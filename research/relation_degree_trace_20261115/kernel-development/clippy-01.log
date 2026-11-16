@@ -1,0 +1,28 @@
+    Checking certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+error: unnecessary use of `clone` to create a slice from a reference
+    --> src/lib.rs:1197:55
+     |
+1197 |                     normal_form_cached(empty.clone(), &[empty.clone()], p),
+     |                                                       ^^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&empty)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#cloned_ref_to_slice_refs
+     = note: `-D clippy::cloned-ref-to-slice-refs` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::cloned_ref_to_slice_refs)]`
+
+error: unnecessary use of `clone` to create a slice from a reference
+    --> src/lib.rs:1207:21
+     |
+1207 |                     &[empty.clone()],
+     |                     ^^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&empty)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#cloned_ref_to_slice_refs
+
+error: unnecessary use of `clone` to create a slice from a reference
+    --> src/lib.rs:1213:21
+     |
+1213 |                     &[empty.clone()],
+     |                     ^^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&empty)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#cloned_ref_to_slice_refs
+
+error: could not compile `certified-relations` (lib test) due to 3 previous errors

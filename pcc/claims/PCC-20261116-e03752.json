@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T22:18:18Z",
+ "id": "PCC-20261116-e03752",
+ "kind": "theorem",
+ "producer": {
+  "commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "388d634f0f72140abb334cc1ea8835b74704dec75f2d8c1ccb08b4109a720764",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+   "theorem": "CubicFiniteNorm22308.coefficient_product_scale"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.",
+ "statement": "theorem coefficient_product_scale (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (s : Fin 223) : coefficientProduct x (scale s y)=scale s (coefficientProduct x y)"
+}

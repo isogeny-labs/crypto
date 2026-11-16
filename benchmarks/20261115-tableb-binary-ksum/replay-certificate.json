@@ -1,0 +1,534 @@
+{
+ "schema": "ecbench.replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "paths_relative_to": "repository root",
+ "study": "research/ic_tableb_binary_ksum_20261115",
+ "method": "ecbench verify --replay-all --exit-code on copies of every one of the 15 committed sessions (records.jsonl.gz gunzipped into a scratch directory; the committed files were not touched), with an ecbench the validator built itself from the recorded source (cargo build --release --locked --bin ecbench, separate CARGO_TARGET_DIR); every measured deterministic run re-executed and compared with its record, every recorded scalar checked by ecbench against its target. Independently of ecbench, every recovered log of every record (warm-ups included) was re-checked with the validator's own Python GF(2^n) curve arithmetic: [recovered]G == target, target on the curve, generator of prime order r. A nonce drawn after publication chose the designated sample (all 15 were replayed anyway), and the seeds of two fresh validator sessions.",
+ "nonce": {
+  "git_ls_remote_origin_main": "ccff7eba479e3223dabd22fe3d1c5cc7246db9f8\trefs/heads/main",
+  "utc": "2026-11-15T17:45:45.240660450Z",
+  "sha256": "4a630c047404f4dbe9b3750497a39a7e75b83ea3795657c6dbaf696c7c0a26a8",
+  "rule": "sha256(ls-remote line + newline + UTC + newline); B27 replicate = int(n[0:8],16) mod 3 + 1; second session = int(n[8:16],16) mod 12 over B15..B24 r1..r3; third = int(n[16:24],16) mod 11 over the rest; fresh curve = [B24,B27][int(n[24:32],16) mod 2]",
+  "designated_sample": [
+   "B27-r1",
+   "B21-r2",
+   "B21-r3"
+  ]
+ },
+ "build": {
+  "command": "CARGO_TARGET_DIR=<validator scratch>/target cargo build --release --locked --bin ecbench (cwd /home/user/crypto, HEAD 3c323f1226, clean tree)",
+  "source_identity": "git diff 2476332d22 HEAD -- src Cargo.lock: empty; git diff --name-only 2476332d22 HEAD touches only research/ic_tableb_binary_ksum_20261115/ and benchmarks/ (no build input changed)",
+  "toolchain": "cargo 1.97.0 (c980f4866 2026-06-30), rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "wall": "12m18s, exit 0",
+  "validator_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+  "recorded_binary_sha256": "bc96a44a3342d24569e7f2bbe7e24e55400eda47d955960e766ae66df3e08f8d",
+  "byte_identical": false,
+  "explanation": "The two ELF files differ only in symbol-table text and the linker build-id: (1) 352 local symbols carry an LLVM promoted-local suffix `.llvm.15188867642286278132` in the recorded binary and `.llvm.8458451346301811158` in the validator's (a module hash that depends on the build directory; the validator used a separate CARGO_TARGET_DIR), which also explains the 352-byte size difference (95489904 vs 95489552 bytes; one digit shorter per occurrence); no other string differs; (2) after `strip`, both files are 86539696 bytes and differ in exactly 20 bytes at offsets 0x32c-0x33f, the GNU build-id descriptor of .note.gnu.build-id (a hash over the unstripped output). The loaded sections .text, .rodata, .data and .data.rel.ro are byte-identical. The validator build is therefore the same program; its replays reproduced every recorded count."
+ },
+ "independence": {
+  "independent_of_producer": [
+   "validator context (did not read analysis/*.mjs, summary.json or the producer's interval code)",
+   "ecbench rebuilt from source by the validator",
+   "replay nonce and fresh-session seeds drawn after publication",
+   "scalar certificates re-checked by the validator's own Python GF(2^n) arithmetic"
+  ],
+  "not_independent": [
+   "same host/container class as the producer's run (not a second host class, unlike the prime twin)",
+   "the validator is a subagent launched from the producing session (same Claude-Session id as the study commits); independence is of context, code, build and seeds, not of operator",
+   "ecbench's own replay shares the producer's source code (it is a re-execution, not a re-implementation)"
+  ]
+ },
+ "scalar_certificates": {
+  "distinct_target_log_pairs": 768,
+  "method": "own affine GF(2^n) double-and-add in Python: [recovered]G == target, target on curve, 0 <= recovered < r; generator on curve, [r]G = O, r prime",
+  "records_checked": 26208
+ },
+ "fresh_sessions": {
+  "F24": {
+   "dir": "research/ic_tableb_binary_ksum_20261115/validator/fresh/F24",
+   "session_id": "ECBS1h7681f62bddd0",
+   "target_seed": 129434185333078,
+   "measurement_seed": 6324984273122917386,
+   "targets_per_curve": 24,
+   "rounds": 1,
+   "arms": [
+    "inc-n67",
+    "inc-n80",
+    "inc-n94",
+    "ksum4",
+    "ksum5",
+    "rho-neg"
+   ],
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "verify": "ecbench verify --replay-all --exit-code: rc 0, 144 records, 144 replays reproduced, 0 problems",
+   "binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "ksum5_over_cheapest_incumbent": {
+    "0": {
+     "incumbent": "inc-n67",
+     "ratio": 0.6474843056999592,
+     "delta_ci": [
+      0.5780733343056534,
+      0.7168952770942649
+     ],
+     "pair_boot_ci": [
+      0.586672613392008,
+      0.7154014114147574
+     ]
+    },
+    "0.1": {
+     "incumbent": "inc-n80",
+     "ratio": 0.6410280429819223,
+     "delta_ci": [
+      0.5734914589701655,
+      0.7085646269936791
+     ],
+     "pair_boot_ci": [
+      0.5799104506851228,
+      0.7065827533320772
+     ]
+    },
+    "1": {
+     "incumbent": "inc-n94",
+     "ratio": 0.6277426916914471,
+     "delta_ci": [
+      0.5408456602817704,
+      0.7146397231011239
+     ],
+     "pair_boot_ci": [
+      0.5502333250561521,
+      0.7129549678614363
+     ]
+    }
+   },
+   "ksum4_over_cheapest_incumbent": {
+    "0": 0.6190411012989747,
+    "0.1": 0.60783725952659,
+    "1": 0.5756750396618525
+   },
+   "mean_S": {
+    "0": {
+     "inc-n67": 10.930016010570725,
+     "inc-n80": 10.937783812112793,
+     "inc-n94": 11.284457917971674,
+     "ksum4": 6.766129148399128,
+     "ksum5": 7.077013827893823,
+     "rho-neg": 1.3112049003007813
+    },
+    "0.1": {
+     "inc-n67": 12.54427161866285,
+     "inc-n80": 12.43826126635839,
+     "inc-n94": 12.711138380604103,
+     "ksum4": 7.560438641419016,
+     "ksum5": 7.973274277671565,
+     "rho-neg": 1.4305355937681234
+    },
+    "1": {
+     "inc-n67": 27.072572091491992,
+     "inc-n80": 25.942558354568742,
+     "inc-n94": 25.55126254429599,
+     "ksum4": 14.709224078598,
+     "ksum5": 16.039618325671217,
+     "rho-neg": 2.5045118349742017
+    }
+   }
+  },
+  "F27": {
+   "dir": "research/ic_tableb_binary_ksum_20261115/validator/fresh/F27",
+   "session_id": "ECBS1he0ff6e97e4b2",
+   "target_seed": 81789263836164,
+   "measurement_seed": 8420580885270927267,
+   "targets_per_curve": 24,
+   "rounds": 1,
+   "arms": [
+    "inc-n150",
+    "inc-n178",
+    "inc-n210",
+    "ksum4",
+    "ksum5",
+    "rho-neg"
+   ],
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "verify": "ecbench verify --replay-all --exit-code: rc 0, 144 records, 144 replays reproduced, 0 problems",
+   "binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "ksum5_over_cheapest_incumbent": {
+    "0": {
+     "incumbent": "inc-n150",
+     "ratio": 0.46044228611205007,
+     "delta_ci": [
+      0.4278572232697762,
+      0.49302734895432393
+     ],
+     "pair_boot_ci": [
+      0.43193313123663746,
+      0.49245642943555773
+     ]
+    },
+    "0.1": {
+     "incumbent": "inc-n150",
+     "ratio": 0.4442812354245059,
+     "delta_ci": [
+      0.4114577820495333,
+      0.47710468879947854
+     ],
+     "pair_boot_ci": [
+      0.4155034823947368,
+      0.4765271686174343
+     ]
+    },
+    "1": {
+     "incumbent": "inc-n150",
+     "ratio": 0.38806139711123355,
+     "delta_ci": [
+      0.35479993227756257,
+      0.42132286194490454
+     ],
+     "pair_boot_ci": [
+      0.35898461547757277,
+      0.4211615110133681
+     ]
+    }
+   },
+   "ksum4_over_cheapest_incumbent": {
+    "0": 0.46505244886180913,
+    "0.1": 0.45323053102365796,
+    "1": 0.4121053392113522
+   },
+   "mean_S": {
+    "0": {
+     "inc-n150": 13.998164926249666,
+     "inc-n178": 14.64935300286385,
+     "inc-n210": 16.024500397167426,
+     "ksum4": 6.5098808785238935,
+     "ksum5": 6.445347060015913,
+     "rho-neg": 0.845520768579921
+    },
+    "0.1": {
+     "inc-n150": 16.21989117945437,
+     "inc-n178": 16.807620267029233,
+     "inc-n210": 18.196063830464855,
+     "ksum4": 7.35134989241005,
+     "ksum5": 7.206193291659034,
+     "rho-neg": 0.9221922310139691
+    },
+    "1": {
+     "inc-n150": 36.21542745829665,
+     "inc-n178": 36.232025644517684,
+     "inc-n210": 37.74013473014172,
+     "ksum4": 14.92457101738546,
+     "ksum5": 14.053809376447129,
+     "rho-neg": 1.6122353929204027
+    }
+   }
+  }
+ },
+ "runs": [
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r1",
+   "session_id": "ECBS1h6a6c4186dc6c",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B15-r1.verify.json.gz",
+   "receipt_sha256": "8cc3641782a5c6f462d1f4dac6d271060b28d1062bfbc520feab47325202b737",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r2",
+   "session_id": "ECBS1h7b31f714b49d",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B15-r2.verify.json.gz",
+   "receipt_sha256": "02a881b7930e60125f967f3a56512b3d85092990acff6deb80f9515e4ce824dd",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r3",
+   "session_id": "ECBS1hf365834ad9b1",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B15-r3.verify.json.gz",
+   "receipt_sha256": "7f748f1ea98f6ea2240c10133b1426e7e9d0c780edd903d9898ad1af7ecf4667",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r1",
+   "session_id": "ECBS1h8afb88fc7e70",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B18-r1.verify.json.gz",
+   "receipt_sha256": "c8127b68476340a002d8bc27cd6fb20919deecb3e4197cc8a37ddd5944987aeb",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r2",
+   "session_id": "ECBS1he1ef785764ce",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B18-r2.verify.json.gz",
+   "receipt_sha256": "ee4ca1a4c76b58800f56fd4b0480df71bc321b695722ffd511a7cdc117d237cc",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r3",
+   "session_id": "ECBS1h98380463a611",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B18-r3.verify.json.gz",
+   "receipt_sha256": "ad58a4dd202217d0be67ce2a97c9ce1488c1b6ded112db33ec4e303cef51c559",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r1",
+   "session_id": "ECBS1h72ebc921a75e",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B21-r1.verify.json.gz",
+   "receipt_sha256": "5b83e5ae4990d5f74f5159ad3e5f8ac56d4539fbc2575bb2706752052615393f",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r2",
+   "session_id": "ECBS1hdf2a3490954f",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B21-r2.verify.json.gz",
+   "receipt_sha256": "a6cad327a7a820bb340299a9f13506269152f7843d343cc16a831b55066e71e0",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": true,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r3",
+   "session_id": "ECBS1h8f13db3aa574",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B21-r3.verify.json.gz",
+   "receipt_sha256": "850cd62b457e669874f41ff9252678bda917e0656271066c5620406b52172be3",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": true,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r1",
+   "session_id": "ECBS1ha7d7c8bdcc7e",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B24-r1.verify.json.gz",
+   "receipt_sha256": "2f66d8ccd1a5714ebd6535dd75272a01ab24b4d73a5dbad12a08e08c5d6bcc55",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r2",
+   "session_id": "ECBS1hfc69bfb85b17",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B24-r2.verify.json.gz",
+   "receipt_sha256": "f736f1f802f39c5eb0b2e3750bc84a8ca388b81673a29f158851aee641f0497b",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r3",
+   "session_id": "ECBS1h0538d2627065",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B24-r3.verify.json.gz",
+   "receipt_sha256": "cd7129b7bc441ad524760d325d0985be5248e14d55ee0703df68d2723418b219",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r1",
+   "session_id": "ECBS1hff7f0081ee1e",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B27-r1.verify.json.gz",
+   "receipt_sha256": "e75e9c90d9580f3ba440c81b9843694c451270643428a7015c269f208410894d",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": true,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r2",
+   "session_id": "ECBS1hce00ec525d4e",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B27-r2.verify.json.gz",
+   "receipt_sha256": "532e60e9ac63902d9452347476ecd3de4853e020e8821a82c87700510369f6cd",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  },
+  {
+   "run": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r3",
+   "session_id": "ECBS1h2ccc78549828",
+   "ok": true,
+   "exit_code": 0,
+   "receipt": "research/ic_tableb_binary_ksum_20261115/validator/replay/B27-r3.verify.json.gz",
+   "receipt_sha256": "ac25892987f7eea15761c751400ae880128b8fd4a86e793141e55f562c9435ca",
+   "records": 1728,
+   "verified_records": 1728,
+   "replays": 1296,
+   "reproduced": 1296,
+   "replay_selection": "all",
+   "problems": [],
+   "checks_all_true": true,
+   "auditor_binary_sha256": "9f63678b7df865190b92644aeae2de7b22027d2f91d954da368364f351385761",
+   "auditor_hardware_class_id": "ECBHW1h3956e07fafaa",
+   "nonce_sampled": false,
+   "scalars_independently_checked": 1728,
+   "recorded_by": "ecbench bc96a44a3342 at git 77bc214198 (producer, this container)"
+  }
+ ]
+}

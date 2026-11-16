@@ -1,0 +1,4398 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "CM-MODULAR-RECODING-V1",
+  "created": "2026-11-08T02:41:20Z",
+  "protocol": {
+    "path": "research/cm-marked-scalar/protocol/recoding-v1/protocol.json",
+    "sha256": "328c33e50fe9cc4d6fd55acc3f103b317f93618b3161e022c45d443ff6d0cb3a",
+    "protocol_id": "CM-MODULAR-RECODING-V1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex_cli/native-cpp",
+    "model": null,
+    "session": "T-1888",
+    "role": "producer"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "41e44c26a057d9ca6cc72ba0424dca84cfcc1dc1",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/cm-marked-scalar/recoding-v1/host.json",
+    "sha256": "15a3a7a999ff0a8817e82369f3d96a18ffcf0af87428d2810d9ee5a9bb595242",
+    "class_id": "shared-development-count-only",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "logical_cpus": 32,
+      "memory_bytes": 132915929088,
+      "kernel": "Linux 6.18.54-121.166.amzn2023.x86_64",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "direct-translated",
+      "role": "reference",
+      "binary_sha256": "63a4a32e112ab2f5b5ad37b6ed428c3e05fa52abaa075cb8f31f5a9f1b01c823",
+      "commit": "41e44c26a057d9ca6cc72ba0424dca84cfcc1dc1"
+    },
+    {
+      "id": "fused-translated",
+      "role": "candidate",
+      "binary_sha256": "63a4a32e112ab2f5b5ad37b6ed428c3e05fa52abaa075cb8f31f5a9f1b01c823",
+      "commit": "41e44c26a057d9ca6cc72ba0424dca84cfcc1dc1"
+    },
+    {
+      "id": "direct-centered",
+      "role": "baseline",
+      "binary_sha256": "63a4a32e112ab2f5b5ad37b6ed428c3e05fa52abaa075cb8f31f5a9f1b01c823",
+      "commit": "41e44c26a057d9ca6cc72ba0424dca84cfcc1dc1"
+    },
+    {
+      "id": "fused-centered",
+      "role": "baseline",
+      "binary_sha256": "63a4a32e112ab2f5b5ad37b6ed428c3e05fa52abaa075cb8f31f5a9f1b01c823",
+      "commit": "41e44c26a057d9ca6cc72ba0424dca84cfcc1dc1"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "P-192-w1-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 192,
+          "adds": 36,
+          "negations": 12,
+          "table_points": 8,
+          "shift": 6,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w1-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 235,
+          "D_A_N_tables": "196,39,17,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 39,
+          "negations": 17,
+          "table_points": 9,
+          "shift": -7,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w1-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 190,
+          "adds": 39,
+          "negations": 19,
+          "table_points": 4,
+          "shift": 0,
+          "window": 4,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w1-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 238,
+          "D_A_N_tables": "196,42,20,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 42,
+          "negations": 20,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 192,
+          "adds": 36,
+          "negations": 12,
+          "table_points": 8,
+          "shift": 6,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 235,
+          "D_A_N_tables": "196,39,17,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 39,
+          "negations": 17,
+          "table_points": 9,
+          "shift": -7,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 190,
+          "adds": 39,
+          "negations": 19,
+          "table_points": 4,
+          "shift": 0,
+          "window": 4,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 238,
+          "D_A_N_tables": "196,42,20,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 42,
+          "negations": 20,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 192,
+          "adds": 36,
+          "negations": 12,
+          "table_points": 8,
+          "shift": 6,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 235,
+          "D_A_N_tables": "196,39,17,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 39,
+          "negations": 17,
+          "table_points": 9,
+          "shift": -7,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 190,
+          "adds": 39,
+          "negations": 19,
+          "table_points": 4,
+          "shift": 0,
+          "window": 4,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 238,
+          "D_A_N_tables": "196,42,20,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 42,
+          "negations": 20,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 192,
+          "adds": 36,
+          "negations": 12,
+          "table_points": 8,
+          "shift": 6,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 235,
+          "D_A_N_tables": "196,39,17,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 39,
+          "negations": 17,
+          "table_points": 9,
+          "shift": -7,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 190,
+          "adds": 39,
+          "negations": 19,
+          "table_points": 4,
+          "shift": 0,
+          "window": 4,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 238,
+          "D_A_N_tables": "196,42,20,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 196,
+          "adds": 42,
+          "negations": 20,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 273,
+          "D_A_N_tables": "228,45,16,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 45,
+          "negations": 16,
+          "table_points": 9,
+          "shift": 2,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 276,
+          "D_A_N_tables": "227,49,24,5"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 227,
+          "adds": 49,
+          "negations": 24,
+          "table_points": 5,
+          "shift": 0,
+          "window": 4,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 273,
+          "D_A_N_tables": "228,45,16,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 45,
+          "negations": 16,
+          "table_points": 9,
+          "shift": 2,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 276,
+          "D_A_N_tables": "228,48,26,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 48,
+          "negations": 26,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 273,
+          "D_A_N_tables": "228,45,16,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 45,
+          "negations": 16,
+          "table_points": 9,
+          "shift": 2,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 276,
+          "D_A_N_tables": "228,48,26,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 48,
+          "negations": 26,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 273,
+          "D_A_N_tables": "228,45,16,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 45,
+          "negations": 16,
+          "table_points": 9,
+          "shift": 2,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 218,
+          "adds": 42,
+          "negations": 14,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 276,
+          "D_A_N_tables": "228,48,26,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 228,
+          "adds": 48,
+          "negations": 26,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 309,
+          "D_A_N_tables": "259,50,21,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 50,
+          "negations": 21,
+          "table_points": 9,
+          "shift": -1,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 311,
+          "D_A_N_tables": "259,52,27,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 52,
+          "negations": 27,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 309,
+          "D_A_N_tables": "259,50,21,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 50,
+          "negations": 21,
+          "table_points": 9,
+          "shift": -1,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 311,
+          "D_A_N_tables": "259,52,27,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 52,
+          "negations": 27,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 312,
+          "D_A_N_tables": "264,48,21,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 264,
+          "adds": 48,
+          "negations": 21,
+          "table_points": 9,
+          "shift": -106,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 311,
+          "D_A_N_tables": "259,52,27,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 52,
+          "negations": 27,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 312,
+          "D_A_N_tables": "264,48,21,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 264,
+          "adds": 48,
+          "negations": 21,
+          "table_points": 9,
+          "shift": -106,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 254,
+          "adds": 46,
+          "negations": 23,
+          "table_points": 8,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 311,
+          "D_A_N_tables": "259,52,27,9"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 259,
+          "adds": 52,
+          "negations": 27,
+          "table_points": 9,
+          "shift": 0,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 69,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 458,
+          "D_A_N_tables": "387,71,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 71,
+          "negations": 27,
+          "table_points": 17,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 70,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 459,
+          "D_A_N_tables": "387,72,25,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 72,
+          "negations": 25,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 69,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 458,
+          "D_A_N_tables": "387,71,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 71,
+          "negations": 27,
+          "table_points": 17,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 70,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 459,
+          "D_A_N_tables": "387,72,25,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 72,
+          "negations": 25,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 69,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 458,
+          "D_A_N_tables": "387,71,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 71,
+          "negations": 27,
+          "table_points": 17,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 70,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 459,
+          "D_A_N_tables": "387,72,25,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 72,
+          "negations": 25,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 69,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 1,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 462,
+          "D_A_N_tables": "393,69,28,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 393,
+          "adds": 69,
+          "negations": 28,
+          "table_points": 17,
+          "shift": 150,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 380,
+          "adds": 70,
+          "negations": 29,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 459,
+          "D_A_N_tables": "387,72,25,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 387,
+          "adds": 72,
+          "negations": 25,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 613,
+          "D_A_N_tables": "524,89,40,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 524,
+          "adds": 89,
+          "negations": 40,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 613,
+          "D_A_N_tables": "524,89,40,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 524,
+          "adds": 89,
+          "negations": 40,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 616,
+          "D_A_N_tables": "530,86,36,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 530,
+          "adds": 86,
+          "negations": 36,
+          "table_points": 17,
+          "shift": -30,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 613,
+          "D_A_N_tables": "524,89,40,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 524,
+          "adds": 89,
+          "negations": 40,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 610,
+          "D_A_N_tables": "525,85,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 525,
+          "adds": 85,
+          "negations": 31,
+          "table_points": 16,
+          "shift": -152,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 616,
+          "D_A_N_tables": "530,86,36,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 530,
+          "adds": 86,
+          "negations": 36,
+          "table_points": 17,
+          "shift": -30,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 613,
+          "D_A_N_tables": "524,89,40,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 524,
+          "adds": 89,
+          "negations": 40,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-direct-translated",
+      "arm": "direct-translated",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 610,
+          "D_A_N_tables": "525,85,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 525,
+          "adds": 85,
+          "negations": 31,
+          "table_points": 16,
+          "shift": -152,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-fused-translated",
+      "arm": "fused-translated",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 616,
+          "D_A_N_tables": "530,86,36,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 530,
+          "adds": 86,
+          "negations": 36,
+          "table_points": 17,
+          "shift": -30,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-direct-centered",
+      "arm": "direct-centered",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 518,
+          "adds": 88,
+          "negations": 31,
+          "table_points": 16,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-fused-centered",
+      "arm": "fused-centered",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 613,
+          "D_A_N_tables": "524,89,40,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "doubles": 524,
+          "adds": 89,
+          "negations": 40,
+          "table_points": 17,
+          "shift": 0,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/recoding-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    }
+  ],
+  "flow": {
+    "planned": 80,
+    "attempted": 80,
+    "completed": 80,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "research/cm-marked-scalar/recoding-v1/runs.tar.xz",
+      "sha256": "29365ee7c6edb752520467b44de2fa360c5c8542a7efe28c50665eb84cc07406",
+      "bytes": 93072,
+      "kind": "raw"
+    },
+    {
+      "path": "research/cm-marked-scalar/recoding-v1/plans.json",
+      "sha256": "bf93a91dc1ac9676da9ea8f2fb72aad3413fb5ecf0452e6af324c9ce86b1e2dd",
+      "bytes": 8321,
+      "kind": "summary"
+    },
+    {
+      "path": "research/cm-marked-scalar/recoding-v1/independent-replay.json",
+      "sha256": "846478259fbd7de245fb90b244377f2ed85ef48f3b071df317e303778567e0ff",
+      "bytes": 270,
+      "kind": "receipt"
+    },
+    {
+      "path": "research/cm-marked-scalar/recoding-v1/selected-qualification.json",
+      "sha256": "5c32eb7389253caa1794c1a9e62fdd2b130b1e0ff6b6c4b5d834f1aa80b91b34",
+      "bytes": 68,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "research/cm-marked-scalar/recoding.cpp",
+      "sha256": "46961d597212202b458b9b5de316414a6fd06af85deb19df6d12ae11e3caa86d",
+      "bytes": 9420,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/cm-marked-scalar/recoding-v1/plans.json",
+        "sha256": "bf93a91dc1ac9676da9ea8f2fb72aad3413fb5ecf0452e6af324c9ce86b1e2dd",
+        "bytes": 8321,
+        "kind": "summary"
+      },
+      {
+        "path": "research/cm-marked-scalar/recoding-v1/independent-replay.json",
+        "sha256": "846478259fbd7de245fb90b244377f2ed85ef48f3b071df317e303778567e0ff",
+        "bytes": 270,
+        "kind": "receipt"
+      },
+      {
+        "path": "research/cm-marked-scalar/recoding-v1/selected-qualification.json",
+        "sha256": "5c32eb7389253caa1794c1a9e62fdd2b130b1e0ff6b6c4b5d834f1aa80b91b34",
+        "bytes": 68,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "One finite native census, not80 independent process runs or timing trials. Export rows are exact derived minimum cases: five curves x four method records x four declared weights.",
+      "by": "native producer"
+    },
+    {
+      "kind": "observation",
+      "text": "Only addition weight1 is decisive; weights2..4 are fixed sensitivity cases. No population or significance inference.",
+      "by": "native producer"
+    },
+    {
+      "kind": "observation",
+      "text": "Centered baseline minima reuse the census zero-shift rows. No independent repetition is implied.",
+      "by": "native producer"
+    },
+    {
+      "kind": "observation",
+      "text": "Raw census, five corruption controls, failures, qualification and publication receipts are preserved in the archive.",
+      "by": "native producer"
+    },
+    {
+      "kind": "observation",
+      "text": "No cryptographic clock was collected. Plan generation and first-use preparation remain costs for future runtime accounting.",
+      "by": "native producer"
+    }
+  ],
+  "reviews_dir": "reviews"
+}
