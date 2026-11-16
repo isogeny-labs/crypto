@@ -17,6 +17,8 @@ use compact_speed_analysis::cas_formats::{msolve_basis, singular_basis, Basis};
 const P: u64 = 2147483647;
 const ARMS: [Arm; 3] = [Arm::F4, Arm::Certified, Arm::Compact];
 const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
+#[path = "../matched_fresh.rs"]
+mod matched_fresh;
 #[path = "../callgrind_capture.rs"]
 mod callgrind_capture;
 #[path = "../phase_capture.rs"]
@@ -767,6 +769,8 @@ fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
+    Some("fresh-native")if a.len()==5=>matched_fresh::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),
+    Some("fresh-native-report")if a.len()==6=>matched_fresh::report(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4]),&a[5]),
     Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
     Some("replay-screen")if a.len()==9=>replay_capture::run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),PathBuf::from(&a[7]),a[8].clone()),
     Some("sparse-screen")if a.len()==10=>sparse_capture::run(Path::new(&a[2]),Path::new(&a[3]),sparse_capture::Paths{worker:PathBuf::from(&a[4]),legacy_cli:PathBuf::from(&a[5]),fused:PathBuf::from(&a[6]),singular:PathBuf::from(&a[7]),msolve:PathBuf::from(&a[8]),cpu:a[9].clone()}),
