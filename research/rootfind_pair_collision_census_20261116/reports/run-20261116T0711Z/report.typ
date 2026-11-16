@@ -47,8 +47,11 @@ are in the same directory. Peak resident sets were 7,045,120, 8,765,440 and
 
 These rows constrain base logarithms after cofactor projection. They contain
 no target coefficient. Positive rank triggers implementation of a charged
-harvest path and a matched target-relation count test. No speed comparison was
-performed. An independent rank replay is still owed.
+harvest path and a matched target-relation count test. A separately compiled
+dense Gauss-Jordan replay of all saved rows returned the same ranks (5, 11,
+23); its three outputs and source are beside this PDF. This is a second
+algorithm in the same session, not an independent reviewer. No speed
+comparison was performed.
 
 Sources: the frozen protocol; `papers/rootfinding-decomposition/`
 `rootfinding_decomposition.tex`; `src/cryptanalysis/ic_boundary.rs`;

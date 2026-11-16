@@ -30,12 +30,14 @@ was `passed`. Maximum resident sets from `/usr/bin/time -l` were 7,045,120,
 
 The rows are homogeneous: they constrain the base logarithms after cofactor
 projection, but do not contain a target coefficient. Their positive rank
-passes the protocol's integration trigger. The next implementation must
-charge collision detection, full point reconstruction, verification and rank
-updates, then compare the number of target-bearing relations needed on matched
-public fixtures. No speed effect has been measured here. Independent rank
-replay is still owed before treating these producer-computed ranks as reviewed
-evidence.
+passes the protocol's integration trigger. A separately compiled dense
+Gauss-Jordan replay of all saved row vectors returned ranks 5, 11 and 23
+(`k13.replay-rank.txt`, `k19.replay-rank.txt`, `k23.replay-rank.txt`). This is a
+second algorithm in the same session, not an independent reviewer. The next
+implementation must charge collision detection, full point reconstruction,
+verification and rank updates, then compare the number of target-bearing
+relations needed on matched public fixtures. No speed effect has been
+measured here.
 
 The current rootfinding manuscript and binary pair table are in
 `papers/rootfinding-decomposition/rootfinding_decomposition.tex` and
