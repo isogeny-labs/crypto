@@ -1,3 +1,126 @@
+# Current checkpoint:39SOURCE READY; ownedRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/Rust graphIC+cheapextension-field relationfinder towardrho parity.
+UserRustscience/allfuturemeasurementsRunpod. No subagents/stopgoal.
+Allold32–38ownedpodsDELETED. NEWOWN39kt5m0imke1z53cCPU4/8/.12h/pinnedRustimage
+created20:01:51Z/1800sDELETEguardian+GraphQLfallbackactive. Healthready/startedfalse
+20:02:53Z. Privateauthpointer/tmp/ic-runpod-auth-location:pod39.id/task39-token/header.
+NEVERprintcredentials/headers/tokens/envresponses/copyAPIkeytoPod.
+
+39Amendment34/production-quotient-plan.json FRESHp1009seed367/85percent/stride32,
+modeorderic/structural-gate/quotient-reuse. Onecoldround0warm/retry,
+60fixture300worker1000whole1800runner8GiBfirstallowedCPU.
+AllSOURCECHECKSFINISHED:productionreleasebinary/strictlib+exampleClippyPASS;
+library34PASS/2oldignoredand3exampletestsPASS(capturedexit0). Nativequalifier54
+PASS/strictClippy/build/actual3armtransport+firstfailurecontinuation/capture
+controlsPASS. Frozen7root+11protocolhashesPASS.317source/binarymanifestsPASS.
+PCC7d680eUNVERIFIED. No compiler/scientificjobactive; no39callyet.
+Workspaceinterruptionofinitialtestcompilepreserved,unchanged-source resumption
+PASS;don'treruntests. No globalparent-suitePASSclaim.
+
+NEXTcommit/PUSHcleansource/spec/manifestsBEFOREprepare-production-quotient-runpod.sh
+/workspace/ic-runpod-runs/runpod-production-quotient-20261116-39. Preparerrequires
+HEADmatchingpublishedoriginref. Upload/POSTONCE; do notredispatchuncertainPOST.
+Read-onlystatus/flow;collectexactarchive/portablepre/preworker/post/qualifiedhashes,
+thenimmediatelyDELETEown39+GET404(orGraphQLfallback)/markprivatepod-ID.deleted.
+Don'tletoptionalfile-readstopcleanup. Reconstruct317sourceblobs/checkcredentials.
+Reportproduction-quotient-render +compactpresentationifneeded +report.typ;
+VIEWallPDFpages/exactbenchmarkcopies/hash/PCC/lesson/journal/commit/PRactual.
+Nativegapspersist/allfullcosts/bands/ratiosnull/no parity;don'tcompose38/37.
+Goalactiveandnextconcreteleadafteractual39result.
+
+Implementation:sharedchecked38helperat src/cryptanalysis/jv_homogeneous_quotient.rs,
+nativepathwrapper;actualRREFreadonlypivotaccess;retainedkernelatreadycheckpoint;
+chargedinitial/dotprojectionevents,2colCountedRelationSystem; newoptionalAPI/CLI
+--reuse-homogeneous-basisrequiresstructuralgate/stride. Oldpath/defaultunchanged.
+Explicitquotientrank/productscopes,initial/perattempt/finalcounts/projectedrows.
+Source/descent/endpoint/projectionidentityandallphaseconservationmandatory.
+Actual2colrank2isnotpretendedfullmatrixrank;independentfullrankcheckedseparately.
+
+38publishedaeb810daf/PRactual38updated/PCC2ed91bUNVERIFIED;alloldrecordsbelow.
+Latest aebCIworkflow/statusEMPTY19:22;requiredgatesunconfirmed/no manualmerge.
+NewpublicationpermitsCIread. Nopostcallraw/checker/summaryrewrites.
+StaticUNSELECTEDnewleadLEAD_EXTENSION_QUADRATIC_REMAINDERS.md+extension-remainder-
+lead-review/layout-v2/report.pdf(VIEWED). ExistingFp-onlycofactorrestriction;
+proposednorm-verifiedMumforddegree2remainderclassoverFp²forgraphcancellation,
+withproof/verification/collision/costobligations. No implementation/protocol/
+measurement/noveltyclaim. PCC8e1cabunverifiedpinsoriginalsource/initialfigmanifest;
+initialclippedlayoutpreserved;correctedlayout-v2hashes/separateREADME. Don'tedit
+pinnedLEADnoteorinitialfiguremanifest. m8finiteBspaceceil(p/2),m9p²;notselected.
+
+Maintain<=60seccommentary/concreteactions;avoidlengthyspeculationorunchangedbuilds.
+
+# Current checkpoint:39production source implemented; ROOTBUILD/TESTS RUNNING
+
+GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.
+UserRustscience/ALLfuturemeasurementsRunpod. No subagents/stopgoal.
+ALLownedpaidpods32–38deleted/no39podallocated. No scientificmeasurementactive.
+Privateauthpointer/tmp/ic-runpod-auth-location persists;neverprintkey/header/
+token/envresponses/copyAPIkeytopod. Don'taskcredentials/profileagain.
+
+38publishedaeb810dafac99a98517641c905aba4ca4013d289/PR4288actual38updatedlint0.
+PCC2ed91bUNVERIFIED. Sixrecordedpairsalltarget10013957165807875/checksPASS,
+product/countdataandcustodybelow. FinalonepagePDFVIEWED/exactcopieshashPASS.
+Own38DELETE204/GET40419:17:15Z. Latest aeb CIworkflow/statusEMPTY19:22,
+requiredgatesunconfirmed/no manualmerge. No artifactbotchangeobservedyet.
+
+NEW39DIRTYPRODUCTIONCODE: pure38helpermoved(sharednativepathwrapper)to
+src/cryptanalysis/jv_homogeneous_quotient.rs;readonlypivotgetterRelationSystem/
+CountedRelationSystem;homogeneous_system retainsactualRREFinfo/constructschecked
+kernelwhenready;chargedkernel/projectiondelta,2columnCountedRelationSystem.
+Newrun_two_large_prime_dlp_on_with_quotient_reuseexport/--reuse-homogeneous-basis
+requiresstructuralgate+rankstride. Oldentrypoints/defaultoutputpreserved.
+Serializehomogeneous_quotient_reuse.initial_basis/attempts.projected_rows/
+actual2colRREFproducts/subtractions/norm/rank/extra_counts/final_extra_counts,
+explicitrank/productscope. last_rankisactualQUOTIENTRANK(2),notfakefullrank.
+Samecerts/descents/ellipticverificationrequired. Nativegapsremainexplicit.
+
+IMPORTANTACTIVEEXECsession76237: local cargo build --release --example
+jv_sieve_two_large_prime_dlp_compare >validation/production-quotient-driver-build.log;
+ON SUCCESS then cargo test --release --lib jv_sieve >production-quotient-library-tests.log;
+ON SUCCESS then cargo test --release --example... >production-quotient-example-tests.log.
+Eachphasewrites*.exit-code.txt. ROOTbuildbegan~19:29;couldtake9m+12m+seconds.
+Wait/pollnonblocking/readlog; DON'TEDIT7FROZENROOTSOURCESwhilecompilerreads.
+FROZEN /tmp/ic-production-quotient39-source-before-checks.sha256 (7files).
+StrictROOTlib/exampleClippyPASS actualcapturedexit0 (logquotient-production-clippy.*).
+Tooloutercellsometimesreports1despiteactualexplicitCargoexit0+PASStests;retain
+receipts/inspectactualstatusfiles,don'tassumetestfailure/rerunjusttogreen.
+No globalfull-parent-suitePASSclaim;knownunrelatedparentfailuresretained.
+
+NATIVE39qualifierproduction-quotient-analysis.rs:54testsPASS, capturedexit0,
+strictClippyPASScapturedexit0. Includesoldindependentcert/rank/gateproofs+
+componentu128oracle,uniquekernel/projectedrows/actualtarget/exact2colcounts,
+all-phaseconservationbaseline−oldaffinesolver/denseconversion+newsolver/
+conversion+kernel/projection;checkpointonlykernelchange. Completehand-record
+andforgedfield/eachphasecontrols. componentquotient-analysisOracle/driver now
+pub(crate),balancegate/gate_checkpub(crate)forread-onlyreuse;oldmathunchanged.
+Nativeexec71321(finalbuild+transport+capture+hashchecks)likelydone;inspectresult.
+Logsproduction-quotient-native-{final-tests,clippy,build}.* actualexit0needed.
+Actualwrapperthreepathsandfirst-armfailurecontinuationPASS;capturerusttest
+PASS. Protocolhashfreeze /tmp/ic-production-quotient39-protocol-before-checks.sha256.
+
+39Amendment34/production-quotient-plan.jsonFRESHp1009seed367/85percent/stride32,
+modeorderic/structural-gate/quotient-reuse. Onecoldround0warm/retry,
+60fixture300worker1000whole1800runner8GiB4vCPU<=0.40USDh.
+run-production-quotient-task.sh attemptsall3afterfailure,stdoutseparateworkerraw.
+prepare-production-quotient-runpod.sh requirescleanpublishedHEADmatchingoriginref,
+futurevalidation/production-quotient-source/build.sha256+runpod39-allocation.json.
+Nativephasechart/compactprojection/reporttemplatesready (production-quotient-*).
+Sourcecode/parser/opencostsneedallfinalchecks+freshmanifests BEFOREpublication/
+anyRunpod39call. No39sourcePCC/manifests/allocation/callyet.
+
+NEXTfinishrootchecks,inspecteveryresult;hashsourceunchanged. Thenfinalnative
+checks onlyasneeded/freezeexpandedsource+binarymanifests/sourcePCC,provisionown
+1800sguardCPU(usingprivateRunpodauth/APIv2pinnedimage),journal/resume/cleancommit
+PUSHbeforeimmutableprepare/upload/POSTONCE. CaptureTTL1800accepted;needlocal
+cleanupguardwithsleep1800(notold900/2700). Collect/portable/sourcecustody/input/
+credentialchecksTHENDELETEownpod+absence,allreports/PDFVIEW/exactcopies/PCC/
+lesson/journal/PR. No39dataassertedyet;doNOTcompose38/37costs. Keepgoalactive.
+
+Maintain<=60seccommentary/concreteactions. Don'tspend10minspeculatingendo/CM/
+nativeIR/m8withoutreadingactualsource/choosingprotocol. All39codeaboveimplemented,
+don'trestart/rederive. Rootcompilerworkcanoverlapindependentnative/docswork.
+
 # Current checkpoint:38COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
 
 GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.

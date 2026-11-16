@@ -1,7 +1,7 @@
 //! Fixed seven-arm parameter diagnostic; failures remain in the exported flow.
 #[allow(dead_code)]
 #[path = "structural-gate-analysis.rs"]
-mod gate;
+pub(crate) mod gate;
 use gate::graph::{
     self,
     full::{
@@ -58,7 +58,7 @@ fn solved(w: &Value, answer: u64) -> Result<bool, String> {
     }
     Err("inconsistent or invalid scalar success".into())
 }
-fn gate_check(w: &Value, plan: &Value, p: u64, l: u64) -> Result<Value, String> {
+pub(crate) fn gate_check(w: &Value, plan: &Value, p: u64, l: u64) -> Result<Value, String> {
     let v = &w["work"];
     let sources = v["source_relations"].as_array().ok_or("sources")?;
     let inputs: Vec<_> = sources.iter().map(|r| r["partial"].clone()).collect();

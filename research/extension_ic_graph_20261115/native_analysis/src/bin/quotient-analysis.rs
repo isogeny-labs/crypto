@@ -1,7 +1,7 @@
 //! Independent column-keyed/u128 oracle for every reused-basis component.
 #[allow(dead_code)]
 #[path = "quotient-bench.rs"]
-mod driver;
+pub(crate) mod driver;
 use driver::saved::{
     full::shared::{self, n, price, Field, Widths, KINDS},
     kernel::Counts,
@@ -15,12 +15,12 @@ use std::{
     io::Write,
     path::Path,
 };
-struct Oracle {
-    basis: BTreeMap<usize, (Vec<u64>, u64)>,
+pub(crate) struct Oracle {
+    pub(crate) basis: BTreeMap<usize, (Vec<u64>, u64)>,
     order: Vec<usize>,
-    counts: Counts,
-    states: Vec<Value>,
-    answer: Option<u64>,
+    pub(crate) counts: Counts,
+    pub(crate) states: Vec<Value>,
+    pub(crate) answer: Option<u64>,
 }
 impl Oracle {
     fn digest(&self, l: u64, columns: usize) -> String {
@@ -38,7 +38,7 @@ impl Oracle {
         h.finalize().to_hex().to_string()
     }
 }
-fn oracle(
+pub(crate) fn oracle(
     l: u64,
     columns: usize,
     rows: &[(Vec<u64>, u64)],

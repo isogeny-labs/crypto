@@ -7,8 +7,8 @@ use crypto_lib::cryptanalysis::{
     jv_sieve::{
         self as sieve,
         two_large_prime::{
-            run_two_large_prime_dlp_on, run_two_large_prime_dlp_on_with_structural_gate,
-            TwoLargePrimeDlpOptions,
+            run_two_large_prime_dlp_on, run_two_large_prime_dlp_on_with_quotient_reuse,
+            run_two_large_prime_dlp_on_with_structural_gate, TwoLargePrimeDlpOptions,
         },
     },
     residual_walk::is_prime_u64,
@@ -49,6 +49,8 @@ struct Args {
     collection_rank_stride: Option<usize>,
     #[arg(long)]
     structural_rank_gate: bool,
+    #[arg(long)]
+    reuse_homogeneous_basis: bool,
     #[arg(long, default_value_t = 8192)]
     max_descent_residuals: u64,
     #[arg(long, default_value_t = 32)]
@@ -134,6 +136,13 @@ impl PublicCurve {
 }
 
 fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, String> {
+    if args.reuse_homogeneous_basis
+        && (method != "two-lp"
+            || !args.structural_rank_gate
+            || args.collection_rank_stride.is_none())
+    {
+        return Err("homogeneous reuse requires two-lp, structural gate and a rank stride".into());
+    }
     if args.structural_rank_gate && method != "two-lp" {
         return Err("structural rank gate is only defined for two-lp".into());
     }
@@ -169,7 +178,8 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
             "ic"=>{let(r,d)=sieve::run_cover_sieve_dlp_on_with_filter(&spec,args.seed,0,1.0,Some(64),1.25,None,false,None);(serde_json::to_value(r).map_err(|e|e.to_string())?,d)},
             "two-lp"=>{
                 let options=TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,collection_rank_stride:args.collection_rank_stride,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents};
-                if args.structural_rank_gate {run_two_large_prime_dlp_on_with_structural_gate(&spec,args.seed,options)?}
+                if args.reuse_homogeneous_basis {run_two_large_prime_dlp_on_with_quotient_reuse(&spec,args.seed,options)?}
+                else if args.structural_rank_gate {run_two_large_prime_dlp_on_with_structural_gate(&spec,args.seed,options)?}
                 else {run_two_large_prime_dlp_on(&spec,args.seed,options)?}
             },
             _=>return Err("method must be ic, two-lp or rho".into()),
@@ -190,6 +200,9 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
             "excluded":"public instance generation/domain checks and legacy report unit calibration; calibration is excluded from IC primitive subtotal but included in process wall; no reusable attack precomputation supplied"});
         if args.structural_rank_gate {
             native["known_uncounted"].as_array_mut().expect("gap array").push(json!("structural rank gate native bookkeeping beyond counted state/parent events"));
+        }
+        if args.reuse_homogeneous_basis {
+            native["known_uncounted"].as_array_mut().expect("gap array").push(json!("homogeneous kernel/projection native control beyond recorded state events"));
         }
         work::enable(false);
         Ok(json!({"schema":"cover.two-large-prime.dlp-worker/v1","source_revision":args.source_revision,"method":method,"seed":args.seed,
@@ -272,6 +285,7 @@ mod tests {
             b_count: None,
             collection_rank_stride: None,
             structural_rank_gate: false,
+            reuse_homogeneous_basis: false,
             max_descent_residuals: 8192,
             max_accepted_descents: 32,
             rho_batch: 1,
@@ -306,6 +320,23 @@ mod tests {
         assert!(clean.get("d").is_none() && clean.get("expected_scalar").is_none());
         let parsed: PublicCurve = serde_json::from_value(clean.clone()).unwrap();
         parsed.validate().unwrap();
+        let mut reuse_args = Args::try_parse_from([
+            "test",
+            "--seed",
+            "17",
+            "--out",
+            "unwritten",
+            "--source-revision",
+            &"a".repeat(40),
+            "--reuse-homogeneous-basis",
+        ])
+        .unwrap();
+        assert!(worker(&parsed, &reuse_args, "ic").is_err());
+        assert!(worker(&parsed, &reuse_args, "two-lp").is_err());
+        reuse_args.structural_rank_gate = true;
+        assert!(worker(&parsed, &reuse_args, "two-lp").is_err());
+        reuse_args.collection_rank_stride = Some(32);
+        assert!(worker(&parsed, &reuse_args, "rho").is_err());
         let mut bad = clean.clone();
         bad["d"] = json!(spec.d);
         assert!(serde_json::from_value::<PublicCurve>(bad).is_err());

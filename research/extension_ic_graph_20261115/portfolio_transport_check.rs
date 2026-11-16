@@ -46,9 +46,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     let negative = args.get(2).is_some_and(|s| s == "--expect-failure");
     let structural = args.get(2).is_some_and(|s| s == "--structural");
-    let failure = args.get(2).is_some_and(|s| s == "--balance-failure");
+    let production = args.get(2).is_some_and(|s| {
+        matches!(
+            s.as_str(),
+            "--production-quotient" | "--production-quotient-failure"
+        )
+    });
+    let failure = args
+        .get(2)
+        .is_some_and(|s| s == "--balance-failure" || s == "--production-quotient-failure");
     let balance = args.get(2).is_some_and(|s| s == "--balance") || failure;
-    if args.len() == 3 && !negative && !structural && !balance {
+    if args.len() == 3 && !negative && !structural && !balance && !production {
         return Err("unknown control option".into());
     }
     let wrapper = fs::canonicalize(Path::new(&args[1]))?;
@@ -66,7 +74,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .ok_or("CPU affinity")?
         .trim();
     let cpu = allowed.split([',', '-']).next().ok_or("CPU")?;
-    let modes: &[&str] = if balance {
+    let modes: &[&str] = if production {
+        &["ic", "structural-gate", "quotient-reuse"]
+    } else if balance {
         &[
             "ic", "s75-r32", "s75-r128", "s85-r32", "s85-r128", "s95-r32", "s95-r128",
         ]
@@ -122,6 +132,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         "transport-only {} control passed",
         if negative {
             "old-wrapper rejection"
+        } else if production {
+            "new-wrapper three-arm production quotient capture"
         } else if structural {
             "new-wrapper two-arm capture"
         } else if balance {

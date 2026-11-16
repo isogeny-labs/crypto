@@ -22,6 +22,9 @@ impl CountedRelationSystem {
     pub fn rank(&self) -> usize {
         self.inner.rank()
     }
+    pub(crate) fn pivot_rows(&self) -> &[(usize, Vec<u64>, u64)] {
+        self.inner.pivot_rows()
+    }
     pub fn ops(&self) -> u64 {
         self.inner.ops()
     }

@@ -22,6 +22,16 @@ use std::collections::HashSet;
 mod structural_rank_bound;
 use structural_rank_bound::{BoundSnapshot, StructuralRankBound};
 
+#[path = "jv_homogeneous_quotient.rs"]
+mod homogeneous_quotient;
+use homogeneous_quotient::{ExtraCounts, Quotient};
+
+fn charge_quotient_delta(before: &ExtraCounts, after: &ExtraCounts, modulus: u64) {
+    work::hook_muls(modulus, after.products - before.products);
+    work::hook_adds(modulus, after.additions - before.additions);
+    work::words(after.word_events - before.word_events);
+}
+
 fn structural_snapshot(s: &BoundSnapshot) -> Value {
     json!({"sources":s.sources,"vertices":s.vertices,"components":s.components,
         "anchored_components":s.anchored_components,"large_rank_lower_bound":s.large_rank_lower_bound,
@@ -61,6 +71,15 @@ fn homogeneous_rank(
     modulus: u64,
     columns: usize,
 ) -> Result<(usize, u64), &'static str> {
+    let system = homogeneous_system(projection, modulus, columns)?;
+    Ok((system.rank(), system.ops()))
+}
+
+fn homogeneous_system(
+    projection: &FilteredTwoLargePrimeRelations,
+    modulus: u64,
+    columns: usize,
+) -> Result<CountedRelationSystem, &'static str> {
     let mut system = CountedRelationSystem::new(modulus, columns);
     for row in &projection.rows {
         if row.rhs != 0 || row.cols.iter().any(|&(c, v)| c >= columns || v >= modulus) {
@@ -74,7 +93,7 @@ fn homogeneous_rank(
         }
         system.insert(dense, 0);
     }
-    Ok((system.rank(), system.ops()))
+    Ok(system)
 }
 
 fn bind_line(h: &mut blake3::Hasher, k: u128, line: &crate::cryptanalysis::jv_sieve::Line) {
@@ -103,7 +122,7 @@ pub fn run_two_large_prime_dlp_on(
     seed: u64,
     options: TwoLargePrimeDlpOptions,
 ) -> Result<(Value, Option<u64>), String> {
-    run_two_large_prime_dlp_impl(spec, seed, options, false)
+    run_two_large_prime_dlp_impl(spec, seed, options, false, false)
 }
 
 /// Optional graph bound defers exact rank checkpoints until enough
@@ -117,7 +136,20 @@ pub fn run_two_large_prime_dlp_on_with_structural_gate(
     if options.collection_rank_stride.is_none() {
         return Err("structural gate requires exact rank checkpoints".into());
     }
-    run_two_large_prime_dlp_impl(spec, seed, options, true)
+    run_two_large_prime_dlp_impl(spec, seed, options, true, false)
+}
+
+/// Retain a ready homogeneous RREF and solve affine rows in its quotient.
+/// This bounded option requires a checked codimension-one homogeneous basis.
+pub fn run_two_large_prime_dlp_on_with_quotient_reuse(
+    spec: &Spec,
+    seed: u64,
+    options: TwoLargePrimeDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if options.collection_rank_stride.is_none() {
+        return Err("quotient reuse requires exact rank checkpoints".into());
+    }
+    run_two_large_prime_dlp_impl(spec, seed, options, true, true)
 }
 
 fn run_two_large_prime_dlp_impl(
@@ -125,6 +157,7 @@ fn run_two_large_prime_dlp_impl(
     seed: u64,
     options: TwoLargePrimeDlpOptions,
     structural_gate: bool,
+    quotient_reuse: bool,
 ) -> Result<(Value, Option<u64>), String> {
     if !(101..=1511).contains(&spec.p)
         || !(3..1u64 << 63).contains(&spec.l)
@@ -169,6 +202,9 @@ fn run_two_large_prime_dlp_impl(
     let mut next_rank_check = rank_target.max(1);
     let mut rank_checks = Vec::new();
     let mut rank_ready = false;
+    let mut retained_quotient: Option<Quotient> = None;
+    let mut initial_quotient = Value::Null;
+    let mut quotient_attempts = Vec::new();
     let mut gate_words = 0;
     let mut gate = if structural_gate {
         let _la = work::enter(Phase::LinearAlgebra);
@@ -299,7 +335,24 @@ fn run_two_large_prime_dlp_impl(
                             break 'collect;
                         }
                     };
-                    let (rank, products) = homogeneous_rank(&projection, spec.l, sieve.small)?;
+                    let (rank, products) = if quotient_reuse {
+                        let system = homogeneous_system(&projection, spec.l, sieve.small)?;
+                        if system.rank() >= rank_target {
+                            let quotient =
+                                Quotient::from_rref(spec.l, sieve.small, system.pivot_rows())?;
+                            charge_quotient_delta(
+                                &ExtraCounts::default(),
+                                &quotient.counts,
+                                spec.l,
+                            );
+                            initial_quotient =
+                                serde_json::to_value(&quotient).map_err(|e| e.to_string())?;
+                            retained_quotient = Some(quotient);
+                        }
+                        (system.rank(), system.ops())
+                    } else {
+                        homogeneous_rank(&projection, spec.l, sieve.small)?
+                    };
                     rank_ready = rank >= rank_target;
                     rank_checks.push(json!({"b_count":bs,"lines":lines,"cohort_digest":fingerprint.clone().finalize().to_hex().to_string(),"source_rows":relations.len(),"complete_rows":projection.rows.len(),"rank":rank,"rank_target":rank_target,"ready":rank_ready,"solver_modular_muls":products,"graph":projection.report,"replayed_rows":projection.replayed_rows,"certificates":projection.certificates,"observed_primitives":work::prims_json(&work::snapshot().since(&before).total())}));
                     next_rank_check = relations.len().saturating_add(stride);
@@ -313,6 +366,9 @@ fn run_two_large_prime_dlp_impl(
                 }
             }
         }
+    }
+    if quotient_reuse && retained_quotient.is_none() {
+        return Err("collection did not produce a reusable codimension-one basis".into());
     }
     let by_x = &sieve.by_x;
     let jac = ctx.jac();
@@ -374,16 +430,34 @@ fn run_two_large_prime_dlp_impl(
                     }
                     Ok(projection) => {
                         let columns = sieve.small + 1;
-                        let mut system = CountedRelationSystem::new(spec.l, columns);
-                        for row in &projection.projection.rows {
+                        let solver_columns = if quotient_reuse { 2 } else { columns };
+                        let solver_target = if quotient_reuse {
+                            1
+                        } else {
+                            projection.target_column
+                        };
+                        let mut system = CountedRelationSystem::new(spec.l, solver_columns);
+                        let mut projected_rows = Vec::new();
+                        let projection_before =
+                            retained_quotient.as_ref().map(|q| q.counts.clone());
+                        for (row_index, row) in projection.projection.rows.iter().enumerate() {
                             let mut dense = vec![0u64; columns];
                             work::words(columns as u64);
                             for &(c, v) in &row.cols {
                                 dense[c] = v;
                                 work::words(2);
                             }
-                            system.insert(dense, row.rhs);
-                            if system.solved(projection.target_column).is_some() {
+                            if let Some(quotient) = retained_quotient.as_mut() {
+                                let before = quotient.counts.clone();
+                                let (small, rhs) = quotient.project(&dense, row.rhs)?;
+                                charge_quotient_delta(&before, &quotient.counts, spec.l);
+                                projected_rows
+                                    .push(json!({"row":row_index,"coefficients":small,"rhs":rhs}));
+                                system.insert(small.to_vec(), rhs);
+                            } else {
+                                system.insert(dense, row.rhs);
+                            }
+                            if system.solved(solver_target).is_some() {
                                 break;
                             }
                         }
@@ -391,7 +465,7 @@ fn run_two_large_prime_dlp_impl(
                         solve_ops = solve_ops
                             .checked_add(system.ops())
                             .ok_or("solver op overflow")?;
-                        let candidate = system.solved(projection.target_column);
+                        let candidate = system.solved(solver_target);
                         let verified = {
                             let _v = work::enter(Phase::Verification);
                             let ec = EllE::new(&ctx.f, &spec.alpha);
@@ -400,6 +474,19 @@ fn run_two_large_prime_dlp_impl(
                             })
                         };
                         attempts.push(json!({"accepted_descents":descents.len(),"input_rows":projection.inputs.len(),"complete_rows":projection.projection.rows.len(),"nonzeros":projection.projection.rows.iter().map(|r|r.cols.len()).sum::<usize>(),"graph":projection.projection.report,"replayed_rows":projection.projection.replayed_rows,"rank":system.rank(),"solver_modular_muls":system.ops(),"candidate_scalar":candidate,"verified":verified,"observed_primitives":work::prims_json(&work::snapshot().since(&before).total())}));
+                        if let (Some(quotient), Some(before)) =
+                            (retained_quotient.as_ref(), projection_before)
+                        {
+                            let extra = ExtraCounts {
+                                products: quotient.counts.products - before.products,
+                                additions: quotient.counts.additions - before.additions,
+                                word_events: quotient.counts.word_events - before.word_events,
+                            };
+                            quotient_attempts.push(json!({"accepted_descents":descents.len(),"solver_columns":solver_columns,
+                                "target_column":solver_target,"rank":system.rank(),"solver_modular_muls":system.ops(),
+                                "normalization_products":system.normalization_products(),"subtraction_ops":system.subtraction_ops(),
+                                "projected_rows":projected_rows,"extra_counts":extra,"actual_scalar":candidate}));
+                        }
                         last_projection = Some(projection);
                         if verified {
                             scalar = candidate;
@@ -446,6 +533,14 @@ fn run_two_large_prime_dlp_impl(
             "checks":gate_checks,"final_state":structural_snapshot(&gate.snapshot()),"charged_word_events_lower_bound":gate_words,
             "word_event_scope":"dense state initialization, support identity/coefficient reads, parent probes and checkpoint bound reads",
             "native_bookkeeping_complete":false,"known_uncounted":"DSU scalar updates, comparisons and allocation/scheduling beyond counted state events"});
+    }
+    if quotient_reuse {
+        output["homogeneous_quotient_reuse"] = json!({"schema":"two-large-prime.homogeneous-quotient-reuse/v1",
+            "initial_basis":initial_quotient,"attempts":quotient_attempts,
+            "final_extra_counts":retained_quotient.as_ref().map(|q|&q.counts),
+            "rank_scope":"kernel-scale-and-target coordinates only; independent full-matrix rank belongs to replay",
+            "solver_product_scope":"two-column RREF products only; kernel/projection products recorded separately",
+            "native_bookkeeping_complete":false,"known_uncounted":"native RREF, Euclidean, fixed-factor and kernel/projection control beyond emitted state events"});
     }
     Ok((output, scalar))
 }
@@ -580,6 +675,41 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::jv_cover::{factor_base, generate_spec};
     use rand::{rngs::StdRng, SeedableRng};
+
+    #[test]
+    fn retained_basis_projection_charges_hand_arithmetic_once() {
+        use crate::cryptanalysis::gaudry_cubic::SparseRel;
+        work::claim();
+        work::enable(true);
+        work::set_moduli(103, 101);
+        let _phase = work::enter(Phase::LinearAlgebra);
+        let projection = FilteredTwoLargePrimeRelations {
+            rows: vec![SparseRel {
+                cols: vec![(0, 1), (1, 2)],
+                rhs: 0,
+            }],
+            certificates: Vec::new(),
+            report: Default::default(),
+            replayed_rows: 1,
+        };
+        let homogeneous = homogeneous_system(&projection, 101, 2).unwrap();
+        let before = work::snapshot();
+        let mut quotient = Quotient::from_rref(101, 2, homogeneous.pivot_rows()).unwrap();
+        charge_quotient_delta(&ExtraCounts::default(), &quotient.counts, 101);
+        let mut system = CountedRelationSystem::new(101, 2);
+        for (row, rhs) in [(vec![3, 4, 1], 17), (vec![1, 0, 2], 9)] {
+            let old = quotient.counts.clone();
+            let (small, rhs) = quotient.project(&row, rhs).unwrap();
+            charge_quotient_delta(&old, &quotient.counts, 101);
+            system.insert(small.to_vec(), rhs);
+        }
+        assert_eq!(system.solved(1), Some(93));
+        let delta = work::snapshot().since(&before).total();
+        assert_eq!(delta.get(work::Kind::ModrMul), 14);
+        assert_eq!(delta.get(work::Kind::ModrAdd), 9);
+        assert_eq!(delta.get(work::Kind::ModrInv), 2);
+        assert_eq!(delta.get(work::Kind::WordOp), 53);
+    }
 
     #[test]
     fn homogeneous_checkpoint_requires_independent_rows_and_zero_rhs() {
