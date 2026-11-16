@@ -1,0 +1,904 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0f83439af1905d6f",
+  "statement": {
+    "name": "Montgomery S3 to Edwards-y, cleared denominators",
+    "source": "Known Montgomery S3 and u=(1+y)/(1-y); exact integer expansion tested in torus-s4-tree/tests/identity.rs. No novelty or formal proof claimed.",
+    "variables": [
+      "A",
+      "x",
+      "y",
+      "z"
+    ],
+    "degree_bound": 7,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "y"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "x"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "y"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "add",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 1
+                            },
+                            {
+                              "op": "neg",
+                              "args": {
+                                "op": "var",
+                                "args": "x"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 4
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 1
+                  },
+                  {
+                    "op": "var",
+                    "args": "x"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 1
+                  },
+                  {
+                    "op": "var",
+                    "args": "y"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 1
+                  },
+                  {
+                    "op": "var",
+                    "args": "z"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "var",
+                            "args": "x"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "var",
+                            "args": "y"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "var",
+                            "args": "z"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "A"
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "const",
+                            "args": 1
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 4
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "A"
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "const",
+                        "args": 2
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "x"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "const",
+                        "args": 1
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "y"
+                        },
+                        {
+                          "op": "var",
+                          "args": "y"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "const",
+                        "args": 1
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "const",
+                        "args": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 4
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "x"
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "y"
+                            },
+                            {
+                              "op": "var",
+                              "args": "y"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "z"
+                            },
+                            {
+                              "op": "var",
+                              "args": "z"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "const",
+                        "args": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": -8
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "y"
+                },
+                {
+                  "op": "var",
+                  "args": "z"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111504,
+  "value_digest": "244b5214c0613eb961def6e57d8355ce88966d481147155011c2647ce561ebfe",
+  "independence": "Producer issue; maintained native checker reused; signed independent verification pending",
+  "proof": null
+}

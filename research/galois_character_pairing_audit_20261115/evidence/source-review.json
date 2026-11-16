@@ -1,0 +1,87 @@
+{
+  "schema": "galois-character-pairing-source-review/v1",
+  "source": {
+    "author": "Peter Bruin",
+    "title": "The Tate pairing for Abelian varieties over finite fields",
+    "year": 2011,
+    "doi": "10.5802/jtnb.764",
+    "url": "https://www.numdam.org/article/JTNB_2011__23_2_323_0.pdf",
+    "bytes": 649044,
+    "sha256": "528b63797f936e094861c98a65da5eb1615dc46747960ba3444516197fbf49a7",
+    "read_scope": "All six article pages read and all seven PDF pages visually inspected in the earlier packet; current selected printed325/PDF4 Galois-Cartier character definition, equation2.1 and Lemma2.1 rechecked before approach."
+  },
+  "target": "Finite-module pairing in Lemma2.1, actual Galois-equivariant algebraic-closure unit characters and all continuous crossed-cocycle classes. Finite K, finite Abelian M with continuous action, exponent dividing #K-1.",
+  "result": "Both duality MulEquivs, exact displayed source formula on every representative, bilinearity, both radicals, equal cardinality. Actual characteristic-2 M=Z/2 trivial-action guard-deletion counterexample: all characters trivial, actual nonzero cocycle class; no right-nondegenerate bilinear map.",
+  "reuse": {
+    "schema": "byte-identical-reused-formal-cores/v1",
+    "copies": [
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/GaloisGenerator.lean",
+        "bytes": 3939,
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FiniteQuotients.lean",
+        "bytes": 4324,
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FiniteCocycles.lean",
+        "bytes": 5449,
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/CocycleClasses.lean",
+        "bytes": 4491,
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/FieldCharacterRoots.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+        "bytes": 1459,
+        "sha256": "32579d797877c0657c0708ac02b29b7f175d2e6cde9ed57c4dec07483866994b",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/CoinvariantCharacters.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean",
+        "bytes": 2859,
+        "sha256": "4ad1669833b5b28e8c0ad62a6dec0bf9eb22fe44dd1ca7c9dc8921bdc82a080e",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/PerfectEvaluation.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+        "bytes": 3197,
+        "sha256": "ce8bf9ce8e9a137730b5b4a9feed3543632eb2eb76a4638594303ec8d8ee6faa",
+        "byte_identical": true
+      }
+    ],
+    "copy_count": 7,
+    "originals_modified": false,
+    "prior_claims": [
+      "PCC-20261115-ed6495",
+      "PCC-20261114-cdb4f1"
+    ],
+    "protocol_count_note": "Initial protocol prior-pin count string included an uncertainty marker; no count from that note is used as a verification assertion. Exact prior plans and hashes were checked."
+  },
+  "additional_credited_proof": "Prime-power unit root argument in char_p_pairing_domain_audit_20261114/lean/PowerTargets.lean; earlier finite-character duality and actual procyclic continuous-cocycle proofs.",
+  "official_APIs": "Pinned Mathlib algebraic closure, finite field Frobenius fixed field, unit homomorphisms, MonoidHom congruences, dense range equalizer, quotient groups, finite Abelian duality.",
+  "KB": "MCP absent; fresh status/mechanism/negative/theorem wrapper attempts127. Prior/primary/official fallback before code. Conductor127. No failed-search absence claim.",
+  "boundaries": [
+    "Comparison with separate Mathlib continuous homogeneous-complex H1 remains open.",
+    "No isogeny-kernel, Lang, Cartier group scheme, Jacobian or divisor realization; full Tate/MOV/Frey–Rück theorem remains open.",
+    "Original Frey–Rück1994, Serre, Lang and Mumford primaries remain unread; Bruin is a separate primary.",
+    "No novelty claim, canonical corpus promotion or completion of all fourteen items."
+  ],
+  "copyright": "Primary PDFs/text/images kept local and excluded from committed artifacts.",
+  "signed_standing": "unverified"
+}

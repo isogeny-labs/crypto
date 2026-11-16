@@ -19,12 +19,17 @@
 // only ever propose candidates.
 #pragma once
 
+#include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+#if defined(__unix__) || defined(__APPLE__)
+#include <poll.h>
+#endif
 
 struct FesSystem {
   int n = 0;
@@ -91,8 +96,28 @@ inline void fes_serve_reply(const std::vector<uint64_t> &sols, unsigned long lon
 // Same contract as the text protocol: total > listed means a capped list.
 static const uint32_t FES_BIN_MAGIC = 0x31534546u;
 
+// Opt-in (FES_SERVE_SPIN_US=N, default 0 = off, no extra system call): before the blocking read of the next
+// request, poll stdin without sleeping for up to N microseconds, so a worker that idles between requests does not
+// pay a cold wake-up.  Probe for the per-call wake-up cost; it changes no reply.  Skipped when a request is
+// already buffered (glibc) or on a platform without poll().
+inline void fes_serve_spin_for_request() {
+#if defined(__unix__) || defined(__APPLE__)
+  static const int spin_us = [] { const char *v = getenv("FES_SERVE_SPIN_US"); return v ? atoi(v) : 0; }();
+  if (spin_us <= 0) return;
+#ifdef __GLIBC__
+  if (stdin->_IO_read_ptr < stdin->_IO_read_end) return;
+#endif
+  const auto t0 = std::chrono::steady_clock::now();
+  pollfd p{0, POLLIN, 0};
+  while (poll(&p, 1, 0) == 0 &&
+         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - t0).count() < spin_us) {
+  }
+#endif
+}
+
 // 1 = request read, 0 = clean EOF, -1 = malformed.
 inline int fes_serve_bin_read(FesSystem &sys, int max_vars) {
+  fes_serve_spin_for_request();
   uint32_t h[4];
   if (fread(h, sizeof h, 1, stdin) != 1) return 0;
   if (h[0] != FES_BIN_MAGIC || h[1] < 1 || (int)h[1] > max_vars || h[2] > 64) return -1;

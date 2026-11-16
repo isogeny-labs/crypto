@@ -1,0 +1,197 @@
+{
+  "schema": "msolve-reindex-source-plan/v1",
+  "created": "2026-11-10T17:48:22.380831+00:00",
+  "status": "Preissue frozen sources; whole14gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/msolve_reindex_lean_audit_20261110/lean",
+    "theorem": "MsolveReindexAudit.reindex_audit_certificate",
+    "statement": "theorem reindex_audit_certificate : (∀ (basis : Fin 3→ℕ) (row : Fin 3), relocated basis (destinationIndex row)=some (basis (sourceIndex row))) ∧ (∀ basis : Fin 3→ℕ, basisLookup basis (destinationIndex 1)≠relocated basis (destinationIndex 1)) ∧ (¬∀ (basis : Fin 3→ℕ) (row : Fin 3), basisLookup basis (destinationIndex row)=relocated basis (destinationIndex row)) ∧ ¬signed32Representable (2^31) ∧ (∀ ctr : ℕ,ctr<32 → (2:ℕ)^ctr<2^32)",
+    "decl_sha256": "f34238c8a4d123f21036b88d47b3c5620ddde4b8d7b15ba5e17e176b43486a4c",
+    "sources": [
+      {
+        "path": "research/msolve_reindex_lean_audit_20261110/lean/Reindex.lean",
+        "bytes": 3953,
+        "sha256": "6c4aa28ac1758a7c1265eb7f37a5b54f640d70ba817c5a2eea8a73276c960bfa"
+      },
+      {
+        "path": "research/msolve_reindex_lean_audit_20261110/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/msolve_reindex_lean_audit_20261110/lean/lakefile.toml",
+        "bytes": 290,
+        "sha256": "2875990bb9841310d0c9b5d7ea641e49a72301893e16e28d7fcb8d9d85fa480d"
+      },
+      {
+        "path": "research/msolve_reindex_lean_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Operational finite-table copy semantics of the observed snapshot. For every possible coefficient type/content, matrix lookup preserves copied coefficients; rewritten basis lookup3 is outside live prefix3, and in-range slot2 can denote a different source. Direct universal reindex invariant negation; signed32/unsigned-bit representability arithmetic. Native trace authenticity, C parser, pointer/allocation semantics and wholeF4Run refinement are not proved."
+  },
+  "artifacts": [
+    {
+      "path": "research/msolve_reindex_lean_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 240,
+      "sha256": "a9537d8e95f5c014844b2fc494b1be2242126c9c5d3ee1697c8e08d3c3b8a6f6"
+    },
+    {
+      "path": "research/msolve_reindex_lean_audit_20261110/evidence/attempts.json",
+      "bytes": 461,
+      "sha256": "f4fd8b7d071993bfc5afe442f8c58fb6f336b4a283e1c26b9523b755a83def98"
+    },
+    {
+      "path": "research/msolve_reindex_lean_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 1002,
+      "sha256": "57df233f961c98d51fd46e80faa44ad6ff8041144290fc4e3a6ce248373e546d"
+    },
+    {
+      "path": "research/msolve_reindex_lean_audit_20261110/evidence/gate.json",
+      "bytes": 1183,
+      "sha256": "f539d6ce129cf25a279e0f296e22d2c68b63300881116c8e35e240f9cd0f1b5e"
+    },
+    {
+      "path": "research/msolve_reindex_lean_audit_20261110/evidence/source-review.json",
+      "bytes": 2455,
+      "sha256": "54c4b684d88d04b4a481c209204ac22a1a1e2829bf08e6c1cbee53258fd961f9"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/protocol.json",
+      "bytes": 19856,
+      "sha256": "b99eb0dc7cc37b57d758144d64521ce6c301d7eb3fd147b1c3bcf0079aa1cc33"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/provenance.json",
+      "bytes": 2052,
+      "sha256": "2ab2094bceb9082000b98c36f704122043a2e8666331396f3699df5ffccc7664"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/frozen-files.sha256",
+      "bytes": 816,
+      "sha256": "35253a1dd9a014ee58d524c45d6eb4116cf10beaf6d4777e000bf5ba2c30155a"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/logged.patch",
+      "bytes": 804,
+      "sha256": "c1f9e3578e9a5aec8b1863918d6a18c79c3650ab9d51cc58b5c5f50f63a2280c"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/corrected.patch",
+      "bytes": 889,
+      "sha256": "64b77ab2e688c1a70e01928bcab2a0cf0f854b09dacae10bd9cf2d7757951068"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/export.json",
+      "bytes": 25911,
+      "sha256": "5ded12c9128fb178271fbec34f25553f505ebba1663c8513ba5fe09ef7a7551a"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/evidence/runs.tar.gz",
+      "bytes": 1922,
+      "sha256": "f3ead21eb23ca1b30c99616171284a7641abe6ee2284364a292baf2004ee891f"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/evidence/runs-inventory.json",
+      "bytes": 5006,
+      "sha256": "e625d9a15bee82377cc4eddb65efb3f99bc47dcca9b8d22098217cbbc4eadf1b"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/evidence/analysis.jsonl",
+      "bytes": 415,
+      "sha256": "07f55ce965331b8b8946d5d9b4db99e157d111cddba25e4ff7c3bcec6d791651"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/evidence/upstream-current-commit.json",
+      "bytes": 194,
+      "sha256": "2c414da83e19d715ed68f472042dfbb6f4e67ad6f8e3f606106a96e6c85c7d2b"
+    },
+    {
+      "path": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3/evidence/upstream-current-source.sha256",
+      "bytes": 65,
+      "sha256": "09c2c80f2ea7c5da3fd56b7897447a07d2db57061b151c0860eceafd95a0e7af"
+    }
+  ],
+  "gate": {
+    "archive": "research/msolve_reindex_lean_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 14,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/msolve_reindex_lean_audit_20261110/evidence/attempts.tar.gz",
+    "files": 2,
+    "roundtrip_equal": true
+  },
+  "source_review": {
+    "schema": "msolve-reindex-source-review/v1",
+    "created": "2026-11-10T17:48:22.380553+00:00",
+    "primary": [
+      {
+        "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/la_ff_32.c",
+        "read_scope": "17bit known-pivot reducer and exact_sparse_reduced_echelon_form remap2619–2623; actual source bytes pinned in native provenance.",
+        "effect": "Known row COEFFS becomes a matrix-table index, but old17bit known-pivot branch reads basis table."
+      },
+      {
+        "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/la_ff_16.c",
+        "read_scope": "Known-pivot reducer160–190 and exact remap1045–1085.",
+        "effect": "Pinned16bit implementation already uses matrix coefficient table."
+      },
+      {
+        "url": "https://github.com/algebraic-solving/msolve/blob/ef2e6aa39cca7b25f63a9a15a0779bf516718b3c/src/neogb/la_ff_32.c",
+        "read_scope": "17bit reducer355–390; current source SHA in native evidence, commitmetadata retained.",
+        "effect": "Currentupstream matrix lookup already matches the tested one-expression backport. No novel upstream bug claim."
+      },
+      {
+        "url": "https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html",
+        "read_scope": "Address/undefined and first-error sections; retained earlier source review.",
+        "effect": "First-error UB diagnostics and later address-only fault sites have separate scope. Earlier shift remains unrepaired."
+      }
+    ],
+    "observed_snapshot": {
+      "old_indices": [
+        0,
+        2,
+        0
+      ],
+      "new_indices": [
+        2,
+        3,
+        4
+      ],
+      "live_basis_count": 3,
+      "first_failing_lookup": 3,
+      "proof_of_C_execution": false
+    },
+    "scope": "Operational finite-table copy semantics of the observed snapshot. For every possible coefficient type/content, matrix lookup preserves copied coefficients; rewritten basis lookup3 is outside live prefix3, and in-range slot2 can denote a different source. Direct universal reindex invariant negation; signed32/unsigned-bit representability arithmetic. Native trace authenticity, C parser, pointer/allocation semantics and wholeF4Run refinement are not proved.",
+    "novelty": "Formal audit and concrete backport of existing upstream behavior, no novelty claim.",
+    "KB": "MCP absent/wrapper127; bounded pinned source/current upstream/GCC/Mathlib fallback. Conductor absent."
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "new_native_experiment_in_formal_project": false,
+    "waivers": false,
+    "paid_compute": 0,
+    "native_refinement_or_authenticity_proved": false,
+    "lean4checker": "Unavailable; actual kernel/transitive axiom gate."
+  },
+  "proof_outline": [
+    "Define copied table by three actual function updates, using observed old0,2,0 and destination2,3,4.",
+    "Exhaust finite row indices and simplify operational updates to prove lookup preservation for every coefficient content.",
+    "Live-prefix lookup3 is absent for every basis; copied matrix3 is sourcebasis2.",
+    "Explicit natural-valued basis refutes invariance even at rewritten slot2 inside live range.",
+    "Direct universal negation and exact signed/unsigned representability arithmetic, without Csemantics claim."
+  ]
+}

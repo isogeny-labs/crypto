@@ -1,0 +1,156 @@
+{
+  "schema": "actual-two-torsion-source-plan/v1",
+  "created": "2026-11-13T23:38:18.633993+00:00",
+  "formal": {
+    "project": "research/two_torsion_rank_audit_20261113/lean",
+    "theorem": "TwoTorsionRankAudit.actual_two_torsion_rank_certificate",
+    "statement": "theorem actual_two_torsion_rank_certificate : (∀ (K : Type) [Field K] [DecidableEq K] [NeZero (2 : K)] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0), Finite (TwoTorsion W) ∧ Nat.card (TwoTorsion W)=Nat.card (Root W)+1 ∧ Nat.card (TwoTorsion W)≤4) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [NeZero (2 : K)] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0), Nat.card (TwoTorsion W)=4 ∧ ∃ A B : TwoTorsion W,BinaryBasis A B) ∧ (∀ (K L : Type) [Field K] [DecidableEq K] [NeZero (2 : K)] [Field L] [DecidableEq L] [IsAlgClosed L] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0) (f : K →+* L), Nat.card (TwoTorsion (W.map f))=4) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 2] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0), Nat.card (TwoTorsion W)=if W.a₁=0 then 1 else 2) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 2], (ordinaryModel K).Δ=1 ∧ (supersingularModel K).Δ=1 ∧ Nat.card (TwoTorsion (ordinaryModel K))=2 ∧ Nat.card (TwoTorsion (supersingularModel K))=1 ∧ addOrderOf (ordinaryPoint K)=2) ∧ (∀ (K L : Type) [Field K] [DecidableEq K] [CharP K 2] [Field L] [DecidableEq L] [CharP L 2] (f : K →+* L) (Q : (ordinaryModel L).Point), 2 • Q=0 → ∃ P : (ordinaryModel K).Point,2 • P=0 ∧ Q=ordinaryMap f P) ∧ (Nat.Prime 2 ∧ Nat.card (ordinaryModel Base).Point=4 ∧ 2∣Nat.card (ordinaryModel Base).Point ∧ 2^2∣Nat.card (ordinaryModel Base).Point ∧ ¬2∣2-1 ∧ Nat.gcd 2 2≠1 ∧ (∀ k : ℕ,0<k → Nat.card (BinaryField k)=2^k ∧ ¬2∣2^k-1)) ∧ (Nat.card (TwoTorsion (ordinaryModel Geometric))=2 ∧ (∀ Q : (ordinaryModel Geometric).Point,2 • Q=0 → ∃ P : (ordinaryModel Base).Point,2 • P=0 ∧ Q=ordinaryMap baseEmbedding P) ∧ ¬ ((∀ Q : (ordinaryModel Geometric).Point,2 • Q=0 → ∃ P : (ordinaryModel Base).Point,2 • P=0 ∧ Q=ordinaryMap baseEmbedding P) ↔ 2∣2-1))",
+    "decl_sha256": "8850158a1229885fb24d7535a487923a2470d24d6140242ef6cac059b5f64400",
+    "scope": "All actual nonsingular Mathlib general Weierstrass point groups: in2!=0, actual2torsion is finite/identity plus distinct cubic roots/card<=4; after every algebraically closed scalar extension it hascard4 and explicit actual binary basis (two nonzero distinct generators, full four-point generation, F2coefficient independence), not an assumed basis/rank. In characteristic2 geometric2torsion hascard1 ifa1=0, otherwise2, derived from actual negation/equation/point existence and uniqueness. Constant ordinary/a1zero modelsDelta1 havecard2/1 overevery characteristic2field. Actual coordinatewise field maps contain all target2torsion images. Actual ordinaryF2pointcard4, prime2/r²divisibility andactual AlgebraicClosureF2torsioncard2/fullrational point images, while2notdividing2^k-1forallpositivek with actual binaryfieldcard2^k. Direct concrete point-inclusion/cyclotomic criterion negation deletes source/node coprimality only. Exact corpus node retains gcd(r,q)=1 and rnotdividingq-1, so qualified node/source notrefuted. Generic odd-prime geometry/Frobenius determinant/representation/descent and full supersingular classification remainopen. No new native experiment/novelty/group-scheme claim.",
+    "sources": [
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/BaseControl.lean",
+        "bytes": 5457,
+        "sha256": "038c5c6a064105b9eeb351999108189b33ddbc0c608b6566e83c478e5389c682"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/BinaryBasis.lean",
+        "bytes": 3850,
+        "sha256": "9ef54e052338c428d6a087bcfe687945b8c11f63bc179f7e34c3e0f13a9850eb"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoCardinality.lean",
+        "bytes": 1677,
+        "sha256": "27aa487fde2820f78381e8033d59d5cf95e0511e15e9b3f81a5079df1eced85e"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoGeometry.lean",
+        "bytes": 3565,
+        "sha256": "aec6bce4be662854a1fda7a20b7248a4ef3da57e12e15bd97ea4ab85c00e16f7"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoModels.lean",
+        "bytes": 4074,
+        "sha256": "38fa13035c6b37fc443cafd3aea48b4211dd70bba7b0affe0e1b44bfab30867a"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/OddCardinality.lean",
+        "bytes": 3448,
+        "sha256": "9074d16dfeadb1cc900d93efe1d1b15edbe2225515aefef292310062a0ad0204"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/RankCertificate.lean",
+        "bytes": 3293,
+        "sha256": "266ff58c842fc2cf38f01513448a3f9288cd68638fbfa78543e83fa800515bf4"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/RootEquiv.lean",
+        "bytes": 3174,
+        "sha256": "664b7a1779ed8c0873aad0635229a5067b80c6bf53b0389707cfab2e96a3a7c2"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3243,
+        "sha256": "a3c183cf78076c7fcde3e998b4527060d213addf37bc2106dfad04e157c219b2"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lakefile.toml",
+        "bytes": 421,
+        "sha256": "ab06a27f68c0ad83c5f5de173173ddda7194a66eaffbdfbba8be0659feaa8203"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BaseControl",
+    "BinaryBasis",
+    "CharTwoCardinality",
+    "CharTwoGeometry",
+    "CharTwoModels",
+    "OddCardinality",
+    "RankCertificate",
+    "RootEquiv"
+  ],
+  "artifacts": [
+    {
+      "path": "research/two_torsion_rank_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 20381,
+      "sha256": "7973617cf83624ef19459814ac398ad0ed75c0489bdadb74db1c7e494dea6847"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/evidence/attempts.json",
+      "bytes": 9870,
+      "sha256": "b23e2d0dcf8936f57adcf57dba01a7fc8ed0600930359947f8d28b542a34048b"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 2559,
+      "sha256": "bc104b3d6fa1d2d8acac4301a197f4df34103c2f3a371a64c1c8973d0c5fffae"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/evidence/gate.json",
+      "bytes": 1164,
+      "sha256": "6aa2ebb2453bd1925b8f4f294cd3516432e189f79b2367c8aef10ccc8f051939"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/evidence/source-review.json",
+      "bytes": 4814,
+      "sha256": "73b6fd086cb99ea3be22536f61d99ebf76f8552116e76ee5d0a97fc0894bf902"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/proof-map.json",
+      "bytes": 2281,
+      "sha256": "02e542be4b337c6a75ed4c4854ae076bada1cbf8e0dfadb947a2f23ba24fa7d1"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/render_report.py",
+      "bytes": 6815,
+      "sha256": "bd26963d709e6eccfead006a2e58caf74937fe71881f59b4576ef5c3d138d358"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/reports/layout.json",
+      "bytes": 316,
+      "sha256": "607e49228d78138b1f0d3ce3bf296e33d35de141a18adca6982e8f30a1246bba"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/reports/rank-boundary.svg",
+      "bytes": 1643,
+      "sha256": "394f961ba5de40f91dda0565ddb385e8a4df214d5d6ead4d599f3c76e4132dfa"
+    },
+    {
+      "path": "research/two_torsion_rank_audit_20261113/reports/report.pdf",
+      "bytes": 47542,
+      "sha256": "27bde5bd5f6f487041d8fd090a5e254c9109dec69bd7cf94e43f2ee39bcab8e7"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 67,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_r2_geometry": true,
+    "actual_binary_basis": true,
+    "actual_char2_cardinality_classification": true,
+    "actual_char2_field_inclusion_counter": true,
+    "source_corpus_full_hypotheses_read": true,
+    "qualified_source_or_node_refuted": false,
+    "generic_odd_prime_Frobenius_geometry_proved": false,
+    "group_scheme_formalization_claimed": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

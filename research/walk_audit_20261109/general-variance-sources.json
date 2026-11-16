@@ -1,0 +1,39 @@
+{
+  "schema": "general-weighted-rho-source-plan/v1",
+  "created": "2026-11-10T01:25:30.521117+00:00",
+  "status": "Whole70kernel gate passed; preissue plan, no new theorem packet yet.",
+  "formal": {
+    "project": "research/walk_audit_20261109/lean",
+    "theorem": "WalkWeightedGeneralAudit.general_variance_audit_certificate",
+    "statement": "theorem general_variance_audit_certificate : (\u2200 (A : Type*) (B : Type*) [AddCommGroup A] [Fintype A] [Fintype B] [DecidableEq A] [DecidableEq B] (p : B \u2192 \u211d) (hp0 : \u2200 i,0\u2264p i) (hp : \u2211 i,p i=1) (increments : B \u2192 A), Function.Injective increments \u2192 \u2200 target : A, (\u2211 h : Hash A B,(hashLaw p hp0 hp h).toReal*inDegree increments h target)=1 \u2227 (\u2211 h : Hash A B,(hashLaw p hp0 hp h).toReal* (inDegree increments h target-1)^2)=1-\u2211 i : B,(p i)^2) \u2227 (\u00ac \u2200 increments : Fin 2 \u2192 ZMod 3, (\u2200 i,increments i\u22600) \u2192 (\u2211 h : Hash (ZMod 3) (Fin 2),(uniformTwoLabelLaw h).toReal* (inDegree increments h 0-1)^2)=1-\u2211 _i : Fin 2,(1/2:\u211d)^2)",
+    "decl_sha256": "dab72e540963ac90a31df1b3731120dc8ad7cd8bfca3e0e9b65b158b680c2720",
+    "sources": [
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      }
+    ],
+    "gate": {
+      "path": "evidence/general-variance-gate.log",
+      "declarations": 70,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every finite abelian group, every finite distinct increment table, all nonnegative normalized real label laws, actual product PMF and actual in-degree cardinality at every target. Exact mean1/variance1-sum(p_i\u00b2). Direct nonzero-only universal disproof by duplicate+1steps onZ3, variance0versus1/2. No collision-time/mixing asymptotic claim."
+  },
+  "literature": "Re-read Galbraithch14v2\u00a714.2.5/book296-297; exact hash/read scope in weighted-sources.json. Mathlib Fintype.prod_sum/finite indicator products are proof infrastructure, not a statistical assumption.",
+  "native_experiments": 0,
+  "paid_compute": 0,
+  "inherited_issued_sources": "WalkBoundary and WalkWeighted unchanged from a88c6fa0; only additive root registration."
+}

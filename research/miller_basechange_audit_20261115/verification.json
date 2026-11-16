@@ -1,0 +1,87 @@
+{
+  "schema": "actual-miller-basechange-verification/v1",
+  "source_commit": "69c955e1d2b8d8af70b89d81b18c9f0350335f1c",
+  "claim_id": "PCC-20261115-b11451",
+  "declaration_sha256": "6cc55f45b73f1c6359aaa6eca67cf5442be42a4594cff1553858aecaadbfee6a",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 70,
+  "gate_declarations": 471,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 153,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-b11451",
+    "claim_sha256": "d2bed08eb0dd0bf437ecb9a7d50aeb496b5ae62ec9bdc0688f46352b2467d97e",
+    "commit": "69c955e1d2b8d8af70b89d81b18c9f0350335f1c",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/miller_basechange_audit_20261115/lean (BasechangeCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T10:06:31Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-b11451",
+    "claim_sha256": "d2bed08eb0dd0bf437ecb9a7d50aeb496b5ae62ec9bdc0688f46352b2467d97e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47596,
+    "sha256": "6331f21015370c4a57f4114bee976de4bbee904d8061c07812a42516527ef680",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 471,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "retained_prefix_negative_control": true,
+    "exact_reused_credited_modules": 58,
+    "new_modules": 9,
+    "actual_full_function_field_embedding": true,
+    "actual_norm_infinity_normalization_compatibility": true,
+    "actual_point_step_alln_miller_compatibility": true,
+    "proper_geometric_miller_predicate_uniqueness": true,
+    "chosen_addition_all_basefields": true,
+    "actual_F3_alln_weak_counterfeit_family": true,
+    "actual_mapped_ratio_geometric_divisor_nonzero": true,
+    "qualified_source_definition_exercise_survive": true,
+    "actual_hypotheses": "FieldsK/L/AlgebraKL; actual DecidableEq data for point/Miller group operations; actualW\u0394neq0 for propergeometricMiller and chosenaddition. Everycharacteristicincluding2/3.",
+    "full_finitepoint_divisor_basechange_or_scheme_descent": false,
+    "binary_runtime_complexity": false,
+    "canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema": "momose-cubic-source-plan/v1",
+  "created": "2026-11-14T23:15:22.344260+00:00",
+  "formal": {
+    "project": "research/momose_cubic_homography_audit_20261114/lean",
+    "theorem": "MomoseCubicHomographyAudit.momose_cubic_homography_certificate",
+    "statement": "theorem momose_cubic_homography_certificate : (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [Fintype K] [Fintype L] (q : ℕ), 2 ≤ q → Fintype.card K = q^2 → Fintype.card L = q^6 → ∀ z w : L, z^(q^3) = z → z^q ≠ z → outsideBase K L w → ∃ A : GL2 K, denominator K L A.val z ≠ 0 ∧ fractional K L A.val z = w ∧ ∀ B : GL2 K, fractional K L B.val z = w → Matrix.ProjGenLinGroup.mk B = Matrix.ProjGenLinGroup.mk A ∧ ∃ u : Kˣ, B * Matrix.GeneralLinearGroup.scalar (Fin 2) u = A) ∧ (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L], Module.finrank K L = 3 → ∀ z : L, outsideBase K L z → ∀ r e a b c : K, z^3 = algebraMap K L r*z + algebraMap K L e → (a ≠ 0 ∨ b ≠ 0) → (momoseMatrix K r e a b c).det ≠ 0 ∧ denominator K L (momoseMatrix K r e a b c) z ≠ 0 ∧ fractional K L (momoseMatrix K r e a b c) z = algebraMap K L a*z^2 + algebraMap K L b*z + algebraMap K L c) ∧ (Fintype.card F9 = 9 ∧ Module.finrank (ZMod 3) F9 = 2 ∧ ∃ a : F9, outsideBase (ZMod 3) F9 a ∧ fractional (ZMod 3) F9 quadraticSwap.val a = a ∧ Matrix.ProjGenLinGroup.mk quadraticSwap ≠ 1) ∧ (¬ (∀ a : F9, outsideBase (ZMod 3) F9 a → ∀ A : GL2 (ZMod 3), fractional (ZMod 3) F9 A.val a = a → Matrix.ProjGenLinGroup.mk A = 1))",
+    "decl_sha256": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+    "scope": "MomoseChao2005eprint277 primaryLemma1 complete actualfinitefield homography existence and uniqueness modulo scalars, sourceexplicitmatrix and actualquadraticnegativecontrol. Actual fieldsK,L/AlgebraKL withcardK=q^2/cardL=q^6/q>=2; actualsourceepsilon satisfiesepsilon^(q^3)=epsilon andepsilon^q!=epsilon; actualtargetoutsideimageofK. Derive actualextensiondegree3 and epsilonoutsideK usingfinitefieldpowerlaw. Derive actualcubicgenerator/powerbasis/coordinates/quadraticrelationindependence fromdegree3/nonbasepoint, notassumed conclusion. Construct actualinvertible2x2matrix andactualfractional action withprovednonzerodenominators. Prove anytwoactualGL2matrices sendingepsilon totarget haveequalactualMathlibPGLquotientclasses anddifferbyactualunit scalarmatrix. Stabilizer atactualcubicpoint consists ofscalarmatrices, derivedfromquadraticrelation anddeterminant. Genericcubic-field constructiveproof also establishes printedexplicitmatrix [a(ar+c)-b^2,a^2e-bc;a,-b] whenepsilon^3=r epsilon+e and(a,b)notbothzero, includingdeterminantnonzero/denominatornonzero/valuea epsilon^2+b epsilon+c. ActualF9=GaloisField3,2/card9/degree2 suppliesa^2=2/nonbasea andactualGL2(F3)matrix[0,2;1,0] withnonidentityactualPGLclassfixinga; directnegationofuniquenessafterdeletingcubicdegree. Thisisnegativecontrolonhypothesisdeletion, notrefutationofqualifiedsourceLemma1, whichisproved. Full21pageprimarytextreview inclappendix/reference; selectedLemma1/PDF6 andLemma3/PDF11 visuallychecked, glyphlimitationsoutsidecheckedtargetretained. No fullcovers/Jacobian/isogeny/kernel/densities/Lemma3-5/classification/attack-runtime proofs orrefutations, canonicalcorpuspromotion ornoveltyclaim. SpecificallydonotreplaceLemma5normalizationwithzerowitness orpromoteomittedLemma3.3proof. SourceMathlibactualGL2units/PGLcenterquotient/fieldalgebraMap/IntermediateField/PowerBasis/GaloisField, notnumericalmatrix/groupstandins. Standardfoundations/defaults/noholes/customaxioms/nativeproofeval/limits/globalflags/waivers/frozenedits/newcryptoexperiment/spend/upload. Nativecompletewrittenheaderbindingproceduralnotkernelparser/hash/physicalhostrefinement; signedstandingunverified.",
+    "sources": [
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/CubicExistence.lean",
+        "bytes": 2863,
+        "sha256": "6fc5cad71223dd6129037856df5aba88d27dfa9dbec2ec13d0966241c8b9837b"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/CubicGenerator.lean",
+        "bytes": 2996,
+        "sha256": "196cd127910766b81b6f8f9a72663ac14beee743e8b5681304a511e010286def"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/CubicUniqueness.lean",
+        "bytes": 3825,
+        "sha256": "a8d0b7efe703bfcda0dd29bc995a1572b4f2ae25ba1c5c6e94694ff6c827fba5"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/FiniteSource.lean",
+        "bytes": 2467,
+        "sha256": "2ab074d23ca71584fc51a6f03bf979cfbc46d0324a4c3a92fd0008cbff6a8f0e"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/HomographyBasics.lean",
+        "bytes": 3096,
+        "sha256": "2267c180b16ad754de3e2c3559a727fe0a4a5fcbec05f6522101067881bedd0c"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/MomoseCertificate.lean",
+        "bytes": 2262,
+        "sha256": "091db677226ec7f99dee358f807dbead7577f806617f24af8ece750b5d3ad6ef"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/QuadraticControl.lean",
+        "bytes": 3421,
+        "sha256": "3fca8910b7e97a25682ee82602a8b4ab4c8927700bfbe081ae40554c8d5124ba"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/lakefile.toml",
+        "bytes": 436,
+        "sha256": "2cd30382c48f57909ddcde76ad3bb6cb0dc95f87397cbb3283f1a93f5972c159"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3180,
+        "sha256": "f29bc5cc4e2aa0573488694996a68285fe00f4eb6ce05d46383840941b74fa25"
+      },
+      {
+        "path": "research/momose_cubic_homography_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CubicExistence",
+    "CubicGenerator",
+    "CubicUniqueness",
+    "FiniteSource",
+    "HomographyBasics",
+    "MomoseCertificate",
+    "QuadraticControl"
+  ],
+  "artifacts": [
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 61248,
+      "sha256": "a886973b910bf514b6f996c7ccb8fefca84eb3d6a66672c4b4d2b5947ccbc438"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "ba10edbe81e58023efd05fcae428b857af595c6e3188e2113e818481d4a7a8dc"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "96e5a78f64c575ed8ea6c6cbdb78817ac47c6c0aed497fb4d5057be702f25775"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1454,
+      "sha256": "e0bcb46184114137af341bdbfc8bab43bc04a6c50e3c737265be0bda06927d3d"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/gate.json",
+      "bytes": 1265,
+      "sha256": "aa396f7f102a665653798d16030407bc84c8a2949b9db06b02b3b5993c0211a2"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/source-review.json",
+      "bytes": 7909,
+      "sha256": "7b5ce26bda3d70486083ad64aad9172440c650c594e25e848e0f56d163c64112"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/evidence/binding-check.json",
+      "bytes": 5495,
+      "sha256": "334c0bc862badb3a7a552a12f28732d54d3fba12356227a37ce3a25d05859d5b"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/proof-map.json",
+      "bytes": 4999,
+      "sha256": "ddbc9e3919fbe631392b3284ca15ca2c098133ca44930d71dced8174d2feb7cb"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/render_report.py",
+      "bytes": 7572,
+      "sha256": "f22225c99ac265d5678dbcd4315e1bc6c521f3050b3d983ac9c56de1666425d1"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/export_binding_input.py",
+      "bytes": 1751,
+      "sha256": "717609c5015fb380602dc2df23d50921083931e597850fc6427918598809eaa3"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/reports/layout.json",
+      "bytes": 360,
+      "sha256": "ca6189e315d4075e161088d62a36f5d321878cb7416f08b2cf9e673b07e4c20f"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/reports/momose-cubic.svg",
+      "bytes": 1387,
+      "sha256": "ceb26752d438902a796519e8d9c356dc2c1b2987f65930c061cdf0612b0f53d0"
+    },
+    {
+      "path": "research/momose_cubic_homography_audit_20261114/reports/report.pdf",
+      "bytes": 48032,
+      "sha256": "5e6f7222f5997d18acefebe9807c26523a962b62c2560e2de3131053c745e63e"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 40,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "source_lemma_one_proved": true,
+    "actual_GL2_PGL_scalar_uniqueness_proved": true,
+    "finite_source_card_and_generator_bridge_proved": true,
+    "source_explicit_matrix_proved": true,
+    "actual_quadratic_negative_control_and_hypothesis_deletion_refutation_proved": true,
+    "qualified_primary_lemma_refuted": false,
+    "whole_cover_classification_density_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

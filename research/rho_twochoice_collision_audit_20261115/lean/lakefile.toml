@@ -1,0 +1,11 @@
+name = "rho_twochoice_collision_audit"
+version = "0.1.0"
+defaultTargets = ["RhoTwoChoiceCollisionAudit"]
+
+[[require]]
+name = "static_hash_collision_audit"
+path = "../../static_hash_collision_audit_20261114/lean"
+
+[[lean_lib]]
+name = "RhoTwoChoiceCollisionAudit"
+roots = ["BinaryMaximal", "BalancedPaths", "SupportCounting", "BinaryEnsemble", "TwoChoiceImports", "BinaryUnbounded", "TwoChoiceCertificate"]

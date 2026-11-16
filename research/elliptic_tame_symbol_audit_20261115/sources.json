@@ -1,0 +1,1499 @@
+{
+  "schema": "elliptic-tame-source-plan/v1",
+  "created": "2026-11-15T23:59:32.889822+00:00",
+  "formal": {
+    "project": "research/elliptic_tame_symbol_audit_20261115/lean",
+    "theorem": "EllipticTameSymbolAudit.actual_elliptic_tame_certificate",
+    "statement": "theorem actual_elliptic_tame_certificate (K : Type*) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0) : (∀ (P : W.Point) (f g h : W.FunctionFieldˣ), pointOrder W (balancedUnit W P f g) P=0 ∧ tameSymbol W P (f*g) h=tameSymbol W P f h*tameSymbol W P g h ∧ tameSymbol W P f (g*h)=tameSymbol W P f g*tameSymbol W P f h ∧ tameSymbol W P g f=(tameSymbol W P f g)⁻¹ ∧ tameSymbol W P f f=(-1 : Kˣ)^pointOrder W f P) ∧ (∀ (P : W.Point) (f g : W.FunctionFieldˣ), (f : W.FunctionField)+(g : W.FunctionField)=1 → tameSymbol W P f g=1) ∧ (∀ P : W.Point,pointOrder W (pointParameterUnit W hΔ P) P=1) ∧ (∀ (P : W.Point) (π ρ : W.FunctionFieldˣ) (hπ : pointOrder W π P=1) (hρ : pointOrder W ρ P=1) (f g : W.FunctionFieldˣ), tameSymbol W P f g=parameterSymbol W P π hπ f g ∧ parameterSymbol W P π hπ f g=parameterSymbol W P ρ hρ f g) ∧ (∀ f g : W.FunctionFieldˣ,Function.HasFiniteMulSupport (fun P => tameSymbol W P f g)) ∧ (∀ (c : Kˣ) (g : W.FunctionFieldˣ), globalTameProduct W (coefficientUnit W c) g=c^divisorDegree W (functionDivisor W g g.ne_zero)) ∧ (∀ (f g : W.FunctionFieldˣ) (hd : Disjoint (functionDivisor W f f.ne_zero).support (functionDivisor W g g.ne_zero).support), globalTameProduct W f g= evaluateDivisor W (functionDivisor W g g.ne_zero) f hd.symm/ evaluateDivisor W (functionDivisor W f f.ne_zero) g hd) ∧ (IsAlgClosed K → ∀ (c : Kˣ) (f : W.FunctionFieldˣ), globalTameProduct W (coefficientUnit W c) f=1 ∧ globalTameProduct W f f=1) ∧ (tameCurve.Δ≠0 ∧ tameSymbol tameCurve 0 (infinityParameterUnit tameCurve) (coefficientUnit tameCurve twoUnit)≠ milnorSymbol tameCurve 0 (infinityParameterUnit tameCurve) (coefficientUnit tameCurve twoUnit)) ∧ (∃ f g : tameCurve.FunctionFieldˣ, (f : tameCurve.FunctionField)+(g : tameCurve.FunctionField)=1 ∧ pointOrder tameCurve f 0= -1 ∧ pointOrder tameCurve g 0= -1 ∧ tameSymbol tameCurve 0 f g=1 ∧ unsignedSymbol tameCurve 0 f g≠1) ∧ ((globalTameProduct tameCurve (coefficientUnit tameCurve twoUnit) missingRootUnit : ControlBase)=4 ∧ globalTameProduct tameCurve (coefficientUnit tameCurve twoUnit) missingRootUnit≠1) ∧ (globalTameProduct geometricTameCurve (coefficientUnit geometricTameCurve geometricTwo) geometricMissingRoot=1)",
+    "decl_sha256": "3880274ed056ca85c3f6fc2fac3f727c73fac24b4fc5e1f4e9b9103702625efb",
+    "scope": "Actual local tame symbols on every general Weierstrass function field, every coefficient field and characteristic, evaluated only on derived actual regular-ring units. Balanced actual local orders cancel; classical sign and corrected inverse Milnor convention explicit. Both multiplicative laws/skew/diagonal/local Steinberg are proved from actual valuations/residues for small, large and unit cases, no supplied Steinberg/reciprocity. Actual translation of X/Y constructs order1 parameters at every actual point of every nonsingular model; formula for every actual order1 parameter is derived and parameter independence proved. Actual finite multiplicative support derives from actual function-divisor finiteness; honest finite product has symbol laws and actual proper disjoint-divisor product=f(div g)/g(div f), with source guards derived. Exact constant/diagonal product degree formulas over every field, geometric constant/diagonal products1. Actual credited F5 y²=x³+1 controls: classical/Milnor parameter/constant2 differ and corrected inverse repairs basis law; actual simple poles f+g=1 have signed Steinberg1 but unsigned−1≠1; actual x−1 has no F5-rational finite zero/divisor−2O, so actual rational-only product constant2 gives4≠1. Same actual curve/functions after scalar extension have geometric product1. Actual nonsingular F2 curve has simple poles with signed and unsigned1. Known Gille–Szamuely first-edition p187 inversion error credited to authors published errata, not new. Local/global symbol laws are not full global reciprocity. General norm projection/ramification/P1 reciprocity reduction/arbitrary divisor representatives/multiplication-isogeny comparison/general geometric descent/canonical Tate/general MOV-FR/full14 remain open. Frozen Auxiliary238pins checked beforeafter all14states and final gate, zero copied/hydrated modules/no lakeupdate. Exact current root coverage every state from01;14states9failures5successes including source13 stylewarning/final14 clean. Actual default recursion limit failure in08 symmetric simp retained, fixed by directed finite-product congruence without raised limits. Fresh full bounded primary local proof/global norm-reduction proof/author erratum and exact prior/official APIs read, incomplete earlier norm dependencies explicitly not claimed read;5correctKBcalls/Conductor127/fallback/noabsence/novelty. Same prover/host procedural written-header binding only. No holes/customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedit/cryptoPython/paidcompute/upload; signedunverified.",
+    "sources": [
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeCertificate.lean",
+        "bytes": 4496,
+        "sha256": "d03f869d2acde28ff8d02d011cd4073afb7db656ff2ae5bf893b44f01d6b7ad7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeControls.lean",
+        "bytes": 4445,
+        "sha256": "875fc10520cae10f9903588da8d345fb110032c70a1a06866ff56940286b6a3a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeField.lean",
+        "bytes": 2669,
+        "sha256": "920636c22c6379526b0e4fc98baa3cfdfb5a81e20e06ccbd53b3c893ec606302"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeFunctions.lean",
+        "bytes": 1098,
+        "sha256": "69cbe26c9a84e11f4237e7ba5ac0eb950261c922c3cacac3b9836cbfb7611be5"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeInfinity.lean",
+        "bytes": 1023,
+        "sha256": "9496f761da59e3bbc4f0b3538fc946539e5e7ef68b21f0241ec632ca409a2704"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeMiller.lean",
+        "bytes": 2183,
+        "sha256": "9d98e2999bb57b6bbd4572783c7cf9a0c9b4d765cd0d33074abc988df4b4f5d2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeNorm.lean",
+        "bytes": 2816,
+        "sha256": "1ec5a84b4db059ab68b14d3eaacb2a89314c98e70ccea96a1598c2283153545f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangePoints.lean",
+        "bytes": 1543,
+        "sha256": "e02e30cd0f8030f18fb1edde095e7464d1bd18f676d5957cd7f28013376af6b0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ConstantDivisors.lean",
+        "bytes": 1879,
+        "sha256": "6824027e72964a8c468d1a6e32f0a099d3fe41501cbdecf4510ad8824966896d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ConstantKernel.lean",
+        "bytes": 3505,
+        "sha256": "a66048dd185a17e3f9b49a0e0870260fe06ce8bf79c1fc491ec684c26d980c26"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DivisorDegree.lean",
+        "bytes": 2090,
+        "sha256": "90f0b79b8973002613252cab0ca8b39125044daeb90135a7a06165d8929460ab"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DivisorEvaluation.lean",
+        "bytes": 5560,
+        "sha256": "c90deb637a9a759baf1e6a2001d68421f3e90a4ccbe2cb6efcd459346dc4846c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationCertificate.lean",
+        "bytes": 7034,
+        "sha256": "03990d735d85ebb550c63c6ffe9a43ec0e37929d4dabc804e7978aef68182da2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationConstants.lean",
+        "bytes": 2828,
+        "sha256": "d07c7bf7023772cd01bbce604181d9f47736b12cafa4f04b5b22ddc9277fd14a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationControls.lean",
+        "bytes": 6387,
+        "sha256": "3b3568c38442fadad79af99fd274b498a79815495440cf8a9d455a312e747677"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationFormulas.lean",
+        "bytes": 4359,
+        "sha256": "09bc4b486a4ebdb43f0c38b7c2b8dd4c5ca4021f5347efc8ac9b5ef71d39783e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteRegular.lean",
+        "bytes": 4512,
+        "sha256": "11c97bd093f400e524480215b835b1c2bb0afb5dc8fe7626458d5ac4853feb5b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionEvaluation.lean",
+        "bytes": 3332,
+        "sha256": "1c6c52d8e1b1047ad5af676df020eee4f00aa0382d44c3fa4f462014b42a9312"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricCertificate.lean",
+        "bytes": 3257,
+        "sha256": "06619bf9d34c7ad63c4cbaa24ae0364a74138ee0f214fd112a476a887a27eae0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricControls.lean",
+        "bytes": 3994,
+        "sha256": "3a486893f0333ccc42aa363070992cd430948e8c804b144de097eb79616cda0e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricDegree.lean",
+        "bytes": 1765,
+        "sha256": "d6cf4517944b22254bb4549919de849da9f212daf85651c1144cf522f678507f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricFibers.lean",
+        "bytes": 1309,
+        "sha256": "39a7e06a20c0529ba59de470aae19dd32c8e08e9f7cf84f48af542daeb27d219"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricMiller.lean",
+        "bytes": 3786,
+        "sha256": "516ea587329e75fe95eb9dd5c903a4a58065726709acacaaa77e2074a9381d63"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/InfinityEvaluation.lean",
+        "bytes": 2135,
+        "sha256": "32790f41b39dd1bffe5c2af23dcdcaf198f44d58f37ec2a1ffbda4e372e0b764"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalNegation.lean",
+        "bytes": 3344,
+        "sha256": "389e1937500b192442e9f8dd858fd0f16c250a4112dc9beb1cbe6d0e7799a7e3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationCertificate.lean",
+        "bytes": 2363,
+        "sha256": "634c422e8e6c752872b7a960545711bd2cc0c204e063dcd64a92f0546935b555"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationControls.lean",
+        "bytes": 2673,
+        "sha256": "d879a00357297322c628f90d29489694be39f15104c978c48cc0ff8f23eaf604"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationCoordinate.lean",
+        "bytes": 4229,
+        "sha256": "7757296d2542df2aadcb26c84754163f9c9cb184214305d49a5fa969813790f1"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationDivisor.lean",
+        "bytes": 2042,
+        "sha256": "eae68fd2af513043179747ff6c8db825ebb71bb2bdaf57fbade4c4b47c17dc84"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationField.lean",
+        "bytes": 2834,
+        "sha256": "b4e670cf28477dc9ca7e9152019ac047935dfada79bb56b151ff1f663464ad4c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationNorm.lean",
+        "bytes": 1963,
+        "sha256": "d58625b3365f957f323a5b0893f593cfcb3b555e9523b3ef7aa018a5f79232b9"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationValuation.lean",
+        "bytes": 3340,
+        "sha256": "8ab265d21e0bbef2e6d32a3651310c4055585b369f5a97ddf2cd7d2ab8ff167e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormalizedUniqueness.lean",
+        "bytes": 2812,
+        "sha256": "91f8ada30670005c05bced0979b820104a287fe584eac94828dcea53e8f2eaea"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/OrderBounds.lean",
+        "bytes": 2249,
+        "sha256": "ec6e5cfd59ae338ff4333043c9180a77083e0fbe829ce120b8c22e359b9be667"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointResidue.lean",
+        "bytes": 3333,
+        "sha256": "cb3bea09d4a62c9beb55262a28782341dd6ae6d26c68baa4c9fa8419de113d8d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/SplitPolynomialDivisors.lean",
+        "bytes": 3773,
+        "sha256": "b7123a14082b947c5ca9835226de09d149b9848ceb7f3149e10864dd33833495"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/UnitEvaluation.lean",
+        "bytes": 2888,
+        "sha256": "81231451b2309aead4581f4e8b5f02d552136963be9b71a8cddd2a941886e145"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lakefile.toml",
+        "bytes": 1819,
+        "sha256": "1b1e48d961a39b99376fe8c91c3615e9b3ff3d19adc668b84e3edb3a8c42f4e6"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCertificate.lean",
+        "bytes": 2313,
+        "sha256": "2d4ae70691f817f1554baf35a2aa8ae47a7f4e16897077785d793433162a4f74"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardControls.lean",
+        "bytes": 2095,
+        "sha256": "96f2f3b92bc1721cd38ab6c9577c61f30bf100ae880e17988ebfac787ebb87b4"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCriterion.lean",
+        "bytes": 3133,
+        "sha256": "04c8f87a64a53c8e3005c4f9f82c194cbdd570720051064f2804c25e4ab5e52a"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardMaximal.lean",
+        "bytes": 3841,
+        "sha256": "9c7574e36b61c61d509e188b2c61996f948a1fa2f3c9a7b9bda8a7b11e49c32a"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardQuotient.lean",
+        "bytes": 3843,
+        "sha256": "848e0dc8e421fa1e10d7626947812f39dfdce41f3063897cb2f09bb315a5d0e3"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardReduction.lean",
+        "bytes": 3883,
+        "sha256": "a445f056f22c19ec71bef988329d306edb05aced3bd48e59d36c6e007d8dd28e"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardRegular.lean",
+        "bytes": 3815,
+        "sha256": "ed525803c0c986e04ca834547f3dc1e7d3d4c2fa5fdf7e76b0f3f400959fdeba"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardSimplePole.lean",
+        "bytes": 2820,
+        "sha256": "9b105e496631a69cf2f1257f47a591b1ab1a9886d3d989fcc2b71c2438cf7a92"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3855,
+        "sha256": "1cb2762973a33160fe149a565575e9e82a18adc7d9db9af4d79a400f7ba37635"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lakefile.toml",
+        "bytes": 421,
+        "sha256": "af07c233c593116e9c7403db6eae93b7ca0686c99b315019529120ebe923e06e"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationAction.lean",
+        "bytes": 4546,
+        "sha256": "9b493a8522646d8dde14fcfa08900608276b7055b592832e870927550cbcb875"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationCertificate.lean",
+        "bytes": 3804,
+        "sha256": "a07ae87f8c6daa4f94ddb2cce2520ee4940d1aa86f1bde2162c6ef4cb19f1a34"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationCoordinate.lean",
+        "bytes": 5119,
+        "sha256": "3dc238d7a308870bb43af588054d607b81d86079b3c522ea6c8088469ca3ebce"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationDivisors.lean",
+        "bytes": 4603,
+        "sha256": "8d3c610b5b1c004a6554f0544989f3b0a93d61e196a94e9f1630b947ccd84dd7"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationExample.lean",
+        "bytes": 4140,
+        "sha256": "f07f0797f67481945c1e0471110307806aab3495e471141e6c5d2fb5bc1da863"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationExampleField.lean",
+        "bytes": 6465,
+        "sha256": "962220d21638df384e8dc2212c4c7bbbc691e517a4d42509fc6b5c2e9896cd79"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationGeneration.lean",
+        "bytes": 1645,
+        "sha256": "5109dccc3ab70a15a73f9e4746fce8535ce8845287adc0c5f05df08cccbae8cd"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationGeneric.lean",
+        "bytes": 4091,
+        "sha256": "56898fc8e1161d67da000434cb37120b73e48058e7e93bd66b2c65d3327b2ae6"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationNaturality.lean",
+        "bytes": 4173,
+        "sha256": "fada47e8e5329a34f3873e054e60f3ae158b4463253d9c60b0a2ed052afbe40c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationPicard.lean",
+        "bytes": 3305,
+        "sha256": "55642c487e83c031245ed28c221cff1405996c077a8290e3f648ae73cd6f427c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationReciprocal.lean",
+        "bytes": 1456,
+        "sha256": "c655b6a79791682a29a11bcaa613694acea1751149b35ce993fcdd39c95a1496"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationTranscendence.lean",
+        "bytes": 3760,
+        "sha256": "e58f562dcc65c72f9cc684e7a06b6b4446ea617566055b5c59d364e5c9db0e17"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4144,
+        "sha256": "8b0997e4d2209b72f3a1ca3c679eba4f56b23d4abcf381469fb27459344dda3c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lakefile.toml",
+        "bytes": 556,
+        "sha256": "6d95f754870438183edcdc3cac19269fcb1fc92cd9a3eca3b42627a249503ff4"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/LocalTranslationCertificate.lean",
+        "bytes": 3769,
+        "sha256": "c1e8c7e681be72be71e781f7dbcdfb039a622683d8a888c5ab05641bb93c9c20"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationEvaluation.lean",
+        "bytes": 4262,
+        "sha256": "cd2eb5ca1dd3336b7ed6b2e0fb20e1bbd2b7195d340f0501e6642f85a1e2b89a"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationExpansion.lean",
+        "bytes": 5328,
+        "sha256": "d6aa8a63c5ad5f30a1729dec99af82da397b2ffd0dbf6643cffb9abc910fa5e7"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationInfinity.lean",
+        "bytes": 6531,
+        "sha256": "d6fe54ad1bc4398c795f2116a8f2ed5803764187a74de2cd0f9890b4a7bc6af6"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationIntegral.lean",
+        "bytes": 6057,
+        "sha256": "bdb852d02c3e96b0518a31d903b2a4d6f81b742827498231deee2c574c9ada0f"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationLocal.lean",
+        "bytes": 6850,
+        "sha256": "035f7bb97404bb3da3bec9d9e2152804c3a27cb93dfaca16d76ad9c7b1832c7f"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationSign.lean",
+        "bytes": 4629,
+        "sha256": "4e860160923efcbd8923e9fa34ce42a0575a1937c260a41724cd58ab75967f2e"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationTransport.lean",
+        "bytes": 4838,
+        "sha256": "29c8ee927a8e5b63825862134dff03334e4d5b4760902a6af9c2e9b64f5f6c08"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationValuation.lean",
+        "bytes": 4492,
+        "sha256": "195c44f048a50b7d10bea418360be952119d46bdccdd820978e0f007e1432fbe"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4428,
+        "sha256": "cd7e02f27ca7bb073688db80a0fc7a5a74cda21f48bba8b5bb227bd76afdec8d"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lakefile.toml",
+        "bytes": 466,
+        "sha256": "09adc3c18cdb3857bdf559fa7c762b3db3a6a34a3c3ffd6f9da1a4cf70629c6b"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralAction.lean",
+        "bytes": 5804,
+        "sha256": "7b0ba31de5730b420c198f5016f714581102b7c46b99db2aa2d9db51d4680976"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralControls.lean",
+        "bytes": 5964,
+        "sha256": "e3448e7f0ec272c11676fa19150ea1e3296fc62c78ad6594df605d5861061166"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralEvaluation.lean",
+        "bytes": 3200,
+        "sha256": "ace444e2cbf7e1cc3f1d219d84b8991c2138ff003a5d699ce60cc6f71652fd2d"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralExtension.lean",
+        "bytes": 5819,
+        "sha256": "fad85d911a5c8985c5d0a428357885085805a4338156887d0e56e5b5b2c5f286"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralField.lean",
+        "bytes": 3400,
+        "sha256": "9dd1dcfbea25d96309dae1c84770804f7449a2a331d9cbb1e0d138575cb86fce"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralLocal.lean",
+        "bytes": 5282,
+        "sha256": "08462446c9ae3354cb86b59dd86318d76ccdc2aed15221ee76a61bf1c4cea374"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralLocalMap.lean",
+        "bytes": 6350,
+        "sha256": "4783f83184e57ce12d9b98d6a34cb0bd7bfd2e83c611494f4ed84f0c3400a5d0"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralRegularBasechange.lean",
+        "bytes": 3827,
+        "sha256": "dc247dfa1b3e9b0db992d0ff852db11ace2adb52fd1783996d0e32c0394de92b"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralTranscendence.lean",
+        "bytes": 5155,
+        "sha256": "9f9139ce06793c26d12c2ea3163668ef5d60186f4a7bd18ef2f9ed39325021f5"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralTranslationCertificate.lean",
+        "bytes": 8182,
+        "sha256": "b8fbf0fe06ef0d248337720eb54d175296a86ff30832af68d1fda8179dce734d"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralTransport.lean",
+        "bytes": 4956,
+        "sha256": "e9d2b7989e63de78470efb3d5b0f268248d149d21c35f53d847e8df3a35938b9"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/GeneralValuationBasechange.lean",
+        "bytes": 5971,
+        "sha256": "2533bd9e25d22a0c3434e0d53e7e482862986ab56cfa3b7e3303a3611f16b9e2"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4711,
+        "sha256": "b54867607acf1649aee620cc2ded256d77f2086aefe169cb9edbe46b215b5997"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/lakefile.toml",
+        "bytes": 516,
+        "sha256": "515e02f9fbdb49c3bca901f79101497eda6b324c8588aa823124a428e7568efc"
+      },
+      {
+        "path": "research/general_translation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+        "bytes": 4882,
+        "sha256": "f3ba6212a416b534a4841417745ebe3d73ed1c02888abb8ed2cf2fea7a8ed2cd"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+        "bytes": 2094,
+        "sha256": "7f19c4896dcb2f348fef4fb18de4d7764e97b76303101c22863d7e9d1edaaf5c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+        "bytes": 3338,
+        "sha256": "dc1118fec71e3e25a176da44e798721baba5385efc0e16aa14ad46edefca00f5"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+        "bytes": 2580,
+        "sha256": "15975255d4f4ac1d84be82f104c4f339c5e752923a1881b446766a883c1d464e"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+        "bytes": 1492,
+        "sha256": "0c146876e71121a4716165bce9e3125e65cce4e9de466ab72aa9bc129835aaa4"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/GeneralThreeBKCertificate.lean",
+        "bytes": 6082,
+        "sha256": "f6934ac0e1d3a99ff5ae357a2eb081504d0ae423860f146ff0db88c1d2196167"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftCoordinates.lean",
+        "bytes": 2923,
+        "sha256": "497e5d338b380a13392407438663a4e238f73c9de1ee81f86df8bcdf0353893c"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftDescent.lean",
+        "bytes": 6809,
+        "sha256": "d6889ff5327f3ad43d9bb72e522505178a3caa8b7afc7d5f3b256317f8c51dd3"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftPointGroup.lean",
+        "bytes": 5690,
+        "sha256": "35980d3f1169af1462f658b52193b64613c6d789d6411762add15a30454c27e2"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeCountBridge.lean",
+        "bytes": 2355,
+        "sha256": "fdc6ea9d81c705bf70f9f097f9950e65fbb224dceb80bfd537d7179dfe018817"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeNormalForm.lean",
+        "bytes": 2244,
+        "sha256": "64f11c4dffbc1520e3f21df243e1f8235748a37d5de7a66f0a5506fb2e3fb34d"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterControls.lean",
+        "bytes": 7752,
+        "sha256": "e9cdcfe6993511dd3d84838cbfb20ee3ea2ff57684b9613880874127cc116dcd"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterFrobenius.lean",
+        "bytes": 4672,
+        "sha256": "31ce844af27e7fc15d473409b05d9974e6617ce8d0b4a5444fd6aebe77172357"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterModule.lean",
+        "bytes": 7522,
+        "sha256": "62e7974780d85bb57951cf47e64cbd6456c7e33a1b60f8da0a6e3c9fcd651b42"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterPoint.lean",
+        "bytes": 8681,
+        "sha256": "897bf21ecd85d70e6e65f1678de86df2610367e73a00f9a6acdbd78294b6f093"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterScalar.lean",
+        "bytes": 4757,
+        "sha256": "181b7e59dfcac10f50993b108e3d084cd2df4520dc9238aaaef807a3cff0dd6d"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+        "bytes": 2653,
+        "sha256": "187b01e8b72494449ceb9f2fd42cd33fd10b09f85b57d14a0d695688ec8b9550"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+        "bytes": 5157,
+        "sha256": "44c162daf6bc9ea3bacb0a3e5b965d8572f4f097d60aaa215df81a452bfbbab3"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+        "bytes": 2400,
+        "sha256": "5caa1d00afe151a6259dc659c40295afcb128a3b3fc6234f7c27e68a8e926cd2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+        "bytes": 6143,
+        "sha256": "ae23e54b95ea98aa9f98d1a7f3a22d2c4fb0c4321330dd2dc36a4579e88c7f72"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+        "bytes": 4722,
+        "sha256": "f61099252ac9f05b6482e4f19559f02e9ef199fc7d44395dbb599c650bb0beb6"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+        "bytes": 2294,
+        "sha256": "139ff737ff154ca1f3952d82b4dab42512ddf382a977f76fc8e4ec301d4b2339"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+        "bytes": 3190,
+        "sha256": "c93226b190f59c494c6b01beaeaa71c9a01036edfea09d35ebabf64915bfc1dc"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+        "bytes": 2533,
+        "sha256": "32894b1a1e4f10e6a04d06ebf02324ff999442826f4cb3a8e548a4abddbb01b9"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lakefile.toml",
+        "bytes": 395,
+        "sha256": "38f4ff5da23bd75c602f06ae62ff82a6404ca10cd3640f65f357fb2854441ad0"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5109,
+        "sha256": "36439b5916281050c33f7d50b635cb5ca8d7fdfcf1678b5a23052d019f8a1cee"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 420,
+        "sha256": "735b3aab39dd0d098d60c9ea782d6c853b3dd72e5e15d39f2e038e8ed75a5937"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4599,
+        "sha256": "318bc66aa76c02fb7cccccf4b6bf23c7a46f4c0292a6c94fe6969fae984ff1ae"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lakefile.toml",
+        "bytes": 519,
+        "sha256": "af999734bbc208c01f4a5d309c6794a74fefc4af4a759d0dc966bfc35f87687d"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4154,
+        "sha256": "7b264e6be03b8ef82293d0897a321bfdb3a244b4a301ca374dba1182b6a831cf"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lakefile.toml",
+        "bytes": 282,
+        "sha256": "a8b213339113a23409463c0085eeb018856674ecb04338455d072c3d22a242d1"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3810,
+        "sha256": "eb1cf595e6547efb084a2f16644bdbd3d6a9ddd5752f9d1639396e94217bc2ea"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentCertificate.lean",
+        "bytes": 3972,
+        "sha256": "5c7a95af09ee52e562e353d9f602608092e73fc9294c1dcf486452723f88dfa2"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentCharacter.lean",
+        "bytes": 4549,
+        "sha256": "b7e72a04534ec8775ea97834ad6677e492e0e0ca39c509293d91f648e1e0ae24"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentControls.lean",
+        "bytes": 3386,
+        "sha256": "aa2438bb70b19c5dd5c713bd836fcf11652bea3ac3c0a57171ec9b09bb1859c7"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentCoordinates.lean",
+        "bytes": 2850,
+        "sha256": "7a1cd436083d2f6f92ea047bf3c0d3ba7ed2e1ac5e6058c3a1c33ab03fe811a6"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentCovariance.lean",
+        "bytes": 2304,
+        "sha256": "76c1384c19ad3cbffa1d143ceaddc3c1a54ead631395baafb3832ece1262cec8"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentFrobenius.lean",
+        "bytes": 1954,
+        "sha256": "668a2822527410bf16596099580407d9c6cd03c723cdb4915ef9a5e06a1a1a2d"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentNecessity.lean",
+        "bytes": 1105,
+        "sha256": "478c25bd3e6864edc7b52bc14a9fb32aef62f670775e5666b43df09998f995c2"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentPerfect.lean",
+        "bytes": 3636,
+        "sha256": "fc54ea905538b90fabe7670e925fb0858ea13bc754fafdf0eebccf2379daa2fb"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentPoint.lean",
+        "bytes": 2574,
+        "sha256": "6f1af53fda9cff31f7f13fc7011d90ecec000063d7e5811ccc66e8bac4224c1d"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/TangentScalar.lean",
+        "bytes": 2602,
+        "sha256": "973cc49dc473ba7be03b95db029f65ef314af9672b1bc7448420358d3fbe322a"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/lake-manifest.json",
+        "bytes": 5507,
+        "sha256": "52d6ec8d4efedd7c7f053e543bf540a5c339462bf62d75e255849512c775bd87"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/lakefile.toml",
+        "bytes": 462,
+        "sha256": "7d254b74b127d53343d99f4a9071672b884c3b9261418616ba6ee2d2c3bc4fb0"
+      },
+      {
+        "path": "research/three_tangent_pairing_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryChoice.lean",
+        "bytes": 3886,
+        "sha256": "0289a79c5862bc4134f96eeb5e44a7871d5e2fdde3cf221f6475ce453ce7e0ce"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryComparison.lean",
+        "bytes": 3692,
+        "sha256": "82ce77dcbe56834d21060bee34812778beb7539dd47cac61d65c724ca8f9be67"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryControls.lean",
+        "bytes": 4182,
+        "sha256": "9786a068224d87be9759a175e6d036dc82571782e69770827387a1abf47906f8"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryDiagonal.lean",
+        "bytes": 2904,
+        "sha256": "f06b2a11aec32e8a7226ec90a981d43c75a34d07d056e1c8b3a11ebea7dba197"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryDivisor.lean",
+        "bytes": 5251,
+        "sha256": "836e0bd2a0a39aaaea9a34b5cc6b2706547025ec1c75bd6054ed8e58e24d3a5a"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryEvaluation.lean",
+        "bytes": 4609,
+        "sha256": "172156ef9e78ea816f4673d860412365d14d12bb58f28aa7ab02d4b4244a5e55"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryExistence.lean",
+        "bytes": 3489,
+        "sha256": "9fc4ee4dfaffed3c319a23cd6ce925271267b2e2449ecf2d77e8d4cf006b0faf"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryLeading.lean",
+        "bytes": 3462,
+        "sha256": "74570290e0cfa63e9ec2e2ab79a61ff7345373623a0f0ff5c955d348cba8c9c3"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryLocal.lean",
+        "bytes": 6020,
+        "sha256": "e4bcdd7e08c5ae0474e9e203b7906d753305b1a070e3c072cc165cd4fa479142"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryOrbits.lean",
+        "bytes": 5601,
+        "sha256": "f6c8aeb4a3434a7ccf6908a46702d8c00f10d526c52b7307582ecbaf10018f32"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryRepresentatives.lean",
+        "bytes": 5688,
+        "sha256": "0f90789340015af45f193a6106b207a7d3990f12178fff36a8815350bc3a2223"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryScalar.lean",
+        "bytes": 6006,
+        "sha256": "f24b9ab6dd4154d4db760051593b0c86a2eb37dbca1df98787f1c0dde4d5274a"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliarySource.lean",
+        "bytes": 5623,
+        "sha256": "c3057a84e886fd1bcbcbdf3fb122f702e1853807fe3ff26ad96a0bd2b1c8f682"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliarySpecialCases.lean",
+        "bytes": 3983,
+        "sha256": "0d3c8df33de88c8e7c1ce5914eb6550721aa7ead0ae608302a9d267f9d117f02"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryTangents.lean",
+        "bytes": 3810,
+        "sha256": "802888fe95d9dd70d0338ebade08adb6399c9edec9da9e6d2f0edc4e30577233"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryWeilThree.lean",
+        "bytes": 6279,
+        "sha256": "a44d04c6d4139d0dd145893e94874cbfa3a9a79f2d5d49f4e330410ab9d88152"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/WeilAuxiliaryCertificate.lean",
+        "bytes": 5025,
+        "sha256": "d92adfb8d25aec60c642382a2df70ed4f16907f0744881b8052f9a5328dbede0"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/lake-manifest.json",
+        "bytes": 7233,
+        "sha256": "b221a14716cc4a88ee3ef72291dd2cb7c4371d75df1d62dea760b0a9c6af0aca"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/lakefile.toml",
+        "bytes": 733,
+        "sha256": "5392d140a28df1ac13eaa58f0097b30fbfaf5fa59efa66b166d80d5ef9feb571"
+      },
+      {
+        "path": "research/weil_auxiliary_ratio_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameCertificate.lean",
+        "bytes": 3831,
+        "sha256": "98daa265f24455e759fb3c7c9a948478a1c1b0be99e4e601953a87f32e67faac"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameControls.lean",
+        "bytes": 8015,
+        "sha256": "e1626c4269d110dcb44cd9441848423566543b03c89df6f42bbc45859d697562"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameDisjoint.lean",
+        "bytes": 5274,
+        "sha256": "7d2481fb7422d270c5de59f3f6be0dd2bbe6b71a460d61952b6d262b2e310c5f"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameGeometricControls.lean",
+        "bytes": 3108,
+        "sha256": "dd8b83f1c4d40f72efc1baa9115dae384a8a713d1bf0eb4b2eb7195de3727af8"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameImports.lean",
+        "bytes": 146,
+        "sha256": "ed38cf3ec4867d276b7857cc63f9fa3b543c227febe10cee5b33c1dff7638154"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameLaws.lean",
+        "bytes": 3377,
+        "sha256": "72616e0e693a02aeb27861f82a4df65189a1eaae94890d0c29fef56c1dee9d29"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameLocal.lean",
+        "bytes": 3831,
+        "sha256": "77f1c1fa926b8a8f44146336dc95d9ced60360fb104452789e410f90980d56ed"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameParameter.lean",
+        "bytes": 4874,
+        "sha256": "c19d11af076f105c6283f46dc540c5a4b028ab9340bf70a00e4a7359303f8728"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameProduct.lean",
+        "bytes": 5776,
+        "sha256": "fd76798c734b03ccab7168c2e1a261e15be1c36b523b1fc6ab35667ffc1b7715"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/TameSteinberg.lean",
+        "bytes": 5061,
+        "sha256": "630574b7c8fd751f18dfff7b4ddd6809b32f30edd6de23289fede7bc445001d9"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/lake-manifest.json",
+        "bytes": 7519,
+        "sha256": "3e858faf9e15c788e3db7a0647822eff7aaded83862fbd8140bd579fee884bbf"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/lakefile.toml",
+        "bytes": 425,
+        "sha256": "b6cc4809f50a30a34b45788c39b75705b05c0dc0952cded80b1cf5ce9ded1c03"
+      },
+      {
+        "path": "research/elliptic_tame_symbol_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualCriterion",
+    "ActualFrobenius",
+    "ActualMatrix",
+    "AllMiller",
+    "AuxiliaryChoice",
+    "AuxiliaryComparison",
+    "AuxiliaryControls",
+    "AuxiliaryDiagonal",
+    "AuxiliaryDivisor",
+    "AuxiliaryEvaluation",
+    "AuxiliaryExistence",
+    "AuxiliaryLeading",
+    "AuxiliaryLocal",
+    "AuxiliaryOrbits",
+    "AuxiliaryRepresentatives",
+    "AuxiliaryScalar",
+    "AuxiliarySource",
+    "AuxiliarySpecialCases",
+    "AuxiliaryTangents",
+    "AuxiliaryWeilThree",
+    "BasechangeCertificate",
+    "BasechangeControls",
+    "BasechangeField",
+    "BasechangeFunctions",
+    "BasechangeInfinity",
+    "BasechangeMiller",
+    "BasechangeNorm",
+    "BasechangePoints",
+    "CharacteristicThree",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "ConstantDivisors",
+    "ConstantKernel",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "DivisionQuartic",
+    "DivisorDegree",
+    "DivisorEvaluation",
+    "EvaluationCertificate",
+    "EvaluationConstants",
+    "EvaluationControls",
+    "EvaluationFormulas",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteRegular",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FrobeniusFiniteExtension",
+    "FrobeniusPointDescent",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "FunctionEvaluation",
+    "GeneralAction",
+    "GeneralBasis",
+    "GeneralCardinality",
+    "GeneralControls",
+    "GeneralEvaluation",
+    "GeneralExtension",
+    "GeneralField",
+    "GeneralLocal",
+    "GeneralLocalMap",
+    "GeneralRegularBasechange",
+    "GeneralRoots",
+    "GeneralThreeBKCertificate",
+    "GeneralTranscendence",
+    "GeneralTranslationCertificate",
+    "GeneralTransport",
+    "GeneralTriplePoint",
+    "GeneralValuationBasechange",
+    "GenericFrobenius",
+    "GeometricCardinality",
+    "GeometricCertificate",
+    "GeometricControls",
+    "GeometricDegree",
+    "GeometricFibers",
+    "GeometricMiller",
+    "GuardControls",
+    "InfinityEvaluation",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalNegation",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "LocalTranslationCertificate",
+    "MillerFunctions",
+    "MillerStep",
+    "NegationCertificate",
+    "NegationControls",
+    "NegationCoordinate",
+    "NegationDivisor",
+    "NegationField",
+    "NegationNorm",
+    "NegationValuation",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "NormalizedUniqueness",
+    "OrderBounds",
+    "OriginEvaluation",
+    "PicardCertificate",
+    "PicardControls",
+    "PicardCriterion",
+    "PicardMaximal",
+    "PicardQuotient",
+    "PicardReduction",
+    "PicardRegular",
+    "PicardSimplePole",
+    "PointDivisor",
+    "PointLocalization",
+    "PointResidue",
+    "PolynomialValues",
+    "QuarticRoots",
+    "RationalControls",
+    "RationalCounterexample",
+    "RationalTorsion",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "S3Completion",
+    "S3Roots",
+    "ShiftCoordinates",
+    "ShiftDescent",
+    "ShiftPointGroup",
+    "SplitPolynomialDivisors",
+    "StructuralAudit",
+    "TameCertificate",
+    "TameControls",
+    "TameDisjoint",
+    "TameGeometricControls",
+    "TameImports",
+    "TameLaws",
+    "TameLocal",
+    "TameParameter",
+    "TameProduct",
+    "TameSteinberg",
+    "TangentCertificate",
+    "TangentCharacter",
+    "TangentControls",
+    "TangentCoordinates",
+    "TangentCovariance",
+    "TangentFrobenius",
+    "TangentNecessity",
+    "TangentPerfect",
+    "TangentPoint",
+    "TangentScalar",
+    "TernaryBasis",
+    "ThreeCharacterControls",
+    "ThreeCharacterFrobenius",
+    "ThreeCharacterModule",
+    "ThreeCharacterPoint",
+    "ThreeCharacterScalar",
+    "ThreeCountBridge",
+    "ThreeNormalForm",
+    "TorsionBoundaries",
+    "TranslationAction",
+    "TranslationCertificate",
+    "TranslationCoordinate",
+    "TranslationDivisors",
+    "TranslationEvaluation",
+    "TranslationExample",
+    "TranslationExampleField",
+    "TranslationExpansion",
+    "TranslationGeneration",
+    "TranslationGeneric",
+    "TranslationInfinity",
+    "TranslationIntegral",
+    "TranslationLocal",
+    "TranslationNaturality",
+    "TranslationPicard",
+    "TranslationReciprocal",
+    "TranslationSign",
+    "TranslationTranscendence",
+    "TranslationTransport",
+    "TranslationValuation",
+    "TriplePoint",
+    "UnitEvaluation",
+    "ValuationCertificate",
+    "WeilAuxiliaryCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 56608,
+      "sha256": "24900df57867c7c1980fbe736cafefeee1784fab1ef46687100be541886acfd8"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 90,
+      "sha256": "3544e7913bc21a010705e6d4eecc2b739b4bc2b2e25d201376219aa862633025"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/attempts.json",
+      "bytes": 656,
+      "sha256": "e9e12b917be421d48c8d6df27de72746ae6972b8551ad0175b544d235595022b"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 16630,
+      "sha256": "206a24ea241ea207a0968e2cdee26ffe4cb8de6cf298a0752e6d2fb483d61e11"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/gate.json",
+      "bytes": 22093,
+      "sha256": "e217799b38369a9225354d254a61d26334e5a032a63a80ce0a60626247d6d372"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/source-review.json",
+      "bytes": 2029,
+      "sha256": "60864512ebb0352eeea894641a57aa3ab548ae97026d5b7ea71a74382cd8541b"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/evidence/binding-check.json",
+      "bytes": 8586,
+      "sha256": "b59f398a62d0aeaf2ec3eefa92ac2ae5c6f278caf6506370c732079feaa58514"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/proof-map.json",
+      "bytes": 30406,
+      "sha256": "462de38dce7ff5bc01d8190a0deb7b931f5277185c0168efe2b21acb6853f9ad"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/render_report.py",
+      "bytes": 7302,
+      "sha256": "4ae7fa3fc522dc6181c1bbed582bd0b03b70909cdd07d3dff93838b11cc5f3b4"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/restore_attempts.py",
+      "bytes": 1454,
+      "sha256": "ad4323d1a631009f5ab16d39ca7067ec39a5cbd7fc355f0723e58da5ac7adbfc"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/export_binding_input.py",
+      "bytes": 1742,
+      "sha256": "e59a5ebf9632d8057df33745a0955328f62bae3f6db76c9a50737d0c3d84d7c7"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/PROTOCOL.md",
+      "bytes": 4769,
+      "sha256": "c6b212cb505ec013bbe879aed21edaf8403150eb79c0cdb545a078b4ccd5bb7b"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/preflight.json",
+      "bytes": 24694,
+      "sha256": "774ae6e081d42d02b839d2efb6992ee6aac1eae739cb0e7a9aefc7ec6d123f55"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/reports/elliptic-tame.svg",
+      "bytes": 1464,
+      "sha256": "12c51439f2c8912d4ed735b9dd7957a5be0c14b2b32810c228c3b9572d5f79df"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/reports/layout.json",
+      "bytes": 251,
+      "sha256": "add56e654b7a81e9ecdfa69188a522b052395f3b185e04ceb4a9adc877f8011b"
+    },
+    {
+      "path": "research/elliptic_tame_symbol_audit_20261115/reports/report.pdf",
+      "bytes": 47201,
+      "sha256": "dee4cda05c868ed970e29bc6031be22a87459716e95c7c1258688bde760e2141"
+    },
+    {
+      "path": "research/weil_auxiliary_ratio_audit_20261115/sources.json",
+      "bytes": 64406,
+      "sha256": "f0b192cb775626f1f3cbf33afed92ba8615f32110099732f66ee37521223777a"
+    }
+  ],
+  "assurance": {
+    "all238pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "default_recursion_failure08_retained": true,
+    "known_author_erratum_credited": true,
+    "actual_local_symbol_laws": true,
+    "actual_Steinberg": true,
+    "actual_any_parameter_formula_independence": true,
+    "actual_every_point_parameter": true,
+    "actual_finite_product_support": true,
+    "actual_guarded_disjoint_evaluation_ratio": true,
+    "actual_geometric_constant_diagonal_products": true,
+    "actual_F5_sign_inverse_rational_scope_counters": true,
+    "actual_matched_ACF5_positive": true,
+    "actual_F2_positive": true,
+    "general_global_reciprocity": false,
+    "norm_projection_ramification": false,
+    "arbitrary_divisor_representative_independence": false,
+    "multiplication_isogeny_comparison": false,
+    "general_geometric_descent_canonical_Tate_MOV_FR": false,
+    "full14complete": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 71,
+    "new_modules": 10,
+    "new_concrete_modules": 9,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 187,
+    "actually_imported_custom_modules": 169,
+    "actually_imported_frozen_modules": 159
+  }
+}

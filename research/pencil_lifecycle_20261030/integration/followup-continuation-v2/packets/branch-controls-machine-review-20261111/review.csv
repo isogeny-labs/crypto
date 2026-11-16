@@ -1,0 +1,22 @@
+category,name,observed,expected,status,scope
+compiler_call,BranchRootMultiplicity,0,0,pass,Lean elaboration/compilation
+compiler_call,BranchCoefficientMultiplicity,0,0,pass,Lean elaboration/compilation
+compiler_call,IndependentControls,0,0,pass,Lean elaboration/compilation
+compiler_call,Readback,0,0,pass,Lean elaboration/compilation
+compiler_call,ExpectedFailure,1,1,pass,Lean elaboration/compilation
+axiom_readback,BranchCoefficientMultiplicity.source_support_base_multiplicity_sum,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.coefficients,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.residual_value,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.determinant_nonzero,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.valid_first,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.valid_second,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.bezout,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.separable,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.branch_root,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.support_zero,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.actual_source_instance,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.equal_support_determinant_zero,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+axiom_readback,BranchCoefficientControls.wrong_branch_rejected,propext;Classical.choice;Quot.sound,propext;Classical.choice;Quot.sound,pass,named declaration dependency readback
+custody,dependency_files,16736,16736,pass,pre/post hash map equality
+custody,dependency_bytes,3111892318,3111892318,pass,pre/post full read
+runtime,worker_wall_seconds,287.195459434995,<=600,pass,three bounded phases

@@ -1,0 +1,41 @@
+{
+  "schema": "research.source-packet/v1",
+  "title": "Two-workspace lock gate v4 UTC-parser successor",
+  "status": "source_only_unexecuted",
+  "task": "T-2134",
+  "version": 4,
+  "changes": [
+    "normalize the required terminal Z to +00:00 before datetime.fromisoformat in both caller and worker",
+    "use unique v4 workspace, unit, and command paths"
+  ],
+  "preserved": [
+    "v3 packet bytes",
+    "v3 failure observation",
+    "50 staged source bindings",
+    "private-network resolver boundary",
+    "45-second shared resolver deadline",
+    "60-second attempt reservation",
+    "one-attempt and no-automatic-retry rule"
+  ],
+  "campaign": {
+    "ceiling_seconds": 129600,
+    "charged_seconds": 3660,
+    "reserved_seconds": 0,
+    "unreserved_seconds": 125940,
+    "absolute_deadline": "2026-11-11T12:00:00Z"
+  },
+  "compiler_runs": 0,
+  "tests_run": 0,
+  "resolver_runs": 0,
+  "lock_generation_runs": 0,
+  "service_runs": 0,
+  "payload_runs": 0,
+  "released": false,
+  "cost_ratio_to_rho": null,
+  "pending": [
+    "independent v4 source review",
+    "fresh serial-owner and workspace/unit readback",
+    "publication and remote readback",
+    "immutable release and current ledger reservation"
+  ]
+}

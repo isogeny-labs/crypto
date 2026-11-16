@@ -21,6 +21,7 @@ measurement of its own.
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_left
 import contextlib
 import fnmatch
 import hashlib
@@ -195,6 +196,10 @@ class RepositoryInputs:
         self.tracked_files = {
             item[2:].decode("utf-8", "surrogateescape") for item in entries
         }
+        self._sorted_paths = sorted(self.tracked_files)
+        self._head_sizes = {}
+        self._head_oids = {}
+        self._blob_reader = None
         self.sparse_files = {
             item[2:].decode("utf-8", "surrogateescape")
             for item in entries
@@ -229,16 +234,19 @@ class RepositoryInputs:
 
     def glob_files(self, pattern: str) -> list[str]:
         pattern = self._relative(pattern)
-        # ``tracked_files`` is already the complete source universe. Scanning
-        # that in-memory index once avoids recursively walking the 312k-file
-        # worktree for every pattern. ``exists`` retains the sparse overlay:
+        # Narrow the sorted Git index by its literal prefix, then apply the
+        # existing component matcher. ``exists`` retains the sparse overlay:
         # sparse HEAD entries count, worktree modifications count, ordinary
         # tracked deletions and untracked files do not.
-        return sorted(
-            path
-            for path in self.tracked_files
-            if _glob_match(path, pattern) and self.exists(path)
-        )
+        wildcard = re.search(r"[*?\[]", pattern)
+        prefix = pattern[:wildcard.start()] if wildcard else pattern
+        paths = []
+        for path in self._sorted_paths[bisect_left(self._sorted_paths, prefix):]:
+            if not path.startswith(prefix):
+                break
+            if _glob_match(path, pattern) and self.exists(path):
+                paths.append(path)
+        return paths
 
     def child_directories(self, base: str) -> list[str]:
         base = self._relative(base).rstrip("/")
@@ -251,6 +259,30 @@ class RepositoryInputs:
                     children.add(remainder.split("/", 1)[0])
         return sorted(children)
 
+    def prefetch_sizes(self, paths: list[str]) -> None:
+        """Resolve sizes and IDs in one process; keep worktree reads authoritative."""
+        missing = sorted({self._relative(path) for path in paths
+                          if self._relative(path) in self.sparse_files
+                          and not os.path.isfile(self._absolute(path))
+                          and self._relative(path) not in self._head_sizes})
+        if not missing:
+            return
+        result = subprocess.run(
+            ["git", "cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize)", "-z"],
+            cwd=self.root, env=self.git_env,
+            input=b"".join(os.fsencode(f"HEAD:{path}") + b"\0" for path in missing),
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        rows = result.stdout.splitlines()
+        if result.returncode or len(rows) != len(missing):
+            raise OSError("cannot batch-size sparse lab-browser inputs")
+        for path, row in zip(missing, rows):
+            fields = row.split()
+            if len(fields) == 3 and fields[1] == b"blob":
+                self._head_sizes[path] = int(fields[2])
+                self._head_oids[path] = fields[0].decode("ascii")
+            # Missing objects remain uncached and fail at their actual use.
+
     def size(self, path: str) -> int:
         relative = self._relative(path)
         absolute = os.path.join(self.root, relative)
@@ -258,6 +290,8 @@ class RepositoryInputs:
             return os.path.getsize(absolute)
         if relative not in self.sparse_files:
             raise FileNotFoundError(absolute)
+        if relative in self._head_sizes:
+            return self._head_sizes[relative]
         result = subprocess.run(
             ["git", "cat-file", "-s", f"HEAD:{relative}"],
             cwd=self.root,
@@ -282,7 +316,7 @@ class RepositoryInputs:
         if relative not in self.sparse_files:
             raise FileNotFoundError(absolute)
         proc = subprocess.Popen(
-            ["git", "cat-file", "blob", f"HEAD:{relative}"],
+            ["git", "cat-file", "blob", self._head_oids.get(relative, f"HEAD:{relative}")],
             cwd=self.root,
             env=self.git_env,
             stdout=subprocess.PIPE,
@@ -308,7 +342,66 @@ class RepositoryInputs:
             )
             raise OSError(f"cannot read sparse input HEAD:{relative}: {detail}")
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def close(self) -> None:
+        reader, self._blob_reader = self._blob_reader, None
+        if reader is None:
+            return
+        for stream in (reader.stdin, reader.stdout, reader.stderr):
+            if stream is not None:
+                try:
+                    stream.close()
+                except OSError:
+                    pass
+        try:
+            reader.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            reader.kill()
+            reader.wait()
+
+    def _read_sparse_blob(self, relative: str) -> bytes:
+        """Read one complete blob, retaining the batch process for the next request.
+
+        NUL-delimited requests admit embedded newlines in paths. Replies carry
+        an exact byte count, so embedded NULs/newlines in data stay framed.
+        Streaming consumers continue to use open_binary without buffering.
+        """
+        if self._blob_reader is None:
+            self._blob_reader = subprocess.Popen(
+                ["git", "cat-file", "--batch", "-z"], cwd=self.root, env=self.git_env,
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+        reader = self._blob_reader
+        assert reader.stdin is not None and reader.stdout is not None
+        oid = self._head_oids.get(relative)
+        request = oid if oid is not None else f"HEAD:{relative}"
+        try:
+            reader.stdin.write(os.fsencode(request) + b"\0")
+            reader.stdin.flush()
+            fields = reader.stdout.readline().split()
+            if (len(fields) != 3 or fields[1] != b"blob"
+                    or (oid is not None and fields[0] != oid.encode("ascii"))):
+                raise OSError("unexpected or unavailable blob")
+            size = int(fields[2])
+            if size < 0 or (relative in self._head_sizes and size != self._head_sizes[relative]):
+                raise OSError("unexpected blob size")
+            data = reader.stdout.read(size)
+            if len(data) != size or reader.stdout.read(1) != b"\n":
+                raise OSError("truncated blob response")
+            return data
+        except (OSError, ValueError) as error:
+            self.close()
+            raise OSError(f"cannot read sparse input HEAD:{relative}: {error}") from error
+
     def read_bytes(self, path: str) -> bytes:
+        relative = self._relative(path)
+        if relative in self.sparse_files and not os.path.isfile(self._absolute(relative)):
+            return self._read_sparse_blob(relative)
         with self.open_binary(path) as fh:
             return fh.read()
 
@@ -701,7 +794,9 @@ def tournament_rounds(curves: list[dict], source: RepositoryInputs) -> list[dict
 def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
-        for path in source.glob_files(pattern):
+        paths = source.glob_files(pattern)
+        source.prefetch_sizes(paths)
+        for path in paths:
             # The canonical leaderboard is required input even after it grows
             # beyond the cap for incidental text files. Otherwise published
             # IC1 identities disappear from search without a source change.
@@ -802,7 +897,11 @@ def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -
 
 
 def build() -> dict:
-    source = RepositoryInputs(ROOT)
+    with RepositoryInputs(ROOT) as source:
+        return _build(source)
+
+
+def _build(source: RepositoryInputs) -> dict:
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)

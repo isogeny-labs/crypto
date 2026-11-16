@@ -1,0 +1,43 @@
+{
+  "schema": "research.affine-replay-source-build-plan/v1",
+  "status": "prospective_not_allocated",
+  "local_prerequisite_modules": 132,
+  "fresh_candidate_calls": 4,
+  "total_compiler_calls": 136,
+  "source_graph": "source-closure.json",
+  "standard_runtime": "Recovered norm baseline plus exact core UInt.Bitwise entry;11 external imports resolved except legacy ZMod path requiring explicit import amendment. No Mathlib rebuild planned.",
+  "required_source_amendment": {
+    "module": "NatClassifier",
+    "old_sha256": "853521288fed7289e77db66a7a3971056af27b274a8e92327f5055c8aa7a5505",
+    "proposed_sha256": "f0fb2340838e43f8aefdb57e3d00687d72f4db67db1cef79800964831a1bc6be",
+    "patch": "NatClassifier-import.patch",
+    "proof_body_unchanged": true
+  },
+  "proposed_envelope": {
+    "total_worker_seconds": 10800,
+    "pre_seconds": 900,
+    "compiler_seconds": 9000,
+    "post_seconds": 900,
+    "per_module_seconds": 120,
+    "cpu": 1,
+    "memory_bytes": 8589934592,
+    "swap": 0,
+    "attempts": 1,
+    "automatic_retry": false,
+    "deadline": "2026-11-10T05:11:39Z",
+    "allocated": false,
+    "rationale": "136 calls share finite9000scompiler ceiling; per-module cap120s is not additive authorization. Complete-source compile times are unmeasured. Stop and retain partial failure at any cap; no assumption all136 finish."
+  },
+  "budget_evidence": {
+    "ledger": "campaign-renewal-20261109/ledger-root-v3-terminal.json",
+    "unreserved_at_that_snapshot": 30540,
+    "staleness": "Subsequent proof/root reservations must be subtracted by coordinator before allocation. This document does not assert current remaining balance."
+  },
+  "recovery_policy": "No indefinite excluded-cache locator; rebuild only exact resolved132 local modules in listed order after reviewed import amendment. Keep original source order and legacy name resolution. All theorem bodies and26readbacks retained.",
+  "next_actions": [
+    "Independent review of source closure precedence and one NatClassifier import replacement.",
+    "Stage exact132 source copies into unique private module directory; verify original hashes except the explicitly reviewed amendment. New candidate Controls/Readback names only override at final four calls, after prerequisites; do not pre-copy conflicting names over earlier module artifacts.",
+    "Bind full cached dependency/runtime custody and a finite source-run wrapper with phase deadlines/failure receipts.",
+    "Publish source and exact launch command, then coordinator decides10800s allocation from current unreserved ledger; no execution authorized by this plan."
+  ]
+}

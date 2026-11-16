@@ -1,0 +1,45 @@
+LIB "linalg.lib";
+proc require76(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../72/runs/rational-local72-01/rational-local72.sing"));
+matrix saved075=allIdempotents0_72;matrix saved175=allIdempotents1_72;
+intmat masks076[2][1];intmat masks176[4][1];intmat ranks076[2][1];intmat ranks176[4][1];
+masks076[1,1]=primitiveMask0_1_72;masks076[2,1]=primitiveMask0_2_72;
+masks176[1,1]=primitiveMask1_1_72;masks176[2,1]=primitiveMask1_2_72;
+masks176[3,1]=primitiveMask1_3_72;masks176[4,1]=primitiveMask1_4_72;
+ranks076[1,1]=primitiveRank0_1_72;ranks076[2,1]=primitiveRank0_2_72;
+ranks176[1,1]=primitiveRank1_1_72;ranks176[2,1]=primitiveRank1_2_72;
+ranks176[3,1]=primitiveRank1_3_72;ranks176[4,1]=primitiveRank1_4_72;
+require76(masks076[1,1]==1 && masks076[2,1]==3 && ranks076[1,1]==28 && ranks076[2,1]==4,"QUAD76_ZERO_DONOR_PROFILE");
+require76(masks176[1,1]==6 && masks176[2,1]==7 && masks176[3,1]==8 && masks176[4,1]==10 && ranks176[1,1]==2 && ranks176[2,1]==14 && ranks176[3,1]==2 && ranks176[4,1]==14,"QUAD76_ONE_DONOR_PROFILE");
+execute(read("../../../52/source-data/rr-table50.sing"));
+map idems76=rationalLocal72,u;
+matrix idems076=idems76(saved075);matrix idems176=idems76(saved175);
+intmat slot76[32][32];int p76;int i76;int j76;int k76;int b76;int f76;int n76;int mask76;int expected76;int zeros76=0;int ones76=0;
+for(p76=1;p76<=528;p76++){i76=parents50[p76,1];j76=parents50[p76,2];require76(i76>=1 && i76<=j76 && j76<=32 && slot76[i76,j76]==0,"QUAD76_SOURCE_PAIR");slot76[i76,j76]=p76;slot76[j76,i76]=p76;}
+for(i76=1;i76<=32;i76++){for(j76=1;j76<=32;j76++){require76(slot76[i76,j76]>0,"QUAD76_COMPLETE_TABLE");}}
+matrix fiber76[32][528];matrix unit76[32][1];matrix V76[32][1];matrix operatorV76[32][32];matrix EV76[32][1];matrix idem76[32][1];matrix operatorE76[32][32];
+for(f76=0;f76<=1;f76++){
+ for(p76=1;p76<=528;p76++){for(i76=1;i76<=32;i76++){fiber76[i76,p76]=subst(table50[i76,p76],u,f76);}}
+ for(i76=1;i76<=32;i76++){unit76[i76,1]=subst(sourceLift50[i76,1],u,f76);V76[i76,1]=subst(sourceLift50[i76,17],u,f76);}
+ operatorV76=matrix(0,32,32);
+ for(j76=1;j76<=32;j76++){for(i76=1;i76<=32;i76++){if(V76[i76,1]!=0){for(k76=1;k76<=32;k76++){operatorV76[k76,j76]=operatorV76[k76,j76]+V76[i76,1]*fiber76[k76,slot76[i76,j76]];}}}}
+ require76(operatorV76*unit76==V76,"QUAD76_SOURCE_UNIT");
+ require76(operatorV76*V76==matrix(0,32,1)+f76*V76+(f76+f76^3)*unit76,"QUAD76_SOURCE_EQUATION");
+ n76=4;if(f76==0){n76=2;}
+ for(b76=1;b76<=n76;b76++){
+  if(f76==0){mask76=masks076[b76,1];expected76=ranks076[b76,1];for(i76=1;i76<=32;i76++){idem76[i76,1]=idems076[i76,mask76];}}
+  else{mask76=masks176[b76,1];expected76=ranks176[b76,1];for(i76=1;i76<=32;i76++){idem76[i76,1]=idems176[i76,mask76];}}
+  operatorE76=matrix(0,32,32);
+  for(j76=1;j76<=32;j76++){for(i76=1;i76<=32;i76++){if(idem76[i76,1]!=0){for(k76=1;k76<=32;k76++){operatorE76[k76,j76]=operatorE76[k76,j76]+idem76[i76,1]*fiber76[k76,slot76[i76,j76]];}}}}
+  require76(operatorE76*operatorE76==operatorE76 && operatorE76*unit76==idem76 && mat_rk(operatorE76)==expected76,"QUAD76_PRIMITIVE_REBOUND");
+  EV76=operatorE76*V76;
+  if(f76==0){require76(EV76!=matrix(0,32,1) && operatorV76*EV76==matrix(0,32,1),"QUAD76_ZERO_SQUARE_NILPOTENT");print("QUAD76_FACTOR fiber=0 mask="+string(mask76)+" e="+string(expected76 div 2)+" V=square_zero_nonzero");}
+  else{
+   if(EV76==matrix(0,32,1)){zeros76++;print("QUAD76_FACTOR fiber=1 mask="+string(mask76)+" e="+string(expected76 div 2)+" V=0");}
+   else{require76(EV76==idem76,"QUAD76_ONE_IDEMPOTENT_RESIDUE");ones76++;print("QUAD76_FACTOR fiber=1 mask="+string(mask76)+" e="+string(expected76 div 2)+" V=1");}
+  }
+ }
+}
+require76(zeros76==2 && ones76==2,"QUAD76_COMPLETE_QUADRATIC_SPLIT");
+print("QUAD76_RESULT branches=6 zero_fiber=2 one_fiber_V0=2 one_fiber_V1=2 all_source_checks=1");
+print("QUADRATIC76_ALL_CHECKS_PASS");quit;

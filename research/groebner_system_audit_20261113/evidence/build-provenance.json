@@ -1,0 +1,114 @@
+{
+  "schema": "native-build-provenance/v1",
+  "created": "2026-11-13T01:40:47.843123+00:00",
+  "source_checkpoint_parent": "75bae9392909e15eb9d6f0fbeda977f043c159b8",
+  "analyzer_source_sha256": "53cd29a80b7b501b7419f9fa20e313a03938a760e17141d57c2006147c5d1f65",
+  "analyzer_compile_argv": [
+    "g++",
+    "-O2",
+    "-std=c++20",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "research/groebner_system_audit_20261113/native/analyze.cpp",
+    "-o",
+    "/workspace/scratch/groebner-system-native/analyze"
+  ],
+  "analyzer_compile_cwd": "/workspace/crypto-audit",
+  "analyzer_binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+  "msolve_binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+  "msolve_origin": {
+    "path": "/workspace/msolve-deps/build/msolve",
+    "upstream_commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+    "version": "0.6.5",
+    "build_recipe": "research/solver_multiplicity_audit_20261109/build-msolve.sh",
+    "build_recipe_sha256": "89ebcb92530002d63d6aebc1fc54c9309c218807f733eb31135dc6d05f8fb13e",
+    "same_original_binary": true
+  },
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "hostname": "2d18c814bc7e",
+  "dynamic_library_paths": [
+    "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0",
+    "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6",
+    "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+    "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libflint.so.17.0.0",
+    "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libgf2x.so.3.0.0",
+    "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libntl.so.44.0.1"
+  ],
+  "libraries": [
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307",
+      "bytes": 225672
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92",
+      "bytes": 1995216
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af",
+      "bytes": 182856
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0",
+      "sha256": "d15e1585c6c267296459570c8ac217ca9123044bcd4e896d2f686b32333445d2",
+      "bytes": 566080
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+      "sha256": "6456b504ac347bd50c419667440b691f6966ad8aff5309d2f06c977fe2f9debe",
+      "bytes": 348056
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+      "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3",
+      "bytes": 977112
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+      "sha256": "4e3ccf5b442fc91054b0153140fe62939009f98ca1367f45de62376d5b18d28c",
+      "bytes": 794992
+    },
+    {
+      "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+      "sha256": "972bb2a18b71140dab0240f8a1f68ab3fb1d56bcd4c4f824a91b70888faf5a00",
+      "bytes": 2497768
+    },
+    {
+      "path": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libflint.so.17.0.0",
+      "sha256": "bfc6a9ac22fcda76f7ad37b50f514c908b8757d984dad91b5ab2a224892c31d0",
+      "bytes": 7571704
+    },
+    {
+      "path": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libgf2x.so.3.0.0",
+      "sha256": "e7956bc61cd3646bb9084e730d467083e8b3613163c4f4831e67a64723ecfc74",
+      "bytes": 55304
+    },
+    {
+      "path": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libntl.so.44.0.1",
+      "sha256": "c92025b0e1b8f07fb0b2f8c536da82e3c9655163018743825dfbe68c450c5164",
+      "bytes": 2795696
+    }
+  ],
+  "ldd": {
+    "msolve": "\tlinux-vdso.so.1 (0x00007fabc221c000)\n\tlibflint.so.17 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libflint.so.17 (0x00007fabc1a2a000)\n\tlibgmp.so.10 => /lib/x86_64-linux-gnu/libgmp.so.10 (0x00007fabc197d000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fabc188d000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007fabc1838000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fabc1642000)\n\tlibmpfr.so.6 => /lib/x86_64-linux-gnu/libmpfr.so.6 (0x00007fabc157f000)\n\tlibntl.so.44 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libntl.so.44 (0x00007fabc12d3000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fabc106d000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fabc1040000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fabc221e000)\n\tlibgf2x.so.3 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libgf2x.so.3 (0x00007fabc102d000)\n",
+    "analyze": "\tlinux-vdso.so.1 (0x00007f2e2583f000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f2e2557e000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2e25551000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2e2535d000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2e2526d000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2e25841000)\n"
+  },
+  "experiment_protocol": {
+    "path": "/workspace/crypto-autoresearcher-current/tools/experiment_protocol.py",
+    "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4"
+  },
+  "paid_compute_and_agent_storage_upload": 0,
+  "native_solver_or_checker_invocations_before_freeze": 0,
+  "source_review": "../edwards_descent_audit_20261113/evidence/source-review.json",
+  "kernel_edwards_binding": "PCC-20261113-bc105f",
+  "assurance": "Native compilation/source/hash provenance only, no compiled semantic refinement or independent host."
+}
