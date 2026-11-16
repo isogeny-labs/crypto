@@ -11,3 +11,6 @@ Freeze/checkpoint then once-only correctness gate. Curve integration and charged
 
 ## Errors
 Duke-hosted primary PDF returned403; author NCSU copy succeeded. No execution failures at this point.
+
+## Completed synthetic gate
+Frozen ef4473fcf94a/checkpoint043823Z gate executed once:36streams,1440prefixes, independent rank/containment and full operator basis checks pass, exit0/empty stderr. Constructed fixture:98431expandednonzeros,2560nodes,512leafentries,1535sums; conservative multiplication bound3582perapply. This is a representation diagnostic on a synthetic stream. Next actual-curve gate frozen separately, explicit solver retained as correctness oracle.
