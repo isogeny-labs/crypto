@@ -1,0 +1,3 @@
+# Direct-scan replay of the five rational-square shapes
+
+Frozen on 16 November 2026 UTC before execution. This replay uses the same fixed `Y/F3` and ten exact trace-`+26` targets as `DEGREE7_LINEAR_SQUARE_PROTOCOL.md`. It scans every `c∈K` except `-1` directly, recomputes the branch residues for each B, and solves CRT for A anew; it does not use the producer's coefficient-polynomial root elimination. It then checks the exact rational-map equation and polynomial squarehood. The planned first replay is b-mask 3, comparing all five per-shape counters with the producer. Additional masks may be replayed if the first comparison reveals a discrepancy or if needed for an exhaustive theorem claim. A matching one-mask replay does not independently certify all ten masks.
