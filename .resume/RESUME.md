@@ -1,4 +1,22 @@
-# Current checkpoint:30SOURCE READY, NOT RUN (16 November14:28Z)
+# Current checkpoint:30FINISHED; publish packet then collection optimization (16 November14:32Z)
+
+Source3acefa56fbd026257f03d962a2d2009559daf8de publishedBEFOREsole30call.
+Run/workspace/ic-local-runs/local-recorded-rref-counter-20261116-30 exits0,
+1start/1completion,1run0warm/CPU0/1GiB/60sec/noretry. CopiedRustqualifierPASS:
+sameactualscalar147253026768918773/rank398/7711970legacyproducts;
+new7711970ModrMul/7553168ModrAdd/398ModrInv/noinverse-doublecharge/otherforeign0.
+Targetdeterminedafter471of1122savedrows; subtotal318388587084incompletearithmetic
+bitops. No newrelation/descent/fullDLP/sample/speedclaim/crossruncomposition.
+All194source/pre/posthashPASS. Raw1368B/summary1230BexactGit+local, immutable
+1020695BinputLOCALhashbound. FinalsinglePDFpageviewed/exactfigcopieshashPASS.
+PCC-20261116-07f0b2standingunverified. Goalactive; no stopgoal/subagents.
+Nextcommit/pushpacket/updatePR, thenreview/selectincrementalcollectiontoavoid
+29fixedcohortoversupply. NOTselected/implementedyet. Readlatestjournal/KB/primary
+beforecode. No livecompiler/scientificjob. CI3aceat14:31appreview+migrateSUCCESS,
+othersEMPTY/requiredgatesreviewunconfirmed;next>=15:21absentevent/newsource.
+Do notmanualmerge/bypass, regularPR4288automergeenabled.
+
+# Previous checkpoint:30SOURCE READY, NOT RUN (16 November14:28Z)
 
 Native checks finished: adapter3/3, sieve25pass/2existingignored, sampler2/2,
 public-input1/1, productiontwoexamples andlibrary/twoexamplesstrictClippyPASS.
