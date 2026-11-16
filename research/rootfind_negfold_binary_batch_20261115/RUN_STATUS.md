@@ -32,6 +32,16 @@ original protocol and spec remain fixed. This revision requires its own
 `publication-amendment-2.json` receipt and the stated release parity gate
 before execution; earlier publication receipts keep their original scope.
 
+**Third before-data amendment:** [`AMENDMENT-3.md`](AMENDMENT-3.md) corrects
+the primary decision metric for this batch-implementation question.
+`bitop/v1` prices the unchanged abstract binary additions at a fixed
+affine weight and cannot recognize shared inversions or omitted ordinate
+products. The m=3 complete cold L2 wall comparison, with its A/A and
+target-cluster gates, is now primary; m=2 is descriptive because the fixed
+spec has no m=2 A/A arm. The [cost-model review](COST_MODEL_REVIEW_20261115.md)
+records the derivation. A new publication receipt must bind this amendment
+before a study job is admitted.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)
