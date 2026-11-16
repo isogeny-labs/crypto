@@ -70,3 +70,5 @@ novelty/absence claim. All14 remain active, including general Markov
 collision integer-block repair, qualified adding-walk limiting constants,
 practical hashes, scalar-recovery runtime and recorded geometry/solver/
 counting obligations. [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `0a9af6e9c78769248a64a9b6456f58052d786492` and local receipt `cda80aee08156b11e722bd6536d8a51a694d3514` share tree `abfec0a55101c0304f9dc4722e3e4aa9617cd55f`. Anonymous fetch completed before exact fresh head/title/body/ready confirmation. All48 pinsets/6190 entries match. New-head CI/review/signing pending; next scheduled owner10:30UTC. [pcc:unverified]
