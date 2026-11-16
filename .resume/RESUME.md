@@ -1,4 +1,22 @@
-# Current checkpoint:31FINISHED; publish then native rho pricing (16 November15:06Z)
+# Current checkpoint:31PUBLISHED; native rho pricing controls next
+
+31packet32a51abdc8931378c3603d7b5938585e2e6f8aa8PUSHED/PRupdatedafterPCCproselint0.
+Artifactbot2d3068867da325b76a429e58d47c47b8599f6442inspecteddiffPNGmigrationonly,
+FFintegrated/exactsparsebenchrestore+ignoredPNGhashPASS/neverreaddignoredPNG.
+No compiler/scientificjob. GoalACTIVE/no stopgoal. All31detailsbelowretained.
+CI32a51at15:08appreview+migrateSUCCESS,workflow/status/reviews/threadsEMPTY,
+requiredgatesunconfirmed. PR4288regular/automergeenabled/no manualmerge/bypass.
+NextCIread>=15:58absentnewsource/publicationevent; don'tbusypoll.
+
+NEXTtechnicalstep: readSTRONG_RHO_ACCOUNTING_FOLLOWUP.md/latestjournal, logselection
+fornativeRhoarithmeticpricecontrols, editactualRustmodule/tests, finishsourcechecks,
+thenfreeze/sourcepublishbeforeanynewmeasure. ActualnativeArith inversiondiffersfrom
+ICFq3harness; TUNED24/18/62legacycreditsarenotcompletenativebitopcounts. Avoid
+wholehooksnapshot+reconstructedrho_tallydoublecount. No newnumericprice/protocol
+selectedyet; don'tspend8minutesrederivinguntestedformulas/alternativealgorithms.
+No paidresource/credentialquestion; userlocalorRunpodauthpersists.
+
+# Previous checkpoint:31FINISHED; publish then native rho pricing (16 November15:06Z)
 
 Source564853c1e5d9708cbe462f5487b8198b63738298publishedBEFOREsole31call.
 Run/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31 exits0,
