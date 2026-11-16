@@ -386,3 +386,6 @@ No build/test/benchmark running at this handoff. Qualified phase source remains 
 
 ## Latest 2026-11-16 fresh closure override
 Fresh completed/null sustained increment; see fresh-native-01/report-01 and session16:xx. PCCe67478/91e8cf. Next publish32, implement/qualify/run immutable RELATION_ABLATION_PROTOCOL sixclasses n3/4/6. Original reserved seeds untouched; localCPU0/checkpointwaived/zero$. Active goal includes BOTH fresh+ablations; do not stop on fresh null. Prior compiler driver03556f439-45; productionquotient unchanged.
+
+## Latest 2026-11-16 follow-up completion override
+Both studies measured/closed: fresh3cases324answers+6diagnostics, all-case sustained increment false PCCe67478/91e8cf;18fixed relationcells allF4degree5/affine5/topformnull, rootrowsdrop/cliquegrows, PCC13cd4f/22d2c0.19complete ablationrawarchives+4fresharchives, bothclosedrecords scopedintegrityerrors[]. See FOLLOWUP_LEAD_REPORT.md and current sessionlog. Next finishpublication34 (based33 remote8f209cdd469c77547d0ad1acdd4d495d66bc5fbd, local0c661d637...) then boundedfollowupgoalcomplete. No current benchmark. Originalholdoutsunused. Successor rank-budget selection is HYPOTHESIS only; new protocol required before measurement. UnsignedlocalL0/CPU0/checkpointwaived/zero$.

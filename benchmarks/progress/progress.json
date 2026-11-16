@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1612Z-fresh-strongest-native-comparison-20261116",
+  "latest_record": "20261116T1631Z-fixed-relation-degree-ablations-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 218,
+    "measured": 219,
     "open": 1
   },
   "repo": "crypto",
@@ -13763,6 +13763,52 @@
       ],
       "problem": "kernel:c25519_family_bsgs_vs_rho",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "cells_with_observed_f4_degree_reduction",
+      "points": [
+        {
+          "commit": "4066bba35b8f",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T1631Z-fixed-relation-degree-ablations-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All18 fixed development cells match complete Rust F4 and3 fresh mature bases, all ideals equal respective stars. All observed F4 and affine closure thresholds5; top-form vanishing null within caps. Root rows shrink, clique can enlarge matrix. Single-call costs descriptive; no further15x or degree reduction. PCC13cd4f/22d2c0 unsigned localL0, checkpoint waiver.",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:certified-relations-degree-ablation",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 18.0,
+      "latest": 18.0,
+      "latest_derived": {},
+      "metric": "checked_complete_development_cells",
+      "points": [
+        {
+          "commit": "4066bba35b8f",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T1631Z-fixed-relation-degree-ablations-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All18 fixed development cells match complete Rust F4 and3 fresh mature bases, all ideals equal respective stars. All observed F4 and affine closure thresholds5; top-form vanishing null within caps. Root rows shrink, clique can enlarge matrix. Single-call costs descriptive; no further15x or degree reduction. PCC13cd4f/22d2c0 unsigned localL0, checkpoint waiver.",
+          "value": 18.0
+        }
+      ],
+      "problem": "kernel:certified-relations-degree-ablation",
+      "unit": "count"
     },
     {
       "better": "neutral",
