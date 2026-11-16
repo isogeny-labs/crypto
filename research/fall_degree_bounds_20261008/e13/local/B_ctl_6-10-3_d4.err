@@ -1,0 +1,16 @@
+memory allocation of 46817280 bytes failed
+stack backtrace:
+   0: std::alloc::rust_oom
+   1: __rustc::__rust_alloc_error_handler
+   2: alloc::alloc::handle_alloc_error
+   3: alloc::raw_vec::handle_error
+   4: <alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>
+   5: crypto_lib::cryptanalysis::gf2_elim::clear_block
+   6: crypto_lib::cryptanalysis::gf2_elim::eliminate_core
+   7: crypto_lib::cryptanalysis::gf2_elim::rref_counted
+   8: <crypto_lib::cryptanalysis::partial_enlargement::Engine>::absorb
+   9: crypto_lib::cryptanalysis::partial_enlargement::pe_closure_checkpointed
+  10: crypto_lib::cryptanalysis::partial_enlargement::pe_closure_with
+  11: dreg_linear_guess::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+exit=134

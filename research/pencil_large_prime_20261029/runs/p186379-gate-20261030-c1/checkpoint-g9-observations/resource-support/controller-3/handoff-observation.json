@@ -1,0 +1,45 @@
+{
+  "schema": "pencil-controller-invocation-observation/v1",
+  "observed_utc": "2026-10-30T07:14:49.489643+00:00",
+  "invocation": 3,
+  "predecessor": "isolab-recovery-controller:592e9381-e505-48bc-a796-3d02c4d3a922",
+  "predecessor_status": "FAILED",
+  "predecessor_end": "2026-10-30T07:12:35.385000+00:00",
+  "successor": "isolab-recovery-controller:2fe8ec79-1f54-4abe-8ec4-151b50b1178b",
+  "successor_start": "2026-10-30T07:12:35.550000+00:00",
+  "mechanism": "AWS autoRetryNumber2",
+  "root_StartBuild_calls": 0,
+  "scientific_submission_count": 1,
+  "same_source_version_and_archive_verified": true,
+  "same_request_environment_verified": true,
+  "same_worker_and_pod_verified": true,
+  "worker_attempt": 0,
+  "worker_restores": 0,
+  "request_deadline_unix_seconds": 1793347824,
+  "outer_expiry_unix_seconds": 1793359074,
+  "scientific_failure_state": null,
+  "current_phase": "checkpointing",
+  "controller_auto_retries_remaining": 0,
+  "prospective_admission_commit": "34cbe04a0bd93d1498c9391445f8b0b1b758335f",
+  "controller_limit": 4,
+  "scientific_new_launch_authorized": false,
+  "observed_record_timeout_retained": "g9 pencil warmup; no complete measured pair.",
+  "evidence": [
+    {
+      "path": "predecessor-observation.json",
+      "sha256": "61a2cc1751d1c1c2afbc1c1bd214c1232088a1c241ab0e3c3dabb7d3c3e7ea84"
+    },
+    {
+      "path": "state-after.json",
+      "sha256": "bce521991f8a512d68fc92e3f2cc0897e3fcfb67b980b392a6e53da9450bd94a"
+    },
+    {
+      "path": "state-observation.json",
+      "sha256": "b0fb59adeabafcd70ba7c29669679e1047c1d7cef58ee93ca1c65e0dcc75de51"
+    },
+    {
+      "path": "successor-build.json",
+      "sha256": "3d722ce0e22c5a112f77400a04a5a750bf8e8cff08d0644f1279df7923151da4"
+    }
+  ]
+}

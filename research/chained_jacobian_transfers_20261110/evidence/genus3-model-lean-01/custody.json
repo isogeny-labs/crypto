@@ -1,0 +1,39 @@
+{
+  "original_tree": "/workspace/scratch/ct55-g3-model-lean-01",
+  "native_exit": 0,
+  "guard_exit": 0,
+  "guards": {
+    "count": 797,
+    "changed": []
+  },
+  "plan": {
+    "protocol": "394e14/de0b472 before source",
+    "command": [
+      "timeout",
+      "600",
+      "tools/lean/proof-gate.sh",
+      "--out",
+      "/workspace/scratch/ct55-g3-model-lean-01/gate",
+      "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/ModelTransport.lean"
+    ],
+    "ELAN_TOOLCHAIN": "leanprover/lean4:v4.35.0",
+    "expected": "TWO faithful ring identities for primitive-basis square and inverse triangular Moore transport,not actual-curve formalization",
+    "guards": 796,
+    "scope": "algebra/conditional group only;actual curves/Picard/sheaves/descent/reducer remain written/native bridges",
+    "native_cache": "original gate scratch outside raw;final compiled gate receipts retained as produced",
+    "correction": "new file;existing nine Descent declarations remain byteexact"
+  },
+  "start": "2026-11-13T05:07:29Z",
+  "finish": "2026-11-13T05:07:50Z",
+  "files": 20,
+  "raw_bytes": 296960,
+  "raw_sha256": "ffb7011323da1fc249cee91d6cb675d0e5608147739f6f8f6d84f18091add4ef",
+  "archive_path": "/workspace/scratch/ct55-g3-model-lean-01-whole-raw.tar.xz",
+  "archive_bytes": 40688,
+  "archive_sha256": "66da97bdb5cb18af7ad68208c9c1a29e205cb959dd10d2a1dec7cfe830b9b91f",
+  "every_member_hash": true,
+  "exact_standard_tar_xz_roundtrip": true,
+  "native_cache_outside_raw": true,
+  "remote_availability": "PENDING actual trusted-base publication if required;not inferred from custody",
+  "standing": "unsigned original local command and byte-custody observation,not signed execution/mathematical verdict"
+}

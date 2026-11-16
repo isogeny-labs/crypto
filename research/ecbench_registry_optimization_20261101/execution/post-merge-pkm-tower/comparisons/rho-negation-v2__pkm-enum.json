@@ -1,0 +1,208 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h18435d456b03",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1hf057b8e5e019",
+    "arm": "rho-negation-v2",
+    "method_id": "ECM1h0de59de796c1",
+    "method": "rho.negation_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 5.486644924923504,
+    "mean_ratio_to_floor": 6.191015830534004,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 5.4375107912674725,
+      "max_s": 6.092632573347891,
+      "max_over_median": 1.1204819277108433,
+      "top_run_share": 0.27761194029850744,
+      "top_run_id": "ECM1h0de59de796c1Wd3c0be60a005R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 110,
+      "distinguished_point_table_inserts_uncharged": 22,
+      "distinguished_point_table_queries_uncharged": 26
+    }
+  },
+  "b": {
+    "session_id": "ECBS1hf057b8e5e019",
+    "arm": "pkm-enum",
+    "method_id": "ECM1h11a3cc1030b6",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 27.613383114689636,
+    "mean_ratio_to_floor": 31.158366239642785,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 27.38409049096149,
+      "max_s": 33.3456987078933,
+      "max_over_median": 1.2177033492822966,
+      "top_run_share": 0.30189798339264534,
+      "top_run_id": "ECM1h11a3cc1030b6Wd3c0be60a005R2",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "legendre_symbols_uncharged": 128,
+      "lookups_uncharged": 562,
+      "row_ops_uncharged": 419,
+      "sqrt_solves_uncharged": 64,
+      "target_guard_probes_uncharged": 46
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "Wd3c0be60a005",
+      "slug": "icv1-fp9-t25-33fa1ca2",
+      "r": 233,
+      "floor_s": 0.8862269254527579,
+      "pairs": 4,
+      "a_mean_s": 5.486644924923504,
+      "b_mean_s": 27.613383114689636,
+      "ratio_b_over_a": 5.032835820895523,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp9-t25-33fa1ca2",
+      "log2_r": 7.864186144654281,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 5.032835820895523,
+      "ci95": [
+        4.023980623706772,
+        6.294621860469193
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        4.573964497041421,
+        5.695121951219513
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 5.032835820895523,
+    "ci95": [
+      4.023980623706772,
+      6.294621860469193
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      4.573964497041421,
+      5.695121951219513
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 5.032835820895523,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        5.032835820895523,
+        5.153648802736602,
+        5.892494929006084
+      ],
+      "order": "pkm-enum > rho-negation-v2 at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 4,
+    "pairs_below_level": 0,
+    "median_ratio": 3.989678247118282,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.7605423929457413,
+    "ns_per_gae_a": 1286.779104477612,
+    "ns_per_gae_b": 978.6500593119811,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-negation-v2",
+      "pkm-enum"
+    ],
+    "method_call_wall_ratio": 3.5615978201978864,
+    "method_call_wall_ci95": [
+      2.9686573320161473,
+      4.2729684211223535
+    ],
+    "method_call_wall_ci95_bootstrap": [
+      3.2334251656238147,
+      3.97083347788087
+    ],
+    "process_wall_ratio": 0.8762760485367945,
+    "process_wall_ci95": [
+      0.6685814902754628,
+      1.1484908338142779
+    ],
+    "process_wall_ci95_bootstrap": [
+      0.7697915891855414,
+      1.0119330711068637
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): pkm-enum / rho-negation-v2 = 5.0328 [4.024, 6.295] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 5.0328, w=0.1: 5.1536, w=1: 5.8925): pkm-enum > rho-negation-v2 at every weight; heavy tail in rho-negation-v2: top run is 28% of the arm's total S (max/median 1.1); more runs needed; heavy tail in pkm-enum: top run is 30% of the arm's total S (max/median 1.2); more runs needed; wall: descriptive (ns/GAE 0.7605, not a result: 4 admitted pairs; at least 5 are needed); ns/GAE of rho-negation-v2, pkm-enum is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1he1dd57556a06",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

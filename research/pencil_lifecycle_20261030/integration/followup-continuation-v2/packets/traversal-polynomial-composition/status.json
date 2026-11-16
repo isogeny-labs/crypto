@@ -1,0 +1,246 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1171",
+  "main_declarations": 12,
+  "control_declarations": 10,
+  "readback": [
+    {
+      "name": "TraversalPolynomial.list_range_sum",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.rawPoly_succ",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.rawPoly_outer",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.rawPoly_composition",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.eventPoly_composition",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.term_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.eventPoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.word_transform_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.eventPoly_high",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.sourcePoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.word_transform_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomial.word_transform_T",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.empty",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.constant",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.quadratic_constant",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.quadratic_linear",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.quadratic_leading",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.negative_alpha",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.omitted_scale",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.quintic_leading",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.high_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "TraversalPolynomialControls.identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "attempts": {
+    "attempt1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt3": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt4": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reconstruct1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "reconstruct2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "claims": [
+    {
+      "claim": "raw nested polynomial sum equals scaled affine composition",
+      "domain": "arbitrary coefficient count over a field"
+    },
+    {
+      "claim": "decoded word transform polynomial equals scaled affine composition",
+      "domain": "length<=6; prime1<p<2^31; canonical coefficients,a,b,s; nonzero scale"
+    },
+    {
+      "claim": "decoded transform equals normalization T_m",
+      "domain": "preceding hypotheses plus decoded s = decoded a^m"
+    }
+  ],
+  "independent_source_fidelity_review": "pending",
+  "scale_computation_binding": "pending",
+  "trim_and_divisor_copy": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

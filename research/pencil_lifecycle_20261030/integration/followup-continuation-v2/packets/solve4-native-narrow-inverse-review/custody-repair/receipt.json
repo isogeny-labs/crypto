@@ -1,0 +1,31 @@
+{
+  "schema": "artifact.custody-repair/v1",
+  "task": "T-1483",
+  "original_commit": "e1c90ee4c37488e952b81fa709686e8b2bb67ba4",
+  "policy": "AGENTS.md section13: archives over64KiB use officialartifactstore",
+  "artifact": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/solve4-native-narrow-inverse-review/replay-evidence.tar.gz",
+  "sha256": "2a607f2d4bc55bf2d90e5d39451f534ab18f3d7b48c10a5becf71b4629ac1af2",
+  "bytes": 9906343,
+  "uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2a607f2d4bc55bf2d90e5d39451f534ab18f3d7b48c10a5becf71b4629ac1af2",
+  "download_command": [
+    "aws",
+    "s3",
+    "cp",
+    "s3://setec-astronomy-artifacts/store/sha256/2a/2a607f2d4bc55bf2d90e5d39451f534ab18f3d7b48c10a5becf71b4629ac1af2",
+    "/var/tmp/native-inverse-archive-readback-gte4thej/replay-evidence.tar.gz",
+    "--only-show-errors"
+  ],
+  "download_exit": 0,
+  "fresh_download": "/var/tmp/native-inverse-archive-readback-gte4thej/replay-evidence.tar.gz",
+  "download_elapsed_seconds": 1.5428411369794048,
+  "archive_hash_matches": true,
+  "all_member_hashes_and_metadata_match": true,
+  "members": 174,
+  "regular_members": 171,
+  "members_manifest_sha256": "4886c590bf27716cf28a478099da087c34dfb79a871e429af19128e9fa950af1",
+  "pointer_manifest_sha256": "0c20c8021f4c020a05448c3f29432794a4259b2d3829966d91f53f6b918d358a",
+  "local_hydrated_original_retained": true,
+  "history_rewritten": false,
+  "proof_records_changed": false,
+  "lean_replayed": false
+}

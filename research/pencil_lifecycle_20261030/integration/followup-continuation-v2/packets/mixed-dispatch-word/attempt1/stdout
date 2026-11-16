@@ -1,0 +1,63 @@
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:39:11: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:35:61: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a0 a1 a2 a3 : UInt64
+a : WordD1
+b : WeightedWord
+h0 : a0.toNat < p.toNat
+h1 : a1.toNat < p.toNat
+h2 : a2.toNat < p.toNat
+h3 : a3.toNat < p.toNat
+ha : WordD1.canonical p a
+hb : WeightedWord.canonical p b
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hva : WordD1.normalizedValid p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a
+hvb : WeightedWord.normalizedValid p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) b
+hn : mixedClassifyWord p a b ≠ MixedCancellation.Branch.mismatch
+hcancel :
+  mixedClassifyWord p a b = MixedCancellation.Branch.cancellation →
+    have c := (mixedWords p a b).point;
+    WordD1.canonical p c ∧
+      c.z ≠ 0 ∧ c.w ≠ 0 ∧ WordD1.normalizedValid p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) c
+hk : (mixedWords p a b).k = 0
+hc : ¬(mixedWords p a b).l = wordNeg p (mixedWords p a b).ry
+hm : ¬(mixedWords p a b).l = (mixedWords p a b).ry
+⊢ (if ¬False then MixedCancellation.Branch.mismatch else MixedCancellation.Branch.positiveCoincidence) =
+    MixedCancellation.Branch.mismatch
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:42:11: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:45:121: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:49:188: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:39:36: warning: This simp argument is unused:
+  ite_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:42:36: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hp, not_true_eq_false, ite_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:45:146: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hp, not_true_eq_false, ite_false, he, ite_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-dispatch-word-20261031-v1/WordDispatch.lean:49:213: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hp, not_true_eq_false, ite_false, he, gd, Option.map_some]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

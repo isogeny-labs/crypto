@@ -1,0 +1,12 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mumford-validity-20261031-v1/Controls.lean:6:61: error: unsolved goals
+⊢ C (1 / 4) + C (1 / 4) * C 2 * X * 2 + C (1 / 4) * C 2 * X * C 3 * 2 + C (1 / 4) * C 2 ^ 2 * X ^ 2 +
+        C (1 / 4) * C 3 * 2 +
+      C (1 / 4) * C 3 ^ 2 =
+    4 + X * 4 + X ^ 2
+/var/tmp/pencil-mumford-validity-20261031-v1/Controls.lean:12:8: error(lean.unknownIdentifier): Unknown identifier `monic_X_add_C`

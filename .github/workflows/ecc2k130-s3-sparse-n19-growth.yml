@@ -18,6 +18,26 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/rotated_s3_sparse_n19_20260925
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -26,14 +46,18 @@ jobs:
       - name: Exercise harmless Linux wall, direct-memory and descendant controls
         run: python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/test_resource_cap.py
       - name: Check source and input hashes; replay archive only when committed
-        run: |
-          python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
-          if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
-            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
-              --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
+            if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
+              python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
+                --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_s3_sparse_n19_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
   measured-first-attempt:
-    if: ${{ github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795 }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795)
     needs: frozen-and-archive
     concurrency:
       group: ecc2k130-n19-sparse-first-release-795
@@ -46,6 +70,26 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/rotated_s3_sparse_n19_20260925
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

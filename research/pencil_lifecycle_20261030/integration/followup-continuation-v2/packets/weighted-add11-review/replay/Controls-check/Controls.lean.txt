@@ -1,0 +1,29 @@
+import WeightedAdd11
+open Polynomial WeightedAdd11
+noncomputable abbrev f : Polynomial ℚ := X^5-X+X^2
+def a : Input ℚ := ⟨0,0,2,3⟩
+def b : Input ℚ := ⟨9,486,3,2⟩
+lemma va : (X-C (nx a)) ∣ f-(C (ny a))^2 := by
+  refine ⟨X^4-1+X,?_⟩
+  norm_num [f,nx,ny,a]
+  ring
+lemma vb : (X-C (nx b)) ∣ f-(C (ny b))^2 := by
+  refine ⟨X^4+X^3+X^2+2*X+1,?_⟩
+  norm_num [f,nx,ny,b]
+  ring
+example : let c := output a b
+    c.z ≠ 0 ∧ c.w ≠ 0 ∧
+    (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+      f-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+  exact preserves_mumford a b f (by norm_num [a]) (by norm_num [a])
+    (by norm_num [b]) (by norm_num [b]) (by norm_num [nx,a,b]) va vb
+example : (output a b).z = 6 ∧ (output a b).w = -216 ∧
+    (output a b).q / (output a b).z^2 = -1 ∧
+    (output a b).s / ((output a b).z^3*(output a b).w) = 1 := by
+  norm_num [output,a,b]
+example : let c := output (⟨0,0,1,1⟩ : Input ℚ) ⟨1,1,1,1⟩
+    c.z = 1 ∧ c.w = -1 ∧ c.q = -1 ∧ c.s = -1 := by norm_num [output]
+example : (output (⟨0,0,0,3⟩ : Input ℚ) b).z = 0 := by norm_num [output,b]
+-- Different raw x values can encode the same normalized affine x.
+example : nx (⟨4,0,2,1⟩ : Input ℚ) = nx ⟨9,0,3,1⟩ := by norm_num [nx]
+example : (output (⟨4,0,2,1⟩ : Input ℚ) ⟨9,0,3,1⟩).w = 0 := by norm_num [output]

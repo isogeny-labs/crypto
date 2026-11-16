@@ -1,0 +1,106 @@
+card: CARD-BLINDSPOT-14-01 (sha256 64adb85f6ef39ef8030e7f3289df6f86954c9881800a5d041abfac7c6aa20eaa)
+commit: 397d5ade00dc143660ab068d2d12d3808e93510e
+receipt: research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-01.json sha256 10e7382158368b1a548227e4a823633f3a5ceb4aa46afc0a3b4e32b57a50e243
+status: completed
+command 1 (make-dirs): ["mkdir", "-p", "research/blindspots_20261018/14-prime-m4-cells/raw", "target/blindspots-14/card-01"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-14/card-01/b14", "examples/blindspots_14_prime_m4.rs"] exit 0 (6.136 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (selftest): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "selftest", "--deep"] exit 0 (21.698 s) succeeded
+  stdout sha256 26b2dee1c6dc4e98b62a26896aa7981f180045b1149e24934eef9a886d2a213b; last 20 lines:
+    selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155233177, steps 16, 340 ms)
+    selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155743427, steps 16, 371 ms)
+    selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714688, steps 16, 278 ms)
+    selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155237892, steps 16, 274 ms)
+    selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155745124, steps 16, 261 ms)
+    selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714299, steps 16, 244 ms)
+    selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158363890, steps 20, 2090 ms)
+    selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158902994, steps 20, 2473 ms)
+    selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158867132, steps 20, 2320 ms)
+    selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158373513, steps 20, 2591 ms)
+    selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158904240, steps 20, 1836 ms)
+    selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158866532, steps 20, 2294 ms)
+    selftest: full IC arm a, 16 bits, run 0: ok, 148 attempts, 9 hits, rank 9
+    selftest: full IC arm a, 16 bits, run 1: ok, 189 attempts, 12 hits, rank 9
+    selftest: full IC arm a, 16 bits, run 2: ok, 158 attempts, 9 hits, rank 9
+    selftest: rho 16 bits run 0: ok, 508 adds, 20 walks
+    selftest: rho 16 bits run 1: ok, 310 adds, 6 walks
+    selftest: rho 16 bits run 2: ok, 524 adds, 10 walks
+    selftest: reach control ok (0.05556, 0.10000, 0.11905)
+    SELFTEST OK (21.7s)
+command 4 (reach): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "reach", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/reach.jsonl"] exit 0 (0.087 s) succeeded
+  stdout sha256 7121642725d2595bf9bc25df704cb11fcb07b4a723b05afd0d3cfc0b2751de0a; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/reach.jsonl: 7121642725d2595bf9bc25df704cb11fcb07b4a723b05afd0d3cfc0b2751de0a
+command 5 (reuse-pkm): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "reuse", "--files", "research/pkm_tower_round2_20260925/runs/M4-kummer-m4-p1.jsonl,research/pkm_tower_round3_20260925/runs/M4b-kummer-m4-p1-N16.jsonl,research/pkm_tower_round6_20260930/bench/rows/m4-N12-ab0-B.jsonl", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/reuse-pkm.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 7ebb7e83d1a196d593cbf56f1971802826848ec124b41a54b49f468917f94238; last 7 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/reuse-pkm.jsonl: 7ebb7e83d1a196d593cbf56f1971802826848ec124b41a54b49f468917f94238
+command 6 (rho-b16): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "rho", "--bits", "16", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl"] exit 0 (0.004 s) succeeded
+  stdout sha256 82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl: 82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46
+command 7 (rho-b20): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "rho", "--bits", "20", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl"] exit 0 (0.004 s) succeeded
+  stdout sha256 acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl: acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78
+command 8 (rho-b24): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "rho", "--bits", "24", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl"] exit 0 (0.019 s) succeeded
+  stdout sha256 126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl: 126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef
+command 9 (rho-b28): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "rho", "--bits", "28", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl"] exit 0 (0.039 s) succeeded
+  stdout sha256 9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl: 9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc
+command 10 (tdec-a-b16): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl"] exit 0 (0.004 s) succeeded
+  stdout sha256 3f7a10de292c5c26a6a9e288b8c45d8082b1e51e9b839e3bb0af2a2c81488eb3; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl: 3f7a10de292c5c26a6a9e288b8c45d8082b1e51e9b839e3bb0af2a2c81488eb3
+command 11 (tdec-a-b20): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "20", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b20.jsonl"] exit 0 (0.005 s) succeeded
+  stdout sha256 62ade1f39f636b1df1ec9bf3e623b9c3bc9da6ac94bb4099cf7b9502e5bef43d; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b20.jsonl: 62ade1f39f636b1df1ec9bf3e623b9c3bc9da6ac94bb4099cf7b9502e5bef43d
+command 12 (tdec-a-b24): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "24", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b24.jsonl"] exit 0 (0.013 s) succeeded
+  stdout sha256 f3ffe7c1377aa59369b23015dec5ec623c8af71426676fa01e931b919dc4885c; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b24.jsonl: f3ffe7c1377aa59369b23015dec5ec623c8af71426676fa01e931b919dc4885c
+command 13 (tdec-a-b28): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "28", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl"] exit 0 (0.103 s) succeeded
+  stdout sha256 58017ad73cc398326542e78648c174e0f0a3637b251dd614cc6a46d61e3651b1; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl: 58017ad73cc398326542e78648c174e0f0a3637b251dd614cc6a46d61e3651b1
+command 14 (tdec-a-b16-bx3): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "3", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 65aa3cca6f0b90ede018f1c621cf22d6abd5f4aedd0639f6f81d1eb01ccaaf23; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl: 65aa3cca6f0b90ede018f1c621cf22d6abd5f4aedd0639f6f81d1eb01ccaaf23
+command 15 (tdec-a-b16-bx4): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "4", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx4.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 1b31e436f81055146f6160d756a319151d467b3452b6440f85647a75d1d74d2a; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx4.jsonl: 1b31e436f81055146f6160d756a319151d467b3452b6440f85647a75d1d74d2a
+command 16 (tdec-a-b16-bx5): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "5", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx5.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 8992d23ada29b58cd25e4094c2837b13102b2e2e4ada0623c568ebd8d43ff36c; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx5.jsonl: 8992d23ada29b58cd25e4094c2837b13102b2e2e4ada0623c568ebd8d43ff36c
+command 17 (tdec-a-b16-bx6): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "6", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx6.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 511163e3c04d1a6f2f00e5d5c261545cd2c77d1d51c2c5c436bcb2cbb0f4381b; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx6.jsonl: 511163e3c04d1a6f2f00e5d5c261545cd2c77d1d51c2c5c436bcb2cbb0f4381b
+command 18 (tdec-a-b16-bx7): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "7", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx7.jsonl"] exit 0 (0.004 s) succeeded
+  stdout sha256 a6aedfa3e2c1bf2de5ebf42b249526ce0f2b5db070748022487b3d293a4a39cd; last 20 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx7.jsonl: a6aedfa3e2c1bf2de5ebf42b249526ce0f2b5db070748022487b3d293a4a39cd
+command 19 (fullic-a-b16): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl"] exit 0 (0.008 s) succeeded
+  stdout sha256 017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl: 017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e
+command 20 (fullic-a-b20): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "20", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl"] exit 0 (0.03 s) succeeded
+  stdout sha256 61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl: 61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e
+command 21 (fullic-a-b24): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "24", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl"] exit 0 (0.144 s) succeeded
+  stdout sha256 49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl: 49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7
+command 22 (fullic-a-b28): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "28", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl"] exit 0 (1.339 s) succeeded
+  stdout sha256 6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl: 6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd
+command 23 (fullic-a-b16-bx3): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "3", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl"] exit 0 (0.025 s) succeeded
+  stdout sha256 d2ca21b8012e87398abd2ff49ae9c51fed8fd0fde138c3017d51cb4f0d40ac67; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl: d2ca21b8012e87398abd2ff49ae9c51fed8fd0fde138c3017d51cb4f0d40ac67
+command 24 (fullic-a-b16-bx4): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "4", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx4.jsonl"] exit 0 (0.018 s) succeeded
+  stdout sha256 bcf8f3a4874ba3b847fba8f9c6aff43f4ef5b28ccd596fa8bfef87d3dff3c117; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx4.jsonl: bcf8f3a4874ba3b847fba8f9c6aff43f4ef5b28ccd596fa8bfef87d3dff3c117
+command 25 (fullic-a-b16-bx5): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "5", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx5.jsonl"] exit 0 (0.013 s) succeeded
+  stdout sha256 9d96e2061e87ecce52210cf506655f8d20ea99b78f24a354b0a15cb0acea268a; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx5.jsonl: 9d96e2061e87ecce52210cf506655f8d20ea99b78f24a354b0a15cb0acea268a
+command 26 (fullic-a-b16-bx6): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "6", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx6.jsonl"] exit 0 (0.012 s) succeeded
+  stdout sha256 8f48668d425b4474e3083572e028b8377728d83e385545069c4aec1fb76bd4be; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx6.jsonl: 8f48668d425b4474e3083572e028b8377728d83e385545069c4aec1fb76bd4be
+command 27 (fullic-a-b16-bx7): ["prlimit", "--as=4294967296", "target/blindspots-14/card-01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "7", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx7.jsonl"] exit 0 (0.009 s) succeeded
+  stdout sha256 6e08e7423cf6a42ebff8867ccdc60c8987a3dc119314925767915014ec2662e2; last 16 lines:
+  output research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx7.jsonl: 6e08e7423cf6a42ebff8867ccdc60c8987a3dc119314925767915014ec2662e2
+command 28 (remove-bin): ["rm", "-f", "target/blindspots-14/card-01/b14"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 29 (remove-bin-dir): ["rmdir", "target/blindspots-14/card-01"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

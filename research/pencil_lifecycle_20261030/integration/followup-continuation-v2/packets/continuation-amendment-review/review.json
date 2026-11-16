@@ -1,0 +1,89 @@
+{
+  "schema": "research.prospective-design-review/v1",
+  "reviewed_utc": "2026-10-31T00:36:07.000978+00:00",
+  "producer_manifest_sha256": "544cdaec25e0b1a118dc046c4aa066936aa1c3bd7d08fc2095a7bb2673942151",
+  "amendment_sha256": "31a1279b3a95c319848221ea48117d68b7cc20be13d553b16db0ac0a0420c78b",
+  "plan_sha256": "29396e40b119acb5a5977fb356cbb058b4343a24732e7f57c1716edbecaa415e",
+  "review_scope": "planning design only",
+  "source_custody": "eight referenced source hashes and producer manifest entries match",
+  "preserved": {
+    "worker_seconds": 25200,
+    "absolute_deadline_utc": "2026-10-31T06:00:00Z",
+    "authorization_scope": "planning_limits_only",
+    "previous_campaigns_unchanged": true,
+    "one_active_scientific_payload": true,
+    "workloads": 1260,
+    "cohort_slots": 22680,
+    "measured_arm_slots": 18900,
+    "warmup_slots": 3780,
+    "matched_pairs": 6300,
+    "gate_separate_slots": 18,
+    "gate_measured_replay_slots": 15,
+    "pricing_cells": 36,
+    "square_prices": [
+      0,
+      0.5,
+      1
+    ],
+    "inverse_prices": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_prices": [
+      0,
+      0.1,
+      1
+    ],
+    "timing": "all five individual rho_AA/rho ratios in[0.90,1.10] independently for cold and online; online exact phase sum and error=null; L2",
+    "prior_failure_rows_retained": true
+  },
+  "derived_feasibility_boundary": {
+    "gate_cap_seconds": 64800,
+    "replay_cap_seconds": 54000,
+    "combined_slot_cap_seconds": 118800,
+    "campaign_ceiling_seconds": 25200,
+    "interpretation": "sum of allowed per-slot maxima, not expected runtime, lower bound, or assertion that gate cannot complete; confirms ceilings do not guarantee completion",
+    "remaining_worker_credit": null
+  },
+  "findings": [
+    {
+      "id": "changed-instrument-decision",
+      "kind": "required_pre_freeze_decision",
+      "finding": "One new gate is a proposal, not continuation admission under the stopped C1 gate.",
+      "required": "Prospective explicit scientific decision accepts a diagnostic-only instrument change, explains its information objective despite unchanged solver/caps, and binds source/counter equivalence before new affected data."
+    },
+    {
+      "id": "infrastructure-attempt-classification",
+      "kind": "required_pre_freeze_precision",
+      "finding": "max_attempts=2 and scientific_gate_attempts=1 do not fully define failure attribution or attempt consumption.",
+      "required": "Define total-attempt counting, observable payload-start boundary, pre-start versus partially executed/preempted cases, authenticated infrastructure evidence and treatment of unknown cause; watchdog/cap/wrong-answer/invalid outcomes never retry as infrastructure. Charge and preserve partial attempts and bind exact allowed restart behavior without replacing missing scientific rows."
+    },
+    {
+      "id": "remaining-resource-feasibility",
+      "kind": "required_admission_binding",
+      "finding": "Remaining worker allowance and gate runtime estimate are null. Per-execution ceilings alone do not establish campaign feasibility.",
+      "required": "Bind live remaining ledger/reservation and enforce worker/deadline cutoffs; prospectively accept a bounded possibly incomplete gate or supply defensible scheduling allowance. Gate extension still requires all18 slots and15measured replay, not partial success."
+    },
+    {
+      "id": "timing-and-p739-reuse",
+      "kind": "required_pre_freeze_decision",
+      "finding": "Finite equivalence cannot certify old p739 timing or original fresh-row identity.",
+      "required": "Bind original-row replay or reviewed finite equivalence, decide separately how60targets receive qualified individual clocks, retain all five cold and online A/A checks, charge fresh validation."
+    },
+    {
+      "id": "actual-instrument-runtime-protocol",
+      "kind": "required_pre_freeze_and_admission_bindings",
+      "finding": "Actual source/binary/image/controller/owner/analysis/request bindings and canonical freeze remain null.",
+      "required": "Complete immutable identities, runtime/deadline/signal/custody qualification, canonical schema validation, prospective review and freeze; later prepare actual session/context subset without invented future IDs."
+    }
+  ],
+  "decision": "planning draft preserves major contracts; not ready for canonical freeze/admission until decisions and bindings above resolve",
+  "no_scientific_retry_assessment": "Preserved declaratively, not operationally complete: changed-gate permission remains pending and infrastructure classification must be frozen to prevent relabelled scientific retry",
+  "protocol_frozen": false,
+  "scientific_execution_admitted": false,
+  "execution_performed": false,
+  "canonical_validator_run": false,
+  "cost_ratio": null
+}

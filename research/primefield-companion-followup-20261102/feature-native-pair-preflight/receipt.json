@@ -1,0 +1,67 @@
+{
+  "recorded_at": "2026-11-03T22:17:58.546379+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "research/primefield-companion-followup-20261102/feature-native-pair-preflight/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/runner"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "step": "test-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-pair-preflight/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/tests"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/tests",
+        "preflight_tests::",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "step": "describe",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/runner",
+        "--describe"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "step": "invalid-cli",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/runner",
+        "--run-frozen-panel",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "exit_code": 2,
+      "expected_exit_code": 2
+    }
+  ],
+  "cryptographic_preflight_calls": 0,
+  "comparative_rows": 0,
+  "binaries": {
+    "runner": "829f97bb0e7e0e5c8ca25683eb5b623678c71048f10616a101a63a870b757ee0",
+    "tests": "5219f0347134892b67bd137be1f7bf4494b97c39b51f14a1a9d2a17fd317f81f"
+  }
+}

@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Exact local 3-torsion profiles from the forty-point Kummer scheme.
+
+Run with PYTHONPATH=/workspace/python-local for arbitrary-prime FLINT matrices.
+"""
+from functools import lru_cache
+from pathlib import Path
+import json
+import math
+import pickle
+import time
+import sympy as S
+from flint import fmpz_mod_ctx, fmpz_mod_mat, fmpz_mod_poly_ctx
+
+ROOT=Path(__file__).parent
+DEST=ROOT/'nist_cover_prym_three_local'
+
+
+def groebner_for(r,d):
+    p=int(r['p']);b=int(r['b']);x=S.Symbol('x');w,u,k,h=S.symbols('w u k h')
+    ff=S.Poly(x*(x-1)*((x+d)**3-3*(x+d)*(x-1)**2+b*(x-1)**3),x,modulus=p)
+    lc=int(ff.LC());f=[int(ff.nth(i))*pow(lc,4-i,p)%p for i in range(6)]
+    assert f[0]==0 and f[5]==1 and f[1]
+    lam=2*w-3*u;z=(f[4]*lam-w*w+3*u*u+3*k*k)*pow(2,-1,p)
+    eq=[2*k**3+2*w*z-u**3-6*u*k*k-lam*f[3],
+        z*z+2*w*k**3-3*k**4-3*u*u*k*k-lam*f[2],
+        2*z*k**3-3*u*k**4-lam*f[1],h*lam-1]
+    return S.groebner(eq,w,u,k,h,modulus=p,order='grevlex',method='f5b')
+
+
+def serialize_gb(gb):
+    return [[(m,int(c)) for m,c in g.terms(order=gb.order)] for g in gb.polys]
+
+
+def profile_from_gb(terms_list,p):
+    rules=[]
+    for terms in terms_list:
+        lm,lc=terms[0];inv=pow(int(lc),-1,p)
+        rules.append((lm,[(m,-int(c)*inv%p) for m,c in terms[1:]]))
+    def divides(a,b):return all(x<=y for x,y in zip(a,b))
+    def add(a,b):return tuple(x+y for x,y in zip(a,b))
+    units=[tuple(int(i==j) for i in range(4)) for j in range(4)]
+    zero=(0,)*4;basis={zero};todo=[zero]
+    while todo:
+        m=todo.pop()
+        for e in units:
+            n=add(m,e)
+            if n not in basis and not any(divides(lm,n) for lm,tail in rules):
+                basis.add(n);todo.append(n)
+        assert len(basis)<=40, 'Kummer quotient too large or not zero-dimensional'
+    basis=sorted(basis);assert len(basis)==40
+    index={m:i for i,m in enumerate(basis)}
+    @lru_cache(maxsize=None)
+    def nf(m):
+        if m in index:
+            return {index[m]:1}
+        for lm,tail in rules:
+            if divides(lm,m):
+                shift=tuple(x-y for x,y in zip(m,lm));out={}
+                for n,c in tail:
+                    for j,v in nf(add(n,shift)).items():out[j]=(out.get(j,0)+c*v)%p
+                return {j:v for j,v in out.items() if v}
+        raise AssertionError('unreduced monomial missing from standard basis')
+    ctx=fmpz_mod_ctx(p);pc=fmpz_mod_poly_ctx(p)
+    mat=[[0]*40 for _ in range(40)]
+    for i,m in enumerate(basis):
+        for j,v in nf(add(m,units[2])).items():mat[i][j]=v
+    M=fmpz_mod_mat(mat,ctx);cp=M.charpoly()
+    assert cp.degree()==40 and cp.gcd(cp.derivative()).degree()==0
+    one=[0]*40;one[index[zero]]=1;v=fmpz_mod_mat([one],ctx);powers=[]
+    for i in range(40):powers.append([int(a) for a in v.entries()]);v=v*M
+    T=fmpz_mod_mat(powers,ctx).transpose()
+    lamvec=[0]*40
+    for j,v in nf(units[0]).items():lamvec[j]=(lamvec[j]+2*v)%p
+    for j,v in nf(units[1]).items():lamvec[j]=(lamvec[j]-3*v)%p
+    vecs=[]
+    for e in units[:2]:
+        v=[0]*40
+        for j,c in nf(e).items():v[j]=c
+        vecs.append(v)
+    rhs=fmpz_mod_mat([[lamvec[i],vecs[0][i],vecs[1][i]] for i in range(40)],ctx)
+    coeff=T.solve(rhs)
+    lampoly=pc([int(coeff[i,0]) for i in range(40)])
+    wpoly=pc([int(coeff[i,1]) for i in range(40)])
+    upoly=pc([int(coeff[i,2]) for i in range(40)])
+    assert lampoly.gcd(cp).degree()==0
+    profile=[];factors=[]
+    leading,fac=cp.factor();assert int(leading)==1
+    for g,e in fac:
+        assert e==1
+        deg=g.degree();norm=int(g.resultant(lampoly));ch=pow(norm,(p-1)//2,p)
+        assert ch in (1,p-1)
+        profile.extend([deg,deg] if ch==1 else [2*deg])
+        factors.append({'degree':deg,'coefficients':[int(a) for a in g.coeffs()],
+                        'lambda_norm':norm,'lambda_quadratic_character':1 if ch==1 else -1})
+    profile.sort();assert sum(profile)==80
+    return {'Prym_nonzero_three_torsion_orbit_lengths':profile,
+            'Prym_full_three_torsion_field_degree':math.lcm(*profile),
+            'Kummer_primitive_coordinate':'k=c0/(c3*u0)',
+            'Kummer_characteristic_polynomial_coefficients':[int(a) for a in cp.coeffs()],
+            'lambda_polynomial_coefficients':[int(a) for a in lampoly.coeffs()],
+            'w_polynomial_coefficients':[int(a) for a in wpoly.coeffs()],
+            'u_polynomial_coefficients':[int(a) for a in upoly.coeffs()],
+            'Kummer_irreducible_factors':factors,
+            'Kummer_reduced_geometric_point_count':40}
+
+
+def one(r,d):
+    DEST.mkdir(exist_ok=True);tag=f'{r["family"]}_{r["candidate"]}_d{d}'
+    result=DEST/(tag+'.json');cache=DEST/(tag+'.pkl')
+    if result.exists():
+        saved=json.loads(result.read_text())
+        source={'p':str(r['p']),'b':str(r['b']),'d':d}
+        if 'source_model' in saved:assert saved['source_model']==source, 'cache/model mismatch'
+        if 'w_polynomial_coefficients' in saved and 'source_model' in saved:return saved
+    start=time.monotonic()
+    if cache.exists():
+        with cache.open('rb') as f:terms=pickle.load(f)
+    else:
+        terms=serialize_gb(groebner_for(r,d))
+        with cache.open('wb') as f:pickle.dump(terms,f)
+    z={k:r[k] for k in ['family','candidate','label','status']}
+    z.update(profile_from_gb(terms,int(r['p'])))
+    z.update({'complete':True,'cover_parameter_d':d,'local_elapsed_seconds':time.monotonic()-start,
+              'source_model':{'p':str(r['p']),'b':str(r['b']),'d':d},
+              'groebner_basis_cache':str(cache),'method':'Forty reduced Kummer 3-torsion points; exact lambda norms recover Frobenius signs.'})
+    result.write_text(json.dumps(z,indent=2)+'\n');return z
+
+
+if __name__=='__main__':
+    r=next(r for r in json.loads((ROOT/'nist_selection_audit.json').read_text())['rows'] if r['family']=='239' and r['candidate']==2185)
+    start=time.monotonic()
+    print(json.dumps(one(r,2),indent=2))
+    print('LOCAL_DONE',time.monotonic()-start)

@@ -1,0 +1,8 @@
+id,location,finding,disposition
+F1,"v1 launcher67,116-117; worker77,126",Duplicate rejection can overwrite prior receipt,v2 owned-output flags address source path
+F2,"v1 launcher75-81,101",Launch gap can leave worker executing after lease loss,v2 worker waits for short-lived ownership permit
+F3,v1 durable_io39-48; worker104,Admission can omit all four exact controls,v2 exact ordered list and critical recipe fields compared
+F4,v1 durable_io24-27,Live prefix may include bytes appended after fsync,v2 fixed length hashed then fsynced
+F5,v1 durable_io35,Positive ceiling accepts infinity and bool,v2 finite nonbool values and allocation receipt checked
+F6,v2-initial durable_io74-78,Concurrent atomic temporary deletion can abort size census,Known atomic-temp disappearance only is tolerated; other I/O errors fail
+F7,v2-initial launcher125-127,Seal failure can leave previous terminal receipt marked passed,"Pending receipt, sealed manifest and separate completion marker required"

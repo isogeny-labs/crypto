@@ -1,0 +1,10 @@
+digraph {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.35"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#985c42",fillcolor="#fff0e7"];
+  edge [color="#456273",arrowsize=0.75];
+  a [label="Preclaim prose finding\nOne standing annotation missing\nOriginal + lint retained"];
+  b [label="Wrong proof-gate path\nNo module compiled\nOriginal exit retained"];
+  c [label="External wrapper cancellation\nfull02 stdout38 / algebra01 stdout23\nOriginal exits missing; NOT accepted\neb1ebb /2cb5c1"];
+  fixed [color="#456273",fillcolor="#e4f2e8",label="Annotation fixed before779dc2/code\nExisting proof-gate +5 bound local passes /0trusted\nUnchanged-input reruns:full03/9f7c80 +algebra02/d7d12d\n38native /625hashes /23algebra /8outputs /12hashes\nComplete process receipts; unsigned"];
+  a -> fixed; b -> fixed; c -> fixed;
+}

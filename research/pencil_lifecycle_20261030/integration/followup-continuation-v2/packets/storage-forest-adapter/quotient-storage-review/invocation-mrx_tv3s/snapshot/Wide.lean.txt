@@ -1,0 +1,134 @@
+import WordCoefficient
+set_option autoImplicit false
+namespace WideModPow
+open PencilWordRefinement WordCoefficient
+
+def wideMul (p a b : UInt64) : UInt64 :=
+ UInt64.ofNat (((BitVec.ofNat 128 a.toNat*BitVec.ofNat 128 b.toNat)%BitVec.ofNat 128 p.toNat).toNat)
+
+theorem product_fits (a b : UInt64) : a.toNat*b.toNat<2^128 := by
+ have ha := a.toNat_lt_size
+ have hb := b.toNat_lt_size
+ change a.toNat<2^64 at ha
+ change b.toNat<2^64 at hb
+ have h := Nat.mul_le_mul (Nat.le_of_lt ha) (Nat.le_of_lt hb)
+ nlinarith
+
+theorem wideMul_value (p a b : UInt64) (hp : 0<p.toNat) :
+ (wideMul p a b).toNat=(a.toNat*b.toNat)%p.toNat := by
+ have ha : a.toNat<2^128 := lt_trans a.toNat_lt_size (by norm_num [UInt64.size])
+ have hb : b.toNat<2^128 := lt_trans b.toNat_lt_size (by norm_num [UInt64.size])
+ have hpw : p.toNat<2^128 := lt_trans p.toNat_lt_size (by norm_num [UInt64.size])
+ have hr : (a.toNat*b.toNat)%p.toNat<2^64 := lt_trans (Nat.mod_lt _ hp) p.toNat_lt_size
+ simp only [wideMul,UInt64.toNat_ofNat',BitVec.toNat_umod,BitVec.toNat_mul,BitVec.toNat_ofNat,
+  Nat.mod_eq_of_lt ha,Nat.mod_eq_of_lt hb,Nat.mod_eq_of_lt hpw,Nat.mod_eq_of_lt (product_fits a b),Nat.mod_eq_of_lt hr]
+
+theorem wideMul_canonical (p a b : UInt64) (hp : 0<p.toNat) :
+ (wideMul p a b).toNat<p.toNat := by rw [wideMul_value p a b hp]; exact Nat.mod_lt _ hp
+
+theorem wideMul_decode (p a b : UInt64) (hp : 0<p.toNat) :
+ ((wideMul p a b).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)*(b.toNat : ZMod p.toNat) := by
+ rw [wideMul_value p a b hp,ZMod.natCast_mod,Nat.cast_mul]
+
+def half (e : UInt64) : UInt64 := e>>>1
+
+theorem half_value (e : UInt64) : (half e).toNat=e.toNat/2 := by
+ simp [half,UInt64.toNat_shiftRight,Nat.shiftRight_eq_div_pow]
+
+theorem lowbit_zero (e : UInt64) : e&&&1=0 ↔ e.toNat%2=0 := by
+ constructor
+ · intro h; have hn := congrArg UInt64.toNat h; simpa [UInt64.toNat_and] using hn
+ · intro h; apply UInt64.toNat.inj; simpa [UInt64.toNat_and] using h
+
+def nextR (p a e r : UInt64) : UInt64 := if e&&&1=0 then r else wideMul p r a
+
+def nextA (p a e : UInt64) : UInt64 := if half e=0 then a else wideMul p a a
+
+theorem nextR_decode (p a e r : UInt64) (hp : 0<p.toNat) :
+ ((nextR p a e r).toNat : ZMod p.toNat)=
+ if e.toNat%2=0 then (r.toNat : ZMod p.toNat) else (r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat) := by
+ by_cases h : e&&&1=0
+ · simp [nextR,h,(lowbit_zero e).mp h]
+ · simp [nextR,h,not_congr (lowbit_zero e) |>.mp h,wideMul_decode p r a hp]
+
+theorem nextA_decode (p a e : UInt64) (hp : 0<p.toNat) :
+ ((nextA p a e).toNat : ZMod p.toNat)=
+ if e.toNat/2=0 then (a.toNat : ZMod p.toNat) else (a.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat) := by
+ have he : half e=0 ↔ e.toNat/2=0 := by
+  constructor
+  · intro h; have hn := congrArg UInt64.toNat h; simpa [half_value] using hn
+  · intro h; apply UInt64.toNat.inj; simpa [half_value] using h
+ by_cases h : half e=0
+ · simp [nextA,h,he.mp h]
+ · simp [nextA,h,(not_congr he).mp h,wideMul_decode p a a hp]
+theorem binary_step {R : Type*} [CommMonoid R] (a r : R) (e : ℕ) :
+ (if e%2=0 then r else r*a)*(if e/2=0 then a else a*a)^(e/2)=r*a^e := by
+ have hd := Nat.mod_add_div e 2
+ by_cases hh : e/2=0
+ · have he : e=0 ∨ e=1 := by omega
+   rcases he with rfl|rfl <;> simp
+ · rw [if_neg hh]
+   by_cases hm : e%2=0
+   · rw [if_pos hm,←pow_two,←pow_mul]
+     have he : 2*(e/2)=e := by omega
+     rw [he]
+   · have hm1 : e%2=1 := by have h := Nat.mod_lt e (by decide : 0<2); omega
+     rw [if_neg hm,←pow_two,←pow_mul,mul_assoc,←pow_succ']
+     have he : 2*(e/2)+1=e := by omega
+     rw [he]
+
+theorem next_step (p a e r : UInt64) (hp : 0<p.toNat) :
+ ((nextR p a e r).toNat : ZMod p.toNat)*((nextA p a e).toNat : ZMod p.toNat)^(half e).toNat=
+ (r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat)^e.toNat := by
+ rw [nextR_decode p a e r hp,nextA_decode p a e hp,half_value]
+ exact binary_step _ _ _
+
+theorem nextR_canonical (p a e r : UInt64) (hp : 0<p.toNat) (hr : r.toNat<p.toNat) :
+ (nextR p a e r).toNat<p.toNat := by
+ unfold nextR
+ split
+ · exact hr
+ · exact wideMul_canonical p r a hp
+
+theorem nextA_canonical (p a e : UInt64) (hp : 0<p.toNat) (ha : a.toNat<p.toNat) :
+ (nextA p a e).toNat<p.toNat := by
+ unfold nextA
+ split
+ · exact ha
+ · exact wideMul_canonical p a a hp
+
+def loop : ℕ → UInt64 → UInt64 → UInt64 → UInt64 → UInt64
+ | 0,_,_,_,r => r
+ | n+1,p,a,e,r => if e=0 then r else loop n p (nextA p a e) (half e) (nextR p a e r)
+
+theorem loop_decode (fuel : ℕ) (p a e r : UInt64) (hp : 0<p.toNat)
+ (he : e.toNat<2^fuel) (ha : a.toNat<p.toNat) (hr : r.toNat<p.toNat) :
+ (loop fuel p a e r).toNat<p.toNat ∧
+ ((loop fuel p a e r).toNat : ZMod p.toNat)=(r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat)^e.toNat := by
+ induction fuel generalizing a e r with
+ | zero =>
+  have hz : e=0 := by
+   apply UInt64.toNat.inj
+   have hn : e.toNat=0 := by norm_num at he; omega
+   simpa using hn
+  subst e
+  simp [loop,hr]
+ | succ n ih =>
+  by_cases hz : e=0
+  · subst e; simp [loop,hr]
+  · rw [loop,if_neg hz]
+    have hhalf : (half e).toNat<2^n := by
+     rw [half_value]
+     apply (Nat.div_lt_iff_lt_mul (by decide : 0<2)).mpr
+     simpa [pow_succ] using he
+    have h := ih (nextA p a e) (half e) (nextR p a e r) hhalf
+     (nextA_canonical p a e hp ha) (nextR_canonical p a e r hp hr)
+    exact ⟨h.1,h.2.trans (next_step p a e r hp)⟩
+
+def modpow (p a e : UInt64) : UInt64 := loop 64 p a e 1
+
+theorem modpow_decode (p a e : UInt64) (hp : 1<p.toNat) (ha : a.toNat<p.toNat) :
+ (modpow p a e).toNat<p.toNat ∧ ((modpow p a e).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)^e.toNat := by
+ have h := loop_decode 64 p a e 1 (by omega) e.toNat_lt_size ha (by simpa using hp)
+ simpa [modpow] using h
+end WideModPow
