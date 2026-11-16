@@ -21,7 +21,7 @@ fn native_kernel_bits() -> u8 {
     NATIVE_KERNELS.with(|v| v.get())
 }
 fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
-    assert!(bits <= 31);
+    assert!(bits <= 63);
     struct Restore(u8);
     impl Drop for Restore {
         fn drop(&mut self) {
@@ -310,6 +310,32 @@ pub fn verify(row: &Row, inputs: &[Poly], p: u64) -> bool {
     }
     result == row.poly
 }
+// A valid fixed shift is injective and preserves the map's key order.
+// Check before inversions or target mutation; malformed shifts use row_shift.
+fn can_stream_shift(row: &Row, shift: &Mono) -> bool {
+    row.poly.keys().chain(row.proof.keys().map(|(_,m)|m)).all(|m|
+        m.len()==shift.len() && m.iter().zip(shift).all(|(x,y)|x.checked_add(*y).is_some()))
+}
+fn axpy_owned<K:Ord>(a:&mut BTreeMap<K,u64>,key:K,c:u64,scale:u64,p:u64){
+    #[cfg(feature="count-field-ops")]
+    COUNTERS.with(|cell|{let mut v=cell.get();v.coefficient_updates+=1;cell.set(v);});
+    let product=mul(c,scale,p);
+    if let Some(value)=a.get_mut(&key) {
+        *value=((*value as u128+product as u128)%p as u128) as u64;
+        if *value==0 {a.remove(&key);}
+    } else if product!=0 {a.insert(key,product);}
+}
+// Only called after can_stream_shift. No temporary shifted polynomial/proof maps.
+fn subtract_shifted_valid(a:&mut Row,b:&Row,m:&Mono,coefficient:u64,p:u64){
+    let scale=minus(coefficient,p);
+    if m.iter().all(|x|*x==0) {
+        axpy_in_place(&mut a.poly,&b.poly,scale,p,false);
+        axpy_in_place(&mut a.proof,&b.proof,scale,p,false);
+    } else {
+        for (key,c) in &b.poly {axpy_owned(&mut a.poly,plus(key,m),*c,scale,p);}
+        for ((i,key),c) in &b.proof {axpy_owned(&mut a.proof,(*i,plus(key,m)),*c,scale,p);}
+    }
+}
 fn input_rows(inputs: &[Poly], n: usize) -> Vec<Row> {
     inputs
         .iter()
@@ -347,6 +373,7 @@ fn normal_form_cached(mut row: Row, basis: &[Row], p: u64) -> Row {
     if row.poly.is_empty() {
         return row;
     }
+    let fused=native_kernel_bits() & 32 != 0;
     // No reducer changes during this call. Option retains the legacy panic only
     // if division actually reaches an invalid empty reducer.
     let reducers: Vec<_> = basis
@@ -362,9 +389,15 @@ fn normal_form_cached(mut row: Row, basis: &[Row], p: u64) -> Row {
             .find(|(_, lm)| divides(lm.expect("nonzero polynomial"), &m))
         {
             let lm = lm.expect("nonzero polynomial");
-            let multiple = row_shift(g, &difference(&m, lm));
-            let factor = mul(c, inv(g.poly[lm], p), p);
-            subtract_row(&mut row, &multiple, factor, p);
+            let shift=difference(&m,lm);
+            if fused && can_stream_shift(g,&shift) {
+                let factor=mul(c,inv(g.poly[lm],p),p);
+                subtract_shifted_valid(&mut row,g,&shift,factor,p);
+            } else {
+                let multiple=row_shift(g,&shift);
+                let factor=mul(c,inv(g.poly[lm],p),p);
+                subtract_row(&mut row,&multiple,factor,p);
+            }
         } else {
             row.poly.remove(&m);
             remainder.insert(m, c);
@@ -1685,6 +1718,40 @@ mod tests {
         assert!(std::panic::catch_unwind(|| {let _=lead_legacy(&Poly::new());}).is_err());
         assert!(std::panic::catch_unwind(|| {let _=lead_with_cached_degrees(&Poly::new());}).is_err());
         assert_eq!(native_kernel_bits(),0);
+    }
+
+    fn compare_streamed_normal_form(target:Row,basis:&[Row],p:u64){
+        reset_counters();let old=with_native_kernel_bits(7,||normal_form_cached(target.clone(),basis,p));let before=serde_json::to_value(counters()).unwrap();
+        reset_counters();let new=with_native_kernel_bits(39,||normal_form_cached(target,basis,p));let after=serde_json::to_value(counters()).unwrap();
+        assert_eq!(new,old);assert_eq!(after,before);assert_eq!(native_kernel_bits(),0);
+    }
+    #[test]
+    fn streamed_reducers_keep_nonmonic_non_groebner_remainders_proofs_and_counts(){
+        for p in [2147483647,9007199254740881] {for n in [3,8,16] {
+            let z=vec![0;n];let mut x2=z.clone();x2[0]=2;let mut y=z.clone();y[1]=1;let mut xy=z.clone();xy[0]=1;xy[1]=1;let mut x=z.clone();x[0]=1;
+            let basis=input_rows(&[BTreeMap::from([(x2,3),(y,3)]),BTreeMap::from([(xy,5),(z.clone(),5)])],n);
+            let sp=s_polynomial(&basis[0],&basis[1],p);assert!(!with_native_kernel_bits(7,||normal_form_cached(sp.clone(),&basis,p)).poly.is_empty());
+            for target in [basis[0].clone(),row_shift(&basis[1],&x),sp,Row{poly:Poly::new(),proof:Proof::new()}] {compare_streamed_normal_form(target,&basis,p);}
+        }}
+    }
+    #[test]
+    fn streamed_reducers_fall_back_before_invalid_shift_collisions(){
+        let basis=input_rows(&[Poly::from([(vec![1],2),(vec![1,0],1)])],2);
+        assert!(!can_stream_shift(&basis[0],&vec![0,0]));
+        let target=Row{poly:Poly::from([(vec![1,0],1)]),proof:Proof::new()};
+        compare_streamed_normal_form(target,&basis,2147483647);
+    }
+    #[test]
+    fn streamed_overflow_keeps_shift_failure_before_inverse_and_restores_scope(){
+        let g=Row{poly:Poly::from([(vec![1],3)]),proof:Proof::from([((0,vec![usize::MAX]),1)])};
+        let target=Row{poly:Poly::from([(vec![2],1)]),proof:Proof::new()};
+        assert!(!can_stream_shift(&g,&vec![1]));
+        let mut observed=Vec::new();
+        for bits in [7,39] {
+            reset_counters();assert!(std::panic::catch_unwind(||{let _=with_native_kernel_bits(bits,||normal_form_cached(target.clone(),std::slice::from_ref(&g),2147483647));}).is_err());
+            observed.push(serde_json::to_value(counters()).unwrap());assert_eq!(native_kernel_bits(),0);
+        }
+        assert_eq!(observed[0],observed[1]);assert_eq!(observed[1]["nontrivial_inversions"],0);
     }
 
 }

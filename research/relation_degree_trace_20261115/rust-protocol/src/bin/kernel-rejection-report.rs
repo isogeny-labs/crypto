@@ -54,6 +54,7 @@ fn main() -> Result<()> {
         "both_updates",
         "both_updates_sum",
         "both_updates_lead",
+        "both_updates_fused",
     ]
     .contains(&args[5].as_str())
     {

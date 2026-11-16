@@ -149,6 +149,7 @@ pub enum NativeKernels {
     BothUpdates,
     BothUpdatesSum,
     BothUpdatesLead,
+    BothUpdatesFused,
 }
 impl NativeKernels {
     fn bits(self) -> u8 {
@@ -160,6 +161,7 @@ impl NativeKernels {
             Self::BothUpdates => 7,
             Self::BothUpdatesSum => 15,
             Self::BothUpdatesLead => 23,
+            Self::BothUpdatesFused => 39,
         }
     }
 }
@@ -641,6 +643,7 @@ mod tests {
                     NativeKernels::BothUpdates,
                     NativeKernels::BothUpdatesSum,
                     NativeKernels::BothUpdatesLead,
+                    NativeKernels::BothUpdatesFused,
                 ] {
                     let (wire, metadata) =
                         produce_native_for_rust_with_kernels(&system, kind, kernels)

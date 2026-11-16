@@ -54,6 +54,10 @@ pub(super) struct Paths {
     lead_baseline: Option<PathBuf>,
     #[serde(default)]
     lead_cached: Option<PathBuf>,
+    #[serde(default)]
+    fused_baseline: Option<PathBuf>,
+    #[serde(default)]
+    fused_direct: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -106,6 +110,7 @@ fn kernel_candidate(samples: &[Value]) -> Option<usize> {
         23 => 20..23,
         26 => 24..26,
         28 => 27..28,
+        30 => 29..30,
         _ => return None,
     };
     eligible
@@ -116,13 +121,13 @@ fn kernel_candidate(samples: &[Value]) -> Option<usize> {
         .map(|(_, i)| i)
 }
 fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
-    if ![23, 26, 28].contains(&routes.len()) {
+    if ![23, 26, 28, 30].contains(&routes.len()) {
         return Value::Null;
     }
     let mut chosen = Value::Null;
     let mut best = 15.;
     for case in cases {
-        if routes.len() == 28
+        if [28,30].contains(&routes.len())
             && (case["id"] != "star-last-n16-s7"
                 || case["input_sha256"]
                     != "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3")
@@ -148,6 +153,8 @@ fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
             (25, "both_updates_sum"),
             (26, "both_updates"),
             (27, "both_updates_lead"),
+            (28, "both_updates"),
+            (29, "both_updates_fused"),
         ]
         .into_iter()
         .filter(|(i, _)| *i < routes.len())
@@ -252,6 +259,9 @@ pub(super) fn run_updates(prepared: &Path, out: &Path, config: &Path) -> Result<
 pub(super) fn run_leads(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     run_impl(prepared, out, config, 5)
 }
+pub(super) fn run_fused(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, 6)
+}
 fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
@@ -259,7 +269,11 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     let exports = mode >= 2;
     let kernels = mode >= 3;
     let updates = mode >= 4;
-    let leads = mode == 5;
+    let leads = mode >= 5;
+    let fused = mode == 6;
+    if [&paths.fused_baseline, &paths.fused_direct].into_iter().any(|p|p.is_some()!=fused) {
+        return Err("exact two fused paths required in30 mode".into());
+    }
     if [&paths.lead_baseline, &paths.lead_cached]
         .into_iter()
         .any(|p| p.is_some() != leads)
@@ -317,6 +331,8 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("root-update-fastsum", &paths.update_fastsum),
         ("root-lead-baseline", &paths.lead_baseline),
         ("root-lead-cached", &paths.lead_cached),
+        ("root-fused-baseline", &paths.fused_baseline),
+        ("root-fused-direct", &paths.fused_direct),
     ] {
         if let Some(exe) = exe {
             routes.push(name);
@@ -370,6 +386,8 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("update_fastsum", &paths.update_fastsum),
         ("lead_baseline", &paths.lead_baseline),
         ("lead_cached", &paths.lead_cached),
+        ("fused_baseline", &paths.fused_baseline),
+        ("fused_direct", &paths.fused_direct),
     ] {
         if let Some(path) = path {
             identities.insert(name.into(), json!({"path":path,"sha256":file_hash(path)?}));
@@ -379,7 +397,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if leads{"LEAD_PAID_SCREEN_PROTOCOL.md"}else if updates{"UPDATE_PAID_SCREEN_PROTOCOL.md"}else if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if fused{"FUSED_PAID_SCREEN_PROTOCOL.md"}else if leads{"LEAD_PAID_SCREEN_PROTOCOL.md"}else if updates{"UPDATE_PAID_SCREEN_PROTOCOL.md"}else if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -544,7 +562,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":if leads{"exact-lead-paid-screen/v1"}else if updates{"exact-update-paid-screen/v1"}else if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if fused{"exact-fused-paid-screen/v1"}else if leads{"exact-lead-paid-screen/v1"}else if updates{"exact-update-paid-screen/v1"}else if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -782,6 +800,80 @@ mod tests {
         bad[2]["paid_wall_ns"] = json!(14);
         assert!(select(bad).is_null());
     }
+    fn fused_fixture() -> (Vec<&'static str>, Vec<Value>) {
+        let (mut routes, mut rows) = lead_fixture();
+        for row in &mut rows {
+            row["paid_wall_ns"] = json!(20);
+        }
+        rows[1]["paid_wall_ns"] = json!(40);
+        rows[2]["paid_wall_ns"] = json!(40);
+        for (name, mode, cost) in [
+            ("root-fused-baseline", "both_updates", 3),
+            ("root-fused-direct", "both_updates_fused", 1),
+        ] {
+            routes.push(name);
+            let mut row = rows[24].clone();
+            row["pipeline"] = json!(name);
+            row["answer"]["kernel_mode"] = json!(mode);
+            row["paid_wall_ns"] = json!(cost);
+            rows.push(row);
+        }
+        (routes, rows)
+    }
+    fn select_fused(rows: Vec<Value>, routes: &[&str], id: &str, hash: &str) -> Value {
+        selected_kernel(
+            &[json!({"id":id,"input_sha256":hash,"samples":rows})],
+            routes,
+        )
+    }
+    #[test]
+    fn fused_selection_is_fixed_candidate_and_fixed_last_hash() {
+        let (routes, rows) = fused_fixture();
+        let hash = "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3";
+        let s = select_fused(rows.clone(), &routes, "star-last-n16-s7", hash);
+        assert_eq!(s["candidate_index"], 29);
+        assert_eq!(s["kernel"], "both_updates_fused");
+        assert!(select_fused(rows.clone(), &routes, "star-first-n16-s7", hash).is_null());
+        assert!(select_fused(rows.clone(), &routes, "star-last-n16-s7", "wrong").is_null());
+        assert_eq!(comparisons_at(&rows, &routes, 29).unwrap().len(), 29);
+        let mut tie = rows;
+        tie[28]["paid_wall_ns"] = json!(1);
+        assert!(select_fused(tie, &routes, "star-last-n16-s7", hash).is_null());
+    }
+    #[test]
+    fn fused_selection_keeps_all30_checks_and_old_controls() {
+        let (routes, rows) = fused_fixture();
+        let select = |r: Vec<Value>| {
+            select_fused(
+                r,
+                &routes,
+                "star-last-n16-s7",
+                "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3",
+            )
+        };
+        for i in 0..30 {
+            let mut bad = rows.clone();
+            bad[i]["status"] = json!("failed");
+            assert!(select(bad).is_null());
+        }
+        for i in 19..30 {
+            let mut bad = rows.clone();
+            bad[i]["answer"]["kernel_mode"] = Value::Null;
+            assert!(select(bad).is_null());
+        }
+        let mut bad = rows.clone();
+        bad[24]["paid_wall_ns"] = json!(1);
+        assert!(select(bad).is_null());
+        let mut bad = rows.clone();
+        bad[29]["used_recovery"] = json!(true);
+        assert!(select(bad).is_null());
+        let mut bad = rows.clone();
+        bad[29]["answer"]["constructor"]["subset_succeeded"] = json!(false);
+        assert!(select(bad).is_null());
+        let mut bad = rows;
+        bad[2]["paid_wall_ns"] = json!(14);
+        assert!(select(bad).is_null());
+    }
     fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         comparisons_for(samples, &ROUTES)
     }
@@ -918,6 +1010,8 @@ mod tests {
             update_fastsum: None,
             lead_baseline: None,
             lead_cached: None,
+            fused_baseline: None,
+            fused_direct: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),
