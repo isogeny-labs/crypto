@@ -1,0 +1,11 @@
+name = "elliptic_ramified_norm_projection_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticRamifiedNormProjectionAudit"]
+
+[[require]]
+name = "elliptic_split_norm_projection_audit"
+path = "../../elliptic_split_norm_projection_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticRamifiedNormProjectionAudit"
+roots = ["RamifiedBasePlace", "RamifiedImports", "RamifiedPullback", "RamifiedParameter", "RamifiedBaseResidue", "RamifiedRatio", "RamifiedSymbol", "RamifiedProjection", "RamifiedControls", "RamifiedCertificate"]

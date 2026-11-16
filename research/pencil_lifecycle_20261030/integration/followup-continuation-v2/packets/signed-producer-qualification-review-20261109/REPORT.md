@@ -1,0 +1,25 @@
+# Actual native producer qualification: source review
+
+Status: source supported pending bounded native qualification. No compiler or test was run by this reviewer.
+
+28 fixed rows exactly equal four primes by seven scalar targets; constructor/identity failures fail rather than skip. At most 56 baseline/capture plus 112 conditional fault calls = 168 native solves.
+
+Outcome contains recovered, exhausted, phase/count/native/detail fields and no wall-clock field. Entire serialized Outcome equality checks these fields, followed by source kG=Q verification.
+
+Expected header uses a fresh Scholten instance; native solver constructs its own fresh instance. Labels results use per-call field deltas and a fresh scalar Ring, so full result equality has no inherited absolute field counter.
+
+Trace serializes a whole newline-terminated record to write_all then flush; NativeSink parses the whole record and injects write or flush errors at actual identity/duplicate callbacks. Native callback errors propagate with ?, poisoned trace is incomplete, and no terminal is accepted afterward.
+
+Seven fixed Labels cases exercise informative/redundant same/opposite signs, inconsistent zero-target, wrong candidate and noncanonical labels. The fixture checks Q=kG and D=2G+8Q before use. Label body is the reviewed native implementation with root import adaptation.
+
+Two exact tests are prospective only; fixed identity/duplicate coverage is asserted and remains unmeasured. No panel enlargement or seed search is allowed on missing coverage.
+
+Draft build/execution allowance 1800+600=2400 seconds and 2 CPU/16 GiB remain planning values; exact runtime/input/publication and serial release bindings must be supplied by coordinator.
+
+A per-row pass line precedes fault reruns; downstream accounting must require the final 28-completed summary and successful test exit, not count those early rows as complete fault qualification.
+
+Fault-injected stream bytes are held in bounded memory and checked in-process; resulting receipt does not expose every stream for independent replay. This protocol qualifies implementation assertions, not a public geometric relation certificate.
+
+Source SHA256 280bba65b45f2b30d33701ebec79f24289e391b3235760d4aab6d10b6827f9ef
+
+Protocol SHA256 7995e3786b270adaf9c9a2a2c9454ecb4e1764354777daf98734810e7cb06ee1

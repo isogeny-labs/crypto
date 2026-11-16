@@ -1,0 +1,13 @@
+--- solve4-pivot-swap-replay-20261109/replay.py
++++ solve4-pivot-swap-renewal-20261111/replay.py
+@@ -1,8 +1,8 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-20261109')
+-ABSOLUTE_DEADLINE=1794287499  # 2026-11-10T05:11:39Z
++W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-renewal-20261111')
++ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+ last_progress=0.0

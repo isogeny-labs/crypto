@@ -1,0 +1,15 @@
+name = "binary_semaev_irreducibility_audit"
+version = "0.1.0"
+defaultTargets = ["BinarySemaevIrreducibilityAudit"]
+
+[[require]]
+name = "semaev_irreducibility_audit"
+path = "../../semaev_irreducibility_audit_20261113/lean"
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "BinarySemaevIrreducibilityAudit"
+roots = ["ASDegree", "BinaryFunctionField", "BinaryPrimitive", "BinaryActualPolynomial", "BinaryCertificate"]

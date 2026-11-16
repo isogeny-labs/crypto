@@ -1,0 +1,69 @@
+{
+  "schema": "diem-chart-verification/v1",
+  "source_commit": "0ddd06564075d5a1b797db7ec269003fbfc50623",
+  "claim_id": "PCC-20261114-66624a",
+  "declaration_sha256": "0d9ce0a7868c2c00d00015993a9a7ea808f8c2e0c6b006b2e32a973efd5e6feb",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 7,
+  "gate_declarations": 31,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 53,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-66624a",
+    "claim_sha256": "e38e02be34ee2c5db5bf06387c62f776d5105c36c31ce3898052069f774cb97a",
+    "commit": "0ddd06564075d5a1b797db7ec269003fbfc50623",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/diem_chart_audit_20261114/lean (ChartCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T00:17:51Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-66624a",
+    "claim_sha256": "e38e02be34ee2c5db5bf06387c62f776d5105c36c31ce3898052069f774cb97a",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47209,
+    "sha256": "839f89a0badb2f100272025a8304d56dd459914a16439c7c29e77f95b0525513",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 31,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "literal_source_helper_refuted": true,
+    "exact_finite_field_qualification": true,
+    "actual_rational_point_repair": true,
+    "main_theorem_or_corpus_node_refuted": false,
+    "scheme_isomorphism_claimed": false,
+    "Rojas_runtime_theorem_claimed": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

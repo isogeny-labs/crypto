@@ -37,15 +37,7 @@ use crate::symmetric::aes::{encrypt_block, AesKey};
 /// Multiply by `α` (`x`) in GF(2^128).  IEEE-1619 little-endian byte
 /// order (LSB at byte 0).  Reduction polynomial `x^128 + x^7 + x^2 + x + 1`.
 fn gf_double(t: &mut [u8; 16]) {
-    let mut carry = 0u8;
-    for byte in t.iter_mut() {
-        let new_carry = (*byte >> 7) & 1;
-        *byte = (*byte << 1) | carry;
-        carry = new_carry;
-    }
-    if carry == 1 {
-        t[0] ^= 0x87;
-    }
+    *t = crate::symmetric::gf128::double_le(t);
 }
 
 fn aes_decrypt_block(block: &[u8; 16], key: &AesKey) -> [u8; 16] {
