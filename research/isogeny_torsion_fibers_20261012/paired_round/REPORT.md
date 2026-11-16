@@ -1,5 +1,11 @@
 # Explicit isogeny transport: same-target relation solves and matched rho
 
+**Review correction, 2026-10-19:** the historical runner consumed a sign word
+for rejected abscissae, contrary to the frozen target protocol. Corrected
+source does not validate the preserved records. See the
+[versioned correction and outstanding gates](REVIEW-20261019.md) and
+[review PDF](review-20261019.pdf) before interpreting this report.
+
 **Date:** 2026-10-12 local (final run 2026-10-13 02:00 UTC). **Status:**
 bounded native complete-solve control, with counted group operations and
 unpriced native work retained separately. **Classification:** measured

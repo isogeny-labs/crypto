@@ -135,13 +135,11 @@ existence alone does not establish cheaper computation there.
 
 The separate generated
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
-classifies transfer obligations for all 4,493 map rows (4,491 distinct cover
-models) and 1,004 linked EC1 representations. The population comprises 165
-binary maps and 4,328 odd-characteristic maps: 2,011 direct prime-field, 30
-normalized-target prime-field, and 2,287 extension-field maps. The EC1 links
-comprise 140 binary and 864 odd-characteristic representations. The
-[2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
-records the native replay and retains the earlier dated assessment report. That
+classifies transfer obligations for every current map and linked EC1
+representation. Its coverage counts are derived from exact registry and graph
+membership. The immutable October 13 report covers its dated 2,100-map,
+664-representation snapshot; it does not establish replay coverage for later
+catalog additions. The generated current-catalog
 classification does not alter this geometry catalog: it records bounded binary
 typed-transfer support,
 refutes capabilities absent from the current implementation, and leaves the
@@ -200,3 +198,48 @@ The [standards importer](standards/README.md) expands the inventory, while
 Pass `--links PATH` alongside custom registry/report paths. `--check` replays
 both the report and the graph. An unresolved source import is recorded in
 `standards/coverage.json` and is not evidence of cover nonexistence.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+classifies transfer obligations for all 4,493 map rows (4,491 distinct cover
+models) and 1,004 linked EC1 representations. The population comprises 165
+binary maps and 4,328 odd-characteristic maps: 2,011 direct prime-field, 30
+normalized-target prime-field, and 2,287 extension-field maps. The EC1 links
+comprise 140 binary and 864 odd-characteristic representations. The
+[2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
+records the native replay and retains the earlier dated assessment report. That
+
+
+
+
+
+
+
+
