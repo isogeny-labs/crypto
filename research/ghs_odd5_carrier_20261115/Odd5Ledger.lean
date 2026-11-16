@@ -93,6 +93,17 @@ theorem primitive_s11_projective_divisor :
     224990655913 % 23 = 0 ∧
     Nat.gcd 23 333566377062870325133 = 1 := by decide
 
+/- Counts for the two partial degree-seven denominator screens. -/
+theorem degree_seven_sparse_assignment_counts :
+    (3 : Nat)^5 = 243 ∧
+    5 * 3^4 = 405 ∧
+    10 * 3^3 = 270 ∧
+    (3^5 - 1) * 270 = 65340 := by decide
+
+theorem degree_seven_linear_square_assignment_counts :
+    (3^5 - 1 : Nat) * 3^5 = 58806 ∧
+    (3^5 - 1 : Nat) * 5 * 3^4 = 98010 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -117,4 +128,6 @@ theorem primitive_s11_projective_divisor :
 #print axioms primitive_s11_trace_step
 #print axioms primitive_s11_order
 #print axioms primitive_s11_projective_divisor
+#print axioms degree_seven_sparse_assignment_counts
+#print axioms degree_seven_linear_square_assignment_counts
 end GHSOdd5Ledger
