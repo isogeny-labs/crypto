@@ -1,17 +1,25 @@
 """Render values already computed by the frozen Rust analyzer; no statistics."""
+import argparse
 import json
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--counts-png-only", action="store_true", help="Render the compact preview without changing SVG/PDF artifacts")
+args = parser.parse_args()
+
 ROOT = Path(__file__).resolve().parent
 groups = json.loads((ROOT / "run/summary.json").read_text())["groups"]
 plt.rcParams.update({"font.size": 9, "svg.fonttype": "none"})
 
 def save(fig, name):
-    fig.savefig(ROOT / (name + ".svg"), bbox_inches="tight")
-    fig.savefig(ROOT / (name + ".png"), dpi=180, bbox_inches="tight")
+    if not args.counts_png_only:
+        fig.savefig(ROOT / (name + ".svg"), bbox_inches="tight")
+    if not args.counts_png_only or name == "counts":
+        # PNG is a preview; full-resolution vector evidence remains in SVG/PDF.
+        fig.savefig(ROOT / (name + ".png"), dpi=60 if name == "counts" else 180, bbox_inches="tight")
     plt.close(fig)
 
 fig, axes = plt.subplots(2, 2, figsize=(10, 7.2))

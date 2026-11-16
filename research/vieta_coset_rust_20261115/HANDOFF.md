@@ -1,5 +1,25 @@
 # Vieta Rust port: continuation receipt
 
+## Bounded follow-up — 16 November, 17:51 UTC
+
+PR4410 old headf4b8640f21 is open; its prior CI has size/PCC/replay/native
+successes, artifact failure for two PNGs and shared validation/harness S3 download
+failures403/InvalidAccessKeyId. No review submissions or unresolved threads.
+Artifact-autofix run43911999680 failed before starting any job; no bot migration
+occurred. There are31 UI check entries but24 checks that ran under the sweeper
+rule (skipped/neutral excluded), within30. No review/gate bypass is permitted.
+
+Continued documented Copilot timeout fallback in comment6924365625; normal merge
+of maina1c98c8e85 preserves exact1198-entry main ledger prefix plus3 unchanged
+local bodies (1201 total), all full parent journal block multisets, claim pins
+and append-only lessons. Compact counts.png previews are now60dpi/61,146 bytes;
+full SVG/PDF figures, raw/summary/replay/protocol/proof bytes are unchanged.
+The original222,926-byte PNGs remain in Git checkpointf4b8640f21. No local S3 action.
+See continuation-20261116/evidence/followup-20261116T1749Z.json and sibling merge
+receipt. The main merge does not repair repository S3 credentials. Keep scientific
+standing unverified; no measurement rerun or cloud experiment. Inspect the newly
+pushed head's actual gates once, then the next bounded4h follow-up if pending.
+
 ## Substantive continuation — 16 November, 16:35 UTC
 
 User requested continuation after the closeout. PR4410 now carries opt-in
