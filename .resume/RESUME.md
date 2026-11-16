@@ -1,6 +1,39 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (02:11Z, 16 November)
+## Current checkpoint (02:50Z, 16 November)
+
+Merged-source validation ALL DONE and published as7bab7eefe on samePR4288:
+43cubicrelease tests, packed-liftcached/uncachedregression,5S4exampletests,
+actualexamplesbuilds,library/examplesClippy-Dwarnings. Prior02:11pendingstates
+belowarehistorical. CIstatus/workflowsqueried02:26for7babreturnedempty;next
+checknotbefore03:16unlessevent. No mergegatepass;no bypass. Mainfetchedagain
+a4dc85728;newAGENTSinstructionsread(standardpanelrationaleincluded;samestudyPR).
+
+NEXTLEADSELECTED: explicit Rust PseudoRemainderPairOnly / CLIpseudo-pair,
+inversion-freeremainderGCDstepsbutfinalmonicnormalization+sharedrootrecovery.
+Implementationdoneinprepared/cubic/driver;oldbaseline/defaultspreserved.
+Newpolynomialdifferential/plantedfactorandfullgraph/pivot/fresh/longstream
+testsadded. ALL45cubicrelease-librarytestsPASS, all5S4exampletestsPASS,
+actualgraph/probe/analyzerbuildsPASS, nativeanalysis8main+3componenttestsPASS,
+library/examples/analyzerClippy-DwarningsPASS. No compileractive. Captured
+validation/pseudo-*. Needcommit/pushsource/specbeforelocalwrapper. No pseudo
+data yet. InitialparallelS4exampletesthad2semantic-counterfailures;identical
+binaryserialdiagnosticpassesall5. NativeF4defaultcounterisprocessglobal;
+test-onlymutexfixesdefaultcommandwithoutweakeningassertions. Originalfailure
+anddiagnosticretained. Core45testsnotinvalidatedbyexample-onlyharnesschange.
+
+Primaryreviewandfrozenplan AMENDMENT_11_PSEUDO_REMAINDERS.md:
+FLINTdivremofficialpageidentitylc(B)^dA=BQ+R,finitefieldnonzeroscaleunit;
+SHA4bf0b619ea45a849bf26da51951bb89feaa046c01ed438284d62c1feda3a7688;
+local/tmp/ic-flint-pseudodiv-primary.html. KBMCP/wrapperunavailable;conductor
+unavailable. No noveltyclaim. Frozenpseudo-pair-plan.json:p127/523/1039,
+freshseeds139/149/151,preparedthenpseudo,540exec90warm450measure,1warm5round,
+CPU0/8GiB/900s/no-retries,paired_oraclesexactstream/scalarchecks,existingrho.
+Manifestvalidation/pseudo-source.sha256createdandchecked(42files). Plannednewdir
+/workspace/ic-local-runs/local-pseudo-pair-20261116-16unstarted. Needreportall
+directcandidate/referenceandrhooutcomeswithAArejectionsretained. GoalACTIVE.
+
+## Previous checkpoint (02:11Z, superseded pending states)
 
 All measurements finished; no experiment running. Reports14/15and exact browsing copies are published as f0b1693ce on PR4288.14complete199.383s,360executions,allscalar/streamprefixcontrols,7/12timingeligible,solecontrolled directdelayed/dense0.857(CI0.819–0.904).15censored900.005s,224attempts/223completions/1knowninflight/16unattempted;pairall4controlled1.24–2.13rho,no parity. Final6reportpagesinspected,fullflow/rawsourcehashesretained. Source6eacb4fd2only; do notattribute data to merged source.
 

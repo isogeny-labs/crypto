@@ -377,8 +377,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // F4's default per-report operation differences read a process-wide
+    // counter. Keep solves from other tests outside these exact comparisons.
+    static F4_COUNTS: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     #[test]
     fn sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts() {
+        let _counts = F4_COUNTS.lock().unwrap();
         for (p, seed, scalars) in [
             (7, 3, vec![]),
             (127, 83, vec![1, 13, 29]),
@@ -438,6 +444,7 @@ mod tests {
 
     #[test]
     fn observed_unsupported_coordinate_case_keeps_the_exact_group_fallback() {
+        let _counts = F4_COUNTS.lock().unwrap();
         let inst = cubic::generate_instance3(7, 3);
         let pre = cubic::SymmetrisedS4::precompute(&inst.curve);
         let base = cubic::SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(3));
@@ -502,6 +509,7 @@ mod tests {
 
     #[test]
     fn sparse_and_dense_graph_pipelines_recover_the_same_relation_prefix() {
+        let _counts = F4_COUNTS.lock().unwrap();
         let inst = cubic::generate_instance3(19, 11);
         let base = cubic::SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(11));
         let opts = cubic::GaudryOptions {
@@ -561,6 +569,7 @@ mod tests {
 
     #[test]
     fn quotient_bounds_and_reference_root_checks_are_exact() {
+        let _counts = F4_COUNTS.lock().unwrap();
         let p = 7;
         let basis = vec![
             vec![(vec![2, 0, 0], 1)],
@@ -585,6 +594,7 @@ mod tests {
 
     #[test]
     fn native_basis_preserves_actual_s4_reference_solutions() {
+        let _counts = F4_COUNTS.lock().unwrap();
         let inst = cubic::generate_instance3(7, 3);
         let pre = cubic::SymmetrisedS4::precompute(&inst.curve);
         let qualified = cubic::solve_s4_subspace_with(

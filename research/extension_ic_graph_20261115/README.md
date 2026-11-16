@@ -233,8 +233,17 @@ no standard lab admission or canonical export validation is asserted.
   timeout124 at900s, 181 completed execution records of240 planned; two
   incomplete and two complete A/A-rejected strata are retained.
 - [Sparse FGLM continuation](AMENDMENT_8_SPARSE_FGLM.md): weighted quotient-graph
-  moments, exact recurrence/Hankel checks and charged dense fallback; new
-  component timing is pending source validation/publication.
+  moments, exact recurrence/Hankel checks and charged dense fallback;
+  [complete component results](local-s4-krylov-component-20261116-11/report.pdf).
+- [Delayed graph kernels](AMENDMENT_9_DELAYED_GRAPH.md):
+  [scalar ablation](local-s4-delayed-v-scalar-20261116-12/report.pdf) and
+  [fresh dense comparison](local-s4-delayed-v-dense-20261116-13/report.pdf),
+  followed by [full cold small](local-delayed-ic-small-20261116-14/report.pdf)
+  and [censored scale](local-delayed-ic-scale-20261116-15/report.pdf) trials.
+- [Pseudo-remainder S3](AMENDMENT_11_PSEUDO_REMAINDERS.md): explicit Rust
+  `--oracles prepared-pair,pseudo-pair`, preserving the original default.
+  [Frozen paired plan](pseudo-pair-plan.json) uses fresh public targets;
+  Rust validation passes and no pseudo-remainder timing has started.
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;

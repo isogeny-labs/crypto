@@ -3754,6 +3754,8 @@ pub enum Solver {
     SymmetricPairOnly,
     /// Same pair equations with charged cached constants and stack workspace.
     PreparedSymmetricPairOnly,
+    /// Same prepared pair equations with inversion-free pseudo-remainder GCD steps.
+    PseudoRemainderPairOnly,
     /// The existing hybrid triple scan, using the symmetric S3 pair oracle.
     SymmetricMeetInTheMiddle,
 }
@@ -3914,8 +3916,11 @@ fn run_gaudry_impl(
     } else {
         None
     };
-    let prepared_pair = (solver == Solver::PreparedSymmetricPairOnly)
-        .then(|| prepared::PreparedSymmetricPair::new(inst));
+    let prepared_pair = match solver {
+        Solver::PreparedSymmetricPairOnly => Some(prepared::PreparedSymmetricPair::new(inst)),
+        Solver::PseudoRemainderPairOnly => Some(prepared::PreparedSymmetricPair::new_pseudo(inst)),
+        _ => None,
+    };
     let precompute_muls = curve.field.muls();
     curve.reset();
     let mut walk_sampler = match sampler {
@@ -4140,7 +4145,7 @@ fn run_gaudry_impl(
                 rep.pair_tests = stats.calls;
                 decs
             }
-            Solver::PreparedSymmetricPairOnly => {
+            Solver::PreparedSymmetricPairOnly | Solver::PseudoRemainderPairOnly => {
                 let stats = rep
                     .symmetric_pair_stats
                     .get_or_insert_with(SymmetricPairStats::default);
@@ -4175,9 +4180,9 @@ fn run_gaudry_impl(
                 | Solver::F4Groebner
                 | Solver::F4Krylov
                 | Solver::F4KrylovDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
-                Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly => {
-                    weil_s3_pair_test(inst, base, &r, &mut rng).0
-                }
+                Solver::SymmetricPairOnly
+                | Solver::PreparedSymmetricPairOnly
+                | Solver::PseudoRemainderPairOnly => weil_s3_pair_test(inst, base, &r, &mut rng).0,
                 Solver::SymmetricMeetInTheMiddle => {
                     subspace_triple_oracle(inst, base, &r, &mut rng).0
                 }
@@ -4189,7 +4194,9 @@ fn run_gaudry_impl(
             };
             let mismatch = if matches!(
                 solver,
-                Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly
+                Solver::SymmetricPairOnly
+                    | Solver::PreparedSymmetricPairOnly
+                    | Solver::PseudoRemainderPairOnly
             ) {
                 decs != other
             } else {

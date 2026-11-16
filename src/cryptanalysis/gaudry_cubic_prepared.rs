@@ -79,14 +79,45 @@ impl Poly5 {
         self
     }
 
-    fn gcd(mut self, mut rhs: Self, ring: &PolyRing) -> Self {
+    fn gcd(self, rhs: Self, ring: &PolyRing) -> Self {
+        self.gcd_with_remainders(rhs, ring, false)
+    }
+
+    // lc(rhs)^d * self = quotient * rhs + remainder. Every scale is a
+    // nonzero field unit, so Euclidean GCDs are preserved up to a scalar.
+    fn pseudo_rem(mut self, rhs: Self, ring: &PolyRing) -> Self {
+        assert!(rhs.len > 0);
+        let leading = rhs.c[rhs.len - 1];
+        while self.len >= rhs.len {
+            let top = self.len - 1;
+            let coef = self.c[top];
+            let shift = self.len - rhs.len;
+            ring.count((top + rhs.len - 1) as u64);
+            for c in &mut self.c[..top] {
+                *c = mm(*c, leading, ring.p);
+            }
+            for i in 0..rhs.len - 1 {
+                self.c[shift + i] = sm(self.c[shift + i], mm(coef, rhs.c[i], ring.p), ring.p);
+            }
+            // The two leading products cancel symbolically.
+            self.c[top] = 0;
+            self.trim();
+        }
+        self
+    }
+
+    fn gcd_with_remainders(mut self, mut rhs: Self, ring: &PolyRing, pseudo: bool) -> Self {
         while rhs.len > 0 {
             // A nonzero constant proves coprimality; no remaining polynomial
             // division or finite-field root extraction is needed.
             if rhs.len == 1 {
                 return Self::new(&[1]);
             }
-            let rem = self.rem(rhs, ring);
+            let rem = if pseudo {
+                self.pseudo_rem(rhs, ring)
+            } else {
+                self.rem(rhs, ring)
+            };
             self = rhs;
             rhs = rem;
         }
@@ -109,6 +140,7 @@ pub(super) struct PreparedSymmetricPair {
     aa: E3,
     a2: E3,
     b4: E3,
+    pseudo_remainders: bool,
 }
 
 impl PreparedSymmetricPair {
@@ -118,6 +150,14 @@ impl PreparedSymmetricPair {
             aa: f.sq(&inst.curve.a),
             a2: f.scale(&inst.curve.a, 2),
             b4: f.scale(&inst.curve.b, 4),
+            pseudo_remainders: false,
+        }
+    }
+
+    pub fn new_pseudo(inst: &Instance3) -> Self {
+        Self {
+            pseudo_remainders: true,
+            ..Self::new(inst)
         }
     }
 
@@ -158,7 +198,11 @@ impl PreparedSymmetricPair {
             .mul(v[pivot], &ring)
             .sub(u[pivot].mul(u[0], &ring).mul(v[pivot], &ring), &ring)
             .add(u[pivot].mul(u[pivot], &ring).mul(v[0], &ring), &ring);
-        let common = eliminant.gcd(compatibility, &ring);
+        let common = if self.pseudo_remainders {
+            eliminant.gcd_with_remainders(compatibility, &ring, true)
+        } else {
+            eliminant.gcd(compatibility, &ring)
+        };
         if common.len == 1 {
             stats.constant_gcd_rejections += 1;
             return (vec![], component_muls + ring.muls.get());
@@ -213,6 +257,7 @@ mod tests {
             let mut rng = StdRng::seed_from_u64(31);
             let base = SubspaceBase::build(&inst, &mut rng);
             let prepared = PreparedSymmetricPair::new(&inst);
+            let pseudo = PreparedSymmetricPair::new_pseudo(&inst);
             let mut points = Vec::new();
             if !inst.curve.g.inf {
                 for d in 1..inst.curve.n {
@@ -228,6 +273,7 @@ mod tests {
             for point in points {
                 let mut a = StdRng::seed_from_u64(37);
                 let mut b = a.clone();
+                let mut c = a.clone();
                 let got = prepared
                     .pair_test(
                         &inst,
@@ -246,7 +292,85 @@ mod tests {
                 )
                 .0;
                 assert_eq!(got, expected, "point={point:?}");
+                let fraction_free = pseudo
+                    .pair_test(
+                        &inst,
+                        &base,
+                        &point,
+                        &mut c,
+                        &mut SymmetricPairStats::default(),
+                    )
+                    .0;
+                assert_eq!(fraction_free, expected, "pseudo point={point:?}");
+                assert_eq!(
+                    a.clone().gen::<u64>(),
+                    c.gen::<u64>(),
+                    "pseudo root RNG stream changed"
+                );
                 assert_eq!(a.gen::<u64>(), b.gen::<u64>(), "root RNG stream changed");
+            }
+        }
+    }
+
+    #[test]
+    fn pseudo_gcd_matches_reference_with_planted_factors_and_degree_drops() {
+        let mut rng = StdRng::seed_from_u64(20261116);
+        for p in [5, 7, 127, 1039, 1_048_573] {
+            let ring = PolyRing::new(p);
+            for _ in 0..600 {
+                let a = Poly5::new(
+                    &(0..rng.gen_range(0..=5))
+                        .map(|_| rng.gen_range(0..p))
+                        .collect::<Vec<_>>(),
+                );
+                let b = Poly5::new(
+                    &(0..rng.gen_range(0..=5))
+                        .map(|_| rng.gen_range(0..p))
+                        .collect::<Vec<_>>(),
+                );
+                assert_eq!(
+                    a.gcd_with_remainders(b, &ring, true).upoly(),
+                    ring.gcd(&a.upoly(), &b.upoly()),
+                    "p={p}, a={a:?}, b={b:?}"
+                );
+                let factor = Poly5::new(&[rng.gen_range(0..p), 1]);
+                let left = Poly5::new(&[rng.gen_range(0..p), rng.gen_range(0..p), 1]);
+                let right = Poly5::new(&[rng.gen_range(0..p), 1]);
+                let a = factor.mul(left, &ring);
+                let b = factor.mul(right, &ring);
+                assert_eq!(
+                    a.gcd_with_remainders(b, &ring, true).upoly(),
+                    ring.gcd(&a.upoly(), &b.upoly()),
+                    "planted p={p}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn pseudo_pipeline_preserves_relation_stream_for_both_backends_and_samplers() {
+        let inst = generate_instance3(67, 3);
+        let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(3));
+        for sampler in [ResidualSampler3::FreshScalar, ResidualSampler3::RAddingLong] {
+            for backend in [LargePrimeBackend::Pivot, LargePrimeBackend::SymbolicGraph] {
+                let mut opts = GaudryOptions {
+                    max_residuals: 100000,
+                    solver: Solver::PreparedSymmetricPairOnly,
+                    small_base: (base.len() as f64).powf(2.0 / 3.0).ceil() as usize,
+                    max_large_primes: 2,
+                    ..GaudryOptions::default()
+                };
+                let baseline = run_gaudry_with_sampler(&inst, &base, 3, &opts, backend, sampler);
+                opts.solver = Solver::PseudoRemainderPairOnly;
+                let candidate = run_gaudry_with_sampler(&inst, &base, 3, &opts, backend, sampler);
+                assert_eq!(baseline.correct, Some(true));
+                assert_eq!(candidate.correct, Some(true));
+                assert_eq!(baseline.recovered_scalar, candidate.recovered_scalar);
+                assert_eq!(baseline.lp_input_digest, candidate.lp_input_digest);
+                assert_eq!(baseline.residuals, candidate.residuals);
+                assert_eq!(baseline.group_ops, candidate.group_ops);
+                assert_eq!(baseline.decompositions, candidate.decompositions);
+                assert_eq!(baseline.lp_histogram, candidate.lp_histogram);
             }
         }
     }
