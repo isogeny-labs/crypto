@@ -1538,7 +1538,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         // UnitT solves for h·log T: one inversion of h and one product.
         let h_inv = if ext.unit_t {
             w_nat.mul += pivot_inversion_steps(r) + 1;
-            invmod(h % r, r)
+            invmod(h % r, r).expect("h is a unit modulo the prime r")
         } else {
             1
         };
