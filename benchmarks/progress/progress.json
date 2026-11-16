@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0636Z-ic-positive-control-la",
+  "latest_record": "20261116T0751Z-ic-positive-control-unit-t",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 204,
+    "measured": 205,
     "open": 1
   },
   "repo": "crypto",
@@ -24445,6 +24445,32 @@
     },
     {
       "better": "lower",
+      "first": 0.772,
+      "latest": 0.772,
+      "latest_derived": {},
+      "metric": "la_mul_u_over_s_p32771",
+      "points": [
+        {
+          "commit": "be5e426df183",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0751Z-ic-positive-control-unit-t",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.761,
+            0.782
+          ],
+          "summary": "Genus-3 positive control: unit-T walk cuts LA mults to 0.76-0.79x (fails at small r: rho cycles, F1); deterministic fallback roots 0.77-0.82x relation work; U/rho at w=0.1 1.72 (p=32771), 1.78 (p=131101); 5a unresolved. Arm V ran with mixed walk (D1). [pcc:unverified]",
+          "value": 0.772
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 3.69,
       "latest": 3.69,
       "latest_derived": {},
@@ -25330,6 +25356,32 @@
           ],
           "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
           "value": 0.196
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.823,
+      "latest": 0.823,
+      "latest_derived": {},
+      "metric": "rel_per_trial_v_over_s_p65537",
+      "points": [
+        {
+          "commit": "be5e426df183",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0751Z-ic-positive-control-unit-t",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.822,
+            0.825
+          ],
+          "summary": "Genus-3 positive control: unit-T walk cuts LA mults to 0.76-0.79x (fails at small r: rho cycles, F1); deterministic fallback roots 0.77-0.82x relation work; U/rho at w=0.1 1.72 (p=32771), 1.78 (p=131101); 5a unresolved. Arm V ran with mixed walk (D1). [pcc:unverified]",
+          "value": 0.823
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
@@ -30827,6 +30879,58 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.78,
+      "latest": 1.78,
+      "latest_derived": {},
+      "metric": "u_over_rho_w01_p131101",
+      "points": [
+        {
+          "commit": "be5e426df183",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0751Z-ic-positive-control-unit-t",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.15,
+            4.52
+          ],
+          "summary": "Genus-3 positive control: unit-T walk cuts LA mults to 0.76-0.79x (fails at small r: rho cycles, F1); deterministic fallback roots 0.77-0.82x relation work; U/rho at w=0.1 1.72 (p=32771), 1.78 (p=131101); 5a unresolved. Arm V ran with mixed walk (D1). [pcc:unverified]",
+          "value": 1.78
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.72,
+      "latest": 1.72,
+      "latest_derived": {},
+      "metric": "u_over_rho_w01_p32771",
+      "points": [
+        {
+          "commit": "be5e426df183",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0751Z-ic-positive-control-unit-t",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.97,
+            3.32
+          ],
+          "summary": "Genus-3 positive control: unit-T walk cuts LA mults to 0.76-0.79x (fails at small r: rho cycles, F1); deterministic fallback roots 0.77-0.82x relation work; U/rho at w=0.1 1.72 (p=32771), 1.78 (p=131101); 5a unresolved. Arm V ran with mixed walk (D1). [pcc:unverified]",
+          "value": 1.72
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
     },
     {
       "better": "lower",
