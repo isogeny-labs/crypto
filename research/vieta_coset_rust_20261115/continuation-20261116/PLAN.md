@@ -29,7 +29,7 @@ Euclidean GCD becomes quasi-linear: short-quotient Euclid remains classical.
   the fast mode (unaffected-path negative control). Full ordered outputs agree.
 - Proposed primary panel: word62 m8192,16384 and P224 m512,2048, two warmups and
   six retained targets each, alternating random-rational/conditioned populations.
-  Supplemental P224/m8192: two retained targets, one of each population, kept
+  Supplemental P224/m8192: two retained targets, no warmups, one of each population, kept
   separate. Fixed mixed arm orders; all failures/limits retained.
 - Counted field operations are primary; all clocks below L2 diagnostics, never
   an isolated timing/fastest-backend claim. Native Rust analysis frozen before
@@ -67,3 +67,25 @@ use documented timeout fallback before editing shared conflicted metadata.
 KB wrapper absent; direct primary/internal fallback. A nonexistent prime_tower
 path was corrected to ic_framework/prime_tower. No failed source lookup is used
 as an absence/novelty claim. No measurement has started.
+
+## Implementation checkpoint — before calibration
+
+Added explicit schoolbook/Karatsuba/Karatsuba+Newton choices; old constructor
+remains schoolbook. Karatsuba handles odd/unbalanced/zero inputs, Newton division
+falls back on short quotients, and all primitive products remain counted. New
+tests use independent naive products and known quotient/remainder identities
+over word and BigUint fields, plus complete relation checks and budget failure.
+Seven unit groups and four CLI/replay tests pass; clippy corrected after one
+constant-chunk lint [pcc:unverified]. No performance call yet.
+
+The six-arm native qualifier and native descriptive summary are implemented.
+Exact A/A and unaffected lookup controls, separate excluded scalar verification,
+fixed seeds and full failed rows are retained. Newton may not engage in typical
+short-quotient Euclid steps; its explicit counter will show this, without a
+presumed whole-GCD complexity improvement.
+
+Copilot did not respond after eight minutes. Comment6921269657 explains the
+documented fallback. Main a409d0037a merged as7d807f2ce3, preserving exact main
+ledger bytes plus one unchanged missing closeout claim body and full journal
+block multisets. The new merge receipt's link typo was corrected before any
+publication/freeze. No frozen original receipt was changed.
