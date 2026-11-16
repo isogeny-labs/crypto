@@ -56,11 +56,18 @@ Leave one curve out at w = 1: Q1 0.40–0.66 (upper ends 0.68–0.97), Q2
   Brent check); a leaner rho could do fewer, so Q3/Q4 measure this rho
   implementation as much as rho itself. Q1 is the reading that depends least
   on such choices, and it is below rho at every price.
-- **Which reading is the lab's band is an owner decision** (AGENTS.md §5a says
-  "every native operation"; the earlier positive-control protocols priced
-  multiplications only). Until it is taken, the statement is: *below the
-  cheapest rho at w = 0, 0.1 and 1 in readings Q1, Q3, Q4 and Qcal; unresolved
-  at w = 1 in Q2.*
+- **Owner decision (2026-11-16): the band's primary reading is Q3**, every
+  emitted native operation on both sides (AGENTS.md §5a, bullet "Native
+  operation means every emitted native operation, on both sides"). Under it:
+  **arm w is below the cheapest rho at w = 0, 0.1 and 1 at p = 8209 for these
+  instances**: 0.003 [0.002, 0.005], 0.098 [0.071, 0.148], 0.142
+  [0.102, 0.215]; leave-one-curve-out upper ends at w = 1 are 0.20–0.30.
+  The other readings are sensitivities: Q1, Q4 and Qcal agree; Q2 (IC
+  additions priced, rho's emitted compares not) is unresolved at w = 1.
+  Caveat carried with the verdict: Q3 prices this rho implementation's ~18
+  compares per step; a leaner rho walk would narrow the w = 1 margin.
+  Positive control of a known effect; `[pcc:unverified]` until an independent
+  replay.
 
 ## Scorecard of the frozen predictions
 

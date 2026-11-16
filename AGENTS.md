@@ -1223,6 +1223,16 @@ Every cross-method comparison and every ranking must:
   group-addition equivalents per native operation, applied the same way
   to every arm. Pinned calibrations may be added as a further point, but
   they never replace the band.
+- **"Native operation" means every emitted native operation, on both
+  sides** (owner, 2026-11-16). The band's primary reading prices every
+  counted native operation of every arm: an index calculus's modular
+  multiplications *and* additions, and a rho reference's canonicalisations
+  *and* its emitted cycle-window and Brent compares (`work_native`), with
+  partition hashes and coefficient additions added where the walk does not
+  emit them. A multiplications-only reading may be reported as a
+  sensitivity, never as the verdict. The decision followed the genus-4
+  positive control, where the readings disagree at `w = 1`
+  (`research/genus4_rho_refs_20261116/RESULTS.md`).
 - **A calibrated weight for field-arithmetic counters** (owner, 2026-11-12).
   Some counters count base-field multiplications: the `mod p` or `mod r`
   mulmods of linear algebra, smoothness tests and root finding. Price those
