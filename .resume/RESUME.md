@@ -398,3 +398,6 @@ User requested continued work; new activegoal fixed RANK_BUDGET_PROTOCOL_02.md P
 
 ## Latest early-rank study completion
 18cells complete allchecks; PCCedfc6c/de603d. Two syzygies each10poly/8proof terms/proddegree6 lower actualF4 and affine5to4 at n3/4/6; negativecountdiffgain0degree5, n6matrix136x175to78x73. All18basisideals equalstar, zero failures/contention, unchangedpins.19rawarchives; closedrecord20261116T2046Z-budgeted-early-rank-relations-20261116, integrityerrors[], PDF4pages inspected. Next finishpublication37 andreceipt; no new15x timing claim. Successor firsttwo structuralrule unmeasured. Allfresh/reservedseedsuntouched.
+
+## Verified final early-rank result37
+Remote728386c0e7d550eefb33b72eb4055f279a549aee/tree82cd30eadfb6f932776a26b273473b663b64a94e; actual full source in rank-publication-37.json.59blobs/exacttree/reflease and remote reportGitSHA226084ef pass. PR4349updated, all source/raw19/PDF4pages/costs uploaded. Boundedearlyrankgoalcomplete pendingreceiptmetadata publication38/goalstatusclose. ActualF4degree5to4 and n6matrix136x175to78x73, NOT a repeated timing/15x claim. Nextunmeasured:firsttwo certifiedsyzygies without scout, new prospectivetimingprotocol needed. No newexperiment/backgroundtask; originalallholdoutsuntouched; localL0/CPU0/checkpointwaiver/zero$.
