@@ -1,5 +1,16 @@
 # Native auxiliary-curve root finding and incidence integration
 
+The requested Runpod execution is complete. The given-datum paper root example
+improved4.46× versus dense CPU time; complete degree256 trace translation
+improved6.84–12.23× depending on support. Complete B128 pullback target work
+remained0.571s median, versus7.88ms for batched pairs; its matched conditional
+rho ratio was1079.96. These are descriptive shared-host observations.
+[pcc:unverified]
+
+[Runpod results and accounting](runpod/RESULTS.md) ·
+[Three-page PDF](runpod/RUNPOD_REPORT.pdf) ·
+[Sealed native summary](runpod/attempt-2/summary.json).
+
 The current implementation follows the paper's complete auxiliary-curve and
 quadratic-twist root-finding pipeline in native C++. A source-coordinate
 variant keeps factors in the original quotient ring throughout Sylow descent,
@@ -28,7 +39,8 @@ timing panel. [pcc:unverified]
 
 The norm/GCD stage remains O(B²) degree-B quotient products. Matched native
 timing, stronger external root-finding controls, larger-field datum setup and
-rho comparisons remain pending budget/admission and independent replay.
+rho comparisons now have a descriptive Runpod run below; independent signed
+replay, wider-field support and admission remain pending.
 No overall runtime ratio is inferred from a component count. [pcc:unverified]
 
 | Requested deliverable | Current status and evidence |
@@ -36,10 +48,10 @@ No overall runtime ratio is inferred from a component count. [pcc:unverified]
 | Full trace/dense translation, including collisions and exceptions | Implemented; native independent-source audit in `native/audit-data/002-result.json`. Unsigned development checks. |
 | Paper-guided auxiliary curve, twist and isogeny | Implemented; counted toy datum completion and original-curve recovery in `native/audit-data/004-result.json`. General efficient datum construction remains open. |
 | Stronger root-finding formulation | Implemented source-coordinate splitting; conditional cost derivation in `reports/PULLBACK.md`. Formal verification and priority review remain open. |
-| Growing labelled pools with r approximately B³ | Historical panel preserved below. New native scaling and complete memory/cost measurements remain pending admission; the small native correctness panel does not replace them. |
-| Repository quotient/GCD and pair controls | Pinned prior-art/control sources preserved under `historical/repo_controls/`; matched native performance comparison remains pending. |
+| Growing labelled pools with r approximately B³ | Executed native Runpod panel:60 public targets, five measured rounds, fresh charged pools, misses, memory and recovery. Shared-host descriptive data in `runpod/RESULTS.md`. |
+| Repository quotient/GCD and pair controls | Pinned sources preserved; native same-target algebraic/pair controls and rho executed. The callable pair control is an algorithm-level adaptation, not an exact upstream Rust pair build. |
 | Structured bases versus known mixed labels | Kept separate; public pool generation and rejected draws are charged. No free labelled structured-base construction is asserted. |
-| Full comparison with rho and external root finding | Protocol in `rho-protocol.json`; blocked on live EKS budget/checkpoint access, followed by qualification and independent replay. |
+| Full comparison with rho and external root finding | Runpod execution complete under user override, with source-bound S3 checkpoints and raw custody. External FLINT uses the fixed paper polynomial. Broader external tuning, isolated admission and signed replay remain open. |
 
 Implementation and test outcomes in this table remain unsigned. [pcc:unverified]
 

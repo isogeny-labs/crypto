@@ -10,7 +10,7 @@
   "created_epoch": 1794846349,
   "deadline_epoch": 1794848149,
   "cost_ceiling_usd": 1,
-  "status": "running",
+  "status": "completed",
   "worker_source_revision": "c0176f942c03a549a98cb680b816e864b8820333",
   "supervisor_exec_session": 32539,
   "checkpoint_admission": {
@@ -73,6 +73,29 @@
   },
   "result_directory": "/workspace/crypto_pr_context/runpod-c0176f942",
   "collection": "supervise-v2.sh live mirrors and final archive, original source c0176f942; credential/namespace material stays outside Git",
-  "active_own_pods": 1,
-  "maximum_allocations_total": 2
+  "active_own_pods": 0,
+  "maximum_allocations_total": 2,
+  "completion": {
+    "schema": "trace-runpod-transfer/v1",
+    "sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+    "bytes": 3298986,
+    "worker_exit": 0
+  },
+  "cleanup": {
+    "schema": "trace-runpod-cleanup/v1",
+    "pod_id": "wg53vkdhjsv6lk",
+    "http_status": "204",
+    "utc": "2026-11-16T16:39:33Z",
+    "deleted": true
+  },
+  "custody": {
+    "schema": "trace-runpod-custody/v1",
+    "bucket": "setec-astronomy-artifacts",
+    "key": "store/runpod/trace-incidence/c0176f942c03a549a98cb680b816e864b8820333/43907109841/results.tar.gz",
+    "sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+    "bytes": 3298986,
+    "upload_http_status": "204",
+    "readback_hash_matches": true
+  },
+  "next_step": "Publish native descriptive report and immutable CAS promotion; no Runpod pod remains active for this request."
 }
