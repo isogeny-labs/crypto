@@ -559,6 +559,12 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "index_inserts" => HASH,
         "index_point_negations" => Prims(&[(FieldAdd, 1)]),
         "index_sort_word_ops" => Prims(&[(WordOp, 1)]),
+        // Extension of 2026-11-07 (ic-acct-7; docs/units/BITOPS.md,
+        // "Extensions"): a column-log combination's products and sums
+        // modulo `r` (`ic.shared_rank`'s descent `Σ coef·log`, its
+        // `h⁻¹`, a full-rank check's `coef·log`).
+        "combination_modr_muls" => Prims(&[(ModrMul, 1)]),
+        "combination_modr_adds" => Prims(&[(ModrAdd, 1)]),
 
         // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
         // "Extensions").  No primitive weight changes; these rules classify
@@ -963,7 +969,7 @@ fn solver_prims(s: &SolverStats) -> Option<Vec<(Prim, u128)>> {
 
 /// The field of a curve, from its facts.
 pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
-    let r_bits = 128 - curve.r.leading_zeros();
+    let r_bits = curve.r.bits();
     let field = match curve.family.as_str() {
         "prime" => Field::Prime {
             bits: curve.field_bits.ok_or("prime curve without field_bits")?,
@@ -1324,7 +1330,7 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             log2_bitops: (gates > 0).then(|| bitops::log2(gates)),
         });
     }
-    let r = x.curve.r as f64;
+    let r = x.curve.r.to_f64();
     let add = widths.gates(GroupAdd).map_err(|e| e.to_string())? as f64;
     let floor =
         (std::f64::consts::PI * r / (2.0 * x.curve.automorphisms_available as f64)).sqrt() * add;
@@ -1383,7 +1389,7 @@ pub fn bitop_view(
     let mut v = r.clone();
     let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
     let total: f64 = w.bitops.parse().map_err(|_| "bitops is not an integer")?;
-    let sqrt_r = (r.workload.curve.r as f64).sqrt();
+    let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
     v.cost.unit = bitops::UNIT.into();
     if r.cost.total_gae.is_some() {
         v.cost.total_gae = Some(total);
@@ -1481,7 +1487,7 @@ pub fn work_line(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLine 
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1532,7 +1538,7 @@ pub fn summarise(
             );
             params.insert(key.clone(), r.method.params.clone());
             by.entry(key).or_default().push((
-                (r.workload.curve.r as f64).log2(),
+                (r.workload.curve.r.to_f64()).log2(),
                 price_record(&r),
                 r.workload.curve.slug.clone(),
             ));
@@ -1920,7 +1926,7 @@ pub fn work_line_v2(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLi
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1957,9 +1963,9 @@ mod tests {
             construction: String::new(),
             field_degree: (family != "prime").then_some(bits),
             field_bits: (family == "prime").then_some(bits),
-            group_order: r,
-            r,
-            cofactor: 1,
+            group_order: (r).into(),
+            r: r.into(),
+            cofactor: (1u64).into(),
             generator: [String::new(), String::new()],
             automorphisms_available: aut,
             registered: false,
@@ -2829,5 +2835,28 @@ mod tests {
             assert!(bits > 0);
             assert_eq!(v2.at, mul_decimal(committed.bitops.parse().unwrap(), bits));
         }
+    }
+
+    /// Extension of 2026-11-07 (ic-acct-7): the column-log combination
+    /// counters price one product or one sum modulo `r` each, and no
+    /// other rule moved.
+    #[test]
+    fn combination_counters_price_one_modr_operation_each() {
+        let rule = |c: &str| match ic_rule(c) {
+            Some(Rule::Prims(p)) => p.to_vec(),
+            _ => panic!("{c} has no primitive rule"),
+        };
+        assert_eq!(rule("combination_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(rule("combination_modr_adds"), vec![(ModrAdd, 1)]);
+        // The counters `ic.shared_rank` now writes beside them keep the
+        // rules of 2026-10-16.
+        assert_eq!(rule("target_rng_draws"), vec![(WordOp, 80)]);
+        assert_eq!(rule("row_build_words"), vec![(WordOp, 1)]);
+        assert_eq!(rule("row_build_modr_adds"), vec![(ModrAdd, 1)]);
+        assert_eq!(rule("row_build_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(
+            rule("curve_equation_checks_uncharged"),
+            vec![(FieldMul, 3), (FieldSqr, 2), (FieldAdd, 3)]
+        );
     }
 }
