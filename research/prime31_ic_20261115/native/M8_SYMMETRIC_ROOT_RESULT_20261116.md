@@ -39,3 +39,28 @@ Reviewed primary existing source rather than repeating searched areas: #4188 alr
 **Highest-priority next actual algorithmic experiment:** on B4/B8 implement **target-conditioned** elimination directly in eight elementary symmetric coefficients e1..e8 or 3+3+2 block-Vieta coefficients, using the constraints `f|H^8` (or block `f_j|H^{deg f_j}`), an original-ideal-certified balanced Semaev/S9 circuit, and selected-root/subresultant machinery from #4228/#4349. Compare extracted finite rational f sets to this independently verified *ground-truth evaluator*, including repeated x and infinity. A target-conditioned solution must not read candidate indices, points or prior group sums during discovery. If all complete B4/B8 outputs match, lift to the 16 frozen prime31 natural masks, measure independent relation rank/one-useful-relation recovery, then twelve unknown scalars and fully cold completed PKM/APS/native-F4/external-CAS comparisons. Optimized rho is a separate security baseline, not the primary algebraic frontier comparator.
 
 **Stop:** A symbolic system that only tests candidate f values or exceeds the registered memory/degree cap without complete roots is not a non-generic index-calculus improvement; record all censored and negative calls. No source here meets the requested cheaper non-generic complete prime31 objective yet.
+
+
+---
+
+## Registered exhaustive B8 confirmation — actually executed (2026-11-16 UTC)
+
+The **separately preregistered** B8 extension ran to completion on Rust release CI at exact source `6567889f5d5cd753302c37e84cf8e8e795fb50dd`: [GitHub Actions 43829426432](https://github.com/isogeny-labs/crypto/actions/runs/43829426432), job `133170883210`, **PASS**. Frozen original CLI JSON and provenance: [M8_SYMMETRIC_B8_EXHAUSTIVE_CI_20261116.json](M8_SYMMETRIC_B8_EXHAUSTIVE_CI_20261116.json). The original 128-sample result was not rewritten or retroactively called exhaustive.
+
+| Exhaustive registered B8 cell | Executed result |
+|---|---:|
+| Unordered 8-leaf abscissa multisets `C(15,8)` | **6,435/6,435** |
+| Signed Semaev x/identity vs full EC decisions | **25,740/25,740 exact matches** |
+| False positive / false negative | **0 / 0** |
+| True-positive target decisions | 6,765 |
+| Multisets whose signed support contains identity | **330** |
+| Diagonal S3 infinity branches exercised | **6,270** |
+| Field-only S3 successor calls | **355,113** |
+| Invalid f certificates rejected | **3/3** |
+| Given-f field-only certificate/evaluation time | 211.906204 ms |
+| Independent complete signed EC semantic validation | 484.633133 ms |
+| Full Rust in-process program (including setup and checks) | **706.903124 ms** |
+
+Together with the earlier exhaustive B4 660-decision cell, this establishes **26,400/26,400** exact field-only versus independently verified signed full-point decisions across **all B4 and B8 unordered multisets**, for the four frozen target categories. This is a stronger finite-instance *correctness* gate than the 128-B8 sample; neither gives a method for selecting f from the public target.
+
+**Interpretation and next step:** the expected Semaev quadratic and exceptional identity semantics of the proposed symmetric factor-base quotient survived exhaustive B8 signed-point checking. The next obstacle is not sign branch correctness at small B; it is computing a target-conditioned constraint on the e1..e8 coefficients and extracting a candidate f **without** traversing the 48,903,492 B31 multisets. No polynomial original-ideal certificate or new cold unknown-log solve was produced here. An exhaustive validator that runs in 0.707 s at B8 does **not** imply a scalable non-generic algorithm at B31, nor can its small-B evaluation clock be compared to APS complete solver wall.
