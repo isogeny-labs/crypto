@@ -1,3 +1,22 @@
+# Resume: crypto @ claude/peaceful-babbage-wddn3o (genus>=2 IC leads L01-L12)
+
+## Goal
+Owner (2026-11-16): pursue twelve new genus>=2 index-calculus leads in parallel (opus coordinators, sonnet/haiku executors).
+## Lead / hypothesis
+L01 anchored pencil sieve; L02 automorphism-orbit bases; L03 base re-balance; L04 batch smooth-part; L05 even-degree function relations; L06 odd-l (l,l,l) isogeny census g3; L07 Prym IC desk count; L08 non-hyperelliptic ladder g4-6; L09 gonal pencil seeds; L10 C34/Picard targets + matched rho; L11 Laine-Lauter memory curve; L12 bielliptic quartic orbits.
+## Spec
+research/g2plus_leads_20261116/Lxx_*/PROTOCOL.md, each frozen (sha256 in frozen.sha256) by its coordinator before any data.
+## State
+Workflow launched from the main session; each lead owns only its own directory. Standalone code, counted field multiplications, local CPU, no wall-time benchmark claims.
+## Next steps
+Read each Lxx/RESULTS.md and ASSESSMENT.md; write research/g2plus_leads_20261116/README.md summary; session log; commit; PR.
+## Runs in flight
+Per-lead local runs, each capped at about 10 CPU-minutes; outputs in Lxx/raw/.
+## Stop and success conditions
+Each lead stops at its preregistered kill criterion. Success = a verified component advance, reported as distance to matched rho; nothing reaches the leaderboard from this pass.
+
+---
+
 # Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
 
 ## Goal
