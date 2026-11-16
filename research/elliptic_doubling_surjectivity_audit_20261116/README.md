@@ -11,3 +11,15 @@ Lean derives surjectivity for every actual multiplication-by-2^n point map. Actu
 Local **PCC-20261116-3b1033 PASS at 2026-11-16T19:51:07Z**, signedunverified. Wholegate20/0failures/0trustednative;6roots from01,newwarnings0. 8states preserve failures01,02,03,04,05,06/passes07,08. All7906preservation entries57initialplans match; producer7963records/2137unique committed paths.28packages/no copied imports/hydration/update. Complete199-character main/SHA7dfe887cc3949392b6f23eb77a13fa15fff652fa038e8e7806a32654f2175c35,5transparent predicates/fullsupportheaders; separatebinding1complete0prefix0unresolved/emptysuffix aftergate. 282formal22artifactpins/222pinned204actualimports/18extra frozen. Lossless249files/120objects/194116XZ/4parts/roundtrip/actualrestore. Report1page/46580B/full4126chars/eachindividualvisual/layout inspected. Ordinaryfoundations/defaultlimits/no holes/customaxioms/nativeproofevaluation/newflags/waivers/frozenedits. [pcc:unverified]
 
 SixKB and source/publicationConductor127; canonical/official/primary fallback,noabsence/novelty. Complete currentprimary printed172/PDF8 text and1300pxvisual beforeprotocol/code; earlier ranges/errata separatelycredited,8.2.7/fullchapter unreadhere. Samehost checks not independentparser/compiler/host/signedstanding. All14active/zero paidcompute/agents/nativeexperiments. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+Local proof receipt `b6ca88206355da61f6392001cfcdc34186a05248` and remote proof
+`8cb31151ab4d55909f19e6d96fe18d025c5f398c` share tree
+`23961aa320156006f2ef7e0fbd2d6e8b24466dee`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending; local replay does not establish signed standing. Full general levels,
+multiplication-isogeny-definition comparison, descent/canonical Tate and
+MOV/Frey–Ruck remain open. All14 targets stay active. [pcc:unverified]
