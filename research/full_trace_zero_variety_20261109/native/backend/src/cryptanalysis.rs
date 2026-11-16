@@ -14,5 +14,7 @@ pub mod trace_zero_point_chain;
 pub mod trace_zero_relations;
 #[path = "../../../../../src/cryptanalysis/trace_zero_linearized.rs"]
 pub mod trace_zero_linearized;
+#[path = "../../../../../src/cryptanalysis/trace_zero_word_field.rs"]
+pub mod trace_zero_word_field;
 #[path = "../../../../../src/cryptanalysis/trace_zero_subspace_relations.rs"]
 pub mod trace_zero_subspace_relations;

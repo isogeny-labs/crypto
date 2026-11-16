@@ -5,6 +5,7 @@ use crate::binary_ecc::{
     curve::{point_add, point_neg},
     BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly, TraceZeroVariety,
 };
+use crate::cryptanalysis::trace_zero_word_field::{WordField, WordPoint};
 use crate::cryptanalysis::{
     binary_semaev::binary_semaev_s3,
     trace_zero_relations::{
@@ -129,6 +130,7 @@ impl ProductProjection {
         }
     }
 
+    #[cfg(test)]
     fn solve(
         &self,
         xs: &[F2mElement],
@@ -136,16 +138,23 @@ impl ProductProjection {
         z: &F2mElement,
         y: &F2mElement,
     ) -> (ProjectedResult, usize) {
+        self.solve_compact(xs, c, words(z), words(y), &WordField::new(c))
+    }
+    fn solve_compact(
+        &self,
+        xs: &[F2mElement],
+        c: &BinaryCurve,
+        z: WordMask,
+        y: WordMask,
+        field: &WordField,
+    ) -> (ProjectedResult, usize) {
         let width = xs.len() + 1;
         let coefficient_mask = (1u64 << width) - 1;
         let mut pivots = [0u64; 64];
         let mut rank = 0;
-        let zw = words(z);
-        let offset = y.add(&z.mul(
-            &z.half_trace(&c.irreducible).expect("odd field"),
-            &c.irreducible,
-        ));
-        let target = words(&offset);
+        let zw = z;
+        let offset = field.add(y, field.mul(z, field.half(z)));
+        let target = offset;
         for (j, (columns, rhs)) in self.equations.iter().zip(&self.rhs).enumerate() {
             let mut row = parity(rhs, &target) << width;
             for (i, col) in columns.iter().enumerate() {
@@ -177,17 +186,16 @@ impl ProductProjection {
                     }
                 }
                 let mut h = if solution & (1u64 << xs.len()) != 0 {
-                    F2mElement::one(c.m)
+                    [1, 0, 0]
                 } else {
-                    F2mElement::zero(c.m)
+                    [0; 3]
                 };
                 for (i, hi) in self.halves.iter().enumerate() {
                     if solution & (1u64 << i) != 0 {
-                        h = h.add(hi);
+                        h = field.add(h, words(hi));
                     }
                 }
-                let product = offset.add(&z.mul(&h, &c.irreducible));
-                let product_words = words(&product);
+                let product_words = field.add(offset, field.mul(z, h));
                 if product_words
                     .iter()
                     .zip(&self.w_support)
@@ -202,13 +210,17 @@ impl ProductProjection {
                         u = u.add(x);
                     }
                 }
-                return (ProjectedResult::Unique(u, product), j + 1);
+                return (
+                    ProjectedResult::Unique(u, F2mElement::from_words(&product_words, c.m)),
+                    j + 1,
+                );
             }
         }
         (ProjectedResult::Deficient, self.equations.len())
     }
 }
 
+#[cfg(test)]
 fn basis(values: impl IntoIterator<Item = BigUint>, n: u32) -> Vec<F2mElement> {
     let mut pivots: Vec<Option<BigUint>> = vec![None; n as usize];
     for mut v in values {
@@ -388,6 +400,31 @@ fn residual_batch(c: &BinaryCurve, target: &BinaryPoint, base: &[BinaryPoint]) -
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn packed_basis_preserves_reference_pivots_and_numeric_coordinate_order() {
+        let mut seed = 202611153u64;
+        for n in [5, 83, 131] {
+            let mut values = Vec::new();
+            for _ in 0..160 {
+                let mut w = [0; 3];
+                for word in &mut w {
+                    seed ^= seed << 13;
+                    seed ^= seed >> 7;
+                    seed ^= seed << 17;
+                    *word = seed;
+                }
+                values.push(F2mElement::from_words(&w, n));
+            }
+            values.sort_by_key(x_key);
+            assert!(values
+                .windows(2)
+                .all(|v| v[0].to_biguint() <= v[1].to_biguint()));
+            let packed = word_basis(values.iter().map(words), n);
+            let reference = basis(values.iter().map(F2mElement::to_biguint), n);
+            assert_eq!(packed, reference);
+        }
+    }
 
     fn small_curve() -> BinaryCurve {
         BinaryCurve {
@@ -653,11 +690,33 @@ fn monic_roots(
     let root = u.mul(&arg.half_trace(irr).expect("odd field"), irr);
     vec![root.clone(), root.add(u)]
 }
-fn point_key(p: &BinaryPoint) -> (BigUint, BigUint) {
-    match p {
-        BinaryPoint::Affine { x, y } => (x.to_biguint(), y.to_biguint()),
-        _ => unreachable!("finite base"),
+fn x_key(x: &F2mElement) -> WordMask {
+    let w = words(x);
+    [w[2], w[1], w[0]]
+}
+fn word_basis(values: impl IntoIterator<Item = WordMask>, n: u32) -> Vec<F2mElement> {
+    let mut pivots: Vec<Option<WordMask>> = vec![None; n as usize];
+    for mut v in values {
+        loop {
+            let Some(word) = (0..3).rev().find(|&i| v[i] != 0) else {
+                break;
+            };
+            let bit = word * 64 + 63 - v[word].leading_zeros() as usize;
+            if let Some(p) = pivots[bit] {
+                for i in 0..3 {
+                    v[i] ^= p[i];
+                }
+            } else {
+                pivots[bit] = Some(v);
+                break;
+            }
+        }
     }
+    pivots
+        .into_iter()
+        .flatten()
+        .map(|w| F2mElement::from_words(&w, n))
+        .collect()
 }
 
 /// For each actual final point R, solve the necessary linear equation
@@ -694,8 +753,8 @@ pub fn decompose_trace_zero_linearized(
         return out;
     }
     let c = v.curve();
-    let mut by_x: BTreeMap<BigUint, Vec<usize>> = BTreeMap::new();
-    let mut by_point = BTreeMap::new();
+    let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
+    let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
     for (i, p) in base.iter().enumerate() {
         let BinaryPoint::Affine { x: fx, y: fy } = p else {
             out.relation.reason = Some("invalid linearized target/base");
@@ -705,7 +764,7 @@ pub fn decompose_trace_zero_linearized(
             out.relation.reason = Some("invalid linearized target/base");
             return out;
         }
-        let (x, y) = point_key(p);
+        let x = x_key(fx);
         let known_sign = by_x.get(&x).is_some_and(|ids| {
             let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
                 unreachable!()
@@ -715,24 +774,23 @@ pub fn decompose_trace_zero_linearized(
         // is_in_4e performs the field-width and curve-equation checks itself.
         // Once one ordinate is admitted, its identical/opposite lift is also
         // admitted; every supplied sign/index is still retained below.
-        if !known_sign && c.is_in_4e(p) != Some(true) {
+        if !known_sign
+            && !compact
+                .as_ref()
+                .map_or_else(|| c.is_in_4e(p) == Some(true), |f| f.admit(p))
+        {
             out.relation.reason = Some("invalid linearized target/base");
             return out;
         }
-        by_x.entry(x.clone()).or_default().push(i);
-        by_point.entry((x, y)).or_insert(i);
+        by_x.entry(x).or_default().push(i);
     }
-    let xs = basis(by_x.keys().cloned(), c.m);
+    let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
     let products: Vec<_> = xs
         .iter()
         .enumerate()
-        .flat_map(|(i, x)| {
-            xs[i..]
-                .iter()
-                .map(|y| x.mul(y, &c.irreducible).to_biguint())
-        })
+        .flat_map(|(i, x)| xs[i..].iter().map(|y| words(&x.mul(y, &c.irreducible))))
         .collect();
-    let ws = basis(products, c.m);
+    let ws = word_basis(products, c.m);
     out.source_dimension = xs.len();
     out.product_dimension = ws.len();
     out.linear_columns = xs.len() + ws.len();
@@ -760,20 +818,31 @@ pub fn decompose_trace_zero_linearized(
             residual_start = r;
             // An immediate relation should not pay for 31 unused residuals.
             residuals = if r == 0 || batch_size == 1 {
-                vec![point_add(c, target, &point_neg(p))]
+                vec![WordPoint::from_point(&point_add(c, target, &point_neg(p)))]
+            } else if let Some(f) = &compact {
+                f.residuals(c, target, &base[r..base.len().min(r + batch_size)])
             } else {
                 residual_batch(c, target, &base[r..base.len().min(r + batch_size)])
+                    .iter()
+                    .map(WordPoint::from_point)
+                    .collect()
             };
         }
-        let residual = residuals[r - residual_start].clone();
+        let residual = residuals[r - residual_start];
         out.relation.patterns_attempted += 1;
         let mut residual_incomplete = false;
-        let found = if residual == BinaryPoint::Infinity {
-            base.iter()
-                .enumerate()
-                .find_map(|(i, q)| by_point.get(&point_key(&point_neg(q))).map(|&j| (i, j)))
+        let found = if residual == WordPoint::Infinity {
+            base.iter().enumerate().find_map(|(i, q)| {
+                let BinaryPoint::Affine { x, .. } = q else {
+                    unreachable!()
+                };
+                let negative = point_neg(q);
+                by_x.get(&x_key(x))
+                    .and_then(|ids| ids.iter().copied().find(|&j| base[j] == negative))
+                    .map(|j| (i, j))
+            })
         } else {
-            let BinaryPoint::Affine { x: z, y: zy } = &residual else {
+            let WordPoint::Affine { x: zw, y: yw } = residual else {
                 unreachable!()
             };
             out.systems += 1;
@@ -781,7 +850,13 @@ pub fn decompose_trace_zero_linearized(
                 let p = projection.get_or_insert_with(|| ProductProjection::new(&xs, &ws, c));
                 out.projected_columns = xs.len() + 1;
                 out.projected_systems += 1;
-                let (answer, rows) = p.solve(&xs, c, z, zy);
+                let (answer, rows) = p.solve_compact(
+                    &xs,
+                    c,
+                    zw,
+                    yw,
+                    compact.as_ref().expect("projected compact workspace"),
+                );
                 out.projected_rows += rows;
                 Some(answer)
             } else {
@@ -799,6 +874,7 @@ pub fn decompose_trace_zero_linearized(
                     (BigUint::default(), Vec::new(), out.linear_columns)
                 }
                 Some(ProjectedResult::Deficient) | None => {
+                    let z = F2mElement::from_words(&zw, c.m);
                     let z2 = z.square(&c.irreducible);
                     let columns: Vec<_> = xs_squared
                         .iter()
@@ -816,6 +892,7 @@ pub fn decompose_trace_zero_linearized(
                     answer
                 }
             };
+            let z = F2mElement::from_words(&zw, c.m);
             out.maximum_rank = out.maximum_rank.max(rank);
             out.maximum_nullity = out.maximum_nullity.max(kernel.len());
             let available = limits.max_models.saturating_sub(out.relation.models);
@@ -858,18 +935,16 @@ pub fn decompose_trace_zero_linearized(
                 let roots = monic_roots(&u, &product, c.m, &c.irreducible);
                 for x in roots {
                     let y = x.add(&u);
-                    let (Some(is), Some(js)) =
-                        (by_x.get(&x.to_biguint()), by_x.get(&y.to_biguint()))
-                    else {
+                    let (Some(is), Some(js)) = (by_x.get(&x_key(&x)), by_x.get(&x_key(&y))) else {
                         continue;
                     };
-                    if !binary_semaev_s3(&x, &y, z, &c.b, &c.irreducible).is_zero() {
+                    if !binary_semaev_s3(&x, &y, &z, &c.b, &c.irreducible).is_zero() {
                         out.relation.reason = Some("linearized S3 replay failed");
                         return out;
                     }
                     for &i in is {
                         for &j in js {
-                            if point_add(c, &base[i], &base[j]) == residual {
+                            if point_add(c, &base[i], &base[j]) == residual.point(c.m) {
                                 pair = Some((i, j));
                                 break;
                             }
