@@ -182,7 +182,7 @@ fn sample_b8()->Vec<[usize;8]>{
     }
     selected.into_iter().collect()
 }
-fn run()->Result<serde_json::Value,String>{
+fn run(exhaustive_b8:bool)->Result<serde_json::Value,String>{
     let start=Instant::now();
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar)?;
@@ -193,6 +193,7 @@ fn run()->Result<serde_json::Value,String>{
     let mut totals=Vec::new();
     let mut all_cases=0u64;
     for b in [4usize,8]{
+        if exhaustive_b8 && b==4 {continue;}
         let xs:Vec<u64>=base.points[..b].iter().map(|p|p.0).collect();
         if xs.iter().copied().collect::<BTreeSet<_>>().len()!=b{
             return Err("duplicate base x".into());
@@ -204,6 +205,9 @@ fn run()->Result<serde_json::Value,String>{
         if b==4 {
             choose_multisets(8,0,b,&mut Vec::new(),&mut multisets);
             if multisets.len()!=165{return Err("wrong B4 multiset count".into());}
+        }else if exhaustive_b8{
+            choose_multisets(8,0,b,&mut Vec::new(),&mut multisets);
+            if multisets.len()!=6_435{return Err("wrong exhaustive B8 count".into());}
         }else{
             multisets=sample_b8();
             if multisets.len()!=128{return Err("wrong B8 sample count".into());}
@@ -274,7 +278,9 @@ fn run()->Result<serde_json::Value,String>{
             "field_only_candidate_evaluation_ns":field_ns.to_string(),
             "independent_signed_group_verification_ns":group_ns.to_string(),
             "tamper_tests_rejected":3,
-            "candidate_selection":if b==4 {"all 165 unordered multisets"}else{"128 seeded distinct unordered multisets"},
+            "candidate_selection":if b==4 {"all 165 unordered multisets"}
+                else if exhaustive_b8 {"all 6435 unordered B8 multisets"}
+                else {"128 seeded distinct unordered multisets"},
             "scope":"given-f only; no S9 target-conditioned root search"
         }));
     }
@@ -283,6 +289,7 @@ fn run()->Result<serde_json::Value,String>{
         "curve_field":P,"group_order":PRIME31.n,"cofactor":1,
         "study":"finite-rational S9 signed-semantics correctness gate; not a DLP algorithm",
         "matched_target_tests":all_cases,
+        "exhaustive_b8":exhaustive_b8,
         "panels":totals,
         "B31_unordered_x_multisets":"48903492",
         "full_cold_validation_ns":start.elapsed().as_nanos().to_string(),
@@ -291,14 +298,25 @@ fn run()->Result<serde_json::Value,String>{
     }))
 }
 fn main()->Result<(),String>{
-    println!("{}",serde_json::to_string_pretty(&run()?).map_err(|e|e.to_string())?);
+    let args:Vec<_>=std::env::args().skip(1).collect();
+    let exhaustive=match args.as_slice(){
+        []=>false,
+        [flag] if flag=="--exhaustive-b8"=>true,
+        _=>return Err("usage: prime31_m8_symmetric_root_gate [--exhaustive-b8]".into())
+    };
+    let result=run(exhaustive)?;
+    let expected=if exhaustive{25_740}else{1_172};
+    if result["matched_target_tests"].as_u64()!=Some(expected){
+        return Err("incomplete registered symmetric m8 panel".into());
+    }
+    println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
     Ok(())
 }
 #[cfg(test)]
 mod tests {
     #[test]
     fn symmetric_rational_root_equivalence(){
-        let result=super::run().unwrap();
+        let result=super::run(false).unwrap();
         assert_eq!(result["matched_target_tests"],1172);
     }
 }
