@@ -155,9 +155,11 @@ impl Network {
         if assignment.len() != self.edges.len() {
             return Err(invalid("edge assignment width"));
         }
+        let mut ports: Vec<bool> = Vec::new();
         for vertex in &self.vertices {
             meter.charge(1, "Boolean vertex evaluation")?;
-            let ports: Vec<_> = vertex.edges.iter().map(|&e| assignment[e]).collect();
+            ports.clear();
+            ports.extend(vertex.edges.iter().map(|&e| assignment[e]));
             if !vertex.predicate.evaluate(&ports, meter)? {
                 return Ok(false);
             }
@@ -249,7 +251,7 @@ impl GraphBuilder {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub(crate) enum Bit {
     Constant(bool),
     Signal(usize),
@@ -307,6 +309,19 @@ pub(crate) struct Program {
     pub steps: Vec<Step>,
     pub edge_signals: Vec<usize>,
     pub signal_regions: Vec<Option<String>>,
+    /// Steps that are the consistency check of the definition just before
+    /// them, on exactly that definition's inputs and outputs. Program
+    /// evaluation computes those outputs with the same function, so the check
+    /// holds by construction there and is skipped; every accepted assignment
+    /// is still verified against the whole graph. Empty means none.
+    pub implied: Vec<bool>,
+    /// Set only when the encoder proved, once, that every graph vertex is
+    /// either the vertex of a Check step read through exactly its edges'
+    /// signals, or a copy/endpoint vertex whose edges all carry one signal and
+    /// whose predicate accepts both constant inputs. Then, for an assignment the
+    /// program accepted, the whole graph holds iff the vertices of the implied
+    /// (skipped) checks hold, and only those, listed here, are re-evaluated.
+    pub implied_vertices: Option<Vec<usize>>,
 }
 
 /// Conservative dependence on enumeration digits (digit zero changes fastest).
@@ -571,7 +586,12 @@ impl Program {
             }
             values[signal] = value;
         }
+        let mut bits: Vec<bool> = Vec::new();
+        let mut input: Vec<BigUint> = Vec::new();
         for (index, step) in self.steps.iter().enumerate() {
+            if self.implied.get(index).copied().unwrap_or(false) {
+                continue;
+            }
             meter.charge(1, "parsimonious program evaluation")?;
             let cutoff = plan.map_or(0, |p| p.step_cutoffs[index]);
             match step {
@@ -580,7 +600,8 @@ impl Program {
                     outputs,
                     function,
                 } => {
-                    let input: Vec<_> = inputs.iter().map(|word| word.value(&values)).collect();
+                    input.clear();
+                    input.extend(inputs.iter().map(|word| word.value(&values)));
                     let output = function(&input, meter)?;
                     if output.len() != outputs.len() {
                         return Err(integrity("program result arity"));
@@ -602,7 +623,8 @@ impl Program {
                     }
                 }
                 Step::Check { vertex, ports } => {
-                    let bits: Vec<_> = ports.iter().map(|&bit| bit.read(&values)).collect();
+                    bits.clear();
+                    bits.extend(ports.iter().map(|&bit| bit.read(&values)));
                     if !network.vertices[*vertex].predicate.evaluate(&bits, meter)? {
                         return Ok(Evaluation::Rejected(cutoff));
                     }
@@ -614,7 +636,25 @@ impl Program {
             .iter()
             .map(|&signal| values[signal])
             .collect();
-        if !network.evaluate(&assignment, meter)? {
+        let holds = match &self.implied_vertices {
+            Some(vertices) if !self.implied.is_empty() => {
+                let mut ports: Vec<bool> = Vec::new();
+                let mut holds = true;
+                for &vertex in vertices {
+                    meter.charge(1, "Boolean vertex evaluation")?;
+                    let vertex = &network.vertices[vertex];
+                    ports.clear();
+                    ports.extend(vertex.edges.iter().map(|&e| assignment[e]));
+                    if !vertex.predicate.evaluate(&ports, meter)? {
+                        holds = false;
+                        break;
+                    }
+                }
+                holds
+            }
+            _ => network.evaluate(&assignment, meter)?,
+        };
+        if !holds {
             return Err(integrity("program witness disagrees with graph"));
         }
         Ok(Evaluation::Accepted(assignment))

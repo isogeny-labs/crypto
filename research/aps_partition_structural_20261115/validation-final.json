@@ -1,0 +1,51 @@
+{
+  "schema": "aps.partition-validation-final/v1",
+  "source_revision": "2089b9cef0e1763a1c03f1e352a78347087da137",
+  "scope": "complete standalone partition-lab package only",
+  "checks": [
+    {
+      "toolchain": "1.98.0",
+      "library": {
+        "passed": 10,
+        "failed": 0
+      },
+      "cli": {
+        "passed": 2,
+        "failed": 0
+      },
+      "strict_clippy_exit": 0,
+      "format_check_exit": 0,
+      "private_test_log_sha256": "b7378d7fa55e56dfc4816ab35ebde5946ed06f9bfab4945e3ef31c94804c2b0a"
+    },
+    {
+      "toolchain": "1.99.1",
+      "library": {
+        "passed": 10,
+        "failed": 0
+      },
+      "cli": {
+        "passed": 2,
+        "failed": 0
+      },
+      "strict_clippy_exit": 0,
+      "format_check_exit": 0,
+      "private_test_log_sha256": "181e9ce5d10857d6d02ae01bdd4a9255d88e41d480828e3cc32e013d4622414f"
+    }
+  ],
+  "root_library_run": false,
+  "production_aps_sampler_tested": false,
+  "f4_trace_reuse_tested": false,
+  "performance_trial": false,
+  "standing": "unverified producer observation",
+  "earlier_setup_boundaries": [
+    "Initial formatting component unavailable; installed before final checks.",
+    "Initial strict lint rejected manual divisibility expressions; replaced by is_multiple_of without assertion changes.",
+    "Earlier eight-case library boundary predates known-label control; final ten-case library boundary is separate."
+  ],
+  "supersedes_local_statement": "PCC-20261115-e20f26",
+  "recording_correction": "Initial receipt called the Rust1.98 formatting action a check; explicit Rust1.98 fmt --check was then run successfully. Initial receipt and native statement remain unchanged locally; this receipt records the completed check.",
+  "format_commands": [
+    "cargo +1.98.0 fmt --check --manifest-path tools/aps-partition-lab/Cargo.toml",
+    "cargo +1.99.1 fmt --check --manifest-path tools/aps-partition-lab/Cargo.toml"
+  ]
+}

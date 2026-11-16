@@ -74,6 +74,7 @@ fn field_text(a: F3) -> String {
     format!("{}*z^2 + {}*z + {}", a.0[2], a.0[1], a.0[0])
 }
 fn main() {
+    let _measurement = cubic_measure_hook::Guard::start();
     let args: Vec<String> = std::env::args().collect();
     assert!(args.len() >= 2, "source_public solve|generate|verify ...");
     match args[1].as_str() {

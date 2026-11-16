@@ -1,0 +1,27 @@
+pairs 3707880 buckets 2^18
+baseline256  push   9.27 ns/pair  place   8.53 ns/pair  (best of 7)
+baseline128  push   7.84 ns/pair  place   8.35 ns/pair  (best of 7)
+baseline64   push   7.96 ns/pair  place   9.31 ns/pair  (best of 7)
+swwc256      push   9.90 ns/pair  place   7.90 ns/pair  (best of 7)
+swwc128      push  10.30 ns/pair  place  10.02 ns/pair  (best of 7)
+prefault256  push   9.27 ns/pair  place   9.34 ns/pair  (best of 7)
+flat256      push   8.62 ns/pair  place   8.68 ns/pair  (best of 7)
+flat128      push   8.19 ns/pair  place  10.23 ns/pair  (best of 7)
+ntswwc256    push   8.02 ns/pair  place  10.31 ns/pair  (best of 7)
+ntswwc128    push   7.92 ns/pair  place  10.25 ns/pair  (best of 7)
+topfilter256 push  12.32 ns/pair  place   4.99 ns/pair  (best of 7)
+pairs 6265920 buckets 2^19
+baseline256  push   9.44 ns/pair  place  10.30 ns/pair  (best of 7)
+baseline128  push   8.24 ns/pair  place  11.22 ns/pair  (best of 7)
+baseline64   push   8.59 ns/pair  place  12.64 ns/pair  (best of 7)
+swwc256      push  10.19 ns/pair  place  10.50 ns/pair  (best of 7)
+swwc128      push  10.89 ns/pair  place  12.15 ns/pair  (best of 7)
+prefault256  push   9.10 ns/pair  place  10.35 ns/pair  (best of 7)
+flat256      push   7.53 ns/pair  place   9.32 ns/pair  (best of 7)
+flat128      push   7.28 ns/pair  place  11.02 ns/pair  (best of 7)
+ntswwc256    push   7.75 ns/pair  place  10.52 ns/pair  (best of 7)
+ntswwc128    push   7.61 ns/pair  place  10.80 ns/pair  (best of 7)
+topfilter256 push   9.04 ns/pair  place   5.64 ns/pair  (best of 7)
+hash only 1.15  hash+counter 2.14  hash+seq store(fresh) 3.55 ns/key  16832606501374947410
+hash only 0.78  hash+counter 0.94  hash+seq store(fresh) 3.17 ns/key  9910882515781450390
+hash only 0.49  hash+counter 0.84  hash+seq store(fresh) 2.18 ns/key  12230717640652776666

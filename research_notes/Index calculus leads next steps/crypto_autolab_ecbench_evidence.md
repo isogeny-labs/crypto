@@ -1,5 +1,7 @@
 # Empirical index-calculus evidence in aburan28/crypto: autolab, ecbench, benchmarks, experiments
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR #2290).
+
 Scope: local repository `/home/user/crypto` only, read on 2026-10-14. Sources are given as repository-relative paths. Every number below is quoted from a committed record. Arithmetic I did myself is labelled as an inference. Abbreviations: S = counted cost / sqrt(r), where the counted cost is usually ecbench GAE (group-addition equivalents) and sometimes instructions (Ir); r = prime subgroup order; "cold" = one target with all setup charged; "online" = one target after reusable setup is excluded.
 
 ## 1. What the IC autolab does, what it tried, and whether any variant beats rho on a complete solve
@@ -68,7 +70,7 @@ There is no admissible sealed IC bound. The three `ic.pipeline` bounds are inadm
 - Koblitz one-target: 5–21x;
 - fiber IC: 8–63x, growing like #E^{1/6}.
 
-IC beats rho only online, and then by a lot: n61 13.9x admitted; N83 18.5x exploratory; N83 54.1x on 5 fresh points.
+IC beats rho only online, and then by a lot: n61 13.9x admitted; N83 18.5x exploratory; N83 54.1x on 5 fresh points (54.1x superseded 2026-10-20: empty-table rho, IC setup excluded; precomputed rho is faster online, see research/20261016-n83-precomputed-rho-control/).
 
 ### Cited Findings
 **Sealed bounds and frontier**
@@ -101,7 +103,7 @@ IC beats rho only online, and then by a lot: n61 13.9x admitted; N83 18.5x explo
 
 **Newest N83 result (2026-10-14, not yet in the frontier synthesis)**
 - K3240 root21 (537,840 points, 3,240 columns), Tier-1 GitHub Actions run on 5 fresh points:
-  - median rho/IC = 54.10 [17.18, 58.90];
+  - median rho/IC = 54.10 [17.18, 58.90] (superseded 2026-10-20: empty-table rho, 580-640 s setup excluded, ratio of means 44.09; K3300/K600 precomputed-rho control has rho faster, IC/rho 3.74x-395x);
   - means: IC 58.9 ms, rho 2,597 ms;
   - IC setup 580–640 s per point, peak RSS about 13.9 GiB.
 

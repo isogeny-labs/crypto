@@ -1,0 +1,17 @@
+{
+  "action": "bind the reference subgroup order to p in the instance selection (e.g. r >= c*p) and run a selection-only pass to check the r/p spread before freezing; rho costs ~sqrt(r), so an r chosen independently of p makes the slope unreadable",
+  "created": "2026-11-15T06:19:58Z",
+  "evidence": [
+    "research/full_jacobian_ic_20261113/RESULTS.md",
+    "research/full_jacobian_ic_rp_20261114/PROTOCOL.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "experiment-protocol",
+    "controlled-experiment",
+    "ecbench-measure"
+  ],
+  "trigger": "freezing a protocol whose decision rule is a slope of (arm cost / matched rho cost) in the size parameter p",
+  "why": "the 2026-11-13 O3 run had every cell above rho but returned unresolved: r ranged 71-3191 independently of p and the rho exponent on ln p was 0.236"
+}

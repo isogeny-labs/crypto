@@ -1,0 +1,9 @@
+# First independent compiler-coordinate oracle
+
+The compiler proof establishes a bijection between (r,s) and the first two signed quintic coefficients (e1,e2) for each fixed h,k in odd characteristic. The new oracle constructs the norm independently from its seven closed coefficient formulas, using separately validated literal polynomial-convolution field arithmetic. It then performs polynomial long division by X-z. The implementation under test instead constructs F^2-fG^2 by polynomial multiplication. Compare every r,s,t and all six quotient coefficients, not just the first two.
+
+Exhaust all h,k,r,s for F3,F5,GF9 at the nonsingular curve y^2=x^3+x+1 and finite target(0,1). For each fixed h,k verify that all q^2(e1,e2)pairs occur exactly once. This proves complete finite coordinate-map equality for these domains, including all h=0 and k=0 cases. GF25 has256frozen seeded cases, not exhaustive coverage. A transcript hash binds every checked case; explicit witnesses retain exceptional branches. The h=k=r=s=0case gives H=X^5, proving that this repeated-root example is retained.
+
+For each of the five source-identified NIST curves, use its actual coefficients and generator target and32frozen full-width h,k,r,s choices. Independently verify the target curve equation and all norm coefficients. These checks are neither new curve-order proofs nor source-root solves. Invalid finite targets and characteristic two must be rejected; characteristic-three cases remain included. Compiler validity requires the declared finite target and odd characteristic.
+
+At most7,683compiled cases (7,267exhaustive +256GF25 +160NIST), cap100,000before acceptance; at most48small witnesses per field and1MiB raw. First scientific execution under90second/4GiB/onecore supervision,84second final serialization guard. Retain exact CURRENT input on failure, then use a fresh frozen repair. No support, original-root completeness, novelty or measured speed advantage is asserted.

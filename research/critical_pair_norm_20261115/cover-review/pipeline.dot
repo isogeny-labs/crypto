@@ -1,0 +1,15 @@
+digraph cover {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.25",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11,margin="0.16,0.10"];
+ edge [color="#455566"];
+ input [label="E/Fp with r ≈ p; original input has k bits"];
+ curve [label="u = least power of 2 ≥ k; v = u+1\nC: Y^(2u) = f(X^v+s), f(s) ≠ 0"];
+ geometry [label="Cover degree δ = uv; genus g = (2u−1)(3u+2)/2\ng and δ are Θ(k²)"];
+ transfer [label="π* preserves the r-subgroup\nπ* followed by π_* is [δ]; gcd(δ,r)=1",fillcolor="#e7f4ed"];
+ egt [label="EGT Theorem 7 geometric conditions hold\nHeuristics 5/6 and arithmetic remain separate"];
+ base [label="Standard full base has p(1−o(1)) rational places\nProjection and sign folding leave ≥ p/(4δ) columns",fillcolor="#fbe8df"];
+ scope [label="Explicit base materialization is exponential in k\nImplicit or smaller bases need another algorithm",fillcolor="#f6efde"];
+ input -> curve -> geometry;
+ geometry -> transfer;
+ geometry -> egt -> base -> scope;
+}

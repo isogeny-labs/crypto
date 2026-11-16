@@ -113,6 +113,13 @@ is attached.
   …).  Those are globally fixed and the registry maps each to its model.
 - **Family notation with a free parameter** (`K_a / GF(2^n)`, `E(F_{p³})`)
   when a sentence is about a family, not a curve.
+- **A standard-panel alias** (`K0-23`, `K1-83`, `P36a`) for a curve on the
+  benchmark panel, in prose and tables. Each alias is pinned to one ICV1
+  model (`panel_alias` in the registry) and resolves through `curve_id`.
+  Machine records still carry the slug. The grammar is `K<a>-<n>` for
+  Koblitz, `B<n><letter>` for other binary curves and `P<bits><letter>`
+  for prime curves; the list and the rules are in
+  [`docs/ic/STANDARD_PANEL.md`](../ic/STANDARD_PANEL.md).
 
 ## Names that are retired
 

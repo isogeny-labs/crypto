@@ -1,0 +1,215 @@
+{
+  "schema": "pr-maintenance/v1",
+  "date": "2026-11-05",
+  "pr": 2445,
+  "requested_goal": "Fix conflicts and failing checks, then merge all eligible PRs across crypto, cryptanalysis, and crypto-autoresearcher.",
+  "standing": "unverified",
+  "head_before": "7bef34affd01a0a867d0480db1cefdbcadd98a57",
+  "incoming_main": "e6d85d82b7f08a02ccecc91f754fb2dc9b835b00",
+  "merge_base": "369c1a2ad56cfd597313a5ef6a101616f234e15c",
+  "parents": [
+    "7bef34affd01a0a867d0480db1cefdbcadd98a57",
+    "e6d85d82b7f08a02ccecc91f754fb2dc9b835b00"
+  ],
+  "ci_failures": [
+    {
+      "job": 127123954871,
+      "issue": "13 duplicate job mapping keys"
+    },
+    {
+      "job": 127123953476,
+      "issue": "scheduling test assumed an exact inline YAML spelling"
+    }
+  ],
+  "workflow_repairs": [
+    {
+      "path": ".github/workflows/artifacts.yml",
+      "job": "artifacts",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/artifacts.yml",
+      "job": "artifacts",
+      "key": "timeout-minutes",
+      "resolution": "retain the later explicit main setting",
+      "retained": "25"
+    },
+    {
+      "path": ".github/workflows/backend-leaderboard.yml",
+      "job": "current",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/bielliptic-quartic.yml",
+      "job": "replay",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/bielliptic-quartic.yml",
+      "job": "replay",
+      "key": "timeout-minutes",
+      "resolution": "retain the later explicit main setting",
+      "retained": "15"
+    },
+    {
+      "path": ".github/workflows/ic-autolab.yml",
+      "job": "linux-integration",
+      "key": "if",
+      "resolution": "conjunction retains both scheduling restrictions"
+    },
+    {
+      "path": ".github/workflows/ic-leaderboard-recompute.yml",
+      "job": "recompute",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/large-files.yml",
+      "job": "size",
+      "key": "if",
+      "resolution": "conjunction retains both scheduling restrictions"
+    },
+    {
+      "path": ".github/workflows/large-files.yml",
+      "job": "size",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/large-files.yml",
+      "job": "size",
+      "key": "timeout-minutes",
+      "resolution": "retain the later explicit main setting",
+      "retained": "25"
+    },
+    {
+      "path": ".github/workflows/phase-paired-native.yml",
+      "job": "replay",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    },
+    {
+      "path": ".github/workflows/phase-paired-native.yml",
+      "job": "replay",
+      "key": "timeout-minutes",
+      "resolution": "retain the later explicit main setting",
+      "retained": "${{ github.event_name == 'pull_request' && 25 || 45 }}"
+    },
+    {
+      "path": ".github/workflows/quotient-calibration-preflight.yml",
+      "job": "source-preflight",
+      "key": "runs-on",
+      "resolution": "retain the later explicit main setting",
+      "retained": "ubuntu-24.04"
+    }
+  ],
+  "test_change": {
+    "path": "scripts/rho_status/test_rho_status.py",
+    "events": [
+      "pull_request",
+      "push",
+      "schedule",
+      "release",
+      "workflow_dispatch",
+      "merge_group"
+    ],
+    "draft_states": [
+      false,
+      true
+    ],
+    "expected": "only nondraft pull_request",
+    "safety": "AST allowlist, no builtins, no names or calls",
+    "publisher_checks": "retained step ordering/equality; anchored dependency rejection"
+  },
+  "integration": {
+    "incoming_files": 60,
+    "branch_files": 86,
+    "overlap": [
+      "docs/session-logs/2026-11-05.md"
+    ],
+    "disjoint_main_entries": [
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b0b61ef2e1386aad4e68e11636ef6d0caddfa280"
+      },
+      {
+        "path": "docs/ic",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "75a05dd2da19801f1510af4347dc85afcf52df03"
+      },
+      {
+        "path": "docs/index-calculus-scoreboard.html",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e5fc015a354493cca84db6f0834b78edd6415565"
+      },
+      {
+        "path": "docs/maintenance/pr-2201-small-conflicts-20261105.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "84feeaa194b6a7e104774405de7412cd011cb0e3"
+      },
+      {
+        "path": "problems",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "bb7b50b3c08c5f3baac909cfbcb2dde48942443a"
+      },
+      {
+        "path": "research",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "971417016ae48d0dceff627e2eec6da118a129f9"
+      },
+      {
+        "path": "src",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "09a75cc4ada7cc2f838a899247a714161df97feb"
+      },
+      {
+        "path": "tools",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9407db659b80e56c03355b01bcde64cdcdaf6bf0"
+      }
+    ],
+    "journal": "Both complete parent line sequences retained in order",
+    "reserved_source": "Exact upstream src tree retained; no manual reserved source edits",
+    "ledger": "Neither parent changed the ledger since the common ancestor"
+  },
+  "validation": {
+    "benchmark_gate": {
+      "records": 37,
+      "referenced_files": 404,
+      "incoming_conflicts": [],
+      "record_inputs_unchanged": true,
+      "previous_observation": "Local benchrec gate passed on 7bef34affd01a0a867d0480db1cefdbcadd98a57 before push; no new benchmark launched."
+    },
+    "static_assertions": [
+      "All workflow trigger, step and permission declaration lines retained",
+      "13 duplicate fields reconciled",
+      "No scientific run or new measurement"
+    ],
+    "new_tests": "not executed locally; execution runtime unavailable; current-head CI required"
+  },
+  "sources": [
+    "AGENTS.md merging and CI rules",
+    "docs/CONDUCTOR.md",
+    "actual GitHub Actions logs for jobs 127123954871 and 127123953476",
+    "existing .github/workflows/ecc2k130-status.yml scheduling conditions",
+    "existing scripts/rho_status/test_rho_status.py"
+  ]
+}
