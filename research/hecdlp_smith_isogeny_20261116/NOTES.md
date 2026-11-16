@@ -53,3 +53,17 @@ no shared-state tools).
    p >= 1031 (no brute force). Needs the near-prime-census lead from
    RESULTS.md section 3 (only 1/28 admitted instances Smith-positive).
 2. Preregistered protocol before any cost claim.
+
+## Smoke results (release build, 2026-11-16; SMOKE, one seed per prime, not a verdict)
+
+Example 1 (p = 37, #J = 55666 = 26 * 2141): homomorphism 12/12 additivity,
+12/12 `[#J]Psi(D) = 0`, 1/1 rational 2-torsion vs S, 12/12 nonzero images.
+Planted DLP (r = 2141): Diem Full recovers t (70 Pic ops), negation rho
+recovers t; both certified on J_H. Diem 2LP did NOT recover at q = 37 (base of
+19 of ~42 points exhausts); the unit test does not assert 2LP there.
+
+`smoke_transfer` (ignored test): p = 67 (#J = 310328 = 8 * 38791), 101
+(1124412 = 12 * 93701), 131 (2090224 = 16 * 130639): homomorphism checks pass,
+Diem 2LP and rho both recover t and certify on J_H. Group-op counts
+(2LP 121/131/171 Pic ops; rho 634/571/452) are on C and are not a cost
+comparison: transfer cost, native-op pricing (5a) and rho matching are absent.
