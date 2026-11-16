@@ -358,6 +358,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
                     .map(|m| match m {
                         "fourier" => Ok(Multiplier::Fourier),
                         "schoolbook" => Ok(Multiplier::Schoolbook),
+                        "auto" => Ok(Multiplier::Auto),
                         other => Err(format!("unknown multiplier {other}")),
                     })
                     .collect::<Result<_, _>>()?;
@@ -390,6 +391,7 @@ fn multiplier_name(multiplier: Multiplier) -> &'static str {
     match multiplier {
         Multiplier::Fourier => "fourier",
         Multiplier::Schoolbook => "schoolbook",
+        Multiplier::Auto => "auto",
     }
 }
 

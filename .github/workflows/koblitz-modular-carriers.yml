@@ -1,5 +1,18 @@
 name: Koblitz modular carrier replay
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - 'research/koblitz_modular_ic_20261018/**'
+      - 'src/cryptanalysis/curve_construction/weil.rs'
+      - 'src/cryptanalysis/curve_construction/modular.rs'
+      - 'src/cryptanalysis/curve_construction/gf2k.rs'
+      - 'src/cryptanalysis/curve_construction/lpoly.rs'
+      - 'src/binary_ecc/**'
+      - 'src/cryptanalysis/identity_certificate.rs'
+      - 'src/hash/sha256.rs'
+      - '.github/workflows/koblitz-modular-carriers.yml'
   workflow_dispatch:
   push:
     branches: [main]
@@ -10,6 +23,7 @@ permissions:
   contents: read
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-modular-carriers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-modular-carriers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
