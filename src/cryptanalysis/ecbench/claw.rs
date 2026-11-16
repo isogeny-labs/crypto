@@ -38,7 +38,8 @@ use std::collections::{BTreeMap, HashMap};
 
 use num_traits::ToPrimitive;
 
-use crate::cryptanalysis::ecbench::canonical::{derive_biguint, derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::canonical::{derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::workload::derive_biguint;
 use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::workload::{BigInstance, WideInstance};
 use crate::cryptanalysis::ic_boundary::{BinaryGroup, BinaryInstance, CountedGroup, GroupOps};

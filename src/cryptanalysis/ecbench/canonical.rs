@@ -235,14 +235,14 @@ pub fn derive_u128(domain: &str, parts: &[String]) -> u128 {
     u128::from_be_bytes(d[..16].try_into().expect("sixteen bytes"))
 }
 
-/// A 256-bit value derived like [`derive_u128`] (the same canonical JSON of
-/// `{domain, parts}` with decimal-string parts), the whole SHA-256 digest
-/// read big-endian: scalars and abscissae on curves whose subgroup order
-/// is past `2^128`.
-pub fn derive_biguint(domain: &str, parts: &[String]) -> num_bigint::BigUint {
+/// The whole SHA-256 digest of the canonical JSON of `{domain, parts}`
+/// (decimal-string parts, as [`derive_u128`] hashes them).  Read big-endian
+/// it is the 256-bit value behind the laws for subgroup orders past
+/// `2^128` (`workload::derive_biguint`).  Kept free of big-integer types:
+/// this file is also compiled by `tools/backend-leaderboard`.
+pub fn derive_digest(domain: &str, parts: &[String]) -> [u8; 32] {
     let v = serde_json::json!({"domain": domain, "parts": parts});
-    let d = sha256(canonical(&v).expect("strings only").as_bytes());
-    num_bigint::BigUint::from_bytes_be(&d)
+    sha256(canonical(&v).expect("strings only").as_bytes())
 }
 
 /// Serde for a `u128` that is written as a JSON number while it fits a

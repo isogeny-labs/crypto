@@ -20,7 +20,7 @@ use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
-use crate::cryptanalysis::ecbench::canonical::{bare_id, derive_biguint, derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::canonical::{bare_id, derive_digest, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
@@ -1880,6 +1880,13 @@ pub const PUBLIC_TARGET_LAW: &str = "hash_to_subgroup_v1";
 /// The public-target law for a subgroup order past `2^64`: the same
 /// inputs, hashed as decimal strings, with a 128-bit draw.
 pub const PUBLIC_TARGET_LAW_WIDE: &str = "hash_to_subgroup_v2";
+
+/// A 256-bit value derived like [`derive_u128`]: the whole SHA-256 digest
+/// of the same canonical JSON ([`derive_digest`]), read big-endian.  Used
+/// for scalars and abscissae on curves whose subgroup order is past `2^128`.
+pub(crate) fn derive_biguint(domain: &str, parts: &[String]) -> num_bigint::BigUint {
+    num_bigint::BigUint::from_bytes_be(&derive_digest(domain, parts))
+}
 
 /// The public-target law of the three-word Koblitz class
 /// ([`Instance::Big`], subgroup order past `2^128`): the same inputs as
