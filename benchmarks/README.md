@@ -45,6 +45,16 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+| Date | Documentary run outside admitted table | Headline measurement | Host and isolation | Study record |
+| --- | --- | --- | --- | --- |
+| 2026-11-16 | [N83 K600 zero-trial preflight](20261116-n83-k600-zero-trial-preflight/) ([run PDF](20261116-n83-k600-zero-trial-preflight/run-report.pdf), [results PDF](20261116-n83-k600-zero-trial-preflight/results-report.pdf), [SVG](20261116-n83-k600-zero-trial-preflight/diagram.svg), [150 dpi PNG](20261116-n83-k600-zero-trial-preflight/diagram.png)) | One native outer wall 4,040.215208 ms; external second-resolution endpoints span 5 s; cgroup peak 105,897,984 B of a 4,294,967,296 B limit; 0 trials, relations and SAT calls; no comparative ratio | Shared macOS ARM64 host, native supervisor plus Linux ARM64 container, one CPU, 4 GiB, no swap, no network; resource-capped preflight, not isolation-tier IC comparison | [Source-linked report and raw run receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-6-zero-trial-pass/REPORT.md) |
+
+This row records a passed source/input/resource preflight. It does not report a
+factor-base search result, cold one-target IC runtime or matched rho. It is
+outside the admitted results table because it has no cryptographic outcome or
+paired reference. The earlier stopped attempts and setup builds remain in the
+study records.
+
 The [16 November N83 K600 host-native supervisor build](20261116-n83-k600-mac-supervisor-build/)
 ([run PDF](20261116-n83-k600-mac-supervisor-build/run-report.pdf),
 [results PDF](20261116-n83-k600-mac-supervisor-build/results-report.pdf),
