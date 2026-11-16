@@ -1,0 +1,9 @@
+# Actual binary torsion-triple certificate
+
+For B=1, S3(a,b,c)=(ab+ac+bc)²+abc+1. Source polynomial degrees at most17 give degree at most68<83, so S3=0 in the actual field lifts to an F2[T] identity. A common irreducible factor of any two sources contradicts the constant1 term. Pairwise coprimality plus square product forces every source to be a square. Square-root descent preserves the identity and forces constant sources. For nonzero constants all three are1, which does not satisfy S3. Thus no nonzero low18bit triple satisfies S3=0.
+
+For the rational two-torsion point P0=(0,1), x(P+P0)=1/x. For nonzero sources, c²*S3(a,b,1/c)=D²+D+S², where D=abc,S=a+b+c. Products have degree<=51 and sums<=17. Therefore the relation is exactly a binary-linear system in52 D coordinates and18 S coordinates over GF83. Two elimination orientations and independent literal polynomial squaring certify its complete kernel.
+
+The proposed nine-dimensional kernel consists of D=A²,S=A²+A,degA<=8. This is a prediction until actual rank is measured. If the kernel equals those nine independent vectors, D=0 cannot be a nonzero product. D=1 forces all three sources1 and S=1, incompatible with S=0. For nonconstant A,degS=degD and S!=D. Since deg(abc)=sum degrees and deg(a+b+c)<=max degree, equality forces two factors to be the constant1, making S=D, a contradiction. This excludes every nonzero triple, including repeated factors, without enumerating source triples. If the kernel is larger, the experiment must retain all extra states and cannot claim exclusion.
+
+This certifies the auxiliary torsion relations, not full original-chain completeness. Ghost-partition and norm-coverage integration need a separate reviewed group/divisor argument and independent small-group tests. No novelty or speed claim is inferred from the rank certificate.

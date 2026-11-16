@@ -1,0 +1,14 @@
+{
+  "action": "test it on primes near that bound, not only on the curves the run uses",
+  "created": "2026-11-15T21:47:18Z",
+  "evidence": [
+    "research/ic_native_ifma_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research"
+  ],
+  "trigger": "adding a SIMD or reduced-radix field kernel accepted for any p below a bound",
+  "why": "the IFMA Montgomery product's final reduction only matters past about 2^51; tests on p < 2^36 passed with it removed"
+}

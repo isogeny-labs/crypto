@@ -1,0 +1,3 @@
+# Existing native baseline located
+
+The initial graph protocol described the full-base ic.rsentrypoint and older BigUint oneLPengine but missed crates/hec-native-ic/src/large_prime.rs. That module already provides a bounded0/1/2LPcorrectness baseline with dense exact partial elimination and projected-place checks. This correction precedes any new curve run. Keep graph protocol/rawcontrols unchanged; do not claim native2LPwas absent. New work replaces its dense combiner with affine signed graph potentials and retains independent group identities. Existing2LPbaseline is the reference, not a claimed new mathematical algorithm.

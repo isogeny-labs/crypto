@@ -1,10 +1,10 @@
 # Quartic-twist mixed polynomial IC: S4/S5 completion and full cost
 
 - **Status:** `investigating`
-- **Kind:** native solver failure; implementation and measurement gaps; external-tool availability
+- **Kind:** native solver failure; proof-encoding resource failures; implementation, identity-registration and measurement gaps; external-tool availability
 - **Affected work:** [mixed polynomial report](../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.md), [larger-curve scaling and occupancy report](../research/twist_index_calculus_20261020/K1_SCALING_REPORT.md), [peeled-orbit reuse report](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md), [frozen protocol](../research/twist_index_calculus_20261020/QUARTIC_TWIST_LINE_PROTOCOL.md)
 - **Next action owner:** quartic twist IC study
-- **Last updated:** 2026-10-24
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -49,7 +49,168 @@ gives every paired per-target cost and its actual supplied-encoding clock
 boundary. Complete GAE pricing, matched strongest rho and full external
 DLP cost remain open; these image-base controls do not discharge them.
 
+The [zero-fiber polynomial collector](../research/twist_index_calculus_20261020/zero_fiber_collector/REPORT.md)
+now completes all 42 registered case-arms on the same seven curves and
+three presentations. Separate pair-partition, physical-set and matrix
+audits pass for every case. This closes the polynomial implementation and
+complete-set replay obligation for that five-factor zero fiber. Charged
+target descent, the matched complete IC price and the full formal bridges
+remain open; zero-only rows cannot recover the target by themselves.
+
+The public-only Phase 2 pipeline is now implemented. Its tightened native
+gate passes 89 tests, including actual p37 zero/plain phi/doubling recovery,
+separate complete-physical-set/RREF replay and deterministic A/A. Duplicate
+physical tuples are explicitly rejected. These are small positive controls,
+not the full registered comparison. The frozen best admitted parent-family
+selection gives 85 distinct configurations and 255 first/A/A executions;
+the workload is frozen in `af66996a19` before its managed launch, and terminal
+panel results remain pending. Globally strongest IC/rho
+pricing remains separate and open. See the
+[current implementation evidence](../research/twist_index_calculus_20261020/zero_fiber_collector/IMPLEMENTATION_STATUS.md).
+
+A separate exact repeated-factor certificate panel now runs on all 42
+registered phi/doubling zero-fiber arms. The first fully audited/repeated
+p37 seed0 pair returns no certificate within raw degrees 4..8 and powers
+1..3. That is a bounded search result, not an ideal-membership obstruction.
+The [degree/closure diagnostic](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/PROTOCOL.md)
+therefore fixes indices 0,1,2 from both arms of that same fixture, with
+raw16 versus closure8 and original-product cap 16: 12 configurations and
+24 producers. Five native algebraic controls pass, including a prelaunch
+regression for search cap versus actual original-product degree. Actual comparison
+production was pending at that prelaunch checkpoint. This supplements both full
+panels; no new relation rank, target recovery or complete cost is measured
+by those controls. The existing full-price and proof exit criteria remain.
+The fixed diagnostic subsequently launched under
+[one managed owner](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/RUNNING.md)
+at 2026-10-25T04:08:23Z, after its committed source/input freeze. Its
+complete comparison subsequently finished at 07:20:28 UTC; see the final
+twelve-row result below. The other two full panels continue.
+
+The first fixed p37 seed0 phi system now has passing first/audit/A/A
+records for both diagnostic methods. Raw16 finds q squared at degree 12
+with 33,609,631 search multiplications; closure8 finds it at working
+degree 7, actual original-product degree 12, with 916,980. Sparse checks
+use 15,211 and 15,983 multiplications respectively. These are one-system
+certificate counts, not a complete filter or DLP comparison; even closure
+search exceeds this system's partial old F4 row count of 125,327. The
+registered doubling cases and full diagnostic have subsequently completed;
+their full table retains the bounded failures as well as the successes.
+
+The [concrete instance verification](../research/twist_index_calculus_20261020/zero_fiber_collector/certificate_instance_proof/REPORT.md)
+independently verifies all 2,197 dense integer coefficient positions of
+`sum(h_i*f_i)=q^2+37*R`, with 454 nonzero coefficients of R. Both native
+gates pass 13 tests. Both actual Lean 4.34.1 encodings fail with an
+out-of-memory panic within their original 8 GiB address-space bounds;
+maximum RSS is 3,775,120 KiB (flat v1) and 3,772,400 KiB (balanced/product
+v2). Their statement hash is identical. Neither yields an accepted
+instance theorem, axiom audit or IDC. The original sources, integer lift
+and failed receipts are retained. This is a proof-encoding resource
+obstruction, not a failed arithmetic identity or mathematical impossibility.
+The next concrete proof obligation is a kernel-checked, bounded expansion
+of the same literal products and integer lift, followed by characteristic
+37 and repeated-factor implications, all ten axiom audits and the standard
+integer-lift IDC. Splitting normalization into small independently proved
+coefficient or product blocks is a candidate encoding; it has not been
+implemented or run. The same aggregate proof limit and full statement
+must be retained. A third, separately versioned encoding first tests
+explicit `grobner` ring normalization in place of `grind`, which handled
+the two failed instance expansions. The prior component theorem uses the
+explicit ring tactic. This prospective tactic experiment retains every
+literal coefficient, all final statements, ten axiom audits and the
+aggregate 1,200-second/8 GiB phase; its source/native gate must be committed
+before real export. Its outcome is not assumed. A successful instance proof would still leave the
+native parser, field/group/decoder and parametric-family bridges open.
+
+The [finite-residual census](../research/twist_index_calculus_20261020/zero_fiber_collector/fp_residual_audit/REPORT.md)
+now completes two native processes over all 42 original zero-fiber arms,
+with identical output trees and passing terminal/source seals. It checks
+33,696 systems per arm and identifies 300 phi versus 150 doubling finite
+Fp residuals. No accepted representative lies there; each exact physical
+set and independently rebuilt rank is preserved. The eligible systems
+contain 65,532 versus 32,766 saved symmetric roots and 18,166,512 versus
+9,083,256 historical F4 row multiplications. These are counterfactual
+partial counts, not a deployed filter or complete-cost gain. The prior
+component obstruction excludes three distinct ordinary roots, including
+when the residual abscissa repeats one of them; infinity is retained.
+Next implement and charge the public-only predicate in a separately
+frozen collector, with the identical doubling rule, physical-set/rank
+replay and complete cold/target costs. Any expanded multiset family needs
+its own replay; the distinct-factor pruning theorem must not silently
+discard those relations. Specific native discriminators are retained in
+the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collector/fp_residual_audit/NEXT_STEPS.md).
+
 ## Evidence and uncertainty
+
+- **Curve-model registration gap:** the frozen fixture records bind their
+  prime, quartic modulus, model, subgroup and public-point presentation, but
+  this study has not yet completed and verified their mapping to registered
+  ICV1 models and exact EC1/UID representations. The native SDK supports
+  prime-extension identities; absence of a completed registration is not an
+  SDK limitation or a mathematical obstruction. Do not invent a slug or
+  alter frozen packet IDs. The exit criterion is a native catalog over all
+  21 original fixture records that checks field/model inputs, establishes
+  the full curve order rather than assuming it from a subgroup order,
+  computes identities through the documented native SDK, verifies the
+  subgroup/generator bindings, and registers every distinct model before
+  citing its slug in current prose. Add exact representation aliases for
+  any cross-repository join. Until then these reports remain fixture-keyed
+  diagnostics, not fully registered cross-model benchmark rows.
+- **Native follow-up implementation, production pending:** the
+  [expanded signed-multiset checker](../research/twist_index_calculus_20261020/zero_fiber_collector/multiset_root_audit/PROTOCOL.md)
+  passes six native controls, including complete public-point pair joining
+  against direct four-slot enumeration, weighted columns, separate rank
+  methods and independent Horner evaluation. Existing-output guards
+  preserve their marker. All 42 first/audit/A/A/parity positions remain
+  required. The
+  [native model binder](../research/twist_index_calculus_20261020/zero_fiber_collector/curve_registry_binding/PROTOCOL.md)
+  builds against the actual SDK and passes four controls after two retained
+  sparse-dependency build failures. Both full catalog processes, metadata
+  registry import and all-42 exact bindings remain pending. These are
+  implemented/gated follow-ups, not a new rank, complete-price or model-
+  registration result. Their source/input freeze must be committed before
+  actual corpus production; full original live panels remain unchanged.
+  Source/input/driver freeze `64c2a4a211a` is subsequently committed and
+  pushed before both managed owners are accepted at 2026-10-25T11:06:41Z:
+  `twist-multiset-root-panel-v1.service` and
+  `twist-curve-registry-binding-v1.service`, each with `Restart=no`.
+  Acceptance is not a completed corpus or registration; inspect native
+  phase/terminal receipts before any continuation or replacement action.
+- **CI resource failure:** the Lean gate selftest at head `59e732cff1c`
+  failed before proving its positive fixtures because the CI runner had
+  only 39 MB free and toolchain extraction returned `No space left on
+  device`. Its sanitized log is retained under
+  `../research/twist_index_calculus_20261020/zero_fiber_collector/results/lean-selftest-sparse-v1/`.
+  The proposed selftest-only sparse checkout retains the exact
+  `tools/lean/` input closure, pinned toolchain and all positive/negative
+  expectations. The full unchanged seven-fixture suite now passes from
+  that exact subtree with explicit single-thread Lean calls under the
+  same 8 GiB / 1,200-second envelope; both positives and all five negative
+  reasons match. The interrupted first local attempt and its retained
+  thread-creation failure remain separate. See the
+  [complete local validation](../research/twist_index_calculus_20261020/zero_fiber_collector/results/lean-selftest-sparse-v2/README.md).
+  Local verification and new-head CI are separate gates;
+  a resource failure is not a proof verdict or permission to bypass them.
+- **Complete bounded degree/closure diagnostic:** all twelve rows and 24
+  producers, twelve audits/parities, native reducer and final seals pass,
+  terminal 0 at 2026-10-25T07:20:28Z. Systems 0 and 2 in both maps yield
+  certificates with original product degree 12; closure uses working
+  degree 7. Neither method finds a power-1/2/3 certificate for system 1
+  within the registered bounds. The construction-count reduction occurs
+  in both phi and doubling; full pipeline price remains null. See the
+  [complete table/report](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/REPORT.md).
+- **Third literal-proof resource failure:** explicit `grobner` encoding
+  v3 passes its 13-test native gate and export, preserving statement SHA
+  e7dd6d7622171f18c1d80ea9c1d26d182b08dbf664c3a3046115eb6715e5eb45.
+  Lean exits 134, signal 6, `std::bad_alloc`; maximum RSS 3,772,392 KiB
+  under the same 8 GiB AS / 1,200-second aggregate envelope. GNU time's
+  signal report and misleading zero footer are retained; phase/terminal
+  134 is authoritative. No axiom audit or IDC runs after failure. The
+  [v3 report](../research/twist_index_calculus_20261020/zero_fiber_collector/certificate_instance_proof/PROOF-V3.md)
+  preserves the exact failure. Next independently check the serialized
+  integer statement and isolate definition/product blocks before another
+  large build. The logs do not locate elaboration versus normalization
+  failure and do not prove mathematical impossibility. All original
+  literal theorems, axiom audits, full statement and aggregate limit remain.
 
 - **Joint S5 construction, independently validated:** The
   [joint-image continuation](../research/twist_index_calculus_20261020/joint_image_elimination/README.md)
@@ -121,6 +282,21 @@ DLP cost remain open; these image-base controls do not discharge them.
   curve kernel and orbit builder. This is bounded structural evidence and an
   executable group-based enumerator, not a measured polynomial/complete-IC
   price. All zero-only target coefficients are zero.
+- **Complete polynomial zero-fiber collection:** The new
+  [native panel summary](../research/twist_index_calculus_20261020/zero_fiber_collector/results/panel-v2/native-summary.json)
+  binds all 42 completed collectors and independent post-run audits. Each
+  arm attempts 33,696 S4 systems after the same 24-action pair quotient,
+  reproducing its 504 signed tuples, 15 projective rows and exact per-case
+  ranks from the immutable physical census. These are case-local sums,
+  not globally unique rows or independent secret samples. The audit
+  reconstructs actions with scalar multiplication, checks every pair's
+  physical relations and transported union, and uses separate RREF.
+  Changed bindings, missing/incomplete systems, duplicate pairs, altered
+  work counters and nonempty-set tuple/sign mutations are rejected. The
+  journalled producer passes 84 native tests. Shared field/curve arithmetic
+  and the equation deriver remain explicit. This is a complete polynomial
+  implementation and replay, not a new complete IC speed result. Shared-host
+  elapsed diagnostics are unadmitted and all target coefficients are zero.
 
 - **Observed:** The [pilot audit](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_audit_p37_v1.json) enumerated all `r` subgroup logs and found five complete signed relations among the first four residuals. `k=1,2,3` reproduce their entire pattern-specific sets; `k=0` misses one and `k=4` has one system failure. The [one-target k=1 audit](../research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json) independently reconstructs all eight processed sets, rank four, all physical factor logs, scalar 271, and the same-target twist24 rho replay. The native producer counts 116,050,118 `Fp M` and 3,936 group operations against rho's 348,941 `Fp M` and 2,745 group operations, in separate units.
 - **Bounded S5 retry:** [Degree 30](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d30_p37_v1.json) and [degree 31](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d31_p37_v1.json) still return “border unreachable at this degree”; the `k=4` control does likewise. The 8 GiB and 1,200 s caps were observed. A repeated quotient dimension of 4,090 is recorded; its cause is unknown.
@@ -164,7 +340,9 @@ out higher-arity precomputation nor establishes a twist-specific gain.
 - [x] Bind the historical p37 pure S5 miss to the new complete source-block set with full public projection and corruption controls; preserve the missing runtime seal and incomplete old whole-stream solver.
 - [x] Reconcile all 21 joint external positions and audit every completed available basis's physical roots; retain nine external timeouts, one native-root timeout, and the stopped duplicate retry.
 - [x] Complete all 21 four-factor zero fibers, three full p37 populations, all 21 five-factor censuses and 63 independently enumerated public-point set/rank comparisons; count zero/projective rows separately.
-- [ ] Implement a polynomial five-factor zero collector with the same orbit quotient for phi and doubling, preserve the exact complete physical sets/ranks, and charge setup, failed systems, matrix work and target descent against the strongest existing IC baseline.
+- [x] Implement a polynomial five-factor zero collector with the same orbit quotient for phi and doubling and independently preserve every complete physical set and factor-log rank on all 42 registered case-arms.
+- [x] Implement public-only stopped zero precomputation plus target descent and verify all four p37 zero/plain phi/doubling positive controls, separate replay and A/A in the tightened 89-test native gate.
+- [ ] Execute and charge the complete 85-configuration stopped-zero/target panel, including setup, every failed system and matrix work, against matched plain phi/doubling and the strongest existing verified IC baseline; retain every loss and separate counters from admitted timing.
 - [ ] For any priced leaderboard result, provide the replay certificate, validator report and strongest matched rho receipt in `VALIDATION.json` under `docs/VALIDATION_GATE.md`.
 
 The first item would establish a complete tagged-line-union polynomial
@@ -173,29 +351,49 @@ or asymptotic advantage. The other items address ranking and transfer.
 
 ## Next discriminating step
 
-- **Action:** Implement and check a five-factor zero-residual polynomial
-  collector, first testing a quotient of image/ordinary peel pairs by the
-  existing action. Match every independently enumerated saved physical set
-  and factor-log rank. Then charge setup, all failed systems, matrix work
-  and target descent; compare phi, the same quotient for generic doubling,
-  and the strongest existing invariant-base IC pipeline. Orbit copies add
-  no independent folded rows. The preceding finite diagnostics and
-  historical input binding are complete and must not be rerun merely to
-  produce new receipts.
+- **Action:** Continue Phase 2 of the
+  [frozen zero-fiber protocol](../research/twist_index_calculus_20261020/zero_fiber_collector/PROTOCOL.md#phase-2-complete-one-target-pipeline).
+  Stop zero precomputation at determined factor logs or the declared pair
+  cap, retain its independent rows, and execute the original target trace
+  through verified recovery or its original cap. Freeze the strongest
+  verified existing IC baseline selection before the comparison. Charge
+  setup, every failed system, action bookkeeping, matrix work and target
+  descent; compare phi, generic doubling with the same quotient, and their
+  plain controls. Orbit copies add no independent folded rows. The completed
+  189+21 panel, zero-fiber polynomial collection and physical censuses must
+  not be repeated merely to produce new receipts.
+  The exact parent-family baseline is now frozen; execute all 85 distinct
+  configurations with 255 candidate runs, 85 independent first-run audits
+  and 170 A/A checks. A lower F4-system count alone does not close the
+  complete-price requirement.
 - **Inputs and controls:** The completed 297-construction workload, frozen
   p37/seed0/query2 regression, pure L0 with full permutation symmetry, and
   generic doubling with the same image size and represented logs. Keep
   original failures and scalar/group oracle separate from candidate inputs.
-- **Limits and stop:** Retain one thread, 8 GiB/1,200 s per executed system,
-  the busy reservation and separate timeout/OOM outcomes. Check managed
+- **Limits and stop:** Phase 2 retains one science worker, 8 GiB per case,
+  a 1,200-second outer watchdog and 1,180-second cooperative case deadline;
+  each S4 call receives the remaining budget. Keep the busy reservation and
+  separate timeout/OOM outcomes. Check managed
   owners and receipts before retrying after app/host recovery. Complete
   physical equality motivates full-stream collection and complete costing;
   a rank increase in zero-only rows motivates an actual invariant collector
   plus charged target descent. A bounded failure or zero-row concentration
   does not establish an obstruction or an IC improvement.
-- **Recheck trigger:** Solver repair or external solver installation, completion of cost instrumentation, or new evidence beyond p=97.
+- **Recheck trigger:** Completion of stopped target-descent execution and cost instrumentation, solver repair, or a new available external-solver comparison. The shared migrated host currently permits correctness/counter diagnostics, not new admitted timing.
 
 ## Resolution and history
+
+2026-10-25: The public-input stopped-precomputation/target pipeline passes
+the tightened 89-test gate and actual four-way p37 recovery/replay controls.
+The fixed 85-configuration comparison is frozen before its managed launch;
+its terminal results remain pending.
+No complete GAE price or newly admitted timing is inferred from these tests.
+
+2026-10-24: All 42 polynomial zero-fiber collectors and separate physical/
+rank audits complete successfully. The same quotient and full pair coverage
+are checked for both arms; all failed launches, native tests and the stopped
+nested-lock attempt remain preserved. Collection is complete at this bounded
+scale. Charged target descent and a matched complete IC price remain open.
 
 2026-10-24: All 297 joint S5 constructions pass independent validation.
 Six native global solves remain bounded failures. All three source-block

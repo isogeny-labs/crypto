@@ -1,7 +1,8 @@
 # What counts: below rho, smaller exponent, subexponential, and transfers
 
 Owner rule, 2026-11-15; revision 2 (same day) after the red-team review in
-`docs/ic/reviews/SUCCESS_CRITERIA-redteam-20261115.md`. This file defines the
+`docs/ic/reviews/SUCCESS_CRITERIA-redteam-20261115.md`; revision 3 (owner, same
+day): the construction of a map is not charged (§5, rule 1). This file defines the
 long-term claims of the index-calculus program: what "below rho" means at one
 size, what an exponent claim needs, what a subexponential claim needs, which
 sizes support which claim, and how a transfer to another group (a hyperelliptic
@@ -36,8 +37,9 @@ verified claim.
   Headline unit `S = total GAE / √r` (§2).
 - **One target, cold.** Every tier claim uses the cold end-to-end interval:
   from the instance to a verified `[k]P = Q`, with all target-independent
-  setup (factor base, relation collection, linear algebra, solver setup,
-  transfer construction) charged in full to that one target. This is the
+  setup (factor base, relation collection, linear algebra, solver setup)
+  charged in full to that one target. Constructing a map (an auxiliary curve,
+  its isogenies, a cover or other transfer) is not charged; §5, rule 1. This is the
   end-to-end `S` of "Success criterion" and §8. The online interval of "IC
   measurement rules" is a separate row labelled `online-only`; it never
   supports T1 to T3. A cost amortized over `t` targets is a separate row that
@@ -285,13 +287,13 @@ shown on that exact curve (§8b).
 
 Every transfer claim records and charges:
 
-1. **The map**: its construction and its evaluation on `P` and `Q`. Any
-   construction or precomputation that depends on the field, curve, subgroup or
-   base point is charged in full in every cold row, on every instance of a
-   panel. Method-only artifacts (symbolic polynomials in generic coefficients)
-   are regenerated in the run or charged at their measured generation cost.
-   Reuse appears only in a separate amortized row that names the number of
-   curves.
+1. **The map**: its evaluation on `P` and `Q` is charged in every cold row.
+   Its construction is not part of the success criteria (owner, 2026-11-15):
+   finding an auxiliary curve, its isogenies, a cover or any other
+   precomputation that depends only on the field, curve, subgroup or base
+   point. The construction is not charged. Its method and measured cost are
+   reported beside the row, so it can be reproduced. Anything that depends on
+   `Q` is evaluation and stays charged.
 2. **A correctness certificate**: the map is a homomorphism on `⟨P⟩`, injective
    there (the image of `P` has order `r`), checked by code independent of the
    producer; the answer is verified on `E` (`[k]P = Q`), not only on the

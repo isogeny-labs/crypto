@@ -1,0 +1,21 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+error[E0382]: use of moved value: `g`
+  --> research/primefield-companion-followup-20261102/feature-recurrence-compression-audit/power.rs:20:24
+   |
+19 |   for g in [vec![0,1],vec![1,0,1],vec![4,r-4,1],vec![0,0,0,1]]{for base in [vec![0],vec![0,1],vec![2,1],vec![1]]{
+   |       -                                                        ------------------------------------------------- inside of this loop
+   |       |
+   |       this reinitialization might get skipped
+   |       move occurs because `g` has type `Vec<u64>`, which does not implement the `Copy` trait
+20 |    let mut ring=Ring{r,g,p:polynomial::Poly::new(r).unwrap()};let v=ring.rem(&base);let(got,n)=ring.sections(m,&v,1024).unwrap();ass...
+   |                        ^ value moved here, in previous iteration of loop
+   |
+help: consider cloning the value if the performance cost is acceptable
+   |
+20 |    let mut ring=Ring{r,g: g.clone(),p:polynomial::Poly::new(r).unwrap()};let v=ring.rem(&base);let(got,n)=ring.sections(m,&v,1024).unwrap();assert_eq!(n,(64-h.leading_zeros()as usize)-1+h.count_ones()as usize);products+=n;
+   |                         +++++++++++
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0382`.

@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:54:57Z",
+ "id": "PCC-20261116-a777e8",
+ "kind": "statement",
+ "producer": {
+  "commit": "82b95fd2b3c1fc258b54cc06eb1c209d9ccee17e",
+  "model": "Codex",
+  "session": "trace-accelerated-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/SOURCES.sha256",
+    "sha256": "1e4f80247cff5ee6a0cf3bd48d7058bdedf3b08c39528bc0711215d495753605"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/checks.json",
+    "sha256": "5512fca8ac7d8a6c38fe6d699f613d4144f65659e12059e572c111ad0fc31223"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/driver-checks.jsonl",
+    "sha256": "898088a8c27bf92d3189474d89b8cd1c213e93bbad0e57ca6a755d8d8412d7a8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/pre-call.sha256",
+    "sha256": "d342b66a5e8f3c51d54b1ddf90cb9972a9f98c392812994083cde6c7b4dc957f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/post-call.sha256",
+    "sha256": "d342b66a5e8f3c51d54b1ddf90cb9972a9f98c392812994083cde6c7b4dc957f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/rust-tests.txt",
+    "sha256": "7849f92253fbbad1e75f19e33093a28508c58171f788d437fa975ee7daa1039c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/analyzer-checks.json",
+    "sha256": "05435fa3765cabf9b0a25da20f49c1708c3d53af7ce9730d8df6ef91149d53ac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/analyzer-pre-call.sha256",
+    "sha256": "7d57ede9ae29fe137b263fe468b2e764a9fde8306df914be92bcf7f81bdfcce1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/analyzer-post-call.sha256",
+    "sha256": "7d57ede9ae29fe137b263fe468b2e764a9fde8306df914be92bcf7f81bdfcce1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/accelerated",
+ "statement": "New native acceleration candidates implement explicit preinverted tail-split Brent-Kung incidence, exact-label fixed-window batched public point generation, and streamed full-support/first-witness Montgomery pairs with Bloom off/on. The development qualifier records 302 complete-support cases, 17856 exact generated labels/points, 52 rejected draws, eight invalid-input cases, 21 crossed no-timer driver checks and two Rust unit tests; the native analyzer rejects altered support and generation counts. Inputs/outputs agree with frozen quotient/GCD and independent cubic enumeration at the checked scope. No candidate runtime result, signed standing, priority or fastest-tool claim."
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T15:17:28Z",
+ "id": "PCC-20261116-1991d0",
+ "kind": "theorem",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b52672fca22833caa426595a01cd2981d8fe43092d0d639e87ad3f0461ff7371",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+   "theorem": "CubicBasisInjectivity22303.cubic_generator_cancel"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact generic CommRing characteristic223 coefficient transport/separation and cubic basis injectivity under z^3=3, fixed-expression equivalence without assumed injectivity. Six typed corollaries fully bind old embedding statements with unchanged original extractor; original limited records preserved. Zero-generator counterexample documents cubic-relation dependency. Both original gates37 audited0 trusted, standard foundations only, no field construction/native refinement/Jacobian/cost or signed standing.",
+ "statement": "theorem cubic_generator_cancel {R : Type} [CommRing R] [IsCharP R 223] (z u v : R) (hz : z^3=3) (h : u*z=v*z) : u=v"
+}

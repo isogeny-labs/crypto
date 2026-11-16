@@ -1,0 +1,52 @@
+--- a/original_boolean_search.rs
++++ b/original_boolean_search.rs
+@@ -13,9 +13,22 @@
+ #[path="dynamic_boolean_search_check.rs"] mod check;
+ pub(in crate::ml_dataset::solvers) use scheduler::search::SearchLimits;
+ pub(in crate::ml_dataset::solvers) use check::Limits as AuditLimits;
++// Charge incremental algorithm quotes against the ORIGINAL cumulative phase
++// counter. observe also enforces global headroom and the phase's absolute clock.
++// This is reservation accounting, not a retired-instruction measurement.
++fn reserve_phase(budget:&mut Budget,work:u64,bytes:u64)->Result<(),Stop>{
++    budget.check(Instant::now())?;
++    let Some(work)=budget.phase_native.work.checked_add(work)else{return budget.fail(Stop::Overflow)};
++    let Some(bytes)=budget.phase_native.bytes.checked_add(bytes)else{return budget.fail(Stop::Overflow)};
++    budget.observe(super::super::Reservation{work,bytes},Instant::now())
++}
+ struct MatrixAdmission<'a>(&'a mut Budget);
++impl provenance::Admission for MatrixAdmission<'_>{
++    fn reserve(&mut self,q:provenance::Quote)->Result<(),provenance::Error>{reserve_phase(self.0,q.work,q.bytes).map_err(|_|provenance::Error::Admission)}
++    fn check(&mut self)->Result<(),provenance::Error>{self.0.check(Instant::now()).map_err(|_|provenance::Error::Admission)}
++}
+ impl sparse::Owner for MatrixAdmission<'_>{
+-    fn reserve(&mut self,q:sparse::Charge)->Result<(),()>{self.0.reserve_checking(q.work,q.bytes,Instant::now()).map_err(|_|())}
++    fn reserve(&mut self,q:sparse::Charge)->Result<(),()>{reserve_phase(self.0,q.work,q.bytes).map_err(|_|())}
+     fn check(&mut self)->Result<(),()>{self.0.check(Instant::now()).map_err(|_|())}
+ }
+ struct LiftAdmission<'a>(&'a mut Budget);
+@@ -49,14 +62,14 @@
+ impl OwnedAttempt{
+     pub(in crate::ml_dataset::solvers) fn failure(&self)->Option<Failure>{self.failure}
+     pub(in crate::ml_dataset::solvers) fn first_stop(&self)->Option<Stop>{self.original.budget.stopped}
+-    pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){(self.original.budget.checking_work,self.original.budget.adapter_bytes)}
++    pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){(self.original.budget.native.work+self.original.budget.checking_work,self.original.budget.native.bytes+self.original.budget.adapter_bytes)}
+     pub(in crate::ml_dataset::solvers) fn boolean_candidate(&self)->Option<&[bool]>{
+         if self.failure.is_some() || self.audit.as_ref()?.result.is_err(){return None}
+         let s=self.search.as_ref()?;if s.result.is_err()||s.verdict!=scheduler::search::Verdict::Witness{return None}
+         let node=s.nodes.get(s.witness_node?)?;if node.candidate_valid!=Some(true){return None}Some(&node.candidate)
+     }
+     fn fail(&mut self,f:Failure,s:Stop){self.failure=Some(f);let _:Result<(),Stop>=self.original.budget.fail(s);}
+-    fn pay(&mut self,w:u64,b:usize)->Result<(),Stop>{self.original.budget.reserve_checking(w,u64::try_from(b).map_err(|_|Stop::Overflow)?,Instant::now())}
++    fn pay(&mut self,w:u64,b:usize)->Result<(),Stop>{reserve_phase(&mut self.original.budget,w,u64::try_from(b).map_err(|_|Stop::Overflow)?)}
+     fn normalize(&mut self)->Result<(),Stop>{
+         let count=self.expansion.as_ref().ok_or(Stop::Phase)?.equations().len();
+         self.pay(1,count.checked_mul(size_of::<equations::Polynomial>()).and_then(|n|n.checked_add(64)).ok_or(Stop::Overflow)?)?;
+@@ -141,7 +154,7 @@
+         caps.expansion.work=caps.expansion.work.min(phase.work);caps.expansion.bytes=caps.expansion.bytes.min(phase.bytes);
+         let Some(map)=self.original.checked.take()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+         // Existing source-authoritative owning API; raw maps cannot enter.
+-        let expanded=equations::expand_owned(map,caps.expansion,&mut Admit(&mut self.original.budget));
++        let expanded=equations::expand_owned(map,caps.expansion,&mut MatrixAdmission(&mut self.original.budget));
+         let status=expanded.status();self.expansion=Some(expanded);
+         if let Err(f)=status{self.fail(Failure::Expansion(f),Stop::NativeFailure);return}
+         if let Err(s)=self.normalize(){self.fail(Failure::Admission(s),s);return}
