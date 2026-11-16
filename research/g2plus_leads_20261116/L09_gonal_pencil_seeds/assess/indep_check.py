@@ -220,6 +220,44 @@ def run(p, bi, s, arm, exact_target_off, pts, a, idx, O, fbpts, fbcol, pencil):
             return t, False
 
 
+def run_A_full(p, bi, s, pts, a, idx, O, fbpts, fbcol):
+    """Arm A to pair exhaustion: proxy T, final exact dim, and first T reaching the final dim."""
+    n_fb = len(fbpts); n_cols = n_fb + 2
+    full = Ech(); lp = Ech(); rows = 0; seen = set()
+    st = Pairs(derive(p, s, bi, 11), n_fb)
+    t = 0; t_uf = -1; dim = 0; t_dim = 0
+    while True:
+        pr = st.next()
+        if pr is None:
+            break
+        t += 1
+        r = line_pts(a, p, pts, O, fbpts[pr[0]], fbpts[pr[1]])
+        if r is None:
+            continue
+        if sum(1 for q in r if q != O and q not in fbcol) > 2:
+            continue
+        key = tuple(sorted(idx[q] for q in r))
+        if key in seen:
+            continue
+        seen.add(key)
+        sm = {n_fb + 1: -1}
+        lps = {}
+        for q in r:
+            if q == O:
+                sm[n_fb] = 1
+            elif q in fbcol:
+                sm[fbcol[q]] = 1
+            else:
+                lps[n_cols + idx[q]] = 1
+        full.insert({**sm, **lps}); lp.insert(dict(lps)); rows += 1
+        if t_uf < 0 and rows - lp.rank >= n_cols - 1:
+            t_uf = t
+        d = full.rank - lp.rank
+        if d > dim:
+            dim = d; t_dim = t
+    return {"A_full_trials": t, "A_T_uf": t_uf, "A_dim_max": dim, "A_T_dim_max": t_dim, "A_ncols": n_cols}
+
+
 def main():
     p, bi, s0, ns = map(int, sys.argv[1:5])
     for s in range(s0, s0 + ns):
@@ -244,9 +282,10 @@ def main():
                     nlp = sum(1 for q in f if q not in small)
                     if nlp <= 2:
                         pencil.append((kind, f))
-        out = {"p": p, "beta_idx": bi, "seed": s, "N1": n1, "n_fb": n_fb, "pencil_rows": len(pencil)}
-        for name, arm, off in [("A_uf", 'A', None), ("B_uf", 'B', None), ("A_ex2", 'A', 2),
-                               ("A_ex1", 'A', 1), ("B_ex1", 'B', 1)]:
+        k_shared = sum(1 for q in fbpts if q[0] == O[0] or q[1] == O[1])
+        out = {"k_shared": k_shared, "p": p, "beta_idx": bi, "seed": s, "N1": n1, "n_fb": n_fb, "pencil_rows": len(pencil)}
+        out.update(run_A_full(p, bi, s, pts, a, idx, O, fbpts, fbcol))
+        for name, arm, off in [("A_uf", 'A', None), ("B_uf", 'B', None), ("B_ex1", 'B', 1)]:
             t, c = run(p, bi, s, arm, off, pts, a, idx, O, fbpts, fbcol, pencil)
             out["T_" + name] = t
             out["cens_" + name] = c
