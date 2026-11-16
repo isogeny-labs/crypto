@@ -3628,8 +3628,157 @@ fn aps_public_ordinate_24q_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-APS-COMPOSED: prospectively frozen same-24-Q six-arm complete cold panel.
+// This measures two orthogonal engineering changes together; NOT a novel
+// non-generic prime-field index-calculus algorithm.
+fn aps_composed_win4_publicy_24q_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const SIZES:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x434F_4D50_4150_5331;
+    const RHO_SEED:u64=0x434F_4D50_5248_4F31;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;6];
+    let mut source_ns=[0u128;4];
+    let mut oracle_ns=[0u128;4];
+    let mut completed=[0u64;6];
+    let mut paired_wins=[0u64;4]; // composed versus binary, win4, rho32, rho64
+    let mut sqrt_counts=[0u64;4];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1||!used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let mut order=[0usize,1,2,3,4,5];
+        order.as_mut_slice().rotate_left(i%6);
+        let mut arms:[serde_json::Value;6]=std::array::from_fn(|_|json!(null));
+        for idx in order{
+            let result=match idx{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,SIZES,6,false,true,true)?,
+                1=>execute_factorized_unequal_index_variant_jumpmode_y(
+                    q,SIZES,6,false,true,2,false)?,
+                2|3=>execute_factorized_unequal_index_variant_jumpmode_y(
+                    q,SIZES,6,false,true,2,true)?,
+                4=>neg_rho_cold_policy_jumps(q,rho_seed,32,4,STEP_CAP,512,false,32)?,
+                5=>neg_rho_cold_policy_jumps(q,rho_seed,32,4,STEP_CAP,512,false,64)?,
+                _=>unreachable!()
+            };
+            let solved=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if idx<4 && !solved{
+                return Err(format!("composed APS incomplete case={i} arm={idx}"));
+            }
+            if solved{
+                let log=if idx<4{
+                    result["attempts"].as_array().and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{result["log"].as_u64()};
+                if log!=Some(known)||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("composed wrong recovered scalar case={i} arm={idx}"));
+                }
+                completed[idx]+=1;
+            }
+            total_ns[idx]+=result["cold_wall_ns"].as_u64()
+                .ok_or("composed missing cold wall")? as u128;
+            if idx<4 {
+                let rounds=result["attempts"].as_array()
+                    .ok_or("composed missing APS attempts")?;
+                for round in rounds{
+                    source_ns[idx]+=round["source_setup_ns"].as_u64().unwrap_or(0) as u128;
+                    oracle_ns[idx]+=round["s3_query_ns"].as_u64().unwrap_or(0) as u128;
+                    sqrt_counts[idx]+=round["s3_sqrts"].as_u64().unwrap_or(0);
+                }
+            }
+            arms[idx]=result;
+        }
+        let reference=arms[0]["attempts"].as_array().ok_or("binary attempts missing")?;
+        for idx in 1..4{
+            let candidate=arms[idx]["attempts"].as_array()
+                .ok_or("composed attempt transcript missing")?;
+            if reference.len()!=candidate.len(){
+                return Err(format!("composed round count divergence case={i} arm={idx}"));
+            }
+            for (r,(old,new)) in reference.iter().zip(candidate.iter()).enumerate(){
+                for key in ["round","seed","s3_pair_quadratics",
+                    "s3_batch_inversions","signed_candidates","solution",
+                    "rejected_duplicate_x","rejected_identity"]{
+                    if old[key]!=new[key]{
+                        return Err(format!("composed transcript mismatch case={i} arm={idx} round={r} key={key}"));
+                    }
+                }
+                let old_sqrt=old["s3_sqrts"].as_u64().ok_or("binary sqrt missing")?;
+                let new_sqrt=new["s3_sqrts"].as_u64().ok_or("variant sqrt missing")?;
+                if old_sqrt!=(SIZES[0]+SIZES[1]) as u64 ||
+                   new_sqrt!=if idx==1 {old_sqrt} else {0}{
+                    return Err(format!("composed sqrt count mismatch case={i} arm={idx} round={r}"));
+                }
+            }
+        }
+        for (j,idx) in [0usize,1,4,5].into_iter().enumerate(){
+            if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+               arms[2]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                paired_wins[j]+=1;
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,"caller_known_scalar_verifier_only":known,
+            "chronological_order":order,
+            "APS_joint_binary":arms[0],"APS_window4_sqrt":arms[1],
+            "APS_window4_public_y":arms[2],"APS_window4_public_y_AA":arms[3],
+            "unfolded_rho32":arms[4],"unfolded_rho64":arms[5]
+        }));
+    }
+    let ratio=total_ns[2] as f64/total_ns[0] as f64;
+    let drift=(total_ns[2] as f64/total_ns[3] as f64-1.0).abs();
+    let aps_complete=completed[..4].iter().all(|&n|n==CASES as u64);
+    let rho_complete=completed[4..].iter().all(|&n|n==CASES as u64);
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_COMPOSED_WIN4_PUBLICY_PROTOCOL_20261116.md",
+        "curve":"ordinary cofactor-one prime31","p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "profile":SIZES,"cases_count":CASES,
+        "arm_names":["APS_joint_binary","APS_window4_sqrt",
+            "APS_window4_public_y","APS_window4_public_y_AA",
+            "unfolded_rho32","unfolded_rho64"],
+        "completed_calls":completed,"all_144_complete":aps_complete&&rho_complete,
+        "fully_cold_ns":total_ns.map(|v|v.to_string()),
+        "aps_source_setup_ns":source_ns.map(|v|v.to_string()),
+        "aps_s3_query_ns":oracle_ns.map(|v|v.to_string()),
+        "aps_s3_sqrt_counts":sqrt_counts,
+        "candidate_over_binary_ratio":ratio,
+        "candidate_over_window4_ratio":total_ns[2] as f64/total_ns[1] as f64,
+        "candidate_over_faster_rho_ratio":if rho_complete{
+            Some(total_ns[2] as f64/total_ns[4].min(total_ns[5]) as f64)
+        }else{None},
+        "paired_candidate_wins_over_binary_window4_rho32_rho64":paired_wins,
+        "candidate_AA_drift":drift,
+        "composed_engineering_gate_pass":aps_complete&&ratio<=0.95
+            &&paired_wins[0]>=18&&drift<=0.05,
+        "classification":"existing published APS S3, explicit generic pair meet-in-the-middle equivalent",
+        "scope":"unisolated producer exact-source CI; no independent signed PCC, tuned WZ rho or external index-calculus frontier",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--aps-composed-win4-publicy-24q" {
+        let result=aps_composed_win4_publicy_24q_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--aps-public-y-24q" {
         let result=aps_public_ordinate_24q_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
