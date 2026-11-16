@@ -37,7 +37,7 @@ export LEAN_PATH=$(IFS=:;printf '%s' "${paths[*]}")
 lean --version > "$out/toolchain.txt"
 step=none
 finish(){ local code=$?;printf '%s\n' "$code" > "$out/launcher.exit";printf '%s\n' "$step" > "$out/last-step.txt"; };trap finish EXIT
-run(){ step=$1;shift;printf '%s\n' "$step" >> "$out/steps.txt";printf '%q ' "$@" > "$out/$step.command";printf '\n' >> "$out/$step.command";local code=0;timeout --signal=TERM --kill-after=10 600 "$@" > "$out/$step.log" 2>&1 || code=$?;printf '%s\n' "$code" > "$out/$step.exit";return "$code"; }
+run(){ local remaining budget;remaining=$((1794802500 - $(date -u +%s)));[ "$remaining" -gt 0 ] || fail "proof window ended";budget=$remaining;[ "$budget" -le 600 ] || budget=600;step=$1;shift;printf '%s\n' "$step" >> "$out/steps.txt";printf '%q ' "$@" > "$out/$step.command";printf '\n' >> "$out/$step.command";local code=0;timeout --signal=TERM --kill-after=10 "$budget" "$@" > "$out/$step.log" 2>&1 || code=$?;printf '%s\n' "$code" > "$out/$step.exit";return "$code"; }
 for stage in gate-source-A gate-source-B gate-positive;do
  run "$stage" bash "$PROOF_GATE_DIR/proof-gate.sh" --out "$out/$stage" research/quadratic_twist_field_cost_20261116/torus-proof/Torus.lean
 done
