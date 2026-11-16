@@ -45,6 +45,20 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [16 November N83 K600 source-matched charged build](20261116-n83-k600-charged-build/)
+([PDF](20261116-n83-k600-charged-build/run-report.pdf),
+[SVG](20261116-n83-k600-charged-build/build-cost.svg),
+[150 dpi PNG](20261116-n83-k600-charged-build/build-cost.png))
+records one Linux ARM64 setup build on a shared local macOS host with a hard
+12 GiB container cgroup. The outer interval was 2,978 s; Rust, solver and
+runtime-image stage intervals to receipt start were 1,540.905, 523.518 and
+199.725 s. All stages, image/source hashes and cleanup passed. There is one
+sample per interval and no comparative ratio. The [study report and raw
+receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-charged-retry/attempt-6-build-success/REPORT.md)
+are authoritative. This documentary setup timing has no relation, rank,
+descent, matched rho or cold one-target IC result, and therefore remains
+outside the admitted results table under the validation gate.
+
 The [15 November N83 K600 v3 local-store construction control](20261115-n83-k600-v3-local-custody/)
 ([PDF](20261115-n83-k600-v3-local-custody/REPORT.pdf),
 [SVG](20261115-n83-k600-v3-local-custody/custody-flow.svg),
