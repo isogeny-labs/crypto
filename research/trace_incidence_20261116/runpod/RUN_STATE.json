@@ -10,7 +10,7 @@
   "created_epoch": 1794845483,
   "deadline_epoch": 1794847283,
   "cost_ceiling_usd": 1,
-  "status": "running",
+  "status": "closed-before-timing",
   "supervisor_exec_session": 57381,
   "worker_source_revision": "c7b146a05b543beb66e42a2d5f1c869d90a672b1",
   "checkpoint_admission": {
@@ -23,6 +23,28 @@
   },
   "result_directory": "/workspace/crypto_pr_context/runpod-c7b146a05",
   "collection": "External supervise.sh session57381; HTTP result namespace and credential paths remain private in the result directory and /tmp",
-  "cleanup": "Only pod8yoqn5n838rcfp; original deadline remains unchanged",
-  "launcher_incident": "Receipt copy targeted the same file after creation; attached supervisor to the existing pod and original deadline, no new pod"
+  "cleanup": {
+    "schema": "trace-runpod-cleanup/v1",
+    "pod_id": "8yoqn5n838rcfp",
+    "http_status": "204",
+    "utc": "2026-11-16T16:14:01Z",
+    "deleted": true
+  },
+  "launcher_incident": "Receipt copy targeted the same file after creation; attached supervisor to the existing pod and original deadline, no new pod",
+  "completion": {
+    "schema": "trace-runpod-transfer/v1",
+    "sha256": "db2d28bd5543fc42300a30a9e259363fb8f836caee5acb4281f27dd3d1817fd6",
+    "bytes": 244872,
+    "worker_exit": 129
+  },
+  "custody": {
+    "schema": "trace-runpod-custody/v1",
+    "bucket": "setec-astronomy-artifacts",
+    "key": "store/runpod/trace-incidence/c7b146a05b543beb66e42a2d5f1c869d90a672b1/43904307401/results.tar.gz",
+    "sha256": "db2d28bd5543fc42300a30a9e259363fb8f836caee5acb4281f27dd3d1817fd6",
+    "bytes": 244872,
+    "upload_http_status": "204",
+    "readback_hash_matches": true
+  },
+  "next_step": "One amended preflight-correction attempt under AMENDMENT_A2.json; no pod currently active for this request"
 }

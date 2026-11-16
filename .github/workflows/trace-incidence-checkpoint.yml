@@ -21,6 +21,7 @@ jobs:
       CHECKPOINT_AWS_REGION: us-east-2
       CHECKPOINT_TOKEN_FILE: /dev/null
       CHECKPOINT_SESSION: trace-incidence-runpod
+      SOURCE_MANIFEST: research/trace_incidence_20261116/runpod/SOURCES_v2.sha256
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -40,7 +41,7 @@ jobs:
       - name: Check source closure and prepare resume note
         run: |
           set -euo pipefail
-          sha256sum -c research/trace_incidence_20261116/runpod/SOURCES.sha256
+          sha256sum -c "$SOURCE_MANIFEST"
           mkdir -p .resume
           sed -e "s/SOURCE_REVISION/${GITHUB_SHA}/g" -e 's/^# /## /' research/trace_incidence_20261116/runpod/RESUME.template.md > .resume/RESUME.md
           if test -f research/trace_incidence_20261116/runpod/RUN_STATE.json; then
@@ -56,7 +57,7 @@ jobs:
           set -euo pipefail
           status=0
           timeout --kill-after=5 180 bash scripts/checkpoint.sh gate > "$RUNNER_TEMP/checkpoint.private.log" 2>&1 || status=$?
-          source_hash=$(sha256sum research/trace_incidence_20261116/runpod/SOURCES.sha256 | cut -d' ' -f1)
+          source_hash=$(sha256sum "$SOURCE_MANIFEST" | cut -d' ' -f1)
           protocol_hash=$(sha256sum research/trace_incidence_20261116/runpod/PROTOCOL.json | cut -d' ' -f1)
           checkpoint_state=""
           if test -f .resume/.last-push; then checkpoint_state=$(cat .resume/.last-push); fi
