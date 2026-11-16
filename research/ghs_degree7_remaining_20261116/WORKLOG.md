@@ -316,3 +316,54 @@ geometry classes remain to be searched. Continue new-family construction.
 ### Errors
 
 None in audit or Lean checks.
+
+## 2026-11-15 23:55 America/Los_Angeles
+
+### What was done
+
+Committed the fixed-carrier theorem, receipt audit, and Lean arithmetic at
+`84f27681f158`. An exploratory exact PGL2(F3) enumeration of the twelve
+recorded carrier polynomials found two six-element components, represented
+by masks 32280 and 35349. Wrote a source-bound orbit certificate and a
+generator that changes exactly one carrier literal in five frozen search
+arms, plus the second-carrier protocol. No counted second-carrier run had
+begun at this entry.
+
+### Decisions made
+
+Screen one representative of the second explicit PGL2 orbit. The earlier
+quadratic-square screen already covers it, so the five remaining arms suffice
+for all normalized degree-seven denominators on the twelve recorded models.
+
+### Open threads
+
+Generate and commit second-carrier sources, run orbit certificate and ten
+search cells, audit hits and coverage, update bound/novelty status.
+
+### Errors
+
+None in preparation.
+
+## 2026-11-15 23:58 America/Los_Angeles
+
+### What was done
+
+The first generator version created sparse and linear copies, then stopped
+because the cubic source spaces its polynomial expression differently.
+Changed the generator to find the unique `f=` assignment, assert the exact
+old expression after removing spaces, and retain its original spacing.
+Reran it successfully: all five second-carrier sources now exist.
+
+### Decisions made
+
+The stopped generator produced no counted search data. Commit the corrected
+generator, orbit source, and five copies before execution.
+
+### Open threads
+
+Run orbit certificate and ten search cells; audit.
+
+### Errors
+
+Initial exact-string replacement failed on cubic source formatting. The
+unique-assignment assertion now handles both spacing styles.
