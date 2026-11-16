@@ -1,0 +1,244 @@
+--- v2/scheduler.rs
++++ v3/scheduler.rs
+@@ -1,13 +1,14 @@
+ //! Arbitrary-width Boolean ideal closure by sparse row elimination.
+ //! Degree-priority ordinary pairs and leading-variable Boolean field pairs.
+ //! Uses the quotient-aware field-pair construction of pq_groebner_f2.
+-//! This sparse scheduler is not a batched F4 implementation or F5.
++//! Same-degree candidates share symbolic preprocessing and sparse matrix pivots.
++//! No F5, solution-search, or authenticated dataset claim.
+ use super::sparse::{Charge, Monomial, Owner, Polynomial};
+ use std::{cmp::Ordering, mem::size_of, time::Instant};
+ #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+ pub enum Failure { Cap, Owner, Deadline, Allocation, Overflow, Malformed }
+ #[derive(Clone, Copy)]
+-pub struct Limits { pub variables:u32, pub generators:usize, pub basis:usize, pub tasks:usize, pub terms:usize, pub proof:usize, pub degree:usize, pub work:u64, pub bytes:u64 }
++pub struct Limits { pub batch_rows:usize, pub batch_ops:usize, pub batches:usize, pub variables:u32, pub generators:usize, pub basis:usize, pub tasks:usize, pub terms:usize, pub proof:usize, pub degree:usize, pub work:u64, pub bytes:u64 }
+ #[derive(Debug, PartialEq, Eq)]
+ pub struct ProofTerm { pub generator:usize, pub multiplier:Monomial }
+ #[derive(Debug, Default)]
+@@ -17,7 +18,7 @@
+ #[derive(Debug, Clone, Copy)]
+ pub struct Task { pub kind:Kind, pub degree:usize, pub serial:u64 }
+ #[derive(Debug)]
+-pub struct Attempt { pub result:Result<(),Failure>, pub complete:bool, pub basis:Vec<Row>, pub pending:Vec<Task>, pub active:Option<Task>, pub current:Row, pub charge:Charge, pub completed:u64, pub row_xors:u64, pub symbolic_reducers:u64, pub field_tasks:u64, pub ordinary_tasks:u64, pub last_degree:usize }
++pub struct Attempt { pub batches:Vec<Batch>, pub result:Result<(),Failure>, pub complete:bool, pub basis:Vec<Row>, pub pending:Vec<Task>, pub active:Option<Task>, pub current:Row, pub charge:Charge, pub completed:u64, pub row_xors:u64, pub symbolic_reducers:u64, pub field_tasks:u64, pub ordinary_tasks:u64, pub last_degree:usize }
+ fn order(a:&[u32],b:&[u32])->Ordering { a.len().cmp(&b.len()).then_with(||a.cmp(b)) }
+ struct Meter<'a,T:Owner>{ owner:&'a mut T, limits:Limits, deadline:Instant, charge:Charge }
+ impl<T:Owner> Meter<'_,T>{
+@@ -42,62 +43,116 @@
+  fn xor(&mut self,a:&Row,b:&Row)->Result<Row,Failure>{let mut out=Row{polynomial:self.alloc(a.polynomial.len().checked_add(b.polynomial.len()).ok_or(Failure::Overflow)?)?,proof:self.alloc(a.proof.len().checked_add(b.proof.len()).ok_or(Failure::Overflow)?)?};for r in [a,b]{for t in &r.polynomial{let t=self.mono(t)?;self.toggle(&mut out.polynomial,t)?}for t in &r.proof{let multiplier=self.mono(&t.multiplier)?;self.proof_toggle(&mut out.proof,ProofTerm{generator:t.generator,multiplier})?}}Ok(out)}
+  fn validate(&mut self,p:&Polynomial,n:u32)->Result<(),Failure>{if p.len()>self.limits.terms{return Err(Failure::Cap)}for(i,t)in p.iter().enumerate(){self.scan(t.len())?;if t.len()>self.limits.degree{return Err(Failure::Cap)}if t.iter().any(|v|*v>=n)||t.windows(2).any(|w|w[0]>=w[1]){return Err(Failure::Malformed)}if i>0&&self.cmp(&p[i-1],t)?!=Ordering::Less{return Err(Failure::Malformed)}}Ok(())}
+ }
+-/// Non-resumable retained attempt: original inputs remain borrowed by caller.
+-/// Complete means all ordinary and necessary Boolean field pairs processed.
+-/// Returned basis is not interreduced; no search, F5, or fall-degree claim.
++
++#[derive(Debug,Clone,Copy,PartialEq,Eq)]
++pub enum Stage { Build, Symbolic, Eliminate, PrepareCommit, Committed }
++#[derive(Debug)]
++pub struct Reducer { pub basis:usize, pub multiplier:Monomial, pub row:usize }
++#[derive(Debug,Clone,Copy)]
++pub struct Pivot { pub target:usize, pub source:usize }
++#[derive(Debug)]
++pub struct Batch {
++ pub basis_before:usize, pub degree:usize, pub tasks:Vec<Task>, pub initial:Vec<Row>, pub matrix:Vec<Row>,
++ pub reducers:Vec<Reducer>, pub operations:Vec<Pivot>, pub stage:Stage,
++ pub row_cursor:usize, pub term_cursor:usize, pub basis_cursor:usize,
++ pub order:Vec<usize>, pub pivots:Vec<usize>, pub staged_basis:Vec<Row>,
++ pub staged_tasks:Vec<Task>, pub additions:Vec<(usize,usize)>,
++}
++fn build_task<T:Owner>(task:Task,g:&[Polynomial],basis:&[Row],m:&mut Meter<T>)->Result<Row,Failure>{
++ match task.kind{
++ Kind::Original(i)=>{let mut r=Row{polynomial:m.alloc(g[i].len())?,proof:m.alloc(1)?};for t in &g[i]{r.polynomial.push(m.mono(t)?)}r.proof.push(ProofTerm{generator:i,multiplier:m.mono(&[])?});Ok(r)},
++ Kind::Field(i,v)=>m.scaled(&basis[i],&[v]),
++ Kind::Pair(i,j)=>{let x=basis[i].polynomial.last().unwrap();let y=basis[j].polynomial.last().unwrap();let lcm=m.union(x,y)?;let u=m.difference(&lcm,x)?;let v=m.difference(&lcm,y)?;let l=m.scaled(&basis[i],&u)?;let r=m.scaled(&basis[j],&v)?;m.xor(&l,&r)} }
++}
++/// Bounded degree-batch matrix scheduler. All admitted rows and operations remain
++/// owned by the attempt. Complete means queued ordinary/Boolean pairs exhausted;
++/// no reduced-basis, F5, solution-search, or original-source admission claim.
+ pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl Owner)->Attempt{
+- let mut a=Attempt{result:Ok(()),complete:false,basis:Vec::new(),pending:Vec::new(),active:None,current:Row::default(),charge:Charge::default(),completed:0,row_xors:0,symbolic_reducers:0,field_tasks:0,ordinary_tasks:0,last_degree:0};
++ let mut a=Attempt{batches:Vec::new(),result:Ok(()),complete:false,basis:Vec::new(),pending:Vec::new(),active:None,current:Row::default(),charge:Charge::default(),completed:0,row_xors:0,symbolic_reducers:0,field_tasks:0,ordinary_tasks:0,last_degree:0};
+  let mut m=Meter{owner,limits,deadline,charge:Charge::default()};
+  a.result=(||{
+   m.pay(1,0)?;if n>limits.variables||g.len()>limits.generators||g.len()>limits.tasks{return Err(Failure::Cap)}
+   if !g.is_empty()&&limits.proof==0{return Err(Failure::Cap)}
+   for p in g{m.pay(1,0)?;m.validate(p,n)?}
++  // Keep V2 original validation/task admission ordering unchanged.
+   a.basis=m.alloc(limits.basis)?;a.pending=m.alloc(limits.tasks)?;let mut serial=0u64;
+   for(i,p)in g.iter().enumerate(){m.pay(1,0)?;a.pending.push(Task{kind:Kind::Original(i),degree:p.last().map_or(0,Vec::len),serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
++  a.batches=m.alloc(limits.batches)?;
+   loop{
+    m.pay(1,0)?;if a.pending.is_empty(){a.complete=true;return Ok(())}
+-   m.scan(a.pending.len())?;let k=(0..a.pending.len()).min_by_key(|i|(a.pending[*i].degree,a.pending[*i].serial)).unwrap();let task=a.pending[k];a.active=Some(task);a.last_degree=task.degree;
+-   if task.degree>limits.degree{return Err(Failure::Cap)}
+-   let row=match task.kind{
+-    Kind::Original(i)=>{let mut r=Row{polynomial:m.alloc(g[i].len())?,proof:m.alloc(1)?};for t in &g[i]{r.polynomial.push(m.mono(t)?)}r.proof.push(ProofTerm{generator:i,multiplier:m.mono(&[])?});r},
+-    Kind::Field(i,v)=>m.scaled(&a.basis[i],&[v])?,
+-    Kind::Pair(i,j)=>{let x=a.basis[i].polynomial.last().unwrap();let y=a.basis[j].polynomial.last().unwrap();let lcm=m.union(x,y)?;let u=m.difference(&lcm,x)?;let v=m.difference(&lcm,y)?;let left=m.scaled(&a.basis[i],&u)?;let right=m.scaled(&a.basis[j],&v)?;m.xor(&left,&right)?}
+-   };a.current=row;
+-   // On-demand admitted symbolic reducer multiples become actual sparse rows.
+-   // Quotient multiplication can cancel a leading term: use a scaled reducer
+-   // only if its computed leading column exactly matches the active column.
+-   loop{
+-    m.pay(1,0)?;let Some(lead)=a.current.polynomial.last()else{break};
+-    let mut reducer=None;
+-    for r in &a.basis{
+-     let pivot=r.polynomial.last().unwrap();
+-     if m.divides(pivot,lead)?{
+-      let multiplier=m.difference(lead,pivot)?;
+-      let candidate=m.scaled(r,&multiplier)?;
+-      if let Some(actual)=candidate.polynomial.last(){
+-       if m.cmp(actual,lead)?==Ordering::Equal{reducer=Some(candidate);break}
++   m.scan(a.pending.len())?;let degree=a.pending.iter().map(|t|t.degree).min().unwrap();a.last_degree=degree;
++   if degree>limits.degree||a.batches.len()==limits.batches{return Err(Failure::Cap)}
++   let batch=Batch{basis_before:a.basis.len(),degree,tasks:m.alloc(limits.batch_rows)?,initial:m.alloc(limits.batch_rows)?,matrix:m.alloc(limits.batch_rows)?,reducers:m.alloc(limits.batch_rows)?,operations:m.alloc(limits.batch_ops)?,stage:Stage::Build,row_cursor:0,term_cursor:0,basis_cursor:0,order:m.alloc(limits.batch_rows)?,pivots:m.alloc(limits.batch_rows)?,staged_basis:m.alloc(limits.basis)?,staged_tasks:m.alloc(limits.tasks)?,additions:m.alloc(limits.basis)?};
++   a.batches.push(batch);let b=a.batches.last_mut().unwrap();
++   for t in &a.pending{m.pay(1,0)?;if t.degree==degree{if b.tasks.len()==limits.batch_rows{return Err(Failure::Cap)}b.tasks.push(*t)}}
++   m.scan(b.tasks.len().checked_mul(b.tasks.len()).ok_or(Failure::Overflow)?)?;b.tasks.sort_unstable_by_key(|t|t.serial);
++   // Every same-degree candidate is materialized before any pivot operation.
++   while b.row_cursor<b.tasks.len(){m.pay(1,0)?;let task=b.tasks[b.row_cursor];a.active=Some(task);let row=build_task(task,g,&a.basis,&mut m)?;
++    b.initial.push(row);let row=m.scaled(b.initial.last().unwrap(),&[])?;b.matrix.push(row);b.row_cursor+=1;
++   }
++   b.stage=Stage::Symbolic;b.row_cursor=0;
++   // Fixed-point symbolic preprocessing over all candidate AND reducer terms.
++   while b.row_cursor<b.matrix.len(){
++    while b.term_cursor<b.matrix[b.row_cursor].polynomial.len(){
++     m.pay(1,0)?;let term=m.mono(&b.matrix[b.row_cursor].polynomial[b.term_cursor])?;
++     let mut found=false;for e in &b.reducers{m.pay(1,0)?;if m.cmp(b.matrix[e.row].polynomial.last().unwrap(),&term)?==Ordering::Equal{found=true;break}}
++     if !found{
++      while b.basis_cursor<a.basis.len(){m.pay(1,0)?;let i=b.basis_cursor;let r=&a.basis[i];let lead=r.polynomial.last().unwrap();
++       if m.divides(lead,&term)?{
++        let multiplier=m.difference(&term,lead)?;let row=m.scaled(r,&multiplier)?;
++        if let Some(actual)=row.polynomial.last(){if m.cmp(actual,&term)?==Ordering::Equal{
++         if b.matrix.len()==limits.batch_rows{return Err(Failure::Cap)}
++         // Retain admitted source row before its working-copy allocation.
++         let idx=b.initial.len();b.initial.push(row);b.reducers.push(Reducer{basis:i,multiplier,row:idx});
++         let row=m.scaled(b.initial.last().unwrap(),&[])?;b.matrix.push(row);a.symbolic_reducers=a.symbolic_reducers.checked_add(1).ok_or(Failure::Overflow)?;break;
++        }}
++       }b.basis_cursor+=1;
+       }
+      }
+-    }
+-    let Some(reducer)=reducer else{break};
+-    let next=m.xor(&a.current,&reducer)?;
+-    a.current=next;a.row_xors=a.row_xors.checked_add(1).ok_or(Failure::Overflow)?;
+-    a.symbolic_reducers=a.symbolic_reducers.checked_add(1).ok_or(Failure::Overflow)?;
++     b.basis_cursor=0;b.term_cursor+=1;
++    }b.term_cursor=0;b.row_cursor+=1;
+    }
+-   if !a.current.polynomial.is_empty(){
+-    if a.basis.len()>=limits.basis{return Err(Failure::Cap)}
+-    let count=a.current.polynomial.last().unwrap().len().checked_add(a.basis.len()).ok_or(Failure::Overflow)?;
+-    if a.pending.len().checked_add(count).ok_or(Failure::Overflow)?>limits.tasks{return Err(Failure::Cap)}
+-    let mut new=m.alloc(count)?;let i=a.basis.len();let lead=a.current.polynomial.last().unwrap();
+-    for(j,r)in a.basis.iter().enumerate(){let lcm=m.union(lead,r.polynomial.last().unwrap())?;new.push(Task{kind:Kind::Pair(j,i),degree:lcm.len(),serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
+-    // Field equation x_v^2+x_v paired with g only when v divides LM(g).
+-    // Queue formal degree LM(g)+1 as the existing reference does.
+-    for &v in lead{m.pay(1,0)?;let degree=lead.len().checked_add(1).ok_or(Failure::Overflow)?;new.push(Task{kind:Kind::Field(i,v),degree,serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
+-    // Commit row and all generated tasks together; capacities already reserved.
+-    m.scan(new.len())?;a.basis.push(std::mem::take(&mut a.current));a.pending.extend(new);
++   // Reducer rows first, then candidates; all share one column/pivot dictionary.
++   for e in &b.reducers{m.pay(1,0)?;b.order.push(e.row)}
++   for i in 0..b.tasks.len(){m.pay(1,0)?;b.order.push(i)}
++   b.stage=Stage::Eliminate;b.row_cursor=0;
++   while b.row_cursor<b.order.len(){m.pay(1,0)?;let target=b.order[b.row_cursor];
++    loop{
++     m.pay(1,0)?;let Some(lead)=b.matrix[target].polynomial.last()else{break};let mut pivot=None;
++     for &i in &b.pivots{if m.cmp(lead,b.matrix[i].polynomial.last().unwrap())?==Ordering::Equal{pivot=Some(i);break}}
++     let Some(source)=pivot else{b.pivots.push(target);break};
++     if b.operations.len()==limits.batch_ops{return Err(Failure::Cap)}
++     let row=m.xor(&b.matrix[target],&b.matrix[source])?;
++     // Prepay recording and commit the actual row plus matching operation together.
++     m.pay(1,0)?;b.matrix[target]=row;b.operations.push(Pivot{target,source});a.row_xors=a.row_xors.checked_add(1).ok_or(Failure::Overflow)?;
++    }b.row_cursor+=1;
+    }
+-   a.pending.swap_remove(k);a.active=None;a.completed=a.completed.checked_add(1).ok_or(Failure::Overflow)?;
+-   match task.kind{Kind::Field(_,_)=>a.field_tasks=a.field_tasks.checked_add(1).ok_or(Failure::Overflow)?,Kind::Pair(_,_)=>a.ordinary_tasks=a.ordinary_tasks.checked_add(1).ok_or(Failure::Overflow)?,_=>()}
++   b.stage=Stage::PrepareCommit;b.row_cursor=0;
++   // Preserve novel reducer rows too: dropping them could hide an unresolved pair.
++   while b.row_cursor<b.pivots.len(){m.pay(1,0)?;let idx=b.pivots[b.row_cursor];let lead=b.matrix[idx].polynomial.last().unwrap();let mut old=false;
++    for r in &a.basis{if m.divides(r.polynomial.last().unwrap(),lead)?{old=true;break}}
++    if !old{
++     if a.basis.len().checked_add(b.staged_basis.len()).ok_or(Failure::Overflow)?>=limits.basis{return Err(Failure::Cap)}
++     let new_index=a.basis.len()+b.staged_basis.len();let row=m.scaled(&b.matrix[idx],&[])?;
++     b.staged_basis.push(row);b.additions.push((idx,new_index));
++    }b.row_cursor+=1;
++   }
++   // Stage all pair/field tasks without changing the old coherent basis or queue.
++   b.row_cursor=0;
++   while b.row_cursor<b.staged_basis.len(){m.pay(1,0)?;let local=b.row_cursor;let i=a.basis.len()+local;let lead=b.staged_basis[local].polynomial.last().unwrap();
++    for j in 0..i{m.pay(1,0)?;if b.staged_tasks.len()==limits.tasks{return Err(Failure::Cap)}let previous=if j<a.basis.len(){&a.basis[j]}else{&b.staged_basis[j-a.basis.len()]};let lcm=m.union(lead,previous.polynomial.last().unwrap())?;b.staged_tasks.push(Task{kind:Kind::Pair(j,i),degree:lcm.len(),serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
++    for &v in lead{m.pay(1,0)?;if b.staged_tasks.len()==limits.tasks{return Err(Failure::Cap)}b.staged_tasks.push(Task{kind:Kind::Field(i,v),degree:lead.len().checked_add(1).ok_or(Failure::Overflow)?,serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
++    b.row_cursor+=1;
++   }
++   let remaining=a.pending.len().checked_sub(b.tasks.len()).ok_or(Failure::Malformed)?;
++   if remaining.checked_add(b.staged_tasks.len()).ok_or(Failure::Overflow)?>limits.tasks{return Err(Failure::Cap)}
++   let completed=a.completed.checked_add(b.tasks.len() as u64).ok_or(Failure::Overflow)?;
++   let mut fields=a.field_tasks;let mut pairs=a.ordinary_tasks;
++   for t in &b.tasks{m.pay(1,0)?;match t.kind{Kind::Field(_,_)=>fields=fields.checked_add(1).ok_or(Failure::Overflow)?,Kind::Pair(_,_)=>pairs=pairs.checked_add(1).ok_or(Failure::Overflow)?,_=>()}}
++   // A bounded prepaid move-only commit: no allocation or failure after this check.
++   m.scan(a.pending.len().checked_add(b.staged_tasks.len()).and_then(|x|x.checked_add(b.staged_basis.len())).ok_or(Failure::Overflow)?)?;
++   a.pending.retain(|t|t.degree!=degree);a.pending.append(&mut b.staged_tasks);a.basis.append(&mut b.staged_basis);
++   a.completed=completed;a.field_tasks=fields;a.ordinary_tasks=pairs;b.stage=Stage::Committed;a.active=None;
+   }
+  })();a.charge=m.charge;a
+ }
+--- v2/harness.rs
++++ v3/harness.rs
+@@ -4,7 +4,7 @@
+  use super::{scheduler::*,sparse::{Charge,Owner,Polynomial}};use std::time::{Instant,Duration};
+  #[derive(Default)]struct Ledger{work:u64,bytes:u64,checks:u64,stop:Option<u64>}
+  impl Owner for Ledger{fn reserve(&mut self,q:Charge)->Result<(),()>{self.work+=q.work;self.bytes+=q.bytes;Ok(())}fn check(&mut self)->Result<(),()>{self.checks+=1;if self.stop.is_some_and(|s|self.checks>=s){Err(())}else{Ok(())}}}
+- fn limits()->super::scheduler::Limits{super::scheduler::Limits{variables:256,generators:64,basis:64,tasks:20000,terms:512,proof:4096,degree:256,work:20_000_000,bytes:200_000_000}}
++ fn limits()->super::scheduler::Limits{super::scheduler::Limits{batch_rows:256,batch_ops:4096,batches:64,variables:256,generators:64,basis:64,tasks:20000,terms:512,proof:4096,degree:256,work:20_000_000,bytes:200_000_000}}
+  fn poly(bits:u64,n:u32)->Polynomial{let mut p=vec![];for mask in 0..1u32<<n{if bits>>mask&1!=0{p.push((0..n).filter(|v|mask>>v&1!=0).collect::<Vec<_>>())}}p.sort_by(|a,b|a.len().cmp(&b.len()).then(a.cmp(b)));p}
+  fn bits(p:&Polynomial)->u64{p.iter().fold(0,|b,t|b^(1u64<<t.iter().fold(0,|m,v|m|(1u32<<v))))}
+  fn mul(a:u64,m:u32,n:u32)->u64{let mut r=0;for t in 0..1u32<<n{if a>>t&1!=0{r^=1<< (t|m)}}r}
+@@ -12,7 +12,18 @@
+  fn in_span(mut x:u64,b:&[u64])->bool{for r in b.iter().rev(){let k=63-r.leading_zeros();if x>>k&1!=0{x^=r}}x==0}
+  fn remainder(mut p:u64,b:&[Row],n:u32)->u64{for _ in 0..1000{if p==0{return 0}let leading=|x:u64|(0..1u32<<n).filter(|m|x>>m&1!=0).max_by_key(|m|(m.count_ones(),(0..n).filter(|v|m>>v&1!=0).collect::<Vec<_>>())).unwrap();let lm=leading(p);let mut hit=false;for r in b{let q=bits(&r.polynomial);let bl=leading(q);if bl&lm==bl{let scaled=mul(q,lm^bl,n);if scaled!=0&&leading(scaled)==lm{p^=scaled;hit=true;break}}}if !hit{return p}}panic!("nonterminating independent reduction")}
+  fn proof(g:&[Polynomial],r:&Row)->bool{let mut out=std::collections::BTreeSet::new();for p in &r.proof{if p.generator>=g.len(){return false}for t in &g[p.generator]{let mut u=t.clone();u.extend(&p.multiplier);u.sort();u.dedup();if !out.insert(u.clone()){out.remove(&u);}}}out==r.polynomial.iter().cloned().collect()}
+- fn check(g:&[Polynomial],a:&Attempt){for r in &a.basis{assert!(proof(g,r));}assert!(proof(g,&a.current));if let Some(t)=a.active{assert!(a.pending.iter().any(|q|q.serial==t.serial));}assert!(!a.complete||a.result.is_ok());}
++ fn independent_scale(p:&Polynomial,m:&[u32])->Polynomial{let mut out=vec![];for t in p{let mut u=t.clone();u.extend(m);u.sort();u.dedup();out=xor_poly(&out,&vec![u]);}out}
++ fn xor_poly(a:&Polynomial,b:&Polynomial)->Polynomial{let mut terms:std::collections::BTreeSet<_>=a.iter().cloned().collect();for t in b{if !terms.insert(t.clone()){terms.remove(t);}}let mut p:Vec<_>=terms.into_iter().collect();p.sort_by(|a,b|a.len().cmp(&b.len()).then(a.cmp(b)));p}
++ fn check_batch(g:&[Polynomial],b:&Batch){
++  for r in b.initial.iter().chain(&b.matrix).chain(&b.staged_basis){assert!(proof(g,r));}
++  assert!(b.matrix.len()<=b.initial.len());
++  let mut replay:Vec<_>=b.initial.iter().map(|r|r.polynomial.clone()).collect();
++  let mut proofs:Vec<std::collections::BTreeSet<_>>=b.initial.iter().map(|r|r.proof.iter().map(|t|(t.generator,t.multiplier.clone())).collect()).collect();
++  for op in &b.operations{let source=proofs[op.source].clone();for term in source{if !proofs[op.target].insert(term.clone()){proofs[op.target].remove(&term);}}assert_ne!(op.target,op.source);assert_eq!(replay[op.target].last(),replay[op.source].last());assert!(replay[op.target].last().is_some());replay[op.target]=xor_poly(&replay[op.target],&replay[op.source]);}
++  for(i,r)in b.matrix.iter().enumerate(){assert_eq!(r.polynomial,replay[i]);assert_eq!(r.proof.iter().map(|t|(t.generator,t.multiplier.clone())).collect::<std::collections::BTreeSet<_>>(),proofs[i]);}
++  for r in &b.reducers{assert!(r.row<b.initial.len());assert!(r.multiplier.windows(2).all(|w|w[0]<w[1]));}
++ }
++ fn check(g:&[Polynomial],a:&Attempt){for b in &a.batches{check_batch(g,b);if b.stage!=Stage::Committed{assert_eq!(a.basis.len(),b.basis_before);}for e in &b.reducers{let expected=independent_scale(&a.basis[e.basis].polynomial,&e.multiplier);assert_eq!(b.initial[e.row].polynomial,expected);}}for r in &a.basis{assert!(proof(g,r));}assert!(proof(g,&a.current));if let Some(t)=a.active{assert!(a.pending.iter().any(|q|q.serial==t.serial));}assert!(!a.complete||a.result.is_ok());}
+  fn runit(n:u32,g:&[Polynomial])->Attempt{let mut owner=Ledger::default();let a=run(n,g,limits(),Instant::now()+Duration::from_secs(10),&mut owner);assert_eq!(owner.work,a.charge.work);assert_eq!(owner.bytes,a.charge.bytes);check(g,&a);a}
+  #[test]fn exhaustive_two_variable_ideals_match_independent_vector_span(){for x in 0..16{for y in 0..16{let g=vec![poly(x,2),poly(y,2)];let a=runit(2,&g);assert_eq!(a.result,Ok(()));assert!(a.complete);let expected=span((0..4).flat_map(|m|[mul(x,m,2),mul(y,m,2)]).collect());let got=span(a.basis.iter().flat_map(|r|(0..1u32<<2).map(move|m|mul(bits(&r.polynomial),m,2))).collect());assert_eq!(expected.len(),got.len());for mask in 0..1usize<<expected.len(){let r=expected.iter().enumerate().filter(|(i,_)|mask>>i&1!=0).fold(0,|x,(_,r)|x^r);assert!(in_span(r,&got));assert_eq!(remainder(r,&a.basis,2),0);}}}}
+  #[test]fn three_variable_ideals_and_derivations(){for seed in 1..33u64{let gs=[seed*7%256,seed*11%256,seed*19%256];let g:Vec<_>=gs.iter().map(|x|poly(*x,3)).collect();let a=runit(3,&g);assert!(a.complete,"{:?}",a.result);let expected=span((0..8).flat_map(|m|gs.map(|x|mul(x,m,3))).collect());let got=span(a.basis.iter().flat_map(|r|(0..1u32<<3).map(move|m|mul(bits(&r.polynomial),m,3))).collect());assert_eq!(expected.len(),got.len());for mask in 0..1usize<<expected.len(){let r=expected.iter().enumerate().filter(|(i,_)|mask>>i&1!=0).fold(0,|x,(_,r)|x^r);assert!(in_span(r,&got));assert_eq!(remainder(r,&a.basis,3),0);}}}
+@@ -41,4 +52,25 @@
+   check(&g,&a);
+  }
+ 
++ #[test]fn shared_degree_batch_has_cross_candidate_pivots_and_field_rows(){
++  let g=vec![poly(10,2),poly(12,2)];let a=runit(2,&g);assert!(a.complete);
++  let b=&a.batches[0];assert_eq!(b.tasks.len(),2);assert_eq!(b.tasks[0].degree,b.tasks[1].degree);
++  assert!(b.operations.iter().any(|o|o.target==1&&o.source==0));
++  assert!(a.batches.iter().any(|b|b.tasks.iter().any(|t|matches!(t.kind,Kind::Field(_, _)))));
++  assert!(a.batches.iter().all(|b|b.stage==Stage::Committed));
++ }
++ #[test]fn refusal_sweep_replays_whole_batch_and_covers_pivot_and_commit_stages(){
++  let g=vec![poly(10,2),poly(12,2),poly(7,2)];let mut owner=Ledger::default();
++  let full=run(2,&g,limits(),Instant::now()+Duration::from_secs(10),&mut owner);assert!(full.complete);check(&g,&full);
++  let mut saw=[false;5];let mut pivot_retained=false;let mut staged_retained=false;
++  for at in 1..=owner.checks{let mut o=Ledger{stop:Some(at),..Default::default()};let a=run(2,&g,limits(),Instant::now()+Duration::from_secs(10),&mut o);check(&g,&a);
++   assert_eq!(a.result,Err(super::scheduler::Failure::Owner));assert!(!a.complete);assert_eq!(a.charge.work,o.work);assert_eq!(a.charge.bytes,o.bytes);
++   if let Some(b)=a.batches.last(){let i=match b.stage{Stage::Build=>0,Stage::Symbolic=>1,Stage::Eliminate=>2,Stage::PrepareCommit=>3,Stage::Committed=>4};saw[i]=true;
++    if b.stage!=Stage::Committed{for t in &b.tasks{assert!(a.pending.iter().any(|p|p.serial==t.serial));}for(_,index)in &b.additions{assert!(*index>=a.basis.len());}}
++    pivot_retained|=b.stage==Stage::Eliminate&&!b.operations.is_empty();staged_retained|=b.stage==Stage::PrepareCommit&&!b.staged_basis.is_empty();
++   }
++  }
++  assert!(saw.iter().all(|v|*v),"stages {:?}",saw);assert!(pivot_retained);assert!(staged_retained);
++ }
++
+ }

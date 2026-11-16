@@ -1,0 +1,261 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-kernel-symmetry-20261028-v1",
+  "created": "2026-10-28T16:00:10.966Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "49ac79e28023c2e4a23f27e299419b8cb15ac577ba50a531ad43d6e0a2ac07dd",
+    "protocol_id": "twist-kernel-symmetry-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-kernel-symmetry-20261028",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "ee305333dfb7c7acc19169794de12e6c6538a3be",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "f8a0b53ebdbd6ca9281b093a7f3acb4e8fb0597c5975bcd32c9e0bf7f100dde2",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "kernel": "Linux fad1b5a2d1f5 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "39dc458873f4a97f5eacbadb497c7c52e6f41a513e69b69fa583b1150c12882b",
+      "commit": "ee305333dfb7c7acc19169794de12e6c6538a3be"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "ee305333dfb7c7acc19169794de12e6c6538a3be"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "symmetry-native-000",
+      "arm": "native",
+      "instance_id": "p827-archived-twist-seven-torsion",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "point_checks": 49
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "addition_checks": 2401,
+          "kernel_checks": 8,
+          "point_order": 48,
+          "projective_order": 8,
+          "corrupt_matrix_rejections": 42,
+          "corrupt_line_rejections": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native direct map and independent PARI ellisogeny/group/matrix/orbit/root-set replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "1f0992c77000041a0d7d2be6d8642b5d5e1614442b3d07abc4d7bd22c51e36d5",
+          "bytes": 5432,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "43758715eb76f82f84f8871426a4f0193064f675652b727fc9d27552ff722af8",
+          "bytes": 1364,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "4dc732e102460e4a1baddccf9e0ce0bbbd5534394ca954cf724f63e157215781",
+          "bytes": 23735,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "897bca101d724d5c316994b4edd24ac075fbe77b32f15456614d7acbdb8a8dd7",
+          "bytes": 1047,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-28T16:00:10.947Z",
+      "finished_at": "2026-10-28T16:00:10.966Z",
+      "worker": "39dc458873f4a97f5eacbadb497c7c52e6f41a513e69b69fa583b1150c12882b",
+      "backend_ref": "runs/symmetry-v1"
+    },
+    {
+      "run_id": "symmetry-pari-000",
+      "arm": "pari",
+      "instance_id": "p827-archived-twist-seven-torsion",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "point_checks": 49
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "addition_checks": 2401,
+          "kernel_checks": 8,
+          "point_order": 48,
+          "projective_order": 8,
+          "corrupt_matrix_rejections": 42,
+          "corrupt_line_rejections": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native direct map and independent PARI ellisogeny/group/matrix/orbit/root-set replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "1f0992c77000041a0d7d2be6d8642b5d5e1614442b3d07abc4d7bd22c51e36d5",
+          "bytes": 5432,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "43758715eb76f82f84f8871426a4f0193064f675652b727fc9d27552ff722af8",
+          "bytes": 1364,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "4dc732e102460e4a1baddccf9e0ce0bbbd5534394ca954cf724f63e157215781",
+          "bytes": 23735,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "897bca101d724d5c316994b4edd24ac075fbe77b32f15456614d7acbdb8a8dd7",
+          "bytes": 1047,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "2638acd0abff053bfa4ebb3715fbeed5241cef74a0c22a8604cb39018c7b7b07",
+      "bytes": 2189,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "00eb6a71e04561ff86d10cf8066502161e2c8d64178a1bf6ce31c41274cf7d8d",
+      "bytes": 10479,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/kernel_symmetry_20261028.rs",
+      "sha256": "2223c029702bc7ca873e03346a1b9feaa00565b6ef78bdcef79cdff2132cbbc4",
+      "bytes": 14684,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "4dc732e102460e4a1baddccf9e0ce0bbbd5534394ca954cf724f63e157215781",
+        "bytes": 23735,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Exact fixed archived seven-torsion module and eight kernels; complete action/cycles and controls. No performance, novelty, unknown-log or NIST claim. Shared author/host independent CAS implementation, no separate-runner review.",
+      "by": "native publication tool"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

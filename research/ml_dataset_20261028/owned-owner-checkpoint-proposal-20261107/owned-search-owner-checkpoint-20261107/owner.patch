@@ -1,0 +1,90 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -52,7 +52,7 @@
+     fn addition(&mut self)->Result<(),provenance::Error>{self.0.reserve_matrix_candidate_addition(Instant::now()).map_err(|_|provenance::Error::Admission)}
+ }
+ #[derive(Clone,Copy)]
+-pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub continuation:ContinuationLimits}
++pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub continuation:ContinuationLimits,pub checkpoint:Option<policy::CheckpointCadence>}
+ #[derive(Clone,Copy,Debug)]
+ pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+ /// Each record belongs to one exact retained partition and model. Returned
+@@ -88,6 +88,7 @@
+     exclusion_audit:Option<exclusions::Audit>,
+     publication:publication::Publication,
+     report_taken:bool,
++    checkpoint_control:Option<scheduler::CheckpointControl>,
+     original_deadline:Instant,failure:Option<Failure>,
+     lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+@@ -154,7 +155,14 @@
+         }
+         self.original.budget.check(Instant::now())
+     }
+-    fn continue_models(&mut self,limits:ContinuationLimits){
++    fn continue_models(&mut self,limits:ContinuationLimits,cadence:Option<policy::CheckpointCadence>){
++        if self.checkpoint_control.is_some(){self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return}
++        if let Some(cadence)=cadence{
++            match scheduler::CheckpointControl::new(cadence.every_batches,cadence.max_snapshots){
++                Ok(control)=>self.checkpoint_control=Some(control),
++                Err(_)=>{self.fail(Failure::Admission(Stop::InvalidLimits),Stop::InvalidLimits);return}
++            }
++        }
+         // Capacity is bounded and prepaid once before the session borrows the
+         // actual original ledger. Every growing record stays in this owner.
+         let bytes=match limits.partitions.checked_mul(size_of::<LiftRecord>()).and_then(|n|n.checked_add(64)){
+@@ -165,6 +173,7 @@
+         let Some(expansion)=self.expansion.as_ref()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+         let variables=expansion.variables();
+         let capture_limits=self.original.capture_limits.clone();
++        let mut checkpoint=self.checkpoint_control.take();
+         let (attempt,terminal_error,accepted,unclassified)=capture_encoding::with_continuation_parts(self,|source,expansion,budget,records,publication,sink|{
+         let map=expansion.source();
+         let signed=source.signed_domain();let target=source.signed_target();
+@@ -172,7 +181,19 @@
+         let mut session=continuation::Session::new(variables,source.normalized(),limits,source.deadline(),&mut owner);
+         let mut terminal_error=None;let mut accepted=None;let mut unclassified=false;
+         loop {
+-            match session.next(){
++            let mut publication_stop=None;
++            let next=if let Some(control)=checkpoint.as_mut(){
++                session.next_with_checkpoint(control,&mut |attempt,partition,search,node,native,continuation_charge,search_charge,owner|{
++                    match source.checkpoint_native(attempt,partition,search,node,native,continuation_charge,search_charge,records,&mut *owner.0,publication,sink,&capture_limits){
++                        Ok(())=>Ok(()),
++                        Err(stop)=>{publication_stop=Some(stop);Err(())},
++                    }
++                })
++            }else{session.next()};
++            // The kernel already installed the failed native/search attempt.
++            // Preserve the precise publication stop before its erased callback error.
++            if let Some(stop)=publication_stop{terminal_error=Some(Failure::Publication(stop));break}
++            match next{
+                 Err(e)=>{terminal_error=Some(Failure::Continuation(e));break},
+                 Ok(continuation::Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions)=>break,
+                 Ok(continuation::Outcome::CandidateRetained)=>{},
+@@ -219,6 +240,7 @@
+         }
+         (session.into_attempt(),terminal_error,accepted,unclassified)
+         });
++        self.checkpoint_control=checkpoint;
+         self.continuation=Some(attempt);
+         self.accepted_record=accepted;
+         if let Some(e)=terminal_error{
+@@ -265,7 +287,7 @@
+         let phase=match self.original.budget.begin_native(true,Instant::now()){Ok(v)=>v,Err(s)=>{self.fail(Failure::Admission(s),s);return}};
+         caps.continuation.work=caps.continuation.work.min(phase.work);caps.continuation.bytes=caps.continuation.bytes.min(phase.bytes);
+         caps.continuation.search.native.work=caps.continuation.search.native.work.min(phase.work);caps.continuation.search.native.bytes=caps.continuation.search.native.bytes.min(phase.bytes);
+-        self.continue_models(caps.continuation);
++        self.continue_models(caps.continuation,caps.checkpoint);
+     }
+ }
+ impl OriginalOwner<'_>{
+@@ -288,7 +310,7 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),report_taken:false,original_deadline,failure:None,
++            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),report_taken:false,checkpoint_control:None,original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+         let caps=match admission{Ok(c)=>c,Err(s)=>{out.fail(Failure::Admission(s),s);return out}};

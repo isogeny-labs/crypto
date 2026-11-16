@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.22,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ a [label="Actual canonical polynomial evaluation\nFixed Sylvester sizes; general Weierstrass model"];
+ b [label="Polynomial extension\nFinite common root OR\nboth declared leading coefficients zero"];
+ c [label="Actual point-family extension\nNonzero prefix sum OR\nzero prefix sum and opposite last points"];
+ d [label="Same exact two alternatives\nChecked actual S3 / S4 bases\nStrong induction: every arity m >= 3",fillcolor="#dcf1e2"];
+ e [label="Domain disproof over nonsingular F5 curve\nS3(3,1,4) = 0; no rational point with x = 3\nQualified closure theorem remains valid",fillcolor="#fff1cf"];
+ {rank=same;b;c}
+ a -> b; b -> d; c -> d; d -> e;
+}

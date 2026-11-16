@@ -1,0 +1,80 @@
+{
+  "schema": "diem-chart-source-review/v1",
+  "primary": {
+    "author": "Claus Diem",
+    "title": "On the discrete logarithm problem in elliptic curves",
+    "journal": "Compositio Mathematica147(2011),75-104",
+    "doi": "10.1112/S0010437X10005075",
+    "url": "https://doi.org/10.1112/S0010437X10005075",
+    "pdf_bytes": 878749,
+    "pdf_sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a",
+    "read_scope": "Notation/setup p78, Definition2.4 and Proposition2.5 pp80-81, proof p81, later Condition2.7. No full-paper read claimed.",
+    "literal_helper": "Now P1_k can be covered by two copies of (Gm)_k.",
+    "source_scope": "Proposition2.5(b) explicitly quantifies every primepowerq. Condition2.7 appears later and is not a hypothesis of2.5. The quoted helper is used for2^nchart calls.",
+    "proof_page_visual_inspection": {
+      "pdf_page": 8,
+      "printed_page": 81,
+      "png_bytes": 455358,
+      "png_sha256": "ce006f9f52d1d0c07a1de20775030ba65570a4c075d2c7ec5999aeb00c34f474",
+      "all_page_inspected": true,
+      "first_wrong_page": "Initial PDFpage7 was printedp80; corrected page8 inspected."
+    }
+  },
+  "corpus": {
+    "path": "docs/ecdlp-hardness-corpus/lit-sumpoly.json",
+    "bytes": 115102,
+    "sha256": "73bbae7663b8ecf407be06ffe4c52a4655ca377a8c347f156d8ccff65ebd373c",
+    "read_at_git_head": "e091bfe00a8e72d229d7dc1358adc2b67877c0ff",
+    "node": {
+      "id": "THM-SP-DIEM11-DECOMPOSITION-ALG",
+      "label": "Diem: decomposition algorithm in Poly(e^(n^2) log q)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "(a) n multihomogeneous polynomials of multidegree (d,...,d) on (P^1)^n have at most n! d^n isolated points counted with multiplicity, with equality iff the scheme is zero-dimensional. (b) A randomized algorithm (Rojas' toric resultants plus univariate factoring) outputs a list of size Poly(n! d^n) containing all F_q-rational isolated points in expected time Poly(n! d^n log q). Applied to the Weil descent S^(1..n) of S_{phi,n+1}(.., phi(P)) (multidegree 2^(n-1)), it lists all phi-isolated decompositions of P in expected time Poly(e^(n^2) log q).",
+      "scope": "Finds only isolated decompositions; positive-dimensional components are skipped, not solved. This is why Diem needs no zero-dimensionality hypothesis: he only needs enough points with isolated decompositions.",
+      "assumptions": [
+        "Multihomogeneous system of equal multidegree"
+      ],
+      "source_refs": [
+        "S-DIEM-2011"
+      ],
+      "tags": [
+        "polynomial-system",
+        "decomposition",
+        "theorem"
+      ],
+      "source_locations": [
+        "Diem 2011, Proposition 2.5",
+        "Diem 2011, Proposition 2.6",
+        "Diem 2011, Definition 2.4"
+      ],
+      "evidence_class": "theorem",
+      "formula": "T_decomp = Poly(e^(n^2) log q); #isolated <= n! d^n",
+      "parameters": [
+        "n",
+        "d",
+        "q"
+      ]
+    },
+    "effect": "Node states the bound/main decomposition algorithm, not the helper sentence. It is not refuted or promoted by this packet."
+  },
+  "formal_primary_sources": {
+    "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/LinearAlgebra/Projectivization/Basic.lean",
+      "Mathlib/LinearAlgebra/Projectivization/Cardinality.lean",
+      "Mathlib/Algebra/GroupWithZero/Units/Fintype.lean"
+    ],
+    "read_scope": "Actual nonzero-vector quotient, mk_eq_mk_iff scalar equivalence, projective induction/cardinality; actual unit cardinality; actual finite surjection/product/function cardinalities."
+  },
+  "method": "Actual P1(F2)=Projectivization(F2,F2xF2) has3points; actual units have1. Any two maps fail. Actual three formulas [1:u],[1:u-1],[u-1:1] inject and cover over every field, all product arities. [1:u] plus [u-1:u-a] cover whenevera!=0,1. Cardinal necessity and existence of third field element give finite-field two-map existence iffcard>=3. Actual n-torus maps overF2 needatleast3^ncharts. Actual chart-index count,3^n<=5n!,3^n*B<=5B^2 forB=n!d^n,d>0 are proved.",
+  "boundary": "Literal source-helper failure; no main theorem/corpus-node/Bezout bound refutation. No scheme/isomorphism/Rojas execution/running-time theorem, multiplicity geometry or general isolated-point theorem is claimed. Rational-point obstruction suffices to contradict a two-copy scheme cover if interpreted as such. Arithmetic gives only a chart-overhead allowance.",
+  "kb": "No loaded KB MCP tools; wrapperstatus/two distinct searches/theorem query all127. Bounded primary/corpus/repository/Mathlib fallback before edits; no absence/novelty claim.",
+  "conductor": "Check attempted before edits; executable unavailable127, scope recorded.",
+  "literal_source_helper_refuted": true,
+  "main_source_theorem_or_corpus_node_refuted": false,
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

@@ -1,0 +1,9 @@
+# Tuned GAE measurement record awaiting admission
+
+The row below is preserved verbatim from the benchmark index at revision
+`520f0261c2c7dfd28c937a974120def470b76c35`. Its study has no
+`VALIDATION.json`, so it remains outside the admitted index until the existing
+validation gate accepts a complete evidence bundle. Reports, plots, and raw
+measurements remain in their original locations.
+
+| 2026-10-20 | [`20261020-tuned-gae`](20261020-tuned-gae/) | A tuned batched affine addition (Montgomery u64 / pclmulqdq GF(2^n), 256-lane batched inversion, verified addition by addition) timed beside the addition that defines the GAE (`ic_boundary::calibrate_group` on `CountedGroup::add`), 33 calibrated curves; Table B re-priced under the tuned unit (13 instances, legacy S reproduced within 1e-9); `rho.prime_fast` vs `rho.negation` on four prime curves of 28 to 40 bits (ecbench, `rho_prime_fast`, `_v2`, `_v2_n256`; 1,024 pairs in the last, all records verified) | reference / tuned addition 3.16 to 4.93x (prime, 10 to 24 bits) and 8.68 to 21.69x (binary, 11 to 41 bits); tuned-unit S is 2 to 19% higher and every gap to the matched rho widens (6.34 to 6.49 at icv1-fp10-t5-192cb216, 38.21 to 45.59 at random-binary-n27): accounting, not an improvement, proposed not canonical; `rho.prime_fast` operations 1.027x `rho.negation` [0.983, 1.075] (no ranking on counted work) at median wall 0.2175x (L0; first configuration 2.05x operations, 0.82x wall); malloc finding about 9 ms in `rho.negation`'s small-curve window (unrecorded, not fixed); engineering on the rho reference | 4 vCPU Xeon 2.80 GHz shared VM, L0 (`--cpus none --allow-busy`) | [`research/tuned_gae_20261020`](../research/tuned_gae_20261020/README.md) ([PDF](20261020-tuned-gae/REPORT.pdf), [run report](20261020-tuned-gae/run-report.pdf)) |

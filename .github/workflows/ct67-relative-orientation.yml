@@ -1,6 +1,7 @@
 name: CT67 two-prime torsion orientation audit
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct67/**'
       - '.github/workflows/ct67-relative-orientation.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct67-orientation:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

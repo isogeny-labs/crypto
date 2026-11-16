@@ -161,6 +161,7 @@ pub(super) struct Output {
     setup_ns: u128,
     setup_helper_arithmetic: algebra::Arithmetic,
     setup_reference_counts: reference::Counts,
+    relation_encoding_work: serde_json::Value,
     query_generation_counts: GroupOps,
     query_generation_field_counts: QueryFieldCounts,
     scalar_elimination_ns: u128,
@@ -176,9 +177,26 @@ pub(super) struct Output {
     scope: &'static str,
 }
 
+#[derive(Default)]
+struct SetupHelpers {
+    validation: algebra::Work,
+    constructor: algebra::Work,
+}
+
 fn setup(r: &Request) -> Result<(Vec<Point>, reference::Counts), String> {
-    let mut validation_counts = reference::Counts::default();
-    r.oracle.validate_counted(&mut validation_counts)?;
+    let mut curve = reference::Curve::new(&r.oracle);
+    let base = setup_counted(r, &mut curve, &mut SetupHelpers::default())?;
+    Ok((base, curve.counts))
+}
+
+fn setup_counted(
+    r: &Request,
+    c: &mut reference::Curve,
+    helpers: &mut SetupHelpers,
+) -> Result<Vec<Point>, String> {
+    helpers
+        .validation
+        .capture(|| r.oracle.validate_counted(&mut c.counts))?;
     if r.schema != "pkm.toy-dlp-request/v1"
         || r.oracle.p > 257
         || r.max_queries == 0
@@ -190,8 +208,6 @@ fn setup(r: &Request) -> Result<(Vec<Point>, reference::Counts), String> {
             "toy control requires p<=257, prime full curve order and 1..10000 queries".into(),
         );
     }
-    let mut c = reference::Curve::new(&r.oracle);
-    c.counts.merge(validation_counts);
     if !c.on_curve(r.generator) {
         return Err("invalid generator".into());
     }
@@ -206,53 +222,133 @@ fn setup(r: &Request) -> Result<(Vec<Point>, reference::Counts), String> {
     if order != r.order || c.mul(Some(r.generator), r.order).is_some() {
         return Err("independent exhaustive full-curve order certificate failed".into());
     }
-    let mut base = Vec::new();
-    for x in r.oracle.instance().base() {
-        let p = r.oracle.p;
-        let x2 = algebra::mulm(x, x, p);
-        let x3 = algebra::mulm(x2, x, p);
-        let ax = algebra::mulm(r.oracle.a, x, p);
-        let rhs = algebra::addm(x3, ax, p);
-        let rhs = algebra::addm(rhs, r.oracle.b, p);
-        if let Some(y) = algebra::sqrtm(rhs, p) {
-            base.push(Point {
-                x,
-                y: y.min((p - y) % p),
-            });
+    helpers.constructor.capture(|| {
+        let mut base = Vec::new();
+        for x in r.oracle.instance().base() {
+            let p = r.oracle.p;
+            let x2 = algebra::mulm(x, x, p);
+            let x3 = algebra::mulm(x2, x, p);
+            let ax = algebra::mulm(r.oracle.a, x, p);
+            let rhs = algebra::addm(x3, ax, p);
+            let rhs = algebra::addm(rhs, r.oracle.b, p);
+            if let Some(y) = algebra::sqrtm(rhs, p) {
+                base.push(Point {
+                    x,
+                    y: y.min((p - y) % p),
+                });
+            }
         }
-    }
-    base.sort_unstable();
-    Ok((base, c.counts))
+        base.sort_unstable();
+        Ok(base)
+    })
 }
 
-fn relation(
+#[derive(Clone, Copy, Default, Debug, Serialize, PartialEq, Eq)]
+struct EncodingCounts {
+    base_entries: u64,
+    witness_lookups: u64,
+    scalar_additions: u64,
+    scalar_subtractions: u64,
+    scalar_remainders: u64,
+    coordinate_subtractions: u64,
+    coordinate_remainders: u64,
+}
+struct EncodingWork {
+    counts: Option<EncodingCounts>,
+    calls: Option<u64>,
+    failures: Option<u64>,
+}
+impl Default for EncodingWork {
+    fn default() -> Self {
+        Self {
+            counts: Some(EncodingCounts::default()),
+            calls: Some(0),
+            failures: Some(0),
+        }
+    }
+}
+fn encoding_increment(value: &mut u64) -> Option<()> {
+    *value = value.checked_add(1)?;
+    Some(())
+}
+impl EncodingWork {
+    fn bump(&mut self, operation: impl FnOnce(&mut EncodingCounts) -> Option<()>) {
+        self.counts = self
+            .counts
+            .and_then(|mut counts| operation(&mut counts).map(|()| counts));
+    }
+    fn report(&self, scalar_modulus: u64, coordinate_modulus: u64) -> serde_json::Value {
+        serde_json::json!({"schema":"pkm.relation-encoding-work/v1",
+            "scalar_modulus":scalar_modulus,"coordinate_modulus":coordinate_modulus,
+            "integer_source_calls":self.counts,"calls":self.calls,"failures":self.failures,
+            "scope":"raw scalar-n row and coordinate-p orientation operations; map entries/lookups are diagnostics, not complete container/logical costs",
+            "execution_accounting":"parent producer/replay path identifies this execution; equal counts are consistency, not shared work or independent cost proof",
+            "overflow":"any class/call overflow makes the integer counts unavailable",
+            "priced_total":null,"comparison_admissible":false})
+    }
+}
+
+fn relation_counted(
     r: &Request,
     base: &[Point],
     a: u64,
     b: u64,
     witness: &Witness,
+    work: &mut EncodingWork,
 ) -> Result<Vec<u64>, String> {
-    let index: BTreeMap<_, _> = base
-        .iter()
-        .enumerate()
-        .map(|(i, q)| (q.x, (i, q.y)))
-        .collect();
-    let mut row = vec![0; base.len() + 2];
-    for q in witness {
-        let &(i, y) = index.get(&q.x).ok_or("witness outside factor base")?;
-        let coefficient = if q.y == y {
-            1
-        } else if q.y == (r.oracle.p - y) % r.oracle.p {
-            r.order - 1
-        } else {
-            return Err("invalid witness ordinate".into());
-        };
-        row[i] = (row[i] + coefficient) % r.order;
+    work.calls = work.calls.and_then(|n| n.checked_add(1));
+    if work.calls.is_none() {
+        work.counts = None;
     }
-    // sum(e_j log B_j) - b*k = a mod n.
-    row[base.len()] = (r.order - b) % r.order;
-    row[base.len() + 1] = a;
-    Ok(row)
+    let result = (|| {
+        let index: BTreeMap<_, _> = base
+            .iter()
+            .enumerate()
+            .map(|(i, q)| {
+                work.bump(|c| encoding_increment(&mut c.base_entries));
+                (q.x, (i, q.y))
+            })
+            .collect();
+        let mut row = vec![0; base.len() + 2];
+        for q in witness {
+            work.bump(|c| encoding_increment(&mut c.witness_lookups));
+            let &(i, y) = index.get(&q.x).ok_or("witness outside factor base")?;
+            let coefficient = if q.y == y {
+                1
+            } else {
+                work.bump(|c| {
+                    encoding_increment(&mut c.coordinate_subtractions)?;
+                    encoding_increment(&mut c.coordinate_remainders)
+                });
+                if q.y == (r.oracle.p - y) % r.oracle.p {
+                    work.bump(|c| encoding_increment(&mut c.scalar_subtractions));
+                    r.order - 1
+                } else {
+                    return Err("invalid witness ordinate".into());
+                }
+            };
+            work.bump(|c| {
+                encoding_increment(&mut c.scalar_additions)?;
+                encoding_increment(&mut c.scalar_remainders)
+            });
+            row[i] = (row[i] + coefficient) % r.order;
+        }
+        // sum(e_j log B_j) - b*k = a mod n.
+        work.bump(|c| {
+            encoding_increment(&mut c.scalar_subtractions)?;
+            encoding_increment(&mut c.scalar_remainders)
+        });
+        row[base.len()] = (r.order - b) % r.order;
+        row[base.len() + 1] = a;
+        Ok(row)
+    })();
+    if result.is_err() {
+        work.failures = work.failures.and_then(|n| n.checked_add(1));
+        if work.failures.is_none() {
+            work.counts = None;
+        }
+    }
+    result
 }
 
 fn next(state: &mut u64) -> u64 {
@@ -279,6 +375,7 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
     let mut matrix = Elimination::new(r.order, base.len() + 1);
     let mut queries = Vec::new();
     let mut rows = Vec::new();
+    let mut encoding = EncodingWork::default();
     let mut seed = r.seed;
     let mut elimination_ns = 0;
     for _ in 0..r.max_queries {
@@ -316,7 +413,7 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
                 return Err("oracle witness verification failed".into());
             }
             for witness in &result.witnesses {
-                let row = relation(r, &base, a, b, witness)?;
+                let row = relation_counted(r, &base, a, b, witness, &mut encoding)?;
                 let stage = Instant::now();
                 let increase = matrix.insert(row.clone())?;
                 elimination_ns += stage.elapsed().as_nanos();
@@ -358,7 +455,7 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
         .expect("exclusive cold pipeline intervals fit total");
     Ok(Output {schema:"pkm.toy-dlp-output/v1",request:r.clone(),factor_base:base,queries,
         original_rows:rows,final_rref:matrix.rows,setup_ns,setup_helper_arithmetic:setup_arithmetic,
-        setup_reference_counts:setup_counts,query_generation_counts:generation,
+        setup_reference_counts:setup_counts,relation_encoding_work:encoding.report(r.order,r.oracle.p),query_generation_counts:generation,
         query_generation_field_counts:QueryFieldCounts::from_group(r.oracle.p,generation),
         scalar_elimination_ns:elimination_ns,scalar_ops:matrix.ops,scalar_verification_ns:verification_ns,
         scalar_verification_counts:verifier.counts,cold_total_ns,cold_unattributed_ns,
@@ -375,11 +472,99 @@ pub(super) struct Certificate {
     rank: usize,
     recovery_weights: Option<super::rank_reference::Combination>,
     ambiguity_kernel: Option<Vec<u64>>,
+    replay_work: serde_json::Value,
     scope: &'static str,
 }
 
+/// Caller-owned audit work survives rejection. These partial source-operation
+/// counts are separate from producer timings and carry no calibrated price.
+pub(super) struct ReplayAccounting {
+    scalar: super::rank_reference::Meter,
+    curve: reference::Curve,
+    scalar_modulus: u64,
+    setup_curve: reference::Curve,
+    setup_state: &'static str,
+    setup_helpers: SetupHelpers,
+    encoding: EncodingWork,
+    completed_oracle_reference_counts: reference::Counts,
+    attempted_oracle_counts: reference::CheckCounts,
+    oracle_calls_attempted: u64,
+    oracle_calls_failed: u64,
+}
+impl ReplayAccounting {
+    pub fn new(r: &Request) -> Self {
+        Self {
+            scalar: super::rank_reference::Meter::default(),
+            curve: reference::Curve::new(&r.oracle),
+            scalar_modulus: r.order,
+            setup_curve: reference::Curve::new(&r.oracle),
+            setup_state: "not_started",
+            setup_helpers: SetupHelpers::default(),
+            encoding: EncodingWork::default(),
+            completed_oracle_reference_counts: reference::Counts::default(),
+            attempted_oracle_counts: reference::CheckCounts::default(),
+            oracle_calls_attempted: 0,
+            oracle_calls_failed: 0,
+        }
+    }
+    pub fn report(&self) -> serde_json::Value {
+        let counts = self.scalar.snapshot().map(|c| {
+            c.entries()
+                .into_iter()
+                .collect::<std::collections::BTreeMap<_, _>>()
+        });
+        serde_json::json!({"schema":"pkm.independent-replay-work/v2",
+            "scalar_reference":{"modulus":self.scalar_modulus,"role":"scalar n, not coordinate p",
+                "unit":"source-operation calls, not machine instructions or GAE",
+                "count_state":if self.scalar.overflowed(){"overflowed_unavailable"}else{"exact_instrumented_source_calls"},
+                "operation_counts":counts,
+                "ownership":"modular/inverse/iteration diagnostics overlap their integer leaves; never price both"},
+            "coordinate_reference":{"modulus":self.curve.p,
+                "setup_counts":self.setup_curve.counts,"setup_state":self.setup_state,
+                "equation_counts":self.curve.counts,
+                "completed_oracle_counts":self.completed_oracle_reference_counts,
+                "attempted_oracle_counts":self.attempted_oracle_counts,
+                "oracle_calls_attempted":self.oracle_calls_attempted,
+                "oracle_calls_failed":self.oracle_calls_failed,
+                "ownership":"validation/witness/enumeration are disjoint stages; completed_oracle_counts is legacy enumeration-only and overlaps attempted enumeration; inverse calls overlap multiplication children; affine overflow unqualified"},
+            "constructor_helpers":{"coordinate_modulus":self.curve.p,
+                "setup_parameters":self.setup_helpers.validation,"setup_constructor":self.setup_helpers.constructor,
+                "unit":"synchronous current-thread constructor-helper source calls; distinct from independent affine implementation",
+                "ownership":"disjoint captures only; inverse/sqrt diagnostics overlap expanded multiplication children; not a whole-process counter"},
+            "relation_encoding":self.encoding.report(self.scalar_modulus,self.curve.p),
+            "coverage_complete":false,"priced_total":null,"comparison_admissible":false,
+            "uncovered":["primality/discriminant/raw guard, JSON/binding and uninstrumented constructor/encoder logic",
+                "early CLI input decoding/checkpoint failures outside this API",
+                "container/allocation/copy/comparison/branch work","integer conversions and counter/serialization overhead",
+                "whole process, memory, persistence and qualified runtime/resume"]})
+    }
+}
+
+#[cfg(test)]
 pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certificate, String> {
-    let (base, _) = setup(r)?;
+    replay_counted(r, record, &mut ReplayAccounting::new(r))
+}
+
+pub(super) fn replay_counted(
+    r: &Request,
+    record: &serde_json::Value,
+    accounting: &mut ReplayAccounting,
+) -> Result<Certificate, String> {
+    accounting.setup_state = "in_progress";
+    let base = match setup_counted(
+        r,
+        &mut accounting.setup_curve,
+        &mut accounting.setup_helpers,
+    ) {
+        Ok(base) => {
+            accounting.setup_state = "returned";
+            base
+        }
+        Err(error) => {
+            accounting.setup_state = "rejected";
+            return Err(error);
+        }
+    };
     if record["schema"] != "pkm.toy-dlp-output/v1"
         || record["request"] != serde_json::to_value(r).map_err(|e| e.to_string())?
         || record["factor_base"] != serde_json::to_value(&base).map_err(|e| e.to_string())?
@@ -387,10 +572,14 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
     {
         return Err("toy DLP binding/admission mismatch".into());
     }
-    let mut curve = reference::Curve::new(&r.oracle);
     let variables = base.len() + 1;
-    let mut coefficients = super::rank_reference::Space::new(r.order, variables)?;
-    let mut augmented = super::rank_reference::Space::new(r.order, variables + 1)?;
+    let mut coefficients =
+        super::rank_reference::Space::new_metered(r.order, variables, accounting.scalar.clone())?;
+    let mut augmented = super::rank_reference::Space::new_metered(
+        r.order,
+        variables + 1,
+        accounting.scalar.clone(),
+    )?;
     let mut target_unit = vec![0; variables];
     target_unit[variables - 1] = 1;
     let mut original = Vec::new();
@@ -411,9 +600,9 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         if query["a"] != a || query["b"] != b {
             return Err("query stream mismatch".into());
         }
-        let ap = curve.mul(Some(r.generator), a);
-        let bq = curve.mul(Some(r.oracle.target), b);
-        let q = curve.add(ap, bq);
+        let ap = accounting.curve.mul(Some(r.generator), a);
+        let bq = accounting.curve.mul(Some(r.oracle.target), b);
+        let q = accounting.curve.add(ap, bq);
         if query["rhs"] != serde_json::to_value(q).map_err(|e| e.to_string())? {
             return Err("query point mismatch".into());
         }
@@ -421,22 +610,33 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         if let Some(q) = q {
             let mut request = r.oracle.clone();
             request.target = q;
-            super::replay(&request, &query["oracle"])?;
+            let mut work = reference::CheckWork::new(&request);
+            accounting.oracle_calls_attempted += 1;
+            let result = super::replay_counted(&request, &query["oracle"], &mut work);
+            // Merge before propagating Err: it must retain the attempted prefix.
+            accounting.attempted_oracle_counts.merge(work.counts());
+            if result.is_err() {
+                accounting.oracle_calls_failed += 1;
+            }
+            let certificate = result?;
+            accounting
+                .completed_oracle_reference_counts
+                .merge(certificate.reference_counts);
             checked += 1;
             let witnesses: Vec<Witness> =
                 serde_json::from_value(query["oracle"]["witnesses"].clone())
                     .map_err(|e| e.to_string())?;
             for witness in witnesses {
-                let row = relation(r, &base, a, b, &witness)?;
+                let row = relation_counted(r, &base, a, b, &witness, &mut accounting.encoding)?;
                 // Independently check each scalar row as an actual group equation.
                 let mut lhs = None;
                 for (coefficient, point) in row[..base.len()].iter().zip(&base) {
-                    let term = curve.mul(Some(*point), *coefficient);
-                    lhs = curve.add(lhs, term);
+                    let term = accounting.curve.mul(Some(*point), *coefficient);
+                    lhs = accounting.curve.add(lhs, term);
                 }
-                let qterm = curve.mul(Some(r.oracle.target), row[base.len()]);
-                lhs = curve.add(lhs, qterm);
-                if lhs != curve.mul(Some(r.generator), a) {
+                let qterm = accounting.curve.mul(Some(r.oracle.target), row[base.len()]);
+                lhs = accounting.curve.add(lhs, qterm);
+                if lhs != accounting.curve.mul(Some(r.generator), a) {
                     return Err("original relation does not hold on curve".into());
                 }
                 useful += usize::from(coefficients.insert(&row[..variables])?);
@@ -451,6 +651,11 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         }
         if query["rank_after"] != coefficients.rank() || query["useful_rows"] != useful {
             return Err("rank/yield recomputation mismatch".into());
+        }
+    }
+    if let Some(emitted) = record.get("relation_encoding_work") {
+        if emitted != &accounting.encoding.report(r.order, r.oracle.p) {
+            return Err("relation encoding work mismatch".into());
         }
     }
     if record["original_rows"] != serde_json::to_value(&original).map_err(|e| e.to_string())? {
@@ -500,7 +705,8 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
     {
         return Err("cold phase intervals do not reconcile".into());
     }
-    let verified = answer.is_some_and(|k| curve.mul(Some(r.generator), k) == Some(r.oracle.target));
+    let verified =
+        answer.is_some_and(|k| accounting.curve.mul(Some(r.generator), k) == Some(r.oracle.target));
     if record["scalar_verified"] != verified
         || record["status"]
             != if verified {
@@ -511,12 +717,243 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
     {
         return Err("scalar verification/status mismatch".into());
     }
-    Ok(Certificate{schema:"pkm.toy-dlp-replay/v2",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:coefficients.rank(),recovery_weights,ambiguity_kernel,scope:"independent affine equations and rightmost-pivot scalar row-space/rank replay; original-row recovery combination or target-changing kernel witness; no complete cost admission"})
+    Ok(Certificate{schema:"pkm.toy-dlp-replay/v2",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:coefficients.rank(),recovery_weights,ambiguity_kernel,replay_work:accounting.report(),scope:"independent affine equations and rightmost-pivot scalar row-space/rank replay; original-row recovery combination or target-changing kernel witness; no complete cost admission"})
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn replay_counter_fixture() -> Request {
+        let mut oracle = crate::tests::fixture();
+        oracle.target = Point { x: 6, y: 3 };
+        Request {
+            schema: "pkm.toy-dlp-request/v1".into(),
+            oracle,
+            generator: Point { x: 5, y: 1 },
+            order: 19,
+            seed: 20261030,
+            max_queries: 16,
+        }
+    }
+
+    #[test]
+    fn helper_setup_scopes_conserve_parameter_and_constructor_calls_on_refusal() {
+        let request = replay_counter_fixture();
+        let mut curve = reference::Curve::new(&request.oracle);
+        let mut helpers = SetupHelpers::default();
+        let before = algebra::counts();
+        assert!(!setup_counted(&request, &mut curve, &mut helpers)
+            .unwrap()
+            .is_empty());
+        let entire = algebra::counts().since(before);
+        assert_eq!(
+            helpers
+                .validation
+                .arithmetic
+                .unwrap()
+                .checked_add(helpers.constructor.arithmetic.unwrap()),
+            Some(entire)
+        );
+        assert_eq!(helpers.validation.calls, Some(1));
+        assert_eq!(helpers.constructor.calls, Some(1));
+        assert!(helpers.constructor.arithmetic.unwrap().sqrt_calls > 0);
+        let mut invalid = request;
+        invalid.oracle.zeta = 1;
+        let mut curve = reference::Curve::new(&invalid.oracle);
+        let mut helpers = SetupHelpers::default();
+        assert!(setup_counted(&invalid, &mut curve, &mut helpers).is_err());
+        assert_eq!(helpers.validation.failures, Some(1));
+        assert!(helpers.validation.arithmetic.unwrap().multiplications > 0);
+        assert_eq!(helpers.constructor.calls, Some(0));
+        assert_eq!(curve.counts.point_tests, 0);
+    }
+
+    #[test]
+    fn relation_encoder_counts_scalar_and_orientation_prefixes_and_marks_overflow() {
+        let request = replay_counter_fixture();
+        let base = vec![Point { x: 5, y: 1 }, Point { x: 6, y: 3 }];
+        let witness = vec![base[0], Point { x: 6, y: 14 }];
+        let mut work = EncodingWork::default();
+        let before = algebra::counts();
+        assert_eq!(
+            relation_counted(&request, &base, 4, 7, &witness, &mut work).unwrap(),
+            vec![1, 18, 12, 4]
+        );
+        assert_eq!(algebra::counts(), before); // raw encoder is not coordinate-helper work
+        assert_eq!(
+            work.counts,
+            Some(EncodingCounts {
+                base_entries: 2,
+                witness_lookups: 2,
+                scalar_additions: 2,
+                scalar_subtractions: 2,
+                scalar_remainders: 3,
+                coordinate_subtractions: 1,
+                coordinate_remainders: 1,
+            })
+        );
+        let mut failed = EncodingWork::default();
+        let invalid = vec![base[0], Point { x: 6, y: 7 }];
+        assert!(relation_counted(&request, &base, 4, 7, &invalid, &mut failed).is_err());
+        assert_eq!(failed.failures, Some(1));
+        assert_eq!(failed.counts.unwrap().scalar_additions, 1);
+        assert_eq!(failed.counts.unwrap().scalar_subtractions, 0);
+        assert_eq!(failed.counts.unwrap().coordinate_subtractions, 1);
+        let mut overflowed = EncodingWork {
+            counts: Some(EncodingCounts {
+                scalar_additions: u64::MAX,
+                ..EncodingCounts::default()
+            }),
+            ..EncodingWork::default()
+        };
+        assert_eq!(
+            relation_counted(&request, &base, 4, 7, &witness, &mut overflowed).unwrap(),
+            vec![1, 18, 12, 4]
+        );
+        assert!(overflowed.counts.is_none());
+        let report = overflowed.report(19, 17);
+        assert_eq!(report["scalar_modulus"], 19);
+        assert_eq!(report["coordinate_modulus"], 17);
+        assert!(report["integer_source_calls"].is_null());
+    }
+
+    #[test]
+    fn emitted_encoder_diagnostics_bind_when_present_and_old_records_remain_readable() {
+        let request = replay_counter_fixture();
+        let mut record = serde_json::to_value(run(&request).unwrap()).unwrap();
+        let certificate = replay(&request, &record).unwrap();
+        assert_eq!(
+            certificate.replay_work["relation_encoding"],
+            record["relation_encoding_work"]
+        );
+        let mut corrupt = record.clone();
+        corrupt["relation_encoding_work"]["integer_source_calls"]["scalar_additions"] =
+            serde_json::json!(u64::MAX);
+        let error = replay(&request, &corrupt)
+            .err()
+            .expect("tampered encoder counts must fail");
+        assert!(error.contains("encoding work mismatch"));
+        record
+            .as_object_mut()
+            .unwrap()
+            .remove("relation_encoding_work");
+        assert!(replay(&request, &record).is_ok());
+    }
+    #[test]
+    fn independent_replay_emits_separate_scalar_affine_and_nested_operation_views() {
+        let request = replay_counter_fixture();
+        let record = serde_json::to_value(run(&request).unwrap()).unwrap();
+        let certificate = replay(&request, &record).unwrap();
+        let value = serde_json::to_value(certificate).unwrap();
+        assert_eq!(value["schema"], "pkm.toy-dlp-replay/v2");
+        let report = &value["replay_work"];
+        assert_eq!(report["coordinate_reference"]["modulus"], 17);
+        assert_eq!(report["scalar_reference"]["modulus"], 19);
+        assert_eq!(report["coverage_complete"], false);
+        assert_eq!(report["comparison_admissible"], false);
+        assert!(report["priced_total"].is_null());
+        assert!(
+            report["coordinate_reference"]["setup_counts"]["point_tests"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        let counts = &report["scalar_reference"]["operation_counts"];
+        let number = |key: &str| counts[key].as_u64().unwrap();
+        assert_eq!(number("space_constructor_calls"), 2);
+        assert!(number("inverse_calls") > 0);
+        assert_eq!(number("u128_products"), number("modular_products"));
+        assert_eq!(
+            number("u128_remainders"),
+            number("modular_products") + number("modular_differences")
+        );
+        assert_eq!(number("u64_remainders"), number("modular_sums"));
+        assert_eq!(number("i128_divisions"), number("euclidean_iterations"));
+        assert_eq!(number("i128_products"), 2 * number("euclidean_iterations"));
+        assert_eq!(
+            number("i128_subtractions"),
+            2 * number("euclidean_iterations")
+        );
+    }
+    #[test]
+    fn rejected_replays_retain_reference_work_before_returning_errors() {
+        let request = replay_counter_fixture();
+        let record = serde_json::to_value(run(&request).unwrap()).unwrap();
+        let index = record["queries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .position(|q| q["useful_rows"].as_u64().unwrap() > 0)
+            .unwrap();
+        let mut bad = record.clone();
+        bad["queries"][index]["rank_after"] = serde_json::json!(999);
+        let mut accounting = ReplayAccounting::new(&request);
+        assert!(replay_counted(&request, &bad, &mut accounting).is_err());
+        let report = accounting.report();
+        assert!(
+            report["scalar_reference"]["operation_counts"]["modular_products"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        assert!(
+            report["coordinate_reference"]["equation_counts"]["point_additions"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        assert_eq!(report["coordinate_reference"]["oracle_calls_failed"], 0);
+        let mut bad = record;
+        bad["queries"][index]["oracle"]["schema"] = serde_json::json!("invalid");
+        let mut accounting = ReplayAccounting::new(&request);
+        assert!(replay_counted(&request, &bad, &mut accounting).is_err());
+        let report = accounting.report();
+        assert_eq!(report["schema"], "pkm.independent-replay-work/v2");
+        assert_eq!(report["coordinate_reference"]["oracle_calls_failed"], 1);
+        assert_eq!(
+            report["coordinate_reference"]["attempted_oracle_counts"]["validation"]["point_tests"],
+            report["coordinate_reference"]["oracle_calls_attempted"]
+        );
+        let mut invalid = request;
+        invalid.schema = "invalid".into();
+        let mut accounting = ReplayAccounting::new(&invalid);
+        assert!(replay_counted(&invalid, &bad, &mut accounting).is_err());
+        let report = accounting.report();
+        assert_eq!(report["coordinate_reference"]["setup_state"], "rejected");
+        assert_eq!(
+            report["coordinate_reference"]["setup_counts"]["point_tests"],
+            1
+        );
+        assert_eq!(
+            report["scalar_reference"]["operation_counts"]["space_constructor_calls"],
+            0
+        );
+        assert!(report["priced_total"].is_null());
+    }
+
+    #[test]
+    fn late_setup_refusal_retains_the_full_scan_without_starting_oracle_work() {
+        let mut request = replay_counter_fixture();
+        request.order = 17; // prime, but not this curve's full order19
+        let mut accounting = ReplayAccounting::new(&request);
+        let error = replay_counted(&request, &serde_json::json!({}), &mut accounting)
+            .err()
+            .expect("incorrect full-curve order must fail");
+        assert!(error.contains("full-curve order"));
+        let report = accounting.report();
+        assert_eq!(report["coordinate_reference"]["setup_state"], "rejected");
+        let counts = &report["coordinate_reference"]["setup_counts"];
+        assert_eq!(counts["point_tests"], 17 * 17 + 2);
+        assert_eq!(counts["field_multiplications"], 4 * (17 * 17 + 2));
+        assert_eq!(counts["field_additions"], 2 * (17 * 17 + 2));
+        assert_eq!(report["coordinate_reference"]["oracle_calls_attempted"], 0);
+        assert_eq!(
+            report["scalar_reference"]["operation_counts"]["space_constructor_calls"],
+            0
+        );
+        assert_eq!(report["coverage_complete"], false);
+        assert!(report["priced_total"].is_null());
+    }
     #[test]
     fn query_field_emission_conserves_every_attempt_including_identity() {
         let mut oracle = crate::tests::fixture();

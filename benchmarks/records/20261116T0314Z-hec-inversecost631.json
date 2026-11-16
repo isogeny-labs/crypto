@@ -1,0 +1,117 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-16T03:17:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Volumes/SSD990-2/hec-inversecost631-target/release/inversecost631",
+        "collect",
+        "/Volumes/SSD990-2/hec-inverse-work",
+        "/Volumes/SSD990-2/hec-inverse-work/research/hec_inversecost631_20261116/run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T03:14:59+00:00",
+      "wall_s": 20.221
+    }
+  ],
+  "commit": "4995fcfdc0592331a9845d81c11ffa967828cdcd",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T03:14:45+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-inversecost631"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0314Z-hec-inversecost631",
+  "metrics": [
+    {
+      "baseline": 2.437092333,
+      "better": "lower",
+      "n": 5,
+      "name": "inverse_component_wall",
+      "note": "Direct symmetric component; excludes common quotient setup and public coordinates; ordered baseline includes retained B fallback.",
+      "reference": 2.437092333,
+      "reference_kind": "baseline",
+      "spread": [
+        1.48245525,
+        1.614404167
+      ],
+      "unit": "wall_s",
+      "value": 1.503780333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "ordered_component_wall",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.432739625,
+        2.639559625
+      ],
+      "unit": "wall_s",
+      "value": 2.437092333
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "ordered_over_direct",
+      "note": "Derived ratio of medians, registered >=10 gate failed; not total IC.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.620643839741
+    }
+  ],
+  "problem": "ic:hec-f631-c49-inverse-pair",
+  "raw": [
+    {
+      "bytes": 1066498,
+      "path": "research/hec_inversecost631_20261116/raw.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6c/6c473c0b5909fbedd9f03444da81761d7fbfcb87c81a62279a13bb0542b33135",
+      "sha256": "6c473c0b5909fbedd9f03444da81761d7fbfcb87c81a62279a13bb0542b33135",
+      "uploaded": true
+    },
+    {
+      "bytes": 293,
+      "path": "research/hec_inversecost631_20261116/SUMMARY.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a6/a657fbf03121f6b5b4026bf952268392b747d34bd6a4f062db843ce80400d45a",
+      "sha256": "a657fbf03121f6b5b4026bf952268392b747d34bd6a4f062db843ce80400d45a",
+      "uploaded": true
+    },
+    {
+      "bytes": 374,
+      "path": "research/hec_inversecost631_20261116/run/cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a17bb1854eead93d420b7923f2a46f42127959add1f71d54a423c0715bb6147d",
+      "sha256": "a17bb1854eead93d420b7923f2a46f42127959add1f71d54a423c0715bb6147d",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-hec-inversecost631/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-inversecost631/REPORT.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-hec-inversecost631/COST.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-inversecost631",
+  "status": "measured",
+  "summary": "All10cells verified; direct symmetric inverse component1.621x faster; tenfold gate failed; common setup excluded; unvalidated.",
+  "validation": null
+}
