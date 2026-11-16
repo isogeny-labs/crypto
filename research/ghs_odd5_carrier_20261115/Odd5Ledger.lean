@@ -80,6 +80,19 @@ theorem trace26_class_screen_sizes :
 theorem trace26_cover_degrees_coprime_to_109 :
     (List.range 21).all (fun d => decide (d < 7 ∨ Nat.gcd d 109 = 1)) = true := by decide
 
+/- Arithmetic checks for the separately replayed s=11 primitive-j isogeny witness. -/
+theorem primitive_s11_trace_step :
+    (26 : Int) * 1534969625950 - 243 * 56701719386 = 26130692463902 := by decide
+
+theorem primitive_s11_order :
+    (3 : Nat)^55 + 1 - 26130692463902 =
+      2 * 109 * 2399 * 333566377062870325133 := by decide
+
+theorem primitive_s11_projective_divisor :
+    (224990655913 : Nat) = 23 * 131 * 74673301 ∧
+    224990655913 % 23 = 0 ∧
+    Nat.gcd 23 333566377062870325133 = 1 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -101,4 +114,7 @@ theorem trace26_cover_degrees_coprime_to_109 :
 #print axioms trace26_ten_target_count
 #print axioms trace26_class_screen_sizes
 #print axioms trace26_cover_degrees_coprime_to_109
+#print axioms primitive_s11_trace_step
+#print axioms primitive_s11_order
+#print axioms primitive_s11_projective_divisor
 end GHSOdd5Ledger

@@ -24,3 +24,7 @@ For a `K=F243` cover `phi:Y_K -> E_b`, the push-pull identity proves `phi^*` is 
 This trace could vanish even when `phi^*(P)` is nonzero: the pullback is only K-rational. Thus each proposed cover or correspondence must certify its action on a chosen source generator, the nonzero small-field image, and scalar preservation. A zero trace falsifies that particular transfer route, although a different correspondence may work. Then benchmark construction, map evaluation, relation/decomposition, linear algebra, target descent and final verification against a Frobenius-aware matched rho run on the same source subgroup.
 
 The next targeted search is degrees 7 through 20 for the fixed `Y` and ten `E_b`, or an evaluable F3-rational isogeny `Res E_b -> J(Y)`. The former is bounded by the verified finite theorem; the latter requires an explicit correspondence, not just a Weil-polynomial match. No practical-vulnerability or globally-new-family label is supported yet.
+
+## New exact primitive source after this audit
+
+`PRIMITIVE_S11_PROTOCOL.md` and `primitive_isogeny_s11.json` record a full-degree-55 `j` source reached by an evaluable 23-isogeny at `s=11`. Its 69-bit subgroup survives the saved reverse map, independently reconstructed in `verify_primitive_s11.py`. This removes the proper-subfield model for that **exact source**, while retaining its membership in the known isogeny-assisted transfer setting. The Jacobian map and full cost comparison remain the decisive open gates. [pcc:unverified]
