@@ -1,0 +1,59 @@
+{
+  "schema": "vieta-publication-closeout/v1",
+  "pr": 4358,
+  "url": "https://github.com/isogeny-labs/crypto/pull/4358",
+  "merged_at": "2026-11-16T03:20:47Z",
+  "merge_commit": "a79fc35e35c1be023e8c862cb74128b356c4ef30",
+  "final_head": "e1e9ee8a0705468f8327e56c9684813c274f5a97",
+  "last_producer_head": "a29a4183baf87c2d568e369c7c6424079e0b8650",
+  "same_tree_sha1": "ade0f39b6e3763e20d974da4ba37bc524f0b8ae9",
+  "external_refresh_commit_subject": "ci: refresh required checks",
+  "ci_green_at_merge": false,
+  "scientific_standing": "Producer observations and hand degree argument remain [pcc:unverified]. Merge is not independent validation.",
+  "jobs": [
+    {
+      "job_id": 133069927220,
+      "name": "artifacts",
+      "conclusion": "failure",
+      "started_at": "2026-11-16T03:20:47Z",
+      "completed_at": "2026-11-16T03:27:52Z",
+      "failed_step": "Tool tests",
+      "cause": "41 shared artifact tests: one failure, five errors, including absent wire_workflows.reads_validation_gate/evidence_store_files",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/43797614713/job/133069927220"
+    },
+    {
+      "job_id": 133069906763,
+      "name": "gate (PCC)",
+      "conclusion": "failure",
+      "started_at": "2026-11-16T03:20:58Z",
+      "completed_at": "2026-11-16T03:23:35Z",
+      "failed_step": "Ledger chain holds, the base ledger is a prefix, the keyring is the base's (pull request)",
+      "cause": "Run compared head1190 entries with then-current main1195; base advanced. Do not infer frozen claim files were changed.",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/43797614525/job/133069906763"
+    },
+    {
+      "job_id": 133069921807,
+      "name": "gate (validation)",
+      "conclusion": "failure",
+      "started_at": "2026-11-16T03:20:45Z",
+      "completed_at": "2026-11-16T03:29:23Z",
+      "failed_step": "The gate's own tests, with a positive and a negative fixture",
+      "cause": "90 shared validation tests: two failures, committed-tree/pre-cap report-list checks; includes unrelated ic-aimed-gather evidence",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/43797614536/job/133069921807"
+    }
+  ],
+  "other_reported_checks": {
+    "success": [
+      "size",
+      "records",
+      "learning",
+      "review",
+      "replay",
+      "clippy (crypto)",
+      "clippy (cd_attack)"
+    ],
+    "evidence_audit": "Several shards failed; no independent-evidence pass asserted."
+  },
+  "followup": "Automation paused after merged state was confirmed; no benchmarks or cloud experiments rerun.",
+  "scope": "API/job-log closeout record and producer interpretation [pcc:unverified]."
+}

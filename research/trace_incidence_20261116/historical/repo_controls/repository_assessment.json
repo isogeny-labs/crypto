@@ -1,0 +1,60 @@
+{
+  "schema": "repo-controls-prior-art/v1",
+  "scope": "Read-only, pinned, bounded source inspection through GitHub connector; not an exhaustive historical literature search.",
+  "repositories": [
+    {
+      "name": "isogeny-labs/crypto",
+      "commit": "6ebf026274395b5de50ddbc8d0523a72ba016a7b",
+      "findings": [
+        {
+          "path": "research/prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs",
+          "source_lines": [85, 109, 129, 178, 242, 763],
+          "finding": "Coordinate-only S3 quotient/Horner/norm/GCD elimination, exceptional leading-coefficient branches, exact candidate recovery, and capped root splitting already exist. The file also has S4 pair-support and division-free factorized resultant variants. These are related prior elimination; polynomial elimination by itself is not a new contribution.",
+          "scope_boundary": "The m2 oracle solves two decomposition summands for a known target. Its per-target cost does not solve selection from a third random pool for free. The checked m2 port is separately scoped; the full m3 control scans targets and charges every tried target. Existing m4 routines were source-inspected, not replayed."
+        },
+        {
+          "path": "src/cryptanalysis/aps_single_relation.rs",
+          "source_lines": [1, 289, 626, 833, 937, 1084, 1254, 1413, 1482],
+          "finding": "Bounded random mixed-label single-relation experiments already construct Ri=alpha_i*G+beta_i*Q without the target log, perform coordinate-domain solving, enumerate signs, skip uninformative B=0 relations, and verify dG=Q. Exact-domain F4, hybrid guessing, separating colorings, and curve automorphism label propagation are present.",
+          "implication": "The labelled-pool model and one-informative-relation recovery are controls and prior art, not novel features of the new incidence selector."
+        },
+        {
+          "path": "src/cryptanalysis/prime_fast.rs",
+          "source_lines": [1188, 1209, 1298, 1377],
+          "finding": "The native m3 meet-in-the-middle pair table builds x(Fj+Fk) and x(Fj-Fk) with one batched inversion per row and x-only additions, retaining witness/sign information. It has B^2 16-byte entries. The local C++ control faithfully uses that arithmetic pattern but streams two independent pools into an O(B) third-pool index.",
+          "implication": "A strong O(B^2) pair control is required. This standalone C++ implementation is a portable algorithm-level control; its times are not times from the original Rust binary."
+        },
+        {
+          "path": "research/prime31_ic_20261115/native/lib.rs",
+          "source_lines": [31, 197],
+          "finding": "The deterministic prime31 curve and Dickson fiber Base::build supply the replayed B31 and B135 m2 cases. The compact structured base has no mixed labels supplied by its compact coordinate construction.",
+          "implication": "The structured-base correctness replay is separate from naturally sampled mixed-labelled pools. No free combination of their advantages is claimed."
+        }
+      ]
+    },
+    {
+      "name": "isogeny-labs/cryptanalysis",
+      "commit": "5dfcf82e698db8d895452c7089f566d3e68d1337",
+      "findings": [
+        {
+          "path": "src/indexcalc.c",
+          "source_lines": [1],
+          "finding": "The inspected native C index-calculus implementation explicitly targets the multiplicative group (Z/pZ)* for p<2^64. It is not an ECDLP incidence/GCD control and its timings are not compared against elliptic-curve algorithms."
+        },
+        {
+          "path": "src/ic_rational.h",
+          "source_lines": [1],
+          "finding": "The bounded rational reconstruction helper is for native multiplicative-group index-calculus descent; it does not provide the missing prime-field elliptic-curve relation selector."
+        },
+        {
+          "path": "papers/ecdlp-constant/sec-indexcalc.tex",
+          "source_lines": [79, 109],
+          "finding": "The elliptic-curve section explicitly distinguishes full-pipeline data from one-residual oracle diagnostics, cites crypto's boundary ledger and residual-walk notes, and reports no complete prime-field ECDLP advantage over matched rho in its measured cells.",
+          "scope_boundary": "These are the repository authors' recorded conclusions, not independently replayed native timings here. The cross-reference to crypto is not an independent second experiment."
+        }
+      ]
+    }
+  ],
+  "provenance": "source_provenance.json records all 8 exact source blobs, pinned commit URLs, verified Git blob hashes and SHA256 capture hashes.",
+  "implementation_boundary": "cargo/rustc were unavailable; no exact native Rust replay was performed. The m2 Python-FLINT port and C++ pair arithmetic are independently checked portable implementations."
+}

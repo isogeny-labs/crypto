@@ -1,0 +1,14 @@
+{
+  "action": "count spurious algebraic roots (non-split e-triples, non-rational intermediates, x=0) on one instance per variant first; require a projection from Boolean roots to verified relations and an enumerate-until-verified rule for decision-mode arms before launch",
+  "created": "2026-11-16T17:08:59Z",
+  "evidence": [
+    "groebner_compare/semaev_verifier.py docstring (spurious roots rejected); producer build note: e-only 9-var instance 17 algebraic roots, 1 re-adds [pcc:unverified]; protocol.json stopping_rules invalidation text"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "reviewing a Semaev/Weil-descent solver comparison where one arm returns the first model (SAT --maxsol 1) and another enumerates all roots, with invalidation on 'returned decomposition fails re-addition' or 'root set differs from oracle'",
+  "why": "a decision-mode arm can land on a non-relation and literal completeness rules invalidate correct arms, so the outcome is fixed by the encoding, not the solver"
+}

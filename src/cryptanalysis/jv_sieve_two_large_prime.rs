@@ -27,6 +27,15 @@ pub use dlp::{
 mod counted_linear;
 pub use counted_linear::CountedRelationSystem;
 
+#[path = "jv_homogeneous_quotient.rs"]
+mod homogeneous_quotient;
+
+#[path = "jv_extension_remainder_dlp.rs"]
+mod extension_remainder_dlp;
+#[path = "jv_principal_relation.rs"]
+mod principal_relation;
+pub use extension_remainder_dlp::{run_extension_remainder_dlp_on, ExtensionRemainderDlpOptions};
+
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
 /// Repeated roots are refused, rather than silently treated as simple roots.
 fn low_degree_roots(ring: &FpRing, f: &[u64], sqrt: &[u64]) -> Option<Vec<u64>> {

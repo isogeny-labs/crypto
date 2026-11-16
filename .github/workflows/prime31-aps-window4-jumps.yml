@@ -1,0 +1,82 @@
+name: prime31 APS window4 public-jump cold study
+
+on:
+  push:
+    branches:
+      - research/prime31-aps-window4-jumps-20261116
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-aps-window4-jumps.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-aps-window4-jumps.yml
+  workflow_dispatch:
+
+jobs:
+  native-window4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install exact Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Focused library regression
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Binary/window4 scalar arithmetic and full public walk identity tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation aps_window4_jump_tests -- --nocapture
+      - name: Fresh 24-Q full cold matched APS / unfolded rho panel
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-window4-jumps-24q > prime31-aps-window4-24q.json
+          python3 - <<'PY'
+          import json
+          with open("prime31-aps-window4-24q.json") as f: d=json.load(f)
+          assert d["cases_count"] == 24
+          assert len(d["cases"]) == 24
+          assert d["verified_completed_calls"][:3] == [24,24,24]
+          assert all(int(v)>0 for v in d["fully_cold_ns"])
+          assert all(int(v)>0 for v in d["aps_source_setup_ns"])
+          assert all(len(c["APS_window4"]["attempts"]) == len(c["APS_joint_binary"]["attempts"]) for c in d["cases"])
+          print("24 fresh Q, transcript-equivalent APS calls, complete cold panel PASS")
+          print("completed",d["verified_completed_calls"],"cold_ns",d["fully_cold_ns"],
+                "source_ns",d["aps_source_setup_ns"],"paired_wins",d["paired_candidate_wins_over_binary_rho32_rho64"],
+                "candidate/binary",d["candidate_over_binary_ratio"],
+                "candidate/faster_rho",d["candidate_over_faster_rho_ratio"],
+                "engineering_gate",d["engineering_gate_pass"],
+                "AA_drift",d["candidate_AA_drift"])
+          PY
+      - name: Validate reused public ordinates against original sqrt lifts
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation aps_public_ordinate_tests -- --nocapture
+      - name: Fresh 24-Q public ordinate full cold APS/rho comparison
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-public-y-24q > prime31-aps-public-y-24q.json
+          python3 - <<'PY'
+          import json
+          with open("prime31-aps-public-y-24q.json") as f: d=json.load(f)
+          assert d["cases_count"] == 24 and len(d["cases"]) == 24
+          assert d["completed_calls"][:3] == [24,24,24]
+          assert d["old_s3_square_roots"] > 0 and d["new_s3_square_roots"] == 0
+          assert all(int(v)>0 for v in d["fully_cold_ns"])
+          print("public-y APS 72/72 same transcript and complete full cold PASS")
+          print("completed",d["completed_calls"],"cold_ns",d["fully_cold_ns"],
+                "s3_ns",d["aps_s3_query_ns"],"sqrt_before",d["old_s3_square_roots"],
+                "sqrt_after",d["new_s3_square_roots"],"paired",d["paired_wins_candidate_over_old_rho32_rho64"],
+                "candidate/old",d["candidate_over_previous_ratio"],
+                "candidate/faster_rho",d["candidate_over_faster_rho_ratio"],
+                "AA_drift",d["candidate_AA_drift"],
+                "passes_5pct_gate",d["passes_preregistered_5pct_gate"])
+          PY
+      - name: Preserve public-y complete raw measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-aps-public-y-24q
+          path: prime31-aps-public-y-24q.json
+          if-no-files-found: warn
+      - name: Retain raw measurements including all failed attempts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-aps-window4-24q
+          path: prime31-aps-window4-24q.json
+          if-no-files-found: warn
