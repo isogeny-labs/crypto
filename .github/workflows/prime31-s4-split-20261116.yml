@@ -57,6 +57,9 @@ jobs:
         run: |
           cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
           cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
+      - name: Exhaustive B8 symmetric m8 finite-root and infinity gate (Rust)
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate -- --exhaustive-b8
       - name: Rust APS one-relation solver algebraic correctness tests
         timeout-minutes: 2
         run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
