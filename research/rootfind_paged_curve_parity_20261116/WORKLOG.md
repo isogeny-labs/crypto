@@ -154,3 +154,66 @@ untouched until its reservation clears. [pcc:unverified]
 
 - The failure is a macOS build incompatibility in an unrelated binary, not
   a parity result.
+
+## 2026-11-16T10:56Z — Pinned harness result and visual record
+
+### What was done (commands, files, features)
+
+- Ran the committed harness at `aa40df7ad378de5ab81fdd058dc076b204661432`
+  with Rust 1.99.1, `--release --locked --offline`, and an explicit `RUSTC`.
+  Exit 0; five tests passed. `test-harness.stdout` and
+  `test-harness.stderr` retain the raw output. The actual-curve parity test
+  passed for K13/K19/K23: 272/4,830/18,906 inserts; 261/4,800/18,842
+  first-witness keys; 11/30/64 complete production collision matches and
+  full group checks; 204/4,473/18,498 touched pages.
+- Added a source-hash-checking result derivation, machine-readable result,
+  data-flow diagram, quantitative page-use chart, report and one-page PDF.
+  Visually inspected the rendered PDF. The run's source hashes and test
+  binary hash are in `RESULTS.json`.
+
+### Decisions made (and why)
+
+- Class this as correctness and page-distribution evidence only. The three
+  page capacities are preallocated, and there is no collector timing in the
+  run. Preserve the production-integration and isolated complete-cost gates.
+- The prior heading `2026-11-16T10:55Z — Platform build boundary` was
+  rounded forward while the clock still read 10:54Z. It identifies the
+  right attempt but should not be interpreted as an exact event timestamp.
+
+### Open threads (unfinished, pick up next time)
+
+- Validate all generated records and source formatting; commit the result,
+  push the branch, and open a ready stacked PR. Production-source work must
+  wait for the existing Conductor reservation to clear.
+
+### Errors (what went wrong, how it was handled)
+
+- The initial PDF layout spilled its provenance footer onto page two.
+  Shortened the footer and resized figures; final PDF is one page. This is
+  an editorial change, not a data change.
+
+## 2026-11-16T11:00Z — Same-host replay with resource log
+
+### What was done (commands, files, features)
+
+- Repeated the committed harness command under `/usr/bin/time -l`, with
+  start/end UTC seconds and exit code in `replay.meta`. Exit 0; five tests
+  passed and the three `PARITY_JSON` values match the first run exactly.
+  `replay.stdout` and `replay.stderr` retain output and process-level
+  resource counters. The test-output line order changed due to concurrent
+  test scheduling, so the derivation compares structured parity records.
+
+### Decisions made (and why)
+
+- Treat the resource log as a cached Cargo/test launch measurement, not a
+  collector RSS or speed comparison. Record it for run provenance only.
+
+### Open threads (unfinished, pick up next time)
+
+- Regenerate and validate the result record, then commit and publish the
+  ready stacked PR.
+
+### Errors (what went wrong, how it was handled)
+
+- The first run lacked explicit timestamps and resource capture; the
+  same-host replay supplies these without replacing its raw record.
