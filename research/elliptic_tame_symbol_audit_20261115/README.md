@@ -48,3 +48,5 @@ general geometric descent/canonical Tate/general MOV-FR remain open.
 [pcc:unverified]
 
 Exact once-only local **PCC-20261115-2d7887 PASS at 2026-11-16T00:02:27Z**; signed standing remains unverified. [Verification receipt](verification.json).232formal17artifact249pins/187pinnedcustom/169actuallyimportedcustom (159credited frozen+10new). [pcc:unverified]
+
+Publication: ready [PR #4355](https://github.com/isogeny-labs/crypto/pull/4355), stacked on #3739. Remote proof `3bf76263b9e5e403748ef46f9f71fa743d449128` and local receipt `dd967c7308d90b7a473dbd625faece26b67e2d33` share tree `731feddae9ca250f4f5190c24266de8bf8108ef4`. Anonymous fetch completed; fresh head/body/title/open/ready matched. Body3 has3772characters. All35 pinsets2646entries/74scope links match;628nonemptyledgerprefix preserved through629. Publication metadata is outside frozen pinsets; current-head CI/review/signing pending. [pcc:unverified]
