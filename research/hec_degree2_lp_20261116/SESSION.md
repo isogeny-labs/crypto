@@ -27,3 +27,17 @@ Restore required destination or document an approved replacement custody destina
 
 ### Errors
 External upload failure retained in CHECKPOINT-STATUS.md; successful authentication does not repair bucketAllAccessDisabled. Original scientific source/protocol unchanged. No compile/render error or scientific rerun. No secret values printed or recorded. Unrelated .resume/RESUME.md preserved.
+
+## Restricted pole-six span bridge derived while execution remains gated
+
+### What was done
+Rechecked live destination: HeadBucket403; guarded resume actual upload17:19ZreturnsAllAccessDisabled and exits1before science. Explicitly verified CONTROL.tsv/PREFIX.tsv/EXIT.txtabsent and frozen hashes unchanged. Mathematical review derived h1-h2=cQ,a=(f-h1h2)/Qand a²-c²f=U1U2. Under odd-order/nonbranch/multiplicity<=2assumptions, proved span(R5,C2)=span(R5,R6)by constructing the pole-six collision function and partitioning every restricted pole-six row into two triple identities. Existing rational.rs confirms directd=1four-anchor cubic family. Added separate post-freeze proof/diagram/two-page report; both pages visually inspected. No experiment ran.
+
+### Decisions made
+The bridge reindexes a MATCHED RESTRICTEDspan augmentation fromH^4candidate enumeration toH^3plus dictionary/row work. It is not a claim that Compact paysH^4, not a finite rank observation, no established priority/new exponent and not the requested full tenfold result. Need independent finite direct/cached span comparison after storage access is restored; the currently frozen gate does not test this bridge. Original frozen theory/source untouched. Full objective active.
+
+### Open threads
+Restore approved checkpoint access or receive an approved replacement, execute the original frozen gate once; separately freeze/validate directpole6/cache equivalence before any performance inference. Current external storage condition persists, but this turn made concrete deductive progress. PR unmerged; no independent scientific validation.
+
+### Errors
+No scientific execution; same checkpointAllAccessDisabledcondition revalidated. The2011group-law PDF fetch403is recorded; primary2005LPcopy remains accessible. No source/hash mismatch, no report-render failure and no gate waiver. Shared log reserved; own handoff retained. Unrelated resume edit untouched.

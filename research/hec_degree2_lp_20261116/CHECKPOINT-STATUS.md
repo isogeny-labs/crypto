@@ -13,3 +13,9 @@ The known profile/transport alternatives did not restore this destination. Curre
 The compiled source and exact theoretical collision budget remain reviewable. Authenticated access to the existing bucket must be restored, or an approved replacement destination supplied and documented in a custody amendment. No approved replacement destination has been specified. This is a first external-storage blocking occurrence for this experiment, not a mathematical negative result or a completed measurement.
 
 Resume through resume.sh only after the checkpoint upload/gate passes. Keep original protocol, source and parameters; do not create a replacement run just because custody was unavailable. If a destination changes, record that amendment before execution. The full mathematical tenfold goal remains active. The code/theory preparation is concrete progress; execution/results remain pending.
+
+## Recheck at 2026-11-16 17:19Z
+
+A read-only HeadBucket check returned403. The guarded resume then retried the actual authenticated checkpoint upload, which again returnedAllAccessDisabled. resume.sh exited1before launching the native binary. All scientific output paths remain absent; frozen hashes still match.
+
+Useful mathematical review continued without executing experiments: POLE6-BRIDGE.md derives a restricted relation-span equality and an enumeration schedule comparison. Its separate theory report is not a finite rank validation or performance result. Original frozen source/protocol/theory remain unchanged. Access restoration or an approved custody replacement is still required for execution.
