@@ -1,0 +1,38 @@
+{
+ "note": "Wall-time study of prime-IC relation-phase constants (lane-stage diagnosis, old/new binary check, joint tuning grid). The schema's `ic` band slot carries the best 32-bit configuration (base 1024, 32 lanes, mitm-prime-batch); the matched rho reference is the grid sessions' own rho.negation arm. The two timer-instrumented diagnosis sessions are descriptive and outside the certified headline.",
+ "replay_certificate": {
+  "path": "../../research/ic_wide_ext_20261028/replay-certificate.json",
+  "sha256": "05d642034336aafc8a79175975dee7d8955fa2cbf1a61a8e67b00ba88c348acf"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ic_wide_ext_20261028/band/grid-32.json (ic.pipeline base 1024, 32 lanes vs rho.negation, 32-bit prime-order curve, 2 sessions)",
+  "binary_or_process": "ecbench release build of this branch; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 31.72583832236903,
+    "rho": 1.0189098859866685
+   },
+   "0.1": {
+    "ic": 34.49922577952602,
+    "rho": 1.12013169469697
+   },
+   "1": {
+    "ic": 59.459712893938935,
+    "rho": 2.0311279730896845
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference), run in every session on the same curve, targets and rounds as the candidate arms; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ic_wide_ext_20261028/validator-report.json",
+  "sha256": "6f451e47ab59530e0139e32f19e11f0265a5e2e961a41da68a083b093e0d9bf9"
+ }
+}

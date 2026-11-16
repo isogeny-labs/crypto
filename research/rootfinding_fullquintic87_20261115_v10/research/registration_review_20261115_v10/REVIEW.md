@@ -1,0 +1,11 @@
+# Version10 registration metadata author/static review
+
+Status: AUTHORED_AND_STATIC_REVIEWED_METADATA_ONLY. This is not an independent review of my ownhelper. Parent reviews actualmanifest and the separate scientificreviewer admits worker/proof/source before this helper canexecute. No helperimport, registration, manifestmutation orscientificexecution byauthor. StaticASTparseonly.
+
+Freshhelper derives from prior admittedv9 registration. Changedpackage/review/EID/cycle, exactactiveprefixlength3 andcounts3, hypothesis/changed-assumption description. Allpreservation/duplicate/provenance code remains the same. Currentmetadataread found exactly3passed active experiments: dual-obstructionv6, frobenius52v8 andfull-quintic-blockv9. At execution, read-only loadrecoverFalse plusvalidate must reverifyall3source identities and attempts, rootmanifestSHA andexactoldspec equality. Canonicalprefix3hash before/after append proves unchangedoldspecs; exactoldmanifestbytes move toexclusive PROGRAM_BEFORE_REGISTRATION.json, thennewprogramfreeze/resume. No reseal, reindex, Gitmaintenance oroldfiledeletion.
+
+The verified137407byte historicalINDEX remains SHA5f1a9793367033919218856c74e41cd1f48e6df3ae3807baa52ed11882a071c1 covering339experiments/35epochs. Builderhashchecked before semanticimport. Both historicalfingerprints/semanticdigests andall3active registered/attemptfingerprints/semanticdigests are compared. Freshrawartifact collisioncheck andindependent scientificsourcepins precede manifestmutation.90s/4GiB/onecore unchanged.
+
+Hypothesis now names the actual87map:35admittedr+52e3coordinates, sharedw recovery, remaininge4conditions andunchanged73survivors, conditional on declaredactualbranchguards. Comparison must charge totalsetup/formulation/solve/verification/serialization/memory against BOTH strong166 and104coordinate compilers. This is a coefficient-family compiler, not supported-root discovery, globaloriginal allroots, novelty or genuineF4/F5/F6gain. Tiny/exceptional scope remains in independently reviewed scientificproof, not invented byregistration metadata.
+
+Source/reviewpackages need notexist at authorship but MUST exist with finalSOURCE_PINS beforeexecution. Parent must inspect frozennewmanifest before run-ready. If registration fails, retainpartials andnewversions; never overwritepreservedoldmanifest orretryoldexperiments.

@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "rustc",
+      "+1.98",
+      "--edition=2021",
+      "--test",
+      "tests.rs",
+      "-L",
+      "dependency=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps",
+      "--extern",
+      "serde_json=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps/libserde_json-10f254ba1c7de3e0.rlib",
+      "-C",
+      "link-arg=-Wl,--threads=1",
+      "-o",
+      "tests"
+    ],
+    "cwd": "/home/ec2-user/ml-dataset-resume-20261029/owned-interrupted-outcome-20261107",
+    "exit_code": 0,
+    "wall_seconds": 0.5481574520090362
+  },
+  {
+    "command": [
+      "./tests"
+    ],
+    "cwd": "/home/ec2-user/ml-dataset-resume-20261029/owned-interrupted-outcome-20261107",
+    "exit_code": 0,
+    "wall_seconds": 0.016941663008765317
+  }
+]

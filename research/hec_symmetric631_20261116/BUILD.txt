@@ -1,0 +1,17 @@
+   Compiling hec-symmetric631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_symmetric631_20261116)
+warning: function `mpow` is never used
+  --> ../hec_inverse631_20261116/verify_poly.rs:92:4
+   |
+92 | fn mpow(mut a: U, mut e: u64, m: &[u64]) -> U {
+   |    ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `reduce` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+
+warning: `hec-symmetric631` (bin "symmetric631") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 1.57s

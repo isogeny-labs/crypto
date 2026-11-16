@@ -1,0 +1,38 @@
+#1 [internal] load build definition from Dockerfile
+#1 sha256:b2ae19c04f080181aad64d582a1917e35b72529b1cac8c5119325d4be9a47819
+#1 transferring dockerfile: 292B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#2 sha256:24d404045d98d2ec0cee813a3cc3e05e0f8f1ccfe4c5c420aaad2610f1064904
+#2 DONE 0.7s
+
+#3 [internal] load .dockerignore
+#3 sha256:bc86b9a6caefd7976a8c8a7ed40366562ba662c677c1ec2ef9e294ac5d970658
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#6 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#6 sha256:a1f9032931bcfd52961231d25e32083a8625d44722fe0b877a46a52d39f0acfa
+#6 resolve docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c 0.0s done
+#6 CACHED
+
+#5 [internal] load build context
+#5 sha256:28d4064df29d760c500c9550d0ae5ff3a0c35d929dc80638644274dce4688c53
+#5 transferring context: 21.94MB 0.1s done
+#5 DONE 0.1s
+
+#4 [2/2] COPY worker exporter solver arm-supervisor preflight-supervisor budget-controller /usr/local/bin/
+#4 sha256:ea77a7c94f253000f70b2ffad5ab9256bb440578a82d7f601e57bebe5c6fd03a
+#4 DONE 0.1s
+
+#7 exporting to image
+#7 sha256:d2baad42b87098229cad1178abb9c39afbb5f34eca7904edea1867e864a20bf7
+#7 exporting layers
+#7 exporting layers 0.5s done
+#7 exporting manifest sha256:b84bd73914a2c76a7c8635ee4d40564d974f0fc7188b9e71f315726050bae2b3 done
+#7 exporting config sha256:34441664ad8f35a8a494ef4fd336e30af26224194d41bd456c95c7ff97ae15be done
+#7 naming to docker.io/library/n83-k600-m6:ba620214684e41def8bc6caddf2e782f43920218 done
+#7 unpacking to docker.io/library/n83-k600-m6:ba620214684e41def8bc6caddf2e782f43920218
+#7 unpacking to docker.io/library/n83-k600-m6:ba620214684e41def8bc6caddf2e782f43920218 0.1s done
+#7 DONE 0.6s
