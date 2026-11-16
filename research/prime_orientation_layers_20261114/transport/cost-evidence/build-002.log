@@ -1,0 +1,23 @@
+../cost-evidence/draft-002.lean.txt:87:22: error: unsolved goals
+case e'_2
+I : Type u_1
+q : I → ℚ
+b : I → ℕ
+i : I
+S : Finset I
+hi : i ∉ S
+ih : (∀ i ∈ S, Bits (b i) (q i)) → Bits (#S + ∑ i ∈ S, b i) (∑ i ∈ S, q i)
+h : ∀ i_1 ∈ insert i S, Bits (b i_1) (q i_1)
+H : Bits (b i + (#S + ∑ i ∈ S, b i) + 1) (q i + ∑ i ∈ S, q i)
+⊢ ∑ i ∈ insert i S, q i = q i + ∑ i ∈ S, q i
+../cost-evidence/draft-002.lean.txt:91:40: warning: This simp argument is unused:
+  sum_insert hi
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [card_insert_of_notMem hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -1,0 +1,1114 @@
+{
+  "meta": {
+    "source_dir": "research/ic_improve4_20261015/01-genus3-relations/results/run",
+    "files": "b{12..22}_c{0..4}_{r2,c4,w}.jsonl (committed per-run records)",
+    "record_fields_used": {
+      "whole": "results[].cost",
+      "relation": "results[].rel_cost",
+      "la": "results[].la_cost",
+      "whole_cl9": "results[].cost_cl9",
+      "la_cl9": "results[].la_cost_cl9",
+      "correct": "results[].correct"
+    },
+    "unit": "cost_units(counters,p,cl)=c[0]+bitlen(p-1)*c[1]+cl*c[2] (examples/ic_improve4_01_genus3_rel.rs fn cost_units): c[0]=M_q count, c[1]=I_q count, c[2]=M_ell count; protocol unit M_q+ceil(log2 q)I_q+M_ell (c_ell=1 primary; c_ell=9 sensitivity, fields *_cl9). Operation counts, not wall time. LA counters [3],[4] are not charged by cost_units.",
+    "aggregation": "geometric mean over common curves of each field (what analysis.md does; reproduced: incumbent whole 4.956e6 at 2^12, 9.967e10 at 2^22).",
+    "derived_formulas": {
+      "la_share": "derived by la/whole (geomeans)",
+      "amdahl_bound": "derived by whole/(whole-la): factor the whole solve falls if LA cost were 0, relation phase unchanged",
+      "la_over_relation": "derived by la/relation"
+    },
+    "identity_check": "rel_cost + la_cost == cost on every selected record (max relative error 0)",
+    "arm_note": "r2:lpsgebw2+C1C2 does not exist as an arm. Nearest: w:lpsgebw2+C1C2 (W=32 walks, curves 0-2 only, charges start-up of 31 extra walks). Record arm names carry a cx suffix (r2:lpsgebw2@8 / @16), stripped here."
+  },
+  "arms": [
+    {
+      "arm": "c4:lpsgebw2o100c@16+C1C2",
+      "per_q": [
+        {
+          "log2q": 12,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 5231675.700477562,
+          "relation_from_rel_cost": 4804968.3517784225,
+          "la_from_la_cost": 426119.6742339554,
+          "la_share_derived": 0.0814,
+          "amdahl_bound_derived": 1.0887,
+          "la_over_relation_derived": 0.0887,
+          "whole_cl9_from_cost_cl9": 8643248.20822782,
+          "la_cl9_from_la_cost_cl9": 3835077.0681055943,
+          "la_share_cl9_derived": 0.4437,
+          "amdahl_bound_cl9_derived": 1.7976
+        },
+        {
+          "log2q": 13,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 11414125.266443646,
+          "relation_from_rel_cost": 9729967.42374498,
+          "la_from_la_cost": 1679161.5838716882,
+          "la_share_derived": 0.1471,
+          "amdahl_bound_derived": 1.1725,
+          "la_over_relation_derived": 0.1726,
+          "whole_cl9_from_cost_cl9": 24862748.881942373,
+          "la_cl9_from_la_cost_cl9": 15112454.254845204,
+          "la_share_cl9_derived": 0.6078,
+          "amdahl_bound_cl9_derived": 2.5499
+        },
+        {
+          "log2q": 14,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 23162290.274338562,
+          "relation_from_rel_cost": 16983932.175307635,
+          "la_from_la_cost": 6172608.631275731,
+          "la_share_derived": 0.2665,
+          "amdahl_bound_derived": 1.3633,
+          "la_over_relation_derived": 0.3634,
+          "whole_cl9_from_cost_cl9": 72553933.79139109,
+          "la_cl9_from_la_cost_cl9": 55553477.681481615,
+          "la_share_cl9_derived": 0.7657,
+          "amdahl_bound_cl9_derived": 4.2678
+        },
+        {
+          "log2q": 15,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 62461630.56643525,
+          "relation_from_rel_cost": 38649949.120487094,
+          "la_from_la_cost": 23807991.837057363,
+          "la_share_derived": 0.3812,
+          "amdahl_bound_derived": 1.6159,
+          "la_over_relation_derived": 0.616,
+          "whole_cl9_from_cost_cl9": 252930108.4569053,
+          "la_cl9_from_la_cost_cl9": 214271926.53351602,
+          "la_share_cl9_derived": 0.8472,
+          "amdahl_bound_cl9_derived": 6.5427
+        },
+        {
+          "log2q": 16,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 196336992.35553354,
+          "relation_from_rel_cost": 119540658.77052452,
+          "la_from_la_cost": 76791815.56019893,
+          "la_share_derived": 0.3911,
+          "amdahl_bound_derived": 1.6424,
+          "la_over_relation_derived": 0.6424,
+          "whole_cl9_from_cost_cl9": 810676834.6442844,
+          "la_cl9_from_la_cost_cl9": 691126340.041792,
+          "la_share_cl9_derived": 0.8525,
+          "amdahl_bound_cl9_derived": 6.781
+        },
+        {
+          "log2q": 17,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 502213575.14187825,
+          "relation_from_rel_cost": 261051074.93460342,
+          "la_from_la_cost": 241157909.47630495,
+          "la_share_derived": 0.4802,
+          "amdahl_bound_derived": 1.9238,
+          "la_over_relation_derived": 0.9238,
+          "whole_cl9_from_cost_cl9": 2431480780.4058037,
+          "la_cl9_from_la_cost_cl9": 2170421185.2867417,
+          "la_share_cl9_derived": 0.8926,
+          "amdahl_bound_cl9_derived": 9.3139
+        },
+        {
+          "log2q": 18,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 1362704927.4210813,
+          "relation_from_rel_cost": 709404473.9150432,
+          "la_from_la_cost": 653259368.3096591,
+          "la_share_derived": 0.4794,
+          "amdahl_bound_derived": 1.9208,
+          "la_over_relation_derived": 0.9209,
+          "whole_cl9_from_cost_cl9": 6588815195.736094,
+          "la_cl9_from_la_cost_cl9": 5879334314.786967,
+          "la_share_cl9_derived": 0.8923,
+          "amdahl_bound_cl9_derived": 9.2868
+        },
+        {
+          "log2q": 19,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 3686854618.677206,
+          "relation_from_rel_cost": 2021031404.4767623,
+          "la_from_la_cost": 1665801916.7234795,
+          "la_share_derived": 0.4518,
+          "amdahl_bound_derived": 1.8242,
+          "la_over_relation_derived": 0.8242,
+          "whole_cl9_from_cost_cl9": 17013290147.509085,
+          "la_cl9_from_la_cost_cl9": 14992217250.5113,
+          "la_share_cl9_derived": 0.8812,
+          "amdahl_bound_cl9_derived": 8.4179
+        },
+        {
+          "log2q": 20,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 9745381603.794495,
+          "relation_from_rel_cost": 5781358060.283264,
+          "la_from_la_cost": 3964001952.7763896,
+          "la_share_derived": 0.4068,
+          "amdahl_bound_derived": 1.6856,
+          "la_over_relation_derived": 0.6857,
+          "whole_cl9_from_cost_cl9": 41457421298.25906,
+          "la_cl9_from_la_cost_cl9": 35676017574.987335,
+          "la_share_cl9_derived": 0.8605,
+          "amdahl_bound_cl9_derived": 7.1708
+        },
+        {
+          "log2q": 21,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 25724682275.69617,
+          "relation_from_rel_cost": 16815023177.686424,
+          "la_from_la_cost": 8909605132.067228,
+          "la_share_derived": 0.3463,
+          "amdahl_bound_derived": 1.5299,
+          "la_over_relation_derived": 0.5299,
+          "whole_cl9_from_cost_cl9": 97001598168.93237,
+          "la_cl9_from_la_cost_cl9": 80186446188.60497,
+          "la_share_cl9_derived": 0.8267,
+          "amdahl_bound_cl9_derived": 5.7687
+        },
+        {
+          "log2q": 22,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 68722295459.18916,
+          "relation_from_rel_cost": 49772772123.023254,
+          "la_from_la_cost": 18949438672.808407,
+          "la_share_derived": 0.2757,
+          "amdahl_bound_derived": 1.3807,
+          "la_over_relation_derived": 0.3807,
+          "whole_cl9_from_cost_cl9": 220317958035.30984,
+          "la_cl9_from_la_cost_cl9": 170544948055.27487,
+          "la_share_cl9_derived": 0.7741,
+          "amdahl_bound_cl9_derived": 4.4265
+        }
+      ],
+      "own_ols_exponent_check_derived": {
+        "12..22": {
+          "whole": 1.397,
+          "relation": 1.3539,
+          "la": 1.5457
+        },
+        "16..22": {
+          "whole": 1.4125,
+          "relation": 1.4697,
+          "la": 1.3163
+        }
+      },
+      "la_share_gt_0_5_at_log2q_c_ell_1": [],
+      "la_share_gt_0_5_at_log2q_c_ell_9": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "arm": "r2:lpsgebw2",
+      "per_q": [
+        {
+          "log2q": 12,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 4955643.405871954,
+          "relation_from_rel_cost": 3858221.0984035917,
+          "la_from_la_cost": 1096849.0667242424,
+          "la_share_derived": 0.2213,
+          "amdahl_bound_derived": 1.2842,
+          "la_over_relation_derived": 0.2843,
+          "whole_cl9_from_cost_cl9": 13731715.675409788,
+          "la_cl9_from_la_cost_cl9": 9871641.600518188,
+          "la_share_cl9_derived": 0.7189,
+          "amdahl_bound_cl9_derived": 3.5574
+        },
+        {
+          "log2q": 13,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 13694547.076148404,
+          "relation_from_rel_cost": 9416211.155862134,
+          "la_from_la_cost": 4277930.452212144,
+          "la_share_derived": 0.3124,
+          "amdahl_bound_derived": 1.4543,
+          "la_over_relation_derived": 0.4543,
+          "whole_cl9_from_cost_cl9": 47918631.34026411,
+          "la_cl9_from_la_cost_cl9": 38501374.06990938,
+          "la_share_cl9_derived": 0.8035,
+          "amdahl_bound_cl9_derived": 5.0884
+        },
+        {
+          "log2q": 14,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 37438189.15692069,
+          "relation_from_rel_cost": 24744902.955242373,
+          "la_from_la_cost": 12691092.653830834,
+          "la_share_derived": 0.339,
+          "amdahl_bound_derived": 1.5128,
+          "la_over_relation_derived": 0.5129,
+          "whole_cl9_from_cost_cl9": 138970053.41622677,
+          "la_cl9_from_la_cost_cl9": 114219833.88447738,
+          "la_share_cl9_derived": 0.8219,
+          "amdahl_bound_cl9_derived": 5.6149
+        },
+        {
+          "log2q": 15,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 101220171.79610899,
+          "relation_from_rel_cost": 63160476.004449606,
+          "la_from_la_cost": 38050692.36920111,
+          "la_share_derived": 0.3759,
+          "amdahl_bound_derived": 1.6024,
+          "la_over_relation_derived": 0.6024,
+          "whole_cl9_from_cost_cl9": 405637050.31576025,
+          "la_cl9_from_la_cost_cl9": 342456231.3228096,
+          "la_share_cl9_derived": 0.8442,
+          "amdahl_bound_cl9_derived": 6.4203
+        },
+        {
+          "log2q": 16,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 279731828.8174138,
+          "relation_from_rel_cost": 165202203.66067854,
+          "la_from_la_cost": 114528254.40319505,
+          "la_share_derived": 0.4094,
+          "amdahl_bound_derived": 1.6933,
+          "la_over_relation_derived": 0.6933,
+          "whole_cl9_from_cost_cl9": 1195959380.4361055,
+          "la_cl9_from_la_cost_cl9": 1030754289.628758,
+          "la_share_cl9_derived": 0.8619,
+          "amdahl_bound_cl9_derived": 7.2392
+        },
+        {
+          "log2q": 17,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 775352060.7758466,
+          "relation_from_rel_cost": 457897254.4145003,
+          "la_from_la_cost": 317425974.7882287,
+          "la_share_derived": 0.4094,
+          "amdahl_bound_derived": 1.6932,
+          "la_over_relation_derived": 0.6932,
+          "whole_cl9_from_cost_cl9": 3314791533.0738087,
+          "la_cl9_from_la_cost_cl9": 2856833773.094065,
+          "la_share_cl9_derived": 0.8618,
+          "amdahl_bound_cl9_derived": 7.2382
+        },
+        {
+          "log2q": 18,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 2045787112.6822207,
+          "relation_from_rel_cost": 1202562653.533731,
+          "la_from_la_cost": 843220637.4872457,
+          "la_share_derived": 0.4122,
+          "amdahl_bound_derived": 1.7012,
+          "la_over_relation_derived": 0.7012,
+          "whole_cl9_from_cost_cl9": 8791556396.428978,
+          "la_cl9_from_la_cost_cl9": 7588985737.385202,
+          "la_share_cl9_derived": 0.8632,
+          "amdahl_bound_cl9_derived": 7.3106
+        },
+        {
+          "log2q": 19,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 5475758140.756501,
+          "relation_from_rel_cost": 3324655760.0168743,
+          "la_from_la_cost": 2151085503.044047,
+          "la_share_derived": 0.3928,
+          "amdahl_bound_derived": 1.647,
+          "la_over_relation_derived": 0.647,
+          "whole_cl9_from_cost_cl9": 22684461882.493633,
+          "la_cl9_from_la_cost_cl9": 19359769527.39647,
+          "la_share_cl9_derived": 0.8534,
+          "amdahl_bound_cl9_derived": 6.823
+        },
+        {
+          "log2q": 20,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 14406246350.435583,
+          "relation_from_rel_cost": 9101855245.33244,
+          "la_from_la_cost": 5304356332.377148,
+          "la_share_derived": 0.3682,
+          "amdahl_bound_derived": 1.5828,
+          "la_over_relation_derived": 0.5828,
+          "whole_cl9_from_cost_cl9": 56841141654.092636,
+          "la_cl9_from_la_cost_cl9": 47739206991.39428,
+          "la_share_cl9_derived": 0.8399,
+          "amdahl_bound_cl9_derived": 6.245
+        },
+        {
+          "log2q": 21,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 37567844300.61027,
+          "relation_from_rel_cost": 24802954391.235603,
+          "la_from_la_cost": 12764856814.729475,
+          "la_share_derived": 0.3398,
+          "amdahl_bound_derived": 1.5146,
+          "la_over_relation_derived": 0.5147,
+          "whole_cl9_from_cost_cl9": 139686745852.396,
+          "la_cl9_from_la_cost_cl9": 114883711332.56514,
+          "la_share_cl9_derived": 0.8224,
+          "amdahl_bound_cl9_derived": 5.6318
+        },
+        {
+          "log2q": 22,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 99668914531.72119,
+          "relation_from_rel_cost": 69706862682.29395,
+          "la_from_la_cost": 29961913164.531315,
+          "la_share_derived": 0.3006,
+          "amdahl_bound_derived": 1.4298,
+          "la_over_relation_derived": 0.4298,
+          "whole_cl9_from_cost_cl9": 339364447765.8603,
+          "la_cl9_from_la_cost_cl9": 269657218480.78152,
+          "la_share_cl9_derived": 0.7946,
+          "amdahl_bound_cl9_derived": 4.8684
+        }
+      ],
+      "own_ols_exponent_check_derived": {
+        "12..22": {
+          "whole": 1.4301,
+          "relation": 1.4184,
+          "la": 1.4591
+        },
+        "16..22": {
+          "whole": 1.4087,
+          "relation": 1.4501,
+          "la": 1.3359
+        }
+      },
+      "la_share_gt_0_5_at_log2q_c_ell_1": [],
+      "la_share_gt_0_5_at_log2q_c_ell_9": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "arm": "r2:lpsgebw2+C1",
+      "per_q": [
+        {
+          "log2q": 12,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 3966019.8386395313,
+          "relation_from_rel_cost": 2868630.526147737,
+          "la_from_la_cost": 1096849.0667242424,
+          "la_share_derived": 0.2766,
+          "amdahl_bound_derived": 1.3823,
+          "la_over_relation_derived": 0.3824,
+          "whole_cl9_from_cost_cl9": 12741776.02033728,
+          "la_cl9_from_la_cost_cl9": 9871641.600518188,
+          "la_share_cl9_derived": 0.7747,
+          "amdahl_bound_cl9_derived": 4.4394
+        },
+        {
+          "log2q": 13,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 12480388.300057702,
+          "relation_from_rel_cost": 8202111.360936014,
+          "la_from_la_cost": 4277930.452212144,
+          "la_share_derived": 0.3428,
+          "amdahl_bound_derived": 1.5215,
+          "la_over_relation_derived": 0.5216,
+          "whole_cl9_from_cost_cl9": 46704321.47008858,
+          "la_cl9_from_la_cost_cl9": 38501374.06990938,
+          "la_share_cl9_derived": 0.8244,
+          "amdahl_bound_cl9_derived": 5.6936
+        },
+        {
+          "log2q": 14,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 30208946.01381085,
+          "relation_from_rel_cost": 17516065.434301212,
+          "la_from_la_cost": 12691092.653830834,
+          "la_share_derived": 0.4201,
+          "amdahl_bound_derived": 1.7245,
+          "la_over_relation_derived": 0.7245,
+          "whole_cl9_from_cost_cl9": 131739591.04747322,
+          "la_cl9_from_la_cost_cl9": 114219833.88447738,
+          "la_share_cl9_derived": 0.867,
+          "amdahl_bound_cl9_derived": 7.5195
+        },
+        {
+          "log2q": 15,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 82711045.30080101,
+          "relation_from_rel_cost": 44652398.37164566,
+          "la_from_la_cost": 38050692.36920111,
+          "la_share_derived": 0.46,
+          "amdahl_bound_derived": 1.852,
+          "la_over_relation_derived": 0.8522,
+          "whole_cl9_from_cost_cl9": 387124010.2508917,
+          "la_cl9_from_la_cost_cl9": 342456231.3228096,
+          "la_share_cl9_derived": 0.8846,
+          "amdahl_bound_cl9_derived": 8.6667
+        },
+        {
+          "log2q": 16,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 255980491.1761552,
+          "relation_from_rel_cost": 141450911.85101262,
+          "la_from_la_cost": 114528254.40319505,
+          "la_share_derived": 0.4474,
+          "amdahl_bound_derived": 1.8097,
+          "la_over_relation_derived": 0.8097,
+          "whole_cl9_from_cost_cl9": 1172207806.9293768,
+          "la_cl9_from_la_cost_cl9": 1030754289.628758,
+          "la_share_cl9_derived": 0.8793,
+          "amdahl_bound_cl9_derived": 8.2869
+        },
+        {
+          "log2q": 17,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 629442453.4692764,
+          "relation_from_rel_cost": 311991670.07150507,
+          "la_from_la_cost": 317425974.7882287,
+          "la_share_derived": 0.5043,
+          "amdahl_bound_derived": 2.0173,
+          "la_over_relation_derived": 1.0174,
+          "whole_cl9_from_cost_cl9": 3168869674.048251,
+          "la_cl9_from_la_cost_cl9": 2856833773.094065,
+          "la_share_cl9_derived": 0.9015,
+          "amdahl_bound_cl9_derived": 10.1555
+        },
+        {
+          "log2q": 18,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 1664125904.2094135,
+          "relation_from_rel_cost": 820902027.1746166,
+          "la_from_la_cost": 843220637.4872457,
+          "la_share_derived": 0.5067,
+          "amdahl_bound_derived": 2.0272,
+          "la_over_relation_derived": 1.0272,
+          "whole_cl9_from_cost_cl9": 8409893534.585694,
+          "la_cl9_from_la_cost_cl9": 7588985737.385202,
+          "la_share_cl9_derived": 0.9024,
+          "amdahl_bound_cl9_derived": 10.2446
+        },
+        {
+          "log2q": 19,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 4383923488.41042,
+          "relation_from_rel_cost": 2232823814.1103935,
+          "la_from_la_cost": 2151085503.044047,
+          "la_share_derived": 0.4907,
+          "amdahl_bound_derived": 1.9634,
+          "la_over_relation_derived": 0.9634,
+          "whole_cl9_from_cost_cl9": 21592619191.37381,
+          "la_cl9_from_la_cost_cl9": 19359769527.39647,
+          "la_share_cl9_derived": 0.8966,
+          "amdahl_bound_cl9_derived": 9.6704
+        },
+        {
+          "log2q": 20,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 11362252567.521221,
+          "relation_from_rel_cost": 6057866442.361661,
+          "la_from_la_cost": 5304356332.377148,
+          "la_share_derived": 0.4668,
+          "amdahl_bound_derived": 1.8756,
+          "la_over_relation_derived": 0.8756,
+          "whole_cl9_from_cost_cl9": 53797130129.90426,
+          "la_cl9_from_la_cost_cl9": 47739206991.39428,
+          "la_share_cl9_derived": 0.8874,
+          "amdahl_bound_cl9_derived": 8.8805
+        },
+        {
+          "log2q": 21,
+          "n_curves": 5,
+          "curves": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "all_correct": true,
+          "whole_from_cost": 29255324306.778175,
+          "relation_from_rel_cost": 16490439534.22906,
+          "la_from_la_cost": 12764856814.729475,
+          "la_share_derived": 0.4363,
+          "amdahl_bound_derived": 1.7741,
+          "la_over_relation_derived": 0.7741,
+          "whole_cl9_from_cost_cl9": 131374206915.12947,
+          "la_cl9_from_la_cost_cl9": 114883711332.56514,
+          "la_share_cl9_derived": 0.8745,
+          "amdahl_bound_cl9_derived": 7.9667
+        },
+        {
+          "log2q": 22,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 75325018321.98364,
+          "relation_from_rel_cost": 45362985891.80569,
+          "la_from_la_cost": 29961913164.531315,
+          "la_share_derived": 0.3978,
+          "amdahl_bound_derived": 1.6605,
+          "la_over_relation_derived": 0.6605,
+          "whole_cl9_from_cost_cl9": 315020461051.4854,
+          "la_cl9_from_la_cost_cl9": 269657218480.78152,
+          "la_share_cl9_derived": 0.856,
+          "amdahl_bound_cl9_derived": 6.9444
+        }
+      ],
+      "own_ols_exponent_check_derived": {
+        "12..22": {
+          "whole": 1.4152,
+          "relation": 1.3888,
+          "la": 1.4591
+        },
+        "16..22": {
+          "whole": 1.3733,
+          "relation": 1.4038,
+          "la": 1.3359
+        }
+      },
+      "la_share_gt_0_5_at_log2q_c_ell_1": [
+        17,
+        18
+      ],
+      "la_share_gt_0_5_at_log2q_c_ell_9": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "arm": "w:lpsgebw2+C1C2",
+      "per_q": [
+        {
+          "log2q": 12,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 4778937.439265666,
+          "relation_from_rel_cost": 3672311.638991974,
+          "la_from_la_cost": 1102289.0404907076,
+          "la_share_derived": 0.2307,
+          "amdahl_bound_derived": 1.2998,
+          "la_over_relation_derived": 0.3002,
+          "whole_cl9_from_cost_cl9": 13606301.860493276,
+          "la_cl9_from_la_cost_cl9": 9920601.36441634,
+          "la_share_cl9_derived": 0.7291,
+          "amdahl_bound_cl9_derived": 3.6916
+        },
+        {
+          "log2q": 13,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 13032536.774651116,
+          "relation_from_rel_cost": 8857958.508692224,
+          "la_from_la_cost": 4173867.974065822,
+          "la_share_derived": 0.3203,
+          "amdahl_bound_derived": 1.4712,
+          "la_over_relation_derived": 0.4712,
+          "whole_cl9_from_cost_cl9": 46424556.59626471,
+          "la_cl9_from_la_cost_cl9": 37564811.766592294,
+          "la_share_cl9_derived": 0.8092,
+          "amdahl_bound_cl9_derived": 5.2399
+        },
+        {
+          "log2q": 14,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 30255530.70590776,
+          "relation_from_rel_cost": 17478554.203618053,
+          "la_from_la_cost": 12766791.191605845,
+          "la_share_derived": 0.422,
+          "amdahl_bound_derived": 1.73,
+          "la_over_relation_derived": 0.7304,
+          "whole_cl9_from_cost_cl9": 132400614.91001107,
+          "la_cl9_from_la_cost_cl9": 114901120.72445288,
+          "la_share_cl9_derived": 0.8678,
+          "amdahl_bound_cl9_derived": 7.566
+        },
+        {
+          "log2q": 15,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 80886080.26304142,
+          "relation_from_rel_cost": 42441344.31579334,
+          "la_from_la_cost": 38439415.55444408,
+          "la_share_derived": 0.4752,
+          "amdahl_bound_derived": 1.9056,
+          "la_over_relation_derived": 0.9057,
+          "whole_cl9_from_cost_cl9": 388406030.2187457,
+          "la_cl9_from_la_cost_cl9": 345954739.98999757,
+          "la_share_cl9_derived": 0.8907,
+          "amdahl_bound_cl9_derived": 9.1495
+        },
+        {
+          "log2q": 16,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 248700421.96685037,
+          "relation_from_rel_cost": 134699256.72123972,
+          "la_from_la_cost": 113998365.47409777,
+          "la_share_derived": 0.4584,
+          "amdahl_bound_derived": 1.8463,
+          "la_over_relation_derived": 0.8463,
+          "whole_cl9_from_cost_cl9": 1160689953.5434215,
+          "la_cl9_from_la_cost_cl9": 1025985289.2668824,
+          "la_share_cl9_derived": 0.8839,
+          "amdahl_bound_cl9_derived": 8.6166
+        },
+        {
+          "log2q": 17,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 604104634.9608439,
+          "relation_from_rel_cost": 289289264.0493176,
+          "la_from_la_cost": 314806119.3413796,
+          "la_share_derived": 0.5211,
+          "amdahl_bound_derived": 2.0882,
+          "la_over_relation_derived": 1.0882,
+          "whole_cl9_from_cost_cl9": 3122560468.853387,
+          "la_cl9_from_la_cost_cl9": 2833255074.072423,
+          "la_share_cl9_derived": 0.9073,
+          "amdahl_bound_cl9_derived": 10.7933
+        },
+        {
+          "log2q": 18,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 1605345322.426975,
+          "relation_from_rel_cost": 758521946.4101323,
+          "la_from_la_cost": 846822462.4429929,
+          "la_share_derived": 0.5275,
+          "amdahl_bound_derived": 2.1164,
+          "la_over_relation_derived": 1.1164,
+          "whole_cl9_from_cost_cl9": 8379925683.111406,
+          "la_cl9_from_la_cost_cl9": 7621402161.986955,
+          "la_share_cl9_derived": 0.9095,
+          "amdahl_bound_cl9_derived": 11.0477
+        },
+        {
+          "log2q": 19,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 4220699789.678417,
+          "relation_from_rel_cost": 2067217294.2767277,
+          "la_from_la_cost": 2153482218.543596,
+          "la_share_derived": 0.5102,
+          "amdahl_bound_derived": 2.0417,
+          "la_over_relation_derived": 1.0417,
+          "whole_cl9_from_cost_cl9": 21448557751.475674,
+          "la_cl9_from_la_cost_cl9": 19381339966.89234,
+          "la_share_cl9_derived": 0.9036,
+          "amdahl_bound_cl9_derived": 10.3756
+        },
+        {
+          "log2q": 20,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 10876507285.566195,
+          "relation_from_rel_cost": 5549020164.431892,
+          "la_from_la_cost": 5327461061.619703,
+          "la_share_derived": 0.4898,
+          "amdahl_bound_derived": 1.9601,
+          "la_over_relation_derived": 0.9601,
+          "whole_cl9_from_cost_cl9": 53496217409.93235,
+          "la_cl9_from_la_cost_cl9": 47947149554.577446,
+          "la_share_cl9_derived": 0.8963,
+          "amdahl_bound_cl9_derived": 9.6406
+        },
+        {
+          "log2q": 21,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 27834401968.242672,
+          "relation_from_rel_cost": 15068243622.999445,
+          "la_from_la_cost": 12766057622.532259,
+          "la_share_derived": 0.4586,
+          "amdahl_bound_derived": 1.8472,
+          "la_over_relation_derived": 0.8472,
+          "whole_cl9_from_cost_cl9": 129962956522.43633,
+          "la_cl9_from_la_cost_cl9": 114894518602.7906,
+          "la_share_cl9_derived": 0.8841,
+          "amdahl_bound_cl9_derived": 8.6248
+        },
+        {
+          "log2q": 22,
+          "n_curves": 3,
+          "curves": [
+            0,
+            1,
+            2
+          ],
+          "all_correct": true,
+          "whole_from_cost": 71271063766.15903,
+          "relation_from_rel_cost": 41368857610.5601,
+          "la_from_la_cost": 29902201073.161037,
+          "la_share_derived": 0.4196,
+          "amdahl_bound_derived": 1.7228,
+          "la_over_relation_derived": 0.7228,
+          "whole_cl9_from_cost_cl9": 310488677770.0828,
+          "la_cl9_from_la_cost_cl9": 269119809658.44998,
+          "la_share_cl9_derived": 0.8668,
+          "amdahl_bound_cl9_derived": 7.5054
+        }
+      ],
+      "own_ols_exponent_check_derived": {
+        "12..22": {
+          "whole": 1.3921,
+          "relation": 1.3533,
+          "la": 1.4598
+        },
+        "16..22": {
+          "whole": 1.3679,
+          "relation": 1.3952,
+          "la": 1.3372
+        }
+      },
+      "la_share_gt_0_5_at_log2q_c_ell_1": [
+        17,
+        18,
+        19
+      ],
+      "la_share_gt_0_5_at_log2q_c_ell_9": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    }
+  ],
+  "readme_reported_exponents_from_analysis_md": {
+    "r2:lpsgebw2": {
+      "12..22": {
+        "whole": 1.430,
+        "relation": 1.419,
+        "la": 1.458
+      },
+      "16..22": {
+        "whole": 1.408,
+        "relation": 1.450,
+        "la": 1.335
+      }
+    },
+    "r2:lpsgebw2+C1": {
+      "12..22": {
+        "whole": 1.415,
+        "relation": 1.389,
+        "la": 1.458
+      },
+      "16..22": {
+        "whole": 1.374,
+        "relation": 1.407,
+        "la": 1.335
+      }
+    },
+    "w:lpsgebw2+C1C2": {
+      "12..22": {
+        "relation": 1.354,
+        "la": 1.460
+      },
+      "16..22": {
+        "relation": 1.395,
+        "la": 1.337
+      },
+      "note": "whole read from README text: 1.368 over 16..22 (C1+C2); 12..22 whole not read"
+    },
+    "c4:lpsgebw2o100c@16+C1C2": {
+      "12..22": {
+        "whole": 1.399,
+        "relation": 1.357,
+        "la": 1.544
+      },
+      "16..22": {
+        "whole": 1.413,
+        "relation": 1.473,
+        "la": 1.314
+      }
+    }
+  },
+  "not_found": [
+    "no r2:lpsgebw2+C1C2 arm",
+    "no matched-rho gap in this item (README: not measured)",
+    "no field for how much of LA is recoverable by a different solver; only analysis.md column mat-vec share of LA products (0.79-0.82, incumbent) and matvecs/cols (1.50)",
+    "wall times not used (descriptive only, host L0)"
+  ]
+}

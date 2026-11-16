@@ -1,0 +1,287 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-shift-overlap-20261027-v1",
+  "created": "2026-10-27T07:16:40Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "b7e3139b59da38041808bdd4d0028b8d8ac8348e2baa9e9ec6f4da7fe436a61d",
+    "protocol_id": "twist-shift-overlap-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-shift-overlap-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "376307efd9528c6ab9c670c10a652801a6a9769044b9ca336391d9d84df2aa25",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "all-shifts",
+      "role": "baseline",
+      "binary_sha256": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+      "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3"
+    },
+    {
+      "id": "independent",
+      "role": "reference",
+      "binary_sha256": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+      "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "all-shifts-000",
+      "arm": "all-shifts",
+      "instance_id": "original-ten-fixtures-all-shifts",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "checked_shifts": 27140
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "smooth_nonzero_shifts": 27130,
+          "GP_overlap_polynomials": 20,
+          "positive_covers": 10,
+          "false_polynomials_rejected": 10
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact finite census only; no timing or performance claim."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent square-table point census and strict PARI Frobenius-polynomial replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "d66823361504cce4e14bf4e8f265982eb4cb939fdca1cd0cf8c5ea085e075d23",
+          "bytes": 102176,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "36cb3aa6a943a77f770e4f1acd015875bd69cc65778b316bfc88ead182648af4",
+          "bytes": 3011,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "9eb7f8f14a9362d9fb78c7e186b0ea950a728bc9506d27e3083693363cf1dfe6",
+          "bytes": 9235,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T07:10:12Z",
+      "finished_at": "2026-10-27T07:10:13Z",
+      "worker": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+      "backend_ref": "runs/overlap-v1"
+    },
+    {
+      "run_id": "all-shifts-verifier-000",
+      "arm": "independent",
+      "instance_id": "original-ten-fixtures-all-shifts",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "checked_shifts": 27140
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "smooth_nonzero_shifts": 27130,
+          "GP_overlap_polynomials": 20,
+          "positive_covers": 10,
+          "false_polynomials_rejected": 10
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact finite census only; no timing or performance claim."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent square-table point census and strict PARI Frobenius-polynomial replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "d66823361504cce4e14bf4e8f265982eb4cb939fdca1cd0cf8c5ea085e075d23",
+          "bytes": 102176,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "36cb3aa6a943a77f770e4f1acd015875bd69cc65778b316bfc88ead182648af4",
+          "bytes": 3011,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "9eb7f8f14a9362d9fb78c7e186b0ea950a728bc9506d27e3083693363cf1dfe6",
+          "bytes": 9235,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T07:10:25Z",
+      "finished_at": "2026-10-27T07:10:49Z",
+      "worker": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+      "backend_ref": "overlap-audit-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "4bff2125614fae111031e26f1c6b7df44aee1bc6b6e456d917819e7edce89445",
+      "bytes": 11290,
+      "kind": "protocol"
+    },
+    {
+      "path": "HOST.json",
+      "sha256": "376307efd9528c6ab9c670c10a652801a6a9769044b9ca336391d9d84df2aa25",
+      "bytes": 580,
+      "kind": "host"
+    },
+    {
+      "path": "FROZEN.json",
+      "sha256": "cf88126eaec64be7961da912bd9971390553a25ebbdf9f92ad917bd4a9ce32d8",
+      "bytes": 1500,
+      "kind": "receipt"
+    },
+    {
+      "path": "GP_COMPATIBILITY_AMENDMENT_V2.md",
+      "sha256": "94d0954e6e1720eeb132b817247142f4c0147db08501a99f99cb60b6104840ba",
+      "bytes": 1416,
+      "kind": "other"
+    },
+    {
+      "path": "GP_COMPATIBILITY.json",
+      "sha256": "cb1a03284385ec12f9ddc4d7dcf60ec83107d6a9e81ce653d64af8a76d38b430",
+      "bytes": 887,
+      "kind": "receipt"
+    },
+    {
+      "path": "pari-replay-v1/RECEIPT.json",
+      "sha256": "352b20feb74bc0f49eeef68d3cf3c1252686c14a22c6509f277642de340caee1",
+      "bytes": 1296,
+      "kind": "receipt"
+    },
+    {
+      "path": "experiment.native.export.json",
+      "sha256": "23e725e21e6b6c12ae15c4de50ba12bb39f5b2042008eb009132dcbf7239d484",
+      "bytes": 7657,
+      "kind": "other"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/bin/twist-shift-overlap.rs",
+      "sha256": "43ee0e2010ded69b759e9f9e9d93e5c45aaf76df4e91d2172b6455c698f88863",
+      "bytes": 26083,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "overlap-audit-v1/AUDIT.json",
+        "sha256": "997530ef0759116d7d5bd78883b8719d54900c40e1feb0a922c5b527d851e4da",
+        "bytes": 4460,
+        "kind": "analysis"
+      },
+      {
+        "path": "ADMISSION.json",
+        "sha256": "9eb7f8f14a9362d9fb78c7e186b0ea950a728bc9506d27e3083693363cf1dfe6",
+        "bytes": 9235,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "One producer and one separate independent-verifier execution process the same complete fixed panel; do not pool their shift counts as independent targets. Positive/negative checks are embedded, not fabricated separate executions. Shared author/host; Legendre/genus/Weil Lean bridge and DLP transfer/cost remain unestablished.",
+      "by": "native exporter"
+    },
+    {
+      "kind": "observation",
+      "text": "Scientific worker/source hashes exactly match the pre-data freeze. The broader worktree also holds later receipts and the explicit pre-PARI polrem(a,b)=a%b compatibility preload; original main script, count dataset, polynomial cases and thresholds are unchanged. source.dirty describes that broader worktree.",
+      "by": "operational metadata annotation"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

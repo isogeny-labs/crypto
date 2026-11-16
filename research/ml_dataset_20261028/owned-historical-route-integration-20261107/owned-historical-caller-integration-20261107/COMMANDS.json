@@ -1,0 +1,23 @@
+[
+  [
+    "python3",
+    "prepare.py"
+  ],
+  [
+    "rustc",
+    "+1.98",
+    "--edition=2021",
+    "--test",
+    "tests.rs",
+    "-L",
+    "dependency=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps",
+    "--extern",
+    "serde_json=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps/libserde_json-10f254ba1c7de3e0.rlib",
+    "-o",
+    "tests"
+  ],
+  [
+    "./tests",
+    "--nocapture"
+  ]
+]

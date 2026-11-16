@@ -1,0 +1,70 @@
+{
+  "schema": "research.final-binding-preparation/v1",
+  "status": "planning_only_awaiting_actual_root_v4_terminal",
+  "active_payload": "root-library-v4",
+  "root_invocation_expected": "a80ba03158b54687892e12b9e78f7c70",
+  "current_ledger": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261109/ledger-root-v4-reserved.json",
+    "sha256": "ea8b75c3676350f40328226e4083de0fb64b88fcb1f47e23871c84678bc81637",
+    "charged_seconds": 16440,
+    "reserved_seconds": 1800
+  },
+  "conditional_accounting_not_actual": {
+    "condition": "Only if root confirms terminal and charges its full1800 reservation with no intervening charges",
+    "prior_debit_seconds": 18240,
+    "remaining_before_helper_seconds": 24960,
+    "proposed_helper_reservation_seconds": 2400,
+    "remaining_after_proposed_reservation_seconds": 22560
+  },
+  "reviewed_freeze_sha256": "1c4b9f6d93e9ac27b6abcf6f1de3b21866729118ec965dc39207b93491864fa0",
+  "independent_review_sha256": "4409cc210399c71cbac024e07bccbaef4e55add32577dbed44dcc1a581ccc542",
+  "source_mutations_performed": false,
+  "pending_final_freeze_changes": [
+    "Set prior_attempt_conservative_debit_seconds from actual terminal ledger",
+    "Set remaining_before_attempt_seconds=43200-actualcharged",
+    "Preserve every source/hash/runtime/limit binding; record old/new freeze hashes and exact numeric delta in new final binding receipt",
+    "Publish final freeze and review/ledger/terminal/claim metadata; verify exact remote revision"
+  ],
+  "required_receipts": {
+    "publication": "Exact final GitHub commit/readback receipt, not current draft publication",
+    "independent_review": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-replay-review-20261109/review.json",
+    "ledger": "Actual post-root terminal ledger including full root1800 charge, then helper reservation ledger",
+    "materializer_terminal": "Aggregate original materializer terminal plus actual latest rootv4 seal/owner/cleanup readback; hash every constituent",
+    "lease_readback": "Fresh live T2070 epoch1 matching exactclaim, maintained through launcher"
+  },
+  "live_launch_checks": [
+    "Root v4 process/session terminal; captured invocation matchesa80ba03158b54687892e12b9e78f7c70, no live descendants/cgroup",
+    "Root completion sealing resolved even if payload failed; original failure costs preserved",
+    "No other active payload; original materializer remains terminal",
+    "Fresh helper workspace and outer directory absent; three helper phase units not-found",
+    "Enough absolute deadline for2400 seconds; latest reserved budget fits43200",
+    "Current fence maintained; no Conductor conflicts; release changesfalse\u2192true only by root"
+  ],
+  "command": [
+    "/usr/bin/python3",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-replay-20261109/launch.py",
+    "--execute",
+    "--freeze-sha256",
+    "ACTUAL_FINAL_PUBLISHED_FREEZE_SHA256",
+    "--release-record",
+    "ABSOLUTE_ROOT_RELEASE_RECORD",
+    "--release-sha256",
+    "ACTUAL_RELEASE_SHA256"
+  ],
+  "limits": {
+    "phase_seconds": {
+      "pre": 900,
+      "compiler": 600,
+      "post": 900
+    },
+    "total_seconds": 2400,
+    "cpu": 1,
+    "memory_gib": 8,
+    "swap": 0,
+    "tasks": 128,
+    "attempts": 1,
+    "automatic_retry": false,
+    "deadline": "2026-11-10T05:11:39Z"
+  },
+  "custody": "All26original and copied retained sources/artifacts checked pre/compiler/post; privatecache strict entries,13modules. Shared16736-file baseline and runtime pre/post retained. Five calls; thirteen final readbacks; expectedFalse rejection. Postcustody runs after compilerfailure only once exactphaseowner is terminal."
+}

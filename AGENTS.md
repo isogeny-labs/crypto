@@ -159,6 +159,16 @@ Change the index or ranking only against that measurement.
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Check research proposals into a PR before handing them off** (owner,
+  2026-10-28). Lead nominations, literature reviews, experiment plans, reports,
+  diagrams, and reproducible sources are finished work. Commit them and open
+  a regular PR, or update the appropriate existing regular PR, before the final
+  response. Include required report PDFs under the current artifact policy.
+  Local commits, workspace links, and private checkpoints are intermediate
+  records until the PR contains the intended files. Verify the remote commit
+  and PR contents. If publication is blocked, report the exact blocker and
+  keep the check-in obligation open. Preserve the distinctions between proposed,
+  proved, and measured work, and honor existing merge and experiment limits.
 - **Use regular PRs.** Create pull requests with `draft=false` and mark an
   existing draft ready for review when you update it. Record pending CI,
   review, and follow-up work in the PR description; draft status is not a
@@ -1859,6 +1869,13 @@ specified in [`docs/curves/ICV1.md`](docs/curves/ICV1.md).
   challenge published may go by that name (`ECC2K-130`, `sect163k1`,
   `secp256k1`, `P-256`).  Family notation with a free parameter is fine
   when a sentence is about the family.
+- **Use the standard panel.** New measurements run on the curves of
+  [`docs/ic/STANDARD_PANEL.md`](docs/ic/STANDARD_PANEL.md) (owner,
+  2026-11-10), and a study that uses another curve says why. Prose and
+  tables may name a panel curve by its alias (`K0-23`, `K1-83`, `P36a`);
+  records and file names keep the slug. An alias-shaped name that is not
+  on the panel fails `curve-names` in `docs/ic/` and in research dated on
+  or after the freeze.
 - **Never write a retired form.** The spellings in `ICV1.md`'s table of
   retired names carry no model and may not appear in new text or be
   emitted by new code.  Frozen reports keep them; the registry resolves
@@ -1910,6 +1927,15 @@ workloads, under the same isolation, into the same sealed records.
   native `boundary_autolab.py claim-check --stage vs_rho`).  It passes
   only with an audit receipt from another host class that replayed both
   runs; without one it fails on that and says so.
+  The wall reference is the fastest rho for the curve family, never the
+  untuned `rho.negation`: `rho.signed_frobenius_strong` on Koblitz curves
+  (the only one `ecbench claim build` accepts today; it has no prime
+  branch), `rho.prime_fast` (`prime_fast::rho_parallel`, negation map, one
+  thread, p < 2^62, `RhoConfig::tuned`) on prime curves: 1.03x
+  `rho.negation`'s operations [0.98, 1.08] at about 0.22x its median wall
+  on 28–40-bit curves (`research/tuned_gae_20261020/`).  It is the wall
+  reference; the counted reference stays `rho.negation`.  A prime wall ratio is `rho.prime_fast` online wall over
+  IC online wall, priced under §5a, until a prime claim branch exists.
 - **Skills:** `ecbench-measure`, `ecbench-independent-runner` and
   `ecbench-extend` under `.agents/skills/`.
 

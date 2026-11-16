@@ -1,0 +1,75 @@
+{
+  "schema": "smart-concrete-verification/v1",
+  "created": "2026-11-10T09:45:23.738668+00:00",
+  "source_commit": "7fc27f7fa99ae2d7cf01861513da1557209afa23",
+  "source_plan": "smart-sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "predata_public_theorems": 28,
+    "concrete_public_theorems": 51,
+    "failing": 0,
+    "trusted_native": 0,
+    "archive": "research/anomalous_curve_audit_20261110/smart-v1/evidence/smart-gate.tar.gz",
+    "roundtrip_equal": true,
+    "private": "All explicit transitions compiled and all reachable private proof dependencies audited transitively; public count includes generated declarations."
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-d8466d",
+    "claim_sha256": "0654ee9165ac525314897bcbcc2f8a85ee7ccc6d7ea84e03212f85f3cc0a0542",
+    "commit": "7fc27f7fa99ae2d7cf01861513da1557209afa23",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/anomalous_curve_audit_20261110/smart-v1/certificate-lean (SmartCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T09:44:26Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-d8466d",
+    "claim_sha256": "0654ee9165ac525314897bcbcc2f8a85ee7ccc6d7ea84e03212f85f3cc0a0542",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "native_packet": {
+    "claim_id": "PCC-20261110-162b83",
+    "actual_local_verdict": {
+      "claim_id": "PCC-20261110-162b83",
+      "claim_sha256": "8060c2e0bfa92199b9acce06329ba4c26cef29da32ff13dee548e5ea180ac9cb",
+      "commit": "37302ba3281d51058f1c3a0737b10b40a9403c06",
+      "proofs": [
+        {
+          "kind": "attestation",
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ],
+          "reasons": [],
+          "verdict": "not_covered"
+        }
+      ],
+      "reasons": [
+        "claim kind measurement is not covered: recompute; replay"
+      ],
+      "schema": "pcc.verdict/v1",
+      "verdict": "not_covered",
+      "verified_at": "2026-11-10T09:02:59Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "signed_standing": {
+      "claim_id": "PCC-20261110-162b83",
+      "claim_sha256": "8060c2e0bfa92199b9acce06329ba4c26cef29da32ff13dee548e5ea180ac9cb",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "native_export": "Canonical --verify-files PASS0findings; immutable113file list intact.",
+  "limits": "Four fixed public-input finite-ring attempts return a scalar satisfying the actual Mathlib point relation on a nonsingular curve with exact160-bit prime-orderG. No genericp-adictransfer,wholecurvepointcount,nativeexecutionrefinement,securitycostorbenchmarkclaim."
+}

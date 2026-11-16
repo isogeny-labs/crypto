@@ -1,0 +1,7 @@
+# Post-run reporting calculation
+
+All34 native data/control stages completed01:30:37–01:31:14UTC before this summary source. Explicit AFTER-data reporting analysis; original frozen protocol/source/binaries/data unchanged. This does not amend population or criteria or become a blinded experiment. [pcc:unverified]
+
+Read independently replayed native auditC/A/B plus counted original cases. Preserve every32point workload and512polynomial input in EACH timing stream. Per target, report all4cold median/IQR/ranges, full counted arithmetic vectors, legacyWeil/fastTate and plainBSGS/fastTate median ratios. Per polynomial input report all3engine timing distributions and legacy/terminal,NTL/terminal ratios, including every loss/tie. Per-field ratio RANGE is a secondary summary of separate one-target observations, never multi-target throughput. Degree ranges come only from exact independently reconstructed native witness peaks; NTL peak stays unknown. Same-field peak not intrinsic/original S3. [pcc:unverified]
+
+Summary code/source/input hashes published before affected report calculation,600s/current01:42deadline. Original cases/protocol and native controls retained. All timing assertions producer observations, no signedPCC/execution/overall fastest/IC-vs-rho claim. Cold generic reduction and phase-only algebraic kernel remain separate; complete admitted-public-log IC cost not measured here. [pcc:unverified]

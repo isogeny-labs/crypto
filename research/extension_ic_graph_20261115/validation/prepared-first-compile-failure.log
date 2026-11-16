@@ -1,0 +1,383 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+error: couldn't read `src/cryptanalysis/chained_transfer/../../../research/chained_transfer_next_20261115/select_only.tsv`: No such file or directory (os error 2)
+    --> src/cryptanalysis/chained_transfer/quartic_ic.rs:2491:9
+     |
+2491 |         include_str!("../../../research/chained_transfer_next_20261115/select_only.tsv");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:106:22
+    |
+106 |             vec![mm((f.p - vs[k]) % f.p, inv_mod(us[k], f.p), f.p)]
+    |                      ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:106:37
+    |
+106 |             vec![mm((f.p - vs[k]) % f.p, inv_mod(us[k], f.p), f.p)]
+    |                                     ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:106:57
+    |
+106 |             vec![mm((f.p - vs[k]) % f.p, inv_mod(us[k], f.p), f.p)]
+    |                                                         ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:106:63
+    |
+106 |             vec![mm((f.p - vs[k]) % f.p, inv_mod(us[k], f.p), f.p)]
+    |                                                               ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:121:52
+    |
+121 |             let roots = ring.roots(&UPoly(vec![t, (f.p - s) % f.p, 1]), rng);
+    |                                                    ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:121:63
+    |
+121 |             let roots = ring.roots(&UPoly(vec![t, (f.p - s) % f.p, 1]), rng);
+    |                                                               ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:125:33
+    |
+125 |                     if am(r, r, f.p) != s || mm(r, r, f.p) != t {
+    |                                 ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+
+error[E0425]: cannot find value `f` in this scope
+   --> src/cryptanalysis/gaudry_cubic_symmetric.rs:125:55
+    |
+125 |                     if am(r, r, f.p) != s || mm(r, r, f.p) != t {
+    |                                                       ^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/cryptanalysis/ecbench/db.rs:63:1
+    |
+ 63 | fn f(v: Option<f64>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::ecbench::db::f`: not accessible
+    |
+   ::: src/cryptanalysis/md5_differential.rs:50:1
+    |
+ 50 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::f`: not accessible
+    |
+   ::: src/cryptopals/challenge55.rs:53:1
+    |
+ 53 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptopals::challenge55::f`: not accessible
+    |
+   ::: src/hash/md4.rs:35:1
+    |
+ 35 | fn f(x: u32, y: u32, z: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::f`: not accessible
+    |
+   ::: src/kdf/bcrypt.rs:187:1
+    |
+187 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kdf::bcrypt::f`: not accessible
+    |
+   ::: src/symmetric/blowfish.rs:211:1
+    |
+211 | fn f(s: &[[u32; 256]; 4], x: u32) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::blowfish::f`: not accessible
+    |
+   ::: src/symmetric/camellia.rs:106:1
+    |
+106 | fn f(x: u64, k: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::camellia::f`: not accessible
+    |
+   ::: src/symmetric/feal.rs:111:1
+    |
+111 | fn f(alpha: u32, beta: u16) -> u32 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::feal::f`: not accessible
+

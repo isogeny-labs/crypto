@@ -1,0 +1,38 @@
+{
+  "compiled": true,
+  "full_owner_compiled": false,
+  "tests_passed": 23,
+  "tests_failed": 0,
+  "scope": "Exact owning LiftRecord and RetainedRecords projection with actual unchanged exclusion verifier; structural CheckedMap fixture and test Ledger, not authentic owner ingress",
+  "commands": [
+    "timeout 180 rustc +1.98 --edition=2021 --test harness.rs -o tests",
+    "timeout 60 ./tests --test-threads=1"
+  ],
+  "artifacts": [
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/projection-checks/harness.rs",
+      "sha256": "a03c17e9e271fb6896432a4480f1cd1013313b44be7ab9cda8f1cd0c1e8b147d",
+      "bytes": 8438
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/projection-checks/owning_projection.rs",
+      "sha256": "e8fca9cc754a704a225e6162d1223b7243ad84d3b9bb4fee5e0d12038d7d1aa5",
+      "bytes": 685
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/projection-checks/compile.log",
+      "sha256": "5fa7af37dce3824f9c70a5142fdcbe09785f22b29e28fe5fe3ce0b992b699751",
+      "bytes": 3744
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/projection-checks/tests",
+      "sha256": "dc46dd2352eda677aa41b696da5f380ba93517ea528ce78139e29dcd9a48c6e1",
+      "bytes": 8174384
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/projection-checks/tests.log",
+      "sha256": "509793ec84166c0a78a24da8ff909cfaebf3c2d4b31a7e8d9d1cbfe3c5a782a0",
+      "bytes": 1714
+    }
+  ]
+}

@@ -128,7 +128,11 @@ use super::genus_ladder::{roots_of, splits_completely, JCurve, JDiv};
 
 #[inline]
 fn md(a: u64, b: u64, p: u64) -> u64 {
-    a * b % p
+    if p < (1 << 32) {
+        a * b % p
+    } else {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
 }
 #[inline]
 fn ad(a: u64, b: u64, p: u64) -> u64 {
@@ -421,6 +425,22 @@ pub struct QuarticFit {
 /// (the three differentials are independent), lie on no conic (`X` is not
 /// hyperelliptic) and on exactly one quartic.
 pub fn fit_quartic(p: u64, pts: &[[Fp2; 3]]) -> Result<QuarticFit, String> {
+    assert!(
+        p < (1 << 32),
+        "fit_quartic stores u32 coefficients; use fit_quartic_u64"
+    );
+    let (q64, points) = fit_quartic_u64(p, pts)?;
+    let mut quartic = [0u32; 15];
+    for (q, c) in quartic.iter_mut().zip(q64) {
+        *q = c as u32;
+    }
+    Ok(QuarticFit { quartic, points })
+}
+
+/// [`fit_quartic`] with `u64` coefficients, for `p` up to `2^62`: the
+/// normalized quartic (first nonzero coefficient 1, `mons_of_degree(4)`
+/// order) and the number of distinct points used.
+pub fn fit_quartic_u64(p: u64, pts: &[[Fp2; 3]]) -> Result<([u64; 15], usize), String> {
     let k = F2::new(p);
     let mut seen: Vec<[Fp2; 3]> = Vec::new();
     for h in pts {
@@ -470,14 +490,11 @@ pub fn fit_quartic(p: u64, pts: &[[Fp2; 3]]) -> Result<QuarticFit, String> {
     let v = &ns[0];
     let lead = *v.iter().find(|&&c| c != 0).unwrap();
     let il = inv_mod(lead, p);
-    let mut quartic = [0u32; 15];
+    let mut quartic = [0u64; 15];
     for (q, &c) in quartic.iter_mut().zip(v) {
-        *q = md(c, il, p) as u32;
+        *q = md(c, il, p);
     }
-    Ok(QuarticFit {
-        quartic,
-        points: seen.len(),
-    })
+    Ok((quartic, seen.len()))
 }
 
 // ---------------------------------------------------------------------------
@@ -1832,7 +1849,7 @@ impl Ct {
     #[inline]
     fn m(&self, a: u64, b: u64) -> u64 {
         self.mul.set(self.mul.get() + 1);
-        a * b % self.p
+        md(a, b, self.p)
     }
     fn inv(&self, a: u64) -> u64 {
         self.inv.set(self.inv.get() + 1);

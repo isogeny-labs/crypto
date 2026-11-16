@@ -1,0 +1,29 @@
+    Checking cubic-graph-analysis v0.1.0 (/workspace/crypto/research/extension_ic_graph_20261115/native_analysis)
+error: unused import: `n`
+ --> src/bin/normalization-analysis.rs:9:18
+  |
+9 |         shared::{n, price, Field, Widths},
+  |                  ^
+  |
+  = note: `-D unused-imports` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: fields `original_scalar`, `original_products`, and `original_rank` are never read
+  --> src/bin/normalization-bench.rs:25:9
+   |
+18 | pub(crate) struct Matrix {
+   |                   ------ fields in this struct
+...
+25 |     pub original_scalar: u64,
+   |         ^^^^^^^^^^^^^^^
+26 |     pub original_products: u64,
+   |         ^^^^^^^^^^^^^^^^^
+27 |     pub original_rank: u64,
+   |         ^^^^^^^^^^^^^
+   |
+   = note: `-D dead-code` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: could not compile `cubic-graph-analysis` (bin "normalization-bench") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `cubic-graph-analysis` (bin "normalization-analysis") due to 1 previous error
