@@ -16,8 +16,8 @@ Weil restriction of an elliptic curve over F_(5^5). The conclusion is
 for this three-branch rational Kummer stratum, not all genus-five covers.
 
 Every row passed an independent direct eleventh-power recount over
-F3125 (`VERIFIED.json`), distinct from the logarithm-residue histogram
-used by `SCREEN.json`. The genus-five and L-polynomial derivation uses
+F3125 (`VERIFIED.json`), distinct from the logarithm-residue histogram. [pcc:unverified]
+The one-pass screen is saved in `SCREEN.json`. The genus-five and L-polynomial derivation uses
 tame Riemann--Hurwitz, `gcd(11,5^r-1)=1` for `r=1..4`, the functional
 equation, and `t=(3126-N5)/5`. `F5Arithmetic.lean` checks the finite
 order-five and trace-recurrence arithmetic with no axioms; it does not
@@ -31,3 +31,8 @@ This screen supplies neither an elliptic source nor a GHS attack cost.
 Primary sources:
 - Ozman--Pries--Weir, *The boundary of the p-rank 0 stratum of the moduli space of cyclic covers of the projective line* (2022): https://doi.org/10.1017/nmj.2022.12
 - Agathocleous--Joux--Taufer, *Elliptic curves over Hasse pairs* (2026), Waterhouse trace cases: https://pure.mpg.de/pubman/item/item_3596867_6/component/file_3655796/Agathocleous-Joux-Taufer_Elliptic%2Bcurves%2Bover%2BHasse%2Bpairs_2026.pdf
+
+The [trace chart](traces.svg) displays the two source-bound counts;
+[RESULT.pdf](RESULT.pdf) contains the visual report. No canonical
+vulnerability graph is changed because the screen yielded no eligible
+elliptic source in this restricted family.

@@ -63,3 +63,9 @@ Primary source: Ozman--Pries--Weir, *The boundary of the p-rank 0
 stratum of the moduli space of cyclic covers of the projective line*,
 Nagoya Math. J. 248 (2022), Lemma 2.1 and Theorem 2.3:
 https://doi.org/10.1017/nmj.2022.12 .
+
+The [orbit diagram](orbit.svg) shows the two Frobenius character orbits
+and the finite zero-minimum certificate. [THEOREM.pdf](THEOREM.pdf) is the
+rendered source-linked report. No canonical vulnerability graph is changed:
+the result is a restricted exclusion, and its publication priority remains
+unresolved.
