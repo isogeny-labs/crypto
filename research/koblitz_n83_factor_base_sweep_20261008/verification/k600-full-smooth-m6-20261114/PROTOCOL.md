@@ -119,3 +119,22 @@ only after relation collection, rank and logarithm recovery, sparse linear
 algebra, target work, and matched rho are measured under the repository's
 candidate and tier contracts for both exact N83 curves. Keep this gate's
 `selected_best_total_runtime` null.
+
+## Native replay amendment — 2026-11-15
+
+The Python `replay_model.py` and its selftest above remain historical prepared
+evidence. For any future K600 m6 model, use the independent native Rust
+[`n83_k600_m6_native_replay`](../../../../examples/n83_k600_m6_native_replay.rs)
+release example. It checks the source and binary bindings, exact archive and
+public fixture hashes, complete SAT assignment, every original CNF/XOR row,
+all six archive lifts and coefficients, four intermediate sums, the target,
+and the 600-column relation row. Its output is create-new and includes the
+replay binary hash. The exact command binds the locked source and binary:
+
+```sh
+target/release/examples/n83_k600_m6_native_replay SOURCE_COMMIT BINARY_SHA256 INPUT_ROOT EXPORT_JSON XCNF SOLVER_RECEIPT SOLVER_STDOUT NEW_RECEIPT
+```
+
+This amendment does not grant the proposed 3,600-second execution ceiling,
+change the frozen base or query, or turn the prepared gate into a completed
+measurement. The first full-model replay remains pending.

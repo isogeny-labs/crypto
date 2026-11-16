@@ -1,0 +1,1657 @@
+{
+  "all_four_worker_controls_neutral": true,
+  "host": {
+    "binary_sha256": "1773397a58ae17aef2b67215b5c92215e3a3c4ae311b081261befadfd99526e3  target/release/examples/f4_f5_boolean_perf\n6dc41e3be4a6e0ecddcbb5e7715a46c7caf32d0114ce3a4a194a7d30ee3538fb  target/release/isolated_bench\n",
+    "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+    "cpu_manifest": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  8\nOn-line CPU(s) list:                     0-7\nVendor ID:                               GenuineIntel\nBIOS Vendor ID:                          Intel(R) Corporation\nModel name:                              Intel(R) Xeon(R) Platinum 8488C\nBIOS Model name:                         Intel(R) Xeon(R) Platinum 8488C\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      4\nSocket(s):                               1\nStepping:                                8\nBogoMIPS:                                4800.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq monitor ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 wbnoinvd ida arat avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq rdpid cldemote movdiri movdir64b md_clear serialize amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               192 KiB (4 instances)\nL1i cache:                               128 KiB (4 instances)\nL2 cache:                                8 MiB (4 instances)\nL3 cache:                                105 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-7\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n",
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+    "reserved_cpus": "one=3,7\nfour=3,7,2,6\n",
+    "source_sha256": "f8a2c87e892c4e8adaac8944dc4c0debd49d0016f54f944c2b327eb4e8cccf32  src/cryptanalysis/gf2_elim.rs\nf5f20eb0c107269b575f0501a575940c19e3dea360b967b2127f833424930034  examples/f4_f5_boolean_perf.rs\n"
+  },
+  "matrices": [
+    {
+      "aa_ratios": [
+        0.9946617955333058,
+        1.0126233630038626,
+        0.9922010667353648,
+        0.9946369350595047,
+        1.013514852286203
+      ],
+      "after": {
+        "max_ms": 5.911065,
+        "max_ns": 5911065.0,
+        "median_ms": 5.85419,
+        "median_ns": 5854190.0,
+        "min_ms": 5.826762,
+        "min_ns": 5826762.0,
+        "n": 5,
+        "samples_ns": [
+          5876724.0,
+          5826762.0,
+          5911065.0,
+          5854190.0,
+          5827714.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 6.198131,
+        "max_ns": 6198131.0,
+        "median_ms": 6.108263,
+        "median_ns": 6108263.0,
+        "min_ms": 6.035977,
+        "min_ns": 6035977.0,
+        "n": 5,
+        "samples_ns": [
+          6105167.0,
+          6126561.0,
+          6035977.0,
+          6108263.0,
+          6198131.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.0077989332646352105,
+        "ci95": [
+          1.0211318941679715,
+          1.0635612866382942
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0388725078802408,
+          1.0514520757841148,
+          1.0211318941679715,
+          1.0434001971237694,
+          1.0635612866382942
+        ],
+        "reference_over_candidate": 1.0434001971237694
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 6.354335,
+        "max_ns": 6354335.0,
+        "median_ms": 6.320591,
+        "median_ns": 6320591.0,
+        "min_ms": 6.278553,
+        "min_ns": 6278553.0,
+        "n": 5,
+        "samples_ns": [
+          6354335.0,
+          6320591.0,
+          6278553.0,
+          6291738.0,
+          6342023.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.0077989332646352105,
+        "ci95": [
+          1.0621695075252937,
+          1.0882522718170453
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0812716404581872,
+          1.084751874197024,
+          1.0621695075252937,
+          1.0747409974736044,
+          1.0882522718170453
+        ],
+        "reference_over_candidate": 1.0812716404581872
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f4-n17-s230-w1-0-0",
+          "paired/matrix-f4-n17-s230-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n17-s230-w1-1-0",
+          "paired/matrix-f4-n17-s230-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n17-s230-w1-2-0",
+          "paired/matrix-f4-n17-s230-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n17-s230-w1-3-0",
+          "paired/matrix-f4-n17-s230-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n17-s230-w1-4-0",
+          "paired/matrix-f4-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n17-s230-w1-0-a-0",
+          "paired/matrix-f4-n17-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-1-a-0",
+          "paired/matrix-f4-n17-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-2-a-0",
+          "paired/matrix-f4-n17-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-3-a-0",
+          "paired/matrix-f4-n17-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-4-a-0",
+          "paired/matrix-f4-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5438747
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0070888218631764,
+        0.9934747179879623,
+        0.9810491250692693,
+        1.002387084590939,
+        0.9905292263219788
+      ],
+      "after": {
+        "max_ms": 49.945823,
+        "max_ns": 49945823.0,
+        "median_ms": 49.646697,
+        "median_ns": 49646697.0,
+        "min_ms": 48.840509,
+        "min_ns": 48840509.0,
+        "n": 5,
+        "samples_ns": [
+          49945823.0,
+          49834769.0,
+          48840509.0,
+          49404314.0,
+          49646697.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 53.628604,
+        "max_ns": 53628604.0,
+        "median_ms": 53.417098,
+        "median_ns": 53417098.0,
+        "min_ms": 52.944926,
+        "min_ns": 52944926.0,
+        "n": 5,
+        "samples_ns": [
+          53386097.0,
+          53417098.0,
+          52944926.0,
+          53468920.0,
+          53628604.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.007088821863176387,
+        "ci95": [
+          1.0688801143591127,
+          1.084037146295916
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0688801143591127,
+          1.0718841297327977,
+          1.084037146295916,
+          1.0822722890150849,
+          1.08020487244096
+        ],
+        "reference_over_candidate": 1.08020487244096
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 55.913112,
+        "max_ns": 55913112.0,
+        "median_ms": 54.911376,
+        "median_ns": 54911376.0,
+        "min_ms": 54.411573,
+        "min_ns": 54411573.0,
+        "n": 5,
+        "samples_ns": [
+          54911376.0,
+          54718283.0,
+          54411573.0,
+          55810657.0,
+          55913112.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.007088821863176387,
+        "ci95": [
+          1.0979941133067157,
+          1.1296717327154873
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.099418784229464,
+          1.0979941133067157,
+          1.1140664606914723,
+          1.1296717327154873,
+          1.1262201793605726
+        ],
+        "reference_over_candidate": 1.1140664606914723
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f4-n23-s230-w1-0-0",
+          "paired/matrix-f4-n23-s230-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s230-w1-1-0",
+          "paired/matrix-f4-n23-s230-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s230-w1-2-0",
+          "paired/matrix-f4-n23-s230-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s230-w1-3-0",
+          "paired/matrix-f4-n23-s230-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s230-w1-4-0",
+          "paired/matrix-f4-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s230-w1-0-a-0",
+          "paired/matrix-f4-n23-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-1-a-0",
+          "paired/matrix-f4-n23-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-2-a-1",
+          "paired/matrix-f4-n23-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-3-a-0",
+          "paired/matrix-f4-n23-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-4-a-0",
+          "paired/matrix-f4-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        90002176
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9874730546635471,
+        1.0075215430625541,
+        1.0045003467398073,
+        0.9856323739197113,
+        1.0029163479622676
+      ],
+      "after": {
+        "max_ms": 50.0973,
+        "max_ns": 50097300.0,
+        "median_ms": 49.888384,
+        "median_ns": 49888384.0,
+        "min_ms": 49.075906,
+        "min_ns": 49075906.0,
+        "n": 5,
+        "samples_ns": [
+          50092559.0,
+          49371160.0,
+          49075906.0,
+          49888384.0,
+          50097300.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 54.17851,
+        "max_ns": 54178510.0,
+        "median_ms": 53.453315,
+        "median_ns": 53453315.0,
+        "min_ms": 52.274768,
+        "min_ns": 52274768.0,
+        "n": 5,
+        "samples_ns": [
+          53572925.0,
+          54178510.0,
+          53453315.0,
+          52807703.0,
+          52274768.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.007521543062554148,
+        "ci95": [
+          1.0434647775429016,
+          1.0973716234335997
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0694787024156622,
+          1.0973716234335997,
+          1.0891967027567457,
+          1.0585170086888362,
+          1.0434647775429016
+        ],
+        "reference_over_candidate": 1.0694787024156622
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 56.718731,
+        "max_ns": 56718731.0,
+        "median_ms": 54.866041,
+        "median_ns": 54866041.0,
+        "min_ms": 54.335017,
+        "min_ns": 54335017.0,
+        "n": 5,
+        "samples_ns": [
+          56718731.0,
+          54335017.0,
+          54796909.0,
+          54866041.0,
+          55050676.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.007521543062554148,
+        "ci95": [
+          1.0988751090378124,
+          1.132278568559454
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.132278568559454,
+          1.1005416319973036,
+          1.1165745773496265,
+          1.099775871673855,
+          1.0988751090378124
+        ],
+        "reference_over_candidate": 1.1005416319973036
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f4-n23-s231-w1-0-0",
+          "paired/matrix-f4-n23-s231-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s231-w1-1-0",
+          "paired/matrix-f4-n23-s231-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s231-w1-2-0",
+          "paired/matrix-f4-n23-s231-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s231-w1-3-0",
+          "paired/matrix-f4-n23-s231-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s231-w1-4-0",
+          "paired/matrix-f4-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 231,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s231-w1-0-a-0",
+          "paired/matrix-f4-n23-s231-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-1-a-0",
+          "paired/matrix-f4-n23-s231-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-2-a-0",
+          "paired/matrix-f4-n23-s231-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-3-a-0",
+          "paired/matrix-f4-n23-s231-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-4-a-0",
+          "paired/matrix-f4-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "93f3fddaaa82b484d44188a72ed81f7757d00b3b84dd66fbef5a6b99d3e297c8",
+        "e328c866f65be47c3b45c412d6ff5d4ccdb38306e32567666c2174fb7e711f9a",
+        11415172693370771636,
+        5289,
+        89507694
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9945052013622697,
+        1.0070404944290017,
+        0.9746341356381851,
+        1.0205920740927992,
+        0.9918886911658829
+      ],
+      "after": {
+        "max_ms": 49.490978,
+        "max_ns": 49490978.0,
+        "median_ms": 49.178379,
+        "median_ns": 49178379.0,
+        "min_ms": 48.973803,
+        "min_ns": 48973803.0,
+        "n": 5,
+        "samples_ns": [
+          48973803.0,
+          49234893.0,
+          49490978.0,
+          49011728.0,
+          49178379.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 54.70105,
+        "max_ns": 54701050.0,
+        "median_ms": 53.732467,
+        "median_ns": 53732467.0,
+        "min_ms": 53.079135,
+        "min_ns": 53079135.0,
+        "n": 5,
+        "samples_ns": [
+          54701050.0,
+          53732467.0,
+          54363050.0,
+          53079135.0,
+          53576369.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.008111308834117148,
+        "ci95": [
+          1.082988443092641,
+          1.1169451145135696
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.1169451145135696,
+          1.091349320084843,
+          1.0984436395659831,
+          1.082988443092641,
+          1.0894293404831419
+        ],
+        "reference_over_candidate": 1.091349320084843
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 56.815637,
+        "max_ns": 56815637.0,
+        "median_ms": 55.73278,
+        "median_ns": 55732780.0,
+        "min_ms": 54.400819,
+        "min_ns": 54400819.0,
+        "n": 5,
+        "samples_ns": [
+          55988671.0,
+          55732780.0,
+          55327478.0,
+          54400819.0,
+          56815637.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.008111308834117148,
+        "ci95": [
+          1.1099551315554514,
+          1.1552970666235258
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.1432371506864598,
+          1.1319772747348105,
+          1.1179305852472747,
+          1.1099551315554514,
+          1.1552970666235258
+        ],
+        "reference_over_candidate": 1.1319772747348105
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f4-n23-s232-w1-0-1",
+          "paired/matrix-f4-n23-s232-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s232-w1-1-0",
+          "paired/matrix-f4-n23-s232-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s232-w1-2-0",
+          "paired/matrix-f4-n23-s232-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s232-w1-3-0",
+          "paired/matrix-f4-n23-s232-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f4-n23-s232-w1-4-0",
+          "paired/matrix-f4-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 232,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s232-w1-0-a-0",
+          "paired/matrix-f4-n23-s232-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-1-a-0",
+          "paired/matrix-f4-n23-s232-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-2-a-0",
+          "paired/matrix-f4-n23-s232-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-3-a-0",
+          "paired/matrix-f4-n23-s232-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-4-a-0",
+          "paired/matrix-f4-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "3e893a57df88197ae495f40c23c42aca9cbed5f8d82bd2caed6a98671577cce1",
+        "833b251b808477a488329ac4438cbf86ecca3e058a22ebda5eb22d9de9b96c94",
+        578512194706274304,
+        5289,
+        89752480
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0010993279909477,
+        1.003383272905443,
+        0.9955386909618005,
+        0.9987747892928177,
+        1.0008110343323142
+      ],
+      "after": {
+        "max_ms": 6.387717,
+        "max_ns": 6387717.0,
+        "median_ms": 6.359425,
+        "median_ns": 6359425.0,
+        "min_ms": 6.34363,
+        "min_ns": 6343630.0,
+        "n": 5,
+        "samples_ns": [
+          6353131.0,
+          6363786.0,
+          6343630.0,
+          6387717.0,
+          6359425.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 6.585827,
+        "max_ns": 6585827.0,
+        "median_ms": 6.561365,
+        "median_ns": 6561365.0,
+        "min_ms": 6.510726,
+        "min_ns": 6510726.0,
+        "n": 5,
+        "samples_ns": [
+          6527763.0,
+          6510726.0,
+          6561365.0,
+          6564261.0,
+          6585827.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.0012252107071822893,
+        "ci95": [
+          1.0230900284830444,
+          1.0356010173875783
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0274875490525852,
+          1.0230900284830444,
+          1.0343234078910655,
+          1.027638043451205,
+          1.0356010173875783
+        ],
+        "reference_over_candidate": 1.027638043451205
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 6.806588,
+        "max_ns": 6806588.0,
+        "median_ms": 6.802968,
+        "median_ns": 6802968.0,
+        "min_ms": 6.781795,
+        "min_ns": 6781795.0,
+        "n": 5,
+        "samples_ns": [
+          6787936.0,
+          6805741.0,
+          6781795.0,
+          6802968.0,
+          6806588.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.0012252107071822893,
+        "ci95": [
+          1.0650077328097034,
+          1.0703150048943104
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0684394828313788,
+          1.0694484383981486,
+          1.0690716514046374,
+          1.0650077328097034,
+          1.0703150048943104
+        ],
+        "reference_over_candidate": 1.0690716514046374
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f5-n17-s230-w1-0-0",
+          "paired/matrix-f5-n17-s230-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n17-s230-w1-1-0",
+          "paired/matrix-f5-n17-s230-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n17-s230-w1-2-0",
+          "paired/matrix-f5-n17-s230-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n17-s230-w1-3-0",
+          "paired/matrix-f5-n17-s230-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n17-s230-w1-4-0",
+          "paired/matrix-f5-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n17-s230-w1-0-a-0",
+          "paired/matrix-f5-n17-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-1-a-0",
+          "paired/matrix-f5-n17-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-2-a-0",
+          "paired/matrix-f5-n17-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-3-a-0",
+          "paired/matrix-f5-n17-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-4-a-0",
+          "paired/matrix-f5-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5034019
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.014732214956455,
+        0.9628818801380252,
+        0.9892651002886066,
+        0.9913514181038344,
+        0.9729862741623442
+      ],
+      "after": {
+        "max_ms": 54.436426,
+        "max_ns": 54436426.0,
+        "median_ms": 52.802547,
+        "median_ns": 52802547.0,
+        "min_ms": 52.644687,
+        "min_ns": 52644687.0,
+        "n": 5,
+        "samples_ns": [
+          52716885.0,
+          54436426.0,
+          52644687.0,
+          52904108.0,
+          52802547.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 57.150929,
+        "max_ns": 57150929.0,
+        "median_ms": 56.600264,
+        "median_ns": 56600264.0,
+        "min_ms": 56.433126,
+        "min_ns": 56433126.0,
+        "n": 5,
+        "samples_ns": [
+          56563724.0,
+          56779185.0,
+          56600264.0,
+          57150929.0,
+          56433126.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.014732214956455048,
+        "ci95": [
+          1.0430366056728264,
+          1.0802739363831633
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.029464429912910095,
+        "paired_samples": 5,
+        "ratios": [
+          1.0729716674268595,
+          1.0430366056728264,
+          1.075137249842515,
+          1.0802739363831633,
+          1.068757649133857
+        ],
+        "reference_over_candidate": 1.0729716674268595
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 60.024909,
+        "max_ns": 60024909.0,
+        "median_ms": 59.297874,
+        "median_ns": 59297874.0,
+        "min_ms": 57.745687,
+        "min_ns": 57745687.0,
+        "n": 5,
+        "samples_ns": [
+          57937888.0,
+          57745687.0,
+          60024909.0,
+          59297874.0,
+          59702862.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.014732214956455048,
+        "ci95": [
+          1.0607912980914656,
+          1.140189303433412
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.029464429912910095,
+        "paired_samples": 5,
+        "ratios": [
+          1.0990385338587438,
+          1.0607912980914656,
+          1.140189303433412,
+          1.1208557566077855,
+          1.1306814801945064
+        ],
+        "reference_over_candidate": 1.1208557566077855
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f5-n23-s230-w1-0-0",
+          "paired/matrix-f5-n23-s230-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s230-w1-1-0",
+          "paired/matrix-f5-n23-s230-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s230-w1-2-0",
+          "paired/matrix-f5-n23-s230-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s230-w1-3-1",
+          "paired/matrix-f5-n23-s230-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s230-w1-4-0",
+          "paired/matrix-f5-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s230-w1-0-a-0",
+          "paired/matrix-f5-n23-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-1-a-0",
+          "paired/matrix-f5-n23-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-2-a-0",
+          "paired/matrix-f5-n23-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-3-a-0",
+          "paired/matrix-f5-n23-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-4-a-0",
+          "paired/matrix-f5-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        83289643
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9982202537658168,
+        0.9954183725055498,
+        0.9846305594226813,
+        0.9815445370150289,
+        1.0257634784494527
+      ],
+      "after": {
+        "max_ms": 52.699709,
+        "max_ns": 52699709.0,
+        "median_ms": 52.077324,
+        "median_ns": 52077324.0,
+        "min_ms": 51.843194,
+        "min_ns": 51843194.0,
+        "n": 5,
+        "samples_ns": [
+          52077324.0,
+          51843194.0,
+          52503064.0,
+          51886437.0,
+          52699709.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 56.890653,
+        "max_ns": 56890653.0,
+        "median_ms": 56.172109,
+        "median_ns": 56172109.0,
+        "min_ms": 55.579153,
+        "min_ns": 55579153.0,
+        "n": 5,
+        "samples_ns": [
+          56890653.0,
+          55579153.0,
+          56172109.0,
+          56170093.0,
+          56266434.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.015369440577318705,
+        "ci95": [
+          1.0676801649891463,
+          1.0924265809049636
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.03073888115463741,
+        "paired_samples": 5,
+        "ratios": [
+          1.0924265809049636,
+          1.0720626703671075,
+          1.0698824929531732,
+          1.0825582993875644,
+          1.0676801649891463
+        ],
+        "reference_over_candidate": 1.0720626703671075
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 58.78235,
+        "max_ns": 58782350.0,
+        "median_ms": 57.908051,
+        "median_ns": 57908051.0,
+        "min_ms": 57.262715,
+        "min_ns": 57262715.0,
+        "n": 5,
+        "samples_ns": [
+          58782350.0,
+          57908051.0,
+          57554181.0,
+          58308248.0,
+          57262715.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.015369440577318705,
+        "ci95": [
+          1.0865850321868,
+          1.1287513544282728
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.03073888115463741,
+        "paired_samples": 5,
+        "ratios": [
+          1.1287513544282728,
+          1.116984632544052,
+          1.0962061376075118,
+          1.1237666598691292,
+          1.0865850321868
+        ],
+        "reference_over_candidate": 1.116984632544052
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f5-n23-s231-w1-0-0",
+          "paired/matrix-f5-n23-s231-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s231-w1-1-0",
+          "paired/matrix-f5-n23-s231-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s231-w1-2-0",
+          "paired/matrix-f5-n23-s231-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s231-w1-3-0",
+          "paired/matrix-f5-n23-s231-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s231-w1-4-0",
+          "paired/matrix-f5-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 231,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s231-w1-0-a-0",
+          "paired/matrix-f5-n23-s231-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-1-a-0",
+          "paired/matrix-f5-n23-s231-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-2-a-0",
+          "paired/matrix-f5-n23-s231-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-3-a-0",
+          "paired/matrix-f5-n23-s231-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-4-a-0",
+          "paired/matrix-f5-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "93f3fddaaa82b484d44188a72ed81f7757d00b3b84dd66fbef5a6b99d3e297c8",
+        "e328c866f65be47c3b45c412d6ff5d4ccdb38306e32567666c2174fb7e711f9a",
+        11415172693370771636,
+        5289,
+        82962324
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0120666469797839,
+        1.0145633056453525,
+        1.0214569455443385,
+        1.0467944598232075,
+        1.0060276091687925
+      ],
+      "after": {
+        "max_ms": 53.132824,
+        "max_ns": 53132824.0,
+        "median_ms": 52.810504,
+        "median_ns": 52810504.0,
+        "min_ms": 52.486373,
+        "min_ns": 52486373.0,
+        "n": 5,
+        "samples_ns": [
+          52486696.0,
+          52486373.0,
+          53050553.0,
+          52810504.0,
+          53132824.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 58.181814,
+        "max_ns": 58181814.0,
+        "median_ms": 56.963375,
+        "median_ns": 56963375.0,
+        "min_ms": 55.689821,
+        "min_ns": 55689821.0,
+        "n": 5,
+        "samples_ns": [
+          56963375.0,
+          58181814.0,
+          55689821.0,
+          57885974.0,
+          56033067.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.014563305645352465,
+        "ci95": [
+          1.0497500563283477,
+          1.1085127562538948
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02912661129070493,
+        "paired_samples": 5,
+        "ratios": [
+          1.0852916899170029,
+          1.1085127562538948,
+          1.0497500563283477,
+          1.0961072062482116,
+          1.0545847704236462
+        ],
+        "reference_over_candidate": 1.0852916899170029
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "legacy": {
+        "max_ms": 59.520918,
+        "max_ns": 59520918.0,
+        "median_ms": 58.656276,
+        "median_ns": 58656276.0,
+        "min_ms": 57.918674,
+        "min_ns": 57918674.0,
+        "n": 5,
+        "samples_ns": [
+          57918674.0,
+          59360065.0,
+          58656276.0,
+          57918885.0,
+          59520918.0
+        ]
+      },
+      "legacy_over_candidate": {
+        "aa_absolute_noise": 0.014563305645352465,
+        "ci95": [
+          1.096730396665027,
+          1.130961459272486
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02912661129070493,
+        "paired_samples": 5,
+        "ratios": [
+          1.1034924735974998,
+          1.130961459272486,
+          1.1056675695727431,
+          1.096730396665027,
+          1.1202287685668655
+        ],
+        "reference_over_candidate": 1.1056675695727431
+      },
+      "legacy_sources": [
+        [
+          "legacy/matrix-f5-n23-s232-w1-0-0",
+          "paired/matrix-f5-n23-s232-w1-0-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s232-w1-1-0",
+          "paired/matrix-f5-n23-s232-w1-1-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s232-w1-2-0",
+          "paired/matrix-f5-n23-s232-w1-2-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s232-w1-3-0",
+          "paired/matrix-f5-n23-s232-w1-3-b-0"
+        ],
+        [
+          "legacy/matrix-f5-n23-s232-w1-4-0",
+          "paired/matrix-f5-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "n": 23,
+      "seed": 232,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s232-w1-0-a-0",
+          "paired/matrix-f5-n23-s232-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-1-a-0",
+          "paired/matrix-f5-n23-s232-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-2-a-0",
+          "paired/matrix-f5-n23-s232-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-3-a-0",
+          "paired/matrix-f5-n23-s232-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-4-a-0",
+          "paired/matrix-f5-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "3e893a57df88197ae495f40c23c42aca9cbed5f8d82bd2caed6a98671577cce1",
+        "833b251b808477a488329ac4438cbf86ecca3e058a22ebda5eb22d9de9b96c94",
+        578512194706274304,
+        5289,
+        83070788
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9432116666003244,
+        1.2006403795189151,
+        1.0003060845842537,
+        1.151736084448134,
+        1.007542581312048
+      ],
+      "after": {
+        "max_ms": 8.386335,
+        "max_ns": 8386335.0,
+        "median_ms": 8.138258,
+        "median_ns": 8138258.0,
+        "min_ms": 7.161013,
+        "min_ns": 7161013.0,
+        "n": 5,
+        "samples_ns": [
+          8138258.0,
+          8386335.0,
+          8076712.0,
+          8296084.0,
+          7161013.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 8.356129,
+        "max_ns": 8356129.0,
+        "median_ms": 8.152006,
+        "median_ns": 8152006.0,
+        "min_ms": 7.552169,
+        "min_ns": 7552169.0,
+        "n": 5,
+        "samples_ns": [
+          8356129.0,
+          7901061.0,
+          8152006.0,
+          7552169.0,
+          8197085.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.056788333399675595,
+        "ci95": [
+          0.9103293795000147,
+          1.1446823235762873
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.11357666679935119,
+        "paired_samples": 5,
+        "ratios": [
+          1.026771208285606,
+          0.9421351520062101,
+          1.009322357910001,
+          0.9103293795000147,
+          1.1446823235762873
+        ],
+        "reference_over_candidate": 1.009322357910001
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "legacy": {
+        "n": 0
+      },
+      "legacy_over_candidate": {
+        "decision": "inconclusive",
+        "paired_samples": 0
+      },
+      "legacy_sources": [],
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n17-s230-w4-0-a-0",
+          "paired/matrix-f4-n17-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-1-a-0",
+          "paired/matrix-f4-n17-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-2-a-0",
+          "paired/matrix-f4-n17-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-3-a-0",
+          "paired/matrix-f4-n17-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-4-a-0",
+          "paired/matrix-f4-n17-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5438747
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.0254620184473013,
+        1.0180236397488354,
+        1.0487744975114492,
+        1.0064300364837637,
+        1.0415133808285189
+      ],
+      "after": {
+        "max_ms": 58.415851,
+        "max_ns": 58415851.0,
+        "median_ms": 58.053101,
+        "median_ns": 58053101.0,
+        "min_ms": 57.570278,
+        "min_ns": 57570278.0,
+        "n": 5,
+        "samples_ns": [
+          57848293.0,
+          58415851.0,
+          58053101.0,
+          57570278.0,
+          58329741.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 59.537292,
+        "max_ns": 59537292.0,
+        "median_ms": 58.706507,
+        "median_ns": 58706507.0,
+        "min_ms": 55.640612,
+        "min_ns": 55640612.0,
+        "n": 5,
+        "samples_ns": [
+          58891650.0,
+          57931554.0,
+          55640612.0,
+          58706507.0,
+          59537292.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.025462018447301338,
+        "ci95": [
+          0.9584434085614134,
+          1.02070214918321
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.050924036894602676,
+        "paired_samples": 5,
+        "ratios": [
+          1.0180360896733807,
+          0.9917094933702155,
+          0.9584434085614134,
+          1.0197363820268508,
+          1.02070214918321
+        ],
+        "reference_over_candidate": 1.0180360896733807
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "legacy": {
+        "n": 0
+      },
+      "legacy_over_candidate": {
+        "decision": "inconclusive",
+        "paired_samples": 0
+      },
+      "legacy_sources": [],
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s230-w4-0-a-0",
+          "paired/matrix-f4-n23-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-1-a-0",
+          "paired/matrix-f4-n23-s230-w4-1-b-1"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-2-a-0",
+          "paired/matrix-f4-n23-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-3-a-0",
+          "paired/matrix-f4-n23-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-4-a-0",
+          "paired/matrix-f4-n23-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        90002176
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.191316566407154,
+        1.0191547584334477,
+        0.9516377964867884,
+        0.9595051592348118,
+        0.926308854921255
+      ],
+      "after": {
+        "max_ms": 8.808181,
+        "max_ns": 8808181.0,
+        "median_ms": 8.472662,
+        "median_ns": 8472662.0,
+        "min_ms": 7.148088,
+        "min_ns": 7148088.0,
+        "n": 5,
+        "samples_ns": [
+          7972236.0,
+          8808181.0,
+          8503107.0,
+          7148088.0,
+          8472662.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 8.568125,
+        "max_ns": 8568125.0,
+        "median_ms": 8.386333,
+        "median_ns": 8386333.0,
+        "min_ms": 7.770237,
+        "min_ns": 7770237.0,
+        "n": 5,
+        "samples_ns": [
+          7770237.0,
+          8568125.0,
+          8386333.0,
+          8186659.0,
+          8527807.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.04836220351321163,
+        "ci95": [
+          0.9727462457912707,
+          1.1452935386357863
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.09672440702642326,
+        "paired_samples": 5,
+        "ratios": [
+          0.9746621901308491,
+          0.9727462457912707,
+          0.9862669022041002,
+          1.1452935386357863,
+          1.0065085801841263
+        ],
+        "reference_over_candidate": 0.9862669022041002
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "legacy": {
+        "n": 0
+      },
+      "legacy_over_candidate": {
+        "decision": "inconclusive",
+        "paired_samples": 0
+      },
+      "legacy_sources": [],
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n17-s230-w4-0-a-0",
+          "paired/matrix-f5-n17-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-1-a-0",
+          "paired/matrix-f5-n17-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-2-a-1",
+          "paired/matrix-f5-n17-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-3-a-0",
+          "paired/matrix-f5-n17-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-4-a-0",
+          "paired/matrix-f5-n17-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5034019
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.0266801758036121,
+        0.9772458348112381,
+        0.9802791578886239,
+        1.037786434164236,
+        0.9892234133783265
+      ],
+      "after": {
+        "max_ms": 58.959755,
+        "max_ns": 58959755.0,
+        "median_ms": 58.044165,
+        "median_ns": 58044165.0,
+        "min_ms": 54.058256,
+        "min_ns": 54058256.0,
+        "n": 5,
+        "samples_ns": [
+          54058256.0,
+          55343228.0,
+          58467857.0,
+          58959755.0,
+          58044165.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 58.668272,
+        "max_ns": 58668272.0,
+        "median_ms": 57.152257,
+        "median_ns": 57152257.0,
+        "min_ms": 55.199793,
+        "min_ns": 55199793.0,
+        "n": 5,
+        "samples_ns": [
+          57152257.0,
+          55199793.0,
+          58668272.0,
+          56692048.0,
+          57517380.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.022754165188761943,
+        "ci95": [
+          0.9615380525241328,
+          1.05723456931352
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.04550833037752389,
+        "paired_samples": 5,
+        "ratios": [
+          1.05723456931352,
+          0.9974082646570598,
+          1.0034277808403342,
+          0.9615380525241328,
+          0.9909244107482639
+        ],
+        "reference_over_candidate": 0.9974082646570598
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "legacy": {
+        "n": 0
+      },
+      "legacy_over_candidate": {
+        "decision": "inconclusive",
+        "paired_samples": 0
+      },
+      "legacy_sources": [],
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s230-w4-0-a-0",
+          "paired/matrix-f5-n23-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-1-a-0",
+          "paired/matrix-f5-n23-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-2-a-0",
+          "paired/matrix-f5-n23-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-3-a-0",
+          "paired/matrix-f5-n23-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-4-a-0",
+          "paired/matrix-f5-n23-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        83289643
+      ],
+      "workers": 4
+    }
+  ],
+  "rejected_attempts": [
+    {
+      "name": "controls/matrix-f4-n17-s230-w1-3-b-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "paired/matrix-f4-n23-s230-w1-2-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "legacy/matrix-f4-n23-s232-w1-0-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "legacy/matrix-f5-n23-s230-w1-3-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "controls/matrix-f5-n23-s232-w1-2-b-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "controls/matrix-f4-n17-s230-w4-1-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "controls/matrix-f4-n23-s230-w4-0-b-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "paired/matrix-f4-n23-s230-w4-1-b-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "controls/matrix-f5-n17-s230-w4-2-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "paired/matrix-f5-n17-s230-w4-2-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "controls/matrix-f5-n23-s230-w4-0-b-0",
+      "reason": "failed or contended isolation"
+    }
+  ],
+  "schema": "boolean-serial-guard/v1",
+  "scope": "Explicit-one-worker guard confirmation. Incremental pairs keep other switches fixed; direct legacy ablation measured separately in the same binary. One-worker matrix calls only; four-worker unchanged-path controls. No complete-root or decomposition speed claim."
+}

@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-10T09:02:36Z",
+ "id": "PCC-20261110-162b83",
+ "kind": "measurement",
+ "producer": {
+  "commit": "37302ba3281d51058f1c3a0737b10b40a9403c06",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/anomalous_curve_audit_20261110/smart-v1/export.json",
+    "sha256": "f4225d64948c98455a3ad3bc08336067315608204ba6d7b1a9d797a8b3404c80"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact unblinded knownanswer/status/shape observations only. Native analyzer does not verify arithmetic. Concrete finite-ring Lean certificates and signed independent execution evidence are separate obligations.",
+ "statement": "Producer-local frozen Smart knownanswer records contain three cells: F5 recovers2 for all four fixed lifts, the offcurve point is rejected with exit2, and the certified160-bit pair recovers its expected scalar for all four fixed lifts. The all-row export passes file/schema/protocol checks. This record does not certify arithmetic, native execution, independence or security cost."
+}

@@ -76,6 +76,10 @@ If an answer contradicts the plan or an accepted design, stop and report.
    changed or removed in the same round, not queued for later.
 6. **Never restate a rule in weaker form.** Point at the skill or AGENTS.md
    section instead.
+7. **Learn continuously.** Every skill and agent ends with a "Continuous
+   loop" section: read `tools/lessons.py brief --scope <name>` before acting,
+   record the outcome and lesson tests after, and fold adopted lessons back
+   into its own text by PR (AGENTS.md "Continuous learning loop").
 
 ## Stop-sign tables
 

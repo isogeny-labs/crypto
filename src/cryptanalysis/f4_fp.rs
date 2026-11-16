@@ -35,6 +35,9 @@
 //! system resolved — the number to compare across coordinate systems —
 //! and stops cooperatively at a deadline, so a budget never leaves a
 //! thread behind.
+//! An opt-in diagnostic policy (`F4_FP_LINEAR_ROOTS=1`, default off) first
+//! substitutes a pure univariate linear equation analytically. Other root
+//! finding and the final exact input check are unchanged.
 //!
 //! [`interreduce`] and [`autoreduce`] reduce every element of a set by the
 //! others over and over; with at most 16 unknowns and every exponent at most
@@ -64,6 +67,10 @@ pub use super::groebner_f4::Ordering;
 /// A polynomial over `F_p`: `(exponent vector, coefficient)` terms with
 /// non-zero coefficients, sorted with the leading term first.
 pub type Poly = Vec<(Vec<u32>, u64)>;
+
+/// Opt-in, bounded trace storage with independent Buchberger checks on replay.
+pub mod reuse;
+pub use reuse::{TracePool, TraceStats};
 
 /// Optional, read-only observations of the regular F4/solve path. Degrees
 /// describe this run, never a certified degree of regularity.
@@ -3239,16 +3246,23 @@ fn f4_with_arithmetic(
         .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
     let mut resumed_opts: Option<F4Options> = None;
     let mut resume_rref: Option<ckpt::RrefLoaded> = None;
+    // (elapsed, field operations) of the loop-top checkpoint just read: the first
+    // step of a resumed run starts from exactly what is on disk, so it needs no
+    // rewrite of that file, and an in-step snapshot of it binds to these values.
+    let mut disk_top: Option<(Duration, u64)> = None;
     if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+        let t_read = Instant::now();
         if let Some(l) = ckpt::load_best(path, Some(fp)) {
             eprintln!(
-                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs",
+                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs (read in {:.1} s)",
                 path.display(),
                 l.steps,
                 l.elapsed.as_secs_f64(),
                 l.basis.len(),
-                l.pairs.len()
+                l.pairs.len(),
+                t_read.elapsed().as_secs_f64()
             );
+            disk_top = Some((l.elapsed, l.field_ops));
             basis = l.basis;
             alive = l.alive;
             pairs = l.pairs;
@@ -3273,14 +3287,16 @@ fn f4_with_arithmetic(
             // finished part of the reduction, so its counts continue from the
             // snapshot's.
             if !deferred && opts.weights.is_none() {
+                let t_rref = Instant::now();
                 if let Some(r) = ckpt::load_rref(&ckpt::rref_path(path), fp, l.steps, l.elapsed) {
                     eprintln!(
-                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows",
+                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows (read in {:.1} s)",
                         r.phase,
                         r.c,
                         r.pivots.len(),
                         r.elapsed.as_secs_f64(),
-                        r.rows.len()
+                        r.rows.len(),
+                        t_rref.elapsed().as_secs_f64()
                     );
                     carried.set(r.elapsed);
                     ops_carry.set(r.ops);
@@ -3377,13 +3393,23 @@ fn f4_with_arithmetic(
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
         }
         // the loop-top values a checkpoint of this step's top records
-        let top_el = t0.elapsed() + carried.get();
-        let top_ops = ops_carry.get() + (field_ops_now() - ops0);
-        let mut wrote_top = false;
+        let (mut top_el, mut top_ops, mut wrote_top) = match disk_top.take() {
+            Some((e, o)) => (e, o, true),
+            None => (
+                t0.elapsed() + carried.get(),
+                ops_carry.get() + (field_ops_now() - ops0),
+                false,
+            ),
+        };
         if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
             let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
             if stop || last_ckpt.elapsed() >= *every {
                 let tw = Instant::now();
+                if wrote_top {
+                    // rewriting the file this step started from: record the values of now
+                    top_el = t0.elapsed() + carried.get();
+                    top_ops = ops_carry.get() + (field_ops_now() - ops0);
+                }
                 let snap = ckpt::Snap {
                     fingerprint: fp,
                     n_vars,
@@ -4876,6 +4902,10 @@ pub enum VisitEvent<'a> {
         node_id: usize,
         report: &'a F4Report,
         trace: &'a F4Trace,
+        /// Actual generating set used for branch selection and specialization.
+        /// Includes missing incoming generators; the raw native report above
+        /// remains unchanged and may describe a truncated relaxed system.
+        generating_set: &'a [Poly],
     },
     Branch {
         node_id: usize,
@@ -4899,6 +4929,7 @@ struct VisitState<'a, F, S> {
     assignment: Vec<u64>,
     visitor: F,
     sink: Option<S>,
+    pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
 }
@@ -5005,7 +5036,19 @@ where
         {
             return VisitEnd::Complete;
         }
-        let (r, trace) = if self.sink.is_some() {
+        let mut native_calls = 1;
+        let (r, trace) = if let Some(pool) = &mut self.pool {
+            let profile: Vec<_> = active
+                .iter()
+                .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                .collect();
+            let before = pool.stats();
+            let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+            let after = pool.stats();
+            native_calls = (after.learned - before.learned + after.replay_attempts
+                - before.replay_attempts) as usize;
+            (r, None)
+        } else if self.sink.is_some() {
             let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
             (r, Some(trace))
         } else {
@@ -5014,15 +5057,30 @@ where
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
-        self.report.f4_runs += 1;
+        self.report.f4_runs += native_calls;
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        // An alive-only native basis can retire an input before its deferred
+        // pair is processed. Preserve the exact incoming generators in the
+        // opt-in traced traversal instead of claiming equality for that subset.
+        // This adds no pair processing and does not change any solver limit.
+        let preserved = trace.as_ref().map(|_| {
+            let mut generators = r.basis.clone();
+            for f in input {
+                if !f.is_empty() && !generators.contains(f) {
+                    generators.push(f.clone());
+                }
+            }
+            generators
+        });
+        let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
                 report: &r,
                 trace,
+                generating_set,
             }) {
                 return VisitEnd::TraceStopped;
             }
@@ -5034,7 +5092,7 @@ where
             return VisitEnd::Complete;
         }
         let mut best: Option<(usize, Vec<u64>)> = None;
-        for g in &r.basis {
+        for g in generating_set {
             let vars: HashSet<_> = g
                 .iter()
                 .flat_map(|(e, _)| {
@@ -5131,8 +5189,7 @@ where
                 return VisitEnd::TimedOut;
             }
             self.assignment[original] = value;
-            let sub: Vec<_> = r
-                .basis
+            let sub: Vec<_> = generating_set
                 .iter()
                 .map(|g| {
                     normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
@@ -5179,6 +5236,7 @@ pub fn solve_visit(
         domains,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        None,
     )
 }
 
@@ -5203,9 +5261,38 @@ pub fn solve_visit_traced(
     if opts.stop_hilbert.is_some() {
         return Err("traced visitor does not support Hilbert stopping".into());
     }
-    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink))
+    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink), None)
 }
 
+/// Reuse certified native traces across attempts in one explicitly scoped
+/// family. Learning, rejected replay, certification and fallback remain inside
+/// the same deadline; the original visitor and traced APIs are unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_visit_reusing(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    pool: &mut TracePool,
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, String> {
+    if opts.stop_hilbert.is_some() {
+        return Err("trace reuse does not support Hilbert stopping".into());
+    }
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        Some(pool),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
 fn solve_visit_impl<F, S>(
     input: &[Poly],
     n_vars: usize,
@@ -5214,6 +5301,7 @@ fn solve_visit_impl<F, S>(
     domains: &[Option<Vec<u64>>],
     visitor: F,
     sink: Option<S>,
+    pool: Option<&mut TracePool>,
 ) -> Result<VisitReport, String>
 where
     F: FnMut(&[u64]) -> bool,
@@ -5248,6 +5336,7 @@ where
         assignment: vec![0; n_vars],
         visitor,
         sink,
+        pool,
         next_node: 0,
         report: VisitReport::default(),
     };
@@ -5305,6 +5394,32 @@ fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
         .collect()
 }
 
+/// A forced assignment from a pure nonconstant linear univariate equation.
+/// Combine coefficients so duplicate or zero terms cannot invent a pivot.
+fn linear_assignment(g: &Poly, p: u64) -> Option<(usize, u64)> {
+    let mut variable = None;
+    let (mut a, mut b) = (0u64, 0u64);
+    for (powers, coefficient) in g {
+        let coefficient = coefficient % p;
+        if coefficient == 0 {
+            continue;
+        }
+        let mut support = powers.iter().enumerate().filter(|(_, power)| **power != 0);
+        match support.next() {
+            None => b = ((b as u128 + coefficient as u128) % p as u128) as u64,
+            Some((i, 1)) if support.next().is_none() => {
+                if variable.is_some_and(|previous| previous != i) {
+                    return None;
+                }
+                variable = Some(i);
+                a = ((a as u128 + coefficient as u128) % p as u128) as u64;
+            }
+            _ => return None,
+        }
+    }
+    (a != 0).then(|| (variable.unwrap(), mulmod((p - b) % p, inv_mod_u64(a, p), p)))
+}
+
 fn powmod(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1u64;
     a %= p;
@@ -5332,6 +5447,17 @@ fn specialise(f: &Poly, i: usize, a: u64, p: u64) -> Vec<(Vec<u32>, u64)> {
 /// Solve a zero-dimensional system over `F_p` by degree-bounded F4 and
 /// substitution.  Solutions are full assignments `(x_0, …, x_{n−1})`.
 pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveReport {
+    let linear_roots = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
+    solve_with_linear_roots(input, n_vars, p, opts, linear_roots)
+}
+
+fn solve_with_linear_roots(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    linear_roots: bool,
+) -> SolveReport {
     let t0 = Instant::now();
     let ops0 = field_ops_now();
     let mut runs = 0usize;
@@ -5345,6 +5471,7 @@ pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveRe
         n_vars,
         p,
         opts,
+        linear_roots,
         &mut runs,
         &mut max_rows,
         &mut max_cols,
@@ -5403,6 +5530,7 @@ fn solve_rec(
     n_vars: usize,
     p: u64,
     opts: &F4Options,
+    linear_roots: bool,
     runs: &mut usize,
     max_rows: &mut usize,
     max_cols: &mut usize,
@@ -5435,18 +5563,30 @@ fn solve_rec(
         return Verdict::Inconsistent;
     }
     // a univariate element?  prefer the variable with the fewest roots
-    let mut best: Option<(usize, Vec<u64>)> = None;
-    for g in &r.basis {
-        let vars: HashSet<usize> = g
+    // A forced linear value is valid even for a truncated basis: every
+    // basis polynomial lies in the input ideal. Other constraints are
+    // still checked by recursion and by solve's final exact input filter.
+    let mut best = if linear_roots {
+        r.basis
             .iter()
-            .flat_map(|(e, _)| e.iter().enumerate().filter(|(_, &k)| k > 0).map(|(i, _)| i))
-            .collect();
-        if vars.len() == 1 {
-            let i = *vars.iter().next().unwrap();
-            let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
-            let roots = roots_univariate(&coeffs, p);
-            if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
-                best = Some((i, roots));
+            .find_map(|g| linear_assignment(g, p))
+            .map(|(i, x)| (i, vec![x]))
+    } else {
+        None
+    };
+    if best.is_none() {
+        for g in &r.basis {
+            let vars: HashSet<usize> = g
+                .iter()
+                .flat_map(|(e, _)| e.iter().enumerate().filter(|(_, &k)| k > 0).map(|(i, _)| i))
+                .collect();
+            if vars.len() == 1 {
+                let i = *vars.iter().next().unwrap();
+                let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
+                let roots = roots_univariate(&coeffs, p);
+                if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
+                    best = Some((i, roots));
+                }
             }
         }
     }
@@ -5480,6 +5620,7 @@ fn solve_rec(
             n_vars - 1,
             p,
             opts,
+            linear_roots,
             runs,
             max_rows,
             max_cols,
@@ -5525,6 +5666,54 @@ mod tests {
     use std::collections::BTreeMap;
 
     #[test]
+    fn analytic_linear_roots_match_exhaustive_field_roots() {
+        for p in [2, 3, 5, 7, 59] {
+            for a in 1..p {
+                for b in 0..p {
+                    let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
+                    let (var, root) = linear_assignment(&g, p).unwrap();
+                    assert_eq!(var, 1);
+                    assert_eq!(roots_univariate(&[(1, a), (0, b)], p), vec![root]);
+                }
+            }
+        }
+        assert_eq!(
+            linear_assignment(&vec![(vec![1], 1), (vec![1], 4)], 5),
+            None
+        );
+        assert_eq!(
+            linear_assignment(&vec![(vec![1, 0], 1), (vec![0, 1], 1)], 5),
+            None
+        );
+        assert_eq!(linear_assignment(&vec![(vec![2], 1)], 5), None);
+        assert_eq!(linear_assignment(&vec![(vec![0], 1)], 5), None);
+    }
+
+    #[test]
+    fn linear_root_policy_preserves_recursive_and_inconsistent_answers() {
+        for p in [3, 5, 7] {
+            for c in 0..p {
+                let input = vec![
+                    vec![(vec![2, 0], 1), (vec![0, 0], c)],
+                    vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+                ];
+                let opts = F4Options::new(Ordering::Grevlex, 8);
+                let baseline = solve_with_linear_roots(&input, 2, p, &opts, false);
+                let candidate = solve_with_linear_roots(&input, 2, p, &opts, true);
+                match (baseline.verdict, candidate.verdict) {
+                    (Verdict::Inconsistent, Verdict::Inconsistent) => {}
+                    (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {
+                        a.sort();
+                        b.sort();
+                        assert_eq!(a, b);
+                    }
+                    (a, b) => panic!("linear policy changed verdict: {a:?} vs {b:?}"),
+                }
+            }
+        }
+    }
+
+
     fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
         let root = std::env::temp_dir().join(format!(
             "f4-visitor-checkpoint-rejection-{}-{}",

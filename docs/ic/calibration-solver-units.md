@@ -78,7 +78,7 @@ The committed reports
 [`runs/ic-bench-solver-engines-2026-09-22.json`](runs/ic-bench-solver-engines-2026-09-22.json)
 and [`…-n17-…`](runs/ic-bench-solver-engines-n17-2026-09-22.json) show the
 input format (`buchberger-f2`, `sat-cdcl` and `exhaustive` solver blocks).
-They are on `random-binary-n13-b1503` and `random-binary-n17-b1ad26`, which
+They are on `icv1-f2m13-t11-f036dc01` and `icv1-f2m17-t455-60048e6d`, which
 have no table row, so they cannot be pin sources.
 
 ## Frozen inputs per key
@@ -92,7 +92,7 @@ card before any run. The executor runs them unchanged.
 
 | key | engine / counter | configuration (`ic bench`) | table rows |
 |:--|:--|:--|:--|
-| `ns_per_conflict` | `sat-cdcl` | `binary-subspace:dimension=6` + `descent-algebraic:m=2` + `sat-cdcl`, walk targets | `char2/random-binary-n15-b524b`, `char2/random-binary-n18-b6507`, `char2/random-binary-n21-b1b6f3b`; Koblitz: `koblitz-orbit:divisor=0;1` + the same oracle on `koblitz/K_1 / GF(2^17)` (the ecbench test fixture) |
+| `ns_per_conflict` | `sat-cdcl` | `binary-subspace:dimension=6` + `descent-algebraic:m=2` + `sat-cdcl`, walk targets | `char2/random-binary-n15-b524b`, `char2/random-binary-n18-b6507`, `char2/random-binary-n21-b1b6f3b`; Koblitz: `koblitz-orbit:divisor=0;1` + the same oracle on `koblitz/icv1-f2m17-tm101-00378d4e` (the ecbench test fixture) |
 | `ns_per_monomial_op` | `buchberger-f2` | as above, `buchberger-f2` | same rows |
 | `ns_per_monomial_test` | `exhaustive` | as above, `exhaustive` | same rows |
 | `ns_per_vector_xor_8x32` / `_16x32` | `fes-f2-wide` | as above, `fes-f2-wide` on a host with AVX2 (8 lanes) or AVX-512 (16 lanes); the lane count is read from `op_unit`, never assumed | same rows; a host without the ISA pins nothing for that key |

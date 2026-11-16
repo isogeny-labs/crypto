@@ -453,3 +453,7 @@ time against plain S_m on E at the same |F| and relation yield.
 
 **Falsification.** The isogenous variant yields relations at lower measured cost
 than plain S_m at matched factor-base size and relation yield (A/A-banded).
+
+**Toy result (2026-11-15).** See `sp04/README.md`: identities exact at p = 1009;
+pulled-back system 2-11x slower at matched size with the same relations. Not
+falsified at toy scale [pcc:unverified].

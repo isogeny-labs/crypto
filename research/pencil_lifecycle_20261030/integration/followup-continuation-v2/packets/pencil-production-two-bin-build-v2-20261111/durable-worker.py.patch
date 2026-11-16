@@ -1,0 +1,69 @@
+--- qualification/durable-worker.py
++++ production-build/durable-worker.py
+@@ -6,7 +6,7 @@
+ F=load_admission(P)
+ W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache'
+ START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False;PHASE_END=END-600;BUILD_END=END-600
+-R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'ten exporter controls plus one synthetic file export over all6300 frozen triplets; no solver calls'}
++R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'two production binaries from exact qualified source; binaries not invoked'}
+ resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+@@ -180,34 +180,36 @@
+  lock=SOURCE/'Cargo.lock';R['generated_root_lock']={'sha256':H(lock),'bytes':lock.stat().st_size};atomic_json(OUT/'generated-root-lock.json',R['generated_root_lock'])
+  shutil.copyfile(lock,OUT/'Cargo.lock')
+  verify_private_source()
+- output=command('compile',[cargo,'test','--release','--lib','--locked','--offline','--no-run','--message-format=json'])
+- binaries=[];finished=[]
++ output=command('compile',[cargo,'build','--release','--locked','--offline','--bin','ecbench','--bin','ecbench_retained_attempt_export_v4','--message-format=json'])
++ binaries={};finished=[]
+  for line in output.splitlines():
+   try:entry=json.loads(line)
+   except json.JSONDecodeError:continue
+   if entry.get('reason')=='build-finished':finished.append(entry.get('success'))
+-  target=entry.get('target',{})
+-  if entry.get('reason')=='compiler-artifact' and target.get('name')=='crypto_lib' and 'lib' in target.get('kind',[]) and target.get('src_path')==str(SOURCE/'src/lib.rs') and entry.get('profile',{}).get('test') and entry.get('executable'):binaries.append(entry['executable'])
++  target=entry.get('target',{});name=target.get('name')
++  if entry.get('reason')=='compiler-artifact' and name in F['production_binaries'] and target.get('kind')==['bin'] and entry.get('executable'):
++   assert target.get('src_path')==str(SOURCE/F['production_binaries'][name]),'production source path'
++   assert entry.get('profile',{}).get('test') is False,'test executable is not production binary'
++   assert name not in binaries,'duplicate production executable artifact'
++   binaries[name]=entry['executable']
+  assert finished==[True],'one successful Cargo build-finished required'
+- assert len(set(binaries))==1,'exactly one root library test executable required'
+- binary=Path(binaries[0]);assert binary.is_absolute() and binary.is_relative_to(STAGE/'target') and stat.S_ISREG(binary.lstat().st_mode)
+- R['test_binary']={'path':str(binary),'sha256':H(binary)};guard()
++ assert set(binaries)==set(F['production_binaries']),'both exact production executables required'
+  R['build_phase_finished_monotonic']=time.monotonic()
+  END=min(END,time.monotonic()+600);PHASE_END=END-40
+- R['execution_end_monotonic']=END;R['execution_deadline_monotonic']=PHASE_END;checkpoint('execution-phase-start')
+- ENV['EXPORTER_QUAL_OUTPUT']=str(OUT/'synthetic-file-control')
+- R['exact_test_results']=[]
+- for i,name in enumerate(F['exact_tests']):
+-  assert H(binary)==R['test_binary']['sha256'],'binary changed before test'
+-  output=command('exact-'+str(i),[str(binary),name,'--exact','--test-threads=1','--nocapture'])
+-  assert len(re.findall(r'test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured;',output))==1,'one nonzero exact passing result required'
+-  R['exact_test_results'].append({'name':name,'passed':True})
+-  if i==10:
+-   summaries=[x for x in json_rows(output) if x.get('qualification')=='synthetic_empty_interrupted_file_export']
+-   assert len(summaries)==1 and summaries[0]['attempt_rows']==22680 and summaries[0]['triplets']==6300 and summaries[0]['eligible_pairs']==0 and summaries[0]['scientific_evidence'] is False
+-   R['synthetic_file_summary']=summaries[0]
+- assert len(R['exact_test_results'])==11
+- assert H(binary)==R['test_binary']['sha256'],'binary changed after tests'
++ R['receipt_end_monotonic']=END;R['receipt_deadline_monotonic']=PHASE_END;checkpoint('receipt-phase-start')
++ R['production_binaries']={}
++ for name,path in binaries.items():
++  binary=Path(path);st=binary.lstat()
++  assert binary.is_absolute() and binary.is_relative_to(STAGE/'target') and stat.S_ISREG(st.st_mode)
++  assert stat.S_IMODE(st.st_mode)&0o111,'production executable lacks executable mode'
++  with binary.open('rb') as stream:
++   assert stream.read(4)==b'\x7fELF','production executable is not ELF';os.fsync(stream.fileno())
++  R['production_binaries'][name]={'path':str(binary),'sha256':H(binary),'bytes':st.st_size,'mode':stat.S_IMODE(st.st_mode),'source_path':F['production_binaries'][name]}
++ R['source_manifest_sha256']=F['source_manifest_sha256'];R['published_source_revision']=F['published_source_revision']
++ R['qualification_receipts']={name:F['release_receipts'][name] for name in ['exporter_qualification','exporter_materialization','combined_qualification']}
++ R['production_binaries_invoked']=False
++ atomic_json(OUT/'production-build-info.json',{'schema':'pencil.production-build-info/v1','source_revision':F['published_source_revision'],'source_manifest_sha256':F['source_manifest_sha256'],'generated_root_lock':R['generated_root_lock'],'binaries':R['production_binaries'],'qualification_receipts':R['qualification_receipts'],'binaries_invoked':False})
++ for name,row in R['production_binaries'].items():assert H(Path(row['path']))==row['sha256'],'production binary changed'
+  verify_private_source()
+  manifest=Path(F['immutable_manifest']['path']);assert H(manifest)==F['immutable_manifest']['sha256'];inputs=json.loads(manifest.read_text());verify(inputs['immutable'])
+  config_key=F['donor_workspace']+'/cache-stage-v2/cargo-home/config.toml';assert H(STAGE/'cargo-home/config.toml')==inputs['immutable'][config_key]['sha256']

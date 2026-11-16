@@ -4,7 +4,10 @@ import json, math, random, statistics as st, pathlib, sys
 here = pathlib.Path(__file__).resolve().parent
 rows = here / "rows"
 CELLS = [(26, 20), (26, 200), (26, 1000), (28, 200), (28, 1000), (28, 3000), (30, 200), (30, 1000), (30, 3000),
-         (32, 200), (32, 1000), (32, 3000), (34, 200), (34, 1000), (34, 3000)]
+         (32, 200), (32, 1000), (32, 3000), (34, 200), (34, 1000), (34, 3000),
+         (36, 200), (36, 1000), (36, 3000),
+         (38, 200), (38, 1000), (38, 3000),
+         (40, 200), (40, 1000), (40, 3000)]
 CELLS = [c for c in CELLS if (rows / f"rho_b{c[0]}_T{c[1]}_r0.jsonl").exists()]
 def load(arm, b, T, r):
     return [json.loads(l) for l in open(rows / f"{arm}_b{b}_T{T}_r{r}.jsonl")]

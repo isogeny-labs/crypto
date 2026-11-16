@@ -8,11 +8,16 @@
 //! genus_ladder run --primes 131,257 --genera 2,3,4,5 --curves 4 --seeds 3
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
 //!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
-//!     [--quartic] [--qc 3.0] [--restart-sqrt] --out FILE.jsonl
+//!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
 //! large prime, `c` double large prime with the prefilter, `R` rho.
+//! `--sge W,F` (repeatable; default off) runs every index-calculus arm a
+//! second time on the same instance and seed with structured Gaussian
+//! elimination before Wiedemann (`w_max = W`, `fill_max = F`), named
+//! `<arm>+sge(W,F)`; the arm without it runs and is recorded unchanged.
+//! Protocol of the merge: `research/genus_ladder_sge_20261115/PROTOCOL.md`.
 //! One JSON object per line.  Protocol:
 //! `research/genus_ladder_20261114/PROTOCOL.md`.  All figures are
 //! `[pcc:unverified]`.
@@ -46,6 +51,7 @@ struct Cfg {
     smith: bool,
     smith_census: u64,
     quartic: bool,
+    sge: Vec<gl::SgeParams>,
     out: String,
 }
 
@@ -73,6 +79,7 @@ fn parse() -> Result<Cfg, String> {
         smith: false,
         smith_census: 0,
         quartic: false,
+        sge: Vec::new(),
         out: String::new(),
     };
     let mut i = 1;
@@ -122,6 +129,17 @@ fn parse() -> Result<Cfg, String> {
             "--seed-search" => c.seed_search = num(&v)? as u64,
             "--max-trials" => c.max_trials = num(&v)? as u64,
             "--smith-census" => c.smith_census = num(&v)? as u64,
+            "--sge" => {
+                let (w, fm) = v
+                    .split_once(',')
+                    .ok_or(format!("--sge wants W,F, not {v}"))?;
+                let w_max = w.parse::<usize>().map_err(|e| format!("--sge W: {e}"))?;
+                let fill_max = num(fm)?;
+                if w_max < 1 || fill_max < 1.0 || !fill_max.is_finite() {
+                    return Err(format!("--sge wants W >= 1 and F >= 1, not {v}"));
+                }
+                c.sge.push(gl::SgeParams { w_max, fill_max });
+            }
             "--out" => c.out = v,
             _ => return Err(format!("unknown flag {flag}")),
         }
@@ -181,14 +199,21 @@ fn main() -> ExitCode {
         w.flush().unwrap();
     };
     let t0 = Instant::now();
-    emit(
-        json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
+    let mut config = json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
         "seeds": cfg.seeds, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
         "rho_cap": cfg.rho_cap, "seed_search": cfg.seed_search, "max_trials": cfg.max_trials,
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
         "threads": cfg.threads,
-        "restart": if cfg.restart_sqrt { json!("min(4096, max(16, sqrt(r)/2))") } else { json!(gl::RESTART) }}),
-    );
+        "restart": if cfg.restart_sqrt { json!("min(4096, max(16, sqrt(r)/2))") } else { json!(gl::RESTART) }});
+    if !cfg.sge.is_empty() {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["sge"] = json!(cfg
+            .sge
+            .iter()
+            .map(|s| json!({"w_max": s.w_max, "fill_max": s.fill_max}))
+            .collect::<Vec<_>>());
+    }
+    emit(config);
 
     // ── instance search, one cell per (p, g) and one per quartic prime ──
     let mut cells: Vec<(u64, u32)> = Vec::new();
@@ -338,51 +363,86 @@ fn main() -> ExitCode {
                     }
                     _ => continue,
                 };
-                let o = gl::run_ic(
-                    &inst,
-                    IcParams {
-                        arm,
-                        nb: gl::fb_size_2lp(*p, *g, cfg.cc),
-                        seed: *seed,
-                        max_trials: cfg.max_trials,
-                        restart: if cfg.restart_sqrt {
-                            gl::restart_sqrt(*r)
-                        } else {
-                            gl::RESTART
+                let settings = std::iter::once(None).chain(cfg.sge.iter().copied().map(Some));
+                for sge in settings {
+                    let o = gl::run_ic(
+                        &inst,
+                        IcParams {
+                            arm,
+                            nb: gl::fb_size_2lp(*p, *g, cfg.cc),
+                            seed: *seed,
+                            max_trials: cfg.max_trials,
+                            restart: if cfg.restart_sqrt {
+                                gl::restart_sqrt(*r)
+                            } else {
+                                gl::RESTART
+                            },
+                            prefilter: pre,
+                            verify_relations: false,
+                            sge,
                         },
-                        prefilter: pre,
-                        verify_relations: false,
-                    },
-                );
-                let mut rec = head.clone();
-                rec["kind"] = json!("run");
-                rec["arm"] = json!(format!("{}{}", o.arm, if pre { "+pre" } else { "" }));
-                rec["certified"] = json!(o.certified);
-                rec["exhausted"] = json!(o.exhausted);
-                rec["ok"] = json!(o.recovered == Some(inst.t_secret));
-                rec["group_ops"] = json!(o.group_ops());
-                rec["setup_ops"] = json!(o.setup_ops);
-                rec["walk_ops"] = json!(o.walk_ops);
-                rec["verify_ops"] = json!(o.verify_ops);
-                rec["cantor_mul"] = json!(o.cantor_mul);
-                rec["cantor_inv"] = json!(o.cantor_inv);
-                rec["rel_mul"] = json!(o.rel.mul);
-                rec["rel_add"] = json!(o.rel.add);
-                rec["la_mul"] = json!(o.la.mul);
-                rec["la_add"] = json!(o.la.add);
-                rec["la_wied_mul"] = json!(o.la_wied.mul);
-                rec["fb_cols"] = json!(o.fb_cols);
-                rec["trials"] = json!(o.trials);
-                rec["candidates"] = json!(o.candidates);
-                rec["prefilter_rejects"] = json!(o.prefilter_rejects);
-                rec["splits"] = json!(o.splits);
-                rec["relations"] = json!(o.relations);
-                rec["rels_by_lp"] = json!(o.rels_by_lp);
-                rec["core_rows"] = json!(o.core_rows);
-                rec["core_cols"] = json!(o.core_cols);
-                rec["attempts"] = json!(o.attempts);
-                rec["wall_ns"] = json!(o.wall_ns);
-                emit(rec);
+                    );
+                    let suffix = match sge {
+                        None => String::new(),
+                        Some(s) => format!("+sge({},{})", s.w_max, s.fill_max),
+                    };
+                    let mut rec = head.clone();
+                    rec["kind"] = json!("run");
+                    rec["arm"] = json!(format!(
+                        "{}{}{}",
+                        o.arm,
+                        if pre { "+pre" } else { "" },
+                        suffix
+                    ));
+                    rec["certified"] = json!(o.certified);
+                    rec["exhausted"] = json!(o.exhausted);
+                    rec["ok"] = json!(o.recovered == Some(inst.t_secret));
+                    rec["group_ops"] = json!(o.group_ops());
+                    rec["setup_ops"] = json!(o.setup_ops);
+                    rec["walk_ops"] = json!(o.walk_ops);
+                    rec["verify_ops"] = json!(o.verify_ops);
+                    rec["cantor_mul"] = json!(o.cantor_mul);
+                    rec["cantor_inv"] = json!(o.cantor_inv);
+                    rec["rel_mul"] = json!(o.rel.mul);
+                    rec["rel_add"] = json!(o.rel.add);
+                    rec["la_mul"] = json!(o.la.mul);
+                    rec["la_add"] = json!(o.la.add);
+                    rec["la_wied_mul"] = json!(o.la_wied.mul);
+                    rec["fb_cols"] = json!(o.fb_cols);
+                    rec["trials"] = json!(o.trials);
+                    rec["candidates"] = json!(o.candidates);
+                    rec["prefilter_rejects"] = json!(o.prefilter_rejects);
+                    rec["splits"] = json!(o.splits);
+                    rec["relations"] = json!(o.relations);
+                    rec["rels_by_lp"] = json!(o.rels_by_lp);
+                    rec["core_rows"] = json!(o.core_rows);
+                    rec["core_cols"] = json!(o.core_cols);
+                    rec["attempts"] = json!(o.attempts);
+                    if let Some(sp) = sge {
+                        // Merge-stage fields, only on merged runs.
+                        let st = o.sge;
+                        rec["w_max"] = json!(sp.w_max);
+                        rec["fill_max"] = json!(sp.fill_max);
+                        rec["la_sge_mul"] = json!(o.la_sge.mul);
+                        rec["la_sge_add"] = json!(o.la_sge.add);
+                        rec["la_wied_add"] = json!(o.la_wied.add);
+                        rec["sge_rows_in"] = json!(st.rows_in);
+                        rec["sge_cols_in"] = json!(st.cols_in);
+                        rec["sge_nnz_in"] = json!(st.nnz_in);
+                        rec["sge_generic_in"] = json!(st.generic_in);
+                        rec["sge_rows_out"] = json!(st.rows_out);
+                        rec["sge_cols_out"] = json!(st.cols_out);
+                        rec["sge_nnz_out"] = json!(st.nnz_out);
+                        rec["sge_generic_out"] = json!(st.generic_out);
+                        rec["sge_merged"] = json!(st.merged);
+                        rec["sge_peeled"] = json!(st.peeled);
+                        rec["sge_empty"] = json!(st.empty);
+                        rec["sge_duplicates"] = json!(st.duplicates);
+                        rec["sge_refused"] = json!(st.refused);
+                    }
+                    rec["wall_ns"] = json!(o.wall_ns);
+                    emit(rec);
+                }
             }
         }
         Spec::Quartic { q, curve_seed } => {

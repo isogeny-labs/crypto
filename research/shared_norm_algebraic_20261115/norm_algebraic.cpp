@@ -21,6 +21,7 @@ using P=std::vector<Polynomial>;
 using reference::Point;
 
 struct Generator {
+    struct DeferredMembership {};
     coeff::Config cfg;
     unsigned m,h;
     System system;
@@ -64,9 +65,13 @@ struct Generator {
     }
     void equations(const P&f) {for(const auto&v:f)if(!v.terms.empty())system.equations.push_back(v);}
 
-    Generator(coeff::Config input,unsigned arity,bool pruned=false):cfg(input),m(arity),h((arity+1)/2) {
+    Generator(coeff::Config input,unsigned arity,DeferredMembership):cfg(input),m(arity),h((arity+1)/2) {
         if(m<3||m>7||m%2==0||cfg.t<1||cfg.t>8||cfg.field.p<5||cfg.field.p>257)
             throw std::invalid_argument("bounded shared-norm shape");
+        system.p=cfg.field.p;
+    }
+    Generator(coeff::Config input,unsigned arity,bool pruned=false)
+        :Generator(input,arity,DeferredMembership{}) {
         if(pruned&&cfg.field.mod(cfg.c)==0)
             throw std::invalid_argument("witness-pruned membership requires nonzero c");
         system.p=cfg.field.p;
@@ -230,12 +235,91 @@ Point multiply(const reference::Curve&E,Point point,int k) {
     return out;
 }
 struct ColdResult {int scalar;std::size_t attempts,calls,misses,rank;};
-ColdResult cold_solve(Point Q,std::uint64_t seed,Oracle&oracle) {
+template<class OracleType>
+ColdResult cold_collect(const reference::Curve&E,Point P,Point Q,std::uint64_t seed,
+    int scalar_order,const std::vector<Point>&base,int membership_depth,int membership_terminal,OracleType&oracle) {
+    if(scalar_order<3||scalar_order>257||!reference::isprime(scalar_order)||base.empty()
+       ||P.infinity||Q.infinity||!E.contains(P)||!E.contains(Q)
+       ||!multiply(E,P,scalar_order).infinity||!multiply(E,Q,scalar_order).infinity)
+        throw std::invalid_argument("prime-order collector admission");
+    for(const auto&point:base)if(point.infinity||!E.contains(point)||!multiply(E,point,scalar_order).infinity)
+        throw std::invalid_argument("collector base subgroup admission");
+    std::mt19937_64 rng(seed);
+    std::ofstream attempts_log(oracle.root/"cold-attempts.tsv");
+    std::ofstream relations_log(oracle.root/"cold-relations.tsv");
+    std::ofstream kernels_log(oracle.root/"cold-kernels.tsv");
+    if(!attempts_log||!relations_log||!kernels_log)throw std::runtime_error("cold trace open failed");
+    attempts_log<<"attempt\tbatch\ta\tb\trx\try\tstatus\tbackend_call\n";
+    relations_log<<"attempt\tbatch\ta\tb\trx\try\trow\tmodel\n";
+    kernels_log<<"batch\trank\tw\talpha\tbeta\tstatus\n";
+    auto vector_text=[](const std::vector<int>&values) {
+        std::ostringstream out;
+        for(std::size_t i=0;i<values.size();++i){if(i)out<<',';out<<values[i];}
+        return out.str();
+    };
+    auto sample=[&]() {
+        const auto order=static_cast<std::uint64_t>(scalar_order);
+        const auto threshold=(std::uint64_t(0)-order)%order;
+        std::uint64_t value;do{value=rng();}while(value<threshold);
+        return static_cast<int>(value%order);
+    };
+    std::size_t attempts=0,misses=0,calls=0;
+    std::uint64_t arithmetic_ops=0;
+    for(unsigned batch=0;batch<64;++batch) {
+        std::vector<std::vector<int>> C;
+        std::vector<int> aa,bb;
+        while(C.size()<base.size()+1) {
+            if(++attempts>4096)throw std::runtime_error("cold solve attempt cap");
+            const int a=sample(),b=sample();
+            const Point R=E.sum(multiply(E,P,a),multiply(E,Q,b));
+            if(R.infinity){
+                ++misses;attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<"\t-\t-\tidentity\t-\n";
+                attempts_log.flush();continue;
+            }
+            // Only public curve, domain and R enter the oracle, never a,b,Q.
+            OracleResult answer;++calls;
+            try{answer=oracle.solve({{E.p},E.a,E.b,membership_depth,membership_terminal,R.x,R.y});}
+            catch(const std::exception&){
+                attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<"\toracle_unknown\t"<<oracle.calls<<'\n';
+                attempts_log.flush();throw;
+            }
+            if(answer.models.empty()){
+                ++misses;attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<"\tno_relation\t"<<oracle.calls<<'\n';
+                attempts_log.flush();continue;
+            }
+            std::vector<int> row(base.size());Point check;
+            std::stringstream input(*answer.models.begin());std::string token;
+            while(std::getline(input,token,';')) {
+                const auto cut=token.find(':');
+                Point point{std::stoi(token.substr(0,cut)),std::stoi(token.substr(cut+1)),false};
+                const auto found=std::find_if(base.begin(),base.end(),[&](Point v){return v.x==point.x;});
+                if(found==base.end()||row[found-base.begin()]!=0)throw std::runtime_error("point absent/repeated in base");
+                if(point.y!=found->y&&point.y!=E.p-found->y)throw std::runtime_error("noncanonical relation sign");
+                row[found-base.begin()]=point.y==found->y?1:scalar_order-1;
+                check=E.sum(check,point);
+            }
+            if(!reference::equal(check,R))throw std::runtime_error("cold relation replay failed");
+            attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<"\taccepted\t"<<oracle.calls<<'\n';
+            relations_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<'\t'<<vector_text(row)<<'\t'<<*answer.models.begin()<<'\n';
+            attempts_log.flush();relations_log.flush();
+            C.push_back(row);aa.push_back(a);bb.push_back(b);
+        }
+        const auto kernel=direct::left_null(C,{&arithmetic_ops,scalar_order});
+        const auto recovered=direct::recover(kernel.w,aa,bb,{&arithmetic_ops,scalar_order});
+        kernels_log<<batch<<'\t'<<kernel.rank<<'\t'<<vector_text(kernel.w)<<'\t'<<recovered.alpha<<'\t'<<recovered.beta<<'\t'<<(recovered.scalar?"return":"retry")<<'\n';
+        kernels_log.flush();
+        if(!recovered.scalar)continue;
+        if(!reference::equal(multiply(E,P,*recovered.scalar),Q))throw std::runtime_error("final scalar replay failed");
+        return {*recovered.scalar,attempts,calls,misses,kernel.rank};
+    }
+    throw std::runtime_error("cold solve batch cap");
+}
+template<class OracleType>
+ColdResult cold_solve(Point Q,std::uint64_t seed,OracleType&oracle) {
     const reference::Curve E{17,2,2};const Point P{5,1,false};
     if(Q.infinity||!E.contains(Q)||Q.x<0||Q.x>=17||Q.y<0||Q.y>=17)
         throw std::invalid_argument("canonical nonzero public target required");
-    // Nonzero P has exact prime order19. Hasse's interval for this fixed F17
-    // curve is [10,26], containing exactly one multiple of19. No point census.
+    // Prime19 and Hasse's interval[10,26] admit exactly this whole group.
     if(!reference::isprime(19)||P.infinity||!E.contains(P)
        ||!multiply(E,P,19).infinity||!multiply(E,Q,19).infinity
        ||((10+18)/19)!=26/19)
@@ -259,71 +343,11 @@ ColdResult cold_solve(Point Q,std::uint64_t seed,Oracle&oracle) {
         setup<<"abscissa_roots\t"<<abscissae.size()<<'\n';
         for(Point point:base)setup<<"base\t"<<point.x<<'\t'<<point.y<<'\n';
     }
-    std::mt19937_64 rng(seed);
-    std::ofstream attempts_log(oracle.root/"cold-attempts.tsv");
-    std::ofstream relations_log(oracle.root/"cold-relations.tsv");
-    std::ofstream kernels_log(oracle.root/"cold-kernels.tsv");
-    if(!attempts_log||!relations_log||!kernels_log)throw std::runtime_error("cold trace open failed");
-    attempts_log<<"attempt\tbatch\ta\tb\trx\try\tstatus\tbackend_call\n";
-    relations_log<<"attempt\tbatch\ta\tb\trx\try\trow\tmodel\n";
-    kernels_log<<"batch\trank\tw\talpha\tbeta\tstatus\n";
-    auto vector_text=[](const std::vector<int>&values) {
-        std::ostringstream out;
-        for(std::size_t i=0;i<values.size();++i){if(i)out<<',';out<<values[i];}
-        return out.str();
-    };
-    auto sample=[&]() {
-        const auto threshold=(std::uint64_t(0)-19)%19;
-        std::uint64_t value;do{value=rng();}while(value<threshold);
-        return static_cast<int>(value%19);
-    };
-    std::size_t attempts=0,misses=0,calls=0;
-    std::uint64_t arithmetic_ops=0;
-    for(unsigned batch=0;batch<64;++batch) {
-        std::vector<std::vector<int>> C;
-        std::vector<int> aa,bb;
-        while(C.size()<base.size()+1) {
-            if(++attempts>4096)throw std::runtime_error("cold solve attempt cap");
-            const int a=sample(),b=sample();
-            const Point R=E.sum(multiply(E,P,a),multiply(E,Q,b));
-            if(R.infinity){
-                ++misses;attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<"\t-\t-\tidentity\t-\n";
-                attempts_log.flush();continue;
-            }
-            // Only public curve, domain and R enter the oracle, never a,b,Q.
-            const auto answer=oracle.solve({{17},2,2,3,1,R.x,R.y});++calls;
-            if(answer.models.empty()){
-                ++misses;attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<"\tno_relation\t"<<oracle.calls<<'\n';
-                attempts_log.flush();continue;
-            }
-            std::vector<int> row(base.size());Point check;
-            std::stringstream input(*answer.models.begin());std::string token;
-            while(std::getline(input,token,';')) {
-                const auto cut=token.find(':');
-                Point point{std::stoi(token.substr(0,cut)),std::stoi(token.substr(cut+1)),false};
-                const auto found=std::find_if(base.begin(),base.end(),[&](Point v){return v.x==point.x;});
-                if(found==base.end()||row[found-base.begin()]!=0)throw std::runtime_error("point absent/repeated in base");
-                row[found-base.begin()]=point.y==found->y?1:18;
-                check=E.sum(check,point);
-            }
-            if(!reference::equal(check,R))throw std::runtime_error("cold relation replay failed");
-            attempts_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<"\taccepted\t"<<oracle.calls<<'\n';
-            relations_log<<attempts<<'\t'<<batch<<'\t'<<a<<'\t'<<b<<'\t'<<R.x<<'\t'<<R.y<<'\t'<<vector_text(row)<<'\t'<<*answer.models.begin()<<'\n';
-            attempts_log.flush();relations_log.flush();
-            C.push_back(row);aa.push_back(a);bb.push_back(b);
-        }
-        const auto kernel=direct::left_null(C,{&arithmetic_ops});
-        const auto recovered=direct::recover(kernel.w,aa,bb,{&arithmetic_ops});
-        kernels_log<<batch<<'\t'<<kernel.rank<<'\t'<<vector_text(kernel.w)<<'\t'<<recovered.alpha<<'\t'<<recovered.beta<<'\t'<<(recovered.scalar?"return":"retry")<<'\n';
-        kernels_log.flush();
-        if(!recovered.scalar)continue;
-        if(!reference::equal(multiply(E,P,*recovered.scalar),Q))throw std::runtime_error("final scalar replay failed");
-        return {*recovered.scalar,attempts,calls,misses,kernel.rank};
-    }
-    throw std::runtime_error("cold solve batch cap");
+    return cold_collect(E,P,Q,seed,19,base,3,1,oracle);
 }
 } // namespace algebraic
 
+#ifndef NORM_ALGEBRAIC_NO_MAIN
 int main(int argc,char**argv) {
     try {
         using namespace algebraic;
@@ -415,3 +439,4 @@ int main(int argc,char**argv) {
         throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --qualify-arity MSOLVE OUTDIR TSV | --qualify-pruned-{models,cold,arity} MSOLVE OUTDIR TSV | --solve[-pruned] MSOLVE OUTDIR Qx Qy SEED");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
+#endif

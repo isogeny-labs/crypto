@@ -99,6 +99,58 @@ for arm in ("A", "B"):
     t.append(f"- {arm}: group ops / sqrt(r) per prime: " + ", ".join(f"{r['p']}: {v:.1f}" for r, v in zip(rows, adj)))
     t.append(f"- {arm}: slope of ln(group ops / sqrt(r)) on ln p: {ols([r['p'] for r in rows], adj):.3f}")
 t.append("")
+# ---- Amendment 1 (2026-11-15): field unit (primary), lower-bound labels ----
+wi = d.get("inv_weight", 10.0)
+t.append(f"### Field unit (primary, Amendment 1): one F_p multiplication or squaring; inversion = {wi:g}; native priced at w = 0.1\n")
+t.append("IC arms A, B are lower bounds (`lower_bound: true`); A_S, B_S carry no Cantor tally (their base is rel_mul + la_mul only).\n")
+t.append("| p | rho E (neg) mul+sqr | rho E inv | rho E total w=0.1 | A mul+sqr | A inv | A total w=0.1 | A/rho w=0.1 | A class | B mul+sqr | B inv | B total w=0.1 | B/rho w=0.1 | B class |")
+t.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+for r in rows:
+    a = r["arms"]
+    f = r["rho_E"]["field"]
+    t.append(
+        f"| {r['p']} | {fmt(f['negation']['field_mul_sqr'],1)} | {fmt(f['negation']['field_inv'],1)} | {fmt(f['band_negation'][1])} | "
+        + " | ".join(
+            f"{fmt(a[x]['field_mul_sqr'])} | {fmt(a[x]['field_inv'],1)} | {fmt(a[x]['field_unit']['total_band'][1])} | "
+            f"{fmt(a[x]['field_unit']['ratio_neg_band'][1],1)} | {a[x]['field_unit']['class_neg_band']}"
+            for x in ("A", "B")
+        )
+        + " |"
+    )
+t.append("")
+t.append("### Cantor step over E1 addition, in field operations (per group operation)\n")
+t.append("| p | J mul+sqr / op | J inv / op | E1 mul+sqr / op | E1 inv / op | ratio at inv weight " + f"{wi:g}" + " | ratio w=0 | ratio w=30 |")
+t.append("|---|---|---|---|---|---|---|---|")
+for r in rows:
+    A = r["arms"]["A"]
+    fe = r["rho_E"]["field"]["negation"]
+    go_e = r["rho_E"]["negation"]["total_ops"]
+    jm, ji = A["field_mul_sqr"] / A["group_ops"], A["field_inv"] / A["group_ops"]
+    em, ei = fe["field_mul_sqr"] / go_e, fe["field_inv"] / go_e
+    q = lambda w: (jm + w * ji) / (em + w * ei)
+    t.append(f"| {r['p']} | {jm:.1f} | {ji:.2f} | {em:.2f} | {ei:.2f} | {q(wi):.2f} | {q(0):.2f} | {q(30):.2f} |")
+t.append("")
+t.append("### Sensitivity to the inversion weight (base only, native work at 0; A and B over negation rho on E1)\n")
+t.append("| p | A w=0 | A w=10 | A w=30 | B w=0 | B w=10 | B w=30 |")
+t.append("|---|---|---|---|---|---|---|")
+for r in rows:
+    fe = r["rho_E"]["field"]["negation"]
+    cells = []
+    for x in ("A", "B"):
+        e = r["arms"][x]
+        for w in (0, 10, 30):
+            num = e["field_mul_sqr"] + w * e["field_inv"] + e["rel_mul"] + e["la_mul"]
+            cells.append(f"{num / (fe['field_mul_sqr'] + w * fe['field_inv']):.1f}")
+    t.append(f"| {r['p']} | " + " | ".join(cells) + " |")
+t.append("")
+t.append("### Verdicts\n")
+t.append(f"- primary (field unit): {d['verdict']['verdict']}")
+t.append(f"- secondary (group operations): {d['verdict_group_ops']['verdict']}")
+for k in ("A_field_ratio_to_rho_E_w0.1", "B_field_ratio_to_rho_E_w0.1", "A_ratio_to_rho_E_w0.1", "B_ratio_to_rho_E_w0.1"):
+    v = d["fits_stage1"].get(k)
+    if v:
+        t.append(f"- slope {k}: {v.get('slope')} (95% CI {v.get('ci95')})")
+t.append("")
 open(f"{out_dir}/tables.md", "w").write("\n".join(t) + "\n")
 
 # ---------- svg ----------

@@ -1,0 +1,9 @@
+# Exact quartic charts over runtime prime fields
+
+Engineering portability gate. Replace F127constant by mandatory runtime prime in candidate chart discovery, section arithmetic, inversion, Frobenius and cancellation. Replace signed control polynomial coefficients by field-dependent negatives. No source/isogeny/DLPportability or novel theorem claim.
+
+Frozen cohort primes97,257,509,1009; each curve X^4+Y^4−Z^4=0 with monicX4. These are fixed reductions of one integer family at distinct characteristics, not generic random curves or isogeny-transfer targets. Smoothness follows since characteristic not2and simultaneous partial zeros4X³=4Y³=−4Z³=0force the zero vector. These are bounded correctness fields, not evidence of asymptotic cost or security scale.
+
+Each candidate must discover chart from actual coefficients: complete point list via univariate rootfactorings with exhaustive independent pointenumerator comparison, first regular O/residual in first32affinepoints, first split canonical line among first32pairs, fresh regular controls. Exact RRrank2/dim8, multiplicationrank18, diagonalrank112/nullity8, coefficient identity/corrupt rejection,480determinant/480split-tensor and120base-divisor cancellation controls. Use split/quadratic branch as discovered; retain actual kind, don't retune to force coverage. Canonical tangent residual and line checks pass. No grouporder/centering/inverse/descent claims from this gate.
+
+Build source/lock/binaryhash freeze and S3checkpoint/gate before execution. One sequential cohort into run/, stdout/stderr/status perprime, stop first unexpected failure; no silent rerun, dropped field, altered prime, searchcap or curve without amendment. Retain failures. No timing benchmark; enumerate controls charged in any later timing study. Fixedu64products safe under these primes, not a general62bitfield implementation assertion.

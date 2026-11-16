@@ -127,3 +127,11 @@ result, so no performance leaderboard, progress chart or benchmark index changes
 The source-linked pipeline diagram explains actual component flow. report.pdf
 was rendered from report.typ and both pages visually inspected. Metadata/prose
 and artifact checks are recorded in PUBLICATION.md after their commands finish.
+
+Subsequent source note: core sourceb5e2b31d42 changes only the baseline oracle
+adapter to a template and adds an include guard around the CLI. The rebuilt
+baseline selftests and retained28-model check pass under that source. Earlier
+hash receipts bind their exact recorded commits/binaries; they must not be
+checked against or assigned to this later execution identity. The separate
+core study preserves its own pre-run hashes and complete qualification.
+[pcc:unverified]

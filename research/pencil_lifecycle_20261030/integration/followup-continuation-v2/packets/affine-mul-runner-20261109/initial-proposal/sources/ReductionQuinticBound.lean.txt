@@ -1,0 +1,33 @@
+import ReductionWordDegree
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial
+variable {K : Type*} [Field K]
+
+theorem quintic_residual_nonzero (f v : K[X]) (hf : f.natDegree=5) : f-v*v ≠ 0 := by
+ intro h
+ have he : f=v*v := sub_eq_zero.mp h
+ by_cases hv : v=0
+ · have hzero : f=0 := by simpa [hv] using he
+   simp [hzero] at hf
+ · have hd : 5=v.natDegree+v.natDegree := by rw [←natDegree_mul hv hv,←he,hf]
+   omega
+
+theorem quintic_quotient_bound (f u v q : K[X]) (hf : f.natDegree=5)
+ (hu : 3≤u.natDegree) (hu4 : u.natDegree≤4) (hv : v.natDegree<u.natDegree)
+ (hq : f-v*v=q*u) : q ≠ 0 ∧ q.natDegree≤2 := by
+ have hr := quintic_residual_nonzero f v hf
+ have hqn : q ≠ 0 := by intro hz; apply hr; simp [hq,hz]
+ have hun : u ≠ 0 := by intro hz; simp [hz] at hu
+ have hd : (f-v*v).natDegree=q.natDegree+u.natDegree := by rw [hq,natDegree_mul hqn hun]
+ have hm : (v*v).natDegree≤v.natDegree+v.natDegree := natDegree_mul_le
+ refine ⟨hqn,?_⟩
+ by_cases h3 : u.natDegree=3
+ · have hlt : (v*v).natDegree<f.natDegree := by omega
+   have he := natDegree_sub_eq_left_of_natDegree_lt hlt
+   omega
+ · have h4 : u.natDegree=4 := by omega
+   have hs : (f-v*v).natDegree≤6 :=
+     (natDegree_sub_le f (v*v)).trans (max_le (by omega) (by omega))
+   omega
+end ReductionWord
