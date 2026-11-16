@@ -17,7 +17,12 @@ use tokio_postgres::types::ToSql;
 
 mod catalog;
 mod curves;
+pub mod export;
+mod factor_bases;
+mod mcp;
+mod results;
 mod sql;
+mod viewer;
 mod write;
 
 pub const OPENAPI: &str = include_str!("../../openapi.yaml");
@@ -172,12 +177,17 @@ async fn openapi() -> impl IntoResponse {
     ([(header::CONTENT_TYPE, "application/yaml")], OPENAPI)
 }
 
-async fn index() -> Json<Value> {
+async fn index(headers: HeaderMap) -> axum::response::Response {
+    if viewer::wants_html(&headers) {
+        return viewer::to_viewer();
+    }
     Json(json!({
         "service": "ecdb",
         "openapi": "/openapi.yaml",
+        "viewer": "/viewer",
         "start_here": ["/v1/meta", "/v1/schema", "/v1/curves?limit=5", "/v1/curves/secp256k1"],
     }))
+    .into_response()
 }
 
 pub fn router(state: Shared) -> Router {
@@ -191,6 +201,16 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/curves/{reference}/transfers", get(curves::transfers))
         .route("/v1/curves/{reference}/covers", get(curves::covers))
         .route("/v1/curves/{reference}/traits", get(curves::traits))
+        .route("/v1/curves/{reference}/relations", get(curves::relations))
+        .route("/v1/curves/{reference}/endomorphisms", get(curves::endomorphisms))
+        .route("/v1/curves/{reference}/division-polynomials", get(curves::division_polynomials))
+        .route("/v1/curves/{reference}/measurements", get(results::curve_measurements))
+        .route("/v1/ic/leaderboard", get(results::leaderboard))
+        .route("/v1/ic/progress", get(results::progress))
+        .route("/v1/ic/boundary", get(results::boundary))
+        .route("/v1/benchmarks", get(results::benchmarks))
+        .route("/v1/ecbench/sessions", get(results::sessions))
+        .route("/v1/ecbench/sessions/{id}", get(results::session))
         .route("/v1/isogenies/{id}", get(catalog::isogeny))
         .route("/v1/isogeny-classes", get(catalog::classes))
         .route("/v1/isogeny-classes/{label}", get(catalog::class))
@@ -199,19 +219,36 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/transfers", get(catalog::transfers))
         .route("/v1/polynomials/{sha256}", get(catalog::polynomial))
         .route("/v1/modular-polynomials", get(catalog::modular_polynomials))
+        .route("/v1/class-polynomials", get(catalog::class_polynomials))
+        .route("/v1/summation-polynomials", get(catalog::summation_polynomials))
+        .route("/v1/factor-bases", get(factor_bases::list))
+        .route("/v1/factor-base-designs", get(factor_bases::designs))
+        .route("/v1/ic/claims", get(factor_bases::claims))
+        .route("/v1/factor-bases/{key}", get(factor_bases::document))
+        .route("/v1/factor-bases/{key}/results", get(factor_bases::results))
         .route("/v1/sql", post(sql::run))
+        .route("/v1/export", get(export::manifest))
+        .route("/v1/export/{table}", get(export::page))
         .route_layer(middleware::from_fn_with_state(state.clone(), read_auth));
     let writes = Router::new()
         .route("/v1/evidence", post(write::evidence))
         .route("/v1/isogenies", post(write::isogeny))
         .route_layer(middleware::from_fn_with_state(state.clone(), write_auth));
-    Router::new()
+    let api: Router = Router::new()
         .route("/", get(index))
         .route("/healthz", get(healthz))
         .route("/openapi.yaml", get(openapi))
+        .route("/viewer", get(viewer::page))
         .merge(reads)
         .merge(writes)
-        .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(tower_http::cors::CorsLayer::permissive())
-        .with_state(state)
+        .with_state(state);
+    // MCP (streamable HTTP, JSON responses): each tool is a request to `api` itself.
+    let inner = api.clone();
+    api.route(
+        "/mcp",
+        post(move |headers: HeaderMap, body: axum::body::Bytes| mcp::handle(inner.clone(), headers, body))
+            .get(mcp::get_not_supported),
+    )
+    .layer(tower_http::trace::TraceLayer::new_for_http())
+    .layer(tower_http::cors::CorsLayer::permissive())
 }

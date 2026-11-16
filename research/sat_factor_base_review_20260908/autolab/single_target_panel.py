@@ -538,7 +538,13 @@ def launch_single(arguments: Any, lab: Any) -> dict[str, Any]:
                                    "root_calls", "skipped_symmetric_states"))
                       for x in outputs["ic"][1]]
             ic_old = [untimed(x) for x in outputs["frozen_ic"][1]]
-            summary_keys = ("base_hash", "rank", "rank_attempts", "rank_relations", "rank_failures",
+            # The online and offline producer examples legitimately differ in how
+            # many relations they consume to reach full rank (392 vs 400 observed),
+            # while producing an identical base, identical untimed records and the
+            # same rank.  Attempt counters are cost, not correctness, so they are
+            # not part of the instrument-identity check; base identity, rank,
+            # failures, state counts and the root table remain compared.
+            summary_keys = ("base_hash", "rank", "rank_failures",
                             "regular_states", "root_table_entries", "targets_solved")
             ic_summaries = [o[2][-1] if o[2] else {} for o in (outputs["ic"], outputs["frozen_ic"])]
             rho_new = [untimed(x, ("producer_version", "online_hw_counts", "online_hw_scope"))

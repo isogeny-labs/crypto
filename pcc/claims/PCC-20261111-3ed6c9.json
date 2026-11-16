@@ -1,0 +1,37 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T18:51:50Z",
+ "id": "PCC-20261111-3ed6c9",
+ "kind": "statement",
+ "producer": {
+  "commit": "dcd324f35fdac7a7ea47027a3f67ff31b011a36c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/seven-identities-01.txt",
+    "sha256": "a5f11ae158a92b64a92cb366bfc3b0c193fc0846599086a546f79c2ae720aa28"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/seven-scaling-identity-01.json",
+    "sha256": "8b585c5f01b4fcd660357f7eb51dd3b31d6b8d0add6a6830f75dff17fa8d9fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/seven-support-identity-01.json",
+    "sha256": "d56ae8fc492eabe02089a1a9dd0c211991ed2a79c5b8b1fef9c5608f09baa51e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Native unchanged identity-certificate issuer/checker accepts IDC1hef947795d0f8d235 coordinate scaling and IDC1he970a46be821e787 matched-support clearing at32 issue+16 extra checker-seed points over2^61-1. Both carry exact SHA256 pointers to separately gate-passing core Lean ring proofs;the native checker does not itself run Lean. These are polynomial artifacts for the written degree7 construction,not finite-field/Jacobian geometry,independently signed standing or a benchmark."
+}

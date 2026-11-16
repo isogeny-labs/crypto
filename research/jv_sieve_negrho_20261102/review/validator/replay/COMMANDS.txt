@@ -1,0 +1,9 @@
+# Validator replays, 2026-11-03, host: 4 vCPU (nproc 4), shared with other agents; counted metrics are host-independent.
+# Binary: /tmp/claude-0/-home-user/e05ef163-36d2-5181-b9b7-869571ded707/scratchpad/jv_cover_round3_frozen
+# sha256 d21002a309374e1a06caf3f93a4c6da212362a72e5987b4e80aa8a96fdc44f2c (identical to target/release/examples/jv_cover at review time;
+# built at main aa1c89ab2a per the task card -- build provenance attested by the caller, binary hash verified by the validator).
+# Runs drawn from nonces taken after publication (DRAW_rho.txt, DRAW_ref.txt); P_1511_s32 is shared with the study-A replay draw.
+$BIN --exp rhostrong --sizes 1511 --first-seed 23 --seeds 1 --neg 1 --batch 16 --r 256 --dp-bits 16 --run 0 --json rho_p1511_s23_run0.json
+$BIN --exp rhostrong --sizes 1451 --first-seed 1 --seeds 1 --neg 1 --batch 16 --r 256 --dp-bits 16 --run 6 --json ref_p1451_s1_run6.json
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 21 --seeds 1 --rho-runs 0 --json P_1511_s21.json
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 32 --seeds 1 --rho-runs 0 --json P_1511_s32.json

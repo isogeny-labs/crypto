@@ -1,0 +1,9 @@
+git checkout source: 52665c7a6e8308f86201e10c9305afa346fd134b
+cargo build --locked --release --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin pdp --bin top
+cargo test --locked --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin pdp --bin top
+python3 stage_spike38_bases_from_s3.py
+pdp generate <candidate-inputs> <candidate-bases/data> research/n83_candidate_pdp_20261028/evidence/pdp/baseline/inputs.json spike38
+top single <candidate-inputs> <top-certificates>
+top single-replay <candidate-inputs> <top-certificates>
+
+Frozen controls: 6 PDP target tests and 10 top-form target tests pass. The broad workspace test command stopped at two unrelated `prime_centered_witness` tests because their persistent-output environment variable was unset; this is recorded in `preflight.json` and does not alter the target-specific results.

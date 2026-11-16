@@ -1,0 +1,14 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.3,ranksep=0.4];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#34556b"];
+ s [label="Actual degree 2/2 Sylvester determinant\nS4 = Res_T(S3(x1,x2,T), S3(x3,x4,T))"];
+ d [label="Checked determinant coefficient identity\n(af-cd)^2 - (ae-bd)(bf-ce)"];
+ a [label="x1 != x2 (or swap pairs)\nActual signed S3 roots"];
+ b [label="x1=x2 and x3=x4\nBoth leading coefficients vanish",fillcolor="#fff2cf"];
+ c [label="Common finite root\nGlue actual points equal up to sign"];
+ p [label="Pair cancellation\nP,-P,Q,-Q; partial sums at infinity"];
+ r [label="S4=0 iff four actual affine points\nwith prescribed x-coordinates sum to zero",fillcolor="#d4eedb"];
+ n [label="Faithful F5 negative control\nS3(0,0,T)=1; S3(1,1,T)=4\nRes degree 2/2=0; no finite common root",fillcolor="#fff2cf"];
+ s -> d; d -> a; d -> b; a -> c; b -> p; c -> r; p -> r; b -> n;
+}

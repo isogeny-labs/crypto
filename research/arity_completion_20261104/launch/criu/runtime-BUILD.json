@@ -1,0 +1,12 @@
+{
+  "schema": "isolab.recovery.runtime-build/v1",
+  "source_archive_sha256": "de7e202e031b7b67688ba723b43c6c9a27dddc4b753e9c94189a16333f2849c3",
+  "source_archive_method": "git archive --format=tar <source_revision> taskq/deploy/eks-karpenter/resume | sha256sum",
+  "source_revision": "77b38335e32881f0e55e3732851a0922f9e60634",
+  "source_state": "committed",
+  "criu_version": "4.2.1",
+  "rust": "1.99.1",
+  "architecture": "x86_64",
+  "base_runtime_sha256": "3ab3cf238340dfdeebec721ae52066aea7b1fe998d0360d2d96f4929e25dc03c",
+  "changed": "isolab-eks-recovery rebuilt with command mode (PR #3431); criu, libraries, tar and isolab-criu-progress copied unchanged from the base runtime archive"
+}

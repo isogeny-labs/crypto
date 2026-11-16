@@ -1,0 +1,1 @@
+Initial renderer sources.json union treated a nested files map as a flat map and attempted Path(files). FileNotFoundError occurred before report rendering. Corrected to obj.get(files,obj); no mathematical source changed.

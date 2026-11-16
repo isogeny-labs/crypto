@@ -1,0 +1,541 @@
+{
+  "experiments": {
+    "k-linear-preparation-20261115-v19": {
+      "attempts": [
+        {
+          "directory": "attempts/k-linear-preparation-20261115-v19/0001",
+          "evidence_sha256": {
+            "artifact-000-raw.json": "d13e1eda936bcf483739a4c24fb1fbb9d2a54fccdcd48c7d2e7f9c39bdcbf3b6",
+            "artifacts.json": "2468629ddd5f155c31c6a563f6b04337de2a58ce7ec1ed16ae84de30cf1b6817",
+            "preregistration.json": "79ea0241ab183ff8f72fa836eda2d9cf28a3f0decdd3f048b93df27e931dca0d",
+            "process.json": "f3f3801374c9d8ba9558777bf487fabf6ffd9eef39d34f3b3e0f13f834396fe4",
+            "scientific_result.json": "e871d9a8e6d16f0a6698ec7e74058dfa49eb6488c9cfa117542d7b92f5a0d9ca",
+            "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout.txt": "9f322f3625670f6ba14ed29083f0afcf8d3e3b61cba85166257ea531cf0ea2fd"
+          },
+          "fingerprint": "d882160c7bbabb3502c44cd181b5ecfef1c198518ae73cf84ece0c9db5e3625c",
+          "preregistration": "attempts/k-linear-preparation-20261115-v19/0001/preregistration.json",
+          "preregistration_sha256": "79ea0241ab183ff8f72fa836eda2d9cf28a3f0decdd3f048b93df27e931dca0d",
+          "process_sha256": "f3f3801374c9d8ba9558777bf487fabf6ffd9eef39d34f3b3e0f13f834396fe4"
+        }
+      ],
+      "registered_at": "2026-11-15T09:05:06.555536+00:00",
+      "registered_fingerprint": "d882160c7bbabb3502c44cd181b5ecfef1c198518ae73cf84ece0c9db5e3625c",
+      "registered_identity": {
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_linear_20261115_v19.worker",
+          "k-linear-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "files_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Exactconditional all-k elimination to35unknowns45equations; positive/rank/guard and complete tiny literalnorm oracles; no globalroots or speedclaim",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "process_runner_sha256": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+        "runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py"
+        ],
+        "timeout_seconds": 90
+      },
+      "result": {
+        "evidence": {
+          "complete_global_root_search": false,
+          "controls": {
+            "all_sets_equal": true,
+            "h0_systems": 672,
+            "literal_k_calls": 25088,
+            "nonempty": 296,
+            "scope": "GF4/GF8 allh,r,w,k,A0/1; GF16h0/1 allr,w,k,A0/1",
+            "systems": 2176
+          },
+          "ephemeral_scratch": true,
+          "error": null,
+          "external_reviewer": false,
+          "original_root_count_exact": null,
+          "peak_rss_kib": 153904,
+          "profile": {
+            "delta-zero": {
+              "cases": 8,
+              "consistent": 0,
+              "nullities": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "ranks": [
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35
+              ]
+            },
+            "planted-relaxation": {
+              "cases": 8,
+              "consistent": 8,
+              "nullities": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "ranks": [
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35
+              ]
+            },
+            "random": {
+              "cases": 16,
+              "consistent": 0,
+              "nullities": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "ranks": [
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35,
+                35
+              ]
+            }
+          },
+          "qualified_speedup": null,
+          "raw_bytes": 70160,
+          "raw_sha256": "d13e1eda936bcf483739a4c24fb1fbb9d2a54fccdcd48c7d2e7f9c39bdcbf3b6",
+          "release_gate_claim": false,
+          "worker_seconds": 1.4884788839990506
+        },
+        "experiment_id": "k-linear-preparation-20261115-v19",
+        "next_actions": [
+          "Use rank/compatibility evidence to design guarded r/wcells. k elimination leaves166outerr/wbits, support/centroid/ghost/globalfieldclosure and matched Groebner gate open."
+        ],
+        "schema": "scientific_result_v1",
+        "status": "passed",
+        "summary": "Exact conditional k elimination:83fieldbits to35unknowns and45binary equations, with positive/singular/delta controls."
+      },
+      "spec": {
+        "artifact_paths": [
+          "research/k_linear_20261115_v19/raw.json"
+        ],
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_linear_20261115_v19.worker",
+          "k-linear-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "depends_on": [],
+        "expected_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Exactconditional all-k elimination to35unknowns45equations; positive/rank/guard and complete tiny literalnorm oracles; no globalroots or speedclaim",
+        "id": "k-linear-preparation-20261115-v19",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py"
+        ],
+        "timeout_seconds": 90
+      },
+      "status": "passed"
+    },
+    "k-singular-preparation-20261115-v19": {
+      "attempts": [
+        {
+          "directory": "attempts/k-singular-preparation-20261115-v19/0001",
+          "evidence_sha256": {
+            "artifact-000-raw.json": "638a997bb11cc31117ab5501fd81ef590fea0b7175eb3c49ee28db9e01a80dd7",
+            "artifacts.json": "1f9578f5638e2a62af7ec04084222fdfa965cd34c80d03193c3d3c233f8ee519",
+            "preregistration.json": "d526e770405e1c082fddab6b978db707686ddebc2c52891bca2e435b50d879a8",
+            "process.json": "e4b40105952400f9993877ed183eab52ef1b1d0e985173896c844d2046dc8fe9",
+            "scientific_result.json": "864d1c40b3bd5ea6ea4aab438c04de9ed642d025f90a9f3e4d3bd75de112bc08",
+            "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout.txt": "ba75050a2dba77acd661a7d09c68fa5718ab5ff63379f04e81d5f6814738051a"
+          },
+          "fingerprint": "e45b52238cb878d99ce2b30bc6713a097a4b66380583a998c356f623d360afb6",
+          "preregistration": "attempts/k-singular-preparation-20261115-v19/0001/preregistration.json",
+          "preregistration_sha256": "d526e770405e1c082fddab6b978db707686ddebc2c52891bca2e435b50d879a8",
+          "process_sha256": "e4b40105952400f9993877ed183eab52ef1b1d0e985173896c844d2046dc8fe9"
+        }
+      ],
+      "registered_at": "2026-11-15T09:09:52.347670+00:00",
+      "registered_fingerprint": "e45b52238cb878d99ce2b30bc6713a097a4b66380583a998c356f623d360afb6",
+      "registered_identity": {
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_singular_20261115_v19.worker",
+          "k-singular-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "files_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/k_singular_20261115_v19/PROOF.md": "8827fcfd63a62bda7d7e58dcc8a962671f67db5ca6deda4345d0ebd79a48bd8c",
+          "research/k_singular_20261115_v19/worker.py": "fd1a9a966c5e951efe305251f4802016abe28661242810ef75c34d3b8a0da39c",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Construct positive singular k fibers by an exact affine intersection, proving uniqueness cannot be assumed; retain kernel1 and further rank drops",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "process_runner_sha256": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+        "runner_sha256": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py",
+          "research/k_singular_20261115_v19/worker.py",
+          "research/k_singular_20261115_v19/PROOF.md"
+        ],
+        "timeout_seconds": 90
+      },
+      "result": {
+        "evidence": {
+          "actual_ranks": [],
+          "affine_family_bits": 31,
+          "complete_global_root_search": false,
+          "error": null,
+          "external_reviewer": false,
+          "intersection_consistent": false,
+          "intersection_rank": 38,
+          "peak_rss_kib": 154088,
+          "positive_k": [
+            0,
+            1
+          ],
+          "qualified_speedup": null,
+          "raw_bytes": 3025,
+          "raw_sha256": "638a997bb11cc31117ab5501fd81ef590fea0b7175eb3c49ee28db9e01a80dd7",
+          "release_gate_claim": false,
+          "worker_seconds": 1.3816877600002044
+        },
+        "experiment_id": "k-singular-preparation-20261115-v19",
+        "next_actions": [
+          "Quotient known kernel1 on its certified affine r/wbranch while keeping further rank drops; intersect full support and global guards separately."
+        ],
+        "schema": "scientific_result_v1",
+        "status": "passed",
+        "summary": "Construct exact positive singular coefficient-span k fibers; every null direction retained."
+      },
+      "spec": {
+        "artifact_paths": [
+          "research/k_singular_20261115_v19/raw.json"
+        ],
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_singular_20261115_v19.worker",
+          "k-singular-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "depends_on": [],
+        "expected_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/k_singular_20261115_v19/PROOF.md": "8827fcfd63a62bda7d7e58dcc8a962671f67db5ca6deda4345d0ebd79a48bd8c",
+          "research/k_singular_20261115_v19/worker.py": "fd1a9a966c5e951efe305251f4802016abe28661242810ef75c34d3b8a0da39c",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Construct positive singular k fibers by an exact affine intersection, proving uniqueness cannot be assumed; retain kernel1 and further rank drops",
+        "id": "k-singular-preparation-20261115-v19",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py",
+          "research/k_singular_20261115_v19/worker.py",
+          "research/k_singular_20261115_v19/PROOF.md"
+        ],
+        "timeout_seconds": 90
+      },
+      "status": "passed"
+    }
+  },
+  "manual_paused": false,
+  "program": {
+    "experiments": [
+      {
+        "artifact_paths": [
+          "research/k_linear_20261115_v19/raw.json"
+        ],
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_linear_20261115_v19.worker",
+          "k-linear-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "depends_on": [],
+        "expected_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Exactconditional all-k elimination to35unknowns45equations; positive/rank/guard and complete tiny literalnorm oracles; no globalroots or speedclaim",
+        "id": "k-linear-preparation-20261115-v19",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py"
+        ],
+        "timeout_seconds": 90
+      },
+      {
+        "artifact_paths": [
+          "research/k_singular_20261115_v19/raw.json"
+        ],
+        "command": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "-m",
+          "research.k_singular_20261115_v19.worker",
+          "k-singular-preparation-20261115-v19"
+        ],
+        "cpu": 0,
+        "depends_on": [],
+        "expected_sha256": {
+          "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+          "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+          "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+          "research/advance/instances/n83-d18-m5-T001-offset0.json": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+          "research/joint_cubic_20261115_v15/raw.json.gz": "6b51ea33d1871fe7e36f643ab81737dc818e9fe7cbc2a9158958ae723ada337c",
+          "research/k_linear_20261115_v19/INPUT_RULES.json": "2103707bf192dab4cb5159d4a5f121c2544cac20aa2869c11520a12619ddf978",
+          "research/k_linear_20261115_v19/PROOF.md": "7a3af6ccb8eec1659928049d6fed49beb7ee32b25714c808b6ac6a043b2c0b67",
+          "research/k_linear_20261115_v19/worker.py": "144a2c04a8b954bf3bb76f93da8c8315a415c84175726a2ab78916ea4b2c4d41",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md": "5e24a95a12d3e010960cdbcf502747bffb50ff13d29e80e06897e860c11c117a",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json": "758f55dec1d65fc46360b9d2b560b0ad14deec185808b9b9434d55096ea9473e",
+          "research/k_singular_20261115_v19/PROOF.md": "8827fcfd63a62bda7d7e58dcc8a962671f67db5ca6deda4345d0ebd79a48bd8c",
+          "research/k_singular_20261115_v19/worker.py": "fd1a9a966c5e951efe305251f4802016abe28661242810ef75c34d3b8a0da39c",
+          "research/quartic_cell_20261114_v1/worker.py": "5643608bfe0e0c0adcc18596cd1643c14e7af85740ec62dd501a152c201170af",
+          "rootfinder/__init__.py": "8483bb5b5497f0ea4515b127ab6180f1163efb7694ce25a1096c85acd27c717a",
+          "rootfinder/binaryfield.py": "c9e622f2a3657ce137a6821088a6c51a711cd9f949fb4f1135ebf0f22b5e39f5"
+        },
+        "hypothesis": "Construct positive singular k fibers by an exact affine intersection, proving uniqueness cannot be assumed; retain kernel1 and further rank drops",
+        "id": "k-singular-preparation-20261115-v19",
+        "input_paths": [
+          "research/advance/instances/n83-d18-m5-T001-offset0.json",
+          "research/joint_cubic_20261115_v15/raw.json.gz"
+        ],
+        "memory_limit_mb": 4096,
+        "source_paths": [
+          "lab/runner.py",
+          "performance/GATE.md",
+          "performance_gate.py",
+          "research/k_linear_20261115_v19/INPUT_RULES.json",
+          "research/k_linear_20261115_v19/PROOF.md",
+          "research/k_linear_20261115_v19/worker.py",
+          "research/k_linear_self_review_20261115_v19/SELF_REVIEW.md",
+          "research/k_linear_self_review_20261115_v19/SOURCE_PINS.json",
+          "research/quartic_cell_20261114_v1/worker.py",
+          "rootfinder/__init__.py",
+          "rootfinder/binaryfield.py",
+          "research/k_singular_20261115_v19/worker.py",
+          "research/k_singular_20261115_v19/PROOF.md"
+        ],
+        "timeout_seconds": 90
+      }
+    ],
+    "ledger_dir": "/dev/shm/rootfinding_cycle_20261115_v19/lab/ledger",
+    "manifest_path": "/dev/shm/rootfinding_cycle_20261115_v19/lab/research_program.json",
+    "manifest_sha256": "b447fc0c3be12f31b731b08b1468ac296136e59fea7e3930d7dc0b73f31b8644",
+    "predecessor": {
+      "active_ids": [
+        "dual-obstruction-20261115-v6",
+        "e2-certificate-preparation-20261115-v17",
+        "e2-compression-preparation-20261115-v18",
+        "e2-compression-storage-repair-preparation-20261115-v18",
+        "e2-fiber-preparation-20261115-v17",
+        "e2-fiber-repair-preparation-20261115-v17",
+        "frobenius52-20261115-v8",
+        "full-quintic-87-20261115-v10",
+        "full-quintic-block-20261115-v9",
+        "gold-projection-preparation-20261115-v14",
+        "joint-cubic-preparation-20261115-v15",
+        "moment-factor-search-preparation-20261115-v16",
+        "moment-factor-search-repair-preparation-20261115-v16",
+        "moment-search-preparation-20261115-v16",
+        "odd-positive-20261115-v11"
+      ],
+      "journal_sha256": "9517973a74703d52dd60d98735aff13a952191373b042ec67787c4fd6b615b0e",
+      "program_sha256": "48957f1ce8b2fac7898cbe4e42227b25029a74772724144e7c7bf2ed7c5ecd8a",
+      "project": "/workspace/generalized_roots",
+      "state_sha256": "fde9081ddc06d1655329e61f4355ea2ea41f32a6a49f78479d76bf48ad1e8e9c"
+    },
+    "program_id": "rootfinding-k-linear-scratch-20261115-v19",
+    "project_root": "/dev/shm/rootfinding_cycle_20261115_v19",
+    "release_policy": "performance/GATE.md",
+    "requested_speed_target": 8,
+    "schema": "rootfinding_research_program_v1",
+    "temporary_storage_only": true
+  },
+  "program_status": "awaiting_design",
+  "release_gate": {
+    "approved": false,
+    "evaluation": "external_gate_required"
+  },
+  "schema": "research_ledger_state_v1"
+}

@@ -1,0 +1,3 @@
+# Qualifier v2 software correction
+
+T-1420. Preserve committed runtime-private-qualifier. Outer UMask0077 changes requested0444 token creation to0400; new helper explicitly fchmods0444 afterwrite and checks root uid/gid, regular type, linkcount1, size37 before copy. No gate source change. Test real temporary files under umask077 with test uid/gid explicitly supplied because worker is unprivileged; production caller supplies no override and requires0:0. Existing mocked release tests and controls retained. Run Python tests only under60s/512MiB. No runtime, container, cloud or gate execution. All admission remains false.

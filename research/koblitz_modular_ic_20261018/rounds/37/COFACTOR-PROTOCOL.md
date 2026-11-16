@@ -1,0 +1,24 @@
+# COFACTOR37 prospective complementary-factor norm calculation
+
+Newlead afteractualnonprincipalE and11E/5Ebothnonprincipal. ReadretainedR15/16
+CM77.2.l.aEulercontrols,R27properMixedPrym24andLMFDB77.2decomposition. Live
+LMFDB77.2.l.bpageunavailable,butofficialAPIrawnewformandmf_hecke_nf rows
+retrieved;describe_tablemf_hecke_nf confirmsbasis/inverse/character semantics.
+Singularofficialmanualresultant anddet algorithmscheckedbeforeimplementation.
+NativeSingular4GiBvirtual/1200s,existingmanualauthorization,no cloud/agents/caps.
+
+In exactdegree16coefficientfield,verifyall16inversebasis rows againstactual
+Heckebasis,a1=1,a2=ap2,chi45=-1,2=45²57mod77,primitivechi2order10 and
+actualHeckea4=a2²-2chi2. Corruptchi2+1mustfailtherecurrence.
+Compute fullNorm(1-a2*T+2chi2*T²)byresultant,requireintegraldegree32constant1.
+EvaluateatT=+1,-1 andindependentlyrecomputebothnorms by16x16multiplication
+matrixdeterminants. ExportfullEulerpolynomialandbothnumbers;recordmod11
+residueswithoutprescribingunitornonunit. No coefficientsearchorfloatdata.
+
+This suppliescandidatecomplementarygrouporders;bindingtheactualMixedPrym
+anditsdiamondtwistrequirestheretainedmodular/properbridge. A subsequent
+cofactorclasscalculationmustfreeze separatelyandcheckanactualannihilator.
+EvenaCMsumprojectiondoesnotseparatethetwoCMsignfactors: R16exactresultant
+2^24*11^6andBezoutdenominator704 alreadyexcludeanaiveunit-at11Frobenius
+signprojector. Nonzero11torsiondoesnotidentifytheintendedfactororprovideIC.
+Retainallfailures/caps;acceptnativeexit0/exactmarker/noerrors/allcontrols.

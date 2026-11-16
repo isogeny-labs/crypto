@@ -1,0 +1,59 @@
+proc require56(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../infinity56-02/base-jets56.sing"));
+ring verifyLocal56=(2,a),(s,h),dp;minpoly=a^2+a+1;short=0;
+map baseMap56=baseJets56,s,h;poly Gzero56=baseMap56(Gzero56);poly Gone56=baseMap56(Gone56);
+list finalPolys56;list centers56;list scales56;list divisors56;list precisions56;
+execute(read("../refine56-01/refinement-branch0conj056.sing"));
+setring verifyLocal56;map stageMap156=refinementBranch0conj056,s,h;
+finalPolys56[1]=stageMap156(Fstep156);centers56[1]=stageMap156(centerStep156);
+scales56[1]=scaleStep156;divisors56[1]=divisorStep156;precisions56[1]=precisionStep156;
+execute(read("../refine56-01/refinement-branch0conj156.sing"));
+setring verifyLocal56;map stageMap256=refinementBranch0conj156,s,h;
+finalPolys56[2]=stageMap256(Fstep156);centers56[2]=stageMap256(centerStep156);
+scales56[2]=scaleStep156;divisors56[2]=divisorStep156;precisions56[2]=precisionStep156;
+execute(read("../refine56-01/refinement-branch1conj056.sing"));
+setring verifyLocal56;map stageMap356=refinementBranch1conj056,s,h;
+finalPolys56[3]=stageMap356(Fstep156);centers56[3]=stageMap356(centerStep156);
+scales56[3]=scaleStep156;divisors56[3]=divisorStep156;precisions56[3]=precisionStep156;
+execute(read("../refine56-01/refinement-branch1conj156.sing"));
+setring verifyLocal56;map stageMap456=refinementBranch1conj156,s,h;
+finalPolys56[4]=stageMap456(Fstep156);centers56[4]=stageMap456(centerStep156);
+scales56[4]=scaleStep156;divisors56[4]=divisorStep156;precisions56[4]=precisionStep156;
+
+proc data56(poly F,int precision){intvec vals;list leading;int i;int v;intvec ex;poly term;for(i=1;i<=17;i++){vals[i]=precision;leading[i]=number(0);}while(F!=0){term=lead(F);ex=leadexp(term);i=ex[1]+1;v=ex[2];if(v<vals[i]){vals[i]=v;leading[i]=leadcoef(term);}F=F-term;}return(list(vals,leading));}
+int case56;int branch56;int i56;int p56;int leftValue56;int degree56;poly F56;poly center56;poly original56;poly reconstructed56;poly X56;poly alpha56;poly unit56=1+h+h*s;list dataLocal56;intvec vals56;list leading56;
+for(case56=1;case56<=4;case56++){
+ branch56=0;if(case56>=3){branch56=1;}
+ F56=finalPolys56[case56];center56=centers56[case56];original56=Gzero56;if(branch56==1){original56=Gone56;}
+ require56(precisions56[case56]+divisors56[case56]==128 && precisions56[case56]>=72,"CHECK56_EXACT_PRECISION_LEDGER");
+ reconstructed56=subst(original56,s,center56+h^scales56[case56]*s);
+ require56(reduce(reconstructed56+h^divisors56[case56]*F56,std(ideal(h^128)))==0,"CHECK56_FULL_SOURCE_CHAIN_RECONSTRUCTION");
+ require56(diff(F56,s)!=0,"CHECK56_SEPARABLE_LOCAL_POLYNOMIAL");
+ dataLocal56=data56(F56,precisions56[case56]);vals56=dataLocal56[1];leading56=dataLocal56[2];
+ leftValue56=6;if(branch56==1){leftValue56=5;}
+ require56(vals56[1]==leftValue56 && vals56[2]==4 && vals56[9]==0 && vals56[17]==8,"CHECK56_DECISIVE_NEWTON_VERTICES");
+ for(i56=1;i56<=8;i56++){require56(7*vals56[i56+1]>=4*(8-i56),"CHECK56_ALL_MIDDLE_EDGE_INEQUALITIES");}
+ for(i56=8;i56<=16;i56++){require56(vals56[i56+1]>=i56-8,"CHECK56_ALL_FINAL_EDGE_INEQUALITIES");}
+ require56(leading56[2]==1 && leading56[9]==1 && leading56[1]!=0,"CHECK56_LINEAR_AND_RAMIFIED_FACE_COEFFICIENTS");
+ require56(7*(leftValue56-4)>4,"CHECK56_STRICT_LOWER_HULL_SLOPES");
+ // Exact F2 coordinate functions produce an order-11 element in both ramified charts.
+ X56=center56+h^scales56[case56]*s;alpha56=h*s*unit56;
+ if(branch56==0){require56(alpha56==X56^2+(1+h)*X56+1+h+h^2,"CHECK56_ACTUAL_ALPHA_ZERO_IDENTITY");}
+ else{require56(h^6*alpha56==X56^2+(h^3+h^4)*X56+h^6+h^8,"CHECK56_ACTUAL_ALPHA_ONE_IDENTITY");}
+ require56(subst(subst(unit56,h,0),s,0)==1,"CHECK56_ALPHA_UNIT_LEADING_COEFFICIENT");
+ print("LOCALCHECK56 case="+string(case56)+" base="+string(branch56)+" positive_factor_degrees=1,7 ramified_root_value=4/7 alpha_order=11 uniformizer_order=1");
+}
+// Complete closed-point ramification/residue accounting over each rational base point.
+intmat points56[4][6];int totalPole56=0;int fiberDegreeZero56=0;int fiberDegreeOne56=0;
+for(i56=1;i56<=4;i56++){
+ branch56=0;if(i56>=3){branch56=1;}int e56=7;if(i56==2 || i56==4){e56=1;}
+ int pole56=4;if(branch56==1){pole56=1;}
+ points56[i56,1]=branch56;points56[i56,2]=e56;points56[i56,3]=2;points56[i56,4]=e56*pole56;points56[i56,5]=e56*pole56;points56[i56,6]=1;
+ totalPole56=totalPole56+2*e56*pole56;
+ if(branch56==0){fiberDegreeZero56=fiberDegreeZero56+2*e56;}else{fiberDegreeOne56=fiberDegreeOne56+2*e56;}
+}
+require56(totalPole56==80 && fiberDegreeZero56==16 && fiberDegreeOne56==16 && 2*11-3*7==1,"CHECK56_COMPLETE_DEGREE_AND_UNIFORMIZER_ACCOUNTING");
+link out56="closed-poles56.sing";write(out56,"ring closedPoles56=2,(L,h),dp;short=0;poly alphaZero56=h^8*L^2+(h^4+h^5)*L+1+h+h^2;poly alphaOne56=h^2*L^2+(h+h^2)*L+1+h^2;poly uniformizerDenominator56=h^3;poly uniformizerZeroNumerator56=alphaZero56^2;poly uniformizerOneNumerator56=alphaOne56^2;intmat points56[4][6];");
+for(case56=1;case56<=4;case56++){for(i56=1;i56<=6;i56++){write(out56,"points56["+string(case56)+","+string(i56)+"]="+string(points56[case56,i56])+";");}}close(out56);
+print("CHECK56_RESULT local_charts=4 residue_degree=2 ramification=7,1,7,1 A_poles=28,4,7,1 zero_degree=80 pole_degree=80 rational_uniformizers=2");
+print("CHECK56_ALL_CHECKS_PASS");quit;

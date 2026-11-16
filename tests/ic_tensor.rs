@@ -58,3 +58,23 @@ fn demo_recovers_the_secret() {
     assert_eq!(report["result"]["recovered"], report["result"]["expected"]);
     assert_eq!(report["network"]["is_graph"], true);
 }
+
+#[test]
+fn demo_recovers_the_secret_on_a_cofactor_curve() {
+    let (ok, report) = ic(&[
+        "tensor",
+        "demo",
+        "--bits",
+        "10",
+        "--m",
+        "2",
+        "--seed",
+        "7",
+        "--cofactor",
+        "4",
+    ]);
+    assert!(ok, "{report}");
+    assert_eq!(report["cofactor"], 4);
+    assert_eq!(report["result"]["verified"], true);
+    assert_eq!(report["result"]["recovered"], report["result"]["expected"]);
+}

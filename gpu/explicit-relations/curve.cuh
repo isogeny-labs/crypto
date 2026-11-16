@@ -184,8 +184,17 @@ struct Curve {
     Jac p = jac(neg(right));
     if (target.inf)
       return p;
-    U h = sub(fp64_to_mont(f, target.x), p.x);
-    U d = sub(fp64_to_mont(f, target.y), p.y);
+    return affine_sub_converted(p, jac(target));
+  }
+  // Both inputs have z=one or zero. p is the negated right point; q is
+  // the target. Exposed so diagnostics can bracket conversion separately.
+  RF_HD Jac affine_sub_converted(Jac p, Jac q) const {
+    if (!p.z)
+      return q;
+    if (!q.z)
+      return p;
+    U h = sub(q.x, p.x);
+    U d = sub(q.y, p.y);
     if (!h)
       return !d ? dbl(p) : Jac{};
     U hh = sq(h), i = twice(twice(hh)), j = mul(h, i), r = twice(d),

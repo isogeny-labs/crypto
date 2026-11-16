@@ -1,0 +1,76 @@
+{
+  "schema": "research.proof-component/v1",
+  "utc": "2026-10-31T08:07:07.711851+00:00",
+  "declarations": [
+    "PencilWordRefinement.guardB_decode",
+    "PencilWordRefinement.word_double_b_zero_forces_point_arm"
+  ],
+  "prime_bounds": "5 <= p < 2^31",
+  "extension_degree": 1,
+  "lookup_tables": null,
+  "scope": "literal B decoding and ordered double-branch identity exclusion",
+  "compiled_main": true,
+  "fixed_propositions_passed": 7,
+  "separate_axiom_readback_passed": true,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "independent_review_complete": false,
+  "canonical_integration": false,
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "requires_polynomial_validity": false,
+  "requires_nonzero_weights": false,
+  "output_payload_validity_claim": false,
+  "compiler_correspondence_claim": false,
+  "checks": {
+    "attempt1": {
+      "exit_code": 1,
+      "source_sha256": "64b3e739b55bb39f70ad7a708ff1a3471e7426ca91d4697cd96e1f4d4f4822e0"
+    },
+    "attempt2": {
+      "exit_code": 0,
+      "source_sha256": "6fe4fc862f6ec260609c67579006b4906bc286500eb81df019ef7d4ce251699f"
+    },
+    "attempt3": {
+      "exit_code": 0,
+      "source_sha256": "6fe4fc862f6ec260609c67579006b4906bc286500eb81df019ef7d4ce251699f",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 158,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "controls1": {
+      "exit_code": 1,
+      "source_sha256": "ef99522b4deebfbaa96315494f11525425f06e77edc19a52597710e2ecd18ac3",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 159,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "controls2": {
+      "exit_code": 0,
+      "source_sha256": "85bde750e021f62d77982b387b0af085d2ccf1a9058ebfea65aceffc2a8420a5",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 159,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "readback1": {
+      "exit_code": 0,
+      "source_sha256": "3f1820474f87e20909a3231871431a78fa01aaa9f52fed2fb1d9810b533f5e20",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 160,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    }
+  },
+  "pdf_visual_inspection": "one page; text, formula, diagram and fixtures legible",
+  "trust_boundary": "Lean compiler/kernel and installed imported dependency binaries; no independent binary/kernel rechecker was run"
+}

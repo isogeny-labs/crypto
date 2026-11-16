@@ -1,0 +1,19 @@
+import EliminationWord
+set_option autoImplicit false
+namespace Solve4Controls
+open Solve4Stage
+instance : Fact (Nat.Prime 7) := ⟨by decide⟩
+instance : Fact (Nat.Prime (7 : UInt64).toNat) := ⟨by decide⟩
+def pivot : WRow := (fun j => (#[0,1,2,0,3] : Array UInt64)[j.val]!)
+def target : WRow := (fun j => (#[0,2,5,0,0] : Array UInt64)[j.val]!)
+def solution : Vector (ZMod 7) := (fun j => (#[0,1,1,0] : Array (ZMod 7))[j.val]!)
+theorem canonical_pivot : canonical 7 pivot := by unfold canonical;decide
+theorem canonical_target : canonical 7 target := by unfold canonical;decide
+theorem row_update : eliminate 7 1 target pivot = (fun j => (#[0,0,1,0,1] : Array UInt64)[j.val]!) := by decide
+theorem equation_positive : residual (decode 7 target) solution=0 ∧ residual (decode 7 (eliminate 7 1 target pivot)) solution=0 := by decide
+theorem zero_multiplier : eliminate 7 1 ((fun j => (#[3,0,4,5,6] : Array UInt64)[j.val]!)) pivot = (fun j => (#[3,0,4,5,6] : Array UInt64)[j.val]!) := by decide
+theorem prefix_necessary : residual (decode 7 ((fun j => (#[1,2,0,0,3] : Array UInt64)[j.val]!))) ((fun j => (#[1,1,0,0] : Array (ZMod 7))[j.val]!):Vector (ZMod 7))=0 ∧ residual (decode 7 (eliminate 7 1 ((fun j => (#[1,2,0,0,3] : Array UInt64)[j.val]!)) ((fun j => (#[1,1,0,0,2] : Array UInt64)[j.val]!)))) ((fun j => (#[1,1,0,0] : Array (ZMod 7))[j.val]!):Vector (ZMod 7))≠0 := by decide
+theorem rhs_update_necessary : residual (decode 7 ((fun j => (#[0,0,1,0,0] : Array UInt64)[j.val]!))) solution≠0 := by decide
+theorem captured_multiplier_necessary : ((fun j => (#[0,0,5,0,0] : Array UInt64)[j.val]!):WRow)≠eliminate 7 1 target pivot := by decide
+theorem normalization_necessary : eliminate 7 1 target ((fun j => (#[0,2,0,0,0] : Array UInt64)[j.val]!)) 1≠0 := by decide
+end Solve4Controls

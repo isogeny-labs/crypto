@@ -1,0 +1,69 @@
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:14:33: warning: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:10:0: warning: automatically included section variable(s) unused in theorem `GraphForest.root_reach`:
+  [Field K]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:16:0: warning: automatically included section variable(s) unused in theorem `GraphForest.reach_parent`:
+  [Field K]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:42:21: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:42:32: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:49:28: warning: `if_false` has been deprecated: Use `ite_false` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:51:11: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:51:22: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:52:11: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:52:22: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:54:0: warning: automatically included section variable(s) unused in theorem `GraphForest.find_preserves_roots`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:55:61: warning: Variable name `hf` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hf
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:63:0: warning: automatically included section variable(s) unused in theorem `GraphForest.attachment_roots`:
+  [Field K]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:77:3: error: Type mismatch: After simplification, term
+  Reach.refl parent
+ has type
+  Reach
+    { parent := fun y => if y = child then parent else s.parent y, pot := fun y => if y = child then p else s.pot y }
+    parent parent
+but is expected to have type
+  Reach { parent := fun y => if y = x✝ then parent else s.parent y, pot := fun y => if y = x✝ then p else s.pot y }
+    parent parent
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:82:5: error: Type mismatch: After simplification, term
+  Reach.refl parent
+ has type
+  Reach
+    { parent := fun y => if y = child then parent else s.parent y, pot := fun y => if y = child then p else s.pot y }
+    parent parent
+but is expected to have type
+  Reach { parent := fun y => if y = b then parent else s.parent y, pot := fun y => if y = b then p else s.pot y }
+    (if child = b then parent else s.parent child) parent
+/var/tmp/graph-forest-closure-20261101/invocation-kzbl87tx/snapshot/Forest.lean:84:5: error: Type mismatch: After simplification, term
+  ih
+ has type
+  Reach { parent := fun y => if y = b then parent else s.parent y, pot := fun y => if y = b then p else s.pot y }
+    (s.parent a) parent
+but is expected to have type
+  Reach { parent := fun y => if y = b then parent else s.parent y, pot := fun y => if y = b then p else s.pot y }
+    (if a = b then parent else s.parent a) parent

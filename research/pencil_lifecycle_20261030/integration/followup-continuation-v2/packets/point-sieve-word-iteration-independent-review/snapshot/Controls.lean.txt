@@ -1,0 +1,12 @@
+import WordIteration
+namespace WordIterationControls
+open WordIteration SieveDifference
+theorem constant_padding : iterate 5 3 0 0 0 0 4 = (3,0,0) := by decide
+theorem binary : iterate 2 1 1 1 0 1 2 = (1,0,0) := by decide
+theorem zero_intermediate : iterate 7 0 0 1 1 2 0 = (0,1,1) := by decide
+theorem late_step : iterate 7 0 0 1 1 2 6 = (1,6,6) := by decide
+theorem full_wrap : iterate 7 0 0 1 1 2 7 = (0,1,1) := by decide
+theorem final_update_retained : iterate 7 0 0 1 1 2 6 ≠ iterate 7 0 0 1 1 2 7 := by decide
+theorem upper_bound : wordAdd 9223372036854775808 9223372036854775807 9223372036854775807 = 9223372036854775806 := by decide
+theorem outside_bound : wordAdd 9223372036854775809 9223372036854775808 9223372036854775808 = 0 := by decide
+end WordIterationControls

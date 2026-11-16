@@ -1,0 +1,15 @@
+{
+  "action": "build ecbench from REV on the pod, or record the binary's sha256 beside REV in the record, before the run",
+  "created": "2026-11-15T20:33:53Z",
+  "evidence": [
+    "research/ic_gpu_rootfind_la_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research",
+    "gpu"
+  ],
+  "trigger": "launching a pod job that copies a locally built binary",
+  "why": "round 5's ecbench was copied from target/release and recorded no commit, so its wall results are not bound to the measured commit"
+}

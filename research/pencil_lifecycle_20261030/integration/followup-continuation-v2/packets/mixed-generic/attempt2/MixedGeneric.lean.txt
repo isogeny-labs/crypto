@@ -1,0 +1,53 @@
+import MixedCancellation
+set_option autoImplicit false
+namespace MixedGeneric
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+noncomputable def curve (a0 a1 a2 a3 : K) : K[X] := X^5+C a3*X^3+C a2*X^2+C a1*X+C a0
+noncomputable def interp (q r s t m : K) : K[X] := ordinate s t+C m*MixedCancellation.support q r
+
+theorem disjoint_product_dvd (x q r : K) (hk : x^2+q*x+r ≠ 0) (P : K[X])
+ (hl : (X-C x) ∣ P) (hu : MixedCancellation.support q r ∣ P) : (X-C x)*MixedCancellation.support q r ∣ P := by
+ obtain ⟨a,ha⟩ := hl
+ obtain ⟨b,hb⟩ := hu
+ have hid : MixedCancellation.support q r-(X-C x)*(X+C (q+x))=C (x^2+q*x+r) := by
+  simp only [MixedCancellation.support,C_add,C_mul,C_pow]; ring
+ have hbez : C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r-(X-C x)*(X+C (q+x)))=1 := by
+  rw [hid,←C_mul,inv_mul_cancel₀ hk,C_1]
+ refine ⟨C ((x^2+q*x+r)⁻¹)*(a-(X+C (q+x))*b),?_⟩
+ calc
+  P = (C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r-(X-C x)*(X+C (q+x))))*P := by rw [hbez,one_mul]
+  _ = (X-C x)*MixedCancellation.support q r*(C ((x^2+q*x+r)⁻¹)*(a-(X+C (q+x))*b)) := by
+   calc
+    _ = C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r*P-(X-C x)*(X+C (q+x))*P) := by ring
+    _ = C ((x^2+q*x+r)⁻¹)*(MixedCancellation.support q r*((X-C x)*a)-(X-C x)*(X+C (q+x))*(MixedCancellation.support q r*b)) := by
+      rw [show MixedCancellation.support q r*P=MixedCancellation.support q r*((X-C x)*a) by rw [ha],
+          show (X-C x)*(X+C (q+x))*P=(X-C x)*(X+C (q+x))*(MixedCancellation.support q r*b) by rw [hb]]
+    _ = _ := by ring
+
+theorem interpolation_divides (f : K[X]) (x y q r s t : K)
+ (hk : x^2+q*x+r ≠ 0)
+ (hp : (X-C x) ∣ f-(C y)^2)
+ (hu : MixedCancellation.support q r ∣ f-(ordinate s t)^2) :
+ (X-C x)*MixedCancellation.support q r ∣ f-(interp q r s t ((y-(s*x+t))/(x^2+q*x+r)))^2 := by
+ let m := (y-(s*x+t))/(x^2+q*x+r)
+ have hm : m*(x^2+q*x+r)+(s*x+t)=y := by
+  dsimp [m]; rw [div_mul_cancel₀ _ hk]; ring
+ have hid : interp q r s t m-C y = (X-C x)*(C m*(X+C x)+C (s+m*q)) := by
+  have hy : y=m*(x^2+q*x+r)+(s*x+t) := hm.symm
+  rw [hy]
+  simp only [interp,MixedCancellation.support,ordinate,C_add,C_sub,C_mul,C_pow]
+  ring
+ have hd1 : (X-C x) ∣ (interp q r s t m)^2-(C y)^2 := by
+  refine ⟨(C m*(X+C x)+C (s+m*q))*(interp q r s t m+C y),?_⟩
+  calc
+   _ = (interp q r s t m-C y)*(interp q r s t m+C y) := by ring
+   _ = _ := by rw [hid]; ring
+ have hd2 : MixedCancellation.support q r ∣ (interp q r s t m)^2-(ordinate s t)^2 := by
+  refine ⟨C m*(interp q r s t m+ordinate s t),?_⟩
+  dsimp [interp]; ring
+ apply disjoint_product_dvd x q r hk
+ · convert dvd_sub hp hd1 using 1 <;> ring
+ · convert dvd_sub hu hd2 using 1 <;> ring
+
+end MixedGeneric

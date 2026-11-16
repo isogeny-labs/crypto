@@ -1,0 +1,66 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-arity-prime-m5-build
+experiment_id: ARITY-COMPLETION-PRIME-TOWER-M5-20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/arity_completion_20261104/prime_tower_m5/receipts/CARD-arity-prime-m5-build.receipt.json
+binds:
+- path: research/arity_completion_20261104/prime_tower_m5/protocol.json
+  sha256: 5fd11a55265e9bc5ce6c81c5f5674a1e6d914e0ea6540cb2493599e4ef79b68d
+- path: research/arity_completion_20261104/prime_tower_m5/PROTOCOL.md
+  sha256: f657d6e04816a3648affeda59416c885beaaab478e8f9b651c598899fae08d01
+- path: research/arity_completion_20261104/prime_tower_m5/analyze.py
+  sha256: 7909f55246f7a20f080e0a06b9407d1bea5a70e8ab9d20e46a4ceeb13dc1a65e
+- path: examples/pkm_tower_pilot.rs
+  sha256: 760ba737ea9fa8f13530bae86ecb92afa64add5c84485b680632b5e13bcf1be9
+- path: Cargo.toml
+  sha256: f81e15d7ca2cfbba419165b272a15cd736db548f1c90e3454d32fbd3ded373e3
+- path: Cargo.lock
+  sha256: cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6
+must_not_exist:
+- research/arity_completion_20261104/prime_tower_m5/receipts/CARD-arity-prime-m5-build.binary.sha256
+commands:
+- id: source-identity
+  argv:
+  - git
+  - diff
+  - --quiet
+  - 1fd6ece55faf55d1a03bcce186f5b830267a2589
+  - --
+  - examples/pkm_tower_pilot.rs
+  - Cargo.toml
+  - Cargo.lock
+  - src
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: build
+  argv:
+  - cargo
+  - build
+  - --release
+  - --locked
+  - --example
+  - pkm_tower_pilot
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+- id: binary-sha256
+  argv:
+  - sha256sum
+  - target/release/examples/pkm_tower_pilot
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/arity_completion_20261104/prime_tower_m5/receipts/CARD-arity-prime-m5-build.binary.sha256
+  outputs:
+  - research/arity_completion_20261104/prime_tower_m5/receipts/CARD-arity-prime-m5-build.binary.sha256
+bus_address: executor-mechanical-arity-prime-m5-build
+background: true
+write_scope:
+- research/arity_completion_20261104/prime_tower_m5/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out.
+- The source-identity command exits with a status other than 0, meaning examples/pkm_tower_pilot.rs, Cargo.toml, Cargo.lock or src differs from commit 1fd6ece55faf55d1a03bcce186f5b830267a2589.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'

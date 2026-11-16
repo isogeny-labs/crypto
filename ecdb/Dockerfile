@@ -18,6 +18,7 @@ COPY docs/ic/fixtures/current_head_prime_route_20261024 /srv/crypto/docs/ic/fixt
 COPY research/isogeny_walk_20261004/runs /srv/crypto/research/isogeny_walk_20261004/runs
 COPY research/isogeny_walk_p192_20261004/runs /srv/crypto/research/isogeny_walk_p192_20261004/runs
 COPY research/prime61_isogeny_20261016 /srv/crypto/research/prime61_isogeny_20261016
+COPY src/cryptanalysis/curve_traits/modular_polynomials.txt /srv/crypto/src/cryptanalysis/curve_traits/modular_polynomials.txt
 USER ecdb
 EXPOSE 8080
 ENTRYPOINT ["ecdb"]

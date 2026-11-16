@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1274-94607e3f | 21.00 | c1-x10-j16-g | 24/24 | 1.696 | 1.734 | 2.078 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | inc-c2 | 24/24 | 2.023 | 2.067 | 2.466 | — |
+| icv1-fp24-tm1274-94607e3f | 21.00 | rho-neg | 24/24 | 1.234 | 1.346 | 2.352 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | c1-x10-j16-g | 24/24 | 1.788 | 1.825 | 2.162 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | inc-c2 | 24/24 | 2.254 | 2.286 | 2.579 | — |
+| icv1-fp24-tm3106-7b0fab0e | 21.00 | rho-neg | 24/24 | 1.039 | 1.131 | 1.958 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | c1-x10-j16-g | 24/24 | 1.712 | 1.740 | 1.992 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | inc-c2 | 24/24 | 2.122 | 2.170 | 2.600 | — |
+| icv1-fp24-tm3458-53ccc2e9 | 21.00 | rho-neg | 24/24 | 1.180 | 1.287 | 2.245 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | c1-x10-j16-g | 24/24 | 1.894 | 1.947 | 2.420 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | inc-c2 | 24/24 | 2.196 | 2.248 | 2.710 | — |
+| icv1-fp24-tm3426-0438c267 | 21.00 | rho-neg | 24/24 | 1.115 | 1.215 | 2.113 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | c1-x10-j16-g | 24/24 | 1.978 | 2.037 | 2.574 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | inc-c2 | 24/24 | 2.075 | 2.118 | 2.500 | — |
+| icv1-fp24-tm4010-db2650ce | 21.00 | rho-neg | 24/24 | 1.139 | 1.241 | 2.161 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1274-94607e3f | c1-x10-j16-g vs inc-c2 | c1-x10-j16-g < inc-c2 |
+| icv1-fp24-tm1274-94607e3f | c1-x10-j16-g vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm1274-94607e3f | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp24-tm3106-7b0fab0e | c1-x10-j16-g vs inc-c2 | c1-x10-j16-g < inc-c2 |
+| icv1-fp24-tm3106-7b0fab0e | c1-x10-j16-g vs rho-neg | rho-neg < c1-x10-j16-g |
+| icv1-fp24-tm3106-7b0fab0e | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp24-tm3458-53ccc2e9 | c1-x10-j16-g vs inc-c2 | c1-x10-j16-g < inc-c2 |
+| icv1-fp24-tm3458-53ccc2e9 | c1-x10-j16-g vs rho-neg | unresolved inside the band |
+| icv1-fp24-tm3458-53ccc2e9 | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp24-tm3426-0438c267 | c1-x10-j16-g vs inc-c2 | c1-x10-j16-g < inc-c2 |
+| icv1-fp24-tm3426-0438c267 | c1-x10-j16-g vs rho-neg | rho-neg < c1-x10-j16-g |
+| icv1-fp24-tm3426-0438c267 | inc-c2 vs rho-neg | rho-neg < inc-c2 |
+| icv1-fp24-tm4010-db2650ce | c1-x10-j16-g vs inc-c2 | unresolved inside the band |
+| icv1-fp24-tm4010-db2650ce | c1-x10-j16-g vs rho-neg | rho-neg < c1-x10-j16-g |
+| icv1-fp24-tm4010-db2650ce | inc-c2 vs rho-neg | rho-neg < inc-c2 |

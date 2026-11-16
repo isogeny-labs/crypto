@@ -1,0 +1,336 @@
+{
+  "schema": "research.component-overview/v1",
+  "captured_utc": "2026-10-31T00:31:16.583824+00:00",
+  "link_base": "followup-continuation-v2/report-complete",
+  "components": [
+    {
+      "id": "word-prelude",
+      "title": "Bounded word prelude",
+      "result": "Literal word scaling and support guard compose with the ordered classifier; common normalized validity excludes the specified zero-slope error.",
+      "scope": "5<=p<2^31, canonical coordinates, nonzero weights, common curve validity; value semantics, not compiler/counter or full group-law proof.",
+      "evidence": [
+        "../packets/word-error-exclusion-review/REVIEW.md",
+        "../cross-scaling-review/result.json"
+      ],
+      "counts": {
+        "independent_word_error_modules": 9
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "constructor",
+      "title": "Literal weighted constructor",
+      "result": "Exact word expression tree preserves canonical coordinates and normalized validity; unit weights supply the degree-two from_affine specialization. Independent compile/readback and controls pass.",
+      "scope": "Canonical affine coefficients and mathematical validity are premises; native validity refinement and subsequent addition closure remain separate.",
+      "evidence": [
+        "../packets/constructor/REPORT.md",
+        "../packets/constructor-review/review.json"
+      ],
+      "counts": {
+        "reviewer_compile_readback_commands": 5
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "add11",
+      "title": "Unit-weight distinct add11",
+      "result": "Interpolation and explicit Bezout construction establish normalized output validity and nonzero weights; distinct x excludes inverse and doubling guards.",
+      "scope": "Field formula with unit weights and input support divisibility; no word correspondence or class-sum theorem. Invalid equal-x inputs expose the classifier-versus-assertion boundary outside the theorem.",
+      "evidence": [
+        "../packets/add11-distinct/REPORT.md",
+        "../packets/add11-distinct-review/review.json"
+      ],
+      "counts": {
+        "reviewer_compile_readback_commands": 4
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "original-g",
+      "title": "Original-G signed recovery",
+      "result": "Candidate recovers 63 of 63 signed states; eager recovers 61 of 63, retaining two degree-one conversion failures. Selected pairs and labels agree.",
+      "scope": "21 retained models, three fixed transitions per arm; no repair/fallback or Delta-zero coverage in this trajectory.",
+      "evidence": [
+        "../packets/kummer-original-gstep/status.json",
+        "../packets/kummer-original-gstep-review/status.json"
+      ],
+      "counts": {
+        "models": 21,
+        "transitions_per_arm": 63,
+        "eager_recoveries": 61,
+        "candidate_recoveries": 63
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "graph",
+      "title": "Recovered states to signed graph",
+      "result": "Both arms insert the same 35 equations; no geometric cycles or terminal returns. Candidate degree-one recovery gains are skipped by the degree-two gate.",
+      "scope": "Fixed original-G trajectory; checker recovers before splitting, unlike historical scheduling. Synthetic stopping controls remain separate.",
+      "evidence": [
+        "../packets/kummer-graph-integration/status.json",
+        "../packets/kummer-graph-review/review.json"
+      ],
+      "counts": {
+        "edges_per_arm": 35,
+        "nonsplit_per_arm": 26,
+        "cycles_per_arm": 0,
+        "terminals_per_arm": 0,
+        "independent_geometric_prefixes": 70,
+        "independent_synthetic_prefixes": 9,
+        "synthetic_stop_prefixes": [
+          3,
+          2,
+          4
+        ]
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "forest",
+      "title": "Retained archive graph extraction",
+      "result": "420 dispositions yield 175 vertices, 61 components and 114 distinct edges: E=V-C, zero cycles. Independent root evaluation and union-find agree.",
+      "scope": "Deduplicated degree-two distinct-root graph only. 120 duplicates are excluded; this does not prove differently labelled duplicates or known-answer labels cannot yield constraints.",
+      "evidence": [
+        "../packets/geometric-forest-review/result.json",
+        "../packets/geometric-forest-scope/ADDENDUM.md"
+      ],
+      "counts": {
+        "records": 60,
+        "cases": 420,
+        "degree_skips": 60,
+        "nonsplit_or_repeated": 126,
+        "duplicates": 120,
+        "edges": 114,
+        "vertices": 175,
+        "components": 61,
+        "cycles": 0
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "adapter",
+      "title": "Relation-row sign adapter",
+      "result": "Native augmented RHS [A,b,-a] maps to zero-equation constant [A,b,+a]. Three release tests and independent source review support solution equivalence.",
+      "scope": "Offline adapter and fixed exhaustive F7 controls; no production relation trace or measured costs.",
+      "evidence": [
+        "../relation-adapter/report/result.json",
+        "../packets/relation-adapter-review/REVIEW.md"
+      ],
+      "counts": {
+        "release_tests": 3,
+        "single_row_systems": 343,
+        "assignments_per_system": 49
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "preflight",
+      "title": "Staged execution preflight",
+      "result": "Original integrated typed validation passed all three tests at 2026-10-31T00:20:45.871342+00:00. Full-host-digest correction has independent source review; final corrected validation is pending at this snapshot.",
+      "scope": "Nine-plan inventory and actual-session subset bindings; both stages keep scientific admission false and require external authenticated custody.",
+      "evidence": [
+        "../preflight-review/typed-tests/receipt.json",
+        "../preflight-review/typed-tests/stdout",
+        "../preflight-review/typed-tests/source-snapshot.json",
+        "../packets/preflight-independent-review/review.json",
+        "../packets/host-full-digest-proposal/correction.patch"
+      ],
+      "counts": {
+        "original_integrated_typed_tests_passed": 3,
+        "cohort_workloads_enrolled": 1260,
+        "cohort_slots_enrolled": 22680,
+        "separate_gate_slots": 18
+      },
+      "corrected_validation": "pending_at_snapshot",
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    },
+    {
+      "id": "prior-kummer",
+      "title": "Distinct earlier Kummer fixtures",
+      "result": "Earlier supplied-neighbour fixtures retain 80/84 baseline versus 84/84 repaired recovery. A separate torsion-step grid retains original 251/252 failure followed by 252/252 recovery with propagated corners and Delta fallback.",
+      "scope": "These are different fixture families from the 63-state original-G trajectory; supplied-neighbour, torsion-step and original-G results are not pooled. Square-root search costs remain unpriced.",
+      "evidence": [
+        "../packets/kummer-degree1-review/review.json",
+        "../packets/kummer-four-corner-review/review.json",
+        "../packets/kummer-sqrt-scope-addendum/ADDENDUM.md"
+      ],
+      "counts": {
+        "supplied_neighbour_eager": 80,
+        "supplied_neighbour_candidate": 84,
+        "supplied_neighbour_total": 84,
+        "torsion_grid_original": 251,
+        "torsion_grid_repaired": 252,
+        "torsion_grid_total": 252
+      },
+      "cost_ratio_to_rho": null,
+      "scientific_cohort_completed": false,
+      "result_kind": "component_proof_or_fixed_software_check"
+    }
+  ],
+  "evidence_bindings": [
+    {
+      "component": "word-prelude",
+      "link": "../packets/word-error-exclusion-review/REVIEW.md",
+      "exists": true,
+      "sha256": "fd26de239af6aa60e8da15786959fdc08345a07ba58f8e3ecc5081e6fd9b909d"
+    },
+    {
+      "component": "word-prelude",
+      "link": "../cross-scaling-review/result.json",
+      "exists": true,
+      "sha256": "5608230bca2c743b4b359a83fde2edccf16c330c274727cc6eb12582e9cd82c2"
+    },
+    {
+      "component": "constructor",
+      "link": "../packets/constructor/REPORT.md",
+      "exists": true,
+      "sha256": "509eac20f613e9a78590f0f286bc501337dc6e5d10860cc08054da8ef960173c"
+    },
+    {
+      "component": "constructor",
+      "link": "../packets/constructor-review/review.json",
+      "exists": true,
+      "sha256": "730d7b5b8c669b54fbd2e22c89c2fd06233c54cc98d7ab0a3897acdfde586682"
+    },
+    {
+      "component": "add11",
+      "link": "../packets/add11-distinct/REPORT.md",
+      "exists": true,
+      "sha256": "4c657079962dab21a0bb37b9f4f34d32f5782f99f69c7f1735b557ad12500edd"
+    },
+    {
+      "component": "add11",
+      "link": "../packets/add11-distinct-review/review.json",
+      "exists": true,
+      "sha256": "d00b28a4f41b29b692589f74bd2da5138bf07538e837e90c73209a8bed6b40d8"
+    },
+    {
+      "component": "original-g",
+      "link": "../packets/kummer-original-gstep/status.json",
+      "exists": true,
+      "sha256": "9c209baec29d03c45855f24fdb305ad32a9f236af213483c7f9916abeca29b70"
+    },
+    {
+      "component": "original-g",
+      "link": "../packets/kummer-original-gstep-review/status.json",
+      "exists": true,
+      "sha256": "2b9dcb1e78de9b1e358dc8b8ef5f943b6183ed16c71698348de61817ea96cf4a"
+    },
+    {
+      "component": "graph",
+      "link": "../packets/kummer-graph-integration/status.json",
+      "exists": true,
+      "sha256": "926ba08d087ca846a2827b0716bbbab44ed63616715e1ce95d19fba98ab75128"
+    },
+    {
+      "component": "graph",
+      "link": "../packets/kummer-graph-review/review.json",
+      "exists": true,
+      "sha256": "2b01b90fe14e2b24aff994235987a7980723d5ab2629e0c151aae93be57a4241"
+    },
+    {
+      "component": "forest",
+      "link": "../packets/geometric-forest-review/result.json",
+      "exists": true,
+      "sha256": "a9f916ad04d68e0d90b4d65dec7cc5e74a5aa9fb7a2a8b82dc94e8d5900ca7de"
+    },
+    {
+      "component": "forest",
+      "link": "../packets/geometric-forest-scope/ADDENDUM.md",
+      "exists": true,
+      "sha256": "0941c3ca21543f2a57c5491e7383d84bb2d654083d6d067c51548eaa1bd26af2"
+    },
+    {
+      "component": "adapter",
+      "link": "../relation-adapter/report/result.json",
+      "exists": true,
+      "sha256": "b06c8f561990da149280e6039f973ef8a22a6f97e9aa6f666035e8032f22f053"
+    },
+    {
+      "component": "adapter",
+      "link": "../packets/relation-adapter-review/REVIEW.md",
+      "exists": true,
+      "sha256": "d647ec25ae718a2c87dcbebf0b471162cef146b6a4f7bf4fcac7261484af70bf"
+    },
+    {
+      "component": "preflight",
+      "link": "../preflight-review/typed-tests/receipt.json",
+      "exists": true,
+      "sha256": "c3bce8c2bcd843734f8ac78796b7c5bf629674522756478e991a9e9ad2ad9c83"
+    },
+    {
+      "component": "preflight",
+      "link": "../preflight-review/typed-tests/stdout",
+      "exists": true,
+      "sha256": "985402bfbde6bd9722109b135bd9834e45bc9929d5876a00be69853d3c2d175d"
+    },
+    {
+      "component": "preflight",
+      "link": "../preflight-review/typed-tests/source-snapshot.json",
+      "exists": true,
+      "sha256": "24dbc67505dbb72d8f34362fb6ba30e260da28ed8a370e950f69a2bb3f7e3bc8"
+    },
+    {
+      "component": "preflight",
+      "link": "../packets/preflight-independent-review/review.json",
+      "exists": true,
+      "sha256": "fa08db7eae7692f7d388a9cea8a02f29c6dafe92e8da46e6906cfcc538a721de"
+    },
+    {
+      "component": "preflight",
+      "link": "../packets/host-full-digest-proposal/correction.patch",
+      "exists": true,
+      "sha256": "1b9ff3b6cb6514a6e25a944f3026e4ed7d76642e3affd546d92d3e38ae979cc3"
+    },
+    {
+      "component": "prior-kummer",
+      "link": "../packets/kummer-degree1-review/review.json",
+      "exists": true,
+      "sha256": "0178dfff1fabb94560c507762a8da70e02125bb606c0e027a82d3da4ab44aa4e"
+    },
+    {
+      "component": "prior-kummer",
+      "link": "../packets/kummer-four-corner-review/review.json",
+      "exists": true,
+      "sha256": "86843bcf1d4a29c50372e9bbafcadcf4574e049cfd183e47f9f99e68b9f8c26a"
+    },
+    {
+      "component": "prior-kummer",
+      "link": "../packets/kummer-sqrt-scope-addendum/ADDENDUM.md",
+      "exists": true,
+      "sha256": "d5039cefb0d7271c5aebaa5c6754136693ac82c9cf8de90ca35c28db51834136"
+    }
+  ],
+  "validation_snapshot": {
+    "captured_utc": "2026-10-31T00:31:16.583824+00:00",
+    "original_typed_receipt": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-31T00:20:45.871342+00:00"
+    },
+    "original_typed_receipt_sha256": "c3bce8c2bcd843734f8ac78796b7c5bf629674522756478e991a9e9ad2ad9c83",
+    "corrected_typed_terminal_receipt_present": false,
+    "corrected_command_sha256": "5f73fcedb6125f7a66b0e4af781365c981c7d90a6beb372237bd862bc63b7208",
+    "status_policy": "This immutable snapshot does not infer a later result; publish terminal corrected checks additively."
+  },
+  "new_full_1260_cohort_completed": false,
+  "new_matched_cost_ratios": null,
+  "scientific_execution_authorized_by_this_report": false,
+  "previous_overview": "../report/index.json"
+}

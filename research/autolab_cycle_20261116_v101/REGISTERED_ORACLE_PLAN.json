@@ -1,0 +1,58 @@
+{
+  "id": "guarded-local-oracles-20261116-v101",
+  "hypothesis": "Leading/infinityguards preserveeverytrueprefixquinticandbindexactlytoexisting76primariesbeforeboundedsearch.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.guarded_local_search_20261116_v101.oracles",
+    "guarded-local-oracles-20261116-v101",
+    "oracles_raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/residue_quotient_20261116_v99b/kernel.py",
+    "research/local_nilpotency_20261116_v100/kernel.py",
+    "research/local_split_circuit_20261116_v100/kernel.py",
+    "research/guarded_local_search_20261116_v101/PROOF_AND_REVIEW.md",
+    "research/guarded_local_search_20261116_v101/search.py",
+    "research/guarded_local_search_20261116_v101/oracles.py",
+    "research/guarded_local_search_20261116_v101/kernel.py",
+    "research/guarded_local_search_20261116_v101/common.py"
+  ],
+  "input_paths": [
+    "research/guarded_local_search_20261116_v101/DATA.json",
+    "research/local_split_circuit_20261116_v100/graph.json",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/residue_quotient_20261116_v99b/kernel.py": "79794f7b079b9a1dc2c2816b6768ba27ac5b623111f3907e76eefa843c0a21ba",
+    "research/local_nilpotency_20261116_v100/kernel.py": "ea351575818b4acd0b2ad91abdb66f1ac00de7d685b71276aef32590bee7177b",
+    "research/local_split_circuit_20261116_v100/kernel.py": "330d76c79b25c2e4b20a4435ae4c0777d31e3cc6d0a48ff369edf69217d6b71a",
+    "research/guarded_local_search_20261116_v101/PROOF_AND_REVIEW.md": "2786ccc10b7d43d7c052917e874f860a65616cb974f08fb736dc70a764a2f431",
+    "research/guarded_local_search_20261116_v101/search.py": "3b83170dc11444a20a85d473f6aaee45a66a6ce710a96608307ee79782a82b7f",
+    "research/guarded_local_search_20261116_v101/oracles.py": "40d0810aea6bf3a284fae504df1fb016ea97baf6cb6e6b852dab2906639b25b6",
+    "research/guarded_local_search_20261116_v101/kernel.py": "9546a800164b1ab2239dfd97e49367f869238f6b09172299e2a9fe495d913c5b",
+    "research/guarded_local_search_20261116_v101/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/guarded_local_search_20261116_v101/DATA.json": "6a7e783fe5445cec00597fbdf5ea6b8ebf2879aa9dc115ba3cb1d3057d1255c4",
+    "research/local_split_circuit_20261116_v100/graph.json": "343dc0f003f65258028e8ad0a7ac9da6069fe1ebbd319ed65b63d93356aac174",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt": "d8a7a989e27b727e5560b609111b18baff88e22d53bcaceb13efd2882d21d2b8"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [],
+  "artifact_paths": [
+    "research/guarded_local_search_20261116_v101/oracles_raw.json",
+    "research/guarded_local_search_20261116_v101/guard_delta.json",
+    "research/guarded_local_search_20261116_v101/guarded.cnf"
+  ]
+}

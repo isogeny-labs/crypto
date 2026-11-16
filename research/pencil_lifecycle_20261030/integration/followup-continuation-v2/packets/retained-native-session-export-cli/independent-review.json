@@ -1,0 +1,57 @@
+{
+  "schema": "prospective-source-review/v1",
+  "task": "T-1550",
+  "reviewer": "assembler_independent_review_v2",
+  "author": "witness_independent_review_v2",
+  "independent": true,
+  "prior_advisory_familiarity": true,
+  "created_at": "2026-11-03T21:49:13.960755+00:00",
+  "decision": "accepted_scoped_prospective_cli_recipe",
+  "execution_release": false,
+  "closure_sha256": "33625ca32fd3c4e59e4a71f610527c7f9d7b70352ecbca37e70f0e5402726613",
+  "closure": {
+    "freeze_sha256": "ecf1d7193677ac355782749b33eaa642a4f35575016e9f1ac33ea1b888a889cc",
+    "frozen_files": {
+      "PLAN.md": "8fee5b58696781e5ef40bdca7fd4e95764f46cf994463ab7e9eea9551c64c0ef",
+      "command.json": "32ffe1fdce1b94aafe4c15315059e7c70c4ff76f95a94ddceef94f6064b7e5fe",
+      "runner.py": "ed0b10b5b6f2ebfe71512133fbbc9d80b93fdd12985254828f46f63435f8fd66",
+      "source-inputs.json": "e2af6e6d16fd2c3a88cd569db2d423980bc2679adccd46d5fe9f3d266cf3c61f",
+      "external-inputs.json": "deb6d28b3c2e1fdd81ebc3d7297b85063778f389578c0430c30273a16fe123d0",
+      "test-inventory.json": "11d387b5fb1c5f98ea133e248d5a2de56b63b40d864064feef3df1b440a363d8",
+      "reuse.json": "4caafd0074c55d5d220f55273498f7f926cf993ba3088965b204c1863904afc3",
+      "dependency-aliases.json": "d75145ba6d1484cdbd27914ba53096d139409af49f4a2902ec63c5b7ea64e4f6"
+    },
+    "input_counts": {
+      "source-inputs.json": 7,
+      "external-inputs.json": 888
+    },
+    "dependency_aliases": 464,
+    "all_hashes_and_alias_joins_match": true,
+    "source_membership_exact": true,
+    "source_symlinks": false,
+    "reuse": {
+      "exporter_sha256": "642995d64c365a83a6fe414129189f2046b26cb60e96715ba3c9a7f6b55af7f7",
+      "custody_sha256": "e01f6baf8ad0ebb8faeeeb9f80d730951e61215b772affc49dec2cc2f2bed5e6",
+      "prior_twelve_control_receipt_sha256": "3220d130f8cf72872a1e7dddcf7784bd9514cb70161c1d6051768bd6aca30e3b",
+      "fixture_delta": "original fixture prefix before tests; Fixture struct and new function visibility only",
+      "native_validators_changed": false
+    },
+    "new_entrypoint_sha256": "ed677ae57e28098fc9dcec6e8bfa3a850f06042566e811f99b9931fcbc4a7733",
+    "entrypoint_controls_sha256": "9bfce9e76145e1e24e9906704a3effe56e67b41c8197aa040467272b9be92fe3"
+  },
+  "findings": [
+    "Strict request/Files/Expected and nativeFreshOwnerPins deny unknown fields; native parse rejects duplicate JSON keys. Exact4uniqueallowedflags required. Hash strings checked lowercase64; actual request capped1MiB, fixed kernel /proc/self/exe capped256MiB.",
+    "Main invokes unchanged exporter/custody with typed caller-supplied pins. All native paths absolute; output freshabsolute. create_new outputs and nonzero JSON errors preserve partial files without retry. Receipt binds exact request, executable and report digest; authentication false and metricsnull.",
+    "Eight real CLI subprocess controls cover positive receipt bindings, wrong request/executable hashes, nested unknown fields, duplicate JSON/CLIflags, external pin mismatch, outputfreshness/absolute, symlink/oversize request, and preservedpartialoutput. Four inherited custody tests deliberately filtered; prior12-control receipt retained.",
+    "Two sequentialcompilers each get fresh zeroextra-token pipe; third command singlethread tests. Exact8namedpass plus4filteredsummary, CLI/testbinary pre/post hashes, input/alias pre/post checks and groupcleanup required. No private fixture API calls remain in reviewed sources.",
+    "Earlier dependency target-only custody strengthened with464alias membership/readlink/resolvedtarget checks; alltargets independently confirmed inside888pinnedexternalinputs. Priorreceipt scope remains unchanged. Stale controls hash corrected."
+  ],
+  "limits": [
+    "Mandatory one115s+5s outer120s attempt; internal100swork/110ssuccess,8GiBAS,512MiBperfile;1GiBoutput/16MiBlog sampled thresholds mayovershoot.",
+    "Jobservermanagedslot is not hardCPU/threadquota; unresolvedkernel/processgroup/receipt completion cannot pass.",
+    "Success requires passedreceipt plus outerexit0; no automaticretry.",
+    "These are synthetic metadata controls through actual validators; caller expectedpins still need external authentication for real-session use. No scientific admission."
+  ],
+  "compiler_invocations_by_reviewer": 0,
+  "tests_executed_by_reviewer": 0
+}

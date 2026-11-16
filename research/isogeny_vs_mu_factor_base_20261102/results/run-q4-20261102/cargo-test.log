@@ -1,0 +1,23 @@
+warning: variable does not need to be mutable
+    --> src/main.rs:1051:17
+     |
+1051 |             let mut eval = |r: &Repr, s4: &mut String| -> f64 {
+     |                 ----^^^^
+     |                 |
+     |                 help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `isomu_search` (bin "isomu_search" test) generated 1 warning (run `cargo fix --bin "isomu_search" -p isomu_search --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running unittests src/main.rs (research/isogeny_vs_mu_factor_base_20261102/search/target/release/deps/isomu_search-035bc0c6fd72ae03)
+
+running 5 tests
+test q4tests::mu_native_density_one_and_dickson_ok ... ok
+test tests::buchberger_small ... ok
+test tests::s3_vanishes_on_sums ... ok
+test tests::velu_fibre_is_odd_multiples ... ok
+test q4tests::conj_preserves_fibre_and_native_matches_velu ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
