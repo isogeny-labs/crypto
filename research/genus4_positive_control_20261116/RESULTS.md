@@ -47,10 +47,31 @@ a single fallback. Total cost against the baseline arm c: v 0.71–0.75×, w
 | 8209 | v | 0.004 [0.003, 0.005] | 0.105 [0.076, 0.151] | **0.564 [0.408, 0.805]** | 0.014 |
 | 8209 | **w** | **0.004 [0.003, 0.005]** | **0.099 [0.072, 0.141]** | **0.528 [0.382, 0.754]** | 0.011 |
 
-- At p = 8209 arm w's upper 95% bound is below 1 at all three prices: by the
-  frozen decision rule this cell is reported as **below rho across the §5a
-  band for these instances**, pending the reviews. Arm v alone also clears
-  w = 1 there (upper end 0.805). The baseline c does not (upper end 1.142).
+- At p = 8209 arm w's upper 95% bound is below 1 at all three prices **of the
+  band as this protocol priced it** (multiplications only, against
+  negation-map rho). The red-team review (`redteam/REDTEAM.md`) keeps that
+  statement only with qualifiers, and the w = 1 part does not survive a
+  symmetric pricing:
+  - **Additions unpriced (F2).** Arm w also performs 9.9e7 modular additions
+    (1.92× its priced multiplications); rho's per-step partition hash and
+    additions are not emitted. Pricing multiplications **and** additions on
+    both arms as emitted: w/R at w = 1 is **1.057 [0.765, 1.499]**
+    (unresolved). With rho's hashes and additions estimated as well: about
+    0.63. AGENTS.md §5a prices every native operation, so the
+    multiplications-only band of this protocol is a narrower reading than
+    the rule.
+  - **Cheapest rho not run (F1).** The lab's reference is the cheapest
+    registered rho at each price; only the negation walk was run. Depending
+    on how plain rho's per-step work is priced, plain rho can be cheaper for
+    w above about 0.39 (IC / plain-rho estimate about 0.76 at w = 1).
+  - **No calibrated weight (F3), 3 independent targets (F4)**: the 12 runs are
+    3 targets × 4 solver seeds; leave-one-curve-out upper bounds 0.74–0.88
+    against negation rho.
+  - So: **robust below rho at w = 0 (0.004) and w = 0.1 (0.099 [0.072, 0.141])
+    under every pricing tried; w = 1 unresolved** until a plain-rho arm, emitted
+    rho addition/hash counters with the symmetric reading, and `w_cal` are in.
+  - Arm v alone also clears w = 1 in the multiplications-only reading
+    (upper end 0.805). The baseline c does not (upper end 1.142).
 - At p = 2053 and 4099 w is below rho at w = 0 and w = 0.1, and its w = 1
   interval straddles 1.
 - The w = 1 ratio falls with p (w: 1.018 → 0.708 → 0.528), as the exponent gap
@@ -66,13 +87,24 @@ a single fallback. Total cost against the baseline arm c: v 0.71–0.75×, w
 | P1 | w/c LA in [0.15, 0.35], v/c in [0.25, 0.45] at every p | **held** (0.222–0.233; 0.330–0.331) |
 | P2 | w/R at w = 1, p = 8209, in [0.40, 0.75] | **held** (0.528) |
 | P3 | w below R at w = 0 and 0.1 at every p | **held** |
-| P4 | at p = 8209 the w = 1 upper bound below 1 | **held** (0.754) |
+| P4 | at p = 8209 the w = 1 upper bound below 1 | **held as frozen** (0.754, multiplications only); does not hold with additions priced on both arms (1.057 [0.765, 1.499]; red-team F2) |
 | P5 | relation multiplications ≥ 75% of w's native multiplications | **held** (0.84–0.88) |
 
 ## What is next
 
-- Independent validator replay and red-team review of this cell (in progress)
-  before any wording beyond `[pcc:unverified]`.
+- Red-team review done (`redteam/REDTEAM.md`, findings F1–F7; no blocking
+  finding, w = 1 claim qualified as above). Follow-ups it names: a plain-rho
+  arm on the p = 8209 curves (≥ 8 seeds), rho's addition and hash counters
+  and the symmetric multiplications-plus-additions reading, a measured
+  `w_cal`, and more independent targets. Independent validator replay pending.
+- Process notes from the review (F6): `analyze.py` was committed 40 s after
+  the run started (the review's independent recomputation agrees, so no
+  effect); rho certifies once, not twice; the bench record's `n` counts runs
+  (12), not independent targets (3), and its problem id is the genus-3
+  control's.
+- The unit-T walk's LA gain is mostly multiplications becoming additions
+  (w/v 0.705 in multiplications, 0.933 counting additions; F5), and the
+  restart cap never binds at these r (cap ≥ 1.9e5 > 4096).
 - The relation phase is now 84–88% of w's native work: a Cardano/Ferrari-type
   field-level splitting test for quartics (the genus-3 lever, generalised) is
   the next component.
