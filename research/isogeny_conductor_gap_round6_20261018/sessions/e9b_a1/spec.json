@@ -1,0 +1,113 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 6 E9b: affine trace-coset base and early-stopping F4 on the a = 1 Koblitz curves",
+ "description": "research/isogeny_conductor_gap_round6_20261018/PROTOCOL.md E9b: rho, MITM and the S3 algebraic descent (f4-f2 and f4-f2-early) over binary-subspace:dimension=8 with and without trace_kernel=1 (on Tr(a) = 1 the affine coset t0 + ker Tr, every base point in 2E), on the a = 1 Koblitz curves with n <= 23.",
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "name": "mitm-default",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-coset",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "f4-default",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2"
+    }
+   }
+  },
+  {
+   "name": "f4early-default",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2-early"
+    }
+   }
+  },
+  {
+   "name": "f4-coset",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2"
+    }
+   }
+  },
+  {
+   "name": "f4early-coset",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2-early"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L2",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 1,
+  "timeout_seconds": 1800,
+  "warmup": 0
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 1,
+    "kind": "koblitz",
+    "n": 17
+   },
+   {
+    "a": 1,
+    "kind": "koblitz",
+    "n": 19
+   },
+   {
+    "a": 1,
+    "kind": "koblitz",
+    "n": 23
+   }
+  ],
+  "target_seed": 20261018,
+  "targets_per_curve": 4
+ }
+}

@@ -1,0 +1,41 @@
+{
+  "original_tree": "/workspace/scratch/ct55-g3-root-regression-01",
+  "native_exit": 124,
+  "guard_exit": 0,
+  "guards": {
+    "count": 2133,
+    "changed": []
+  },
+  "plan": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--offline",
+      "--locked"
+    ],
+    "timeout_s": 900,
+    "guard_count": 2133,
+    "guard_scope": "all811 native accepted inputs plus every physical Rust/Cargo input in root src/crates/declared local dependencies androotmanifest;not claimed a complete compiler include closure",
+    "fresh_cache": "/workspace/scratch/ct55-g3-root-regression-01-build-cache",
+    "cache_outside_raw": true,
+    "question": "existing rootlibrary regression required before publishing existing-source interface additions",
+    "prediction": "interface-only additions should not alter existing unit behavior;pre-existing infrastructure/compiler gaps unknown",
+    "acceptance": "originalnative0/finalguards0;otherwise preserve original failed run and discriminate own-source vs existing dependency gap",
+    "scope": "local correctness regression command,no timing or paid experiment"
+  },
+  "start": "2026-11-13T05:56:16Z",
+  "finish": "2026-11-13T06:11:16Z",
+  "files": 2146,
+  "raw_bytes": 56381440,
+  "raw_sha256": "1bf1c91eabeddc740ce9cad20ec97e902da1a117aa8b8ac42717dfaaae8a21a7",
+  "archive_path": "/workspace/scratch/ct55-g3-root-regression-01-whole-raw.tar.xz",
+  "archive_bytes": 9277888,
+  "archive_sha256": "6aab85b47911607b75eacd8419fb05f23ddd3bcb93e993a4e7552f64a5527dc7",
+  "every_member_hash": true,
+  "exact_standard_tar_xz_roundtrip": true,
+  "native_cache_outside_raw": true,
+  "remote_availability": "PENDING actual trusted-base publication if required;not inferred from custody",
+  "standing": "unsigned original local command and byte-custody observation,not signed execution/mathematical verdict"
+}

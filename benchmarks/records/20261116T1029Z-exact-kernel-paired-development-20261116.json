@@ -1,0 +1,103 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T10:31:46+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/kernel-paired-isolation-7cb431bf0-01.jsonl",
+        "--label",
+        "exact-kernel-selected-both-paired",
+        "--",
+        "/workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09",
+        "root-paired",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/kernel-paired-results-7cb431bf0-01",
+        "research/relation_degree_trace_20261115/kernel-development/paired-config-20.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T10:29:46+00:00",
+      "wall_s": 11.732
+    }
+  ],
+  "commit": "67281a8b9a55b717941f168a9ae12937f106bd0b",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T10:29:31+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1029Z-exact-kernel-paired-development-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Warmup plus7 A/A pairs, all three checked workflows; no main blocks",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 45.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 35768,
+      "path": "research/relation_degree_trace_20261115/kernel-paired-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4a/4a339db98afe17bcb0049798053160b9b3472654b6e4d87d403e448fe893bb83",
+      "sha256": "4a339db98afe17bcb0049798053160b9b3472654b6e4d87d403e448fe893bb83",
+      "uploaded": false
+    },
+    {
+      "bytes": 325,
+      "path": "research/relation_degree_trace_20261115/kernel-paired-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0b/0b10a2ea3d76064e883f8c05cc586d3f93ebc682b6641a8c8427382b94b44a62",
+      "sha256": "0b10a2ea3d76064e883f8c05cc586d3f93ebc682b6641a8c8427382b94b44a62",
+      "uploaded": false
+    },
+    {
+      "bytes": 1901,
+      "path": "research/relation_degree_trace_20261115/kernel-paired-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0b/0b1b24413b07425c9018b3de9fc0cf976b21a5d70f6ae070958be3777ad9de2c",
+      "sha256": "0b1b24413b07425c9018b3de9fc0cf976b21a5d70f6ae070958be3777ad9de2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 812465,
+      "path": "research/relation_degree_trace_20261115/kernel-paired-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/ddebdf1eb1c1d9b8bc6289626e0aa732382a28a5a6a9e3cf2cf7489582464f1a",
+      "sha256": "ddebdf1eb1c1d9b8bc6289626e0aa732382a28a5a6a9e3cf2cf7489582464f1a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/kernel-paired-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/kernel-paired-01/report-01/aa.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/kernel-paired-01/report-01/aa.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "exact-kernel-paired-development-20261116",
+  "status": "measured",
+  "summary": "A/A rejects F4 pipeline-work interval excluding1; expanded/candidate pass. All45 answers match/0 monitor contention/pinsunchanged/selectedboth0exports. Main0/no speed ratio/no retry. PCC3510d3/5d9667.",
+  "validation": null
+}

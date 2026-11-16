@@ -1,0 +1,23 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T08:37:45Z",
+ "id": "PCC-20261111-d755b1",
+ "kind": "statement",
+ "producer": {
+  "commit": "aabae1979457c3ba9e5112487a907b50cab15a99",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/small-prime-standalone-01.txt",
+    "sha256": "81b056c94392c3b9bbd0991e2aac93a45be079981d5e09357c786ca8e936e0c6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Standalone small-prime development backend using unchanged checked Fp2 context passes8 tests(2 new,6 inherited). Predeclared p13,29,101 fixtures have rational Jacobian orders180,960,9216 on both sides and2-torsion counts4/4,4/16,4/16. Both dual norms, equal fibers, source whole pullback norms and zero control pass. Bound p<=4096; enumeration<=101. Field arithmetic is reused and is not independently validated by this producer-run comparison; feature integration and BigUint family oracle remain pending. No speed or cryptographic-size claim."
+}

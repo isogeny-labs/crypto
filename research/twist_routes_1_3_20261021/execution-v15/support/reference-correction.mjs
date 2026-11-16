@@ -1,0 +1,13 @@
+// Operational literal API replacement, byte pins and protocol metadata only.
+import fs from 'node:fs';import crypto from 'node:crypto';import {spawn} from 'node:child_process';
+const v='research/twist_routes_1_3_20261021/execution-v15',d=v+'/reference-v2';const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');const read=p=>JSON.parse(fs.readFileSync(p));const put=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
+const mode=process.argv[2];
+if(mode==='prepare'){
+ const original=v+'/runs/inputs-v1/verify.gp';const s=fs.readFileSync(original,'utf8');const occurrences=s.split('ellj(ee)').length-1;if(occurrences!==9)throw Error('unexpected replacement population');
+ fs.writeFileSync(d+'/verify.gp',s.replaceAll('ellj(ee)','ee.j'),{flag:'wx'});
+ put(d+'/REPLACEMENT.json',{schema:'twist.reference-api-correction/v1',original,original_sha256:sha(original),corrected:d+'/verify.gp',corrected_sha256:sha(d+'/verify.gp'),from:'ellj(ee)',to:'ee.j',occurrences,all_other_bytes_unchanged:true,native_data_rerun:false});
+ const p=read(v+'/protocol.json');p.protocol_id='twist-cold-inputs-reference-v2';p.version=2;p.study_dir=d;p.question='Correct only the GP finite-field j accessor and independently verify unchanged input data.';
+ p.analysis_plan.script={path:v+'/support/reference-correction.mjs',sha256:sha(v+'/support/reference-correction.mjs')};p.analysis_plan.inputs.push(v+'/ADMISSION.json',d+'/REPLACEMENT.json');p.reporting.report_dir='research/twist_routes_1_3_20261021/reports/cold-inputs-20261029';p.extensions.reference_only_correction=true;p.extensions.native_execution_reused=v+'/runs/producer-transport.json';p.extensions.original_reference_rejected=true;p.freeze={status:'draft',protocol_sha256:null,commit:null,frozen_at:null,filed_before_affected_data:false};p.amendments=[];put(d+'/protocol.json',p);
+}else if(mode==='seal'){
+ const p=read(d+'/protocol.json');const f=read(v+'/FROZEN.json');put(d+'/FROZEN.json',{schema:'twist.reference-correction-freeze/v1',source_revision:p.freeze.commit,protocol_file_sha256:sha(d+'/protocol.json'),original_native_freeze_sha256:sha(v+'/FROZEN.json'),source_hashes:{[d+'/verify.gp']:sha(d+'/verify.gp'),[d+'/PROTOCOL.md']:sha(d+'/PROTOCOL.md'),[v+'/support/reference-correction.mjs']:sha(v+'/support/reference-correction.mjs'),[v+'/support/run-reference-v2.mjs']:sha(v+'/support/run-reference-v2.mjs'),[v+'/support/input-admission.mjs']:sha(v+'/support/input-admission.mjs')},input_hashes:{[v+'/runs/inputs-v1/verify.gp']:sha(v+'/runs/inputs-v1/verify.gp'),[v+'/runs/inputs-v1/FIXTURES.json']:sha(v+'/runs/inputs-v1/FIXTURES.json')},gp:f.gp});
+}else throw Error('prepare|seal');
