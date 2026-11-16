@@ -1,0 +1,13 @@
+# Trace -14 degree-seven cover screen
+
+Frozen on 15 November 2026, before running the adapted search.
+
+Field: `K=F3[a]/(a^5+2a+1)`. Carrier: `Y/F3: y²=x^11+x^8+x^7+x^6+x^5+x²+2x` (mask 9735). Source: `E/K: v²=u³+u²+(a²+2)` (mask 11), with order 258 and selected prime subgroup order 43. The branch polynomial factors over K as `x` times five distinct irreducible quadratics, while the elliptic cubic has one rational root and one irreducible quadratic. These facts were checked directly before the search.
+
+The first arm enumerates all normalized degree-seven maps `Y_K→E` with denominator `B∈{1,Q_i,Q_i³,Q_iQ_j}` and infinity sent to the elliptic origin. At each unpoled quadratic branch point, the numerator residue is assigned one of the three elliptic two-torsion roots over its quadratic field. CRT reconstructs every residue. For `B=Q_iQ_j`, the remaining leading coefficient ranges over `K×`. Every candidate is tested against `f C²=B(A³+A²B+(a²+2)B³)`, including coprimality and polynomial squarehood. Zero hits would exclude only these four denominator shapes for this one exact source/carrier pair.
+
+The code is adapted from the frozen trace +22 sparse script, with changed carrier mask, source mask, order assertion, schema, and field-root assertions. The executed script SHA256 is recorded in the output. Full degree-seven coverage needs the remaining six denominator classes; other carrier and source models are separate questions.
+
+Follow-up arms, frozen before their runs: reuse the trace +22 exact algorithms for `(x-c)^2,(x-c)^4,(x-c)^6,Q_i(x-c)^2,Q_i(x-c)^4`, for `H²,Q_iH²` with monic quadratic `H`, for monic cubic `H²`, for `Q_iQ_j(x-c)²`, and for `Q_iQ_jQ_k`. Every arm changes only the source/carrier parameters, target order and receipt schema; it retains the original exhaustive parameter logic, necessary-point controls, and final polynomial identity check. A complete zero-hit result for this pair requires all five arms to finish without censored cells, plus the sparse arm above. All scripts record their own SHA256 and exact candidate counters.
+
+Prior-work boundary: [Iijima–Momose–Chao 2015](https://eprint.iacr.org/2015/805.pdf) classifies the direct `(2,…,2)` odd-characteristic descent construction for prime extension degrees through seven. This source order is 2 modulo 4, outside its degree-five genus-five full-rational-two-torsion case. [Howe, Theorem 4.17](https://arxiv.org/pdf/2110.04221) supplies an abstract bounded-degree elliptic cover from a genus-five carrier in the same isogeny class. Neither observation makes this trace a new family or supplies explicit transfer equations.

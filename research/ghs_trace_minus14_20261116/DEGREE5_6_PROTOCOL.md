@@ -1,0 +1,5 @@
+# Degree-five and degree-six follow-up
+
+Frozen before execution on 15 November 2026. Adapt the previously frozen complete degree-five and degree-six denominator algorithms to the exact trace -14 pair in `PROTOCOL.md`. The source elliptic cubic is `u³+u²+a²+2`, the carrier branch polynomial is `x^11+x^8+x^7+x^6+x^5+x²+2x`, and the rational branch factor is `x`.
+
+For odd degree five, branch parity gives `B=S H²` of even degree at most four, with `S` a product of selected quadratic branch factors. The six denominator classes and their candidate accounting are inherited from the degree-five algorithm. For even degree six, the branch factor `x` must occur to odd multiplicity in `B`, and the ten classes are inherited from the degree-six algorithm. The translated scripts retain exact CRT interpolation, resultant fallbacks, all finite-field parameters, and full equation checks; each output embeds its source hash, coverage counts, and every exact hit. A zero-hit result has only fixed-pair scope.
