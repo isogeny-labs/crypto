@@ -1,0 +1,4 @@
+Equiv.ofInjective.{u_3, u_4} {α : Sort u_3} {β : Type u_4} (f : α → β) (hf : Function.Injective f) : α ≃ ↑(Set.range f)
+Nat.card_congr.{u_1, u_2} {α : Type u_1} {β : Type u_2} (f : α ≃ β) : Nat.card α = Nat.card β
+Finset.prod_eq_zero_iff.{u_1, u_4} {ι : Type u_1} {M₀ : Type u_4} [CommMonoidWithZero M₀] {f : ι → M₀} {s : Finset ι}
+  [Nontrivial M₀] [NoZeroDivisors M₀] : ∏ x ∈ s, f x = 0 ↔ ∃ a ∈ s, f a = 0
