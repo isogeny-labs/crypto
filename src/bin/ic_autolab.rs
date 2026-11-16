@@ -29,6 +29,7 @@
 //! explicitly requested local route (counted units only, no wall-time claim).
 
 use clap::{Parser, Subcommand};
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -75,7 +76,7 @@ enum Cmd {
     Propose {
         #[arg(long)]
         round: u64,
-        #[arg(long, default_value = "algebraic")]
+        #[arg(long, default_value = "generic")]
         track: String,
         /// Sizes k (bits of p), comma separated.
         #[arg(long, default_value = "20,24")]
@@ -187,7 +188,7 @@ enum Cmd {
     Loop {
         #[arg(long, default_value_t = 1)]
         rounds: u64,
-        #[arg(long, default_value = "algebraic")]
+        #[arg(long, default_value = "generic")]
         track: String,
         #[arg(long, default_value = "20,24")]
         sizes: String,
@@ -222,6 +223,8 @@ enum Cmd {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 struct ArmConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    method_id: Option<String>,
     name: String,
     family: String,
     n: u64,
@@ -238,6 +241,9 @@ impl ArmConfig {
     /// with any further pipeline parameters.
     fn key(&self) -> (String, String) {
         let mut o = self.oracle.clone();
+        if let Some(id) = self.method_id.as_deref().filter(|id| *id != "ic.pipeline") {
+            o += &format!("|method_id={id}");
+        }
         for (k, v) in &self.params {
             o += &format!("|{k}={v}");
         }
@@ -245,12 +251,15 @@ impl ArmConfig {
     }
     fn method(&self) -> Value {
         let mut params = serde_json::Map::new();
-        params.insert("factor_base".into(), json!(self.factor_base));
-        params.insert("oracle".into(), json!(self.oracle));
+        let id = self.method_id.as_deref().unwrap_or("ic.pipeline");
+        if id == "ic.pipeline" {
+            params.insert("factor_base".into(), json!(self.factor_base));
+            params.insert("oracle".into(), json!(self.oracle));
+        }
         for (k, v) in &self.params {
             params.insert(k.clone(), json!(v));
         }
-        json!({"id": "ic.pipeline", "params": params})
+        json!({"id": id, "params": params})
     }
 }
 
@@ -259,18 +268,87 @@ struct Incumbent {
     arm: ArmConfig,
     /// Mean S at w = 0, 0.1, 1 GAE per unpriced native operation.
     s: [f64; 3],
-    rho_s: [f64; 3],
+    #[serde(default)]
+    rho_s: Option<[f64; 3]>,
     evidence: Value,
     since_round: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SizeInfo {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reference: Option<Value>,
     k: u32,
-    r: u64,
+    r: ExactScalar,
     log2_r: f64,
     n_a: u64,
     curve: Value,
+}
+
+impl SizeInfo {
+    fn reference_method(&self) -> Value {
+        self.reference
+            .clone()
+            .unwrap_or_else(|| json!({"id":"rho.negation"}))
+    }
+}
+
+fn validate_explicit_routes(size: &SizeInfo, arms: &[&ArmConfig]) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::ecbench::{
+        methods::{self, MethodSpec},
+        workload::CurveSpec,
+    };
+    let full = size.curve["kind"] == "curve25519";
+    if full && size.reference.is_none() {
+        return Err("Curve25519 requires an explicit bounded rho reference".into());
+    }
+    if !full && size.reference.is_none() && arms.iter().all(|a| a.method_id.is_none()) {
+        return Ok(());
+    }
+    let spec: CurveSpec = serde_json::from_value(size.curve.clone()).map_err(|e| e.to_string())?;
+    let instance = spec.build()?;
+    let facts = instance.facts(&spec);
+    if size.r != instance.r() {
+        return Err("size order differs from the actual curve subgroup".into());
+    }
+    let resolve = |value: Value| -> Result<methods::ResolvedMethod, String> {
+        let m: MethodSpec = serde_json::from_value(value).map_err(|e| e.to_string())?;
+        let m = methods::resolve(&m)?;
+        methods::applicable(&m, &instance, &facts)?;
+        Ok(m)
+    };
+    if resolve(size.reference_method())?.family != "rho" {
+        return Err("Autolab reference must be a rho method".into());
+    }
+    for arm in arms {
+        if resolve(arm.method())?.family != "ic" {
+            return Err("Autolab index-calculus candidates must resolve to an ic method".into());
+        }
+    }
+    Ok(())
+}
+
+fn validate_frozen_routes(
+    size: &SizeInfo,
+    incumbent: &ArmConfig,
+    frozen: &Value,
+) -> Result<(), String> {
+    let arms = frozen["arms"].as_array().ok_or("frozen spec lacks arms")?;
+    let method = |name| {
+        arms.iter()
+            .find(|a| a["name"] == name)
+            .map(|a| &a["method"])
+    };
+    if method("rho-neg") != Some(&size.reference_method()) {
+        return Err("rho reference differs from the frozen train specification".into());
+    }
+    if method("inc") != Some(&incumbent.method()) {
+        return Err("incumbent method differs from the frozen train specification".into());
+    }
+    if frozen["workloads"]["curves"] != json!([size.curve]) {
+        return Err("curve differs from the frozen train specification".into());
+    }
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -367,6 +445,8 @@ impl Ledger {
 
 #[derive(Deserialize, Clone, Debug)]
 struct Family {
+    #[serde(default)]
+    method_id: Option<String>,
     id: String,
     oracle: String,
     default_f: f64,
@@ -414,6 +494,7 @@ impl TrackFamilies {
             fam.n_max.unwrap_or(self.n_max),
         );
         ArmConfig {
+            method_id: fam.method_id.clone(),
             name: format!("{}-n{n}", fam.id),
             family: fam.id.clone(),
             n,
@@ -422,7 +503,20 @@ impl TrackFamilies {
                 .replace("{n}", &n.to_string())
                 .replace("{scan}", &(self.scan_factor * n).to_string()),
             oracle: fam.oracle.clone(),
-            params: fam.params.clone(),
+            params: if fam.method_id.is_some() {
+                fam.params
+                    .iter()
+                    .map(|(k, v)| {
+                        (
+                            k.clone(),
+                            v.replace("{n}", &n.to_string())
+                                .replace("{scan}", &(self.scan_factor * n).to_string()),
+                        )
+                    })
+                    .collect()
+            } else {
+                fam.params.clone()
+            },
         }
     }
     fn family(&self, id: &str) -> Option<&Family> {
@@ -607,512 +701,27 @@ fn fmt_s(s: &[f64; 3]) -> String {
     format!("{:.3} / {:.3} / {:.3}", s[0], s[1], s[2])
 }
 
-fn distance(s: &[f64; 3], rho: &[f64; 3]) -> [f64; 3] {
-    [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]]
+/// Return a cost mean only for a nonempty, completely verified cohort.
+fn complete_means(rows: &BTreeMap<String, ([f64; 3], u64, u64)>, arm: &str) -> Option<[f64; 3]> {
+    let (s, runs, verified) = rows.get(arm)?;
+    (*runs > 0 && runs == verified && s.iter().all(|v| v.is_finite() && *v >= 0.0)).then_some(*s)
 }
 
-// ---------------------------------------------------------------------------
-// Admission: only algebraic index calculus counts
-// ---------------------------------------------------------------------------
-
-/// The owner's ruling of 2026-11-10
-/// (`research/ic_track_ruling_20261110/DECISIONS.md`): only the algebraic
-/// track is index calculus. It supersedes the two-track Option C of
-/// `research/prime_ic_program_20261029/DECISIONS.md` R1 for this loop.
-const TRACK_RULING: &str = "research/ic_track_ruling_20261110/DECISIONS.md";
-
-/// Tracks the loop no longer proposes, freezes, selects, assesses or
-/// ratchets. Their incumbents stay in the ledger as history and may appear
-/// in tables as references, never as index calculus.
-const RETIRED_TRACKS: &[&str] = &["generic"];
-
-/// Refuse a retired track with the ruling that retired it.
-fn check_track(track: &str) -> Result<(), String> {
-    if RETIRED_TRACKS.contains(&track) {
-        return Err(format!(
-            "track `{track}` is retired: only algebraic index calculus is admitted ({TRACK_RULING}). \
-             Generic decomposition, table, walk and BSGS-boundary arms are references, not index calculus."
-        ));
-    }
-    Ok(())
-}
-
-/// Oracles that build the relation system from the summation polynomial and
-/// the factor-base constraint and hand it to a solver (classification column
-/// B = "IC" in `research/prime_ic_program_20261029/ruling/classification.json`).
-/// Each entry is the oracle name and, where the oracle has engines, the
-/// engines that count.
-const ALGEBRAIC_ORACLES: &[(&str, &[&str])] = &[
-    // Semaev S_(m+1) on a Kummer or isogeny tower, F4 over the tower ring.
-    ("pkm-semaev", &["f4"]),
-    // Weil descent over a subspace base, solved by F4 or SAT.
-    ("descent-algebraic", &[]),
-    ("descent-algebraic-fiber", &[]),
-    // Koblitz point decomposition by Groebner elimination.
-    ("pdp3-koblitz", &["inherited-f4", "f6-ic"]),
-    // Gaudry k = 4 with D4 symmetry, Macaulay solve.
-    ("gaudry-x-bin", &[]),
-];
-
-/// Oracles that run identically on a random base (enumeration, tables,
-/// walks, root finding by group addition). Named so that a refusal says why.
-const GENERIC_ORACLES: &[&str] = &[
-    "subtract",
-    "mitm",
-    "mitm-prime-batch",
-    "mitm-prime-blocked",
-    "mitm-fiber",
-    "mitm-frobenius",
-    "mitm-frobenius-counted",
-    "mitm-frobenius-lazy-counted",
-    "mitm-frobenius-layout-counted",
-    "mitm-frobenius-fiber",
-    "ksum",
-    "wsum",
-    "wwalk",
-    "rootfind-mitm",
-    "rootfind-pairs",
-    "rootfind-subtract",
-    "gpu-rootfind",
-    "semaev_s3_roots",
-    "bsgs",
-];
-
-/// Split `name:k=v,k=v` into the name and its parameters.
-fn oracle_parts(oracle: &str) -> (String, BTreeMap<String, String>) {
-    let (name, rest) = oracle.split_once(':').unwrap_or((oracle, ""));
-    let params = rest
-        .split(',')
-        .filter(|p| !p.is_empty())
-        .map(|p| {
-            let (k, v) = p.split_once('=').unwrap_or((p, ""));
-            (k.trim().to_string(), v.trim().to_string())
-        })
-        .collect();
-    (name.trim().to_string(), params)
-}
-
-/// The admission rule as a pure function of the oracle string: an arm is
-/// index calculus only if its oracle is algebraic and, where the oracle has
-/// engines, runs a solver engine (not exhaustive enumeration). A new oracle
-/// joins `ALGEBRAIC_ORACLES` only after the random-base test of the ruling.
-fn oracle_admission(oracle: &str) -> Result<(), String> {
-    let (name, params) = oracle_parts(oracle);
-    if let Some((_, engines)) = ALGEBRAIC_ORACLES.iter().find(|(n, _)| *n == name) {
-        if name == "pkm-semaev" {
-            pkm_bounds_admission(oracle, &params)?;
-        }
-        if engines.is_empty() {
-            return Ok(());
-        }
-        // pkm-semaev defaults to F4; pdp3-koblitz has no default that counts.
-        let engine = params
-            .get("engine")
-            .cloned()
-            .or_else(|| (name == "pkm-semaev").then(|| "f4".to_string()));
-        return match engine {
-            Some(e) if engines.contains(&e.as_str()) => Ok(()),
-            Some(e) => Err(format!(
-                "oracle `{oracle}`: engine `{e}` is not a solver engine for `{name}` (admitted: {}); \
-                 exhaustive and root-finding engines are generic ({TRACK_RULING})",
-                engines.join(", ")
-            )),
-            None => Err(format!(
-                "oracle `{oracle}`: `{name}` needs an explicit solver engine (admitted: {})",
-                engines.join(", ")
-            )),
-        };
-    }
-    if GENERIC_ORACLES.contains(&name.as_str()) {
-        return Err(format!(
-            "oracle `{oracle}` is generic decomposition: it runs identically on a random base, \
-             so it is a reference, not index calculus ({TRACK_RULING})"
-        ));
-    }
-    Err(format!(
-        "oracle `{oracle}` is not on the algebraic list; add it to ALGEBRAIC_ORACLES only after \
-         it passes the random-base test of {TRACK_RULING}"
-    ))
-}
-
-/// `pkm-semaev` parameters an arm may set. The solver bounds (`degree`
-/// below its default of 12, `max_nnz`, `staircase`) are refused: a system F4
-/// cannot decide inside them is decided on the grid, which is enumeration
-/// with its multiplications unpriced (`pkm_semaev.rs`, module comment).
-/// `guess` is the hybrid guess-and-determine split (F4 still solves every
-/// specialised system); `budget_exceeded_rate` in the measures, and the
-/// assess rule, catch a split that leaves F4 nothing to decide.
-const PKM_PARAMS: &[&str] = &[
-    "m",
-    "mode",
-    "engine",
-    "guess",
-    "trace",
-    "lifts",
-    "crosscheck",
-    "degree",
-];
-const PKM_DEFAULT_DEGREE: u64 = 12;
-
-fn pkm_bounds_admission(oracle: &str, params: &BTreeMap<String, String>) -> Result<(), String> {
-    for (k, v) in params {
-        if !PKM_PARAMS.contains(&k.as_str()) {
-            return Err(format!(
-                "oracle `{oracle}`: pkm-semaev parameter `{k}` is not admitted (a solver bound decides \
-                 undecided systems on the grid, which is enumeration; admitted: {})",
-                PKM_PARAMS.join(", ")
-            ));
-        }
-        if k == "degree" {
-            let d: u64 = v
-                .parse()
-                .map_err(|_| format!("oracle `{oracle}`: degree `{v}` is not an integer"))?;
-            if d < PKM_DEFAULT_DEGREE {
-                return Err(format!(
-                    "oracle `{oracle}`: degree {d} is below the default {PKM_DEFAULT_DEGREE}; \
-                     a lowered bound sends systems to the grid"
-                ));
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Further `ic.pipeline` parameters an algebraic arm may carry, with the
-/// values each may take (empty: any value). `oracle` and `factor_base` are
-/// reserved: `ArmConfig::method` writes them from the arm's own fields, so a
-/// `params` entry would replace the admitted oracle.
-const ARM_PARAMS: &[(&str, &[&str])] = &[
-    ("targets", &["walk", "stride"]),
-    ("linalg", &[]),
-    ("max_trials", &[]),
-];
-
-/// Admit an arm: the track must not be retired, the oracle must be
-/// algebraic, the further parameters must be on `ARM_PARAMS`, and the method
-/// the arm actually emits must carry the admitted oracle and base.
-fn admit_arm(track: &str, arm: &ArmConfig) -> Result<(), String> {
-    check_track(track)?;
-    let who = |e: String| format!("arm {}: {e}", arm.name);
-    oracle_admission(&arm.oracle).map_err(who)?;
-    for (k, v) in &arm.params {
-        match ARM_PARAMS.iter().find(|(n, _)| n == k) {
-            None => {
-                return Err(who(format!(
-                    "parameter `{k}` is not admitted on an algebraic arm (admitted: {})",
-                    ARM_PARAMS
-                        .iter()
-                        .map(|(n, _)| *n)
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                )))
-            }
-            Some((_, vals)) if !vals.is_empty() && !vals.contains(&v.as_str()) => {
-                return Err(who(format!(
-                    "parameter `{k}={v}` is not admitted (admitted values: {})",
-                    vals.join(", ")
-                )))
-            }
-            _ => {}
-        }
-    }
-    let m = arm.method();
-    if m["params"]["oracle"].as_str() != Some(arm.oracle.as_str())
-        || m["params"]["factor_base"].as_str() != Some(arm.factor_base.as_str())
-    {
-        return Err(who(
-            "the emitted method does not carry the admitted oracle and base".into(),
-        ));
-    }
-    Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// Measures beyond the distance to rho
-// ---------------------------------------------------------------------------
-
-/// The session's records (`records.jsonl`, or `records.jsonl.gz`), if the
-/// raw tree is present locally. Absent records leave the measures empty;
-/// they never change the classification.
-fn read_records(sdir: &Path) -> Vec<Value> {
-    let plain = sdir.join("records.jsonl");
-    let text = if plain.exists() {
-        std::fs::read_to_string(&plain).ok()
-    } else {
-        let gz = sdir.join("records.jsonl.gz");
-        std::fs::File::open(&gz).ok().and_then(|f| {
-            use std::io::Read;
-            let mut s = String::new();
-            flate2::read::GzDecoder::new(f)
-                .read_to_string(&mut s)
-                .ok()
-                .map(|_| s)
-        })
-    };
-    text.map(|t| {
-        t.lines()
-            .filter_map(|l| serde_json::from_str::<Value>(l).ok())
-            .collect()
-    })
-    .unwrap_or_default()
-}
-
-/// One verified, non-warm-up record of `arm`: its pairing key (round,
-/// target) and the per-target algebraic measures.
-#[derive(Clone, Debug, PartialEq)]
-struct RecordMeasures {
-    /// (target seed, target index, round): the public target and the
-    /// repetition. `workload.target_counter` is the hash-to-subgroup retry
-    /// counter, not the target, and must not be used.
-    key: (u64, u64, u64),
-    s: Option<f64>,
-    relations: f64,
-    targets_tried: f64,
-    solver_ops: Option<f64>,
-    solver_calls: Option<f64>,
-    budget_exceeded: Option<f64>,
-    solving_degree_max: Option<f64>,
-    phase_gae: BTreeMap<String, f64>,
-}
-
-fn record_measures(rec: &Value, arm: &str) -> Option<RecordMeasures> {
-    if rec["arm"].as_str() != Some(arm)
-        || rec["warmup"].as_bool() == Some(true)
-        || rec["outcome"]["status"].as_str() != Some("verified")
+/// Missing/zero/corrupt reference costs cannot define a finite ratio.
+fn checked_distance(s: &[f64; 3], rho: &[f64; 3]) -> Option<[f64; 3]> {
+    if s.iter().any(|v| !v.is_finite() || *v < 0.0)
+        || rho.iter().any(|v| !v.is_finite() || *v <= 0.0)
     {
         return None;
     }
-    let solver = &rec["detail"]["decomposition"]["solver"];
-    let mut phase_gae = BTreeMap::new();
-    for p in rec["phases"].as_array().into_iter().flatten() {
-        if let (Some(n), Some(g)) = (p["name"].as_str(), p["gae"].as_f64()) {
-            *phase_gae.entry(n.to_string()).or_insert(0.0) += g;
-        }
-    }
-    Some(RecordMeasures {
-        key: (
-            rec["workload"]["target_seed"].as_u64()?,
-            rec["workload"]["target_index"].as_u64()?,
-            rec["round"].as_u64().unwrap_or(0),
-        ),
-        s: rec["cost"]["s"].as_f64(),
-        relations: rec["counters"]["relations_found"].as_f64().unwrap_or(0.0),
-        targets_tried: rec["counters"]["targets_tried"].as_f64().unwrap_or(0.0),
-        solver_ops: solver["ops"].as_f64(),
-        solver_calls: solver["calls"].as_f64(),
-        budget_exceeded: solver["budget_exceeded"].as_f64(),
-        solving_degree_max: solver["solving_degree_max"].as_f64(),
-        phase_gae,
-    })
+    let ratio = [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]];
+    ratio.iter().all(|v| v.is_finite()).then_some(ratio)
 }
 
-fn mean(xs: &[f64]) -> Option<f64> {
-    (!xs.is_empty()).then(|| xs.iter().sum::<f64>() / xs.len() as f64)
-}
-
-/// Per-arm algebraic measures: relation yield per decomposition attempt,
-/// solver work per call, the share of calls that hit the solver budget, the
-/// largest solving degree seen, and each phase's share of the counted cost.
-fn arm_measures(records: &[Value], arm: &str) -> Value {
-    let rows: Vec<RecordMeasures> = records
-        .iter()
-        .filter_map(|r| record_measures(r, arm))
-        .collect();
-    if rows.is_empty() {
-        return json!({"records": 0});
-    }
-    let rel: f64 = rows.iter().map(|r| r.relations).sum();
-    let tried: f64 = rows.iter().map(|r| r.targets_tried).sum();
-    let ops: f64 = rows.iter().filter_map(|r| r.solver_ops).sum();
-    let calls: f64 = rows.iter().filter_map(|r| r.solver_calls).sum();
-    let over: f64 = rows.iter().filter_map(|r| r.budget_exceeded).sum();
-    let dmax = rows
-        .iter()
-        .filter_map(|r| r.solving_degree_max)
-        .fold(None, |a: Option<f64>, d| Some(a.map_or(d, |a| a.max(d))));
-    let mut phases: BTreeMap<String, f64> = BTreeMap::new();
-    for r in &rows {
-        for (n, g) in &r.phase_gae {
-            *phases.entry(n.clone()).or_insert(0.0) += g;
-        }
-    }
-    let total: f64 = phases.values().sum();
-    let shares: BTreeMap<String, f64> = phases
-        .iter()
-        .map(|(n, g)| (n.clone(), if total > 0.0 { g / total } else { 0.0 }))
-        .collect();
-    json!({
-        "records": rows.len(),
-        "mean_s_w0": mean(&rows.iter().filter_map(|r| r.s).collect::<Vec<_>>()),
-        "relations_per_attempt": (tried > 0.0).then(|| rel / tried),
-        "solver_ops_per_call": (calls > 0.0).then(|| ops / calls),
-        "solver_op_unit": "F_p multiply-adds (elimination only), as the solver records them",
-        "budget_exceeded_rate": (calls > 0.0).then(|| over / calls),
-        "solving_degree_max": dmax,
-        "phase_share_gae": shares,
-    })
-}
-
-/// Deterministic generator for the bootstrap (no wall-clock seed).
-struct SplitMix(u64);
-impl SplitMix {
-    fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
-        let mut z = self.0;
-        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-        z ^ (z >> 31)
-    }
-}
-
-/// Paired ratio b/a of a per-target measure on the targets both arms
-/// verified: the geometric mean of the per-target ratios with a 95%
-/// percentile bootstrap interval (2,000 resamples, fixed seed).
-fn paired_ratio(
-    a: &[RecordMeasures],
-    b: &[RecordMeasures],
-    f: impl Fn(&RecordMeasures) -> Option<f64>,
-) -> Option<(f64, [f64; 2], usize)> {
-    let mut am: BTreeMap<(u64, u64, u64), f64> = BTreeMap::new();
-    for r in a {
-        if let Some(v) = f(r) {
-            if am.insert(r.key, v).is_some() {
-                return None; // a duplicate key: refuse rather than pair wrongly
-            }
-        }
-    }
-    let mut seen_b = BTreeSet::new();
-    if b.iter().any(|r| !seen_b.insert(r.key)) {
-        return None;
-    }
-    let logs: Vec<f64> = b
-        .iter()
-        .filter_map(|r| {
-            let vb = f(r)?;
-            let va = *am.get(&r.key)?;
-            (va > 0.0 && vb > 0.0).then(|| (vb / va).ln())
-        })
-        .collect();
-    let n = logs.len();
-    if n < 2 {
-        return None;
-    }
-    let point = (logs.iter().sum::<f64>() / n as f64).exp();
-    let mut rng = SplitMix(0x1C_A1_6E_B4);
-    let mut boots: Vec<f64> = (0..2000)
-        .map(|_| {
-            let s: f64 = (0..n).map(|_| logs[(rng.next() % n as u64) as usize]).sum();
-            (s / n as f64).exp()
-        })
-        .collect();
-    boots.sort_by(|x, y| x.partial_cmp(y).unwrap());
-    Some((point, [boots[49], boots[1949]], n))
-}
-
-/// Stage comparison of sel against inc on the algebraic measures. A stage
-/// improvement is reported as such (AGENTS.md success criterion); it never
-/// ratchets the pipeline incumbent by itself.
-fn stage_comparison(records: &[Value]) -> Value {
-    let pick = |arm: &str| -> Vec<RecordMeasures> {
-        records
-            .iter()
-            .filter_map(|r| record_measures(r, arm))
-            .collect()
-    };
-    let (inc, sel) = (pick("inc"), pick("sel"));
-    let row = |r: Option<(f64, [f64; 2], usize)>| match r {
-        Some((p, ci, n)) => json!({"ratio_sel_over_inc": p, "ci95": ci, "paired_targets": n}),
-        None => Value::Null,
-    };
-    let ops = paired_ratio(&inc, &sel, |r| {
-        Some(r.solver_ops? / r.solver_calls.filter(|c| *c > 0.0)?)
-    });
-    let tried = paired_ratio(&inc, &sel, |r| {
-        (r.relations > 0.0).then(|| r.targets_tried / r.relations)
-    });
-    let stage = match ops {
-        Some((_, ci, _)) if ci[1] < 1.0 => "solver work per call lower (stage improvement)",
-        Some((_, ci, _)) if ci[0] > 1.0 => "solver work per call higher",
-        Some(_) => "solver work per call unresolved",
-        None => "no paired solver records (or duplicate pairing keys)",
-    };
-    json!({
-        "solver_ops_per_call": row(ops),
-        "attempts_per_relation": row(tried),
-        "stage_verdict": stage,
-    })
-}
-
-/// Most solver calls an algebraic `sel` may hand to the grid, as a share,
-/// before the arm counts as enumeration rather than solving.
-const MAX_GRID_SHARE: f64 = 0.01;
-
-/// A `sel` whose solver hands more of its calls to the grid than
-/// `MAX_GRID_SHARE` and than the incumbent is enumerating, not solving:
-/// returns the reason, or `None` when the records are absent or the share is
-/// within bounds.
-fn grid_fallback(records: &[Value]) -> Option<String> {
-    let rate = |arm: &str| arm_measures(records, arm)["budget_exceeded_rate"].as_f64();
-    let sel = rate("sel")?;
-    let inc = rate("inc").unwrap_or(0.0);
-    (sel > MAX_GRID_SHARE.max(inc)).then(|| {
-        format!(
-            "sel hands {:.2}% of its solver calls to the grid (incumbent {:.2}%, bound {:.0}%): \
-             enumeration, not an algebraic solve",
-            100.0 * sel,
-            100.0 * inc,
-            100.0 * MAX_GRID_SHARE
-        )
-    })
-}
-
-/// Growth of the track's incumbents with size. Total cost is S·sqrt(r), so
-/// its exponent in r is 1/2 plus the slope of log2 S against log2 r. Fitted
-/// by least squares at each weight w = 0, 0.1, 1 over the sizes that have an
-/// incumbent, for the incumbents and for their matched rho, when there are at
-/// least two sizes. At w = 0 the solver's native work is unpriced, so the
-/// w = 1 exponent is the one that prices it. A fit across incumbents of
-/// different families, or over fewer than three sizes, is indicative only.
-fn growth_exponents(ledger: &Ledger, track: &str) -> Option<Value> {
-    let incs = ledger.tracks.get(track)?;
-    let mut pts = Vec::new();
-    let mut families = BTreeSet::new();
-    for (k, inc) in incs {
-        let size = ledger.sizes.get(k)?;
-        if inc.s.iter().chain(inc.rho_s.iter()).all(|v| *v > 0.0) {
-            pts.push((size.log2_r, inc.s, inc.rho_s));
-            families.insert(inc.arm.family.clone());
-        }
-    }
-    if pts.len() < 2 {
-        return None;
-    }
-    let slope = |ys: &dyn Fn(&(f64, [f64; 3], [f64; 3])) -> f64| -> f64 {
-        let n = pts.len() as f64;
-        let mx = pts.iter().map(|p| p.0).sum::<f64>() / n;
-        let my = pts.iter().map(ys).sum::<f64>() / n;
-        let sxy: f64 = pts.iter().map(|p| (p.0 - mx) * (ys(p) - my)).sum();
-        let sxx: f64 = pts.iter().map(|p| (p.0 - mx).powi(2)).sum();
-        if sxx > 0.0 {
-            sxy / sxx
-        } else {
-            f64::NAN
-        }
-    };
-    let e_ic: Vec<f64> = (0..3).map(|w| 0.5 + slope(&|p| p.1[w].log2())).collect();
-    let e_rho: Vec<f64> = (0..3).map(|w| 0.5 + slope(&|p| p.2[w].log2())).collect();
-    let mixed = families.len() > 1;
-    Some(json!({
-        "sizes": pts.len(),
-        "weights": [0.0, 0.1, 1.0],
-        "exponent_ic": e_ic,
-        "exponent_rho": e_rho,
-        "gap": e_ic.iter().zip(&e_rho).map(|(a, b)| a - b).collect::<Vec<_>>(),
-        "families": families,
-        "mixed_families": mixed,
-        "indicative_only": pts.len() < 3 || mixed,
-        "rule": "total cost = S * sqrt(r); exponent = 1/2 + slope of log2 S on log2 r at each weight, incumbents only; w = 1 prices the solver's native work",
-    }))
+fn fmt_distance(s: &[f64; 3], rho: Option<&[f64; 3]>) -> String {
+    rho.and_then(|r| checked_distance(s, r))
+        .map(|d| format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]))
+        .unwrap_or_else(|| "unavailable".into())
 }
 
 // ---------------------------------------------------------------------------
@@ -1384,16 +993,12 @@ fn cmd_propose(
     exploration: usize,
     out: Option<PathBuf>,
 ) -> Result<Value, String> {
-    check_track(track)?;
     let ledger = load_ledger(home)?;
     let fams = load_families(home)?;
     let tf = fams
         .tracks
         .get(track)
         .ok_or_else(|| format!("families.json has no track {track}"))?;
-    for f in tf.families.iter().filter(|f| f.enabled) {
-        oracle_admission(&f.oracle).map_err(|e| format!("families.json, family {}: {e}", f.id))?;
-    }
     if ledger.rounds.iter().any(|r| r.round == round) {
         return Err(format!("round {round} is already in the ledger"));
     }
@@ -1462,8 +1067,13 @@ fn train_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
+    let scope = if size.curve["kind"] == "curve25519" {
+        "actual Curve25519 subgroup"
+    } else {
+        "Curve25519-family miniature"
+    };
     let mut arms = vec![
-        json!({"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}}),
+        json!({"name": "rho-neg", "role": "reference", "method": size.reference_method()}),
         json!({"name": "inc", "role": "baseline", "method": inc.method()}),
     ];
     for c in cands {
@@ -1472,7 +1082,7 @@ fn train_spec(
     json!({
         "schema": "ecbench.spec/v1",
         "label": format!("ic_autolab round {round} train, {track} track, k = {}", size.k),
-        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), train screen. Public synthetic Curve25519-family miniature and targets; no security claim. In-sample selection; promotion_eligible=false.", home.display()),
+        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), train screen. Public synthetic {scope} and targets; no security claim. In-sample selection; promotion_eligible=false.", home.display()),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},
         "arms": arms,
         "measurement": {"rounds": rounds, "warmup": 1, "order": if rounds % 2 == 1 { "alternate_measured" } else { "alternate" }, "seed": target_seed + 7, "isolation_required": "L0", "timeout_seconds": timeout}
@@ -1492,17 +1102,22 @@ fn holdout_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
+    let scope = if size.curve["kind"] == "curve25519" {
+        "actual Curve25519 subgroup"
+    } else {
+        "Curve25519-family miniature"
+    };
     json!({
         "schema": "ecbench.spec/v1",
         "label": format!("ic_autolab round {round} holdout, {track} track, k = {}", size.k),
-        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), fresh holdout: sel = {} ({} + {}). Public synthetic Curve25519-family miniature and targets; no security claim.", home.display(), sel.name, sel.factor_base, sel.oracle),
+        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), fresh holdout: sel = {} ({} + {}). Public synthetic {scope} and targets; no security claim.", home.display(), sel.name, sel.factor_base, sel.oracle),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},
         "arms": [
-            {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+            {"name": "rho-neg", "role": "reference", "method": size.reference_method()},
             {"name": "inc", "role": "baseline", "method": inc.method()},
             {"name": "sel", "role": "candidate", "method": sel.method()},
             {"name": "inc-aa", "role": "control", "method": inc.method()},
-            {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+            {"name": "rho-neg-aa", "role": "control", "method": size.reference_method()}
         ],
         "measurement": {"rounds": rounds, "warmup": 1, "order": if rounds % 2 == 1 { "alternate_measured" } else { "alternate" }, "seed": target_seed + 7, "isolation_required": "L0", "timeout_seconds": timeout}
     })
@@ -1556,7 +1171,17 @@ fn protocol_text(
         let size = ledger.size(*k).expect("checked");
         t += &format!(
             "### k = {k} (p = {}, r = {}, log2 r = {:.2}, N_a = {})\n\n",
-            size.curve["p"], size.r, size.log2_r, size.n_a
+            size.curve
+                .get("p")
+                .map(Value::to_string)
+                .unwrap_or_else(|| if size.curve["kind"] == "curve25519" {
+                    "2^255 - 19".into()
+                } else {
+                    "unspecified".into()
+                }),
+            size.r,
+            size.log2_r,
+            size.n_a
         );
         t += &format!(
             "- `inc` (baseline): `{}` + `{}` (family `{}`, N = {}); S = {} since round {}.\n",
@@ -1567,7 +1192,10 @@ fn protocol_text(
             fmt_s(&inc.s),
             inc.since_round
         );
-        t += "- `rho-neg` (reference): `rho.negation`, the matched rho.\n";
+        t += &format!(
+            "- `rho-neg` (reference): `{}`, the matched rho.\n",
+            size.reference_method()["id"].as_str().unwrap_or("invalid")
+        );
         let cands = panel["sizes"][k.to_string()]["candidates"]
             .as_array()
             .cloned()
@@ -1643,6 +1271,15 @@ fn protocol_text(
          seeds above are new.\n",
         ledger.exposures.len()
     );
+    if seeds.keys().any(|k| {
+        ledger
+            .size(*k)
+            .is_ok_and(|s| s.curve["kind"] == "curve25519")
+    }) {
+        t = t.replace("Curve25519-family miniature", "declared Curve25519 workload")
+            .replace("Factor base and oracle strings are ecbench `ic.pipeline` parameters.",
+                "Each arm uses its explicit ecbench method when supplied; otherwise factor base and oracle strings are ic.pipeline parameters.");
+    }
     t
 }
 
@@ -1690,11 +1327,10 @@ fn cmd_freeze(home: &Path, round: u64, panel_path: &Path, opts: FreezeOpts) -> R
                 "panel incumbent at k = {k} differs from the ledger; re-propose"
             ));
         }
-        admit_arm(&track, &inc)?;
-        for c in &cands {
-            admit_arm(&track, c)?;
-        }
         let size = ledger.size(k)?;
+        let mut routes = vec![&inc];
+        routes.extend(cands.iter());
+        validate_explicit_routes(size, &routes)?;
         specs.insert(
             k,
             train_spec(
@@ -2133,7 +1769,7 @@ fn select_from_band(
     Option<[f64; 3]>,
 ) {
     let rows = band_rows(band);
-    let inc_s = rows.get("inc").map(|r| r.0);
+    let inc_s = complete_means(&rows, "inc");
     let mut table = Vec::new();
     let mut best0: Option<(f64, ArmConfig)> = None;
     let mut best2: Option<(f64, ArmConfig)> = None;
@@ -2179,7 +1815,6 @@ fn cmd_select(home: &Path, round: u64, ecbench: Option<PathBuf>) -> Result<Value
         .as_str()
         .ok_or("manifest.track")?
         .to_string();
-    check_track(&track)?;
     let sel_path = dir.join("selection.json");
     if sel_path.exists() {
         return Err(format!(
@@ -2210,7 +1845,7 @@ fn cmd_select(home: &Path, round: u64, ecbench: Option<PathBuf>) -> Result<Value
         }
         let band = read_json(Path::new(row["band"].as_str().ok_or("band")?))?;
         let (sel, alt_w1, table, inc_s) = select_from_band(&band, &cands);
-        let rho_s = band_rows(&band).get("rho-neg").map(|r| r.0);
+        let rho_s = complete_means(&band_rows(&band), "rho-neg");
         match &sel {
             Some(arm) => {
                 let inc = ledger.incumbent(&track, k)?;
@@ -2222,6 +1857,14 @@ fn cmd_select(home: &Path, round: u64, ecbench: Option<PathBuf>) -> Result<Value
                     )
                 };
                 let size = ledger.size(k)?;
+                if size.reference.is_some()
+                    || inc.arm.method_id.is_some()
+                    || arm.method_id.is_some()
+                {
+                    validate_explicit_routes(size, &[&inc.arm, arm])?;
+                    let frozen = read_json(&dir.join("specs").join(format!("train-k{k}.json")))?;
+                    validate_frozen_routes(size, &inc.arm, &frozen)?;
+                }
                 let spec = holdout_spec(
                     home,
                     round,
@@ -2427,7 +2070,6 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
         .as_str()
         .ok_or("manifest.track")?
         .to_string();
-    check_track(&track)?;
     let result_path = dir.join("RESULT.json");
     if result_path.exists() {
         return Err(format!(
@@ -2469,30 +2111,18 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
             );
             continue;
         }
-        if let Err(e) = admit_arm(&track, &sel) {
-            sizes.insert(
-                k_s.clone(),
-                json!({"class": Class::Inadmissible, "why": [e], "sel": sel, "incumbent": inc.arm}),
-            );
-            continue;
-        }
         let sdir = PathBuf::from(run["session_dir"].as_str().ok_or("session_dir")?);
         let c0 = compare(ecbench, &sdir, "inc", "sel", None)?;
         let c01 = compare(ecbench, &sdir, "inc", "sel", Some(0.1))?;
         let c1 = compare(ecbench, &sdir, "inc", "sel", Some(1.0))?;
         let aa = compare(ecbench, &sdir, "inc", "inc-aa", None)?;
         let band = read_json(Path::new(run["band"].as_str().ok_or("band")?))?;
-        let (mut class, mut why) = classify(&c0, &band, Some(&aa));
+        let (class, why) = classify(&c0, &band, Some(&aa));
         let rows = band_rows(&band);
-        let s_sel = rows.get("sel").map(|r| r.0);
-        let s_inc = rows.get("inc").map(|r| r.0);
-        let s_rho = rows.get("rho-neg").map(|r| r.0);
+        let s_sel = complete_means(&rows, "sel");
+        let s_inc = complete_means(&rows, "inc");
+        let s_rho = complete_means(&rows, "rho-neg");
         let session = read_json(&sdir.join("session.json"))?;
-        let records = read_records(&sdir);
-        if let Some(e) = grid_fallback(&records) {
-            class = Class::Inadmissible;
-            why.push(e);
-        }
         sizes.insert(
             k_s.clone(),
             json!({
@@ -2508,16 +2138,11 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
                 },
                 "band_verdict": band_verdict(&band, "inc", "sel"),
                 "band_rho": band_verdict(&band, "rho-neg", "sel"),
-                "measures": {
-                    "note": "reported beside the decision rule; they never change the class",
-                    "inc": arm_measures(&records, "inc"),
-                    "sel": arm_measures(&records, "sel"),
-                    "stage": stage_comparison(&records),
-                },
+                "rho_reference": band["rows"].as_array().and_then(|rows| rows.iter().find(|row| row["arm"] == "rho-neg")).cloned(),
                 "s": {"sel": s_sel, "inc": s_inc, "rho_neg": s_rho},
                 "distance_to_rho": {
-                    "sel": s_sel.zip(s_rho).map(|(a, b)| distance(&a, &b)),
-                    "inc": s_inc.zip(s_rho).map(|(a, b)| distance(&a, &b)),
+                    "sel": s_sel.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
+                    "inc": s_inc.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
                 },
                 "evidence": {
                     "session_id": session["session_id"],
@@ -2539,9 +2164,7 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
         "track": track,
         "assessed": now_utc(),
         "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
-        "admission": format!("algebraic arms only ({TRACK_RULING}); a non-algebraic sel is inadmissible"),
         "sizes": sizes,
-        "growth": growth_exponents(&ledger, &track),
     });
     write_json(&result_path, &result)?;
     for (k, v) in result["sizes"].as_object().unwrap() {
@@ -2565,7 +2188,6 @@ fn cmd_ratchet(home: &Path, round: u64) -> Result<(), String> {
         .as_str()
         .ok_or("manifest.track")?
         .to_string();
-    check_track(&track)?;
     let entry = ledger
         .rounds
         .iter()
@@ -2649,9 +2271,8 @@ fn cmd_ratchet(home: &Path, round: u64) -> Result<(), String> {
         if class == Class::Improvement {
             let sel: ArmConfig =
                 serde_json::from_value(r["sel"].clone()).map_err(|e| e.to_string())?;
-            admit_arm(&track, &sel)?;
             let s_to = s3(&r["s"]["sel"]).ok_or("sel S")?;
-            let rho = s3(&r["s"]["rho_neg"]).ok_or("rho S")?;
+            let rho = s3(&r["s"]["rho_neg"]);
             let ratio = r["ratio"]["w0"]["ratio"].as_f64().ok_or("ratio")?;
             let ci = r["ratio"]["w0"]["ci95"]
                 .as_array()
@@ -2686,6 +2307,8 @@ fn cmd_ratchet(home: &Path, round: u64) -> Result<(), String> {
                 "band_verdict": r["band_verdict"],
                 "route": manifest["route"],
                 "validation_gate": "none (development loop)",
+                "rho_reference_complete": rho.is_some(),
+                "rho_reference": r["rho_reference"],
             });
             ledger.tracks.get_mut(&track).unwrap().insert(
                 k_s.clone(),
@@ -2959,7 +2582,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
                     best.as_ref().map(|b| fmt_s(&b.0)).unwrap_or("-".into()),
                     inc_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
                     rho_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
-                    inc_s.zip(rho_s).map(|(a, b)| { let d = distance(&a, &b); format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]) }).unwrap_or("-".into()),
+                    inc_s.zip(rho_s).map(|(a, b)| fmt_distance(&a, Some(&b))).unwrap_or("unavailable".into()),
                 );
                 continue;
             }
@@ -3132,17 +2755,15 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     md += "## Ledger after this round\n\n| k | incumbent | since round | S (w = 0 / 0.1 / 1) | distance to rho |\n|--:|:--|--:|:--|:--|\n";
     if let Some(t) = ledger.tracks.get(&track) {
         for (k, inc) in t {
-            let d = distance(&inc.s, &inc.rho_s);
+            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
             md += &format!(
-                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {:.1}x / {:.1}x / {:.1}x |\n",
+                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {} |\n",
                 inc.arm.name,
                 inc.arm.factor_base,
                 inc.arm.oracle,
                 inc.since_round,
                 fmt_s(&inc.s),
-                d[0],
-                d[1],
-                d[2]
+                d
             );
         }
     }
@@ -3175,41 +2796,19 @@ fn cmd_status(home: &Path) -> Result<(), String> {
         l.family, l.schema, l.created, l.updated
     );
     for (track, sizes) in &l.tracks {
-        if RETIRED_TRACKS.contains(&track.as_str()) {
-            println!("track {track}: RETIRED, history only, not index calculus ({TRACK_RULING})");
-        } else {
-            println!("track {track}:");
-        }
+        println!("track {track}:");
         println!(
             "  {:>3} | {:<14} | {:<5} | {:<28} | {:<10}",
             "k", "incumbent", "round", "S (w=0 / 0.1 / 1)", "to rho"
         );
         for (k, inc) in sizes {
-            let d = distance(&inc.s, &inc.rho_s);
+            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
             println!(
-                "  {k:>3} | {:<14} | {:<5} | {:<28} | {:.1}x / {:.1}x / {:.1}x",
+                "  {k:>3} | {:<14} | {:<5} | {:<28} | {}",
                 inc.arm.name,
                 inc.since_round,
                 fmt_s(&inc.s),
-                d[0],
-                d[1],
-                d[2]
-            );
-        }
-        if let Some(g) = growth_exponents(&l, track) {
-            let e = |key: &str, w: usize| g[key][w].as_f64().unwrap_or(f64::NAN);
-            println!(
-                "  growth: total cost ~ r^{:.3} at w = 0, r^{:.3} at w = 1 (rho r^{:.3} / r^{:.3}) over {} sizes{}",
-                e("exponent_ic", 0),
-                e("exponent_ic", 2),
-                e("exponent_rho", 0),
-                e("exponent_rho", 2),
-                g["sizes"],
-                if g["indicative_only"] == true {
-                    " (indicative only: fewer than 3 sizes or mixed families)"
-                } else {
-                    ""
-                }
+                d
             );
         }
     }
@@ -3274,7 +2873,6 @@ fn cmd_loop(
     freeze: FreezeOpts,
     run: RunOpts,
 ) -> Result<(), String> {
-    check_track(track)?;
     let start = load_ledger(home)?
         .rounds
         .iter()
@@ -3489,7 +3087,7 @@ mod tests {
             Incumbent {
                 arm: inc,
                 s: [8.987, 9.71, 16.217],
-                rho_s: [1.578, 1.693, 2.724],
+                rho_s: Some([1.578, 1.693, 2.724]),
                 evidence: json!({}),
                 since_round: 0,
             },
@@ -3499,8 +3097,9 @@ mod tests {
         sizes.insert(
             "20".to_string(),
             SizeInfo {
+                reference: None,
                 k: 20,
-                r: 131203,
+                r: 131203u64.into(),
                 log2_r: 17.0,
                 n_a: 32,
                 curve: json!({"kind": "prime_explicit", "p": 1048573}),
@@ -3669,8 +3268,9 @@ mod tests {
         l.sizes.insert(
             "24".into(),
             SizeInfo {
+                reference: None,
                 k: 24,
-                r: 2097349,
+                r: 2097349u64.into(),
                 log2_r: 21.0,
                 n_a: 81,
                 curve: json!({}),
@@ -3682,7 +3282,7 @@ mod tests {
             Incumbent {
                 arm: win,
                 s: [7.0, 7.5, 12.3],
-                rho_s: [1.2, 1.3, 2.2],
+                rho_s: Some([1.2, 1.3, 2.2]),
                 evidence: json!({}),
                 since_round: 2,
             },
@@ -3725,8 +3325,9 @@ mod tests {
             l.sizes.insert(
                 k.to_string(),
                 SizeInfo {
+                    reference: None,
                     k,
-                    r,
+                    r: r.into(),
                     log2_r: l2,
                     n_a: na,
                     curve: json!({}),
@@ -3737,7 +3338,7 @@ mod tests {
                 Incumbent {
                     arm: tf.arm(tf.family("ksum4").unwrap(), n),
                     s: [1.0; 3],
-                    rho_s: [1.0; 3],
+                    rho_s: Some([1.0; 3]),
                     evidence: json!({}),
                     since_round: 2,
                 },
@@ -3746,8 +3347,9 @@ mod tests {
         l.sizes.insert(
             "32".into(),
             SizeInfo {
+                reference: None,
                 k: 32,
-                r: 536884639,
+                r: 536884639u64.into(),
                 log2_r: 29.0,
                 n_a: 512,
                 curve: json!({}),
@@ -3758,7 +3360,7 @@ mod tests {
             Incumbent {
                 arm: tf.arm(tf.family("mitm2").unwrap(), 512),
                 s: [24.0; 3],
-                rho_s: [1.0; 3],
+                rho_s: Some([1.0; 3]),
                 evidence: json!({}),
                 since_round: 0,
             },
@@ -3909,6 +3511,78 @@ mod tests {
     }
 
     #[test]
+    fn ratchet_keeps_verified_improvement_when_reference_is_unavailable() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let home = std::env::temp_dir().join(format!(
+            "ic-autolab-reference-{}-{unique}",
+            std::process::id()
+        ));
+        struct Cleanup(std::path::PathBuf);
+        impl Drop for Cleanup {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_dir_all(&self.0);
+            }
+        }
+        let _cleanup = Cleanup(home.clone());
+        let mut l = ledger();
+        l.rounds.push(RoundEntry {
+            round: 1,
+            dir: "round-001".into(),
+            track: "generic".into(),
+            sizes: vec![20],
+            status: "assessed".into(),
+        });
+        save_ledger(&home, &mut l).unwrap();
+        let tf = families();
+        let challenger = tf.arm(tf.family("mitm2").unwrap(), 8);
+        let dir = round_dir(&home, 1);
+        write_json(
+            &dir.join("MANIFEST.json"),
+            &json!({"track":"generic", "route":"test-fixture",
+            "seeds":{"20":{"holdout":123}}, "holdout":{"targets":4}}),
+        )
+        .unwrap();
+        write_json(
+            &dir.join("selection.json"),
+            &json!({"sizes":{"20":{"status":"challenger"}}}),
+        )
+        .unwrap();
+        write_json(&dir.join("panel.json"), &json!({"sizes":{}})).unwrap();
+        write_json(
+            &dir.join("analysis/run-train.json"),
+            &json!({"sessions":[]}),
+        )
+        .unwrap();
+        let reference = json!({"arm":"rho-neg", "runs":4, "verified":1});
+        write_json(
+            &dir.join("RESULT.json"),
+            &json!({"sizes":{"20":{
+            "class":"improvement", "sel":challenger, "s":{"sel":[7.0,8.0,12.0],"rho_neg":null},
+            "ratio":{"w0":{"ratio":0.78,"ci95":[0.72,0.84]}},
+            "rho_reference":reference, "band_verdict":"sel < inc",
+            "evidence":{"session_id":"fixture"}}}}),
+        )
+        .unwrap();
+        cmd_ratchet(&home, 1).unwrap();
+        let updated = load_ledger(&home).unwrap();
+        let inc = updated.incumbent("generic", 20).unwrap();
+        assert_eq!(inc.arm.name, challenger.name);
+        assert_eq!(inc.s, [7.0, 8.0, 12.0]);
+        assert_eq!(inc.rho_s, None);
+        assert_eq!(inc.evidence["rho_reference_complete"], false);
+        assert_eq!(inc.evidence["rho_reference"], reference);
+        assert_eq!(updated.history.len(), 1);
+        assert_eq!(updated.rounds[0].status, "ratcheted");
+        assert!(cmd_ratchet(&home, 1)
+            .unwrap_err()
+            .contains("already ratcheted"));
+        assert_eq!(load_ledger(&home).unwrap().history.len(), 1);
+    }
+
+    #[test]
     fn selection_takes_the_lowest_verified_candidate_below_the_incumbent() {
         let tf = families();
         let a = tf.arm(tf.family("ksum3").unwrap(), 8);
@@ -4007,213 +3681,170 @@ mod tests {
     }
 
     #[test]
-    fn only_algebraic_oracles_are_admitted() {
-        // The algebraic incumbent family and its guess splits.
-        for o in [
-            "pkm-semaev:m=2,mode=full,guess=4",
-            "pkm-semaev:m=2,mode=full,guess=0",
-            "pkm-semaev:m=3,mode=chain,engine=f4",
-            "descent-algebraic:m=3",
-            "pdp3-koblitz:m=3,engine=inherited-f4,degree=4",
-            "pdp3-koblitz:m=3,engine=f6-ic",
-            "gaudry-x-bin:macaulay=9",
-        ] {
-            assert!(oracle_admission(o).is_ok(), "{o}");
-        }
-        // Every generic family of the retired track, the walks included.
-        let fams: Families = serde_json::from_str(include_str!(
-            "../../research/curve25519_autolab_20261104/families.json"
-        ))
+    fn size_orders_preserve_legacy_numbers_and_full_curve25519_values() {
+        let legacy = json!({"k":20,"r":131203,"log2_r":17.0,"n_a":32,
+            "curve":{"kind":"prime_explicit","p":1048573}});
+        let size: SizeInfo = serde_json::from_value(legacy.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&size).unwrap(), legacy);
+        let order = crypto_lib::cryptanalysis::curve25519_wide::L25519;
+        let wide = json!({"k":255,"r":order,"log2_r":252.0,"n_a":32,
+            "curve":{"kind":"curve25519"}});
+        let size: SizeInfo = serde_json::from_value(wide.clone()).unwrap();
+        assert_eq!(size.r.bits(), 253);
+        assert_eq!(serde_json::to_value(size).unwrap(), wide);
+    }
+
+    #[test]
+    fn explicit_full_width_routes_preserve_reference_and_parameter_caps() {
+        let order = crypto_lib::cryptanalysis::curve25519_wide::L25519;
+        let mut size: SizeInfo = serde_json::from_value(json!({"k":255,"r":order,
+            "log2_r":252.0,"n_a":32,"curve":{"kind":"curve25519"},
+            "reference":{"id":"rho.curve25519_bounded","params":{"max_steps":"32"}}}))
         .unwrap();
-        for f in &fams.tracks["generic"].families {
-            let e = oracle_admission(&f.oracle).unwrap_err();
-            assert!(e.contains("generic decomposition"), "{}: {e}", f.oracle);
-        }
-        for f in &fams.tracks["algebraic"].families {
-            assert!(oracle_admission(&f.oracle).is_ok(), "{}", f.oracle);
-        }
-        // Exhaustive and root-finding engines of algebraic oracles are not solvers.
-        assert!(oracle_admission("pkm-semaev:m=2,engine=exhaustive").is_err());
-        assert!(oracle_admission("pdp3-koblitz:m=3,engine=rootfind-negfold").is_err());
-        assert!(oracle_admission("pdp3-koblitz:m=3").is_err());
-        // Solver bounds that send systems to the grid are refused.
-        assert!(oracle_admission("pkm-semaev:m=2,degree=1").is_err());
-        assert!(oracle_admission("pkm-semaev:m=2,max_nnz=1").is_err());
-        assert!(oracle_admission("pkm-semaev:m=2,staircase=2").is_err());
-        assert!(oracle_admission("pkm-semaev:m=2,degree=14").is_ok());
-        // An oracle nobody has classified is refused until it passes the random-base test.
-        let e = oracle_admission("new-idea:m=2").unwrap_err();
-        assert!(e.contains("random-base test"), "{e}");
-    }
-
-    #[test]
-    fn the_generic_track_is_retired_everywhere() {
-        let e = check_track("generic").unwrap_err();
-        assert!(e.contains("retired") && e.contains(TRACK_RULING), "{e}");
-        assert!(check_track("algebraic").is_ok());
-        let tf = families();
-        let arm = tf.arm(tf.family("ksum3").unwrap(), 11);
-        assert!(admit_arm("generic", &arm).is_err());
-        assert!(admit_arm("algebraic", &arm).is_err());
-        // A `params` entry cannot replace the admitted oracle, and walk
-        // target streams are not admitted.
-        let mut a = ArmConfig {
-            name: "x".into(),
-            family: "pkm-iso-g4".into(),
-            n: 6,
-            factor_base: "prime-isogeny:t=6".into(),
-            oracle: "pkm-semaev:m=2,mode=full,guess=4".into(),
-            params: BTreeMap::new(),
-        };
-        assert!(admit_arm("algebraic", &a).is_ok());
-        a.params.insert("oracle".into(), "ksum:m=3".into());
-        assert!(admit_arm("algebraic", &a).is_err());
-        a.params.clear();
-        a.params.insert("targets".into(), "stride-generator".into());
-        assert!(admit_arm("algebraic", &a).is_err());
-        a.params.insert("targets".into(), "stride".into());
-        assert!(admit_arm("algebraic", &a).is_ok());
-        let home = std::env::temp_dir().join(format!("ic_autolab_retired_{}", std::process::id()));
-        // Propose refuses before it reads anything.
-        let e = cmd_propose(&home, 99, "generic", &[20], 4, 1, None).unwrap_err();
-        assert!(e.contains("retired"), "{e}");
-    }
-
-    fn rec(arm: &str, target: u64, s: f64, ops: f64, calls: f64, rel: f64, tried: f64) -> Value {
-        json!({
-            "arm": arm, "warmup": false, "round": 0,
-            "workload": {"target_counter": 0, "target_seed": 7, "target_index": target},
-            "outcome": {"status": "verified"},
-            "cost": {"s": s},
-            "counters": {"relations_found": rel, "targets_tried": tried},
-            "detail": {"decomposition": {"solver": {"ops": ops, "calls": calls, "budget_exceeded": 1.0, "solving_degree_max": 5.0}}},
-            "phases": [{"name": "relations", "gae": 900.0}, {"name": "linear_algebra", "gae": 100.0}],
-        })
-    }
-
-    #[test]
-    fn measures_and_stage_comparison_follow_the_records() {
-        let mut recs = Vec::new();
-        for t in 0..20u64 {
-            let jitter = 1.0 + (t % 3) as f64 * 0.01;
-            recs.push(rec("inc", t, 30.0, 1000.0 * jitter, 10.0, 10.0, 1000.0));
-            recs.push(rec("sel", t, 25.0, 600.0 * jitter, 10.0, 10.0, 1000.0));
-        }
-        // A warm-up and an unverified record are ignored.
-        let mut w = rec("sel", 99, 1.0, 1.0, 1.0, 1.0, 1.0);
-        w["warmup"] = json!(true);
-        recs.push(w);
-        let mut u = rec("sel", 98, 1.0, 1.0, 1.0, 1.0, 1.0);
-        u["outcome"]["status"] = json!("failed");
-        recs.push(u);
-        let m = arm_measures(&recs, "sel");
-        assert_eq!(m["records"], 20);
-        assert!((m["relations_per_attempt"].as_f64().unwrap() - 0.01).abs() < 1e-12);
-        assert!((m["budget_exceeded_rate"].as_f64().unwrap() - 0.1).abs() < 1e-12);
-        assert!((m["phase_share_gae"]["relations"].as_f64().unwrap() - 0.9).abs() < 1e-12);
-        let st = stage_comparison(&recs);
-        let r = st["solver_ops_per_call"]["ratio_sel_over_inc"]
-            .as_f64()
-            .unwrap();
-        assert!((r - 0.6).abs() < 1e-9, "{r}");
-        assert_eq!(st["solver_ops_per_call"]["paired_targets"], 20);
+        let families: TrackFamilies = serde_json::from_value(json!({
+            "factor_base":"public-lifts:size={n}","scan_factor":4,"n_grid":[1.0],"n_min":1,"n_max":128,
+            "families":[{"id":"full-pair","method_id":"ic.curve25519_pair_v1","oracle":"signed-pair",
+                "default_f":1.0,"params":{"base_size":"{n}","max_scan":"{scan}","max_trials":"4"}}]
+        })).unwrap();
+        let arm = families.arm(&families.families[0], 8);
         assert_eq!(
-            st["stage_verdict"],
-            "solver work per call lower (stage improvement)"
+            arm.method(),
+            json!({"id":"ic.curve25519_pair_v1",
+            "params":{"base_size":"8","max_scan":"32","max_trials":"4"}})
         );
-        assert_eq!(arm_measures(&recs, "nobody")["records"], 0);
-        // Every synthetic record has budget_exceeded 1 of 10 calls: 10% > 1%,
-        // but no more than the incumbent's, so no grid verdict.
-        assert!(grid_fallback(&recs).is_none());
-        let mut worse = recs.clone();
-        for r in worse.iter_mut().filter(|r| r["arm"] == "sel") {
-            r["detail"]["decomposition"]["solver"]["budget_exceeded"] = json!(5.0);
-        }
-        assert!(grid_fallback(&worse).unwrap().contains("enumeration"));
-        // A duplicated pairing key is refused, not silently overwritten.
-        let mut dup = recs.clone();
-        dup.push(rec("inc", 3, 30.0, 1.0, 10.0, 10.0, 1000.0));
-        assert!(stage_comparison(&dup)["solver_ops_per_call"].is_null());
-    }
-
-    #[test]
-    fn measures_read_a_committed_algebraic_session() {
-        // research/curve25519_algebraic_ecbench_scale_20261105, k = 24, chunk 0.
-        let recs: Vec<Value> = include_str!(
-            "../../research/curve25519_algebraic_ecbench_scale_20261105/sessions/k24-c0-a1/records.jsonl"
-        )
-        .lines()
-        .map(|l| serde_json::from_str(l).unwrap())
-        .collect();
-        let m = arm_measures(&recs, "pkm-iso-t6-g4");
-        assert_eq!(m["records"], 1);
-        let per_call = m["solver_ops_per_call"].as_f64().unwrap();
-        assert!(
-            (per_call - 36_371_217_749.0 / 819_522.0).abs() < 1e-6,
-            "{per_call}"
+        validate_explicit_routes(&size, &[&arm]).unwrap();
+        let spec = train_spec(
+            Path::new("fixture"),
+            1,
+            "generic",
+            &size,
+            &arm,
+            &[],
+            7,
+            2,
+            2,
+            60,
         );
-        assert_eq!(m["solving_degree_max"].as_f64(), Some(5.0));
-        // The generic baseline arm carries no solver: no solver measure, no panic.
-        let g = arm_measures(&recs, "proj-a");
-        assert_eq!(g["records"], 1);
-        assert!(g["solver_ops_per_call"].is_null());
-        // rho has no counters at all.
-        assert_eq!(arm_measures(&recs, "rho-neg")["records"], 1);
-    }
-
-    #[test]
-    fn growth_exponent_is_half_plus_the_slope_of_log_s() {
-        let mut l = ledger();
-        let tf = families();
-        let arm = tf.arm(tf.family("ksum3").unwrap(), 11);
-        let mut alg = BTreeMap::new();
-        // S doubles per 4 bits of r: exponent 0.5 + 0.25; rho flat: 0.5.
-        for (k, log2r, s) in [(20u32, 16.0, 4.0), (24, 20.0, 8.0), (28, 24.0, 16.0)] {
-            l.sizes.insert(
-                k.to_string(),
-                SizeInfo {
-                    k,
-                    r: 0,
-                    log2_r: log2r,
-                    n_a: 0,
-                    curve: json!({}),
-                },
-            );
-            alg.insert(
-                k.to_string(),
-                Incumbent {
-                    arm: arm.clone(),
-                    s: [s, s, s],
-                    rho_s: [1.0, 1.0, 1.0],
-                    evidence: json!({}),
-                    since_round: 0,
-                },
-            );
-        }
-        l.tracks.insert("algebraic".into(), alg);
-        let g = growth_exponents(&l, "algebraic").unwrap();
-        for w in 0..3 {
-            assert!((g["exponent_ic"][w].as_f64().unwrap() - 0.75).abs() < 1e-12);
-            assert!((g["exponent_rho"][w].as_f64().unwrap() - 0.5).abs() < 1e-12);
-        }
-        assert_eq!(g["indicative_only"], false);
-        // A different family at one size makes the fit indicative only.
-        let other = tf.arm(tf.family("ksum4").unwrap(), 11);
-        l.tracks
-            .get_mut("algebraic")
+        let holdout = holdout_spec(
+            Path::new("fixture"),
+            1,
+            "generic",
+            &size,
+            &arm,
+            &arm,
+            9,
+            2,
+            2,
+            60,
+        );
+        assert_eq!(spec["arms"][0]["method"], size.reference_method());
+        assert_eq!(holdout["arms"][0]["method"], holdout["arms"][4]["method"]);
+        assert!(spec["description"]
+            .as_str()
             .unwrap()
-            .get_mut("24")
-            .unwrap()
-            .arm = other;
-        let g = growth_exponents(&l, "algebraic").unwrap();
-        assert_eq!(g["mixed_families"], true);
-        assert_eq!(g["indicative_only"], true);
-        assert!(growth_exponents(&l, "generic").is_none(), "one size only");
+            .contains("actual Curve25519 subgroup"));
+        validate_frozen_routes(&size, &arm, &spec).unwrap();
+        let mut changed_reference = size.clone();
+        changed_reference.reference.as_mut().unwrap()["params"]["max_steps"] = json!("64");
+        assert!(validate_frozen_routes(&changed_reference, &arm, &spec)
+            .unwrap_err()
+            .contains("reference"));
+        let mut another = arm.clone();
+        another.method_id = Some("ic.pipeline".into());
+        assert_ne!(arm.key(), another.key());
+        size.reference = None;
+        assert!(validate_explicit_routes(&size, &[&arm])
+            .unwrap_err()
+            .contains("explicit"));
+        size.reference = Some(json!({"id":"rho.curve25519_bounded","params":{"max_steps":"32"}}));
+        size.r = 131203u64.into();
+        assert!(validate_explicit_routes(&size, &[&arm])
+            .unwrap_err()
+            .contains("order"));
+        size.r = order.parse().unwrap();
+        let mut false_ic = arm;
+        false_ic.method_id = Some("rho.curve25519_bounded".into());
+        false_ic.params = BTreeMap::from([("max_steps".into(), "32".into())]);
+        assert!(validate_explicit_routes(&size, &[&false_ic])
+            .unwrap_err()
+            .contains("ic method"));
     }
 
     #[test]
     fn civil_dates_are_right() {
         assert_eq!(civil_from_days(0), (1970, 1, 1));
         assert_eq!(civil_from_days(20761), (2026, 11, 4));
+    }
+}
+
+#[cfg(test)]
+mod complete_reference_tests {
+    use super::*;
+    #[test]
+    fn partial_reference_does_not_supply_a_distance() {
+        let rows = BTreeMap::from([
+            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
+            ("rho-neg".into(), ([2.0, 3.0, 4.0], 4, 1)),
+        ]);
+        assert!(complete_means(&rows, "sel").is_some());
+        let ratio = complete_means(&rows, "sel")
+            .zip(complete_means(&rows, "rho-neg"))
+            .and_then(|(s, rho)| checked_distance(&s, &rho));
+        assert_eq!(ratio, None);
+    }
+
+    #[test]
+    fn complete_cohorts_keep_the_original_ratios() {
+        let rows = BTreeMap::from([
+            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
+            ("rho-neg".into(), ([2.0, 4.0, 6.0], 4, 4)),
+        ]);
+        assert_eq!(
+            complete_means(&rows, "sel")
+                .zip(complete_means(&rows, "rho-neg"))
+                .and_then(|(s, rho)| checked_distance(&s, &rho)),
+            Some([0.5; 3])
+        );
+    }
+
+    #[test]
+    fn empty_incomplete_and_nonfinite_cohorts_are_not_eligible() {
+        for (means, runs, verified) in [
+            ([1.0; 3], 0, 0),
+            ([1.0; 3], 4, 0),
+            ([1.0; 3], 4, 3),
+            ([f64::NAN; 3], 4, 4),
+            ([-1.0; 3], 4, 4),
+            ([f64::INFINITY; 3], 4, 4),
+        ] {
+            let rows = BTreeMap::from([("inc".into(), (means, runs, verified))]);
+            assert!(complete_means(&rows, "inc").is_none());
+        }
+    }
+
+    #[test]
+    fn invalid_denominators_and_ratio_overflow_are_not_distances() {
+        assert_eq!(checked_distance(&[1.0; 3], &[0.0; 3]), None);
+        assert_eq!(checked_distance(&[1.0; 3], &[-1.0; 3]), None);
+        assert_eq!(checked_distance(&[1.0; 3], &[f64::NAN; 3]), None);
+        assert_eq!(
+            checked_distance(&[f64::MAX; 3], &[f64::MIN_POSITIVE; 3]),
+            None
+        );
+        assert_eq!(checked_distance(&[0.0; 3], &[1.0; 3]), Some([0.0; 3]));
+    }
+
+    #[test]
+    fn optional_reference_keeps_legacy_array_encoding() {
+        let mut value = serde_json::json!({"arm":{"name":"fixture","family":"fixture","n":1,
+        "factor_base":"fixture","oracle":"fixture"},"s":[1.0,2.0,3.0],
+        "rho_s":[2.0,3.0,4.0],"evidence":{},"since_round":0});
+        let mut inc: Incumbent = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(inc.rho_s, Some([2.0, 3.0, 4.0]));
+        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
+        inc.rho_s = None;
+        value["rho_s"] = Value::Null;
+        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
+        assert_eq!(fmt_distance(&inc.s, inc.rho_s.as_ref()), "unavailable");
     }
 }

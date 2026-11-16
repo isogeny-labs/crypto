@@ -1,0 +1,27 @@
+{
+  "schema": "native-development-status/v1",
+  "standing": "pcc:unverified",
+  "cpp": {
+    "broad_audit": "audit-data/002-result.json",
+    "integration": "audit-data/004-result.json",
+    "cli": "audit-data/005-cli-result.json",
+    "characteristic_p_edge": "audit-data/007-edge-result.json"
+  },
+  "rust": {
+    "example": "audit-data/006-rust-example-result.json",
+    "tests_passed": 3,
+    "full_library": {
+      "status": "compile blocked by missing legacy compile-time inputs",
+      "receipt": "audit-data/006-rust-library-result.json",
+      "exit_code": 101
+    }
+  },
+  "historical_receipt": "../development-checks.json is preserved unchanged; this file records later status",
+  "benchmark": "Descriptive Runpod execution completed; see ../runpod/RESULTS.md. No signed/isolation admission.",
+  "pcc_statements": {
+    "native_data": "PCC-20261116-087eff",
+    "cost_derivation": "PCC-20261116-b5325c",
+    "late_development": "PCC-20261116-756492",
+    "standing": "unverified"
+  }
+}

@@ -72,6 +72,11 @@ pub type Poly = Vec<(Vec<u32>, u64)>;
 pub mod reuse;
 pub use reuse::{TracePool, TraceStats};
 
+/// Opt-in certified relation/quotient basis construction using this module's
+/// polynomial representation. It has its own typed result; it does not invent
+/// F4 solving-degree or regularity observations or change the default engine.
+pub mod certified;
+
 /// Optional, read-only observations of the regular F4/solve path. Degrees
 /// describe this run, never a certified degree of regularity.
 #[derive(Clone, Debug, serde::Serialize)]

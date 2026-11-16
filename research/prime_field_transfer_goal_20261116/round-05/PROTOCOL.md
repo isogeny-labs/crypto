@@ -1,0 +1,7 @@
+# Round05: Eisenstein coefficient geometry
+
+Original GOAL remains active. This is a local bounded correctness trial, no performance or novelty claim. Prior art already read: original LLL1982 sections1–2, repository CT84 rational recognition and round04's exact global-root controls. KB/Conductor unavailable. LLL height/separation bounds alone do not supply the missing small-representation existence bound.
+
+Compare the frozen round04 rational Pade recognizer with a new version using the coefficient-pair bilinear form2ac-ad-bc+2bd. Its squared norm2(a²-ab+b²)=((2a-b)²+3b²)/2 is positive for a nonzero real pair. This is classical Eisenstein geometry, not a compressed evaluator. All LLL updates and independent final recomputation use the same new metric. Unimodular change, global-root/source/target gates and controls stay binding.
+
+Prediction: changing only geometry may change which reduced rows expose exact roots; it need not improve coverage. Test all18 order19 inputs at original1/2/4/8/16/32 and the same four public order61 inputs at4/8/16/32. One call per bin,60seconds each; delta3/4 and10000-step cap unchanged. Retain every rejection/timeout. No order127 setup retry. Keep old86 scientific pins unchanged. A fresh qualifier and recorder check source/executable before/after calls. Report original primary bins separately from later reproduction. No Python crypto and no cloud spend.

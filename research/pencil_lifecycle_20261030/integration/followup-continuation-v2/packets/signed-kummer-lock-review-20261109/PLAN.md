@@ -1,1 +1,0 @@
-Review exact closure/target paths and hashes, finite clock/storage/resource bounds, read-only donor, fresh private output, and native caller ownership capture. Source inspection only. No Cargo resolution or tests. Use retained signed/kummer packets as primary sources; KB unavailable. Initial containment findings sent to author before execution.

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T21:10:44Z",
+ "id": "PCC-20261116-f44cc0",
+ "kind": "statement",
+ "producer": {
+  "commit": "c4a33666b2864399af234771b67ac1b3fa088267",
+  "model": "Codex",
+  "session": "trace-accelerated-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/SOURCES_v2.sha256",
+    "sha256": "7fa7de0440d923e0fdb382f47a88add5fa35569f1810f8a990326a4ed6609a90"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/sparse-source-check.json",
+    "sha256": "a2dc809eef5daea869ec21690663deb0e9ddb711101e113ca32dd0b02c319f99"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/accelerated/development/sparse-source-check.txt",
+    "sha256": "84f24dadf1a791523b9cbdb6e8b0e4fe488e0315317226eab88c179cd4e43a60"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/accelerated",
+ "statement": "Before any accelerated paid allocation, a separate fresh sparse checkout of c4a33666b2864399af234771b67ac1b3fa088267 using read-only local Git object alternates and corrected bootstrap-v2 patterns passes the complete SOURCES_v2 checksum list, including both workflow files and the standalone Rust lockfile. This asserts checkout/manifest coverage only, not successful object transfer, Runpod execution or runtime improvement. The original first-snapshot manifest and scientific kernels/development evidence remain unchanged."
+}

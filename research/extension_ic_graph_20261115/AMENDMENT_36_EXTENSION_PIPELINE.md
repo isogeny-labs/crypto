@@ -1,0 +1,26 @@
+# Verified quadratic remainders in the scalar-recovery pipeline
+
+Trial40 demonstrated206verified class-cancellation rows contributing to homogeneous rank491. This next experiment integrates the actual producer into the IC library and tests a fresh complete solve. No40component subtraction, repricing or composition is used to predict the result.
+
+| Requested work | Concrete implementation / evaluation |
+|---|---|
+| Rust only science | Production principal certificates/graph collection/kernel/affine recovery; native independent checker |
+| Integrate existing IC | Optional run_extension_remainder_dlp_on reuses existing univariate sieve, counted incremental RREF, checked homogeneous quotient, Nagao decomposition and verified descent |
+| Preserve protected target | Affine coefficient−b and RHS a; two-column kernel-scale/target solve; final elliptic replay |
+| Compare other IC/rho | Same compiled public-input worker: original IC, matched full-smooth producer, remainder graph producer, and the four registered plain/negation × batch1/16 native rho configurations |
+| Runpod measurements | One cold round,0warm/retry, all7arms attempted after any worker failure; CPU4vCPU8GiB<=0.40USDh with7200s deletion guardian |
+| Exact evidence | Published source/spec/binaries before sole call; every source/Cantor/witness/rank/kernel/descent/affine/target/counter check; original argv/status/raw/custody and inspected report |
+
+The frozen recipe is extension-pipeline-plan.json: fresh p1009seed389 held-out planted fixture, separate public input file with no answer field; workers rebuild the transfer with Spec.d=0. Neither new producer reads Spec.d. Both producer arms cold-build the same full Fp base from seed^0xBACE0001, share a source-independent line enumeration seed, and use separate extraction RNGs. Both maintain actual homogeneous rank and stop at a complete1024B batch only when rank reaches base_size−1, full p²B exhaustion, or65536sources.
+
+The candidate's exact mathematical construction matches40: F=A²−C²H, distinct supported points, irreducible quadratic U, V=−A/C modU and V²=H modU; signed canonical classes produce original-source witnesses. The old full-smooth extractor is the paired producer control. The ready actual RREF supplies the checked normalized one-dimensional kernel. Existing Nagao decompositions and verified_descent bind aG+bQ to six base classes; coefficients project to(kernel-scale,−b), RHS a. Only actual target determination followed by elliptic replay ends the solve. All kernel/projection algebra and known state events are charged; remaining native gaps stay explicit. No original-IC fallback.
+
+The full qualifier has a separate ordinary-u128/Cantor backend: every original norm/source/class/support, every graph witness and homogeneous rank/product prefix, normalized kernel and initialization events, actual descent equations and residual-stream labels, every affine projection/rank/product/target prefix, unreduced full-matrix target, final elliptic replay and all observed LA primitive conservation. The paired producer arms must have identical normalized kernel, descents/affine rows, post-collection LA and every other primitive phase apart from relations and collection LA. Original IC is independently repriced/replayed; each rho run binds actual executed options and native calibration/phase counters. All7must recover the held-out answer for a qualified packet. Failures remain original failures, without retries or omitted later arms.
+
+Controls are scoped to the changed mechanism and capture path. The production mathematical helper copies40's checked constructor with crate import adaptation;40original source/data remain unchanged. Existing quotient helper is shared between old and new production paths. JSON output uses a buffered Rust writer for every method; this changes capture overhead without changing the primitive interval or arithmetic. Process wall remains practicality only and includes output.
+
+Worker limits600s, fixture60s, whole4500s, qualifier900s, memory8GiB, allocation7200s. No paid allocation during builds. Immutable capture refuses a second scientific dispatch. Collect and hash originals before immediately deleting the owned runner and confirming absence. Preserve timeouts, OOMs, unsuccessful fixture/worker/qualifier statuses and unattempted dependencies; no success is inferred from a launched run.
+
+Scope: one fresh public-only planted validation target in the restricted weak Fp⁶ family, not unknown-log T1. Registered rho reference scope is the four configurations already exercised in34; no global parameter optimum is claimed. Native container/control/scan/PRNG/fixed-factor/hash/serialization gaps keep all complete totals/bands/ratios null and every full-cost ranking ineligible. No rho-parity conclusion is admitted from incomplete subtotals. The user’s broader objective remains active.
+
+Prior work/source basis remains the Joux–Vitse primary paper §§3.2–3.3/6, LEAD_EXTENSION_QUADRATIC_REMAINDERS.md and40qualified packet. KB unavailability receipts remain explicit. No novelty/asymptotic transfer claim. Canonical experiment schemas remain encrypted/unavailable; native export labels that gap. No independent signed verdict is claimed.
