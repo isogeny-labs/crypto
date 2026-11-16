@@ -1,3 +1,234 @@
+# Resume: rootfinding first-independent collector on codex/rootfind-multihit-relations-20261116
+
+This top section is the current handoff for the worktree and PR #4421. The
+complete earlier resume text follows under "Preserved prior task notes"; its
+three merge-marker lines were removed while retaining both conflicting sides.
+The untouched original is saved locally at
+`.resume/RESUME.before-rootfind-20261116.md` with SHA-256
+`97231b21e85008f87510f5ceb3a88531ee6446c8681d61c67e00c56ee77088c0`. Earlier task status has not been independently refreshed.
+
+## Goal
+Continue the rootfinding ECDLP index-calculus work until an exact matched
+complete-call result is faster than F4/F5/F6; the current bounded task is the
+first-independent relation-collection screen in PR #4421.
+
+## Lead / hypothesis
+The batch oracle returns the first verified triple even if its relation is
+dependent. `research/rootfind_first_independent_20261116/PROTOCOL.md` freezes a
+policy that continues the same residual until the first independent row and
+compares first-hit and all-hit controls on public K13/K19/K23 streams.
+
+## Spec
+`research/rootfind_first_independent_20261116/PROTOCOL.md`, frozen at commit
+`0e413634e86a9358d431aaf2e0a3dc77ce5e9b40`; source commit
+`83407456e0f052d4cf51d533b1fda824063b2287`; pinned harness commit
+`ea2fc503bfb431f1b2ad7f5a9ec24c1241fcba9f`; archived result commit
+`6322b6d89f`. PR #4421 is the publication surface.
+
+## State
+The release harness compiled with `--locked --no-run`; executable SHA-256 is
+`f58ad80e4402725f22ee51dfe14db1b8bb0af12a2c56f22cddbbf6de5b6c0247`.
+The frozen first-independent screen ran once at 2026-11-16T13:42:02Z from
+the source-bound executable and passed 1/1. K13/K19/K23 first versus
+candidate modeled group additions to full rank were 963/991,
+14203/15337 and 128211/144219; the candidate missed its operation
+prediction in all three fixed streams. Raw `run.meta`, `run.stdout`,
+`run.stderr`, derived `RESULTS.json`, the editable diagram/chart, and the
+inspected two-page PDF are committed under
+`research/rootfind_first_independent_20261116/`. Raw/executable hashes and
+operation arithmetic passed separate checks. The full development
+library suite ended 6416 passed, 16 failed, 135 ignored; raw logs and
+scoped reruns are retained in that study's `TEST_STATUS.json`.
+The frozen EKS F4/F5/F6 panel remains budget-gated: the correct AWS account's
+latest observed monthly actual was USD 2094.914 against USD 1300.
+
+## Next steps
+1. Push the archived branch and update existing PR #4421 with the three-cell
+   operation result, validation scope and PDF link.
+2. Keep first-independent out of the production collector: the frozen
+   operation prediction failed on all three registered streams.
+3. Recheck live correct-account daily and monthly budgets before any EKS
+   F4/F5/F6 panel submission; do not launch while either is exhausted.
+4. When budget and isolation admit the panel, compare complete same-target
+   calls with independent replay and priced setup, relation, rank, verification
+   and failed attempts. The production collector paths are still held by
+   Conductor T-6708 and today's shared session log by T-6720.
+
+## Runs in flight
+None for this branch. The source-bound test executable is at
+`/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_first_independent-0455cb05dd584dab`.
+No PID or cloud job exists for this screen.
+
+## Stop and success conditions
+Stop on checkpoint refusal, wrong curve/base identity, wrong answer, failed
+relation re-addition, inconsistent row, timeout, or missing raw output; retain
+all failures. The fixed screen succeeds only when all three curves complete
+and every full-rank arm verifies scalar 641. A candidate operation gain
+requires fewer modeled group additions than first-hit on the fixed stream;
+only the frozen complete-call L2 F4/F5/F6 panel can decide the larger goal.
+
+## Preserved prior task notes
+
+The following notes are historical and have not been revalidated in this
+session. They are retained so checkpoint repair loses no preceding handoff.
+
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
+
+Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
+C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
+research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
+Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
+Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
+None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
+Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
+
+---
+
+# Current chord proof task - source only
+Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
+The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
+research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
+New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
+None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
+Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
+
+# Preserved incoming resume (historical task state)
+# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
+
+
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
+
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
+
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
+
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
+
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
+
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+## Open questions
+- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
+- /home/user/crypto-autoresearcher is half-switched, pending the owner.
+
+# Preserved previous branch resume (historical task state)
+# Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
+
+Complete the arity dimension of elliptic-curve index calculus with the
+preregistered cells no record covers: PKM prime towers at m = 5 (N = 10, 15,
+20); chained-S3 SAT with a Frobenius-union base at m = 5 and 6 on Koblitz
+n = 23..41; the same at n = 83 with the cell cap lifted to 1800 s. Study
+directory `research/arity_completion_20261104/` (README there), PR #3378.
+
+Prime towers: D(m=5, N=10) in {6, 7}, D(m=5, N=15) in {7, 8}, D(m=5, N=20)
+>= 8 or capped; tower kind does not change D; N = 15 finishes in 7200 s and
+8 GiB. Kill: D >= 8 at N <= 15 closes m = 5 on prime towers.
+Koblitz: m = 5, 6 decide at n = 23 within 600 s for S = 2; cost grows so that
+n = 37, 41 cap at m = 6; planted controls always recover; n = 83 stays
+undecided at 1800 s; no decided query at n >= 31 under the 188 s m = 4
+root-table parity point. Kill: K4 and K5 both supported.
+
+- `research/arity_completion_20261104/prime_tower_m5/protocol.json`, frozen at
+  commit 1fd6ece55f (sha 2b82eecd…); commands in arms[*].instrument.flags.
+- `research/arity_completion_20261104/koblitz_m5_m6/protocol.json` + grid.tsv
+  + run_shard.sh (freeze block records its commit once frozen).
+- Cards: `research/arity_completion_20261104/cards/CARD-arity-prime-m5-*.yaml`
+  (lint CARD OK); Koblitz cards follow the same pattern after its freeze.
+- Instruments: `examples/pkm_tower_pilot.rs` (engine tower, p 2013265921),
+  `examples/n83_msweep_cell.rs` (chain-s3 and chain-s3-orbit, union:S base).
+
+- Protocols validated with crypto-autoresearcher tools/experiment_protocol.py
+  (main commit, files fetched raw); prime-tower frozen before data.
+- No cell has run. Development release builds in /dev/shm only.
+- Launch gates fail in the authoring container: STS InvalidClientTokenId, no
+  checkpoint upload token (problems/arity-completion-launch-gates.md).
+
+1. From a session with account 104186811093 (or an upload token): push this
+   checkpoint, run the build cards, re-dispatch the director with the binary
+   sha256 for the cell cards, submit through isolab-eks per AGENTS.md §9a.
+2. Run controls first; a failed control voids the study (both protocols).
+3. analyze.py per study; export with experiment_protocol.py from-rows;
+   report, figure, PDF; no leaderboard row (stage diagnostics).
+4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
+
+Multi-curve re-baseline done (PCC-20261105-37a78d): plateau 1.57-1.91x rho across five family curves per size; next: owner decision or new structural idea.
+Specs: research/curve25519_autolab_20261104/multicurve/spec-k*.json (frozen before data); siblings from `curve25519_family siblings`. Binaries rebuilt from main.
+After it: add-raw, metric per size (mean S/rho over curves and its curve-to-curve spread), close the record, pcc claim, README row, commit, PR. If the incumbents' ratios move materially, update the ledger incumbents and OBSTRUCTION.md.
+
+Stop: per-cell caps in the protocols; Part A stops at a given m after two
+consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
+decided cell with a verified planted control; the preregistered kill criteria
+close the respective m >= 5 lines. No cap is raised after the freezes.
+
+# Round 5 (2026-11-04, written before any round-5 run): solver side
+
+## Derived first (no runs; awk on recorded logs)
+- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
+- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
+
+## Test H: character-hybrid on the separators
+Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
+2 branches per separator.
+- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
+- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
+- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
+- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
+
+## Round 5, test H outcome (recorded before test L)
+- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
+- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
+- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
+
+## Test L (fat-leaf tree, written before any L run)
+- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
+- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
+- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
+- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
+
+## Test Y (function coupling, written before any Y run)
+- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
+- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
+- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
+- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
+- Cells: m3 at t4 and t5, k0.
+
+## Round 6 (2026-11-04): local long run of the P2 cell m5 t4 (written before the run)
+- The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
+- Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
+- Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
+
+## Round 7d: decisive Riemann–Roch cell (written before the run)
+- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
+- Reading, from round7_rr's kill criterion:
+  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
+  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
+  - D_RR ≥ 9 means no gain at m = 5.
+  - Cut off again: undecided.
+
+## Round 7e: E1Q at m4 t5 (written before the run)
+- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
+- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
+- Reading:
+  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
+  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
+
+
+# Current twist proof continuation, 2026-11-06
+All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
+
+New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
+=======
 # Resume: mathematical 10x hyperelliptic IC goal
 
 ## Goal
@@ -3731,7 +3962,6 @@ Stop each stage at600s and the focused scientific window at3600s. No paid comput
 
 
 
-<<<<<<< HEAD
 - Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
 - /home/user/crypto-autoresearcher is half-switched, pending the owner.
 
