@@ -204,8 +204,19 @@ pub struct F4Stats {
     pub pairs_left: u64,
 }
 
-/// The largest matrix a step may build, in 64-bit words (1 GiB).
+/// The largest matrix a step may build, in 64-bit words (1 GiB), unless
+/// `F4_F2_MAX_MATRIX_WORDS` raises or lowers it for one run.
 pub const MAX_MATRIX_WORDS: u64 = 1 << 27;
+
+fn max_matrix_words() -> u64 {
+    static CAP: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+    *CAP.get_or_init(|| {
+        std::env::var("F4_F2_MAX_MATRIX_WORDS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(MAX_MATRIX_WORDS)
+    })
+}
 
 const NONE: u32 = u32::MAX;
 pub const MATRIX_PROFILE_BINS: usize = 6;
@@ -463,7 +474,6 @@ impl Columns {
     }
 
     fn unpack(&self, row: &Row, n_vars: usize) -> F2BoolPoly {
-        let mut monos = Vec::new();
         // one test a word, one extraction a set bit, then the canonical
         // rebuild of the term list
         let set: u32 = row.bits[row.start..row.end]
@@ -473,6 +483,8 @@ impl Columns {
         tally::word_ops(
             (row.end - row.start) as u64 + u64::from(set) + tally::poly::from_monos(set as usize),
         );
+        // exactly `set` terms: one allocation, no regrowth
+        let mut monos = Vec::with_capacity(set as usize);
         for w in row.start..row.end {
             let mut word = row.bits[w];
             while word != 0 {
@@ -1380,6 +1392,10 @@ struct State {
 #[derive(Default)]
 struct PairSelectScratch {
     dense: Option<DensePairSelectScratch>,
+    /// The active basis indices of one `insert_core`, rebuilt per call
+    /// and kept for its allocation (not part of the dense scratch's
+    /// reported bytes).
+    active: Vec<usize>,
 }
 
 struct DensePairSelectScratch {
@@ -1628,7 +1644,9 @@ impl State {
         }
 
         // New pairs (h, g): keep one per minimal lcm (chain criterion).
-        let active: Vec<usize> = (0..h).filter(|&g| self.active[g]).collect();
+        let mut active = std::mem::take(&mut self.pair_select_scratch.active);
+        active.clear();
+        active.extend((0..h).filter(|&g| self.active[g]));
         let selected = if dense_pair_select_enabled() && self.n_vars <= 20 {
             select_new_pairs_dense(
                 self.n_vars,
@@ -1641,6 +1659,7 @@ impl State {
         } else {
             select_new_pairs_quadratic(lh, &self.lm, &active, st)
         };
+        self.pair_select_scratch.active = active;
         // Old pairs whose lcm `h` divides strictly on both sides.
         if immediate_filter {
             self.filter_pairs_since(h, st);
@@ -1770,6 +1789,17 @@ pub fn groebner_basis_f4(
         }
     }
 
+    // Per-step buffers, emptied at the top of every step and reused, so a
+    // step allocates them only when it outgrows an earlier one.  Their
+    // contents are each step's own; `lcm_columns` is read only by
+    // membership and through `examined`, whose values `Columns` sorts, so
+    // a reused set's iteration order changes nothing.
+    let mut selected: Vec<Pair> = Vec::new();
+    let mut seen_rows: FxSet<(Mask, usize)> = FxSet::default();
+    let mut half_keys: Vec<(Mask, usize)> = Vec::new();
+    let mut field_keys: Vec<(Mask, usize)> = Vec::new();
+    let mut lcm_columns: FxSet<Mask> = FxSet::default();
+    let mut active: Vec<usize> = Vec::new();
     while !s.pairs.is_empty() {
         if deadline.is_some_and(|d| Instant::now() >= d) {
             st.timed_out = true;
@@ -1778,8 +1808,16 @@ pub fn groebner_basis_f4(
         // the scan for the lowest degree and the partition, one a pair
         tally::word_ops(2 * s.pairs.len() as u64);
         let d = s.pairs.iter().map(|p| p.deg).min().unwrap();
-        let (selected, rest): (Vec<Pair>, Vec<Pair>) = s.pairs.drain(..).partition(|p| p.deg == d);
-        s.pairs = rest;
+        // the partition in place: both sides keep their order
+        selected.clear();
+        s.pairs.retain(|p| {
+            if p.deg == d {
+                selected.push(*p);
+                false
+            } else {
+                true
+            }
+        });
         st.steps += 1;
         st.degree_reached = st.degree_reached.max(d);
 
@@ -1787,10 +1825,10 @@ pub fn groebner_basis_f4(
         // The rows the step reduces: both halves of every critical pair
         // (their common leading monomial is the lcm, which one half will
         // pivot and the other lose), and every field product.
-        let mut seen_rows: FxSet<(Mask, usize)> = FxSet::default();
-        let mut half_keys: Vec<(Mask, usize)> = Vec::new();
-        let mut field_keys: Vec<(Mask, usize)> = Vec::new();
-        let mut lcm_columns: FxSet<Mask> = FxSet::default();
+        seen_rows.clear();
+        half_keys.clear();
+        field_keys.clear();
+        lcm_columns.clear();
         // the multipliers (an AND-NOT each) and the hashed row and lcm sets
         for p in &selected {
             match p.kind {
@@ -1856,7 +1894,8 @@ pub fn groebner_basis_f4(
 
         // Symbolic preprocessing.  Every monomial other than an S-pair's
         // lcm is examined once; a divisible one gets a reducer led by it.
-        let active: Vec<usize> = (0..s.polys.len()).filter(|&g| s.active[g]).collect();
+        active.clear();
+        active.extend((0..s.polys.len()).filter(|&g| s.active[g]));
         tally::word_ops(s.polys.len() as u64);
         let mut no_divisor = MonomialSeen::new(n_vars);
         // The first level: every monomial of the S-rows but the lcms.
@@ -1997,10 +2036,10 @@ pub fn groebner_basis_f4(
         let n_rows = reducers.len() + half_rows.len() + field_rows.len();
         let cols = Columns::from_monomials(examined.into_values());
         let words = cols.words() as u64;
-        if words * n_rows as u64 > MAX_MATRIX_WORDS {
+        if words * n_rows as u64 > max_matrix_words() {
             st.oversize = true;
             st.build_ns += t.elapsed().as_nanos() as u64;
-            s.pairs.extend(selected);
+            s.pairs.extend_from_slice(&selected);
             break;
         }
         st.matrix_rows_max = st.matrix_rows_max.max(n_rows as u64);

@@ -1,0 +1,15 @@
+name = "finite_fourier_upper_bound_audit"
+version = "0.1.0"
+defaultTargets = ["FiniteFourierUpperBoundAudit"]
+
+[[require]]
+name = "walk_character_audit"
+path = "../../walk_character_audit_20261114/lean"
+
+[[require]]
+name = "hildebrand_cell_audit"
+path = "../../hildebrand_cell_audit_20261114/lean"
+
+[[lean_lib]]
+name = "FiniteFourierUpperBoundAudit"
+roots = ["FourierAlgebra", "TVDistance", "WalkUpperBound", "NormalizationControl", "UpperBoundCertificate"]

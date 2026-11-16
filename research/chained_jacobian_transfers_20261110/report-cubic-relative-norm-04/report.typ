@@ -1,0 +1,43 @@
+#set page(paper: "a4", margin: 17mm)
+#set text(size: 10pt, font: "DejaVu Sans")
+#set par(justify: false, leading: 0.6em, spacing: 0.7em)
+#set heading(numbering: none)
+= Full cubic relative norm and trace at223
+#text("The complete three-conjugate product equals the embedded determinant norm under CommRing R, characteristic223 and z³=3. Both unchanged original Lean4.35/4.34.1 gates pass55 audited/0 failing/0 trusted. Fourteen new named statements have complete original PCC bindings, data60bdae. Claims remain unsigned. [pcc:unverified]")
+
+== Full expressions and cofactor
+#text("Let e be the canonical Fin223 embedding and E=e(a)+e(b)z+e(c)z². The exact frozen03 prefix supplies full q-power transport and derived encoding injectivity. Put q=223. [pcc:unverified]")
+#table(columns: (28%,72%), inset: 6pt,
+ [Coefficient cofactor P], [(a²−3bc, 3c²−ab, b²−ac)],
+ [Base norm n], [a³+3b³+9c³−9abc],
+ [Two conjugates], [E^q · (E^q)^q = E(P)],
+ [Cofactor identity], [E · E(P) = e(n)],
+ [Full relative norm], [E · E^q · (E^q)^q = e(n)],
+ [Full additive trace], [E + E^q + (E^q)^q = e(3a)],
+)
+#text("Embedding transports coefficient operations; the cubic relation reduces the products to P. Multiplying by E produces the determinant norm already used by the frozen cubic non-square obstruction. Explicit reassociation and the two cofactor identities prove the complete relative norm. No field or domain hypothesis is assumed. [pcc:unverified]")
+
+#image("cofactor-to-norm.svg", width: 100%)
+== Conditional two-sided inverse
+#text("If a supplied s in Fin223 satisfies s·n(x)=1, then E(x)·E(sP(x))=1 and E(sP(x))·E(x)=1. Scalar encoding and the cofactor identity prove this implication; the desired ambient inverse is not assumed. This is the algebraic structure used by original Kf::inv. The nonzero-norm guarantee and native program refinement remain open. [pcc:unverified]")
+
+#pagebreak()
+= Exact bindings, controls and scope
+#table(columns: (44%,56%), inset: 6pt,
+ [Fourteen new named statements], [Exact role],
+ [Four embedding statements], [Zero/one, negation, subtraction and constants3/9.],
+ [Product and scalar encoding], [Full schoolbook coefficient product and scalar multiplication agree with ambient multiplication.],
+ [Four cofactor/norm/trace statements], [Two conjugates yield P; E·E(P)=e(n); full relative norm and additive trace.],
+ [Norm multiplicativity], [n(x·y)=n(x)n(y) in the coefficient model.],
+ [Conditional inverse], [A certified base-norm inverse gives both ambient inverse identities.],
+ [Two controls], [Norm nonadditivity; zero norm excludes every base inverse certificate.],
+)
+#text("The nonadditivity control gives n(2,0,0)=8 versus n(1,0,0)+n(1,0,0)=2 modulo223. The zero control gives n(0,0,0)=0 and no s with s·n=1. No223³ population is enumerated. A multiplicative algebra norm does not thereby define an additive elliptic/Jacobian group map or an ECDLP transfer. [pcc:unverified]")
+
+== Original gates and rejected first source
+#text("The full source has49 named declarations and six generated equations, hence55 audited. Each unchanged original gate uses one worker/120s/original proof memory defaults; only propext,Classical.choice,Quot.sound occur. Source SHA256: e804f278901b824feaa29361636ba5c6f20dc41015a72a0196816d6df13556e7. Exact03 prefix9bd383b7 and all fourteen complete bindings are frozen in cubic-relative-norm-final-03. [pcc:unverified]")
+#text("First Root attempt8a55c6 failed1: grind expanded nested powers beyond polynomial degree49,952 and its failed theorem printed sorryAx. Complete rejected source/9,108B output remain immutable. Explicit reassociation/cofactor rewrites repair only the derivation; the theorem and original gates are unchanged. [pcc:unverified]")
+
+== Remaining bridges
+#text("Actual extension-field construction, nonzero-norm guarantee for nonzero inputs, original UInt64/powmod/compiler/counter correspondence, global Jacobian maps and admitted matched construction/transfer/solve/recovery costs remain separate. No native program, population, benchmark or paid launch was run. Original LP60/240/62 and original360/witness/seven controls/feedback/post remain unexecuted. [pcc:unverified]")
+#text("Sources: exact03/02/determinant/word and whole original common.rs832fd288; actual Lean4.34/4.35 characteristic/power/mul_assoc interfaces. Preregistrationa4c32b includes the competing hypothesis and controls. KB/conductor127, locked atlas unread, no novelty/absence inference. Canonical chain/cubic/F101 prime-field graphs remain unchanged: no geometric edge or cost was added. [pcc:unverified]")

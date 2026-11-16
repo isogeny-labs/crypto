@@ -1,0 +1,17 @@
+digraph norm_pipeline {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.32", fontname="DejaVu Sans", fontsize=13,
+         label="Shared norm IC • fixed F17 fixture • PCC-20261115-be28ec (unverified)", labelloc=t];
+  node [shape=box, style="rounded,filled", color="#36566f", fillcolor="#eef4f8", fontname="DejaVu Sans", fontsize=11, margin="0.16,0.10"];
+  edge [color="#36566f", arrowsize=0.7];
+  public [label="Public curve, P and point Q\nFactor X^8−1 and lift roots; no base logs", URL="norm_algebraic.cpp"];
+  mixed [label="Draw a,b; R=aP+bQ\nOracle receives R only", URL="norm_algebraic.cpp"];
+  norm [label="Unknown norm coefficients + retained remainders\nOriginal mode or witness-pruned mode\nPruned: retain target separation; require c≠0", URL="chart-pruning.md"];
+  backend [label="Pinned native msolve\n20s / 2GiB per call; failures → unknown", fillcolor="#fff1d6", URL="PROTOCOL.md"];
+  extract [label="Dual quotient coordinate eigenspaces\nCheck original equations, roots and group sum", URL="quotient_extract.cpp"];
+  rows [label="B+1 signed relations → left kernel of C only\nk=−alpha/beta; restart on beta=0; check kP=Q", URL="norm_algebraic.cpp"];
+  replay [label="Separate OpenSSL replay\n90 complete sets / 400 models\n18 cold targets / 72 relations / 18 kernels", fillcolor="#e1f1ea", URL="replay.cpp"];
+  open [label="Growing-family obligation remains\nInitial basis cost + useful yield + all failed calls\nSmall final quotient does not bound construction", color="#ad6b25", fillcolor="#fff1d6", URL="../prime_one_shot_20261029/continuation/theory/initial-elimination-obligation.md"];
+  public -> mixed -> norm -> backend -> extract -> rows;
+  rows -> replay [label="bounded controls", fontsize=10];
+  backend -> open [style=dashed];
+}

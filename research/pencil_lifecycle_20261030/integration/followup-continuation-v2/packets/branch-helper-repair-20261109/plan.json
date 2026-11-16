@@ -1,0 +1,52 @@
+{
+  "schema": "research.replay-plan-draft/v1",
+  "status": "prospective_source_only_not_released",
+  "source_sha256": "e824907afcd8e34329dca5119232737a39caaf1b2c24e63daa86f8834d1195fd",
+  "statements_changed": false,
+  "calls": [
+    "BranchRootMultiplicity",
+    "BranchCoefficientMultiplicity",
+    "IndependentControls",
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "expected_exits": [
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "final_target_readback_names": 13,
+  "reuse_modules": 13,
+  "reuse_files": 26,
+  "reuse_rules": [
+    "Copy only exact listed13 .olean files into isolated imports directory; never include failed BranchRootMultiplicity artifact.",
+    "Match source hashes to successful call order and frozen v2 sources; hash retained imports before and after.",
+    "Successful prior calls have no sorryAx or errors; all40 printed names have only propext/Classical.choice/Quot.sound. Nonbranch has no named print in this run. Reuse eligibility binds exact .olean bytes independently of source hashes plus exit0/runtime/custody. Final separate target audit covers transitively used declarations; no extra blanket module readback gate.",
+    "Use unchanged runtime and 16736-file baseline closure; verify pre/post runtime/dependency identity.",
+    "Fresh outputs path must precede isolated retained imports then baseline roots; source modules compile in explicit order.",
+    "Original v2 workspace remains immutable. No whole-directory reuse."
+  ],
+  "proposed_seconds": {
+    "pre": 900,
+    "compiler": 600,
+    "post": 900,
+    "total": 2400
+  },
+  "rationale": "Previous14-call compiler phase397.613s is scheduling evidence only. Five calls rebuild corrected helper/target/controls and separate audit/negative control; timeout remains a recorded outcome.",
+  "limits": {
+    "cpu": 1,
+    "memory_gib": 8,
+    "swap": 0,
+    "tasks": 128,
+    "retries": 0,
+    "deadline": "2026-11-10T05:11:39Z"
+  },
+  "ledger_and_release": "Unset. Current prior debit16260 leaves26940 before other launches. Root must bind actual latest ledger and publication after prospective source review.",
+  "remaining": [
+    "Independent review of four proof-only changes and retained-import plan",
+    "Generate/adapt exact runner with safe unique units/workspace and copied retained import byte checks",
+    "Bind current ledger, exact runtime/input hashes, publication and serial terminal readback before execution"
+  ]
+}

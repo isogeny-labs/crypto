@@ -1,0 +1,32 @@
+{
+  "head": "bad7e29b88036dd805bd1d51ab6671442b0d35e2",
+  "base": "dfb70bbdfa1f571d1a96fe461db964df0551feda",
+  "command": [
+    "python3",
+    "tools/benchrec.py",
+    "check",
+    "--base",
+    "dfb70bbdfa1f571d1a96fe461db964df0551feda"
+  ],
+  "started": "2026-11-09T06:07:35.241748+00:00",
+  "finished": "2026-11-09T06:07:35.774070+00:00",
+  "exit": 1,
+  "records": 76,
+  "progress_files": 4,
+  "exact_git_objects_restored": 915,
+  "all_git_objects_equal": true,
+  "archives_restored": 0,
+  "canonical_data_or_rendering_changes": false,
+  "s3_verified": false,
+  "full_object_manifest": {
+    "path": "/workspace/prime-leads-cycle-20261109/benchrec-restored-exact-objects.json",
+    "bytes": 215464,
+    "sha256": "ec449836ae6ec06d48379d9b9ca9e91646f4be76bb3bef02ad80a2f2200080c4"
+  },
+  "output": {
+    "path": "/workspace/prime-leads-cycle-20261109/benchrec-after-restoration.log",
+    "bytes": 297,
+    "sha256": "d1d602bf2b8086251d845d099279930531a2d77d0d9af4db0ccfa5236bd96d0e"
+  },
+  "bounded_output": "FAIL: benchmarks/records/20261105T1826Z-ic-aimed-gather-registry-binding-20261105.json: raw docs/curves/registry.json differs from its recorded sha256\nFAIL: benchmarks/records/20261108T2223Z-pkm-fd-pfd-c.json: still open; close it with benchrec.py close\nbenchrec: 2 problem(s) across 76 record(s)\n"
+}

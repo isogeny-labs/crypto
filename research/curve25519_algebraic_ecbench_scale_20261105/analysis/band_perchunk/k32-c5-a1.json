@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "proj-a",
+      "runs": 1,
+      "verified": 1,
+      "mean_s": [
+        24.035755852734006,
+        26.395064460866507,
+        47.628841934059025
+      ],
+      "charged_sum": 556927.0,
+      "native_sum": 546670,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "rho-neg",
+      "runs": 1,
+      "verified": 1,
+      "mean_s": [
+        1.497101657444315,
+        1.645124352382264,
+        2.9773286068238045
+      ],
+      "charged_sum": 34689.0,
+      "native_sum": 34298,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "proj-a",
+      "b": "rho-neg",
+      "verdict": "rho-neg < proj-a"
+    }
+  ]
+}

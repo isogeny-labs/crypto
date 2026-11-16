@@ -1,3 +1,5 @@
+> **Follow-up, 2026-11-07**: the "Next" item below (why the fused walk needs 1.1-1.3x more steps) is answered in [`../ic_residual_fused_steps_20261107/README.md`](../ic_residual_fused_steps_20261107/README.md): not hash-bit correlation (an independent hash changes the step count by at most about 1%), but coincidence hazard. The baseline's unstored intermediate points still merge walks, so it detects collisions in fewer steps at twice the additions per step. The text below is unchanged.
+
 > **Pricing note**: the w > 0 figures here (fused/baseline 0.91-1.30) price the baseline's table bytes as operations (see `../ic_residual_dp_eq_20261101/README.md`); w = 0 is unaffected.
 
 # Fused residual step (targets=residual-fused): result

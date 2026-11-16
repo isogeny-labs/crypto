@@ -57,7 +57,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves/sources research/quadratic_twist_evidence_20261021
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves/sources/quadratic-twist-native-20261021.json research/quadratic_twist_evidence_20261021
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: '1.99.1'

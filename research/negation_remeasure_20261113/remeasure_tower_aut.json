@@ -1,0 +1,849 @@
+{
+  "args": "Args { sections: [\"tower\"], out_dir: \"research/negation_remeasure_20261113\", tag: \"_aut\", tower_primes: \"251,503,1009,2003,4001,8009,16001,32003,64007\", tower_instances: 3, tower_old_seeds: 0, tower_seeds: 0, tower_rho_seeds: 0, v3_seeds: 8, v3_rho_seeds: 32, cover_primes: \"211,419,821,1619,3203,6421,12841\", cover_seeds: 3, cover_ic_seeds: 8, cover_rho_seeds: 32, threads: 4, max_trials: 40000000, no_calibration: true }",
+  "calibration": {
+    "batch_len": 20000,
+    "batches": 25,
+    "calibrated_reading": "every native class at 0, 1 and 10 times its own w_cal",
+    "definition": "w_cal(class) = time(one native operation of the class) / time(one group addition of the arm's own group), same host and process",
+    "host": {
+      "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+      "cpus": 4,
+      "isolation": "none: shared VM, other processes may run"
+    },
+    "method": "best-of-N timing (not perf-ipc; no isolated host): minimum over batches of ns per operation"
+  },
+  "calibration_skipped": true,
+  "ok": true,
+  "rows": [
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 206
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 100
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 73
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 251,
+      "r_mean": 107.0,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 206,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 0.10033043766666666,
+      "wall_s_max_instance": 0.142383719
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 186
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 152
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 120
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 503,
+      "r_mean": 259.6666666666667,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 186,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 0.13307577333333334,
+      "wall_s_max_instance": 0.137627771
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 125
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 784
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 362
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 1009,
+      "r_mean": 409.0,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 125,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 0.31560472666666667,
+      "wall_s_max_instance": 0.453959715
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 992
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 281
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 1857
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 2003,
+      "r_mean": 1010.3333333333334,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 992,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 0.5454415013333334,
+      "wall_s_max_instance": 0.57996962
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 1203
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 2652
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 2955
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 4001,
+      "r_mean": 1017.6666666666666,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 1203,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 1.9809151366666669,
+      "wall_s_max_instance": 2.425200955
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 3388
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 7824
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 24
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 8009,
+      "r_mean": 3322.3333333333335,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 3388,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 5.014175763,
+      "wall_s_max_instance": 6.164370688
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 14753
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 12478
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 13506
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 16001,
+      "r_mean": 6671.666666666667,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 14753,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 20.996298124333332,
+      "wall_s_max_instance": 28.328912636
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 17129
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 22483
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 19615
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 32003,
+      "r_mean": 13395.0,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 17129,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 132.49105681866666,
+      "wall_s_max_instance": 155.597395982
+    },
+    {
+      "arms": {},
+      "calibration_skipped": true,
+      "class_times_ns": {
+        "canon": 1.0,
+        "draw": 1.0,
+        "hash": 1.0,
+        "insert": 1.0,
+        "inv_r": 1.0,
+        "lookup": 1.0,
+        "mul_p": 1.0,
+        "mul_r": 1.0,
+        "word": 1.0
+      },
+      "curves_checked": [
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 0,
+          "j_invariant": 17143
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 1,
+          "j_invariant": 58484
+        },
+        {
+          "automorphism_beyond_negation": null,
+          "inst": 2,
+          "j_invariant": 8526
+        }
+      ],
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": -0.0,
+      "p": 64007,
+      "r_mean": 26649.666666666668,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 17143,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        },
+        "plain": {
+          "canonicalisations": -0.0,
+          "certified": 0,
+          "dp_inserts": -0.0,
+          "dp_lookups": -0.0,
+          "key_evaluations": -0.0,
+          "kind": "",
+          "native": -0.0,
+          "native_per_step": -0.0,
+          "other_ops": -0.0,
+          "partition_hashes": -0.0,
+          "runs": 0,
+          "steps": -0.0,
+          "total_ops": -0.0,
+          "walk_ops": -0.0,
+          "walk_share": -0.0,
+          "walks": -0.0,
+          "word_ops": -0.0
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 1.0,
+        "J_g2": 1.0,
+        "J_g3": 1.0
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 454.7794598586667,
+      "wall_s_max_instance": 459.708933071
+    }
+  ],
+  "section": "tower",
+  "wall_s": 462.414186773
+}

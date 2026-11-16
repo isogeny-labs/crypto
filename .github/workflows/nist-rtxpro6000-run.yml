@@ -19,6 +19,7 @@ jobs:
       - name: Check Modal credentials
         id: creds
         run: |
+          set -o pipefail
           if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
@@ -31,11 +32,15 @@ jobs:
       - name: Device validation
         if: steps.creds.outputs.available == 'true'
         working-directory: gpu/nist
-        run: modal run modal_app.py::validate 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/validate.log
+        run: |
+          set -o pipefail
+          modal run modal_app.py::validate 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/validate.log
       - name: RTX PRO tournament
         if: steps.creds.outputs.available == 'true'
         working-directory: gpu/nist
-        run: modal run modal_app.py::tune --repeats 3 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/tune.log
+        run: |
+          set -o pipefail
+          modal run modal_app.py::tune --repeats 3 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/tune.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
