@@ -8,6 +8,38 @@ pub struct PairCandidate {
     pub cubic_difference: Row,
     pub cubic_syzygy: Row,
 }
+/// Exact f3 recognition without constructing unused cubic consequences.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct PairMetadata {
+    pub inputs: [usize; 2],
+    pub variables: [usize; 2],
+}
+pub(crate) fn pair_metadata(inputs: &[Poly], n: usize, p: u64) -> Vec<PairMetadata> {
+    if p == 2 {
+        return Vec::new();
+    }
+    let recognized: Vec<_> = inputs
+        .iter()
+        .enumerate()
+        .filter_map(|(i, f)| recognize(f, i, n, p))
+        .collect();
+    let mut used = BTreeSet::new();
+    let mut pairs = Vec::new();
+    for (i, left) in recognized.iter().enumerate() {
+        for right in &recognized[i + 1..] {
+            if (left.indices, left.a, left.b) == (right.indices, right.a, right.b)
+                && left.z != right.z
+                && used.insert((left.indices, left.a, left.b))
+            {
+                pairs.push(PairMetadata {
+                    inputs: [left.input, right.input],
+                    variables: left.indices,
+                });
+            }
+        }
+    }
+    pairs
+}
 fn plus_row(a: &mut Row, b: &Row, factor: u64, p: u64) {
     axpy(&mut a.poly, &b.poly, factor, p);
     axpy(&mut a.proof, &b.proof, factor, p);

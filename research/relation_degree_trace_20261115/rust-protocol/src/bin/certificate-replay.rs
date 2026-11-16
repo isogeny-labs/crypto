@@ -18,12 +18,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     let system: System = serde_json::from_slice(&read(&args[2], 4 * 1024 * 1024)?)?;
     let bytes = match args[1].as_str() {
         "produce" => {
-            let compact = match args[3].as_str() {
-                "compact" => true,
-                "expanded" => false,
-                _ => return Err("unknown constructor".into()),
-            };
-            serde_json::to_vec_pretty(&replay::produce(&system, compact)?)?
+            if args[3] == "compact-sparse" {
+                serde_json::to_vec(&replay::produce_sparse(&system)?.witness)?
+            } else if args[3] == "compact-product" || args[3] == "expanded-product" {
+                serde_json::to_vec(&replay::produce_product(
+                    &system,
+                    args[3] == "compact-product",
+                )?)?
+            } else {
+                let compact = match args[3].as_str() {
+                    "compact" => true,
+                    "expanded" => false,
+                    _ => return Err("unknown constructor".into()),
+                };
+                serde_json::to_vec_pretty(&replay::produce(&system, compact)?)?
+            }
         }
         "script" => replay::singular_script(
             &system,
@@ -48,14 +57,18 @@ fn main() -> Result<(), Box<dyn Error>> {
             )?
             .into_bytes()
         }
-        "import" => {
+        "import" | "import-product" => {
             let members = external_certificate::parse(
                 std::str::from_utf8(&read(&args[3], 16 * 1024 * 1024)?)?,
                 system.variables.len(),
                 system.prime,
                 system.polynomials.len(),
             )?;
-            serde_json::to_vec_pretty(&replay::complete(&system, Vec::new(), members)?)?
+            if args[1] == "import-product" {
+                serde_json::to_vec(&replay::complete_product(&system, Vec::new(), members)?)?
+            } else {
+                serde_json::to_vec_pretty(&replay::complete(&system, Vec::new(), members)?)?
+            }
         }
         _ => return Err("unknown mode".into()),
     };

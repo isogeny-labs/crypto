@@ -26,7 +26,16 @@ pub struct Member {
 pub struct PairReduction {
     pub left: usize,
     pub right: usize,
+    /// Checked Buchberger product criterion; never a producer-only assertion.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub product_criterion: bool,
     pub proof: Vec<CofactorTerm>,
+}
+fn is_false(value: &bool) -> bool {
+    !*value
+}
+fn coprime(a: &Mono, b: &Mono) -> bool {
+    a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0)
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -79,6 +88,35 @@ fn quotient_witness(target: Poly, reducers: &[Row], p: u64) -> Result<Vec<Cofact
 }
 /// Build all witnesses from a constructor's already checked basis, with no oracle.
 pub fn produce(system: &System, compact: bool) -> Result<Witness, String> {
+    produce_impl(system, compact, false)
+}
+/// Opt-in shorter replay, with the same constructor and complete answer.
+pub fn produce_product(system: &System, compact: bool) -> Result<Witness, String> {
+    produce_impl(system, compact, true)
+}
+#[derive(Serialize)]
+pub struct SparseWitness {
+    pub witness: Witness,
+    pub constructor: quotient::compact::Info,
+    pub subset_succeeded: bool,
+    pub subset_error: Option<String>,
+}
+pub fn produce_sparse(system: &System) -> Result<SparseWitness, String> {
+    let input = system.decode()?;
+    let output = quotient::compact::solve_sparse(&input, system.variables.len(), system.prime)?;
+    let certificate = output.output.certificate;
+    Ok(SparseWitness {
+        witness: complete_product(
+            system,
+            certificate.definitions.iter().map(member).collect(),
+            certificate.basis.iter().map(member).collect(),
+        )?,
+        constructor: output.output.info,
+        subset_succeeded: output.subset_succeeded,
+        subset_error: output.subset_error,
+    })
+}
+fn produce_impl(system: &System, compact: bool, product: bool) -> Result<Witness, String> {
     let input = system.decode()?;
     let n = system.variables.len();
     let p = system.prime;
@@ -90,10 +128,11 @@ pub fn produce(system: &System, compact: bool) -> Result<Witness, String> {
             basis: quotient::solve(&input, n, p)?.0,
         }
     };
-    complete(
+    complete_impl(
         system,
         certificate.definitions.iter().map(member).collect(),
         certificate.basis.iter().map(member).collect(),
+        product,
     )
 }
 /// Complete witnesses for independently produced membership rows. No supplied
@@ -102,6 +141,23 @@ pub fn complete(
     system: &System,
     definitions: Vec<Member>,
     basis: Vec<Member>,
+) -> Result<Witness, String> {
+    complete_impl(system, definitions, basis, false)
+}
+/// Opt-in completion for mature producers; product-criterion acceptance is
+/// checked by the same consumer used for locally constructed witnesses.
+pub fn complete_product(
+    system: &System,
+    definitions: Vec<Member>,
+    basis: Vec<Member>,
+) -> Result<Witness, String> {
+    complete_impl(system, definitions, basis, true)
+}
+fn complete_impl(
+    system: &System,
+    definitions: Vec<Member>,
+    basis: Vec<Member>,
+    product: bool,
 ) -> Result<Witness, String> {
     let n = system.variables.len();
     let p = system.prime;
@@ -119,6 +175,7 @@ pub fn complete(
             pairs.push(PairReduction {
                 left,
                 right,
+                product_criterion: false,
                 proof: Vec::new(),
             });
         }
@@ -144,6 +201,15 @@ pub fn complete(
         .map(|f| quotient_witness(f, &reducers, p))
         .collect::<Result<_, _>>()?;
     for row in &mut witness.pair_reductions {
+        if product
+            && coprime(
+                lead(&reducers[row.left].poly),
+                lead(&reducers[row.right].poly),
+            )
+        {
+            row.product_criterion = true;
+            continue;
+        }
         let target = s_polynomial(&reducers[row.left], &reducers[row.right], p).poly;
         row.proof = quotient_witness(target, &reducers, p)?;
     }
@@ -372,6 +438,18 @@ pub fn singular_script(system: &System, witness: &Witness) -> Result<String, Str
             let a = lead(&basis[left]);
             let b = lead(&basis[right]);
             let lcm: Mono = a.iter().zip(b).map(|(x, y)| (*x).max(*y)).collect();
+            if row.product_criterion {
+                if !row.proof.is_empty() || !coprime(a, b) {
+                    return Err("replay: invalid product criterion".into());
+                }
+                // The actual leading monomials are already bound above. Check
+                // the product criterion again in the arithmetic consumer.
+                script += &format!(
+                    "if(leadmonom(g{left})*leadmonom(g{right})!={}){{print(\"REPLAY_FAIL:product\");quit;}}\n",
+                    mono(&lcm)
+                );
+                continue;
+            }
             let rhs = budget.cofactor(&row.proof, &basis, &basis_names, Some(&lcm), &mut script)?;
             identity(
                 &mut script,
@@ -497,5 +575,70 @@ mod tests {
         assert!(singular_script(&system, &w)
             .unwrap_err()
             .contains("nonstandard"));
+    }
+    #[test]
+    fn product_criterion_preserves_legacy_wire_and_complete_pair_coverage() {
+        let (system, legacy) = fixture();
+        let short = produce_product(&system, true).unwrap();
+        assert!(!serde_json::to_string(&legacy)
+            .unwrap()
+            .contains("product_criterion"));
+        assert_eq!(
+            serde_json::to_value(&legacy.basis).unwrap(),
+            serde_json::to_value(&short.basis).unwrap()
+        );
+        assert_eq!(legacy.pair_reductions.len(), short.pair_reductions.len());
+        assert!(short.pair_reductions.iter().any(|r| r.product_criterion));
+        assert!(short
+            .pair_reductions
+            .iter()
+            .filter(|r| r.product_criterion)
+            .all(|r| r.proof.is_empty()));
+        assert!(singular_script(&system, &short)
+            .unwrap()
+            .contains("REPLAY_FAIL:product"));
+        let mut bad = short.clone();
+        bad.pair_reductions[0].right = 0;
+        assert!(singular_script(&system, &bad)
+            .unwrap_err()
+            .contains("index"));
+        let mut bad = short.clone();
+        let row = bad
+            .pair_reductions
+            .iter_mut()
+            .find(|r| r.product_criterion)
+            .unwrap();
+        row.proof.push(CofactorTerm {
+            generator: 0,
+            exponents: vec![0; 3],
+            coefficient: 1,
+        });
+        assert!(singular_script(&system, &bad)
+            .unwrap_err()
+            .contains("product criterion"));
+    }
+    #[test]
+    fn noncoprime_product_marker_is_rejected_by_consumer() {
+        let (system, mut w) = fixture();
+        w.basis.truncate(2);
+        w.pair_reductions.truncate(1);
+        // Placeholders reach the product-shape boundary without stale reducer
+        // indices from the six-row fixture; this script is never executed.
+        w.input_reductions = vec![Vec::new(); system.polynomials.len()];
+        for (row, m) in w
+            .basis
+            .iter_mut()
+            .zip([vec![2, 0, 0], vec![1, 1, 0], vec![0, 0, 1]])
+        {
+            row.polynomial = vec![CanonicalTerm {
+                exponents: m,
+                coefficient: 1,
+            }];
+        }
+        w.pair_reductions[0].product_criterion = true;
+        w.pair_reductions[0].proof.clear();
+        assert!(singular_script(&system, &w)
+            .unwrap_err()
+            .contains("product criterion"));
     }
 }

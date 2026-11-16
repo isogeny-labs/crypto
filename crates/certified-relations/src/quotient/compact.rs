@@ -173,18 +173,50 @@ fn original_bound(row: &Row, bounds: &[usize]) -> usize {
 /// Same polynomial construction as the expanded control, with a different
 /// retained certificate representation. No oracle, witness or hidden fallback.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, false)
+    solve_impl(inputs, n, p, false, false)
+}
+pub struct SparseOutput {
+    pub output: Output,
+    pub subset_succeeded: bool,
+    pub subset_error: Option<String>,
+}
+/// Try a short certified root consequence, then the unchanged full constructor.
+/// Both attempts run in the caller's interval. No output bypasses final checks.
+pub fn solve_sparse(inputs: &[Poly], n: usize, p: u64) -> Result<SparseOutput, String> {
+    match solve_impl(inputs, n, p, false, true) {
+        Ok(output) => Ok(SparseOutput {
+            output,
+            subset_succeeded: true,
+            subset_error: None,
+        }),
+        Err(error) => Ok(SparseOutput {
+            output: solve(inputs, n, p)?,
+            subset_succeeded: false,
+            subset_error: Some(error),
+        }),
+    }
 }
 /// Explicit ablation: eagerly construct every vertex before selecting a root.
 /// Polynomial kernels, proof representation and final checks match solve.
 pub fn solve_all_vertices(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, true)
+    solve_impl(inputs, n, p, true, false)
 }
-fn solve_impl(inputs: &[Poly], n: usize, p: u64, all_vertices: bool) -> Result<Output, String> {
+fn solve_impl(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    all_vertices: bool,
+    subset: bool,
+) -> Result<Output, String> {
     if !admitted(inputs, n, p) {
         return Err("compact: unsupported prime/input shape".into());
     }
-    let (root_row, root, projection_work, pairs) = if all_vertices {
+    let (root_row, root, projection_work, pairs) = if subset {
+        let pairs = cheap::pair_metadata(inputs, n, p);
+        let (row, root, work) = projection::subset_quadratic(inputs, n, p, &pairs)
+            .ok_or("compact: no supported subset vertex")?;
+        (row, root, work, pairs)
+    } else if all_vertices {
         let (projected, vertices, work) = projection::all_quadratic(inputs, n, p);
         let root = vertices
             .into_iter()
@@ -195,12 +227,34 @@ fn solve_impl(inputs: &[Poly], n: usize, p: u64, all_vertices: bool) -> Result<O
             .into_iter()
             .find(|r| is_univariate(&r.poly, root.variable) && degree(&r.poly) == root.degree)
             .ok_or("compact: missing root polynomial")?;
-        (row, root, work, cheap::consequences(inputs, n, p))
+        (
+            row,
+            root,
+            work,
+            cheap::consequences(inputs, n, p)
+                .iter()
+                .map(|pair| cheap::PairMetadata {
+                    inputs: pair.inputs,
+                    variables: pair.variables,
+                })
+                .collect(),
+        )
     } else {
         let pairs = cheap::consequences(inputs, n, p);
         let (row, root, work) = projection::selected_quadratic(inputs, n, p, &pairs)
             .ok_or("compact: no supported certified vertex")?;
-        (row, root, work, pairs)
+        (
+            row,
+            root,
+            work,
+            pairs
+                .iter()
+                .map(|pair| cheap::PairMetadata {
+                    inputs: pair.inputs,
+                    variables: pair.variables,
+                })
+                .collect(),
+        )
     };
     let t = root.variable;
     let mut chain = Chain {
@@ -315,6 +369,47 @@ fn solve_impl(inputs: &[Poly], n: usize, p: u64, all_vertices: bool) -> Result<O
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn sufficient_subset_keeps_full_checked_star_ideals() {
+        for hub in [0, 7] {
+            let edges: Vec<_> = (0..8).filter(|v| *v != hub).map(|v| (hub, v)).collect();
+            let system = workload::generate_graph(2147483647, 8, 7, &edges)
+                .unwrap()
+                .system;
+            let input = system.decode().unwrap();
+            let old = solve(&input, 8, system.prime).unwrap();
+            let new = solve_sparse(&input, 8, system.prime).unwrap();
+            assert!(new.subset_succeeded);
+            assert_eq!(
+                new.output
+                    .certificate
+                    .basis
+                    .iter()
+                    .map(|r| &r.poly)
+                    .collect::<Vec<_>>(),
+                old.certificate
+                    .basis
+                    .iter()
+                    .map(|r| &r.poly)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(old.info.projection_work.edge_resultants, 7);
+            assert_eq!(new.output.info.projection_work.edge_resultants, 2);
+            assert!(verify(&new.output.certificate, &input, 8, system.prime));
+            let metadata = cheap::pair_metadata(&input, 8, system.prime);
+            let cubic = cheap::consequences(&input, 8, system.prime);
+            assert_eq!(
+                metadata,
+                cubic
+                    .iter()
+                    .map(|pair| cheap::PairMetadata {
+                        inputs: pair.inputs,
+                        variables: pair.variables
+                    })
+                    .collect::<Vec<_>>()
+            );
+        }
+    }
     #[test]
     fn research_capacity_is_explicit_and_bounded() {
         for n in [3, 8, 9, 16, 17] {

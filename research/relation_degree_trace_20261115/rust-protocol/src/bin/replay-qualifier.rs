@@ -14,7 +14,7 @@ use std::{
     time::Instant,
 };
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
-fn save(path: &Path, bytes: &[u8]) -> Result<()> {
+pub(crate) fn save(path: &Path, bytes: &[u8]) -> Result<()> {
     fs::File::options()
         .write(true)
         .create_new(true)
@@ -22,7 +22,7 @@ fn save(path: &Path, bytes: &[u8]) -> Result<()> {
         .write_all(bytes)?;
     Ok(())
 }
-fn call(
+pub(crate) fn call(
     exe: &Path,
     args: &[String],
     out: &Path,
@@ -90,7 +90,7 @@ fn unit(index: usize) -> Vec<CofactorTerm> {
         coefficient: 1,
     }]
 }
-fn non_gb() -> (System, Witness) {
+pub(crate) fn non_gb() -> (System, Witness) {
     let p = 2147483647;
     let t = |m: [usize; 3], c: i64| Term {
         exponents: m.to_vec(),
@@ -128,6 +128,7 @@ fn non_gb() -> (System, Witness) {
         pair_reductions: vec![PairReduction {
             left: 0,
             right: 1,
+            product_criterion: false,
             proof: vec![],
         }],
     };

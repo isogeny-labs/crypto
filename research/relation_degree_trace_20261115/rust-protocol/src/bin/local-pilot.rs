@@ -19,6 +19,8 @@ const ARMS: [Arm; 3] = [Arm::F4, Arm::Certified, Arm::Compact];
 const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
 #[path = "../replay_capture.rs"]
 mod replay_capture;
+#[path = "../sparse_capture.rs"]
+mod sparse_capture;
 fn arm_name(a: Arm) -> &'static str {
     match a {
         Arm::F4 => "f4",
@@ -105,6 +107,9 @@ fn prepare(root: &Path, mode: &str) -> Result<()> {
     }
     if mode == "replay-screen" {
         return prepare_graphs(root, true, "replay-screen");
+    }
+    if mode == "sparse-screen" {
+        return prepare_graphs(root, true, "sparse-screen");
     }
     let roster: Vec<_> = match mode {
         "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
@@ -287,7 +292,7 @@ fn prepare_graphs(root: &Path, scale: bool, mode: &str) -> Result<()> {
         fs::create_dir(&dir)?;
         let f = system.decode()?;
         let bytes = serde_json::to_vec(&system)?;
-        if mode == "replay-screen" {
+        if mode == "replay-screen" || mode == "sparse-screen" {
             let declared: Value =
                 serde_json::from_str(include_str!("../../../scale-screen-01/input-manifest.json"))?;
             let expected = declared["cases"]
@@ -750,6 +755,7 @@ fn main() -> Result<()> {
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
     Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
     Some("replay-screen")if a.len()==9=>replay_capture::run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),PathBuf::from(&a[7]),a[8].clone()),
+    Some("sparse-screen")if a.len()==10=>sparse_capture::run(Path::new(&a[2]),Path::new(&a[3]),sparse_capture::Paths{worker:PathBuf::from(&a[4]),legacy_cli:PathBuf::from(&a[5]),fused:PathBuf::from(&a[6]),singular:PathBuf::from(&a[7]),msolve:PathBuf::from(&a[8]),cpu:a[9].clone()}),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]

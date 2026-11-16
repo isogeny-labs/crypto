@@ -24,7 +24,7 @@ fn checked(
     }
     Ok(bytes)
 }
-fn replay(
+pub(super) fn replay(
     r: &Runner,
     cli: &Path,
     system: &System,

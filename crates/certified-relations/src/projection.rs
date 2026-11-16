@@ -284,6 +284,80 @@ pub(crate) fn selected_quadratic(
     }
     None
 }
+/// Opt-in sufficient subset. Full ideal containment is the caller's separate
+/// mandatory obligation; a degree bound alone never certifies completeness.
+pub(crate) fn subset_quadratic(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    pairs: &[cheap::PairMetadata],
+) -> Option<(Row, Vertex, Work)> {
+    let mut cache: Vec<Option<Row>> = vec![None; pairs.len()];
+    let mut work = Work::default();
+    for axis in (0..n).rev() {
+        let incident: Vec<_> = pairs
+            .iter()
+            .enumerate()
+            .filter(|(_, pair)| pair.variables.contains(&axis))
+            .collect();
+        if incident.len() < 2 {
+            continue;
+        }
+        let mut root: Option<Row> = None;
+        let mut count = 0;
+        for (index, pair) in incident {
+            let canonical = cache[index].get_or_insert_with(|| {
+                work.edge_resultants += 1;
+                let row = |i: usize| Row {
+                    poly: inputs[i].clone(),
+                    proof: BTreeMap::from([((i, vec![0; n]), 1)]),
+                };
+                quadratic_resultant(
+                    &row(pair.inputs[0]),
+                    &row(pair.inputs[1]),
+                    pair.variables,
+                    n,
+                    p,
+                )
+            });
+            if canonical.poly.is_empty() {
+                continue;
+            }
+            let oriented = if pair.variables[0] == axis {
+                canonical.clone()
+            } else {
+                swap(canonical, pair.variables[0], pair.variables[1])
+            };
+            assert!(verify(&oriented, inputs, p));
+            count += 1;
+            root = Some(if let Some(previous) = root {
+                gcd(previous, oriented, axis, p)
+            } else {
+                oriented
+            });
+            let r = root.as_ref().unwrap();
+            if count >= 2 && (2..=4).contains(&degree(&r.poly)) {
+                break;
+            }
+        }
+        let Some(root) = root else { continue };
+        let d = degree(&root.poly);
+        if count < 2 || root.poly.is_empty() || !(2..=8).contains(&d) {
+            continue;
+        }
+        work.vertex_gcd_folds += 1;
+        assert!(verify(&root, inputs, p));
+        let vertex = Vertex {
+            variable: axis,
+            incident_projections: count,
+            degree: d,
+            certificate_terms: root.proof.len(),
+            certificate_product_degree: certificate_degree(&root, inputs),
+        };
+        return Some((root, vertex, work));
+    }
+    None
+}
 fn augment_impl(
     inputs: &[Poly],
     n: usize,
