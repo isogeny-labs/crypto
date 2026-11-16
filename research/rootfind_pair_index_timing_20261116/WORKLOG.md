@@ -27,4 +27,7 @@
 
 ### Errors
 
-- None at protocol freeze.
+- The frozen draft described a default `u32` hash reference. A source read
+  before implementation showed that production uses `u64` keys, a custom
+  `MixHasher`, and capacity `a*a+1`. Pre-source Amendment 1 corrects the
+  control without changing inputs or timing boundaries. [pcc:unverified]
