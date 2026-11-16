@@ -1,5 +1,10 @@
 # Native auxiliary-curve root finding and incidence integration
 
+The [new acceleration extension](accelerated/README.md) targets the incidence
+norm and actual mixed-label pool generation. Its development checks are
+registered as PCC-20261116-a777e8; new Runpod timings are pending.
+[pcc:unverified]
+
 The requested Runpod execution is complete. The given-datum paper root example
 improved4.46× versus dense CPU time; complete degree256 trace translation
 improved6.84–12.23× depending on support. Complete B128 pullback target work
