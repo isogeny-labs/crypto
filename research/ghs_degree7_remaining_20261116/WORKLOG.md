@@ -157,3 +157,30 @@ class.
 ### Errors
 
 None in this preparation.
+
+## 2026-11-15 23:18 America/Los_Angeles
+
+### What was done
+
+Committed the two-pole linear-square protocol and source at `7804e49e1678`.
+Both counted runs completed. Each checked 7,906,140 logical candidates and
+65,340 denominators. b=68 had 11,076 point-filter survivors and zero full
+square identities in 27.232 CPU s; b=84 had 11,195 and zero in 27.648 CPU s.
+The two receipts have the same source SHA256. Wrote the bounded result note.
+
+### Decisions made
+
+This closes the second of the three previously unsearched normalized
+degree-seven denominator classes on the fixed carrier. The last class is
+`B=Q_iQ_jQ_k`; its naive candidate count is 643,043,610 per source model
+after the square-leading-coefficient filter. Use exact bitset intersections
+of necessary point conditions to avoid per-candidate polynomial arithmetic.
+
+### Open threads
+
+Freeze and run the three-pole screen, then independently audit all three new
+shape results and assess the fixed-carrier degree-seven bound.
+
+### Errors
+
+None in the two counted runs.
