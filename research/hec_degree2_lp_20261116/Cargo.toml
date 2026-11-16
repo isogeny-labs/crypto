@@ -1,0 +1,10 @@
+[package]
+name="hec-degree2-lp"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="degree2-lp-gate"
+path="main.rs"
