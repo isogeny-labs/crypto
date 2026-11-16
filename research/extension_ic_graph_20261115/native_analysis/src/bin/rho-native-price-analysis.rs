@@ -11,7 +11,7 @@ use std::{
     io::Write,
     path::Path,
 };
-type Counts = BTreeMap<String, u64>;
+pub(crate) type Counts = BTreeMap<String, u64>;
 const OPS: [&str; 13] = [
     "mul",
     "sq",
@@ -153,7 +153,7 @@ fn calibration(v: &Value) -> Result<(), String> {
     }
     Ok(())
 }
-fn account(w: &Value, native: bool, p: u64, l: u64) -> Result<(Value, Counts), String> {
+pub(crate) fn account(w: &Value, native: bool, p: u64, l: u64) -> Result<(Value, Counts), String> {
     let v = &w["work_native"];
     let label = if native {
         "executed native Barrett tower prime-field primitives"

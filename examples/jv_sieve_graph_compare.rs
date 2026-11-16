@@ -120,7 +120,41 @@ fn solve_worker(
     keep: usize,
     mst: bool,
 ) -> Result<Value, String> {
-    solve_worker_inner(curve, method, seed, keep, mst, false, false)
+    solve_worker_inner(curve, method, seed, keep, mst, false, RhoPricing::default())
+}
+
+#[derive(Clone, Copy, Default)]
+struct RhoPricing {
+    native: bool,
+    options: Option<StrongOpts>,
+}
+
+/// Shared public-input reference for the combined IC/graph comparison.
+/// The supplied JSON is decoded with the same answer-rejecting schema.
+#[allow(dead_code)] // Linked by the combined public-input comparison example.
+pub(crate) fn solve_configured_native_rho(
+    public: &Value,
+    seed: u64,
+    options: StrongOpts,
+) -> Result<Value, String> {
+    if !(1..=64).contains(&options.batch)
+        || !(1..=4096).contains(&options.r)
+        || options.dp_bits > 44
+    {
+        return Err("invalid bounded rho portfolio options".into());
+    }
+    let curve: PublicCurve = serde_json::from_value(public.clone()).map_err(|e| e.to_string())?;
+    solve_worker_counted_mode(
+        &curve,
+        "rho",
+        seed,
+        75,
+        false,
+        RhoPricing {
+            native: true,
+            options: Some(options),
+        },
+    )
 }
 
 fn solve_worker_counted(
@@ -130,6 +164,27 @@ fn solve_worker_counted(
     keep: usize,
     mst: bool,
     native_rho_prices: bool,
+) -> Result<Value, String> {
+    solve_worker_counted_mode(
+        curve,
+        method,
+        seed,
+        keep,
+        mst,
+        RhoPricing {
+            native: native_rho_prices,
+            options: None,
+        },
+    )
+}
+
+fn solve_worker_counted_mode(
+    curve: &PublicCurve,
+    method: &str,
+    seed: u64,
+    keep: usize,
+    mst: bool,
+    pricing: RhoPricing,
 ) -> Result<Value, String> {
     // Nested parallel iterators must execute on the tally owner's thread.
     let pool = rayon::ThreadPoolBuilder::new()
@@ -141,7 +196,7 @@ fn solve_worker_counted(
         bitops::set_moduli(curve.p, curve.l);
         bitops::enable(true);
         let _instance = bitops::enter(Phase::Instance);
-        solve_worker_inner(curve, method, seed, keep, mst, true, native_rho_prices)
+        solve_worker_inner(curve, method, seed, keep, mst, true, pricing)
     })
 }
 
@@ -152,7 +207,7 @@ fn solve_worker_inner(
     keep: usize,
     mst: bool,
     accounting: bool,
-    native_rho_prices: bool,
+    rho_pricing: RhoPricing,
 ) -> Result<Value, String> {
     if !is_prime_u64(curve.p)
         || !is_prime_u64(curve.l)
@@ -199,18 +254,22 @@ fn solve_worker_inner(
             g,
             q,
         };
-        let (counted, scalar) =
-            rho::strong_rho_counted_with_scalar(&instance, seed, 0, rho_options(curve.l));
+        let (counted, scalar) = rho::strong_rho_counted_with_scalar(
+            &instance,
+            seed,
+            0,
+            rho_pricing.options.unwrap_or_else(|| rho_options(curve.l)),
+        );
         let verified = counted.verified;
         let capped = counted.run.capped;
         let tally = if accounting {
             let _harness = bitops::enter(Phase::Harness);
-            let prices = if native_rho_prices {
+            let prices = if rho_pricing.native {
                 rho::measure_native_fq3_prims(curve.p, curve.l)
             } else {
                 rho::measure_fq3_prims(curve.p, curve.l)
             };
-            if native_rho_prices {
+            if rho_pricing.native {
                 native_calibration = Some(
                     json!({"schema":"rho.native-tower-primitives/v1","mul":bitops::prims_json(&prices.mul),"square":bitops::prims_json(&prices.sq),"inverse":bitops::prims_json(&prices.inv),"complete":false,"legacy_tuned_credits_included":false}),
                 );
@@ -290,7 +349,7 @@ fn solve_worker_inner(
             (
                 t,
                 &Phase::RHO[..],
-                if native_rho_prices {
+                if rho_pricing.native {
                     "executed native Barrett tower prime-field primitives"
                 } else {
                     "existing generic Fq3 harness primitive prices"
@@ -598,6 +657,9 @@ mod tests {
     use super::*;
     #[test]
     fn public_fixture_has_no_answer_and_rho_returns_its_actual_scalar() {
+        // This example is also included by the combined worker's test crate.
+        // Fixture construction on parallel test threads must own its hooks.
+        bitops::claim();
         let spec = cover::generate_spec(7, 3);
         let curve = PublicCurve {
             p: 7,

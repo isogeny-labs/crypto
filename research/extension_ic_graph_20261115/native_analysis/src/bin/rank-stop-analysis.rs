@@ -1,7 +1,7 @@
 //! Rank-stopped collection: independent certificate/rank/prefix checks.
 #[allow(dead_code)]
 #[path = "two-lp-dlp-analysis.rs"]
-mod full;
+pub(crate) mod full;
 use full::shared::{accumulate, canonical, counts, n, prime, Terms};
 use serde_json::{json, Value};
 use std::{
@@ -54,7 +54,7 @@ fn checkpoint_rows(
     Ok(rows)
 }
 
-fn checkpoints(w: &Value, plan: &Value, p: u64, l: u64) -> Result<Value, String> {
+pub(crate) fn checkpoints(w: &Value, plan: &Value, p: u64, l: u64) -> Result<Value, String> {
     let v = &w["work"];
     let columns = n(v, "small_base")?;
     let target = columns.checked_sub(1).ok_or("empty small base")?;

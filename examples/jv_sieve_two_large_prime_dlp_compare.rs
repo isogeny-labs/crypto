@@ -18,6 +18,10 @@ use std::{
     time::Instant,
 };
 
+#[allow(dead_code)]
+#[path = "jv_sieve_graph_compare.rs"]
+mod shared_comparison;
+
 #[derive(Parser)]
 struct Args {
     #[arg(long)]
@@ -44,6 +48,10 @@ struct Args {
     max_descent_residuals: u64,
     #[arg(long, default_value_t = 32)]
     max_accepted_descents: usize,
+    #[arg(long, default_value_t = 1)]
+    rho_batch: usize,
+    #[arg(long)]
+    rho_plain: bool,
 }
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -122,6 +130,21 @@ impl PublicCurve {
 
 fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, String> {
     curve.validate()?;
+    if method == "rho" {
+        use crypto_lib::cryptanalysis::jv_rho_strong::StrongOpts;
+        let options = StrongOpts {
+            negation: !args.rho_plain,
+            batch: args.rho_batch,
+            r: 256,
+            dp_bits: 16.min((curve.l.ilog2() / 2).saturating_sub(4)),
+        };
+        let public = serde_json::to_value(curve).map_err(|e| e.to_string())?;
+        let reference =
+            shared_comparison::solve_configured_native_rho(&public, args.seed, options)?;
+        return Ok(
+            json!({"schema":"cover.two-large-prime.dlp-worker/v1","source_revision":args.source_revision,"method":"rho","seed":args.seed,"public":public,"solver_answer_placeholder":0,"actual_scalar":reference["recovered_scalar"],"recovered_scalar":reference["recovered_scalar"],"verified":reference["verified"],"capped":reference["capped"],"inner_wall_ns":reference["inner_wall_ns"],"work":reference["work"],"work_native":reference["work_native"],"signature":reference["signature"],"rho_options":options}),
+        );
+    }
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(1)
         .build()
@@ -137,7 +160,7 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
         let (report,scalar)=match method{
             "ic"=>{let(r,d)=sieve::run_cover_sieve_dlp_on_with_filter(&spec,args.seed,0,1.0,Some(64),1.25,None,false,None);(serde_json::to_value(r).map_err(|e|e.to_string())?,d)},
             "two-lp"=>run_two_large_prime_dlp_on(&spec,args.seed,TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,collection_rank_stride:args.collection_rank_stride,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents})?,
-            _=>return Err("method must be ic or two-lp".into()),
+            _=>return Err("method must be ic, two-lp or rho".into()),
         };
         drop(model);
         let verified={let _v=work::enter(Phase::Verification);let f=Fq3::new(curve.p);let ec=EllE::new(&f,&alpha);scalar.is_some_and(|d|d>0&&d<curve.l&&ec.mul(&g,d)==q)};
@@ -218,7 +241,49 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 mod tests {
     use super::*;
     #[test]
+    fn combined_public_worker_recovers_with_each_rho_portfolio_configuration() {
+        work::claim();
+        let spec = cover::generate_spec(101, 19);
+        let public = PublicCurve::from_spec(&spec);
+        let mut args = Args {
+            generate: false,
+            p: None,
+            seed: 331,
+            method: Some("rho".into()),
+            fixture: None,
+            out: PathBuf::from("unused"),
+            source_revision: "a".repeat(40),
+            small_percent: 75,
+            b_count: None,
+            collection_rank_stride: None,
+            max_descent_residuals: 8192,
+            max_accepted_descents: 32,
+            rho_batch: 1,
+            rho_plain: false,
+        };
+        for (negation, batch) in [(false, 1), (true, 1), (false, 16), (true, 16)] {
+            args.rho_batch = batch;
+            args.rho_plain = !negation;
+            let got = worker(&public, &args, "rho").unwrap();
+            assert_eq!(got["actual_scalar"], spec.d);
+            assert_eq!(got["verified"], true);
+            assert_eq!(got["solver_answer_placeholder"], 0);
+            assert_eq!(got["work"]["run"]["correct"], false);
+            assert_eq!(got["work"]["run"]["batch"], batch);
+            assert_eq!(got["work"]["run"]["negation"], negation);
+            assert_eq!(got["rho_options"]["batch"], batch);
+            assert_eq!(
+                got["work_native"]["native_tower_calibration"]["inverse"]["field_mul"],
+                80
+            );
+            assert_eq!(got["work_native"]["complete"], false);
+        }
+        args.rho_batch = 0;
+        assert!(worker(&public, &args, "rho").is_err());
+    }
+    #[test]
     fn public_fixture_rejects_answer_fields_including_nested_fields() {
+        work::claim();
         let spec = cover::generate_spec(101, 17);
         let public = PublicCurve::from_spec(&spec);
         let clean = serde_json::to_value(&public).unwrap();

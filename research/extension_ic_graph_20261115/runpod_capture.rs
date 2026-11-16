@@ -51,8 +51,13 @@ fn execute(state: Arc<Mutex<State>>) {
         if !unpack.success() {
             return Ok((90, false));
         }
+        let script = if task.join("run-portfolio-task.sh").is_file() {
+            "run-portfolio-task.sh"
+        } else {
+            "run-rho-native-task.sh"
+        };
         let status = Command::new("bash")
-            .arg("run-rho-native-task.sh")
+            .arg(script)
             .current_dir(&task)
             .env_remove("IC_TASK_TOKEN")
             .stdout(Stdio::from(File::create(
@@ -170,8 +175,15 @@ fn main() -> io::Result<()> {
     if token.len() < 48 {
         return Err(io::Error::other("short task token"));
     }
-    thread::spawn(|| {
-        thread::sleep(Duration::from_secs(2700));
+    let lifetime = env::var("IC_RUNNER_LIFETIME_SECONDS")
+        .unwrap_or_else(|_| "2700".into())
+        .parse::<u64>()
+        .map_err(|_| io::Error::other("invalid runner lifetime"))?;
+    if !(2700..=7200).contains(&lifetime) {
+        return Err(io::Error::other("runner lifetime outside bounded range"));
+    }
+    thread::spawn(move || {
+        thread::sleep(Duration::from_secs(lifetime));
         process::exit(0);
     });
     let state = Arc::new(Mutex::new(State::default()));

@@ -1,3 +1,46 @@
+# Current checkpoint:33SOURCE READY; Runpod provisioning, no scientific dispatch
+
+GoalACTIVE: Rust elliptic graph IC integration and Runpod measurements toward rho parity.
+User requires Rust, no Python science, Runpod backend. No subagents authorized.
+Protocol: research/extension_ic_graph_20261115/AMENDMENT_28_SAME_BINARY_PORTFOLIO.md
+Plan: research/extension_ic_graph_20261115/portfolio-plan.json. p1009 seed331,
+same executable/public-only input for IC, rank-stop75/stride128/fullp² and
+plain/negation rho batch1/16,r256/DPpolicy. Held-out planted answer is NOT unknown-log.
+One round,0warm/retry,900s each5500s whole8GiB. All partial prices unrankable,
+complete totals/band/ratios null, no parity claim. Check exact scalar/certificates/
+checkpoint ranks/phase accounting; retain failures and continue remaining arms.
+
+Root example tests1+3/strictClippy pass; standalone qualifier tests33+17+16 and
+strictClippy/build, Rust transport control+warnings-denied build pass. Earlier
+parallel fixture foreign-hook fail retained and fixed with owner claims. Old31/32
+summary byte equality checked in new copied directories. Source manifest269files
+and binary manifest PASS. PCC source/preregistration f276fb and007ffe unverified.
+Source changes two example files, narrow pub(crate) pure qualifier helper reuse,
+new native portfolio analyzer/task/prepare/protocol; no library source changed.
+
+Private API auth directory pointer /tmp/ic-runpod-auth-location; NEVER print key,
+headers,tasktokens or fullcreate.env. pod33.id identifies OWN new CPU4vCPU8GiB
+allocation, $0.12h expected/max0.40h, 7200s local DELETE guardian active.
+validation/runpod33-allocation.json/deployment-public.json safe source receipts.
+No API key passed to Pod; separate task33-header/token removed from child env.
+All previous OWN32pods deleted, never alter unrelated account pods.
+
+NEXT: finish source publication clean BEFORE immutable prepare/upload/onePOSTrun.
+Package command prepare-portfolio-runpod.sh NEW-STAGE; then use private task33-header
+for PUT/bundle, POST/run ONCE, GET/status/artifacts. Never redispatch on network doubt.
+Runner first allowed CPU freezes before call; require remaining>=5710seconds.
+Original copied Rust qualifier runs on Runpod; all original raw/source/binaries/
+pre/preworkers/post/qualified custody hashes. Collect exact archive+verify then DELETE
+OWN33pod+confirm404,markprivatepod-ID.deleted. Complete final report onepage inspected,
+PDF/SVG/150dpiPNG exactcopies, originals LOCAL/hashbound, large raw>64KiB staysLOCAL.
+Actual stage path and podID added before dispatch. No measurement33data yet.
+
+Stopping: failed/censored calls retained, no unchanged rerun. Continue goal after
+result; no stop_goal unless achieved or same external blocker three goal turns.
+CheckpointS3 still unavailable; explicit user Runpod direction persists, do not ask
+credentials/profile. PR4288 regular/automergeenabled, no manualmerge/gatebypass.
+Maintain <=60sec progress commentary; avoid long speculative planning without tools.
+
 # Current checkpoint:32PUBLISHED; fair reference portfolio/comparison next
 
 32packet c906c4e2f5061c2942daa845af3e881a63d7d109PUSHED/PRupdatedPCCproselint0.
