@@ -144,3 +144,12 @@ Gaps (recorded, not done):
 No benchmark record or leaderboard row (no timing/cost). Figures: the transfer
 chain diagram (`reports/chain.svg`) and the `#C=#H` graph (`reports/counts.svg`,
 `.png`); PDF `reports/report.pdf` (inspected, 2 pages).
+
+## Amendment S56 (56-bit ladder prime)
+
+The same construction at `p = 2^56 - 5` (`find_a3_curve(56, 3)`, prime-order
+`E: y^2 = x^3 - 3x + 60`): Smith-positive at `gamma = 15`, `phi^*` checked on
+the full prime-order group, explicit quartic `C` verified on 120/120 held-out
+image points and certified smooth by resultants. `Psi` into `Pic^0(C)` not run
+at that size (u32 `plane_quartic_pic`). See `RESULTS_S56.md` and
+`reports/s56/report_s56.pdf`. `[pcc:unverified]`
