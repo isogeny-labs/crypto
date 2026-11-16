@@ -59,3 +59,5 @@ fallback, no novelty/absence claim. All14 remain active, including
 general collision block repair, qualified adding-walk limiting constants,
 practical hashes/scalar recovery and recorded geometry/counting/solver
 obligations. [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `4c25dbcb345dee13b18d314d16eb76f334be74da` and local receipt `3bca64e9c28728f6d3b4a170239ba55f290d836b` share tree `846250eb6dc9e01d3f8c7e3cc7b29c719064a257`. Anonymous fetch completed before exact fresh head/title/body/ready confirmation. All49 pinsets/6260 entries match. New-head CI/review/signing pending; next scheduled owner10:30UTC. [pcc:unverified]
