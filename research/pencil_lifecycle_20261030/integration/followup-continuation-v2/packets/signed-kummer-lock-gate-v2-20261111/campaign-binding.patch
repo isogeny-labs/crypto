@@ -1,0 +1,25 @@
+--- initial/release-draft.json
++++ current/release-draft.json
+@@ -10,5 +10,5 @@
+   "current_ledger_sha256": null,
+   "launcher_sha256": "ec748e3234441739e032a9e5451d7a7f0565728293d29b259f5799ec1b952a00",
+   "rustc_proxy_sha256": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e",
+-  "absolute_deadline": null
++  "absolute_deadline": "2026-11-11T12:00:00Z"
+ }
+--- initial/report.json
++++ current/report.json
+@@ -26,11 +26,11 @@
+     "absolute UTC deadline",
+     "live owner and ledger",
+     "fresh cache and current release receipts",
+-    "explicit 43200-second suballocation for combined admission"
++    "current campaign authorization receipt for 129600 seconds and 2026-11-11T12:00:00Z"
+   ],
+   "observations": [
+     "The header-write fault intentionally emits zero bytes; identity is unavailable for that expected prefix. Other traces require exact revision, source digest, workload and run identity.",
+     "Previous packets and failed attempts are unchanged.",
+-    "The 43200-second combined suballocation check is preserved, not expanded to the enclosing 129600-second campaign."
++    "The stale 43200-second campaign constant is corrected to the authorized 129600 seconds; actual prior and remaining worker time remain unbound until the final ledger."
+   ]
+ }

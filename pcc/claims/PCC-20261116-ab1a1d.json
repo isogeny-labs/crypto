@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:11:23Z",
+ "id": "PCC-20261116-ab1a1d",
+ "kind": "statement",
+ "producer": {
+  "commit": "43bb330419a234fbf2010fd4b31970e95b59c238",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/rankfree-control-v1/pre-call.json",
+    "sha256": "24a3d7cafdd7016d5c3635073cc667a0fc977e3c50f537e32324369d60aca060"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/rankfree-control-v1/post-call.json",
+    "sha256": "65edfaefd181215995cc5d4c9f8f7ef2b78b30b701c2b16282954391b1f89b0c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/rankfree-control-v1/command.log",
+    "sha256": "97dff4142ab1113214bfbc6da7a763dffe3ad9d1cef01a5685a249db782e52da"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/rankfree-control-v1/source-v2.tar.gz",
+    "sha256": "399f3ea3da698fc38ec5e67789fd0657e8b81b6bc60d6b77a3d0093325d91b15"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Producer finite controller-private coefficient controls: for the rank-one 3-by-2 matrix over F5, all 125 coefficient-tag vectors give exactly 25 zero denominators and 100 correct known-secret candidates with a tag-blind kernel. An explicit tag-dependent nonzero kernel annihilates the denominator for all 125 tags. Separate full-column-rank and rank-one fixtures use actual Curve25519 arithmetic and its standard scalar modulus; all group rows and the final known-secret scalar 1234567 are checked. These are finite correctness controls, not an unknown DLP solve, a proof of the generic independence statement, a subquadratic solver, or a sparse-linear-algebra performance measurement. The control elimination is dense/cubic and capped at dimension 64."
+}

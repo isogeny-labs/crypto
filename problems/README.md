@@ -11,24 +11,16 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Prepared/joint collector runtime qualification](point-table-joint-runtime-qualification.md) | open | matched native point-table/joint runtime result | current-source S3 upload/readback, authenticated exact native image/execution, admitted matched comparison |
-| [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |
-| [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
-
----
-
+| [Curve25519 torus decomposition and scaling](curve25519-torus-four-point-decomposition.md) | open | converting the quadratic construction into a changed attack exponent | collision/selection proofs, fixed-base solver cost, suitable four/six-sum parameters and full family/phase bounds |
+| [Curve25519 native Singular isolated runner](curve25519-singular-isolated-runner.md) | open | the actual-field full-base solve | qualified native-workload adapter, live identity/capacity and budget remainder |
 | [Historical benchmark registry path](benchmark-record-mutable-registry-path.md) | resolved | offline archived-input availability for a reused registry path | existing guarded archive verification, matched readback and substitution controls; both records preserved |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
 | [Lift to characteristic zero, reduce at a second prime p′](lift-reduce-second-prime-transfer.md) | open (proposed lead; untracked route) | deciding whether lifting to an abelian variety over a number field and reducing at a second prime can weaken a prime-field ECDLP | atlas/KB lookup for a duplicate; review of the derived g = 1 and non-torsion reductions; a bound on the field of definition of an N-torsion lift for g ≥ 2 |
 | [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | resolved (walk v2, 2026-11-08) | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
 | [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
-| [RR Dickson matrix-reduction qualification](rr-dickson-matrix-reduction-qualification.md) | open (output qualification and measurement admission) | retain RR degree while lowering matrix growth and complete equal-output cost | complete normalization checks; S3 checkpoint and budget admission; matched RR/F panel |
-
----
-
 | [Chained same-characteristic transfers do not cheapen a prime-field ECDLP](prime-field-chained-transfer-no-advantage.md) | open (derived + measured boundary for isogeny→bielliptic cover→genus-2 Jacobian) | a cryptanalytic speedup from chaining covers/isogenies/Jacobian maps over F_p | a same-characteristic destination with DLP exponent below √p, or a computable cross-characteristic subgroup map, each with full cost accounting |
 | [P-256 mixed eigenline: folded-rho cost](p256-eigenline-folded-rho-cost.md) | open | net runtime advantage from the checked six-image subgroup | cycle-safe independent-increment solver and matched complete costs below the stated threshold; no active benchmark |
-| [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only; PR4378 merge audit added | current-main PCC prefix/integration and historical published-prefix retention | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
+| [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
 | [Ecbench time-namespace runtime](ecbench-time-namespace-runtime.md) | open | two library clock-initialization controls | qualified proc time-namespace support or specified fail-closed unsupported-runtime contract; rerun original controls/full suite |
 | [Inherited main strict-lint failures](pkm-main-strict-lint-inherited.md) | open | integrated PKM strict lint | repair trace visibility/usage and custody boolean style upstream; rerun unchanged warnings-as-errors gate |
 | [Legacy PCC validator relative-path binding](pcc-legacy-validator-relative-path-binding.md) | open | shared PCC gate rejects13unchanged main claims | canonical shared-verifier/evidence-dir review with escape/digest canaries; preserve frozen claim/report/ledger bytes |
@@ -52,18 +44,12 @@ Keep resolved and superseded records in the index.
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
 | [Exact compact scalar-predicate splitting](prime-scalar-exact-splitting.md) | open | an essentially new compact scalar-verification route to sub-exponential prime-field ECDLP | constructible exact splitting/weighted extension with complete network, recursive, cost and formal proof bounds |
-| [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
-| [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; native dimension controls and jet-capacity distinction added (unverified) | conditional tensor algorithm | sharp taper/enumeration refinement and aggregate bit/allocation bounds; bounded controls do not establish the source theorem |
-
----
-
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | fixed-fixture algebraic IC and witness-pruned encoding implemented; growing-family cost/yield open | proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
 | [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; checked p/r/hash setup and opt-in finite backends implemented | conditional tensor algorithm | general correctness, smaller-packet proof, precision/packing invariants and complexity accounting; bounded controls do not establish the source theorem |
 | [Parent-library isogeny-walk validation](root-library-isogeny-walk-runtime.md) | incomplete; processes killed, cause unknown | legacy root-library regression | exact case and full parent scope must complete without weakened acceptance; native primality checks are separate |
 | [IC six-obligation follow-up gates](ic-six-obligation-followup-gates.md) | investigating | fixed-population yield/rank, production arity-three theory, PKM lower bound, Wagner variance, and xedni selector conclusions | clean source custody and native producers; checked proof/lower-bound objects; frozen EKS protocols only after their individual gates |
 | [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | open | asymptotic lower bound for the registered exact linear-message contraction | freeze the production cut family and prove a uniform exponential nonzero minor or equivalent rank bound, plus the architecture cost bridge |
 | [ECDLP dataset worker publication and cumulative admission](ml-ecdlp-dataset-durable-launch.md) | open | first durable native cloud cell and admitted large-corpus launch | approved scoped worker access, real PUT/GET/hash preflight, cumulative budget reservations, fresh restore and independent replay |
-| [Native point-table applicable CI dependency](point-table-crypto-applicable-ci.md) | open | Crypto4342/4351 merge under all applicable checks | owning lane resolves the unchanged open genus-ladder benchmark record; fresh current-head CI/review |
 
 | [Guarded fall-degree exact-pair Lean proof](guarded-fall-degree-lean-exact-pair.md) | resolved | the original ordinary guarded three-abscissa prime-field pair `(4,5)` | `GuardedExactPair.exact_pair_prime` proves the full statement; current proof map and versioned verification receipt bind the complete source chain |
 | [E12b On-Demand launch denied](fall-degree-e12b-on-demand-launch.md) | open | completion of registered fall-degree cell 3:24:7 after two Spot interruptions | administrator-authorized On-Demand execution environment, successful launch preflight, then unchanged Amendment 12 gates and four draws |
@@ -91,7 +77,7 @@ Keep resolved and superseded records in the index.
 | [Upper-size point-driven pencil elimination and full cohort](genus2-pencil-upper-size-elimination.md) | investigating | remaining 717 exact-order pencil targets and full cold cost comparison; first p=186,379 target reached a replayed 25-million-coefficient cap | scalable exact elimination or sufficient execution resources, then independent replay and source checks |
 | [Sign-safe Kummer relation labels for a genus-2 collector](genus2-kummer-relation-labels.md) | partly resolved; fixed-difference 1,260-target matched collector measured | constant-size signed sidecar for the original arbitrary-jump walk | checked recurrence, full source replay and matched cost for that walk |
 | [Generic Kummer two-torsion action identity](kummer-generic-action-identity.md) | open; all-state chart nonvanishing proved | all-state geometric action law for 105 recorded model/root pairs | exact Mumford-ideal cross-product certificates and exceptional-branch proofs |
-| [Complete algebraic mixed-fiber PKM solver and DLP pipeline](mixed-fiber-pkm-full-solver.md) | open | L3 F4/msolve and related prime31 native adapter; complete IC/rho comparison | full primitive accounting, public-target prime31 recovery, checkpoint/EKS admission, all-roots/external references and independent replay |
+| [Complete algebraic mixed-fiber PKM solver and DLP pipeline](mixed-fiber-pkm-full-solver.md) | open | L3 F4/msolve solver and complete IC/rho comparison | complete polynomial systems, all-roots references, then full source-checked DLPs |
 | [Original evidence for three ECDLP leads is unlocated](three-leads-original-evidence-unlocated.md) | open for historical provenance; fresh rebuild complete | exact authentication of the historical statistics only; all three routes now have fresh complete solves and cost verdicts | original immutable producers and raw records; see the [fresh two-cohort genus-2 rebuild](../research/three_leads_e2e_20261018/README.md) |
 | [Isogeny-class rho statistical and admission gap](isogeny-class-rho-statistical-admission.md) | investigating | blanket empirical null and merge of the source/evidence/paper stack | corrected native statistics, exact producer/row lineage, covariance assessment, refreshed graphs, sealed native admission and concrete proof bridges |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
@@ -198,3 +184,96 @@ A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
 | [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection, bounded norm reconstruction and uniform full sub-exponential bit cost; finite weighted-count and actual growing input-budget components added | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |
+
+
+
+
+| [Fourteen-target audit: proof and execution gaps](fourteen-target-audit-proof-and-execution-gaps.md) | open | remaining all-fourteen-item proofs, censuses, independent replay and main integration | real second-host replay, provenance-preserving ledger reconciliation, and exact remaining curve/Jacobian/implementation bridges; local checkpoints already authorized |
+| [Lean statement binding completeness](lean-statement-binding-completeness.md) | open | full declaration hashing for one issued BK audit receipt; canonical parser contract | versioned complete BK wrapper and canonical complete-signature/qualified-name parser with genuine controls |
+| [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| [Distinct pairing-target batch cap](pairing-batch-distinct-target-cap.md) | resolved by added cell | the specified 64 distinct nonidentity targets remain impossible on each frozen order-19 and order-61 group | order-67 degree-two pairing cell supplied 66 public targets and V7/V7B matched prime-field rho plus cold source BSGS, each with 594 scalar replays; counted cost and scaling remain separate |
+| [Root-finding pipeline complete-cost calibration](rootfinding-complete-cost-calibration.md) | open | qualified full-cost or wall-time comparison for the assessed root-finding IC pipeline; 4/8/16-lane, B train/holdout and coverage panels are verified and replayed; a fresh-target equal-prefix component control exists, while native field counts are absent from sealed records and wall data are L0 | serialize and price native work; repeat matched public targets under L2 isolation and on an independent host |
+| [EC Bench GPU matched workload and validation](ecbench-gpu-matched-workload-contract.md) | open | admitted CPU/GPU comparison of the same ECDLP workload | frozen CUDA input/output, exact costs, independent answer replay and GPU contention controls |
+| [Non-rational isogeny fiber DLP cost](nonrational-isogeny-fiber-dlp-cost-gap.md) | open; the projected-base grid completed 384 cold children and replays, and explicit dual transport completed 480/480 with 96 paired cells and 13,482 relation witnesses matched. At order 229, B=64, cold `S_group` direct dual/inverse/destination-direct/rho was 2,492.134/2,559.868/2,431.537/7.979. The earlier larger inverse-order and Linux replay/resource receipts remain linked in the problem. Complete portable price and L2 wall remain open. | attribute a general algebraic coordinate effect and admit complete portable cost | independently price all native primitives on the exact dual workload; run genuinely reused 64-target setup, L2 wall, and a separately frozen larger-order dual comparison |
+| [Release library validation on shared host](release-library-validation-shared-host-20261012.md) | resolved locally; controlled full run passed 4,009 tests | passing release-library gate for the fiber study | complete two-thread, loopback-accessible run passed; preserve the earlier sandboxed 13-failure receipt and recheck only if source or CI changes |
+| [GHS → Smith characteristic mismatch](ghs-to-smith-pipeline-characteristic-mismatch.md) | open | the GHS → Smith → Diem pipeline | a char-2 hyperelliptic→quartic isogeny, or an odd-char descent onto genus-3 hyperelliptic curves |
+| [Smith 18.57% walk extension](smith-kernel-isogeny-class-walk.md) | open | costing walks that lift Smith's coverage toward 50.16% | native Smith Prop. 2/4 tests and per-class success counts |
+
+
+
+
+
+
+
+
+
+
+
+
+| [Frozen chained-transfer PCC data addresses](chained-transfer-pcc-evidence-addresses.md) | resolved at feature-checkpoint CI scope | Original current-source PCC succeeds with full source/address custody; PR4396 merged40839 | Keep immutable snapshot subjects; main-ledger integration and scientific NEW28 remain separate. [pcc:unverified] |
+| [Current chained-transfer store and startup](chained-transfer-current-store-and-startup.md) | investigating | Currentb846 PCC/validation store403 and original migration startup0jobs block final-head merge; whole CI115681 retained | Original authenticated current-source pulls/upload/full replay and all unchanged merge gates; no role/identity/policy bypass. [pcc:unverified] |
+| [Original FB30 character extension](https://github.com/isogeny-labs/cryptanalysis/blob/fe91441709ba1860f8e5b0e54834f5fa0e8fd0c3/problems/chained-transfer-original-FB30-character-extension-02.md) | investigating | Collected constraints admit a finite noncharacter functional | Prospective unassisted actual-relation completion, full-population checks and separately admitted matched costs. [pcc:unverified] |
+| [Chained transfer admission and ledger synchronization](chained-transfer-admission-and-ledger-sync.md) | open | admitted solving-cost comparison,lead-atlas integration and root3877/consumer1484 merges;both frozen histories fork | checkpoint/budget access,vault binding,accepted reconciliation retaining both histories and final-head CI/review |
+| [Chained transfer workspace interruption](chained-transfer-workspace-unavailable-20261111.md) | resolved (execution/custody restored) | CT20 compatible gluing/actual Jacobian7-hop and local receipt recovery | usable execution workspace; inspect original pending records or retain fresh gated receipts |
+
+
+
+
+
+
+
+
+  claim that it was solved. [pcc:unverified]
+
+
+does not establish a mathematical obstruction or a security theorem. [pcc:unverified]
+
+
+
+
+
+| [Shared CI archive object reads403](ci-archive-object-read-403.md) | open | backend/IC leaderboard checks before their computations | exact archived object availability and authorized CI reads, then unchanged-command replay |
+| [P-256 aligned auxiliary relation solver](p256-aligned-auxiliary-solver.md) | open | actual P-256 m2..7 matched 2x relation-stage result and structured regularity | qualified big-prime CAS execution, complete replay, checkpoint/EKS admission and matched measurements |
+| [Prepared/joint collector runtime qualification](point-table-joint-runtime-qualification.md) | open | matched native point-table/joint runtime result | current-source S3 upload/readback, authenticated exact native image/execution, admitted matched comparison |
+| [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |
+| [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
+
+---
+
+| [RR Dickson matrix-reduction qualification](rr-dickson-matrix-reduction-qualification.md) | open (output qualification and measurement admission) | retain RR degree while lowering matrix growth and complete equal-output cost | complete normalization checks; S3 checkpoint and budget admission; matched RR/F panel |
+
+
+| [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only; PR4378 merge audit added | current-main PCC prefix/integration and historical published-prefix retention | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
+| [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; native dimension controls and jet-capacity distinction added (unverified) | conditional tensor algorithm | sharp taper/enumeration refinement and aggregate bit/allocation bounds; bounded controls do not establish the source theorem |
+
+
+| [Native point-table applicable CI dependency](point-table-crypto-applicable-ci.md) | open | Crypto4342/4351 merge under all applicable checks | owning lane resolves the unchanged open genus-ladder benchmark record; fresh current-head CI/review |
+
+
+| [N83 mixed-orbit factor-base total-runtime selection](n83-mixed-orbit-factor-base-selection.md) | investigating | K600 object archived to S3 and native read-only v3 S3 import passed twice; five staged ARM64 examples passed a warm build and focused preflight tests passed 6/6; first current-head full-library attempt exhausted boot disk before tests, and the later partial suite lacks a full summary and exit receipt; native S3 writer acceptance, cold solver/image build, hard-cgroup preflight, natural yield, rank/logs, unseen-target solve and same-target rho across the finite grid remain | complete isolated checkpoint replay and stable-storage library rerun; obtain exact native writer choice and build capacity; run the frozen source-bound charged ARM64 build, zero-trial preflight and separate input/budget gates, then the K600 m6 pair, distinct full-D18 gate, and fully charged finite-grid measurements |
+| [N83 K600 m6 preflight lock and arm source-commit cycle](n83-k600-preflight-lock-commit-cycle.md) | open | a committed zero-trial preflight lock and arm admission under one source identity | implement and test a two-revision or detached-ref custody contract, then pass a qualified Linux preflight |
+| [Complete algebraic mixed-fiber PKM solver and DLP pipeline](mixed-fiber-pkm-full-solver.md) | open | L3 F4/msolve and related prime31 native adapter; complete IC/rho comparison | full primitive accounting, public-target prime31 recovery, checkpoint/EKS admission, all-roots/external references and independent replay |
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,96 @@
+{
+  "schema": "small-characteristic-source-plan/v1",
+  "created": "2026-11-10T10:09:27.790417+00:00",
+  "status": "Preissue frozen source plan; full gatePASS28/0failures/0trusted.",
+  "formal": {
+    "project": "research/supersingular_small_characteristic_20261110/lean",
+    "theorem": "SmallCharacteristicCensusAudit.all_prime_field_models_audit_certificate",
+    "statement": "theorem all_prime_field_models_audit_certificate : (∀ E : WeierstrassCurve.Affine (ZMod 2), E.Δ≠0 → sourceSupersingular 2 E → (Nat.card E.Point=1 ∨ Nat.card E.Point=3 ∨ Nat.card E.Point=5) ∧ ∀ r : ℕ, Nat.Prime r → r∣Nat.card E.Point → embeddingDegree 2 r≤6) ∧ (∀ E : WeierstrassCurve.Affine (ZMod 3), E.Δ≠0 → sourceSupersingular 3 E → (Nat.card E.Point=1 ∨ Nat.card E.Point=4 ∨ Nat.card E.Point=7) ∧ ∀ r : ℕ, Nat.Prime r → r∣Nat.card E.Point → embeddingDegree 3 r≤6) ∧ (E2.Δ≠0 ∧ Nat.card E2.Point=5 ∧ sourceSupersingular 2 E2 ∧ (∃ P : E2.Point,addOrderOf P=5) ∧ embeddingDegree 2 5=4) ∧ (E3.Δ≠0 ∧ Nat.card E3.Point=7 ∧ sourceSupersingular 3 E3 ∧ (∃ P : E3.Point,addOrderOf P=7) ∧ embeddingDegree 3 7=6) ∧ ¬ (∀ (p r : ℕ) (E : WeierstrassCurve.Affine (ZMod p)), Nat.Prime p → 2<p → Nat.Prime r → 2<r → Nat.Coprime r p → E.Δ≠0 → sourceSupersingular p E → r∣Nat.card E.Point → embeddingDegree p r=2)",
+    "decl_sha256": "fd241a429a143452e078f98693bd9291acbce54be6d53172be1f557242f3a81d",
+    "sources": [
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/AllPrimeFieldModels.lean",
+        "bytes": 6106,
+        "sha256": "b5f94cf22cb8d78fec024b136725a6302c8a0e0cc029e2f8491b07da307d3e45"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/PrimeFieldControls.lean",
+        "bytes": 6492,
+        "sha256": "beb959fa2bea5c702af27bcff9139bd760099db66e169fd9697d27db6f6ac057"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lakefile.toml",
+        "bytes": 296,
+        "sha256": "dd143bac32c45dd6ebb5d3c37eb44b835bab06b422c40650e1303e87aacde055"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lake-manifest.json",
+        "bytes": 4097,
+        "sha256": "10f1e32be697000701a0f2c5bf41e44233ddbf4d016d54ec0b8e3608fb40837a"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "All32F2/243F3general Weierstrass coefficient tuples; actual nonsingular point-cardinality bridge; source-trace supersingular count sets and all prime-divisor modular embedding bounds≤6; actual nonsingular E2/E3 counterexamples to exact prime-field degree2with subgroup primes5/7and degrees4/6. No full geometric supersingularity equivalence, higher extension-field census or full torsion-field degree theorem."
+  },
+  "gate": {
+    "public_theorems": 28,
+    "failing": 0,
+    "trusted_native": 0,
+    "archive": "research/supersingular_small_characteristic_20261110/evidence/gate.tar.gz",
+    "archive_files": 5,
+    "roundtrip_equal": true
+  },
+  "attempts": {
+    "archive": "research/supersingular_small_characteristic_20261110/evidence/attempts.tar.gz",
+    "files": 11,
+    "roundtrip_equal": true
+  },
+  "coverage": {
+    "fields": [
+      2,
+      3
+    ],
+    "extension_degrees": [
+      1
+    ],
+    "coefficient_tuple_counts": [
+      32,
+      243
+    ],
+    "counts_are": "General Weierstrass coefficient tuples, not isomorphism classes.",
+    "point_count_sets": {
+      "F2": [
+        1,
+        3,
+        5
+      ],
+      "F3": [
+        1,
+        4,
+        7
+      ]
+    },
+    "method": "Kernel-decided finite universal statement; explicitly proved equivalence to actual Mathlib point cardinality. No native measurement/sampling."
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "paid_compute": 0,
+    "lean4checker": "Unavailable; kernel/transitive axiom gate used."
+  },
+  "sources_checked": [
+    "FST2010Definition2.1/Remark2.2pp230–231andtrace-squarelistp237, prior read scopes/hash in census source plans.",
+    "Waterhouse1969Theorem4.1pp536–537, prior read/visual inspection retained.",
+    "ActualTorsionBoundaries/SupersingularTraceClasses source declarations and Mathlib affine point equivalence/order/Cauchy lemmas."
+  ],
+  "retrieval": "KB/Conductor unavailable; retained bounded primary/repository/Mathlib fallback. No novelty claim."
+}

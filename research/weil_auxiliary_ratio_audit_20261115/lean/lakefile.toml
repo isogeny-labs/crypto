@@ -1,0 +1,15 @@
+name = "weil_auxiliary_ratio_audit"
+version = "0.1.0"
+defaultTargets = ["WeilAuxiliaryRatioAudit"]
+
+[[require]]
+name = "general_translation_audit"
+path = "../../general_translation_audit_20261115/lean"
+
+[[require]]
+name = "three_tangent_pairing_audit"
+path = "../../three_tangent_pairing_audit_20261115/lean"
+
+[[lean_lib]]
+name = "WeilAuxiliaryRatioAudit"
+roots = ["AuxiliaryDivisor", "AuxiliaryLocal", "AuxiliaryEvaluation", "AuxiliaryExistence", "AuxiliaryLeading", "AuxiliaryTangents", "AuxiliaryScalar", "AuxiliaryRepresentatives", "AuxiliarySource", "AuxiliaryOrbits", "AuxiliaryDiagonal", "AuxiliarySpecialCases", "AuxiliaryComparison", "AuxiliaryWeilThree", "AuxiliaryChoice", "AuxiliaryControls", "WeilAuxiliaryCertificate"]

@@ -1,0 +1,3 @@
+# Operational renewal review before execution
+
+Root reviews the agent-authored renewal against solve4-pivot-swap-replay-20261109. Check exact mathematical sources,5calls,17names, retained dependencies, resources and900/600/900phase caps. Permit only fresh identity/deadline129600campaign/prior1200remaining128400 and hash changes. Check sum and no retries. Native runtime/kernel behavior is not established by this review; final release requires actual terminal ledger, independent source review publication and fresh ownership. Prior count1200 must match the two completed600charges. No new semantic theorem verdict. [pcc:unverified]

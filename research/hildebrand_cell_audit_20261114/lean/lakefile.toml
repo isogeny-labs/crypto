@@ -1,0 +1,11 @@
+name = "hildebrand_cell_audit"
+version = "0.1.0"
+defaultTargets = ["HildebrandCellAudit"]
+
+[[require]]
+name = "weighted_cycle_coupling_audit"
+path = "../../weighted_cycle_coupling_audit_20261114/lean"
+
+[[lean_lib]]
+name = "HildebrandCellAudit"
+roots = ["UniformChoices", "CenteredCell", "CellProbability", "CellCertificate"]

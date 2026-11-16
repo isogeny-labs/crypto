@@ -1,0 +1,57 @@
+MumfordCantorGroup.lean:147:6: error: Tactic `rewrite` failed: motive is not type correct:
+  fun _a => ↑(Fintype.card { Q // (↑Q).u.Splits }) / ↑(Fintype.card ↥_a) = 1
+Error: Application type mismatch: The argument
+  AddSubgroup.decidableMemZMultiples
+has type
+  DecidablePred fun x => x ∈ AddSubgroup.zmultiples (point 1)
+but is expected to have type
+  DecidablePred fun x => x ∈ _a
+in the application
+  @AddSubgroup.instFintypeSubtypeMemOfDecidablePred ReducedPair
+    instAddCommGroupReducedPair_mumfordCantorGroup.toAddGroup _a AddSubgroup.decidableMemZMultiples
+
+Explanation: The rewrite tactic rewrites an expression 'e' using an equality 'a = b' by the following process. First, it looks for all 'a' in 'e'. Second, it tries to abstract these occurrences of 'a' to create a function 'm := fun _a => ...', called the *motive*, with the property that 'm a' is definitionally equal to 'e'. Third, we observe that 'congrArg' implies that 'm a = m b', which can be used with lemmas such as 'Eq.mpr' to change the goal. However, if 'e' depends on specific properties of 'a', then the motive 'm' might not typecheck.
+
+Possible solutions: use rewrite's 'occs' configuration option to limit which occurrences are rewritten, or use 'simp' or 'conv' mode, which have strategies for certain kinds of dependencies (these tactics can handle proofs and 'Decidable' instances whose types depend on the rewritten term, and 'simp' can apply user-defined '@[congr]' theorems as well).
+
+⊢ ↑(Fintype.card { Q // (↑Q).u.Splits }) / ↑(Fintype.card ↥(AddSubgroup.zmultiples (point 1))) = 1
+MumfordCantorGroup.lean:164:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:169:9: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:172:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ∈ smallSubgroup ∧ P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:179:9: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ∈ smallSubgroup ∧ P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:184:5: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:186:5: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ∈ smallSubgroup ∧ P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:194:20: error(lean.invalidField): Invalid field `Squarefree`: The environment does not contain `Polynomial.Squarefree`, so it is not possible to project the field `Squarefree` from an expression
+  curvePolynomial
+of type `K[X]`
+MumfordCantorGroup.lean:202:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:203:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // P ∈ smallSubgroup ∧ P ≠ 0 ∧ P.u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+'MumfordCantorGroupAudit.cantor_subgroup_audit_certificate' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'MumfordCantorGroupAudit.useful_smooth_fractions' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct100/**'
       - '.github/workflows/ct100-chord-capacity.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct100/**'
       - '.github/workflows/ct100-chord-capacity.yml'
   workflow_dispatch:
 jobs:
   ct100:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

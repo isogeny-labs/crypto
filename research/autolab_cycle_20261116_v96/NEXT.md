@@ -1,0 +1,6 @@
+# Next queue
+
+1. Implement the affine-dual whole-cell theorem in NEXT_AFFINE_DUAL_CELLS.md. Tiny exhaustive separator coverage and independent certificate checker first, then128frozenGF83separators withatmost32deterministicdualchoices;90s,4GiB,onecore. Measure rank/cost,not sampled rates asglobalproof. Keep SAMEseparator andbothfiniteendpointroots;zero/infinitybranchesexplicit.
+2. Integrate rebracketing into a small original five-source chain and compare complete8-coordinate roots with an independent exhaustive oracle and oldseparatorjoin. Charge all endpoint discovery,blocksetup,branching,dedup/output. Actuald18outer~2^54statesremain; derivewhole-cell cuts before a hardglobalretry. Shared prepared field/pair kernels may cutoverhead,but nottheouterexponent.
+3. Complete large equal-endpoint/diagonal fibers through a separately proved structured output algorithm or retain caps. Zero-bridge routing isclosed; a diagonal cap isnotUNSAT. Preserve d18control.
+4. Prime/odd-extension backend: cachedchord/tangent recovery with shared optimizedsqrtcontexts andexplicitM<pguard;source/target-count crossover. Fullmatching genuineF4/F5/F6 engineering and20hardinstancesrun inparallelresearchstream,not a reason tostop independenttheory. Only fullgate cancertify50x.

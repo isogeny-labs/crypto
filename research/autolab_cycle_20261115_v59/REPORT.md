@@ -1,0 +1,11 @@
+# C59: completed positive GF83 exceptional cubic chart
+
+Two frozen90s/4GiB/onecore experiments used resume/run-ready. The native backend was generalized fromA0 to arbitraryA on certifiedGF83,B1: e20 gainsAh^2,e30 gainsAzh^2,target validation gainsAz^2. The conjugate-target convention is independently checked. All predecessors remain.
+
+Gold polarization and Newton give e1e2+e3 in the span of vi^2vj+vivj^2, independent ofA. Exact Artin-Schreier reduction retains all traces/kernels before repeated-root-safe support. Both A0/A1,d4 calibrations matched complete Python cubic parameter sets; all32 native families matched independent full83-variable row elimination. Compilation1.525652s is separate. A positiveA1,d18 fixture used three distinct deterministic rational sources. Solver input contains no planted h/r/roots; witnesses are read after execution/replay.
+
+The FULL cubic scan visited all262144 admittedh and261941 refined r candidates. Exactly one supported cubic was independently reconstructed/factored and checked by coefficient identities and curve-point sums. Restoring the doublex1 ghost source yielded exactly6 finite original tuples, all verified by literal field arithmetic. Original coordinates have339 bits, but this is the exceptional cubic branch, not the full main339-variable system. The outer dimension and16 full-width fibers were independently checked. Nullities varied0..4, including14 rank79 families: generic-rank assumptions would be unsound.
+
+Native wall2.2271105899999384s; charged supervisor lifetime2.381179770003655s includes startup,replay,raw serialization and finalstdout. This is one development run, not repeated performance or a speed ratio. Peak supervisorRSS343412KiB,native-child12032KiB; conservative sum355444KiB is not a simultaneous cgroup peak. Limits and full metrics are preserved.
+
+Next generalizeB with new ordinary-curve oracles: target validation and the constant-norm remainder requireB, while cubic coefficients/Gold identity remain unchanged. The main quintic h/k search,genuineF4/F5/F6,20 hard inputs,many-field timings and novelty remain open. C56's8.57x conditional reference diagnostic is unchanged and does not certify this chart. Qualified speedup remains null.

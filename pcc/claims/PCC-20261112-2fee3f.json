@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:28:39Z",
+ "id": "PCC-20261112-2fee3f",
+ "kind": "statement",
+ "producer": {
+  "commit": "8487859d7aa48d13b0defe7928d915d67352c01f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/native.txt",
+    "sha256": "9bbe3fabf46988c718be5ffcc66d4d4788cae70446af26cc68f632c55a2861e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/clippy.txt",
+    "sha256": "9ec93a9a7ae62334024c095120c5d044549c5df34ca90e8386e8133adb4a7a7e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/source.rs",
+    "sha256": "c89e1ce672e1347a189613e08cc73c2ebf1806d7c62622328626eb7404621f53"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/source.sha256",
+    "sha256": "8b19109c8b329d1ffe3c52d9c58139502fb727794c72eb3a80fc7ed20bf7a48d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-regression-26.txt",
+    "sha256": "11c90778f5f462771857c6f7aa5ec06927fd8c3f5aa80973a2ea295ccb6766f2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned independent flat-field replay28 strictClippy and all4 certificate tests pass:oldT1 both unchanged cases plus bothT2 candidates,exact identities/irreducible sextics/gcd/separabledegree4/complete118finite inputs/signed infinity/four simple geometric poles/wrongcodomain. T2E109 uses existing F101^4 modulus[99,0,0,0,1];all four poles have exact Frobenius orbit4,x inFp2notFp,y^(101\u00b2)=-y,so are absent inFp6. T2E113 retains116finite+2origin and exactly2rational poles inFp6. Failed27/bf2591 preserved;no coefficient-descent or independent oldR2-evaluation claim. Original3 constructor regression26 passes after helper extraction."
+}

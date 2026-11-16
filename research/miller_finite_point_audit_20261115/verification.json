@@ -1,0 +1,83 @@
+{
+  "schema": "miller-finite-point-verification/v1",
+  "source_commit": "9aed9df99b11175bde1d8d5e938512a6ed98f7b1",
+  "claim_id": "PCC-20261115-bb5771",
+  "declaration_sha256": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 30,
+  "gate_declarations": 224,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 344,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-bb5771",
+    "claim_sha256": "130c60ecc58a989ad92f7be2a2065c1c88fe5a3d438ed82ddd47293ace773b13",
+    "commit": "9aed9df99b11175bde1d8d5e938512a6ed98f7b1",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/miller_finite_point_audit_20261115/lean (FinitePointCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T06:18:06Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-bb5771",
+    "claim_sha256": "130c60ecc58a989ad92f7be2a2065c1c88fe5a3d438ed82ddd47293ace773b13",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47123,
+    "sha256": "855fb66d8cee6b165ee3662a9abd3c7a0267bd3ef794efab849726294fd7f262",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 224,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 19,
+    "new_modules": 8,
+    "actual_finite_point_local_DVR_derived": true,
+    "actual_full_function_field_fraction_ring_proved": true,
+    "actual_official_normalized_adic_multiplicities": true,
+    "actual_chord_vertical_three_torsion_point_divisors": true,
+    "actual_two_torsion_uniformizer_guard_counterexample": true,
+    "actual_three_torsion_divisor_guard_counterexample": true,
+    "arbitrary_field_scope": "Actual nonsingular K-points; for elliptic model over algebraically closedK, all geometric points.",
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "general_all_function_divisor_finiteness": false,
+    "full_pairing_or_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

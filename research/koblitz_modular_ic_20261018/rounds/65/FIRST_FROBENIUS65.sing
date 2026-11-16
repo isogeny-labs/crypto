@@ -1,0 +1,135 @@
+LIB "linalg.lib";
+proc require65(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump65(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+matrix sourceGram65=T61;matrix sourceUnit65=unit61;
+require65(nrows(sourceGram65)==32 && ncols(sourceGram65)==32,"FROB65_TRACE_GRAM_SHAPE");
+poly fC65=u^5+u^3+u^2+u+1;
+poly expectedDisc65=u^76*(u+1)^24*fC65^12;
+require65(det(sourceGram65)==expectedDisc65,"FROB65_EXACT_SOURCE_DISCRIMINANT");
+module quotientGB65=std(module(sourceGram65));int quotientLength65=vdim(quotientGB65);
+require65(quotientLength65==160,"FROB65_TRACE_DUAL_QUOTIENT_LENGTH");
+module quotientBasis65=kbase(quotientGB65);matrix sourceQ65=matrix(quotientBasis65);
+require65(nrows(sourceQ65)==32 && ncols(sourceQ65)==quotientLength65,"FROB65_COMPLETE_MODULE_KBASE");
+link quotientOut65="ASCII:w quotient-basis65.sing";open(quotientOut65);
+write(quotientOut65,"ring quotientPolynomial65=2,(u),dp;short=0;");
+dump65(quotientOut65,"sourceGram65",sourceGram65);dump65(quotientOut65,"sourceQ65",sourceQ65);close(quotientOut65);
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots65[32][1];int p65;int i65;int j65;int k65;
+for(p65=1;p65<=528;p65++){
+ if(parents50[p65,1]==parents50[p65,2]){j65=parents50[p65,1];require65(j65>=1 && j65<=32 && squareSlots65[j65,1]==0,"FROB65_ALL_UNIQUE_SQUARE_SLOTS");squareSlots65[j65,1]=p65;}
+}
+matrix squareSource65[32][32];
+for(j65=1;j65<=32;j65++){
+ require65(squareSlots65[j65,1]>0,"FROB65_EVERY_SOURCE_SQUARE_SLOT");
+ for(i65=1;i65<=32;i65++){squareSource65[i65,j65]=table50[i65,squareSlots65[j65,1]];}
+}
+execute(read("../../../61/runs/trace61-01/trace-dual61.sing"));
+map polynomialToField65=tracePolynomial61,u;
+map tableToField65=tablePidCertificate50,u;
+matrix G65=polynomialToField65(sourceGram65);
+matrix Q65=polynomialToField65(sourceQ65);
+matrix one65=polynomialToField65(sourceUnit65);
+matrix S65=tableToField65(squareSource65);
+require65(G65==T61 && G65*inverse61==unitmat(32) && inverse61*G65==unitmat(32),"FROB65_FULL_TRACE_DUAL_INVERSES");
+matrix oneSquared65[32][1];for(i65=1;i65<=32;i65++){oneSquared65[i65,1]=one65[i65,1]^2;}
+require65(S65*oneSquared65==one65,"FROB65_SOURCE_UNIT_SQUARE_CONTROL");
+matrix traceDualCoordinates65=inverse61*Q65;
+matrix squaredCoordinates65[32][quotientLength65];
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=quotientLength65;j65++){
+ squaredCoordinates65[i65,j65]=traceDualCoordinates65[i65,j65]^2;
+}}
+matrix squareImage65=G65*S65*squaredCoordinates65;
+string rationalCode65="matrix numeratorRows65[32]["+string(quotientLength65)+"];matrix denominatorRows65[32]["+string(quotientLength65)+"];";
+number coefficient65;int nonzero65=0;
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=quotientLength65;j65++){
+ require65(diff(squareImage65[i65,j65],q)==0,"FROB65_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage65[i65,j65]!=0){
+  coefficient65=leadcoef(squareImage65[i65,j65]);
+  require65(numerator(coefficient65)/denominator(coefficient65)==coefficient65,"FROB65_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode65=rationalCode65+"numeratorRows65["+string(i65)+","+string(j65)+"]="+string(numerator(coefficient65))+";denominatorRows65["+string(i65)+","+string(j65)+"]="+string(denominator(coefficient65))+";";
+  nonzero65++;
+ }
+}}
+ring binaryRing65=2,(u),dp;short=0;execute(rationalCode65);
+matrix remainderRows65[32][quotientLength65];list denominators65;intvec offsets65;
+poly common65;poly den65;poly exactQuotient65;poly numerator65;poly remainder65;ideal principal65;
+int rows65=0;int degree65;
+for(i65=1;i65<=32;i65++){
+ common65=1;
+ for(j65=1;j65<=quotientLength65;j65++){
+  if(numeratorRows65[i65,j65]!=0){den65=denominatorRows65[i65,j65];require65(den65!=0,"FROB65_NONZERO_DENOMINATOR");common65=(common65*den65)/gcd(common65,den65);}
+ }
+ require65(common65!=0,"FROB65_NONZERO_COMMON_DENOMINATOR");
+ denominators65[i65]=common65;offsets65[i65]=rows65;degree65=deg(common65);
+ if(common65!=1){principal65=std(ideal(common65));}
+ for(j65=1;j65<=quotientLength65;j65++){
+  remainder65=0;
+  if(numeratorRows65[i65,j65]!=0){
+   den65=denominatorRows65[i65,j65];exactQuotient65=common65/den65;
+   require65(exactQuotient65*den65==common65,"FROB65_EXACT_ROW_CLEARING");
+   numerator65=numeratorRows65[i65,j65]*exactQuotient65;
+   if(common65!=1){remainder65=reduce(numerator65,principal65);}
+  }
+  require65(remainder65==0 || deg(remainder65)<degree65,"FROB65_COMPLETE_REMAINDER_BOUND");
+  remainderRows65[i65,j65]=remainder65;
+ }
+ rows65=rows65+degree65;
+}
+matrix binaryMap65[rows65+1][quotientLength65];matrix terms65;poly rebuilt65;int exponent65;
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=quotientLength65;j65++){
+ remainder65=remainderRows65[i65,j65];rebuilt65=0;
+ if(remainder65!=0){terms65=coef(remainder65,u);for(k65=1;k65<=ncols(terms65);k65++){
+  exponent65=deg(terms65[1,k65]);
+  require65(terms65[1,k65]==u^exponent65 && terms65[2,k65]==1,"FROB65_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap65[offsets65[i65]+exponent65+1,j65]=1;
+  rebuilt65=rebuilt65+terms65[1,k65]*terms65[2,k65];
+ }}
+ require65(rebuilt65==remainder65,"FROB65_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank65=mat_rk(binaryMap65);int kernelDimension65=quotientLength65-rank65;
+require65(kernelDimension65>=0,"FROB65_BINARY_RANK_BOUND");
+string rationalKernelCode65="";int changedKernel65=0;
+link out65="ASCII:w square-kernel65.sing";open(out65);
+write(out65,"ring binaryCertificate65=2,(u),dp;short=0;");
+dump65(out65,"numeratorRows65",numeratorRows65);dump65(out65,"denominatorRows65",denominatorRows65);
+dump65(out65,"remainderRows65",remainderRows65);dump65(out65,"binaryMap65",binaryMap65);
+write(out65,"int rank65="+string(rank65)+";int kernelDimension65="+string(kernelDimension65)+";");
+if(kernelDimension65>0){
+ matrix kernelBasis65=matrix(syz(module(binaryMap65)));
+ require65(nrows(kernelBasis65)==quotientLength65 && ncols(kernelBasis65)==kernelDimension65 && mat_rk(kernelBasis65)==kernelDimension65,"FROB65_COMPLETE_KERNEL_DIMENSION");
+ require65(binaryMap65*kernelBasis65==matrix(0,rows65+1,kernelDimension65),"FROB65_ALL_KERNEL_PRODUCTS");
+ for(i65=1;i65<=quotientLength65;i65++){for(j65=1;j65<=kernelDimension65;j65++){require65(kernelBasis65[i65,j65]==0 || kernelBasis65[i65,j65]==1,"FROB65_KERNEL_OVER_F2");}}
+ rationalKernelCode65="matrix rationalKernel65["+string(quotientLength65)+"]["+string(kernelDimension65)+"];";
+ for(i65=1;i65<=quotientLength65;i65++){for(j65=1;j65<=kernelDimension65;j65++){
+  if(kernelBasis65[i65,j65]==1){rationalKernelCode65=rationalKernelCode65+"rationalKernel65["+string(i65)+","+string(j65)+"]=1;";}
+ }}
+ if(rank65>0){
+  int changeColumn65=0;
+  for(i65=1;i65<=rows65+1;i65++){for(j65=1;j65<=quotientLength65;j65++){
+   if(changeColumn65==0 && binaryMap65[i65,j65]!=0){changeColumn65=j65;}
+  }}
+  require65(changeColumn65>0,"FROB65_NONZERO_CHANGED_KERNEL_COLUMN");
+  matrix badKernel65=kernelBasis65;badKernel65[changeColumn65,1]=badKernel65[changeColumn65,1]+1;
+  require65(binaryMap65*badKernel65!=matrix(0,rows65+1,kernelDimension65),"FROB65_CHANGED_KERNEL_REJECTED");changedKernel65=1;
+ }
+ dump65(out65,"kernelBasis65",kernelBasis65);
+}
+close(out65);
+setring traceDual61;
+if(kernelDimension65>0){
+ execute(rationalKernelCode65);
+ matrix wholeFieldImages65=squareImage65*rationalKernel65;
+ for(i65=1;i65<=32;i65++){for(j65=1;j65<=kernelDimension65;j65++){
+  if(wholeFieldImages65[i65,j65]!=0){coefficient65=leadcoef(wholeFieldImages65[i65,j65]);require65(denominator(coefficient65)==1,"FROB65_EVERY_WHOLE_FIELD_SURVIVOR");}
+ }}
+ link sourceOut65="ASCII:w survivor-functions65.sing";open(sourceOut65);
+ write(sourceOut65,"ring survivorField65=(2,u),(q),dp;short=0;");
+ matrix survivorCoordinates65=traceDualCoordinates65*rationalKernel65;
+ dump65(sourceOut65,"survivorCoordinates65",survivorCoordinates65);close(sourceOut65);
+}
+print("FROB65_RESULT order_rank=32 trace_dual_quotient=160 square_columns="+string(quotientLength65)+" binary_rows="+string(rows65)+" square_rank="+string(rank65)+" square_survivor_dimension="+string(kernelDimension65)+" rational_nonzero_entries="+string(nonzero65)+" exact_source_discriminant=1 changed_kernel_rejected="+string(changedKernel65));
+print("FIRST_FROBENIUS65_ALL_CHECKS_PASS");quit;
