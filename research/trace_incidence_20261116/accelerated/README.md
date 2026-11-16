@@ -132,3 +132,11 @@ unchanged; scientific kernels and all development evidence are unchanged.
 The v2 manifest also passes in a separate sparse checkout using read-only local
 Git object alternates (PCC-20261116-f44cc0). This checks source-path coverage;
 object transfer and paid execution are separate requirements. [pcc:unverified]
+
+Broad library validation is separate: it compiled, but the already-failing full
+run was interrupted before completion. Retrying its41 reported failures after
+tracked input restoration leaves32 passing and nine failing (archived records,
+unavailable time-namespace proc files and unchanged registry assertions).
+`development/broad-check-status.json` and the retry transcript retain that
+limit under PCC-20261116-2d5f3f. The full suite is not reported as passing.
+[pcc:unverified]
