@@ -181,7 +181,7 @@ fn main() -> io::Result<()> {
         .unwrap_or_else(|_| "2700".into())
         .parse::<u64>()
         .map_err(|_| io::Error::other("invalid runner lifetime"))?;
-    if !(2700..=7200).contains(&lifetime) {
+    if !(900..=7200).contains(&lifetime) {
         return Err(io::Error::other("runner lifetime outside bounded range"));
     }
     thread::spawn(move || {

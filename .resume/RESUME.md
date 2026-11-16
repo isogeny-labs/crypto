@@ -1,3 +1,53 @@
+# Current checkpoint:36SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/RustICgraph+cheapalgebraicfinderresearchtowardrho parity,Runpodonly
+measurements. No subagents. AllscienceRust. Authpersists/privatepointer
+/tmp/ic-runpod-auth-location;NEVERprintkey/headers/tokens/envresponses/copyAPIkeytoPod.
+
+NEWOWN36PODh0vdoz5vz4mtn3:officialv2CPU4vCPU8GiB0.12USDh/pinnedRustimage,
+900sDELETEguardian(withGraphQLfallback)active. Healthready/startedfalse18:18.
+Privatepod36.id/task36-header/token. No36scientificdispatch/dataYET.
+Allold32/33/34/35ownpodsdeleted.900sttlrequiresremaining>=300beforecall;
+publish/packagepromptlyafterthissourcecommit. No compileractive.
+
+36Amendment31/normalization-plan.json: EXACT35candidateinput571735B SHA256
+11ac30e4e22202b12dd79fe9d30085b15979b89a47809e7e876f9017a875cfe3 at
+/workspace/ic-runpod-runs/runpod-structural-rank-gate-20261116-35/returned/task/run/structural-gate.raw.json.
+RecordedmatrixcomponentONLY/no newDLP/end-to-end35repricing/composition.
+Originalsourcec79c11d6c59a7dbbb60c08892ad6587511b115d7,expected7897311products/
+rank387/columns387/scalar61513282845831007. TwoRREFmodes inONEpairedreplayworker:
+faithfulShoup/u128/inverse/update/targetorder baseline versus skip-zero pivot
+normalization(coefficients+RHS). Existingforward/backwardzeroskipsPRESERVED.
+Solversgetonlymatrix/modulus/target, recordedreferencesemittedaftercomputation.
+Independentcolumn-keyedu128oraclechecksEVERYinsertstateandactualzero-count;
+separatebatchtargetcheck. Productdeltaequalszeros;adds/inv/scans/factorcounts
+same. Candidatezero-testswordeventscharged; nativeothergapsremainunrankable.
+Timingincludesdiagnostichashing/baselinezero-observer/practicalityONLY.
+1pairedreplay,0warm/retry,60worker180whole900runner8GiBfirstallowedCPU.
+
+SourcechecksALLPASS:18driver/20qualifiertests,strictClippy/buildincludingrenderer;
+handcounts/small+widefields/out-of-orderpivots/inconsistentinputs/forgedcounts,
+statesandcompletenesscontrols. Nativeactualwrappercreate-newraw/stdoutcontroland
+Rustcaptureauth/once/warnings-deniedbuildPASS.290source/input/binarymanifestsPASS.
+PCC-20261116-3cbd79unverified. InitialClippyunusedfields/importsfixed/retainedlog.
+No full-libraryrebuildneeded(nativeanalysiscratesourceonly).
+
+NEXTcommit/pushclean36source/spec/manifestsBEFOREprepare-normalization-runpod.sh
+NEW36STAGE INPUT-RAW,uploadimmutablebundleandPOSTrunONCE. Genericcaptureusesrun-task.sh.
+Afterfinishedcollectexactarchive,portablepre/preworker/post/qualifiedhashesand
+sourcecustody,THENimmediatev2DELETE+GET404(orGraphQLfallback). Markprivate
+pod-ID.deleted. Missinganalysislogmustnotstopcleanup. Do NOTredispatchuncertainPOST.
+Reportnormalization-render/normalization-report.typ,inspectEVERYfinalPDFpage,
+exactPDF/SVG/150dpiPNGbenchmarkcopies/largeoriginalLOCALhashcustody. ActualdataPCC,
+lesson/journal/commit/PRupdate;goalactive. No36resultclaimedyet.
+
+35result7f60931a3published/PRupdated,c79sourcebeforecall,actual6171gatewords/
+1of2checksskipped/identicalstreams+scalar, allsource/custody/qualifierPASS. Graph
+LAincomplete903928056050→661359105264,whole6349082215578→6106513264792;
+notcomposablewithfuture36. All35and34origdata/reports/custodybelowunchanged.
+No fullparityadmission/completecost;requiredCIreviewunconfirmed/no manualmerge.
+Keep<=60seccommentary/concreteactions;avoidlongspeculationorunnecessaryrootbuild.
+
 # Current checkpoint:35PUBLISHED/PRUPDATED; no owned paid pod active
 
 35results7f60931a3fede3e33974070a93717b28c73b8dd9PUSHED/PR4288actual35updated
