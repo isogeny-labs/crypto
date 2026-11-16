@@ -1,0 +1,13 @@
+# Normalization source attribution correction
+
+T-1177, 2026-10-31. Producer provenance correction and fresh proof replay. Independent source-fidelity review remains pending.
+
+Four packets copied the first 61 lines of projective_law_gate.rs into source-transform.rs.txt. Those excerpts contain none of choose, transform or map_divisor. The original affine-loop packet actually bound research/five_leads_e2e_20261019/native/genus2_model_gate.rs. Its current full-file hash still equals the original recorded hash. The defect is incorrect source attribution and excerpt selection, not evidence that the canonical source changed. Earlier commentary suggesting a moved canonical function is superseded by this finding.
+
+Affected packets, preserved unchanged: coefficient-array-storage, coefficient-traversal, traversal-polynomial-composition, scale-trim-storage. Their mathematical checks remain recorded as producer proof checks; the excerpts do not supply the advertised source review material. Use this correction's named canonical function bodies and source map for that purpose.
+
+The extractor requires one matching function header, balances braces, and asserts no quoted strings or comments occur in the selected function bodies. It records full-file/function hashes and exact line ranges. Canonical choose, transform and map_divisor are included. In the related gate, choose and transform exist later in the file; map_divisor is absent. In projective_state_collector.rs all three functions exist. Collector choose/transform are byte-identical to canonical. The other present bodies match after the explicitly recorded local-variable identifier replacements: gate out->x in choose, gate scale_inv->inv in transform, collector out->result in map_divisor. These are text comparisons, not a compiler equivalence or independent semantic verdict.
+
+The unchanged Scale, Trim, Bridge, Controls and Readback modules are recompiled in a fresh private directory. The verifier additionally binds canonical genus2_model_gate.rs, projective_state_collector.rs, extraction code and source-map.json, alongside the earlier source/dependency bindings. All five checks passed with unchanged inputs; the 32 named readbacks contain only standard Lean axioms. No proof-source edits were needed. Existing compiled upstream dependencies remain in the trust boundary; this is a producer replay, not independent review.
+
+The report, editable diagram, structured status, corrected function excerpts, full source snapshots, extraction script and receipts are additive. Old evidence is not overwritten. Divisor-validity composition remains the next mathematical step. No scientific campaign, timing or cost ratio.

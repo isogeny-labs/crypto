@@ -1,0 +1,19 @@
+import NonmonicExact
+set_option autoImplicit false
+namespace NonmonicControls
+open NonmonicDivision WideModPow
+theorem inverse_nonunit : il 17 2=9 := by decide
+theorem leading_one_shortcut : il 17 1=1 := by decide
+theorem inverse_one_coefficient : coefficient 17 1 7=7 := by decide
+theorem nonmonic_coefficient : coefficient 17 2 6=3 := by decide
+theorem wrong_raw_coefficient : coefficient 17 2 6≠6 := by decide
+theorem coefficient_zero : coefficient 17 2 0=0 := by decide
+theorem first_step : selected 17 2 [2,2] [2,4,2] (by decide) (by decide)=[2,2] := by decide
+theorem second_step : selected 17 2 [2,2] [2,2] (by decide) (by decide)=[] := by decide
+theorem nonexact_step : selected 17 2 [2,2] [3,2] (by decide) (by decide)=[1] := by decide
+theorem zero_leading_excluded : ¬((0:UInt64)≠0) := by decide
+theorem untrimmed_divisor_leading_zero : ([2,0]:List UInt64).getLast?=some 0 := by decide
+theorem composite_inverse_failure : ((2:UInt64)*inverseGenerator 15 2)%15≠1 := by decide
+theorem composite_not_prime : ¬Nat.Prime 15 := by decide
+theorem empty_divisor_has_no_leading : ([]:List UInt64).getLast?=none := rfl
+end NonmonicControls

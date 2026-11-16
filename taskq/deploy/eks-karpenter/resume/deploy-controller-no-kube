@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# deploy-controller's package/upload/CloudFormation steps, run from a merged main
+# checkout. The namespace/rbac kubectl apply steps are skipped: this host cannot
+# reach the EKS API and namespace.yaml/rbac.yaml/bridge.yaml are unchanged by the PR.
+set -euo pipefail
+R=$(git -C "$(dirname "$0")" rev-parse --show-toplevel); here=$R/taskq/deploy/eks-karpenter/resume
+S=${ISOLAB_RECOVERY_WORKDIR:?set to a writable scratch directory}
+W=$S/recovery-deploy; mkdir -p $W
+[[ $(aws sts get-caller-identity --query Account --output text) == 104186811093 ]]
+export AWS_REGION=us-east-2 AWS_DEFAULT_REGION=us-east-2
+rev=$(git -C $R rev-parse HEAD); git -C $R merge-base --is-ancestor $rev origin/main
+git -C $R diff --quiet || { echo dirty; exit 2; }
+export CARGO_TARGET_DIR=/dev/shm/criu-deploy-target
+cargo +1.99.1 build --locked --release --manifest-path "$here/controller/Cargo.toml" --target x86_64-unknown-linux-musl
+cargo +1.99.1 build --locked --release --manifest-path "$here/../mcp/Cargo.toml" --target-dir /dev/shm/criu-deploy-mcp
+package=$(mktemp -d "$W/package.XXXXXX"); mkdir -p "$package/bin" "$package/deploy/remote" "$package/resume"
+install -m755 /dev/shm/criu-deploy-target/x86_64-unknown-linux-musl/release/isolab-eks-recovery "$package/bin/"
+install -m755 /dev/shm/criu-deploy-mcp/release/isolab-eks-mcp "$package/bin/"
+install -m755 "${ISOLAB_KUBECTL:?path to the kubectl binary to package}" "$package/bin/"
+install -m755 "$here/../submit-job" "$package/deploy/"
+install -m755 "$here/../remote/verify-build" "$package/deploy/remote/"
+install -m755 "$here/run-controller" "$package/resume/"
+cp "$here/buildspec.yml" "$package/resume/"
+(cd "$package" && sha256sum bin/* deploy/submit-job deploy/remote/* resume/* > SHA256SUMS && zip -q -X -r controller.zip bin deploy resume SHA256SUMS)
+digest=$(sha256sum "$package/controller.zip" | cut -d' ' -f1)
+key="inputs/recovery-controllers/$digest.zip"; bucket=isolab-results-104186811093-us-east-2
+aws s3 cp "$package/controller.zip" "s3://$bucket/$key" --only-show-errors --sse AES256
+version=$(aws s3api head-object --bucket "$bucket" --key "$key" --query VersionId --output text)
+[[ "$version" != null && "$version" != None && -n "$version" ]]
+aws cloudformation describe-stacks --stack-name isolab-remote-launcher --query 'Stacks[0]' > "$W/remote-stack.json"
+vpc=$(jq -r '.Parameters[]|select(.ParameterKey=="VpcId")|.ParameterValue' "$W/remote-stack.json")
+subnets=$(jq -r '.Parameters[]|select(.ParameterKey=="PrivateSubnets")|.ParameterValue' "$W/remote-stack.json")
+sg=$(jq -r '.Parameters[]|select(.ParameterKey=="ClusterSecurityGroup")|.ParameterValue' "$W/remote-stack.json")
+trigger=$(jq -r '.Outputs[]|select(.OutputKey=="TriggerRoleArn")|.OutputValue|split("/")[-1]' "$W/remote-stack.json")
+aws cloudformation deploy --stack-name isolab-recovery-controller --template-file "$here/bridge.yaml" \
+  --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset \
+  --parameter-overrides "LauncherKey=$key" "LauncherVersion=$version" "VpcId=$vpc" \
+  "PrivateSubnets=$subnets" "ClusterSecurityGroup=$sg" "TriggerRoleName=$trigger"
+jq -n --arg key "$key" --arg version "$version" --arg sha "$digest" --arg rev "$rev" \
+  --arg sup "$(sha256sum "$package/bin/isolab-eks-recovery" | cut -d' ' -f1)" \
+  '{key:$key,version:$version,sha256:$sha,source_revision:$rev,supervisor_sha256:$sup}' > "$W/controller-source.json"
+cat "$W/controller-source.json"

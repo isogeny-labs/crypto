@@ -1,0 +1,63 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+S4Degree.lean:49:61: error: unsolved goals
+R : Type u_1
+inst✝ : CommRing R
+a b c z b2 b4 b6 b8 : R
+⊢ a * z * (⋯ ^ 2).coeff 3 * c * 2 - a * z * X.coeff 4 * b8 * b2 * b + a * z * (⋯ * ⋯ * C c * C b2 * 2).coeff 4 +
+                                                                                        a * z *
+                                                                                          (X ^ 2 * C c * C b6 * 2).coeff
+                                                                                            4 -
+                                                                                      a * z *
+                                                                                        (X ^ 2 * C b8 * C b * 2).coeff
+                                                                                          4 +
+                                                                                    a * z *
+                                                                                      (C b4 * X ^ 3 * C c * 6).coeff 4 -
+                                                                                  a * z *
+                                                                                    (X ^ 3 * C b6 * C b * 2).coeff 4 -
+                                                                                a * z ^ 2 * X.coeff 4 * b2 * b * b6 -
+                                                                              a * z ^ 2 * X.coeff 4 * b * b4 ^ 2 +
+                                                                            a * z ^ 2 *
+                                                                              (C b4 * X ^ 2 * C c * 4).coeff 4 -
+                                                                          a * z ^ 2 * (X ^ 2 * C b6 * C b * 3).coeff 4 +
+                                                                        a * z ^ 2 * (X ^ 3 * C c * C b2 * 4).coeff 4 +
+                                                                      a * z ^ 2 * (X ^ 4 * C c * 2).coeff 4 +
+                                                                    a * z ^ 3 * (X ^ 2 * C c * C b2 * 4).coeff 4 +
+                                                                  a * z ^ 3 * (X ^ 3 * C c * 12).coeff 4 +
+                                                                a * z ^ 3 * (X ^ 4 * C b * 2).coeff 4 +
+                                                              a * z ^ 4 * (X ^ 2 * C c * 2).coeff 4 +
+                                                            a * z ^ 4 * (X ^ 3 * C b * 2).coeff 4 -
+                                                          a * X.coeff 4 * b8 * b * b4 -
+                                                        a * X.coeff 4 * b * b6 ^ 2 +
+                                                      a * (X ^ 2 * C c * C b8 * 2).coeff 4 +
+                                                    a * (X ^ 3 * C c * C b6 * 2).coeff 4 +
+                                                  a ^ 2 * z * (C b6 ^ 2).coeff 3 * 2 +
+                                                a ^ 2 * z * (C b4 * X ^ 2 * C b6 * 2).coeff 4 -
+                                              a ^ 2 * z ^ 2 * (X ^ 2 * C b8 * 2).coeff 4 -
+                                            a ^ 2 * z ^ 2 * (X ^ 3 * C b6 * 2).coeff 4 -
+                                          a ^ 2 * z ^ 3 * (X ^ 2 * C b6 * 2).coeff 4 -
+                                        a ^ 2 * z ^ 3 * (C b4 * X ^ 3 * 2).coeff 4 +
+                                      a ^ 2 * z ^ 4 +
+                                    z * b8 * (C b ^ 2).coeff 3 * 2 -
+                                  z * (X ^ 3 * C c ^ 2 * 4).coeff 4 +
+                                z * (X ^ 4 * C c * C b * 2).coeff 4 -
+                              z ^ 2 * c * X.coeff 4 * b * b4 +
+                            z ^ 2 * X.coeff 4 * b ^ 2 * b6 +
+                          z ^ 2 * b ^ 2 +
+                        z ^ 2 * (C b4 * X ^ 2 * C b ^ 2 * 2).coeff 4 -
+                      z ^ 2 * (X ^ 2 * C c * C b2 * C b * 2).coeff 4 +
+                    z ^ 2 * (X ^ 2 * C c ^ 2 * 6).coeff 4 -
+                  z ^ 2 * (X ^ 3 * C c * C b * 2).coeff 4 +
+                z ^ 3 * c * X.coeff 4 * b2 * b -
+              z ^ 3 * X.coeff 4 * b ^ 2 * b4 -
+            z ^ 3 * (C c ^ 2).coeff 3 * 4 -
+          z ^ 3 * (X ^ 2 * C c * C b * 2).coeff 4 -
+        z ^ 3 * (X ^ 3 * C b ^ 2 * 2).coeff 4 +
+      c ^ 2 =
+    a * z ^ 2 * c * 2 + a * z ^ 3 * b * 2 + a ^ 2 * z ^ 4 + z * c * b * 2 + z ^ 2 * b ^ 2 + c ^ 2
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

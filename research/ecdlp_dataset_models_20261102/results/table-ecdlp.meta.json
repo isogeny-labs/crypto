@@ -1,0 +1,36 @@
+{
+  "canary": false,
+  "endpoint": "ecdlp",
+  "excluded": {
+    "no_feature_identity": 1,
+    "status:error": 20,
+    "status:unsupported": 120
+  },
+  "feature_names": [
+    "n",
+    "m",
+    "twist",
+    "log2_subgroup_order",
+    "log2_group_order",
+    "log2_cofactor",
+    "factor_base_points",
+    "factor_base_orbits",
+    "mean_orbit_size",
+    "frobenius_power",
+    "frobenius_nontrivial",
+    "negation",
+    "coefficient_field_degree",
+    "characteristic_two",
+    "family_koblitz",
+    "family_binary",
+    "family_prime",
+    "arm_enumerate",
+    "arm_bsgs",
+    "arm_root",
+    "arm_double-large-prime"
+  ],
+  "label": "1 = scalar recovered without the witness and independently replayed within the cap; 0 = otherwise (censored, or completed without a scalar)",
+  "query_input": "arm_* one-hot: the method being attempted, chosen before any outcome exists",
+  "rows": 819,
+  "schema": "ecdlp-dataset-models.table/v1"
+}

@@ -1,0 +1,15 @@
+digraph precision {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.3",nodesep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f3fa",fontname="Helvetica",fontsize=12,margin="0.15"];
+ edge [color="#334155",fontname="Helvetica",fontsize=10];
+ basis [label="Actual Hermite basis E_t\nintegral local product; unit constant 1"];
+ inverse [label="Constructed reciprocal\nfinite mapped inverse buffer"];
+ mirror [label="Actual centered-grid involution\nvaluation pairing and all source levels"];
+ moment [label="Finite second moment <= 6 D_i\nv2(E_t(0)) >= -6 h D_i"];
+ eval [label="Explicit integral evaluation numerator\nloss at most 4 M (a + 1)"];
+ stable [label="Original p_t = p + 8 h D_i + 8 M (a + 1)\nactual finite-functional error lies in 2^p O"];
+ exact [label="OPEN: exact reconstruction from input jets\ncoordinate and bit-cost refinement",fillcolor="#fff2d4",style="rounded,filled,dashed"];
+ basis -> inverse; mirror -> moment; basis -> moment;
+ inverse -> stable; moment -> stable; eval -> stable;
+ stable -> exact [style=dashed];
+}

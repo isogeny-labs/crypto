@@ -1,0 +1,43 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-primeleads-rerun-20261101-R1-v2
+experiment_id: prime_field_leads_20261031_rerun_20261101
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: bc7b2d085be55353f7520b485a45132ea588be66
+receipt: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R1-v2/receipt.json
+binds:
+- path: research/prime_field_leads_20261031/rerun_20261101/run_stage.sh
+  sha256: 8075791332b655cd6f114ad3d5e0cb7f5621f66ce88a949473f76373b6345fdf
+- path: research/prime_field_leads_20261031/rerun_20261101/RERUN_PLAN.md
+  sha256: 3f60f9637cb0759fdf014d04bb999cd3bf17474ee513865e2abff2c0630bab0c
+- path: research/prime_field_leads_20261031/rerun_20261101/binaries.sha256
+  sha256: 1d000893c23cbd500dd7e15773a233a74d331299aac0e24735470734fefa42d2
+- path: research/prime_field_leads_20261031/rerun_20261101/msolve_version.txt
+  sha256: 28f7c8d0e9a3362e1b7a0f02d4f514b7e644849ba7d501e67af6a51de2c580e4
+- path: research/prime_field_leads_20261031/L2b_dreg_trajectory/run_cell.sh
+  sha256: 12080f68068dfb594d5b8a8046f6eec1ba77286a127fc51b522057f4393568d3
+- path: research/prime_field_leads_20261031/L2b_dreg_trajectory/summarize.sh
+  sha256: 1f827ab44d1b2ed56dd681d33ec368e17442fc44e682946e22988ded86a9699d
+- path: research/prime_field_leads_20261031/L2b_dreg_trajectory/run_ladder.sh
+  sha256: c5e320c1138e3eaf9294dbf8105a9120444225962eab8681c5f0f0c5d8779945
+- path: research/prime_field_leads_20261031/L2b_dreg_trajectory/PREREG.md
+  sha256: 1f28419b93b2c72c89e8403ac1c1a9959c2ef914ede2dc034db5b84339ba2a02
+must_not_exist:
+- research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R1-v2
+commands:
+- id: l2b
+  argv:
+  - research/prime_field_leads_20261031/rerun_20261101/run_stage.sh
+  - l2b
+  timeout_seconds: 18000
+  success_exit_codes:
+  - 0
+  stdout: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R1-v2/l2b.stdout
+  stderr: research/prime_field_leads_20261031/rerun_20261101/receipts/CARD-primeleads-rerun-20261101-R1-v2/l2b.stderr
+bus_address: executor-mechanical-primeleads-r1
+background: true
+write_scope:
+- research/prime_field_leads_20261031/rerun_20261101/
+stop_when:
+- Any command exits nonzero or reaches its timeout; no retry; return the receipt summary unchanged.

@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-05T16:42:28.399899+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-miller-builder/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-miller-builder-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-miller-builder-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 20,
+  "output_packet": "research/primefield-companion-followup-20261102/feature-native-miller-builder/program.tsv",
+  "overflow_checks": true,
+  "comparative_panel": false,
+  "binary_sha256": "b62810f445e79ae268ab24a27eac7e8df50ae2d32d34e8f9dd6d65ad3f084df9"
+}

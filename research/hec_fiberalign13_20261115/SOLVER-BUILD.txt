@@ -1,0 +1,373 @@
+Cloning into 'tmp/msolve'...
+Note: switching to 'cc044551f8e202d00691990fd3fd0b1226a88ea2'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: no obvious need to run autopoint
+autoreconf: running: aclocal --force 
+autoreconf: configure.ac: tracing
+autoreconf: running: glibtoolize --copy --force
+glibtoolize: putting auxiliary files in '.'.
+glibtoolize: copying file './ltmain.sh'
+glibtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+glibtoolize: copying file 'm4/libtool.m4'
+glibtoolize: copying file 'm4/ltoptions.m4'
+glibtoolize: copying file 'm4/ltsugar.m4'
+glibtoolize: copying file 'm4/ltversion.m4'
+glibtoolize: copying file 'm4/lt~obsolete.m4'
+glibtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: configure.ac: no need to run autopoint (confirmed)
+autoreconf: running: aclocal --force 
+autoreconf: running: /opt/homebrew/Cellar/autoconf/2.73/bin/autoconf --force
+autoreconf: running: /opt/homebrew/Cellar/autoconf/2.73/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:17: installing './ar-lib'
+configure.ac:14: installing './compile'
+configure.ac:18: installing './config.guess'
+configure.ac:18: installing './config.sub'
+configure.ac:7: installing './install-sh'
+configure.ac:7: installing './missing'
+Makefile.am: installing './depcomp'
+parallel-tests: installing './test-driver'
+autoreconf: configure.ac: not running make: --make not given
+autoreconf: Leaving directory '.'
+checking for a BSD-compatible install... /opt/homebrew/bin/ginstall -c
+checking whether sleep supports fractional seconds... yes
+checking filesystem timestamp resolution... 2
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /opt/homebrew/bin/gmkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking xargs -n works... yes
+checking whether UID '501' is supported by ustar format... yes
+checking whether GID '20' is supported by ustar format... yes
+checking how to create a ustar tar archive... plaintar
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... /usr/bin/clang
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether /usr/bin/clang accepts -g... yes
+checking for /usr/bin/clang option to enable C23 features... -std=gnu23
+checking whether /usr/bin/clang -std=gnu23 understands -c and -o together... yes
+checking dependency style of /usr/bin/clang -std=gnu23... gcc3
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for wchar.h... yes
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking for ar... ar
+checking the archiver (ar) interface... ar
+checking build system type... aarch64-apple-darwin27.2.0
+checking host system type... aarch64-apple-darwin27.2.0
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /usr/bin/clang -std=gnu23... /Library/Developer/CommandLineTools/usr/bin/ld
+checking if the linker (/Library/Developer/CommandLineTools/usr/bin/ld) is GNU ld... no
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 786432
+checking how to convert aarch64-apple-darwin27.2.0 file names to aarch64-apple-darwin27.2.0 format... func_convert_file_noop
+checking how to convert aarch64-apple-darwin27.2.0 file names to toolchain format... func_convert_file_noop
+checking for /Library/Developer/CommandLineTools/usr/bin/ld option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ranlib... ranlib
+checking for archiver @FILE support... no
+checking for strip... strip
+checking command to parse /usr/bin/nm -B output from /usr/bin/clang -std=gnu23 object... ok
+checking for sysroot... no
+checking for a working dd... /bin/dd
+checking how to truncate binary pipes... /bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dsymutil... dsymutil
+checking for nmedit... nmedit
+checking for lipo... lipo
+checking for otool... otool
+checking for otool64... no
+checking for -single_module linker flag... ld: warning: -single_module is obsolete
+no
+checking for -no_fixup_chains linker flag... yes
+checking for -exported_symbols_list linker flag... yes
+checking for -force_load linker flag... yes
+checking for dlfcn.h... yes
+checking which variant of shared library versioning to provide... (default) aix
+checking for objdir... .libs
+checking if /usr/bin/clang -std=gnu23 supports -fno-rtti -fno-exceptions... yes
+checking for /usr/bin/clang -std=gnu23 option to produce PIC... -fno-common -DPIC
+checking if /usr/bin/clang -std=gnu23 PIC flag -fno-common -DPIC works... yes
+checking if /usr/bin/clang -std=gnu23 static flag -static works... no
+checking if /usr/bin/clang -std=gnu23 supports -c -o file.o... yes
+checking if /usr/bin/clang -std=gnu23 supports -c -o file.o... (cached) yes
+checking whether the /usr/bin/clang -std=gnu23 linker (/Library/Developer/CommandLineTools/usr/bin/ld) supports shared libraries... yes
+checking dynamic linker characteristics... darwin27.2.0 dyld
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for gcc... (cached) /usr/bin/clang
+checking whether the compiler supports GNU C... (cached) yes
+checking whether /usr/bin/clang accepts -g... (cached) yes
+checking for /usr/bin/clang option to enable C23 features... (cached) -std=gnu23
+checking whether /usr/bin/clang -std=gnu23 understands -c and -o together... (cached) yes
+checking dependency style of /usr/bin/clang -std=gnu23... (cached) gcc3
+checking for library containing atan2... none required
+checking for library containing __gmpz_init... -lgmp
+checking for library containing mpfr_init... -lmpfr
+checking for library containing fmpz_add_ui... -lflint
+checking for flint/nmod.h... yes
+checking for /usr/bin/clang -std=gnu23 option to support OpenMP... none needed
+checking for inttypes.h... (cached) yes
+checking for stdint.h... (cached) yes
+checking for inline... inline
+checking for int16_t... yes
+checking for int32_t... yes
+checking for int64_t... yes
+checking for int8_t... yes
+checking for size_t... yes
+checking for uint16_t... yes
+checking for uint32_t... yes
+checking for uint64_t... yes
+checking for uint8_t... yes
+checking the number of available CPUs... 14 
+checking for x86 cpuid  output... unknown
+checking for x86-AVX xgetbv  output... unknown
+checking for __builtin_constant_p... yes
+checking for __builtin_clzll... yes
+checking for __builtin_clzl... yes
+checking for floor... yes
+checking for getdelim... yes
+checking for gettimeofday... yes
+checking for memmove... yes
+checking for memset... yes
+checking for malloc... yes
+checking for realloc... yes
+checking for pow... yes
+checking for sqrt... yes
+checking for strchr... yes
+checking for strstr... yes
+checking for strtol... yes
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating msolve.pc
+config.status: creating src/fglm/Makefile
+config.status: creating src/neogb/Makefile
+config.status: creating src/usolve/Makefile
+config.status: creating src/msolve/Makefile
+config.status: creating src/msolve/msolve-version.h
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+/Library/Developer/CommandLineTools/usr/bin/make  all-recursive
+Making all in src/usolve
+/bin/sh ../../libtool  --tag=CC   --mode=compile /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../..   -Xpreprocessor -fopenmp    -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libusolve_la-usolve.lo -MD -MP -MF .deps/libusolve_la-usolve.Tpo -c -o libusolve_la-usolve.lo `test -f 'usolve.c' || echo './'`usolve.c
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libusolve_la-usolve.lo -MD -MP -MF .deps/libusolve_la-usolve.Tpo -c usolve.c  -fno-common -DPIC -o .libs/libusolve_la-usolve.o
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libusolve_la-usolve.lo -MD -MP -MF .deps/libusolve_la-usolve.Tpo -c usolve.c -o libusolve_la-usolve.o >/dev/null 2>&1
+mv -f .deps/libusolve_la-usolve.Tpo .deps/libusolve_la-usolve.Plo
+/bin/sh ../../libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o libusolve.la  libusolve_la-usolve.lo  -lflint -lmpfr -lgmp 
+libtool: link: ar cr .libs/libusolve.a .libs/libusolve_la-usolve.o 
+libtool: link: ranlib .libs/libusolve.a
+libtool: link: ( cd ".libs" && rm -f "libusolve.la" && ln -s "../libusolve.la" "libusolve.la" )
+Making all in src/fglm
+/bin/sh ../../libtool  --tag=CC   --mode=compile /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../..   -Xpreprocessor -fopenmp    -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libfglm_la-fglm_core.lo -MD -MP -MF .deps/libfglm_la-fglm_core.Tpo -c -o libfglm_la-fglm_core.lo `test -f 'fglm_core.c' || echo './'`fglm_core.c
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libfglm_la-fglm_core.lo -MD -MP -MF .deps/libfglm_la-fglm_core.Tpo -c fglm_core.c  -fno-common -DPIC -o .libs/libfglm_la-fglm_core.o
+fglm_core.c:455:51: warning: unused parameter 'st' [-Wunused-parameter]
+  455 |                                             md_t *st){
+      |                                                   ^
+fglm_core.c:500:15: warning: unused parameter 'st' [-Wunused-parameter]
+  500 |                                                   md_t *st){
+      |                                                         ^
+2 warnings generated.
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libfglm_la-fglm_core.lo -MD -MP -MF .deps/libfglm_la-fglm_core.Tpo -c fglm_core.c -o libfglm_la-fglm_core.o >/dev/null 2>&1
+mv -f .deps/libfglm_la-fglm_core.Tpo .deps/libfglm_la-fglm_core.Plo
+/bin/sh ../../libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -Wall -Wextra -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o libfglm.la  libfglm_la-fglm_core.lo  -lflint -lmpfr -lgmp 
+libtool: link: ar cr .libs/libfglm.a .libs/libfglm_la-fglm_core.o 
+libtool: link: ranlib .libs/libfglm.a
+libtool: link: ( cd ".libs" && rm -f "libfglm.la" && ln -s "../libfglm.la" "libfglm.la" )
+Making all in src/neogb
+/bin/sh ../../libtool  --tag=CC   --mode=compile /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../..   -Xpreprocessor -fopenmp    -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libneogb_la-gb.lo -MD -MP -MF .deps/libneogb_la-gb.Tpo -c -o libneogb_la-gb.lo `test -f 'gb.c' || echo './'`gb.c
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libneogb_la-gb.lo -MD -MP -MF .deps/libneogb_la-gb.Tpo -c gb.c  -fno-common -DPIC -o .libs/libneogb_la-gb.o
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libneogb_la-gb.lo -MD -MP -MF .deps/libneogb_la-gb.Tpo -c gb.c -o libneogb_la-gb.o >/dev/null 2>&1
+mv -f .deps/libneogb_la-gb.Tpo .deps/libneogb_la-gb.Plo
+/bin/sh ../../libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -version-info 4:0:0 -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o libneogb.la -rpath /usr/local/lib libneogb_la-gb.lo  -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -dynamiclib -Wl,-undefined -Wl,dynamic_lookup -Wl,-no_fixup_chains -o .libs/libneogb.4.dylib  .libs/libneogb_la-gb.o   -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -lflint -lmpfr -lgmp  -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2   -install_name  /usr/local/lib/libneogb.4.dylib -compatibility_version 5 -current_version 5.0 
+libtool: link: (cd ".libs" && rm -f "libneogb.dylib" && ln -s "libneogb.4.dylib" "libneogb.dylib")
+libtool: link: ar cr .libs/libneogb.a libneogb_la-gb.o
+libtool: link: ranlib .libs/libneogb.a
+libtool: link: ( cd ".libs" && rm -f "libneogb.la" && ln -s "../libneogb.la" "libneogb.la" )
+Making all in src/msolve
+/bin/sh ../../libtool  --tag=CC   --mode=compile /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../..   -Xpreprocessor -fopenmp    -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libmsolve_la-libmsolve.lo -MD -MP -MF .deps/libmsolve_la-libmsolve.Tpo -c -o libmsolve_la-libmsolve.lo `test -f 'libmsolve.c' || echo './'`libmsolve.c
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libmsolve_la-libmsolve.lo -MD -MP -MF .deps/libmsolve_la-libmsolve.Tpo -c libmsolve.c  -fno-common -DPIC -o .libs/libmsolve_la-libmsolve.o
+libtool: compile:  /usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I. -I../.. -Xpreprocessor -fopenmp -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT libmsolve_la-libmsolve.lo -MD -MP -MF .deps/libmsolve_la-libmsolve.Tpo -c libmsolve.c -o libmsolve_la-libmsolve.o >/dev/null 2>&1
+mv -f .deps/libmsolve_la-libmsolve.Tpo .deps/libmsolve_la-libmsolve.Plo
+/bin/sh ../../libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -version-info 4:0:0 -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o libmsolve.la -rpath /usr/local/lib libmsolve_la-libmsolve.lo ../usolve/libusolve.la ../fglm/libfglm.la ../neogb/libneogb.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -dynamiclib -Wl,-undefined -Wl,dynamic_lookup -Wl,-no_fixup_chains -o .libs/libmsolve.4.dylib  .libs/libmsolve_la-libmsolve.o   -Wl,-force_load,../usolve/.libs/libusolve.a -Wl,-force_load,../fglm/.libs/libfglm.a  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp ../neogb/.libs/libneogb.dylib -lflint -lmpfr -lgmp  -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -O2   -install_name  /usr/local/lib/libmsolve.4.dylib -compatibility_version 5 -current_version 5.0 
+libtool: link: (cd ".libs" && rm -f "libmsolve.dylib" && ln -s "libmsolve.4.dylib" "libmsolve.dylib")
+libtool: link: (cd .libs/libmsolve.lax/libusolve.a && ar x "/Volumes/SSD990-2/hec-inverse-work/research/hec_fiberalign13_20261115/tmp/msolve/src/msolve/../usolve/.libs/libusolve.a")
+libtool: link: (cd .libs/libmsolve.lax/libfglm.a && ar x "/Volumes/SSD990-2/hec-inverse-work/research/hec_fiberalign13_20261115/tmp/msolve/src/msolve/../fglm/.libs/libfglm.a")
+libtool: link: ar cr .libs/libmsolve.a libmsolve_la-libmsolve.o  .libs/libmsolve.lax/libusolve.a/libusolve_la-usolve.o  .libs/libmsolve.lax/libfglm.a/libfglm_la-fglm_core.o 
+libtool: link: ranlib .libs/libmsolve.a
+libtool: link: rm -fr .libs/libmsolve.lax
+libtool: link: ( cd ".libs" && rm -f "libmsolve.la" && ln -s "../libmsolve.la" "libmsolve.la" )
+depbase=`echo src/msolve/main.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT src/msolve/main.o -MD -MP -MF $depbase.Tpo -c -o src/msolve/main.o src/msolve/main.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o msolve src/msolve/main.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/msolve src/msolve/main.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+Making check in src/usolve
+make[1]: Nothing to be done for `check'.
+Making check in src/fglm
+make[1]: Nothing to be done for `check'.
+Making check in src/neogb
+make[1]: Nothing to be done for `check'.
+Making check in src/msolve
+make[1]: Nothing to be done for `check'.
+/Library/Developer/CommandLineTools/usr/bin/make  neogb_io fglm_build_matrixn_radical-shape-31 fglm_build_matrixn_nonradical-shape-31 fglm_build_matrixn_nonradical-radicalshape-31 line_endings_support
+depbase=`echo test/neogb/io/validate_input_data.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT test/neogb/io/validate_input_data.o -MD -MP -MF $depbase.Tpo -c -o test/neogb/io/validate_input_data.o test/neogb/io/validate_input_data.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+depbase=`echo test/fglm/build_matrixn_radical-shape-31.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT test/fglm/build_matrixn_radical-shape-31.o -MD -MP -MF $depbase.Tpo -c -o test/fglm/build_matrixn_radical-shape-31.o test/fglm/build_matrixn_radical-shape-31.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+depbase=`echo test/fglm/build_matrixn_nonradical-shape-31.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT test/fglm/build_matrixn_nonradical-shape-31.o -MD -MP -MF $depbase.Tpo -c -o test/fglm/build_matrixn_nonradical-shape-31.o test/fglm/build_matrixn_nonradical-shape-31.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+depbase=`echo test/fglm/build_matrixn_nonradical-radicalshape-31.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT test/fglm/build_matrixn_nonradical-radicalshape-31.o -MD -MP -MF $depbase.Tpo -c -o test/fglm/build_matrixn_nonradical-radicalshape-31.o test/fglm/build_matrixn_nonradical-radicalshape-31.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+depbase=`echo test/msolve/line_endings_support.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+	/usr/bin/clang -std=gnu23 -DHAVE_CONFIG_H -I.   -Xpreprocessor -fopenmp    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -MT test/msolve/line_endings_support.o -MD -MP -MF $depbase.Tpo -c -o test/msolve/line_endings_support.o test/msolve/line_endings_support.c &&\
+	mv -f $depbase.Tpo $depbase.Po
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o neogb_io test/neogb/io/validate_input_data.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o fglm_build_matrixn_radical-shape-31 test/fglm/build_matrixn_radical-shape-31.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/neogb_io test/neogb/io/validate_input_data.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o fglm_build_matrixn_nonradical-shape-31 test/fglm/build_matrixn_nonradical-shape-31.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/fglm_build_matrixn_radical-shape-31 test/fglm/build_matrixn_radical-shape-31.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o fglm_build_matrixn_nonradical-radicalshape-31 test/fglm/build_matrixn_nonradical-radicalshape-31.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/fglm_build_matrixn_nonradical-shape-31 test/fglm/build_matrixn_nonradical-shape-31.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+/bin/sh ./libtool  --tag=CC   --mode=link /usr/bin/clang -std=gnu23    -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib -lomp -o line_endings_support test/msolve/line_endings_support.o src/neogb/libneogb.la src/fglm/libfglm.la src/usolve/libusolve.la -lflint -lmpfr -lgmp 
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/fglm_build_matrixn_nonradical-radicalshape-31 test/fglm/build_matrixn_nonradical-radicalshape-31.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+libtool: link: /usr/bin/clang -std=gnu23 -O2 -I/opt/homebrew/opt/flint/include -I/opt/homebrew/include -I/opt/homebrew/opt/libomp/include -o .libs/line_endings_support test/msolve/line_endings_support.o  -L/opt/homebrew/opt/flint/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/libomp/lib src/neogb/.libs/libneogb.dylib src/fglm/.libs/libfglm.a src/usolve/.libs/libusolve.a -lomp -lflint -lmpfr -lgmp
+/Library/Developer/CommandLineTools/usr/bin/make  check-TESTS
+PASS: neogb_io
+PASS: fglm_build_matrixn_radical-shape-31
+PASS: fglm_build_matrixn_nonradical-radicalshape-31
+PASS: fglm_build_matrixn_nonradical-shape-31
+PASS: line_endings_support
+PASS: test/diff/diff_bug-68.sh
+PASS: test/diff/diff_bug-2nd-prime-bad.sh
+PASS: test/diff/diff_bug-empty-tracer.sh
+PASS: test/diff/diff_cp-d3-n4-p2.sh
+PASS: test/diff/diff_cyclic5-16.sh
+PASS: test/diff/diff_cyclic5-31.sh
+PASS: test/diff/diff_bug-prob-sparse-dense-la.sh
+PASS: test/diff/diff_cyclic5-qq.sh
+PASS: test/diff/diff_eco6-16.sh
+PASS: test/diff/diff_eco6-31.sh
+PASS: test/diff/diff_eco6-qq.sh
+PASS: test/diff/diff_elim-31.sh
+PASS: test/diff/diff_elim-qq.sh
+PASS: test/diff/diff_empty-elim-qq.sh
+PASS: test/diff/diff_f4sat-31.sh
+PASS: test/diff/diff_f4sat-byone-31.sh
+PASS: test/diff/diff_f4sat-field-char.sh
+PASS: test/diff/diff_eco10-31.sh
+PASS: test/diff/diff_f4sat-zero-input.sh
+PASS: test/diff/diff_f4sat-is-saturated-check.sh
+PASS: test/diff/diff_hankel-degenerate-16.sh
+PASS: test/diff/diff_sum-squares-system.sh
+PASS: test/diff/diff_henrion5-qq.sh
+PASS: test/diff/diff_input-overflow-a-16.sh
+PASS: test/diff/diff_input-overflow-b-16.sh
+PASS: test/diff/diff_issue-230.sh
+PASS: test/diff/diff_issue-230-squared.sh
+PASS: test/diff/diff_issue-310-bivariate.sh
+PASS: test/diff/diff_kat6-31.sh
+PASS: test/diff/diff_kat7-qq.sh
+PASS: test/diff/diff_kat8-qq-truncate.sh
+PASS: test/diff/diff_line-endings.sh
+PASS: test/diff/diff_linear0-qq.sh
+PASS: test/diff/diff_groebner-g2.sh
+PASS: test/diff/diff_linear1-qq.sh
+PASS: test/diff/diff_maxbitsize-bug.sh
+PASS: test/diff/diff_linear2-qq.sh
+PASS: test/diff/diff_mq-2-1.sh
+PASS: test/diff/diff_multy-16.sh
+PASS: test/diff/diff_multy-31.sh
+PASS: test/diff/diff_nf-16.sh
+PASS: test/diff/diff_nf-31.sh
+PASS: test/diff/diff_multy-qq.sh
+PASS: test/diff/diff_nf-8.sh
+PASS: test/diff/diff_nf-lm-bug.sh
+PASS: test/diff/diff_nonradical-radicalshape-no-square-31.sh
+PASS: test/diff/diff_nonradical-radicalshape-no-square-qq.sh
+PASS: test/diff/diff_nonradical-radicalshape-qq.sh
+PASS: test/diff/diff_nonradical-shape-31.sh
+PASS: test/diff/diff_one-16.sh
+PASS: test/diff/diff_one-31.sh
+PASS: test/diff/diff_one-qq.sh
+PASS: test/diff/diff_quadratic-nonradical-qq.sh
+PASS: test/diff/diff_radical-shape-31.sh
+PASS: test/diff/diff_nonradical-shape-qq.sh
+PASS: test/diff/diff_radical-shape-qq.sh
+PASS: test/diff/diff_realroot1.sh
+PASS: test/diff/diff_realroot-extraction-exact-root.sh
+PASS: test/diff/diff_reals-dim0-extract.sh
+PASS: test/diff/diff_reals-dim0-chgvar.sh
+PASS: test/diff/diff_reals-dim0.sh
+PASS: test/diff/diff_reals-dim0-swapvar.sh
+PASS: test/diff/diff_test-lifting2.sh
+PASS: test/diff/diff_univariate-assign-left.sh
+PASS: test/diff/diff_univariate-cubic-close-roots.sh
+PASS: test/diff/diff_univariate-sgn.sh
+============================================================================
+Testsuite summary for msolve 0.11.0
+============================================================================
+# TOTAL: 71
+# PASS:  71
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+============================================================================

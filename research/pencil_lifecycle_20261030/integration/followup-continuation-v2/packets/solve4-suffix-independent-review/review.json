@@ -1,0 +1,86 @@
+{
+  "schema": "formal.source-fidelity-review/v1",
+  "task": "T-1441",
+  "producer_commit": "c59e9400a1",
+  "outcome": "validated_scoped",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "scope": "One target-row suffix assignment as a finite function, canonical UInt64 decoding, augmented equation preservation and normalized pivot zeroing",
+  "producer_declarations": 10,
+  "producer_controls": 9,
+  "reviewer_declarations": 5,
+  "axiom_readbacks": 24,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "elapsed_seconds": 18.127511992002837,
+  "input_files": 28798,
+  "changed_inputs": [],
+  "expected_false_theorem_exit": 1,
+  "independence": {
+    "authored_producer": false,
+    "authored_prior_ordinary_fiber_review": true,
+    "blind_derivation": false,
+    "pre_source_residual_derivation": "PLAN.md",
+    "producer_and_sibling_reports_read": "Producer report and coordinator/author handoffs; no sibling solve4 verdict exists",
+    "algorithm_independence_claimed": false
+  },
+  "claims": [
+    {
+      "claim": "suffix equals full subtraction given zero pivot prefix",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "claim": "augmented residual linearity and equation equivalence given pivot equation",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "claim": "canonical bounded UInt64 update refines field suffix",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    },
+    {
+      "claim": "normalized pivot coefficient is zero after captured-factor update",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped"
+    }
+  ],
+  "limits": [
+    "Pivot-prefix invariant and normalization are premises, not derived from solve4 execution",
+    "Actual nested array mutation, alias exclusion, pivot search, swapping, inversion, full-column induction, returned solution and operation counters are not formalized",
+    "Local imported helper source and oleans copied and hashed; cached helpers not rebuilt in this review",
+    "Shared upstream Lean/Mathlib binary caches pre/post hashed; no independent kernel binary checker",
+    "Captured-factor counterexample executes a deliberately wrong pure fold in Lean, not a Rust program"
+  ],
+  "controls": [
+    "actual recapture fold differs from correct update",
+    "exact recapture result row [0,0,5,0,0] mod7",
+    "pivot not satisfying equation breaks preservation",
+    "noncanonical UInt64 input breaks subtraction decoding",
+    "modulus above2^32 permits multiplication overflow decoding failure"
+  ],
+  "native_source_bindings": [
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-original-gstep-review/replay/src/recover_boundary_impl.rs",
+      "sha256": "56a6bda57c9e8402e6ec80f3d6fd5ba5ba3308aae23c1c42480b7023b01a7183"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-original-gstep-review/replay/src/recover_impl_uncached.rs",
+      "sha256": "9ea87718f9ce7ae554907f5f83d1c1a8bd17844556bb991a37221b3d5ddc7265"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-original-gstep-review/replay/src/pruned.rs",
+      "sha256": "149d55205b5edd872610350a2ddb7bf872d248f0e46f131b0091d618d33c6e5e"
+    }
+  ],
+  "scientific_runs": 0,
+  "promotion": "Technical component review only; parent owns official status and publication"
+}

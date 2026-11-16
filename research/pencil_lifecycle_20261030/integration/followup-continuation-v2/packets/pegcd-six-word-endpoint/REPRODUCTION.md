@@ -1,0 +1,3 @@
+# Reproduction
+
+Restore archived .lean.txt sources as .lean in a fresh directory. Keep the uniquely named PegcdWord modules. Source-host paths in check.sh and replay.sh must be adapted to the restored location and pinned dependency/toolchain directories. dependencies.txt and per-attempt before.sha256 record original imported source/cache bindings. Compiled caches and checker binary are intentionally omitted. This is a source-and-receipt archive, not a self-contained toolchain distribution. The seven modules listed in check.rs are the final fresh replay targets; other sources are dependency snapshots. inventory.txt lists exactly fifteen declarations. Independent source fidelity remains pending.

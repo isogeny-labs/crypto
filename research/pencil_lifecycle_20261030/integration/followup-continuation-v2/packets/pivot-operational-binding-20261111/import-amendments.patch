@@ -1,0 +1,20 @@
+--- original/EliminationField.lean.txt
++++ replay/EliminationField.lean.txt
+@@ -1,4 +1,6 @@
+-import RowFold
++import Mathlib.Algebra.Field.Basic
++import Mathlib.Tactic.Ring
++import Lean.Elab.Tactic.Omega
+ set_option autoImplicit false
+ namespace Solve4Stage
+ variable {K : Type*} [Field K]
+--- original/Controls.lean.txt
++++ replay/Controls.lean.txt
+@@ -1,6 +1,6 @@
+ -- Prospective exact witnesses; not compiled.
+ import PivotSwap
+-import Mathlib.Tactic.Decide
++import Lean.Elab.Tactic.Decide
+ import Mathlib.Tactic.NormNum
+ namespace Solve4PivotSwapControls
+ open Solve4PivotSwap Solve4Stage

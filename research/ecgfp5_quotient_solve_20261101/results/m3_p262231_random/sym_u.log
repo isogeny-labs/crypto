@@ -1,0 +1,82 @@
+
+--------------- INPUT DATA ---------------
+#variables                       3
+#equations                       3
+#invalid equations               0
+field characteristic        262231
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         4
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  4       1       2       2 x 33        100.00%        1 new       0 zero         0.00 | 0.00         
+  5       2       2      11 x 55         59.01%        2 new       0 zero         0.00 | 0.00         
+  6       2       2      21 x 75         49.33%        2 new       0 zero         0.00 | 0.00         
+  7       4       4      29 x 89         46.18%        4 new       0 zero         0.00 | 0.00         
+  8       8       8      43 x 101        46.88%        3 new       5 zero         0.00 | 0.00         
+  9       6       6      46 x 106        48.24%        2 new       4 zero         0.00 | 0.00         
+ 10       4       4      47 x 108        47.99%        1 new       3 zero         0.00 | 0.00         
+ 11       2       2      46 x 108        47.79%        0 new       2 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis       17 x 81         67.47%       17 new       0 zeroDimension of quotient: 64
+[64, 12], Non trivial / Trivial = 18.75%
+Density of non-trivial part 94.92%
+Time spent to generate sequence (elapsed): 0.02 sec (0.01 Gops/sec)
+Time spent to compute eliminating polynomial (elapsed): 0.00 sec
+Elimination polynomial has degree 64.
+Time for rational param:          0.03 (elapsed) sec /  0.03 sec (cpu)
+
+------------------------------------------------------------------------------------
+msolve overall time           0.03 sec (elapsed) /  0.03 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.01 sec
+overall(cpu)            0.01 sec
+select                  0.00 sec   2.6%
+symbolic prep.          0.00 sec   3.4%
+update                  0.00 sec  33.9%
+convert                 0.00 sec  42.9%
+linear algebra          0.00 sec  13.0%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                    17
+#terms in basis                 920
+#pairs reduced                   29
+#GM criterion                   124
+#redundant elements               1
+#rows reduced                    75
+#zero reductions                 14
+max. matrix data                 47 x 108 (47.991%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+
+{"cmd": ["msolve", "-v", "2", "-t", "4", "-P", "1", "-f", "/tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr/research/ecgfp5_quotient_solve_20261101/results/m3_p262231_random/sym_u.ms", "-o", "/tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr/research/ecgfp5_quotient_solve_20261101/results/m3_p262231_random/sym_u.out"], "exit_code": 0, "signal": null, "killed_by_rss_cap": false, "rss_cap_gib": 12, "killed_by_wall_cap": false, "wall_cap_seconds": 0, "wall_seconds": 0.201, "user_seconds": 0.000, "sys_seconds": 0.032, "maxrss_kib": 6544, "peak_rss_sampled_kib": 16, "last_rss_sampled_kib": 16, "rss_samples_s_kib": [[0.0,16]]}

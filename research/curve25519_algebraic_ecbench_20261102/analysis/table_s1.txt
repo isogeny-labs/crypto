@@ -1,0 +1,6 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|
+| ECBS1h1a9fd7090916 | rho-neg | rho.negation | icv1-fp20-tm1050-4295f05e | 17.00 | 6/6 | 1.744 (heavy tail; more runs needed) | [1.233, 2.468] | 0.886 | 1.968 | 1.968 | 1.000 | yes | 0.227 | L0×6 | fixed set-up is 22% of S (over 10%); log2 r = 17.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h1a9fd7090916 | proj-a | ic.pipeline | icv1-fp20-tm1050-4295f05e | 17.00 | 6/6 | 12.284 | [11.195, 13.479] | – | – | 13.861 | 7.042 | yes | 1.108 | L0×6 | log2 r = 17.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h1a9fd7090916 | pkm-iso-t6-g4 | ic.pipeline | icv1-fp20-tm1050-4295f05e | 17.00 | 6/6 | 31.703 | [22.704, 44.267] | – | – | 35.773 | 18.175 | yes | 282142.184 | L0×6 | log2 r = 17.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h1a9fd7090916 | pkm-iso-t6-g4-aa | ic.pipeline | icv1-fp20-tm1050-4295f05e | 17.00 | 6/6 | 31.703 | [22.704, 44.267] | – | – | 35.773 | 18.175 | yes | 302506.490 | L0×6 | log2 r = 17.0 is below the calibrated range (2^25); S has not reached its constant |

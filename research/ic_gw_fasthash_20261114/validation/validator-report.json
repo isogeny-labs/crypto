@@ -1,0 +1,456 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/ic_gw_fasthash_20261114",
+ "status": "pass",
+ "independent": true,
+ "independence_note": "Validator subagent with its own context, nonce, sample, runner, comparator and analysis script (no producer script was imported; analyze.py, plot.py were not read). It runs in the same Claude Code session and the same container as the producer, so independence is of reasoning and code, not of host or organization; no keyring signature.",
+ "validated_snapshot": {
+  "repository": "/home/user/crypto (branch claude/f4-f5-algorithm-speed-bvp7qd = local origin/main)",
+  "head": "a851708714d014043a1f0286628ed862d2505a4e",
+  "data_commit": "59afa21add (ic_gw_fasthash: results, report, benchmark record)",
+  "protocol_freeze_commit": "9d4e6aebc5 (PROTOCOL.md, analyze.py, make-units.sh, run scripts, units.tsv, src/ added before data)",
+  "later_commits_touching_study": [
+   "8da2fac152 (github-actions: fasthash.png moved to the artifact store; .artifacts.json, .gitignore added; no data or source change)"
+  ],
+  "freeze_integrity": "git diff 9d4e6aebc5..HEAD is empty for PROTOCOL.md, src/, units.tsv, make-units.sh, run-*.sh, analyze.py and for the included sources research/quartic_n4_20261019/*.rs and src/cryptanalysis/plane_quartic_pic.rs",
+  "dirty_paths_under_study_before_validation": [],
+  "remote_main_at_nonce_time": "6ef2197cf99f1798c0bd5fa121508673fb9fc591 (git ls-remote; not fetched, so whether the study changed there was not checked)"
+ },
+ "raw_data": [
+  {
+   "path": "../runs-fasthash-20261114.tar.gz",
+   "repo_path": "research/ic_gw_fasthash_20261114/runs-fasthash-20261114.tar.gz",
+   "sha256": "d9d301a42050b5073f10a8f330eb8e31cbc3c4144bc71dbf9706d2482c01b897",
+   "role": "producer raw JSONL of the 94 units (SHA256SUMS inside: 191/191 OK)"
+  },
+  {
+   "path": "../units.tsv",
+   "repo_path": "research/ic_gw_fasthash_20261114/units.tsv",
+   "sha256": "f87d3bec936b89aaaad335a9441492d08ce29a755f60299848e9680f734e7a29",
+   "role": "frozen unit list (regenerates byte-identically from make-units.sh)"
+  },
+  {
+   "path": "../PROTOCOL.md",
+   "repo_path": "research/ic_gw_fasthash_20261114/PROTOCOL.md",
+   "sha256": "fbf3bb4cdab4721e0223182e973e3bfddccc580110649b0f1e3a2a880838859f",
+   "role": "frozen protocol (9d4e6aebc5)"
+  },
+  {
+   "path": "replay/replay-runs-20261115.tar.gz",
+   "repo_path": "research/ic_gw_fasthash_20261114/validation/replay/replay-runs-20261115.tar.gz",
+   "sha256": "2c2ddfbbac766bb512154d2aa32c8b16aa70c188ceba2db11b5de4d11c69de72",
+   "role": "validator replay JSONL (26 runs), replay log, fastcheck output, sample, plan"
+  },
+  {
+   "path": "recompute.json",
+   "repo_path": "research/ic_gw_fasthash_20261114/validation/recompute.json",
+   "sha256": "bb92059ad21319d3a4e8b4e0ea94f000f3234da1498af0d27b5a092d392c70dd",
+   "role": "validator recompute output (scripts/recompute.py)"
+  },
+  {
+   "path": "replay-compare.json",
+   "repo_path": "research/ic_gw_fasthash_20261114/validation/replay-compare.json",
+   "sha256": "b4ea5d2aeacda9ccac67c02efb8f066f39eae8116335018dd884a81e6bdeda4e",
+   "role": "validator replay comparison and timing output (scripts/compare.py)"
+  }
+ ],
+ "raw_data_path_base": "paths in raw_data[].path are relative to research/ic_gw_fasthash_20261114/validation/ (the directory of this report); repo_path is repository-relative",
+ "headline": [
+  {
+   "name": "COMBO relations.cpu ratio, min pass-mean over 15 (q, seed)",
+   "claimed": 0.4301917210331103,
+   "recomputed": 0.4301917210331103,
+   "rel_tol": 1e-09,
+   "readme": "0.430",
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu ratio, max pass-mean over 15 (q, seed)",
+   "claimed": 0.5605826112645177,
+   "recomputed": 0.5605826112645177,
+   "rel_tol": 1e-09,
+   "readme": "0.561",
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu ratio, worst single pass over 30",
+   "claimed": 0.6439442658092176,
+   "recomputed": 0.6439442658092176,
+   "rel_tol": 1e-09,
+   "readme": "0.644 (task card); cell q=524287 seed 3 pass 2",
+   "agrees": true
+  },
+  {
+   "name": "A/A floor max|REF2/REF - 1| (4 single-pass, 2 pass-means)",
+   "claimed": 0.20694188798317115,
+   "recomputed": 0.20694188798317115,
+   "rel_tol": 1e-09,
+   "readme": "20.7%",
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu geomean over seeds of pass-means, q=262111",
+   "claimed": 0.4928037961336033,
+   "recomputed": 0.4928037961336033,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu geomean over seeds of pass-means, q=524287",
+   "claimed": 0.5449698517520702,
+   "recomputed": 0.5449698517520702,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu geomean over seeds of pass-means, q=1048507",
+   "claimed": 0.49973156454729795,
+   "recomputed": 0.49973156454729795,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu geomean over seeds of pass-means, q=2097091",
+   "claimed": 0.4666419426569576,
+   "recomputed": 0.4666419426569576,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO relations.cpu geomean over seeds of pass-means, q=4194271",
+   "claimed": 0.46258590739358557,
+   "recomputed": 0.46258590739358557,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO DL-record total CPU ratio geomean over 3 seeds x 2 passes, q=262111",
+   "claimed": 0.8378516114222796,
+   "recomputed": 0.8378516114222796,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO DL-record total CPU ratio geomean over 3 seeds x 2 passes, q=524287",
+   "claimed": 0.8843961050862591,
+   "recomputed": 0.8843961050862591,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO DL-record total CPU ratio geomean over 3 seeds x 2 passes, q=1048507",
+   "claimed": 0.8813657645246651,
+   "recomputed": 0.8813657645246651,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO DL-record total CPU ratio geomean over 3 seeds x 2 passes, q=2097091",
+   "claimed": 0.8738886930913315,
+   "recomputed": 0.8738886930913315,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO DL-record total CPU ratio geomean over 3 seeds x 2 passes, q=4194271",
+   "claimed": 0.7958038238518541,
+   "recomputed": 0.7958038238518541,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "COMBO peak RSS ratio geomean, q=4194271",
+   "claimed": 1.0000792504945852,
+   "recomputed": 1.0000792504945852,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "gate counted-field mismatches (79 unit comparisons, 237 ic records)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "HASH relations.cpu ratio, min pass-mean (context, not the claim)",
+   "claimed": 0.5942555648834755,
+   "recomputed": 0.5942555648834755,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "HASH relations.cpu ratio, max pass-mean (context, not the claim)",
+   "claimed": 0.9230910399758805,
+   "recomputed": 0.9230910399758805,
+   "rel_tol": 1e-09,
+   "agrees": true
+  }
+ ],
+ "decisions": {
+  "COMBO": {
+   "claimed": "SUPPORTED",
+   "recomputed": "SUPPORTED",
+   "all_45_values_below_1_minus_floor": true
+  },
+  "HASH": {
+   "claimed": "NOT SUPPORTED",
+   "recomputed": "NOT SUPPORTED",
+   "singles_at_or_above_1_minus_floor": [
+    [
+     262111,
+     1,
+     "pass1",
+     0.9143478260869564
+    ],
+    [
+     262111,
+     1,
+     "pass2",
+     0.803960396039604
+    ],
+    [
+     262111,
+     3,
+     "pass2",
+     0.8442485306465155
+    ],
+    [
+     1048507,
+     2,
+     "pass1",
+     1.062917933130699
+    ]
+   ]
+  }
+ },
+ "method": "Own script scripts/recompute.py, written from PROTOCOL.md alone (analyze.py was not read or imported), run on the extracted committed tarball. For each (q, seed) and pass: ratio = sum over DL attempt records of relations.cpu (ARM) / same (REF); pass-mean = arithmetic mean of the two pass ratios; floor = max |REF2/REF - 1| over the 4 single-pass and 2 pass-mean A/A values; SUPPORTED iff all 15 pass-means and all 30 single-pass ratios < 1 - floor. Total CPU = DL record sum over the 7 phases' .cpu; RSS from the rss record. Every numeric entry of analysis.json (157 values) was compared with the recompute: 0 differences beyond 1e-12 relative.",
+ "checks": {
+  "artifacts": "runs-fasthash-20261114.tar.gz sha256 d9d301a4... = README and benchmark record; inner SHA256SUMS 191/191 OK; 94/94 units of units.tsv present, no extra unit files; each unit has one unit record (rc 0, pass/arm/bin/q/seed match units.tsv) and one rss record (rc 0)",
+  "protocol_frozen": "PROTOCOL.md, analyze.py, units.tsv, make-units.sh, run scripts and src/ were added in 9d4e6aebc5 and are unchanged at HEAD; the benchmark record names commit 9d4e6aebc5, commit_dirty false, start 22:08:06Z (freeze commit 22:08:00Z)",
+  "units_tsv": "bash make-units.sh output is byte-identical to units.tsv (94 units, the protocol's order rules)",
+  "binaries": "COMBO and HASH rebuilt from src/ with the README command reproduce the recorded sha256 exactly; REF at the task-card path has sha256 de500bc1... and rebuilding research/quartic_dl1_cd_sqrt_20261113/src reproduces it",
+  "gate_recomputed": "79 unit comparisons, 237 ic records, mismatches [], verify failures [], retried []",
+  "gate_negative_control": "a copy of committed p2_COMBO_4194271_2 with DL s.rel_2lp + 1 gives exactly one gate mismatch [2, COMBO, 4194271, 2, record 2, ['s.rel_2lp']] and gate pass = false",
+  "counted_replay": "26 runs over 7 nonce-drawn units: 0 counted-field mismatches against replayed REF; for (524287, 2) and (1048507, 2) also 0 mismatches against the committed p1/p2 REF and COMBO records; all rc 0; every ic record ok with k_found == k; one attempt each",
+  "fastcheck": "0 mismatches vs modpow, 0 vs the interpreted chain, 0 count mismatches at all five sizes (250,007 inputs per size including 7 edge values)",
+  "source_change_scope": "src/ differs from research/quartic_dl1_cd_sqrt_20261113/src only in ic2.rs (find_relations_2lp: KeyIdx/VidMap/Pend/prefetch; cfg(combo) FastChain/pow_fast at the square-root call; new KeyIdx/VidMap types) and v3.rs (cfg(combo) fastcheck subcommand). No phase timer, counter definition or record printer changed; cfg(combo) appears in no included file.",
+  "readme_figures": "README ranges, geomeans, A/A pairs (1.010/0.793, 1.030/1.015), A/A seconds (2.28, 1.93, 1.81), total-CPU geomeans, RSS ratios, prediction ranges and load1 1.00..2.30 all reproduce at their stated rounding; tables.md matches analysis.json"
+ },
+ "timing_replay_summary": {
+  "units": [
+   "q=2097091 seed=9",
+   "q=4194271 seed=8",
+   "q=2097091 seed=4",
+   "q=1048507 seed=8",
+   "q=1048507 seed=2"
+  ],
+  "relations_cpu_COMBO/REF_mean_of_ABBA_pairs": {
+   "2097091/9": 0.4591,
+   "4194271/8": 0.4795,
+   "2097091/4": 0.4325,
+   "1048507/8": 0.497,
+   "1048507/2": 0.4891
+  },
+  "relations_cpu_COMBO/REF_range_mean_of_pairs": [
+   0.4325,
+   0.497
+  ],
+  "relations_cpu_COMBO/REF_worst_single_pair": 0.5122,
+  "dl_total_cpu_COMBO/REF_mean_of_pairs": {
+   "2097091/9": 0.8388,
+   "4194271/8": 0.8268,
+   "2097091/4": 0.8381,
+   "1048507/8": 0.8419,
+   "1048507/2": 0.7828
+  },
+  "process_cpu_COMBO/REF_mean_of_pairs": {
+   "2097091/9": 0.9348,
+   "4194271/8": 0.9618,
+   "2097091/4": 0.9323,
+   "1048507/8": 0.952,
+   "1048507/2": 0.8986
+  },
+  "aa_relations_cpu_REF2/REF_q2097091_seed9": 0.9826,
+  "aa_dl_total_cpu_REF2/REF": 0.9459,
+  "aa_process_cpu_REF2/REF": 0.944,
+  "REF_relations_cpu_spread_max/min_over_4_REF_runs_q2097091_seed9": 1.0963,
+  "every_single_pair_below_1_minus_study_floor_0.793": true,
+  "every_single_pair_below_1_minus_replay_AA": true,
+  "kernel_cross_check": "in every timing unit the drop in process CPU (wait4 utime+stime, measured by the kernel, independent of the driver's phase timers) is positive and at least 0.9x the drop in DL relations.cpu (ratio delta_proc_cpu_s / delta_relations_cpu_s: 2097091/9 1.44, 4194271/8 0.90, 2097091/4 1.23, 1048507/8 1.15, 1048507/2 2.64), so the saving is not an artifact of the in-program relations timer"
+ },
+ "null_object_control": "A/A (REF vs REF2, same binary) is the null for a timing ratio and should sit at 1. The study's A/A gives 1.010, 0.793, 1.030, 1.015 (pass-means 0.902, 1.023); the replay A/A gives 0.983. The COMBO signal (0.43-0.56) lies far outside both. The quantity meant to destroy the effect is the arm difference itself; no decay parameter applies to a constant-factor CPU change.",
+ "heuristic_validation_checks": [
+  {
+   "check": "pre-registered prediction",
+   "result": "PROTOCOL.md (frozen before data) predicted COMBO relations.cpu 0.45-0.70; the per-size geomeans are 0.463-0.545 (inside). The pilot that informed it (wf_f57f915b-f9f) is disclosed as not a claim."
+  },
+  {
+   "check": "sample integrity",
+   "result": "sample sizes, seeds 1-3 and order are frozen in units.tsv, and all statistics were recomputed from raw records"
+  },
+  {
+   "check": "correspondence validity",
+   "result": "not applicable (no substitute sampling)"
+  },
+  {
+   "check": "scale binding",
+   "result": "k = 18..22 (q = 262111..4194271, ell about 2^54..2^64) in one GHS-weak family; no transfer to larger q is claimed or validated"
+  }
+ ],
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "result": "CPU seconds from the driver's phase timers (relations.cpu), plus kernel process CPU in the replay; counted M-eq unchanged by construction"
+  },
+  {
+   "check": "memory alongside time",
+   "result": "peak RSS reported (VmHWM polled at 0.2 s): COMBO/REF 1.000 at q=4194271. Replay wait4 maxrss (exact peak) COMBO/REF is 0.996-1.000 per ABBA block (see timing rows)"
+  },
+  {
+   "check": "total = per-attempt x 1/success",
+   "result": "every one of the 94 committed and 26 replayed runs succeeded on attempt 1 (ok, k_found == k), so the observed success rate is 1 and per-run CPU is the expected cost; no success-probability factor is hidden"
+  },
+  {
+   "check": "optimistic assumptions",
+   "result": "a time-only claim on an L0 shared host. The 'total CPU' metric is the DL pipeline, not the whole process (see problems[0])."
+  }
+ ],
+ "validation_ladder_checks": {
+  "step1_assumptions_isolated": "the claim rests on (a) counted work unchanged (measured: gate and replay, 0 mismatches) and (b) exactness of the Barrett-reduced chain for q < 2^32 (fastcheck at 5 sizes plus the bound argument). Failure mode hunted: a silent value or count drift. None found.",
+  "step2_measured_ratio_on_full_pipeline": "the speedup is a measured ratio against REF on the full pipeline at every size claimed (k = 18..22), not a projection, and was re-measured in the replay at k = 20..22 on new seeds. No extrapolation beyond k = 22 is claimed.",
+  "step3_cheats": "not applicable (no real-scale partial run)",
+  "step4_reproducibility_pointer": "exercised: COMBO and HASH rebuilt bit-identically from committed sources, REF rebuilt bit-identically from its published sources, units.tsv regenerated, raw tarball checksums verified"
+ },
+ "problems": [
+  {
+   "severity": "note",
+   "kind": "scope of 'total CPU'",
+   "issue": "The 'total CPU at k = 22 about 0.80' is the DL record's phase sum (fb, relations, matrix, linear_algebra, log_recovery, descent, verify), as PROTOCOL.md defines it. It excludes the instance search (search_s in the ratios record, 0.2-35 s depending on q and seed), the D and DL1 arms' own linear algebra and the calibration. End to end, the process CPU ratio COMBO/REF in this replay is 0.90-0.96 (0.962 at k = 22, seed 8). The producer's own unit wall_ms ratios give 0.93-0.98 geomean per size (0.935 at k = 22). Neither contradicts the protocol metric, but the whole-process saving is about 4-10%, not about 20%."
+  },
+  {
+   "severity": "note",
+   "kind": "replay vs claimed total CPU",
+   "issue": "Replayed DL-record total CPU at k = 22 (one unit, seed 8, ABBA mean of pairs) is 0.827, against the claimed geomean of 0.796 over seeds 1-3. That lies inside the producer's own range of 0.71-0.87. Total CPU is noisy on this host (the study's A/A total-CPU pairs were 0.85-1.11)."
+  },
+  {
+   "severity": "note",
+   "kind": "A/A floor",
+   "issue": "The study's 20.7% floor is set by one slow REF unit (p2 REF q=2097091 seed 1: relations.cpu 2.2818 s, against 1.9328 s in p1 and 1.8096 s for p2 REF2), and reproduces exactly. COMBO clears it in every cell and pass (worst single 0.6439 < 0.7931). The replay's A/A at q=2097091 seed 9 is 0.983 (1.7%), and the spread over its 4 REF runs is 9.6% max/min."
+  },
+  {
+   "severity": "minor",
+   "kind": "process (benchmark records rule)",
+   "issue": "benchmarks/records/20261114T2208Z-ic-gw-fasthash.json has raw[0].uploaded = false: the raw tarball is not in S3, although the bench.record rule requires it. It is in git, which is what made the recompute possible."
+  },
+  {
+   "severity": "minor",
+   "kind": "figure",
+   "issue": "README embeds fasthash.png, which commit 8da2fac152 moved to the artifact store (.artifacts.json pins sha256 119a78df...). The validator did not fetch or check it. No headline depends on it."
+  },
+  {
+   "severity": "note",
+   "kind": "post-hoc statement",
+   "issue": "The README's 'HASH probably a real gain at k >= 21' is labelled post hoc and is not validated as a claim. The frozen-rule HASH decision NOT SUPPORTED reproduces: four single-pass values are at or above 1 - floor, and q=1048507 seed 2 pass 1 is 1.0629 > 1."
+  },
+  {
+   "severity": "note",
+   "kind": "negative case",
+   "issue": "Apart from the A/A null, the protocol pre-registers no negative case, such as a size where the chain gain should vanish. Post hoc, COMBO is weakest at q=524287 (geomean 0.545), where the chain saves least (chain_cost 17 vs plain_cost 18, a single segment). This is consistent with the mechanism but is not evidence."
+  }
+ ],
+ "limitations": [
+  "L0: shared session container (4 vCPU, Intel Xeon 2.10 GHz), no CPU isolation, no Iso Lab EKS route, no native L2/replay/A/A admission. CPU seconds are a within-session paired comparison only; CPU only (no GPU, no other microarchitecture). Wall/CPU time is not a measured bound (AGENTS.md, 'Curve identity and measured bounds') and moves no counted-cost frontier.",
+  "Counted work is identical by the gate, so the counted M-eq and the gap to the matched rho are unchanged. This validation supplies no rho reference or \u00a75a band. A VALIDATION.json for any leaderboard or benchmarks row would still need a matched rho reference.",
+  "The replay covers 7 of the 45 (q, seed) units in the universe (2 of them also in the producer's 15); timing replay covers 5 units at k = 20-22 with one ABBA block each and one A/A pair. Seeds 4-9 are new instances of the same family, not new curve families.",
+  "Validated snapshot a851708714. Remote main had moved to 6ef2197cf9 at nonce time; it was not fetched, so later changes to the study directory are not covered.",
+  "Independence: the validator is a subagent of the producer's Claude Code session on the same container. It used its own scripts and builds and did not read analyze.py or plot.py. The REF binary was taken from the scratchpad path the task card named (hash-verified and rebuilt bit-identically from the published sources).",
+  "A passed report means the receipt is admissible evidence for the COMBO time-only claim at k = 18..22 in this family and setting. It does not support an ECDLP claim or demonstrate any asymptotic speedup, and it does not authorize promotion or a leaderboard row."
+ ],
+ "validation_report": {
+  "id": "VAL-20261115-f58909",
+  "task_id": "none named by the task card (main-session validation-gate request)",
+  "run_ids": [
+   "research/ic_gw_fasthash_20261114 runs-fasthash-20261114 (94 units, 59afa21add)"
+  ],
+  "artifact_checks": [
+   "tarball sha256 + 191/191 inner checksums",
+   "94/94 units present, rc 0",
+   "binaries rebuilt bit-identically",
+   "freeze unchanged"
+  ],
+  "metric_recomputations": [
+   "COMBO pass-mean range 0.4302..0.5606, worst single 0.6439, floor 0.20694, decision SUPPORTED; 157/157 analysis.json values equal"
+  ],
+  "control_checks": [
+   "A/A null reproduced",
+   "replay A/A 0.983",
+   "comparator and gate negative controls flag a +1 counted change and ignore timing changes",
+   "fastcheck 0 mismatches"
+  ],
+  "heuristic_validation_checks": [
+   "prediction pre-registered and held"
+  ],
+  "cost_model_checks": [
+   "unit CPU s declared",
+   "RSS reported",
+   "success rate 1 observed"
+  ],
+  "proof_architecture_checks": [],
+  "verdict": "passed",
+  "limitations": [
+   "L0: shared session container (4 vCPU, Intel Xeon 2.10 GHz), no CPU isolation, no Iso Lab EKS route, no native L2/replay/A/A admission. CPU seconds are a within-session paired comparison only; CPU only (no GPU, no other microarchitecture). Wall/CPU time is not a measured bound (AGENTS.md, 'Curve identity and measured bounds') and moves no counted-cost frontier.",
+   "Counted work is identical by the gate, so the counted M-eq and the gap to the matched rho are unchanged. This validation supplies no rho reference or \u00a75a band. A VALIDATION.json for any leaderboard or benchmarks row would still need a matched rho reference.",
+   "The replay covers 7 of the 45 (q, seed) units in the universe (2 of them also in the producer's 15); timing replay covers 5 units at k = 20-22 with one ABBA block each and one A/A pair. Seeds 4-9 are new instances of the same family, not new curve families.",
+   "Validated snapshot a851708714. Remote main had moved to 6ef2197cf9 at nonce time; it was not fetched, so later changes to the study directory are not covered.",
+   "Independence: the validator is a subagent of the producer's Claude Code session on the same container. It used its own scripts and builds and did not read analyze.py or plot.py. The REF binary was taken from the scratchpad path the task card named (hash-verified and rebuilt bit-identically from the published sources).",
+   "A passed report means the receipt is admissible evidence for the COMBO time-only claim at k = 18..22 in this family and setting. It does not support an ECDLP claim or demonstrate any asymptotic speedup, and it does not authorize promotion or a leaderboard row."
+  ],
+  "artifact_paths": [
+   "research/ic_gw_fasthash_20261114/validation/replay-certificate.json",
+   "research/ic_gw_fasthash_20261114/validation/validator-report.json",
+   "research/ic_gw_fasthash_20261114/validation/replay/replay-runs-20261115.tar.gz"
+  ]
+ },
+ "review_attestation": {
+  "review_plan": "none attached to the task card; no joints were assigned, so this report verdicts receipt admissibility",
+  "joints_owned": [],
+  "sources_read": [
+   "crypto-autoresearcher/docs/agent-runtime-core.md",
+   "crypto-autoresearcher/agents/validator.md",
+   "crypto-autoresearcher/AGENTS.md (Review architecture 359-420; Curve identity and measured bounds 523-536)",
+   "crypto-autoresearcher/docs/inventor-protocol.md section 6",
+   "crypto/docs/VALIDATION_GATE.md",
+   "research/ic_gw_fasthash_20261114/PROTOCOL.md",
+   "research/ic_gw_fasthash_20261114/README.md",
+   "research/ic_gw_fasthash_20261114/tables.md",
+   "research/ic_gw_fasthash_20261114/analysis.json",
+   "research/ic_gw_fasthash_20261114/make-units.sh",
+   "research/ic_gw_fasthash_20261114/run-unit.sh",
+   "research/ic_gw_fasthash_20261114/run-local.sh",
+   "research/ic_gw_fasthash_20261114/units.tsv",
+   "research/ic_gw_fasthash_20261114/.artifacts.json",
+   "research/ic_gw_fasthash_20261114/.gitignore",
+   "research/ic_gw_fasthash_20261114/src/ic2.rs (diff vs REF, find_relations_2lp, pack2, pow_fixed, Chain)",
+   "research/ic_gw_fasthash_20261114/src/v3.rs (diff vs REF, grep)",
+   "research/ic_gw_fasthash_20261114/runs-fasthash-20261114.tar.gz (all unit records)",
+   "research/quartic_dl1_cd_sqrt_20261113/src (diff base)",
+   "research/quartic_dl1_cd_sqrt_20261113/launch/image.json (grep v3 hash)",
+   "research/quartic_dl1_cd_sqrt_20261113/combo/validation/{replay-certificate,validator-report}.json (structure only)",
+   "benchmarks/records/20261114T2208Z-ic-gw-fasthash.json"
+  ],
+  "not_read": [
+   "research/ic_gw_fasthash_20261114/analyze.py",
+   "research/ic_gw_fasthash_20261114/plot.py",
+   "research/ic_gw_fasthash_20261114/REPORT.typ",
+   "research/ic_gw_fasthash_20261114/REPORT.pdf",
+   "research/ic_gw_fasthash_20261114/fasthash.svg"
+  ],
+  "read_sibling_reports": false,
+  "verdict": "passed"
+ },
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "17a139437433696635fd711c3ceab57e75972b2958e9ab6005bd7911edad06a7"
+ }
+}

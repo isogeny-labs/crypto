@@ -71,6 +71,10 @@ pub struct PhaseRecord {
     pub wall_ns: Option<u64>,
     #[serde(default)]
     pub native: BTreeMap<String, u64>,
+    /// The bitop-unit ledger of the phase (`ecbench::methods::PhaseRecord`),
+    /// read by `band::table_work_counts`; absent on older records.
+    #[serde(default)]
+    pub work_native: BTreeMap<String, u64>,
     #[serde(flatten)]
     pub rest: BTreeMap<String, Value>,
 }

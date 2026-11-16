@@ -1,0 +1,20 @@
+import ComponentSizes
+set_option autoImplicit false
+namespace ComponentMap
+open UnionSize
+variable {K : Type*} [Field K] {n : Nat}
+def initialGraph (K : Type*) [Field K] (n : Nat) : GraphFind.State K n :=
+ ⟨id,fun _=>GraphFind.ident⟩
+def initialSizes (n : Nat) : Sizes n := ⟨Array.replicate n 1,by simp⟩
+
+theorem initial_map : Valid (initialGraph K n) id := by
+ constructor <;> intro x <;> simp [initialGraph]
+
+theorem identity_fiber (root : Fin n) : fiber id root={root} := by
+ ext x;simp [fiber]
+
+theorem initial_sizes : SizeValid (id : Fin n→Fin n) (initialSizes n) := by
+ intro root hr
+ rw [identity_fiber]
+ simp [sizeAt,initialSizes]
+end ComponentMap

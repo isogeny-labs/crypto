@@ -1,0 +1,23 @@
+{
+  "schema": "n83.k2048-m5-natural-solver-lock/v1",
+  "source_commit": "9c993d2f2b2b4835dca4b480045ea337d66f472f",
+  "input_root": "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114",
+  "raw_root": "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw",
+  "worker": "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/target/release/examples/koblitz_n83_factor_base_export",
+  "worker_sha256": "8f611eaf35b1e071a4ce05567685f425fb1dbfb446f57415921f4b2f6593f432",
+  "solver": "/opt/homebrew/bin/cryptominisat5",
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "positive_replay_sha256": "d648542575b7aa2bd8dbbeebc32727531449ecf38f5d8a87c8f00d56b13e0296",
+  "export_receipt_sha256": "9a072c75106649e43bf239df8ff2a5cb95876f6cab7cfe91c1d11d1ffc007c32",
+  "xcnf_sha256": "02d07716333e073f7eb40a7646ae3652b86b2129cb4d226f5dcc611d6bda7fff",
+  "xcnf_bytes": 20511067,
+  "variables": 111478,
+  "cnf_clauses": 1140557,
+  "xor_rows": 4980,
+  "solver_flags": ["--threads", "1", "--random", "20261114", "--maxtime", "600", "--maxconfl", "1000000", "--verb", "1", "--verbstat", "1", "--printsol", "1", "--maxnummatrices", "32", "--autodisablegauss", "0", "--gaussusefulcutoff", "0", "--branchstr", "vsids"],
+  "outer_watchdog_seconds": 660,
+  "load_gate_1m": 24,
+  "sample_spacing_seconds": 15,
+  "sample_count": 3,
+  "scratch_min_bytes": 2147483648
+}

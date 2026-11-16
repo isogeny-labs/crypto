@@ -1,0 +1,56 @@
+--- v3/durable-worker.py
++++ v4/durable-worker.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-import datetime, hashlib, json, os, re, resource, shutil, signal, stat, subprocess, sys, time, traceback
++import datetime, hashlib, json, math, os, re, resource, shutil, signal, stat, subprocess, sys, time, traceback
+ from pathlib import Path
+ P=Path(__file__).resolve().parent
+ from durable_io import atomic_json, flush_logs, load_admission, durable_limits
+@@ -17,10 +17,43 @@
+  INTERRUPTED=True
+  raise RuntimeError('signal '+str(sig))
+ for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,interrupted)
++def retain_permit_anomaly(snapshots, error=None):
++ row={'snapshots':snapshots}
++ if error is not None:row['error']=repr(error)
++ R.setdefault('permit_anomalies',[]).append(row)
++ R['permit_anomalies']=R['permit_anomalies'][-32:]
++def read_permit_snapshot():
++ meta={'read_start_unix':time.time(),'read_start_monotonic':time.monotonic()}
++ try:
++  with (Path(F['durable_run'])/'supervisor-permit.json').open('rb') as stream:raw=stream.read(4097)
++  meta.update(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
++  assert len(raw)<=4096,'supervisor permit size'
++  permit=json.loads(raw)
++  meta['value']=permit
++  assert isinstance(permit,dict),'supervisor permit object'
++  assert permit['invocation_id']==R['invocation_id'] and permit['lease']==F['lease'],'supervisor permit identity'
++  expiry=permit['expires_unix']
++  assert isinstance(expiry,(int,float)) and not isinstance(expiry,bool) and math.isfinite(expiry),'supervisor permit expiry format'
++  meta.update(read_end_unix=time.time(),read_end_monotonic=time.monotonic())
++  return permit,meta
++ except BaseException as error:
++  meta.update(read_end_unix=time.time(),read_end_monotonic=time.monotonic())
++  retain_permit_anomaly([meta],error)
++  raise
+ def check_permit():
+- permit=json.loads((Path(F['durable_run'])/'supervisor-permit.json').read_text())
+- assert permit['invocation_id']==R['invocation_id'] and permit['lease']==F['lease'],'supervisor permit identity'
+- assert time.time()<permit['expires_unix'],'supervisor permit expired'
++ first,one=read_permit_snapshot()
++ if time.time()<first['expires_unix']:return
++ # No grace period: only a newly read, identity-matched, unexpired permit can pass.
++ retry_start=time.monotonic()
++ try:
++  second,two=read_permit_snapshot()
++  assert time.monotonic()-retry_start<=0.25,'supervisor permit reread bound'
++  assert not INTERRUPTED and time.monotonic()<END-40,'supervisor permit deadline/signal'
++  assert time.time()<second['expires_unix'],'supervisor permit expired'
++ except BaseException as error:
++  retain_permit_anomaly([one]+([two] if 'two' in locals() else []),error)
++  raise
++ retain_permit_anomaly([one,two])
+ def guard():
+  if PERMIT_REQUIRED:check_permit()
+  if OWNED_OUTPUT:durable_limits(Path(F['durable_run']),F['limits'])

@@ -1,0 +1,252 @@
+{
+  "branch": "claude/gpu-ic-modal-baseline-20261113",
+  "closed_utc": "2026-11-13T17:49:30+00:00",
+  "commands": [
+    {
+      "argv": [
+        "modal",
+        "run",
+        "--detach",
+        "research/ic_gpu_call_overhead_20261113/modal_ab.py",
+        "--out",
+        "/tmp/claude-0/-home-user/e375a883-d595-5f04-8ef9-a57bb8288ce5/scratchpad/modal_a100_2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T17:44:18+00:00",
+      "wall_s": 147.339
+    }
+  ],
+  "commit": "4b4a19c82b68ae4e60f990925b8324ae04775747",
+  "commit_dirty": true,
+  "created_utc": "2026-11-13T16:42:56+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
+  },
+  "id": "20261113T1642Z-ic-gpu-call-overhead-a100",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "whole_call_before_koblitz_n23_a100",
+      "note": "whole fes-f2-gpu solver call, 1878 calls, A100-SXM4-80GB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000588522139,
+        0.000631906992
+      ],
+      "unit": "wall_s",
+      "value": 0.000614796593
+    },
+    {
+      "baseline": 0.000614796593,
+      "better": "lower",
+      "n": 3,
+      "name": "whole_call_after_koblitz_n23_a100",
+      "note": "whole fes-f2-gpu solver call, 1878 calls, A100-SXM4-80GB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000376943325,
+        0.000398867718
+      ],
+      "unit": "wall_s",
+      "value": 0.000389113999
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "worker_wait_and_read_after_koblitz_n23_a100",
+      "note": "CUDA worker wait for the next request plus the read, per call, after the change. Timer error: the idle wait is included, so this is not the parse (corrected 2026-11-13; the parse is about 13 us on the host worker)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0002105,
+        0.0002248
+      ],
+      "unit": "wall_s",
+      "value": 0.000215666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "whole_call_before_char2_n25_a100",
+      "note": "whole fes-f2-gpu solver call, 2338 calls, A100-SXM4-80GB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000726045567,
+        0.000745081105
+      ],
+      "unit": "wall_s",
+      "value": 0.000734776198
+    },
+    {
+      "baseline": 0.000734776198,
+      "better": "lower",
+      "n": 3,
+      "name": "whole_call_after_char2_n25_a100",
+      "note": "whole fes-f2-gpu solver call, 2338 calls, A100-SXM4-80GB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000459262891,
+        0.000492921854
+      ],
+      "unit": "wall_s",
+      "value": 0.000475459662
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "worker_wait_and_read_after_char2_n25_a100",
+      "note": "CUDA worker wait for the next request plus the read, per call, after the change. Timer error: the idle wait is included, so this is not the parse (corrected 2026-11-13; the parse is about 13 us on the host worker)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0003055,
+        0.0003474
+      ],
+      "unit": "wall_s",
+      "value": 0.0003204
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 12,
+      "name": "runs_with_different_counted_answers",
+      "note": "counted fields compared strictly vs the first before-run; calibration-priced fields excluded (they move between same-binary runs)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:fes_f2_gpu_call_a100",
+  "raw": [
+    {
+      "bytes": 1828,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/timings_a100.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b430adf4b094596cd962771e352428859ae759d9453beb27d5c058f072152e",
+      "sha256": "e3b430adf4b094596cd962771e352428859ae759d9453beb27d5c058f072152e",
+      "uploaded": false
+    },
+    {
+      "bytes": 994,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/identity_a100.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/54/5455aa8130cc0f87df0e30fb7769be85831cf4832e263ab658f7fae273e84ee9",
+      "sha256": "5455aa8130cc0f87df0e30fb7769be85831cf4832e263ab658f7fae273e84ee9",
+      "uploaded": false
+    },
+    {
+      "bytes": 11774,
+      "path": "research/ic_gpu_call_overhead_20261113/results_a100.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/6457ecd64448da52071c136592253ec163979f294ded0ca140819e87d3af4074",
+      "sha256": "6457ecd64448da52071c136592253ec163979f294ded0ca140819e87d3af4074",
+      "uploaded": false
+    },
+    {
+      "bytes": 614,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/launch.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a8/a88b1a8468140d650628d464eb4fa56cd289ae325005ed3c261f4a82207fe90e",
+      "sha256": "a88b1a8468140d650628d464eb4fa56cd289ae325005ed3c261f4a82207fe90e",
+      "uploaded": false
+    },
+    {
+      "bytes": 2287,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/job.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/acf0cb3c9ec94f2c46ffca10df00595aa1ad67652c876ab1d5ec0fb22f1eeb72",
+      "sha256": "acf0cb3c9ec94f2c46ffca10df00595aa1ad67652c876ab1d5ec0fb22f1eeb72",
+      "uploaded": false
+    },
+    {
+      "bytes": 2058,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/ab.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/22/22ab5c7917d38ebbc049e6a03c5309187cb559c27fda3ce264f1f26f85767318",
+      "sha256": "22ab5c7917d38ebbc049e6a03c5309187cb559c27fda3ce264f1f26f85767318",
+      "uploaded": false
+    },
+    {
+      "bytes": 151,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7b/7b7c028d58a8c21ed177ccbf9ba90d6be08df4803cc0532f788902495718cc44",
+      "sha256": "7b7c028d58a8c21ed177ccbf9ba90d6be08df4803cc0532f788902495718cc44",
+      "uploaded": false
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/gpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d0cf6ac71725fd2f2de8ce21a83eff64176a0cf3ba9ffaded8e6ac2614dcd15f",
+      "sha256": "d0cf6ac71725fd2f2de8ce21a83eff64176a0cf3ba9ffaded8e6ac2614dcd15f",
+      "uploaded": false
+    },
+    {
+      "bytes": 208,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/nvcc.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "sha256": "68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "uploaded": false
+    },
+    {
+      "bytes": 41,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/fes-selftest.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "sha256": "74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 36,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/serve-smoke-cuda.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "sha256": "647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "uploaded": false
+    },
+    {
+      "bytes": 36,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/serve-smoke-host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "sha256": "647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "uploaded": false
+    },
+    {
+      "bytes": 14913,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/nvidia-smi-q.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d8bd74d3755e3c63fe202147a5395d99ba973528b2d8599406f7273818ef5ec",
+      "sha256": "4d8bd74d3755e3c63fe202147a5395d99ba973528b2d8599406f7273818ef5ec",
+      "uploaded": false
+    },
+    {
+      "bytes": 1099,
+      "path": "research/ic_gpu_call_overhead_20261113/raw/a100/lscpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/edc6450bbe85ed10d0506c9426d285c682a1de6a7e4cb9c599b91755ae9bb213",
+      "sha256": "edc6450bbe85ed10d0506c9426d285c682a1de6a7e4cb9c599b91755ae9bb213",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_call_overhead_20261113/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_call_overhead_20261113/fig_a100.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-call-overhead-a100",
+  "status": "measured",
+  "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+  "validation": null
+}

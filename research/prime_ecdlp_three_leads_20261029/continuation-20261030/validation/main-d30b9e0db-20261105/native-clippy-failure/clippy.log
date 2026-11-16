@@ -1,0 +1,23 @@
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Checking pencil-symbolic-graph v0.1.0 (/workspace/crypto/research/pencil_large_prime_20261029)
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: function `solve_one_with_trace` is never used
+    --> src/cryptanalysis/ecbench/../../../research/pencil_large_prime_20261029/src/native_solver.rs:1351:8
+     |
+1351 | pub fn solve_one_with_trace(
+     |        ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `-D dead-code` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: equality checks against false can be replaced by a negation
+   --> src/ml_dataset/custody.rs:713:8
+    |
+713 |     if receipt.completion.roundtrip_verified == false
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `!receipt.completion.roundtrip_verified`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#bool_comparison
+    = note: `-D clippy::bool-comparison` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::bool_comparison)]`
+
+error: could not compile `crypto` (lib) due to 2 previous errors

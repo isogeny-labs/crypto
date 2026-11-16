@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "ec2",
+    "describe-volumes",
+    "--query",
+    "Volumes[].{Id:VolumeId,Type:VolumeType,Size:Size,Iops:Iops,Throughput:Throughput,State:State,AZ:AvailabilityZone,Attachments:Attachments[].InstanceId}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:31.867331+00:00",
+  "observed_utc": "2026-11-03T22:29:36.268908+00:00",
+  "elapsed_seconds": 4.401588561013341,
+  "stdout_sha256": "45cd3e4e6a45e6d6264b861d707b3836ef479976ef8d984a040827c00745656b",
+  "stdout_bytes": 11379,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}
