@@ -62,3 +62,15 @@ equivalence claimed. Full Silverman/Washington external proofs unread.
 canonical/official fallback, no absence/novelty claim. No native experiment
 or paid spend. All14 remain active, including the recorded geometric,
 counting, walk and implementation obligations. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+Local proof receipt `ebcca480340a10d20ac0a8d407afb18db982add8` and remote proof
+`447ab839cbd093de3a7e28d2aa3ba236010481c4` share tree
+`366b4ea6adb0e4b2ff63d8e8c603e9a61d183c82`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending. Local replay PASS does not establish signed standing. The author
+correction is acknowledged; general corrected factorization/Weil nondegeneracy
+and Scheme API comparison remain open. All14 targets stay active. [pcc:unverified]
