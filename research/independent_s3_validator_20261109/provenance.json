@@ -1,0 +1,64 @@
+{
+  "schema": "independent-s3-provenance/v1",
+  "source_commit": "275f566e0750db6f3eb58e8325ba03c29e7ab3f5",
+  "source_sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+  "workflow_sha256": "dd140f522e063b64cb362d9004c3420172058359b63d37c043c71b5941ee6b6a",
+  "reference_sha256": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+  "compiler_preflight": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "build": [
+    "rustc",
+    "--edition=2021",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "overflow-checks=yes",
+    "-D",
+    "warnings",
+    "src/main.rs",
+    "-o",
+    "<OUT>/validator"
+  ],
+  "host_preflight": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "kernel": "6.18.57",
+    "arch": "x64"
+  },
+  "preflight": {
+    "fields": [
+      3,
+      23
+    ],
+    "p3_seconds": 0.005,
+    "p23_seconds": 0.746,
+    "data_seen": [
+      "All existing C++ S3 prime-field aggregates before independent Rust development.",
+      "evidence/preflight/* (p3 and p23 only)"
+    ],
+    "full_rust_population_seen": false
+  },
+  "budget": {
+    "paid_spend": 0,
+    "repository": "isogeny-labs/crypto",
+    "visibility": "public",
+    "runner": "ubuntu-24.04 standard",
+    "no_eks": true,
+    "no_gpu": true,
+    "no_larger_runner": true,
+    "no_secrets": true,
+    "no_cache": true,
+    "no_artifact_upload": true,
+    "billing_url": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+    "billing_text_sha256": "95f86232c84b051913fe421e617df65f9993c6f86ec8e58c4c78ffbdc84fb937"
+  },
+  "source_review": {
+    "kb": "unavailable; exact corpus/Lean/primary billing fallback",
+    "semaev_original_pdf": "prior access403; not newly read",
+    "formal": [
+      "../theorem_audit_20261108/lean/S3Roots.lean",
+      "../theorem_audit_20261108/lean/S3Completion.lean",
+      "lean/ValidatorFoundation.lean"
+    ],
+    "cpp_reference": "../theorem_census_20261109/evidence/semaev-native.jsonl"
+  },
+  "independence_scope": "Distinct Rust implementation versus earlier C++; same producing author, no independent signature. Separate hosted execution remains unasserted until job evidence. No formal Rust compiler/runtime semantics."
+}

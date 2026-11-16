@@ -1,0 +1,38 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "17a139437433696635fd711c3ceab57e75972b2958e9ab6005bd7911edad06a7"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "275dca079d49c324d5f60d9c99c4ae3a1440191980836083c2005f88d9cd861c"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "frozen N4 v2 grid negation-map rho (rho2::rho_neg) on the same GHS-weak E0 instances; k = 22 from the frozen supplement (research/quartic_n4v2_20261020/results/summary_supp.json), as that study does",
+  "unit": "cold F_q-multiplication equivalents (M-eq) with the frozen grid's per-size r_inv, r_lmul; hash/cmp at w*gae (section 5a)",
+  "binary_or_process": "N4 v2 driver. The IC arm is COMBO (research/ic_gw_fasthash_20261114/src, sha256 00355034924e...), whose counted output is field-for-field identical to v3 (sha256 de500bc1...) on all 94 study units and on 7 nonce-sampled validator replays; the rho reference is v3's rho2::rho_neg, which replays the frozen k = 22 negation-map run field for field (research/quartic_dl1_cd_sqrt_20261113/combo/validation/rho-replay-v3-k22-neg-seed2-run1.jsonl, 0 differences)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "strongest_available_note": "E0 has coefficients generic in K = F_{q^3} (built from u, u^q, u^{q^2}), so no Frobenius endomorphism; the negation map is the available symmetry. Plain rho at k = 22 for comparison: IC/rho 0.0024, 0.0026, 0.0032 at w = 0, 0.1, 1.",
+  "gae_band": {
+   "0": {
+    "ic": 1038514332.4152999,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1208511467.8152997,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2738485686.4153,
+    "rho": 1492814000000.0
+   }
+  },
+  "order_holds_across_band": true,
+  "scope": "DL arm, c_D = 1.7 + square-root chain, q = 4194271 (k = 22), mean over seeds 1-3, cold M-eq. COMBO changes CPU time only: its counted M-eq equals v3's, so the band equals the combo/validation band and the distance to rho is unchanged. Time claim: relation-stage CPU 0.43-0.56 of v3 (L0); whole-process CPU 0.90-0.96 (validator replay)"
+ }
+}

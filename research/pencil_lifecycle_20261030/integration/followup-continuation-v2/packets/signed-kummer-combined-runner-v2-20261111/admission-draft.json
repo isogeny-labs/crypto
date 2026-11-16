@@ -1,0 +1,107 @@
+{
+  "schema": "signed-kummer-combined-admission/v1",
+  "released": false,
+  "workspace": "/var/tmp/pencil-signed-kummer-combined-v2-20261111",
+  "donor_workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+  "absolute_deadline": "2026-11-11T12:00:00Z",
+  "total_seconds": 2400,
+  "build_phase_seconds": 1800,
+  "execution_phase_seconds": 600,
+  "cpu": 2,
+  "memory_bytes": 17179869184,
+  "swap_bytes": 0,
+  "attempts": 1,
+  "automatic_retry": false,
+  "prior_v4_terminal_confirmed": false,
+  "fresh_cache_manifest": {
+    "path": null,
+    "sha256": null
+  },
+  "immutable_manifest": {
+    "path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+    "sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
+  },
+  "campaign_ceiling_seconds": 129600,
+  "campaign_charged_seconds": null,
+  "campaign_remaining_seconds": null,
+  "lease": null,
+  "release_receipts": {
+    "prior_v4_terminal": {
+      "path": null,
+      "sha256": null
+    },
+    "fresh_cache_snapshot": {
+      "path": null,
+      "sha256": null
+    },
+    "ledger": {
+      "path": null,
+      "sha256": null
+    },
+    "lease_readback": {
+      "path": null,
+      "sha256": null
+    },
+    "independent_review": {
+      "path": null,
+      "sha256": null
+    },
+    "publication": {
+      "path": null,
+      "sha256": null
+    },
+    "lock_publication": {
+      "path": null,
+      "sha256": null
+    },
+    "campaign_authorization": {
+      "path": null,
+      "sha256": null
+    }
+  },
+  "packet_files": {
+    "driver-inputs.json": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
+    "expected-source-manifest.json": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+    "commands.json": "be73946bea8cc591fb37c6b88202ca9698f7934c8fd126b2277db115db50ff61",
+    "stage_driver.py": "3a072cbfd03fac4149bbebdc969ef33173b67f1e35fa248e83cdc96ef9f64564",
+    "materialize.py": "087a3a31491a4ed0abff0e730e29cef46aab6461398b6c650555c778b2f79e78",
+    "durable-launcher.py": "aa6cd5159603e0d32e0637f154c513d64df43a3de12b9b18a79662d3a9852535",
+    "durable_io.py": "f225a6e232e27cded358b96f6867734e7c49d9904bed24aaa496cea88111c4ba",
+    "durable-worker.py": "8db5ec046ecb249f050b3d3b4e06e042f7b427eaabf3a022550fab8385da9203",
+    "panel_acceptance.py": "afa728704e1559ddcdaffa705960e2e1dcda694a7c322b63a47dd433a7d7be33",
+    "overlays.json": "636f528a373fc7937a46a6dce2d80533246a85ce043a6e33900b876ba76c35a8",
+    "acceptance_negative_controls.py": "e2964a1d88d6332a79f5245a753a52fddff2cb66d3ded94f3d8d27a840f733cf"
+  },
+  "durable_run": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v2-20261111",
+  "unit": "pencil-signed-kummer-combined-v2-20261111.service",
+  "uid": 1000,
+  "gid": 1000,
+  "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "limits": {
+    "target_stop_threshold_bytes": 6442450944,
+    "workspace_stop_threshold_bytes": 8589934592,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944,
+    "durable_metadata_stop_bytes": 67108864,
+    "durable_total_stop_bytes": 402653184,
+    "supervisor_permit_seconds": 10
+  },
+  "exact_tests": [
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_signed_panel_identity_duplicate_terminal_and_faults",
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_kummer_labels_results_counters_and_early_returns"
+  ],
+  "source_manifest_sha256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+  "published_source_revision": null,
+  "generated_locks": {
+    "driver": {
+      "path": null,
+      "sha256": null,
+      "bytes": null
+    },
+    "adapter": {
+      "path": null,
+      "sha256": null,
+      "bytes": null
+    }
+  }
+}

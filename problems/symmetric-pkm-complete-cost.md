@@ -24,6 +24,7 @@ it would not establish a larger-family or asymptotic advantage.
 - **Observed:** PR2868 merged as8171fb53733b43b3174abf66c839d43037a30fc2. Its partial counters and structural proofs did not establish the requested cost result.
 - **Observed:** On2026-10-30 the managed runtime reports no configured identities, secrets or runtime variables. The unchanged checkpoint gate exits1 for missing upload token/AWS profile. No scientific panel launched.
 - **Implemented:** Native complete-set collection, separate tiny affine reference, request-bound replay, phase ledgers, three presentations and a cold toy relation/LA/recovery control; see current validation receipts for verified scope.
+- **2026-10-30 continuation:** [Independent scalar replay](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/README.md) recomputes coefficient/augmented rank and useful yield with separate arithmetic, checks final RREF membership, and supplies directly checked original-row recovery weights or a target-changing kernel witness. Five supporting Lean contracts build; final scoped audit passes18 declarations with zero trusted exceptions and module kernel replay passes against imports. Fresh integrated native validation is pending. This narrows the rank/recovery correctness gap; complete cost and scientific acceptance remain open.
 - **Derived/proved:** An additive-group chain-order lemma is checked in Lean. The oracle exponent/model assumptions, polynomial/ECC bridge and all Rust cost semantics remain unproved.
 - **Missing capability:** Complete arithmetic/logical count coverage; qualified external solver/extractor; frozen panel and strongest matched references; native-command tested image/execution/resume route; artifact/checkpoint access and independent replay.
 - **Not established:** 20% oracle improvement,2x memory reduction, cold IC improvement, below-rho cost or bounded solving degree. Missing access and bounded timeouts are not mathematical obstructions.
@@ -51,6 +52,35 @@ different acceptance requirements.
 
 ## Resolution and history
 
+2026-10-30T18:45Z: sourcea030 preserves both merge histories, and the changed
+Lean gate passes18 declarations/zero trusted plus module replay. Fresh native
+validation stops at the [inherited chain-SAT delimiter](binary-semaev-chain-sat-merge-delimiter.md)
+before any tests run. New main's file preview contains a repair, but PR2949
+reports conflicts; reviewed resolution and fresh affected validation remain
+required. The G2 accounting gaps are rechecked, not fixed or priced. No new
+scientific panel, count qualification or goal completion is claimed.
+
+2026-10-30T17:03Z follow-up: fresh pinned-source23 example tests, strict lint/
+format, CLI refusal, backlog validation and library build pass; full library
+execution is active, not passed. The [G2 source audit](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_ACCOUNTING_AUDIT.md)
+locates discarded validation counts, query `GroupOps` fields skipped by serde
+and inverse/expanded-multiplication overlap. These require explicit count
+emission and a nonoverlapping hierarchy before any pricing; no source fix or
+comparison is claimed by the audit. New remote0cc5 changes source/dependencies
+and is not validated by this pinned-source receipt. All scientific criteria
+and execution blockers remain in force.
+
 2026-10-30: opened for the explicitly activated G1–G6 goal. The mixed-fiber PKM
 problem is related prior work, not the same symmetric presentation. Original
 receipt directories and scientific records are preserved. Unresolved.
+
+## 2026-11-05T07:09:35.071742+00:00 — G2 emitter progress; scientific acceptance unchanged
+
+The [new ownership contract](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_COUNTER_OWNERSHIP_20261105.md)
+implements retained validation counts and explicit per-attempt/aggregate query
+field/reduction emissions, including identity attempts. Source-c41's18oracle
+tests/strictlint/fmt/CLI refusal pass. Complete solver/root/logical pricing,
+durable failed-call records, replay/runtime/resume and external/scaling panels
+remain open. The inherited library assertion andJV cap do not establish a full
+suite pass. PR2949 merged; unpublished continuation preserved separately.
+G1-G3/G6partial,G4/G5unrun,0panels,comparison_admissible=false.

@@ -1,0 +1,36 @@
+{
+  "schema": "elliptic-picard-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "elliptic-picard-bridge-certificate",
+      "expected_decl_sha256": "1d0707209326c4217584e719bcfaa2f2284a11b5d12e390a72c59c093d7ef9d4",
+      "full_characters": 1056,
+      "full_decl_sha256": "1d0707209326c4217584e719bcfaa2f2284a11b5d12e390a72c59c093d7ef9d4",
+      "full_normalized_signature": "theorem actual_elliptic_picard_certificate : (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ ≠ 0), Function.Bijective (pointClass W hΔ) ∧ (∀ P : W.Point, ellipticPicardEquiv W hΔ P=divisorClass W hΔ (pointDivisor W P)) ∧ (∀ D : W.Point →₀ ℤ, D ∈ principalPointDivisors W ↔ divisorDegree W D=0 ∧ divisorPointSum W D=0) ∧ (∀ P Q : W.Point, (∃ (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf=Finsupp.single P 1-Finsupp.single Q 1) ↔ P=Q) ∧ (∀ (f : W.FunctionField) (_ : f ≠ 0), FiniteRegular W f ↔ ∃ a : W.CoordinateRing, f=algebraMap W.CoordinateRing W.FunctionField a) ∧ (∀ (f : W.FunctionField) (_ : f ≠ 0), FiniteRegular W f → pointOrder W f 0 ≠ -1)) ∧ rationalCurve.Δ ≠ 0 ∧ divisorDegree rationalCurve (principalDivisorHom rationalCurve rationalBadUnit) = -4 ∧ (¬ ∃ h : Additive rationalCurve.FunctionFieldˣ → ZeroDivisors rationalCurve, ∀ u, (h u).val=principalDivisorHom rationalCurve u) ∧ geometricControlCurve.Δ ≠ 0 ∧ Function.Bijective geometricControlMap ∧ (∃ P, geometricControlMap P≠0)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_elliptic_picard_certificate",
+        "end_byte": 1728,
+        "file": "/workspace/scratch/picard-bridge-binding-input01/PicardCertificate.lean",
+        "qualified_decl_id": "EllipticPicardBridgeAudit.actual_elliptic_picard_certificate",
+        "signature": "theorem actual_elliptic_picard_certificate :\n    (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K]\n      (W : WeierstrassCurve.Affine K) (hΔ : W.Δ ≠ 0),\n      Function.Bijective (pointClass W hΔ) ∧\n      (∀ P : W.Point, ellipticPicardEquiv W hΔ P=divisorClass W hΔ (pointDivisor W P)) ∧\n      (∀ D : W.Point →₀ ℤ, D ∈ principalPointDivisors W ↔\n        divisorDegree W D=0 ∧ divisorPointSum W D=0) ∧\n      (∀ P Q : W.Point, (∃ (f : W.FunctionField) (hf : f ≠ 0),\n        functionDivisor W f hf=Finsupp.single P 1-Finsupp.single Q 1) ↔ P=Q) ∧\n      (∀ (f : W.FunctionField) (_ : f ≠ 0),\n        FiniteRegular W f ↔ ∃ a : W.CoordinateRing,\n          f=algebraMap W.CoordinateRing W.FunctionField a) ∧\n      (∀ (f : W.FunctionField) (_ : f ≠ 0),\n        FiniteRegular W f → pointOrder W f 0 ≠ -1)) ∧\n    rationalCurve.Δ ≠ 0 ∧\n    divisorDegree rationalCurve (principalDivisorHom rationalCurve rationalBadUnit) = -4 ∧\n    (¬ ∃ h : Additive rationalCurve.FunctionFieldˣ → ZeroDivisors rationalCurve,\n      ∀ u, (h u).val=principalDivisorHom rationalCurve u) ∧\n    geometricControlCurve.Δ ≠ 0 ∧\n    Function.Bijective geometricControlMap ∧\n    (∃ P, geometricControlMap P≠0)",
+        "start_byte": 465
+      },
+      "recorded_statement": "theorem actual_elliptic_picard_certificate : (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ ≠ 0), Function.Bijective (pointClass W hΔ) ∧ (∀ P : W.Point, ellipticPicardEquiv W hΔ P=divisorClass W hΔ (pointDivisor W P)) ∧ (∀ D : W.Point →₀ ℤ, D ∈ principalPointDivisors W ↔ divisorDegree W D=0 ∧ divisorPointSum W D=0) ∧ (∀ P Q : W.Point, (∃ (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf=Finsupp.single P 1-Finsupp.single Q 1) ↔ P=Q) ∧ (∀ (f : W.FunctionField) (_ : f ≠ 0), FiniteRegular W f ↔ ∃ a : W.CoordinateRing, f=algebraMap W.CoordinateRing W.FunctionField a) ∧ (∀ (f : W.FunctionField) (_ : f ≠ 0), FiniteRegular W f → pointOrder W f 0 ≠ -1)) ∧ rationalCurve.Δ ≠ 0 ∧ divisorDegree rationalCurve (principalDivisorHom rationalCurve rationalBadUnit) = -4 ∧ (¬ ∃ h : Additive rationalCurve.FunctionFieldˣ → ZeroDivisors rationalCurve, ∀ u, (h u).val=principalDivisorHom rationalCurve u) ∧ geometricControlCurve.Δ ≠ 0 ∧ Function.Bijective geometricControlMap ∧ (∃ P, geometricControlMap P≠0)",
+      "recorded_text_sha256": "1d0707209326c4217584e719bcfaa2f2284a11b5d12e390a72c59c093d7ef9d4",
+      "source_plan": "research/elliptic_picard_bridge_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "EllipticPicardBridgeAudit.actual_elliptic_picard_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Frozen procedural writtenheadercheck, not kernel parser/hash/compiler/physicalhost refinement. Fullheadercheckaftercompletedgate; no prefix/verifierchange."
+}

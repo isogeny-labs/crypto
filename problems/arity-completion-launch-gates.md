@@ -9,7 +9,7 @@
   execution)
 - **Next action owner:** owner (credentials and budget); then the session that
   holds them runs the frozen cards
-- **Last updated:** 2026-11-04
+- **Last updated:** 2026-11-06
 
 ## Problem
 
@@ -153,3 +153,60 @@ k0n37, k0n41; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
 prime-tower controls under protocol v2 (D 6, 7, 4); kummer-m5-t2 D = 6;
 kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
 `analyze.py` and the director's assessment.
+
+## 2026-11-06: conjugate-pair and radix follow-up shares the access dependency
+
+`research/lead_followup_20261106/PROTOCOL.md` and blocked cards
+`XP-20261106-conjugate-chart-followup` / `XP-20261106-radix-depth-followup`
+reuse this launch-gate record. The managed Codex runtime reports no configured
+AWS identity, secrets or EKS tool. With a complete `.resume/RESUME.md`,
+`scripts/checkpoint.sh gate` reports no upload transport (no AWS profile
+`ecc-challenges-new`, no checkpoint upload token). GitHub access works, but
+the current `isolab-experiment.yml` dispatch takes ecbench specs; the example
+payload requires an authenticated arbitrary-command route and a matching image.
+No scientific job was submitted. These are access observations, not mathematical
+obstructions or a change to any earlier run's budget/attempt allowance.
+
+Exit conditions for these two cards: reconnect the existing scoped capability,
+pass the checkpoint and publication checks, pin the command image/source/binary,
+verify live budget/capacity under their shared proposed ceiling, and qualify the
+worker controls. Development tests and a merged preparation PR do not satisfy
+those conditions or complete either scientific panel.
+
+- **Last updated:** 2026-11-08 (Koblitz part resolved; prime tower open)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+negative controls (chain-s3 4/4 proved_unsat on each of icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5,
+icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
+
+## Update 2026-11-08: Koblitz part resolved, prime tower open
+
+- Koblitz m = 5, 6: complete. The stale line above ("shards have not started")
+  was wrong: attempt 4 ran Part A and 3 Part B cells on 11-05, then ended by Job
+  DeadlineExceeded after about 8.9 h Pending. Attempt 5 ran the 13 remaining
+  Part B cells as a plain command Job (no CRIU; launch/README.md deviation 10).
+  148 of 148 cells are recorded.
+  - Assessment: `koblitz_m5_m6/ASSESSMENT-a5.md` (complete-with-deviations).
+  - Report: `koblitz_m5_m6/reports/REPORT.md` and `REPORT.pdf`.
+  - Record: `benchmarks/records/20261108T1825Z-arity-koblitz-m56-a5.json`.
+- CRIU/EBS command mode is qualified (`launch/criu/QUALIFICATION-20261108.md`).
+  It is not used for these protocols, because their checkpoint policy is `none`.
+- Still open: the prime-tower `isogeny-m5-t2` cell has used its
+  `retries.max_attempts` = 2. Running it again needs an owner decision. The
+  cpu-spot limit raise (`launch/criu/nodepool-change-20261107/patch-cpu-spot.sh`)
+  still needs an operator.

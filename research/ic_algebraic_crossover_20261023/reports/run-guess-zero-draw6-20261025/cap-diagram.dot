@@ -1,0 +1,10 @@
+digraph caps {
+  graph [rankdir=LR, bgcolor="white", margin=0.1];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3f5", fontname="Helvetica", fontsize=11];
+  edge [color="#536879"];
+  original [label="Original draw 6\n46 Boolean variables\nno guessed bits"];
+  low [label="Earlier 140,000-column cap\nrefused before closure\nverdict unknown", fillcolor="#f4e8e0"];
+  high [label="200,000-column continuation\n179,447 columns admitted\ndegree-4 refutation observed", fillcolor="#dcefed"];
+  original -> low;
+  original -> high;
+}

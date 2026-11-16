@@ -1,0 +1,66 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "pilot: dg vs dgb vs dgb filter=1 at 32 bits (local, descriptive)",
+ "description": "local feasibility pilot only; pilot seed, not a study curve",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 909090
+   }
+  ],
+  "targets_per_curve": 3,
+  "target_seed": 909091,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "dg",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "167871873",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgb",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-blocked:m=2",
+     "max_trials": "167871873",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgbf",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-blocked:m=2,filter=1",
+     "max_trials": "167871873",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 909092,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on build directory
+   Compiling crypto v0.1.0 (/workspace/scratch/12b17547dd2e/crypto)
+error: couldn't read `src/cryptanalysis/ecbench_large_prime/../../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench_large_prime/orbit.rs:217:29
+    |
+217 |     const MANIFEST: &[u8] = include_bytes!("../../../tests/fixtures/ecbench_manifest_small.json");
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench_large_prime.rs:2011:9
+     |
+2011 |         include_bytes!("../../tests/fixtures/ecbench_manifest_small.json");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+

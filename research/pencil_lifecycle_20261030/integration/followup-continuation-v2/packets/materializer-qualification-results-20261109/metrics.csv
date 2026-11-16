@@ -1,0 +1,16 @@
+case,assertions_passed,storage_consistency,reported_status,committed_records,inline_records,unreferenced_tail_bytes,rejected
+normal_intermediate_and_final,True,storage_complete,passed,2,2,0,
+interrupted_unacknowledged_tail,True,storage_incomplete,failed,1,0,11,
+first_file_fsync_failure,True,storage_failed,failed,0,1,,
+first_directory_fsync_failure,True,storage_failed,failed,0,1,,
+append_fsync_failure,True,storage_failed,failed,1,2,39,
+append_write_failure,True,storage_failed,failed,1,2,0,
+append_short_failure,True,storage_failed,failed,1,2,3,
+append_flush_failure,True,storage_failed,failed,1,2,39,
+checkpoint_replace_failure,True,storage_incomplete,failed,1,0,39,
+acknowledged_prefix_corruption_rejected,True,,,,,,True
+normal_repeat_control,True,storage_complete,passed,2,2,0,
+before_first_append_interruption,True,storage_incomplete,failed,0,0,,
+durable_append_before_checkpoint,True,storage_incomplete,failed,1,0,39,
+checkpoint_directory_fsync_failure,True,storage_incomplete,failed,2,0,0,
+pointer_count_mismatch_rejected,True,,,,,,True

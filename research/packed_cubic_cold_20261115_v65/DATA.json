@@ -1,0 +1,36 @@
+{
+  "descriptor": "research/packed_cubic_20261115_v65/full_ordinary_instance.json",
+  "expected": "research/full_ordinary_cubic_20261115_v60/raw.json",
+  "reference": "research/general_binary_cubic_repair_20261115_v60/scan",
+  "gray": "research/constant_cubic_gray_20261115_v64b/scan",
+  "packed": "research/packed_cubic_20261115_v65/scan",
+  "order": [
+    [
+      "reference",
+      "gray",
+      "packed"
+    ],
+    [
+      "packed",
+      "gray",
+      "reference"
+    ],
+    [
+      "gray",
+      "reference",
+      "packed"
+    ],
+    [
+      "packed",
+      "reference",
+      "gray"
+    ]
+  ],
+  "repetitions_per_backend": 4,
+  "profile_and_verification_instrumentation": false,
+  "native_seconds": 8,
+  "outer_seconds": 9,
+  "worker_seconds": 90,
+  "worker_memory_mb": 4096,
+  "core": 0
+}

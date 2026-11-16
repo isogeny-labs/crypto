@@ -1,0 +1,188 @@
+module
+public import OrientationNode
+public import OrientationMoment
+public import OrientationAnchor
+public import OrientationValuation
+public import OrientationContent
+public import OrientationProduct
+public import OrientationResidue
+public import OrientationDiagonal
+public import OrientationJet
+public import OrientationLeading
+public import OrientationRefinement
+public import OrientationRank
+import all OrientationNode
+import all OrientationMoment
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+import all OrientationRefinement
+import all OrientationRank
+public section
+noncomputable section
+namespace OrientationNodeMoment
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationGradedNode
+  OrientationResidue OrientationDiagonal OrientationJet OrientationLeading OrientationRefinement
+
+theorem node_slope_even (u i x y : ℕ) (t : ℤ)
+    (hiu : i < u) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hc : x.testBit i=y.testBit i) :
+    VBound 1 (slope u (rowResidue u x) y (t:ℚ)) := by
+  have hp := actual_node_denominator_le (rowResidue u x) y i t ht0 hi
+    (row_crossing u i x y hiu hc)
+  have hb := vbound_div (power_integral u) (r:=((t:ℚ)-delta (rowResidue u x) y))
+  exact hb.mono (by omega)
+
+def nodeReciprocal (u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) : ℚ :=
+  (1+slope u (rowResidue u x) y (t:ℚ)*(rowQuotient u x:ℚ))⁻¹ *
+  ∏ j ∈ mask u x y,
+    ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j
+
+theorem node_comparison_reciprocal (u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hiu : i < u) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hc : x.testBit i=y.testBit i) :
+    nodeComparisonRatio u x (rowResidue u x) y t m = nodeReciprocal u x y t m := by
+  have hmask := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  have hb := denominator_inverse u x y (t:ℚ)
+    (sub_ne_zero.mpr (Ne.symm (actual_displacement_ne_node (rowResidue u x) y i t ht0 hi
+      (row_crossing u i x y hiu hc))))
+  have hp : correctionRatio u x (rowResidue u x) y m =
+      ∏ j ∈ mask u x y,
+        ((1+slope u (rowResidue u x) y ((2:ℚ)^j)*(rowQuotient u x:ℚ))⁻¹)^m j := by
+    unfold correctionRatio
+    apply prod_congr rfl
+    intro j hj
+    rw [denominator_inverse u x y ((2:ℚ)^j)
+      (denominator_ne_zero u (rowResidue u x) y j (hmask ▸ hj))]
+  simp only [nodeComparisonRatio,hb,hp,nodeReciprocal]
+
+def nodeDenominator (u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) : ℚ[X] :=
+  (1+C (slope u (rowResidue u x) y (t:ℚ))*X)*
+    ∏ j ∈ mask u x y, (1+C (slope u (rowResidue u x) y ((2:ℚ)^j))*X)^m j
+
+theorem node_denominator_weighted (u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hiu : i < u) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hc : x.testBit i=y.testBit i) : WeightedPolynomial (nodeDenominator u x y t m) := by
+  apply (weighted_linear (node_slope_even u i x y t hiu ht0 hi hc)).mul
+  apply WeightedPolynomial.prod
+  intro j hj
+  exact (weighted_linear (anchor_slope_even u x y j hj)).pow (m j)
+
+theorem node_denominator_constant (u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    (nodeDenominator u x y t m).coeff 0=1 := by
+  rw [coeff_zero_eq_eval_zero]
+  simp only [nodeDenominator,eval_mul,eval_prod,eval_pow,eval_add,eval_one,eval_C,eval_X,
+    mul_zero,add_zero,one_pow,prod_const_one,mul_one]
+
+theorem node_denominator_reciprocal (u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    nodeReciprocal u x y t m =
+      ((nodeDenominator u x y t m).eval (rowQuotient u x:ℚ))⁻¹ := by
+  simp only [nodeDenominator,nodeReciprocal,eval_mul,eval_prod,eval_pow,eval_add,
+    eval_one,eval_C,eval_X,mul_inv_rev,← Finset.prod_inv_distrib,← inv_pow]
+  ring
+
+theorem node_denominator_row_class (u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    nodeDenominator u x y t m = nodeDenominator u (rowResidue u x) y t m := by
+  have hm := masks_stable u u x (rowResidue u x) y le_rfl (row_mod u x)
+  unfold nodeDenominator
+  rw [← hm]
+  have hr : rowResidue u (rowResidue u x)=rowResidue u x := by simp [rowResidue]
+  rw [hr]
+
+theorem actual_node_reciprocal_family (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) :
+    (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m =
+      ((chart a t (completed (grid a) u (rowResidue u x) y m)).coeff 1/diagonalJet a u i m)*
+        nodeReciprocal u x y t m := by
+  rw [actual_node_jet_comparison a u u i x (rowResidue u x) y t m hx
+    (row_source_bound a u x hua) hy hiu le_rfl hua (row_mod u x) ht ht0 hi hc,
+    node_comparison_reciprocal u i x y t m hiu ht0 hi hc]
+
+theorem actual_node_moment_error (a u i x y k : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) :
+    VBound (k:ℤ) ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m-
+      ((chart a t (completed (grid a) u (rowResidue u x) y m)).coeff 1/diagonalJet a u i m)*
+        (inverseTrunc (nodeDenominator u (rowResidue u x) y t m) k).eval
+          (rowQuotient u x:ℚ)) := by
+  have hD := node_denominator_weighted u i x y t m hiu ht0 hi hc
+  have h0 := node_denominator_constant u x y t m
+  have ht' := inverse_trunc_error (nodeDenominator u x y t m) hD h0 k (rowQuotient u x:ℤ)
+  have hp := actual_node_first_integral a u i (rowResidue u x) y t m
+    (row_source_bound a u x hua) hy ht ht0 hi hiu hua (row_crossing u i x y hiu hc)
+  have hh : VBound (k:ℤ)
+      (((nodeDenominator u x y t m).eval (rowQuotient u x:ℚ))⁻¹-
+        (inverseTrunc (nodeDenominator u x y t m) k).eval (rowQuotient u x:ℚ)) := by
+    simpa only [Int.cast_natCast] using ht'
+  have he := hp.mul hh
+  rw [actual_node_reciprocal_family a u i x y t m hx hy ht ht0 hi hiu hua hc,
+    node_denominator_reciprocal,← node_denominator_row_class u x y t m]
+  simpa only [zero_add,mul_sub] using he
+
+def nodeMomentRight (a u i k : ℕ) (hu : u≤a) (t : ℤ) (m : ℕ → ℕ) :
+    Matrix (MomentLabels u k) (Ports a) ℚ := fun rb y =>
+  nodeCrossingFirst a u i t m (OrientationRank.classPort a u hu rb.1) y *
+    PowerSeries.coeff rb.2.val (inverseSeries (nodeDenominator u rb.1.val y.val t m)) /
+      (2:ℚ)^rb.2.val
+
+theorem node_moment_right_integral (a u i k : ℕ) (hu : u≤a) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (rb : MomentLabels u k) (y : Ports a) : VBound 0 (nodeMomentRight a u i k hu t m rb y) := by
+  unfold nodeMomentRight nodeCrossingFirst
+  split_ifs with hc
+  · have hR := actual_node_first_integral a u i rb.1.val y.val t m
+      (OrientationRank.classPort a u hu rb.1).isLt y.isLt ht ht0 hi hiu hu hc
+    have hD := node_denominator_weighted u i rb.1.val y.val t m hiu ht0 hi hc
+    have hb := weighted_inverse_coefficients _ hD rb.2.val
+    have hq := vbound_div hb (r:=(2:ℚ)^rb.2.val)
+    rw [two_power_valuation,sub_self] at hq
+    simpa only [OrientationRank.classPort,zero_add,mul_div_assoc] using hR.mul hq
+  · simp only [zero_mul,zero_div]
+    exact VBound.zero _
+
+theorem node_moment_product (a u i k : ℕ) (hu : u≤a) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a) :
+    (momentLeft a u k*nodeMomentRight a u i k hu t m) x y =
+      nodeCrossingFirst a u i t m
+        (OrientationRank.classPort a u hu ⟨rowResidue u x.val,row_bound u x.val⟩) y *
+      (inverseTrunc (nodeDenominator u (rowResidue u x.val) y.val t m) k).eval
+        (rowQuotient u x.val:ℚ) := by
+  let r0 : Labels u := ⟨rowResidue u x.val,row_bound u x.val⟩
+  have hz (r : Labels u) (hr : r ≠ r0) (b : Fin k) : momentLeft a u k x (r,b)=0 := by
+    unfold momentLeft
+    split_ifs with he
+    · exact False.elim (hr (Fin.ext he.symm))
+    · rfl
+  have hs : (∑ r : Labels u,∑ b : Fin k,
+      momentLeft a u k x (r,b)*nodeMomentRight a u i k hu t m (r,b) y) =
+      ∑ b : Fin k,momentLeft a u k x (r0,b)*nodeMomentRight a u i k hu t m (r0,b) y :=
+    Finset.sum_eq_single r0 (by intro r _ hr; simp only [hz r hr,zero_mul,sum_const_zero])
+      (by intro h; exact False.elim (h (mem_univ _)))
+  rw [Matrix.mul_apply,Fintype.sum_prod_type,hs,trunc_eval_moments,mul_sum]
+  apply sum_congr rfl
+  intro b _
+  simp only [momentLeft,nodeMomentRight,r0,ite_true]
+  field_simp [show (2:ℚ)^b.val ≠ 0 by positivity]
+
+theorem actual_node_moment_factorization (a u i k : ℕ) (hu : u≤a) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (x y : Ports a) : VBound (k:ℤ) (nodeCrossingFirst a u i t m x y-
+      (momentLeft a u k*nodeMomentRight a u i k hu t m) x y) := by
+  rw [node_moment_product]
+  have hb := matching_bits u x.val (rowResidue u x.val) i hiu (row_mod u x.val)
+  by_cases hc : x.val.testBit i=y.val.testBit i
+  · have hr : (rowResidue u x.val).testBit i=y.val.testBit i := hb.symm.trans hc
+    simp only [nodeCrossingFirst,hc,hr,OrientationRank.classPort,ite_true]
+    exact actual_node_moment_error a u i x.val y.val k t m x.isLt y.isLt ht ht0 hi hiu hu hc
+  · have hr : (rowResidue u x.val).testBit i ≠ y.val.testBit i := by rwa [← hb]
+    simp only [nodeCrossingFirst,hc,hr,OrientationRank.classPort,ite_false,zero_mul,sub_self]
+    exact VBound.zero _
+
+end OrientationNodeMoment

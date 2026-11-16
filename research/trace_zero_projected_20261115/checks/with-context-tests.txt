@@ -1,0 +1,485 @@
+   Compiling trace-zero-projected v0.1.0 (/workspace/crypto-trace/research/trace_zero_projected_20261115/native)
+error[E0432]: unresolved import `num_traits`
+  --> src/../../../../src/binary_ecc/trace_zero.rs:18:5
+   |
+18 | use num_traits::{One, Zero};
+   |     ^^^^^^^^^^ use of unresolved module or unlinked crate `num_traits`
+   |
+   = help: if you wanted to use a crate named `num_traits`, use `cargo add num_traits` to add it to your `Cargo.toml`
+
+error[E0599]: no associated function or constant named `one` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:191:34
+    |
+191 |         let mut label = BigUint::one() << i;
+    |                                  ^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:204:16
+    |
+204 |         if row.is_zero() {
+    |                ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no associated function or constant named `zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:209:30
+    |
+209 |     let mut label = BigUint::zero();
+    |                              ^^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+help: there is a method `is_zero` with a similar name
+    |
+209 |     let mut label = BigUint::is_zero();
+    |                              +++
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:218:13
+    |
+218 |     if !row.is_zero() {
+    |             ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:225:14
+    |
+225 |     while !b.is_zero() {
+    |              ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:226:18
+    |
+226 |         while !a.is_zero() && a.bits() >= b.bits() {
+    |                  ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:245:35
+    |
+245 |     let mut polynomial = BigUint::one() << n;
+    |                                   ^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:247:32
+    |
+247 |         polynomial ^= BigUint::one() << i;
+    |                                ^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:269:91
+    |
+269 |             && polynomial_gcd(power.add(&z).to_biguint(), polynomial.clone()) != BigUint::one()
+    |                                                                                           ^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigInt` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:297:31
+    |
+297 |         let count = ((BigInt::one() << n) + BigInt::one() - t1)
+    |                               ^^^ associated function or constant not found in `BigInt`
+    |
+note: if you're trying to build a new `BigInt` consider using one of the following associated functions:
+      BigInt::new
+      BigInt::new_const
+      BigInt::from_biguint
+      BigInt::from_slice
+      and 7 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/bigint.rs:593:5
+    |
+593 |     pub fn new(sign: Sign, digits: Vec<u32>) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub const fn new_const(n: i32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+617 |     pub fn from_biguint(mut sign: Sign, mut data: BigUint) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+631 |     pub fn from_slice(sign: Sign, slice: &[u32]) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigInt` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:297:53
+    |
+297 |         let count = ((BigInt::one() << n) + BigInt::one() - t1)
+    |                                                     ^^^ associated function or constant not found in `BigInt`
+    |
+note: if you're trying to build a new `BigInt` consider using one of the following associated functions:
+      BigInt::new
+      BigInt::new_const
+      BigInt::from_biguint
+      BigInt::from_slice
+      and 7 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/bigint.rs:593:5
+    |
+593 |     pub fn new(sign: Sign, digits: Vec<u32>) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub const fn new_const(n: i32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+617 |     pub fn from_biguint(mut sign: Sign, mut data: BigUint) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+631 |     pub fn from_slice(sign: Sign, slice: &[u32]) -> BigInt {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:451:20
+    |
+451 |             if row.is_zero() {
+    |                    ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no method named `is_zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:470:21
+    |
+470 |             if !row.is_zero() {
+    |                     ^^^^^^^ method not found in `BigUint`
+    |
+   ::: /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19/src/identities.rs:28:8
+    |
+ 28 |     fn is_zero(&self) -> bool;
+    |        ------- the method is available for `BigUint` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `is_zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+
+error[E0599]: no associated function or constant named `one` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:568:38
+    |
+568 |         let mut numerator = BigUint::one();
+    |                                      ^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `ne` with a similar name, but with different arguments
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/cmp.rs:275:4
+help: trait `One` which provides `one` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::One;
+    |
+
+error[E0599]: no associated function or constant named `zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:569:47
+    |
+569 |         while (&numerator % 4u32) != BigUint::zero() {
+    |                                               ^^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+help: there is a method `is_zero` with a similar name
+    |
+569 |         while (&numerator % 4u32) != BigUint::is_zero() {
+    |                                               +++
+
+error[E0599]: no associated function or constant named `zero` found for struct `BigUint` in the current scope
+   --> src/../../../../src/binary_ecc/trace_zero.rs:797:39
+    |
+797 |         let mut polar = vec![BigUint::zero(); d];
+    |                                       ^^^^ associated function or constant not found in `BigUint`
+    |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+   --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+    |
+569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+587 |     pub const fn new_const(n: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `zero` is implemented but not in scope; perhaps you want to import it
+    |
+ 12 + use num_traits::identities::Zero;
+    |
+help: there is a method `is_zero` with a similar name
+    |
+797 |         let mut polar = vec![BigUint::is_zero(); d];
+    |                                       +++
+
+error[E0599]: no associated function or constant named `zero` found for struct `BigUint` in the current scope
+    --> src/../../../../src/binary_ecc/trace_zero.rs:1208:36
+     |
+1208 |             let mut raw = BigUint::zero();
+     |                                    ^^^^ associated function or constant not found in `BigUint`
+     |
+note: if you're trying to build a new `BigUint` consider using one of the following associated functions:
+      BigUint::new
+      BigUint::new_const
+      BigUint::from_slice
+      BigUint::from_bytes_be
+      and 4 others
+    --> /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:569:5
+     |
+ 569 |     pub fn new(digits: Vec<u32>) -> BigUint {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 587 |     pub const fn new_const(n: u32) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 597 |     pub fn from_slice(slice: &[u32]) -> BigUint {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 637 |     pub fn from_bytes_be(bytes: &[u8]) -> BigUint {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: items from traits can only be used if the trait is in scope
+help: trait `Zero` which provides `zero` is implemented but not in scope; perhaps you want to import it
+     |
+  12 + use num_traits::identities::Zero;
+     |
+help: there is a method `is_zero` with a similar name
+     |
+1208 |             let mut raw = BigUint::is_zero();
+     |                                    +++
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `trace-zero-projected` (lib test) due to 18 previous errors
