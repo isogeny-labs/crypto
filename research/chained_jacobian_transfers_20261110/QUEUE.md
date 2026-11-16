@@ -1,5 +1,27 @@
 Canonical main also contains a separate441664-character historical queue body, including pre-existing conflict markers. It is retained whole and byte-exact in [the canonical-base archive](current-main-intake-20261116-02/entire-canonical-main-queue-base.md.xz) and immutable base90ea, alongside the complete issue3904 history below. This active summary does not discard or silently resolve that historical record. [pcc:unverified]
 
+## Current checkpoint — 2026-11-16 22:56:33 UTC
+
+Regular [crypto PR4455](https://github.com/isogeny-labs/crypto/pull/4455) is open, draftfalse, head [07290f91170ef6c8fbef3709bcf0f6de61d52abc](https://github.com/isogeny-labs/crypto/tree/chained-transfer-verified-main-intake-20261116-07290f91170e), base90ea6cb42434698be3fac9d2d012a579f298b961. Normal atomic new lane/chained-transfers and immutable tag/exact readbacks0; actual source/PR publication390d0e. Normal auto-merge is enabled, actual state blocked; no merge was invoked. First new-source own CI observation **23:35UTC**, then four-hour unchanged cadence. All claims remain unsigned. [pcc:unverified]
+
+The source includes the completed finite norm08/actual native norm–Euclid09 certificates and reports,37 fresh complete statement bindings on the **verified full1,216-row main prefix**, retained original dual/current-Root37/66 zero-failure proof records, complete legacy forks, whole13ZIP/924member/21log merged-head CI custody, all negative records and queue history. New workflow pins document a one-comment Root auditor dependency change; original workflows remain whole archival files. Governancec8faf0/intakea2257a. [pcc:unverified]
+
+The failed sparse01 intake had a missing base ledger/keyring and38-entry fork; earlier canonical labels934bce are explicitly rejected for that attempt. Its entire source/claims/evidence/index are preserved. The fresh02 intake verifies the exact full main ledger/keyring **before** any new records and passes the original prefix after them. No old history was reset/rechained/dropped, and legacy fork reconciliation remains separate. Whole canonical main queue441664characters/442032bytes, including pre-existing conflict text, is retained losslessly in the PR alongside this complete issue history. [pcc:unverified]
+
+Current original artifact policy still selects **eight whole objects**, pending original authenticated migration/full remote byte replay and current CI/reviews. No size/label/policy exemption or scientific/merge waiver. Complete cached whitespace/authored prose/actionlint/prefix pass0; whole historic log/RESUME prose remains1 with findings byte-identical to main, while new appends pass0. [pcc:unverified]
+
+### Next unblocked research
+
+1. **Rust Richelot model-chart correctness unit10 — implementation active.** Frozen protocol809f0c, prospective amendmentfc1a07 and inspected one-page report4f4e0c are in the published source before code. All12 exact CT49 source/target sextics, reversible coefficients/finite and infinity point charts, all102 projective arguments, independent point/character checks and mutation/domain controls are mandatory. The amended exhaustion control uses an explicit empty/restricted candidate list, not an invented smooth-curve obstruction. Sign of a model isomorphism cannot establish Richelot dual orientation. No code or execution result has yet been published for10. [pcc:unverified]
+2. **Source-before-calls.** Publish exact new Rust source on a separate immutable tag before bounded development units, retaining every source/output/control. Keep active PR0729 stable until23:35 ownCI, then normal guarded lane continuation. No benchmark or original full-population call is substituted. [pcc:unverified]
+3. **Actual nontrivial transfers.** After model correctness, carry charts through existing Richelot factors/balanced divisor arithmetic, exceptional fibres and dual[2] orientation; preserve CT50 forced rational-return negative. Stronger shared Mathlib/crypto-lean field/representation assembly is explicitly unfinished before further Lean declarations. [pcc:unverified]
+4. **Original science and cost.** Full original LP60/240/62,360/witness/seven controls/feedback/post, qualified OCI/ABI/pool/lane, actual subgroup maps/chains and full setup/transfer/solve/recovery against strongest matched ECDLP algorithms remain open. No compiler/full-field/Jacobian/cost or signed promotion follows from source publication. [pcc:unverified]
+
+Paid STOPe42949, locked crypto-autoresearcher8edec422, KB/Conductor unavailable and all original admission/scientific/CI/merge criteria persist. Active checkout /workspace/crypto-chained-main-validated; original Rooteb3 and Consumere079 worktrees/indices retained. Only this session's new unindexed failed transfer cache was cleaned after complete digest/error/no-live-Git checks; old raw science/partials/indexed objects remain. [pcc:unverified]
+
+<details>
+<summary>Previous complete queue body retained as superseded status</summary>
+
 ## Current checkpoint — 2026-11-16 21:44:56 UTC
 
 [Root PR4425](https://github.com/isogeny-labs/crypto/pull/4425) and [Consumer PR1670](https://github.com/isogeny-labs/cryptanalysis/pull/1670) were **merged by the owner** after the last20:04 observation. Actual Root head5e581972670f158162e67c8016005c80328b5b45 merged20:13 asf9905c5eecc4fedfc86619050747142dd8be79a2; Consumer headf8933160cc2112c890ff6cece8c5055c22385ff4 merged20:17:54 asa549de7fc5af11ae6c8e6bf4f77e936f9330b801. The agent invoked neither merge. Earlier ready278/12cc status below is historical, superseded byaa700d/1e7318. Stop polling or pushing closed source branches. These merges do not imply green CI or scientific verification. [pcc:unverified]
@@ -163,6 +185,9 @@ Paid-work stop and next queue:
 
 Resume/storage:
 Both current Git indices/shared metadata remain whole via RAM-backed exact symlinks; original SourceRoot/Consumer HEAD/tree/ledger bytes preservedbfeb59/5bad90. Two complete indexed pack relocations7cb04a/23d689 retain every object byte/original path. Exact duplicate inactive index backups share immutable whole-file hardlinks c6ee49/cdb264, all paths/content retained. No scientific/raw/source/hold deletion. Current full Root8959 guard /dev/shm/ct359-root-word-current-merge-whole-byte-guard; fresh merge/branch holdct366; successful runtime source /dev/shm/ct360-repaired-native-source-with-original-links-02/runtime; whole current Consumer artifact /dev/shm/ct369-Consumer-adb-entire-OCI-source-CI. Original failed sourcect352 and all old contexts/ZIPs remain. On volatile metadata loss, preserve working bytes and restore published immutable objects/index only; never repeat completed science. Original queue-history-20261115.md stays frozen and every replaced queue body is retained whole. Next CI observation only after new source activity (~50min), otherwise normal4h cadence. [pcc:unverified]
+
+
+</details>
 
 
 </details>

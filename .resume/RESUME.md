@@ -7605,3 +7605,20 @@ Normal commit/push/regular lane PR and own scoped CI/full original store/PCC gat
 
 ## Errors
 Rejected incomplete sparse01 had missing base ledger/keyring and38-row fork; its canonical labels934bce are explicitly rejected, whole failed intake/index preserved, never rechained.02 begins with exact1216-row base and passes original prefix. New unindexed failed Git transport cache was removed only after fullSHA/error/no-live-Git checks; old scientific data/partials/indexed objects remain. New-clone automatic GC had already completed before stop, now disabled; raw old-pack retention is not claimed for that repack. Metadata syntax/missing-blob/encoding failures retained; targeted API text matches exact Git blobs. Original branches/indices untouched; no new science/paid/signed or field/Jacobian/cost promotion. [pcc:unverified]
+
+---
+
+2026-11-16T23:08:22.740329+00:00
+# Prepare immutable Richelot chart source before first bounded unit
+
+## What was done
+pcc/claims/PCC-20261116-7248c6.json: exact06fe86f1/standard-library Rust source, four declared correctness tests and complete per-point/projective/sign traces prepared under public809f0c/fc1a07; twelve fixtures/protocol bytes unchanged. No compilation/native result yet. Actual4455 open/draftfalse/head0729/auto-merge-blocked at22:45, publication390d0e and queue update22:56:34/full47983chars/history retained. [pcc:unverified]
+
+## Decisions made
+Normal child0729/new immutable source tag only before compile/calls; hold remote active0729 for own CI23:35. Compiler-only first, freeze separately copied qualifier/source/executable hashes, bounded native unit then strict Clippy/report/follow-up publication. No original scientific or merge criterion waived. [pcc:unverified]
+
+## Open threads
+Compile/test exact new source and preserve every outcome; own0729CI23:35/eight whole original store objects/PCC/gates/reviews. Full divisor maps/dual orientation/field-library/compiler/runtime/admission/strongest-cost and original full LP populations remain open. [pcc:unverified]
+
+## Errors
+No chart build/call has occurred. Sparse01/protection403/archive503/temporary cache/source-label/type/prose/whitespace failures remain preserved; original prototypes and sources unchanged. No benchmark, Jacobian/DLP, paid or signed promotion. [pcc:unverified]
