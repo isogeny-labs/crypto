@@ -105,6 +105,9 @@ jobs:
       - name: Prospective 32-Q post-Jacobian APS profile sweep with incumbent A/A
         timeout-minutes: 6
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --post-jac-profile
+      - name: Fresh 24 Q packed open-addressed x APS versus HashMap compact and BSGS cold
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --packed-x-index-confirm
       - name: Preregistered fresh 24 Q compact unique-x index APS versus old APS and cold BSGS
         timeout-minutes: 7
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compact-x-index-confirm
