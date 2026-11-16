@@ -25,3 +25,6 @@ Build01 compiled the C++ and Rust study instruments but the official identity ca
 
 ## Observed-control amendment v4
 Run02 completed both positive/negative proof checks, source-bound identity checks, fixed cap controls, quadratic primitive checks and all C/A/B semantic replay. Its missing-empty-branch generator failed to find a zero COVER-root branch; the actual intended empty branch has zero ADMITTED rows. Change only that selector, preserving exact original outputs/failure. Full corrected replication, not blinded confirmation; no cost data ran. Algorithms/frontier/population/deadline unchanged. [pcc:unverified]
+
+## Observed-dispatch amendment v5
+Run03 passed full semantic replay and all16semantic corruption controls. Its first A counter interval and all seven counter corruptions passed, then B37 population guard rejected101: an unbraced nested-if bound else to the method condition instead of the stream selector. Add explicit stream braces ONLY. Keep all raw counts/failures, disclose observed prefix, and repeat full declared scope; no selected-prefix result. Arithmetic/proofs/analysis/budget unchanged. [pcc:unverified]

@@ -62,8 +62,8 @@ int main(int argc,char**argv){try{
   if(method==2){auto pair=pairs.at(policy);plans.back().tb={tworeps[pair[0]],tworeps[pair[1]]};}
  };
  for(int route:{3,4,5})for(int method:{0,1,2})if(method<2||first<105)for(int rep=0;rep<2;rep++)add_plan(method,route,first,"warmup-"+std::to_string(rep),false,false,false);
- if(tag=="A")for(int policy=first;policy<end;policy++)for(int route:{3,4,5})for(int method:{0,1,2})if(method<2||policy<105)add_plan(method,route,policy,"plain",false,false,true);
- else for(int policy=end-1;policy>=first;policy--)for(int route:{5,4,3})for(int method:{2,1,0})if(method<2||policy<105)add_plan(method,route,policy,"plain",false,false,true);
+ if(tag=="A"){for(int policy=first;policy<end;policy++)for(int route:{3,4,5})for(int method:{0,1,2})if(method<2||policy<105)add_plan(method,route,policy,"plain",false,false,true);}
+ else{for(int policy=end-1;policy>=first;policy--)for(int route:{5,4,3})for(int method:{2,1,0})if(method<2||policy<105)add_plan(method,route,policy,"plain",false,false,true);}
  add_plan(0,3,first,"repeat-aa",false,false,true);add_plan(0,3,first,"positive-inside",true,false,true);add_plan(0,3,first,"negative-outside",false,true,true);
  auto old_fn=&Legacy::recover_cold;auto new_fn=&RootCover::recover_cold;auto two_fn=&TwoBase::recover_cold;
  asm volatile("" : "+r"(old_fn), "+r"(new_fn), "+r"(two_fn) :: "memory");
