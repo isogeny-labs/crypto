@@ -13,6 +13,51 @@ pub struct KrylovStats {
     pub walk_muls: u64,
     pub recurrence_muls: u64,
     pub reconstruction_muls: u64,
+    pub scalar_steps: u64,
+    pub delayed_steps: u64,
+}
+
+fn advance(
+    graph: &[Vec<(usize, u64)>],
+    previous: &[u64],
+    p: u64,
+    muls: &mut u64,
+    delayed: bool,
+) -> Vec<u64> {
+    graph
+        .iter()
+        .map(|edges| {
+            let mut sum = 0;
+            for &(i, c) in edges {
+                if delayed {
+                    // The caller establishes <=64 normalized terms and p<2^20:
+                    // sum <=64*(p-1)^2 <2^46. Preserve semantic field hooks.
+                    let term = if c == 1 {
+                        previous[i]
+                    } else {
+                        super::super::jv_bitops::hook_mul(p);
+                        *muls += 1;
+                        c * previous[i]
+                    };
+                    super::super::jv_bitops::hook_add(p);
+                    sum += term;
+                } else {
+                    let term = if c == 1 {
+                        previous[i]
+                    } else {
+                        *muls += 1;
+                        mm(c, previous[i], p)
+                    };
+                    sum = am(sum, term, p);
+                }
+            }
+            if delayed {
+                sum % p
+            } else {
+                sum
+            }
+        })
+        .collect()
 }
 
 /// Polynomial long division, with the same multiplication accounting as PolyRing.
@@ -93,11 +138,14 @@ fn shape_polynomials(
     rng: &mut StdRng,
     work: &mut KrylovStats,
     muls: &mut u64,
+    use_delayed: bool,
 ) -> Option<(UPoly, [UPoly; 2])> {
     let d = matrix.len();
     if d < 2 || indices.iter().any(|&i| i >= d) {
         return None;
     }
+    let delayed =
+        use_delayed && d <= 64 && p > 1 && p < (1 << 20) && matrix.iter().flatten().all(|&c| c < p);
     // M's columns contain NF(e1*b). These edges apply M^t to a projection.
     let graph: Vec<Vec<_>> = (0..d)
         .map(|j| {
@@ -121,22 +169,12 @@ fn shape_polynomials(
         let mut frames = vec![projection];
         for k in 1..2 * d {
             let previous = &frames[k - 1];
-            let next = graph
-                .iter()
-                .map(|edges| {
-                    let mut sum = 0;
-                    for &(i, c) in edges {
-                        let term = if c == 1 {
-                            previous[i]
-                        } else {
-                            *muls += 1;
-                            mm(c, previous[i], p)
-                        };
-                        sum = am(sum, term, p);
-                    }
-                    sum
-                })
-                .collect();
+            let next = advance(&graph, previous, p, muls, delayed);
+            if delayed {
+                work.delayed_steps += 1;
+            } else {
+                work.scalar_steps += 1;
+            }
             frames.push(next);
         }
         work.walk_muls += *muls - before;
@@ -187,10 +225,19 @@ pub(super) fn read(
     stats: &mut SolveStats,
     work: &mut KrylovStats,
     muls: &mut u64,
+    use_delayed: bool,
 ) -> Option<Vec<[u64; 3]>> {
     // Projection randomness cannot alter the caller's root-factoring stream.
     let mut projections = StdRng::seed_from_u64(0x4b52_594c_4f56 ^ p);
-    let (q, h) = shape_polynomials(matrix, indices, p, &mut projections, work, muls)?;
+    let (q, h) = shape_polynomials(
+        matrix,
+        indices,
+        p,
+        &mut projections,
+        work,
+        muls,
+        use_delayed,
+    )?;
     let ring = PolyRing::new(p);
     let mut out = Vec::new();
     for lam in ring.roots(&q, rng) {
@@ -278,6 +325,7 @@ mod tests {
                 &mut StdRng::seed_from_u64(3),
                 &mut KrylovStats::default(),
                 &mut 0,
+                false,
             )
             .unwrap();
             assert_eq!(got.0 .0, q.0);
@@ -294,7 +342,8 @@ mod tests {
                 101,
                 &mut StdRng::seed_from_u64(9),
                 &mut KrylovStats::default(),
-                &mut 0
+                &mut 0,
+                false
             )
             .is_none());
         }
@@ -323,5 +372,51 @@ mod tests {
             101,
             &mut 0
         ));
+    }
+
+    #[test]
+    fn delayed_walks_match_u128_reference_at_the_guard_boundary() {
+        let mut rng = StdRng::seed_from_u64(0x44454c4159);
+        for p in [2, 7, 1039, (1 << 20) - 1] {
+            for d in [2, 17, 64] {
+                for boundary in [false, true] {
+                    let matrix: Vec<Vec<u64>> = (0..d)
+                        .map(|_| {
+                            (0..d)
+                                .map(|_| if boundary { p - 1 } else { rng.gen_range(0..p) })
+                                .collect()
+                        })
+                        .collect();
+                    let graph: Vec<Vec<_>> = matrix
+                        .iter()
+                        .map(|row| {
+                            row.iter()
+                                .enumerate()
+                                .filter_map(|(i, &c)| (c != 0).then_some((i, c)))
+                                .collect()
+                        })
+                        .collect();
+                    let previous: Vec<_> = (0..d)
+                        .map(|_| if boundary { p - 1 } else { rng.gen_range(0..p) })
+                        .collect();
+                    let (mut scalar_muls, mut delayed_muls) = (0, 0);
+                    let scalar = advance(&graph, &previous, p, &mut scalar_muls, false);
+                    let delayed = advance(&graph, &previous, p, &mut delayed_muls, true);
+                    let reference: Vec<_> = graph
+                        .iter()
+                        .map(|edges| {
+                            (edges
+                                .iter()
+                                .map(|&(i, c)| c as u128 * previous[i] as u128)
+                                .sum::<u128>()
+                                % p as u128) as u64
+                        })
+                        .collect();
+                    assert_eq!(scalar, reference);
+                    assert_eq!(delayed, reference);
+                    assert_eq!(scalar_muls, delayed_muls);
+                }
+            }
+        }
     }
 }

@@ -30,6 +30,11 @@ struct Args {
     /// Complete native F4 coordinate solves, dense versus checked sparse FGLM.
     #[arg(long)]
     extraction_comparison: bool,
+    /// Compare guarded delayed walks; keep scalar or dense as an explicit reference.
+    #[arg(long)]
+    delayed_comparison: bool,
+    #[arg(long)]
+    scalar_reference: bool,
     #[arg(long)]
     source_revision: String,
     #[arg(long)]
@@ -112,10 +117,17 @@ fn vanishes(poly: &f4::Poly, point: [u64; 3], p: u64) -> bool {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
+    if (args.delayed_comparison && !args.extraction_comparison)
+        || (args.scalar_reference && !args.delayed_comparison)
+    {
+        return Err("delayed/scalar controls require complete extraction mode".into());
+    }
     if args.extraction_comparison && (args.f4_max_degree != 24 || args.f4_deadline_ms != 0) {
         return Err("complete extraction uses the native degree24/no-deadline solver".into());
     }
-    let schema = if args.extraction_comparison {
+    let schema = if args.delayed_comparison {
+        "gaudry.cubic.s4-delayed/v1"
+    } else if args.extraction_comparison {
         "gaudry.cubic.s4-extraction/v1"
     } else {
         "gaudry.cubic.s4-component/v1"
@@ -210,6 +222,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         if args.extraction_comparison {
                             arms = ["dense_a", "krylov_a", "dense_b", "krylov_b"];
                         }
+                        if args.delayed_comparison {
+                            arms = if args.scalar_reference {
+                                ["scalar_a", "delayed_a", "scalar_b", "delayed_b"]
+                            } else {
+                                ["dense_a", "delayed_a", "dense_b", "delayed_b"]
+                            };
+                        }
                         if round % 2 == 1 {
                             arms.reverse();
                         }
@@ -232,7 +251,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 for _ in 0..args.batch_iterations {
                                     let mut stats = cubic::SolveStats::default();
                                     let mut native = cubic::S4F4Stats::default();
-                                    let solver = if arm.starts_with("krylov") {
+                                    let solver = if arm.starts_with("delayed") {
+                                        cubic::solve_s4_f4_krylov_delayed
+                                    } else if arm.starts_with("krylov") || arm.starts_with("scalar")
+                                    {
                                         cubic::solve_s4_f4_krylov
                                     } else {
                                         cubic::solve_s4_f4
@@ -372,6 +394,7 @@ mod tests {
             for d in scalars.into_iter().filter(|&d| d < inst.curve.n) {
                 let r = inst.curve.mul(&inst.curve.g, d);
                 let mut work = cubic::S4F4Stats::default();
+                let mut scalar_stats = cubic::SolveStats::default();
                 let dense = cubic::solve_s4_f4(
                     &inst,
                     &pre,
@@ -385,12 +408,26 @@ mod tests {
                     &pre,
                     &r.x,
                     &mut StdRng::seed_from_u64(91),
-                    &mut cubic::SolveStats::default(),
+                    &mut scalar_stats,
                     &mut work,
                 );
                 // Both public coordinate APIs document None as unsupported,
                 // which the full collector routes through its charged oracle.
                 assert_eq!(dense, fast, "p={p} d={d}");
+                let mut delayed_stats = cubic::SolveStats::default();
+                let delayed = cubic::solve_s4_f4_krylov_delayed(
+                    &inst,
+                    &pre,
+                    &r.x,
+                    &mut StdRng::seed_from_u64(91),
+                    &mut delayed_stats,
+                    &mut cubic::S4F4Stats::default(),
+                );
+                assert_eq!(fast, delayed, "delayed p={p} d={d}");
+                assert_eq!(
+                    scalar_stats.fp_muls, delayed_stats.fp_muls,
+                    "semantic work p={p} d={d}"
+                );
                 assert!(work.krylov.completed + work.krylov.dense_fallbacks <= 1);
                 if fast.is_some() && work.quotient_dimension_total > 0 {
                     assert_eq!(work.krylov.completed + work.krylov.dense_fallbacks, 1);
@@ -501,12 +538,25 @@ mod tests {
             cubic::LargePrimeBackend::SymbolicGraph,
             cubic::ResidualSampler3::RAddingLong,
         );
-        for r in [&fast, &pivot, &dense] {
+        let delayed = cubic::run_gaudry_with_sampler(
+            &inst,
+            &base,
+            11,
+            &cubic::GaudryOptions {
+                solver: cubic::Solver::F4KrylovDelayed,
+                ..opts
+            },
+            cubic::LargePrimeBackend::SymbolicGraph,
+            cubic::ResidualSampler3::RAddingLong,
+        );
+        for r in [&fast, &pivot, &dense, &delayed] {
             assert_eq!(r.correct, Some(true));
         }
         assert_eq!(fast.lp_input_digest, pivot.lp_input_digest);
         assert_eq!(fast.lp_input_digest, dense.lp_input_digest);
         assert_eq!(fast.residuals, dense.residuals);
+        assert_eq!(fast.lp_input_digest, delayed.lp_input_digest);
+        assert_eq!(fast.oracle_fp_muls, delayed.oracle_fp_muls);
     }
 
     #[test]

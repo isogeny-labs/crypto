@@ -23,7 +23,7 @@ case "$driver_kind" in
     driver_binary=target/release/examples/gaudry_cubic_graph_compare
     analyzer_binary=$here/native_analysis/target/release/cubic-graph-analysis
     ;;
-  s4-f4-component|s4-krylov-component)
+  s4-f4-component|s4-krylov-component|s4-delayed-component)
     driver_binary=target/release/examples/gaudry_cubic_s4_f4_probe
     analyzer_binary=$here/native_analysis/target/release/s4-component-analysis
     ;;
@@ -82,6 +82,10 @@ else
   argv+=(--residuals-per-instance "$residual_count" --batch-iterations "$batch_count" \
     --f4-max-degree "$f4_degree" --f4-deadline-ms "$f4_deadline")
   if [[ "$driver_kind" == s4-krylov-component ]]; then argv+=(--extraction-comparison); fi
+  if [[ "$driver_kind" == s4-delayed-component ]]; then
+    argv+=(--extraction-comparison --delayed-comparison)
+    if [[ $(jq -r .reference_kind "$run_dir/runtime-plan.json") == scalar ]]; then argv+=(--scalar-reference); fi
+  fi
 fi
 jq -n --args '$ARGS.positional' -- "${argv[@]}" > "$run_dir/argv.json" || exit 2
 sha256sum "$run_dir/driver" "$run_dir/analyzer" "$run_dir/runtime-plan.json" \

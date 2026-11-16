@@ -517,6 +517,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             "SymmetricPairOnly" => "Symmetric pair",
             "PreparedSymmetricPairOnly" => "Prepared pair",
             "F4Krylov" => "F4 sparse FGLM",
+            "F4KrylovDelayed" => "F4 delayed graph",
             "F4Groebner" => "Native F4",
             "SymmetricMeetInTheMiddle" => "Symmetric triple",
             other => other,

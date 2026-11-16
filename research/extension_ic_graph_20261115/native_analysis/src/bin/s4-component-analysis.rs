@@ -47,13 +47,31 @@ fn positive(row: &Value, name: &str) -> Result<f64, Box<dyn Error>> {
         .ok_or_else(|| format!("invalid {name}").into())
 }
 fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Value, Box<dyn Error>> {
-    let extraction = plan["driver_kind"] == "s4-krylov-component";
-    let arms = if extraction {
+    let delayed = plan["driver_kind"] == "s4-delayed-component";
+    let scalar_reference = delayed && plan["reference_kind"] == "scalar";
+    if delayed && !matches!(plan["reference_kind"].as_str(), Some("scalar" | "dense")) {
+        return Err("delayed comparison requires explicit scalar/dense reference".into());
+    }
+    let extraction = delayed || plan["driver_kind"] == "s4-krylov-component";
+    let metric = if scalar_reference {
+        "complete_delayed_over_scalar"
+    } else if delayed {
+        "complete_delayed_over_dense"
+    } else {
+        "complete_krylov_over_dense"
+    };
+    let arms = if scalar_reference {
+        ["scalar_a", "delayed_a", "scalar_b", "delayed_b"]
+    } else if delayed {
+        ["dense_a", "delayed_a", "dense_b", "delayed_b"]
+    } else if extraction {
         ["dense_a", "krylov_a", "dense_b", "krylov_b"]
     } else {
         ARMS
     };
-    let schema = if extraction {
+    let schema = if delayed {
+        "gaudry.cubic.s4-delayed/v1"
+    } else if extraction {
         "gaudry.cubic.s4-extraction/v1"
     } else {
         "gaudry.cubic.s4-component/v1"
@@ -235,7 +253,13 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                                                     == "complete_S4_coordinate_solve"))
                                 })
                         }) && block[0]["signature"] == block[2]["signature"]
-                            && block[1]["signature"] == block[3]["signature"];
+                            && block[1]["signature"] == block[3]["signature"]
+                            && (!scalar_reference
+                                || (block.iter().all(|r| {
+                                    r["signature"][1].as_u64().is_some()
+                                        && r["signature"][2].as_u64().is_some()
+                                }) && block[0]["signature"][1] == block[1]["signature"][1]
+                                    && block[0]["signature"][2] == block[1]["signature"][2]));
                         if !valid {
                             reasons.push(format!(
                                 "{phase} round {round} native/output/control failure"
@@ -282,9 +306,25 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                     o.remove("basis_phase_upper_below_half");
                     o.remove("median_macaulay_aa");
                     o.remove("median_f4_aa");
-                    o.insert("complete_krylov_over_dense".into(), estimate.clone());
-                    o.insert("median_dense_aa".into(), json!(mc_control));
-                    o.insert("median_krylov_aa".into(), json!(f4_control));
+                    o.insert(metric.into(), estimate.clone());
+                    o.insert(
+                        if delayed {
+                            "median_reference_aa"
+                        } else {
+                            "median_dense_aa"
+                        }
+                        .into(),
+                        json!(mc_control),
+                    );
+                    o.insert(
+                        if delayed {
+                            "median_delayed_aa"
+                        } else {
+                            "median_krylov_aa"
+                        }
+                        .into(),
+                        json!(f4_control),
+                    );
                     o.insert(
                         "complete_phase_upper_below_one".into(),
                         json!(
@@ -292,10 +332,17 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                                 && estimate["bootstrap_95"][1].as_f64().is_some_and(|v| v < 1.)
                         ),
                     );
-                    for (name, arm) in [
-                        ("first_measured_dense", "dense_a"),
-                        ("first_measured_krylov", "krylov_a"),
-                    ] {
+                    for (name, arm) in if delayed {
+                        [
+                            ("first_measured_reference", arms[0]),
+                            ("first_measured_delayed", arms[1]),
+                        ]
+                    } else {
+                        [
+                            ("first_measured_dense", "dense_a"),
+                            ("first_measured_krylov", "krylov_a"),
+                        ]
+                    } {
                         let first = executions.get(&(
                             base.0,
                             base.1,
@@ -326,12 +373,22 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         result["in_flight_batches_without_completion"] =
             json!(starts.len().saturating_sub(actual.len()));
     }
+    if delayed {
+        result["schema"] = json!("gaudry.cubic.s4-delayed-analysis/v1");
+        result["reference_kind"] = json!(if scalar_reference { "scalar" } else { "dense" });
+        result["comparison_metric"] = json!(metric);
+    }
     Ok(result)
 }
 
 fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
-    let extraction = summary["schema"] == "gaudry.cubic.s4-extraction-analysis/v1";
-    let metric = if extraction {
+    let delayed = summary["schema"] == "gaudry.cubic.s4-delayed-analysis/v1";
+    let extraction = delayed || summary["schema"] == "gaudry.cubic.s4-extraction-analysis/v1";
+    let metric = if delayed {
+        summary["comparison_metric"]
+            .as_str()
+            .ok_or("missing comparison metric")?
+    } else if extraction {
         "complete_krylov_over_dense"
     } else {
         "basis_phase_over_complete_reference"
@@ -346,18 +403,23 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
     let lo = cases
         .iter()
         .filter_map(|r| ratio(r, 0))
-        .fold(0.1f64, f64::min)
-        * 0.7;
+        .fold(if extraction { 1.0f64 } else { 0.1f64 }, f64::min)
+        * if extraction { 0.85 } else { 0.7 };
     let hi = cases
         .iter()
         .filter_map(|r| ratio(r, 1))
-        .fold(2f64, f64::max)
-        * 1.4;
+        .fold(if extraction { 1.0f64 } else { 2f64 }, f64::max)
+        * if extraction { 1.1 } else { 1.4 };
     let root = SVGBackend::new(path, (1200, 600)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .caption(
-            if extraction {
+            if delayed {
+                format!(
+                    "p{p}: complete delayed graph / {} coordinate solve",
+                    summary["reference_kind"].as_str().unwrap_or("?")
+                )
+            } else if extraction {
                 format!("p{p}: complete native F4 Krylov / dense coordinate solve")
             } else {
                 format!("p{p}: F4 basis phase / complete S4 coordinate solve")
@@ -496,6 +558,29 @@ mod tests {
         assert_eq!(good["cases"][0]["complete_phase_upper_below_one"], true);
         assert_eq!(good["attempted_execution_batches"], 24);
         assert!(good["cases"][0]["basis_phase_over_complete_reference"].is_null());
+        let mut delayed_plan = plan.clone();
+        delayed_plan["driver_kind"] = json!("s4-delayed-component");
+        delayed_plan["reference_kind"] = json!("scalar");
+        let mut delayed_rows = rows.clone();
+        for r in &mut delayed_rows {
+            r["schema"] = json!("gaudry.cubic.s4-delayed/v1");
+            if let Some(arm) = r["arm"].as_str() {
+                r["arm"] = json!(arm.replace("dense", "scalar").replace("krylov", "delayed"));
+            }
+            if r["record_type"] == "execution" {
+                r["signature"][1] = json!(100);
+                r["signature"].as_array_mut().unwrap().push(json!(64));
+            }
+        }
+        let accepted = analyze(&delayed_plan, delayed_rows.clone(), 0).unwrap();
+        assert_eq!(accepted["cases"][0]["complete_phase_upper_below_one"], true);
+        assert!(accepted["cases"][0]["complete_krylov_over_dense"].is_null());
+        delayed_rows[4]["signature"][1] = json!(99);
+        assert_eq!(
+            analyze(&delayed_plan, delayed_rows, 0).unwrap()["cases"][0]
+                ["eligible_local_controlled_comparison"],
+            false
+        );
         rows[4]["signature"][0] = json!([[1, 2, 4]]);
         assert_eq!(
             analyze(&plan, rows.clone(), 0).unwrap()["cases"][0]
