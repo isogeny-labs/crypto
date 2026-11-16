@@ -1,3 +1,84 @@
+# crypto — Comprehensive Educational Cryptography Library
+
+[OpenResearch setup and agent integration](docs/openresearch.md).
+
+A from-scratch implementation of the major cryptographic algorithm families in Rust,
+plus a substantial **cryptanalysis suite** for studying how those algorithms break.
+Every algorithm is documented with the underlying mathematics, making this a study
+companion as much as a working library.
+
+[Lean retrospective, 2026-10-18](research/lean_retrospective_20261018/README.md):
+checked subgroup-transport and factor-base lemmas, exact proof scope, and
+remaining historical-coverage obligations.
+[Backend performance frontier](docs/backend-leaderboard/index.html) ·
+[Machine-readable leaderboard](docs/backend-leaderboard/leaderboard.json) ·
+[How agents measure and beat an incumbent](docs/ecbench/BACKEND_FRONTIER.md).
+Compare F4, F5, F6-IC, root finding and SAT by exact workload, including cold
+operation time, solver counters and explicit gaps in field-size coverage.
+
+> ## ⚠️ DO NOT USE IN PRODUCTION
+>
+> This library is **not safe** for any real use case where confidentiality,
+> integrity, or authenticity matters.  It is an educational reimplementation
+> intended for studying the algorithms.
+>
+> **What is wrong with it:**
+> - **Not constant-time.** All big-integer arithmetic uses `num-bigint`,
+>   which branches on secret values.  Every RSA, ECDSA, ECDH, and ECC
+>   operation leaks via timing.  AES uses a lookup-table S-box vulnerable
+>   to cache-timing attacks.
+> - **No third-party audit.**
+> - **Two Kybers.**  `pqc::ml_kem` is real FIPS 203 ML-KEM (validated
+>   against the NIST ACVP vectors, but still not constant-time);
+>   `pqc::kyber` is a pre-standard toy that is *not* compatible with
+>   FIPS 203 and is kept only for comparison.
+> - **Toy McEliece parameters** (m=6, n=32, t=3) — far below any security
+>   level.
+>
+> See [`SECURITY.md`](SECURITY.md) for the full list of structural
+> limitations and recommended audited alternatives (`aws-lc-rs`, `ring`,
+> RustCrypto, dalek, etc.).
+
+---
+
+## Repository layout
+
+| path | what lives there |
+|:--|:--|
+| `src/`, `tests/`, `examples/` | the Rust library, its tests and runnable examples |
+| `research/notes/` | every research note, grouped by theme; start at [`research/notes/README.md`](research/notes/README.md) |
+| `research/<topic>_<date>/` | frozen experiment directories (harness, contract, results) that the notes cite |
+| `experiments/`, `figures/` | older frozen run outputs and plots referenced by the notes |
+| `isolab/` | standalone experiment execution environment: NATS hub, Linux workers with enforced measurement fidelity, MCP server; see [`isolab/README.md`](isolab/README.md) |
+| `spotlab/` | resumable throughput jobs on the cheapest AWS/GCP spot capacity: checkpoints in S3/GCS, automatic resume after preemption, MCP server; not a measurement environment; see [`spotlab/README.md`](spotlab/README.md) |
+| `docs/` | published pages (`index-calculus-scoreboard.html`, `algorithm-lab.html`, the ECC2K-130 status site), guides and primers in `docs/guides/`, the roadmap in `docs/DEFERRED.md` |
+| `ecc2k130/`, `gpu/`, `hdl/` | the ECC2K-130 rho campaign: fleet tooling, GPU kernels, FPGA cost models |
+| `sage/`, `scripts/`, `secp256k1_cm_audit/`, `cd_attack/`, `quantum_circuit_secp256k1/` | Sage/PARI/Python companions to specific notes |
+| `papers/` | manuscript sources, one directory per paper (`papers/README.md` is the index) |
+| [`problems/`](problems/README.md) | named research and audit blockers, supporting evidence, and concrete conditions for moving past them |
+| [`backlog/`](backlog/README.md) | experiments we would like to run: one validated card each (`backlog validate`), leased and run through cairn, results landed in `research/` by PR |
+| `AGENTS.md` | the reporting convention (boundary, table, ratio) every research thread follows |
+
+## Quick tour
+
+The dedicated [`isogeny` executable](tools/isogeny-cli/README.md) screens P192/P224
+prime degrees, constructs explicit isogenies, and verifies their certificates.
+Download its platform archive from [Releases](https://github.com/aburan28/crypto/releases)
+and run it directly:
+
+```sh
+isogeny search --curve p224 --ell 1471 --out ./p224-1471
+isogeny search --curve p192 --ell 10453 --out ./p192-10453
+isogeny verify --input ./p224-1471
+isogeny curves
+isogeny search --curve P-384 --ell 19 --out ./p384-19
+isogeny search --curve P-521 --ell 7 --out ./p521-7
+```
+
+The executable embeds its algorithms and standard curve data. The kernel route at
+these two degrees constructs one Frobenius eigenline of two and labels coverage
+`PARTIAL`. The repository's Release workflow builds the platform archives and
+publishes them through ReleaseMe; PR runs test the archives before publication.
 # Root-finding decomposition engine in ecbench: results
 
 For the Bochum v0.2 hashed-factor-base algorithm, see the
@@ -562,8 +643,8 @@ another's success condition. The doc explains both.
 | `zk::polynomial`      | Polynomial arithmetic over a field              |
 | `zk::kzg`             | KZG polynomial commitments                      |
 | `zk::bulletproofs`    | Bulletproofs range proofs                       |
-| `zk::groth16`         | Groth16 zk-SNARK skeleton                       |
-| `zk::plonk`           | PLONK polynomial IOP: **educational, unaudited, not zero-knowledge, not succinct** (polynomials sent in the clear in place of KZG commitments). `verify` checks each sent evaluation against its polynomial and the gate, copy-constraint and `Z(1) = 1` identity at `ζ` |
+| `zk::groth16`         | Groth16 zk-SNARK skeleton: R1CS/QAP layers only; **`verify` is non-functional** (the pairing rejects honest proofs too) |
+| `zk::plonk`           | PLONK polynomial IOP: **educational, unaudited, not zero-knowledge, not succinct** (polynomials sent in the clear in place of KZG commitments). The Fiat–Shamir transcript absorbs the circuit and public inputs before any challenge; `check` compares each sent evaluation with its polynomial and then the gate (with public inputs), copy-constraint and `Z(1) = 1` identity at `ζ`, and names the comparison that failed. Soundness is not quantified; must not back a research claim |
 | `zk::stark` / `stark_v2` | STARK-style proof skeletons: **educational, unaudited, not zero-knowledge, no grinding, no stated security level; must not back a research claim**. `stark_v2` is DEEP-ALI: coset LDE, composition polynomial, an out-of-domain sample `z` (the AIR checked at `z`) and degree-bounded FRI on the DEEP quotient; its conjectured soundness (Reed–Solomon proximity conjecture, random-oracle Fiat–Shamir) is `ε ≲ β^(−q) + ε_field + ε_hash`, capped at 128 bits by SHA-256 Merkle commitments, over the BLS12-381 scalar field. `stark` is a spot-check argument, not a STARK (see the module docs) |
 
 ---
@@ -1125,16 +1206,16 @@ makes every orbit claimable. For points already collected without counters,
 - [`AGENTS.md`](AGENTS.md) — how cryptanalysis progress is reported here: state a boundary, put every variant in one table in one unit, and classify each change by whether the ratio to that boundary moved.
 - [`docs/index-calculus-scoreboard.html`](docs/index-calculus-scoreboard.html) — one-page visual scoreboard of the ECDLP cost ledger: every index-calculus variant against Pollard rho and the generic-group floor, the solve-constant ledger, and the fitted exponents. Open it in a browser, or read the published copy at [/scoreboard/](https://aburan28.github.io/crypto/scoreboard/).
 - [`research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md`](research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md) — the three regimes of index calculus (generic prime field, generic binary field, Koblitz) run end to end on the same planted logarithms and priced phase by phase in one unit — group-addition equivalents per `√r`, exact native counts with host-measured conversions — against the generic floor `√(π/2A)` and a counted Pollard rho on the same instance; the decomposition oracles (enumeration, meet in the middle, `S₄` pairs-and-solve, matrix-F4, CDCL SAT) priced per target with each system's first fall degree; fitted exponents per phase; and the boundaries the next rounds iterate against (`ic boundary`, `docs/ic/runs/ic-boundary-ledger-2026-09-21.json`). Its §10 is the second round: an engineering ledger (pair tables folded by negation and, on Koblitz curves, by the Frobenius; walk-drawn targets; two-summand rows; a base sized to the folded table; the exact class-aware counting ceiling) with every first-round row kept as its before mark and a saved baseline/candidate comparison (`docs/ic/runs/ic-boundary-ledger-round2-2026-09-21.json`). §10.2 records the defect that round caught: a run that decomposes one group element twice is pinned by that collision rather than by its relations, which ends about a quarter of unguarded two-summand runs and 82% of those whose walk segments share a jump table, so both target sources are now guarded and 22 of the first round's rows were corrected. Its §11 is the third round: the walk's *restarts* — which Round 2 paid for with sixteen fresh jumps, thirty-two scalar multiplications each, and which now cost one group operation — balanced prime and binary bases, and a derived shape law for the whole family, `S_family = 0.75·(#E·t/k)^{2/3}/(t·√r)` with `t` the table fold and `k` the column fold, which is `Θ(r^{1/6})` on a prime-order curve and so bounds what any amount of base-size tuning can win (`docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json`). The companion `ic corpus` writes Trimoska-style Weil-descended `S₄` instances with certified labels for Magma, XOR-aware SAT solvers and ANF tools (`docs/ic/corpus/`).
-- [`RESEARCH.md`](./RESEARCH.md) — research notes.
-- [`RESEARCH_P256.md`](./RESEARCH_P256.md) — P-256 specific structural studies.
-- [`RESEARCH_RESIDUAL_WALKS.md`](./RESEARCH_RESIDUAL_WALKS.md) — finding points vs finding relations: collision search over partial factor-base decompositions, measured against Pollard rho (`experiments/20_residual_walk_panel.*`); optimisation ledger, frozen baseline and tuned scoreboards (`experiments/20_residual_walk_{baseline,tuned}.json`, `scripts/residual_walk_scoreboard.py`); round 3 on the count factor: signed-pair seeding and `j = 0` automorphism folding (`experiments/20_residual_walk_{seeded,structure}.json`).
-- [`RESEARCH_TII_MCELIECE.md`](./RESEARCH_TII_MCELIECE.md) — TII McEliece key-recovery challenges: attack ideas + imported keys (`research/tii_mceliece/`).
-- [`RESEARCH_EXOTIC_COORDINATES.md`](./RESEARCH_EXOTIC_COORDINATES.md) — algorithmic search for exotic point coordinates that make decomposition relations cheaper (prime, binary, Koblitz).
-- [`DEFERRED.md`](./DEFERRED.md) — known gaps + deferred work.
+- `RESEARCH.md` — research notes (no longer in the repository: the file is absent from the checkout and from every ref of this clone; see [`research/notes/README.md`](research/notes/README.md) for the current note index).
+- [`RESEARCH_P256.md`](./research/notes/cm-isogeny/RESEARCH_P256.md) — P-256 specific structural studies.
+- [`RESEARCH_RESIDUAL_WALKS.md`](./research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md) — finding points vs finding relations: collision search over partial factor-base decompositions, measured against Pollard rho (`experiments/20_residual_walk_panel.*`); optimisation ledger, frozen baseline and tuned scoreboards (`experiments/20_residual_walk_{baseline,tuned}.json`, `scripts/residual_walk_scoreboard.py`); round 3 on the count factor: signed-pair seeding and `j = 0` automorphism folding (`experiments/20_residual_walk_{seeded,structure}.json`).
+- [`RESEARCH_TII_MCELIECE.md`](./research/notes/code-based/RESEARCH_TII_MCELIECE.md) — TII McEliece key-recovery challenges: attack ideas + imported keys (`research/tii_mceliece/`).
+- [`RESEARCH_EXOTIC_COORDINATES.md`](./research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md) — algorithmic search for exotic point coordinates that make decomposition relations cheaper (prime, binary, Koblitz).
+- [`DEFERRED.md`](./docs/DEFERRED.md) — known gaps + deferred work.
 - [`docs/ECDLP_ATTACK_MATRIX.md`](./docs/ECDLP_ATTACK_MATRIX.md) — ECDLP attack taxonomy.
 - [`docs/ic/BOUNDARY_TARGETS.md`](./docs/ic/BOUNDARY_TARGETS.md) — index-calculus per-stage boundary ledger (beat targets for agents).
 - [`research/sat_factor_base_review_20260908/autolab/`](./research/sat_factor_base_review_20260908/autolab/) — agent autolab runner wired to the IC boundary ledger.
-- [`docs/RESEARCH_BENCH_LOG.md`](./docs/RESEARCH_BENCH_LOG.md) — live empirical bench measurements.
+- [`RESEARCH_BENCH_LOG.md`](./research/notes/ecdlp-general/RESEARCH_BENCH_LOG.md) — live empirical bench measurements.
 - [`gpu/ecc/README.md`](./gpu/ecc/README.md) — GPU elliptic-curve kernels.
 - [`gpu/ecc/OPTIMIZATION_BLACKWELL.md`](./gpu/ecc/OPTIMIZATION_BLACKWELL.md) — Blackwell tuning: cost model + measured occupancy.
 - [`gpu/ecc2k/README.md`](./gpu/ecc2k/README.md) — Koblitz / ECC2K-95 kernels and the Frobenius-class walk.

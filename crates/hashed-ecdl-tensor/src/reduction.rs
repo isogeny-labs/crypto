@@ -8,12 +8,12 @@
 use crate::arithmetic::{floor_root, hash_prime_by, inverse, random_below, RandomSource};
 use crate::contraction::Counter;
 use crate::curve::{Curve, Point};
-use crate::encoding::Encoder;
+use crate::encoding::{Encoder, Multiplier, PointWords};
 use crate::network::Network;
 use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_integer::Integer;
 use num_traits::{One, ToPrimitive, Zero};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// One independent affine-hash seed over the common public prime.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -125,18 +125,165 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Auto, true, meter)?.0)
+}
+
+/// The same language with the integer multiplication gadget chosen explicitly
+/// (`Fourier` is Theorem 3's gadget throughout). Only the Boolean graph
+/// changes: the accepted assignments, counts and witnesses do not. Free points
+/// keep the plain `(x, y)` input layout here; `decomposition_network` (Auto
+/// multiplier) enumerates prime-order free points as `(x, parity of y)`.
+pub fn decomposition_network_with_multiplier(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    multiplier: Multiplier,
+    meter: &mut Meter,
+) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, false, meter)?.0)
+}
+
+/// Build the same decomposition language with semantic slot regions and return
+/// the canonical vertex side immediately after slot `ceil(m/2)`.
+///
+/// Region labels are bound into every production predicate tag. Equality,
+/// fanout and endpoint vertices inherit the region in which their signal was
+/// produced, placing the wiring needed to legalize a crossing on the producer
+/// side of the cut.
+pub fn decomposition_network_with_semantic_cut(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
+    decomposition_network_impl(
+        curve,
+        bases,
+        target,
+        true,
+        Multiplier::Fourier,
+        false,
+        meter,
+    )
+}
+
+/// The same language as the general construction, with the last slot computed
+/// instead of searched: slots `0..m-1` are free input points, and
+/// `A_m = target - (A_1 + ... + A_{m-1})` is built from them, then held to its
+/// own hash predicate and marked as interface like every other slot. Each
+/// assignment of the general network maps to exactly one here (its last point is
+/// determined by the others), so counts and the canonical witness are unchanged,
+/// while the free input bits drop from `2*w*m` to `2*w*(m-1)`. `hash_member`
+/// still rejects an identity last slot, as the general network does.
+fn derived_last_slot_network(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    multiplier: Multiplier,
+    compressed: bool,
+    meter: &mut Meter,
+) -> Result<Network> {
+    let (last, free) = bases
+        .split_last()
+        .ok_or_else(|| invalid("decomposition target or arity"))?;
+    let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
+    let mut sum: Option<PointWords> = None;
+    for base in free {
+        let point = if compressed {
+            encoder.input_point_compressed_unchecked(curve, meter)?
+        } else {
+            encoder.input_point(curve, false, meter)?
+        };
+        // The hash reads only x and the low ordinate bit, both free when
+        // compressed, so it runs before the costlier curve equation; the
+        // constraints are a conjunction, so the order changes no language.
+        encoder.hash_member(
+            curve,
+            &point,
+            &base.prime,
+            &base.seed.alpha,
+            &base.seed.beta,
+            &base.threshold,
+            meter,
+        )?;
+        encoder.assert_valid_point(curve, &point, meter)?;
+        encoder.mark_point_interface(&point, meter)?;
+        // O + A_1 = A_1: the first free point starts the sum directly instead
+        // of passing through a whole addition network with a constant identity.
+        sum = Some(match sum {
+            None => point,
+            Some(sum) => encoder.point_add(curve, &sum, &point, meter)?,
+        });
+    }
+    let sum = sum.ok_or_else(|| invalid("decomposition target or arity"))?;
+    let negated = encoder.negate_point(curve, &sum, meter)?;
+    let point = encoder.point_add(
+        curve,
+        &Encoder::constant_point(curve, target)?,
+        &negated,
+        meter,
+    )?;
+    encoder.hash_member(
+        curve,
+        &point,
+        &last.prime,
+        &last.seed.alpha,
+        &last.seed.beta,
+        &last.threshold,
+        meter,
+    )?;
+    encoder.mark_point_interface(&point, meter)?;
+    encoder.finish(meter)
+}
+
+fn decomposition_network_impl(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    semantic_cut: bool,
+    multiplier: Multiplier,
+    compressed: bool,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("decomposition target or arity"));
     }
+    if !semantic_cut && curve.cofactor().is_one() {
+        return Ok((
+            derived_last_slot_network(curve, bases, target, multiplier, compressed, meter)?,
+            Vec::new(),
+        ));
+    }
     let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
+    if semantic_cut {
+        encoder.set_semantic_region("setup")?;
+    }
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
-    for base in bases {
+    let cut_after_slots = bases.len().div_ceil(2);
+    let mut left_regions = BTreeSet::new();
+    for (slot, base) in bases.iter().enumerate() {
+        let input_region = format!("slot.{slot}.input");
+        let membership_region = format!("slot.{slot}.membership");
+        let addition_region = format!("slot.{slot}.addition");
+        if slot < cut_after_slots {
+            left_regions.insert(input_region.clone());
+            left_regions.insert(membership_region.clone());
+            left_regions.insert(addition_region.clone());
+        }
+        if semantic_cut {
+            encoder.set_semantic_region(&input_region)?;
+        }
         let point = if curve.cofactor().is_one() {
             encoder.input_point(curve, false, meter)?
         } else {
             let source = encoder.input_point(curve, true, meter)?;
             encoder.clear_cofactor(curve, &source, meter)?
         };
+        if semantic_cut {
+            encoder.set_semantic_region(&membership_region)?;
+        }
         encoder.hash_member(
             curve,
             &point,
@@ -147,10 +294,38 @@ pub fn decomposition_network(
             meter,
         )?;
         encoder.mark_point_interface(&point, meter)?;
+        if semantic_cut {
+            encoder.set_semantic_region(&addition_region)?;
+        }
         sum = encoder.point_add(curve, &sum, &point, meter)?;
     }
+    if semantic_cut {
+        encoder.set_semantic_region("target.assertion")?;
+    }
     encoder.assert_point_equal(&sum, &Encoder::constant_point(curve, target)?, meter)?;
-    encoder.finish(meter)
+    let network = encoder.finish(meter)?;
+    if !semantic_cut {
+        return Ok((network, Vec::new()));
+    }
+    let mut left_vertices = Vec::new();
+    for (vertex_id, vertex) in network.vertices.iter().enumerate() {
+        let tag = vertex
+            .predicate
+            .canonical_tag()
+            .ok_or_else(|| integrity("semantic-cut vertex lacks canonical tag"))?;
+        let region = tag
+            .parameters
+            .iter()
+            .find_map(|(key, value)| (key == "semantic_region").then_some(value))
+            .ok_or_else(|| integrity("semantic-cut vertex lacks region"))?;
+        if left_regions.contains(region) {
+            left_vertices.push(vertex_id);
+        }
+    }
+    if left_vertices.is_empty() || left_vertices.len() == network.vertex_count() {
+        return Err(integrity("semantic mid-slot cut is not proper"));
+    }
+    Ok((network, left_vertices))
 }
 
 /// Deterministic prefix-count decomposition. `None` certifies zero assignments;
@@ -533,6 +708,60 @@ fn solve_using(
     oracle: &mut impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
     meter: &mut Meter,
 ) -> Result<Certificate> {
+    solve_with_preparation(
+        curve,
+        target,
+        config,
+        rng,
+        |_, _, _, _| Ok(()),
+        |c, bases, _, query, work| oracle(c, bases, query, work),
+        meter,
+    )
+}
+
+// The indexes are complete enumerations owned by this reduction, never a
+// caller-supplied partial table. Prepare only once per nonempty fresh trial.
+pub(crate) fn solve_with_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    prepare: impl FnMut(&Curve, &[FactorBase], &[BTreeMap<Point, usize>], &mut Meter) -> Result<State>,
+    oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_with_target_preparation(curve, target, config, rng, prepare, oracle, false, meter)
+}
+
+// Joint targets are an explicit alternative; the original collector stays the
+// control. Coefficients never enter the decomposition oracle.
+pub(crate) fn solve_with_target_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut prepare: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &[BTreeMap<Point, usize>],
+        &mut Meter,
+    ) -> Result<State>,
+    mut oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    joint_targets: bool,
+    meter: &mut Meter,
+) -> Result<Certificate> {
     if config.slots < 2 || config.trials == 0 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("reduction input"));
     }
@@ -550,6 +779,7 @@ fn solve_using(
             scalar: BigUint::zero(),
         });
     }
+    let mut joint_table = None;
     for _ in 0..config.trials {
         meter.charge(1, "fresh-seed trial")?;
         let prime = if let Some(prime) = &config.hash_prime {
@@ -596,13 +826,29 @@ fn solve_using(
             .ok_or_else(|| overflow("relation attempts"))?;
         let mut relations = Vec::with_capacity(required);
         let mut matrix = Vec::with_capacity(required);
+        let mut oracle_state = prepare(curve, &bases, &indexes, meter)?;
         for _ in 0..attempts {
             let u = random_below(curve.order(), rng, meter)?;
             let v = random_below(curve.order(), rng, meter)?;
-            let left = curve.mul(curve.generator(), &u, meter)?;
-            let right = curve.mul(target, &v, meter)?;
-            let point = curve.add(&left, &right, meter)?;
-            if let Some(points) = oracle(curve, &bases, &point, meter)? {
+            let point = if joint_targets {
+                if joint_table.is_none() {
+                    joint_table = Some(crate::joint::JointTable::from_subgroup_points(
+                        curve,
+                        curve.generator(),
+                        target,
+                        meter,
+                    )?);
+                }
+                joint_table
+                    .as_ref()
+                    .expect("initialized joint table")
+                    .evaluate(&u, &v, meter)?
+            } else {
+                let left = curve.mul(curve.generator(), &u, meter)?;
+                let right = curve.mul(target, &v, meter)?;
+                curve.add(&left, &right, meter)?
+            };
+            if let Some(points) = oracle(curve, &bases, &mut oracle_state, &point, meter)? {
                 let relation = Relation { u, v, points };
                 matrix.push(matrix_row(&relation, &indexes, columns)?);
                 relations.push(relation);
@@ -762,8 +1008,205 @@ pub fn verify_with_rng(
 mod tests {
     use super::*;
     use crate::arithmetic::Seeded;
+    use crate::canonical::{CanonicalNetwork, ExportPolicy, IrProvenance};
+    use crate::census::{
+        boundary_shape, contract_functional_boundary, rewire_functional_definitions,
+    };
     use crate::contraction::Backend;
     use crate::Limits;
+
+    #[test]
+    fn semantic_mid_slot_cut_is_bound_into_the_canonical_ir() {
+        let mut meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        let bases = [(7u8, 3u8), (2, 1), (3, 4)]
+            .into_iter()
+            .map(|(alpha, beta)| {
+                FactorBase::new(
+                    &curve,
+                    11u8.into(),
+                    5u8.into(),
+                    HashSeed {
+                        alpha: alpha.into(),
+                        beta: beta.into(),
+                    },
+                    &mut meter,
+                )
+                .unwrap()
+            })
+            .collect::<Vec<_>>();
+        let (network, left_vertices) =
+            decomposition_network_with_semantic_cut(&curve, &bases, curve.generator(), &mut meter)
+                .unwrap();
+        assert!(!left_vertices.is_empty());
+        assert!(left_vertices.len() < network.vertex_count());
+        assert!(left_vertices.windows(2).all(|pair| pair[0] < pair[1]));
+        let canonical = CanonicalNetwork::capture(
+            &network,
+            &vec![None; network.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(canonical.vertices.iter().all(|vertex| vertex
+            .predicate
+            .tag
+            .parameters
+            .iter()
+            .any(|(key, value)| key == "semantic_region" && !value.is_empty())));
+        let shape = boundary_shape(&canonical, &left_vertices, &mut meter).unwrap();
+        assert!(!shape.cut_edges.is_empty());
+        assert_eq!(
+            shape.enumerated_free_width,
+            shape.cut_edges.len() + shape.free_internal_edges.len()
+        );
+        let mut corrupted = canonical.clone();
+        let region = corrupted.vertices[0]
+            .predicate
+            .tag
+            .parameters
+            .iter_mut()
+            .find(|(key, _)| key == "semantic_region")
+            .unwrap();
+        region.1.push_str(".mutation");
+        assert!(corrupted.validate(&mut meter).is_err());
+
+        let (rewired, receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        assert!(receipt.candidate_definitions >= receipt.definition_pairs * 2);
+        assert!(receipt.definition_pairs > 0);
+        assert!(receipt.edge_endpoint_swaps > 0);
+        let rewired_canonical = CanonicalNetwork::capture(
+            &rewired,
+            &vec![None; rewired.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control-rewired".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(rewired_canonical
+            .vertices
+            .iter()
+            .zip(&canonical.vertices)
+            .all(|(left, right)| left.predicate == right.predicate));
+        let rewired_shape = boundary_shape(&rewired_canonical, &left_vertices, &mut meter).unwrap();
+        assert_eq!(rewired_shape.cut_edges.len(), shape.cut_edges.len());
+        assert_eq!(
+            rewired_shape.internal_edges.len(),
+            shape.internal_edges.len()
+        );
+        let rewired_tensor =
+            contract_functional_boundary(&rewired, &left_vertices, 16, 20, &mut meter).unwrap();
+        let (repeated, repeated_receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        let repeated_tensor =
+            contract_functional_boundary(&repeated, &left_vertices, 16, 20, &mut meter).unwrap();
+        assert_eq!(receipt, repeated_receipt);
+        assert_eq!(rewired_tensor, repeated_tensor);
+    }
+
+    #[test]
+    fn derived_last_slot_matches_general_network_and_brute_force() {
+        let mut meter = Meter::new(Limits {
+            steps: 20_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        // Every subgroup point: the generator's multiples, identity included.
+        let mut points = vec![Point::Infinity];
+        let mut next = curve.generator().clone();
+        while next != Point::Infinity {
+            points.push(next.clone());
+            next = curve.add(&next, curve.generator(), &mut meter).unwrap();
+        }
+        let seeds = [(7u8, 3u8), (2, 1), (3, 4)];
+        let mut checked = 0;
+        // Three slots only at the smallest threshold and a few targets: the
+        // general network's three free points make larger cases slow.
+        for (slots, thresholds, targets) in [
+            (2usize, &[11u8, 5, 2][..], points.len()),
+            (3, &[2u8][..], 3),
+        ] {
+            for &threshold in thresholds {
+                let bases: Vec<_> = seeds[..slots]
+                    .iter()
+                    .map(|&(alpha, beta)| {
+                        FactorBase::new(
+                            &curve,
+                            11u8.into(),
+                            threshold.into(),
+                            HashSeed {
+                                alpha: alpha.into(),
+                                beta: beta.into(),
+                            },
+                            &mut meter,
+                        )
+                        .unwrap()
+                    })
+                    .collect();
+                for target in points.iter().take(targets) {
+                    // Independent count: ordered tuples of base points summing to target.
+                    let members: Vec<Vec<Point>> = bases
+                        .iter()
+                        .map(|base| {
+                            points
+                                .iter()
+                                .filter(|p| base.contains(&curve, p, &mut meter).unwrap())
+                                .cloned()
+                                .collect()
+                        })
+                        .collect();
+                    let mut brute = 0u64;
+                    let mut stack = vec![(0usize, Point::Infinity)];
+                    while let Some((slot, partial)) = stack.pop() {
+                        if slot == slots {
+                            brute += u64::from(&partial == target);
+                            continue;
+                        }
+                        for point in &members[slot] {
+                            stack.push((slot + 1, curve.add(&partial, point, &mut meter).unwrap()));
+                        }
+                    }
+                    let derived =
+                        decomposition_network(&curve, &bases, target, &mut meter).unwrap();
+                    let (general, _) =
+                        decomposition_network_with_semantic_cut(&curve, &bases, target, &mut meter)
+                            .unwrap();
+                    assert!(derived.input_bit_count() < general.input_bit_count());
+                    let count = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .count(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    let derived_count = count(&derived, &mut meter);
+                    assert_eq!(derived_count, count(&general, &mut meter));
+                    assert_eq!(derived_count, BigUint::from(brute));
+                    let witness = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .witness(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    assert_eq!(witness(&derived, &mut meter), witness(&general, &mut meter));
+                    checked += 1;
+                }
+            }
+        }
+        assert_eq!(checked, 3 * points.len() + 3);
+    }
 
     #[test]
     fn inverse_hash_enumeration_matches_independent_subgroup_scan() {

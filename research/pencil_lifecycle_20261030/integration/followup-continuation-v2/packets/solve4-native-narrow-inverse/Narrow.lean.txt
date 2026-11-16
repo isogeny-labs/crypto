@@ -1,0 +1,115 @@
+import Inversion
+import WordComparator
+set_option autoImplicit false
+namespace RecoverNarrowPow
+open PencilWordRefinement
+abbrev half := WideModPow.half
+theorem lowbit_one (e : UInt64) : e &&& 1 = 1 ↔ e.toNat % 2 = 1 := by
+ constructor
+ · intro h; have hn := congrArg UInt64.toNat h; simpa [UInt64.toNat_and] using hn
+ · intro h; apply UInt64.toNat.inj; simpa [UInt64.toNat_and] using h
+
+def nextR (p a e r : UInt64) := if e &&& 1 = 1 then WordComparator.mul p r a else r
+def nextA (p a : UInt64) := WordComparator.mul p a a
+
+theorem binary_step {R : Type*} [CommMonoid R] (a r : R) (e : Nat) :
+ (if e%2=1 then r*a else r)*(a*a)^(e/2)=r*a^e := by
+ have hd := Nat.mod_add_div e 2
+ by_cases hm : e%2=1
+ · rw [if_pos hm,←pow_two,←pow_mul,mul_assoc,←pow_succ']
+   have he : 2*(e/2)+1=e := by omega
+   rw [he]
+ · have hm0 : e%2=0 := by have h := Nat.mod_lt e (by decide : 0<2); omega
+   rw [if_neg hm,←pow_two,←pow_mul]
+   have he : 2*(e/2)=e := by omega
+   rw [he]
+
+theorem nextR_canonical (p a e r : UInt64) (hp : 0<p.toNat) (hr : r.toNat<p.toNat) :
+ (nextR p a e r).toNat<p.toNat := by
+ unfold nextR
+ split
+ · exact WordComparator.mul_canonical p r a hp
+ · exact hr
+
+theorem nextA_canonical (p a : UInt64) (hp : 0<p.toNat) :
+ (nextA p a).toNat<p.toNat := WordComparator.mul_canonical p a a hp
+
+theorem next_step (p a e r : UInt64) (hb : p.toNat≤2^32)
+ (ha : a.toNat<p.toNat) (hr : r.toNat<p.toNat) :
+ ((nextR p a e r).toNat : ZMod p.toNat)*((nextA p a).toNat : ZMod p.toNat)^(half e).toNat=
+ (r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat)^e.toNat := by
+ have hn : ((nextR p a e r).toNat : ZMod p.toNat)=
+  if e.toNat%2=1 then (r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat) else r.toNat := by
+  unfold nextR
+  split <;> rename_i h
+  · rw [if_pos ((lowbit_one e).mp h)]
+    exact WordComparator.mul_decode p r a hb hr ha
+  · rw [if_neg (fun hn => h ((lowbit_one e).mpr hn))]
+ rw [hn,show ((nextA p a).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat) from WordComparator.mul_decode p a a hb ha ha,WideModPow.half_value]
+ exact binary_step _ _ _
+def loop : ℕ → UInt64 → UInt64 → UInt64 → UInt64 → UInt64
+ | 0,_,_,_,r => r
+ | n+1,p,a,e,r => if e=0 then r else loop n p (nextA p a) (half e) (nextR p a e r)
+
+theorem loop_decode (fuel : ℕ) (p a e r : UInt64) (hp : 0<p.toNat) (hb : p.toNat≤2^32)
+ (he : e.toNat<2^fuel) (ha : a.toNat<p.toNat) (hr : r.toNat<p.toNat) :
+ (loop fuel p a e r).toNat<p.toNat ∧
+ ((loop fuel p a e r).toNat : ZMod p.toNat)=(r.toNat : ZMod p.toNat)*(a.toNat : ZMod p.toNat)^e.toNat := by
+ induction fuel generalizing a e r with
+ | zero =>
+  have hz : e=0 := by
+   apply UInt64.toNat.inj
+   have hn : e.toNat=0 := by norm_num at he; omega
+   simpa using hn
+  subst e
+  simp [loop,hr]
+ | succ n ih =>
+  by_cases hz : e=0
+  · subst e; simp [loop,hr]
+  · rw [loop,if_neg hz]
+    have hhalf : (half e).toNat<2^n := by
+     rw [WideModPow.half_value]
+     apply (Nat.div_lt_iff_lt_mul (by decide : 0<2)).mpr
+     simpa [pow_succ] using he
+    have h := ih (nextA p a) (half e) (nextR p a e r) hhalf
+     (nextA_canonical p a hp) (nextR_canonical p a e r hp hr)
+    exact ⟨h.1,h.2.trans (next_step p a e r hb ha hr)⟩
+
+def modpow (p a e : UInt64) : UInt64 := loop 64 p a e 1
+
+theorem modpow_decode (p a e : UInt64) (hp : 1<p.toNat) (hb : p.toNat≤2^32) (ha : a.toNat<p.toNat) :
+ (modpow p a e).toNat<p.toNat ∧ ((modpow p a e).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)^e.toNat := by
+ have h := loop_decode 64 p a e 1 (by omega) hb e.toNat_lt_size ha (by simpa using hp)
+ simpa [modpow] using h
+def inverseGenerator (p a : UInt64) : UInt64 := modpow p a (p-2)
+
+theorem inverse_exponent (p : UInt64) (hp : 1<p.toNat) : (p-2).toNat=p.toNat-2 := by
+ rw [UInt64.toNat_sub_of_le]
+ · rfl
+ · change (2:UInt64).toNat≤p.toNat
+   simpa using (show 2≤p.toNat by omega)
+
+theorem generator_product (p a : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (hb : p.toNat≤2^32) (ha : a.toNat<p.toNat) (hn : a≠0) :
+ (inverseGenerator p a).toNat<p.toNat ∧
+ (a.toNat : ZMod p.toNat)*((inverseGenerator p a).toNat : ZMod p.toNat)=1 := by
+ have h := modpow_decode p a (p-2) hp hb ha
+ refine ⟨h.1,?_⟩
+ change (a.toNat : ZMod p.toNat)*((modpow p a (p-2)).toNat : ZMod p.toNat)=1
+ rw [h.2,inverse_exponent p hp,←pow_succ']
+ have he : p.toNat-2+1=p.toNat-1 := by omega
+ rw [he]
+ exact WideModPow.fermat p.toNat _ (canonical_word_nonzero p a (by omega) ha hn)
+
+theorem generator_decode (p a : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (hb : p.toNat≤2^32) (ha : a.toNat<p.toNat) (hn : a≠0) :
+ ((inverseGenerator p a).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)⁻¹ := by
+ have h := (generator_product p a hp hb ha hn).2
+ have ha0 := canonical_word_nonzero p a (by omega) ha hn
+ calc
+  _ = 1*((inverseGenerator p a).toNat : ZMod p.toNat) := by ring
+  _ = ((a.toNat : ZMod p.toNat)⁻¹*(a.toNat : ZMod p.toNat))*((inverseGenerator p a).toNat : ZMod p.toNat) := by rw [inv_mul_cancel₀ ha0]
+  _ = (a.toNat : ZMod p.toNat)⁻¹*((a.toNat : ZMod p.toNat)*((inverseGenerator p a).toNat : ZMod p.toNat)) := by ring
+  _ = _ := by rw [h,mul_one]
+
+end RecoverNarrowPow

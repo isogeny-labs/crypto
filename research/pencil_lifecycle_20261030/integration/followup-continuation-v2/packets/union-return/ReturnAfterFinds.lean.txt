@@ -1,0 +1,38 @@
+import ReturnContract
+set_option autoImplicit false
+namespace UnionReturn
+open SignedWord
+variable {n : Nat}
+theorem branch_safe (r : UInt64) [Fact r.toNat.Prime] (s : UnionState n)
+ (ru rv : Fin n) (p : Pot) (v : Fin n→F r) (k : F r) (forward : Bool)
+ (hp : 1<r.toNat) (hr : r.toNat≤2^63) (hg : GoodPot r p) (hf : FixedGood r s)
+ (hv : GraphUnion.Valid (unionDecode r s) v k)
+ (he : v ru=SignedGraphAlgebra.eval (decPot r p) (v rv) k) :
+ GraphSameRoot.Safe (outDecode r (branch r s ru rv p forward)) k := by
+ cases forward
+ · have hrev:=reversePot_correct r p (by omega) hg
+   apply word_safe r s rv ru _ v k hp hr hrev.1 hf hv
+   rw [hrev.2]
+   exact SignedGraphAlgebra.reversal _ _ _ _ (sd_square r p.s hg.1) he
+ · exact word_safe r s ru rv p v k hp hr hg hf hv he
+
+theorem after_two_finds_safe (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (t w : State n) (u v ru rv : Fin n) (pu pv : Pot)
+ (rank : Fin n→Nat) (value : Fin n→F r) (su sv : Int8) (a b : UInt64) (k : F r)
+ (hp : 1<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph) (hgf : FixedGood r s)
+ (hf : GraphFind.Forest (decode r s.graph) rank) (hv : GraphUnion.Valid (unionDecode r s) value k)
+ (h1 : Run r s.graph u t ru pu) (h2 : Run r t v w rv pv)
+ (hs : Sign su) (ht : Sign sv) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (he : sd r su*value u+sd r sv*value v=wd r a+wd r b*k) (forward : Bool) :
+ GraphSameRoot.Safe (outDecode r (branch r ⟨w,s.fixed⟩ ru rv (reducedUnionPot r pu pv su sv a b) forward)) k := by
+ obtain ⟨hgt,hpu,hu⟩:=run_refines r (by omega) hr s.graph t u ru pu h1 hg
+ obtain ⟨hgw,hpv,hv'⟩:=run_refines r (by omega) hr t w v rv pv h2 hgt
+ have hpot:=reducedUnionPot_correct r a b pu pv su sv (by omega) hr ha hb hpu hpv hs ht
+ obtain ⟨hwf,hwv,hru,hrv,hue,hve⟩:=GraphForest.two_finds (unionDecode r s) (decode r t) (decode r w) u v ru rv (decPot r pu) (decPot r pv) rank value k hf hv hu hv'
+ have hsu : (sd r su*(decPot r pu).s)*(sd r su*(decPot r pu).s)=1 := by
+   simpa only [decPot,←sd_mul r su pu.s hs hpu.1] using sd_square r (su*pu.s) (sign_mul _ _ hs hpu.1)
+ apply branch_safe r ⟨w,s.fixed⟩ ru rv _ value k forward hp hr hpot.1 hgf hwv
+ rw [hpot.2]
+ have reduced:=SignedGraphAlgebra.edge_reduction (decPot r pu) (decPot r pv) (sd r su) (sd r sv) (value u) (value v) (value ru) (value rv) (wd r a) (wd r b) k hue hve he
+ exact SignedGraphAlgebra.union_forward _ _ _ _ _ _ _ hsu reduced
+end UnionReturn

@@ -1,0 +1,15 @@
+Producer browser/export checks; not independent execution standing.
+$ node --check tools/curve-atlas/dist/export.mjs
+
+
+exit: 0
+$ node --check tools/curve-atlas/dist/app.mjs
+
+
+exit: 0
+$ node tools/curve-atlas/export-checks.mjs
+standalone: PNG/SVG downloads, image dimensions/colors, full-graph zoom, tall graph, mobile and encoder failure checks passed.
+modules: PNG/SVG downloads, image dimensions/colors, full-graph zoom, tall graph, mobile and encoder failure checks passed.
+
+
+exit: 0

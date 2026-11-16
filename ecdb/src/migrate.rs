@@ -27,6 +27,25 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "views_functions_roles",
         sql: include_str!("../migrations/0008_views_functions_roles.sql"),
     },
+    Migration { version: 9, name: "measurements", sql: include_str!("../migrations/0009_measurements.sql") },
+    Migration { version: 10, name: "volcano_key", sql: include_str!("../migrations/0010_volcano_key.sql") },
+    Migration { version: 11, name: "factor_bases", sql: include_str!("../migrations/0011_factor_bases.sql") },
+    Migration {
+        version: 12,
+        name: "fb_designs_ic_claims",
+        sql: include_str!("../migrations/0012_fb_designs_ic_claims.sql"),
+    },
+    Migration {
+        version: 13,
+        name: "frobenius_ell_charpoly",
+        sql: include_str!("../migrations/0013_frobenius_ell_charpoly.sql"),
+    },
+    Migration {
+        version: 14,
+        name: "order_class_groups",
+        sql: include_str!("../migrations/0014_order_class_groups.sql"),
+    },
+    Migration { version: 15, name: "prym_complement", sql: include_str!("../migrations/0015_prym_complement.sql") },
 ];
 
 pub fn schema_version() -> i32 {

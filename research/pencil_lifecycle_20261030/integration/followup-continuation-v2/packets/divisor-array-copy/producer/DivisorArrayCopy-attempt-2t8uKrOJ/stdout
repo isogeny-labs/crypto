@@ -1,0 +1,55 @@
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:25:3: error: unexpected token 'from'; expected identifier
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:33:58: error: unexpected token 'from'; expected term
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:57:24: error: unsolved goals
+case cons
+v : List UInt64
+a b c head✝ : UInt64
+tail✝ : List UInt64
+h1 : tail✝.length + 1 + 1 + 1 < 3
+h2 : v.length ≤ tail✝.length + 1 + 1 + 1
+⊢ False
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:66:17: error: unsolved goals
+case cons.cons.cons.cons.cons.cons
+a b c x y head✝ : UInt64
+tail✝ : List UInt64
+h2 : tail✝.length + 1 + 1 + 1 < 3
+⊢ False
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:74:3: error: Tactic `rfl` failed: The left-hand side
+  (raw [a] []).degree = [a].length - 1
+is not definitionally equal to the right-hand side
+  (raw [a] []).degree ≤ 2 ∧ (raw [a] []).u.size = 3 ∧ (raw [a] []).v.size = 2 ∧ up (raw [a] []) = [a]
+
+case inl
+a : UInt64
+h : shape [a] []
+⊢ (raw [a] []).degree = [a].length - 1 ∧
+    (raw [a] []).degree ≤ 2 ∧ (raw [a] []).u.size = 3 ∧ (raw [a] []).v.size = 2 ∧ up (raw [a] []) = [a]
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:75:36: error: Expected type must not contain free variables
+  (raw [a, b] []).degree = [a, b].length - 1 ∧
+    (raw [a, b] []).degree ≤ 2 ∧ (raw [a, b] []).u.size = 3 ∧ (raw [a, b] []).v.size = 2 ∧ up (raw [a, b] []) = [a, b]
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:75:36: error: Expected type must not contain free variables
+  (raw [a, b] [x]).degree = [a, b].length - 1 ∧
+    (raw [a, b] [x]).degree ≤ 2 ∧
+      (raw [a, b] [x]).u.size = 3 ∧ (raw [a, b] [x]).v.size = 2 ∧ up (raw [a, b] [x]) = [a, b]
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:76:48: error: Expected type must not contain free variables
+  (raw [a, b, c] []).degree = [a, b, c].length - 1 ∧
+    (raw [a, b, c] []).degree ≤ 2 ∧
+      (raw [a, b, c] []).u.size = 3 ∧ (raw [a, b, c] []).v.size = 2 ∧ up (raw [a, b, c] []) = [a, b, c]
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:76:48: error: Expected type must not contain free variables
+  (raw [a, b, c] [x]).degree = [a, b, c].length - 1 ∧
+    (raw [a, b, c] [x]).degree ≤ 2 ∧
+      (raw [a, b, c] [x]).u.size = 3 ∧ (raw [a, b, c] [x]).v.size = 2 ∧ up (raw [a, b, c] [x]) = [a, b, c]
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+/var/tmp/pencil-divisor-array-copy-20261101-v1/DivisorArrayCopy.lean:76:48: error: Expected type must not contain free variables
+  (raw [a, b, c] [x, y]).degree = [a, b, c].length - 1 ∧
+    (raw [a, b, c] [x, y]).degree ≤ 2 ∧
+      (raw [a, b, c] [x, y]).u.size = 3 ∧ (raw [a, b, c] [x, y]).v.size = 2 ∧ up (raw [a, b, c] [x, y]) = [a, b, c]
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables

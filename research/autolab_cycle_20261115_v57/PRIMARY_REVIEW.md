@@ -1,0 +1,4 @@
+The divisor and descent steps use classical theory, not a novelty claim. J.S.Milne, Elliptic Curves, second edition, I.4 (especially Riemann-Roch4.13 and its Galois-descent discussion) and II.1, describes base-field divisor spaces and the pole-order basis for a Weierstrass curve. The Picard discussion identifies degree-zero divisor classes with the elliptic group, supporting the principal-divisor criterion used here. The characteristic-two curve-specific ghost partition, explicit guard certificates and counterexamples are derived and tested in this checkpoint. Full novelty review remains open.
+https://www.jmilne.org/math/Books/EC2.pdf
+
+Semaev's summation-polynomial relation is over the algebraic closure; it does not guarantee rational lifts. See the primary sources retained in C55's PRIMARY_REVIEW.md. This distinction is essential to the counterexamples and to any proposed comprehensive solver.

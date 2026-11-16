@@ -1,0 +1,52 @@
+{
+  "decision": "accepted_library_build_evidence",
+  "reviewer": "assembler_independent_review_v2",
+  "independent_of_build_author": true,
+  "artifacts": {
+    "rebuild2-attempt1/receipt.json": "c59afc1d00bd2db7d5dd7d7015cd15f97f68750b2f86a84543b1dd9ac2cfbbd6",
+    "rebuild2-attempt1/cleanup-receipt.json": "0de37699c961e54a87042d10a0cc6abb0b3f2088b35df6c26a5264fb778df963",
+    "rebuild2-attempt1/1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rebuild2-attempt1/1.stderr": "0a127c02460687e8f06c9efcb7f398299e6bae51a2cfd3000a024edafebfc12c",
+    "rebuild2-execution.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "rebuild2-freeze.json": "21aadc8e1ffc29209684b726a4961982d1a04dfdfdb82e8d16be816bdfc91260"
+  },
+  "outputs_rehashed": {
+    "crypto_lib.d": {
+      "sha256": "f438c823450c7a7a96e7086b69df106c656d181d5863549fba1f81e1c6e2661f",
+      "bytes": 322682
+    },
+    "libcrypto_lib.rmeta": {
+      "sha256": "6a3d5dd3ad3dc744fe267f278672f931f624249205f289353d2346511c63548f",
+      "bytes": 165091518
+    },
+    "libcrypto_lib.rlib": {
+      "sha256": "71753af3fbab712659cbf04e2d4d8cc718c2c31631812cffc5d889cb89b88e3f",
+      "bytes": 637987072
+    }
+  },
+  "argv_matches_reviewed": true,
+  "frozen_inputs_still_match": true,
+  "native_pre_post_changed": [],
+  "outer_exit": 0,
+  "compiler_exit": 0,
+  "reaped": true,
+  "elapsed_seconds": 132.53478321401053,
+  "jobserver": {
+    "read_fd": 3,
+    "write_fd": 4,
+    "additional_tokens": 0,
+    "implicit_slot": 1,
+    "inode": 16658389,
+    "device": 15,
+    "mode": 4480,
+    "pass_fds": [
+      3,
+      4
+    ],
+    "scope": "jobserver-managed work slots, not hard CPU or thread quota"
+  },
+  "observed_output_bytes": 803401272,
+  "observed_overshoot": 0,
+  "scope": "One native library compilation; no exporter link/test or scientific execution. Cached externs retain byte custody only.",
+  "review_actions": "Read native receipts, compare exact argv/freeze, independently hash all three outputs; no executable invocation."
+}

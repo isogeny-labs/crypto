@@ -1,0 +1,45 @@
+{
+  "schema": "pencil.signed-kummer-lock-v3-final-binding-review/v1",
+  "created_utc": "2026-11-11T00:53:50Z",
+  "status": "no_blocking_final_binding_finding",
+  "bindings": {
+    "release_sha256": "024105c388aab653a3e045ecd04cd802a6592f9a2529c804d77de30fe4a86459",
+    "ledger_sha256": "1267a5957b37ca44d4e4e73b760744203091217bb5cae810b8af394b515a1b1f",
+    "execution_command_sha256": "eac6453e43718a93010229a5ea9af4f8ca50170a62b15c780a10b64781e96e28",
+    "lease_readback_sha256": "acec2dca853abf92ebcb54ed28c12ef80619c98d25e00f1e933a3131d28aa81c",
+    "publication_sha256": "edfbf2527a1aa4364db0f5c568a2d6327fe1c15d29464c0e75a9921fdc1f2c22",
+    "serial_terminal_sha256": "0ca16b77a4f98c0541bad89daa3864fbbd7bd1314d43b71ac71452ca8cc08239",
+    "source_review_sha256": "bd68f2c7be8f62c22e8c13ead082b672b47d48aa1741bdb2cce27c2461a7e979",
+    "prior_pivot_completion_sha256": "05493f4fd38b2cc40696789db61bbf812c7ad9608021a3497a1da25be14e173f",
+    "source_publication_commit": "6475e141f9c32a8e8d4a9f8bb929b095b52fd017",
+    "final_binding_publication_commit": "dd5b007040da6f52dfa819c8502c69b9a4787e50"
+  },
+  "checks": {
+    "published_source_files_exact": true,
+    "published_v3_review_exact": true,
+    "source_commit_is_final_publication_ancestor": true,
+    "release_internal_hashes_match": true,
+    "ledger_charged_seconds": 3600,
+    "ledger_reserved_seconds": 60,
+    "ledger_unreserved_seconds": 125940,
+    "prior_pivot_completion_matches": true,
+    "prior_pivot_phase_owners_terminal": true,
+    "active_pencil_units": 0,
+    "new_workspace_absent": true,
+    "target_unit_not_found": true,
+    "task_T2128_claimed": true,
+    "lease_fencing_epoch": 1,
+    "attempt_limit": 1,
+    "automatic_retry": false,
+    "execution_command_release_hash_matches": true,
+    "deadline_allowance_exceeds_60_seconds": true,
+    "execution_performed_by_reviewer": false
+  },
+  "limits": [
+    "Final-receipt and admission review only; the already completed v3 source review was not repeated.",
+    "No compiler, lock generator, payload, systemd submission, cloud action, or git-index mutation was performed.",
+    "The saved lease readback is time-bounded; root must maintain and recheck the live lease at invocation.",
+    "No result, lock resolution, or scientific claim exists until the offline gate completes and its outputs are reviewed."
+  ]
+}
+

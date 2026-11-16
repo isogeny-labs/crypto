@@ -3,6 +3,8 @@
 mod audit;
 #[path = "factor_base_sweep/engine.rs"]
 mod engine;
+#[path = "factor_base_sweep/forecast.rs"]
+mod forecast;
 #[path = "factor_base_sweep/model.rs"]
 mod model;
 #[path = "factor_base_sweep/polynomials.rs"]
@@ -120,6 +122,40 @@ enum Action {
         #[arg(long)]
         run: PathBuf,
     },
+    /// Rank a run's candidates by their degree-of-regularity forecast and
+    /// projected relation-phase cost, from the records on disk (complete or
+    /// still running). Advisory: it starts, stops or skips nothing.
+    Triage {
+        #[arg(long)]
+        run: PathBuf,
+        /// Also write the ranking to a new file.
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Write the next plan from a run's triage: drop candidates whose
+    /// advice is in --drop (after enough solves) or that were inapplicable,
+    /// keep the rest, expand seeds and dimensions. Nothing runs; the
+    /// provenance is written beside the plan as <out>.refine.json.
+    Refine {
+        #[arg(long)]
+        run: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(
+            long,
+            value_delimiter = ',',
+            default_value = "hopeless_at_bound,doubtful"
+        )]
+        drop: Vec<String>,
+        /// Consecutive seeds per kept candidate (default 1: the same seed).
+        #[arg(long, default_value_t = 1)]
+        seed_count: u32,
+        /// Dimensions for kept binary shapes (default: each keeps its own).
+        #[arg(long, value_delimiter = ',')]
+        dimensions: Vec<u32>,
+        #[command(flatten)]
+        tuning: Tuning,
+    },
     #[command(hide = true)]
     Worker {
         #[arg(long)]
@@ -217,6 +253,34 @@ fn dispatch() -> Result<()> {
             println!("{}", out.display());
         }
         Action::Verify { run } => println!("{}", run::verify(&run)?),
+        Action::Triage { run, out } => {
+            let ranking = run::triage(&run)?;
+            if let Some(out) = out {
+                model::write_new(&out, &ranking)?;
+            }
+            println!("{ranking}");
+        }
+        Action::Refine {
+            run,
+            out,
+            drop,
+            seed_count,
+            dimensions,
+            tuning,
+        } => {
+            let drop: Vec<String> = drop.into_iter().filter(|d| !d.is_empty()).collect();
+            let (mut plan, mut provenance) = run::refine(&run, &drop, seed_count, &dimensions)?;
+            tuning.apply(&mut plan, false)?;
+            plan.validate()?;
+            let sidecar = out.with_extension("refine.json");
+            provenance["plan"] = serde_json::json!(out);
+            model::write_new(&out, &plan)?;
+            model::write_new(&sidecar, &provenance)?;
+            println!(
+                "{}",
+                serde_json::json!({"plan":out,"provenance":sidecar,"candidates":plan.candidates.len(),"kept":provenance["kept"].as_array().map_or(0,|k|k.len()),"dropped":provenance["dropped"].as_array().map_or(0,|d|d.len()),"advisory":provenance["advisory"]})
+            );
+        }
         Action::Worker { attempt } => {
             let request = model::read(&attempt.join("request.json"))?;
             engine::run(&request, &attempt)?;

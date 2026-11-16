@@ -38,6 +38,7 @@ Paths are relative to the evidence directory and must stay inside the repository
 {
   "schema": "validation-gate/v1",
   "rows": ["icv1-..."],                       // optional: slugs it covers; default all rows of the directory
+  "row_digest": "…",                          // optional: digest of the row it backs, or {slug: digest}
   "replay_certificate": {"path": "replay-certificate.json", "sha256": "…"},
   "validator_report":   {"path": "validator-report.json",   "sha256": "…"},
   "rho_reference": {
@@ -48,7 +49,7 @@ Paths are relative to the evidence directory and must stay inside the repository
     "matches_protocol": true, "strongest_available": true,
     "same_unit": true, "same_binary_or_process": true,
     "gae_band": {"0": {"ic": 0.0, "rho": 0.0}, "0.1": {"ic": 0.0, "rho": 0.0}, "1": {"ic": 0.0, "rho": 0.0}},
-    "order_holds_across_band": true           // rank two arms only where this is true
+    "order_holds_across_band": true           // derived from gae_band; rank two arms only where this is true
   }
 }
 ```
@@ -59,10 +60,38 @@ The two pinned files must hash to their `sha256`, and must say:
   `scalars_verified: true`, a non-empty `runs` list;
 - validator report: `status: "pass"`, `independent: true`, a non-empty `raw_data`
   list of repository files (each may pin a `sha256`), and a non-empty `headline`
-  list of `{name, claimed, recomputed, rel_tol?}` whose numbers agree within
-  `rel_tol` (default 1e-9).
+  list of `{name, claimed, recomputed, rel_tol?}` whose numbers are finite and
+  agree within a relative tolerance of 1e-9. The tolerance is the gate's
+  (`HEADLINE_REL_TOL`): a report may state its own `rel_tol` only as a finite
+  number from 0 up; NaN, infinity, a negative value or a non-number is an
+  error, so a report cannot switch the comparison off that way. A cap of 1e-6
+  (`HEADLINE_REL_TOL_MAX`) is implemented and not yet enforced
+  (`HEADLINE_REL_TOL_ENFORCE_MAX = False`): 22 admitted benchmarks rows state
+  tolerances from 1e-3 to 5e299 for headlines rounded for display, and
+  enforcing the cap needs the owner to choose between re-issuing those reports
+  with the numbers the recompute produces and freezing the rows. Until then a
+  large finite `rel_tol` still widens the comparison. New reports should claim
+  the recomputed number and state no tolerance.
+
+Each pinned file must hold a JSON object. The `rho_reference` descriptor is
+checked as written, except that `order_holds_across_band` is recomputed: it is
+true exactly when `ic` is below `rho` at all three band points or above it at
+all three (a tie is not an order), every band number must be finite and
+positive, and a stored value that differs from the recomputed one is an error.
+
+`row_digest` is optional and binds the manifest to the row text: the digest the
+gate computes for the row (Mechanics, below), as one string, or as an object
+keyed by slug when the directory backs several leaderboard rows. When present
+it must match the row being judged; a manifest without it is accepted as
+before and is not bound to a row text.
 
 `python3 scripts/validation_gate.py evidence DIR` explains one directory.
+
+The `independent: true` booleans this gate reads are written by the producer.
+Under the sabotage contract (`docs/SABOTAGE_RESISTANCE.md`) a row's claim is
+additionally recorded with `pcc`, and its replay certificate and validator
+report carry a keyring signature, which is what "independent" means there.
+This gate's behaviour is unchanged.
 `scripts/fixtures/validation_gate/` holds a complete toy example (`positive/`) and
 a refused one (`negative-no-rho-reference/`); the numbers in them are not a
 measurement.
@@ -71,7 +100,7 @@ measurement.
 
 | standing | meaning |
 |:--|:--|
-| validated | a complete `VALIDATION.json`, or a passing sweep verdict that names the three artifacts |
+| validated | a complete `VALIDATION.json`, or a passing sweep verdict whose three artifacts check |
 | unvalidated (pre-gate) | frozen in `docs/ic/validation/PRE_GATE.json` / `benchmarks/PRE_GATE.json` with the digest it has now |
 | unvalidated | not frozen, or changed since the freeze, and not validated: the builder refuses it, CI fails |
 | failed validation | a sweep verdict says `failed`: the builder refuses it |
@@ -83,13 +112,40 @@ longer matches the row is ignored.
 **Validation sweep verdicts.** Slice A lands
 `research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl`, slice B
 `…/B-benchmarks/verdicts.jsonl`; the builder and the check read them when they
-exist. One JSON object per line: `row` (a board key `board:<slug>:<source>`, a
-slug, or a benchmarks directory), `verdict` (`validated` | `failed`), the three
-keys `replay_certificate`, `validator_report`, `rho_reference` (non-empty: where
-each artifact is), and optionally `row_digest`. **The sweeps had not landed when
-this gate was written, so this line format is the gate's assumption**; a sweep
-that writes another shape needs the reader in `scripts/validation_gate.py`
-(`load_verdicts`, `verdict_status`) adjusted in the same PR.
+exist (`load_verdicts`, `verdict_status` in `scripts/validation_gate.py`). One
+JSON object per line:
+
+- **The row:** `row`, as the gate names it (a board key `board:<slug>:<source>`,
+  `<slug>@<source>`, a slug, or a benchmarks directory), or the sweep's own
+  `row_id`. A `row_id` of `A:<slug>`, `B:<slug>` or `C:<slug>` reaches only that
+  table's board row. It is never reduced to the bare slug, because Tables A and C
+  share curves and one table's verdict must not reach the other's row.
+- **`verdict`:** `validated` (or `pass`, `passed`, `ok`) validates only when the
+  three keys `replay_certificate`, `validator_report` and `rho_reference` each
+  name a file in the repository that passes the check its counterpart in a
+  `VALIDATION.json` passes (`verdict_artifact_errors`), and with every caveat
+  field present (`pricing_ok`, `rho_reference_ok`, `replay_ok`,
+  `recomputed_ok`, `protocol_frozen_ok`) set to `true` or `not_applicable`.
+  Each key is a path from the repository root, or `{path, sha256}` to pin it;
+  the validator report's `raw_data` paths are read from the report's directory;
+  `rho_reference` names a JSON file holding the descriptor, or a
+  `VALIDATION.json`, whose `rho_reference` is read. A passing line whose
+  artifacts are absent, do not resolve or do not check leaves the row
+  `unvalidated`, with the reason, and so does not outrank the freeze. `failed` and `contradicted` (and `fail`, `invalid`,
+  `refuted`, `rejected`) fail the row. `validated_with_caveats` and `unvalidated`
+  are recognized but never pass: the row keeps its standing, with the verdict and
+  its caveats shown under `validation.sweep`.
+- **Optional:** `row_digest`.
+
+A line that names no row, or carries an unrecognized verdict word, stops the
+gate rather than being skipped. Later lines win, except that nothing overrides
+a failing verdict.
+
+The two verdict files are append-only. With `--base`, the lines the file has on
+the base must open the head file unaltered and in order; a missing, altered or
+reordered line fails the check, so a failing verdict cannot be dropped. A
+verdict file the base does not have may carry a passing line only if that
+line's artifacts check.
 
 ## Mechanics
 
@@ -103,7 +159,10 @@ that writes another shape needs the reader in `scripts/validation_gate.py`
 - `.github/workflows/validation-gate.yml` runs `scripts/test_validation_gate.py` and
   `scripts/validation_gate.py check --base origin/<base>` on every pull request. The
   check also fails when a freeze file gained or re-digested an entry, so the
-  freeze cannot be used to launder a new row.
+  freeze cannot be used to launder a new row, and when a sweep verdict file
+  lost or changed a line. A `--base` that does not resolve to a commit stops the
+  check with an error; a file that is absent on a base that does resolve is
+  treated as absent.
 - `.github/workflows/audit-runs-daily.yml` and `.claude/skills/audit-runs` re-audit
   finished sessions daily with a nonce-drawn sample.
 
@@ -158,5 +217,5 @@ board row that depends on them stays out of the validated standing; the sweep ve
 | table | replay | validator | rho reference with the 5a band | standing |
 |:--|:--|:--|:--|:--|
 | B | native re-execution of the ladder, 13 of 13 instances identical | recompute from per-run gae | negation map, band computed for 13 instances | validated: `docs/ic/runs/VALIDATION.json` |
-| A | independent replay of the 64 R1 runs per size (rule v7) | recompute from the 64 R1 files (`recompute_A.sh`; a retry file replaces the contended attempt it retried) | validated by main under rule v7: `research/ic_tool_program/rule/v7/VALIDATION.json`; the derived lower-bound band of `band_A.sh` is a cross-check, not gate evidence | validated |
+| A | independent replay of the 64 R1 runs per size (rule v7) | recompute from the 64 R1 files (`recompute_A.sh`; a retry file replaces the contended attempt it retried) | validated by main under rule v9: `research/ic_tool_program/rule/v9/VALIDATION.json`; the derived lower-bound band of `band_A.sh` is a cross-check, not gate evidence | validated |
 | C | native replay of sampled runs identical | recompute from the pair files | **band not available**, and the reference is S20's, not measured with the IC figure | pre-gate, until both exist (it fails the gate on main) |

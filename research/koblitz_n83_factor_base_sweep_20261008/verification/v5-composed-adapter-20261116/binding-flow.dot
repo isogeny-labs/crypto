@@ -1,0 +1,15 @@
+digraph v5_binding {
+  graph [rankdir=LR, bgcolor="white", label="N83 V5 retained K600 adapter admission", labelloc=t, fontsize=17];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3fa", color="#364b67", fontname="Helvetica"];
+  parents [label="Pinned V2/V3/V4\nparent bytes"];
+  catalog [label="Saved V5 design\nexact bytes"];
+  case [label="Ordinal 26960859236\nmask 18, SAT, m=6"];
+  manifest [label="Retained K600 v3 manifest\nSHA-256 3e85c9e4…"];
+  binding [label="Exact adapter binding\ncheck only", fillcolor="#d8eddf"];
+  run [label="Cold relation/rank/target run\nnot admitted by this check", fillcolor="#f4e9d7"];
+  parents -> case;
+  catalog -> case;
+  case -> binding;
+  manifest -> binding;
+  binding -> run [style=dashed, label="separate frozen protocol"];
+}

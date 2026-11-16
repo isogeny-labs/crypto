@@ -28,13 +28,48 @@
 //! cargo run --release --example la_engine_bench -- export-core --cols 16384 --weight 3 --dir /tmp/c
 //! cargo run --release --example la_engine_bench -- check-cado --cols 16384 --weight 3 --dir /tmp/c --sol /tmp/c/wdir/K.sols0-1.0
 //! ```
+//!
+//! ## Wide moduli (`--modulus-bits B`)
+//!
+//! `ours --modulus-bits B` replaces `--modulus` by a fixed odd prime of
+//! `B` bits (table below; primality is checked in-program by Miller–Rabin
+//! over `BigUint`) and solves in the word width
+//! `WordWidth::for_modulus` picks for it (`--word u128|u192|u256`
+//! overrides, e.g. the 61-bit prime in `Wide<2>` to isolate limb cost):
+//!
+//! | `B` | prime | width |
+//! |:--|:--|:--|
+//! | 61 | `2^61 − 1` | `u64` (the control: exactly the `--modulus 2305843009213693951` run) |
+//! | 89 | `2^89 − 1` | `U128` |
+//! | 127 | `2^127 − 1` | `U128` |
+//! | 129 | ECC2K-130 subgroup order `r` (`log2 r ≈ 129.0`, bit length 130) | `U192` |
+//! | 190 | `2^190 − 11` | `U192` |
+//! | 255 | `2^255 − 19` | `U256` |
+//!
+//! The wide generator draws its column and sign stream exactly as the
+//! 61-bit control does for the same seed (it advances the stream by the
+//! control's planted-value draws), and takes planted logarithms and
+//! `--coeffs wide` values from a second stream seeded `seed ^
+//! WIDE_VALUE_STREAM`, uniform in `[1, r)`.  With the default ±1
+//! coefficients every width therefore solves the same matrix pattern;
+//! only the modulus changes.  Wide widths run the `full-bw` and `full-bl`
+//! arms.  The record adds `modulus_bits`, `modulus_bit_length`,
+//! `modulus_name`, `primality`, `word_width` and the solver's counted work
+//! (`row_ops`, `krylov_products`, `krylov_lanes`, `core_dimension`,
+//! `core_nonzeros`).  Without `--modulus-bits` the output is unchanged.
+//!
+//! ```text
+//! cargo run --release --example la_engine_bench -- ours --arm full-bw --cols 1024 --weight 3 --modulus-bits 129
+//! ```
 
 use crypto_lib::cryptanalysis::ic_boundary::RowStatus;
 use crypto_lib::cryptanalysis::ic_framework::linalg::matrix_by_name;
 use crypto_lib::cryptanalysis::{
-    filter_relations, solve_sparse_system, FilterOptions, FilterStrategy, SparseCoreSolver,
-    SparseRow, SparseSolveOptions, SparseSolveOutcome,
+    filter_relations, solve_sparse_system, FilterOptions, FilterStrategy, ModWord,
+    SparseCoreSolver, SparseRow, SparseSolveOptions, SparseSolveOutcome, SparseSolveReport, Wide,
+    WordWidth,
 };
+use num_bigint::{BigUint, RandBigInt};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -407,6 +442,268 @@ fn coeffs_name(p: &Params) -> &'static str {
     }
 }
 
+// ── Wide moduli: `--modulus-bits B` ─────────────────────────────────
+
+/// `2^61 − 1`: the 61-bit control's modulus; its planted-value draws are
+/// the ones the wide generator replays to keep the column stream aligned.
+const P61: u64 = (1 << 61) - 1;
+
+/// Seed offset of the wide generator's value stream (planted logarithms
+/// and `--coeffs wide` values).
+const WIDE_VALUE_STREAM: u64 = 0x5749_4445_5641_4c53;
+
+/// The ECC2K-130 subgroup order, as in `koblitz_sparse_la`'s wide tests.
+const ECC2K130_ORDER: &str = "680564733841876926932320129493409985129";
+
+/// The fixed prime for `--modulus-bits B` and its name.
+fn wide_prime(bits: u32) -> (BigUint, &'static str) {
+    let one = BigUint::from(1u32);
+    match bits {
+        61 => ((&one << 61u32) - 1u32, "2^61 - 1"),
+        89 => ((&one << 89u32) - 1u32, "2^89 - 1"),
+        127 => ((&one << 127u32) - 1u32, "2^127 - 1"),
+        129 => (
+            ECC2K130_ORDER.parse().unwrap(),
+            "ECC2K-130 subgroup order (log2 r = 129.0, bit length 130)",
+        ),
+        190 => ((&one << 190u32) - 11u32, "2^190 - 11"),
+        255 => ((&one << 255u32) - 19u32, "2^255 - 19"),
+        other => {
+            eprintln!("--modulus-bits must be one of 61 89 127 129 190 255, not {other}");
+            std::process::exit(2);
+        }
+    }
+}
+
+/// Miller–Rabin with the fixed bases 2, 3, …, 71 (the first 20 primes).
+/// The bases up to 41 are a proof for `n < 3 317 044 064 679 887 385 961 981`
+/// (Sorenson–Webster); above that a pass is a strong probable prime to
+/// all 20 bases.  Returns `None` for a composite.
+fn miller_rabin(n: &BigUint) -> Option<&'static str> {
+    const BASES: [u32; 20] = [
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+    ];
+    let one = BigUint::from(1u32);
+    let two = BigUint::from(2u32);
+    if *n < two {
+        return None;
+    }
+    for &b in &BASES {
+        if *n == BigUint::from(b) {
+            return Some("proven (small prime)");
+        }
+        if (n % b) == BigUint::from(0u32) {
+            return None;
+        }
+    }
+    let n1 = n - &one;
+    let s = n1.trailing_zeros().unwrap();
+    let d = &n1 >> s;
+    'bases: for &b in &BASES {
+        let mut x = BigUint::from(b).modpow(&d, n);
+        if x == one || x == n1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = x.modpow(&two, n);
+            if x == n1 {
+                continue 'bases;
+            }
+        }
+        return None;
+    }
+    let bound: BigUint = "3317044064679887385961981".parse().unwrap();
+    Some(if *n < bound {
+        "proven (Miller-Rabin bases 2..41, n < 3.317e24)"
+    } else {
+        "strong probable prime to the 20 fixed bases 2..71"
+    })
+}
+
+struct WideSystem<W: ModWord> {
+    rows: Vec<SparseRow<W>>,
+    planted: Vec<W>,
+    rows_to_cover: usize,
+}
+
+/// `generate` in width `W`: the same row shape and column/sign stream as
+/// the 61-bit control for the same seed, values reduced mod `r`.
+fn generate_wide<W: ModWord>(p: &Params, r: &BigUint, m: &W::Modulus) -> WideSystem<W> {
+    let mut rng = StdRng::seed_from_u64(p.seed);
+    for _ in 0..p.cols {
+        let _: u64 = rng.gen_range(1..P61);
+    }
+    let mut vrng = StdRng::seed_from_u64(p.seed ^ WIDE_VALUE_STREAM);
+    let one = BigUint::from(1u32);
+    let planted: Vec<W> = (0..p.cols)
+        .map(|_| W::from_biguint(&vrng.gen_biguint_range(&one, r), m))
+        .collect();
+    let mut covered = vec![false; p.cols];
+    let mut uncovered = p.cols;
+    let mut rows = Vec::new();
+    let mut rows_to_cover = 0;
+    let mut extra = 0usize;
+    while extra < p.excess {
+        let mut entries = Vec::with_capacity(p.weight);
+        for _ in 0..p.weight {
+            let c = rng.gen_range(0..p.cols) as u32;
+            let v = if p.wide {
+                let _: u64 = rng.gen_range(1..P61);
+                W::from_biguint(&vrng.gen_biguint_range(&one, r), m)
+            } else if rng.gen::<bool>() || p.positive {
+                W::one()
+            } else {
+                W::max_residue(m)
+            };
+            entries.push((c, v));
+        }
+        let row = SparseRow::new(entries, W::zero(), *m);
+        if row.entries.is_empty() {
+            continue;
+        }
+        let mut rhs = W::zero();
+        for &(c, v) in &row.entries {
+            rhs = rhs.add(v.mul(planted[c as usize], m), m);
+            if !covered[c as usize] {
+                covered[c as usize] = true;
+                uncovered -= 1;
+            }
+        }
+        rows.push(SparseRow {
+            entries: row.entries,
+            rhs,
+        });
+        if uncovered == 0 {
+            if rows_to_cover == 0 {
+                rows_to_cover = rows.len();
+            }
+            extra += 1;
+        }
+    }
+    WideSystem {
+        rows,
+        planted,
+        rows_to_cover,
+    }
+}
+
+/// The `full-bw` / `full-bl` arms in width `W`; the record has the keys of
+/// `run_ours`'s `full-*` record.
+fn run_wide<W: ModWord>(p: &Params, arm: &str, r: &BigUint) -> serde_json::Value {
+    let solver = match arm {
+        "full-bw" => SparseCoreSolver::BlockWiedemann,
+        "full-bl" => SparseCoreSolver::BlockLanczos,
+        other => {
+            eprintln!("--modulus-bits in a wide word runs full-bw or full-bl, not {other}");
+            std::process::exit(2);
+        }
+    };
+    let Some(m) = W::modulus_from_biguint(r) else {
+        eprintln!("the modulus does not fit word width {:?}", W::WIDTH);
+        std::process::exit(2);
+    };
+    let t0 = Instant::now();
+    let sys = generate_wide::<W>(p, r, &m);
+    let gen_s = t0.elapsed().as_secs_f64();
+    let nnz: usize = sys.rows.iter().map(|r| r.entries.len()).sum();
+    let mut out = serde_json::json!({
+        "arm": arm, "cols": p.cols, "weight": p.weight, "excess": p.excess,
+        "seed": p.seed, "modulus": r.to_string(), "coeffs": coeffs_name(p),
+        "block": p.block, "threads": threads(),
+        "merge_max_weight": p.merge_max_weight, "max_row_weight": p.max_row_weight,
+        "filter_strategy": if p.markowitz || p.cado_preset {"cado"} else {"legacy"}, "filter_preset": p.cado_preset, "target_density": p.target_density,
+        "rows": sys.rows.len(), "rows_to_cover": sys.rows_to_cover, "nonzeros": nnz,
+        "generate_s": gen_s,
+    });
+    let o = out.as_object_mut().unwrap();
+    let opts = sparse_opts(p, solver, true);
+    let tf = Instant::now();
+    let f = filter_relations(sys.rows.clone(), p.cols, m, &opts.filter);
+    let filter_s = tf.elapsed().as_secs_f64();
+    drop(f);
+    let t = Instant::now();
+    let (outcome, report) = solve_sparse_system(&sys.rows, p.cols, m, &opts);
+    let solve_s = t.elapsed().as_secs_f64();
+    let ok = matches!(&outcome, SparseSolveOutcome::Solved(x) if *x == sys.planted);
+    o.insert("filter_s".into(), filter_s.into());
+    o.insert("solve_s".into(), solve_s.into());
+    o.insert(
+        "core_s_derived".into(),
+        (solve_s - filter_s).max(0.0).into(),
+    );
+    o.insert("report".into(), serde_json::to_value(&report).unwrap());
+    o.insert("verified".into(), ok.into());
+    out
+}
+
+/// The counted work of a `full-*` / `core-*` record, lifted to top level.
+fn counted_work(report: &SparseSolveReport) -> serde_json::Value {
+    let (products, lanes) = match (&report.wiedemann, &report.lanczos) {
+        (_, Some(l)) => (l.sparse_products, l.block_size),
+        (Some(w), None) => (w.products, w.block_n),
+        (None, None) => (0, 0),
+    };
+    serde_json::json!({
+        "row_ops": report.row_ops, "krylov_products": products, "krylov_lanes": lanes,
+        "core_dimension": report.core_dimension, "core_nonzeros": report.core_nonzeros,
+        "filter_row_ops": report.filter.row_ops,
+    })
+}
+
+/// `ours --modulus-bits B`: the 61-bit `u64` control runs `run_ours`
+/// unchanged; every other width runs `run_wide`.
+fn run_modulus_bits(p: &Params, arm: &str, bits: u32, word: Option<&str>) -> serde_json::Value {
+    let (r, name) = wide_prime(bits);
+    let Some(primality) = miller_rabin(&r) else {
+        panic!("{name} failed Miller-Rabin");
+    };
+    let width = match word {
+        None => WordWidth::for_modulus(&r).expect("supported modulus"),
+        Some("u64") => WordWidth::U64,
+        Some("u128") => WordWidth::U128,
+        Some("u192") => WordWidth::U192,
+        Some("u256") => WordWidth::U256,
+        Some(other) => {
+            eprintln!("--word must be u64, u128, u192 or u256, not {other}");
+            std::process::exit(2);
+        }
+    };
+    let mut out = match width {
+        WordWidth::U64 => {
+            let Some(m) = <u64 as ModWord>::modulus_from_biguint(&r) else {
+                eprintln!("{name} does not fit the u64 word");
+                std::process::exit(2);
+            };
+            run_ours(&Params { p: m, ..p.clone() }, arm)
+        }
+        WordWidth::U128 => run_wide::<Wide<2>>(p, arm, &r),
+        WordWidth::U192 => run_wide::<Wide<3>>(p, arm, &r),
+        WordWidth::U256 => run_wide::<Wide<4>>(p, arm, &r),
+    };
+    let o = out.as_object_mut().unwrap();
+    let work = o
+        .get("report")
+        .map(|v| counted_work(&serde_json::from_value(v.clone()).unwrap()));
+    o.insert("modulus_bits".into(), bits.into());
+    o.insert("modulus_bit_length".into(), r.bits().into());
+    o.insert("modulus_name".into(), name.into());
+    o.insert("primality".into(), primality.into());
+    o.insert("word_width".into(), serde_json::to_value(width).unwrap());
+    o.insert(
+        "generator".into(),
+        if width == WordWidth::U64 {
+            "u64-control"
+        } else {
+            "wide-v1"
+        }
+        .into(),
+    );
+    if let Some(serde_json::Value::Object(w)) = work {
+        o.extend(w);
+    }
+    out
+}
+
 // ── CADO's own filter: purge → merge-dl → replay-dl → bwc ─────────────
 
 /// Relations in CADO's indexed format, `a,b:i1,…,ik` (hex), an index
@@ -577,7 +874,18 @@ fn main() {
         target_density: num("--target-density", 0) as usize,
         cado_preset: get("--filter-preset").as_deref() == Some("cado"),
     };
+    let modulus_bits = get("--modulus-bits").map(|v| v.parse::<u32>().unwrap());
+    if modulus_bits.is_some() && (get("--modulus").is_some() || cmd != "ours") {
+        eprintln!("--modulus-bits applies to `ours` and replaces --modulus");
+        std::process::exit(2);
+    }
     let v = match cmd.as_str() {
+        "ours" if modulus_bits.is_some() => run_modulus_bits(
+            &p,
+            &get("--arm").expect("--arm"),
+            modulus_bits.unwrap(),
+            get("--word").as_deref(),
+        ),
         "ours" => run_ours(&p, &get("--arm").expect("--arm")),
         "export-core" => export_core(&p, &get("--dir").expect("--dir")),
         "check-cado" => check_cado(

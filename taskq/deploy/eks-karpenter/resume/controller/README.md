@@ -47,6 +47,12 @@ spec, image/source/binary identity, L2 observations, native replays and A/A
 controls must all pass. A failed or ambiguous benchmark submission is not given
 a new Job name or another measurement attempt.
 
+In [command mode](../CONTROLLER.md#command-mode) the supervisor execs the
+request's `argv` with the same credential drop plus the computation-only perf
+filter, records any exit code, and answers a `seal` operation instead of
+`verify`; the controller uploads the sealed outputs and ends the run
+`command_completed` without a fresh benchmark epoch. It is unit-tested only.
+
 Tests exercise immutable request binding, original deadlines, ambiguous owner
 and worker fences, incomplete generation retention, failed-measurement refusal,
 credential restoration, completion/checkpoint races and runtime identity.

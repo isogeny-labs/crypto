@@ -1,0 +1,9 @@
+component,source,scope
+Horner evaluator,native_solver.rs873-878,exact baseline body
+Sieve branches,native_solver.rs949-1089,unchanged candidate body after evaluation capture
+Canonical add,native_solver.rs812-821,UInt64 addition bound p<=2^63 proved separately
+Canonical multiply,native_solver.rs832-841,u128 product retained unchanged
+Counters,meter.rs and tracked_set.rs,verbatim implementation and actual deltas
+Divisor,degree/u/v wrapper,same field shape without constructor validation
+Loop recurrence,Difference.state_closed,ring-valued recurrence only
+Ordered branch fold,Difference.same_branch_fold,equal inputs imply equal fold not compiled Rust semantics

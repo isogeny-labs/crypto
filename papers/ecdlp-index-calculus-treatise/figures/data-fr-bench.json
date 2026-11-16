@@ -1,0 +1,1466 @@
+{
+ "commit": "05f7382689cd603eee71d12557630e9795de3f5b",
+ "what": "Rows of the admitted benchmarks table (benchmarks/README.md) with gate standing markers",
+ "rows": [
+  {
+   "date": "2026-11-02",
+   "entry": "20261102-e39-pivot-rules",
+   "entry_cell": "[`20261102-e39-pivot-rules`](20261102-e39-pivot-rules/) ([PDF](20261102-e39-pivot-rules/REPORT.pdf); [validation](20261102-e39-pivot-rules/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "E39: pivot rules in the k = 4 GLS/V\u2084 chain solve's echelon \u2014 F (first arrival, no selection work), S (static per-call order), H (F, else S) against E31's solver A, E25 and B\u2033 (E33); third pre-registered confirmation (E36\u2013E38 voided on controls), fresh target streams (salt `E39E0001`), 32 end-to-end rows (E25's 20 GLS rows, E24's 12) and Stage A 10 curves \u00d7 1,000 calls; counted `F_p` multiplications plus priced selection work at 0, 0.1 and 1 GAE against E27's matched walk (iii)",
+   "headline": "F, S and H each ahead of A and E25 at every weight on 32/32 rows: `S_A/S_F` `1.457`\u2013`1.537` / `1.094`\u2013`1.106` / `1.0115`\u2013`1.0130` (S `1.402`\u2013`1.449` \u2026 `1.0077`\u2013`1.0086`; H `1.497`\u2013`1.542` \u2026 `1.0076`\u2013`1.0083`); against B\u2033 unresolved; negative-control rule L behind A everywhere; every gating control 320/320 positive, non-empty detection \u2265 `0.9897`; rho ahead everywhere, closest row F `5.18\u00b710\u00b3\u00d7` (0 GAE) and `1.11\u00b710\u2075\u00d7` (1 GAE) rho, A `7.91\u00b710\u00b3\u00d7` / `1.12\u00b710\u2075\u00d7`; about `1.2 %` at 1 GAE, where the Macaulay build dominates; validated (8/8 binaries rebuilt byte-identical, 31/31 replayed runs identical, 7,286 summary values recomputed, gate valid), errata in note \u00a79.49",
+   "host": "one shared 4-vCPU container, L0; operation counts only; `p \u2264 521`, degree 11; fresh targets on the same 32 curves"
+  },
+  {
+   "date": "2026-11-02",
+   "entry": "20261102-e40-macaulay-entries",
+   "entry_cell": "[`20261102-e40-macaulay-entries`](20261102-e40-macaulay-entries/) ([PDF](20261102-e40-macaulay-entries/REPORT.pdf); [validation](20261102-e40-macaulay-entries/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "E40: the k = 4 GLS/V\u2084 chain solve's Macaulay build \u2014 variant V stores each row from its lead column instead of over all 448 columns, with exactly solver A's arithmetic; 32 end-to-end rows (E25's 20 GLS rows, E24's 12) paired with E37's A and E25 records, Stage A 10 curves \u00d7 1,000 calls; counted `F_p` multiplications plus native cell and offset operations priced at 0, 0.1 and 1 GAE against E27's matched walk (iii)",
+   "headline": "V stores `102,826`\u2013`102,827` cells per call against A's `176,064` (`1.712\u00d7`), paying `22,340`\u2013`22,489` counted offset operations; `S_A/S_V` `1.0000` at 0 GAE (identical multiplications), `1.2518`\u2013`1.2618` at 0.1 and `1.3629`\u2013`1.3807` at 1 GAE on 32/32 rows, ahead of E25 at every weight \u2014 the registered weak rank, a native-work constant, not a 0-GAE gain; size depends on the per-cell price (about `1.06\u00d7` at 0.01 GAE per cell); rho ahead everywhere, closest row `6.00\u00b710\u00b3\u00d7` / `1.58\u00b710\u2074\u00d7` / `6.17\u00b710\u2074\u00d7` (A `6.00\u00b710\u00b3\u00d7` / `1.99\u00b710\u2074\u00d7` / `8.51\u00b710\u2074\u00d7`); validated (clean rebuild byte-identical, 235,414 replayed fields identical, 466 recomputed figures, gate valid), errata in the validator report",
+   "host": "one shared 4-vCPU container, L0; operation counts only; `p \u2264 521`, degree 11"
+  },
+  {
+   "date": "2026-10-31",
+   "entry": "20261031-e32-handover-ladder",
+   "entry_cell": "[`20261031-e32-handover-ladder`](20261031-e32-handover-ladder/) ([PDF](20261031-e32-handover-ladder/REPORT.pdf); [validation](20261031-e32-handover-ladder/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "E32: the handover ladder on E25's GLS curves, eleven sizes `p = 101`\u2013`3089` (`log\u2082 n` `22.6`\u2013`42.4`), three curves each, 33 paired curves; E31 solver A with Karatsuba products (arm B, \u03c8-folded base) against E27's matched `\u27e8\u00b1\u03c8\u27e9` walk (iii), 16 walks per curve; every phase in counted `F_p` multiplications, distances at 0, 0.1 and 1 GAE",
+   "headline": "no crossover in the measured range: rho ahead on all 33 curves at every weight (`n* > 2^42.4`); median distance falls from `2.07\u00b710\u2074\u00d7` (`p = 101`) to `1.54\u00b710\u00b3\u00d7` (`p = 3089`) at 0 GAE, `2.01\u00b710\u2074\u00d7` at 1 GAE, best curve `1,143\u00d7`; slope of log D on log n `\u22120.243` [`\u22120.279`, `\u22120.205`] (theory `\u22121/4`); fitted crossover `log\u2082 n*` `85.5` [`79.2`, `94.3`] (0 GAE), `91.2` (0.1), `97.6` (1), an extrapolation, not a measured crossing; a measurement, not an improvement; validated (independent replay 66/66 runs from a fresh build, 14,619 fields identical), errata in note \u00a79.36",
+   "host": "one shared 4-vCPU container, L0; operation counts only; `p = 4337` unpaired (rho pool exceeded memory) and excluded"
+  },
+  {
+   "date": "2026-10-30",
+   "entry": "20261030-e27-walk-karatsuba",
+   "entry_cell": "[`20261030-e27-walk-karatsuba`](20261030-e27-walk-karatsuba/) ([PDF](20261030-e27-walk-karatsuba/REPORT.pdf); [validation](20261030-e27-walk-karatsuba/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "E27: the matched `\u27e8\u00b1\u03c8\u27e9` and negation walks on E25's ten GLS curves (`p = 101`\u2013`397`, 16 walks each) under three arithmetics, E25's schoolbook `F_{p\u2074}` products, Karatsuba products, and Karatsuba with the norm inversions of a 16-walk lockstep pool batched by Montgomery's trick; the E31 solver-A index calculus end to end with Karatsuba products on both arms; every phase in counted `F_p` multiplications",
+   "headline": "affine addition `97` \u2192 `79` \u2192 `66.3`\u2013`66.7` `F_p` multiplications; all 320 walks bit-identical across the arithmetics; matched walk `1.453`\u2013`1.463\u00d7` cheaper, IC side only `1.0048`\u2013`1.0057\u00d7` (non-solve `F_{p\u2074}` work \u2248 2 % of `S`); every row moves further from rho, by `1.448`\u2013`1.456\u00d7` (0 GAE), `1.415`\u2013`1.443\u00d7` (0.1), `1.236`\u2013`1.325\u00d7` (1); distance remaining `6.39\u00b710\u00b3`\u2013`4.06\u00b710\u2075\u00d7` at 0 GAE, rho ahead across the \u00a75a band; a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, 23,144 fields identical), errata E1\u2013E3 in the validator report",
+   "host": "one shared 4-vCPU container, L0; operation counts only"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-pkm-rootfind-prime",
+   "entry_cell": "[`20261018-pkm-rootfind-prime`](20261018-pkm-rootfind-prime/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "`rootfind-subtract` and `rootfind-mitm` (m = 2) against tower F4 and signature F5 (`pkm-tower`) on the PKM Kummer base `prime-kummer`, four prime-order curves of 9 to 15 bits, the same public targets (8 per cell, 4 at 15 bits), 252 runs verified and replayed",
+   "headline": "root finder / F4: S 1.16 to 16.9 (F4's S a lower bound: not decided); F_p multiplications 4.6e-8 to 3.5e-5; inversions 1.15 to 17 times; relation wall 1e-6 to 1e-4; AGENTS.md \u00a75a band (0, 0.1, 1 GAE per unpriced op): unresolved, derived break-even 1.2e-8 to 8.5e-7 GAE/op; distance to same-target rho: `rootfind-subtract` 5.4 to 29.2 times",
+   "host": "x86-64 Linux cloud VM, L1/L2 per run"
+  },
+  {
+   "date": "2026-10-29",
+   "entry": "20261029-icb-large-prime",
+   "entry_cell": "[`20261029-icb-large-prime`](20261029-icb-large-prime/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "One- and two-large-prime partial relations (`mitm-frobenius-counted:m=3,large_primes={1,2},lp_domain_factor=c`, already on main) on the Koblitz compact-orbit pair-table pipeline at n = 53 and 61, against the plain table at equal envelope and at its optimum, and the strong signed-Frobenius rho; 2 + 2 sessions, planted logarithms, every arm verified",
+   "headline": "counted S at n = 53: best plain table 6.38 (440 columns), best two-large-prime arm 3.86 (paired 0.604 [0.599, 0.610]); n = 61: 7.62 (880 columns) vs 4.26 (0.559 [0.535, 0.578]); the order holds across the priced band for the best arms (0.604 / 0.635 / 0.730 at n = 53), other 2LP arms lose at weight 1; one large prime is worse than plain (1.47-1.73x); rho still ahead 30-35x (n = 53) and 47-64x (n = 61); a constant inside the classic pipeline, not Table A, not an exponent; 612 replays reproduced",
+   "host": "Intel Xeon @ 2.10 GHz (family 6 model 207, AVX-512), 4 vCPU cloud container, `--allow-busy` (below L2)"
+  },
+  {
+   "date": "2026-10-29",
+   "entry": "20261029-jv-cover-hilbert-stop",
+   "entry_cell": "[`20261029-jv-cover-hilbert-stop`](20261029-jv-cover-hilbert-stop/) ([PDF](20261029-jv-cover-hilbert-stop/REPORT.pdf); [validation](20261029-jv-cover-hilbert-stop/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Hilbert early stop in the Joux\u2013Vitse cover index calculus (`jv_cover --exp dlp`, six-quadric cover over `F_p`, `--stop hilbert:16` with an incremental staircase) against unmodified full F4 and an A/A copy; p = 53, 101, 251, 503 (25 cells, 8/8/6/3 seeds), same relations and relation digest, every logarithm verified; weak class, lower-bound framing (counted `F_p` multiplications only)",
+   "headline": "paired S_A/S_B 1.848 [1.825, 1.878] (p=53), 1.875 [1.870, 1.879] (101), 1.868 [1.866, 1.870] (251), 1.849 [1.848, 1.850] (503), all 25 cells pass; emitted native-ops ratio 0.988/0.985/0.984/0.983; the as-found `hilbert:1` + scan form is a relabelling (S 2.53\u20132.64\u00d7 lower, native ops 8.3\u20138.5\u00d7 higher); log\u2013log slope of S/rho \u22122.27; counted unit only, IC is a lower bound (F4 driver's pair selection, assembly and lookups unpriced); validation is a same-host replay plus a negation-map rho reference measured after the run",
+   "host": "Intel Xeon 2.10 GHz, 4 vCPU shared VM, load 3\u20136, one thread (`RAYON_NUM_THREADS=1`); deterministic counts"
+  },
+  {
+   "date": "2026-10-29",
+   "entry": "20261029-ic-aimed-gather",
+   "entry_cell": "[`20261029-ic-aimed-gather`](20261029-ic-aimed-gather/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "IC relation collection (`ic price`, rule v3 `k0n53/T01`, `icv1-f2m53-tm56619371-dac20a85`): the aimed subset's coordinates gathered once per unit instead of on every trial (#2448); 42 same-session rounds of main, main and candidate in all six orders, paired native ratios against a 42-round A/A; independent replay and validator report ([`VALIDATION.json`](20261029-ic-aimed-gather/VALIDATION.json))",
+   "headline": "collect phase **1.093\u00d7 [1.068, 1.136]** (main / candidate, 38/42 rounds above 1; 230.3 \u2192 212.5 ms) against an A/A of [0.977, 1.026]: **established**; whole set-up 1.042\u00d7 [1.020, 1.082] against [0.946, 1.015]: marginal (+0.005, only after the bootstrap correction), not claimed; intervals corrected: the as-run bootstrap drew only odd-numbered rounds, and a first correction drew every resample half odd and half even ([CORRECTION.md](../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md)); counted operations and the recovered logarithm identical; Callgrind 1.023\u00d7 fewer instructions at n53 (first session); the board's rule v7 row (IC 8.146 vs rho 1.159 S, 7.03\u00d7) predates the change and is not re-priced",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, AVX-512, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 126 runs contended (71 launches refused and retried); local, not Iso Lab (build-vs-build A/A)"
+  },
+  {
+   "date": "2026-10-29",
+   "entry": "20261029-ic-packed-filter",
+   "entry_cell": "[`20261029-ic-packed-filter`](20261029-ic-packed-filter/) ([PDF](20261029-ic-packed-filter/ic-packed-filter-report.pdf); [graph](20261029-ic-packed-filter/summary.svg); [validation](20261029-ic-packed-filter/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Prime-field index calculus component: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table (`mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2`), b = 32, two curves, 288 pairs, interleaved with position and A/A arms (backlog XP-20261029-packed-filter, frozen protocol); matched `rho-neg` in the counted session",
+   "headline": "corrected wall `dgbf / dgb` 0.9601 [0.9569, 0.9633] (\u22123.99%) at identical charged GAE; `bitop/v1` +0.301% (build-side only); S\u2032 `dgbf / dgb` 1.0 / 1.0505 / 1.3586 at w = 0 / 0.1 / 1 (decides nothing; `dgbf` costlier at w > 0); distance remaining `dgbf / rho-neg` 31.47 / 31.50 / 31.63 (rho cheaper at every weight). Validated with caveats (independent replay and validator, TASK-20261029-654f73), single session, not replicated; 24 bits read a regression (1.0032), 28 bits undecidable ([details](20261029-ic-packed-filter/README.md))",
+   "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2"
+  },
+  {
+   "date": "2026-10-29",
+   "entry": "20261029-prime-fb-size-20bit",
+   "entry_cell": "[`20261029-prime-fb-size-20bit`](20261029-prime-fb-size-20bit/) ([PDF](20261029-prime-fb-size-20bit/REPORT.pdf); [validation](20261029-prime-fb-size-20bit/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Prime-field index calculus (`ic.pipeline`, oracle `mitm:negation_folded=1`): low-x factor-base size and exact oracle selected on train curves, decided per size on fresh holdout curves (backlog XP-20261016, frozen protocol; 48 targets \u00d7 2 rounds; incumbent `ic-pair`, A/A arms and a same-session negation-map rho on the same targets); deterministic counted cost S = GAE/\u221ar with native work priced at w = 0, 0.1, 1",
+   "headline": "20 bits: N 32 \u2192 45 gives paired S ratio 0.818 [0.773, 0.866] / 0.798 [0.752, 0.847] / 0.726 [0.677, 0.778] at w = 0 / 0.1 / 1 (96 pairs, all verified; A/A 1.000); distance to rho 9.47 \u2192 7.75 (w = 0), 12.88 \u2192 9.35 (w = 1). 24 and 28 bits: a smaller N falls at w = 0 and rises at w = 1, read as relabelling; 32 bits: selection = incumbent. Counted unit only, one holdout curve per size; validation is a same-host replay, and the second-host replay PROTOCOL \u00a713 needs before a leaderboard promotion is outstanding",
+   "host": "4 vCPU Xeon 2.10 GHz cloud container, one core pinned (L0); deterministic counts"
+  },
+  {
+   "date": "2026-10-28",
+   "entry": "20261028-d4-char2-frob-roots",
+   "entry_cell": "[`20261028-d4-char2-frob-roots`](20261028-d4-char2-frob-roots/) ([PDF](20261028-d4-char2-frob-roots/REPORT.pdf); [validation](20261028-d4-char2-frob-roots/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Char-2 D\u2084 index calculus (`ic.binary_d4`) with Frobenius-semilinear root finding (`BinOptions.frob_roots`, default off) against the unmodified oracle and an A/A copy, on ordinary binary curves over F(2^48) (m = 12, 3 targets) and F(2^56) (m = 14, 1 target), with a same-session negation-map rho on the same targets; deterministic counted cost S = GAE/\u221ar",
+   "headline": "paired S ratio lever/base 0.8543 (m = 12, all three targets) and 0.8154 (m = 14, one target, just below its pre-registered [0.82, 0.95]); A/A 1.0000. Counted F_q multiplications only: the eigen step's XOR and table-lookup work is emitted by neither IC arm, so IC S is a lower bound and whether the gain survives pricing it is unverified. Counted unit only: oracle wall time about 3% in one in-process comparison, so no wall-clock claim. IC/rho at m = 14: 4.27 \u2192 3.48 (w = 0), 2.13 \u2192 1.74 (w = 1); rho cheaper at every weight on every target. Validated with caveats (same-host same-binary replay)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU KVM cloud VM, L0 shared"
+  },
+  {
+   "date": "2026-10-27",
+   "entry": "20261027-postgb-linear-stage",
+   "entry_cell": "[`20261027-postgb-linear-stage`](20261027-postgb-linear-stage/) ([PDF](20261027-postgb-linear-stage/REPORT.pdf); [validation](20261027-postgb-linear-stage/VALIDATION.json))",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Linear stage after F4, end to end (monic grevlex basis \u2192 every checked F_p point), on 253 Gr\u00f6bner bases in five families: jv-nagao, gaudry-s4, gaudry-d4, gaudry-s5 (\u03b4 = 4096) and a dense control (\u03b4 32\u20131024). New `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp\u2013Massey, gcd(f, x^p \u2212 x) roots, rational univariate read-out, AVX-512/AVX2) against the incumbent sparse FGLM and the dense stage. 7 interleaved rounds, single thread; counts re-measured with the fixed counter (amendment 3); `jv_cover` DLP with each stage beside a same-process negation-map rho",
+   "headline": "sparse \u00f7 fast wall time 7.60 [7.43, 7.78] (jv-nagao), 7.13 (gaudry-s4), 17.8 (gaudry-d4), 45.5 (gaudry-s5), 20.0 (dense); all arms agree on all 253 systems; fast gave up on 1. Portable (no SIMD) 6.3\u201311.1\u00d7. Counted sparse \u00f7 fast 0.77\u20132.14 (P4's \u00b125% clause failed). In `jv_cover` the linear stage's wall time falls 4.8\u20137.2\u00d7 and counted S 0.6\u20131.8%; S over the negation-map rho 257\u20131310 (pooled 497 at w = 0, 64 at w = 1): rho cheaper at every weight. Validated (independent Rust replay, 18/18 logs checked dd\u00b7G = Q)",
+   "host": "Intel Xeon @ 2.80 GHz, 4 vCPU cloud VM (host B; host A reported separately), quiet-CPU wait, single thread"
+  },
+  {
+   "date": "2026-10-24",
+   "entry": "20261024-ic-m2-linear-ladder",
+   "entry_cell": "[`20261024-ic-m2-linear-ladder`](20261024-ic-m2-linear-ladder/) ([report PDF](20261024-ic-m2-linear-ladder/REPORT.pdf))",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "Algebraic index calculus (relations from the Weil descent of Semaev's S3, linear in (x1+x2, x1x2) over the factor base x \u2208 span{1..z^(d\u22121)}) on Koblitz curves n = 13, 17, 19, 19, 23, 23, 41 (cofactor \u2264 4), 52 one-target cold DLPs beside same-process strong rho",
+   "headline": "slope of log2(decomposition trials) per bit of n 0.647 [0.639, 0.655] (wall 0.717) against 1.079 for the F4 algebraic arm's solver XORs (like-for-like XOR slope 0.780\u20130.848); n = 41 solved in 424\u2013515 s per target, the largest algebraic solve here (F4 timed out at n = 31); distance to rho (wall) 4\u00d7 at n = 13, 169\u2013197\u00d7 at n = 23, 36,440\u00d7 at n = 41; \u00a75a: rho cheaper at 0, 0.1 and 1 GAE on every rung; every scalar verified (52/52 both arms), fresh-process replay verified, independent validator pass",
+   "host": "4-vCPU cloud container (Intel Xeon @ 2.8 GHz), L0 shared, one thread"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-strong-rho-batchinv",
+   "entry_cell": "[`20261022-strong-rho-batchinv`](20261022-strong-rho-batchinv/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "strong signed-Frobenius rho reference (`koblitz_rho_fixture \u2026 strong`), round 4: `Gf2::batch_inv_clmul` walks fixed-width `as_chunks::<4>()` arrays instead of zipped variable-length chunks; Callgrind instructions per walk step at n = 41, 53; native ns/step A/A + 5 A/B rounds at n = 53, 61; independent replay and validator report ([`VALIDATION.json`](20261022-strong-rho-batchinv/VALIDATION.json))",
+   "headline": "707.2 \u2192 679.7 instructions per step at n53 (\u22123.9%, 1.040\u00d7), 706.5 \u2192 679.0 at n41, outputs identical at n = 41, 53, 61 and every scalar independently verified; native **not established**: 1.117\u00d7 at n53 rests on baseline drift (other readings 1.039\u20131.058\u00d7, inside the 7.0% A/A spread) and an independent 16-round rerun read 0.989\u00d7; 1.076\u00d7 at n61 inside the 14.4% A/A spread; counted GAE identical at 0, 0.1 and 1 (no counted-unit order); IPC unavailable (no hardware PMU)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 32 runs contended"
+  },
+  {
+   "date": "2026-10-24",
+   "entry": "20261024-e31-chain-solve",
+   "entry_cell": "[`20261024-e31-chain-solve`](20261024-e31-chain-solve/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "E31: the `k = 4` `V\u2084`-line decomposition solve by its `P\u2082`-chains (solver A) and with sparsest pivots (B), beside E25's solver, selected by a flag; Stage A on the same 1,000 calls per curve and end to end on E25's ten GLS curves (`p = 101`\u2013`397`), both arms, every phase charged in `F_p` multiplications, matched `\u27e8\u00b1\u03c8\u27e9` walks; identical decompositions on all 10,000 calls per solver",
+   "headline": "per call A `2.62`\u2013`2.69\u00d7`, B `4.99`\u2013`5.32\u00d7` fewer `F_p` multiplications; end to end `S_E25/S_A` `2.50`\u2013`2.56` (0 GAE), `1.39`\u2013`1.43` (0.1), `1.034`\u2013`1.053` (1): A ahead of E25 across the band under the registered model; B ahead only at 0 GAE (`4.53`\u2013`4.76\u00d7`) once its pivot-selection pass is priced, rank unresolved across the band; best `S`/rho `4.42\u00b710\u00b3` (A) at 0 GAE, rho ahead at every weight; engineering (phase speed-up), errata in note \u00a79.24",
+   "host": "one shared 4-vCPU container, L0; operation counts only"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-cheon-ecbench",
+   "entry_cell": "[`20261022-cheon-ecbench`](20261022-cheon-ecbench/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "Cheon DLPwAI as registered ecbench methods (`cheon.pminus1_comb`, `cheon.pminus1_naive`, `cheon.pplus1_comb`) charged in `ecbench.gae` against `rho.negation`, with the static-DH oracle counted as a separate resource (queries and server work outside `total_gae`); 14 P-224-shaped curves of 32 to 56 bits, 8 planted targets each, 3 sessions, 320 runs; unpriced work at 0, 0.1 and 1 GAE and oracle queries at 0, 0.1, 1 GAE or server work",
+   "headline": "pooled paired charged-ops ratio to rho over 36 to 56 bits at w=0: 0.552 [0.455, 0.651] (n-1 comb), 0.279 [0.216, 0.419] (n+1 comb), 7.66 (naive); order unchanged across the 12-cell w x q band; sealed exponents Cheon comb 0.450 and 0.428 vs rho 0.496 and 0.513, intervals overlap (no exponent separation); oracle queries per run 29 to 4,031; DLPwAI only, not a plain-ECDLP or IC improvement",
+   "host": "4-core Xeon 2.1 GHz, shared host, L0 (operation counts only); 320/320 exact replays"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-ic-generator-orbit",
+   "entry_cell": "[`20261022-ic-generator-orbit`](20261022-ic-generator-orbit/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ecbench `ic.pipeline_full` on 7 Koblitz curves (n13\u2013n37, per-curve columns of the 2026-10-14 protocol): the lazy orbit IC baseline (#2158) against the orbit-layout pair table (`mitm-frobenius-layout-counted`) and the generator-orbit base with the generator stride (`generator_orbit=1`, `stride-generator`), with `rho-frob`, `rho-strong` and an A/A; 5,760 records, all verified, 4,320 replays identical; validated (VALIDATION.json: independent replay certificate, validator report with 87/87 headlines, rho-frob reference with the \u00a75a band)",
+   "headline": "layout table 1.02\u20131.09\u00d7 cheaper on all 7 curves with identical relations (960/960 run pairs); net 1.26\u20133.20\u00d7 over the baseline on all 7, band order holding at w = 0, 0.1, 1; n29 (log\u2082 r 15.4, c = 1): IC below rho-frob at every band weight (S 0.546/0.611/1.196 vs 1.569; paired 0.366 [0.241, 0.523]), also under a like-for-like band, unresolved when every native unit operation is charged at w; at one column a Frobenius-folded BSGS beating rho-frob's set-up, not a scaling result (gap 1.15\u00d7 n31, 1.93\u00d7 n23, 3.89\u00d7 n37); n19 band not re-priced (no pinned calibration); engineering",
+   "host": "4 vCPU Xeon VM, `ecbench run --cpus none` (L0); counts only"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-kummer-paired-replay",
+   "entry_cell": "[`20261022-kummer-paired-replay`](20261022-kummer-paired-replay/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "uncached differential Kummer collector versus same-process negation rho on 21 models \u00d7 60 public targets; 1,260 source-verified solves per arm, 36 pooled price cells, and an isolated byte-identical validation replay",
+   "headline": "modeled full-cold candidate/rho cost is 8.959687\u201355.935424\u00d7 across the 36 cells, with 0 wins; at `M+0.5S+10I` and 0.1 GAE/native logical operation it is 14.356662\u00d7. The fresh 24:50.16 elapsed time is validation telemetry on a shared host, not a wall-speed comparison.",
+   "host": "Intel Xeon 6975P-C, 32 visible CPUs, L0 shared host; modeled GAE costs"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-projective-law",
+   "entry_cell": "[`20261022-projective-law`](20261022-projective-law/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "complete projective genus-2 law, normalized wrapper and retained weighted-state collectors; 21 models \u00d7 60 targets = 1,260 source-verified candidate and matched negation-rho solves per arm; 576 independently recomputed arm/slice/price cells",
+   "headline": "at `M+0.5S+10I`, 0.1 GAE/logical operation: wrapper/rho 3.793783, retained-state/rho 4.179297, retained-state/wrapper 1.101617; direct 36-cell state/wrapper range 0.546762\u20131.303720 (12 lower, 24 higher); neither arm below rho in a pooled price cell, while retained state is below rho in 3/36 cells at 16 bits and 2/36 at 20 bits. Wrapper/external affine-law collector 1.549223; retained state/external 1.706651. External fastest-tool wall comparison: not run; no wall-speed claim.",
+   "host": "Linux x86_64 shared host; counted cold GAE, L0 concurrent wall diagnostic only"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-pencil-degree-peeling",
+   "entry_cell": "[`20261022-pencil-degree-peeling`](20261022-pencil-degree-peeling/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "exact point-driven pencil elimination with degree peeling against original online elimination and same-process negation rho: nine pilot curves \u00d7 60 paired targets, plus one separately replayed p=48,383 target and two other 28-bit first-target online solves; failed 32-bit coefficient-cap attempts retained; 543 distinct source targets solved, 717 of the original 1,260 remain open",
+   "headline": "representative cold `M+0.5S+10I`, 0.1 GAE/logical operation: nine-slice peel/online 0.269806\u20130.898244 and peel/rho 11.615357\u20131,204.654657; each curve has 24/36 cells below online, 12/36 above, 0/36 below rho. Single p=48,383 target: peel/online 0.233555, peel/rho 22,644.843832; not a curve mean. External fastest-tool wall comparison: not run; no wall-speed claim.",
+   "host": "Linux x86_64 shared host; counted cold GAE, L0 concurrent wall diagnostic only"
+  },
+  {
+   "date": "2026-10-21",
+   "entry": "20261021-four-followups",
+   "entry_cell": "[`20261021-four-followups`](20261021-four-followups/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "five frozen factor-base/jump arms on 21 genus-2 transfer models \u00d7 60 targets each (6,300 candidate and 6,300 rho solves source-verified, 35/35 byte replays); point-driven sparse-pencil pilot on nine models \u00d7 60 targets (540 candidate/rho pairs source-verified and non-wall replayed), plus one separately replayed 28-bit target (541 distinct pairs total); published projective-law branch checks, 21 exact Kummer ambiguity witnesses and 21 rational two-torsion factorizations",
+   "headline": "at `M+0.5S+10I`, 0.1 GAE/native operation: full-base 8/16/32-jump arms cost 2.447173/2.448830/2.453278\u00d7 rho; half/quarter-base arms cost 3.017732/3.919193\u00d7 rho. Eight jumps cost 0.999323\u00d7 the 16-jump external arm pooled, cheaper in 15/36 cells. The nine pencil models cost 12.931178, 28.666756, 31.080921, 246.117110, 267.374941, 332.187349, 4331.361006, 3856.238613 and 4250.094923\u00d7 rho in ascending p. Law branch samples matched Cantor in 13,608 1+1, 12,096 1+2 and 6,551 2+2 cases; full law cohort, full pencil cohort and differential Kummer walk remain open. The independently replayed one-target 28-bit pencil probe is 96,957.132823\u00d7 rho and not a curve-cohort estimate.",
+   "host": "Intel Xeon 6975P-C, 32 visible CPUs; L0 concurrent host; operation-count prices, no qualified wall-speed claim"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-isogeny-volcano-cost-v2",
+   "entry_cell": "[`20261017-isogeny-volcano-cost-v2`](20261017-isogeny-volcano-cost-v2/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Pre-registered ecbench study (PROTOCOL v2/v2.1): rho.negation, bsgs.negation and ic.pipeline (32 smallest abscissae, MITM) on every curve of 28 ordinary 24-bit depth-3 split-crater volcanoes (14 with \u2113 = 2, 14 with \u2113 = 3; 7,760 curve-models, crater curves \u00d7 16 isomorphic models, isogeny-transported instance, planted_shared targets); 154,160 measured runs, all verified, 1,344/1,344 audit replays exact",
+   "headline": "\u2113 = 2 IC relation yield floor/crater 0.942 [0.928, 0.956] (95%), one-sided p = 0.0001: the v1 lead is confirmed (v2, 8 classes: 0.932). \u2113 = 3 yield 1.006 and rho 1.004, both equal within \u00b15% (90% CI). Coordinate effect replicated (\u03c4 7.2% between models > 1.9% between same-level curves). The \u2113 = 3 structure-change class shows no deficit (1.025), so torsion structure does not explain it. Rho below IC on all 7,760 curve-models at every \u00a75a weight (IC/rho 17\u2013170\u00d7 at w = 0). Controls: planted IC 1.062 (pred. 1.063), BSGS exact, power plants detected",
+   "host": "Intel Xeon @ 2.80 GHz, 4 vCPU shared VM, L0, counted units only"
+  },
+  {
+   "date": "2026-10-20",
+   "entry": "20261020-ic-planner-validation",
+   "entry_cell": "[`20261020-ic-planner-validation`](20261020-ic-planner-validation/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "the `ic plan` / `ic bench --auto` planner (`ic-planner/1`) on prime curves outside its evidence: ecbench `ic.pipeline` plan (`prime-abscissa` at `#E^{1/3}/2`, `mitm-prime-blocked:m=2`, `incremental-gauss`, `walk`) against one-change alternatives (half and double base, `rootfind-subtract`, full-rank stop, random targets) and an A/A, on registered `icv1-fp24-tm5099-a6f137c6`, `icv1-fp26-tm1775-7e8fb6df`, `icv1-fp28-t28201-65099091` (primary) and three unregistered `prime_search` curves (supplementary); 1,152 measured runs + 384 warmups, all verified, audits OK (72 exact replays)",
+   "headline": "at w = 0 the plan beats every alternative on all six curves (half base 1.36\u20131.56\u00d7, double 1.49\u20131.60\u00d7, rootfind 150\u2013637\u00d7, full rank 3.30\u20134.81\u00d7, random targets 41.5\u201358.7\u00d7); at w = 1 the doubled base is 2\u20139% cheaper (size rule not separated across the \u00a75a band); predicted gap to rho within 18% of measured (12.6\u201325.8\u00d7); engineering (tooling validation)",
+   "host": "4 vCPU Xeon 2.80 GHz VM, `ecbench run --cpus auto`; counts only"
+  },
+  {
+   "date": "2026-10-20",
+   "entry": "20261020-jv-sieve-strong-rho",
+   "entry_cell": "[`20261020-jv-sieve-strong-rho`](20261020-jv-sieve-strong-rho/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Retained weak-class IC/rho measurements, 444 rows; original summary replayed exactly",
+   "headline": "**Comparison withheld:** control acceptance unspecified, original hash charges incomplete, interrupted-attempt costs unavailable. Original PDF/figures preserved; [review qualification](../research/jv_sieve_strong_rho_20261019/review-20261020/README.md)",
+   "host": "Original shared cloud host; review is replay only"
+  },
+  {
+   "date": "2026-10-19",
+   "entry": "20261019-s5-plain-c4-options",
+   "entry_cell": "[`20261019-s5-plain-c4-options`](20261019-s5-plain-c4-options/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "Plain `S\u2085` decomposition solve over `F_{269\u2074}` (\u00a711.17 curve and residuals, 13 paired residuals, rotated arm order): committed Macaulay solver vs #1792's sparsest pivots, chain eigen step and shape replay; counted `F_p` multiplications, every solve equal to the meet-in-the-middle oracle",
+   "headline": "`C\u2084` 1.209\u00b710\u00b9\u00b2 \u2192 1.675\u00b710\u00b9\u00b9 with sparsest + chains (7.22\u00d7, paired 7.12\u20137.39) \u2192 **8.69\u00b710\u00b9\u2070** with replay as well (**13.90\u00d7** ratio of means, 12 replayed residuals, 1 fallback charged); sparsest alone 3.93\u00d7 (n = 4); `cost.rs` `C\u2084` updated, no registry verdict changed (no `k = 4` rows); distance to the matched negation rho on the same curve: one decomposition \u2248 1.1\u00b710\u2075\u00d7 a whole one-target rho solve (7.7\u00b710\u2075 `F_p` mult.), order held across the \u00a75a band; validated (replay 91/91 identical, validator 17/17)",
+   "host": "Apple M4 Pro, 14 cores, macOS, `RAYON_NUM_THREADS=4`, no isolation (load about 26; counts are contention-independent, wall descriptive)"
+  },
+  {
+   "date": "2026-10-19",
+   "entry": "20261019-ic-linalg-pipeline-sparse-cado",
+   "entry_cell": "[`20261019-ic-linalg-pipeline-sparse-cado`](20261019-ic-linalg-pipeline-sparse-cado/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ecbench `ic.pipeline` relation matrix, `linalg=sparse-cado` (CADO-style filter + block Wiedemann) vs `incremental-gauss-full-rank`, same factor base (`prime-abscissa:size=N`, N = 1,024 to 16,384), oracle (`mitm:negation_folded=1`) and relation stream, on registered `icv1-fp32-t7319-90da43e9` against `rho.negation`; 424 measured runs + 92 warmups (all 516 records verified), audits OK (30 exact replays)",
+   "headline": "S identical (ops ratio 1.0000 [1, 1] at every N; not ranked across the \u00a75a band); sparse-cado counts 1.50\u20131.53\u00d7 the dense `row_ops` but spends 0.72\u00d7 (N = 1,024) to 0.25\u00d7 (8,192) and 0.28\u00d7 (16,384) of its linear-algebra wall time (descriptive, L1); oracle",
+   "host": "F"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-k4-gls-v4",
+   "entry_cell": "[`20261018-k4-gls-v4`](20261018-k4-gls-v4/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "E25: the GLS endomorphism `\u03c8` (`\u03c8\u00b2 = \u22121`) on the `k = 4` `V\u2084` line over `F_{p\u2074}`: two arms on one GLS curve, one base, one target stream \u2014 A, the `V\u2084` fold (4 points a column), B, the `\u27e8V\u2084, \u03c8\u27e9` fold (8) \u2014 every phase charged in `F_p` multiplications, 16 `\u27e8\u00b1\u03c8\u27e9`, negation and unfolded walks per curve; 10 curves, `p = 101`\u2013`397`, `h = 16`; every logarithm and walk verified",
+   "headline": "`S_A / S_B` `1.35`\u2013`2.67` (median `1.86`); against the matched `\u27e8\u00b1\u03c8\u27e9` walk B gains `1.26`\u2013`1.97\u00d7` over A at `p \u2265 197`; `S_B / rho` `1.1\u00b710\u2074`\u2013`2.7\u00b710\u2075`; modelled handover `2^{93.2}` \u2192 `2^{88.0}` (engineering, a constant, this family only)",
+   "host": "one shared 4-vCPU container, L0; operation counts only"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-k4-v4-line",
+   "entry_cell": "[`20261018-k4-v4-line`](20261018-k4-v4-line/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "the `k = 4` index calculus over `F_{p\u2074}` end to end, every phase charged in `F_p` multiplications against 16 matched negation walks per curve: E19, the `\u03c4_T` line with the weighted `D\u2084` solve (10 curves, `p = 53`\u2013`269`), against E24, the full-2-torsion `V\u2084` line with `S\u2085` in the invariants of `V\u2084\u2074_0 \u22ca S\u2084` (weights 2,2,1,1, quotient 64, Macaulay degree 11; 12 curves, `p = 101`\u2013`521`); every logarithm verified",
+   "headline": "per call `C`: `1.41\u00b710\u2079` \u2192 `1.66\u00b710\u2076` `F_p` multiplications; end to end `S / rho`: E19 `2.6`\u2013`8.8\u00b710\u2076\u00d7`, E24 `1.3\u00b710\u2074`\u2013`1.7\u00b710\u2075\u00d7` \u2014 `35`\u2013`240\u00d7` lower at every matched `p`; slope `n^{\u22120.25}`; modelled handover `2^{116.7}` \u2192 `2^{90.1}` (extrapolated) \u2014 engineering, a constant; still `\u2265 1.3\u00b710\u2074\u00d7` slower than rho",
+   "host": "4 vCPU cloud container, shared, L0 (operation counts only)"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-blindspots-fp2-gaudry-k2",
+   "entry_cell": "[`20261018-blindspots-fp2-gaudry-k2`](20261018-blindspots-fp2-gaudry-k2/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Gaudry k = 2 index calculus on E(F_{p^2}), four index-calculus arms against matched rho, 24 to 40 bits, native work priced at 0, 0.1, 1 GAE; validated ([`VALIDATION.json`](20261018-blindspots-fp2-gaudry-k2/VALIDATION.json): sampled exact replay 282/945 rows, independent recompute, matched rho-neg in the same binary)",
+   "headline": "REGRESSES (constant). No arm below matched rho at any size or price; best arms ic-b and ic-c2 50x and 52x rho at 40 bits (w=0), 22x and 14x (w=1), ratio of mean cost over curves; ic-b and ic-c2 not ranked against each other across the \u00a75a band; exponent not separated from rho's. GLS rows against rho-neg are not against the strongest rho. No improvement claimed",
+   "host": "Shared 4-vCPU container, isolation L0, toy scale"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-blindspots-prime-m4-cells",
+   "entry_cell": "[`20261018-blindspots-prime-m4-cells`](20261018-blindspots-prime-m4-cells/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "First prime-field arity m = 4 cost cells, 16 to 28 bit primes: full IC (arm a) and own F4 (arm b) against matched rho; validated ([`VALIDATION.json`](20261018-blindspots-prime-m4-cells/VALIDATION.json): sampled exact replay, independent recompute, negation-map rho added in the same binary with arm (a) rows reproduced exactly)",
+   "headline": "REGRESSES (primitive): arm (a) full IC 8.2x to 29.5x the negation-map rho at w=0.1 (16 to 28 bits; 6.5x to 35.6x across w = 0, 0.1, 1), dearer than both negation-map and plain rho at every cell and price, 16 of 16 solves per cell; arm (b) cost grows as",
+   "host": "F"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-blindspots-genus3-la-exponent",
+   "entry_cell": "[`20261018-blindspots-genus3-la-exponent`](20261018-blindspots-genus3-la-exponent/)",
+   "validation_linked": true,
+   "pre_gate": false,
+   "measured": "Genus-3 linear-algebra exponent, five arms, counted operations at b = 16 to 20, 4 curves; whole IC against a matched negation-map rho in the same binary at b = 20; validated ([`VALIDATION.json`](20261018-blindspots-genus3-la-exponent/VALIDATION.json): replay of the recorded cells and 7 rho walks, independent recompute)",
+   "headline": "Phase: arm d LA cost ratio 0.9862 [0.9836, 0.9876] of arm a at b=20, the size of the A/A spread; LA exponent 1.3787 against 1.3846 (exponent rule MATCHES). Whole IC against matched rho: UNRESOLVED across the \u00a75a band, every arm below rho at w=0 (0.38x) and above it at w=0.1 (1.6x to 2.6x) and w=1 (3.7x to 6.5x), with mod-ell products priced as native work per the frozen protocol; the earlier \"IC below rho at every price\" used c_ell pricing and does not survive \u00a75a. No improvement over rho claimed",
+   "host": "Shared 4-vCPU container, isolation L0, toy scale"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-hec-rho-negation",
+   "entry_cell": "[`20261018-hec-rho-negation`](20261018-hec-rho-negation/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "DP Pollard rho on hyperelliptic Jacobians (genus 2/3/4, 18 instances, N 1321 to 16790591, 40 seeds each), walk on divisors vs on \u00b1-classes with look-ahead; counted group operations",
+   "headline": "folded/plain walk ops 0.67 to 0.89 at N \u2264 6\u00b710^4; median 0.968 at N \u2265 10^5 (registered R1, \u2264 0.80, falsified); plain S_walk 1.82 and 2.10 vs ideal 1.2533 at the two largest rows; every run verified",
+   "host": "4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-hec-rho-hash-mixing",
+   "entry_cell": "[`20261018-hec-rho-hash-mixing`](20261018-hec-rho-hash-mixing/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "DP Pollard rho on hyperelliptic Jacobians, same 18 instances and 40 seeds as round nine; four arms: plain and \u00b1-folded walks, each with the old divisor hash and with it passed through SplitMix64's finaliser; counted group operations",
+   "headline": "mixed plain S_walk median 1.406 at N \u2265 10^5, two largest rows 2.240 and 1.696 (registered H1, \u2264 1.55, falsified); mixed fold/plain median 0.960 (H2, \u2264 0.80, falsified); small-N control difference 0.023 (H3 holds); every run verified",
+   "host": "4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)"
+  },
+  {
+   "date": "2026-10-19",
+   "entry": "20261019-hec-rho-branch-width",
+   "entry_cell": "[`20261019-hec-rho-branch-width`](20261019-hec-rho-branch-width/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "DP Pollard rho on hyperelliptic Jacobians and on Z/N (same walk), same 18 instances and 40 seeds as rounds nine to eleven; 8-bit vs full-width branch coefficients; counted group operations",
+   "headline": "full-width Jacobian S_walk median 1.390 at N \u2265 10^5 (registered W2 holds), largest row 2.100 \u2192 1.481 (8-bit/full 1.418); integer model 1.303 (W1 holds); small-N control moves 0.025 (W3 holds); every run verified. Accounting correction against IC: the 8-bit reference was slow at large N",
+   "host": "4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent)"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-k-conversion",
+   "entry_cell": "[`20261018-k-conversion`](20261018-k-conversion/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "K = Ir per Macaulay column touch (dense degree-3 MutantXL closure, m = 4 cells N = 36 to 44 and m = 3 N = 34) over Ir per signed-Frobenius strong-rho walk step (n = 83 and n = 61), Callgrind, one binary",
+   "headline": "K (rho steps per column) pooled m = 4 median 4.48 [3.96, 16.77]; 83 at 17,902 columns (degree 4, N = 26); derived conversion only: +7.62 and +10.32 bit rows become +9.78 and +12.48 at median K (accounting, not an improvement); n = 131 rho step not measurable",
+   "host": "4 vCPU Xeon 2.10 GHz shared VM, no PMU, no isolation tier (Ir is contention-independent)"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-perf-history-factor-bases",
+   "entry_cell": "[`20261017-perf-history-factor-bases`](20261017-perf-history-factor-bases/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "callgrind solve `Ir` of 11 frozen `ic_factor_base` children (rho references and index calculus with 9 factor bases over Koblitz a = 1 n = 17, a 20-bit generic prime curve and a j = 0 prime curve) at `ca00c151`, rendered with the 75-snapshot perf history",
+   "headline": "Index calculus at 28.1\u201334.6 M `Ir` against rho at 0.22\u20130.84 M on the same curves (38\u2013159\u00d7 above rho); on j = 0 the order-6 GLV base has 3\u00d7 the signed points of the negation base at 32 columns and costs 4 % more `Ir`; tooling entry, no speedup claimed",
+   "host": "Managed Linux x86_64 container, callgrind, not the CI runner"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-photo-volcano-restart",
+   "entry_cell": "[`20261017-photo-volcano-restart`](20261017-photo-volcano-restart/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Fresh 46-curve, five-level photographed 2-volcano: 100 paired ECDLP cases per curve; rho and BSGS stage counters/time; actual IC GB diagnostics",
+   "headline": "Snapshot 14:50 UTC: rho 4600/4600 verified, BSGS 3297/4600; rho curve-mean count range 107895789.39\u2013134494184.67 group operations (descriptive max/min 1.246519); IC 4600 target GB probes each 217410 field multiplications, elapsed 11.519667\u2013266.013969 ms; zero full IC recoveries; no speedup/hardness claim",
+   "host": "Intel Xeon Platinum 8573C, four-CPU cgroup, 16 GiB, CPU-only L0 concurrent"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-weil-descent-round4-genus2-ic",
+   "entry_cell": "[`20261018-weil-descent-round4-genus2-ic`](20261018-weil-descent-round4-genus2-ic/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ECDLP on E/F_{p\u00b2} through genus-2 Jacobians over F_p (Addendum H): H1 cofactor law (Scholten family, h = 4\u2026128, log2 #E 32\u201340, 2,800 runs); H2 general E~E^\u03c3 gluing incl. prime-order E (h = 1), log2 #E 28\u201340, 640 runs, reduced sextic-model formulas; H4 memory-capped IC; H6 44\u201348 bits (180 runs); counted F_p M / I / native ops over the \u00a75a pricing band (native at 0, 0.1, 1 GAE), Legendre split test at one I",
+   "headline": "all 3,860 answers verified; validated (VAL-20261024-wd4: nonce-drawn exact replay of all 3,860 rows, independent k\u00b7P = Q verifier, 105 headlines recomputed); H1: IC trials \u221d h^-0.402 (95% [0.380, 0.424]) vs rho h^-0.468 \u2192 no large-cofactor win; H2 (h = 1): IC 0.43\u20130.44\u00b7p Jacobian ops vs rho 0.78\u20130.96\u00b7p, per op 41M+I vs 12M+I, band 0.59\u20132.04 with native work in GAE (Erratum V) **unresolved** at 28\u201340 bits (\u22481.8\u00d7 rho at measured cost, I = 3M, split test included); h = 4: rho cheaper in every cell at 36\u201340 bits; H4: memory-capped IC reverts to rho; H6: constants hold at 44\u201348 bits",
+   "host": "counted units only; RunPod CPU pods (AMD EPYC 4564P, 16 vCPU) and a 4-vCPU cloud container, L0"
+  },
+  {
+   "date": "2026-10-18",
+   "entry": "20261018-weil-descent-n2-routes",
+   "entry_cell": "[`20261018-weil-descent-n2-routes`](20261018-weil-descent-n2-routes/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ECDLP on Scholten-type `E/F_{p\u00b2}` (`Jac(C) ~ Res E`, C genus 2 over F_p), `log2 #E` 20\u201340, 3 instances \u00d7 10 targets per size: rho (negation map, r = 64, DP trails, fruitless-cycle escape) vs genus-2 first-cycle double-large-prime IC after the transfer \u03c4 (Arm J) vs Weil-descended summation-polynomial decomposition (Arm D), c = 1, 2, 4; counted F_p M / I / native ops priced over {I = 3M, 2\u00b7log2 p M} \u00d7 {Jacobian op measured, = one E(F_{p\u00b2}) add} \u00d7 {native 0, 0.1, 1 GAE}",
+   "headline": "1,260/1,260 answers verified; validated (VAL-20261024-wd3: nonce-drawn exact replay of all 1,368 rows incl. the control, independent k\u00b7P = Q verifier, 62 headlines recomputed); rho steps/p matches 0.886\u00b7\u221a\u2113/p (K6); Arm J \u2248 0.27\u20130.37\u00b7p Jacobian ops (independent-trial control agrees) vs rho 0.31\u20130.44\u00b7p; per op 41M+I vs 12M+I; Arm J/rho band 0.51\u20132.98 with native work in GAE (Erratum V), **unresolved** at every size (rho cheaper in 10/12 cells at 40 bits, 2.8\u00d7 at measured cost, I = 3M); Arm D 2.7\u201366\u00d7 rho, rho cheaper in every cell",
+   "host": "counted units only (host-independent); 4 vCPU cloud container, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-ic-rule-v7",
+   "entry_cell": "[`20261016-ic-rule-v7`](20261016-ic-rule-v7/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ledger \u00a723's single-target comparison at baseline v7 (v6 + R11's streamed build): the index calculus against Pollard rho on the same unseen public point, six sizes 2^36.6\u20132^47.2, 64 targets and 4 A/A repeats a size, 408 rows, each checked and read against \u00a723, rule v6 and rule v3; v7's own strong rho as the reference check",
+   "headline": "**rho's cold lead narrower again**: 3.43\u201311.51\u00d7 (rule v6: 3.78\u201312.06\u00d7; rule v3: 5.23\u201320.97\u00d7), 7.03 / 6.37 / 11.51\u00d7 at 2^44.3 / 2^44.5 / 2^47.2; online the index calculus is 14.1\u201337.0\u00d7 faster; 408/408 checked, every logarithm \u00a723's, reference admissible (rho 0.57\u20130.78\u00d7 the strong walk a step); both arms timed in one process, so the \u00a75a band gives one figure \u2014 accounting",
+   "host": "Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-ic-rule-v6",
+   "entry_cell": "[`20261016-ic-rule-v6`](20261016-ic-rule-v6/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ledger \u00a723's single-target comparison at baseline v6 (v4 + R06 + R08): the index calculus against Pollard rho on the same unseen public point, six sizes 2^36.6\u20132^47.2, 64 targets and 4 A/A repeats a size, 408 rows, each checked and read against \u00a723 and rule v3; v6's own strong rho as the reference check",
+   "headline": "**distance to rho about 40% smaller**: cold, rho still faster at every size, 3.78\u201312.06\u00d7 (rule v3: 5.23\u201320.97\u00d7), 7.90 / 7.40 / 12.06\u00d7 at 2^44.3 / 2^44.5 / 2^47.2; online the index calculus is 14.2\u201336.4\u00d7 faster; 408/408 checked, every logarithm \u00a723's, reference admissible (rho 0.70\u20130.85\u00d7 the strong walk a step); both arms timed in one process, so the \u00a75a band (0 / 0.1 / 1 GAE) gives one figure \u2014 accounting",
+   "host": "Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate)"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-volcano-repaired-2935",
+   "entry_cell": "[`20261017-volcano-repaired-2935`](20261017-volcano-repaired-2935/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Repaired bounded survey checkpoint",
+   "headline": "2,935 vertices, all 51 strata; 46,960 records: 30,270 verified, 14,626 exhausted, 2,064 timeout. 1,530,557 relations / 71,296,000 actual calls. One interrupted attempt excluded and retained. No admitted runtime or external fastest claim.",
+   "host": "Frozen release runner; native capsule host observations; raw wall unqualified"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-rootfinding-native-cycles",
+   "entry_cell": "[`20261017-rootfinding-native-cycles`](20261017-rootfinding-native-cycles/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Native exact finite-field component controls, predicate-stage diagnostics, actual GF(2^83) norm search and affine-cone profile",
+   "headline": "60 s hard search inconclusive, 0 verified models and no exact count; 66 odd-field extraction controls across11 fields; 16,133 formal cone variables and2,879 parity rows, not measured speedup; no qualified end-to-end gain",
+   "host": "Managed Linux x86_64; recorded one-core/4GiB budgets, no qualified isolation"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-volcano-C-finite-field",
+   "entry_cell": "[`20261017-volcano-C-finite-field`](20261017-volcano-C-finite-field/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Original C k=1 reduced Tate and projected-prime subgroup relations; r=7",
+   "headline": "3,738/3,738 prefix targets verified; 15,042 equations / 9,171 queries; exact re-execution. Local labels: 517 vertices / 24 strata, conductor 2,985,984\u2013967,458,816; 1,352 unknown. End-to-end ns min/mean/max 121,110 / 211,175.290 / 3,620,010, n=3,738, unqualified. No external speed claim.",
+   "host": "Xeon Platinum 8573C, four-CPU quota, release code; unqualified wall observations"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-volcano-repaired-qa",
+   "entry_cell": "[`20261017-volcano-repaired-qa`](20261017-volcano-repaired-qa/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Watchdog recording repair, new control and three-root pilot",
+   "headline": "60 attempts: 40 verified, 18 exhausted, 2 timeout. Exact baseline completed pairs 58; censored pairs 2. No runtime improvement or external fastest claim.",
+   "host": "Xeon Platinum 8573C, four-CPU quota, release; raw wall unqualified"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-volcano-ic-release-stopped",
+   "entry_cell": "[`20261017-volcano-ic-release-stopped`](20261017-volcano-ic-release-stopped/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Separate release survey, stopped on failed audit",
+   "headline": "70 audited vertices, all 51 strata; 1,120 accepted attempts (810 verified, 280 exhausted, 30 timeouts); one failed 16-record capsule excluded and preserved. 42,746 relations / 1,383,570 actual calls. No admitted runtime comparison or external speed claim.",
+   "host": "Xeon Platinum 8573C, Linux x86-64, 4 CPU quota; release build, unqualified wall observations"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-volcano-ic-campaign",
+   "entry_cell": "[`20261017-volcano-ic-campaign`](20261017-volcano-ic-campaign/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Checked projected-subgroup IC, MITM/subtraction, matched rho/BSGS, two public targets and explicit failures",
+   "headline": "Dev survey: 99 vertices, all 51 strata; 1,584 attempts, 1,065 verified, 422 exhausted, 97 timeouts. 57,176 relations / 2,223,204 source trials / 2,075,145 actual oracle calls. Release gates: 56 exact completed comparisons, four censored. Not all vertices. External comparison: not run; no runtime speedup claim.",
+   "host": "Xeon Platinum 8573C, Linux x86-64, 4 CPU quota, L0/debug counts; raw wall unqualified"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-generic-dlp-memory-parallelism",
+   "entry_cell": "[`20261017-generic-dlp-memory-parallelism`](20261017-generic-dlp-memory-parallelism/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`bsgs_fast` table-slot prefetch (kernels hint each visited x a round ahead) and `prime_fast` Jacobian `mul` / Straus\u2013Shamir `combine` (rho start-up), main `b1bf5b893` vs `c699775dd` with an A/A arm, one target per process, 7 rotated rounds (5 at 52 bits): BSGS chain and paired (K = 16) full group at 40\u201352 bits (1 thread) and 48 bits (3 threads), `rho_parallel` at 32\u201352 bits (1 and 3 threads); PARI/GP 2.15.4 `elllog` on the same curves and targets",
+   "headline": "counted outputs identical in every configuration (answers, steps, table entries, DPs; 120 field-operation rows); BSGS one-target `total_s` baseline/candidate 1.30\u20131.44\u00d7 chain and 1.74\u20131.98\u00d7 paired at 44\u201352 bits (verdict improves), 40 bits within noise; rho `solve_s` 5.84\u00d7 at 32, 3.75\u00d7 at 36, 1.82\u00d7 at 40, 1.14\u00d7 at 48 bits (1 thread), 44 and 52 bits within noise; start-up alone 6.8\u201316.1\u00d7; vs PARI/GP `elllog` (same targets, 1 thread): candidate/PARI 0.020\u20130.167, baseline/PARI 0.022\u20130.974",
+   "host": "Intel Xeon @ 2.10 GHz (Sapphire/Emerald Rapids class), 4 vCPU KVM, isolated_bench on CPU 3 (CPUs 1\u20133 for 3 threads), L0; 26/438 runs contended, left out"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-generic-dlp-correctness",
+   "entry_cell": "[`20261017-generic-dlp-correctness`](20261017-generic-dlp-correctness/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "generic-DLP correctness fixes, deterministic counts before (`main` `b1bf5b893`) and after: `pollard_collab` negation-map 2-cycle escape (512/512/256 walkers on `demo-small`, `demo-mid`, `demo-32`, with and without the negation map); Pohlig\u2013Hellman digits by baby-step giant-step with one `\u2308\u221aq\u2309` table per prime (24 targets \u00d7 bounds 2^14, 2^17 on the 47-bit `y\u00b2 = x\u00b3 + 4` curve of order `3\u00b719\u2074\u00b7151\u00b7181\u00b713171`)",
+   "headline": "collab dead trails with the negation map 50 \u2192 1, 106 \u2192 0, 197 \u2192 15, every DP record verifies, no-negation arm identical; Pohlig\u2013Hellman `total_steps` 284,364 \u2192 10,682 (26.62\u00d7, 1.85\u201346.53\u00d7 per solve), all 48 answers correct and identical; nothing timed",
+   "host": "counts, host-independent; rustc 1.97.0 release"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-isogeny-volcano-cost",
+   "entry_cell": "[`20261017-isogeny-volcano-cost`](20261017-isogeny-volcano-cost/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Pre-registered ecbench study (PROTOCOL v1/v1.1): rho.negation, bsgs.negation and ic.pipeline (32 smallest abscissae, MITM) on every curve of 6 ordinary 24-bit volcanoes (\u2113 = 2, 3; ramified/split/inert craters; 200 curves \u00d7 4 isomorphic models, isogeny-transported instance, planted_shared targets) plus j = 0 / 1728 controls; 46,912 measured runs, all verified, 408/408 replays exact",
+   "headline": "BSGS identical on every curve and model. Rho: floor/crater 1.022 [0.983, 1.062] (90%), no horizontal or coordinate effect (\u03c4 inside null). IC yield: floor/crater 0.980 [0.957, 1.004], inconclusive (planted +5% control missed); between isomorphic models \u03c4 = 4.7% (p = 0.0005) > between same-level curves \u03c4 = 2.2%: a coordinate effect. Exploratory: \u2113 = 2 floors \u2248 \u22126.5% yield (cyclic 2-part). Rho below IC on all 800 curves at every \u00a75a weight (IC \u2248 30\u201360\u00d7 rho). Controls: IC base+1 1.061 (pred. 1.063), rho.cubic 0.70, rho.quartic 0.71",
+   "host": "Intel Xeon @ 2.80 GHz, 4 vCPU shared VM, L0, counted units only"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-isogeny-volcano-rho",
+   "entry_cell": "[`20261016-isogeny-volcano-rho`](20261016-isogeny-volcano-rho/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`volcano-rho`: one ECDLP instance (40-bit p, n = 272748451513) carried by explicit, verified V\u00e9lu 3-isogenies to every level of a depth-3 3-volcano (curve A: 80 curves, 2 crater / 6 / 18 / 54 floor; curve B: split crater); single-walker DP Pollard rho (32-adding, no negation), 100 paired-seed solves on each of 29 curves + 3 isomorphic controls, group additions and wall time",
+   "headline": "no level effect: pooled mean iterations L0 700,483 \u00b1 47,849, L1 681,766 \u00b1 26,525, L2 637,158 \u00b1 20,410, floor 659,589 \u00b1 20,993, all 659,263 \u00b1 12,422 (min 8,477, max 2,099,707) vs \u221a(\u03c0n/2) = 654,547; control 674,042 \u00b1 40,816; per-curve means 572,846\u2013733,141; 641\u2013661 ns/op on every curve; 3,200/3,200 solves correct. Curve B (`--crater split`, p = 714095314843, prime order, 41 curves, 4,400 solves): L0\u2013L3 1,091,654 / 1,090,391 / 1,081,516 / 1,099,508 (each \u00b1 ~35,000), all 1,090,981 \u00b1 17,380 vs \u221a(\u03c0n/2) = 1,059,102 (r = 32 walk heuristic \u00d71.016 = 1,076,000); control 1,097,651 \u00b1 60,787. Curve C (\u2113 = 2, `--bits 48`, p \u2261 1 mod 8, the whole depth-3 2-volcano: 30 curves, 2/4/8/16, all measured, 3,300 solves): L0\u2013L3 519,550 / 513,250 / 486,931 / 496,402 (\u00b1 39,163 / 26,834 / 18,140 / 12,454), all 497,666 \u00b1 9,336 vs \u221a(\u03c0n/2) = 490,158; control 478,319 \u00b1 28,790. Single-solve spread matches the birthday model (sd/mean 0.52 on all three curves). Pull-back control (`--walk pullback`, curve C, 33 arms \u00d7 20 seeds): 20/20 seeds took exactly the same number of steps on every curve; cost per step 6.4\u20137.6 \u00b5s vs 0.76 \u00b5s native. Curve D (j = 0 crater, D_K = \u22123, whole depth-5 2-volcano, 32 curves, `ca volcano --automorphisms`, 14,400 solves): plain negation-map rho flat at 140,242 \u00b1 1,053 ops on every level; the order-6-automorphism-folded rho on the crater 74,024 \u00b1 3,560, i.e. 1.89 \u00b1 0.09\u00d7 fewer ops (\u221a3 = 1.73 predicted; both arms above their ideals by 1.23\u00d7 / 1.13\u00d7), 1.33\u00d7 in wall time. Curve E (j = 1728 crater, D_K = \u22124, whole depth-5 2-volcano, 32 curves, 14,400 solves): plain flat at 1,339,300 \u00b1 11,010 ops; the order-4-folded rho on the crater 1,018,110 \u00b1 47,342, i.e. 1.32 \u00b1 0.06\u00d7 fewer ops (\u221a2 = 1.41 predicted and excluded), but 0.44\u00d7 (2.3\u00d7 slower) in wall time: ca folds j = 1728 with the generic `glv_rho_solve` (174 vs 57 ns/op), not a tuned covariant walk. Instance study (`--instance-study`, curve C root, 5 arms \u00d7 1,000 solves): redrawing k, the generator, all three, or k \u2264 2^16 against walk-seed-only 487,658 \u00b1 16,110: means 480,254 / 492,522 / 496,427 / 487,206 (each \u00b1 ~16,000), every",
+   "host": "z"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-eigen-seta-pk-degree-test",
+   "entry_cell": "[`20261017-eigen-seta-pk-degree-test`](20261017-eigen-seta-pk-degree-test/) ([run PDF](20261017-eigen-seta-pk-degree-test/RUN.pdf), [results PDF](20261017-eigen-seta-pk-degree-test/REPORT.pdf))",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Eigen-S\u00e9ta attacker oracle: testing a candidate secret degree f from the public key alone (`eigenx` `pk_degree_test`, Kani chain of length e on E_A \u00d7 E_A) against one full decapsulation (chain of length E), L1/L3/L5, one key each, interleaved",
+   "headline": "chain e/E = 569/1076, 832/1594, 1087/2106; time median 0.79 vs 1.28 s (L1, n=7), 2.72 vs 5.54 s (L3, n=3), 6.84 vs 13.34 s (L5, n=3); 158 wrong candidates, 0 accepted; attack-cost accounting, not a KEM speedup; no external implementation of this computation exists to compare against",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU shared VM, unpinned, L0"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-gpu-nist-jac-seed",
+   "entry_cell": "[`20261017-gpu-nist-jac-seed`](20261017-gpu-nist-jac-seed/) ([report](20261017-gpu-nist-jac-seed/REPORT.md), [graph](20261017-gpu-nist-jac-seed/seeding.svg))",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`gpu/nist` rho walk-seeding / jump-table build (`EcCurve::double_scalar_mul`) switched from affine double-and-add to the inversion-free a=-3 Jacobian ladder (`n_double`/`n_madd`) with one final `to_affine`; `jmadd` dispatches the equal/inverse cases so the result is bit-identical when Q is a multiple of G (the walk's case, ~2% of seeds)",
+   "headline": "P-256 seeding 0.66 vs 11.53 ms/seed, 17.4x; field inversions per seed ~750 -> 1 (P-384 ~1150 -> 1, test-verified, not timed); 0 mismatches vs the affine ladder over 3000 random dependent seeds; setup-only (reseeds are rare vs walk steps)",
+   "host": "op-count reduction, wall-clock corroboration; 4 vCPU cloud VM, L0, no isolation/PMU"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-n83-e2e-precision",
+   "entry_cell": "[`20261017-n83-e2e-precision`](20261017-n83-e2e-precision/) ([run PDF](20261017-n83-e2e-precision/RUN.pdf), [results PDF](20261017-n83-e2e-precision/RESULT.pdf), [graph PDF](20261017-n83-e2e-precision/precision.pdf))",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "N83 K1104/root11 versus K1120/root11, 16 sealed public points, 64 fresh IC processes and 16 same-point rho solves; provider ZIP and every result member bound to independent replay",
+   "headline": "K1120 mean cold process 119.701 s versus K1104 119.847 s; paired K1104-minus-K1120 mean 145.454 ms, 95% interval [-92.776, 383.684] ms; frozen selection `BOUNDED_UNKNOWN`",
+   "host": "Tier 1 cloud instance, exact source and topology receipts"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-f5-gf2-defaults",
+   "entry_cell": "[`20261017-f5-gf2-defaults`](20261017-f5-gf2-defaults/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "matrix-F5 / GF(2) opt-in switches as defaults: direct pack, direct unpack, table reuse; `f4_f2_bench` F5 (n \u2264 24, Reduced and SelectiveEchelon, 1/4 threads) and matrix F4, `f6_ic_probe` inherited F4; arms on / each off / all off; 3 then 15 rounds, decision rule committed before run 2",
+   "headline": "all arms exact (rows, bases, decisions, word counts); direct pack **on by default** (1.006\u20132.173\u00d7 every F5 cell); direct unpack stays opt-in (0.986\u00d7 on n24 d4 Selective 4 t); table reuse stays opt-in (0.955\u00d7 matrix F4 n16 m24); all three vs previous defaults 1.11\u20131.27\u00d7 on the largest F5 cases",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU KVM, AVX-512F, shared, unpinned, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-sea-point-count",
+   "entry_cell": "[`20261016-sea-point-count`](20261016-sea-point-count/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "matched BSGS, cached SEA, cold P-192 API and unchanged CM count control; five A/A and five A/B pairs each",
+   "headline": "BSGS24 61.747\u219231.495 \u00b5s/call (paired 1.98652\u00d7), BSGS32 327.251\u2192117.994 \u00b5s (2.79019\u00d7), BSGS40 1936.899\u2192591.519 \u00b5s (3.24310\u00d7); SEA40 0.81228\u00d7, SEA192 1.02393\u00d7, cold API 1.00469\u00d7 all within A/A envelope; 140/140 verified records",
+   "host": "AMD EPYC 9V74 VM, CPU 4 pinned, movable-thread eviction/process monitoring, PSI unavailable, shared host"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-n83-precomputed-rho-control",
+   "entry_cell": "[`20261016-n83-precomputed-rho-control`](20261016-n83-precomputed-rho-control/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "N83 a=1 Koblitz (r = 8569786107849059), 16 public points of `gha-38597929540-1`: frozen IC K3300 (Tier 1) and K600 (hosted) against Pollard rho with a precomputed `G`-only distinguished-point table (Bernstein\u2013Lange, fold step), table time-matched to the IC setup wall or memory-matched to IC max RSS; empty-table fold rho as positive control",
+   "headline": "online median IC/precomputed rho: K3300 3.74\u00d7 (95% CI 2.65\u201311.05, time-matched), 40.61\u00d7 (24.27\u201371.72, memory-matched); K600 81.52\u00d7 (46.35\u2013236.59) and 214.73\u00d7 (47.94\u2013483.84) time-matched, 395.53\u00d7 memory-matched \u2014 precomputed rho faster in every matched pair, so the 113\u00d7 and 12.29\u00d7 \"IC beats rho\" readings do not survive; empty-table rho/IC 70.9\u00d7 (K3300), 3.62\u00d7 (K600); every recovered scalar of every arm replayed, all agree; counts (\u00a75a) unranked",
+   "host": "hosted `ubuntu-24.04`, 4 vCPU shared, L0 (EPYC 7763, EPYC 9V45, Xeon 6973P-C; ratios within one runner)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-generalized-rootfinding",
+   "entry_cell": "[`20261016-generalized-rootfinding`](20261016-generalized-rootfinding/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "historical Python complete-separator calibration, 20 fields / 38 curve contexts / 3 cold pairs; compact support verification",
+   "headline": "prior cached separator / batch whole-cold median 1.3830x; actual GF83 support-only 1.1409x; repeated-root NIST support cases regress; no qualified wall, IC/rho, or F4/F5/F6 claim",
+   "host": "managed Linux x86_64, 1 CPU / 4 GiB per worker; isolation unqualified"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-prime-order-search",
+   "entry_cell": "[`20261017-prime-order-search`](20261017-prime-order-search/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`find_prime_order_curve` accepting a curve by `PrimeCurve::prime_order` (one point stepped across the Hasse interval, O(\u221ap) additions) instead of `point_count` + primality (O(p) Legendre symbols); `ecbench plan` wall time on one-curve `prime_search` specs, 16\u201326 bits, main vs change, 3 runs each",
+   "headline": "plan time 0.21 \u2192 0.040 s (16 bits), 6.90 \u2192 0.064 s (22), 10.96 \u2192 0.046 s (24), 217.6 \u2192 0.137 s (26; 1,592\u00d7); same random draws and curves: all 21 committed `prime_search` sessions re-plan to their 288 recorded workload IDs; unit test agrees with the naive count on 400 curves and the naive search at 8\u201316 bits \u2014 engineering, setup only, no measured result changes",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud container, shared, unpinned, L0"
+  },
+  {
+   "date": "2026-10-17",
+   "entry": "20261017-isogeny-flint-losses",
+   "entry_cell": "[`20261017-isogeny-flint-losses`](20261017-isogeny-flint-losses/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos against FLINT 3.0.1 and PARI/GP 2.15.4 after fixing the 49 cases FLINT won and the SEA case PARI won on 2026-10-16: polynomial products and squares n = 16\u201316384, x^p mod g deg 32\u20131024, over 2^61 \u2212 1, 2^127 \u2212 1, 2^255 \u2212 19, CSIDH-512 prime; \u03a6_\u2113 \u2113 \u2264 89; SEA on 30 curves. Changes: explicit CRT, lazy input reduction, AVX-512 IFMA NTT (runtime-detected, portable fallback), wrapped products past powers of two, prepared/cyclic Barrett, four-output word kernels",
+   "headline": "ours/FLINT < 1 in all 114 polynomial cases (max 0.96, median 0.35; was up to 2.98); former losses now 0.16\u20130.81; 0 output mismatches (114 polynomial cases, 23 \u03a6_\u2113 levels, 30 SEA orders); SEA over 2^127 \u2212 1 (the last loss, to PARI with precomputed seadata: 878 vs 708 ms) now 545 vs 647 ms (0.84) with an Atkin-aware search and stopping rule, 2^61 \u2212 1 18 vs 79 ms; 154/154 tests with IFMA on and off",
+   "host": "4 vCPU Xeon VM (AVX-512 IFMA), 1 isolated CPU, 64 runs none contended, best of 2 rounds per tool"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-strong-rho-step3",
+   "entry_cell": "[`20261016-strong-rho-step3`](20261016-strong-rho-step3/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "strong signed-Frobenius rho reference (`koblitz_rho_fixture \u2026 strong`), round 3: walk compiled with `pclmulqdq` so field products inline, walk starts formed `lanes` at a time with one batched inversion; Callgrind instructions per walk step at n = 53; native ns/step A/A + 5 A/B rounds at n = 53, 61",
+   "headline": "781 \u2192 718 instructions per step (\u22128.1%, 1.09\u00d7), outputs identical at n = 41, 53, 61; native 1.008\u00d7 at n53 (A/A 5.6%, not established), 1.025\u00d7 at n61 (A/A 2.4% from 4 runs, marginal, not claimed); IPC unavailable (no hardware PMU)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 4 of 32 runs contended (excluded)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-strong-rho-canon2",
+   "entry_cell": "[`20261016-strong-rho-canon2`](20261016-strong-rho-canon2/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "strong signed-Frobenius rho reference (`koblitz_rho_fixture \u2026 strong`), canonicalization round 2: `i64` casts in `MulMod`, branchless `rotate`, reused rotations, precomputed \u00b1\u03bb^k with Shoup products, inlined `canonicalize`; Callgrind instructions per walk step at n = 53; native ns/step A/A + 5 A/B rounds at n = 53, 61",
+   "headline": "938 \u2192 781 instructions per step (\u221216.8%, 1.20\u00d7), outputs identical at n = 41, 53, 61; native 1.173\u00d7 at n53 (A/A 20.6%, not established), 1.135\u00d7 at n61 (A/A 12.1%); IPC unavailable (no hardware PMU)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 32 runs contended"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-fp64-branchfree",
+   "entry_cell": "[`20261016-fp64-branchfree`](20261016-fp64-branchfree/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`std::hint::select_unpredictable` for the Montgomery reduction's final subtraction, `add` and `sub` in production `fp_backend::Fp64` (p < 2^63) and `prime_fast::Fp64` (p < 2^62), bit-identical results; baseline vs candidate `hwcost` binaries (only the two field files differ) alternated A1 B1 A2 B2: the rho kernel per field and batch size, field-op microbenchmarks, and the production rho `prime_fast::rho_parallel` end to end (44-bit curve, one thread, known-answer solves)",
+   "headline": "rho kernel 0.40\u20130.44\u00d7 (`fp_backend::Fp64`) and 0.45\u20130.47\u00d7 (`prime_fast::Fp64`) of baseline time at every B \u2265 4096; `rho_parallel` 98.9/98.6 \u2192 68.2/71.1 ns per step (0.69, 0.72); dependent mul/sqr chains within +1.8%; unchanged controls within 3%; all 9 frozen claims PASS; dependent `sub` chains with a predictable wrap 18\u201333% slower (controls also moved, \u221227%/\u221214%)",
+   "host": "Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU KVM, L0, no PMU"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-f4fp-blocked-pairs",
+   "entry_cell": "[`20261016-f4fp-blocked-pairs`](20261016-f4fp-blocked-pairs/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`f4_fp` Faug\u00e8re\u2013Lachartre pair reduction `D \u2212 C\u00b7B'` in blocks of 64 rows \u00d7 256-column tiles (`reduce_pairs_blocked`) against the row-by-row product (same binary, `F4_FP_FL_BLOCKED=0`) and msolve 0.6.5, 18 F_p systems (13 standard + 5 large: quad n10/n11, cubic n6, quart n4, overdet n14 m28), 1 thread, 3 interleaved rounds",
+   "headline": "identical bases in every round; blocked/control 0.78\u00d7 quad_n10 (1.41 s vs 1.80 s), 0.89\u00d7 quad_n11 (9.37 s vs 10.55 s), ranges disjoint; 0.88\u00d7 quad_n9 (overlap); other cases within noise; vs msolve (-t 1, process wall): 0.78\u00d7 / 0.75\u00d7 quad_n10 / n11, 1.11\u20131.49\u00d7 quad_n8, n9, cubic_n5, cubic_n6; no effect seen at 4 threads (exploratory)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU KVM, shared, unpinned, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-inherited-f4-eager-runs",
+   "entry_cell": "[`20261016-inherited-f4-eager-runs`](20261016-inherited-f4-eager-runs/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "inherited-F4 eager rewrite through shift runs (the new non-BMI2 path, `KIC_F4_EAGER=runs`) against BMI2 `pdep\u2218pext`, the lazy rewrite and the bit scatter (the old non-BMI2 path), `f6_ic_probe` one binary, 9 Koblitz cells, f4 and f6p, 5 rounds \u00d7 3 reps, x86 proxy",
+   "headline": "80/80 targets identical; runs charge exactly BMI2's units; vs bit scatter median CPU 1.22\u20131.70\u00d7 lower on 6/9 cells (both engines), 1.27\u00d7/1.07\u00d7 K1/2^19, level on K1/2^17 d6/d7; vs BMI2 2\u201328% slower (BMI2 stays default there); aarch64 unmeasured",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU KVM, BMI2, shared, unpinned, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-f6-gate-first-x86",
+   "entry_cell": "[`20261016-f6-gate-first-x86`](20261016-f6-gate-first-x86/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "gate-first F6-IC order (`KIC_F6_GATE_FIRST`, now default on) against the specialise-then-ask order, plus the RREF root (`KIC_F4_INHERIT_ROOT=rref`) and both, `f6_ic_probe` one binary, 9 Koblitz cells (the W5 four + K0/2^19 d7, K1/2^19 d6, K1/2^17 d7, K1/2^29 d8, K0/2^37 d9), x86 eager rewrite, 5 rounds \u00d7 3 reps",
+   "headline": "80/80 targets decided identically in every arm and round; F6-IC 1.336\u20131.733\u00d7 fewer word XORs on all 9 cells, median CPU 1.56\u20132.12\u00d7 lower (worst round pairing \u2265 1.25); inherited F4 unchanged; skipped-node counts equal the aarch64 study's; RREF root mixed (1.10\u20131.23\u00d7 larger cells, 0.89\u20130.98\u00d7 smaller), stays off",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU KVM, BMI2, shared, unpinned, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-endo-native-bench",
+   "entry_cell": "[`20261016-endo-native-bench`](20261016-endo-native-bench/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "GLV-2 through a cheap isogeny-chain endomorphism vs a width-w NAF baseline, natively (`endo-chain-bench`, curve-generic), on Bandersnatch (short Weierstrass model), Tom-384 and CP6-782 G1: counted field operations M_eq = M + S per k\u00b7P (256 pairs) against the frozen model, timed median/min over 20 rounds with an A/A arm, width \u00d7 table grid, \u03c6(P) stage diagnostics; preregistered (`PROTOCOL.md`), positive control 97/97 arms equal to the CryptoPro-B sweep",
+   "headline": "all 5 preregistered conditions met on all 3 curves; counted ratio best baseline / best GLV-2 1.525 / 1.521 / 1.492 (model 1.523 / 1.524 / 1.494); declared GLV vs fastest baseline by median 1.504 / 1.504 / 1.570, min 1.528 / 1.530 / 1.520; A/A median ratio 0.997 / 1.001 / 1.038; every total arm within 0.31 % of the model; \u03c6(P) counts 162/162 equal to the model but the one declared exception \u2014 engineering, variable-time, Bandersnatch Edwards arithmetic not measured",
+   "host": "Intel Xeon @ 2.10 GHz cloud VM, 4 vCPU, timing pinned to CPU 3 via `isolated_bench` (admitted, uncontended), L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-j0-parallel-relations",
+   "entry_cell": "[`20261016-j0-parallel-relations`](20261016-j0-parallel-relations/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "j=0 staged IC relation collection serial vs rayon-parallel (index-order-preserving, `RAYON_NUM_THREADS=1` = sequential), `j0_stage_ladder` 16/20-bit, 2 interleaved reps per arm at 14 threads + 1-thread regression check, vs `origin/main` `569b157f3`",
+   "headline": "engineering (wall scaling, counted work unchanged): relations stage median ~1025 ms \u2192 ~234 ms (**4.4\u00d7**) at 16 bits and ~39.6 s \u2192 ~13.2 s (**3.0\u00d7**) at 20 bits on 14 threads; no 1-thread regression beyond unseeded trial-count spread; every run recovered the planted scalar, rho agreement, 48 relations; external comparison: not run (internal parallelization)",
+   "host": "Apple M4 Pro, 14 cores, shared, no isolation receipt"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-strong-rho-assurance",
+   "entry_cell": "[`20261016-strong-rho-assurance`](20261016-strong-rho-assurance/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "strong signed-Frobenius rho reference (`koblitz_rho_fixture \u2026 strong`): step counts against \u221a(\u03c0r/2A) on 400 fixtures at n = 41, 53, 61; Callgrind instructions per walk step at n = 53; native ns/step A/A + 5 A/B rounds at n = 53, 61 for `apply2` basis conversion, reduced `add_mod`, fixed table hasher",
+   "headline": "steps/ideal mean 0.994, 0.922, 0.943 (95% CI upper 1.044, 0.971, 0.993); 1,196 \u2192 938 instructions per step (\u221221.5%), outputs identical; native 1.023\u00d7 at n53 (A/A 10.7%, not established), 1.209\u00d7 at n61 (A/A 18.3%); IPC unavailable (no hardware PMU)",
+   "host": "Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 2 of 32 runs contended (excluded)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-hwcost-round2",
+   "entry_cell": "[`20261016-hwcost-round2`](20261016-hwcost-round2/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`hwcost` round 2: (A) baseline vs `-C target-cpu=native` build of the rho kernel over `Fp64`, `FpWide<1..4>`, alternated A1 B1 A2 B2; (B) `Fp64` vs bit-identical branch-free variants (`Fp64Bf` masks, `Fp64Cm` `select_unpredictable`) with disassembly counts; (C) GPU profile (SMs as cores, overlapping pipes) against 46 recorded ECC2K-130 builds; (D) IC vs matched rho in wall time and dollars from frozen campaign records, \u00a75a band",
+   "headline": "native `fp64` kernel 1.6\u20132.6\u00d7 faster (ratio 0.38\u20130.63), `FpWide` no detected effect at 37/40 batch sizes; `Fp64Cm` kernel 0.40\u20130.50\u00d7 `Fp64` at B \u2265 4096 (F1\u2032 PASS), a priori model within 4\u20138% (F2\u2032 PASS; `Fp64Bf` compiled to the same code, F1 invalid); GPU a priori 17.9% median error over 46 builds, 1.45% with one \u03b7 per GPU, 19.5% across GPUs; IC > rho in wall time on every \u00a75a-ranked curve (Koblitz 4/8, prime 5/6), none IC < rho; not an IC improvement",
+   "host": "A, B: Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU KVM, L0, no PMU; C: recorded RTX PRO 6000 / B200 rates; D: campaign host Xeon 2.30 GHz, L0"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-isogeny-vs-flint-pari",
+   "entry_cell": "[`20261016-isogeny-vs-flint-pari`](20261016-isogeny-vs-flint-pari/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos (round 5) against FLINT 3.0.1 and PARI/GP 2.15.4 on identical full-size inputs with identical outputs (0 mismatches): polynomial products and squares n = 16\u201316384, x^p mod g deg 32\u20131024, over 2^61 \u2212 1, 2^127 \u2212 1, 2^255 \u2212 19 and the CSIDH-512 prime; \u03a6_\u2113 mod p for \u2113 \u2264 89; SEA on 30 curves (PARI with and without seadata)",
+   "headline": "**external ratio (ours / fastest external):** products 127-bit 0.42\u20130.95 (faster at every n), 255-bit 0.59\u20131.07; 61-bit FLINT nmod_poly faster for n = 32\u20132048 (to 2.5\u00d7), ours faster from 4096; 511-bit FLINT faster for n = 64\u20132048 (to 2.3\u00d7), level from 4096; x^p mod g FLINT faster at 61 bits (1.65\u20132.1\u00d7) and 511 bits (1.3\u20133.0\u00d7); \u03a6_\u2113 \u2113 \u2264 89 2.24 s vs PARI 11.4 s (5.1\u00d7); SEA 61-bit 41 vs 91 ms (PARI+seadata), 127-bit 1254 vs 1062 ms (PARI 1.18\u00d7 faster); Magma not run (no licence)",
+   "host": "4-vCPU Xeon VM, tools/isolated_bench.py on one CPU, 121 runs, 0 contended, two rounds with order reversed, single thread"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-isogeny-round5",
+   "entry_cell": "[`20261016-isogeny-round5`](20261016-isogeny-round5/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos optimisation round 5: multi-prime NTT for long products over multi-limb prime fields (1/2/4/8 limbs), shared q-series for \u03a6_\u2113, lazy squarings, sliding-window polynomial powers, table reducer to 160 coefficients, BMSS linear-algebra loop fix; SEA over 2^127 \u2212 1 profiled per phase; full benchmark suite main vs branch, min of two runs per arm",
+   "headline": "NTT 10\u201311\u00d7 Karatsuba at n = 8192 (2/4 limbs), bit-identical output; \u03a6_\u2113 for \u2113 \u2264 89 over 2^127 \u2212 1 9.4\u20139.6 s \u2192 2.3 s (4.1\u00d7); SEA point count 2^127 \u2212 1 1.14\u00d7 geomean (0.82\u20131.42); BMSS linear algebra \u2113 = 101 40/64/52\u00d7 (40/256/511-bit); Kohel \u2113 = 1009 2.0\u20132.4\u00d7; CSIDH-512, \u221a\u00e9lu, kernel/find groups unchanged; 148/148 tests",
+   "host": "4 vCPU shared VM, one run per profile, min of two per suite arm, L0 wall"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-hwcost-rho-model",
+   "entry_cell": "[`20261016-hwcost-rho-model`](20261016-hwcost-rho-model/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`hwcost` analytical time-and-cost model (counted ops \u00d7 measured cycles/op, memory roofline, measured thread scaling) calibrated on this host and validated against a batched-affine Pollard rho iteration (r-adding walk, one Montgomery batch inversion per step) over `Fp64` and `FpWide<1..4>` (2^63\u221225, 2^64\u221259, 2^128\u2212159, P-192, P-256), B = 2^4 \u2026 2^22 walks, 1 thread; scaling at 1/2/4 threads",
+   "headline": "calibrated model (one fitted residual per field, fitted on B \u2264 1024): median \\",
+   "host": "error\\"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-fixed-degree-isogenies",
+   "entry_cell": "[`20261016-fixed-degree-isogenies`](20261016-fixed-degree-isogenies/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos fixed-degree isogenies (Ben\u010dina\u2013Kutas\u2013Merz\u2013Petit\u2013Stopar\u2013Weitk\u00e4mper) end to end at p = 1605631, steps 2\u20135 per norm-equation solver at 61/127-bit p, MITM/vOW baselines for d = 2^e, Strassen \u2113! mod (2^61 \u2212 1), one CSURF-512 action",
+   "headline": "pipeline: 6/6 planted prime d (log_p d 0.51\u20130.57) found by Cornacchia and Kani-certified, 3/3 random targets with d \u2248 8\u201312p found (pairing-checked), Coron 0/2 at this small p; 1.9\u20133.9 s per instance, 94\u201399 % in End(E); steps 2\u20135 at 61 bits: Cornacchia and Coron 8/8 each to log_p d 0.64 (Coron faster in 7/8 setting\u2013repetition pairs), trivariate 2/6; 127 bits Coron 6/6 in 0.04\u20134.3 s; Strassen 0.42\u00d7 / 0.26\u00d7 / 0.24\u00d7 naive at \u2113 = 10^5 / 10^6 / 4\u00b710^6; CSURF-512 action 25.8 ms",
+   "host": "2 vCPU Xeon 2.8 GHz container, shared with the build, one run per setting, L0 wall"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-pair46-factor-bases",
+   "entry_cell": "[`20261015-pair46-factor-bases`](20261015-pair46-factor-bases/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "pair-46 (53-bit CM(-19), p = 5t\u00b2+19t+19) factor-base campaign, 14 families; timed items: 01 endo-chain (\u03c8-chain DLP vs \u00b1BSGS and rho on CM(-19) toys at 16\u201322 bits, 40 targets per arm and size; \u03c8 x-evaluation vs affine addition on pair 46) and 06 PKM chained rational-map bases (one Buchberger relation system per target, p = 17\u201317921, 12 targets per level, vs matched rho)",
+   "headline": "01: best \u03c8-chain S = 1.47 [1.28, 1.69] per \u221aN vs \u00b1BSGS 0.955 [0.86, 1.05] (ratio 1.54 [1.30, 1.82]) at 22 bits; \u03c8 x-evaluation 454 ns vs addition 462 ns (c_E 0.98) on pair 46 \u2014 negative, constant; 06: per-system cost slope p^2.02 [2.00, 2.04] (chained A1, local toy range) vs rho p^0.52, projected relation stage about 4e6\u00d7 rho at n1 = 5 (Python constants) \u2014 negative; campaign: no factor-base advantage found, 12/13 red-team upheld, item 14 refuted to empirical_negative, item 11 blocked",
+   "host": "shared Linux host, 1 pinned core (taskset), L0, standalone Rust/Python instruments (no ecbench session)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-binary-mitm-ladder-l11-l12",
+   "entry_cell": "[`20261016-binary-mitm-ladder-l11-l12`](20261016-binary-mitm-ladder-l11-l12/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "binary MITM oracle ladder, `\u2113 = 11` over `F_{2^33}` and `\u2113 = 12` over `F_{2^37}` on the non-Koblitz `y^2+xy=x^3+zx+1` (2,017 / 4,023-point bases; pair tables 2,033,876 / 8,092,016 sums, 65 / 259 MB), 64 targets each, vs Gaudry pairs-and-solve on the same subspace",
+   "headline": "0 disagreements on all 128 targets; median 1.746 ms vs 1.62 s (928.0\u00d7) at \u2113=11 and 8.566 ms vs 18.7 s (2,187.2\u00d7) at \u2113=12 \u2014 the largest rung pairs-and-solve was historically usable at; max 8,068 / 16,092 counted point-adds vs 2,098,176 / 8,390,656 quartic solves; all witnesses group-verified \u2014 engineering, no exponent or vs_rho claim",
+   "host": "arm64 macOS, shared, unpinned (L0 wall, contended by other builds)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-isogeny-large-ell",
+   "entry_cell": "[`20261016-isogeny-large-ell`](20261016-isogeny-large-ell/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos kernel \u2192 codomain and one point image at large prime degree \u2113 = 101\u201310007 (pair-by-pair vs remainder tree to \u2113 = 250007), 256- and 511-bit p: \u221a\u00e9lu (Montgomery, short Weierstrass) vs projective / x-only V\u00e9lu; CSIDH-512 with \u221a\u00e9lu leaves",
+   "headline": "Montgomery \u221a\u00e9lu codomain 5.58\u00d7 (256-bit) / 5.27\u00d7 (511-bit) V\u00e9lu at \u2113 = 10007 (was 1.51\u00d7 / 1.62\u00d7), crossover \u2248 \u2113 150 (was \u2248 1000); images 1.27\u20131.51\u00d7; Weierstrass \u221a\u00e9lu 2.7\u20132.8\u00d7 x-only V\u00e9lu (was slower), x-only V\u00e9lu itself 15\u201325 % faster; remainder-tree path slower than pair-by-pair to \u2113 = 250007; CSIDH-512 no change outside noise; all outputs equal V\u00e9lu (130/130 tests)",
+   "host": "4 vCPU shared VM, one run per setting, L0 wall"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261015-ic-improve4-01-genus3-relations",
+   "entry_cell": "[`20261015-ic-improve4-01-genus3-relations`](20261015-ic-improve4-01-genus3-relations/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 IC after cubic GHS, relation phase vs round 3's R2 (`r2:lpsgebw2`): C1 = field-level splitting test (Lucas test of the Cardano resolvent's cubic character, V_{n/3}(2+27\u00b7disc/P'^3)=2, n=q\u2212(\u22123\\",
+   "headline": "q); identical relations, shadow-verified every trial); C2 = 32 lockstep walks sharing one inversion (Montgomery); C3 = 70% oversampling + clique removal + SGE cx 32; C4 = C1+C2+C3 with \u03ba re-tuned on training; held-out curves 0\u20134, q = 2^12\u20132^22; F_q-mult equivalents",
+   "host": "C1 ADVANCES (exponent, constant, primitive): whole 0.756\u00d7 at 2^22, exponent \u0394 \u22120.015 (12..22) / \u22120.034 (16..22), local 21\u201322 1.364 vs 1.408, per-trial log slope 9.75\u21922.71 units/bit. C2 ADVANCES (constant) 0.959\u00d7; C1+C2 0.715\u00d7, local 1.356. C3 TRADES (0.979\u00d7, LA 0.78\u00d7, gain shrinks with q). C4 TRADES: 0.690\u00d7 at 2^22 but steep \u03ba schedule, exponent +0.0045 (16..22). Distance to 4/3 (16..22 fit): 0.035 (C1+C2) vs 0.075. A/A \u0394 \u22120.0012; gate 0 41/41; every log verified"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-genus3-2lp-rebalance",
+   "entry_cell": "[`20261015-genus3-2lp-rebalance`](20261015-genus3-2lp-rebalance/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 index calculus with double large primes on GHS cubic covers (q prime \u2248 2^10\u20132^20), whole method in F_q plus mod-\u2113 multiplications: rebuilt baseline (\u03ba = 2, tree-cycle elimination + Lanczos) against a factor base retuned per size (\u03ba \u2208 {0.5\u20262} on training curves) and structured Gaussian elimination before Lanczos; 12 paired test instances per size, all 360 logs verified",
+   "headline": "baseline fit q^1.383 over 2^14\u20132^20 (99% [1.382, 1.384]), relation phase q^1.332, linear algebra q^1.447 (row weight 7.8 \u2192 14.4); retuned \u03ba: q^1.373, paired ratio 0.961 at 2^20; SGE: q^1.419, ratio 0.781 at 2^14 \u2192 0.906 at 2^20; rebuilt baseline / rho on Jac(C) 0.16 raw at 2^14 (n = 4)",
+   "host": "4-vCPU Xeon cloud container, unisolated (counts are the metric)"
+  },
+  {
+   "date": "2026-10-16",
+   "entry": "20261016-isogeny-round5",
+   "entry_cell": "[`20261016-isogeny-round5`](20261016-isogeny-round5/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "isogeny_algos optimisation round 5: multi-prime NTT for long products over multi-limb prime fields (1/2/4/8 limbs), shared q-series for \u03a6_\u2113, lazy squarings, sliding-window polynomial powers, table reducer to 160 coefficients, BMSS linear-algebra loop fix; SEA over 2^127 \u2212 1 profiled per phase; full benchmark suite main vs branch, min of two runs per arm",
+   "headline": "NTT 10\u201311\u00d7 Karatsuba at n = 8192 (2/4 limbs), bit-identical output; \u03a6_\u2113 for \u2113 \u2264 89 over 2^127 \u2212 1 9.4\u20139.6 s \u2192 2.3 s (4.1\u00d7); SEA point count 2^127 \u2212 1 1.14\u00d7 geomean (0.82\u20131.42); BMSS linear algebra \u2113 = 101 40/64/52\u00d7 (40/256/511-bit); Kohel \u2113 = 1009 2.0\u20132.4\u00d7; CSIDH-512, \u221a\u00e9lu, kernel/find groups unchanged; 148/148 tests",
+   "host": "4 vCPU shared VM, one run per profile, min of two per suite arm, L0 wall"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-p61-adjacency-pilot",
+   "entry_cell": "[`20261015-p61-adjacency-pilot`](20261015-p61-adjacency-pilot/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "selected-degree 5/13/37/59 adjacency generation and distinct kernel-first replay on admitted vertices of the certified `p61-i0025` class over `p = 2^61 - 1`; nested one-, 64-, and 4,096-vertex windows",
+   "headline": "4,096 vertices, 28,672 edges and 471,040 kernel coefficients: 191.551 s generation, 296.931 s replay, 41,543,871 logical and 8,552,556 gzip bytes; exact shard, chain, source, and summary replay; one shared-host observation, L0 descriptive; full-class projection 3.632 TB logical / 0.748 TB gzip",
+   "host": "macOS arm64, shared and unisolated; concurrent 8-thread p61 census"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-pdp-root-shape-replay",
+   "entry_cell": "[`20261015-pdp-root-shape-replay`](20261015-pdp-root-shape-replay/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "the inherited-F4 decomposition stage (Koblitz curves over `F_{2^n}`, `n` prime) with and without cross-target root shape replay (F4Remake's idea, `KIC_F4_ROOT_REPLAY=1`), on the stage bench's `chain`, `chain-holdout` and `holdout` ladders, one binary; and `decompose_by_e3` (exact `m = 3`) against the pair-table oracle, 8 `(n, \u2113)` cells \u00d7 16 targets",
+   "headline": "default \u00f7 replay word operations **0.970, 0.954, 0.983**: replay costs more on all 9 cells (0.753\u20130.985\u00d7), verdicts identical; pilot on the frozen ladder 1.016 \u2014 a recorded null, the switch stays off; `decompose_by_e3` costs **553\u201334,901\u00d7** the table oracle's field multiplications \u2014 engineering, stage diagnostic",
+   "host": "4 vCPU Xeon 2.10 GHz, shared; deterministic counts"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-binary-mitm-ladder-l9-l10",
+   "entry_cell": "[`20261015-binary-mitm-ladder-l9-l10`](20261015-binary-mitm-ladder-l9-l10/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "binary MITM oracle ladder, `\u2113 = 9` over `F_{2^27}` and `\u2113 = 10` over `F_{2^31}` on the non-Koblitz `y^2+xy=x^3+zx+1` (519 / 1,053-point bases; pair tables 134,594 / 554,304 sums, 4.1 / 16.9 MiB), 64 targets each, vs Gaudry pairs-and-solve on the same subspace",
+   "headline": "0 disagreements on all 128 targets; median 0.293 ms vs 724.9 ms (2,473.9\u00d7) at \u2113=9 and 0.735 ms vs 3,119.2 ms (4,244.2\u00d7) at \u2113=10; max 2,076 / 4,212 counted point-adds vs 134,912 / 525,312 quartic solves; all witnesses group-verified \u2014 engineering, no exponent or vs_rho claim",
+   "host": "arm64 macOS, shared, unpinned (L0 wall, contended by other builds)"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-f4-generic-field",
+   "entry_cell": "[`20261015-f4-generic-field`](20261015-f4-generic-field/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "PKM tower F4 engine generic over `PrimeField` (`f4_tower_generic`) against the u32 `f4_fp_tower`, and the new AVX-512 IFMA backend `Fp52` against `Fp64`; one system per run, Kummer / split / torus Dickson towers, m = 2 N = 16 and m = 3 N = 12; engine cost per multiply-add at 31, 32, 45, 61 bits, P-192, P-224",
+   "headline": "5/5 pre-registered claims PASS: generic Fp32 vs f4_fp_tower 1.09\u00d7 / 1.06\u00d7 at p < 2^31 (no regression; 182 rows field-for-field identical), 2.18\u00d7 / 2.24\u00d7 at 3\u00b72^30 + 1 (Shoup lazy rows vs eager Barrett); Fp52 IFMA 2.57\u00d7 Fp64 at 27\u00b72^40 + 1; engine ns/muladd 0.48 (31-bit) \u2026 0.72 (45-bit Fp52) \u2026 2.0 (61-bit) \u2026 8.5 (P-192) \u2026 14.5 (P-224); D at v2 = 40/48/56, P-224 and torus P-192/P-256 equals the recorded small-prime D in every cell",
+   "host": "4 vCPU Xeon 2.10 GHz (AVX-512 IFMA), shared with another lane, single core, L0, 7 interleaved reps"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ecc2k130-modal-rollout",
+   "entry_cell": "[`20261015-ecc2k130-modal-rollout`](20261015-ecc2k130-modal-rollout/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "campaign-compatible \u03c3-table kernel against the fused-control kernel in a five-pair RTX PRO 6000 panel, followed by a Modal DP32 rollout observation",
+   "headline": "matched medians 15.884369 vs 15.513653 billion scalar updates/s; paired median ratio 1.023930 (range 1.023803\u20131.024086), A/A max drift 0.099%, 300/300 replay per arm and identical DP corpora; new call 8011 reported 15.8931 billion iterations/s and uploaded points/checkpoint (descriptive live sample); no whole-campaign cost claim",
+   "host": "RTX PRO 6000, same-device benchmark; Modal production call"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-frontier-campaign",
+   "entry_cell": "[`20261015-ic-frontier-campaign`](20261015-ic-frontier-campaign/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "one-target cold counts of every ECDLP method family on fixed ladders (8 Koblitz curves log2 r 11\u201339, 6 a=-3 prime curves 20\u201340 bits, 5 PKM curves), IC parameters selected on separate train targets, every arm priced across the AGENTS.md \u00a75a band",
+   "headline": "4,848 executions (3,178 verified, 54 exhausted shared-rank), 19/19 replay-all audits identical; no IC arm beats rho on any curve at any weight; compact orbit 3.8\u201315\u00d7 signed-Frobenius rho (w=0), prime pair table 10.5\u2192101.8\u00d7 rho-neg (w=0.1, 20\u219240 bits); no IC exponent below rho's",
+   "host": "Linux x86_64 cloud container, 4 vCPU, L0 counts only"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-isogeny-p192-search",
+   "entry_cell": "[`20261015-isogeny-p192-search`](20261015-isogeny-p192-search/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "PKM isogeny-tower auxiliary-curve search at the NIST P-192 prime by 2-Sylow halving (`pkm-aux-search`, `two_sylow_search.rs`): \u00b5s per curve draw, three arms (baseline: 3 sqrt per halving, halves tested by Legendre; fast-chi; fast: test = next level's `(p\u22123)/4` addition-chain exponentiation), families `z2xz8` (X\u2081(2,8)) and `z2xz2`, 7 \u00d7 65,536 draws interleaved; depth distribution over 2^28 / 2^25 draws against the pre-registered Haar model",
+   "headline": "`z2xz8` fast 10.06 \u00b5s/draw (min\u2013max 9.78\u201310.19) vs baseline 30.83 (0.326\u00d7), fast-chi 12.48; `z2xz2` 13.89 vs 24.74 (0.561\u00d7); S1\u2013S4 pass; P(b \u2265 t) = 2^(3\u2212t) consistent at every tested t; t = 48 derived 98,352 core-hours; ordinary curve with a point of order 2^38 found in 45.6 core-min; supersingular y\u00b2 = x\u00b3 + x gives order 2^48/2^64 in one draw",
+   "host": "one core (`taskset`), shared 4-core host with another lane, noisy"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-binary-mitm-oracle-l8",
+   "entry_cell": "[`20261015-binary-mitm-oracle-l8`](20261015-binary-mitm-oracle-l8/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "first binary-regime sub-$2^{2\u2113}$ decomposition oracle at $\u2113 = 8$: group-law MITM pair table (all $P_i+P_j$, charged to the factor-base stage) vs Gaudry pairs-and-solve on a non-Koblitz curve $y^2+xy=x^3+zx+1$ over $F_{2^{25}}$, 256-point subspace base, 64 targets (48 natural + 16 planted)",
+   "headline": "median per-target 0.120\u20130.155 ms vs 11.7\u201342.8 ms (94\u00d7\u2013277\u00d7 across three runs; gate \"\u2264 half\" passed by 47\u00d7\u2013138\u00d7), max 1,068 counted point-adds vs 32,896 quartic solves, 20 found / 44 refuted, 0 disagreements vs pairs-and-solve, all witnesses group-verified; table 32,896 sums, ~1 MiB, ~21 ms build \u2014 engineering, no exponent or vs_rho claim",
+   "host": "arm64 macOS, shared, unpinned (L0 wall)"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-fp-backend",
+   "entry_cell": "[`20261015-fp-backend`](20261015-fp-backend/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "variable-time prime-field backends (`fp_backend::PrimeField`: `Fp32`, `Fp64`, `FpWide<N>`, `FpWide<4,true>`, Solinas `FpP192`) with lazy accumulators, against the f4_fp_tower u32 kernels (verbatim copies), `prime_fast::Fp64`, `ct_bignum` and `BigUint`; ns/op for mul, sqr, inv, sqrt, Legendre, batch inverse, F4 row update (10^4/10^5) and dot product at p31, p32, p61, p63, P-192, P-224, P-256, 200-bit",
+   "headline": "39/39 pre-registered claims PASS: F4 dense row Fp32 vs f4_fp_tower 1.31\u00d7 (p31, same arithmetic: no regression), 2.65\u00d7 (p32); lazy vs eager row update 9.5\u00d7 (p31), 4.0\u00d7 (p61), 1.6\u20132.0\u00d7 (192\u2013256-bit); mul vs ct_bignum: FpP192 1.95\u00d7 tp / 2.71\u00d7 lat, Fp224 1.56\u00d7 / 2.10\u00d7, P-256 1.26\u00d7 / 1.48\u00d7; inverse 2.4 \u00b5s P-192, 2.6 \u00b5s P-224 (3.3\u00d7 Fermat); sqrt P-224 14.4 \u00b5s (windowed TS 3.7\u00d7 plain)",
+   "host": "4 vCPU Xeon 2.10 GHz, shared with another lane, single core, L0, 9 interleaved reps"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-d4-weighted-s5",
+   "entry_cell": "[`20261015-d4-weighted-s5`](20261015-d4-weighted-s5/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`C\u2084`, one `k = 4` decomposition over `F_{p\u2074}` on 2-torsion curves (FGHR `Y`-line): the `D\u2084`-symmetrised `S\u2085` as four weighted unknowns `(\u03c3\u2081, \u03c3\u2082, \u03c3\u2083, \u03c0)` (weights 2,2,2,1, weighted Macaulay degree 26) against C8's five-unknown form on the same targets, `p = 13\u20264093`, 102 targets, brute-force and meet-in-the-middle ground truth; plain `S\u2084` form quoted (over the 2.5 GB cap)",
+   "headline": "`C_w = 1.41\u20131.44\u00b710\u2079` `F_p` multiplications (flat in `p`), C8 `2.54\u20132.56\u00b710\u00b9\u2070`: paired \u00d717.8\u201318.5 (min 7.7), \u00d7844\u2013863 below the quoted `1.213\u00b710\u00b9\u00b2` (projection 630\u00d7); lift-back \u2264 2\u00b710\u207b\u2074 of a solve; 1 of 102 targets degenerate (unsolved by both arms); handover in E18's \u03c4_T frame `2^{157.9}` \u2192 `2^{118.9}` (derived) \u2014 engineering, a constant",
+   "host": "4 vCPU Xeon, shared, 1 thread, L0"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-conductor-gap-cm-orbits",
+   "entry_cell": "[`20261015-conductor-gap-cm-orbits`](20261015-conductor-gap-cm-orbits/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "44,000 orbit controls; 500 primary and 265 replication attempts verified; 145 exact same-crater solve comparisons",
+   "headline": "Primary floor/crater native CPU 0.980 [0.866, 1.111], descriptive L0 with endpoint-wave confounding; pinned construction: CM 5.464 ms, floor recurrence 6.857 ms; incomplete common price",
+   "host": "5 visible CPUs, 4-core quota; local CPU-0 orbit reservation; primary solves L0"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-factor-base-evaluation",
+   "entry_cell": "[`20261015-factor-base-evaluation`](20261015-factor-base-evaluation/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "historical Sage/C stage diagnostic: four matched point factor bases, 48 prime-order curves, 16/20/24 bits; independent fixed-column relation rank",
+   "headline": "24-bit rows/CPU s: low-x 1,352, coset 1,167, random 1,144, low digit weight 859; coset/random 1.020 (95% field-bootstrap 0.959\u20131.083); norm solver 90 rows/229.902 CPU s vs exact join 115/0.268; no full-DLP or rho ratio",
+   "host": "Xeon Platinum 8573C, pinned CPU 0, no repository isolation/A/A receipt; historical Python/Sage timings, exploratory"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-01-genus3-linalg",
+   "entry_cell": "[`20261015-ic-improve2-01-genus3-linalg`](20261015-ic-improve2-01-genus3-linalg/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 IC-2LP after cubic GHS: linear-algebra arms (large primes as columns + SGE + Wiedemann `lpsgewd`, BFS cycle basis, SGE, Wiedemann; tuned on training curves) against round-1 IC-2LP (DFS substitution + Lanczos on normal equations), paired on instance/target/walk, q = 2^10\u20132^20 (+2^21), 3 curves per size; F_q-mult equivalents",
+   "headline": "ADVANCES (constant, small exponent): whole q^1.380 [1.376, 1.384] vs q^1.398, \u0394 \u22120.018; ratio 0.653\u00d7 [0.647, 0.660] at 2^20; LA 0.463\u00d7 but LA exponent 1.70 vs 1.52 (TRADES); local-exponent trend still +0.020/bit, not 4/3; exploratory \u03ba = 1.41: q^1.357, 0.638\u00d7 at 2^21; A/A \u0394 0.000 [\u22120.004, 0.004]; 474/474 logs verified",
+   "host": "4-core shared, load 4\u201314, single thread"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-cyclotomic-falsifier",
+   "entry_cell": "[`20261015-cyclotomic-falsifier`](20261015-cyclotomic-falsifier/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "D4/A2 cyclotomic \u03b3-weight base `C_w` (w = 1, 2, 3) on Koblitz n = 23 (a = 0, 1): exact 2-sum / 3-sum coverage and additive energy over all r targets against 1999 random Frobenius-stable bases of equal columns, compact-orbit-scan, the matched ONB base and a planted \u03bb-progression control; ecbench end to end, cyclotomic vs compact-orbit-scan at equal columns vs rho-frob, 16 public targets \u00d7 2 rounds",
+   "headline": "yield: every n = 23 cyclotomic test inside the null (effects \u22120.49% \u2026 +0.65%, min p = 0.363, critical 0.00333; positive control p = 0.001 on all cells) \u2014 A2 yield clause survives, yield-neutral; cost (S, operations only, lower bounds): cyclotomic / compact 1.022 [1.021, 1.023] (K1, 30 cols), 1.122 [1.120, 1.125] (K0, 17 cols), 0.884 [0.544, 1.413] (K1, 1 col), 0.977 [0.818, 1.161] (K0, 3 cols); IC arms 2.7\u201330\u00d7 rho-frob; 480/480 records verified, 320/320 replays identical",
+   "host": "4 vCPU shared container, L0, 1 thread"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-04-d4-2lp-fix",
+   "entry_cell": "[`20261015-ic-improve2-04-d4-2lp-fix`](20261015-ic-improve2-04-d4-2lp-fix/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "D\u2084 + 2LP regression fix, k = 4 IC on E(F_{p\u2074}): first-dependency stop (`d4-ed`, ecbench base `yline-d4-ed`: square-core filter after every relation, Wiedemann once square) against the D\u2084 incumbent, paired over 27 held-out curves, p = 101\u20131601",
+   "headline": "ADVANCES (constant): whole 0.979\u00d7 [0.973, 0.986], relation 0.979\u00d7, LA 0.969\u00d7; exponent \u0394 \u22120.0008 [\u22120.0024, +0.0015] MATCHES; relations 0.977 \u00d7 (cols + 1), the exact first-dependency bound; never worse on any curve (0.946\u20131.000); adaptive \u03b1 arm 1.000 at every size; item-01 2LP re-measured 1.026\u00d7 REGRESSES; ecbench ECBS1h08cd110d706f 0.990\u00d7 [0.977, 0.998]; 189/189 logs verified",
+   "host": "4 vCPU shared (load 8\u201313), L0, operation counts only"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-pkm-isogeny-tower",
+   "entry_cell": "[`20261015-pkm-isogeny-tower`](20261015-pkm-isogeny-tower/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "PKM's isogeny-tower factor base `prime-isogeny:t=T` in ecbench with its auxiliary-curve search charged to the factor-base phase (BSGS filter + Mestre order, all group operations on `E'` in GAE), against a plain base of equal size, the Kummer tower and rho with the negation map; five 20\u201328-bit curves with `v\u2082(p\u22121) = 12` and three 20\u201324-bit curves with `v\u2082(p\u22121) = 1` (P-192 shape); 8 targets \u00d7 2 rounds; search-cost sweep `t = 4\u202614`, 16 seeds",
+   "headline": "counted S, paired: isogeny \u00f7 plain 1.002 [0.979, 1.028] \u2026 1.331 [1.321, 1.343], the excess = the search's share of S (0.8\u201325 %, set by the seed's 3\u2013744 curves tried); isogeny \u00f7 Kummer 0.976\u20131.196; every IC arm 17\u2013137\u00d7 rho; curves tried \u2248 1.05\u00b72^t (224 builds); derived P-192 search \u2248 2^74 GAE at t = 48 vs rho 2^95.8; 1,080/1,080 verified, 720/720 replays identical; lower bounds (prime natives unpriced) \u2014 accounting",
+   "host": "4 vCPU Xeon 2.10 GHz, shared, L0 (counts only)"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-improve-02-equivariant-oracle",
+   "entry_cell": "[`20261014-ic-improve-02-equivariant-oracle`](20261014-ic-improve-02-equivariant-oracle/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "G2 Frobenius-equivariant Macaulay pass as Koblitz decomposition oracle (barrel, m=2, \u2113=3) against incumbent `solve_boolean_system` (InheritedF4 deg 3) on the gauge-fixed system, 12 targets per n",
+   "headline": "TRADES (constant): whole-oracle CPU I/C 0.25\u00d7 (n=5), 0.17\u00d7 (n=7), 5.1\u00d7 [4.85, 5.34] (n=11), 15.5\u00d7 [15.1, 15.9] (n=13), 0/48 gate failures; plain non-equivariant fall-row augmentation already gives 11.6\u00d7 at n=13, equivariance adds 1.34\u00d7 [1.30, 1.37]; step-level gate fails (one linear consequence short, 37/37); not applicable to the production pipeline systems, where fall-row augmentation regresses 0.29\u20130.59\u00d7",
+   "host": "4-core shared, single thread, 4 GB cap, thread CPU time, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-next10-09-equal-advice",
+   "entry_cell": "[`20261014-ic-next10-09-equal-advice`](20261014-ic-next10-09-equal-advice/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "free-relation harvest from existing compact-orbit pair tables (E-3 census), Koblitz a=0 n=61; equal-advice audit of the online IC rows against Bernstein\u2013Lange preprocessing rho, n=41/53/61, 64 unseen targets each",
+   "headline": "improvement over collecting every relation: 49 independent free relations at K=600, 8.2 % of the 599 needed (\u00d71.09); full rank would need K\u22482,050; audit: BL with equal or smaller advice is 53\u2013317\u00d7 faster online than IC, so the online rows are not IC improvements",
+   "host": "4 vCPU shared by 10 jobs, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-next10-07-cubic-ghs-genus3",
+   "entry_cell": "[`20261014-ic-next10-07-cubic-ghs-genus3`](20261014-ic-next10-07-cubic-ghs-genus3/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 hyperelliptic IC after cubic GHS (m=3, r=5): double large primes against the full-factor-base incumbent, complete solves, q=2^8\u20132^15, 3 curves per size",
+   "headline": "exponent improvement: q^1.650 [1.639, 1.660] \u2192 q^1.300 [1.292, 1.308] (q^1.377 over 2^11\u20132^15), 24/24 + 18/18 solves verified; transfer built over F_{q^3} reaches q=2^15 (previous build q\u226413); for reference the rho model is q^1.53",
+   "host": "4 vCPU shared by 10 jobs, single-threaded Python, counted F_q-mult equivalents"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-next10-06-equivariant-f4-m4",
+   "entry_cell": "[`20261014-ic-next10-06-equivariant-f4-m4`](20261014-ic-next10-06-equivariant-f4-m4/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "G2 equivariant Macaulay pass against full F\u2082 reduction (barrel system, l=3, degree 3); msolve F4 against the committed XL degree on m=4 / m=3 Weil-descent cells",
+   "headline": "equivariant pass completed, bit-identical at n=7\u201317, 44\u00d7 / 58\u00d7 / 73\u00d7 CPU at n=11/13/17 (25\u201345\u00d7 with assembly), n=31 in 31 s where the full matrix needs about 21 GB; solving degree 4 with F4 where XL reads 5 to \u22657 (1 to \u22653 degrees lower), modelled n=131 m=4 price +21/+112 \u2192 +7.6 bits before K; (4,5)/(4,6) blocked at 3 GB",
+   "host": "4 vCPU shared, single thread, 3 GB cap, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-next10-03-pkm-degree",
+   "entry_cell": "[`20261014-ic-next10-03-pkm-degree`](20261014-ic-next10-03-pkm-degree/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "PKM Kummer-tower solving degree with msolve 0.6.5 (1 thread, 5 GB, 45 min) against committed f4_fp_tower, p\u2081 = 2013265921, m=2\u20134, N up to 24; XL degree and \u03b4 census",
+   "headline": "instrument: msolve runs m=4 N=20 to three productive degree-8 rounds within 5 GB, where f4_fp_tower needs >14 GB; matched f4_fp_tower on all 16 finished systems; degree result is a regression for the lead: m=4 plateau at 7 breaks (D \u2265 8), m=3 D \u2265 7 undecided; XL degree = N + 4 exactly for m=2",
+   "host": "4 vCPU shared, single thread, 5 GB cap, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-next10-01-fp4-ladder",
+   "entry_cell": "[`20261014-ic-next10-01-fp4-ladder`](20261014-ic-next10-01-fp4-ladder/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "E(F_{p\u2074}) k=4 IC ladder: D\u2084-symmetrised and double-large-prime arms against the plain S\u2084 incumbent; p=101\u20131033 (log\u2082 #E 26.6\u201340.1), 21 curves, h=4; ecbench session ECBS1hf49e5346dc2b",
+   "headline": "D\u2084/plain 0.0548 [0.048, 0.061] = 18.2\u00d7 constant improvement, same exponent; double large primes: linear-algebra exponent 0.495 \u2192 0.420 [0.405, 0.440], relation phase 0.238 \u2192 0.333, whole solve 2.31\u00d7 [2.10, 2.62] costlier at measured sizes; 84/84 IC and 672/672 rho logs verified, 12/12 replays identical; IC costs are lower bounds (oracle, C\u2084 charged)",
+   "host": "4 vCPU shared by 10 jobs, L0, operation counts only"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ecdlp-speedups",
+   "entry_cell": "[`20261015-ecdlp-speedups`](20261015-ecdlp-speedups/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "matched baseline/candidate whole-process A/B of the Koblitz compact-orbit shared-log DLP fast path at n=41 (timer hoist in `lift128`, sparse-canonical selector in the wide probe path, root-table Bloom on by default), 16 public synthetic targets \u00d7 3 interleaved reps; and the prime j=0 staged IC relation stage at 16 bits (orbit-index map hoisted out of the relation loop), 3 reps",
+   "headline": "engineering: orbit fast path whole-process median 60.9 s \u2192 37.5 s (1.63\u00d7; targets stage 1.95\u00d7), bit-identical recovered scalars/relations on all reps; j=0 relation stage 13.99 s \u2192 11.90 s (1.17\u00d7 median, ~8% per trial), same planted scalar recovered and rho agreement; wall on a shared host without `isolated_bench`, stage diagnostics, not a frozen-suite end-to-end claim",
+   "host": "Apple M4 Pro, 14 cores, shared, no isolation receipt"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-joux-vitse-k5-n1",
+   "entry_cell": "[`20261015-joux-vitse-k5-n1`](20261015-joux-vitse-k5-n1/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Joux\u2013Vitse `(n \u2212 1)`-decomposition at `n = 5` on `E(F_{p\u2075})`: cost of one trial (F4 with trace replay, every trial checked against meet in the middle) on a 12-rung ladder `p = 11\u2026241` (2 curves \u00d7 32 trials + `500p` rate trials each), and complete DLPs at `p = 11` (2 seeds; a third stopped, one-point factor base) and `p = 31`, paired with rho on the same target; the committed `jv_quintic` plain test re-run on today's engine",
+   "headline": "trial `5.9\u20139.2\u00b710\u2079` `F_p` mult., flat (`p^{\u22120.12\u00b10.05}`); trials per relation `\u2248 25p` (rate\u00b724p `0.96` at `p = 241`); complete DLPs IC / rho `4.5\u00b710\u2077`, `1.8\u00b710\u2078` (`p = 11`) and `6.8\u00b710\u2077` (`p = 31`), all answers verified; extrapolated crossover `q \u2248 2^{58.2}` (group `\u2248 2^{291}`); `jv_quintic` `C\u2033 = 1.104\u00b710\u00b9\u2070` (was `3.0\u00b710\u00b9\u2070`)",
+   "host": "Claude Code cloud container, 4 vCPU Xeon @ 2.10 GHz, isolation none (counts are the metric)"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-frobenius-orbit-ic-vs-rho",
+   "entry_cell": "[`20261014-frobenius-orbit-ic-vs-rho`](20261014-frobenius-orbit-ic-vs-rho/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Frobenius-orbit factor base (`compact-orbit-scan` + `mitm-frobenius-counted:m=2`) with `stride-renew` targets on eight public Koblitz curves (log2 r 11\u201339), every native priced by the new `*_full` methods (`src/cryptanalysis/ecbench/full_prices.json`), against rho-frob, rho-strong (both fully priced) and the subspace `rootfind-negfold` arm; 16 targets \u00d7 3 rounds per curve",
+   "headline": "counted S, paired: orbit \u00f7 rho-frob 2.96 [2.55, 3.24] (n = 13) \u2026 18.2 [15.7, 21.6] (n = 41), never below 1 (n = 17 and n = 29 intervals reach 1); orbit \u00f7 rho-strong 0.41 at n = 13, 15.3 at n = 41; orbit \u00f7 negfold 0.51 \u2192 0.065 (n = 13 \u2192 23); `ecbench trend` slope of ln(IC \u00f7 rho-frob) 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6); 2,816/2,816 records verified, 2,112/2,112 replays identical, no lower bounds; wall L0 descriptive \u2014 engineering, constant-only",
+   "host": "4 vCPU Xeon 2.80 GHz, shared, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ecc2k130-signed-sigma",
+   "entry_cell": "[`20261014-ecc2k130-signed-sigma`](20261014-ecc2k130-signed-sigma/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ECC2K-130 \u03c3 walk against signed steps `R \u00b1 \u03c3\u02b2(R)` (`SIGMA_SIGN`): RTX PRO 6000 A/A + A/B at the campaign knobs and 385,024 workers, 300-report replay and 64 planted `GF(2^41)` logs per walk; iteration constants on the device reference walk (n = 23, 41) and the emulator (n = 23\u201359, 108 cells)",
+   "headline": "`SIGMA_SIGN=2` (sign = parity of popcount(x \u2227 \u03c3\u02b2x)): rate A/B 0.9965 (A/A drift 0.10%), 14.731 \u2192 14.678 B it/s; iterations 0.958\u20130.967 on the device walk at n = 41, 0.951\u20130.959 emulated at n = 37\u201359; derived GPU time per solve 0.961\u20130.970; 300/300 replays, 64/64 planted. `SIGMA_SIGN=1` (weight bit 4) rate-neutral, \u2264 1.6% iterations by the model. Best-of-two selection 13\u201316% fewer iterations but about +38% carry-less work (derived, not built). New walk, new corpus: not rolled out",
+   "host": "1\u00d7 RTX PRO 6000 Blackwell (CUDA 13.3, Modal), no isolation receipt; Modal CPU containers for iteration counts"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-rho-walk-leads",
+   "entry_cell": "[`20261014-rho-walk-leads`](20261014-rho-walk-leads/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "four Pollard rho walk proposals on prime-field curves (N \u2248 2^32\u20132^40): best of x(P+R)/x(P\u2212R) and best of four, lazy reduction before the DP check, walks sharing an index or a pair table, negation-map representative rule per point or per epoch; steps to a verified collision (paired trials, 1,000\u20132,000 per arm) and batched-affine step cost on a 1-limb field and P-256 at 8\u20131024 walks per inversion",
+   "headline": "best of P\u00b1R steps speedup 1.129 (1.081\u20131.184) under distinguished points, predicted 1.155; cost 1.215\u00d7 a plain step on P-256 at 1024 walks per inversion (net about 0.95), 1.029\u20131.119\u00d7 at 8\u201364 walks (net 1.03\u20131.12 predicted); best of four 1.463 steps, 2.43\u00d7 cost; every \u00b1R walk needs fruitless-cycle escape; lazy DP test 0.998, lazy table index 0.733; shared index 0.073 (lower bound), pair table 1.027; negation rule per point 1.330 vs fixed 1.368, per epoch 0.828 (worse than no negation map)",
+   "host": "Modal CPU containers, 16 vCPU, shared, no isolation receipt (ns descriptive)"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-fb-hyperparam-sweep",
+   "entry_cell": "[`20261014-fb-hyperparam-sweep`](20261014-fb-hyperparam-sweep/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "factor-base hyperparameter sweep, `m = 2` over `F_{2\u207f}`, `n = 8\u201316`, `n' = 2\u20136`: coordinate / random / subfield bases \u00d7 generic / Koblitz `b` (208 cells) \u2014 measured yield, `d_ff`, `D*`, per-attempt root-finding / brute-force / Macaulay time, derived cost model; prime `a = \u22123` 20/24/28-bit small-x IC (`m = 2, 3`) vs rho whole solves",
+   "headline": "all 208 cells pass every control (13,312/13,312 planted found, 53,248/53,248 oracle agreements, 0/832 calibration refutations, 0 censored `D*`); yield \u2248 0.5\u00d7 the `",
+   "host": "V"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-rootfind-stride-targets",
+   "entry_cell": "[`20261014-rootfind-stride-targets`](20261014-rootfind-stride-targets/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "target generation of the ecbench IC relation loop for complete `rootfind-negfold` m = 2 on public Koblitz E_0: r-adding walk against `stride` and `stride-renew` (new), n = 13 (r = 2003, 32 targets \u00d7 3 rounds) and n = 19 (r = 130873, 16 \u00d7 2\u20133); rho-strong, rho-frob and A/A on the same targets",
+   "headline": "counted S, paired: stride-renew \u00f7 walk 0.531 [0.506, 0.557] (n = 13, d = 5) and 0.835 [0.741, 0.943] (n = 19, d = 6, both lower bounds); d = 4 stride-renew \u00f7 rho-strong 0.770 [0.720, 0.824] at n = 13, but rho-frob S \u2248 1.9 is 6\u00d7 below every IC arm there and IC stays 4.7\u00d7 rho-strong at n = 19; 2,064/2,064 records verified and replayed; wall L0 descriptive \u2014 engineering, a constant",
+   "host": "4 vCPU Xeon 2.10 GHz, shared, L0"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-m4-wide-chain-vs-mitm",
+   "entry_cell": "[`20261015-ic-m4-wide-chain-vs-mitm`](20261015-ic-m4-wide-chain-vs-mitm/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "amendment 1 of the m \u2265 3 study: decomposition cost per relation (wall ns, one core) of the wide `u128` chained-S\u2083 solver (`wide_groebner_decompose`, \u2264 128 unknowns) against the pair-table MITM floor, binary Koblitz `K_a/F_{2^n}`, `m = 4`, `d = \u2308n/4\u2309`, all seven cells n = 11\u202631 (34\u201394 unknowns); exactness against the floor",
+   "headline": "grows faster than the floor: slope 0.805 [0.717, 0.872] log\u2082 ns/relation per unit n on n = 11\u201323 vs floor 0.333 on the same cells (\u0394 [0.433, 0.504]); \u00f7 floor 5.5\u00b710\u00b2 (n = 11) \u2192 3.1\u00b710\u2074 (n = 23), \u2265 1.2\u00b710\u2075 / \u2265 1.3\u00b710\u2075 at n = 29 / 31 (censored lower bounds); 70/70 finished verdicts exact",
+   "host": "cloud container, 4 vCPU Xeon @ 2.1 GHz, L0 (shared, one grid)"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-secg-small-x-s3-cost",
+   "entry_cell": "[`20261014-secg-small-x-s3-cost`](20261014-secg-small-x-s3-cost/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "cost of deciding a target by a Semaev S\u2083 solve over a small-x factor base (one quadratic per base abscissa) against the pair-sum table lookup and against Pollard rho, on all 33 SECG curves (`secp112r1` to `secp521r1`, `sect113r1` to `sect571r1`); B = 1024 and 4096, 20 random subgroup targets per run, one thread; with the exact two-point yield `2B\u00b2/(n \u2212 1)` of the base",
+   "headline": "S\u2083 per target at B = 4096: 5.4 ms `sect113r1`, 9.6 ms `sect163r2`, 42 ms `secp160r1`; table lookup 2 to 5 \u00b5s (S\u2083 is 2600 to 313 000 times dearer, no table); B + 1 relations by S\u2083 solves are 52 (`sect113r1`), 77 (`sect163r2`), 79 (`secp160r1`) bits slower than rho on the same machine, 52 to 280 bits over the 33 curves; the S\u2083 decision equals the table on every element of toy fields and in 66 runs; not a speedup",
+   "host": "4 vCPU shared container, single runs per curve and size, no isolation receipt"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-greedy-factor-base-yield",
+   "entry_cell": "[`20261014-greedy-factor-base-yield`](20261014-greedy-factor-base-yield/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "greedy coverage-driven factor base against uniformly random orbits of the same count, Koblitz `K\u2080/2\u00b9\u00b3`, `K\u2080/2\u00b9\u2075`, `K\u2081/2\u00b9\u2077` (partial coverage) and `K\u2080/2\u2079`, `K\u2081/2\u2079`, `K\u2081/2\u00b9\u2075` (saturated); exhaustive subgroup targets, pair sums (`m = 2`), 20 seeds, production census; equal columns and equal points",
+   "headline": "expected trials at the best column count 4.46 vs 5.29 (1.18\u00d7) on `K\u2080/2\u00b9\u00b3`, 3.00 vs 3.25 (1.08\u00d7) on `K\u2080/2\u00b9\u2075`, 16.35 vs 18.18 (1.11\u00d7) on `K\u2081/2\u00b9\u2077`; coverage ratio up to 1.181 [1.138, 1.230]; full-scan construction on `K\u2081/2\u00b9\u2077` 0.23 s at 4 columns, 1.5 s at 12 (about 85 ms of it subgroup enumeration, shared with the random control; the shipped sampler's 0.2 ms does not enumerate, so not comparable); the dense selector enumerates the subgroup and stops at `r \u2264 2\u00b2\u00b2`; a sampled selector runs past it and its gain shrinks with `r` (best ratio 1.090 at `r = 2\u00b9\u2076`, 1.046 at `2\u00b2\u00b9`, 1.012 at `2\u00b2\u2077\u00b7\u2078`, 1.0000 at `2\u00b3\u2079`), so this is not a cryptographic-size result",
+   "host": "4 vCPU Xeon 2.10 GHz, shared container, one run, no isolation receipt"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-m3-algebraic-vs-mitm",
+   "entry_cell": "[`20261014-ic-m3-algebraic-vs-mitm`](20261014-ic-m3-algebraic-vs-mitm/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "decomposition cost per relation (wall ns, one core) of inherited F4 (S\u2083 chain), F6-IC, CDCL+XOR SAT and unsplit/split S\u2084 hybrids against the pair-table MITM floor, binary Koblitz `K_a/F_{2^n}`, `d = \u2308n/m\u2309`, `m = 3` (n = 13\u202631) and `m = 4` (n = 11\u202619 algebraic; \u2265 23 unsupported, 64-variable cap); exactness against the floor and exhaustive enumeration",
+   "headline": "no arm grows more slowly than the floor: slopes log\u2082 ns/relation per unit n, `m = 3` floor 0.207 [0.204, 0.211], f4-chain 0.534 (\u0394 [0.315, 0.338]), f6-ic 0.583 (\u0394 [0.366, 0.384]); `m = 4` floor 0.363, f4-chain 0.560 (\u0394 [0.342, 0.453]); cheapest arm \u00f7 floor 3.0\u00b710\u00b2 (n = 13) \u2192 3.8\u00b710\u2074 (n = 31); SAT and split hybrid censored (undetermined), lower bounds 10\u2076\u201310\u2077\u00d7 floor",
+   "host": "cloud container, 4 vCPU Xeon @ 2.1 GHz, L0 (shared, two grids concurrent)"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ecbench-rho-optimized",
+   "entry_cell": "[`20261014-ecbench-rho-optimized`](20261014-ecbench-rho-optimized/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "standing `rho.signed_frobenius_strong` canonicalization against its trajectory-identical legacy path; 48 public workloads on six registered Koblitz curves, 240 measured pairs, plus a frozen n=61 complete-solve Callgrind census",
+   "headline": "optimized/same-binary legacy 0.802155 `callgrind.Ir` (1,600,543,701 / 1,995,304,985; 19.785% fewer), clearing the 0.85 gate; optimized/pre-change 0.804582; GAE 1.0000 [1.0000, 1.0000], 720/720 measured replays identical; native 0.9586 wall median is L0 descriptive only, not a result",
+   "host": "virtual AMD EPYC 9V74, Linux x86_64, `ECBENV2h217559836c7c`; PSI unavailable, zero L2 pairs; Valgrind 3.19.0 deterministic instruction result"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-ecc-arithmetic-modal",
+   "entry_cell": "[`20261013-ecc-arithmetic-modal`](20261013-ecc-arithmetic-modal/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Two source-bound x86-64 public binary-field multiply panels, each with 24 AB/BA pairs per field and 500,000 products per arm; 34 tests per run and all 384 arm rows checked",
+   "headline": "GF(2^131) median baseline/candidate milliseconds: 36.079/33.580 in run 1 and 28.825/27.043 in run 2; absolute times shifted substantially between workers and the unchanged four-limb control was biased; descriptive only, no qualified speedup",
+   "host": "Modal Linux/gVisor x86-64, 2 vCPUs requested, CPU model unknown, no isolation receipt"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-ecc-arithmetic",
+   "entry_cell": "[`20261013-ecc-arithmetic`](20261013-ecc-arithmetic/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Paired public `F2mElement::mul` for GF(2^113/131/163/233), 24 AB/BA rounds and 500,000 products per arm/round; 17 focused tests passed",
+   "headline": "GF(2^131) baseline 27,826,500\u2013932,235,083 ns, candidate 16,801,958\u2013694,301,375 ns per 500,000; wall comparison rejected for host contention; no speedup claimed",
+   "host": "Apple M4 Pro, macOS 26.6, shared L0, load over 100"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-rootfinding-buffers",
+   "entry_cell": "[`20261014-rootfinding-buffers`](20261014-rootfinding-buffers/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Prime synchronized lane collector reuses request, native left/right, and output vectors; baseline-candidate-baseline on eight public targets with serial-8, batch-8, rho and rho A/A arms",
+   "headline": "384/384 verified sealed executions, 288/288 identical measured replays, zero deterministic differences across 128 candidate/baseline pairs; batch-8 relation-phase wall ratio 0.937 (0.786\u20131.122) and whole-solve 0.993 (0.803\u20131.251), L0 descriptive; no resolved wall gain and native costs remain unpriced",
+   "host": "macOS arm64, shared, L0"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-gaudry-k4-d4-char2",
+   "entry_cell": "[`20261015-gaudry-k4-d4-char2`](20261015-gaudry-k4-d4-char2/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "one `k = 4` D\u2084 decomposition over `F_{(2^m)^4}` (`C\u2084`, `F_q` multiplications; plain, weighted and Frobenius-reduced forms) and end-to-end ecbench `S` against rho at `m = 6\u201314` (sessions `ECBS1h03a1d62aba88`, `ECBS1h4d63e1551dc1`, `ECBS1hb9229e3a0f30`)",
+   "headline": "Frobenius form `C\u2084` **1.98\u00b710\u2075**, **481\u00d7** below plain (479\u2013483) at `m = 8`; `S` Frobenius \u00f7 plain 0.0057 at `m = 6`; IC \u00f7 rho theory 5,080 (`m = 6`) \u2192 **6.06** (`m = 14`); fitted slope \u22120.248, crossover extrapolated `2^{68.1}` \u2014 engineering, no crossover measured",
+   "host": "4 vCPU Xeon 2.10 GHz, one core reserved; deterministic counts, wall L1"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-gaudry-k4-d4-cost",
+   "entry_cell": "[`20261014-gaudry-k4-d4-cost`](20261014-gaudry-k4-d4-cost/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`C\u2084`, one `k = 4` decomposition over `F_{p\u2074}` with FGHR's `D\u2084` oracle: new options (weighted grading `\u03c3\u2084 = \u03c0\u00b2` at weighted Macaulay degree 26, eigen step along the chains of `\u03c0`, sparsest pivots, shape replay with top-up) against the committed oracle, `p = 29\u20264049`, exact against meet in the middle; then end to end in ecbench on `E(F_{29\u2074})`, two targets, paired with the committed oracle and rho",
+   "headline": "`C\u2084` `2.55\u00b710\u00b9\u2070` \u2192 **`6.89\u00b710\u2077`** `F_p` multiplications at `p = 269` (369.8\u00d7, 367.9\u2013371.6; 311\u2013430\u00d7 across `p`), of which 26.4\u00d7 is pivot choice and 10.95\u00d7 the weighted form at equal linear algebra; 648/648 solves exact; ecbench `S` 6.57\u00b710\u2078 \u2192 1.65\u00b710\u2076 and 7.23\u00b710\u2078 \u2192 1.78\u00b710\u2076 (398\u00d7, 406\u00d7), identical trials; IC still 1.39\u00b710\u2076\u00d7 rho; \u00a711.16 model crossover `2^{135}` \u2192 `2^{103}` (`h = 2`, extrapolated) \u2014 engineering, a constant",
+   "host": "4 vCPU Xeon 2.10 GHz; ecbench one reserved core, IC runs L1, rho L2; ladder 3 threads, shared"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-gaudry-k4-ecbench",
+   "entry_cell": "[`20261013-gaudry-k4-ecbench`](20261013-gaudry-k4-ecbench/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Gaudry's `k = 4` index calculus end to end in ecbench on `E(F_{29\u2074})` (`#E = 16 \u00b7 44,263`, rational 2-torsion): `ic.pipeline` with FGHR's Y-line base and the `D\u2084` oracle, every phase charged in counted `F_p` multiplications, against rho with the negation map; one target, audited",
+   "headline": "IC `S = 7.17\u00b710\u2078` against rho's 1.065: **6.7\u00b710\u2078\u00d7 rho**, within 2\u00d7 of \u00a711.16's model; 633 trials, 8 relations, relations \u2248 100 % of `S`; all runs verified, 3/3 replays identical \u2014 engineering, the method priced end to end at a size where it loses",
+   "host": "4 vCPU Xeon 2.10 GHz, one reserved core (`--cpus auto`), IC run L1, rho L2"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-rootfinding-lanes-coverage",
+   "entry_cell": "[`20261014-rootfinding-lanes-coverage`](20261014-rootfinding-lanes-coverage/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "4/8/16 synchronized serial/batch prime relation collection; B40\u201364 train/holdout; B48 fixed-stride coverage against exact uniform subgroup occupancy, matched rho and A/A; fresh-target equal-prefix component control",
+   "headline": "1,088/1,088 verified sealed ecbench executions and 816/816 identical measured replays; 72/72 exact lane pairs at equal counted GAE; train B48 selection did not resolve a holdout winner (B56/B48 0.979, interval 0.919\u20131.038); fresh equal-prefix stride-23/stride-1 rank difference at 4,096 probes 2.750 rows per target (1.000\u20134.625), rank-per-lower-bound-GAE ratio 1.095 (1.032\u20131.176), attenuating by 8,192; field operations missing from sealed records, costs lower-bound, wall L0",
+   "host": "macOS arm64, shared, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-paper-figures",
+   "entry_cell": "[`20261014-paper-figures`](20261014-paper-figures/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "figures of the ECC2K-130 Blackwell paper, Draft 8 (no new measurement): history, ledger, speedup breakdown, kernel diagrams, roofline, cycle rules, per-GPU, CPU per-ISA, instruction timeline, upper bounds, time to a solve against fleet size",
+   "headline": "RTX PRO 6000 sigma-walk 14.64 (audited) / 15.88 billion iterations/s, about 229x the 2010 GTX 295 card; ledger 17.2x split representation 6.3x, geometry 1.5x, layout 1.3x, `clmad` 1.2x, unattributed 1.16x; derived ceiling about 24-26 for any one-addition walk on one card; expected solve 4.3 RTX PRO 6000-years (5 cards about a year, 1,000 cards about 3.2 days with the cutoff-32 delay); P-256 about 6e21 card-years",
+   "host": "values as recorded in the paper's evidence records"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-prime-rootfinding-batchtable",
+   "entry_cell": "[`20261013-prime-rootfinding-batchtable`](20261013-prime-rootfinding-batchtable/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ecbench cold one-target prime two-summand table built with scalar versus batched inversions at 64 abscissae, eight fresh public targets, matched rho and A/A",
+   "headline": "24/24 verified measured per arm; 32/32 exact paired outputs and counted phases including warmups; both 18,633.042 mean cold GAE (batch/scalar 1.000); source-derived table inversions 4,096 versus 64, mean setup wall 243.226 versus 128.380 \u00b5s (L0 descriptive); 96/96 identical measured replays; batch/rho counted ratio 16.229, native work unpriced",
+   "host": "macOS arm64, shared, L0"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-prime-rootfinding-arity",
+   "entry_cell": "[`20261013-prime-rootfinding-arity`](20261013-prime-rootfinding-arity/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ecbench cold one-target prime pair-table arity two versus three summands at 64 abscissae, eight fresh public targets, matched rho and A/A",
+   "headline": "24/24 verified measured per pair-table arm; m3/m2 counted-GAE ratio 1.431345 (95% target-cluster interval 1.224624\u20131.716117), 96/96 identical measured replays; auxiliary rootfind arm had 32 setup errors from a stale binary; m2/rho counted ratio 20.029, native work unpriced, wall not admitted",
+   "host": "macOS arm64, shared, L0"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-rootfinding-pair-size",
+   "entry_cell": "[`20261013-rootfinding-pair-size`](20261013-rootfinding-pair-size/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ecbench cold one-target two-summand prime pair-table IC with 32 versus 64 abscissae, paired on eight fresh public targets, matched rho and A/A",
+   "headline": "24/24 verified measured per arm; B64/B32 counted-GAE ratio 0.830225 (95% target-cluster interval 0.697026\u20130.961546), 96/96 identical measured replays; prime native work unpriced, wall not admitted; B64/rho counted ratio 18.873",
+   "host": "macOS arm64, 14 logical CPUs, shared, L0"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-gaudry-quartic-d4",
+   "entry_cell": "[`20261013-gaudry-quartic-d4`](20261013-gaudry-quartic-d4/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`C\u2084`, one `k = 4` decomposition over `F_{p\u2074}` at `p = 269`: FGHR's `D\u2084`-symmetric system on a curve with rational 2-torsion (`Y`-line base) against Gaudry's `S\u2084` system (`x`-line base); 20 targets, exactness against meet in the middle, decomposition rates on 8,000 targets",
+   "headline": "`C\u2084` `1.21\u00b710\u00b9\u00b2` \u2192 `2.54\u00b710\u00b9\u2070` `F_p` multiplications (47.5\u201348.4\u00d7), quotient dimension 4,096 \u2192 512, 3 min \u2192 5 s a solve; on \u00a711.16's model the crossover with rho moves from `2^{150}` to `2^{135}` (`h = 2`); **annotation 2026-10-16 (claim audit): rho there is `rho4`'s walk without the negation map**; E18 (`research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` \u00a79.3) measured unfolded/negation at 1.32\u00d7 and re-derived the plain handover against the negation walk at `2^{156.1}`, not `2^{151}`, so both endpoints move later and the `D\u2084` `2^{135}` is not re-derived against the negation walk \u2014 the `C\u2084` 48\u00d7 is unaffected; 1 of 20 targets degenerate \u2014 engineering, a constant",
+   "host": "4 vCPU Xeon 2.10 GHz, shared, 4 threads"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-gaudry-quartic-solve-speed",
+   "entry_cell": "[`20261013-gaudry-quartic-solve-speed`](20261013-gaudry-quartic-solve-speed/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "the `k = 4` Macaulay solve of Gaudry's index calculus over `F_{p\u2074}` (`gaudry_quartic`), before/after commit `029309579`: generic planted systems `d = 4, 5, 6` at `p = 269`, interleaved, 12 solves per arm and degree; the `S\u2085` solve (`d = 8`) after",
+   "headline": "median whole solve 1.9\u00d7 / 4.1\u00d7 / 6.4\u00d7 faster at `d = 4 / 5 / 6` (37.4 s \u2192 5.9 s at `d = 6`); `S\u2085` 164\u2013203 s a solve (about 30 min before); every count and solution identical, `C\u2084 = 1.2269\u00b710\u00b9\u00b2` unchanged \u2014 engineering, no exponent or counted cost moved",
+   "host": "4 vCPU Xeon 2.10 GHz (AVX-512), shared, otherwise idle, 4 threads"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-ic-rootfind-ecbench",
+   "entry_cell": "[`20261013-ic-rootfind-ecbench`](20261013-ic-rootfind-ecbench/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "index calculus end to end in ecbench with the root-finding oracle (`rootfind-mitm`) against the inherited-F4 Gr\u00f6bner oracle, the `mitm` table oracle and rho: binary `E_0` over `F_{2^n}`, `n = 13\u202637`; prime curves of 20\u201328 bits with PKM's Kummer tower base",
+   "headline": "whole IC solve with the root-finder 350\u00d7 faster in wall than with F4 at `n = 13` (admitted), about 10,000\u00d7 at `n = 23` (descriptive); IC still 2.9\u201325,116\u00d7 the strong rho in `S` (binary) and 29\u2013141\u00d7 rho (prime), gap widening; all runs verified, every replay audit OK",
+   "host": "4 vCPU Xeon 2.10 GHz, reserved core (`ecbench --cpus auto`), L2 for most runs"
+  },
+  {
+   "date": "2026-10-13",
+   "entry": "20261013-nist-gpu-rho-ladder",
+   "entry_cell": "[`20261013-nist-gpu-rho-ladder`](20261013-nist-gpu-rho-ladder/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`gpu/nist` Pollard rho on NIST P-256 / P-384 with the ECC2K-130 GPU levers applied: PTX carry chains, compile-time batch width W, threads/block, register caps; single-run sweep cells of 8,192 iterations",
+   "headline": "first working build 1.075 / 0.210 billion iterations/s (P-256 / P-384); PTX carry chains 1.19\u00d7 / 1.38\u00d7; W=16, 256 thr 1.340 / 0.438; W=32 with by-reference inversion 1.632 / 0.548 (round 2, PR 1778), cumulative 1.52\u00d7 / 2.61\u00d7; register caps 96/128/160 all lose; DP counts match the 2^-24 rate in every cell; engineering, S flat",
+   "host": "1\u00d7 RTX PRO 6000 Blackwell (188 SMs), CUDA 13.3, sm_120, Modal, no isolation receipt"
+  },
+  {
+   "date": "2026-10-12",
+   "entry": "20261012-rootfinding-decomposition",
+   "entry_cell": "[`20261012-rootfinding-decomposition`](20261012-rootfinding-decomposition/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "ecbench cold one-target direct-subtraction versus pair-table IC pipelines and matched rho on a 20-bit prime and 17-bit Koblitz subgroup; source audit of the supplied manuscript",
+   "headline": "24 verified measured runs per arm; pair-table/subtraction counted-$S$ quotient 0.018861 (95% cluster interval 0.018547\u20130.019242) prime, bounded by unpriced native work; 0.057047 (0.041159\u20130.092069) Koblitz, fully priced in ecbench.gae; matched rho has smaller counted $S$ on both curves",
+   "host": "macOS arm64, shared, L0 wall"
+  },
+  {
+   "date": "2026-10-12",
+   "entry": "20261012-pdp-root-finder",
+   "entry_cell": "[`20261012-pdp-root-finder`](20261012-pdp-root-finder/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "root-finding PDP oracles (2-sum table `rf-mitm`/`mitm3`/`mitm4`, pairs-and-solve by the group law `rf-pairs`/`pairs3`, `subtract2`) against PS-0's `decompose`, PS-2's row kernel and the F4 references: binary PS-0 rungs `\u2113 = 8\u202614` and the (23, 8) cell, prime Kummer towers at `p\u2081` (`m = 2, 3, 4`); counted field operations and reserved-core wall",
+   "headline": "binary, per refuted target: `rf-mitm` 3.1 \u00b5s \u2192 482 \u00b5s at `\u2113 = 8 \u2192 14` against PS-0's 9.3 ms \u2192 55.5 s (3,007\u00d7 \u2192 115,160\u00d7) and PS-2's 276 \u00b5s \u2192 757 ms (89\u00d7 \u2192 1,572\u00d7); `5",
+   "host": "F"
+  },
+  {
+   "date": "2026-10-12",
+   "entry": "20261012-conductor-gap-counts",
+   "entry_cell": "[`20261012-conductor-gap-counts`](20261012-conductor-gap-counts/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "native MITM-based IC and negation rho on two fixed CM pairs; operation counts only",
+   "headline": "IC floor/crater counted-S ratios: 0.975242 at ell = 8209 (99% 0.603463\u20131.450934), 1.127134 at ell = 131101 (99% 0.922471\u20131.341694); 192 verified records, 96 exact measured replays; no full-cost or wall advantage",
+   "host": "Xeon Platinum 8573C, shared, L0"
+  },
+  {
+   "date": "2026-10-11",
+   "entry": "20261011-lit2026-w11-generic-engineering",
+   "entry_cell": "[`20261011-lit2026-w11-generic-engineering`](20261011-lit2026-w11-generic-engineering/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "lit2026 W11: `bsgs_fast` step kernels (chain, paired, co-Z) in counted field operations per visited point and full-group wall time; binary x-only isogeny evaluators in the torsion walk; k = 2 cubical-ladder Tate pairing; challenge-ladder rho diagnostics (row added 2026-10-17: the entry's copies landed in the 2026-10-12 integration without a row)",
+   "headline": "BSGS chain\u2192paired: 16.75\u21923.71 M-equivalents per visited point; original/paired wall ratios 1.145\u20131.670 on the measured ladder; end-to-end binary class walk: no-change; external comparison: not run (the study predates AGENTS.md \u00a715 and names no external tool)",
+   "host": "Shared Apple M4 Pro, 14 cores; L0; load 72\u2013155"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve3-01-genus3-relations",
+   "entry_cell": "[`20261015-ic-improve3-01-genus3-relations`](20261015-ic-improve3-01-genus3-relations/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 IC after cubic GHS, relation phase: R1 = one-inversion Cantor addition + Stickelberger split pre-filter + root finding reusing x^((q\u22121)/2) mod u (identical walk and relations, shadow-verified every trial); R2 = R1 + \u03ba re-tuned on training (\u03ba = 1.306\u00b70.9102^(log2 q \u2212 20)); each against round-2 item 06's `sched:lpsgebw2`, paired on instance/target/walk, held-out curves 0\u20134, q = 2^12\u20132^22 (group order widened to u128); F_q-mult equivalents",
+   "headline": "R1 TRADES: relation phase 0.471\u00d7, whole 0.635\u00d7 at 2^22, fitted exponent \u0394 +0.015 (gain largest at small q), local exponent 21\u201322 1.376 vs 1.409. R2 ADVANCES (constant): 0.617\u00d7 at 2^22, exponent \u0394 +0.0008 [\u22120.0002, +0.0020] (MATCHES). Diagnosis: trials \u221d q^1.258 at fixed \u03ba (below 4/3), cost per trial \u2248 229 + 22\u00b7log2 q; the old 1.43 relation exponent came from the \u03ba schedule, which falls because linear algebra grows faster than q^{4/3}. A/A \u0394 +0.0008; gate 0 38/38; 192/192 logs verified",
+   "host": "4-core host, \u2264 2 single-threaded jobs"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve3-02-harvest-gate",
+   "entry_cell": "[`20261015-ic-improve3-02-harvest-gate`](20261015-ic-improve3-02-harvest-gate/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "root-rank gate for the Koblitz Gr\u00f6bner linear-row harvest: new default `root,gpv=0.9607,rank=331` against round-2 item 05's gpv gate, trained t=0..11 on 12 cells, held-out t=2000.. (248 rows); `KIC_LINEAR_HARVEST=gpv` and `=0` restore the old behaviour, counter-identical",
+   "headline": "ADVANCES (constant), no cell regresses: old/new gate CPU (29,15) m2 1.41\u00d7 [1.32, 1.52], (37,19) m2 1.89\u00d7, (31,16) m2 1.18\u00d7, (23,8) m3 1.05\u00d7, (31,10) m3 1.04\u00d7; production call 1.06\u20131.30\u00d7 where it adds firing; end to end (verified logs) 1.20\u00d7 at (29,15), 1.14\u00d7 at (31,16); 0/248 root-set failures; lib unit tests 248/248",
+   "host": "4-core shared, single thread, thread CPU, 6 GB cap"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-06-genus3-kappa-bw",
+   "entry_cell": "[`20261015-ic-improve2-06-genus3-kappa-bw`](20261015-ic-improve2-06-genus3-kappa-bw/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 IC after cubic GHS: frozen \u03ba schedule \u03ba(q) = 1.739\u00b70.9225^(log2 q \u2212 20) (with cx(q)), block Wiedemann (2,1) and both, each against round-2 item 01's `lpsgewd` \u03ba = 2 cx 8, paired on instance/target/walk; trained on curves 5\u20137, held-out curves 0\u20134, q = 2^12\u20132^21; F_q-mult equivalents",
+   "headline": "Block Wiedemann ADVANCES: \u0394 exponent \u22120.008, 0.945\u00d7 at 2^21, LA 0.889\u00d7 (mat-vecs 1.50N vs 2.00N). Schedule TRADES: 0.968\u00d7 at 2^21, \u2264 1 at every size, fitted exponent \u0394 +0.028 (gain largest at small q), local-exponent trend \u22120.002/bit vs +0.008/bit, local exponent 20\u201321 1.395 vs 1.423. Combination TRADES: 0.929\u00d7 at 2^21, 0.605\u00d7 round-1 IC-2LP; A/A \u0394 \u22120.0004 [\u22120.0028, +0.0021]; 280/280 logs verified",
+   "host": "4-core host, \u2264 3 single-threaded jobs"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-05-linear-harvest",
+   "entry_cell": "[`20261015-ic-improve2-05-linear-harvest`](20261015-ic-improve2-05-linear-harvest/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "Koblitz IC Gr\u00f6bner oracle (InheritedF4): harvest the root basis's multi-variable linear rows (discarded by `decisive_rows`) into linear elimination, gated on gens/var < 0.9607 (trained, frozen); paired against the incumbent on 9 pipeline cells, 96 held-out targets, A/A; end-to-end m=2 at (19,10), (23,12); now default on (`KIC_LINEAR_HARVEST=0` opts out)",
+   "headline": "ADVANCES where it fires: I/G 1.075 [1.023, 1.125] (19,7) m3, 1.073 [1.028, 1.119] (17,9) m2, 1.166 [1.092, 1.246] (23,12) m2; MATCHES elsewhere (identical counters); no cell regresses; every-node harvest 0.30\u20130.83\u00d7 (regresses); 0/96 root-set failures; opt-out matches committed incumbent counters 60/60; e2e 12/12 logs verified, reductions \u221215%/\u221225%, CPU 1.065\u00d7/0.992\u00d7; unit tests 248/248 pass",
+   "host": "4 vCPU shared, single thread, thread CPU, load 5\u201312"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-03-fallrow-gate",
+   "entry_cell": "[`20261015-ic-improve2-03-fallrow-gate`](20261015-ic-improve2-03-fallrow-gate/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "gated fall-row augmentation in the Koblitz Gr\u00f6bner decomposition oracle against incumbent `InheritedF4` d3, paired thread CPU; 9 pipeline cells, barrel n=5\u201313, end-to-end (17,6) and (19,7)",
+   "headline": "gate (generators per variable \u2265 2.158) fires only on overdetermined barrel systems: I/G 1.83\u00d7 [1.74, 1.94] n=9, 4.42\u00d7 [4.25, 4.60] n=11, 11.9\u00d7 [11.5, 12.4] n=13; all 9 pipeline cells MATCH (no firing), always-augment regresses there 0.23\u20130.91\u00d7; end-to-end identical relations and logs; ADVANCES (constant), production no-op; opt-in `KIC_FALLROW_GATE=1`; 0/202 root-set failures",
+   "host": "4-core shared, single thread, nice, load 5\u20137"
+  },
+  {
+   "date": "2026-10-15",
+   "entry": "20261015-ic-improve2-02-freerel-production",
+   "entry_cell": "[`20261015-ic-improve2-02-freerel-production`](20261015-ic-improve2-02-freerel-production/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "free relations (root-table self-collisions as homogeneous rows) in the production compact-orbit Koblitz IC (`koblitz_orbit_dlp_fast_online`), K tuned per arm on training seeds, held-out test n=41/53/61; now on by default (`KIC_FREE_RELATIONS=0` opts out)",
+   "headline": "ADVANCES (constant): tuned vs tuned counted 0.960\u00d7 [0.946, 0.976] pooled (n=41 0.949, n=53 0.954, n=61 0.962), wall 0.941\u00d7 [0.922, 0.961]; same-K pooled 0.963\u20130.970\u00d7; incumbent K retune alone at n=41 0.46\u00d7 (K 255\u2192100); opt-out A/A 24/24 byte-identical; 360/360 runs verified; 2-torsion census adds 0 relations",
+   "host": "4-core shared, nice, 1 thread, 3 GiB cap, load 3\u201310"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-improve-03-tracezero-freerel",
+   "entry_cell": "[`20261014-ic-improve-03-tracezero-freerel`](20261014-ic-improve-03-tracezero-freerel/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "trace-zero pre-filter and free relations on the compact-orbit Koblitz IC incumbent (`koblitz_orbit_dlp_fast_online`), n41 K255, n53 K220, n61 K500; 44 paired replicates, 8 verified targets each, A/A exact",
+   "headline": "free relations ADVANCES (constant): complete solve 0.957\u00d7 [0.944, 0.970] counted (S3 root solves), wall 0.948\u00d7 [0.908, 0.989]; rank stage 0.36\u00d7 / 0.94\u00d7 / 0.94\u00d7 (free rank 161 / 4 / 25); trace filter vacuous on odd-order targets (0 of 29,624 rejections), 1.00003\u00d7 counted (regresses by 3.4e-5)",
+   "host": "4-core shared, nice, 1 thread, 3 GB cap, L0"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-improve-01-d4-2lp",
+   "entry_cell": "[`20261014-ic-improve-01-d4-2lp`](20261014-ic-improve-01-d4-2lp/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "k = 4 IC on E(F_{p\u2074}): D\u2084 Y-line + double large primes (tuned on 14 training curves, frozen \u03b1 = 0.95) against the D\u2084 incumbent, paired on 24 held-out curves p = 101\u20131301; GAE counts, each trial charged C\u2084(D\u2084) = 2.54\u00b710\u00b9\u2070 F_p mults",
+   "headline": "whole cost 1.025\u00d7 [1.016, 1.037] (REGRESSES; exponent +0.0055 [+0.0036, +0.0078]); relation phase 1.025\u00d7; LA 0.827\u00d7 [0.802, 0.853] (ADVANCES, constant); untuned Gaudry-\u03b1 2LP 2.36\u00d7 [2.04, 2.70]; fitted handover \u2248 2^128.9 (extrapolated); ecbench ECBS1hb2883a84d770 1.0108 [1.001, 1.026], 36/36 verified, 12 replays",
+   "host": "4 vCPU shared, L0, operation counts"
+  },
+  {
+   "date": "2026-10-14",
+   "entry": "20261014-ic-improve-04-genus3-2lp",
+   "entry_cell": "[`20261014-ic-improve-04-genus3-2lp`](20261014-ic-improve-04-genus3-2lp/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "genus-3 hyperelliptic IC after the cubic GHS transfer (split arm): double large primes against the full-factor-base incumbent, Rust port, paired on instance/target/seed, q = 2^10\u20132^20, 3 curves per size; F_q-mult-equivalent counted cost",
+   "headline": "ADVANCES (exponent and constant): IC-2LP q^1.385 [1.379, 1.391] vs incumbent q^1.910 [1.904, 1.913] over 2^10\u20132^18 (\u0394 \u22120.525 [\u22120.529, \u22120.521]); paired ratio 0.620 at 2^10 \u2192 0.036 [0.035, 0.036] at 2^18; tuned 1LP q^1.446; IC-2LP local exponent rises to 1.46 at 2^20 (linear algebra q^1.52), not 4/3; port reproduces item 7 Python on 42/42 solves",
+   "host": "4-core shared, single thread, 3 GB cap, counted unit"
+  },
+  {
+   "date": "2026-10-11",
+   "entry": "20261011-groebner-vs-msolve-singular-polybori",
+   "entry_cell": "[`20261011-groebner-vs-msolve-singular-polybori`](20261011-groebner-vs-msolve-singular-polybori/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "`f4_fp` and the inherited-F4 / F6-IC decomposition oracle against msolve 0.6.5, Singular 4.3.2 and PolyBoRi on identical exported systems (Magma scripts included, not run)",
+   "headline": "F_p: same reduced basis as Singular on 13/13 systems; msolve 1-thread 12\u201324\u00d7 faster than ours on square generic systems (quad_n9: 246 ms vs 5 693 ms), level on overdetermined ones. Boolean n = 17, 8 targets: ours decides in 7\u201324 ms per target, msolve 42.7\u201346.5 s and PolyBoRi 40.4\u201352.3 s for the full basis, Singular > 120 s; verdicts agree",
+   "host": "4 vCPU Xeon 2.10 GHz, shared, L0"
+  },
+  {
+   "date": "2026-10-11",
+   "entry": "20261011-inherited-f4-eager-rewrite",
+   "entry_cell": "[`20261011-inherited-f4-eager-rewrite`](20261011-inherited-f4-eager-rewrite/)",
+   "validation_linked": false,
+   "pre_gate": true,
+   "measured": "inherited F4 eager rewrite of kept rows against lazy rows (`KIC_F4_EAGER=0`), same binary, `f6_ic_probe`",
+   "headline": "lazy/eager median ratio: K\u2080/2\u00b2\u00b3 dim 8 inherited F4 1.40, F6-IC 1.62; K\u2080/2\u00b3\u00b9 dim 9 1.48 and 1.53; counters and verdicts identical",
+   "host": "4 vCPU Xeon 2.10 GHz, shared, L0"
+  },
+  {
+   "date": "2026-10-22",
+   "entry": "20261022-ecbench-harness-overhead",
+   "entry_cell": "[`20261022-ecbench-harness-overhead`](20261022-ecbench-harness-overhead/)",
+   "validation_linked": false,
+   "pre_gate": false,
+   "measured": "ecbench harness overhead: `docs/curves/registry.json` (4.7 MB) parsed once per process instead of on every registry lookup, and `GenericOutcome::count` allocating a counter key only on first use; old binary (main 412b60289) vs this change, `smoke-prime-20` (every method, 20-bit prime-order curve) and `generic-32` (rho, BSGS, kangaroo, 32-bit), 3 alternated sessions per binary; one binary per change for attribution",
+   "headline": "timed solve window 0.03\u20130.07\u00d7 at 20 bits (\u22484 ms of old-binary overhead inside a 0.3 ms solve) and 0.64\u20130.81\u00d7 at 32 bits for every rho, BSGS and kangaroo arm; measured child 0.75\u20130.85\u00d7; `ic.pipeline` solve 0.96\u00d7; 2,376 records identical outside timing, 1,044 cross-binary replays reproduced, \u00a75a band identical \u2014 engineering, no counted result changes; old solve wall times on small curves carry the offset",
+   "host": "Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU cloud container, `--cpus auto --allow-busy` (below L2)"
+  }
+ ],
+ "sources": [
+  {
+   "path": "benchmarks/README.md",
+   "blob": "441d1517dbc6fa757d62e3ba6a9124aea852ee6a"
+  },
+  {
+   "path": "benchmarks/PRE_GATE.json",
+   "blob": "3ffb3a3e3da21380830a0133bae2cfe2f0500bcb"
+  }
+ ]
+}

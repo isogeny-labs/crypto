@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "error": null,
+  "commands": [
+    {
+      "module": "Difference",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-brtv_aff/Difference.olean",
+        "/var/tmp/point-sieve-lean-brtv_aff/Difference.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-brtv_aff/Readback.olean",
+        "/var/tmp/point-sieve-lean-brtv_aff/Readback.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/point-sieve-lean-brtv_aff/ExpectedFailure.olean",
+        "/var/tmp/point-sieve-lean-brtv_aff/ExpectedFailure.lean"
+      ],
+      "expected_exit": 1,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 34.28618833102519,
+  "dependency_count": 28797,
+  "source_revision": "source-only-finite-difference-first-attempt",
+  "workspace": "/var/tmp/point-sieve-lean-brtv_aff",
+  "runtime_execution": false,
+  "independent_binary_kernel_rechecker": false,
+  "trust": "Pinned precursor and shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+}

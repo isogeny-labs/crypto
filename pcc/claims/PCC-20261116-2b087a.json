@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T19:20:28Z",
+ "id": "PCC-20261116-2b087a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5f7c710d6d9b3f442107d9d97425b2b4d04ed283",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "3f49b35a19fc2d046db36d095c51308c4981d545fd923d469ea6b18a218e8760",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+   "theorem": "CubicCofactorWordBridge22307.word_cofactor_decode"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact normalized UInt64 multiply/subtract/cofactor model at223/3, decoded Fin223 polynomial plus raw canonical values, explicit normalization and overflow counterexample. Both unchanged original gates42/0 underj1/120/default memory. Not Rust compiler/base inverse/universal field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem word_cofactor_decode (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : decodeTriple (wordCofactor a b c)= ((decodeWord a)^2-3*decodeWord b*decodeWord c, 3*(decodeWord c)^2-decodeWord a*decodeWord b, (decodeWord b)^2-decodeWord a*decodeWord c)"
+}

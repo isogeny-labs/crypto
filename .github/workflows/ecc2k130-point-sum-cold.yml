@@ -61,6 +61,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Replay the frozen inputs and check runner syntax
         run: |
+          set -o pipefail
           mkdir -p "$RUNNER_TEMP/point-sum-cold"
           python3 -m py_compile research/notes/ecc2k130/point_sum_cold_20260930/*.py
           python3 research/notes/ecc2k130/point_sum_cold_20260930/verify_frozen.py \

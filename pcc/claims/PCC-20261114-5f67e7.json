@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:21Z",
+ "id": "PCC-20261114-5f67e7",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "4967a1df4f3638e3c66bb5e8370d0b8c1238b3762207cbe2be11f2c7a6d938b6",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormRowClosure.closureSpanInvariant"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormRowClosure.closureSpanInvariant: theorem closureSpanInvariant (deg : A \u2192 \u2115) (F G : Set A) (D : \u2115) (hF : \u2200 f\u2208F, deg f\u2264D) (hG : \u2200 g\u2208G, deg g\u2264D) (same : Submodule.span K F=Submodule.span K G) (p : A) : InClosure K deg F D p \u2194 InClosure K deg G D p"
+}

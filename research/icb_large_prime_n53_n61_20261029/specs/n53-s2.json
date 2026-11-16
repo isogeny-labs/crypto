@@ -1,0 +1,221 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "large-prime collector on the Koblitz compact-orbit m=3 pipeline, n=53",
+ "description": "lead LEAD-ICB-large-prime-variants: 1LP/2LP partial relations against the plain pair table at equal and optimal envelope",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 53
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610292,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong",
+    "params": {
+     "lanes": "32",
+     "dp_bits": "8",
+     "step_cap_factor": "2000"
+    }
+   }
+  },
+  {
+   "name": "plain-k80",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=80,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "plain-k220",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=220,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "plain-k320",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=320,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "plain-k440",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=440,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "plain-k660",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=660,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp1-k20-c10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=20,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=1,lp_domain_factor=10,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp1-k40-c10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=40,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=1,lp_domain_factor=10,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp2-k20-c10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=20,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=2,lp_domain_factor=10,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp2-k20-c30",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=20,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=2,lp_domain_factor=30,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp2-k40-c10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=40,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=2,lp_domain_factor=10,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp2-k80-c3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=80,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=2,lp_domain_factor=3,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp2-k40-c3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=40,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=2,lp_domain_factor=3,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "plain-k440-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=440,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  },
+  {
+   "name": "lp0-k440",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=440,raw_x_cap=400000000",
+     "oracle": "mitm-frobenius-counted:m=3,large_primes=0,lp_domain_factor=10,lp_raw_x_cap=400000000",
+     "targets": "walk",
+     "max_trials": "40000000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261029,
+  "isolation_required": "L2",
+  "timeout_seconds": 3600
+ }
+}

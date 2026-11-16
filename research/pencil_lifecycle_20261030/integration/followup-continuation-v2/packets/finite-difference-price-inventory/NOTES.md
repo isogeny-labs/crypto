@@ -1,0 +1,13 @@
+# Proposed finite-event inventory amendment
+
+Integrated source SHA061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1 replaces only the sequential u/v evaluation. This packet proposes source-site classification under the existing finite policy; it is not independent coverage admission.
+
+Active coefficients are read once and charged k=2d+1 collection visits. Two native base additions initialize differences; three additions run per x including the final unused update. Constant zero padding and local scalar assignments do not create collection elements. Existing peval already treats scalar coefficient Copy as a read rather than a separate clone event. This is an interpretation to review, not a claim that machine copies cost nothing.
+
+The four get/first optional-access expressions introduce bounds/Option machinery. Proposed classification is API/control machinery outside the selected collection-comparison primitive, consistent with the registry's no API-call surcharge and exclusion of an instruction census. A non-author finite-policy reviewer must explicitly accept or correct this classification. If a broader copy/comparison convention is selected, update both reference convention and candidate consistently before new data rather than charging only this syntactic spelling.
+
+The current analyzer already consumes base_adds, inverse-normalized base_muls and collection_entry_visits; recurrence multiplies are outside inverse expansion. No new valuation coefficient or analyzer field is required for the declared delta. Existing conditional predicates, batch inversion, rational buckets, map comparisons and exceptional work remain their existing categories. Scalar arithmetic, setup/transfer, hash/RNG, source verification, metadata/calibration and primality categories are unchanged by this recurrence, subject to final integrated route binding.
+
+Low degrees are explicit in degree-deltas.csv: constant evaluation increases additions by2p+2; linear evaluation increases additions by2; quadratic evaluation changes them by2-2p. All cases reduce the original Horner multiplication count and active-entry visits by the recorded symbolic formulas. These are source-accounting identities, not measured costs. The native caller uses degree2; degree0/1 remain control scope.
+
+Preserve old pricing/review records. The optimized candidate needs fresh results for all1260 original targets; no old p739 counter substitution. Final protocol/source/binary/category bindings and independent policy review remain required. No new tests, source compiler, pricing calculation or scientific execution occurred.

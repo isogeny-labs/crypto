@@ -1,0 +1,81 @@
+{
+  "protocol": "ct104-cold-single-target",
+  "version": 1,
+  "date": "2026-11-14",
+  "scientific_standing": "pcc:unverified",
+  "curve": "11a1",
+  "source": {
+    "characteristic": 59,
+    "subgroup_order": 11,
+    "generator": [
+      19,
+      22
+    ]
+  },
+  "target": {
+    "characteristic": 2,
+    "extension_degree": 40
+  },
+  "global": {
+    "x_field_degree": 60,
+    "oriented_point_field_degree": 120,
+    "dense_psi11_coefficients": 61,
+    "dense_oriented_element_slots": 120
+  },
+  "measurement_rules": {
+    "mode": "single-public-target-cold",
+    "clock": "same-host wall ns and CPU ns",
+    "include_compile": true,
+    "include_precomputation": true,
+    "include_failed_attempts": true,
+    "exclude_warm_cache": false,
+    "counts": [
+      "integer_and_finite_field_ops",
+      "elliptic_additions",
+      "lattice_iterations",
+      "total_allocated_bytes",
+      "peak_resident_bytes"
+    ],
+    "references": [
+      "optimized source Pollard rho",
+      "source BSGS",
+      "admitted same-input cold index calculus baseline"
+    ],
+    "correctness": "verify source and target recovered logs by independent scalar multiplication"
+  },
+  "stages": [
+    {
+      "phase": "setup_psi11_and_field_degree_certificate",
+      "state": "not_measured"
+    },
+    {
+      "phase": "build_degree120_global_algebra_and_primes",
+      "state": "not_measured"
+    },
+    {
+      "phase": "recognize_arbitrary_Q_without_scalar",
+      "state": "not_implemented"
+    },
+    {
+      "phase": "certify_global_point_and_source_orientation",
+      "state": "not_implemented"
+    },
+    {
+      "phase": "evaluate_fixed_binary_residue",
+      "state": "not_implemented"
+    },
+    {
+      "phase": "construct_F2_40_arithmetic_and_target_DLP",
+      "state": "not_measured"
+    },
+    {
+      "phase": "independent_source_rho_BSGS_IC_single_target",
+      "state": "not_measured"
+    },
+    {
+      "phase": "independent_replay_and_validator",
+      "state": "not_measured"
+    }
+  ],
+  "claim": "No reproducible cold-cost speedup; the protocol does not yet have executable online lifting."
+}

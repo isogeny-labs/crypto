@@ -1,0 +1,9 @@
+# Next: bounded rational reconstruction for global reciprocal pairs
+
+Freeze the published prepared reciprocal_rational_20261115_v38 source before first execution. Prove and oracle-check existence/uniqueness under3d-3<n. Independent reference: binary linear homogeneous solve for Ddegree<=2d-2 and high(tD)zero above d-1, reduce every nonzero fraction and compare Euclid. Complete GF16/GF32/GF64 pair maps for allowed small d, diagonal t0, cancellations, repeated factors, no-fraction queries, invalid modulus precondition and boundary3d-3>=n refusal. No source edit after registration; failures get fresh variant.
+
+Next implement exact monic divisors U|D², retain a=(U+D)/N,b=(D²/U+D)/N when integral, nonzero anddegree<d. Enumerate both orderedpairs and all repeated factors; t0 retains full diagonal. Explicit divisor/work/output caps with inconclusive/lowerbound semantics; no timeout-to-empty conversion. Test complete small pair-domain sets independently, then actualGF83 low18 planted pairs and frozen random triple-target queries. Charge field/polynomial/factor setup, verification/output and memory;90seconds4GiB1core. Native field irreducibility is a caller certificate until refusal path implemented.
+
+A successful pair oracle removes the2^36pairtable but leaves2^54global triple queries. Investigate whole-triple-cell rational-approximation rejection before global solving. Current8sourcecell rejections cover only2^38of2^90ordered assignments. Reusing sampled rejection percentages is forbidden.
+
+Review primary rational reconstruction/Padé, polynomial factorization and algebraic-code syndrome literature before novelty claims. Any odd-extension or prime-interval analogue needs its own degree/height bounds, units/signs and curve-norm derivation; binaryk0 reciprocal identity is not assumed there. Retain complete originalroot/ghost and genuinebaseline engineering queues.

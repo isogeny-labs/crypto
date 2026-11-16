@@ -1,0 +1,26 @@
+2592 cube solves pending
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/ic-prime-eth-leads-20261031/leads/RESIDUES/cube/./cube_driver.py", line 50, in <module>
+    for r in ex.map(work,jobs):
+             ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Volumes/SSD990-2/ic-prime-eth-leads-20261031/leads/RESIDUES/cube/./cube_driver.py", line 33, in work
+    fd,path=tempfile.mkstemp(suffix='.cnf',dir=os.environ.get('TMPDIR','/tmp')); os.close(fd)
+            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tempfile.py", line 357, in mkstemp
+    return _mkstemp_inner(dir, prefix, suffix, flags, output_type)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tempfile.py", line 256, in _mkstemp_inner
+    fd = _os.open(file, flags, 0o600)
+OSError: [Errno 28] No space left on device: '/tmp/claude-501/tmplflyp3k4.cnf'

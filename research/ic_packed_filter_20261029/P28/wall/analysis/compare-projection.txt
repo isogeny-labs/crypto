@@ -1,0 +1,102 @@
+PROJECTION_KIND wall FILES 15
+COMPARE_FILE compare-dgb-aa__dgbf-w0.json
+  schema=ecbench.comparison/v2 pricing_weight=0.0 resample_seed=20261002 a_arm=dgb-aa b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  A_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  B_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  WALL {"aa_arms":["dgb-aa","dgb"],"aa_ci95":[0.9957600853840428,1.0009289844807723],"aa_median_ratio":1.001442720127712,"aa_pairs":288,"aa_ratio":0.9983411896991615,"aa_selection":"includes arm A","ci95":[0.9410912161291977,0.9471343864963956],"ci_method":"linearised_t_pairs","corrected_ci95":[0.9417997416200832,0.9495695463030676],"corrected_dof":549.9769886162372,"corrected_ratio":0.9456766642772405,"dof":287.0,"legacy_aa_arms":["dgb","dgb-aa"],"legacy_aa_ci95":[0.9980407948609087,1.0031077359804563],"legacy_ci95":[0.9431068697100238,0.9489504592380085],"legacy_outside_noise":true,"median_ratio":0.944830463100321,"ns_per_gae_a":92.56434355280649,"ns_per_gae_b":87.39073412365876,"ns_per_gae_upper_bound_arms":["dgb-aa","dgbf"],"outside_noise":true,"pairs":288,"pairs_below_level":0,"ratio_b_over_a":0.9441079660852748,"reasons":[],"required_level":"L2","self_aa":false,"status":"admitted","total_wall_ci95":[0.9410912161291978,0.9471343864963957],"total_wall_ratio":0.9441079660852749}
+COMPARE_FILE compare-dgb-aa__dgbf-w0.1.json
+  schema=ecbench.comparison/v2 pricing_weight=0.1 resample_seed=20261002 a_arm=dgb-aa b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb-aa__dgbf-w1.json
+  schema=ecbench.comparison/v2 pricing_weight=1.0 resample_seed=20261002 a_arm=dgb-aa b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgb-aa-w0.json
+  schema=ecbench.comparison/v2 pricing_weight=0.0 resample_seed=20261002 a_arm=dgb b_arm=dgb-aa admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  A_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  B_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  WALL {"aa_arms":null,"aa_ci95":null,"aa_median_ratio":null,"aa_pairs":0,"ci95":[0.9990718777304124,1.004257968036871],"ci_method":"linearised_t_pairs","dof":287.0,"legacy_aa_arms":["dgb","dgb-aa"],"legacy_aa_ci95":[0.9980407948609087,1.0031077359804563],"legacy_ci95":[0.9979954744956717,1.0031294721380057],"legacy_outside_noise":false,"median_ratio":1.001442720127712,"ns_per_gae_a":92.41079686623074,"ns_per_gae_b":92.56434355280649,"ns_per_gae_upper_bound_arms":["dgb","dgb-aa"],"outside_noise":null,"pairs":288,"pairs_below_level":0,"ratio_b_over_a":1.001661566524505,"reasons":["the compared arms run one method: this is itself an A/A control"],"required_level":"L2","self_aa":true,"status":"admitted","total_wall_ci95":[0.9990718777304124,1.004257968036871],"total_wall_ratio":1.001661566524505}
+COMPARE_FILE compare-dgb__dgb-aa-w0.1.json
+  schema=ecbench.comparison/v2 pricing_weight=0.1 resample_seed=20261002 a_arm=dgb b_arm=dgb-aa admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgb-aa-w1.json
+  schema=ecbench.comparison/v2 pricing_weight=1.0 resample_seed=20261002 a_arm=dgb b_arm=dgb-aa admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgbf-w0.json
+  schema=ecbench.comparison/v2 pricing_weight=0.0 resample_seed=20261002 a_arm=dgb b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  A_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  B_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  WALL {"aa_arms":["dgb","dgb-aa"],"aa_ci95":[0.9990718777304124,1.004257968036871],"aa_median_ratio":1.001442720127712,"aa_pairs":288,"aa_ratio":1.001661566524505,"aa_selection":"includes arm A","ci95":[0.9425655297580176,0.9487980677461451],"ci_method":"linearised_t_pairs","corrected_ci95":[0.9401678049011117,0.9480646401409445],"corrected_dof":543.537047611716,"corrected_ratio":0.9441079660852747,"dof":287.0,"legacy_aa_arms":["dgb","dgb-aa"],"legacy_aa_ci95":[0.9980407948609087,1.0031077359804563],"legacy_ci95":[0.9449681916487177,0.9506084904744648],"legacy_outside_noise":true,"median_ratio":0.9475190197768031,"ns_per_gae_a":92.41079686623074,"ns_per_gae_b":87.39073412365876,"ns_per_gae_upper_bound_arms":["dgb","dgbf"],"outside_noise":true,"pairs":288,"pairs_below_level":0,"ratio_b_over_a":0.9456766642772405,"reasons":[],"required_level":"L2","self_aa":false,"status":"admitted","total_wall_ci95":[0.9425655297580177,0.9487980677461452],"total_wall_ratio":0.9456766642772406}
+COMPARE_FILE compare-dgb__dgbf-w0.1.json
+  schema=ecbench.comparison/v2 pricing_weight=0.1 resample_seed=20261002 a_arm=dgb b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgbf-w1.json
+  schema=ecbench.comparison/v2 pricing_weight=1.0 resample_seed=20261002 a_arm=dgb b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgbf-edge-w0.json
+  schema=ecbench.comparison/v2 pricing_weight=0.0 resample_seed=20261002 a_arm=dgb b_arm=dgbf-edge admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  A_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  B_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  WALL {"aa_arms":["dgb","dgb-aa"],"aa_ci95":[0.9990718777304124,1.004257968036871],"aa_median_ratio":1.001442720127712,"aa_pairs":288,"aa_ratio":1.001661566524505,"aa_selection":"includes arm A","ci95":[0.9413594728364476,0.9470406656157968],"ci_method":"linearised_t_pairs","corrected_ci95":[0.9389034237268816,0.9463704729526453],"corrected_dof":561.5101694008376,"corrected_ratio":0.9426295545808369,"dof":287.0,"legacy_aa_arms":["dgb","dgb-aa"],"legacy_aa_ci95":[0.9980407948609087,1.0031077359804563],"legacy_ci95":[0.9432043613122328,0.9482726885659629],"legacy_outside_noise":true,"median_ratio":0.946170817445309,"ns_per_gae_a":92.41079686623074,"ns_per_gae_b":87.25388593324955,"ns_per_gae_upper_bound_arms":["dgb","dgbf-edge"],"outside_noise":true,"pairs":288,"pairs_below_level":0,"ratio_b_over_a":0.9441957962937374,"reasons":[],"required_level":"L2","self_aa":false,"status":"admitted","total_wall_ci95":[0.9413594728364476,0.9470406656157968],"total_wall_ratio":0.9441957962937374}
+COMPARE_FILE compare-dgb__dgbf-edge-w0.1.json
+  schema=ecbench.comparison/v2 pricing_weight=0.1 resample_seed=20261002 a_arm=dgb b_arm=dgbf-edge admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgb__dgbf-edge-w1.json
+  schema=ecbench.comparison/v2 pricing_weight=1.0 resample_seed=20261002 a_arm=dgb b_arm=dgbf-edge admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgbf-edge__dgbf-w0.json
+  schema=ecbench.comparison/v2 pricing_weight=0.0 resample_seed=20261002 a_arm=dgbf-edge b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  A_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  B_UNPRICED_COUNTS {"legendre_symbols_uncharged":236880,"lookups_uncharged":36101742,"row_ops_uncharged":731414,"sqrt_solves_uncharged":117216,"target_guard_probes_uncharged":60153}
+  WALL {"aa_arms":null,"aa_ci95":null,"aa_median_ratio":null,"aa_pairs":0,"ci95":[0.9984038787469248,1.0047429329632338],"ci_method":"linearised_t_pairs","dof":287.0,"legacy_aa_arms":["dgb","dgb-aa"],"legacy_aa_ci95":[0.9980407948609087,1.0031077359804563],"legacy_ci95":[0.9982661738077904,1.0029664221810117],"legacy_outside_noise":false,"median_ratio":1.0006648975382801,"ns_per_gae_a":87.25388593324955,"ns_per_gae_b":87.39073412365876,"ns_per_gae_upper_bound_arms":["dgbf-edge","dgbf"],"outside_noise":null,"pairs":288,"pairs_below_level":0,"ratio_b_over_a":1.0015683907822042,"reasons":["the compared arms run one method: this is itself an A/A control"],"required_level":"L2","self_aa":true,"status":"admitted","total_wall_ci95":[0.998403878746925,1.004742932963234],"total_wall_ratio":1.0015683907822044}
+COMPARE_FILE compare-dgbf-edge__dgbf-w0.1.json
+  schema=ecbench.comparison/v2 pricing_weight=0.1 resample_seed=20261002 a_arm=dgbf-edge b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+COMPARE_FILE compare-dgbf-edge__dgbf-w1.json
+  schema=ecbench.comparison/v2 pricing_weight=1.0 resample_seed=20261002 a_arm=dgbf-edge b_arm=dgbf admissible=true a_session_status=complete b_session_status=complete
+  OPS {"band":{"note":"point ratios of totals; rank only where the order holds at every weight","order":"unresolved inside the band","pairs":288,"ratio_b_over_a":[1.0,1.0,1.0],"weights":[0.0,0.1,1.0]},"bounded":true,"censored_pairs":0,"ci95":[1.0,1.0],"ci_method":"linearised_t","dof":47.0,"pairs":288,"ratio_b_over_a":1.0,"same_seeds":true,"same_session":true,"status":"ok","unpaired_runs":0,"workloads":48}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm295-85243301"}
+  CURVE {"ci95":[1.0,1.0],"ci_method":"linearised_t","pairs":144,"ratio_b_over_a":1.0,"slug":"icv1-fp28-tm8273-f1778659"}
+  WALL_BLOCK_IDENTICAL_TO_W0_FILE true
+PROJECT_COMPARE_OK

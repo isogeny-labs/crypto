@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   custody:
+    if: ${{ !github.event.pull_request.draft }}
     strategy:
       fail-fast: false
       matrix:

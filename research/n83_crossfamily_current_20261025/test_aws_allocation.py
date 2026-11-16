@@ -2,6 +2,7 @@
 
 import io
 from datetime import datetime, timezone
+import json
 import tarfile
 import tempfile
 import unittest
@@ -33,7 +34,7 @@ class AwsAllocationTest(unittest.TestCase):
                 return {'Reservations': [{'Instances': [
                     {'InstanceId': instance_id, 'InstanceType': 'g5g.4xlarge',
                      'InstanceLifecycle': 'spot', 'ImageId': 'ami-example',
-                     'Placement': {'AvailabilityZone': 'us-east-1d'},
+                     'Placement': {'AvailabilityZone': 'us-west-2c'},
                      'SubnetId': 'subnet-example', 'State': {'Name': 'pending'},
                      'LaunchTime': datetime(2026, 10, 26, 19,
                                             tzinfo=timezone.utc),
@@ -49,13 +50,13 @@ class AwsAllocationTest(unittest.TestCase):
                          'ec2_describe_instances_at_launch')
 
     def test_user_data_has_both_guards_and_fits_ec2_limit(self):
-        plan = {'account_id': '590183823895', 'region': 'us-east-1',
+        plan = {'account_id': '590183823895', 'region': 'us-west-2',
                 'instance_type': 'g5g.4xlarge', 'image_id': 'ami-example',
                 'source_head_sha': 'a' * 40,
                 'source_archive_sha256': 'b' * 64,
                 'source_manifest_sha256': 'c' * 64,
                 'cap_seconds': 21600}
-        zone = {'stratum': 0, 'zone': 'us-east-1d'}
+        zone = {'stratum': 0, 'zone': 'us-west-2c'}
         script = allocate_aws.user_data(
             plan, zone, {'source.tar.gz': 'https://example.com/source',
                          'manifest.json': 'https://example.com/manifest'},
@@ -73,6 +74,19 @@ class AwsAllocationTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             aws_deadline_guard.verified_live_ids(
                 FakeEc2(project='Other'), receipt)
+
+    def test_guard_rejects_wrong_ec2_region_before_waiting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            receipt = root / 'allocation.json'
+            receipt.write_text(json.dumps({
+                'account_id': '590183823895', 'region': 'us-east-1',
+                'deadline_utc': '2026-10-27T16:00:00+00:00',
+                'run_id': 'run1', 'instance_ids': ['i-example'],
+                'source_head_sha': 'a' * 40}))
+            with self.assertRaisesRegex(ValueError, 'region differs'):
+                aws_deadline_guard.guard(receipt, root / 'guard.json',
+                                         ec2=FakeEc2(), sleep=lambda _: None)
 
     def test_archive_extraction_rejects_parent_path(self):
         with tempfile.TemporaryDirectory() as directory:

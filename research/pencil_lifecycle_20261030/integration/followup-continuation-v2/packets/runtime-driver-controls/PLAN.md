@@ -1,0 +1,7 @@
+# Local driver controls, fixed before execution
+
+Exercise the published assembler Driver with its prefix replaced by the current Python interpreter and -c. Do not call main, workflow, sudo, Docker, cloud tools or scientific payloads. Use eight fixed controls: exit0/stdout/stderr, exit7, sleeping child terminated on a 0.2-second client timeout, SIGTERM-ignoring child requiring escalation, 17 MiB stdout rejection, a pending-signal flag injected during a sleeping child, a preexisting pending-signal flag, and an expired absolute deadline. All sleeping child commands self-expire after five seconds. Retain all results, including failures, and do not automatically retry.
+
+Use a new private /var/tmp directory. Outer command limit 30 seconds, 512 MiB virtual memory. The output control deliberately exceeds the driver's observed 16 MiB threshold by one MiB; total expected raw output stays below 20 MiB. Driver subprocess receipts, raw outputs and PID/PGID readback are retained. Inspect /proc after each completed call; a reaped direct child should be absent. No claims about root-owned processes, sudo propagation, Docker daemon termination, descendant trees or cgroups follow from these controls.
+
+These are local software supervision checks, not timing/performance measurements or a renewal of assembly/qualification/scientific allowances. Freeze source hashes before the single check and recheck afterward. Independent review remains pending.

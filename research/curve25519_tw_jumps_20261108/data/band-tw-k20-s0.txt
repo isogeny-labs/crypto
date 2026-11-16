@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.424 | 1.522 | 2.402 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j16 | 64/64 | 2.166 | 2.311 | 3.615 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j2 | 64/64 | 6.693 | 7.170 | 11.466 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j32 | 64/64 | 2.281 | 2.424 | 3.706 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j4 | 64/64 | 2.684 | 2.879 | 4.637 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j8 | 64/64 | 2.183 | 2.337 | 3.718 | — |
+
+Table work priced in U at w per operation (`--price-table-work`): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j16 | rho-neg < twcj-j16 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j2 | rho-neg < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j32 | rho-neg < twcj-j32 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j4 | rho-neg < twcj-j4 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j8 | rho-neg < twcj-j8 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j2 | twcj-j16 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j32 | twcj-j16 < twcj-j32 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j4 | twcj-j16 < twcj-j4 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j8 | twcj-j16 < twcj-j8 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j32 | twcj-j32 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j4 | twcj-j4 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j8 | twcj-j8 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j32 vs twcj-j4 | twcj-j32 < twcj-j4 |
+| icv1-fp20-tm1050-4295f05e | twcj-j32 vs twcj-j8 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | twcj-j4 vs twcj-j8 | twcj-j8 < twcj-j4 |

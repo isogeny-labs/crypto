@@ -1,0 +1,36 @@
+{
+  "input": "research/orbit_cold_20261116_v70/INSTANCE.json",
+  "calibration_paths": [
+    "research/orbit_roots_20261116_v70/ordinary.json",
+    "research/orbit_roots_20261116_v70/repeated.json"
+  ],
+  "order": [
+    [
+      "gcd",
+      "field_first",
+      "gray"
+    ],
+    [
+      "field_first",
+      "gray",
+      "gcd"
+    ],
+    [
+      "gray",
+      "gcd",
+      "field_first"
+    ],
+    [
+      "gcd",
+      "field_first",
+      "gray"
+    ]
+  ],
+  "repetitions_per_method": 4,
+  "conditional_family_only": true,
+  "native_child_reporting_seconds": 8,
+  "outer_seconds": 9,
+  "worker_seconds": 90,
+  "memory_mb": 4096,
+  "core": 0
+}

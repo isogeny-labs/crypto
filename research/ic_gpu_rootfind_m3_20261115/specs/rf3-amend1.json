@@ -1,0 +1,139 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rootfind-subtract m = 3 on the GPU inside a complete IC solve (pair-table probe set on the device), prime-order curves 26-32 bits (amendment 1)",
+ "description": "research/ic_gpu_rootfind_m3_20261115, frozen 2026-11-15 before the run. rf3-cpu: rootfind-subtract:m=3 (CPU sweep, negation-folded pair table). rf3-gpu: rootfind-subtract-gpu:m=3 with a worker process per run (worker=spawn). rf3-gpud: the same through a running rootfind_serve --daemon (worker=daemon; the daemon's start is a one-time host cost reported beside the records). The three must report identical relations, logarithm and counted S; rho.negation is the matched reference, rho-neg-aa the A/A control. Public synthetic curves; no security claim. rf3-cpuaa-F1024 is an A/A copy of rf3-cpu-F1024 (the wall-time noise floor of an IC arm). Amendment 1 (2026-11-15, before any rf3 record existed): ecbench's prime_search takes at most 32 bits, so the frozen 30/32/34/36-bit curve set could not run; the curves are 26/28/30/32 bits, everything else unchanged.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 26,
+    "seed": 20261115
+   },
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 20261115
+   },
+   {
+    "kind": "prime_search",
+    "bits": 30,
+    "seed": 20261115
+   },
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 20261115
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261116
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-cpu-F1024",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpu-F1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=spawn",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpud-F1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-cpu-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpu-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=spawn",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpud-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-cpuaa-F1024",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261117,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

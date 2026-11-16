@@ -1,0 +1,15 @@
+digraph Proof {
+  graph [rankdir=TB, bgcolor="white", nodesep=.3, ranksep=.35];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3f8", fontname="DejaVu Sans", fontsize=10];
+  edge [color="#526777", arrowsize=.7];
+  pairs [label="All actual bounded pairs\n91 coefficient shapes -> 10 pairs\n8 split-u pairs; separable f"];
+  runs [label="All 100 polynomial runs\nactual full gcd / Bezout\ncomposition / unit / remainder"];
+  unique [label="Unique output\ncantorAdd defined first"];
+  group [label="Finite group transport\nall 100 additions match cantorAdd"];
+  subgroup [label="Actual (X,1) order 5\nproper cyclic subgroup\nall 5 members split"];
+  fractions [label="Direct universal negations\n1 != 4/5 including identity\n1 != 7/9 excluding identity", fillcolor="#e8f4eb"];
+  {rank=same; pairs; runs;}
+  {rank=same; unique; group;}
+  {rank=same; subgroup; fractions;}
+  pairs -> runs -> unique -> group -> subgroup -> fractions;
+}

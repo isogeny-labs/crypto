@@ -1,0 +1,47 @@
+{
+  "namespace": "SemaevIrreducibilityAudit",
+  "proofs": [
+    {
+      "claim": "odd-degree polynomial times nonzero scalar cannot be rational square",
+      "file": "OddDegree.lean",
+      "declarations": [
+        "odd_degree_not_square",
+        "cubic_multiple_not_square"
+      ]
+    },
+    {
+      "claim": "actual S3 function-field no-root/degree2/irreducibility",
+      "file": "S3FunctionField.lean",
+      "declarations": [
+        "actual_discriminant",
+        "actual_discriminant_not_square",
+        "actual_function_field_quadratic_irreducible"
+      ]
+    },
+    {
+      "claim": "actual coefficient embedding, primitive condition and Gauss bridge",
+      "file": "PrimitiveBridge.lean",
+      "declarations": [
+        "coefficientEmbedding_injective",
+        "literalSource_map",
+        "literalSource_isPrimitive",
+        "actual_nested_source_irreducible"
+      ]
+    },
+    {
+      "claim": "actual multivariate/scalar-extension/symmetry theorem and characteristic control",
+      "file": "ActualPolynomial.lean",
+      "declarations": [
+        "sourceMv_as_literal",
+        "sourceMv_eval",
+        "sourceMv_isSymmetric",
+        "sourceMv_irreducible_after_field_map",
+        "sourceMv_binary_not_irreducible",
+        "actual_S3_absolute_irreducibility_with_control"
+      ]
+    }
+  ],
+  "hypotheses": "FieldK,2!=0, arbitrarya,b for irreducibility; exact IsSymmetric lemma needs no characteristic restriction. Negative control is the literal F2short polynomial,a=b0; no elliptic-group claim for that input.",
+  "local_gate": "64/0failures/0trusted",
+  "signed_standing": "not established"
+}

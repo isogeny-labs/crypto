@@ -1,0 +1,123 @@
+⚠ [3154/3209] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3155/3209] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3156/3209] Replayed FrobeniusCore
+warning: FrobeniusCore.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [8171/8322] Built StructuralAudit (3.9s)
+warning: StructuralAudit.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Algebra.Group.Subgroup.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.GroupTheory.OrderOfElement` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [9051/9055] Replayed MultiplicityControl
+warning: MultiplicityControl.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: MultiplicityControl.lean:9:0: automatically included section variable(s) unused in theorem `TheoremAudit.double_root_quotient_dimension`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: MultiplicityControl.lean:16:8: This simp argument is unused:
+  roots_X_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: MultiplicityControl.lean:18:0: automatically included section variable(s) unused in theorem `TheoremAudit.double_root_multiplicity_mass`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: MultiplicityControl.lean:20:8: This simp argument is unused:
+  roots_X_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [9052/9055] Replayed SolvingDegreeBound
+warning: SolvingDegreeBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [9053/9055] Replayed DegreeControl
+warning: DegreeControl.lean:63:6: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: DegreeControl.lean:72:14: This simp argument is unused:
+  Finsupp.single_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [hj]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DegreeControl.lean:89:4: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [9054/9055] Built Audit (5.8s)
+info: Audit.lean:7:0: 'TheoremAudit.S3_repeated_identity' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:8:0: 'TheoremAudit.S3_repeated_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:9:0: 'TheoremAudit.S3_repeated_root_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:10:0: 'TheoremAudit.S3_two_torsion_no_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:11:0: 'TheoremAudit.pointX_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:12:0: 'TheoremAudit.pointX_double' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:13:0: 'TheoremAudit.S3_repeated_mathlib_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:14:0: 'TheoremAudit.S3_signed_zero_sum_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:15:0: 'TheoremAudit.zero_sum_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:16:0: 'TheoremAudit.S3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:17:0: 'TheoremAudit.S3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:18:0: 'TheoremAudit.cyclic_restriction_trivial' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:19:0: 'TheoremAudit.sum_confined' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:20:0: 'TheoremAudit.outside_subgroup_not_smooth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:21:0: 'TheoremAudit.branch_collision_mass' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:22:0: 'TheoremAudit.minus_one_embedding_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:23:0: 'TheoremAudit.trace_zero_prime_embedding_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:24:0: 'TheoremAudit.two_subgroup_embedding_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:25:0: 'TheoremAudit.stable_branch_locus_excludes_diem' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:26:0: 'TheoremAudit.short_branch_locus_stable' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:27:0: 'TheoremAudit.triangular_iterate' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:28:0: 'TheoremAudit.geometric_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:29:0: 'TheoremAudit.triangular_iterate_identity_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:30:0: 'TheoremAudit.unipotent_not_identity' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:31:0: 'TheoremAudit.double_root_quotient_dimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:32:0: 'TheoremAudit.double_root_support_size' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:33:0: 'TheoremAudit.double_root_multiplicity_mass' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:34:0: 'TheoremAudit.control_X0_in_degree3_span' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:35:0: 'TheoremAudit.control_X1_in_degree3_span' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:36:0: 'TheoremAudit.control_variables_are_gb' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:37:0: 'TheoremAudit.control_degree3_rows_suffice' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:38:0: 'TheoremAudit.control_all_rows_degree_le_three' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:39:0: 'TheoremAudit.control_degree2_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (9055 jobs).

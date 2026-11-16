@@ -25,10 +25,14 @@ Sources (all committed, read at --ref unless noted):
                                 verified fixed-cohort cutoff coverage, not random sampling or security
   research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
                                 verified broader recorded-census coverage, not historical use or security
+  research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json
+                                exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
   research/explicit_relations_e2e_20261030/results-v*/
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
+  research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
+                                bounded D18 solver-policy gate on the a=0 N83 curve; no complete-cost rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -40,6 +44,7 @@ import atexit
 import datetime as dt
 import json
 import os
+import posixpath
 import subprocess
 import sys
 from pathlib import Path
@@ -384,6 +389,19 @@ def nist_selection_broader_census(ref, since):
                  source=f"{path}@{commit}")
 
 
+def nist_selection_exact_pair_audit(ref, since):
+    """Export the verified allocation inventory; do not compute a statistic."""
+    path = "research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        emit("nist.selection_exact_pair_audit.verified_assignments", data.get("assignments"),
+             date=date, problem="nist-candidate-selection", unit="label assignments", better="neutral",
+             label="Verified fixed-score allocation inventory; not sampled curves or security",
+             source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -600,6 +618,30 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def ic_packed_filter(ref, since):
+    """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
+    at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
+    from the native `ecbench compare` output; beside it the counted distance to the same-session
+    rho.negation at w = 0, copied from the validator's j4.json."""
+    study = "research/ic_packed_filter_20261029"
+    path = f"{study}/P32/wall/analysis/compare-dgb__dgbf-w0.json"
+    for date, commit, text in file_history(ref, path, since):
+        w = json.loads(text).get("wall", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.packed_filter.p32.wall_ratio", w.get("corrected_ratio"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, corrected wall per charged GAE dgbf / dgb, 32 bits (component)",
+             source=src)
+        emit("ic_component.packed_filter.p32.wall_ratio_ci95_hi", (w.get("corrected_ci95") or [None, None])[1], date=date,
+             problem=P_IC, unit="ratio", better="lower",
+             label="IC packed-table filter, upper end of the corrected 95% interval, 32 bits (component)", source=src)
+    path = f"{study}/validation/code/out/j4.json"
+    for date, commit, text in file_history(ref, path, since):
+        j = json.loads(text).get("P32-counted", {}).get("dgbf/rho-neg", {}).get("0.0", {})
+        emit("ic_component.packed_filter.p32.dgbf_over_rho_neg_w0", j.get("ratio_b_over_a"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, counted S' dgbf / rho-neg at w = 0, 32 bits (distance remaining)",
+             source=f"{path}@{commit}")
+
+
 def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
                           metric_prefix="gpu.explicit_relations"):
     """Exact completed-panel counts; no timing or global-maximum claims."""
@@ -703,6 +745,100 @@ def explicit_gpu_profile(ref, since):
                  source=f"{path}@{revision}")
 
 
+def explicit_gpu_fullcache(ref, since):
+    """Read both committed strata; retain preflight failures separately."""
+    study = "research/explicit_relations_fullcache_20261101"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for path in ls(ref, study):
+        directory, _, name = path.rpartition("/")
+        version = directory.rsplit("/", 1)[-1]
+        if not version.startswith("results-v") or not version[9:].isdigit():
+            continue
+        if name not in ("failure.json", "export-small.json", "export.json"):
+            continue
+        record = json.loads(show(ref, path))
+        date = record.get("created", record.get("observed_at", ""))[:10]
+        if len(date) != 10 or date < since:
+            continue
+        prefix = f"gpu.explicit_relations.fullcache.{version[8:]}"
+        if name == "failure.json":
+            if record.get("kind") != "preflight_failure" or record.get("attempted_recovery_cells") != 0:
+                raise ValueError(f"invalid GPU preflight record: {path}")
+            samples = [("preflight_failures", 1, "retained preflight failure; zero recovery attempts")]
+        else:
+            runs = record.get("runs", [])
+            attempted = sum(r.get("attempts", 0) >= 1 for r in runs)
+            if attempted != record.get("flow", {}).get("attempted"):
+                raise ValueError(f"inconsistent GPU full-cache coverage: {path}")
+            protocol_path = posixpath.normpath(f"{directory}/{record['protocol']['path']}")
+            protocol = json.loads(show(ref, protocol_path))
+            sample = protocol["sample_size"]
+            planned = len(protocol["arms"]) * sample["instances"] * (
+                sample["replicates"] + sample.get("warmups", 0))
+            if attempted > planned:
+                raise ValueError(f"GPU full-cache attempts exceed protocol: {path}")
+            prefix += ".small" if name == "export-small.json" else ".large"
+            samples = [
+                ("planned", planned, "protocol-planned executions"),
+                ("attempted", attempted, "recorded complete-recovery executions"),
+                ("verified_recoveries", sum(r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified" for r in runs),
+                 "fresh CPU-replayed recoveries"),
+                ("timeouts", sum(r.get("status") == "timeout" for r in runs),
+                 "retained solve timeouts"),
+                ("failed", sum(r.get("status") == "failed" for r in runs),
+                 "retained failed or resource-limited executions"),
+                ("interrupted", sum(r.get("status") == "interrupted" for r in runs),
+                 "retained interrupted executions; no complete clock"),
+                ("not_attempted", planned - attempted,
+                 "planned cells not started after infrastructure stop"),
+            ]
+        for suffix, value, label in samples:
+            emit(f"{prefix}.{suffix}", value, date=date,
+                 problem="gpu-generic-decomposition", unit="count", better="neutral",
+                 label=f"Full-cache {version}: {label}; fixed bounded panel, L0",
+                 source=f"{path}@{revision}")
+
+
+def n83_d18_vsids_gate(ref, since):
+    path = ("research/koblitz_n83_factor_base_sweep_20261008/verification/"
+            "d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json")
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "n83.d18-vsids-raw-audit/v1":
+            continue
+        if record.get("status") != "PASS_CENSORED_NATURAL":
+            continue
+        positive = record.get("positive", {})
+        natural = record.get("natural", {})
+        if positive.get("status") != "SAT_PENDING_XCNF_REPLAY" or natural.get("status") != "INDETERMINATE":
+            continue
+        source = f"{path}@{commit}"
+        emit("n83.a0.d18_vsids.positive_conflicts", positive.get("conflicts"),
+             date=date, problem=P_IC, unit="conflicts", better="neutral",
+             label="Constructed D18 positive, VSIDS-only branching; L0 local, PCC unverified",
+             source=source)
+        emit("n83.a0.d18_vsids.natural_censored_queries", 1,
+             date=date, problem=P_IC, unit="queries", better="neutral",
+             label="One public natural D18 query capped without a model; no relation-yield estimate, PCC unverified",
+             source=source)
+
+
+def vieta_component(ref, since):
+    """Export stored native observations; censored records do not imply admission."""
+    for slug in ("20261115T2104Z-vieta-coset-local-scale",
+                 "20261115T2147Z-vieta-three-fixture-repair"):
+        path = f"benchmarks/records/{slug}.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            for metric in record.get("metrics", []):
+                emit(f"vieta.component.{metric['name']}", metric.get("value"),
+                     date=date, problem="vieta-coset-component",
+                     unit=metric.get("unit", ""), better="neutral",
+                     label="Generic-reference operation counts; censored epoch, PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -722,6 +858,7 @@ def main():
     nist_selection_strict_elkies(a.ref, a.since)
     nist_selection_expanded_cutoff(a.ref, a.since)
     nist_selection_broader_census(a.ref, a.since)
+    nist_selection_exact_pair_audit(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)
@@ -732,10 +869,14 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    ic_packed_filter(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
                           "gpu.explicit_relations.affine")
     explicit_gpu_profile(a.ref, a.since)
+    explicit_gpu_fullcache(a.ref, a.since)
+    n83_d18_vsids_gate(a.ref, a.since)
+    vieta_component(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

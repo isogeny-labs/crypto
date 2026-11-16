@@ -45,6 +45,7 @@ jobs:
         run: python research/ic_candidate_tournament_20260915/goal_20260924/generic-reference-qualification/render_report.py --check
       - name: Fresh archive, all exported rows and eleven frozen audits
         run: |
+          set -o pipefail
           python -m unittest discover \
             -s research/ic_candidate_tournament_20260915/goal_20260924/generic-reference-qualification \
             -p test_archive.py -v 2>&1 | tee "$RUNNER_TEMP/ic-generic-reference-replay.log"

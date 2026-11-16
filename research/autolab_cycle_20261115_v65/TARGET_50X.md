@@ -1,0 +1,7 @@
+# Requested fiftyfold end-to-end target
+
+The user raised the stretch target to50x. A claim requires geometric-mean speedup>=50against the fastest completed source-identified genuine matchedF4/F5/F6configuration on the frozen20hard-instance panel. Preserve the immutableperformance/GATE.mdfloor2xand all its other requirements:>=1sfastest completed baseline,>=3cold repetitions,<=1.10worst slowdown,A/A<=10%,qualified isolation and memory,independent complete original root sets,and requestedGF(2^83),ordinarybinary/Koblitz,oddextensions,NIST P192/P224/P256/P384/P521coverage. Report per-instance ratios,per-field aggregates and memory. No cached-answer lookup,preprocessing omission,truncated roots or timeout ratio qualifies.
+
+No fiftyfold result has been established. The prior2.284sownASreference would imply a45.7mscomplete-pipeline target for a50xlocal comparison,but that is not the genuine-baseline denominator. The actual release timing budget is each completed genuine baseline divided by50. Adding a target file does not relax correctness or manufacture a hard input. Requiring all fields while the currentoptimized backend isGF83only remains an open engineering/research obligation.
+
+Stage profiling is a diagnostic with clock overhead and incomplete final-output accounting;clean cold timing charges full lifetime separately. Amdahl limits are conditional models under unchanged other-stage costs,not rigorous bounds on every possible algorithm. Use them to select search-space reductions instead of extrapolating a word-size optimization to50x.

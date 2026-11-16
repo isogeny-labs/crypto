@@ -1,0 +1,57 @@
+{
+  "schema": "crypto.transfer-assessment/v3",
+  "case_id": "n83-general-jacobian-norm-projector",
+  "status": "structural_route_certified_pending_replay",
+  "source": {
+    "object": "E/GF(2^83)",
+    "order": "9671406556923184866742756",
+    "target_prime": "2417851639230796216685689",
+    "trace": "-6151469093347"
+  },
+  "destination": {
+    "object": "J(C)",
+    "curve": "v^2+u^2v=u^7+u",
+    "dimension": 3
+  },
+  "transformation": {
+    "map": "phi(u,v)=(u^3,uv+1)",
+    "degree": 3,
+    "pushforward": "residue-field norm on arbitrary reduced Mumford support",
+    "endomorphism": "e=phi^*phi_*",
+    "projector": "p=[3^-1 mod r]e"
+  },
+  "certificates": [
+    "phi_*phi^*=[3]",
+    "e^2=[3]e",
+    "p^2=p on declared r-torsion",
+    "D=p(D)+(1-p)(D)",
+    "phi_*((1-p)(D))=0"
+  ],
+  "prym": {
+    "base_frobenius": "X^4+4",
+    "degree_83_frobenius": "X^4+q^2",
+    "elliptic_factor_traces": [
+      "4398046511104",
+      "-4398046511104"
+    ],
+    "order": "93536104789177786765035829293842113257979682750465",
+    "gcd_with_r": "1",
+    "shares_source_isogeny_factor": false
+  },
+  "cost": {
+    "standard_full_jacobian": "rejected by prior q^(4/3) screen",
+    "projected_relations": "unmeasured",
+    "speedup_claim": false
+  },
+  "controls": [
+    "486-class independent GF(8) norm table",
+    "236196 ordered homomorphism pairs",
+    "malformed-input rejection",
+    "small-field exact point counts",
+    "exact integer gcds"
+  ],
+  "open_obligations": [
+    "complete CI/native replay after executor disconnect",
+    "image-compatible relation-yield experiment only if strict rho crossover gate remains plausible"
+  ]
+}

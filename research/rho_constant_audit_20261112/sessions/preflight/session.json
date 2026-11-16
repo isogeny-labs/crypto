@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h9cd21a0011c9",
+  "label": "Separate one-target preflight for fixed repository rho-count audit",
+  "spec_id": "ECS1hbc386ee698fd",
+  "spec_sha256": "bc386ee698fd5cd6870d4753aab1a7153dfd2406e54480d4d9406882463d6e83",
+  "env_class_id": "ECBENV3h4ed1141c63b6",
+  "host_sha256": "48aee58b9e3bb77ffbd6be01d419eb8e9eca59314741441355ade8514a4813c2",
+  "plan_sha256": "2c101439de4324df90e6f9d25e034053e9804858c921ffc720861585c14b7a20",
+  "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "246eeed35f57ac6a52e256c05aaef0ab85be53cfa3b77fc2a61b440623921263",
+  "child_env": {
+    "HOME": "/home/agent",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/agent/.cargo/bin:/home/agent/.elan/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794522323199,
+  "finished_unix_ms": 1794522323308,
+  "status": "complete",
+  "executions_planned": 12,
+  "records_written": 12,
+  "records_sha256": "160d23d10ceff70f8d3fc6a7ff7fcd886a1b6db1d593fb178403f2117b079bc1",
+  "status_counts": {
+    "verified": 12
+  },
+  "last_seq": 11
+}

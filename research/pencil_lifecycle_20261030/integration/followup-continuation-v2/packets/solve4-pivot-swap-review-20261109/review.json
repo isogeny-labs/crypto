@@ -1,0 +1,120 @@
+{
+  "schema": "research.source-fidelity-review/v1",
+  "status": "scoped_source_design_supported_uncompiled",
+  "new_execution": false,
+  "claims": [
+    {
+      "claim": "First nonzero search",
+      "finding": "search_some proves zero prefix in the supplied list and a nonzero returned row; search_none characterizes list exhaustion. native_search_bound proves row eligibility and nonzero entry. Ascending/no-duplicate coverage of candidates versus Rust col..4 is not proved."
+    },
+    {
+      "claim": "Whole-row swap",
+      "finding": "swapIndex is an involution including equal indices. swapRows permutes all five entries including RHS. Rowwise predicate equivalence supplies decoded equation-set equivalence for arbitrary decode; no primality or overflow assumptions needed for permutation alone."
+    },
+    {
+      "claim": "Prefix transfer",
+      "finding": "selected_zero_prefix requires all eligible rows to have zero entries before col. It transfers that premise only; it does not establish the loop invariant. selected_pivot places the supplied nonzero entry on the diagonal."
+    },
+    {
+      "claim": "Controls",
+      "finding": "Concrete matrix has eligible column values 0,2,3 at col1; selects row2 and moves RHS6 with coefficient2; prior row0 unchanged. Zero matrix exhausts search. All-ones and RHS-omission negatives reject unjustified prefix and coefficient-only swapping. These are prospective uncompiled controls."
+    }
+  ],
+  "findings": [],
+  "correction_required": false,
+  "declaration_count": 9,
+  "control_count": 8,
+  "axiom_readback_names": 17,
+  "source_sha256": "9535830381d9f1a49e8769f9554d78a394415eb8fa658f35ca41edd89da91111",
+  "native_excerpt_sha256": "0df2d90085c617bea6616acb5f2cf62ff3242c8ab62b8812e9a994de772ce296",
+  "scope_limits": [
+    "Readback is prospective; no Lean elaboration or axiom audit occurred in this review.",
+    "Native source binding is the retained concatenated excerpt, including the complete solve4 function; it is not a binding to the full native module, compiled binary or compiler.",
+    "Candidate-list representation refinement, physical array mutation, canonical decode/zero correspondence, loop invariant propagation, counters and full returned-vector correctness remain open integrations.",
+    "Already-reviewed normalization is reused, not reproved."
+  ],
+  "next_step": "Bind this unchanged scoped design and controls to one prospective dependency-qualified replay; subsequent composition must supply candidate-list and iteration/full-return obligations.",
+  "source_bindings_verified": [
+    {
+      "name": "goal-coverage-audit/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "storage-field-review/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "word-union-composition/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "ordinary-fiber-independent-review/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "solve4-native-normalization-composition-review/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "solve4-native-normalization-composition/Composition.lean.txt",
+      "hash_matches": true
+    },
+    {
+      "name": "solve4-elimination-stage/EliminationField.lean.txt",
+      "hash_matches": true
+    },
+    {
+      "name": "solve4-elimination-stage/native-source.rs.txt",
+      "hash_matches": true
+    },
+    {
+      "name": "target-stream-implementation/REPORT.md",
+      "hash_matches": true
+    },
+    {
+      "name": "native-duplicate-target-review-20261105/result.json",
+      "hash_matches": true
+    },
+    {
+      "name": "weighted-global-class-reconciliation/NEXT.md",
+      "hash_matches": true
+    }
+  ],
+  "reviewed_files": [
+    {
+      "path": "solve4-pivot-swap-20261109/PivotSwap.lean.txt",
+      "sha256": "9535830381d9f1a49e8769f9554d78a394415eb8fa658f35ca41edd89da91111",
+      "bytes": 4229
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/Controls.lean.txt",
+      "sha256": "cdb7ed07c94adb42735e0cf214966eeea24c51cb312b4d8260e7af2ecec84d8b",
+      "bytes": 1110
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/ExpectedFailure.lean.txt",
+      "sha256": "2be0ca38af19258af54466c6aa9b356f02071b7d2479395093885bab1dc08595",
+      "bytes": 120
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/Readback.lean.txt",
+      "sha256": "9580b51aa480241c05543c7b08ebe65b15ffa6f2a869669f43ffab04a34c8079",
+      "bytes": 908
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/native-source.rs.txt",
+      "sha256": "0df2d90085c617bea6616acb5f2cf62ff3242c8ab62b8812e9a994de772ce296",
+      "bytes": 1946
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/PLAN.md",
+      "sha256": "dba81f7c688c708f71a62ce2de557c6a49180d9b663cd1a3211a88654cd81b6a",
+      "bytes": 2779
+    },
+    {
+      "path": "solve4-pivot-swap-20261109/source-bindings.json",
+      "sha256": "c50ed1a7f4af615886a415ffb73a19f739ea8679a561aa8872374f36e0edfd64",
+      "bytes": 3875
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+import StoredDivision
+import NonmonicExact
+set_option autoImplicit false
+namespace NonmonicStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder MonicTermination QuotientStorage NonmonicDivision
+
+def wloop {n:Nat} (p a:UInt64) (b:List UInt64) (fuel:Nat) (xs:State n) (r:List UInt64) :
+ Option (State n×List UInt64) :=
+ if hr:r=[] then some (xs,r) else
+ if hl:b.length≤r.length then
+  if hj:r.length-b.length<n then
+   match fuel with
+   | 0=>none
+   | k+1=>wloop p a b k (put xs ⟨r.length-b.length,hj⟩ (coefficient p a (r.getLast hr))) (NonmonicDivision.selected p a b r hr hl)
+  else none
+ else some (xs,r)
+termination_by structural fuel
+
+theorem loop_refines {n:Nat} (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hanz:a≠0) (hbs:Canon p b) (hm:b.getLast?=some a)
+ (N fuel:Nat) (xs:State n) (r:List UInt64) (hc:Canon p r) (hr:r.length≤N) (hn:N-b.length<n) :
+ (wloop p a b fuel xs r).map (fun z=>(decodedPoly p z.1,z.2))=
+ NonmonicDivision.qloop p a b fuel (decodedPoly p xs) r := by
+ induction fuel generalizing xs r with
+ | zero =>
+   rw [wloop,NonmonicDivision.qloop]
+   split_ifs with he hl hj
+   · rfl
+   · rfl
+   · rfl
+   · rfl
+ | succ fuel ih =>
+   rw [wloop,NonmonicDivision.qloop]
+   split_ifs with he hl hj
+   · rfl
+   · have hs:=NonmonicDivision.selected_correct p a b r he hl hp hb ha hanz hbs hc
+     have hd:=NonmonicDivision.selected_shorter p a b r he hl hp hb ha hanz hbs hc hm
+     rw [ih _ _ hs.1 (by omega),put_decode]
+   · exact False.elim (hj (current_index_bound N b.length r.length n hr hn))
+   · rfl
+
+theorem loop_good {n:Nat} (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hanz:a≠0) (hbs:Canon p b)
+ (fuel:Nat) (xs ys:State n) (r out:List UInt64) (hg:Good p xs) (hc:Canon p r)
+ (ho:wloop p a b fuel xs r=some (ys,out)) : Good p ys ∧ Canon p out := by
+ induction fuel generalizing xs ys r out with
+ | zero =>
+   rw [wloop] at ho
+   split_ifs at ho with he hl hj
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+ | succ fuel ih =>
+   rw [wloop] at ho
+   split_ifs at ho with he hl hj
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+   · exact ih _ ys _ out (put_good p xs _ _ hg (coefficient_correct p a (r.getLast he) hp hb ha hanz (hc _ (List.getLast_mem he))).1)
+       (NonmonicDivision.selected_correct p a b r he hl hp hb ha hanz hbs hc).1 ho
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+end NonmonicStorage

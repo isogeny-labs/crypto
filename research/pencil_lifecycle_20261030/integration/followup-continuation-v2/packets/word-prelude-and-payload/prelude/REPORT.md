@@ -1,0 +1,15 @@
+# Literal coefficient prelude to batch inversion
+
+The packet derives canonicality and exact decoded norm, S1 and S0 from eight canonical coefficient words. normWord/s1Word/s0Word preserve the native nested multiply/subtract/add order at three_leads.rs1015–1034. Explicit rfl lemmas identify each literal word definition with a separately defined operation tree; a proved structural induction supplies canonicality and decoding. No target correspondence or intermediate canonicality is assumed.
+
+norm_decode establishes the exact field polynomial (ra-rb)^2-(qa-qb)*(ra-rb)*qb+(qa-qb)^2*rb. s1_decode preserves the ordinate order sb-sa and tb-ta. s0_decode preserves d*(b-a*qb)+a*c*rb. guarded_batch_from_inputs then combines their derived bounds with actual nonzero word guards and the preserved batch inversion theorem, obtaining field nonzero guards, nonzero product and canonical ni/si with ni=1/normField and si=1/s1Field.
+
+Scope: expression/decoding lemmas require 0<p<2^31 and canonical input words; the inverse endpoint requires prime2<p<2^31. The proof deliberately excludes the unused pow5 expression constructor so it does not introduce the older helper's p>=5 condition; a full p=3 control instantiates the joint. Native interpretation assumes Field.n=1 and diagnostic tables absent, with source mul/bs using UInt64 multiply then remainder and sub using add(neg). This does not establish source dispatch from arbitrary public Jacobian inputs or counter/compiler/array semantics. The S0 model describes the body computed after a successful native guard, not an assertion that native code evaluates it in bypassed branches.
+
+Nine main declarations, seven fixed controls and sixteen separate named axiom readbacks pass. Successful receipts: FastPreludeExpr-attempt-ibaf3GXO, FastPreludeDecode-attempt-XbtKYdD1, FastPreludeControls-attempt-mQfpMVkj, FastPreludeReadback-attempt-nXjfUgo5. All bindings unchanged. Readbacks contain only standard propext/Classical.choice/Quot.sound subsets; ExpectedFailure-attempt-j922ItbO rejects 0=1 with exit1. Independent review pending; existing pinned caches remain trusted.
+
+Controls: p17 input(qa,ra,sa,ta,qb,rb,sb,tb)=(1,2,1,2,0,1,4,6) gives N2,S1=16,S0=7; full endpoint si theorem; smallest odd prime p3; same-support norm zero; norm nonzero/S1 zero; flipped ordinate orientation; excluded noncanonical input. No curve validity or smoothness is assumed or claimed by these coefficient controls.
+
+Retained failures: FastPreludeExpr-attempt-M2wH5Ude used unsupported grouped structure-field syntax; fields were separated without changing content. FastPreludeControls-attempt-d1H6BD0m needed Inputs.canonical unfolded before decide. No scientific workload, timing, cloud operation, repository edit or prior-packet modification occurred. Frozen scope and campaign limits unchanged.
+
+Next joints: source slope coefficient multiplications, inverse_lead operations and native polynomial calls; connect actual stored divisors to coefficient assumptions and generic reduction/class interpretation. No further coefficient-domain restriction was needed beyond those listed.

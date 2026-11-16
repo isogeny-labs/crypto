@@ -93,10 +93,13 @@ cache, replays `S3Roots` with `leanchecker --fresh`, and refuses `sorry`,
 axiom set. Earlier text here stated the result without any kept output
 (sheriff case SHF-20261016-3caa6f, finding L6). The output of a green run
 is now committed as [`lean/axiom-audit.txt`](lean/axiom-audit.txt) (`.txt` because `papers/.gitignore` ignores `*.log`)
-(run 38984047507, job 117251255336, PR #2026 head e5a884227,
-2026-10-17): all three theorems depend on exactly `propext`,
-`Classical.choice` and `Quot.sound`, and `leanchecker --fresh` passed
-(added 2026-10-17, sheriff case SHF-20261017-e4d7f6, L-N7). To check locally:
+(run 41010358498, job 123914606537, main at 77f0eddecd, 2026-10-30, whose
+`lean/` sources are identical to this commit's): all seven declarations,
+the four bridge lemmas included, depend on exactly `propext`,
+`Classical.choice` and `Quot.sound`, and `leanchecker --fresh` passed.
+The first committed log (run 38984047507, 2026-10-17; sheriff case
+SHF-20261017-e4d7f6, L-N7) covered only the first three; it was replaced
+2026-11-06 (sheriff case SHF-20261106-a114e7, LNX-4). To check locally:
 
 ```
 cd lean && lake exe cache get && lake build && lake env lean AxiomAudit.lean

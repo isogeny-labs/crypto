@@ -1,0 +1,9 @@
+binary	sha256_16	seq	arm	method	before_solve_Ir	solve_Ir	total_Ir	total_gae	ir_per_gae	note
+baseline main 8a208fa570	b661f953d79dccd8	0	rho-neg	rho.negation	242782512	31726911	274792709	34156	928.88	whole-process count from the run without markers; the split is from the marker run (ECBENCH_CALLGRIND_SOLVE=1, Collected 274798309)
+B: A + walk (ic_boundary)	0eff84e84d22b1a6	0	rho-neg	rho.negation	39232509	30093469	69591262	34156	881.06	marker run Collected 69617226
+baseline main 8a208fa570	b661f953d79dccd8	1	inc	ic.pipeline N=1024			1147910545	1446809		whole process only: --combine-dumps=yes --callgrind-out-file=/dev/null (a dump part per relation marker)
+B: A + walk (ic_boundary)	0eff84e84d22b1a6	1	inc	ic.pipeline N=1024			944194507	1446809		whole process only, as above
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	0	rho-neg	rho.negation	243219672	31727893	275220629	34156	928.91	marker run Collected 275240510
+C: B + registry index (main 5ac38ef4e9)	0038806674a3af21	0	rho-neg	rho.negation	2207376	30092881	32598131	34156	881.04	marker run Collected 32576800
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	1	inc	ic.pipeline N=1024			1157017508	1446809		whole process only, as above
+C: B + registry index (main 5ac38ef4e9)	0038806674a3af21	1	inc	ic.pipeline N=1024			916254438	1446809		whole process only, as above

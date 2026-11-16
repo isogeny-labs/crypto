@@ -1,0 +1,56 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ct-dynamic-audit-20261102-1
+experiment_id: ct_dynamic_audit_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: a1530967a1c6ea4e63bb9b470639ec0c73294117
+receipt: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.receipt.json
+binds:
+  - {path: research/ct_dynamic_audit_20261102/PROTOCOL.md, sha256: fb6685e533997a5a074f9be4f1bdff0659072b032c7c751c0e470e774f1d70c6}
+  - {path: research/ct_dynamic_audit_20261102/protocol.json, sha256: b4917ab9bec0efcea1a84d4f2ca91ec21f7ecabb96723756cc95e6409761d449}
+  - {path: research/ct_dynamic_audit_20261102/run.sh, sha256: eaa8d61f17e32435340ee734b3c90697d4602182a92c6ebe116e085f26b99877}
+  - {path: research/ct_dynamic_audit_20261102/src/main.rs, sha256: 34791996bd59e7fcab68f3edb1eee7f1fef2424ba1f676f18afa6311df06aac3}
+  - {path: Cargo.toml, sha256: f81e15d7ca2cfbba419165b272a15cd736db548f1c90e3454d32fbd3ded373e3}
+  - {path: Cargo.lock, sha256: cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6}
+  - {path: target/release/ct_dynamic_audit, sha256: ebdf722a792ec116fdcc694cbfbbcc3d91246ec5f54940a06d445022771e402b}
+must_not_exist:
+  - research/ct_dynamic_audit_20261102/raw
+  - research/ct_dynamic_audit_20261102/results
+commands:
+  - id: build
+    argv: [env, CARGO_PROFILE_RELEASE_DEBUG=line-tables-only, cargo, build, --release, --locked, --bin, ct_dynamic_audit]
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.build.stdout
+    stderr: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.build.stderr
+  - id: binary-sha256
+    argv: [sha256sum, target/release/ct_dynamic_audit]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.binary-sha256.stdout
+  - id: audit-run
+    argv: [bash, research/ct_dynamic_audit_20261102/run.sh, target/release/ct_dynamic_audit, research/ct_dynamic_audit_20261102/raw, research/ct_dynamic_audit_20261102/results]
+    timeout_seconds: 3000
+    success_exit_codes: [0]
+    stdout: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.run.stdout
+    stderr: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.run.stderr
+    outputs:
+      - research/ct_dynamic_audit_20261102/raw/ENV.txt
+      - research/ct_dynamic_audit_20261102/results/rows.jsonl
+      - research/ct_dynamic_audit_20261102/results/summary.json
+      - research/ct_dynamic_audit_20261102/results/fig_ir_spread.svg
+  - id: output-sha256
+    argv: [sha256sum, research/ct_dynamic_audit_20261102/results/rows.jsonl, research/ct_dynamic_audit_20261102/results/summary.json, research/ct_dynamic_audit_20261102/results/fig_ir_spread.svg, research/ct_dynamic_audit_20261102/raw/ENV.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.output-sha256.stdout
+bus_address: executor-mechanical-ct-dynamic-audit
+background: true
+write_scope:
+  - research/ct_dynamic_audit_20261102/
+  - target/
+stop_when:
+  - Any command exits with a status other than 0 or reaches its timeout; no command is retried.
+  - Any path listed under must_not_exist already exists before the first command starts.
+notes: "Execution route is the session container. The EKS route of AGENTS.md section 9a is unavailable because the session has no AWS identity and the aws CLI is absent. The metrics are Valgrind instruction-stream properties, not clocks. Timeouts total 3720 seconds."

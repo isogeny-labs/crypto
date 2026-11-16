@@ -1,0 +1,62 @@
+{
+ "idea_id": "MP-ml_empirical-6",
+ "skeptic_lens": "mathematical refutation",
+ "verdict": "refuted",
+ "confidence": 0.85,
+ "expected_class_confirmed": "accounting",
+ "reason": "Three independent breaks of the mechanism. (A) Tautology: for any component whose learner input is a function of the coordinates of single group elements (components 1-target-level and 2), the twin arm is informationally identical to the permutation null. enc is a uniformly random injection drawn independently of the labels, so for every held-out target enc(R) is uniform on the unused codomain and independent of label(R); hence E_enc[skill_twin] = chance for every learner, exactly, and skill_real - skill_twin = skill_real - chance, which csd leak_audit's permutation null already reports. For components whose input is the abstract relation matrix (component 3) the twin gap is identically 0 by inspection of the input signature. The harness therefore never produces a measurement not already determined a priori by whether the component reads coordinates. (B) False positive on its own positive control (computed, experiments/MP-ml_empirical-6/trace_control.json): on y^2+xy=x^3+a2x^2+a6 over F_2^13 (#E=2*4091) the identity Tr(x(P))=Tr(a2) <=> P in 2E (Knudsen halving) holds for all 8182 points, so the 'trace feature' is the indicator of the index-2 subgroup 2E, i.e. [r*R==O], a GGM-simulable function costing O(log r) group operations (exactly the TREAT-ggm-simulable class). With factor base x in V, V in ker Tr, l=5: real trace AUC 0.762 (m=2), 0.079 (m=3, i.e. 0.921 reversed), twin naive-Bayes AUC 0.503/0.503 over 10 encodings -> twin gap +0.26 / +0.42 'certifies non-generic skill' for a feature that is a group-theoretic coset indicator. With a random V (not in ker Tr) real AUC = 0.500: the positive control gives no signal at all. So the harness mislabels generic skill as non-generic whenever the generic computation needs more than the zero group operations the twin's feature pipeline is granted; the correct baseline (best generic skill at the same operation budget) is a theorem (CGK/CHW), not a runnable arm. (C) Component 3's quantitative claims fail a counting check (experiments/MP-ml_empirical-6/rank_counting.json; B=256, exact elimination over F_r, r=1048583, 30 runs/arm). Single-target IC needs rows until the FIRST LINEAR DEPENDENCY (left-kernel vector), not rank B: random m=2 needs 0.514B (even cycle in G(B,M)), random m=3 needs 0.926B (k-XORSAT 0.918); 'rank-aware steering' (forced lowest-degree column) RAISES this to 0.886B (m=2) and B+1 (m=3, never dependent before full rank) - steering toward rank gain is strictly counterproductive for the one-target DLP. For the all-logs (preprocessing) variant the random excess factor is the coupon-collector H_B/m = 3.06 (m=2) / 2.04 (m=3), measured 2.94/2.06, unbounded as ln B/m, not a k-XORSAT constant; forced-column steering gives 1.14/1.00, a 61%/52% reduction, so the idea's own prediction_if_true ('5-20% fewer') is wrong and its prediction_if_false ('<0.5x indicates a rank-accounting bug') fires on correct accounting. The k-XORSAT k=m+1 fixed point is the wrong invariant for both stopping rules (relations carry m base columns, not m+1; the threshold governs row independence, not column coverage). The non-genericity argument is not at issue (idea admits accounting), but the 'zero twin gap = generic, positive twin gap = may claim exponent stake' rule is unsound in the positive direction by (B) and vacuous in the zero direction by (A).",
+ "fix": "Not salvageable as a certifier. What survives independently: (i) the pre-closure of a rank-aware GNN as engineering, but for the right reason - an exact incremental F_r rank oracle costs O(B) per row and the only steering with any effect is forced coverage in the all-logs variant (factor ln(B)/m, a log factor; LEAD-ICE-relation-graph-rank-large-prime already forecloses it), while in the one-target variant the goal is the first dependency and steering is harmful; (ii) a correct genericity check for a coordinate feature is analytic, not a twin arm: test whether the feature factors through a group-theoretic invariant (coset of nE for small n, e.g. Tr(x) = [R in 2E]; order-of-point; subgroup membership) by checking invariance under the full automorphism group of the abstract group Z/r x cofactor (constant on cosets), and price the generic simulation in group ops; any residual label correlation not explained by such invariants is the actual KN-OPEN-91d4f6 x-functional-filter question, to be tested against the existing permutation null with the 2E-coset covariate regressed out. Replace the 'positive control' with Tr(x) explicitly labelled as the generic control (expected real AUC 0.75 at m=2 when V in ker Tr) that a valid certifier must classify as generic.",
+ "collisions": [
+  "TREAT-ggm-simulable-augmented-oracles (the trace/halving indicator is GGM-simulable; the harness certifies it as non-generic)",
+  "csd/experiment.py permutation null (the twin arm equals it in expectation for coordinate-input learners)",
+  "LEAD-ICE-relation-graph-rank-large-prime (first-dependency stopping, 2-core; rank-feedback selection foreclosed)",
+  "LEAD-ICB-free-relations-self-collision (a linear dependency IS the free relation; steering for rank gain postpones it)",
+  "Knudsen 1999 point halving: Tr(x_P)=Tr(a2) iff P halvable"
+ ],
+ "evidence": {
+  "trace_control": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/MP-ml_empirical-6/trace_control.json",
+  "trace_control_script": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/MP-ml_empirical-6/trace_control.py",
+  "rank_counting": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/MP-ml_empirical-6/rank_counting.json",
+  "rank_counting_script": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/MP-ml_empirical-6/rank_counting.py",
+  "numbers": {
+   "curve": "y^2+xy=x^3+x^2+9 over F_2^13 (x^13+x^4+x^3+x+1), #E=8182=2*4091, halving identity verified on all points",
+   "trace_AUC_real_vs_twin": {
+    "V_in_kerTr_m2": [
+     0.762,
+     0.503
+    ],
+    "V_in_kerTr_m3": [
+     0.079,
+     0.503
+    ],
+    "random_V_m2": [
+     0.5,
+     0.499
+    ],
+    "random_V_m3": [
+     0.502,
+     0.498
+    ]
+   },
+   "rows_to_first_dependency_over_B": {
+    "m2_random": 0.514,
+    "m2_steered": 0.886,
+    "m3_random": 0.926,
+    "m3_steered": ">1 (never before full rank)"
+   },
+   "rows_to_full_rank_over_B": {
+    "m2_random": 2.94,
+    "m2_steered": 1.14,
+    "m3_random": 2.06,
+    "m3_steered": 1.0,
+    "coupon_collector_prediction": {
+     "m2": 3.06,
+     "m3": 2.04
+    }
+   }
+  },
+  "analytic": "E_enc[skill_twin]=chance for any learner whose input is f(enc(R)) with enc a random injection independent of labels; hence twin arm == permutation null for components (1),(2). Component (3) twin gap == 0 by input signature. Neither case yields information beyond what is known before running."
+ },
+ "cpu_minutes_used": 1.5,
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-ml_empirical-6.refute.json"
+}
