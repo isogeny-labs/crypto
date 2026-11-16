@@ -1,0 +1,9 @@
+# Bind the parity control to actual higher moments
+
+Actual all-k b0 source076 proves matching-port right coefficient1=1 for every k>0,under u<=a,i<=a and arbitrary Nat multiplicities. The successor all-active count and generic symmetric control require their own accepted receipt; do not infer them from076 or from declared label count. Preserve every failed source/raw output. [pcc:unverified]
+
+Next actual test: choose t=pole(i)=-2^i, i<u<=a, a matching residue port r and m(j)=1 if j=i,0 otherwise. Derive actual node slope=-2^(u-i) and actual retained anchor slope=+2^(u-i), including mask membership and nonzero denominators. Prove that evaluating the actual denominator coefficients at Z0 gives exactly (1-cH)(1+cH),c=2^(u-i). Do not substitute a favorable supplied denominator. [pcc:unverified]
+
+Transport the generic odd-H cancellation through the actual geometricRows,actual numerator constant0/first1 and outer factor2^-b. For odd b<k, predict zero matching-port Z1 coefficient of actual polyRight. Include k0/empty-label boundary separately and even-index nonzero control where valid. Preserve any failed identity or concrete exact counterexample; no timing/scaling/native/paid/cloud/attack campaign. [pcc:unverified]
+
+Matching-port first-jet cancellation alone does not make an entire mode zero or improve its uniform valuation. Inspect other columns and higher Z coefficients before pruning or increasing mode weight. Any improvement must preserve actual matrix factorization and source/target sides,then bind to weighted inventory and original child-entry/edge/degree bounds. Full packet/extension arithmetic and all preparation/control/index/array/trace/memory/public expected bit costs remain open. Watcher stays paused; protected histories are never chosen/rechained/rewritten. [pcc:unverified]
