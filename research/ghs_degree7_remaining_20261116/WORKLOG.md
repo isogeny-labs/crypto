@@ -211,6 +211,30 @@ classes into a fixed-carrier degree-seven lower bound with stated scope.
 
 None in preparation.
 
+## 2026-11-16 00:03 America/Los_Angeles
+
+### What was done
+
+The four frozen degree-eight linear-square runs completed with zero exact
+identities. Each cell represented 23,894,838 logical candidates and checked
+1,952,100 direct point-filter controls; CPU costs were 124.836, 125.010,
+131.245, and 131.485 seconds. Added a source-hash and counter audit and a
+bounded result note after the earlier directory lease was released.
+
+### Decisions made
+
+Keep this as a five-shape degree-eight screen. General nonbranch square
+parts and three quadratic branch poles remain open.
+
+### Open threads
+
+Screen the remaining degree-eight denominator classes; construct an exact
+subgroup map before any trace +22 attack-cost claim.
+
+### Errors
+
+None in these four counted runs.
+
 ## 2026-11-15 23:08 America/Los_Angeles
 
 ### What was done
