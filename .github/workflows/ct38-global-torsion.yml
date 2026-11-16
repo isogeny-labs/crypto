@@ -1,6 +1,7 @@
 name: CT38 global 5-torsion cross-characteristic control
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/lift_reduce_second_prime_20261112/**'
       - '.github/workflows/ct38-global-torsion.yml'
@@ -12,6 +13,7 @@ permissions:
   contents: read
 jobs:
   bounded-arithmetic:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

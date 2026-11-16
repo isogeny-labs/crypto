@@ -1,0 +1,54 @@
+{
+  "schema": "fixture-view-admission/v1",
+  "admitted": false,
+  "phase": "materialize",
+  "total_seconds": 120,
+  "campaign_ceiling_seconds": 43200,
+  "campaign_remaining_seconds": null,
+  "absolute_deadline": "2026-11-10T05:11:39Z",
+  "attempts": 1,
+  "automatic_retry": false,
+  "uid": 1000,
+  "gid": 1000,
+  "workspace": "/var/tmp/pencil-fixture-materialize-20261109",
+  "view_source": "/var/tmp/pencil-fixture-materialize-20261109/source",
+  "compiled_source": "/var/tmp/pencil-root-materialize-t1953-20261109/source",
+  "durable_run": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-20261109",
+  "unit": "pencil-fixture-materialize-20261109.service",
+  "lease": null,
+  "serial_predecessor_terminal_sha256": null,
+  "independent_review_sha256": null,
+  "publication": {
+    "verified_github_commit": null,
+    "readback_sha256": null
+  },
+  "cost_mode": "owner-waived-dollar-facts/v1",
+  "recipe_files": {
+    "durable-launcher.py": "ef3b42eb91a998ac3b6beb1dcfb4fcfa035b624c8f8086053e4ce9ba12d806fa",
+    "durable_io.py": "282e197839a4ec8633f0798cb8f2ce928dfae3aeaa348cdec78c35dd0c32793a",
+    "durable-worker.py": "757f210418974d61fa876791c52cce25b953ae193c158e18ee22b38f0cc1403a"
+  },
+  "materialized_view_sha256": null,
+  "materialization_terminal_sha256": null,
+  "binary": {
+    "path": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+    "sha256": "20c362a4c34dbe0cd10f9801be182fc32281e6a5ecbc1bc6c0f97797f46cd7ca"
+  },
+  "limits": {
+    "supervisor_permit_seconds": 10,
+    "durable_log_bytes": 268435456,
+    "durable_total_stop_bytes": 402653184,
+    "durable_metadata_stop_bytes": 67108864
+  },
+  "initial_manifest": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+  "initial_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+  "additions_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/additive-inputs-proposal.json",
+  "additions_manifest_sha256": "056cfa1690a64526ed99d602a7c94a452e1ea8547bc8837a51816b822899d4e1",
+  "git_repository": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105",
+  "git_commit": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+  "materialized_view_manifest": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-20261109/worker/materialized-view.json",
+  "elf_dependencies": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/elf-dependency-source-readback.json",
+  "elf_dependencies_sha256": "a6a4cb3b9fc5bf6242449d835395976d1303d73cf8d6e29c1aed889e921dd862",
+  "test_inventory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/expected-test-inventory.json",
+  "test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016"
+}

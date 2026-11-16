@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct107/**'
       - '.github/workflows/ct107-line-field-index.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct107/**'
       - '.github/workflows/ct107-line-field-index.yml'
   workflow_dispatch:
 jobs:
   ct107:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

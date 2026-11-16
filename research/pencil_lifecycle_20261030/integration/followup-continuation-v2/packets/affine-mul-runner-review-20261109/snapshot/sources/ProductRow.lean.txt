@@ -1,0 +1,30 @@
+import Events
+import ProductWord
+set_option autoImplicit false
+namespace ProductPolynomial
+open Polynomial CoefficientTraversal ScaleTrim TraversalPolynomial RemainderPolynomial
+
+theorem run_polynomial {n : Nat} (p c : UInt64) [Fact p.toNat.Prime]
+ (es : List (ProductWord.Event n)) (xs : State n)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hc : c.toNat<p.toNat)
+ (hx : Good p xs) (he : ∀e∈es,e.2.toNat<p.toNat) :
+ decodedPoly p (ProductWord.run p c es xs)=decodedPoly p xs+eventPoly p c es := by
+ have hr:=ProductWord.run_correct p c es xs hp hb hc hx he
+ apply Polynomial.ext
+ intro i
+ simp only [decodedPoly,sourcePoly_coefficient,coeff_add]
+ by_cases hi : i < n
+ · simp only [if_pos hi,extend,dif_pos hi]
+   rw [event_coeff]
+   simpa [decode,ProductWord.contribution,Fin.ext_iff] using hr.2 ⟨i,hi⟩
+ · have hh:=event_coeff_high p c es i (by omega)
+   simp only [if_neg hi,hh,add_zero]
+
+theorem generated_polynomial_step {n : Nat} (p c : UInt64) [Fact p.toNat.Prime]
+ (j : Nat) (bs : List UInt64) (h : j+bs.length≤n) (xs : State n)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hc : c.toNat<p.toNat)
+ (hx : Good p xs) (hbs : ∀b∈bs,b.toNat<p.toNat) :
+ decodedPoly p (ProductWord.run p c (events j bs h) xs)=
+ decodedPoly p xs+C (c.toNat : ZMod p.toNat)*X^j*wordsPoly p bs := by
+ rw [run_polynomial p c _ xs hp hb hc hx (events_good p j bs h hbs),events_polynomial]
+end ProductPolynomial

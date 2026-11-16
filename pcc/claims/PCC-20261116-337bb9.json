@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T13:55:53Z",
+ "id": "PCC-20261116-337bb9",
+ "kind": "statement",
+ "producer": {
+  "commit": "032a36cffd7e85e9986f13486c79bb7c3cd31735",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/whole-identical-completed-engine-byte-sharing-28/actual-allocation-and-branch-checkpoint-failure.json",
+    "sha256": "cd80de8742318883a77aa505a865dfdaa49a66ac2e2b48b31bac38f872aff919"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/whole-identical-completed-engine-byte-sharing-28/actual-whole-byte-sharing.json",
+    "sha256": "83051a1cdea5e6efe63d1bf2c9234714c64cec19697d130ecd9becd5f5a3a3c8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/whole-identical-completed-engine-byte-sharing-28/entire-before-and-progress.json",
+    "sha256": "f4fa5bea68c8162cfb843df048adadce6e67d3c673113724e01d52eb2e4711f7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/whole-identical-completed-engine-byte-sharing-28/entire-first-partial-branch-checkpoint-file-records.json",
+    "sha256": "6108dc707a7808a20b45760e03bece182e2b57ccfcdccd8be89e0037699fba74"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Fresh next-proof branch checkpoint409 stops1 on ENOSPC while backing up working files, before any branch switch; actual HEAD remains genuine032a, actuald3c9 merge already fetched. Entire original partial backup and its complete file-record inventory retained; both frozen final Lean source hashes unchanged. Separate410 whole-byte sharing of two exact old finished prepared-engine rlib/rmeta copies recovers58095864 redundant bytes, every original regular path/full byte/mode retained with complete before inode/mtime metadata, no mutable cache/native executable/Git source/index/history change. First28 record-directory ENOSPC had no mutation. Next distinct completion reuses byte-identical closed full captures and source archive hardlink, retaining first partial without overwrite; no paid/native/scientific rerun, policy or budget change."
+}

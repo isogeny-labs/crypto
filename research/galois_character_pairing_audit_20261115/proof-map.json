@@ -1,0 +1,182 @@
+{
+  "main": "GaloisCharacterPairingAudit.galois_character_pairing_certificate",
+  "binding": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+  "custom_imports": {
+    "FiniteQuotients": "research/galois_character_pairing_audit_20261115/lean/FiniteQuotients.lean",
+    "CocycleClasses": "research/galois_character_pairing_audit_20261115/lean/CocycleClasses.lean",
+    "PerfectEvaluation": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+    "FiniteCocycles": "research/galois_character_pairing_audit_20261115/lean/FiniteCocycles.lean",
+    "FieldCharacterRoots": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+    "GaloisCharacters": "research/galois_character_pairing_audit_20261115/lean/GaloisCharacters.lean",
+    "GaloisGenerator": "research/galois_character_pairing_audit_20261115/lean/GaloisGenerator.lean",
+    "GaloisUnits": "research/galois_character_pairing_audit_20261115/lean/GaloisUnits.lean",
+    "GaloisPairingCertificate": "research/galois_character_pairing_audit_20261115/lean/GaloisPairingCertificate.lean",
+    "CharTwoGaloisControl": "research/galois_character_pairing_audit_20261115/lean/CharTwoGaloisControl.lean",
+    "PerfectCocyclePairing": "research/galois_character_pairing_audit_20261115/lean/PerfectCocyclePairing.lean",
+    "CoinvariantCharacters": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean"
+  },
+  "claims": [
+    {
+      "declaration": "GaloisCharacterPairingAudit.root_unit_from_base",
+      "conclusion": "An Omega unit killed by q-1 uniquely descends to K units."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.baseCharacterEquiv",
+      "conclusion": "All Omega-valued characters descend under actual annihilation."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.invariant_all_galois",
+      "conclusion": "Frobenius-invariant K characters are invariant under all Gamma, using actual density."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.galoisCharacterEquiv",
+      "conclusion": "Actual Gamma-equivariant Omega characters correspond to invariant K characters."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.classCoinvariantEquiv",
+      "conclusion": "Actual all-continuous-cocycle/principal quotient is actual Frobenius coinvariants."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.leftDuality",
+      "conclusion": "Actual left perfectness MulEquiv."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.rightDuality",
+      "conclusion": "Actual right perfectness MulEquiv."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.source_pairing_formula",
+      "conclusion": "Exact displayed source formula on every representative in actual Omega units."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.pairing_left_nondegenerate",
+      "conclusion": "Left radical trivial."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.pairing_right_nondegenerate",
+      "conclusion": "Right radical trivial."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.duality_cardinality",
+      "conclusion": "Actual character/class groups have equal cardinality."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.two_characters_trivial",
+      "conclusion": "Every finite char2 K: all actual M2 Galois characters trivial."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.missing_two_class_ne_one",
+      "conclusion": "Same actual continuous-cocycle class domain has a nonzero class."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.annihilation_guard_needed",
+      "conclusion": "No right-nondegenerate bilinear homomorphism on the same actual domains."
+    },
+    {
+      "declaration": "GaloisCharacterPairingAudit.two_annihilation_false",
+      "conclusion": "The deleted annihilation hypothesis is actually false."
+    }
+  ],
+  "reuse": {
+    "schema": "byte-identical-reused-formal-cores/v1",
+    "copies": [
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/GaloisGenerator.lean",
+        "bytes": 3939,
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FiniteQuotients.lean",
+        "bytes": 4324,
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FiniteCocycles.lean",
+        "bytes": 5449,
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/CocycleClasses.lean",
+        "bytes": 4491,
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/FieldCharacterRoots.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+        "bytes": 1459,
+        "sha256": "32579d797877c0657c0708ac02b29b7f175d2e6cde9ed57c4dec07483866994b",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/CoinvariantCharacters.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean",
+        "bytes": 2859,
+        "sha256": "4ad1669833b5b28e8c0ad62a6dec0bf9eb22fe44dd1ca7c9dc8921bdc82a080e",
+        "byte_identical": true
+      },
+      {
+        "origin": "research/finite_tate_duality_audit_20261114/lean/PerfectEvaluation.lean",
+        "copy": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+        "bytes": 3197,
+        "sha256": "ce8bf9ce8e9a137730b5b4a9feed3543632eb2eb76a4638594303ec8d8ee6faa",
+        "byte_identical": true
+      }
+    ],
+    "copy_count": 7,
+    "originals_modified": false,
+    "prior_claims": [
+      "PCC-20261115-ed6495",
+      "PCC-20261114-cdb4f1"
+    ],
+    "protocol_count_note": "Initial protocol prior-pin count string included an uncertainty marker; no count from that note is used as a verification assertion. Exact prior plans and hashes were checked."
+  },
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 73,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_all_Gamma_equivariant_Omega_characters": true,
+    "actual_character_descent_derived": true,
+    "actual_all_continuous_cocycle_principal_class_quotient": true,
+    "both_duality_MulEquivs_derived": true,
+    "exact_source_Omega_value_formula_proved": true,
+    "actual_characteristic2_guard_deletion_counterexample": true,
+    "canonical_continuous_complex_H1_comparison_proved": false,
+    "full_isogeny_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

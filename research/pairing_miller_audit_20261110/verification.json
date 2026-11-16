@@ -1,0 +1,58 @@
+{
+  "schema": "pairing-miller-verification/v1",
+  "source_commit": "4db7a35b08d295f9151fe1bd2bbdf5cd00ba44fe",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 32,
+  "claim_id": "PCC-20261110-5b33a1",
+  "declaration_sha256": "b81f031148b0f0aa1948f87e139a40ff02d2f7bb0a9ba775bdcaae6623222f77",
+  "actual_verdict": {
+    "claim_id": "PCC-20261110-5b33a1",
+    "claim_sha256": "beeee3e1428e753753ea3d7cba7c387a7a78b8e2380f07b6b6175e598a24b548",
+    "commit": "4db7a35b08d295f9151fe1bd2bbdf5cd00ba44fe",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/pairing_miller_audit_20261110/lean (MillerCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T18:43:39Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-5b33a1",
+    "claim_sha256": "beeee3e1428e753753ea3d7cba7c387a7a78b8e2380f07b6b6175e598a24b548",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "gate": {
+    "archive": "research/pairing_miller_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 126,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/pairing_miller_audit_20261110/evidence/attempts.tar.gz",
+    "files": 51,
+    "roundtrip_equal": true
+  },
+  "report": {
+    "path": "reports/proof-20261110/report.pdf",
+    "pages": 3,
+    "bytes": 58960,
+    "sha256": "7d37435d0f94b503555dd3d9e51f6f70502c521d40728776c42a6e4f10bf34de",
+    "all_pages_visually_inspected": true
+  },
+  "canonical_divisor_identification_proved": false,
+  "paid_compute": 0,
+  "native_experiment": false
+}

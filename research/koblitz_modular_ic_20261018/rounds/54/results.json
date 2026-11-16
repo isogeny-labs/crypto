@@ -1,0 +1,347 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 54,
+  "runs": [
+    {
+      "attempt": "fiber-lean54-01",
+      "source_revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": [
+        "Fiber54.anti_orbitTrace_zero",
+        "Fiber54.basisMap_injective",
+        "Fiber54.orbitTrace.eq_1",
+        "Fiber54.orbitTrace_fixed_by_square",
+        "Fiber54.range_iff_fixed",
+        "Fiber54.recover_fixed"
+      ],
+      "authored_claims": [
+        "Fiber54.anti_orbitTrace_zero",
+        "Fiber54.basisMap_injective",
+        "Fiber54.orbitTrace_fixed_by_square",
+        "Fiber54.range_iff_fixed",
+        "Fiber54.recover_fixed"
+      ],
+      "generated_equation_declarations": [
+        "Fiber54.orbitTrace.eq_1"
+      ],
+      "status": "accepted"
+    },
+    {
+      "attempt": "fiber54-01",
+      "source_revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIBER54_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FIBER54_RESULT rank_E=16 rank_K=16 image=1 relations=1 inverse=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T16:23:46Z",
+      "finished_utc": "2026-10-31T16:23:51Z",
+      "native_wall_seconds": 5.0
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "source_revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FLATPOINTS54_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FLATPOINTS54_RESULT points=4 F2_degree=20 source_RR_products=2112 binary_value_conversions=128 both_field_ideal_products=true"
+      ],
+      "point_results": [
+        "FLATPOINT54_POINT index=1 F2_degree=20 rho_degree=16 RR_values=32",
+        "FLATPOINT54_POINT index=2 F2_degree=20 rho_degree=16 RR_values=32",
+        "FLATPOINT54_POINT index=3 F2_degree=20 rho_degree=18 RR_values=32",
+        "FLATPOINT54_POINT index=4 F2_degree=20 rho_degree=18 RR_values=32"
+      ],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T17:15:45Z",
+      "finished_utc": "2026-10-31T17:15:47Z",
+      "native_wall_seconds": 2.0
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "source_revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FROBFIBER54_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 25,
+      "first_errors": [
+        "   ? error occurred in or before ::irreducible54 line 2: ` int degree=deg(f);if(degree<1){return(0);}`",
+        "   ? wrong type declaration. type 'help int;'",
+        "   ? last reserved name was `degree`",
+        "   ? leaving ::irreducible54 (0)",
+        "   ? leaving ::irreducible54 (0)",
+        "   ? error occurred in or before ::irreducible54 line 2: ` int degree=deg(f);if(degree<1){return(0);}`",
+        "   ? wrong type declaration. type 'help int;'",
+        "   ? last reserved name was `degree`"
+      ],
+      "native_results": [
+        "FROBFIBER54_RESULT factors=4 all_quartic=1 RR_products=0 distinct_norms=0 irreducible_norms=0 frob2_sign=1 frob4_identity=1 trace_rank=4 anti_rank=8 anti_trace_zero=1"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T16:43:47Z",
+      "finished_utc": "2026-10-31T16:43:50Z",
+      "native_wall_seconds": 3.0
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "source_revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FROBFIBER54_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FROBFIBER54_RESULT factors=4 all_quartic=1 RR_products=2112 distinct_norms=4 irreducible_norms=4 frob2_sign=1 frob4_identity=1 trace_rank=4 anti_rank=8 anti_trace_zero=1"
+      ],
+      "point_results": [
+        "FROBFIBER54_POINT index=1 relative_degree=4 F2_residue_degree=20 norm_degree=20 norm_irreducible=1",
+        "FROBFIBER54_POINT index=2 relative_degree=4 F2_residue_degree=20 norm_degree=20 norm_irreducible=1",
+        "FROBFIBER54_POINT index=3 relative_degree=4 F2_residue_degree=20 norm_degree=20 norm_irreducible=1",
+        "FROBFIBER54_POINT index=4 relative_degree=4 F2_residue_degree=20 norm_degree=20 norm_irreducible=1"
+      ],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T16:48:13Z",
+      "finished_utc": "2026-10-31T16:48:16Z",
+      "native_wall_seconds": 3.0
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "fiber-lean54-01",
+      "artifact": "driver.sh",
+      "revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/LEAN_DRIVER.sh",
+      "sha256": "97b8fc45cad92d164a51832519a5bec4717dcd155126010542d3f855dc320937"
+    },
+    {
+      "attempt": "fiber-lean54-01",
+      "artifact": "launcher.sh",
+      "revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/REPLAY_LEAN.sh",
+      "sha256": "c9fd5de4789cfd3485cc4d5d918fd4ada559d25eca6f82939219a51ef77325bb"
+    },
+    {
+      "attempt": "fiber-lean54-01",
+      "artifact": "Fiber54.lean",
+      "revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/lean/Fiber54.lean",
+      "sha256": "53350225403729dd3d12db276c60d85f519f88fc4f98c88f9a26ab094606550e"
+    },
+    {
+      "attempt": "fiber-lean54-01",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/LEAN-PROTOCOL.md",
+      "sha256": "f2271d611e9c9a5201127bedea2946d516921ac8bf76d0d944c51afbf4eac158"
+    },
+    {
+      "attempt": "fiber-lean54-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "f11a9946d6a82dd65586d46275b344b433718b3a",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "input.sing",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/FIBER54.sing",
+      "sha256": "b8c4c07825504b8cc59f9cdeb3c7da35cdce85f599d7142a353f08a46c7d2625"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "driver.sh",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/NATIVE_DRIVER.sh",
+      "sha256": "3167c4dc57b741c6b0ed1b7c3a5d3fa5eb311386163448fe3b51890365bd3575"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "launcher.sh",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/PROTOCOL.md",
+      "sha256": "d4044cec07a87c86161a802de3a5dbce4db9a08702455f0d4effedcc2b08934f"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "protocol.json",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/protocol.json",
+      "sha256": "31b42ca66ffd0d6f0ab81f2ac86bbce38391a1aacf9dfbc021d86d7ea4fa1275"
+    },
+    {
+      "attempt": "fiber54-01",
+      "artifact": "donors.json",
+      "revision": "5aaca65cd65fea8f2ba516eb2e10c2fb6cb9f5d6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/donors.json",
+      "sha256": "3f76539e271de52b4b1a42e391d5a7cd460b929231d058f0d7459ecf6970b631"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "input.sing",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/FLATPOINTS54.sing",
+      "sha256": "774a1b2692bc6f1479d8abd433fa7cfa1aa7662bf6a131f032bf5a5dfd224f4e"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "driver.sh",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/NATIVE_DRIVER.sh",
+      "sha256": "3167c4dc57b741c6b0ed1b7c3a5d3fa5eb311386163448fe3b51890365bd3575"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "launcher.sh",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/PROTOCOL.md",
+      "sha256": "397c874c9c57ed8bb76f35016b972f98b7521bd98cc3468541c0696a8350be36"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "protocol.json",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/protocol.json",
+      "sha256": "156d944a15f44ef8a4b9fed9be4d1a3d2f54f14ecda0eec33f1e0ea1b4b8738a"
+    },
+    {
+      "attempt": "flatpoints54-01",
+      "artifact": "donors.json",
+      "revision": "0d3bb8ee2b8c5ee7e0d388024b7b22bbba2dbdea",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/donors.json",
+      "sha256": "109c4e88c6c29089288cb4ff5ae29695a933ea51da9ebf4827f8c4c060e2e27a"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "input.sing",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/FROBFIBER54.sing",
+      "sha256": "004a929736e8cbab93df22f7a6fb424b64b29dd993e6e0f18495962218ab550b"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "driver.sh",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/NATIVE_DRIVER.sh",
+      "sha256": "3167c4dc57b741c6b0ed1b7c3a5d3fa5eb311386163448fe3b51890365bd3575"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "launcher.sh",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/PROTOCOL.md",
+      "sha256": "e80370a15615dddbdd13ae50c6952149280f98cd99080e8194b0f7aaaf8ca9cd"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "protocol.json",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/protocol.json",
+      "sha256": "2e993df15338d50eeeda87f770b6fc5da4ecb3d6da6e50f4b3261629c0ac5082"
+    },
+    {
+      "attempt": "frobfiber54-01",
+      "artifact": "donors.json",
+      "revision": "23db682b70a3840823eeed1bbc7dcfd6d0eaea2e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/donors.json",
+      "sha256": "9d110797071c9ef9755c6ba523d57583d814c9bb1af64b171f15a90db762c043"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "input.sing",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/FROBFIBER54.sing",
+      "sha256": "84d9946e97270c8146f165aee6259107dc4fecabfee55cabb4779fd3ac9883c2"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "driver.sh",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/NATIVE_DRIVER.sh",
+      "sha256": "3167c4dc57b741c6b0ed1b7c3a5d3fa5eb311386163448fe3b51890365bd3575"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "launcher.sh",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/PROTOCOL.md",
+      "sha256": "4f60502c00df05c58a6f645f54a82bbdea01453e9f0b40759c7557a364fc27eb"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "protocol.json",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/protocol.json",
+      "sha256": "2e993df15338d50eeeda87f770b6fc5da4ecb3d6da6e50f4b3261629c0ac5082"
+    },
+    {
+      "attempt": "frobfiber54-02",
+      "artifact": "donors.json",
+      "revision": "583d4441059da2999fc546ff4a5232671a651492",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/54/donors.json",
+      "sha256": "9d110797071c9ef9755c6ba523d57583d814c9bb1af64b171f15a90db762c043"
+    }
+  ],
+  "authored_proved_claims": [
+    "Fiber54.anti_orbitTrace_zero",
+    "Fiber54.basisMap_injective",
+    "Fiber54.orbitTrace_fixed_by_square",
+    "Fiber54.range_iff_fixed",
+    "Fiber54.recover_fixed"
+  ],
+  "audited_declarations": [
+    "Fiber54.anti_orbitTrace_zero",
+    "Fiber54.basisMap_injective",
+    "Fiber54.orbitTrace.eq_1",
+    "Fiber54.orbitTrace_fixed_by_square",
+    "Fiber54.range_iff_fixed",
+    "Fiber54.recover_fixed"
+  ]
+}

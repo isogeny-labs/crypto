@@ -1,0 +1,41 @@
+{
+  "schema": "mumford.calibration.launcher-failure/v1",
+  "observed_at": "2026-11-09T22:16:43.193Z",
+  "protocol_sha256": "f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6",
+  "protocol_commit": "eb164a7eb892c0ab9e7553dcbaf4df90f3c2daa0",
+  "arm": "f3-positive",
+  "instance": "0",
+  "replicate": 0,
+  "seed": 202611090301,
+  "exit_status": 127,
+  "outcome": "infra_error",
+  "reason": "Launcher /usr/bin/time missing; timeout/bash/native executables were not reached.",
+  "native_curve_calls": 0,
+  "raw_curve_directory_exists": false,
+  "observed_flow": {
+    "planned_cells": 2,
+    "launcher_attempts": 1,
+    "native_curve_calls": 0,
+    "completed_cells": 0,
+    "infrastructure_failures": 1,
+    "remaining_unattempted_cells": 1
+  },
+  "files": [
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/evidence/calibration-v1-launcher.stderr.log",
+      "bytes": 60,
+      "sha256": "6933a7e0df95783acf93ed90af942334f7d1619d9a6a1f897c79ed256537f3c9"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/evidence/calibration-v1-launcher.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/evidence/calibration-v1-launcher.exit-status",
+      "bytes": 4,
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe"
+    }
+  ],
+  "standing": "Producer observation, unsigned/unverified."
+}

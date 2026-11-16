@@ -1,0 +1,105 @@
+{
+  "main": "MillerPrincipalIdealAudit.miller_affine_ideal_certificate",
+  "binding": "d2b0fd734afc3313003d0373976189f696193cbf25807d2b3b20610645ef40ce",
+  "custom_imports": {
+    "LineEvaluation": "research/miller_principal_ideal_audit_20261115/lean/LineEvaluation.lean",
+    "MillerIdealCertificate": "research/miller_principal_ideal_audit_20261115/lean/MillerIdealCertificate.lean",
+    "LineIdeals": "research/miller_principal_ideal_audit_20261115/lean/LineIdeals.lean",
+    "GuardControls": "research/miller_principal_ideal_audit_20261115/lean/GuardControls.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MillerPrincipalIdealAudit.cancel_principal",
+      "conclusion": "Cancellation of a nonzero principal ideal factor in every integral domain."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.chord_principal_ideal",
+      "conclusion": "Actual generic point-ideal product equals chord/tangent principal ideal."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.three_tangent_nonvertical",
+      "conclusion": "Actual three-torsion implies nonvertical tangent."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.tangent_three_principal_ideal",
+      "conclusion": "Actual three-torsion tangent ideal equals point ideal cubed."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.line_class_nonzero",
+      "conclusion": "Actual coordinate-ring line class nonzero."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.line_function_nonzero",
+      "conclusion": "Actual function-field line image nonzero."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.point_eval_XClass",
+      "conclusion": "Actual coordinate-ring evaluation on X class."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.point_eval_YClass",
+      "conclusion": "Actual coordinate-ring evaluation on Y class."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.line_evaluation",
+      "conclusion": "Actual regular-function line evaluation equals numerical line formula."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.short_tangent_slope",
+      "conclusion": "Short-model tangent slope formula."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.short_three_miller_evaluation",
+      "conclusion": "Actual three-torsion tangent evaluation equals numerical Miller expression."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.control_positive_ideal",
+      "conclusion": "Actual F5 three-torsion positive ideal control."
+    },
+    {
+      "declaration": "MillerPrincipalIdealAudit.control_negative_ideal",
+      "conclusion": "Actual F5 tangent cube counterexample after deleting three-torsion guard."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 25,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_affine_ideal_function_evaluation_bridge": true,
+    "actual_negative_guard_control": true,
+    "projective_infinity_or_canonical_divisor_bridge": false,
+    "canonical_pairing_identification": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

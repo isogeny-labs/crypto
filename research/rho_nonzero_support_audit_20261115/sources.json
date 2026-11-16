@@ -1,0 +1,360 @@
+{
+  "schema": "rho-nonzero-source-plan/v1",
+  "created": "2026-11-15T16:21:46.363342+00:00",
+  "formal": {
+    "project": "research/rho_nonzero_support_audit_20261115/lean",
+    "theorem": "RhoNonzeroSupportAudit.nonzero_support_certificate",
+    "statement": "theorem nonzero_support_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p ≤ nonzeroMean p + 2) ∧ (∀ (p : ℕ) [Fact p.Prime] [Fact (2 < p)], nonzeroMean p = ∑ f : NonzeroEmbedding p, (uniformLaw (NonzeroEmbedding p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + (f (h x)).val) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 3 ≤ m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 4 ≤ nonzeroMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, 2 < p ∧ (C : ℝ) * p < (@nonzeroMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, 2 < p → @nonzeroMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ (p : ℕ) [Fact p.Prime], finiteMean (fun z : TwoSupport p => if ¬Good z then (1 : ℝ) else 0) = 2 / p) ∧ (Fintype.card (NonzeroSupport 2) = 0 ∧ Fintype.card (NonzeroSupport 3) = 2)",
+    "decl_sha256": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+    "scope": "Actual uniform ordered distinct both-nonzero increments in prime Z/p forp>2, independent actual fair static binary vertex hashes, actual leastrepeat from0. Explicit actual conditioned-coordinate/nonzero-embedding bijection and actual uniformsupport PMF×vertexproduct PMF; actual p>2population witnesses, p2empty/p3exacttwo supports kernelchecked. EmptyfiniteMean atp2 is not a normalizedprobabilitylaw. Exact discarded zero-containing support mass2/p derived using nonzerodifference and distinct excluded firstpoints0,−δ; actual table first-repeat means nonnegative≤p. Established finite conditional-mean/cardinality lemma derives Eall≤Enonzero+2, not supplied as a premise. Credited preceding actual zeroallowed Eall≥m²/2 atp≥4m²(4m+1) yields Enonzero≥m²/2−2 form>0,≥m²/4 form≥3. Bertrand gives for every naturalC some primep>2 with Enonzero²>Cp and no realnonnegative uniformsqrtbound. This is a domainrefinement of existing r2negativecalibration; establishedconditioning/oldmaximal-path-count-deferreddecisions/Bertrand methods and known results credited, no novelty/independentnewcounterfamily claim. Qualified source nS≥8/20 largerpartition conjectures remainopen. No Floydoperation/cyclealone/scalarrecovery/practicalhashruntime conclusion. Fournewconcrete modules/17frozenlocalmodules0copies/32oldformalconfigs/51oldformal-artifactpins checkedbeforeafterall3states/fullgate. Complete explicit827character mainheader/nativefullcheck; unchangedfrozenverifier. Foundations/defaults only/noholes/customaxioms/nativeproofeval/raisedlimits/globalflags/waivers/frozenedits/cryptoPython/newsolverbenchmark/spend/upload/newhost/compilerrefinement/canonicalpromotion/full14claim. Largerpartitioncollisionconstants/practicalhash/remaining14 remainopen.",
+    "sources": [
+      {
+        "path": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+        "bytes": 2000,
+        "sha256": "6f513a6bc498e01f7bdf60c156dd7778b9e301101c5ed90ca26648ca8bc0f1f3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+        "bytes": 2485,
+        "sha256": "9ec402373f13e2004e58a185dc7824b6bf7ef1e88ca0ec0819eb1088f190abfa"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+        "bytes": 3005,
+        "sha256": "a816e5f511d2f438e6fcd7c29d6d3730281ceb757a4dafae35f6a2cfbe530a3e"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+        "bytes": 2810,
+        "sha256": "85231289c6ddd9d038f9f8acccd3e75faf322fd4a735a4fdff885596c14bb434"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+        "bytes": 3898,
+        "sha256": "04a6e61e1c4e95724a1bb14f34f9344924185fb9216ef650f640a451a26d4a61"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+        "bytes": 2104,
+        "sha256": "28e88e300b31a25978d0b8e13f4ee7119666e27366d3f039a9445121d147df3f"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+        "bytes": 3510,
+        "sha256": "b4660c08256c6336341194cb5e1a188f1a528908cc4a35af414190eca1c5a0ad"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "0a701461970071d742dd15e11f48fec7b44c17ef90c1cd95c3d563472c9d06b3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3948,
+        "sha256": "64c5efc80667aa6d01a85d66546171cf484ea733ed60bc78b8ede4f2321e410d"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lakefile.toml",
+        "bytes": 280,
+        "sha256": "ef3c7bbfa8df48c11cc80121f45e386731f323f54651aab17488579dae39e438"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4069,
+        "sha256": "90f185ef835962877da491e4397eb6f9a17786f3a3c66494e96461bf513a66e9"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lakefile.toml",
+        "bytes": 258,
+        "sha256": "50c2e8bd80c059c5bf813cc5645abc046e6f41be2f06025bb8423282bb3ad82b"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BalancedPaths.lean",
+        "bytes": 5602,
+        "sha256": "f9ff0990f63d8f172a302a4a7e88f1a10bbfe2f23974fa93b49264e965d0e314"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryEnsemble.lean",
+        "bytes": 5403,
+        "sha256": "7fafd0ad5987accc8ff84445fcd352dc4fc5cba7caa5d59fc9849c04b7a689f7"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryMaximal.lean",
+        "bytes": 6064,
+        "sha256": "2b636dcb84006e6b692e16bfeeaa21b21897dd382ea4fa422e19eacdd26350b8"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryUnbounded.lean",
+        "bytes": 3040,
+        "sha256": "4ac80aa3ff742a9303848c382a5692837de99ce234824393de8603e05afef3c7"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/SupportCounting.lean",
+        "bytes": 7595,
+        "sha256": "d7945a2015647ef7673128c88173ac562e5109970a829f326dd4554156f936e1"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceCertificate.lean",
+        "bytes": 2164,
+        "sha256": "9c6028f460c5059e4de510db8bfd4f778c3e366c2f1f947af0554d30a669c01e"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceImports.lean",
+        "bytes": 52,
+        "sha256": "ef4210912f68e4dbc1e2a1d4534f45c59c50bc0b32d01b6ddb099c9123d87341"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4641,
+        "sha256": "218e3c5bc0c5752342e9e18261429f42dbf15c190c2db499cbc9b29965bce6c0"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lakefile.toml",
+        "bytes": 405,
+        "sha256": "3128201f765ae8d6fdcfdfa3c108242beca62c70f91079de9b2f4322d2886a28"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/ConditionedMean.lean",
+        "bytes": 4633,
+        "sha256": "f2e3e72dbe141f3dc6ef4e54a01e7aea7f6a4ae6d3d7ff805c78660cf17864dd"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/NonzeroBounds.lean",
+        "bytes": 2724,
+        "sha256": "09484f6499a13d7307dc7828d7755b6ba8a00449ae18cd338697ce276444cc87"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/NonzeroCertificate.lean",
+        "bytes": 1522,
+        "sha256": "53994f82d7c17cee71bfa5e50f62e1169140a97d1c28a06d70ccaa7d17c74e85"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/NonzeroLaw.lean",
+        "bytes": 3178,
+        "sha256": "49d42a300f08fae1102c59ffc48e3059edf413789a42722c682c4c3861b0479c"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4930,
+        "sha256": "2415f644203ed95d361b32ab599715b4ca40136d6377906d54449146f9b2c90a"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/lakefile.toml",
+        "bytes": 335,
+        "sha256": "8fee8212b3e18a5a6ae6286f3eb79326cd5bedea594bca7dd443bf15329d5ce3"
+      },
+      {
+        "path": "research/rho_nonzero_support_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BalancedPaths",
+    "BinaryEnsemble",
+    "BinaryMaximal",
+    "BinaryUnbounded",
+    "CollisionCertificate",
+    "CollisionTails",
+    "ConditionedMean",
+    "Cylinder",
+    "FirstCollision",
+    "NonzeroBounds",
+    "NonzeroCertificate",
+    "NonzeroLaw",
+    "PathAgreement",
+    "PostCollisionControl",
+    "SupportCounting",
+    "Survival",
+    "TwoChoiceCertificate",
+    "TwoChoiceImports",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral"
+  ],
+  "artifacts": [
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 18216,
+      "sha256": "8d24a3b4f7b35ead3bbdf7dd08c43419697700d0c3cc208be42426f4fc07ba11"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "3e8e8d77bccc276c63719e4752b4cc2ae714356db4baa6f21755667e73263b20"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/attempts.json",
+      "bytes": 228,
+      "sha256": "65851825125c80be8b29f269563c5b22d061067746b6f0034b58ff7217b19414"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 2101,
+      "sha256": "e5ae6bbfb58fc88ee7afe32b6000cffe3004e9d544ceb79cc08329876b37b0ae"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/gate.json",
+      "bytes": 4123,
+      "sha256": "ae515c9d2ce5d77adb4c004e6d5d95e9a5305241e91593e19ab3303d1e03f5a9"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/source-review.json",
+      "bytes": 3917,
+      "sha256": "c4223e067a9fa2670d721adcbbb318fca18a69b8f7de1aae569a12011552c587"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/binding-check.json",
+      "bytes": 4337,
+      "sha256": "94bead03834f5cd382a6c97db0030d4e807b61de7bb885f1f316a961ebfd6380"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/proof-map.json",
+      "bytes": 6381,
+      "sha256": "b2ca5c8cbe882c863f0355acaf4b3cbe19b2505a2a1d6d9b3ff2eb4851119d1e"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/render_report.py",
+      "bytes": 7505,
+      "sha256": "2d52a4b670a7bfebe07284b5b234cdff5f212ec5fb6703751852ac5391d7b84a"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/export_binding_input.py",
+      "bytes": 1736,
+      "sha256": "74b552c45c01acd7c30c34879044cfd41a6bc3093173e36235c141e0900f1595"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/PROTOCOL.md",
+      "bytes": 6776,
+      "sha256": "2f371dc9246ee7073799db58b27f8dee379bac63ecf8d14f43885c2e27e2dd20"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/preflight.json",
+      "bytes": 5266,
+      "sha256": "aa8ce925677eb69b2c929ecd14c9d41a1830e7a94a677c0dea1000174e2f001e"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/reports/layout.json",
+      "bytes": 285,
+      "sha256": "b30a4d0d2c26339d3f61272451de04d68bf2022ad5281fffe5d9e42c2f5d44ef"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/reports/nonzero-support.svg",
+      "bytes": 1383,
+      "sha256": "d468f455250d3aaca18768de5ae0231fc63aee0f36cf66f76b820573e726e9db"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/reports/report.pdf",
+      "bytes": 47827,
+      "sha256": "c55f4d44aa2ed99d0f540e20f6dc8440cff4d3f5117b994e6a7ceab6f5a491a0"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/sources.json",
+      "bytes": 15632,
+      "sha256": "8a94e11d4f66d196f552d4cab77d61d500f5a2f28169d68cbbe2b98ea5c3a0b8"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/report-drafts.tar.xz",
+      "bytes": 47780,
+      "sha256": "673e5bc8015c8e26c115ad010cc3d1e9377aa70f8424416e57692c76b0aceddc"
+    },
+    {
+      "path": "research/rho_nonzero_support_audit_20261115/evidence/report-drafts.json",
+      "bytes": 1589,
+      "sha256": "0b9397708695f2ee8d11687e9591dab84f52a1220d5433c8cd1e8b5991f23224"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 20,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_both_nonzero_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "exact_discarded_mass_and_conditioned_mean_comparison": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "p2_not_normalized_as_PMF": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

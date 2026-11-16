@@ -1,0 +1,16 @@
+digraph Torsion {
+  graph [rankdir=LR,bgcolor="white",pad="0.18",nodesep="0.35",ranksep="0.7"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#44627a",fillcolor="#edf4fb",margin="0.14,0.10"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#44627a"];
+  lifts [label="64 actual product 4-torsion lifts\npreimage of Ker P0 under [2]"];
+  old [label="J0[2]: 16 classes\nall geometric branch pairs"];
+  new [label="J1[2]: 16 classes\nactual new root order",fillcolor="#e9f5ed"];
+  lifts -> old [label="P0: four preimages each"];
+  lifts -> new [label="P1 alpha: independent of lift"];
+  old -> new [label="actual Phi2\n256 additions + Frobenius"];
+  k0 [label="old Richelot kernel: 4\n(0,4), (1,5), (2,3)"];
+  k1 [label="transported kernel: 4\n(0,5), (1,3), (2,4)",fillcolor="#e9f5ed"];
+  k0 -> old [label="subset",style=dotted];
+  k1 -> new [label="subset",style=dotted];
+  k0 -> k1 [label="restriction of actual Phi2"];
+}
