@@ -11483,6 +11483,7 @@ mod accounting_tests {
     }
 }
 
+/// `rho.negation_strong` end to end through `solve`, on curves over F_(2^m)^4.
 #[cfg(test)]
 mod neg_strong_tests {
     use super::*;
