@@ -2,6 +2,15 @@
 
 ## Current reduction and revised scaling plan
 
+The [bounded public-input reference](reports/root-reference-v1/REPORT.md)
+now discovers and replays six-member roots for all13 fixed toy public
+targets, and agrees with full finite enumeration on the actual six-column
+control. Representative families preserve all185760 completion queries;
+keeping only a first witness loses59384 toy completion lookups. This is a
+correctness reference: its uncapped triple enumeration remains cubic, so
+the next candidate must replace that loop to pursue the subquadratic gate.
+PCC-20261116-7de4ca and1720b6. [pcc:unverified]
+
 The [public-target interface](reports/target-circuit-v2/REPORT.md) joins six
 distinct raw members in a1059-variable/1089-equation quadratic system,
 with complete Edwards addition and a signed raw-index row decoder. Controls
@@ -9,7 +18,9 @@ cover24024 toy pair/target assignments, actual cancellation/identity
 intermediates and1059 rejected variable mutations. Standard BSGS recovers
 eighteen fixed actual j,t labels using14600 baby entries. The next gate is
 root discovery with charged work and useful yield; checking known witnesses
-supplies no solver bound. PCC-20261116-4679b0. [pcc:unverified]
+supplies no solver bound. The bounded reference above now exercises public
+root discovery without qualifying large-base scaling or useful yield.
+PCC-20261116-4679b0. [pcc:unverified]
 
 The [quadratic membership interface](reports/membership-circuit-v1/REPORT.md)
 now compiles public parameters into a140-variable/142-equation membership
