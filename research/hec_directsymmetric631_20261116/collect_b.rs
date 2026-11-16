@@ -27,12 +27,12 @@ fn main() {
         } else {
             format!("generated-{label}/target.ms")
         };
-        let output = format!("solve-{label}.res");
+        let output = format!("job-{label}.res");
         assert!(!std::path::Path::new(&output).exists());
         let mut child = Command::new(std::env::var("HEC_MSOLVE").expect("HEC_MSOLVE is mandatory"))
             .args(["-t", "2", "-v", "1", "-c", "0", "-f", &input, "-o", &output])
-            .stdout(Stdio::from(file(&format!("solve-{label}.stdout"))))
-            .stderr(Stdio::from(file(&format!("solve-{label}.stderr"))))
+            .stdout(Stdio::from(file(&format!("job-{label}.stdout"))))
+            .stderr(Stdio::from(file(&format!("job-{label}.stderr"))))
             .spawn()
             .unwrap();
         let start = Instant::now();
@@ -43,13 +43,13 @@ fn main() {
             if start.elapsed().as_secs() >= 300 {
                 child.kill().unwrap();
                 child.wait().unwrap();
-                fs::write(format!("solve-{label}.status"), "censored_wall300s\n").unwrap();
+                fs::write(format!("job-{label}.status"), "censored_wall300s\n").unwrap();
                 panic!("solver_wall_cap")
             }
             std::thread::sleep(Duration::from_millis(10));
         };
         fs::write(
-            format!("solve-{label}.status"),
+            format!("job-{label}.status"),
             format!("exit={:?}\n", status.code()),
         )
         .unwrap();
@@ -61,8 +61,8 @@ fn main() {
         };
         let s = Command::new(std::env::current_exe().unwrap().with_file_name("verify-direct631"))
             .args([&input, &output, control])
-            .stdout(Stdio::from(file(&format!("solve-{label}.verify.stdout"))))
-            .stderr(Stdio::from(file(&format!("solve-{label}.verify.stderr"))))
+            .stdout(Stdio::from(file(&format!("job-{label}.verify.stdout"))))
+            .stderr(Stdio::from(file(&format!("job-{label}.verify.stderr"))))
             .status()
             .unwrap();
         assert!(s.success(), "independent_substitution_failed");
