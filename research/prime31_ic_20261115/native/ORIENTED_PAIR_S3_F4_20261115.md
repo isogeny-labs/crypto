@@ -128,3 +128,27 @@ The controlled m8 experiment is a **bounded development falsifier**, not a claim
 4. Stop this presentation if the full target-conditioned oriented system also stops uniformly with no completed roots. Further cap increases and any performance claims require a distinct admitted study with actual target roots, row rank and PKM/APS index-calculus comparisons.
 
 The previous fixed-pair cap ladder has **not** established a successful oracle; this target-dependent experiment tests whether the two partial S4 constraints change that conclusion before abandoning the oriented mechanism.
+
+
+## Executed 16-natural-target target-conditioned m8 comparison — orientation helps early matrices, not completion
+
+The preregistered Rust source [ea455b457891](https://github.com/isogeny-labs/crypto/commit/ea455b4578913c42427753e7e8fd2d8d1ebbc9c0) ran successfully in [Actions 43782128635](https://github.com/isogeny-labs/crypto/actions/runs/43782128635), job 133021473364. It includes the actual existing ordinary prime31 \`Base\`, \`Arithmetic\`, and \`f4_fp_tower\` implementation; full exact-source JSON for all 16 natural public inputs is [ORIENTED_M8_NATURAL_F4_CI_20261116.json](ORIENTED_M8_NATURAL_F4_CI_20261116.json). The Rust positive fixture independently verifies both original four-polynomial and oriented five-polynomial inputs vanish on the same actual signed eight-point sum. No private mask coefficients or generic group-sum tables enter algebraic discovery. Producer/development **[pcc:unverified]**; not independent replicated PCC.
+
+| Field from 16 naturally sampled public targets | Original balanced m8 S4/S3 | Target-conditioned oriented m8 |
+| --- | ---: | ---: |
+| Total free variables | 3 | 4 |
+| Polynomials | 4 | 5 |
+| Fixed polynomials after tower normal form | 526, 526, 16 terms | 526, 526, 4, 7 terms |
+| Target S4 normal-form terms | 125 | **875** |
+| Target construction median (observed single CI host) | 0.024 ms | **0.172 ms** |
+| Degree reached | 6 | 6 |
+| Max dense B' entries (each target) | 26,618 | **17,216** |
+| Max columns (each target) | 429 | **291** |
+| Partial multiply-adds (each target) | 30,943 | **12,141** |
+| F4 wall median (observed single CI host) | 1.758 ms | 1.085 ms |
+| Completed bases/root extractions | **0** | **0** |
+| Censored/undetermined due to 15k dense cap | **16/16** | **16/16** |
+
+This is a **real source-executed structural tradeoff**: the oriented m8 representation reduced the early rejected B' matrix ~35.3%, its first-stage multiply-adds ~60.8%, and its observed F4 wall clock. However, substitution into target S4 enlarged the symbolic target normal form **7×** (125 to 875 terms) and its construction time. Every natural target was *still oversize* at 15k and produced no roots. Therefore **the current implementation has no admissible per-successful-relation cost or useful-rank improvement**, no proof of a new non-generic algorithm and no complete prime31 ECDLP solver. The current F4 timings are incomplete/censored and must never be compared as a cold-solve speed ratio.
+
+**Decision:** stop raising this orientation presentation's full m8 F4 caps blindly; both the fixed-pair 15k/30k/60k and target-conditioned 15k experiments censor every run. Freeze this as a negative completion result plus a precise resource-profile improvement. The next prioritized path is certified quotient/root extraction from merged #4228 and ongoing #4349, with wide prime31 compatibility and external same-ideal comparisons; independently explore the published APS 2018 one-relation formulation rather than merely increasing m8 F4 resource budgets. A meaningful continuation must supply *completed* natural target roots, replay signed relations and independent rank before claiming an index-calculus frontier cost benefit.
