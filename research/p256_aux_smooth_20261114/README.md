@@ -1,5 +1,9 @@
 # Aligned P-256 auxiliary factor base
 
+Latest: [2026-11-16 continuation](continuation_20261116/REPORT.md) adds
+actual small P-256 CAS qualification and exact linear preprocessing.
+The original report below is the preserved2026-11-14 snapshot.
+
 See [REPORT.md](REPORT.md) for the implemented construction, exact scope,
 unsigned observations and open m2..7 baseline/2x/regularity requirements.
 See [PROTOCOL.md](PROTOCOL.md) before any benchmark and

@@ -24,6 +24,13 @@ hash manifests live in evidence/. Do not call d4 the d8 benchmark.
 
 ## State
 
+2026-11-16 continuation supersedes the execution status below: see
+continuation_20261116/REPORT.md. Raw/reduced m2 depth1/2 CAS controls now
+match complete native references. Exact affine reduction has72 native
+cases. Eight public requests include three preserved failures; no runtime
+or regularity result is inferred. Claim PCC-20261116-2335a8 is unsigned
+[pcc:unverified]. Frozen core/protocol/proof pins are unchanged.
+
 Native C++/GMP/OpenSSL constructor and four complete relation-system
 exports exist. Unit observations are claim PCC-20261114-4a3ab6,
 not_covered/unverified, not independent verification [pcc:unverified].
@@ -51,6 +58,10 @@ environment. No signed independent verdict has been issued.
 
 None. Only local development builds/unit tests and static exports have run.
 No EKS job or performance experiment has been launched.
+
+The eight public unit requests have finished. No remote unit is still
+running; do not repeat them automatically. Original depth8 m2..7 EKS/L2
+measurement and actual regularity remain open.
 
 ## Stop and success conditions
 

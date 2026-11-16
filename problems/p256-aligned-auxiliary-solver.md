@@ -5,7 +5,7 @@
 - **Affected work:** [aligned auxiliary study](../research/p256_aux_smooth_20261114/REPORT.md),
   [prospective protocol](../research/p256_aux_smooth_20261114/PROTOCOL.md)
 - **Next action owner:** continuing P-256 relation-stage task
-- **Last updated:** 2026-11-14
+- **Last updated:** 2026-11-16
 
 ## Problem
 
@@ -74,3 +74,12 @@ new matched run. Do not repeat the failed gate without changed conditions.
 2026-11-14: opened with construction evidence and executable prospective
 CAS export/replay. Unresolved; merging this record does not complete the
 original performance or degree-of-regularity request.
+
+2026-11-16: [continuation](../research/p256_aux_smooth_20261114/continuation_20261116/REPORT.md)
+adds actual public Magma m2 depth1/2 qualification for all raw/reduced
+presentations, complete-count controls and exact point replay. Native
+affine elimination has72 reconstruction cases. PCC-20261116-2335a8 is
+unsigned [pcc:unverified]. This supersedes the earlier "Magma not run"
+status only for those small units. Exact-source EKS/L2 admission, intended
+depth8 m2..7 measurements,2x stage gain and structured regularity remain
+open. No other study's record was closed and no gate was bypassed.
