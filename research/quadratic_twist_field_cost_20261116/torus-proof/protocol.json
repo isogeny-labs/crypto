@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-torus-coordinate-proof-20261116",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-15",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/torus-proof",
@@ -520,7 +520,7 @@
     {
       "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
       "provenance": "retrieved",
-      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+      "claim": "Primary author torus compression/operations and exceptional\u00b11 section read; SNARK inverse cost not native CPU price"
     },
     {
       "ref": "https://doi.org/10.1007/11535218_5",
@@ -530,11 +530,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "6258bea4db71b7674ac8c69d24cd0697fcff18d7a0a0a31dfa317d76691718c5",
-    "commit": "b18176b9534a3ee91b97efa6c20883922bd49e00",
-    "frozen_at": "2026-11-16T03:50:46Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   },
   "extensions": {
     "checkpoint": "Existing authorized samebranch GitHub source/protocol transport; clean source plus fresh connected ref before proof, no S3/skip/raw upload",
@@ -545,7 +545,7 @@
       "compress-decompress",
       "membership"
     ],
-    "source_sha256": "235cea5f44d2513bb824b96241be6f08377f4f0501b00d1d8168a29b92fd80d1",
+    "source_sha256": "4dcd5b96149eb32467e7e69209c89b3d3523eda8c81c5518bf8cb493f5a2f276",
     "environment_inventory_sha256": "895f576428ba7b0e4a882dc8ee7d38962e248098172ebdcf44e06218cd92fc8e",
     "controls_manifest": "CONTROL_SOURCES.json",
     "new_proof_execution_before_freeze": false,
@@ -561,6 +561,13 @@
       "proof_library_files_unchanged": 40077,
       "cause": "13to16bytezero-paddingofLakecachetag, allactualproofartifactsbyte-identical",
       "old_cache_modified": false
+    },
+    "first_Lean_attempt": {
+      "checkpoint": "28a00d02b2525961e67c609c232a5f972a216fd2",
+      "status": "FAIL_build",
+      "cause": "compress_decompress intermediate denominator definition not unfolded",
+      "unaccepted_sorryAx": true,
+      "statements_and_hypotheses_unchanged": true
     }
   }
 }

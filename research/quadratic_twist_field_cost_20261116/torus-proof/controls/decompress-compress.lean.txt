@@ -59,7 +59,9 @@ theorem compress_decompress (d u : K) (h2 : (2:K) ≠ 0)
     compress (realCoord d u) (imagCoord d u) = u := by
   have ha : realCoord d u + 1 = 2 / denominator d u := by
     unfold realCoord
-    field_simp [hc] <;> ring
+    field_simp [hc]
+    unfold denominator
+    ring
   unfold compress
   rw [ha]
   unfold imagCoord
