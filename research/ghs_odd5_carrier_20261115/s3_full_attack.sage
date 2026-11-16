@@ -126,7 +126,7 @@ def canon(Pt,aa,bb):
   D=Fr(D);choices.append((D,aa*pow(lam,j,r)%r,bb*pow(lam,j,r)%r))
  return min(choices,key=lambda z:key(z[0]))
 def rho_trial(seed):
- rng=random.Random(seed);start=time.process_time_ns()
+ rng=random.Random(int(seed));start=time.process_time_ns()
  steps=[(rng.randrange(r),rng.randrange(r)) for _ in range(16)]
  jumps=[u*P+v*Q for u,v in steps]
  aa=rng.randrange(r);bb=rng.randrange(r);D=aa*P+bb*Q
