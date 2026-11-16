@@ -131,3 +131,10 @@ Trusted artifact publication, current-head hosted CI, then canonical source copi
 
 ### Errors
 The first local Cargo command selected Homebrew rustc1.93 despite the newer Cargo. Invoke the installed1.99.1 Cargo and rustc by exact path; no dependency downgrade or global toolchain change. The first successor used default JSON floating parsing, which altered scientific values; rejected it before updating the manifest, then enabled arbitrary precision/round-trip parsing and checked exact Decimal equality. An early negative-control invocation lacked its fixture and was discarded; the completed mutated-target control fails specifically at the complete-record assertion. [pcc:unverified]
+
+## Registry-dependent catalog completion (2026-11-16T06:49Z)
+
+### Validation and custody
+Trusted publication run 43817399144 selected no files because JSON below 1 MiB remains in Git under the existing policy. Removed the unused prospective store locator and ignore file; retained the exact new report in Git. Regenerated the two workflow pulls using the existing generator, which now passes its check. No upload is claimed.
+
+The release native cover checker regenerated all 22,300 rows and replayed its own committed output. All 22,278 previous certificate rows compare equal; 22 additional restored-registry rows are covered, with zero invalid or unsupported rows. Six catalog consistency controls pass. The registry, checker source, original scientific reports and raw evidence are unchanged by this metadata regeneration. Dated receipt records the generated file hashes.
