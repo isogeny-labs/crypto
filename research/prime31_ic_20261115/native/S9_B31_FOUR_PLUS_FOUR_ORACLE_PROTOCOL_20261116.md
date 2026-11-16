@@ -38,3 +38,12 @@ Let `A={P_1,-P_1,...,P_B,-P_B}`, choosing smaller-y representatives at the first
 3. Given-f verifier and target-conditioned algebraic extractor must agree on blinded B4/B8 plus natural B31 Q; only then attempt rank-complete factor-base logarithm recovery and full cold single-target ECDLP comparison against tuned WZ rho and mature external IC methods.
 
 All outcomes will remain producer-only [pcc:unverified] until independent signed validation. No paid compute, history rewriting, merge or leaderboard promotion is part of this experiment.
+
+
+## Pre-execution amendment: match the actual algebraic S9 factor base
+
+**2026-11-16, before obtaining any B31 oracle result.** Cross-reading `research/prime31_ic_20261115/native/M8_RATIONAL_QUOTIENT_BRIDGE_20261116.md` revealed that the actual balanced S9/K–S5 algebraic path uses the *depth-six Dickson fibre's 31 liftable abscissae*, not the first 31 rational abscissae selected above. Running only the first-B oracle would create **incompatible ground truth** for the S9 worker.
+
+Retain all original first-B31 cases, and **add a parallel Dickson31 panel** using `Base::build(PRIME31,6,...).points`, 31 canonical actual rational points, with precisely the same 24 natural scalar seeds, 16 planted-token seed, exhaustive 4+4 algorithm, identity test, original-point replay, work counters and correctness gates. The two bases have separate table-build costs, `4A` cardinalities, collision reports and per-Q results; do not merge the hit rates or select the better base. The native Dickson31 oracle is the relevant reference for the algebraic K961/S5 elimination. Neither branch has been measured at the time of the amendment and neither is a non-generic solver.
+
+This amendment also rules out treating coverage of an arbitrary first-31 base as evidence that the special Dickson f exists or vice versa.
