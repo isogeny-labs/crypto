@@ -1,0 +1,370 @@
+# be2969ce src/cryptanalysis/ic_boundary.rs lines 5482-5850 (git show be2969ce:<path>), blob f5fec3044ba1c9d1c36dec21204e4b76d22dc4ed
+const PACKED_PART_ENTRIES: usize = 1 << 14;
+
+/// **The cache-blocked pair table in one word per entry.**  The key
+/// (`x + 1 < 2^32`) in the high half and the witness `(i, j)`, 16 bits
+/// each, in the low half; `0` is an empty slot, since no key is `0`.
+/// [`table_part`] picks a region, and each region is an open-addressed
+/// (linear-probing) table at most three-quarters full.  The sums are
+/// first gathered by region in their original order, then each region
+/// is filled in one pass, so the first pair to reach a key keeps it.
+struct PackedPairTable {
+    slots: Vec<u64>,
+    /// Region `k` is `slots[base[k]..base[k] + mask[k] + 1]`.
+    base: Vec<usize>,
+    mask: Vec<usize>,
+    shift: u32,
+    entries: u64,
+    insert_attempts: u64,
+}
+
+impl PackedPairTable {
+    fn build(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+    ) -> Result<Self, String> {
+        let expected = fb.abscissa_list.len().pow(2) + 1;
+        let bits = (expected / PACKED_PART_ENTRIES)
+            .max(1)
+            .next_power_of_two()
+            .trailing_zeros();
+        let shift = 64 - bits;
+        let count = 1usize << bits;
+        let reserve = expected / count + expected / count / 8 + 64;
+        let mut pending: Vec<Vec<u64>> = (0..count).map(|_| Vec::with_capacity(reserve)).collect();
+        let mut insert_attempts = 0u64;
+        for_each_folded_prime_sum(g, fb, ops, |key, i, j| {
+            pending[table_part(key, shift)].push(key << 32 | u64::from(i) << 16 | u64::from(j));
+            insert_attempts += 1;
+        })?;
+        let mut base = Vec::with_capacity(count);
+        let mut mask = Vec::with_capacity(count);
+        let mut total = 0usize;
+        for part in &pending {
+            let size = (part.len() * 4 / 3 + 1).next_power_of_two();
+            base.push(total);
+            mask.push(size - 1);
+            total += size;
+        }
+        let mut slots = vec![0u64; total];
+        let mut entries = 0u64;
+        for (k, part) in pending.iter_mut().enumerate() {
+            let region = &mut slots[base[k]..=base[k] + mask[k]];
+            for &word in part.iter() {
+                let key = word >> 32;
+                let mut s = slot_of(key, mask[k]);
+                loop {
+                    let held = region[s];
+                    if held == 0 {
+                        region[s] = word;
+                        entries += 1;
+                        break;
+                    }
+                    if held >> 32 == key {
+                        break;
+                    }
+                    s = (s + 1) & mask[k];
+                }
+            }
+            *part = Vec::new();
+        }
+        Ok(Self {
+            slots,
+            base,
+            mask,
+            shift,
+            entries,
+            insert_attempts,
+        })
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(u32, u32)> {
+        if key == 0 || key > u64::from(u32::MAX) {
+            return None;
+        }
+        let k = table_part(key, self.shift);
+        let region = &self.slots[self.base[k]..=self.base[k] + self.mask[k]];
+        let mut s = slot_of(key, self.mask[k]);
+        loop {
+            let held = region[s];
+            if held == 0 {
+                return None;
+            }
+            if held >> 32 == key {
+                return Some((((held >> 16) & 0xffff) as u32, (held & 0xffff) as u32));
+            }
+            s = (s + 1) & self.mask[k];
+        }
+    }
+}
+
+/// A key's home slot in a packed region: the low bits of a third
+/// multiplier, independent of the region choice's high bits.
+#[inline]
+fn slot_of(key: u64, mask: usize) -> usize {
+    (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
+}
+
+/// A table of all pair sums of a base, keyed by the sum's abscissa so
+/// `S` and `−S` share one entry; the probe checks which it found.
+pub struct PairTable {
+    map: FastMap<(u32, u32)>,
+    /// The cache-blocked layout ([`Self::build_negation_folded_prime_blocked`]):
+    /// the same entries split over small maps by [`table_part`]; empty for
+    /// every other builder, which keeps everything in `map`.
+    parts: Vec<FastMap<(u32, u32)>>,
+    part_shift: u32,
+    /// The packed form of the cache-blocked layout, when keys fit 32 bits
+    /// and indices 16 ([`PackedPairTable`]); `parts` is then empty.
+    packed: Option<PackedPairTable>,
+    /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
+    /// under negation).
+    pub kind: &'static str,
+    pub entries: u64,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    /// Inserts tried during the build, kept or not (`entries` counts only
+    /// the kept ones).  `bitop/v1` only, through [`Self::work_counters`].
+    pub insert_attempts: u64,
+    /// `x_index` reads of a folded build, one per abscissa.
+    pub index_lookups: u64,
+}
+
+impl PairTable {
+    /// The build's work beside its group operations, for `bitop/v1`
+    /// (`ecbench::work`): one hash insert per attempt.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.insert_attempts > 0 {
+            out.insert("table_insert_attempts".to_string(), self.insert_attempts);
+        }
+        if self.index_lookups > 0 {
+            out.insert("lookups".to_string(), self.index_lookups);
+        }
+        out
+    }
+
+    pub fn build<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let n = fb.points.len();
+        let mut ops = GroupOps::default();
+        let mut map: FastMap<(u32, u32)> = fast_map(n * (n + 1) / 4 + 1);
+        let mut attempts = 0u64;
+        for i in 0..n {
+            for j in i..n {
+                let s = g.add(&mut ops, fb.points[i], fb.points[j]);
+                if g.is_identity(&s) {
+                    continue;
+                }
+                map.entry(g.key(&s) >> 1).or_insert((i as u32, j as u32));
+                attempts += 1;
+            }
+        }
+        Self {
+            kind: "full",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: 0,
+        }
+    }
+
+    /// **The same table with the negation folded out of the build.**  The
+    /// key is the abscissa of the sum, which `{P, Q}` and `{−P, −Q}` share,
+    /// so half of the full build's additions made entries the map already
+    /// held.  One pair per orbit under negation: the first point above
+    /// each abscissa against every signed point above a later abscissa,
+    /// plus its own double.  About `|F|²/4` additions instead of
+    /// `|F|²/2`; the probe is unchanged.
+    pub fn build_negation_folded<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut attempts = 0u64;
+        for ai in 0..a {
+            let i = groups[ai][0];
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    let s = g.add(&mut ops, fb.points[i], fb.points[j]);
+                    if g.is_identity(&s) {
+                        continue;
+                    }
+                    map.entry(g.key(&s) >> 1).or_insert((i as u32, j as u32));
+                    attempts += 1;
+                }
+            }
+        }
+        Self {
+            kind: "negation_folded",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        }
+    }
+
+    /// Prime-field version of the same folded table. A row shares one
+    /// inversion across its doubling and all later abscissae; each signed
+    /// pair uses the same inverse. Only the sum's x coordinate is needed
+    /// for the key. The exact point is re-added by `probe` on a hit.
+    pub fn build_negation_folded_prime_batch(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+    ) -> Result<Self, String> {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let a = fb.abscissa_list.len();
+        let mut attempts = 0u64;
+        let mut map: FastMap<(u32, u32)> = fast_map(a.pow(2) + 1);
+        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            map.entry(key).or_insert((i, j));
+            attempts += 1;
+        })?;
+        Ok(Self {
+            kind: "negation_folded_prime_batch",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        })
+    }
+
+    /// **The batched table, built in cache-sized pieces.**  The same sums
+    /// in the same order as [`Self::build_negation_folded_prime_batch`],
+    /// but the entries are spread over many small maps by a second hash
+    /// of the key ([`table_part`]), and each block of
+    /// [`TABLE_BLOCK`] sums is grouped by map (a stable counting sort)
+    /// before it is inserted.  A map is small enough to stay in cache
+    /// while its share of a block goes in, where one large map takes a
+    /// cache miss on nearly every insertion once it outgrows the cache.
+    ///
+    /// Within each map the sums arrive in the original order, so the
+    /// first pair to reach a key keeps it, as in every other builder:
+    /// the keys and witnesses are the batched table's, and so are the
+    /// probe's answers and the counted operations.
+    ///
+    /// When every key fits 32 bits (`p < 2^32`) and every index 16 bits,
+    /// an entry is one word and the pieces are open-addressed regions of
+    /// one array ([`PackedPairTable`]): each piece's sums are gathered
+    /// first and inserted in one pass, a quarter of the memory of the
+    /// maps.  Larger fields keep the small maps.
+    pub fn build_negation_folded_prime_blocked(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+    ) -> Result<Self, String> {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
+            let packed = PackedPairTable::build(g, fb, &mut ops)?;
+            let insert_attempts = packed.insert_attempts;
+            let index_lookups = fb.abscissa_list.len() as u64;
+            return Ok(Self {
+                kind: "negation_folded_prime_blocked",
+                entries: packed.entries,
+                map: fast_map(0),
+                parts: Vec::new(),
+                part_shift: 0,
+                packed: Some(packed),
+                build_ops: ops,
+                build_wall_ns: start.elapsed().as_nanos() as u64,
+                insert_attempts,
+                index_lookups,
+            });
+        }
+        Self::build_negation_folded_prime_blocked_maps(g, fb, start, ops)
+    }
+
+    /// The small-maps form of the cache-blocked table, for keys or
+    /// indices too wide for [`PackedPairTable`].
+    fn build_negation_folded_prime_blocked_maps(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        start: Instant,
+        mut ops: GroupOps,
+    ) -> Result<Self, String> {
+        let expected = fb.abscissa_list.len().pow(2) + 1;
+        let bits = (expected / TABLE_PART_ENTRIES)
+            .max(1)
+            .next_power_of_two()
+            .trailing_zeros();
+        let part_shift = 64 - bits;
+        let count = 1usize << bits;
+        let mut parts: Vec<FastMap<(u32, u32)>> = (0..count)
+            .map(|_| fast_map(expected / count + expected / count / 8 + 64))
+            .collect();
+        let mut block: Vec<(u64, u32, u32)> = Vec::with_capacity(TABLE_BLOCK);
+        let mut attempts = 0u64;
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); TABLE_BLOCK];
+        let mut offsets = vec![0usize; count + 1];
+        let mut flush = |block: &mut Vec<(u64, u32, u32)>, parts: &mut [FastMap<(u32, u32)>]| {
+            offsets.iter_mut().for_each(|o| *o = 0);
+            for &(key, _, _) in block.iter() {
+                offsets[table_part(key, part_shift) + 1] += 1;
+            }
+            for k in 0..count {
+                offsets[k + 1] += offsets[k];
+            }
+            let mut next = offsets.clone();
+            for &entry in block.iter() {
+                let k = table_part(entry.0, part_shift);
+                sorted[next[k]] = entry;
+                next[k] += 1;
+            }
+            for (k, part) in parts.iter_mut().enumerate() {
+                for &(key, i, j) in &sorted[offsets[k]..offsets[k + 1]] {
+                    part.entry(key).or_insert((i, j));
+                }
+            }
+            block.clear();
+        };
+        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            attempts += 1;
+            block.push((key, i, j));
+            if block.len() == TABLE_BLOCK {
+                flush(&mut block, &mut parts);
+            }
+        })?;
+        flush(&mut block, &mut parts);
+        Ok(Self {
+            kind: "negation_folded_prime_blocked",
+            entries: parts.iter().map(|m| m.len() as u64).sum(),
+            map: fast_map(0),
+            parts,
+            part_shift,
+            packed: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: fb.abscissa_list.len() as u64,
+        })
+    }
+
+    /// The witness stored under a key, in whichever layout the table has.
+    fn get(&self, key: u64) -> Option<(u32, u32)> {
+        if let Some(packed) = &self.packed {
+            packed.get(key)
+        } else if self.parts.is_empty() {
+            self.map.get(&key).copied()

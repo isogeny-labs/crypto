@@ -1,0 +1,53 @@
+name: NIST read-only launch admission
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/nist-admission.yml'
+      - 'taskq/deploy/eks-karpenter/nist-admission/**'
+permissions:
+  contents: read
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: taskq/deploy/eks-karpenter/nist-admission
+      - run: bash taskq/deploy/eks-karpenter/nist-admission/test.sh
+  observe:
+    needs: controls
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: taskq/deploy/eks-karpenter/nist-admission
+      - name: Use the existing lab OIDC role
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: nist-admission-${{ github.run_id }}
+          role-duration-seconds: 900
+          aws-region: us-east-2
+          mask-aws-account-id: true
+      - name: Read account and budget metadata without launching work
+        env:
+          AWS_EC2_METADATA_DISABLED: 'true'
+        run: bash taskq/deploy/eks-karpenter/nist-admission/check.sh "$RUNNER_TEMP/nist-admission/report.json"
+      - name: Retain only the allowlisted diagnostic report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: nist-admission-${{ github.run_id }}
+          path: ${{ runner.temp }}/nist-admission/report.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:04:25Z",
+ "id": "PCC-20261116-f4dd12",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v1/COMPLETE.txt",
+    "sha256": "022b2a31a3fcd00bc238b393835efb3107fcf2f5ec19d1526f30b08a2d316ca0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v1.tar.gz",
+    "sha256": "ebd55f7b4062aca57ae5e10120693a43009aa67e87b248dd4edf8b4705a4fe65"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v1/MANIFEST.sha256",
+    "sha256": "4d09912cff150ed72c831b8b6063b884db760667b2cb00a0d8ef8e94252d83ce"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-e2e.sh",
+    "sha256": "ea32d682512da6e98c28c6b1618f59c08a4b6b084bd5f01bfd5e1fbef5084b94"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The single native development command check-e2e.sh completed its original P-192 cover/module controls, all eight kernel-coset quotient/dual transfer checks,40 OpenSSL P-192 endpoint checks, and both public small-curve IC recoveries with OpenSSL row/answer checks and corruption canaries. Recovered toy subgroup target counts are11 and109. Combined-run data match the retained v3 outputs; the full raw tree is preserved in a hash-manifested archive. This is an unsigned functional development suite, not a reconstructed plane-quartic target, P-192 scalar recovery or performance/scaling result."
+}

@@ -1,0 +1,41 @@
+   Compiling l09 v0.1.0 (/home/user/crypto/research/g2plus_leads_20261116/L09_gonal_pencil_seeds/code)
+warning: field `n_cols` is never read
+   --> src/arms.rs:140:9
+    |
+139 | pub struct State {
+    |            ----- field in this struct
+140 |     pub n_cols: usize,
+    |         ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `p` is never read
+  --> src/curve.rs:10:9
+   |
+ 9 | pub struct Curve {
+   |            ----- field in this struct
+10 |     pub p: u64,
+   |         ^
+
+warning: fields `g` and `r` are never read
+   --> src/curve.rs:172:9
+    |
+169 | pub struct LineRes {
+    |            ------- fields in this struct
+...
+172 |     pub g: Poly,
+    |         ^
+173 |     pub r: Poly,
+    |         ^
+
+warning: method `fpm` is never used
+  --> src/field.rs:51:12
+   |
+10 | impl Fp {
+   | ------- method in this implementation
+...
+51 |     pub fn fpm(&self) -> u64 {
+   |            ^^^
+
+warning: `l09` (bin "l09") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 1.19s

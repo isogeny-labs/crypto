@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - research/prime31-aps-walk-source-20261116
+      - research/prime31-s9-zero-fibre-theorem-20261116
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_s9_orientation_fibres.rs
       - .github/workflows/prime31-s9-orientation-fibres.yml
@@ -49,6 +50,7 @@ jobs:
           assert q["base"] == "actual_dickson_depth6_31_rational_points"
           assert len(q["selected_eight_x"]) == 8
           assert q["oriented_masks_evaluated"] == 256
+          assert q["squarefree_identity_sign_orientations"] == 0
           assert q["first_two_sign_orientations_have_distinct_Q"]
           assert q["repeated_x_identity_cases"] == 1
           assert q["repeated_x_orientation_net_choices"] == 9

@@ -1,0 +1,893 @@
+{
+  "card_id": "CARD-volcano-census-followup-20261023-7-i0001",
+  "card_path": "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-7-i0001.yaml",
+  "card_sha256": "d3418b1142617ba81133d9c21161cfeb4eef4eaed821b4ed6fad0adcbb2292d0",
+  "commands": [
+    {
+      "argv": [
+        "pgrep",
+        "-x",
+        "ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "guard-ecbench-not-running",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "kill",
+        "-0",
+        "15982"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "guard-driver-pid-15982-dead",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "a621cf625a109eadf4c950f7869a0557579d2a5a657f629dc1b4347c587e152c",
+      "stderr_tail": [
+        "kill: (15982): No such process"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/ca.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "guard-ca-sha256",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b54681b0757023a597a47c0a38527cdd479919adf2655e54d0fbb2bfd87c5544",
+      "stdout_tail": [
+        "/home/user/cryptanalysis/build/ca: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.257,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v1",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.257,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4906aeb761c1d2b68187a17cfa964ad60d6d0963501e10520051af6fbb842cd3",
+      "stdout_tail": [
+        "OK V5 tcr-v1 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.266,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.266,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c5c6be6a61733111db4d12042e14c964d93f3af9ceb401f6d8f59a03172d88f0",
+      "stdout_tail": [
+        "OK V5 tcr-v2 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.262,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v3",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.262,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "217d51ad13eb91c1b897de1066bee38754ef97b8e10d6ce41eb0797957323b36",
+      "stdout_tail": [
+        "OK V5 tcr-v3 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "4"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.299,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v4",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.299,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5e385d1589ac7a1abe04651db04be0d90e0bf859a495c4873c9877880395bf86",
+      "stdout_tail": [
+        "OK V5 tcr-v4 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.298,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v5",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.298,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "26d33c9a6e3bbdb4c95b0e9dd3cb02c2e70565b0be28a322ca20cbab05d0ced7",
+      "stdout_tail": [
+        "OK V5 tcr-v5 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.285,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v6",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.285,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5e3bf9a731ef551fd46820575bd227046cdcfe7ea9a35a4d38424bfa931ca300",
+      "stdout_tail": [
+        "OK V5 tcr-v6 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "7"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.322,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v7",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.322,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "51dbb2660bf32ae30d949371d9d72be531931af6814fe419ff85f3f049c020d5",
+      "stdout_tail": [
+        "OK V5 tcr-v7 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "8"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.314,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v8",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.314,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3d256decceaadbce153cd212aea0e18338a92a6c1b203ac55183eea29ca91943",
+      "stdout_tail": [
+        "OK V5 tcr-v8 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "9"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.319,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v9",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.319,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2cf65c77a669e604e00c0ff0832ff49a930d48bc258aa7e362ccb749ddeb1390",
+      "stdout_tail": [
+        "OK V5 tcr-v9 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.326,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v10",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.326,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a084483b12e2b46d09cc726e35807d4c42982d93604cac4172e797fd3716ec28",
+      "stdout_tail": [
+        "OK V5 tcr-v10 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.364,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v11",
+      "index": 14,
+      "outputs": {},
+      "seconds": 0.364,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d1c3a2133571dac45191a2dd2695f5587721ada8ae39920a28dd80ecb6241120",
+      "stdout_tail": [
+        "OK V5 tcr-v11 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "12"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.307,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v12",
+      "index": 15,
+      "outputs": {},
+      "seconds": 0.307,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ff5b481d6094b1bae3afd6240187d6f777391e8dc4d8c8700b24f293461c9dcc",
+      "stdout_tail": [
+        "OK V5 tcr-v12 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "tcr",
+        "13"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.313,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tcr-v13",
+      "index": 16,
+      "outputs": {},
+      "seconds": 0.313,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c6927142c8019f0fc169a1614ae35f3c3ea2e2fc0c2fcefc8be844efde5fa942",
+      "stdout_tail": [
+        "OK V5 tcr-v13 rows=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh",
+        "publish",
+        "V5 Tcr paths v1-v13"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.492,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "publish",
+      "index": 17,
+      "outputs": {},
+      "seconds": 3.492,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6fe8f8694b1ddf3a162c9f20ff9a63fa557bae765f3d47932f32b4d706a2f1d8",
+      "stdout_tail": [
+        "COMMITTED research/volcano_ecdlp_census_followup_20261023/runs/transfer_cost.jsonl",
+        "PUSHED claude/volcano-census-followup-20261023"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 17,
+  "commit": "0efed33916bba5feb8c14d55393afe1c459914b7",
+  "dirty_after": [
+    "esearch/volcano_ecdlp_census_followup_20261023/runs/progress.jsonl",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0003.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0021.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0022.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0034.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-5-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-5-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-6-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-6-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-7-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/driver.lock",
+    "research/volcano_ecdlp_census_followup_20261023/runs/driver.pid",
+    "research/volcano_ecdlp_census_followup_20261023/runs/extract/V5-Tcr-L5-c25.csv.xz",
+    "research/volcano_ecdlp_census_followup_20261023/runs/phase_b.log",
+    "research/volcano_ecdlp_census_followup_20261023/runs/prune.log",
+    "research/volcano_ecdlp_census_followup_20261023/runs/tables/V5-Tcr-L5-c25.txt",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.audit.json",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.log",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.tar.xz",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.verify.log"
+  ],
+  "dirty_before": [
+    "esearch/volcano_ecdlp_census_followup_20261023/runs/progress.jsonl",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-1-i0003.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0003.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0004.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0005.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0006.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0007.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0008.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0009.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0010.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0011.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0012.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0013.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0014.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0015.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0016.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0017.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0018.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0019.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0020.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0021.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0022.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0023.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0024.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0025.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0026.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0027.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0028.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0029.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0030.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0031.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0032.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0033.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0034.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0035.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0036.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0037.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0038.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0039.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0040.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0041.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0042.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0043.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0044.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0045.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0046.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0047.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0048.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0049.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0050.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0051.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0052.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-2-i0053.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-3-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.stdout",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-4-i0002.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-5-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-5-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-6-i0001.receipt.json",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-6-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/cards/instances/CARD-volcano-census-followup-20261023-7-i0001.yaml",
+    "research/volcano_ecdlp_census_followup_20261023/runs/driver.lock",
+    "research/volcano_ecdlp_census_followup_20261023/runs/driver.pid",
+    "research/volcano_ecdlp_census_followup_20261023/runs/extract/V5-Tcr-L5-c25.csv.xz",
+    "research/volcano_ecdlp_census_followup_20261023/runs/phase_b.log",
+    "research/volcano_ecdlp_census_followup_20261023/runs/prune.log",
+    "research/volcano_ecdlp_census_followup_20261023/runs/tables/V5-Tcr-L5-c25.txt",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.audit.json",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.log",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.tar.xz",
+    "research/volcano_ecdlp_census_followup_20261023/sessions/V5-Tcr-L5-c25.verify.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

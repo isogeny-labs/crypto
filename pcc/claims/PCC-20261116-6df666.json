@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:08:19Z",
+ "id": "PCC-20261116-6df666",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/geometry_field.hpp",
+    "sha256": "7c9b3df2218a3af05b56be2995bec1d4f53f4cec55a277ecf051d55795978130"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/level2_input.cpp",
+    "sha256": "094dc3ac14da5bed247026aff6d82d7dffc79b01a5ad47af848b02ee7157c9bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/LEVEL2_INPUT_PROTOCOL.md",
+    "sha256": "f2ee8a1f5a8009f8b95478c282a53262767463432bc9890d5381b146241242c0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/level2-input-v1/result.json",
+    "sha256": "458080ea1fdd7ea6f2d5b6f6669b49c19d980a799d52d03926e4ea9bd5816c5f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native P192 d7 input construction verifies the irreducible cubic tower over the archived degree8 field, all seven finite source branch roots,64 distinct source2-torsion classes, a symplectic frame, six actual Frobenius basis checks and64 theta-characteristic parity identities, with two rejecting corruptions. This supplies level2 input over an auxiliary Fp24 working field; no target quartic or same-field descent is claimed."
+}

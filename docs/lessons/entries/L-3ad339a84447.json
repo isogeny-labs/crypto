@@ -1,0 +1,14 @@
+{
+  "action": "factor #E for every (n,a) cell and check the rho instrument's constructor preconditions (KoblitzCurve::new needs r > h and r^2 not dividing #E) before accepting the cell grid",
+  "created": "2026-11-16T17:08:59Z",
+  "evidence": [
+    "grid.tsv: (a=0,n=11) #E=2116=4*23^2, (a=0,n=17) #E=130972=4*137*239 (r<h); src/cryptanalysis/koblitz_index_calculus.rs:1230-1236 returns None"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a protocol prices matched rho on small Koblitz/binary curves chosen for decomposition rate or factor-base size",
+  "why": "cells picked for IC convenience can make the named rho reference unconstructible or trivial (r=23), so C-vs-rho cannot be computed or is predetermined"
+}

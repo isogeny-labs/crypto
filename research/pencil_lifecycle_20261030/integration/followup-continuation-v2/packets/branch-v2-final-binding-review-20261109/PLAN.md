@@ -1,1 +1,0 @@
-Source-only review of final numeric admission bindings. Verify frozen hashes, recover prior frozen bytes from Git, compare budget changes, verify terminal and ledger receipts. No payload execution or live admission release.

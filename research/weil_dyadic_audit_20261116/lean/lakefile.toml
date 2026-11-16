@@ -1,0 +1,15 @@
+name = "weil_dyadic_audit"
+version = "0.1.0"
+defaultTargets = ["WeilDyadicAudit"]
+
+[[require]]
+name = "weil_two_nondegeneracy_audit"
+path = "../../weil_two_nondegeneracy_audit_20261116/lean"
+
+[[require]]
+name = "elliptic_doubling_surjectivity_audit"
+path = "../../elliptic_doubling_surjectivity_audit_20261116/lean"
+
+[[lean_lib]]
+name = "WeilDyadicAudit"
+roots = ["DyadicImports", "DyadicTransport", "DyadicNondegenerate", "DyadicCharacteristic", "DyadicControls", "DyadicCertificate"]
