@@ -349,6 +349,12 @@ impl ServeWorker {
         &self.path
     }
 
+    /// The worker's process id (tests: tell a reused worker from a fresh one).
+    #[cfg(test)]
+    fn pid(&self) -> u32 {
+        self.child.id()
+    }
+
     /// Send one system and read its reply (the binary protocol of
     /// `gpu/fes/fes_io.hpp`: little-endian words, no text formatting).
     pub fn solve(&mut self, sys: &PackedSystem) -> Result<ServeReply, String> {
@@ -418,6 +424,34 @@ pub fn solve_on_shared_server(sys: &PackedSystem) -> Result<Option<(ServeReply, 
             Err(e)
         }
     }
+}
+
+/// Start `worker` into `slot` unless one is already there; never waits for it.  A failure is ignored: the first
+/// solve starts the worker again and reports the error then.
+fn prewarm_into(slot: &Mutex<Option<ServeWorker>>, worker: Option<PathBuf>) {
+    let mut guard = slot.lock().unwrap_or_else(|p| p.into_inner());
+    if guard.is_none() {
+        if let Some(w) = worker {
+            if let Ok(server) = ServeWorker::spawn(&w) {
+                *guard = Some(server);
+            }
+        }
+    }
+}
+
+/// Start the process-wide serve worker now instead of at the first solve, so that its start-up overlaps other work.
+/// A CUDA worker creates its context and buffers before it reads its first request (about 150 ms on an A100), and
+/// the first call otherwise waits for that.  Returns at once (spawning a process does not wait for the worker to
+/// initialise); does nothing when a worker is already running or none is found.  `ICX_FES_PREWARM=0` turns it off
+/// (A/B measurements against the same binary).
+pub fn prewarm_shared_server() {
+    if std::env::var("ICX_FES_PREWARM")
+        .map(|v| v == "0")
+        .unwrap_or(false)
+    {
+        return;
+    }
+    prewarm_into(&SHARED_SERVER, discover_worker());
 }
 
 /// Generate a pseudo-random quadratic Boolean system in `n` variables and `m`
@@ -649,6 +683,62 @@ mod tests {
             want.sort_unstable();
             assert_eq!(got, want, "trial {trial} (n = {n}, m = {m})");
         }
+    }
+
+    /// A worker that is slow to start (a CUDA context takes about 150 ms) does not hold up the prewarm; it starts the
+    /// worker once, a second prewarm reuses it, and the first solve after it still answers like the CPU search.
+    #[test]
+    fn prewarm_returns_at_once_starts_one_worker_and_the_first_solve_answers() {
+        let Some(worker) = build_host_worker() else {
+            eprintln!("no C++ compiler: prewarm test skipped");
+            return;
+        };
+        let dir = worker.parent().unwrap().to_path_buf();
+        let slow = dir.join("slow_start");
+        std::fs::write(
+            &slow,
+            format!("#!/bin/sh\nsleep 0.4\nexec {} \"$@\"\n", worker.display()),
+        )
+        .unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&slow, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        let slot: Mutex<Option<ServeWorker>> = Mutex::new(None);
+        prewarm_into(&slot, None);
+        assert!(
+            slot.lock().unwrap().is_none(),
+            "no worker found: nothing started"
+        );
+        let t0 = std::time::Instant::now();
+        prewarm_into(&slot, Some(slow.clone()));
+        assert!(
+            t0.elapsed() < std::time::Duration::from_millis(300),
+            "prewarm waited for the worker's start-up: {:?}",
+            t0.elapsed()
+        );
+        let pid = slot.lock().unwrap().as_ref().expect("started").pid();
+        prewarm_into(&slot, Some(slow));
+        assert_eq!(
+            slot.lock().unwrap().as_ref().unwrap().pid(),
+            pid,
+            "a second prewarm reuses the worker"
+        );
+        let forms = sample_forms(12, 3, 4242);
+        let sys = PackedSystem::from_quadratic_forms(&forms).unwrap();
+        let reply = slot
+            .lock()
+            .unwrap()
+            .as_mut()
+            .unwrap()
+            .solve(&sys)
+            .expect("first solve after prewarm");
+        let mut got = reply.proposed.clone();
+        got.sort_unstable();
+        let mut want = sys.cpu_search();
+        want.sort_unstable();
+        assert_eq!(got, want);
     }
 
     /// Shuffled solution lists sort back to exactly the CPU walk's order.

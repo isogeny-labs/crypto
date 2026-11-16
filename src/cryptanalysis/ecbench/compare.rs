@@ -179,8 +179,7 @@ pub struct ArmSummary {
 pub struct WorkloadRow {
     pub workload_id: String,
     pub slug: String,
-    /// The subgroup order; written as the `compat_u128` encoding was.
-    pub r: crate::cryptanalysis::ecbench::exact_scalar::ExactScalar,
+    pub r: super::exact_scalar::ExactScalar,
     pub floor_s: f64,
     /// Matched pairs on this workload (censored ones included).
     pub pairs: u64,

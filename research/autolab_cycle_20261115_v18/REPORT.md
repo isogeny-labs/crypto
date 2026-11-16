@@ -1,0 +1,20 @@
+# Exact equation compression: measured conditional-cell improvement — v18
+
+The hypothesis was to remove unused prelinear g9 work, cache immutable moment images, stop certificate elimination once constant1 is derived, and replace60raw coordinate equations with an equivalent38-equation basis carrying original-output masks. The direct E2 fiber/complete affine kernel and final syndrome semantics are unchanged. Each compressed identity is replayed literally from the original syndrome. This is field-specific exact preparation work, not a novel generalized all-roots release.
+
+Twelve fresh-process calls compared4methods on32preregistered matching exposed GF(2^83)E2cells, with3repetitions/method andalternatingorder. Full linear fibers and final polynomial syndromes hashed identically across allcalls. Every method rejected all32cells; each represents2^35familyparameters, so this certifies2^40conditional relaxation points, only32of2^34outerE2cells. TheGF4/GF8/GF16complete48parameter controls and136two-variable polynomial-pair certificate oracles ran in every child. Repeated roots remain covered, while positive support/source/ghost/original-chain closure is unproved.
+
+| Method | Geometric mean total child lifetime | Child peak RSS | A/A spread |
+|---|---:|---:|---:|
+| Prior reference |2.320030s|21904KiB|5.79%|
+| Cached reference |2.204057s|19728KiB|5.45%|
+| Lean compiler plus early certificate |0.686947s|22800KiB|1.88%|
+| Same plus equivalent38-equation basis |0.605586s|20752KiB|2.96%|
+
+The final compiler is3.831xversuspriorreference,3.640xversuscachedreference, but only1.134xversusthestrongerleancompiler. The last ratio is the relevant incremental evidence for equation compression. These are component timings on exposed calibration cells, not genuineF4/F5/F6all-roots speed ratios. Startup,imports,parsing,fieldverification,sharedsetup,cellsolving,identityreplay andserializedstdout throughcompletechilddeath are charged. Supervising worker17.577309s,parentRSS32584KiB; childRSS andparentRSS are reported separately, not invented as a cgroup high-water mark. Hostisolation is unqualified.
+
+The original comparison attempt exceeded its evidence-size cap before writing raw output; no comparative timings from that failed attempt are used. Its traceback/process record remain frozen. A fresh storage variant interns identical proof bodies while retaining every timing/RSS/report field, then reconstructs all12report dictionaries exactly. New raw142153bytes,SHA0f2fc11a48937ca8c06b0e8c7f1b97ff4449e497293a171dbd7b3dfd4e9e310a. Exactly2workers ran thiscycle,90s/4GiB/onecore. All13previousactive attempts and339historicalidentities were checked; read-only integrity passes. Review remains sole-model preparation with independent oracle algorithms, external promotion pending.
+
+Next: cache/update the E2-dependent first linear system under Gray changes, and measure degree-filtered certificate blocks before implementing bit-sliced batching. A row-packed scalar baseline already uses word parallelism across monomials, so bit-slicing across instances does not automatically confer64xarithmetic gain. Any claimed batch advantage must beat the new lean/compressed scalar pipeline with exact pivot-zero/rank-deficient fallbacks. The outer2^34cell bottleneck remains; seek guarded identities spanning larger outer affine cells rather than merely extrapolating per-cell throughput.
+
+The requested8xend-to-end goal and immutable2xGATEfloor remain open:20completedhardmatched genuineF4/F5/F6cases,independentoriginalrootsets,requestedbinary/Koblitz/odd/NISTprimecoverage,coldrepetitions,memory andqualifiedisolation. No global original339-variable root search completed. Frozen source/input/manifests/raw byte contents are preserved. Storage is tight; only redundant transport requests whose every content was verified in preserved source were removed, and immutableduplicate storage was shared without changing any artifact path/hash. Code/proof bundle and raw gzip are separate portable parts, requiring the pinned historical dependency chain.

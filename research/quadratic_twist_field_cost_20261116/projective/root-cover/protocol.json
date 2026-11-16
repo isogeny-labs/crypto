@@ -1,0 +1,1564 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-cubic-root-cover-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/projective/root-cover",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does an explicitly nonzero quadratic cover from identical actual cubic membership inputs improve finite admission and original-source recovery at named expanded witness cap3, after offering it to every source/twist control and retaining proportional-input unknowns?",
+  "claims": [
+    {
+      "id": "complete-root-cover",
+      "text": "Proposed complete root-cover/recovery replay under explicit nonzero cover and denominator domains; lower named field-input certificate bound is not intrinsic regularity, original S3 degree or speed",
+      "class": "exact_computation",
+      "decided_by": [
+        "complete-root-cover"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Proposed complete root-cover/recovery replay under explicit nonzero cover and denominator domains; lower named field-input certificate bound is not intrinsic regularity, original S3 degree or speed",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "qualifier-build",
+      "role": "candidate",
+      "description": "Root-cover protocol stage qualifier-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "cpp-build",
+      "role": "candidate",
+      "description": "Root-cover protocol stage cpp-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "rust-build",
+      "role": "candidate",
+      "description": "Root-cover protocol stage rust-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "describe-build",
+      "role": "candidate",
+      "description": "Root-cover protocol stage describe-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "compare-build",
+      "role": "candidate",
+      "description": "Root-cover protocol stage compare-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "protocol-check",
+      "role": "candidate",
+      "description": "Root-cover protocol stage protocol-check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-qualifier-head",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-qualifier-head",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-qualifier-source",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-qualifier-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "proof-A",
+      "role": "candidate",
+      "description": "Root-cover protocol stage proof-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "proof-B",
+      "role": "control_aa",
+      "description": "Root-cover protocol stage proof-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-proof-identity",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-proof-identity",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "reject-proof-filter",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-proof-filter",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "reject-proof-quadratic",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-proof-quadratic",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "produce-C",
+      "role": "candidate",
+      "description": "Root-cover protocol stage produce-C",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-A",
+      "role": "control_aa",
+      "description": "Root-cover protocol stage produce-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "control_aa",
+      "description": "Root-cover protocol stage produce-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "independent-audit",
+      "role": "control_positive",
+      "description": "Root-cover protocol stage independent-audit",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "describe",
+      "role": "candidate",
+      "description": "Root-cover protocol stage describe",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "compare",
+      "role": "candidate",
+      "description": "Root-cover protocol stage compare",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "corrupt-map",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-map",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-map",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-missing-policy",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-scalar",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-log",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-cost",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-source",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-columns",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-missing-failure",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-missing-failure",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-failure",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-missing-failure",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-cap",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-cap",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-cap",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-cap",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-witness",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-root",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-branch",
+      "role": "candidate",
+      "description": "Root-cover protocol stage corrupt-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-branch",
+      "role": "control_negative",
+      "description": "Root-cover protocol stage reject-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "audit-original-again",
+      "role": "candidate",
+      "description": "Root-cover protocol stage audit-original-again",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell; native qualifier, arithmetic, replay and analysis",
+          "clock_valid": "false",
+          "historical_input": "exact native prior9e48248c receipt; no historical timing reexecution"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "fresh-repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "independent-audit",
+      "expected_detection": "Complete independent actual root/witness/point/row/log/original-scalar reconstruction after six Lean declarations pass",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-root",
+      "null_population": {
+        "description": "Two false qualifier inputs,three false mathematical conclusions,twelve native changed/rehashed false full-case corpora",
+        "generator": "Frozen native corruption code; actual changed site required; false proof sources prefiled",
+        "n": 17,
+        "why_n": "Complete declared integrity categories, no random null/p-value",
+        "matched_on": [
+          "same exact actual field/source/target population",
+          "source/input binding",
+          "complete independent replay"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "payload_truth",
+        "levels": [
+          "original",
+          "explicit false input"
+        ]
+      },
+      {
+        "name": "process_repeat",
+        "levels": [
+          "C",
+          "A",
+          "B",
+          "proof-A",
+          "proof-B"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "New native nonzero quadratic-cover certificate and independently different root extraction; old mappings/input construction retained",
+        "how": "All source files and PINS metadata hash-bound in frozen protocol before affected launch"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "ALL455policies×3roles×cap3×31queries/30targets; exact historical cap3/4 receipt only as pinned prior input",
+        "how": "No new favorable policy/target selection, all failures retained"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "describe-build",
+          "compare-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "proof-A",
+          "proof-B",
+          "reject-proof-identity",
+          "reject-proof-filter",
+          "reject-proof-quadratic",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "describe",
+          "compare",
+          "corrupt-map",
+          "reject-map",
+          "corrupt-missing-policy",
+          "reject-missing-policy",
+          "corrupt-scalar",
+          "reject-scalar",
+          "corrupt-log",
+          "reject-log",
+          "corrupt-cost",
+          "reject-cost",
+          "corrupt-source",
+          "reject-source",
+          "corrupt-columns",
+          "reject-columns",
+          "corrupt-missing-failure",
+          "reject-missing-failure",
+          "corrupt-cap",
+          "reject-cap",
+          "corrupt-witness",
+          "reject-witness",
+          "corrupt-root",
+          "reject-root",
+          "corrupt-branch",
+          "reject-branch",
+          "audit-original-again"
+        ],
+        "how": "Dependency-ordered exact engineering replication, no clock statistic or total-cost promotion"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "measured",
+        "value": "FreshC/A/B and repeated pinned proof gate",
+        "how": "No lookup of positive answers; native replay verifies every separate original scalar"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "complete-root-cover",
+        "arms": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "describe-build",
+          "compare-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "proof-A",
+          "proof-B",
+          "reject-proof-identity",
+          "reject-proof-filter",
+          "reject-proof-quadratic",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "describe",
+          "compare",
+          "corrupt-map",
+          "reject-map",
+          "corrupt-missing-policy",
+          "reject-missing-policy",
+          "corrupt-scalar",
+          "reject-scalar",
+          "corrupt-log",
+          "reject-log",
+          "corrupt-cost",
+          "reject-cost",
+          "corrupt-source",
+          "reject-source",
+          "corrupt-columns",
+          "reject-columns",
+          "corrupt-missing-failure",
+          "reject-missing-failure",
+          "corrupt-cap",
+          "reject-cap",
+          "corrupt-witness",
+          "reject-witness",
+          "corrupt-root",
+          "reject-root",
+          "corrupt-branch",
+          "reject-branch",
+          "audit-original-again"
+        ],
+        "differs_in": [
+          "payload_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All44expected outcomes; every accepted root/row/witness/public log/original scalar matches independent native reconstruction; six named Lean declarations with0failing/trusted; all17false categories reject expected exit/no receipt; every proportional-input loss retained"
+      },
+      {
+        "id": "fresh-repeat",
+        "arms": [
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "domain": "Actual F61/r31 cyclic source points and actual twist-assisted reduced Tate images",
+        "check": "Same actual source/twist domain and whole finite homomorphism checks; actualQ input, legitimate admitted public logs, every recovered ORIGINAL scalar; no generic map or known-target-label oracle"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact full finite declared population, no p-value or timed effect claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 180,
+      "per_sample_seconds": 30,
+      "threads": 2,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Prior actual full native panel informs build/replay envelope; new root algorithm unexecuted before freeze, overrun remains incomplete"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "profiles",
+        "name": "profiles",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "1365complete policy/role/cap profiles per fresh stream",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "target_workloads",
+        "name": "target_workloads",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "40950configuration-target attempts on30repeated actual source points per fresh stream",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "map_calls",
+        "name": "map_calls",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual cold mapping requests from producer counts and independent reconstruction",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "algebraic_recoveries",
+        "name": "algebraic_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Original source target scalar recovered using admitted public logs and a certified query",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "blocked_setups",
+        "name": "blocked_setups",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Rank-deficient admitted public setup, never patched by a scalar oracle",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "named_witness_peak",
+        "name": "expanded original membership-input certificate degree",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Maximum degree of actual constructed products in the stated f,h witness; square-root scalar work separately unpriced; not intrinsic regularity or originalS3",
+        "source": "native independent trace/audit/compare",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "actual certificate degree",
+      "root_checks",
+      "maps",
+      "setup queries",
+      "failed branches",
+      "original source scalars"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs",
+      "all proportional R=0unknown branches",
+      "actual field-root extraction results",
+      "native fresh-vs-historical full source comparisons"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "outer_seconds": 3600,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Stop on first unexpected stage outcome or absolute08:40UTC;600s each; preserve all failures; no subset/null substitution",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact finite complete execution plus qualified full-panel named field-input witness comparison, no speed or intrinsic regularity claim",
+    "comparison_ids": [
+      "complete-root-cover"
+    ],
+    "threshold": "All44expected outcomes; every accepted root/row/witness/public log/original scalar matches independent native reconstruction; six named Lean declarations with0failing/trusted; all17false categories reject expected exit/no receipt; every proportional-input loss retained",
+    "statistic": "Exact complete finite per-policy/target outcomes and all matched gain/tie/loss counts",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Finite useful admission/recovery and qualified certificate peaks, including every proportional-input loss",
+    "verdict_vocabulary": [
+      "finite_root_cover_observed_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_field_cost_20261116/projective/root-cover/audit.rs",
+      "sha256": "273c78839d51f57b60f46984cec7af5968cb1dd0ff449c31743e9660851a1f0c"
+    },
+    "inputs": [
+      "All1365freshprofiles/40950original-target workloads perC/A/Bstream",
+      "Exact actual fields/source/twist/paired inputs",
+      "Pinned HISTORICAL native cap3/4 auditSHA9e48248c; no baseline clock reexecution"
+    ],
+    "outputs": [
+      "Complete native trace/root/certificate/row/log/scalar audit",
+      "Frozen native full matched/source-frontier description and historical comparison",
+      "Every meaningful rehashed false payload and failure"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Native-emitted full policy/recovery/rank graph with all unknowns/losses",
+      "Actual input/cover/source-recovery degree-boundary diagram"
+    ],
+    "report_dir": "research/quadratic_twist_field_cost_20261116/projective/root-cover/reports"
+  },
+  "inadmissible": [
+    "Change full population/caps/criteria after data",
+    "Feed reference point enumeration into candidate stopping",
+    "Use target scalar labels or unadmitted public logs in recovery",
+    "Turn cap-unknown into a certified root",
+    "Claim named chart degree is original witness degree or intrinsic regularity",
+    "Infer speed from unisolated clocks or incomplete cost vectors",
+    "Discard ties/losses/blocked setups/failed queries",
+    "Upload denied findings/assets or use paid resources/credential fallback"
+  ],
+  "literature": [
+    {
+      "ref": "https://libntl.org/doc/ZZ_pEX.txt",
+      "provenance": "retrieved",
+      "claim": "PrimaryNTL11.6GCD/XGCD contracts read locally; root-cover is a standard leading-coefficient cancellation, not novel algebra"
+    },
+    {
+      "ref": "https://libntl.org/doc/ZZ_pEXFactoring.txt",
+      "provenance": "retrieved",
+      "claim": "PrimaryFindRoots split/squarefree hypotheses read locally; explicit quadratic/zero/proportional branches required"
+    },
+    {
+      "ref": "isogeny-labs/crypto-autoresearcher@b9c6c32a:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-shared-coefficient-membership.yaml",
+      "provenance": "retrieved",
+      "claim": "Disclosed historical atlas fallback after current5d7c27e3 blobs failedUTF8 decoding; retain complete root/membership/extraction costs, no current disposition/novelty claim"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "fcd381b8f12738bd68830c53afab364b04dc4ec7f3d5e3262b96d9429aeea65d",
+    "commit": "b3a7808b031354e79a4557e7df62200e3114f68f",
+    "frozen_at": "2026-11-16T07:48:13Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "pins_sha256": "dbaec2d66d939cd44d454167c1ff8dbddba30e8d2336b44c2a78f02d2bb8f395",
+    "window": "07:40–08:40UTC2026-11-16",
+    "deadline_epoch": 1794818400,
+    "max_local_workers": 2,
+    "per_stage_seconds": 600,
+    "stage_plan": [
+      {
+        "name": "qualifier-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "cpp-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "rust-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "describe-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "compare-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "protocol-check",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-qualifier-head",
+        "expected_exit": 101
+      },
+      {
+        "name": "reject-qualifier-source",
+        "expected_exit": 101
+      },
+      {
+        "name": "proof-A",
+        "expected_exit": 0
+      },
+      {
+        "name": "proof-B",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-proof-identity",
+        "expected_exit": 1
+      },
+      {
+        "name": "reject-proof-filter",
+        "expected_exit": 1
+      },
+      {
+        "name": "reject-proof-quadratic",
+        "expected_exit": 1
+      },
+      {
+        "name": "produce-C",
+        "expected_exit": 0
+      },
+      {
+        "name": "produce-A",
+        "expected_exit": 0
+      },
+      {
+        "name": "produce-B",
+        "expected_exit": 0
+      },
+      {
+        "name": "independent-audit",
+        "expected_exit": 0
+      },
+      {
+        "name": "describe",
+        "expected_exit": 0
+      },
+      {
+        "name": "compare",
+        "expected_exit": 0
+      },
+      {
+        "name": "corrupt-map",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-map",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-missing-policy",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-missing-policy",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-scalar",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-scalar",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-log",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-log",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-cost",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-cost",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-source",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-source",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-columns",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-columns",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-missing-failure",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-missing-failure",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-cap",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-cap",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-witness",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-witness",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-root",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-root",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-branch",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-branch",
+        "expected_exit": 101
+      },
+      {
+        "name": "audit-original-again",
+        "expected_exit": 0
+      }
+    ],
+    "scientific_execution_before_freeze": false,
+    "prior_data_observed": true,
+    "whole_scope": "455×3×1×31diagnostics;455×3×1×30separate recovery workloads",
+    "proportional_cover": "UNKNOWN, all losses retained",
+    "root_extraction": "CandidateTonelliShanks; independentreal-coordinate square root enumeration; no saved roots or pairtable",
+    "original_source": "actual E61/P scalar check with admitted public setup logs",
+    "named_degree_scope": "expanded membership-cubic witness; compressed pullback and originalS3 remain unknown; root scalar work charged separately/not priced",
+    "canonical_guide_gap": "Current encrypted guide unreadable; historical canonical instructions and current pinned validator used, no clock/slope claim",
+    "checkpoint": "authorized samebranch source/protocol GitHub only; no assets/S3/credential use",
+    "no_paid_resources": true
+  }
+}

@@ -29,7 +29,6 @@ use serde_json::Value;
 
 use crate::cryptanalysis::ecbench::audit::AuditReport;
 use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
-use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::methods::expected_s;
 use crate::cryptanalysis::ecbench::record::{floor_s, Record};
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
@@ -242,7 +241,7 @@ pub struct MethodRef {
 pub struct SizeRow {
     pub slug: String,
     pub log2_r: f64,
-    pub r: ExactScalar,
+    pub r: super::exact_scalar::ExactScalar,
     pub field_bits: u32,
     pub automorphisms_available: u32,
     pub floor_s: f64,
@@ -1660,10 +1659,10 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
                 .iter()
                 .filter(|r| r.workload.curve.slug == row.slug)
                 .collect();
-            let ln_r = (row.r.to_f64()).ln();
+            let ln_r = (row.r as f64).ln();
             q_strata.push(
                 mine.iter()
-                    .map(|r| q_of(r) / (r.workload.curve.r.to_f64()).sqrt())
+                    .map(|r| q_of(r) / (r.workload.curve.r as f64).sqrt())
                     .collect(),
             );
             q_pts.push(

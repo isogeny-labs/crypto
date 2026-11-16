@@ -1,0 +1,120 @@
+{
+  "schema": "elliptic-translation-preflight/v1",
+  "build_snapshots": 24,
+  "failed_states": [
+    "01",
+    "03",
+    "04",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "17",
+    "20",
+    "21"
+  ],
+  "successful_states": [
+    "02",
+    "05",
+    "06",
+    "15",
+    "16",
+    "18",
+    "19",
+    "22",
+    "23",
+    "24"
+  ],
+  "gate": {
+    "archive": "research/elliptic_translation_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_elliptic_translation_audit_20261115_lean/audit.log",
+        "bytes": 8640,
+        "sha256": "ea9962d0490b8c589b6ed8bf04b6797e57fdc208e4f436fa29a9c22a58192dd1"
+      },
+      {
+        "member": "research_elliptic_translation_audit_20261115_lean/build.log",
+        "bytes": 27712,
+        "sha256": "15756d85aa9d4455eee92c83a2843e324e6f36a5a3b2fd467dd364b2d2eb5652"
+      },
+      {
+        "member": "research_elliptic_translation_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_elliptic_translation_audit_20261115_lean/source-build.log",
+        "bytes": 27712,
+        "sha256": "d83e109e8e46e39d025fd179f78751932aba058567ec6357adf152ff900d8eb1"
+      },
+      {
+        "member": "research_elliptic_translation_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 82,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 12,
+    "new_concrete_modules": 12,
+    "credited_dependency_modules": 84,
+    "credited_prior_gate": 35,
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "build.log": [],
+      "source-build.log": [],
+      "audit.log": [
+        "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+      ]
+    }
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/elliptic_translation_audit_20261115/evidence/attempts.tar.xz",
+    "files": 480,
+    "unique_objects": 136,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "credited_dependency_modules": 84,
+  "copied_modules": 0,
+  "all107predecessor_pins_checked_each_state_and_gate": true,
+  "new_modules": 12,
+  "new_concrete_modules": 12,
+  "actual_generic_point_transcendence_derived": true,
+  "actual_coordinate_hom_injectivity_derived": true,
+  "actual_FF_translation_RingEquiv_inverse_composition_faithful": true,
+  "actual_official_Point_map_generic_compatibility": true,
+  "actual_integer_divisor_translation_principal_preservation": true,
+  "actual_induced_Picard_translation_identity": true,
+  "actual_source_FF_formula": true,
+  "actual_ACF5_CharP5_translation_not_affine_ring": true,
+  "actual_F5_deleted_affine_guard_counter": true,
+  "actual_F5_guarded_positive": true,
+  "supplied_transcendence_or_injective_map_or_inverse_premise": false,
+  "all_local_order_residue_pullback": false,
+  "general_basefield_descent": false,
+  "linebundle_Scheme_comparison": false,
+  "canonical_pairing_comparison": false,
+  "qualified_source_refuted": false,
+  "full14complete": false,
+  "paid_compute_and_agent_upload": 0
+}

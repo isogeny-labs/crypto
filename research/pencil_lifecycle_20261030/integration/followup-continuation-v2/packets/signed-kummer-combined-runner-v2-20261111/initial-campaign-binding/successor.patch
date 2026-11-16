@@ -1,0 +1,3957 @@
+--- a/acceptance_negative_controls.py
++++ b/acceptance_negative_controls.py
+@@ -0,0 +1,16 @@
++"""Prospective only: never invoked by this source preparation."""
++import json,tempfile,unittest
++from pathlib import Path
++from panel_acceptance import trace_identity
++class IdentityNegatives(unittest.TestCase):
++ def check_rejected(self,field):
++  fixture=json.loads((Path(__file__).parent/'driver-fixture.json').read_text())
++  identity=dict(source_revision='a'*40,source_sha256='b'*64,workload_id=fixture['target']['workload_id'],run_id='observed')
++  identity[field]='c'*len(identity[field])
++  with tempfile.TemporaryDirectory() as tmp:
++   p=Path(tmp)/'trace.jsonl';p.write_text(json.dumps(dict(kind='ObservedHeader',data=dict(identity=identity,native={})))+'\n')
++   with self.assertRaisesRegex(AssertionError,'trace source identity mismatch'):
++    trace_identity(p,fixture,'a'*40,'b'*64,'observed')
++ def test_changed_revision(self):self.check_rejected('source_revision')
++ def test_changed_source_hash(self):self.check_rejected('source_sha256')
++if __name__=='__main__':unittest.main()
+--- a/admission-draft.json
++++ b/admission-draft.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": "signed-kummer-combined-admission/v1",
+   "released": false,
+-  "workspace": "/var/tmp/pencil-signed-kummer-combined-20261110",
++  "workspace": "/var/tmp/pencil-signed-kummer-combined-v2-20261111",
+   "donor_workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+   "absolute_deadline": null,
+   "total_seconds": 2400,
+@@ -60,39 +60,20 @@
+     }
+   },
+   "packet_files": {
+-    "driver-inputs.json": "b1aff1db9f2433ee4b67c7b6c884bf95fa21b562f7eee1d88680c254cba4abe5",
+-    "report.pdf": "cdd4102b11ebf4c7f23290a99b36b6cdfba7fbd57c2a500f529de56bd8e0a4e4",
+-    "scope.csv": "4ae2da6d6d246b0e283f2b2d408b55a4b1de5fa04f0e6b237a36de005991529a",
++    "driver-inputs.json": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
+     "expected-source-manifest.json": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+-    "materialize.py.patch": "b440c9a88ddb0e3baeb292655c328e731c7808eef490ec2e415c264a52dea244",
+-    "PLAN.md": "a8b667d8d27a945be5529a5a5e98cbf901de2cd58133f8094f322937a01a6af5",
+-    "commands.json": "9a8810bf39cdea83bf15234431a0139849653d9d5860cf1aed488deb46a66e33",
+-    "flow.svg": "6196d843691f99fa9a16e7b76c96ddd74d3a15941d5b8c0f58aced1eca5719ee",
+-    "stage_driver.py": "49ff91235050697b8526c06a959fdd16e3950dd8bbbf328754fb0226a22b0ed5",
+-    "materialize.py": "3fb1dd9176c8d0a83946bda9e477be70ef9164d423c84ac00fff8fde610e149a",
++    "commands.json": "be73946bea8cc591fb37c6b88202ca9698f7934c8fd126b2277db115db50ff61",
++    "stage_driver.py": "3a072cbfd03fac4149bbebdc969ef33173b67f1e35fa248e83cdc96ef9f64564",
++    "materialize.py": "087a3a31491a4ed0abff0e730e29cef46aab6461398b6c650555c778b2f79e78",
+     "durable-launcher.py": "aa6cd5159603e0d32e0637f154c513d64df43a3de12b9b18a79662d3a9852535",
+-    "durable_io.py": "3ba44b98fcb0cfe768d6574c96cbfab5662ea634ed7295c56f27efa585bc88ab",
+-    "durable-worker.py": "9aa4389355009eeef641b63a5247d5f7a394165e7722ff5042ec5926bb14eff0",
+-    "panel_acceptance.py": "b5aa6b93af5abd12847e9aec3f9fd240b219e331bbe807946f0faa3471b27f52",
++    "durable_io.py": "6fd36bc2127416e16a3d1b1790bf7f37dd44c68def0c4d436cbb43141bdb5abd",
++    "durable-worker.py": "8db5ec046ecb249f050b3d3b4e06e042f7b427eaabf3a022550fab8385da9203",
++    "panel_acceptance.py": "afa728704e1559ddcdaffa705960e2e1dcda694a7c322b63a47dd433a7d7be33",
+     "overlays.json": "636f528a373fc7937a46a6dce2d80533246a85ce043a6e33900b876ba76c35a8",
+-    "SESSION.md": "13088bb9cc9fca37c7060a88a0b827d14b033fca9c4e2f5d693749878babf391",
+-    "input-bindings.json": "6f917559e794b5cf684cb3d0b5269f2e15ac82335bd90c354c2c3cd473a56b0c",
+-    "durable-launcher.py.patch": "b0907ece842c9e53cc6db1beebd6ec8f2c4ee772b864a1cfe50e15958b2e9ae8",
+-    "durable-worker.py.patch": "611f2dbe1c5188e7e8af7932fa7207d90e50a61ba921265b277e8fddd24f60d8",
+-    "durable_io.py.patch": "f46bf0fe620791069cae0398af45b6a8b50ac3bce3c6c275c1bc1b69dfed4e7f",
+-    "result.json": "6ac12f3371c6c48d2f3ebbf4b5038a51639e2ab007527e3fe9e5942a56a6bae5",
+-    "report.typ": "9ecca78d9591db43e42273286463192564896d4b4c230f0cd64abde7ec7f837b",
+-    "overlay/src/cryptanalysis/three_leads_followup.rs": "a36e7e10031084f777c31555b9ac91de272c2b83e628deb9819b50924decef13",
+-    "overlay/research/pencil_large_prime_20261029/src/relation_stream.rs": "d279bcd5d72e4a90e766b0410ed989a739af4ff9d68182eac2fadf424788399c",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream/src/lib.rs": "bc92b870babedf1becb2e7b279ebd15e7fb10b9bc6164ce4119c00de96b740ff",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/protocol.json": "7995e3786b270adaf9c9a2a2c9454ecb4e1764354777daf98734810e7cb06ee1",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/kummer-fixture.json": "7a19db373a6e2e89c91966b4757ff7f867aaeb2d94651644f44bad1e0e255d2a",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/labels-root.rs": "fad055e66c8141468df479bfa2534e42efe089efa032dab8a2e862257187e8de",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/native_producer_tests.rs": "280bba65b45f2b30d33701ebec79f24289e391b3235760d4aab6d10b6827f9ef",
+-    "overlay/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/signed-panel.json": "fa521201444e65726fdec41bb0d573fddc17c5d42b03be72aac1e91408d1d310"
++    "acceptance_negative_controls.py": "e2964a1d88d6332a79f5245a753a52fddff2cb66d3ded94f3d8d27a840f733cf"
+   },
+-  "durable_run": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-20261110",
+-  "unit": "pencil-signed-kummer-combined-20261110.service",
++  "durable_run": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v2-20261111",
++  "unit": "pencil-signed-kummer-combined-v2-20261111.service",
+   "uid": 1000,
+   "gid": 1000,
+   "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+@@ -110,10 +91,17 @@
+     "cryptanalysis::three_leads_followup::native_event_qualification::actual_kummer_labels_results_counters_and_early_returns"
+   ],
+   "source_manifest_sha256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+-  "generated_driver_lock": {
+-    "path": null,
+-    "sha256": null,
+-    "bytes": null
+-  },
+-  "published_source_revision": null
++  "published_source_revision": null,
++  "generated_locks": {
++    "driver": {
++      "path": null,
++      "sha256": null,
++      "bytes": null
++    },
++    "adapter": {
++      "path": null,
++      "sha256": null,
++      "bytes": null
++    }
++  }
+ }
+--- a/commands.json
++++ b/commands.json
+@@ -1,15 +1,15 @@
+ {
+   "status": "prospective_not_released",
+-  "working_directory": "/var/tmp/pencil-signed-kummer-combined-20261110/source",
++  "working_directory": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/source",
+   "build_env": {
+     "PATH": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+     "LANG": "C.UTF-8",
+     "LC_ALL": "C.UTF-8",
+     "CARGO_BUILD_JOBS": "1",
+     "RUST_TEST_THREADS": "1",
+-    "CARGO_HOME": "/var/tmp/pencil-signed-kummer-combined-20261110/cache/cargo-home",
+-    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-kummer-combined-20261110/cache/target",
+-    "TMPDIR": "/var/tmp/pencil-signed-kummer-combined-20261110/cache/tmp",
++    "CARGO_HOME": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/cargo-home",
++    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/target",
++    "TMPDIR": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/tmp",
+     "RUSTC": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+     "QUAL_SOURCE_REVISION": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+     "QUAL_SOURCE_SHA256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871"
+@@ -45,7 +45,7 @@
+   "materialization_argv": [
+     "/usr/bin/python3",
+     "-B",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-20261110/materialize.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v2-20261111/materialize.py"
+   ],
+   "phase_clock_start": "build deadline starts before materialization and all input/hash/cache verification",
+   "build_artifact_selection": {
+@@ -53,8 +53,8 @@
+     "target_name": "crypto_lib",
+     "target_kind_contains": "lib",
+     "profile_test": true,
+-    "target_src_path": "/var/tmp/pencil-signed-kummer-combined-20261110/source/src/lib.rs",
+-    "unique_executable_under": "/var/tmp/pencil-signed-kummer-combined-20261110/cache/target/",
++    "target_src_path": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/source/src/lib.rs",
++    "unique_executable_under": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/target/",
+     "require_build_finished_success": true,
+     "record_binary_sha256_before_execution": true
+   },
+@@ -88,7 +88,7 @@
+     "2395s",
+     "/usr/bin/python3",
+     "-B",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-20261110/durable-launcher.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v2-20261111/durable-launcher.py"
+   ],
+   "source_identity_semantics": "source_revision is canonical29861base; source_sha256 binds the complete staged candidate source manifest, including all overlays. Original native7986123f digest remains provenance only.",
+   "driver_tests": [
+--- a/driver-fixture.json
++++ b/driver-fixture.json
+@@ -0,0 +1,3639 @@
++{
++  "target": {
++    "algorithm_seed": "13703248144867106833",
++    "all_source_checks": true,
++    "bits": 16,
++    "case_count": 7,
++    "cases": [
++      {
++        "a": 0,
++        "affine_map_correct": true,
++        "b": 0,
++        "case_index": 0,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 0,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 0
++      },
++      {
++        "a": 1,
++        "affine_map_correct": true,
++        "b": 0,
++        "case_index": 1,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              148,
++              428,
++              1
++            ],
++            "v": [
++              323,
++              558
++            ]
++          },
++          "k_difference": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_expected": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_left": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_observed": [
++            54,
++            729,
++            448,
++            452
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      },
++      {
++        "a": 0,
++        "affine_map_correct": true,
++        "b": 1,
++        "case_index": 2,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              329,
++              5,
++              1
++            ],
++            "v": [
++              76,
++              627
++            ]
++          },
++          "k_difference": [
++            573,
++            23,
++            689,
++            634
++          ],
++          "k_expected": [
++            573,
++            23,
++            689,
++            634
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            155,
++            535,
++            572,
++            610
++          ],
++          "k_right": [
++            573,
++            23,
++            689,
++            634
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      },
++      {
++        "a": 1,
++        "affine_map_correct": true,
++        "b": 1,
++        "case_index": 3,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              336,
++              255,
++              1
++            ],
++            "v": [
++              349,
++              498
++            ]
++          },
++          "k_difference": [
++            217,
++            465,
++            149,
++            501
++          ],
++          "k_expected": [
++            703,
++            591,
++            529,
++            446
++          ],
++          "k_left": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_observed": [
++            357,
++            236,
++            235,
++            627
++          ],
++          "k_right": [
++            573,
++            23,
++            689,
++            634
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      },
++      {
++        "a": 1,
++        "affine_map_correct": true,
++        "b": 34146,
++        "case_index": 4,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              504,
++              635,
++              1
++            ],
++            "v": [
++              720,
++              354
++            ]
++          },
++          "k_difference": [
++            703,
++            591,
++            529,
++            446
++          ],
++          "k_expected": [
++            217,
++            465,
++            149,
++            501
++          ],
++          "k_left": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_observed": [
++            45,
++            202,
++            586,
++            46
++          ],
++          "k_right": [
++            573,
++            23,
++            689,
++            634
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      },
++      {
++        "a": 12277,
++        "affine_map_correct": true,
++        "b": 29389,
++        "case_index": 5,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              603,
++              288,
++              1
++            ],
++            "v": [
++              281,
++              561
++            ]
++          },
++          "k_difference": [
++            217,
++            447,
++            571,
++            461
++          ],
++          "k_expected": [
++            655,
++            713,
++            141,
++            508
++          ],
++          "k_left": [
++            282,
++            127,
++            340,
++            77
++          ],
++          "k_observed": [
++            55,
++            105,
++            198,
++            336
++          ],
++          "k_right": [
++            97,
++            472,
++            130,
++            597
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      },
++      {
++        "a": 34146,
++        "affine_map_correct": true,
++        "b": 34146,
++        "case_index": 6,
++        "coordinate_status": "pass",
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              336,
++              255,
++              1
++            ],
++            "v": [
++              390,
++              241
++            ]
++          },
++          "k_difference": [
++            217,
++            465,
++            149,
++            501
++          ],
++          "k_expected": [
++            703,
++            591,
++            529,
++            446
++          ],
++          "k_left": [
++            738,
++            356,
++            457,
++            19
++          ],
++          "k_observed": [
++            357,
++            236,
++            235,
++            627
++          ],
++          "k_right": [
++            573,
++            23,
++            689,
++            634
++          ]
++        },
++        "difference_degree": 2,
++        "signed_lift_count": 1,
++        "source_label_correct": true,
++        "sum_degree": 2
++      }
++    ],
++    "p": 739,
++    "planted": 31124,
++    "r": 34147,
++    "schema": "kummer-coordinate-target/v1",
++    "source_scalar_verified": true,
++    "target_index": 0,
++    "workload_id": "Wcf52db405c0d",
++    "workload_sha256": "cf52db405c0dcf1916b87de8f429f914a92160b07f72b39e869284441fa42de9"
++  },
++  "theta": {
++    "eligible_orders": 60,
++    "fp_theta_tuple_found": true,
++    "ordered_pairs": 20,
++    "p": 739,
++    "schema": "kummer-theta-basefield/v1",
++    "selected": {
++      "constants": {
++        "A": 491,
++        "B": 249,
++        "C": 18,
++        "D": 718,
++        "a": 369,
++        "all_equations_verified": true,
++        "alpha": 40,
++        "b": 1,
++        "c": 255,
++        "d": 605,
++        "e": 719,
++        "f": 1,
++        "lambda": 296,
++        "mu": 16,
++        "nu": 10
++      },
++      "delta": 123,
++      "lambda_mu_nu": [
++        296,
++        16,
++        10
++      ],
++      "r0": 246,
++      "r1": 369,
++      "sqrt_scale": 87
++    },
++    "square_pairs": 10,
++    "theta_tuples": 80
++  },
++  "model": {
++    "cases": [
++      {
++        "kind": "double",
++        "left_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "kind": "double",
++        "left_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "kind": "double",
++        "left_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "kind": "double",
++        "left_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "difference_degree": 2,
++        "kind": "add",
++        "left_degree": 2,
++        "right_degree": 2,
++        "status": "pass",
++        "sum_degree": 2
++      }
++    ],
++    "exception_fail": 0,
++    "exception_inapplicable": 8,
++    "exception_pass": 48,
++    "exceptional_cases": [
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 0,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 0,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 0,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              0,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_expected": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            669,
++            35,
++            512,
++            625
++          ],
++          "k_right": [
++            369,
++            1,
++            255,
++            605
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 0,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              0,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_expected": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            669,
++            35,
++            512,
++            625
++          ],
++          "k_right": [
++            1,
++            369,
++            605,
++            255
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            1,
++            369,
++            605,
++            255
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            1,
++            369,
++            605,
++            255
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            35,
++            669,
++            625,
++            512
++          ],
++          "k_right": [
++            1,
++            369,
++            605,
++            255
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              738,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            0,
++            60,
++            0,
++            641
++          ],
++          "k_expected": [
++            0,
++            60,
++            0,
++            641
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": null,
++          "k_right": [
++            0,
++            60,
++            0,
++            641
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            0,
++            60,
++            0,
++            641
++          ],
++          "k_observed": [
++            669,
++            140,
++            228,
++            454
++          ],
++          "k_right": [
++            0,
++            60,
++            0,
++            641
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            0,
++            60,
++            0,
++            641
++          ],
++          "k_observed": [
++            669,
++            140,
++            228,
++            454
++          ],
++          "k_right": [
++            0,
++            60,
++            0,
++            641
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              738,
++              1
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            282,
++            0,
++            574,
++            0
++          ],
++          "k_expected": [
++            282,
++            0,
++            574,
++            0
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": null,
++          "k_right": [
++            0,
++            60,
++            0,
++            641
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              443,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            609,
++            0,
++            155,
++            0
++          ],
++          "k_expected": [
++            609,
++            0,
++            155,
++            0
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": null,
++          "k_right": [
++            609,
++            0,
++            155,
++            0
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            609,
++            0,
++            155,
++            0
++          ],
++          "k_observed": [
++            62,
++            615,
++            157,
++            358
++          ],
++          "k_right": [
++            609,
++            0,
++            155,
++            0
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            609,
++            0,
++            155,
++            0
++          ],
++          "k_observed": [
++            62,
++            615,
++            157,
++            358
++          ],
++          "k_right": [
++            609,
++            0,
++            155,
++            0
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              443,
++              1
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            0,
++            339,
++            0,
++            79
++          ],
++          "k_expected": [
++            0,
++            339,
++            0,
++            79
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": null,
++          "k_right": [
++            609,
++            0,
++            155,
++            0
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              723,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            0,
++            617,
++            215,
++            0
++          ],
++          "k_expected": [
++            0,
++            617,
++            215,
++            0
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": null,
++          "k_right": [
++            0,
++            617,
++            215,
++            0
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            0,
++            617,
++            215,
++            0
++          ],
++          "k_observed": [
++            19,
++            701,
++            656,
++            658
++          ],
++          "k_right": [
++            0,
++            617,
++            215,
++            0
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            0,
++            617,
++            215,
++            0
++          ],
++          "k_observed": [
++            19,
++            701,
++            656,
++            658
++          ],
++          "k_right": [
++            0,
++            617,
++            215,
++            0
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              723,
++              1
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            502,
++            0,
++            0,
++            242
++          ],
++          "k_expected": [
++            502,
++            0,
++            0,
++            242
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": null,
++          "k_right": [
++            0,
++            617,
++            215,
++            0
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              729,
++              1,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            532,
++            0,
++            0,
++            389
++          ],
++          "k_expected": [
++            532,
++            0,
++            0,
++            389
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": null,
++          "k_right": [
++            532,
++            0,
++            0,
++            389
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            532,
++            0,
++            0,
++            389
++          ],
++          "k_observed": [
++            617,
++            244,
++            144,
++            559
++          ],
++          "k_right": [
++            532,
++            0,
++            0,
++            389
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            532,
++            0,
++            0,
++            389
++          ],
++          "k_observed": [
++            617,
++            244,
++            144,
++            559
++          ],
++          "k_right": [
++            532,
++            0,
++            0,
++            389
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              729,
++              1
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            0,
++            531,
++            448,
++            0
++          ],
++          "k_expected": [
++            0,
++            531,
++            448,
++            0
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": null,
++          "k_right": [
++            532,
++            0,
++            0,
++            389
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "zero_output",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              2,
++              1,
++              0
++            ],
++            "v": [
++              17,
++              0
++            ]
++          },
++          "k_difference": [
++            733,
++            302,
++            562,
++            635
++          ],
++          "k_expected": [
++            733,
++            302,
++            562,
++            635
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            724,
++            16,
++            666,
++            479
++          ],
++          "k_right": [
++            733,
++            302,
++            562,
++            635
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            306,
++            27,
++            191,
++            734
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            733,
++            302,
++            562,
++            635
++          ],
++          "k_observed": [
++            400,
++            678,
++            703,
++            45
++          ],
++          "k_right": [
++            733,
++            302,
++            562,
++            635
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              4,
++              4,
++              1
++            ],
++            "v": [
++              445,
++              214
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            306,
++            27,
++            191,
++            734
++          ],
++          "k_left": [
++            733,
++            302,
++            562,
++            635
++          ],
++          "k_observed": [
++            598,
++            444,
++            267,
++            82
++          ],
++          "k_right": [
++            733,
++            302,
++            562,
++            635
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              2,
++              1
++            ],
++            "v": [
++              0,
++              361
++            ]
++          },
++          "k_difference": [
++            665,
++            716,
++            94,
++            430
++          ],
++          "k_expected": [
++            665,
++            716,
++            94,
++            430
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            217,
++            397,
++            723,
++            257
++          ],
++          "k_right": [
++            733,
++            302,
++            562,
++            635
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              8,
++              1,
++              0
++            ],
++            "v": [
++              190,
++              0
++            ]
++          },
++          "k_difference": [
++            369,
++            518,
++            376,
++            72
++          ],
++          "k_expected": [
++            369,
++            518,
++            376,
++            72
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            128,
++            412,
++            553,
++            43
++          ],
++          "k_right": [
++            369,
++            518,
++            376,
++            72
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            695,
++            139,
++            69,
++            182
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            369,
++            518,
++            376,
++            72
++          ],
++          "k_observed": [
++            531,
++            416,
++            403,
++            420
++          ],
++          "k_right": [
++            369,
++            518,
++            376,
++            72
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              64,
++              16,
++              1
++            ],
++            "v": [
++              550,
++              45
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            695,
++            139,
++            69,
++            182
++          ],
++          "k_left": [
++            369,
++            518,
++            376,
++            72
++          ],
++          "k_observed": [
++            93,
++            462,
++            442,
++            52
++          ],
++          "k_right": [
++            369,
++            518,
++            376,
++            72
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              8,
++              1
++            ],
++            "v": [
++              0,
++              161
++            ]
++          },
++          "k_difference": [
++            221,
++            370,
++            667,
++            363
++          ],
++          "k_expected": [
++            221,
++            370,
++            667,
++            363
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            327,
++            611,
++            696,
++            186
++          ],
++          "k_right": [
++            369,
++            518,
++            376,
++            72
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              26,
++              1,
++              0
++            ],
++            "v": [
++              122,
++              0
++            ]
++          },
++          "k_difference": [
++            83,
++            438,
++            456,
++            253
++          ],
++          "k_expected": [
++            83,
++            438,
++            456,
++            253
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            621,
++            606,
++            64,
++            593
++          ],
++          "k_right": [
++            83,
++            438,
++            456,
++            253
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            505,
++            422,
++            664,
++            632
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            83,
++            438,
++            456,
++            253
++          ],
++          "k_observed": [
++            612,
++            254,
++            477,
++            697
++          ],
++          "k_right": [
++            83,
++            438,
++            456,
++            253
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              676,
++              52,
++              1
++            ],
++            "v": [
++              556,
++              642
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            505,
++            422,
++            664,
++            632
++          ],
++          "k_left": [
++            83,
++            438,
++            456,
++            253
++          ],
++          "k_observed": [
++            468,
++            634,
++            150,
++            214
++          ],
++          "k_right": [
++            83,
++            438,
++            456,
++            253
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              26,
++              1
++            ],
++            "v": [
++              0,
++              109
++            ]
++          },
++          "k_difference": [
++            414,
++            534,
++            310,
++            512
++          ],
++          "k_expected": [
++            414,
++            534,
++            310,
++            512
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            47,
++            564,
++            535,
++            383
++          ],
++          "k_right": [
++            83,
++            438,
++            456,
++            253
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              32,
++              1,
++              0
++            ],
++            "v": [
++              16,
++              0
++            ]
++          },
++          "k_difference": [
++            508,
++            323,
++            178,
++            259
++          ],
++          "k_expected": [
++            508,
++            323,
++            178,
++            259
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            6,
++            30,
++            648,
++            262
++          ],
++          "k_right": [
++            508,
++            323,
++            178,
++            259
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            681,
++            447,
++            85,
++            669
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            508,
++            323,
++            178,
++            259
++          ],
++          "k_observed": [
++            144,
++            451,
++            460,
++            164
++          ],
++          "k_right": [
++            508,
++            323,
++            178,
++            259
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              285,
++              64,
++              1
++            ],
++            "v": [
++              616,
++              573
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            681,
++            447,
++            85,
++            669
++          ],
++          "k_left": [
++            508,
++            323,
++            178,
++            259
++          ],
++          "k_observed": [
++            652,
++            301,
++            497,
++            634
++          ],
++          "k_right": [
++            508,
++            323,
++            178,
++            259
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              32,
++              1
++            ],
++            "v": [
++              0,
++              369
++            ]
++          },
++          "k_difference": [
++            20,
++            4,
++            421,
++            432
++          ],
++          "k_expected": [
++            20,
++            4,
++            421,
++            432
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            118,
++            467,
++            193,
++            184
++          ],
++          "k_right": [
++            508,
++            323,
++            178,
++            259
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              44,
++              1,
++              0
++            ],
++            "v": [
++              600,
++              0
++            ]
++          },
++          "k_difference": [
++            116,
++            196,
++            703,
++            542
++          ],
++          "k_expected": [
++            116,
++            196,
++            703,
++            542
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            721,
++            97,
++            133,
++            502
++          ],
++          "k_right": [
++            116,
++            196,
++            703,
++            542
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            684,
++            519,
++            400,
++            463
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            116,
++            196,
++            703,
++            542
++          ],
++          "k_observed": [
++            510,
++            458,
++            28,
++            704
++          ],
++          "k_right": [
++            116,
++            196,
++            703,
++            542
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              458,
++              88,
++              1
++            ],
++            "v": [
++              339,
++              246
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            684,
++            519,
++            400,
++            463
++          ],
++          "k_left": [
++            116,
++            196,
++            703,
++            542
++          ],
++          "k_observed": [
++            129,
++            516,
++            607,
++            298
++          ],
++          "k_right": [
++            116,
++            196,
++            703,
++            542
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              44,
++              1
++            ],
++            "v": [
++              0,
++              591
++            ]
++          },
++          "k_difference": [
++            276,
++            284,
++            537,
++            447
++          ],
++          "k_expected": [
++            276,
++            284,
++            537,
++            447
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            682,
++            102,
++            604,
++            478
++          ],
++          "k_right": [
++            116,
++            196,
++            703,
++            542
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              62,
++              1,
++              0
++            ],
++            "v": [
++              731,
++              0
++            ]
++          },
++          "k_difference": [
++            406,
++            440,
++            155,
++            666
++          ],
++          "k_expected": [
++            406,
++            440,
++            155,
++            666
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            228,
++            491,
++            47,
++            283
++          ],
++          "k_right": [
++            406,
++            440,
++            155,
++            666
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            694,
++            583,
++            303,
++            209
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            406,
++            440,
++            155,
++            666
++          ],
++          "k_observed": [
++            270,
++            199,
++            493,
++            677
++          ],
++          "k_right": [
++            406,
++            440,
++            155,
++            666
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              149,
++              124,
++              1
++            ],
++            "v": [
++              736,
++              12
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            694,
++            583,
++            303,
++            209
++          ],
++          "k_left": [
++            406,
++            440,
++            155,
++            666
++          ],
++          "k_observed": [
++            53,
++            233,
++            727,
++            460
++          ],
++          "k_right": [
++            406,
++            440,
++            155,
++            666
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              62,
++              1
++            ],
++            "v": [
++              0,
++              167
++            ]
++          },
++          "k_difference": [
++            167,
++            359,
++            21,
++            168
++          ],
++          "k_expected": [
++            167,
++            359,
++            21,
++            168
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            468,
++            714,
++            50,
++            400
++          ],
++          "k_right": [
++            406,
++            440,
++            155,
++            666
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              68,
++              1,
++              0
++            ],
++            "v": [
++              496,
++              0
++            ]
++          },
++          "k_difference": [
++            225,
++            591,
++            707,
++            495
++          ],
++          "k_expected": [
++            225,
++            591,
++            707,
++            495
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            48,
++            333,
++            72,
++            549
++          ],
++          "k_right": [
++            225,
++            591,
++            707,
++            495
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            311,
++            633,
++            439,
++            132
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            225,
++            591,
++            707,
++            495
++          ],
++          "k_observed": [
++            386,
++            706,
++            453,
++            727
++          ],
++          "k_right": [
++            225,
++            591,
++            707,
++            495
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              190,
++              136,
++              1
++            ],
++            "v": [
++              123,
++              201
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            311,
++            633,
++            439,
++            132
++          ],
++          "k_left": [
++            225,
++            591,
++            707,
++            495
++          ],
++          "k_observed": [
++            481,
++            461,
++            496,
++            639
++          ],
++          "k_right": [
++            225,
++            591,
++            707,
++            495
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              68,
++              1
++            ],
++            "v": [
++              0,
++              297
++            ]
++          },
++          "k_difference": [
++            363,
++            292,
++            199,
++            438
++          ],
++          "k_expected": [
++            363,
++            292,
++            199,
++            438
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            506,
++            519,
++            255,
++            409
++          ],
++          "k_right": [
++            225,
++            591,
++            707,
++            495
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 1,
++            "u": [
++              80,
++              1,
++              0
++            ],
++            "v": [
++              67,
++              0
++            ]
++          },
++          "k_difference": [
++            133,
++            512,
++            610,
++            324
++          ],
++          "k_expected": [
++            133,
++            512,
++            610,
++            324
++          ],
++          "k_left": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_observed": [
++            582,
++            518,
++            519,
++            501
++          ],
++          "k_right": [
++            133,
++            512,
++            610,
++            324
++          ]
++        },
++        "difference_degree": 1,
++        "kind": "identity",
++        "left_degree": 0,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 1
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 0,
++            "u": [
++              1,
++              0,
++              0
++            ],
++            "v": [
++              0,
++              0
++            ]
++          },
++          "k_difference": [
++            549,
++            147,
++            571,
++            556
++          ],
++          "k_expected": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_left": [
++            133,
++            512,
++            610,
++            324
++          ],
++          "k_observed": [
++            56,
++            627,
++            261,
++            228
++          ],
++          "k_right": [
++            133,
++            512,
++            610,
++            324
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "inverse",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 0
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              488,
++              160,
++              1
++            ],
++            "v": [
++              158,
++              657
++            ]
++          },
++          "k_difference": [
++            369,
++            1,
++            255,
++            605
++          ],
++          "k_expected": [
++            549,
++            147,
++            571,
++            556
++          ],
++          "k_left": [
++            133,
++            512,
++            610,
++            324
++          ],
++          "k_observed": [
++            310,
++            188,
++            313,
++            143
++          ],
++          "k_right": [
++            133,
++            512,
++            610,
++            324
++          ]
++        },
++        "difference_degree": 0,
++        "kind": "double",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      },
++      {
++        "coordinate_witness": {
++          "jacobian_expected": {
++            "degree": 2,
++            "u": [
++              0,
++              80,
++              1
++            ],
++            "v": [
++              0,
++              304
++            ]
++          },
++          "k_difference": [
++            127,
++            20,
++            421,
++            414
++          ],
++          "k_expected": [
++            127,
++            20,
++            421,
++            414
++          ],
++          "k_left": [
++            1,
++            369,
++            605,
++            255
++          ],
++          "k_observed": [
++            14,
++            555,
++            413,
++            34
++          ],
++          "k_right": [
++            133,
++            512,
++            610,
++            324
++          ]
++        },
++        "difference_degree": 2,
++        "kind": "branch0",
++        "left_degree": 1,
++        "quotient_ok": true,
++        "right_degree": 1,
++        "status": "pass",
++        "sum_degree": 2
++      }
++    ],
++    "map_checks": 16,
++    "map_fail": 0,
++    "p": 739,
++    "sample_point_count": 8,
++    "schema": "kummer-coordinate-generic/v1",
++    "torsion_actions": [
++      {
++        "action": {
++          "generic_samples": 11,
++          "matrix": [
++            [
++              0,
++              1,
++              0,
++              0
++            ],
++            [
++              1,
++              0,
++              0,
++              0
++            ],
++            [
++              0,
++              0,
++              0,
++              1
++            ],
++            [
++              0,
++              0,
++              1,
++              0
++            ]
++          ]
++        },
++        "root": 246
++      },
++      {
++        "action": {
++          "generic_samples": 11,
++          "matrix": [
++            [
++              738,
++              719,
++              298,
++              680
++            ],
++            [
++              20,
++              1,
++              59,
++              441
++            ],
++            [
++              298,
++              680,
++              738,
++              719
++            ],
++            [
++              59,
++              441,
++              20,
++              1
++            ]
++          ]
++        },
++        "root": 369
++      },
++      {
++        "action": {
++          "generic_samples": 11,
++          "matrix": [
++            [
++              738,
++              719,
++              413,
++              501
++            ],
++            [
++              20,
++              1,
++              238,
++              326
++            ],
++            [
++              413,
++              501,
++              738,
++              719
++            ],
++            [
++              238,
++              326,
++              20,
++              1
++            ]
++          ]
++        },
++        "root": 443
++      },
++      {
++        "action": {
++          "generic_samples": 11,
++          "matrix": [
++            [
++              1,
++              37,
++              257,
++              641
++            ],
++            [
++              702,
++              738,
++              98,
++              482
++            ],
++            [
++              482,
++              98,
++              738,
++              702
++            ],
++            [
++              641,
++              257,
++              37,
++              1
++            ]
++          ]
++        },
++        "root": 736
++      },
++      {
++        "action": {
++          "generic_samples": 11,
++          "matrix": [
++            [
++              1,
++              37,
++              716,
++              627
++            ],
++            [
++              702,
++              738,
++              112,
++              23
++            ],
++            [
++              23,
++              112,
++              738,
++              702
++            ],
++            [
++              627,
++              716,
++              37,
++              1
++            ]
++          ]
++        },
++        "root": 737
++      }
++    ],
++    "xADD_fail": 0,
++    "xADD_inapplicable": 0,
++    "xADD_pass": 6,
++    "xDBL_fail": 0,
++    "xDBL_inapplicable": 0,
++    "xDBL_pass": 4
++  },
++  "retained_divisor": {
++    "degree": 2,
++    "u": [
++      38,
++      223,
++      1
++    ],
++    "v": [
++      421,
++      70
++    ]
++  },
++  "labels": [
++    2,
++    8
++  ],
++  "provenance": "retained graph-integration p739 candidate row2; alternate labels deliberately planted using known k"
++}--- a/driver-inputs.json
++++ b/driver-inputs.json
+@@ -295,10 +295,20 @@
+       "destination": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/fixture.json",
+       "sha256": "607f7278c579d5b79c3c3a28d0067d5e4a9c6915800eb09bdfe30e9b3e8ef14f",
+       "bytes": 68470
++    },
++    {
++      "source": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-signed-driver-20261109/driver-controls.rs",
++      "destination": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/driver-controls.rs",
++      "sha256": "854c8219f8aaef926b026d3ca101bca6992414b3a666f7a17f505105611b2f9b",
++      "bytes": 9086
+     }
+   ],
+   "original_driver_lock": "absent",
+   "registry_vendor": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/vendor",
+   "immutable_manifest": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+-  "immutable_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
++  "immutable_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
++  "workspaces": {
++    "driver": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter",
++    "adapter": "research/pencil_large_prime_20261029"
++  }
+ }
+--- a/durable-worker.py
++++ b/durable-worker.py
+@@ -211,7 +211,7 @@
+  ENV.update(KUMMER_TARGET_CAP='1',KUMMER_START_INDEX='0',KUMMER_VALIDATE_TRANSITIONS='0',KUMMER_DRIVER_SOURCE_SHA256=H(driver_source),KUMMER_DRIVER_REVISION=F['published_source_revision'],KUMMER_DRIVER_CONTROL_OUTPUT=str(OUT/'driver-panel'))
+  driver_output=command('compile-driver',[cargo,'test','--manifest-path',str(driver_manifest),'--release','--bin','equivalence','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)
+  driver_binary=select_binary(driver_output,'equivalence','bin',driver_crate/'src/check.rs');R['driver_binary']=driver_binary
+- adapter_output=command('compile-adapter',[cargo,'test','--manifest-path',str(driver_manifest),'-p','pencil-symbolic-graph','--features','pencil-symbolic-graph/reporting','--release','--lib','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)
++ adapter_output=command('compile-adapter',[cargo,'test','--manifest-path',str(driver_root/'research/pencil_large_prime_20261029/Cargo.toml'),'--features','reporting','--release','--lib','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)
+  adapter_binary=select_binary(adapter_output,'pencil_symbolic_graph','lib',driver_root/'research/pencil_large_prime_20261029/src/lib.rs');R['adapter_binary']=adapter_binary
+  verify_driver_source()
+  R['build_phase_finished_monotonic']=time.monotonic()
+@@ -239,7 +239,7 @@
+   assert H(Path(driver_binary['path']))==driver_binary['sha256']
+   output=command('driver-exact-'+str(index),[driver_binary['path'],name,'--exact','--test-threads=1','--nocapture'],cwd=driver_root);one_test(output)
+   fixture=json.loads((driver_crate/'fixture.json').read_text())
+-  R['driver_summary' if index==0 else 'native_probe_summary']=verify_driver(OUT/'driver-panel',fixture) if index==0 else verify_probe(OUT/'driver-panel')
++  R['driver_summary' if index==0 else 'native_probe_summary']=verify_driver(OUT/'driver-panel',fixture,F['published_source_revision'],H(driver_source)) if index==0 else verify_probe(OUT/'driver-panel',fixture,F['published_source_revision'],H(driver_source))
+  R['adapter_negatives']=[]
+  for index,suffix in enumerate(NEGATIVES):
+   assert H(Path(adapter_binary['path']))==adapter_binary['sha256']
+--- a/durable_io.py
++++ b/durable_io.py
+@@ -46,12 +46,13 @@
+     deadline=datetime.datetime.fromisoformat(a['absolute_deadline'].replace('Z','+00:00'))
+     assert deadline.tzinfo is not None and (deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds()>0
+     assert a['campaign_ceiling_seconds']==43200
+-    lock=a['generated_driver_lock']
+-    assert isinstance(lock['path'],str) and Path(lock['path']).is_absolute(), 'generated lock absent'
+-    assert type(lock['bytes']) is int and lock['bytes']>0
+-    assert re.fullmatch('[a-f0-9]{64}',lock['sha256'] or ''), 'generated lock hash absent'
+-    assert Path(lock['path']).stat().st_size==lock['bytes']
+-    assert hashlib.sha256(Path(lock['path']).read_bytes()).hexdigest()==lock['sha256']
++    assert set(a['generated_locks'])=={'driver','adapter'}
++    for lock in a['generated_locks'].values():
++        assert isinstance(lock['path'],str) and Path(lock['path']).is_absolute(), 'generated lock absent'
++        assert type(lock['bytes']) is int and lock['bytes']>0
++        assert re.fullmatch('[a-f0-9]{64}',lock['sha256'] or ''), 'generated lock hash absent'
++        assert Path(lock['path']).stat().st_size==lock['bytes']
++        assert hashlib.sha256(Path(lock['path']).read_bytes()).hexdigest()==lock['sha256']
+     assert re.fullmatch('[a-f0-9]{40}',a['published_source_revision'] or ''), 'source publication pending' 
+     assert type(a['campaign_charged_seconds']) is int and type(a['campaign_remaining_seconds']) is int
+     assert a['campaign_charged_seconds']>=0 and a['campaign_charged_seconds']+a['campaign_remaining_seconds']==43200
+@@ -72,15 +73,17 @@
+         q=Path(row['path']);assert q.is_absolute() and hashlib.sha256(q.read_bytes()).hexdigest()==row['sha256'],name
+     pub=json.loads(Path(a['release_receipts']['publication']['path']).read_text());assert pub['verified_github_commit']==a['published_source_revision']
+     lockpub=json.loads(Path(a['release_receipts']['lock_publication']['path']).read_text())
+-    assert lockpub['verified_github_commit'] and lockpub['lock_sha256']==lock['sha256'] and lockpub['lock_bytes']==lock['bytes']
++    assert lockpub['verified_github_commit'] and set(lockpub['locks'])=={'driver','adapter'}
++    for kind,lock in a['generated_locks'].items():
++        assert lockpub['locks'][kind]['sha256']==lock['sha256'] and lockpub['locks'][kind]['bytes']==lock['bytes']
+     authorization=json.loads(Path(a['release_receipts']['campaign_authorization']['path']).read_text())
+     assert authorization['absolute_deadline']==a['absolute_deadline'] and authorization['worker_seconds']==43200
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+-    assert a['workspace']=='/var/tmp/pencil-signed-kummer-combined-20261110'
+-    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-20261110'
+-    assert a['unit']=='pencil-signed-kummer-combined-20261110.service'
++    assert a['workspace']=='/var/tmp/pencil-signed-kummer-combined-v2-20261111'
++    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v2-20261111'
++    assert a['unit']=='pencil-signed-kummer-combined-v2-20261111.service'
+     assert a['limits']=={'target_stop_threshold_bytes':6*1024**3,'workspace_stop_threshold_bytes':8*1024**3,'logs_stop_threshold_bytes':256*1024**2,'minimum_free_bytes':6*1024**3,'durable_metadata_stop_bytes':64*1024**2,'durable_total_stop_bytes':384*1024**2,'supervisor_permit_seconds':10}
+     return a
+ 
+--- a/materialize.py
++++ b/materialize.py
+@@ -10,7 +10,7 @@
+ assert time.monotonic()<END and END-time.monotonic()<=1800
+ ABS=datetime.datetime.fromisoformat(A['absolute_deadline'].replace('Z','+00:00')).timestamp()
+ W=Path(A['workspace']);DONOR=Path(A['donor_workspace']);SOURCE=W/'source';CACHE=W/'cache'
+-assert str(W)=='/var/tmp/pencil-signed-kummer-combined-20261110'
++assert str(W)=='/var/tmp/pencil-signed-kummer-combined-v2-20261111'
+ assert str(DONOR)=='/var/tmp/pencil-root-materialize-t1953-20261109'
+ assert W.is_dir() and not W.is_symlink()
+ assert {x.name for x in W.iterdir()}=={'workspace-owner.json'},'existing staged attempt; do not overwrite'
+--- a/panel_acceptance.py
++++ b/panel_acceptance.py
+@@ -5,7 +5,18 @@
+ NEGATIVES=['missing_call_result_rejected','changed_call_number_rejected','changed_signed_labels_rejected','missing_lift_disposition_rejected']
+ def one_test(text):
+  assert len(re.findall(r'test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured;',text))==1,'exact nonzero passing test'
+-def verify_driver(directory,fixture):
++def trace_identity(path,fixture,revision,source_sha256,run_id):
++ lines=Path(path).read_text().splitlines(); assert lines,'missing observed header'
++ header=json.loads(lines[0]); assert header['kind']=='ObservedHeader'
++ identity=header['data']['identity']
++ assert identity==dict(source_revision=revision,source_sha256=source_sha256,workload_id=fixture['target']['workload_id'],run_id=run_id),'trace source identity mismatch'
++ target=fixture['target'];cases=target['cases'];p=target['p']
++ native_expected=dict(kind='header',schema='kummer-driver-events/v1',workload_id=target['workload_id'],target_index=target['target_index'],bits=16,p=p,r=target['r'],g=cases[1]['coordinate_witness']['jacobian_expected'],q=cases[2]['coordinate_witness']['jacobian_expected'],initial_pair=[cases[2]['coordinate_witness']['k_expected'],cases[3]['coordinate_witness']['k_expected']],initial_labels=[0,1],algorithm_seed=target['algorithm_seed'],candidate_cap=100*p+10000,transition_validation_enabled=False)
++ assert header['data']['native']==native_expected,'native header mismatch'
++
++ return identity
++
++def verify_driver(directory,fixture,revision,source_sha256):
+  d=Path(directory);r=json.loads((d/'result.json').read_text())
+  assert r['schema']=='kummer-driver-software-qualification/v1'
+  assert r['original_disabled_observed_equal'] is True and r['native_runs']==11
+@@ -17,13 +28,18 @@
+   assert json.loads(lines[0])==expected,'complete row equality'
+  assert [(x['kind'],x['operation']) for x in r['faults']]==JOINTS
+  assert all(x['passed'] is True and type(x['position']) is int and x['position']>=0 for x in r['faults'])
+- for name in ['observed.jsonl']+['fault-'+str(i)+'.jsonl' for i in range(8)]:
+-  assert (d/name).is_file() and (d/name).stat().st_size>0
++ trace_identity(d/'observed.jsonl',fixture,revision,source_sha256,'observed')
++ # Header-write fault occurs before any byte is emitted. Do not invent identity evidence.
++ assert r['faults'][0]['position']==0 and (d/'fault-0.jsonl').read_bytes()==b''
++ for i in range(1,8):
++  trace_identity(d/('fault-'+str(i)+'.jsonl'),fixture,revision,source_sha256,'fault-'+str(i))
++ r['trace_identity_acceptance']={'checked_runs':['observed']+['fault-'+str(i) for i in range(1,8)],'header_fault':'expected_empty_prefix_identity_unavailable'}
+  return r
+-def verify_probe(directory):
++def verify_probe(directory,fixture,revision,source_sha256):
+  d=Path(directory).with_suffix('.native-probe');r=json.loads((d/'result.json').read_text())
+  assert r['schema']=='kummer-driver-native-probe/v1' and r['p']==739 and r['r']==34147
+  assert r['passed'] is True and r['forced_fallback_reconstructed_signed_successor'] is True
+  assert r['zero_vector_lift_status']=='zero_projective_vector' and r['zero_vector_lift_candidates_tested']==0
+- assert r['trace_complete'] is True and (d/'events.jsonl').stat().st_size>0
++ assert r['trace_complete'] is True
++ trace_identity(d/'events.jsonl',fixture,revision,source_sha256,'forced-native')
+  return r
+--- a/stage_driver.py
++++ b/stage_driver.py
+@@ -18,9 +18,11 @@
+ for row in inputs['files']:
+  rel=Path(row['destination']);assert not rel.is_absolute() and '..' not in rel.parts
+  checked_copy(row['source'],ROOT/rel,row['sha256'],row['bytes']);rows[str(rel)]={'sha256':row['sha256'],'bytes':row['bytes']}
+-crate=ROOT/inputs['crate'];lock=A['generated_driver_lock']
+-checked_copy(lock['path'],crate/'Cargo.lock',lock['sha256'],lock['bytes'])
+-rows[str((crate/'Cargo.lock').relative_to(ROOT))]={'sha256':lock['sha256'],'bytes':lock['bytes']}
++crate=ROOT/inputs['crate']
++for kind,lock in A['generated_locks'].items():
++ target=ROOT/inputs['workspaces'][kind]/'Cargo.lock'
++ checked_copy(lock['path'],target,lock['sha256'],lock['bytes'])
++ rows[str(target.relative_to(ROOT))]={'sha256':lock['sha256'],'bytes':lock['bytes']}
+ fixture=json.loads((crate/'fixture.json').read_text())
+ for rel,key in [('research/kummer_theta_20261022/results/theta-models.jsonl','theta'),('research/kummer_coordinates_20261022/results/generic-models.jsonl','model'),('research/kummer_coordinates_20261022/results/target-gate-16.jsonl','target')]:
+  guard();raw=(json.dumps(fixture[key],separators=(',',':'))+'\n').encode();path=ROOT/rel;path.parent.mkdir(parents=True,exist_ok=True)

@@ -1,0 +1,69 @@
+{
+  "schema": "research.next-join/v1",
+  "status": "source_only_proposal_no_proof_or_execution",
+  "sources": [
+    {
+      "path": "goal-coverage-audit/REPORT.md",
+      "sha256": "19bfa1c4fa44aded507b6cd6be1cc8b7e284228934ad0f56f33d879625fb8869"
+    },
+    {
+      "path": "affine-dispatch/REPORT.md",
+      "sha256": "ec8a9d3200f4853e7f5cc166b4c6ebb9ecdf11f2a05b1dc7fef2b1fee57e8993"
+    },
+    {
+      "path": "affine-dispatch/producer/AffineUnique.lean.txt",
+      "sha256": "68b2e37579ad7821ef8035457d8fe835c0f5d28ea564c278deeaac77cb4f6ab0"
+    },
+    {
+      "path": "dispatch-acceptance/DispatchAcceptance.lean.txt",
+      "sha256": "dac0cc47f391723acc878838d927b479468b86d109ac3327253f052b42c3c69d"
+    },
+    {
+      "path": "stored-input-review/REPORT.md",
+      "sha256": "bb5b567463fa9c3f92c8e336a196f4047f094b0e80a24da89f87d8d933b8c124"
+    },
+    {
+      "path": "stored-validity-wrapper/REPORT.md",
+      "sha256": "8cfae348046de49ff7554b49bd1c49100b06d7cbba9ea8aeab00f8e29e24c805"
+    },
+    {
+      "path": "strict-storage-and-field-crt/REPORT.md",
+      "sha256": "bf391a9933d25c11a16b0c660a683fd94e4b859a4123b697c762f203d9bdea1f"
+    },
+    {
+      "path": "union-and-crt-certificates/REPORT.md",
+      "sha256": "da9f4308806d6561a5b32b333812f3a3c81a8377df4ceaf8b04034d033aaf6c9"
+    },
+    {
+      "path": "fallback-word-divisions/REPORT.md",
+      "sha256": "bb22f0ed5964320d2411ff259fbcf917593c4fbb201c6a728b23a31c8f7d97d7"
+    },
+    {
+      "path": "affine-dispatch/producer/three_leads.rs",
+      "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6"
+    }
+  ],
+  "superseded_gap": "Dispatch-to-stored-validity already exists in dispatch-acceptance. Do not recreate it; affine-dispatch source-fidelity review is still a separate pending obligation.",
+  "next_statement": "Under prime2<p<2^31, canonical degree-five curve coefficients, Field.n=1/no tables, and initial WellFormed a, every source-ordered Jacobian::mul trace initialized r=Divisor::O preserves WellFormed of both r and a at every reached loop boundary and returns an r accepted by StoredValidity.test. Each reached addition receives WellFormed operands derived from the loop invariant, not a separately assumed per-call predicate.",
+  "native_boundary": "three_leads.rs Jacobian::mul lines1062-1073: test odd bit; add accumulator if set; shift k; square base only if shifted k>0; return r. Preserve k=0 and k=1 skip behavior.",
+  "reuse": [
+    "AffineDispatch.every_execution_preserves and total_preserving_execution",
+    "DispatchAcceptance.every_execution_accepted",
+    "Existing stored constructor/identity/normalization/CRT/division results"
+  ],
+  "do_not_claim": [
+    "No proof that valid() alone establishes canonical inactive padding; initial WellFormed provenance remains required.",
+    "No scalar/group-law semantic equality, physical Rust refinement, weighted dispatcher closure or operation-cost equivalence.",
+    "No need to repeat complete fast/fallback/constructor joins already in affine-dispatch."
+  ],
+  "initial_caller_next": "After this bounded caller closure, connect Jacobian::point canonical x,y plus asserted curve equation to initial WellFormed; transfers and externally supplied divisors need their own canonical storage provenance.",
+  "controls_planned": [
+    "k=0 returns original identity without add",
+    "k=1 performs accumulator add but no trailing square",
+    "k=2 exercises even first step and shifted square",
+    "k=3 exercises odd add and subsequent square",
+    "noncanonical inactive padding demonstrates valid test alone is insufficient"
+  ],
+  "scan_scope": "Exact goal/index locators and named packet reports; packet-directory names checked for existing scalar/caller closure; no broad source scan or replay.",
+  "prerequisite_review": "Independent source-fidelity review of both affine-dispatch and dispatch-acceptance remains pending; producer results are reusable prerequisites, not already validated native closure."
+}

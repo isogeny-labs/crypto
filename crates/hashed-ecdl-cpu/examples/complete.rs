@@ -56,8 +56,11 @@ fn ms(d: Duration) -> f64 {
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args().collect();
-    if args.len() != 5 {
-        return Err("complete ARM[u/v/w/x] CASE[0..2] ROUND[0..9] OUTPUT_DIR".into());
+    let profile = args.len() == 6 && args[5] == "--profile-stages";
+    if args.len() != 5 && !profile {
+        return Err(
+            "complete ARM[u/v/w/x] CASE[0..2] ROUND[0..9] OUTPUT_DIR [--profile-stages]".into(),
+        );
     }
     let arm = &args[1];
     let case: usize = args[2].parse()?;
@@ -106,8 +109,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         queries: Duration::ZERO,
         calls: 0,
     };
+    let mut stages = paper::ReductionStats::default();
     let solve_start = Instant::now();
-    let cert = paper::solve_with_oracle(&c, p, q, &config, &mut oracle)?;
+    let cert = if profile {
+        paper::solve_with_oracle_profile(&c, p, q, &config, &mut oracle, &mut stages)?
+    } else {
+        paper::solve_with_oracle(&c, p, q, &config, &mut oracle)?
+    };
     let solve = solve_start.elapsed();
     let replay_start = Instant::now();
     paper::verify(&c, p, q, &cert)?;
@@ -134,7 +142,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let other = solve
         .checked_sub(oracle.bases + oracle.queries)
         .ok_or("timer overlap")?;
-    println!("{arm},{case},{seed},{round},{},verified,{},{},{},{:.9},{:.9},{:.9},{:.9},{:.9},{:.9},{},{},{},{},{},{},{digest},{:.12},L0",
+    // Extra clocks perturb the run. Keep these rows out of ordinary L0 panels;
+    // the frozen analyzer rejects this distinct tier rather than pooling them.
+    let tier = if profile { "L0-profile" } else { "L0" };
+    if profile {
+        fs::write(
+            format!("{}/stages-{arm}-{case}-{round}.csv", args[4]),
+            format!(
+                "arm,instance_id,seed,replicate,solve_ms,bases_ms,targets_ms,oracle_ms,linear_ms,internal_replay_ms,external_replay_ms,complete_ms,tier\n{arm},{case},{seed},{round},{:.9},{:.9},{:.9},{:.9},{:.9},{:.9},{:.9},{:.9},{tier}\n",
+                ms(solve), ms(stages.bases), ms(stages.targets), ms(stages.oracle),
+                ms(stages.linear), ms(stages.replay), ms(replay), ms(total),
+            ),
+        )?;
+    }
+    println!("{arm},{case},{seed},{round},{},verified,{},{},{},{:.9},{:.9},{:.9},{:.9},{:.9},{:.9},{},{},{},{},{},{},{digest},{:.12},{tier}",
         round==0,cert.scalar,cert.attempts,cert.relations.len(),ms(built_curve),ms(oracle.bases),ms(oracle.queries),ms(other),ms(replay),ms(total),
         oracle.calls,stats.preparations,stats.built_rows,stats.probed_rows,stats.query_inversions,stats.peak_table_bytes,total.as_secs_f64());
     Ok(())

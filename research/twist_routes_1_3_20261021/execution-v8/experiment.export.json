@@ -1,0 +1,244 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-kernel-relations-20261027-v1",
+  "created": "2026-10-27T14:32:03Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "44d59074bd25ea258211b1ef482cfbdd30c96bf8e74e66a4df9a541ef482d153",
+    "protocol_id": "twist-kernel-relations-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-kernel-relations-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "93a8281dbf29a51ba4be3ba57dce3d6222402bc8",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "3b9a00f6457bdb5a8f9c7c9289d9f8f4f83f35fafe4659a68e24468ade6c4eb8",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "764c1288d75cf67212f28a6ce428761b2f601fd9e826a30ab37094ff499bcf65",
+      "commit": "93a8281dbf29a51ba4be3ba57dce3d6222402bc8"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "93a8281dbf29a51ba4be3ba57dce3d6222402bc8"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "twist-kernel-native-000",
+      "arm": "native",
+      "instance_id": "p827-all-eight-kernels-all-576-query-cases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "query_cases": 576,
+          "kernel_lines": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "generic_dual_compositions": 16,
+          "systems": 18
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native complete replay and independent PARI maps/group/relations/linear algebra"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "58618a66dfec1cbdf743d56e8d0eedde83279bb3b9906adea1710b89f50dd768",
+          "bytes": 22024,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "4038668b7e79e18dcec9ef52e7a5a0b8483ad59e19e33465fdee8f51e98bab58",
+          "bytes": 1703,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "dbeec6d4136d797eb2622348a3423d96891936474927a22f97550664a232f49e",
+          "bytes": 16644,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T14:21:54.560Z",
+      "finished_at": "2026-10-27T14:21:55.070Z",
+      "worker": "764c1288d75cf67212f28a6ce428761b2f601fd9e826a30ab37094ff499bcf65",
+      "backend_ref": "runs/kernel-v1"
+    },
+    {
+      "run_id": "twist-kernel-pari-000",
+      "arm": "pari",
+      "instance_id": "p827-all-eight-kernels-all-576-query-cases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "query_cases": 576,
+          "kernel_lines": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "generic_dual_compositions": 16,
+          "systems": 18
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native complete replay and independent PARI maps/group/relations/linear algebra"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "58618a66dfec1cbdf743d56e8d0eedde83279bb3b9906adea1710b89f50dd768",
+          "bytes": 22024,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "4038668b7e79e18dcec9ef52e7a5a0b8483ad59e19e33465fdee8f51e98bab58",
+          "bytes": 1703,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "dbeec6d4136d797eb2622348a3423d96891936474927a22f97550664a232f49e",
+          "bytes": 16644,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "1ebebcfa7f1192f8e71eaea76ec2936932ca38ebe6eb27baa4af821b397a8c85",
+      "bytes": 1879,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "5847460d7df9823ba21fe99973a6e9f6730bab0f9353b5399c47896cf71befce",
+      "bytes": 12174,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/bin/twist-kernel-relations.rs",
+      "sha256": "a3063f16dc79029dfa5b9b879414e57638c9d66ccb7b02843779c1b3374331b0",
+      "bytes": 38237,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "dbeec6d4136d797eb2622348a3423d96891936474927a22f97550664a232f49e",
+        "bytes": 16644,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Two actual complete finite native/CAS executions on one public curve and target. Sixteen offsets generate relations for the same target; they are not independent DLP samples. Same-base rows and ranks agree under injective transport. No performance, novelty, NIST or complete-IC improvement follows.",
+      "by": "native exporter"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

@@ -1,0 +1,14 @@
+digraph Circuit {
+  graph [rankdir=TB,bgcolor="white",fontname="Helvetica",ranksep=0.25];
+  node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+  edge [color="#4D607D"];
+  public [label="PUBLIC INPUTS ONLY\np,h,a,q,k and optional curve A\nField/order/map contracts explicit"];
+  bits [label="15 selector + 15 slack bits\nx+d=k-1; p>2^(w+1)\nNo modular range wrap"];
+  member [label="Both Fp2 coordinates; norm one\nz^q = omega * product(1+b_i(omega^(2^i)-1))\n140 variables / 142 equations / 423 terms; degree 2"];
+  point [label="Optional signed elliptic image\nBranch, curve equation, guarded three doublings\n159 variables / 161 equations / 483 terms; degree 2"];
+  controls [label="FIXED NATIVE CONTROLS\n6962 small-field candidate/selector assignments\n18 actual signed images; 159 mutations rejected"];
+  lean [label="THREE LEAN NUMERIC ENDPOINTS\nActual selector no-wrap/range\nRange-gadget counterexample at p17\nCompiler semantics remain unformalized"];
+  next [fillcolor="#FFF3D9",label="NEXT: COMPLETE TARGET AGGREGATION\nAll group cases; normalized indexing\nActual solver work, useful yield and phase/family bounds\nCircuit counts are not a solving-cost result"];
+  public -> bits; bits -> member; member -> point;
+  bits -> lean; point -> controls; controls -> next; lean -> next;
+}

@@ -1,0 +1,114 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:43:29Z",
+ "id": "PCC-20261116-35f196",
+ "kind": "statement",
+ "producer": {
+  "commit": "fa30a9f381d8add5f05f2710deec15c772c80a39",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/PROTOCOL.md",
+    "sha256": "27801b96b0210480b24d5279e7cfe1626416f46e495658fdf62f0c520b1822d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/DERIVATION.md",
+    "sha256": "613bf44e9f019224d99bce9a56c8c9723ed8012b2380bb61d3125eda3abbab43"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/SOURCES.sha256",
+    "sha256": "306b9ab7b6b27d085ed9b514a6f912dd60e19e70033dddf5ed8476f5a833e6f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "c00f2c0c1d810ad4547ebeeaca48a9a5f7734fc19345578715eb3768014f07d0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/source-v1-delta.tar.xz",
+    "sha256": "c44fc3c521469ebad0f72cbc1d03b8be3c621f91cd4572db3b55f20dd219f17b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/native-v1/pre-call.json",
+    "sha256": "f3d2a2f844612568dd1005dc061d34678844dce4645f933367cf0ab5555f1c15"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/native-v1/controls.json",
+    "sha256": "eba697a8d8105d36909faffac037a0797ea854519d28af8bd2d2f728d289d1e2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/native-v1/equivalence-trace.bin.gz",
+    "sha256": "ed36c3dc29972a78ca7b4cbddb23a6064c8b7d9b4b9e21c772f12379f2de4569"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/native-v1/identities.json",
+    "sha256": "f35a92eec5641db645b90931ca52fa00ddb95d9feec651dbe0e56e86b93bc82f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/rust-test-02.log",
+    "sha256": "259aa8cd33ce1bf7dfe862445904c0248bba4acc622a135013baf250f8636b95"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/fmt-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/clippy-01.log",
+    "sha256": "e35b1e2db45065478e2676a32053d2810d1a313d64e0185fcd33e9f9aea7e126"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/build-final.log",
+    "sha256": "514a94e30ace1a5068703840558f6d28d32acb786c220e6bc89207e93ce4980e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/native-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-trace-lift-v1",
+ "statement": "Fixed native guarded trace projection: all149776 original Fp2-pair/projected-lift comparisons agree across the preregistered p101 and p59 algebraic fixtures. The p101 q3 original24 members replay through the unchanged membership circuit;18 actual-field chart lifts replay the original norm and power equations, with nine positive-label inputs and nine conjugate-label controls. Six malformed/ramified/characteristic refusals and imaginary-coordinate mutations reject. Three classical polynomial identities are native evaluated in fixed32-point streams plus extra32-point streams with plus-one corruption refusal; this is not a formal proof of the adapter. Focused release test, formatting and strict all-target Clippy pass. Six compiled-in sources and the composite49-input snapshot match; no old43-input dependency source changed. This adapter discovers no decomposition roots and establishes no solving-cost exponent, performance ratio or signed scientific standing."
+}

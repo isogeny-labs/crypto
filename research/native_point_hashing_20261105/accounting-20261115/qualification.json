@@ -1,0 +1,255 @@
+{
+  "schema": "native-point-hash.accounting-development-qualification/v1",
+  "recorded_at": "2026-11-15T08:21:44.802157+00:00",
+  "standing": "Unregistered producer development observations; no signed PCC or independent audit verdict",
+  "dependency_base_commit": "94eb0c62db159fdcf366a7e224674e93489aa634",
+  "source_manifest": {
+    "path": "research/native_point_hashing_20261105/accounting-20261115/source.sha256",
+    "sha256": "3073bfd0f33f26e1f99ecee94145c127d2eeefd39f8cb923a5f7be9b2873dbc0",
+    "scope": "Both examples/shared modules and named native/word/statistics inputs, Cargo/lockfile, fixed recipe, v1/v2/v3 protocol bytes, budget exception and current card; remaining library files unchanged from dependency base"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "build_env": {
+    "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+    "PATH_prefix": "/home/agent/.cargo/bin"
+  },
+  "checks": [
+    {
+      "name": "example controls",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study",
+        "--example",
+        "native_point_hash_accounting"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/test.final.stdout.log",
+          "sha256": "00dfaeae03bf3fc3b0592c42bf79c34e4efd2577e17a9e289df6d9416db88367"
+        },
+        {
+          "member": "support/test.final.stderr.log",
+          "sha256": "c6f48842ff247583c0db94507b59048ecd632723fad3dd363b7a1ff6531ce97f"
+        }
+      ]
+    },
+    {
+      "name": "strict release lint",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study",
+        "--example",
+        "native_point_hash_accounting",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/clippy.final.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "support/clippy.final.stderr.log",
+          "sha256": "8ae90a6f51ca6205562f2244e6a642946b5230c4e5bb9f930aae11826c8c1d91"
+        }
+      ]
+    },
+    {
+      "name": "release build",
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study",
+        "--example",
+        "native_point_hash_accounting"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/build.final.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "support/build.final.stderr.log",
+          "sha256": "67ed9056a4ce147de72994e9a3ec1140bc36046b4dc86b60ca000c7fb73b2a46"
+        }
+      ]
+    },
+    {
+      "name": "format",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/native_point_hash_study.rs",
+        "examples/native_point_hash_accounting.rs",
+        "examples/native_point_hash_study/driver.rs",
+        "examples/native_point_hash_study/accounting.rs",
+        "examples/native_point_hash_study/pilot.rs"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/fmt.final.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "support/fmt.final.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "canonical draft structural check (pinned readable historical tool)",
+      "argv": [
+        "python3",
+        "/workspace/crypto-autoresearcher/tools/experiment_protocol.py",
+        "validate",
+        "research/native_point_hashing_20261105/pilot-v1/protocol-v3.json"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/protocol.final.stdout.log",
+          "sha256": "585454e17d53fc2001550b6e1156bf34954077dce5246b5a0ac859d50a568943"
+        },
+        {
+          "member": "support/protocol.final.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "blocked native backlog card",
+      "argv": [
+        "/workspace/.task-cache/hashed-ecbench-target/release/backlog",
+        "--root",
+        "/workspace/crypto-ecbench-hashed",
+        "validate",
+        "XP-20261105-native-point-hashing",
+        "--no-git"
+      ],
+      "exit_code": 0,
+      "logs": [
+        {
+          "member": "support/backlog.final.stdout.log",
+          "sha256": "adeed9f18d97eb7de1e402ce0d88ce94ce78592bdd6ac0231f28fdc30b0cb3f5"
+        },
+        {
+          "member": "support/backlog.final.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "unit_controls": {
+    "ordinary": 19,
+    "accounting": 20,
+    "note": "19 shared controls; one additional allocator-forwarding control. Not 39 distinct controls."
+  },
+  "binaries": {
+    "native_point_hash_study": {
+      "sha256": "dc85e1a2054a82ce1c4090c824b6ae73e41e8c0eda368907e37cbf1be1b840df",
+      "source_stage": "source.final.sha256",
+      "scope": "Local release development binary only; not an admitted native image"
+    },
+    "native_point_hash_accounting": {
+      "sha256": "278795335284e35480466c846fb2fb9b655afee7d921d8e15d35e92bf732ccfd",
+      "source_stage": "source.final.sha256",
+      "scope": "Local release development binary only; not an admitted native image"
+    }
+  },
+  "development_flow": {
+    "attempted": 76,
+    "failed": 0,
+    "finished": 76,
+    "inflight": 0,
+    "not_attempted": 0,
+    "passed": 76,
+    "planned": 76
+  },
+  "development_parity": {
+    "accounting_requests_present": true,
+    "historical_v1_compared": true,
+    "inputs_answers_base_sizes_native_and_key_counts_match": true,
+    "ordinary_allocations_unknown": true,
+    "records_compared": 76,
+    "schema": "native-point-hash.development-accounting-qualification/v1",
+    "scope": "development artifact parity, not counter authentication or scientific measurement",
+    "snapshots_compared": 292,
+    "standing": "unregistered producer observation; no signed PCC or independent audit verdict"
+  },
+  "batch_clocks_run": 0,
+  "production_oracle_batches_run": 0,
+  "cloud_builds_or_jobs_submitted": 0,
+  "diagnostic_metrics": 21,
+  "registered_production_contrast_cells_upper_bound": 3360,
+  "input_recipe": {
+    "raw_sha256": "b879734d0a51e140df59753d9179790fbbd71cce60c832dd054f03fd711ece09",
+    "logical_plan_sha256": "dbd6104f0a124920690d86fc9e2bd27d867d2b01c35f2749e6991388def46529",
+    "planned_attempts": 2368
+  },
+  "canonical_tool": {
+    "repository": "isogeny-labs/crypto-autoresearcher",
+    "readable_checkout_commit": "96f010d853a088d6ff5093ebedc4270b013484dd",
+    "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "current_origin_main": "a50600ef2",
+    "limitation": "Fetched current main uses VLT1 encoded canonical blobs, with no configured filter. The pinned readable historical tool provides development structural validation only; current canonical access and freeze remain pending."
+  },
+  "archives": [
+    {
+      "path": "research/native_point_hashing_20261105/accounting-20261115/support.tar.xz",
+      "sha256": "41598e9d3531013427556c43e07baee4be4c931a73ec5a2ba4c281d30046f3d3",
+      "bytes": 35068,
+      "files": 87,
+      "member_hash_manifest": "support/SHA256SUMS"
+    },
+    {
+      "path": "research/native_point_hashing_20261105/accounting-20261115/initial-runs.tar.xz",
+      "sha256": "20bb2b4ed7c0ffe16b51da5278dea900c69a1bce0824864327dd90f6c13b9614",
+      "bytes": 26448,
+      "files": 613,
+      "member_hash_manifest": "initial-runs/SHA256SUMS"
+    },
+    {
+      "path": "research/native_point_hashing_20261105/accounting-20261115/final-runs.tar.xz",
+      "sha256": "ff7342d40342b1040eb87cc222bbbdbd9ff922487de34ab53f996093d1e0a504",
+      "bytes": 26288,
+      "files": 613,
+      "member_hash_manifest": "final-runs/SHA256SUMS"
+    },
+    {
+      "path": "research/native_point_hashing_20261105/accounting-20261115/publication-checks.tar.xz",
+      "sha256": "bab6dee95edfe2e70632332132519d3efb1696d18daaa4dbb38a2617dd57c8ab",
+      "bytes": 2500,
+      "files": 6,
+      "member_hash_manifest": "publication-checks/SHA256SUMS"
+    }
+  ],
+  "failure_provenance": "support/development-failures.json; first deadline refusal and lint failure retained with exact sources; two metadata invocations were not redirected and are disclosed",
+  "budget": "Explicit user override remains active for the bounded USD 10 first pilot; do not reintroduce unknown account/lane headroom as a permission gate",
+  "unresolved": [
+    "Authenticated native worker/image and current-source S3 checkpoint/readback",
+    "Native L2/host/rusage/resource and masked canonical export",
+    "Full field inventory, calibrated prices and external references; internal table probes/live/usable bytes remain unmeasured",
+    "Current canonical plaintext access, runtime/power qualification and protocol freeze",
+    "Protected canonical PCC ledger decision and independent full audit",
+    "Remaining component studies and fresh-target confirmation"
+  ],
+  "post_packaging_checks": "publication-checks.tar.xz retains all three archive member readbacks, current manifest and prose checks"
+}
