@@ -1,3 +1,22 @@
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
+
+## Goal
+Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
+## Lead / hypothesis
+C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
+## Spec
+research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
+## State
+Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
+## Next steps
+Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
+## Runs in flight
+None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
+## Stop and success conditions
+Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
+
+---
+
 # Current chord proof task - source only
 ## Goal
 Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
