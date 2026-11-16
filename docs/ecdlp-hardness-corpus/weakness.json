@@ -2,17 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 610,
+    "nodes": 613,
     "status_inflation": 17,
     "model_scope_leaps": 9,
-    "contagious_sources": 21,
+    "contagious_sources": 23,
     "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
-    "live_obstructions": 53,
+    "live_obstructions": 54,
     "author_flagged": 8,
     "attack_queue": 248,
-    "hygiene_queue": 113
+    "hygiene_queue": 114
   },
   "status_inflation": [
     {
@@ -376,6 +376,52 @@
         {
           "id": "THM-SALIZZONI-EX39-EXACT",
           "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-SP-JV-2013-HAL",
+      "title": "Elliptic Curve Discrete Logarithm Problem over Small Degree Extension Fields. Application to the Static Diffie-Hellman Problem on E(F_q^5) (HAL version)",
+      "verification": "primary_read",
+      "refuted": [
+        "CLAIM-JV-ASSUMPTION1-ALL-CURVES"
+      ],
+      "refuted_fraction": 0.125,
+      "exposed": [
+        {
+          "id": "THM-SP-DIEM11-FACTOR-BASE-SIZE",
+          "status": "proved_external",
+          "impact": 6
+        },
+        {
+          "id": "COND-SP-JV-N1-DECOMPOSITION",
+          "status": "conditional",
+          "impact": 2
+        },
+        {
+          "id": "GAP-SP-JV-CONJECTURE",
+          "status": "open",
+          "impact": 2
+        },
+        {
+          "id": "HEUR-SP-JV-ASSUMPTION1",
+          "status": "heuristic",
+          "impact": 1
+        },
+        {
+          "id": "HEUR-SP-JV-ASSUMPTION2",
+          "status": "heuristic",
+          "impact": 1
+        },
+        {
+          "id": "HEUR-SP-GENERIC-IDEAL-DEGREE",
+          "status": "heuristic",
+          "impact": 0
+        },
+        {
+          "id": "OBS-SP-JV-FP5-TIMINGS",
+          "status": "proved_external",
           "impact": 0
         }
       ]
@@ -1092,6 +1138,27 @@
         },
         {
           "id": "MEAS-REVERSE-TRIPLES",
+          "status": "measured",
+          "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-ROUND6-LEAN",
+      "title": "SubfieldFactorBase: the x in F_q factor base of a subfield curve never leaves E(F_q) (Lean, 2026-11-08)",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-JV-ASSUMPTION1-ALL-CURVES"
+      ],
+      "refuted_fraction": 0.333,
+      "exposed": [
+        {
+          "id": "CEX-SUBFIELD-FACTOR-BASE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "MEAS-PQ2-MSOLVE-N37-STEP5",
           "status": "measured",
           "impact": 0
         }
@@ -1960,6 +2027,16 @@
       "statement": "A published reading of degree 5 at n = 45, m = t = 2 on the diagonal with Semaev's subspace contradicts d_F4 <= 4 if KY's step degree equals Semaev's d_F4; not a committed certificate (repository S6 keeps the off-diagonal failure NOT established)."
     },
     {
+      "edge": "R6-006",
+      "relation": "obstructs",
+      "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+      "from_status": "measured",
+      "to": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "to_status": "heuristic",
+      "impact": 1,
+      "statement": "On the diagonal k = ceil(n/m) at m = 2, n = 37, msolve's F4 runs a degree-5 step: d_F4 > 4 for this implementation (Semaev's quantity is Magma's)."
+    },
+    {
       "edge": "E-GG-050",
       "relation": "does_not_cover",
       "from": "THM-GG-MV-MIXING",
@@ -2483,6 +2560,20 @@
       "score": 3.046
     },
     {
+      "id": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "label": "Semaev 2015 Assumption 1: d_F4 <= 4",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 2,
+      "obstructed": 2,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 2
+    },
+    {
       "id": "HEUR-BK-GG-DECOMP-PROPORTION",
       "label": "Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k!",
       "status": "heuristic",
@@ -2579,20 +2670,6 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 1.495
-    },
-    {
-      "id": "HEUR-SP-SEMAEV15-ASSUMPTION1",
-      "label": "Semaev 2015 Assumption 1: d_F4 <= 4",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 1,
-      "inflates": 0,
-      "contagion": 2,
-      "obstructed": 1,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 1.43
     },
     {
       "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
@@ -2903,6 +2980,34 @@
       "score": 0.939
     },
     {
+      "id": "COND-SP-JV-N1-DECOMPOSITION",
+      "label": "Joux-Vitse: (n-1)-point decomposition index calculus",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "impact": 2,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.45,
+      "cost": "discharge conditions",
+      "action": "attack the weakest condition first; each condition is its own node",
+      "score": 0.939
+    },
+    {
+      "id": "HEUR-SP-GENERIC-IDEAL-DEGREE",
+      "label": "Gaudry-Diem PDP ideal has generic degree 2^(n(n-1))",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "exact small-field census",
+      "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
+      "score": 0.936
+    },
+    {
       "id": "HEUR-AUTOMORPHISM-SPEEDUP",
       "label": "Automorphism quotient speedup",
       "status": "heuristic",
@@ -2915,20 +3020,6 @@
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
       "score": 0.904
-    },
-    {
-      "id": "COND-SP-JV-N1-DECOMPOSITION",
-      "label": "Joux-Vitse: (n-1)-point decomposition index calculus",
-      "status": "conditional",
-      "model": "algebraic_coordinate",
-      "impact": 2,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.45,
-      "cost": "discharge conditions",
-      "action": "attack the weakest condition first; each condition is its own node",
-      "score": 0.9
     },
     {
       "id": "COND-WD-DT-RESULT13",
@@ -2957,6 +3048,34 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 0.9
+    },
+    {
+      "id": "HEUR-SP-JV-ASSUMPTION1",
+      "label": "Joux-Vitse Assumption 1: (n-1)-decomposition yield",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 0.85
+    },
+    {
+      "id": "HEUR-SP-JV-ASSUMPTION2",
+      "label": "Joux-Vitse Assumption 2: degree bounded by the Macaulay bound",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 0.85
     },
     {
       "id": "HEUR-SP-SEMAEV15-WEAK-REGULARITY",
@@ -2999,20 +3118,6 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 0.813
-    },
-    {
-      "id": "HEUR-SP-GENERIC-IDEAL-DEGREE",
-      "label": "Gaudry-Diem PDP ideal has generic degree 2^(n(n-1))",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 0,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.8,
-      "cost": "exact small-field census",
-      "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
-      "score": 0.8
     },
     {
       "id": "HEUR-WAGNER-FOUR-SUM",
@@ -3211,34 +3316,6 @@
       "score": 0.792
     },
     {
-      "id": "HEUR-SP-JV-ASSUMPTION1",
-      "label": "Joux-Vitse Assumption 1: (n-1)-decomposition yield",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 1,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 0.792
-    },
-    {
-      "id": "HEUR-SP-JV-ASSUMPTION2",
-      "label": "Joux-Vitse Assumption 2: degree bounded by the Macaulay bound",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 1,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 0.792
-    },
-    {
       "id": "HEUR-WD-ADH-NORM-SMOOTH",
       "label": "ADH: norms of a(x) + y b(x) are as smooth as random polynomials",
       "status": "heuristic",
@@ -3405,6 +3482,20 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 0.765
+    },
+    {
+      "id": "GAP-SP-JV-CONJECTURE",
+      "label": "Joux-Vitse Conjecture on the summation morphism C^(n-1) -> W(E)",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 2,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.731
     },
     {
       "id": "ALG-GG-BL-PRECOMP-RHO",
@@ -3601,20 +3692,6 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 0.713
-    },
-    {
-      "id": "GAP-SP-JV-CONJECTURE",
-      "label": "Joux-Vitse Conjecture on the summation morphism C^(n-1) -> W(E)",
-      "status": "open",
-      "model": "algebraic_coordinate",
-      "impact": 2,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.35,
-      "cost": "open obligation",
-      "action": "prove or refute",
-      "score": 0.7
     },
     {
       "id": "ASM-PF-PKM-UNIT-COST",
@@ -7123,6 +7200,20 @@
       "label": "Constant-zero challenge: (sP, 0, s) verifies for every key (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-SUBFIELD-FACTOR-BASE",
+      "label": "Subfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
       "impact": 0,
       "inflates": 0,
       "contagion": 1,

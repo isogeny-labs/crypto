@@ -556,3 +556,14 @@ From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one
 
 The run directories hold every command's `run.log`, JSON, CSV and dumps. The exact
 commands and the SHA-256 of every output are in `replay_certificate.json`.
+
+## Frozen copies of the checked files (added by the producer, 2026-11-08)
+
+The report pins 297 files by SHA-256. 143 of them live outside this directory, and several
+are living documents (the corpus, triage, READMEs) that later rounds edit; any edit made
+those pins fail and turned the pcc gate red. The pcc verifier resolves a `raw_data` path
+relative to the report's directory first and the repository root second, so each of the 143
+files is now frozen here at its own path (`validation/<path>`), copied byte for byte from
+commit c685fadce2, the commit this report binds. Every copy was checked against its pinned
+SHA-256 before it was written. `validator_report.json` and `replay_certificate.json` are
+unchanged. The live documents may now evolve without invalidating the claim.

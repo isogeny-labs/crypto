@@ -41,6 +41,7 @@ fn main() {
                 }
                 let mut cfg = RhoConfig::for_bits(bits, true);
                 cfg.threads = 1;
+                cfg.table_bits = 5;
                 cfg.seed = t + 1;
                 let t0 = Instant::now();
                 let r = rho_parallel(&c, g, q, &cfg);

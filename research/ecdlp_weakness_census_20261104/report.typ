@@ -55,6 +55,14 @@ $d_"lin" <= "sd"$ is kernel-checked. The degree 4 matches
 Kousidis--Wiemers' Magma value for $n <= 36$; they report 5 from $n = 37$, so a window ending
 at $n = 34$ does not decide whether the degree stays bounded. m = 2 only. [pcc:unverified]
 
+On fresh instances beyond the census window, msolve gives maximal step degree 4 at $n = 36$.
+At $n = 37$, run on isolab-eks, it starts a degree-5 F4 step (a 1,016,044 × 610,665 matrix,
+53 GB) after four degree-4 steps, reproducing with a second implementation the step to 5
+that Kousidis--Wiemers report for Magma. Kubernetes stopped the run at its deadline about
+three hours into that step, so the final basis check is unavailable; the corpus records the
+result as an obstruction to Semaev's $d_"F4" <= 4$ (`MEAS-PQ2-MSOLVE-N37-STEP5`). A rerun to
+completion was not started because the account's monthly budget is exhausted. [pcc:unverified]
+
 == pf_yield
 
 #figure(image("figures/pf_yield.svg", width: 100%), caption: [Unordered pair counts U(R): dispersion and zero class, three factor-base shapes, p from 2003 to 80021.])

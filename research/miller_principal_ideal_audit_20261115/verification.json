@@ -1,0 +1,77 @@
+{
+  "schema": "miller-affine-ideal-verification/v1",
+  "source_commit": "0a150e0f559aba9da821eca4405b5040b0924f7f",
+  "claim_id": "PCC-20261115-357b60",
+  "declaration_sha256": "d2b0fd734afc3313003d0373976189f696193cbf25807d2b3b20610645ef40ce",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 7,
+  "gate_declarations": 25,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 100,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-357b60",
+    "claim_sha256": "e6f5fa4a5dd1a5ef82ca1203c175ec030215db60c4a7e8ca5b58f491e09488b3",
+    "commit": "0a150e0f559aba9da821eca4405b5040b0924f7f",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/miller_principal_ideal_audit_20261115/lean (MillerIdealCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T04:16:36Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-357b60",
+    "claim_sha256": "e6f5fa4a5dd1a5ef82ca1203c175ec030215db60c4a7e8ca5b58f491e09488b3",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46797,
+    "sha256": "4da45c969fcbd86bdebc70c8cae999787eedf818624489e7e274a1a6e2e48206",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 25,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_affine_ideal_function_evaluation_bridge": true,
+    "actual_negative_guard_control": true,
+    "projective_infinity_or_canonical_divisor_bridge": false,
+    "canonical_pairing_identification": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

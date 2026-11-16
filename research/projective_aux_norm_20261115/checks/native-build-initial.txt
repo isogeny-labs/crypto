@@ -1,0 +1,8 @@
+/workspace/crypto-audit/research/projective_aux_norm_20261115/auxiliary.cpp: In member function ‘std::optional<int> auxiliary::Tower::evaluate(int) const’:
+/workspace/crypto-audit/research/projective_aux_norm_20261115/auxiliary.cpp:41:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   41 |         if(Q==0)return std::nullopt;return initial.residue(P*initial.inverse(Q));
+      |         ^~
+/workspace/crypto-audit/research/projective_aux_norm_20261115/auxiliary.cpp:41:37: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   41 |         if(Q==0)return std::nullopt;return initial.residue(P*initial.inverse(Q));
+      |                                     ^~~~~~
+cc1plus: all warnings being treated as errors

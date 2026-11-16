@@ -1,7 +1,7 @@
 //! Driver for `research/cheon_p224_shape_20261022/` (see its `PROTOCOL.md`).
 //!
 //! ```text
-//! cheon_p224_shape gen   --out curves.json
+//! cheon_p224_shape gen   --out curves.json [--bits 36,38,...,62]
 //! cheon_p224_shape check --curves curves.json
 //! cheon_p224_shape spec  --curves curves.json --out ecbench-spec.json
 //! cheon_p224_shape run   --curves curves.json --out runs.jsonl [--family minus|plus]
@@ -72,9 +72,17 @@ fn explicit_spec(c: &Value) -> CurveSpec {
 
 fn gen(args: &[String]) {
     let out = arg(args, "--out").expect("--out");
+    // Sizes default to SIZES; a --bits list picks others (p < 2^62, so at most 62).
+    let sizes: Vec<u32> = arg(args, "--bits").map_or(SIZES.to_vec(), |s| {
+        s.split(',').map(|b| b.parse().expect("--bits")).collect()
+    });
+    assert!(
+        sizes.iter().all(|&b| (4..=62).contains(&b)),
+        "--bits must lie in 4..=62 (prime_explicit needs p < 2^62)"
+    );
     let mut rows = Vec::new();
     for family in ["minus", "plus"] {
-        for &bits in &SIZES {
+        for &bits in &sizes {
             let f = if family == "minus" { 0u64 } else { 1 };
             let seed = (0x4368_6561u64 << 32) ^ ((bits as u64) << 8) ^ f;
             let p = next_prime(3u64 << (bits - 2));

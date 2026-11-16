@@ -1,0 +1,214 @@
+{
+    "builds": [
+        {
+            "id": "isolab-experiment-launcher:15aa331f-944c-4d1f-bc28-d87d5e878204",
+            "arn": "arn:aws:codebuild:us-east-2:104186811093:build/isolab-experiment-launcher:15aa331f-944c-4d1f-bc28-d87d5e878204",
+            "buildNumber": 420,
+            "startTime": 1794258795.162,
+            "endTime": 1794258843.831,
+            "currentPhase": "COMPLETED",
+            "buildStatus": "SUCCEEDED",
+            "sourceVersion": "GAbpTmZE8VYoN72rYIOwYqaior1Pj6ep",
+            "projectName": "isolab-experiment-launcher",
+            "phases": [
+                {
+                    "phaseType": "SUBMITTED",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258795.162,
+                    "endTime": 1794258795.232,
+                    "durationInSeconds": 0
+                },
+                {
+                    "phaseType": "QUEUED",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258795.232,
+                    "endTime": 1794258796.188,
+                    "durationInSeconds": 0
+                },
+                {
+                    "phaseType": "PROVISIONING",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258796.188,
+                    "endTime": 1794258818.501,
+                    "durationInSeconds": 22,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "DOWNLOAD_SOURCE",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258818.501,
+                    "endTime": 1794258820.907,
+                    "durationInSeconds": 2,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "INSTALL",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258820.907,
+                    "endTime": 1794258821.034,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "PRE_BUILD",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258821.034,
+                    "endTime": 1794258821.067,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "BUILD",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258821.067,
+                    "endTime": 1794258843.329,
+                    "durationInSeconds": 22,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "POST_BUILD",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258843.329,
+                    "endTime": 1794258843.406,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "UPLOAD_ARTIFACTS",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258843.406,
+                    "endTime": 1794258843.495,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "FINALIZING",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794258843.495,
+                    "endTime": 1794258843.831,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "COMPLETED",
+                    "startTime": 1794258843.831
+                }
+            ],
+            "source": {
+                "type": "S3",
+                "location": "isolab-results-104186811093-us-east-2/inputs/launchers/e9dc81a2076325113d92edef4b612175f803346d50f204dfdc49b893c93b1f1f.zip",
+                "buildspec": "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/requests/35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e.buildspec.yml",
+                "insecureSsl": false
+            },
+            "secondarySources": [],
+            "secondarySourceVersions": [],
+            "artifacts": {
+                "location": ""
+            },
+            "cache": {
+                "type": "NO_CACHE"
+            },
+            "environment": {
+                "type": "LINUX_CONTAINER",
+                "image": "aws/codebuild/standard:7.0",
+                "computeType": "BUILD_GENERAL1_SMALL",
+                "environmentVariables": [
+                    {
+                        "name": "ISOLAB_CLUSTER",
+                        "value": "isolab",
+                        "type": "PLAINTEXT"
+                    },
+                    {
+                        "name": "ISOLAB_RUN_REQUEST_SHA256",
+                        "value": "435c9a2f35cace854534accf300402365a4f99f15babb0bbd187aa3e1ff92809",
+                        "type": "PLAINTEXT"
+                    },
+                    {
+                        "name": "ISOLAB_REQUEST_KEY",
+                        "value": "inputs/requests/6955d7cafe6e75a363588b1595d7a0204dc7540c8ba0ec868ff75a0141639107.json",
+                        "type": "PLAINTEXT"
+                    },
+                    {
+                        "name": "ISOLAB_BUCKET",
+                        "value": "isolab-results-104186811093-us-east-2",
+                        "type": "PLAINTEXT"
+                    }
+                ],
+                "privilegedMode": false,
+                "imagePullCredentialsType": "CODEBUILD"
+            },
+            "serviceRole": "arn:aws:iam::104186811093:role/isolab-remote-launcher-LauncherRole-sTrV7P2VXnBK",
+            "logs": {
+                "groupName": "/aws/codebuild/isolab-experiment-launcher",
+                "streamName": "15aa331f-944c-4d1f-bc28-d87d5e878204",
+                "deepLink": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups/log-group/$252Faws$252Fcodebuild$252Fisolab-experiment-launcher/log-events/15aa331f-944c-4d1f-bc28-d87d5e878204",
+                "cloudWatchLogsArn": "arn:aws:logs:us-east-2:104186811093:log-group:/aws/codebuild/isolab-experiment-launcher:log-stream:15aa331f-944c-4d1f-bc28-d87d5e878204",
+                "cloudWatchLogs": {
+                    "status": "ENABLED",
+                    "groupName": "/aws/codebuild/isolab-experiment-launcher"
+                }
+            },
+            "timeoutInMinutes": 20,
+            "queuedTimeoutInMinutes": 10,
+            "buildComplete": true,
+            "initiator": "coreuser",
+            "vpcConfig": {
+                "vpcId": "vpc-04bee1e26f609d01c",
+                "subnets": [
+                    "subnet-0ed67dc1e1b83132d",
+                    "subnet-0fef4d36a1f2a37ff",
+                    "subnet-023ccd74a57eb5a51"
+                ],
+                "securityGroupIds": [
+                    "sg-096fc63b0090d98bf"
+                ]
+            },
+            "networkInterface": {
+                "subnetId": "subnet-0ed67dc1e1b83132d",
+                "networkInterfaceId": "eni-07e2f9af0c3d6c911"
+            },
+            "encryptionKey": "arn:aws:kms:us-east-2:104186811093:alias/aws/s3"
+        }
+    ],
+    "buildsNotFound": []
+}

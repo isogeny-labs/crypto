@@ -78,3 +78,32 @@ not a statement about the curves' own fields.
    full-size jump coefficients), with the same frozen covariates and seeds.
 2. Diagnose the bimodality on 50 curves at p ≤ 2^20 (cheapest: per-curve fruitless-cycle
    escapes and cycle lengths against the two clusters).
+
+## Round 2: rho outcome rerun with the corrected walk (run-r2-20261108T0544Z)
+
+**Outcome (PROTOCOL-R2 rule 3): null, with an informative instrument** [pcc:unverified].
+Card `CARD-p3-cross-trace-20261108-r2` (`cards/p3-run-r2.assessment.md`), walk v2, the same
+2,000 curves per prime, covariates and seeds as round 1.
+
+- **Instrument (rule 1 not triggered).** A/A correlation between disjoint-seed runs fell
+  from 0.974 / 0.986 (walk v1) to **0.027 / 0.009**; between-curve variance ratios are
+  1.016 / 0.992 (p24) and 0.965 / 0.948 (p28), against 41 and 72 with v1. Every one of the
+  4,000 per-curve means lies between 0.850 and 1.091·√n (medians 0.97 and 0.95), inside the
+  frozen 0.7 to 1.3 band. The positive control recovers the planted +2 % (1.91 % and 1.96 %),
+  with a minimum detectable effect of 0.19 % at 80 % power.
+- **Tests.** All 7 rho tests are null. The largest effect is −0.087 % per SD (p24, z_691,
+  95 % CI [−0.19 %, +0.01 %], p = 0.083); every interval lies within ±0.19 % of zero, far below
+  the 1 % decision line.
+
+| prime | z_691 | logL1_200000 | ψ3 roots | ψ5 roots |
+|---|---|---|---|---|
+| p24 | −0.087 [−0.186, +0.011] | +0.013 [−0.086, +0.113] | −0.022 [−0.122, +0.077] | −0.024 [−0.124, +0.075] |
+| p28 | −0.036 [−0.133, +0.061] | +0.025 [−0.073, +0.123] | −0.036 [−0.134, +0.062] | not tested |
+
+(rho ops/√n, effect per covariate SD as % of the mean, 95 % CI.)
+
+**Reading.** With a sound walk, the split-prime statistic, the partial L(1, χ) ratio and the
+ψ3/ψ5 root counts change rho cost by less than 0.2 % per SD at both primes. Together with the
+round-1 coverage null, the seed of this study is closed on both outcomes at 2^24 and 2^28.
+The round-1 rho intervals that reached past +1 % came from the defective walk.
+`problems/p3census-rho-walk-bimodal.md` is resolved by this run.

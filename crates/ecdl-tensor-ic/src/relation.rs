@@ -28,9 +28,10 @@ impl Curve {
             v[0] = true;
             return v;
         }
-        for i in 0..b {
-            v[1 + i] = (pt.x >> i) & 1 == 1;
-            v[1 + b + i] = (pt.y >> i) & 1 == 1;
+        let (xs, ys) = v[1..].split_at_mut(b);
+        for (i, (xb, yb)) in xs.iter_mut().zip(ys.iter_mut()).enumerate() {
+            *xb = (pt.x >> i) & 1 == 1;
+            *yb = (pt.y >> i) & 1 == 1;
         }
         v
     }
@@ -47,13 +48,10 @@ impl Curve {
             return Some(INFINITY);
         }
         let mut pt = Point::default();
-        for i in 0..b {
-            if v[1 + i] {
-                pt.x |= 1u64 << i;
-            }
-            if v[1 + b + i] {
-                pt.y |= 1u64 << i;
-            }
+        let (xs, ys) = v[1..1 + 2 * b].split_at(b);
+        for (i, (&xb, &yb)) in xs.iter().zip(ys).enumerate() {
+            pt.x |= (xb as u64) << i;
+            pt.y |= (yb as u64) << i;
         }
         if self.on_curve(pt) {
             Some(pt)
@@ -347,7 +345,7 @@ pub fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<
     let want = bits_key(&c.encode_point(r));
     n.vertices.push(Vertex::Pred(PredVertex {
         e: s,
-        p: Rc::new(move |vals: &[bool]| bits_key(vals) == want),
+        p: Rc::new(move |vals: &[bool]| crate::tensor::bits_match_key(vals, &want)),
     }));
     n.num_edges = next;
     (n, a)

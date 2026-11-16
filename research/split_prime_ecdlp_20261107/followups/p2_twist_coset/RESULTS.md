@@ -94,3 +94,28 @@ over the 12 cells per t: observed 1.878 / 1.458 / 1.225 against exact
   hash (`47c827e3…c9ec`). Card-authoring limitation, not an execution deviation.
 - The relay added one harness line (the `BENCHREC=` prefix the repository hook
   requires); the receipt's argv shows the card's command unchanged.
+
+## Round 2: F4 cost on unplanted targets (run-r2-20261108T052937Z)
+
+**Outcome (PROTOCOL-R2 rule 1): coset-independence holds on unplanted targets, exactly**
+[pcc:unverified]. Card `CARD-p2-twist-coset-20261108-r2` (director: executed as specified;
+`cards/p2-run-r2.assessment.md`). 144 msolve cells: 4 primes × (m2 t4, m2 t6, m3 t4) ×
+3 arms × 4 unplanted targets (`--target unplanted --tseed 101..104`), 1.5 GiB, 1,200 s;
+none capped or timed out. Analysis: `analysis/p2r2analyze` (Rust) →
+`analysis/derived_r2/{r2_unplanted_f4.tsv, decision_r2.json}`.
+
+- Every one of the 144 systems was inconsistent (quotient dimension 0); none of the 48
+  unplanted targets per (m, t) decomposed over its coset, as expected at these sizes.
+- The F4 work proxy, D and widest matrix are **identical across arms, targets, primes and
+  both tower kinds** at each (m, t): 258,271 (m2 t4, D 4, widest 276), 10,759,232 (m2 t6,
+  D 5, widest 2,056), 662,045,497 (m3 t4, D 12, widest 13,419). Selected vs random and A/A
+  differences are 0.
+- Unplanted cost is 90 to 98 % of round 1's planted cost at the same cells (0.975 at m2 t4,
+  0.963 at m2 t6, 0.896 at m3 t4).
+
+**Reading.** On a failed decomposition attempt, which is almost every attempt, F4 performs
+the same computation whatever the coset, so coset selection changes only the success rate.
+Round 1's stage-level gain, (c_max/c_mean)^(m−1) ≈ 1.9 (m = 2) and 3.5 (m = 3) at t = 4,
+therefore holds for the relation search as a whole, not only on planted targets. It still
+decays toward 1 as the base grows. The identical cost across primes and tower kinds also
+shows that at these sizes the F4 trace of an inconsistent system depends only on (m, t).
