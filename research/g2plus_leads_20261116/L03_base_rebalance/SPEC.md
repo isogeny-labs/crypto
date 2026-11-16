@@ -91,7 +91,7 @@ as in the source. `JDiv` derives `Clone, Copy, Debug, PartialEq, Eq, Hash, Defau
 
 ## 4. `rel.rs` and `la.rs`: port verbatim
 
-`rel.rs`, from `genus_ladder.rs` lines 905–1160: `ModU`, `Res`, `mod_u`,
+`rel.rs`, from `genus_ladder.rs` lines 905–1163: `ModU`, `Res`, `mod_u`,
 `splits_completely`, `vtrim`, `cinv`, `vrem`, `vgcd_monic`, `vdiv_monic`, `roots_of`
 (change `&mut StdRng` to `&mut Rng`), `disc_character`. The `Nat` counter comes from `la.rs`.
 `cinv` charges its Fermat inversion as multiplications into `Nat.mul`. Keep this: it
@@ -101,9 +101,9 @@ is the lab convention, so relation-phase inversions are already priced inside `r
 
 | lines | items | changes |
 |---|---|---|
-| 50–62 | `Nat { mul, add }`, `merge` | none |
+| 52–62 | `Nat { mul, add }`, `merge` | none |
 | 543–591 | `mulmod`, `addm`, `subm`, `powm`, `invm` | `mulmod(a, b, r) = ((a as u128 * b as u128) % r as u128) as u64` (exactly equal to the source's for `r < 2^50`) |
-| 865–890 | `REL_FB = 5`, `Rel`, `Rel::endpoints` | none |
+| 865–887 | `REL_FB = 5`, `Rel`, `Rel::endpoints` | none |
 | 890 | `type Row = (Vec<(u32, u64)>, u64)` | none |
 | 892–928 | `combine` | none |
 | 930–972 | `Dsu` (`new`, `add_vertex`, `find`, `edge`, `cycles0`) | none (`ops` counter kept) |
@@ -111,7 +111,7 @@ is the lab convention, so relation-phase inversions are already priced inside `r
 | 1076–1124 | `peel` | none |
 | 1127–1188 | `mat_vec`, `mat_t_vec`, `m_apply` | none |
 | 1190–1236 | `berlekamp_massey` | none |
-| 1238–1325 | `wiedemann` | `&mut StdRng` → `&mut Rng` |
+| 1238–1317 | `wiedemann` | `&mut StdRng` → `&mut Rng` |
 | `ic_boundary.rs` 1399–1401 | `pivot_inversion_steps(m) = 2·(64 − m.leading_zeros())` | none |
 
 ## 5. `run.rs`: the 2LP arm
@@ -139,13 +139,14 @@ Expected `fb_size` (gate Q5 and unit test T3), grid order `cc = 0.125 … 4`:
 is **`genus_ladder.rs` lines 1276–1529 ported verbatim** for `arm = DoubleLp`
 (`max_lp = 2`), `prefilter = true`, `sge = None`, `restart = RESTART`,
 `max_trials = MAX_TRIALS`, `rng = Rng::new(seed_state)`. Delete the `Arm::Full`
-branches (the `else` branch of the cycle check at 1452–1460, and `want = usize::MAX`).
+branches (the `else` branch of the cycle check at lines 1465–1473, and `want = usize::MAX`;
+the `if prm.arm != Arm::Full` test becomes unconditional).
 Then apply exactly these modifications:
 
 - **M1 (Cantor counter split).** Read `(curve.fmul(), curve.finv(), ops.adds + ops.doubles)`
   at four points: `s0` at function entry; `s1` right after the jump table is built
   (where the source sets `res.setup_ops`); `s2` at the moment `wiedemann` returns a
-  solution that is about to be certified (immediately before `let v0 = ...`, line 1512);
+  solution that is about to be certified (immediately before `let v0 = ...`, line 1511);
   `s3` after `chk = curve.smul(&mut ops, inst.g, t)` (the first certificate multiplication).
   Set `cm_setup = s1.mul − s0.mul`, `ci_setup = s1.inv − s0.inv`;
   `cm_loop = s2.mul − s1.mul`, `ci_loop = s2.inv − s1.inv`;
@@ -153,11 +154,11 @@ Then apply exactly these modifications:
   `group_ops_setup`, `group_ops_loop`, `group_ops_verify`. If certification fails and
   the loop continues, the next success re-reads `s2` and `s3`, and the failed certificate's
   Cantor work stays inside `cm_loop`. After the second, independent multiplication
-  (`mul_rtl`), restore the `Fk` counters exactly as the source does (lines 1516–1520).
+  (`mul_rtl`), restore the `Fk` counters exactly as the source does (lines 1514–1519).
   The JSON fields `cantor_mul` and `cantor_inv` are `cm_setup + cm_loop + cm_verify` and
   the corresponding inversion sum.
 - **M2 (relation counter split).** Two `Nat`: `rel_fixed` receives the character-table
-  count (`(p−1)/2` mul) and the base-scan counts (lines 1300–1324). `rel_trial` receives
+  count (`(p−1)/2` mul) and the base-scan counts (lines 1294–1324). `rel_trial` receives
   every `rel` increment inside the `'outer` loop: `disc_character`, `splits_completely`,
   `roots_of`, the `v` evaluations, and the `res.rel.mul += 2`.
 - **M3 (`n_full`).** After the base scan, compute in a separate **uncounted** pass
