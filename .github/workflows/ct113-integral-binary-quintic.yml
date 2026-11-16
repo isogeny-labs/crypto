@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct113/**'
       - '.github/workflows/ct113-integral-binary-quintic.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct113/**'
       - '.github/workflows/ct113-integral-binary-quintic.yml'
   workflow_dispatch:
 jobs:
   ct113:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

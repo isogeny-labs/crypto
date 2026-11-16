@@ -1,0 +1,18 @@
+{
+  "schema": "source-coupled-bernstein-controls-inputs/v1",
+  "parameters_order": ["lambda0", "B", "C", "gamma", "delta"],
+  "parameter_grid": [-1, 0, 1],
+  "M_values": [0, 1, 2, 3],
+  "prime_moduli": [2, 3, 5, 7, 11],
+  "source_domain": "all ordered integer triples in [0,M]^3, including repetitions",
+  "closed_form": "ten symmetric tensor Bernstein coefficients of degree(2,2,2), scaled by8",
+  "independent_oracle": "generic Fraction power-to-Bernstein conversion for all27 coefficients and elementary-symmetric original-source evaluation",
+  "phase_shifts": [-3, -1, 1, 4],
+  "extra_witness": {"lambda0":1,"B":0,"C":1,"gamma":2,"delta":0,"M":1,"p":7},
+  "witness_scope": "abstract empty coefficient chart; no actual elliptic realization proved",
+  "bounds": {"coefficient_cases":972,"ordered_source_values":24300,"prime_source_checks":121500,"phase_shift_checks":19440,"predicate_cap":200000,"worker_seconds":90,"memory_limit_mb":4096,"cores":1},
+  "artifact": "raw-controls.json.gz",
+  "command": ["python", "-m", "research.source_coupled_bernstein_20261112_v1.worker", "EXPERIMENT_ID"],
+  "real_curve_profile": false,
+  "qualified_gain_claim": false
+}

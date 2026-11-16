@@ -2,6 +2,7 @@ name: Cross-characteristic torsion toy (bounded)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/**'
       - '.github/workflows/chained-crosschar-torsion-toy.yml'
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   two-independent-arithmetic-checks:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
