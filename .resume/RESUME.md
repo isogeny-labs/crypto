@@ -1,3 +1,64 @@
+# Resume: pair-index timing on codex/rootfind-pair-index-timing-20261116
+
+This is the current branch handoff. The older rootfinding and unrelated
+handoffs remain below as historical text. The current task is Conductor
+T-6814; production collector files remain reserved by T-6708.
+
+## Goal
+Continue toward a matched complete-call rootfinding result faster than
+F4/F5/F6. This branch measures whether changing the binary pair-index
+representation can lower its cold build and lookup component.
+
+## Lead / hypothesis
+`research/rootfind_pair_index_timing_20261116/PROTOCOL.md` fixes the actual
+K13/K19/K23 pair and probe streams, five arms and 101 measured repetitions.
+`AMENDMENT-1.md` matches the reference to the production `MixHasher` and
+`a*a+1` reservation. The prior paged and inline prototypes passed
+first-witness correctness screens; their timing is not yet known.
+
+## Spec
+Protocol commit `46faae79f8`; hash-control amendment commit `71d5af799b`;
+corrected harness source and retained first compile failure commit
+`1b91f79a5c`. Exact test source SHA-256
+`f8e7d48cd2faa2eb6a2c04e5df095dc5263e9fe9209febf65073cf44a4fdcbcb`;
+locked harness Cargo.lock SHA-256
+`608cd364e6fd8d307b99ba7d02bdf50407ec42117065056c90a49ff88311f4e1`.
+
+## State
+The first release compile-only command failed on a source type mismatch and
+is archived as `build.*`. The corrected second compile-only command passed;
+`build2.*` is retained. The source-bound executable is
+`/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_pair_index_timing-79a07ef92fe2f245`,
+SHA-256 `4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff`.
+No timed test has executed. The correct AWS account's latest monthly and
+daily readbacks exceed their limits; this local L0 diagnostic needs no EKS
+job and cannot replace the frozen L2 F4/F5/F6 panel.
+
+## Next steps
+1. Commit `build2.*` and this resume, push this branch-specific S3 checkpoint
+   with `scripts/checkpoint.sh gate`, and read back the uploaded resume.
+2. Execute the exact release test once under a 600-second watchdog:
+   `gtimeout -s TERM -k 10s 600s /usr/bin/time -l <executable> --exact fixed_koblitz_pair_index_build_probe_timing --nocapture`.
+   Save `run.meta`, `run.stdout` and `run.stderr` under the study directory.
+3. Check all 3 case lines and 1,515 measured arm rows, retain failures,
+   derive descriptive component counts, make a graph and PDF, then publish
+   in a new ready PR stacked on #4421. Do not promote an F4/F5/F6 result
+   from these microbench timings.
+
+## Runs in flight
+None. No PID or cloud job exists for this branch. The executable path above
+is the only admitted local timer binary.
+
+## Stop and success conditions
+Stop and preserve output on checkpoint refusal, wrong executable hash,
+wrong curve/base digest, pair-count or group-equation mismatch, wrong
+first-witness/checksum, panic, timeout, or missing raw rows. The screen
+completes only if K13/K19/K23 and every five-arm repetition return exact
+answers with all planned rows; a component winner must exceed the A/A
+difference. A complete-call F4/F5/F6 claim needs its separate frozen panel.
+
+## Historical handoffs
+
 # Resume: rootfinding first-independent collector on codex/rootfind-multihit-relations-20261116
 
 This top section is the current handoff for the worktree and PR #4421. The

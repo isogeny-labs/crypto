@@ -61,3 +61,31 @@
   factor-base API. Complete output and UTC/exit are retained in `build.*`;
   a one-type source correction follows in a new commit. No timed result has
   been obtained. [pcc:unverified]
+
+## 2026-11-16, corrected compile and run admission
+
+### What was done
+
+- Committed the one-type correction and first compile failure at
+  `1b91f79a5c`. Repeated the locked release compile-only command with the
+  same explicit Rust 1.99.1 Cargo/rustc and shared target. It exited zero
+  in the UTC interval saved in `build2.meta`; full stderr/stdout are kept.
+  The source-bound executable SHA-256 is `4f8e218be771...`. [pcc:unverified]
+- Updated the branch-specific resume with protocol, amendments, source,
+  binary, run command, stop conditions and S3 checkpoint steps.
+
+### Decisions made
+
+- Push a fresh checkpoint before the one frozen local diagnostic. The
+  monthly and daily correct-account AWS budgets remain over their limits,
+  so the L2 F4/F5/F6 panel is not submitted.
+
+### Open threads
+
+- Commit the corrected build receipt and resume, pass S3 gate, execute once,
+  derive result and visual report, and open a stacked PR.
+
+### Errors
+
+- The Rust toolchain's `rust-objcopy` emitted its known missing
+  `libLLVM.dylib` warning; the corrected compile returned zero.
