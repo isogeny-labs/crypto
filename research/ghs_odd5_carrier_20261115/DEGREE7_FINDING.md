@@ -24,6 +24,8 @@ For each mask `m`, write `b_m=sum_i floor(m/3^i) mod 3 * a^i` and `E_m/K: v²=u�
 
 The other five targets form the orbit `3 → 27 → 167 → 182 → 230 → 3`. The five saved positive covers themselves are Frobenius conjugates: their A and B coefficient vectors match those of mask 30 after the indicated field automorphism; C matches up to sign. Thus there are **five exact K-model records but one independent positive Frobenius orbit**, not five unrelated families. `frobenius_orbits.sage`, public Magma 2.30-1 (`frobenius_orbits_magma.json`), `cover_frobenius_orbit.sage`, and two axiom-free Lean modulus-reduction theorems verify this partition and construction relation. The negative orbit has no hit in the specified quadratic-square degree-seven shapes; this is not a complete degree-seven exclusion.
 
+`DEGREE7_BASE_CHANGE_THEOREM.md` proves the scoped infinite field-size family: for every `s` coprime to five, the same degree-seven cover base-changes to `F_(3^(5s))`, its trace map is an isogeny into the genus-five Jacobian, and dimension five is the minimum possible genus for any nonzero algebraic Jacobian transfer from this simple Weil restriction. The fixed-pair degree-seven **minimum** is proved only at `s=1`; a smaller cover degree after later base change is not excluded. The theorem gives a prime-subgroup injection criterion `r∤deg(F)` and separates it from the asymptotic cost screen and measured s=3 result.
+
 Each positive cover has `u=A/B`, `v=y*C/B²`, `B=Q_i H²`, `deg A=7`, `deg B=6`, and satisfies the exact polynomial identity
 
 `f*C² = B*(A³+2A²B+b_m B³)`.

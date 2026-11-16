@@ -147,6 +147,20 @@ theorem trace26_other_frobenius_orbit :
     cubeMask 3 = 27 ∧ cubeMask 27 = 167 ∧
     cubeMask 167 = 182 ∧ cubeMask 182 = 230 ∧ cubeMask 230 = 3 := by decide
 
+/- Exponent-only cost screening, with rho's Frobenius orbit factor included.
+   This does not formalize Diem's algorithm, constants, or measured timings. -/
+theorem s3_rho_adjusted_exponent_screen_fails :
+    (65827 : Nat)^5 ≤ 3^5 * (3^3)^16 := by decide
+
+theorem s11_rho_adjusted_exponent_screen_passes :
+    (333566377062870325133 : Nat)^5 > 11^5 * (3^11)^16 := by decide
+
+theorem s11_frobenius_eigenvalue_arithmetic :
+    (213515707826203049379 : Nat) ≠ 1 ∧
+    213515707826203049379^11 % 333566377062870325133 = 1 ∧
+    (213515707826203049379^2 + 243) % 333566377062870325133 =
+      (26 * 213515707826203049379) % 333566377062870325133 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -178,4 +192,7 @@ theorem trace26_other_frobenius_orbit :
 #print axioms degree_seven_prime_transfer_arithmetic
 #print axioms trace26_cover_positive_frobenius_orbit
 #print axioms trace26_other_frobenius_orbit
+#print axioms s3_rho_adjusted_exponent_screen_fails
+#print axioms s11_rho_adjusted_exponent_screen_passes
+#print axioms s11_frobenius_eigenvalue_arithmetic
 end GHSOdd5Ledger
