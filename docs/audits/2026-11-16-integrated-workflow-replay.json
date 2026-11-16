@@ -93,5 +93,14 @@
     ".github/workflows/rust-all-targets.yml",
     ".github/workflows/weak-curve-database.yml"
   ],
-  "structured_equality_all": true
+  "structured_equality_all": true,
+  "budget_override": {
+    "workflow": ".github/workflows/gb-baseline-rebench.yml",
+    "job": "rebench",
+    "before": 300,
+    "pull_request": 25,
+    "push": 300,
+    "workflow_dispatch": 300,
+    "commands_or_panel_inputs_changed": false
+  }
 }

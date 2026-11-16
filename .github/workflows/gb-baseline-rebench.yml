@@ -86,7 +86,9 @@ jobs:
     # Same runner routing as the other benchmark workflows: the EKS pool when
     # this workflow is listed in CRYPTO_EKS(_HIGHMEM)_WORKFLOWS, else hosted.
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-highmem' || (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 300
+    # Routine PR validation follows the lab's 25-minute ceiling. Main and
+    # explicit dispatch retain the existing full-panel allowance.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 300 }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

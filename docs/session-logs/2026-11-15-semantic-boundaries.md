@@ -99,3 +99,17 @@ Current-head hosted CI and exact owner-source consumer sync. Full committed-tree
 
 ### Errors
 Sparse merge omitted manually materialized receipts/helpers outside its patterns. Confirmed their committed objects and restored them; an absent worktree file is not an upstream deletion. Earlier stage receipts remain historical and are superseded by docs/audits/2026-11-16-current-main-integration.json. [pcc:unverified]
+
+## 2026-11-16T04:46Z - PR budget checker recovery
+
+### What was done
+The integrated CI parse job advances beyond draft gating and reports one existing rebench job with four routine PR budget violations. Limit its pull_request allowance to25 minutes under the existing checker; push and explicit dispatch retain300 minutes. Panel inputs, commands and promotion rules are unchanged. Record this one timeout exception to the otherwise generated/draft-only workflow transformation in the integration receipt.
+
+### Decisions made
+Use the existing routine PR ceiling without adding a budget exemption or changing historical measurements. A timeout remains a failed or censored CI run, not a completed panel.
+
+### Open threads
+Current-head hosted checks and owner artifact-tool consumer copy after landing.
+
+### Errors
+A later checker step was masked by the initial draft-tier failures. Repair the actual reported budget rather than widening the checker. [pcc:unverified]
