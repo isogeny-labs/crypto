@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct115/**'
       - '.github/workflows/ct115-frobenius-kummer.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct115/**'
       - '.github/workflows/ct115-frobenius-kummer.yml'
   workflow_dispatch:
 jobs:
   ct115:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
