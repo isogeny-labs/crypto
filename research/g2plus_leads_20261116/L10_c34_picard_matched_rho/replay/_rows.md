@@ -1,0 +1,18 @@
+- `replay/lab_source.sha256` vs `raw/lab_source.sha256`: DIFFERS (1 replay lines vs 1 raw lines; 1 lines differ)
+  - line 1: raw `3bf45c3a116d3c870e5b19742ce151179e654e6c173db0d65b7b7dfee954588a  /home/user/crypto/src/cr` | replay `e6cf9d5337f1ba3d6b2bc22b1d4f29f4093831817721452e1702a055cf3d1c37  /home/user/crypto/src/cr`
+- `replay/tiny.jsonl` vs `raw/tiny.jsonl`: identical (14257 bytes, sha256 3cbf2fbb2b5bf5d7)
+- `replay/rhocost.jsonl` vs `raw/rhocost.jsonl`: identical (12172 bytes, sha256 86593e42ad692d6a)
+- `replay/measure.jsonl` vs `raw/measure.jsonl`: DIFFERS (168 replay lines vs 167 raw lines; 1 lines differ)
+  - line 168: raw `<EOF>` | replay `{"schema":"l10.measure/v1","family":"Q","arm":"Q_full","p":16411,"curve_seed":3,"solver_se`
+- `replay/pc.jsonl` vs `raw/pc.jsonl`: identical (13371 bytes, sha256 c0cbc236e25d4184)
+- `replay/replay_1033_a.jsonl` vs `raw/replay_1033_a.jsonl`: identical (17600 bytes, sha256 441001b4e904f54d)
+- `replay/replay_1033_b.jsonl` vs `raw/replay_1033_b.jsonl`: identical (17600 bytes, sha256 441001b4e904f54d)
+- `replay/replay_cmp.txt` vs `raw/replay_cmp.txt`: identical (7 bytes, sha256 19eaf43821a7660e)
+- `replay/analysis.json` vs `raw/analysis.json`: DIFFERS (1184 replay lines vs 1184 raw lines; 16 lines differ)
+  - line 248: raw `   "L_bm": 16165.0,` | replay `   "L_bm": 16142.166666666666,`
+  - line 249: raw `   "accepted": 16549.0,` | replay `   "accepted": 16524.666666666668,`
+- `replay/tables.md` vs `raw/tables.md`: DIFFERS (138 replay lines vs 138 raw lines; 1 lines differ)
+  - line 88: raw `| 16411 | Q_full | 16539.0 | 16539.0 | 32956.2 | 16549.0 | 0.5022 | 12.6 | 0.0 | 16394.6 |` | replay `| 16411 | Q_full | 16514.7 | 16514.7 | 32938.5 | 16524.7 | 0.5017 | 12.7 | 0.0 | 16401.2 |`
+- `replay/plot.svg` vs `plot.svg`: DIFFERS (54 replay lines vs 54 raw lines; 2 lines differ)
+  - line 18: raw `<path d="M80.0,318.2 L179.3,279.0 L282.2,235.6 L385.9,193.1 L490.4,149.5 L595.3,106.0 L700` | replay `<path d="M80.0,318.2 L179.3,279.0 L282.2,235.6 L385.9,193.1 L490.4,149.5 L595.3,106.0 L700`
+  - line 25: raw `<circle cx="700.0" cy="62.4" r="3" fill="#1f77b4"/>` | replay `<circle cx="700.0" cy="62.5" r="3" fill="#1f77b4"/>`
