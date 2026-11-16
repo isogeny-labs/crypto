@@ -125,8 +125,11 @@ fn verify_candidate(
     for sa in [-1i8,1] {
         for sb in [-1i8,1] {
             for sc in [-1i8,1] {
-                let v=ar.add(PRIME31,signed(ar,a.pt,sa),signed(ar,b.pt,sb));
-                if ar.add(PRIME31,v,signed(ar,c.pt,sc)).is_some() {continue;}
+                let pa=signed(ar,a.pt,sa);
+                let pb=signed(ar,b.pt,sb);
+                let pc=signed(ar,c.pt,sc);
+                let v=ar.add(PRIME31,pa,pb);
+                if ar.add(PRIME31,v,pc).is_some() {continue;}
                 let sum_coeff=|x:u64,y:u64,s:i8| {
                     addn(x,if s==1{y}else{subn(0,y)})
                 };
@@ -336,13 +339,14 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
     let compare=match args.as_slice() {
-        [] | [a] if a=="--one" => false,
+        [] => false,
+        [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
         _ => return Err("usage: prime31_aps_one_relation --one|--compare".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
-    if v["complete_target_scalar_recovered"]!=true {
+    if v["complete_target_scalar_recovered"].as_bool()!=Some(true) {
         return Err("published APS m3 bounded sample did not find a valid relation".into());
     }
     Ok(())
