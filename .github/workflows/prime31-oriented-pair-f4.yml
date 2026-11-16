@@ -45,3 +45,11 @@ jobs:
       - name: Paired exact-B31 oriented versus S3 30k/60k F4 cap ladder
         timeout-minutes: 3
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --ladder
+      - name: Verify target-conditioned oriented m8 planted signed polynomial fixture
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4 -- --verify
+      - name: Same-host 16-natural-target original versus oriented m8 Rust F4
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4 -- --panel
