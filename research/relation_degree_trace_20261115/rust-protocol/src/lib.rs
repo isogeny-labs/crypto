@@ -244,6 +244,18 @@ fn intervals<const K: usize>(values: &[[f64; K]]) -> [Statistics; K] {
 fn includes_one(stats: &Statistics) -> bool {
     stats.percentile_95[0] <= 1. && stats.percentile_95[1] >= 1.
 }
+/// Calculator-only entry point for separately validated paired transcripts.
+/// Existing roster/admission rules above remain unchanged. No execution or
+/// correctness standing follows from supplying numerical arrays.
+pub fn paired_statistics<const K: usize>(values: &[[f64; K]]) -> Result<[Statistics; K], String> {
+    if K == 0
+        || ![7, 21].contains(&values.len())
+        || values.iter().flatten().any(|x| !x.is_finite() || *x <= 0.)
+    {
+        return Err("paired calculator requires7/21 complete positive finite rows".into());
+    }
+    Ok(intervals(values))
+}
 /// Numerical A/A gate for captured calls. Full transcript/provenance validation
 /// is separate; this helper grants no execution or mathematical standing.
 pub fn aa_control(arm: Arm, pairs: &[[Sample; 2]], setup: u64) -> Result<AaResult, String> {

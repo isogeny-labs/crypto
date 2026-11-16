@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0620Z-replay-phase-diagnosis-20261116",
+  "latest_record": "20261116T0724Z-actual-root-consumer-paid-screen-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 200,
+    "measured": 201,
     "open": 1
   },
   "repo": "crypto",
@@ -13767,14 +13767,19 @@
     {
       "better": "higher",
       "first": 66.0,
-      "latest": 66.0,
-      "latest_derived": {},
+      "latest": 90.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 36.3636,
+        "improvement_vs_previous_percent": 36.3636
+      },
       "metric": "complete_outputs",
       "points": [
         {
           "commit": "1b90e1c568e1",
           "date": "2026-11-16",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
           "n": null,
           "record": "20261116T0605Z-sparse-paid-screen-20261116",
           "reference": null,
@@ -13782,6 +13787,21 @@
           "spread": null,
           "summary": "Complete sparse screen, no follow-up:66 matching outer outputs,four charged recoveries. No case meets both primary10x gates; no15x confirmation. PCCf8e097/437abb, unsigned L0. [pcc:unverified]",
           "value": 66.0
+        },
+        {
+          "commit": "5aac4f991d2f",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 36.3636,
+            "improvement_vs_previous_percent": 36.3636
+          },
+          "n": null,
+          "record": "20261116T0724Z-actual-root-consumer-paid-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "90 matching outputs,4 paid recoveries; onlyfirst-star-n16 selected for paired testing. Primary single-call24.828/15.130, prior-replay1.760, optimizedexpanded5.835; not confirmed15x. PCC37a51f/5d63eb, unsigned L0. [pcc:unverified]",
+          "value": 90.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -13814,19 +13834,39 @@
       "better": "lower",
       "first": 4.0,
       "latest": 4.0,
-      "latest_derived": {},
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "improvement_vs_previous_percent": 0.0
+      },
       "metric": "paid_recovery_workflows",
       "points": [
         {
           "commit": "1b90e1c568e1",
           "date": "2026-11-16",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
           "n": null,
           "record": "20261116T0605Z-sparse-paid-screen-20261116",
           "reference": null,
           "reference_kind": null,
           "spread": null,
           "summary": "Complete sparse screen, no follow-up:66 matching outer outputs,four charged recoveries. No case meets both primary10x gates; no15x confirmation. PCCf8e097/437abb, unsigned L0. [pcc:unverified]",
+          "value": 4.0
+        },
+        {
+          "commit": "5aac4f991d2f",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "improvement_vs_previous_percent": 0.0
+          },
+          "n": null,
+          "record": "20261116T0724Z-actual-root-consumer-paid-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "90 matching outputs,4 paid recoveries; onlyfirst-star-n16 selected for paired testing. Primary single-call24.828/15.130, prior-replay1.760, optimizedexpanded5.835; not confirmed15x. PCC37a51f/5d63eb, unsigned L0. [pcc:unverified]",
           "value": 4.0
         }
       ],
