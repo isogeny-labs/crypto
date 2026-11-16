@@ -1,0 +1,15 @@
+[package]
+name = "trace-zero-linearized"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+trace-zero-terminal = { path = "../../trace_zero_terminal_20261115/native" }
+trace-zero-experiments = { path = "../../trace_zero_experiments_20261109/native" }
+trace-zero-comparisons = { path = "../../trace_zero_comparisons_20261115/native" }
+trace-zero-leads = { path = "../../trace_zero_leads_20261109/native" }
+full-trace-zero-backend = { path = "../../full_trace_zero_variety_20261109/native/backend" }
+num-bigint = { version = "0.4", features = ["rand"] }
+rand = "0.8"
+serde_json = "1"

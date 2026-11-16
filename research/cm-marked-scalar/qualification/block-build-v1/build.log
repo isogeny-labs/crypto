@@ -1,0 +1,9 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations block_qual.cpp -o /tmp/cm-marked-scalar-build/block-qual -lcrypto -lgmpxx -lgmp
+In file included from block_core.hpp:3,
+                 from block_qual.cpp:1:
+cache_core.hpp:46:13: warning: ‘void cmcache::multiply(Runtime&, EC_POINT*, const EC_POINT*, const cmcache::Split&, const cmcache::Plan&, bool, cmcache::Metrics&, const Audit&)’ defined but not used [-Wunused-function]
+   46 | static void multiply(Runtime&r,EC_POINT*out,const EC_POINT*P,const Split&s,const Plan&p,bool reuse,Metrics&m,const Audit&audit={}){
+      |             ^~~~~~~~
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

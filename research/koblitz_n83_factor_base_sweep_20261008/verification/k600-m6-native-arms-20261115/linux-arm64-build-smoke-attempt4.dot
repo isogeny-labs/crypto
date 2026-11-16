@@ -1,0 +1,11 @@
+digraph Attempt4 {
+  rankdir=LR;
+  graph [fontname="Helvetica", bgcolor="white", pad="0.2"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#eaf3ff", color="#2b4d74"];
+  edge [color="#466784"];
+  protocol [label="Frozen attempt 4\nsource 45c5a8c4\n3 tracked inputs present"];
+  build [label="Warm target build\n12 GiB cap, one job\nCargo 26.21 s"];
+  output [label="Five executable\nLinux ARM64 ELFs\nDocker exit 0", fillcolor="#eaf8e7", color="#477548"];
+  next [label="Fresh charged build\nsolver + runtime image\nthen K600 controls", fillcolor="#fff0d6", color="#9d6420"];
+  protocol -> build -> output -> next;
+}

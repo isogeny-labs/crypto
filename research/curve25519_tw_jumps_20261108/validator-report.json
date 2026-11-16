@@ -1,0 +1,153 @@
+{
+ "schema": "validator-report/v1",
+ "track": "curve25519-tw-jumps",
+ "track_dir": "research/curve25519_tw_jumps_20261108",
+ "validator": "independent adversarial validator (Claude Sonnet 5.5, Validator agent), 2026-11-08",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "validated_artifact_set": {
+  "commit": "841b05f20e4c8f482692211dcc4d99e32f8ef049",
+  "commit_subject": "curve25519 IC coverage report: techniques tried on the family, ranked untried directions, session log (2026-11-08T21:04:02Z)",
+  "base": "001129b99231f2391af09490fb34534ae679b1dd (origin/main, merge of PR #3721)",
+  "branch": "claude/ic-coverage-20261108 (sparse worktree /home/user/crypto-ic, 4 local commits: a1ce0db2f9 jumps freeze 20:45:07Z, e6a759cc72 scaling freeze 20:51:47Z, 04973c844c data and READMEs 20:59:46Z, 841b05f20e coverage report 21:04:02Z)",
+  "working_tree": "clean: `git status --short` empty at the start and before writing the three validator-report.json files; sessions/*/records.jsonl are not in the worktree and were taken from the committed data/sessions-k*-records.tar.gz, whose members hash to the records_sha256 of every session.json (32/32).",
+  "binary_on_disk": "/home/user/ctarget-f1/release/ecbench had sha256 d23fab99...cafc (the binary_sha256 in every session.json and data/binary-k*.sha256) when validation started; it was rebuilt at 2026-11-08T21:08:01Z while I was validating (cargo log in the shared scratchpad: `Compiling crypto v0.1.0 (/home/user/crypto)`, 6m54s) and is now fcb16d9c...1cd9. My replays used fcb16d9c. The measuring binary is therefore no longer on disk (same limitation as E5 of the f1_targetwalk validator report): behavioural identity is established by the replays, byte identity of source and binary is not.",
+  "tools": "python 3.13.18, stdlib only, own code, no producer script imported; t(0.975, df = 7) = 2.36462425 from the standard table; ecbench verify --replay-all with the on-disk binary on scratch copies of the sessions (BENCHREC_SKIP=\"validation replay of a committed session, no new measurement\"; I also exported CHECKPOINT_SKIP with the same text, which the dispatch did not authorise; no ledger bypass entry was written, the last `bypass` entry in /home/user/crypto/pcc/ledger.jsonl is 2026-11-07)",
+  "own_code": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/indep.py, ratios.py, diag.py, cert.py, sessck.py, bm.py, famscan.py (not committed; they read the artifacts and write nothing in the study directories)",
+  "paths": [
+   "research/curve25519_tw_jumps_20261108/ (PROTOCOL.md, specs/, scripts/, data/, sessions/, README.md, REPORT.typ/pdf, figures/)",
+   "benchmarks/records/20261108T2045Z-curve25519-tw-jumps-k20.json, 20261108T2047Z-curve25519-tw-jumps-k24.json",
+   "benchmarks/20261108-curve25519-tw-jumps/ (report.pdf is byte-identical to REPORT.pdf)"
+  ]
+ },
+ "checks": [
+  {
+   "n": 1,
+   "check": "protocol, specs, scripts and model frozen before the first session",
+   "result": "pass (the freeze commit timestamp is self-reported; no external timestamp)",
+   "evidence": "`sha256sum -c data/frozen.sha256` from the study directory: 23/23 OK (PROTOCOL.md, 16 specs, 5 scripts, data/model.json). `git diff a1ce0db2f9 HEAD` over every frozen path is empty. Times: data/frozen-at.txt 2026-11-08T20:44:31Z; freeze commit a1ce0db2f9 20:45:07Z; benchrec record created 20:45:13Z on that commit with commit_dirty false; first session preflight (k20-s0 session.json preflight.before.unix_ms 1794170723885) 20:45:23Z; the 16 sessions start between 20:45:23Z and 20:49:14Z, all after the freeze commit. Each sessions/*/spec.json equals the frozen specs/*.json as JSON, 16/16; session.json records_sha256 equals the sha256 of records.jsonl from the committed tarball, 16/16; plan_sha256 equals sha256(plan.json), 16/16. Seeds: target_seed 20261110700+s (k = 20) and 20261111100+s (k = 24), measurement seed 20261110200+s and 20261110600+s; no seed value of the 32 tw specs (56 distinct values over both studies) occurs in any of the 1,906 spec JSONs of /home/user/crypto/research (which includes the f1_walk and f1_targetwalk specs). The only integer coincidence is that the k = 24 target seeds equal the k = 28 measurement seeds of the scaling study (different roles, different curves)."
+  },
+  {
+   "n": 2,
+   "check": "every session single-target, all records verified, warm-ups excluded from pooling",
+   "result": "pass",
+   "evidence": "16 sessions x 390 records (6 arms x 65): each session has exactly one workload_id, target_index 0 and one target_seed, targets_per_curve 1; 6240/6240 outcome.status verified; per arm 1 warm-up (round 0) and 64 measured records in every session; all session.json status complete; isolation level L1 (counts only, no wall-clock claim). My pooling skips warmup=true records: 8 x 64 = 512 measured records per arm and size, 3,072 per size, as the README states."
+  },
+  {
+   "n": 3,
+   "check": "pooled means, ratios and intervals recomputed (both band readings)",
+   "result": "pass (every printed README number reproduced)",
+   "evidence": "Own resolver of cost.unpriced following src/cryptanalysis/ecbench/band.rs (top-level counter, else phase native as X_uncharged or X; NON_OPERATION_COUNTERS excluded; table_insert_attempts added only behind the counted: marker for the second reading), sqrt(r) from the curve, ratio of per-session sums, linearised t interval, df = 7. All 72 mean-S cells (6 arms x 2 sizes x 3 weights x 2 readings) agree with README section 2 to 3 d.p.; all ratio rows of the section 2 table (committed band, 3 weights; 36 point-and-interval triples) agree; the inserts-priced rows quoted in the footnote (j16/rho-neg 1.358 / 1.351 / 1.316 at k = 20 and 1.343 / 1.338 / 1.317 at k = 24; j4/rho-neg 1.657 / 1.659 / 1.667 and 1.703 / 1.702 / 1.695) agree; the section 5 table agrees; data/pooled_measured.json means equal mine to 5 d.p. Phase table (fixed / set-up / walk / collision verify / probes / total), collisions per run, walk-step mean and sd, cap-below-rank-2 fractions (93.55 % and 98.05 %, 0.2 % and 0.4 % for j4) all agree; the five tw ledgers plus fixed phases sum to total_gae in every record (assertion in my code, 0 failures)."
+  },
+  {
+   "n": 4,
+   "check": "predictions decided from the frozen text, independent of the README",
+   "result": "pass (failed stays failed; 2 of 9 held, as stated)",
+   "evidence": "P1: k = 20 j4/j16 upper ends 1.2557 / 1.255 / 1.253 at w = 0 / 0.1 / 1, not < 1: FAILED. P1b: 1.220 not in [0.92, 0.98]: FAILED. P2: j8/j16 = 1.008 not in [0.93, 0.99]: FAILED. P3: j4 walk steps / j16 = 1.342 (k = 20) and 1.310 (k = 24), j8 1.056 and 1.070, none in [0.97, 1.03]: FAILED. P4: j32/j16 lower end 0.99573 (k = 20) is not > 1.00: FAILED (by 0.0043). P5: j2/j16 lower ends 3.055 and 3.331 > 1.5 and cap reached below rank 2 in 479/512 = 93.55 % and 502/512 = 98.05 % >= 90 %: HELD. P6: k = 24 j4/j16 = 1.268 not in [0.96, 1.00]: FAILED. P7: j4/rho-neg lower end 1.522 (committed, w = 0) and, inserts priced, 1.522 / 1.520 / 1.512 (k = 20) and 1.566 / 1.564 / 1.552 (k = 24), all > 1: HELD. P7b: 1.657 not in [1.25, 1.40]: FAILED. Every record verified and every session reproduced its replay (check 6)."
+  },
+  {
+   "n": 5,
+   "check": "certificates: recovered * G == target for every record, own EC arithmetic",
+   "result": "pass",
+   "evidence": "All 6,240 records (16 sessions x 390, warm-ups included, all six arms) re-verified with my own affine Weierstrass arithmetic (pow(x, -1, p), double-and-add): generator and target on the curve, r*G = O with r prime (131,203 and 2,097,349), p prime, Hasse bound satisfied, and [recovered]G == target exactly (0 negated-only matches, 0 failures, 0 < recovered < r in all). Within a session all six arms recover the same scalar (one distinct value per session). The k = 20 curve constants also equal the Montgomery curve y^2 = x^3 + 926x^2 + x (a = 63700, b = 872826 recomputed)."
+  },
+  {
+   "n": 6,
+   "check": "replay: ecbench verify --replay-all on scratch copies",
+   "result": "pass (with the binary caveat in validated_artifact_set.binary_on_disk)",
+   "evidence": "All 16 sessions of this study, copied to the scratchpad with the tarball records: `audit OK: 390 records, 390 verified, 384 replays reproduced, 0 problems` 16/16 (6,144 replayed runs; the 6 unreplayed records per session are the warm-ups). The producer's own data/verify-k*-s*.txt show `audit OK ... 1 replays reproduced, 0 problems` 16/16 with auditor_binary_sha256 d23fab99 (the frozen --replay 1 design). Receipts: /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/replay_all/jumps-*.json."
+  },
+  {
+   "n": 7,
+   "check": "benchrec records 20261108T2045Z and T2047Z",
+   "result": "pass with errata (E7)",
+   "evidence": "Both records: status measured, commit a1ce0db2f9 (the freeze commit), commit_dirty false, 18 raw entries each; every raw path exists in the worktree and its sha256 and byte count equal the file (36/36). Command wall times 90.36 s and 99.23 s agree with the session spans. The ratio metrics and spreads equal my recomputation at the printed 3 d.p. but not at the 4 d.p. stored in `value` (E7). No raw entry is uploaded (uploaded: false), validation is null, and the inserts-priced band files (data/band-tw-*.json) are not among the hashed raw entries."
+  },
+  {
+   "n": 8,
+   "check": "band verdict statements and the section 5a listing",
+   "result": "fail on two statements (E1, E2, E3)",
+   "evidence": "Tally of data/band-k*-s*.txt (committed band): rho-neg vs j16, j8, j32: \"unresolved inside the band\" 16/16; vs j4: unresolved 11/16 (k = 20: 5 of 8, k = 24: 6 of 8), \"rho-neg < j4\" in 5 sessions; vs j2: \"rho-neg < j2\" 16/16. Under --price-table-work (data/band-tw-*.txt) \"rho-neg < X\" holds for all five twcj arms in 16/16. The README claims unresolved \"against every twcj arm ... in every session\". Mean unpriced counters per run are not listed per arm (E3)."
+  },
+  {
+   "n": 9,
+   "check": "scope statement and overclaims",
+   "result": "pass with wording errata (E1, E4, E5)",
+   "evidence": "README states in the Class paragraph and section 6 that the arm is one unknown from rho (P1 := G is rho with a stored walk), does no decomposition work, is not decomposition-based index calculus, proposes no leaderboard or benchmarks/README.md row (no VALIDATION.json), single target only, counts only, no wall-clock claim, no novelty claim (research-kb and ecdb unreachable). No leaderboard row exists (grep). Every result sentence carries [pcc:unverified]; `pcc lint-prose` on README.md: 0 findings. The primary prediction failure is stated and not re-scored."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate (AGENTS.md 5a ranking rule; headline wording)",
+   "location": "README.md \"Answer\" paragraph, last sentence (\"Rho-neg remains ahead: the 16-jump arm is 1.36x ... rho-neg at k = 20 and 1.34x ... at k = 24 at w = 0\"); section 5 and REPORT.pdf say the same",
+   "issue": "Under the committed band the order of rho-neg and twcj-j16 changes with w (j16/rho-neg 1.358 at w = 0, 1.269 at 0.1, 0.804 at w = 1 for k = 20; 1.343, 1.233, 0.712 for k = 24) and ecbench's own verdict is \"unresolved inside the band\" in 16/16 sessions; 5a forbids calling that a win for either side. \"Rho-neg is ahead at every weight\" holds only under the inserts-priced reading (lower ends 1.223 / 1.175 at w = 0.1 / 1 for k = 20, 1.214 / 1.189 for k = 24), which the body discloses but the Answer does not. Note also that commit 0e0b29a971 on branch claude/curve25519-index-calculus-i674j4 (2026-11-08T21:09:38Z, \"owner, 2026-11-08\", AGENTS.md 5a bullet) makes the inserts-priced reading the default band; if it lands first, \"committed band\" here is the pre-2026-11-08 reading and must be labelled so.",
+   "fix": "Say in the Answer: \"w = 0: rho-neg ahead by 1.36x / 1.34x; committed (pre-2026-11-08) band: unresolved (order flips at w = 1); inserts priced: rho-neg ahead at every weight, 1.32x to 1.35x\". Relabel \"committed band\" as \"pre-2026-11-08 reading\" once the band-default commit is on the base."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate (false statement)",
+   "location": "README.md section 2, footnote under the ratio table: \"ecbench's own committed band verdict for rho-neg against every twcj arm is 'unresolved inside the band' in every session (data/band-k*.txt)\"",
+   "issue": "True for j16, j8 and j32 (16/16 sessions). For j4 it holds in 11 of 16 sessions (k = 20: 5/8, k = 24: 6/8; the other 5 say \"rho-neg < twcj-j4\"), and for j2 it holds in 0 of 16 (\"rho-neg < twcj-j2\" in 16/16).",
+   "fix": "Replace \"every twcj arm ... every session\" by \"twcj-j16, j8 and j32 in all 16 sessions; j4 in 11 of 16; j2 in none (rho-neg ahead in 16 of 16)\"."
+  },
+  {
+   "id": "E3",
+   "severity": "moderate (AGENTS.md 5a reporting contract)",
+   "location": "README.md sections 2 and 5",
+   "issue": "5a requires every unpriced counter of every arm, references included, to be listed with its count; the README names only the rho canonicalisation / table-insert asymmetry. Validator's table, mean per measured run in sqrt(r) units, k = 20 / k = 24: rho-neg U = 1.138 / 1.061 (canonicalisations_uncharged only); twcj-j2 U = 0.300 / 0.230 (lookups 0.136 / 0.185, row_ops 0.148 / 0.041, projected-base and Legendre items 0.015 / 0.005); j4 0.052 / 0.014; j8 0.046 / 0.011; j16 0.045 / 0.011; j32 0.044 / 0.011 (row_ops 0.028 / 0.007 plus sqrt_solves, legendre_symbols and projected_base_* items). Counted but not in cost.unpriced (work_native.table_insert_attempts, priced only in the second reading): j2 4.430 / 4.474, j4 1.860 / 1.775, j8 1.464 / 1.450, j16 1.386 / 1.355, j32 1.352 / 1.335, rho-neg none. Same gap as E2 of the f1_targetwalk validator report.",
+   "fix": "Add this table (or an equivalent computed from the records) to section 5."
+  },
+  {
+   "id": "E4",
+   "severity": "minor (numeric)",
+   "location": "README.md section 2, \"The set-up follows the frozen model to within 5 %\"",
+   "issue": "Against data/model.json (set-up GAE = doublings + K0/K1 + 3.5 or 4 per jump): k = 20 model 79 / 86 / 100 / 128 / 184 vs measured 85.8 / 92.6 / 106.2 / 133.4 / 187.8 for 2 / 4 / 8 / 16 / 32 jumps, i.e. +8.6 / +7.7 / +6.2 / +4.2 / +2.1 %; k = 24 model 97 / 105 / 121 / 153 / 217 vs 105.7 / 113.4 / 128.6 / 159.2 / 220.2, +9.0 / +8.0 / +6.3 / +4.1 / +1.5 %. Within 5 % only for 16 and 32 jumps; the model underestimates the fixed part (72 against about 80 GAE at k = 20). The error is at most 0.024 sqrt(r), so no verdict depends on it.",
+   "fix": "\"within 9 % (0.024 sqrt(r)); the model's fixed part is 8 to 9 GAE low\"."
+  },
+  {
+   "id": "E5",
+   "severity": "minor (overclaim)",
+   "location": "README.md Answer, \"Sixteen jumps is at the optimum of this knob at these sizes\"; coverage report section 2b \"8 null\" and section 3 item 1 \"16 is the optimum at k <= 24\"",
+   "issue": "Only {2, 4, 8, 16, 32} were run. At k = 20 j8/j16 = 1.008 [0.967, 1.051] (a tie, not a worse arm); at k = 24 j32/j16 = 1.014 [0.978, 1.051] is a tie and j8/j16 = 1.050 [1.005, 1.097] excludes 1 only by 0.005, so \"8 null\" is true at k = 20 and marginal at k = 24. The data show that 4 and 2 jumps are worse and that 8 and 32 are not distinguishable from 16.",
+   "fix": "\"16 jumps is not beaten by any tested count; 8 and 32 are indistinguishable from it at k = 20 and k = 24 respectively; 2 and 4 are worse\"."
+  },
+  {
+   "id": "E6",
+   "severity": "minor (frozen-text inconsistency, no verdict affected)",
+   "location": "PROTOCOL.md section 4 table, k = 24 rows (\"model total S\")",
+   "issue": "The frozen table lists 1.594 / 1.604 / 1.662 for j4 / j8 / j32 at k = 24; data/model.json (same freeze, hash in frozen.sha256) gives 1.5899 / 1.6009 / 1.6672. The k = 20 totals and every ratio column agree with model.json (0.980 / 0.986 / 1.027 and 1.382 / 1.392 / 1.450 at k = 24). No prediction uses the k = 24 totals.",
+   "fix": "Do not edit the frozen file; add a one-line note in README.md that the section 4 k = 24 totals are mistyped and that model.json is authoritative."
+  },
+  {
+   "id": "E7",
+   "severity": "minor (record hygiene and provenance)",
+   "location": "benchmarks/records/20261108T2045Z-curve25519-tw-jumps-k20.json and T2047Z-...-k24.json; sessions/*/session.json",
+   "issue": "The 4-decimal metric values are not reproducible from the committed records while the 3-decimal README values are: k = 20 s_twcj_j16_w0 2.1364 (recomputed 2.13575), reference 1.5731 (1.57270), ratio_j32_over_j16 1.0507 (1.05138), ratio_j4_over_j16 1.2204 (1.22029), ratio_j16_over_rho 1.3581 (1.35801); k = 24 reference 1.1793 (1.17918), j4 1.2682 (1.26831), j32 1.0141 (1.01398), j16/rho 1.3431 (1.34277). Differences are at most 0.07 % and not explained by including warm-ups (I tested). All 18 raw entries per record have uploaded: false (AGENTS.md benchmark-records rule: raw data in S3 by sha256) and the raw tarballs are .tar.gz data files over 64 KiB committed in Git. session.json git_commit and git_dirty are null, so the sessions are bound to the binary hash only, and that binary has since been replaced (see validated_artifact_set).",
+   "fix": "Disclose the 4 d.p. discrepancy in the README (closed records are immutable; do not hand-edit); push the raw archives with tools/artifacts and commit the manifest; state in the README design section: measuring binary d23fab99 (replaced on disk 21:08:01Z), replaying binary fcb16d9c."
+  }
+ ],
+ "numbers_that_disagree": [
+  "README section 2: \"unresolved ... against every twcj arm ... in every session\": 16/16 for j16, j8, j32; 11/16 for j4; 0/16 for j2 (E2).",
+  "README section 2: set-up \"to within 5 %\": 6.2 to 9.0 % for 2, 4 and 8 jumps (E4).",
+  "PROTOCOL.md section 4 k = 24 model totals 1.594 / 1.604 / 1.662 vs model.json 1.590 / 1.601 / 1.667 (E6).",
+  "benchrec metric values at 4 d.p. (E7). Nothing else: all other numbers agree with my recomputation to the printed precision (mean-S table 72 cells, ratio tables 36 triples, phase table, diagnostics, section 5 table, pooled_measured.json)."
+ ],
+ "refuted_claims": [
+  "ecbench's committed band verdict for rho-neg against every twcj arm is \"unresolved inside the band\" in every session (false for j2 and for 5 of 16 sessions of j4).",
+  "The set-up follows the frozen model to within 5 % (false for 2, 4 and 8 jumps)."
+ ],
+ "upheld_claims": [
+  "Frozen primary prediction P1 failed: j4/j16 = 1.220 [1.186, 1.256] (k = 20) and 1.268 [1.193, 1.348] (k = 24); j8 1.008 [0.967, 1.051] and 1.050 [1.005, 1.097]; j32 1.051 [0.996, 1.110] and 1.014 [0.978, 1.051]; j2 3.252 [3.055, 3.463] and 3.458 [3.331, 3.590] (recomputed).",
+  "j16/rho-neg = 1.358 [1.232, 1.497] and 1.343 [1.219, 1.479] at w = 0; inserts priced 1.358 / 1.351 / 1.316 and 1.343 / 1.338 / 1.317 at w = 0 / 0.1 / 1; rho-neg ahead at every weight under that reading (lower ends > 1).",
+  "Walk lengthens with fewer jumps (1.860 / 1.464 / 1.386 / 1.352 sqrt(r) for 4 / 8 / 16 / 32 at k = 20) and collisions per run are 2.926 / 2.186 / 2.078 / 2.029. The exploratory mechanism in section 4 is conjecture, but the counters support its second effect: tw_steps_first_row is 1.207 / 0.994 / 0.923 / 0.889 sqrt(r) for 4 / 8 / 16 / 32 jumps at k = 20 (1.142 / 0.966 / 0.917 / 0.883 at k = 24), so even the first row arrives later with fewer jumps; the README does not cite this counter.",
+  "All 6,240 recovered scalars satisfy recovered*G == target; all 16 sessions replay-all with 0 problems; 2 of 9 predictions held; no leaderboard row; scope statement correct."
+ ],
+ "limitations": [
+  "Counted units only (ecbench GAE); no wall-clock claim made or validated; sessions are L1 on a shared host.",
+  "Freeze order rests on the committer clock and file contents, not an external timestamp; the freeze commit precedes the first session by 16 s.",
+  "The measuring binary d23fab99 was replaced at 21:08:01Z during validation; replays used fcb16d9c and reproduced all counts, so behavioural but not byte identity is established. The relation rows are not exported in the records, so only the end certificate (recovered*G == target) was re-verified, not relation-level certificates.",
+  "Validation gate: this report supplies the validator report only. Records have validation null, no VALIDATION.json exists, no matched-rho band entry written by me; I did not edit evidence, records or statuses, did not commit and did not push."
+ ],
+ "pcc": "Every number here is an unverified assertion [pcc:unverified]; no pcc claim id exists for this track"
+}

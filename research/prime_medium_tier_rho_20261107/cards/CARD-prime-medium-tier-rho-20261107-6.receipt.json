@@ -1,0 +1,868 @@
+{
+  "card_id": "CARD-prime-medium-tier-rho-20261107-6",
+  "card_path": "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-6.yaml",
+  "card_sha256": "bd06a9a665d477614112cf25a254f02c467ef73c41081f75b16e67cd04a8113b",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.351,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 10.351,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1610fcd6d0254801ef7a53ef3af27e46162a9b61e56a14b715d972d393ca66b8",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261107T222209Z-03100802d7cc/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.176,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.176,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "704cca8f4253c98e5702b989bf8dceb05516a3bbe56c2374a173a4bf29e14c23",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_tier_rho_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.015,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j1",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.015,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5751d7a1ce8c2315bcf041fcd4147fde0f364a6af39a205eedd54f6ee2030f02",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 107516164087790,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f634d0fb2f0a90b3584f99db9d828ec9e43dac609923c18df61e237a400630ee",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 26995759977218,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.017,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j3",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.017,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0cfa85dade0c9611e04546b7e34188e09ac6441cff61cb399a1ed4119c60c8eb",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 166668755239101,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J4.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.012,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j4",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.012,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0e4a2af29ef1776a9a5447981bb9840a6ba2229ca9b846263bb2643e747bb4f9",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 6472169882280,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.012,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j5",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.012,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "da89c151cf224094c6f515bf8964b6b3933e4d98a3993cd8e1ff7032eaccf1ef",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 54391810056847,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J6.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.012,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j6",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.012,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1bbf8f32f998ab9072ef09a581717df66afd93d0e912d58ecf5bdf7584c758bd",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 22552766203232,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        ".image == {image_uri:$i, source_revision:$s, ecbench_sha256:$b}",
+        "research/prime_medium_tier_rho_20261107/receipts/image-publication.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "receipt-identity",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "[inputs | .job.build == {image_uri:$i, source_revision:$s, ecbench_sha256:$b} and .provenance.source_revision == $s] | length == 6 and all",
+        "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J4.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J6.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-identity",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "--",
+        "research/prime_medium_tier_rho_20261107/wait_launcher_result.sh",
+        "isolab-experiment-launcher:96ff43a7-16f8-4b4c-9282-7b746c77b152",
+        "prime-medium-rho-20261107-j4",
+        "research/prime_medium_tier_rho_20261107/receipts/J4",
+        "6600"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.923,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "wait-j4",
+      "index": 12,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J4/result.json": "5aa8141c16aecb2e0670cefabe62ab3555ad6d84add652496e88cb6c4457134c"
+      },
+      "seconds": 1.923,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8ce75b55b412df2edd164a57bb08c11afff2c0c719406d89eeae6c770dbb8145",
+      "stdout_tail": [
+        "Launcher: isolab-experiment-launcher:96ff43a7-16f8-4b4c-9282-7b746c77b152 status FAILED",
+        "Launcher receipts: s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/launcher/96ff43a7-16f8-4b4c-9282-7b746c77b152/",
+        "{",
+        "  \"schema\": \"isolab.eks.result/v1\",",
+        "  \"state\": \"failed\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j4\",",
+        "  \"job_uid\": \"3d6fea89-d9f0-4f05-a6b8-0657fd74746f\",",
+        "  \"pod_uid\": \"\",",
+        "  \"results_uri\": \"\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/launcher/96ff43a7-16f8-4b4c-9282-7b746c77b152/\",",
+        "  \"request_sha256\": \"0e4a2af29ef1776a9a5447981bb9840a6ba2229ca9b846263bb2643e747bb4f9\",",
+        "  \"launcher\": \"isolab-experiment-launcher:96ff43a7-16f8-4b4c-9282-7b746c77b152\",",
+        "  \"exit_code\": 23,",
+        "  \"build\": {",
+        "    \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "    \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/check_session_complete.sh",
+        "prime-medium-rho-20261107-j4",
+        "research/prime_medium_tier_rho_20261107/receipts/J4",
+        "140"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.204,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admit-j4",
+      "index": 13,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J4/admission.json": "7d56134cb9865346c293d786a8da094e6c8ee099f7458f1d4c6ecb965b026e27"
+      },
+      "seconds": 8.204,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7d56134cb9865346c293d786a8da094e6c8ee099f7458f1d4c6ecb965b026e27",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"prime-medium-rho/session-admission/v1\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j4\",",
+        "  \"job_uid\": \"3d6fea89-d9f0-4f05-a6b8-0657fd74746f\",",
+        "  \"pod_uid\": \"6c891815-afca-495a-86b0-06736d3622cf\",",
+        "  \"results_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/6c891815-afca-495a-86b0-06736d3622cf/\",",
+        "  \"job_exit_code\": 42,",
+        "  \"expected_executions\": 140,",
+        "  \"audit_records\": 140,",
+        "  \"audit_replays\": 120,",
+        "  \"l2_accepted\": false,",
+        "  \"l2_below_l2\": 50,",
+        "  \"admitted_for_counts\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pod_uid, state, exit_code, launcher, results_uri, receipt_uri, request_sha256}",
+        "research/prime_medium_tier_rho_20261107/receipts/J4/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-j4",
+      "index": 14,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ca66f16470be72ff6f48d024919c77a370d935c4d701b160e7d2947666bc9bb1",
+      "stdout_tail": [
+        "{\"job_name\":\"prime-medium-rho-20261107-j4\",\"job_uid\":\"3d6fea89-d9f0-4f05-a6b8-0657fd74746f\",\"pod_uid\":\"\",\"state\":\"failed\",\"exit_code\":23,\"launcher\":\"isolab-experiment-launcher:96ff43a7-16f8-4b4c-9282-7b746c77b152\",\"results_uri\":\"\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/launcher/96ff43a7-16f8-4b4c-9282-7b746c77b152/\",\"request_sha256\":\"0e4a2af29ef1776a9a5447981bb9840a6ba2229ca9b846263bb2643e747bb4f9\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 26,
+          "seconds": 987.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 26,
+      "id": "launch-j5",
+      "index": 15,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J5/result.json": "cb1a9a23a85360e7b38f71065ead60e6336e4e78a1be2786d0fa37ca5e3883a0"
+      },
+      "seconds": 987.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3200680e6630d357cb2807e95e37fabfbe92f0e20a53788d3023eb3c73fe6d77",
+      "stdout_tail": [
+        "Launcher: isolab-experiment-launcher:fec83790-e911-4381-b6f6-64a6b5537014",
+        "Launcher receipts: s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/launcher/fec83790-e911-4381-b6f6-64a6b5537014/",
+        "{",
+        "  \"schema\": \"isolab.eks.result/v1\",",
+        "  \"state\": \"failed\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j5\",",
+        "  \"job_uid\": \"a6ae1974-6751-4bab-b8d1-498bd9b06c7d\",",
+        "  \"pod_uid\": \"\",",
+        "  \"results_uri\": \"\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/launcher/fec83790-e911-4381-b6f6-64a6b5537014/\",",
+        "  \"request_sha256\": \"da89c151cf224094c6f515bf8964b6b3933e4d98a3993cd8e1ff7032eaccf1ef\",",
+        "  \"launcher\": \"isolab-experiment-launcher:fec83790-e911-4381-b6f6-64a6b5537014\",",
+        "  \"exit_code\": 23,",
+        "  \"build\": {",
+        "    \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "    \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/check_session_complete.sh",
+        "prime-medium-rho-20261107-j5",
+        "research/prime_medium_tier_rho_20261107/receipts/J5",
+        "140"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admit-j5",
+      "index": 16,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J5/admission.json": "99f1c755d1ba570302dd3ccde2e6da52455263e647d34fc0f2d6e91b82a9e2d7"
+      },
+      "seconds": 9.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "99f1c755d1ba570302dd3ccde2e6da52455263e647d34fc0f2d6e91b82a9e2d7",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"prime-medium-rho/session-admission/v1\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j5\",",
+        "  \"job_uid\": \"a6ae1974-6751-4bab-b8d1-498bd9b06c7d\",",
+        "  \"pod_uid\": \"ba6247ab-b09f-4ac7-b1fc-30bec3672c43\",",
+        "  \"results_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/ba6247ab-b09f-4ac7-b1fc-30bec3672c43/\",",
+        "  \"job_exit_code\": 42,",
+        "  \"expected_executions\": 140,",
+        "  \"audit_records\": 140,",
+        "  \"audit_replays\": 120,",
+        "  \"l2_accepted\": false,",
+        "  \"l2_below_l2\": 67,",
+        "  \"admitted_for_counts\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pod_uid, state, exit_code, launcher, results_uri, receipt_uri, request_sha256}",
+        "research/prime_medium_tier_rho_20261107/receipts/J5/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-j5",
+      "index": 17,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5fbe50d35cb556feb0ec8a509c698750a5927c6d7907895eca1e819025e004fe",
+      "stdout_tail": [
+        "{\"job_name\":\"prime-medium-rho-20261107-j5\",\"job_uid\":\"a6ae1974-6751-4bab-b8d1-498bd9b06c7d\",\"pod_uid\":\"\",\"state\":\"failed\",\"exit_code\":23,\"launcher\":\"isolab-experiment-launcher:fec83790-e911-4381-b6f6-64a6b5537014\",\"results_uri\":\"\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/launcher/fec83790-e911-4381-b6f6-64a6b5537014/\",\"request_sha256\":\"da89c151cf224094c6f515bf8964b6b3933e4d98a3993cd8e1ff7032eaccf1ef\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "research/prime_medium_tier_rho_20261107/requests/final/J6.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 26,
+          "seconds": 860.91,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 26,
+      "id": "launch-j6",
+      "index": 18,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J6/result.json": "dcf83ed25244b91be38ed062a8e48e50f6d50c199e53642abd5c3028ddaed22f"
+      },
+      "seconds": 860.91,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d6d1b4e2818f37ae2742370b00c0506525a28a79211fd2faee0ea0d109ea9b6c",
+      "stdout_tail": [
+        "Launcher: isolab-experiment-launcher:a886d13c-b388-4f0f-91d8-65707185fec5",
+        "Launcher receipts: s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/launcher/a886d13c-b388-4f0f-91d8-65707185fec5/",
+        "{",
+        "  \"schema\": \"isolab.eks.result/v1\",",
+        "  \"state\": \"failed\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j6\",",
+        "  \"job_uid\": \"fc7d197f-1b6f-4ce9-b783-07363945d528\",",
+        "  \"pod_uid\": \"\",",
+        "  \"results_uri\": \"\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/launcher/a886d13c-b388-4f0f-91d8-65707185fec5/\",",
+        "  \"request_sha256\": \"1bbf8f32f998ab9072ef09a581717df66afd93d0e912d58ecf5bdf7584c758bd\",",
+        "  \"launcher\": \"isolab-experiment-launcher:a886d13c-b388-4f0f-91d8-65707185fec5\",",
+        "  \"exit_code\": 23,",
+        "  \"build\": {",
+        "    \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "    \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/check_session_complete.sh",
+        "prime-medium-rho-20261107-j6",
+        "research/prime_medium_tier_rho_20261107/receipts/J6",
+        "140"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.919,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admit-j6",
+      "index": 19,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J6/admission.json": "695670671d28966b9c91b2a10d709322e5e0e124d40f197f16eb0fc0d1b01f99"
+      },
+      "seconds": 8.919,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "695670671d28966b9c91b2a10d709322e5e0e124d40f197f16eb0fc0d1b01f99",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"prime-medium-rho/session-admission/v1\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j6\",",
+        "  \"job_uid\": \"fc7d197f-1b6f-4ce9-b783-07363945d528\",",
+        "  \"pod_uid\": \"0ab86855-193c-4bba-b47c-90249590ea47\",",
+        "  \"results_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/0ab86855-193c-4bba-b47c-90249590ea47/\",",
+        "  \"job_exit_code\": 42,",
+        "  \"expected_executions\": 140,",
+        "  \"audit_records\": 140,",
+        "  \"audit_replays\": 120,",
+        "  \"l2_accepted\": false,",
+        "  \"l2_below_l2\": 46,",
+        "  \"admitted_for_counts\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pod_uid, state, exit_code, launcher, results_uri, receipt_uri, request_sha256}",
+        "research/prime_medium_tier_rho_20261107/receipts/J6/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-j6",
+      "index": 20,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "56ddf4651428a10eb366eb1c4590f2bcba107a0f9b72b66b7e251a718d093c37",
+      "stdout_tail": [
+        "{\"job_name\":\"prime-medium-rho-20261107-j6\",\"job_uid\":\"fc7d197f-1b6f-4ce9-b783-07363945d528\",\"pod_uid\":\"\",\"state\":\"failed\",\"exit_code\":23,\"launcher\":\"isolab-experiment-launcher:a886d13c-b388-4f0f-91d8-65707185fec5\",\"results_uri\":\"\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/launcher/a886d13c-b388-4f0f-91d8-65707185fec5/\",\"request_sha256\":\"1bbf8f32f998ab9072ef09a581717df66afd93d0e912d58ecf5bdf7584c758bd\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 20,
+  "commit": "03100802d7cc02ec1ce3d2f2ff68d6a80ee947d8",
+  "dirty_after": [
+    "enchmarks/records/20261107T2115Z-prime-medium-rho-bound.json"
+  ],
+  "dirty_before": [
+    "docs/curves/cover-links.yaml",
+    "docs/curves/covers.json",
+    "docs/ic-leaderboard.html",
+    "docs/ic/LEADERBOARD.md",
+    "docs/ic/leaderboard.json",
+    "ocs/browser/data.json",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-5.assessment.yaml",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-6.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

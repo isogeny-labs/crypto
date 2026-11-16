@@ -1,0 +1,3687 @@
+{
+ "schema": "validator-report/v1",
+ "id": "VAL-20261112-ad875d",
+ "status": "pass",
+ "verdict": "passed",
+ "disposition": "validated",
+ "independent": true,
+ "independence_note": "Validator subagent (claude-opus-5-5) that did not produce the sessions, code, analysis, README, replay or preflight. All numbers below come from validator code written fresh in Python 3 stdlib (recompute.py, integrity.py, bootstrap2.py, sensitivity.py) reading records.jsonl directly; no ecbench binary was run. The preflight files were opened only after recompute.json existed. The independent: true boolean is the writer's; the sabotage contract's signed verdict is not part of this file.",
+ "validator": "Validator subagent (claude-opus-5-5)",
+ "claim": "research/prime_ksum_pooled_20261029: on 16 fresh prime-order curves (4 per size, 20-32 bits), the k-sum tables ksum5-sel and ksum4-sel cost less than the tuned mitm incumbent inc-sel at w = 0, 0.1 and 1 (pooled paired ratios of total counted cost), on every curve, with ksum5-sel/inc-sel = 0.700, 0.446, 0.324, 0.217 at w = 0; rho-neg remains 5.8-7.3x cheaper (distance remaining). Generic track; UNQUALIFIED (one host).",
+ "snapshot": {
+  "validated_results_commit": "a0ff77014f42a1c96106a833f1e99d21f8e85e15",
+  "repository_head_at_validation": "14cbbecc383012699e79728d5d993de8d7697277",
+  "head_work_tree_dirty_lines": 0,
+  "head_moved_during_validation": {
+   "from": "14cbbecc383012699e79728d5d993de8d7697277",
+   "to": "55713d2001bfbced31461f7b94e96992e75b7177",
+   "by": "merges from other sessions (not the validator)",
+   "unchanged_between": [
+    "research/prime_ksum_pooled_20261029 (whole directory)",
+    "scripts/validation_gate.py",
+    "src/cryptanalysis/ecbench/band.rs",
+    "docs/curves/sources/prime-ksum-pooled-20261029.json"
+   ],
+   "changed_between": [
+    "src/cryptanalysis/ecbench/compare.rs (adds --unit bitop/v1; the GAE ratio-of-sums definition used here is unchanged)"
+   ],
+   "work_tree_note": "other sessions also have uncommitted edits outside the study directory (docs/ic, docs/session-logs, src/cryptanalysis/ic_framework); git status for research/prime_ksum_pooled_20261029 is clean"
+  },
+  "readme_git_blob_head": "f405f34f2fb41c2ff033e636a965cab131883ef8",
+  "protocol_git_blob_head": "f19aa7d5ad269961f11f2e1e7a112de9657f7557",
+  "band_json_git_blob": "08d09208a103540cd20c2881054bd290cbd696bb",
+  "note": "Study files at HEAD differ from a0ff77014f only by README.md (+3 lines, external comparison disclosure), analyse.sh (audit gating), PNG/PDF renders and the move of records.jsonl to the artifact store; analysis/ is byte-identical (band.json blob equal at both commits). Raw records validated are the a0ff77014f blobs, bound by sha256 to .artifacts.json and session.json at HEAD."
+ },
+ "method": "Pricing: priced_gae(w) = total_gae - C + w * (U + n_C), S = priced_gae / sqrt(r), C = n_C = 0 (every record has calibration_pinned_units = []); U = counts behind cost.unpriced (top-level counter, else phase native [name] or [name minus _uncharged]); no byte-valued counter occurs. Study reading = pre-2026-11-08 (table_insert_attempts not charged); the 2026-11-08 default adds the phase sum of work_native.table_insert_attempts where a phase carries counted:table_insert_attempts (IC arms only). Pairs: (workload_id, round) over non-warm-up verified runs; pooled ratio B/A = sum S_B / sum S_A. Band row: mean S over measured verified runs per (curve, arm). Certificates: (a, b) solved from G and one target, then required to hold for G and all 24 (holdout) or 12 (train) targets of the curve; j(a, b) = ICV1 j; p and r Miller-Rabin; r = p + 1 - t; Hasse; cofactor 1; [r]G = O; [r]Q = O; [d]G = Q by affine double-and-add.",
+ "raw_data": [
+  {
+   "path": "sessions/train-P20/.artifacts.json",
+   "sha256": "2bb0fc45b5bb2eb71e1e9b4667b7881868ec7299a248bad364279b01d3d40b7c",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "2d43f018b0cc938ef467366fcddefc57a303cba6",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/train-P20/records.jsonl",
+    "sha256": "f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44",
+    "bytes": 9854106,
+    "git_blob_at_a0ff77014f": "feccf56d405362ef8eed6b21e980a62ff407ad39",
+    "git_blob_of_recovered_bytes": "feccf56d405362ef8eed6b21e980a62ff407ad39",
+    "artifacts_json_sha256": "f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44",
+    "session_json_records_sha256": "f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44",
+    "all_four_agree": true,
+    "records": 1224,
+    "status_counts": {
+     "verified": 1224
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/train-P20/session.json",
+   "sha256": "72c553caad76008b39de678a817155e9653d66f778c174b31d671b4b9a008f20",
+   "git_blob_head": "ae8c193c696f46a376e2ceddea0b79d6aa974df5",
+   "session_id": "ECBS1hccc51e0efaaf",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/train-P24/.artifacts.json",
+   "sha256": "bd40e17247e17c03220d4fb95ea1b178aea4435482f5dc740071a22d4470dd86",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "0d8fac5854673e3604eaaf6c393b0d0758fe6b7d",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/train-P24/records.jsonl",
+    "sha256": "8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738",
+    "bytes": 9920463,
+    "git_blob_at_a0ff77014f": "dcfa73e9f96f9258b216f018d7505dac10c47e04",
+    "git_blob_of_recovered_bytes": "dcfa73e9f96f9258b216f018d7505dac10c47e04",
+    "artifacts_json_sha256": "8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738",
+    "session_json_records_sha256": "8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738",
+    "all_four_agree": true,
+    "records": 1224,
+    "status_counts": {
+     "verified": 1224
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/train-P24/session.json",
+   "sha256": "d060df3257c77aeb503c9a59dc975cb1610629e6bb4b51e9af568b76a63258ca",
+   "git_blob_head": "b779efbff1f387215242a45ce3a58288c797f262",
+   "session_id": "ECBS1hbebf7126eeb8",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/train-P28/.artifacts.json",
+   "sha256": "ac7e171f7f448945b62e0a3545bf49e984c584ccb48db8e63b9a600e703a8513",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "b4ffe3a03da01dab2ee3db803f5c59484520a9ac",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/train-P28/records.jsonl",
+    "sha256": "71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f",
+    "bytes": 9971890,
+    "git_blob_at_a0ff77014f": "c1f398a3254da5c25573d692ba816cd0b7b64c12",
+    "git_blob_of_recovered_bytes": "c1f398a3254da5c25573d692ba816cd0b7b64c12",
+    "artifacts_json_sha256": "71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f",
+    "session_json_records_sha256": "71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f",
+    "all_four_agree": true,
+    "records": 1224,
+    "status_counts": {
+     "verified": 1224
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/train-P28/session.json",
+   "sha256": "4ead54efe121746ae126fcca07d674a514a065b3117c6ff33a1fc103a111441b",
+   "git_blob_head": "92cf801f6a307337f49517d98fda32c56212cb2e",
+   "session_id": "ECBS1hcb6fd8bf4a01",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/train-P32/.artifacts.json",
+   "sha256": "954be1399054832e9972df197ffce41f0ea61f33d9e42ffa920066cddfd02feb",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "709e39af6fcbf692755bd984c1a711e1ed20dd70",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/train-P32/records.jsonl",
+    "sha256": "d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef",
+    "bytes": 10037911,
+    "git_blob_at_a0ff77014f": "3522a798f398b37cda70b73655a1a750e1934d4b",
+    "git_blob_of_recovered_bytes": "3522a798f398b37cda70b73655a1a750e1934d4b",
+    "artifacts_json_sha256": "d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef",
+    "session_json_records_sha256": "d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef",
+    "all_four_agree": true,
+    "records": 1224,
+    "status_counts": {
+     "verified": 1224
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/train-P32/session.json",
+   "sha256": "628bf7d7b1cc83f8d05c0e990a99e0e8923ca0ff3a0f8426233f70863e473011",
+   "git_blob_head": "51c31ba5d78545e819317f9daf5111ee735acf5b",
+   "session_id": "ECBS1h7fb9572c17af",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/holdout-P20/.artifacts.json",
+   "sha256": "4cc0d6e37b9cf685f28c01a063ace64887be7050a6cb47e3f9dc3114840d8e69",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "95ab835ddbfc749be98279996927bd916da159cb",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/holdout-P20/records.jsonl",
+    "sha256": "4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267",
+    "bytes": 14349428,
+    "git_blob_at_a0ff77014f": "61bc1eede160a16586de7bf60b4aaf1335f1a55c",
+    "git_blob_of_recovered_bytes": "61bc1eede160a16586de7bf60b4aaf1335f1a55c",
+    "artifacts_json_sha256": "4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267",
+    "session_json_records_sha256": "4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267",
+    "all_four_agree": true,
+    "records": 2016,
+    "status_counts": {
+     "verified": 2016
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/holdout-P20/session.json",
+   "sha256": "4b40585b1c564e730645c76d3f374922dfc624a1fce82b90f7be3a5eb3033394",
+   "git_blob_head": "19561322901210fe17a2b4c5b9bf50592e3dad21",
+   "session_id": "ECBS1hacb7f105de0a",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/holdout-P24/.artifacts.json",
+   "sha256": "b77413d69b969a202103fd1658dd6fd78c033a67fd8b9a59d2324fc7575070ba",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "4dbf602b623af8d683b36d193a44be501dc4e970",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/holdout-P24/records.jsonl",
+    "sha256": "72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6",
+    "bytes": 16905693,
+    "git_blob_at_a0ff77014f": "20f7ac96e5e2118410f5fdbc1e0d2feb34ebaf73",
+    "git_blob_of_recovered_bytes": "20f7ac96e5e2118410f5fdbc1e0d2feb34ebaf73",
+    "artifacts_json_sha256": "72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6",
+    "session_json_records_sha256": "72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6",
+    "all_four_agree": true,
+    "records": 2304,
+    "status_counts": {
+     "verified": 2304
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/holdout-P24/session.json",
+   "sha256": "4130cbbe909bcc1c2629fddbd7dfa035bdcc88cd89a18d88d8c554a7520f6630",
+   "git_blob_head": "9c5cf9d73b58eb54cd2fd54e756b8c0139166daa",
+   "session_id": "ECBS1hbd8f99f49bd4",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/holdout-P28/.artifacts.json",
+   "sha256": "101a9965de736b8c96040558977d8e775801dfcfe38b563fb4fd1bf449699273",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "67769f9aeeb53e12f01088dcb05eb4ccc755d23e",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/holdout-P28/records.jsonl",
+    "sha256": "d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516",
+    "bytes": 17000511,
+    "git_blob_at_a0ff77014f": "012acebe991ea2e912e74a6392201af3d155297a",
+    "git_blob_of_recovered_bytes": "012acebe991ea2e912e74a6392201af3d155297a",
+    "artifacts_json_sha256": "d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516",
+    "session_json_records_sha256": "d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516",
+    "all_four_agree": true,
+    "records": 2304,
+    "status_counts": {
+     "verified": 2304
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/holdout-P28/session.json",
+   "sha256": "550d0e19ec1fda17413cdb1d85dfe16303a17d5e345ac2defbb3132f668ef764",
+   "git_blob_head": "8adfe1bfb51dc9ce25a1ecf66fe841889420bac9",
+   "session_id": "ECBS1h569bfb294d4d",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  },
+  {
+   "path": "sessions/holdout-P32/.artifacts.json",
+   "sha256": "4dbde56c4e793b28f03d03aba8d8fc535d2a0451824ba93ec826ee5f69bd2d29",
+   "sha256_of": "the artifact-store manifest at this path (HEAD); it pins records.jsonl below",
+   "git_blob_head": "6390f4cdb612dab65b4b866b88116be4134d9ac1",
+   "records_jsonl": {
+    "repo_path": "research/prime_ksum_pooled_20261029/sessions/holdout-P32/records.jsonl",
+    "sha256": "fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144",
+    "bytes": 17105674,
+    "git_blob_at_a0ff77014f": "eaab476a2706e1701b051c2b20692eeba11317b1",
+    "git_blob_of_recovered_bytes": "eaab476a2706e1701b051c2b20692eeba11317b1",
+    "artifacts_json_sha256": "fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144",
+    "session_json_records_sha256": "fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144",
+    "all_four_agree": true,
+    "records": 2304,
+    "status_counts": {
+     "verified": 2304
+    },
+    "note": "absent from the HEAD work tree (artifact store, .gitignore); recovered from git at a0ff77014f and hashed by the validator"
+   }
+  },
+  {
+   "path": "sessions/holdout-P32/session.json",
+   "sha256": "85ac39a21f2bb522065323c5d5aa05b4ad8503693c1b8204a4738db8da75b72b",
+   "git_blob_head": "885b4316e54bae347ff737016c1d6501902c9f1e",
+   "session_id": "ECBS1h407e9e2de743",
+   "binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195",
+   "git_commit_in_session": null,
+   "git_dirty_in_session": null
+  }
+ ],
+ "headline": [
+  {
+   "name": "P20 ksum5-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.6997923362692918,
+   "recomputed": 0.6997923362692924,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum5-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.6854146658860025,
+   "recomputed": 0.685414665886002,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum5-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.6150500011657204,
+   "recomputed": 0.6150500011657208,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum4-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.632448601752286,
+   "recomputed": 0.6324486017522859,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum4-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum4-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.6332800317951057,
+   "recomputed": 0.6332800317951053,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum4-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum4-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.6373490704252671,
+   "recomputed": 0.6373490704252676,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-inc-sel__ksum4-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum5-sel/rho-neg pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 5.992873902482722,
+   "recomputed": 5.992873902482725,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-rho-neg__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum5-sel/rho-neg pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 5.86773269650751,
+   "recomputed": 5.867732696507505,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-rho-neg__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P20 ksum5-sel/rho-neg pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 5.256525032532094,
+   "recomputed": 5.256525032532093,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P20-rho-neg__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.4463874391690781,
+   "recomputed": 0.44638743916907786,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.4476505315336534,
+   "recomputed": 0.44765053153365325,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.4536019880472439,
+   "recomputed": 0.4536019880472439,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum4-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.45211677338223977,
+   "recomputed": 0.45211677338223943,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum4-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum4-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.4580134295488116,
+   "recomputed": 0.4580134295488113,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum4-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum4-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.4857973776868751,
+   "recomputed": 0.48579737768687525,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-inc-sel__ksum4-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/rho-neg pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 5.81623574736839,
+   "recomputed": 5.81623574736839,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-rho-neg__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/rho-neg pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 5.835132057323533,
+   "recomputed": 5.835132057323533,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-rho-neg__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P24 ksum5-sel/rho-neg pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 5.92438101553151,
+   "recomputed": 5.92438101553151,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P24-rho-neg__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.32431940820970734,
+   "recomputed": 0.32431940820970706,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.3190963459885536,
+   "recomputed": 0.3190963459885535,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.29339774142447184,
+   "recomputed": 0.2933977414244717,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum4-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.3363536249002568,
+   "recomputed": 0.33635362490025655,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum4-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum4-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.33719744165108817,
+   "recomputed": 0.33719744165108806,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum4-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum4-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.34134920398628316,
+   "recomputed": 0.34134920398628305,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-inc-sel__ksum4-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/rho-neg pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 7.332013509761892,
+   "recomputed": 7.332013509761896,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-rho-neg__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/rho-neg pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 7.121522182455296,
+   "recomputed": 7.121522182455295,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-rho-neg__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P28 ksum5-sel/rho-neg pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 6.159745518799396,
+   "recomputed": 6.159745518799395,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P28-rho-neg__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.21710949905788196,
+   "recomputed": 0.217109499057882,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.21765005757953843,
+   "recomputed": 0.21765005757953834,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.22036652802915666,
+   "recomputed": 0.22036652802915666,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum4-sel/inc-sel pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 0.25290399464347224,
+   "recomputed": 0.2529039946434723,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum4-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum4-sel/inc-sel pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 0.25587120374175715,
+   "recomputed": 0.25587120374175715,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum4-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum4-sel/inc-sel pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 0.27078232901387783,
+   "recomputed": 0.2707823290138778,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-inc-sel__ksum4-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/rho-neg pooled paired ratio, w=0, pre-2026-11-08 reading",
+   "claimed": 7.3391419002868075,
+   "recomputed": 7.339141900286809,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-rho-neg__ksum5-sel-w0.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/rho-neg pooled paired ratio, w=0.1, pre-2026-11-08 reading",
+   "claimed": 7.222660848481805,
+   "recomputed": 7.222660848481801,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-rho-neg__ksum5-sel-w0.1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "P32 ksum5-sel/rho-neg pooled paired ratio, w=1, pre-2026-11-08 reading",
+   "claimed": 6.69646090233908,
+   "recomputed": 6.69646090233908,
+   "rel_tol": 1e-12,
+   "claimed_source": "analysis/compare-P32-rho-neg__ksum5-sel-w1.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "README table: ksum5-sel/inc-sel P20 w=0",
+   "claimed": 0.7,
+   "recomputed": 0.6997923362692924,
+   "rel_tol": 0.0007142864285714285,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum4-sel/inc-sel P20 w=0",
+   "claimed": 0.632,
+   "recomputed": 0.6324486017522859,
+   "rel_tol": 0.0007911400316455696,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum5-sel/inc-sel P24 w=0",
+   "claimed": 0.446,
+   "recomputed": 0.44638743916907786,
+   "rel_tol": 0.0011210773542600896,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum4-sel/inc-sel P24 w=0",
+   "claimed": 0.452,
+   "recomputed": 0.45211677338223943,
+   "rel_tol": 0.0011061957964601768,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum5-sel/inc-sel P28 w=0",
+   "claimed": 0.324,
+   "recomputed": 0.32431940820970706,
+   "rel_tol": 0.0015432114197530863,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum4-sel/inc-sel P28 w=0",
+   "claimed": 0.336,
+   "recomputed": 0.33635362490025655,
+   "rel_tol": 0.001488096726190476,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum5-sel/inc-sel P32 w=0",
+   "claimed": 0.217,
+   "recomputed": 0.217109499057882,
+   "rel_tol": 0.0023041497695852533,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README table: ksum4-sel/inc-sel P32 w=0",
+   "claimed": 0.253,
+   "recomputed": 0.2529039946434723,
+   "rel_tol": 0.001976286561264822,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README: ksum5-sel/inc-w0 P24 w=0",
+   "claimed": 0.486,
+   "recomputed": 0.4856867404838573,
+   "rel_tol": 0.0010288076131687242,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README: ksum5-sel/inc-w0 P28 w=0",
+   "claimed": 0.368,
+   "recomputed": 0.36836017490162715,
+   "rel_tol": 0.001358697010869565,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README: ksum5-sel/inc-w0 P32 w=0",
+   "claimed": 0.248,
+   "recomputed": 0.24849813958163336,
+   "rel_tol": 0.002016131048387097,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/rho-neg P20 w=0",
+   "claimed": 6.0,
+   "recomputed": 5.992873902482725,
+   "rel_tol": 0.008333341666666666,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/rho-neg P24 w=0",
+   "claimed": 5.8,
+   "recomputed": 5.81623574736839,
+   "rel_tol": 0.008620698275862069,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/rho-neg P28 w=0",
+   "claimed": 7.3,
+   "recomputed": 7.332013509761896,
+   "rel_tol": 0.0068493219178082185,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/rho-neg P32 w=0",
+   "claimed": 7.3,
+   "recomputed": 7.339141900286809,
+   "rel_tol": 0.0068493219178082185,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/bsgs-neg P20 w=0",
+   "claimed": 7.6,
+   "recomputed": 7.569315098547836,
+   "rel_tol": 0.006578953947368421,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/bsgs-neg P24 w=0",
+   "claimed": 6.5,
+   "recomputed": 6.519941904879257,
+   "rel_tol": 0.007692315384615385,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/bsgs-neg P28 w=0",
+   "claimed": 7.2,
+   "recomputed": 7.153735964535657,
+   "rel_tol": 0.006944451388888888,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README distance remaining: ksum5-sel/bsgs-neg P32 w=0",
+   "claimed": 7.1,
+   "recomputed": 7.112493279800916,
+   "rel_tol": 0.0070422605633802815,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P20 w=0",
+   "claimed": 1.034,
+   "recomputed": 1.0338018179625552,
+   "rel_tol": 0.00048355947775628624,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P20 w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0002512880664736,
+   "rel_tol": 0.0005000005,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P20 w=1",
+   "claimed": 0.863,
+   "recomputed": 0.8631573736668676,
+   "rel_tol": 0.000579374855156431,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (d): ksum5-sel/ksum4-sel P20 w=1",
+   "claimed": 0.965,
+   "recomputed": 0.9650127845253343,
+   "rel_tol": 0.0005181352331606217,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (d): ksum5-sel/ksum4-sel P24 w=1",
+   "claimed": 0.934,
+   "recomputed": 0.9337267117559799,
+   "rel_tol": 0.0005353324411134903,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (d): ksum5-sel/ksum4-sel P28 w=1",
+   "claimed": 0.86,
+   "recomputed": 0.8595237311180658,
+   "rel_tol": 0.0005813959302325582,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (d): ksum5-sel/ksum4-sel P32 w=1",
+   "claimed": 0.814,
+   "recomputed": 0.813814287038881,
+   "rel_tol": 0.0006142512285012285,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (d): ksum5-sel/ksum4-sel P20 w=0",
+   "claimed": 1.106,
+   "recomputed": 1.1064809603980803,
+   "rel_tol": 0.00045208001808318257,
+   "claimed_source": "README.md (rounded; rel_tol = half a unit in the last printed digit)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P24 w=0 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P24 w=0.1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P24 w=1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P28 w=0 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P28 w=0.1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P28 w=1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P32 w=0 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P32 w=0.1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README (c): inc-sel/inc-rec P32 w=1 is exactly 1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "README.md section 4 (c)"
+  },
+  {
+   "name": "README: train records, all verified",
+   "claimed": 4896,
+   "recomputed": 4896,
+   "rel_tol": 0,
+   "claimed_source": "README.md section 3"
+  },
+  {
+   "name": "README: holdout records, all verified",
+   "claimed": 8928,
+   "recomputed": 8928,
+   "rel_tol": 0,
+   "claimed_source": "README.md section 3"
+  },
+  {
+   "name": "holdout records whose recovered d satisfies [d]G = Q (validator arithmetic; README: all 8,928 verified)",
+   "claimed": 8928,
+   "recomputed": 8928,
+   "rel_tol": 0,
+   "claimed_source": "README.md section 3"
+  },
+  {
+   "name": "measured (non-warm-up) verified holdout records with [d]G = Q (replay certificate runs list: 5,952)",
+   "claimed": 5952,
+   "recomputed": 5952,
+   "rel_tol": 0,
+   "claimed_source": "scratchpad/ksum/replay-certificate.json runs (5952, all validator_dG_equals_Q true)"
+  }
+ ],
+ "headline_failures": [],
+ "checks": {
+  "raw_data_binding": true,
+  "curves_and_primality": true,
+  "certificates_dG_eq_Q": true,
+  "session_integrity_plan_binary_timestamps": true,
+  "headline_recomputed": true,
+  "per_curve_band_order_pre": true,
+  "per_curve_band_order_post": true,
+  "selection_recomputed": true,
+  "committed_outputs_and_preflight_agree": true
+ },
+ "requirements": [
+  {
+   "requirement": "raw data bound: sha256(recovered records.jsonl) = .artifacts.json = session.json records_sha256 = sha256(git blob at a0ff77014f); git blob id recomputed from the bytes",
+   "result": "pass",
+   "evidence": "validator/hashes.json"
+  },
+  {
+   "requirement": "[d]G = Q for every measured verified holdout record, own arithmetic",
+   "result": "pass",
+   "evidence": "validator/recompute.json certificates",
+   "counts": {
+    "train_warmup_records": 1632,
+    "train_warmup_status_verified": 1632,
+    "train_warmup_dG_eq_Q": 1632,
+    "train_measured_records": 3264,
+    "train_measured_status_verified": 3264,
+    "train_measured_dG_eq_Q": 3264,
+    "holdout_warmup_records": 2976,
+    "holdout_warmup_status_verified": 2976,
+    "holdout_warmup_dG_eq_Q": 2976,
+    "holdout_measured_records": 5952,
+    "holdout_measured_status_verified": 5952,
+    "holdout_measured_dG_eq_Q": 5952,
+    "workloads_with_multiple_distinct_logs": 0,
+    "workloads": 480
+   }
+  },
+  {
+   "requirement": "curves: p, r prime (Miller-Rabin), r = p+1-t, Hasse, cofactor 1, [r]G = O, j matches ICV1, j not 0/1728, (a, b) equal to docs/curves/sources/prime-ksum-pooled-20261029.json",
+   "result": "pass",
+   "evidence": "validator/recompute.json curves (24 curves)"
+  },
+  {
+   "requirement": "session integrity: records = plan executions (arm, workload, round, warm-up, seed), seq contiguous, one binary fc86ee11 = BINARY.sha256 on every record, phase gae sums = total_gae, train between registration and freeze, holdout after freeze, spec bytes = REGISTRATION.sha256 / FROZEN.sha256",
+   "result": "pass",
+   "evidence": "validator/integrity.json"
+  },
+  {
+   "requirement": "selection recomputed from train (smallest mean S at w = 1, ties to the smaller table): inc 64/162/407/1024, inc-w0 64/115/289/727, ksum4 10/14/21/30, ksum5 9/11/15/19, k* = 5",
+   "result": "pass",
+   "evidence": "validator/recompute.json selection (unchanged under the 2026-11-08 reading)"
+  },
+  {
+   "requirement": "headline ratios recomputed (committed exact values and README rounded values)",
+   "result": "pass",
+   "evidence": "headline (this file)"
+  },
+  {
+   "requirement": "section 5a band per curve: rho-neg < ksum5-sel < inc-sel at w = 0, 0.1, 1 on all 16 curves",
+   "result": "pass",
+   "evidence": "gae_band_per_curve (this file); holds under both readings"
+  },
+  {
+   "requirement": "step 4: committed analysis/compare-*.json (150), band.json (124 rows, 420 ranks), preflight.json, preflight-tablework.json, gae_band_per_curve.json agree with the validator",
+   "result": "pass",
+   "evidence": "validator/compare_committed.json"
+  },
+  {
+   "requirement": "reproducibility binding of the measurement binary's source revision",
+   "result": "caveat",
+   "evidence": "sessions/*/session.json git_commit = null, git_dirty = null; replay-certificate.json states the binary was built from 26249b4 plus the uncommitted #2852 diff (not verified by the validator). Mitigation: counts replay identically under ecbench built from clean 6edb2cb36d (replay certificate)."
+  },
+  {
+   "requirement": "controls: reference (rho-neg, negation, strongest: prime field, j not 0/1728, automorphisms_used 2 on all 1,152 holdout rho-neg records), cheaper baseline (bsgs-neg), A/A (rho-neg-aa), frozen benchmark (FROZEN.sha256)",
+   "result": "pass",
+   "evidence": "validator/recompute.json curves; validator/integrity.json aa_counted_identical"
+  },
+  {
+   "requirement": "external fastest implementation",
+   "result": "not run (disclosed in README section 7); the claim compares only in-repository arms, so it is a scope gap, not a failed check",
+   "evidence": "README.md section 7"
+  }
+ ],
+ "pricing_readings": {
+  "study_reading": "pre-2026-11-08 (ecbench --no-price-table-work equivalent): table_insert_attempts NOT priced. Evidence: every committed compare file equals the validator's pre reading to 1.6e-15 and differs from the 2026-11-08 reading by up to 25%; band.json carries no priced_table_work key and its native_sum equals the pre-reading sum on all 124 rows (48 rows, the reference arms, also equal under the post reading).",
+  "table_work_counters_present_on": "IC arms (inc-*, ksum4-*, ksum5-*) in train and holdout, behind counted:table_insert_attempts; rho and BSGS records carry none; no sibling counters",
+  "post_reading_effect": "ranks unchanged everywhere; w = 0 unchanged; IC arms rise at w > 0, so ksum/inc-sel falls slightly and ksum5-sel/rho-neg at w = 1 rises from 5.26/5.92/6.16/6.70 to 6.30/6.92/8.09/8.52 (20/24/28/32 bits).",
+  "cite_rule": "AGENTS.md section 5a: where these figures are cited again, label them the pre-2026-11-08 reading."
+ },
+ "headline_table": {
+  "pre": {
+   "P20": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.6997923362692924,
+      "ci95_linearised_t": [
+       0.6845532289155437,
+       0.715370687356223
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.6824479743956087,
+       0.7182455185267479
+      ]
+     },
+     "0.1": {
+      "ratio": 0.685414665886002,
+      "ci95_linearised_t": [
+       0.6691521193102965,
+       0.7020724445972637
+      ]
+     },
+     "1": {
+      "ratio": 0.6150500011657208,
+      "ci95_linearised_t": [
+       0.5942789717585337,
+       0.6365470122803838
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.6324486017522859,
+      "ci95_linearised_t": [
+       0.615598626013338,
+       0.6497597898305819
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.6119739930415273,
+       0.654682611584256
+      ]
+     },
+     "0.1": {
+      "ratio": 0.6332800317951053,
+      "ci95_linearised_t": [
+       0.6150678826468761,
+       0.6520314423581396
+      ]
+     },
+     "1": {
+      "ratio": 0.6373490704252676,
+      "ci95_linearised_t": [
+       0.6124579504919255,
+       0.6632517991572845
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 5.992873902482725,
+      "ci95_linearised_t": [
+       5.646420099244485,
+       6.360585464737923
+      ]
+     },
+     "0.1": {
+      "ratio": 5.867732696507505,
+      "ci95_linearised_t": [
+       5.5217905346260725,
+       6.2353482591847
+      ]
+     },
+     "1": {
+      "ratio": 5.256525032532093,
+      "ci95_linearised_t": [
+       4.912423753178922,
+       5.624729625524661
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.569315098547836,
+      "ci95_linearised_t": [
+       7.105551571764425,
+       8.063347437907211
+      ]
+     },
+     "0.1": {
+      "ratio": 7.315744326068954,
+      "ci95_linearised_t": [
+       6.866233171365057,
+       7.794683592688116
+      ]
+     },
+     "1": {
+      "ratio": 6.1656212662320655,
+      "ci95_linearised_t": [
+       5.775759149099245,
+       6.5817989665551915
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 1.1064809603980803,
+      "ci95_linearised_t": [
+       1.0795704674918432,
+       1.1340622521546593
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       1.0714283543225134,
+       1.142632598566152
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0823247717808424,
+      "ci95_linearised_t": [
+       1.0538151211374043,
+       1.1116057153802343
+      ]
+     },
+     "1": {
+      "ratio": 0.9650127845253343,
+      "ci95_linearised_t": [
+       0.9297045545392275,
+       1.001661947067558
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.91945935058661,
+       1.0134510288148595
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0338018179625552,
+      "ci95_linearised_t": [
+       1.0061842021979335,
+       1.0621774785253921
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       1.0014624769485194,
+       1.0650536823664223
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0002512880664736,
+      "ci95_linearised_t": [
+       0.9722524471277071,
+       1.029056437177804
+      ]
+     },
+     "1": {
+      "ratio": 0.8631573736668676,
+      "ci95_linearised_t": [
+       0.8345657285061285,
+       0.8927285488335428
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.8289205566525266,
+       0.8958242978437724
+      ]
+     }
+    }
+   },
+   "P24": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.44638743916907786,
+      "ci95_linearised_t": [
+       0.4345977381373957,
+       0.45849696940882756
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.4327826222215969,
+       0.4612565509398627
+      ]
+     },
+     "0.1": {
+      "ratio": 0.44765053153365325,
+      "ci95_linearised_t": [
+       0.4347808722371706,
+       0.4609011370515171
+      ]
+     },
+     "1": {
+      "ratio": 0.4536019880472439,
+      "ci95_linearised_t": [
+       0.4356483245413914,
+       0.47229554659027045
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.45211677338223943,
+      "ci95_linearised_t": [
+       0.4424599479874897,
+       0.4619843619819501
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.4400266308597748,
+       0.46461094342729187
+      ]
+     },
+     "0.1": {
+      "ratio": 0.4580134295488113,
+      "ci95_linearised_t": [
+       0.4474284089050248,
+       0.46884886491772354
+      ]
+     },
+     "1": {
+      "ratio": 0.48579737768687525,
+      "ci95_linearised_t": [
+       0.47073955011035906,
+       0.5013368690013776
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 5.81623574736839,
+      "ci95_linearised_t": [
+       5.398348263137058,
+       6.266472005884935
+      ]
+     },
+     "0.1": {
+      "ratio": 5.835132057323533,
+      "ci95_linearised_t": [
+       5.4078782096768,
+       6.296141445174981
+      ]
+     },
+     "1": {
+      "ratio": 5.92438101553151,
+      "ci95_linearised_t": [
+       5.449788151869542,
+       6.440303629995185
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 6.519941904879257,
+      "ci95_linearised_t": [
+       6.091961758822038,
+       6.977989049494684
+      ]
+     },
+     "0.1": {
+      "ratio": 6.487426716712325,
+      "ci95_linearised_t": [
+       6.059351544625709,
+       6.945744127033082
+      ]
+     },
+     "1": {
+      "ratio": 6.3408004416115205,
+      "ci95_linearised_t": [
+       5.906775743107786,
+       6.806716894111682
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.4856867404838573,
+      "ci95_linearised_t": [
+       0.4685313576662609,
+       0.5034702715668851
+      ]
+     },
+     "0.1": {
+      "ratio": 0.4678277137431378,
+      "ci95_linearised_t": [
+       0.45020014432526156,
+       0.48614548996680657
+      ]
+     },
+     "1": {
+      "ratio": 0.39968163044617666,
+      "ci95_linearised_t": [
+       0.38057830975838086,
+       0.41974385197499114
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.49192047695348745,
+      "ci95_linearised_t": [
+       0.47610273917461676,
+       0.5082637332976889
+      ]
+     },
+     "0.1": {
+      "ratio": 0.47865770398033297,
+      "ci95_linearised_t": [
+       0.462313476849806,
+       0.49557975065078447
+      ]
+     },
+     "1": {
+      "ratio": 0.4280499051960607,
+      "ci95_linearised_t": [
+       0.4099669633212184,
+       0.44693045472250476
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.9873277556806818,
+      "ci95_linearised_t": [
+       0.963807303428306,
+       1.01142219369991
+      ]
+     },
+     "0.1": {
+      "ratio": 0.977374248555623,
+      "ci95_linearised_t": [
+       0.9522253109990182,
+       1.0031873871714945
+      ]
+     },
+     "1": {
+      "ratio": 0.9337267117559799,
+      "ci95_linearised_t": [
+       0.9016056702172511,
+       0.9669921131225301
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.8922563156619071,
+       0.974653294351955
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "P28": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.32431940820970706,
+      "ci95_linearised_t": [
+       0.3191884036599318,
+       0.32953289447682527
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.31807863574694173,
+       0.33093932804384935
+      ]
+     },
+     "0.1": {
+      "ratio": 0.3190963459885535,
+      "ci95_linearised_t": [
+       0.3134718932967938,
+       0.3248217151221324
+      ]
+     },
+     "1": {
+      "ratio": 0.2933977414244717,
+      "ci95_linearised_t": [
+       0.2854954052437295,
+       0.30151880938151054
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.33635362490025655,
+      "ci95_linearised_t": [
+       0.33047980486959677,
+       0.34233184393274396
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.32921206710566364,
+       0.34362056981869404
+      ]
+     },
+     "0.1": {
+      "ratio": 0.33719744165108806,
+      "ci95_linearised_t": [
+       0.3307018317187783,
+       0.3438206376574556
+      ]
+     },
+     "1": {
+      "ratio": 0.34134920398628305,
+      "ci95_linearised_t": [
+       0.33179645746247494,
+       0.35117698348315557
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 7.332013509761896,
+      "ci95_linearised_t": [
+       6.8189347079239795,
+       7.883698027620164
+      ]
+     },
+     "0.1": {
+      "ratio": 7.121522182455295,
+      "ci95_linearised_t": [
+       6.621536229549355,
+       7.659261602900636
+      ]
+     },
+     "1": {
+      "ratio": 6.159745518799395,
+      "ci95_linearised_t": [
+       5.715813800594083,
+       6.638156206632484
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.153735964535657,
+      "ci95_linearised_t": [
+       6.737393065389249,
+       7.595807125041806
+      ]
+     },
+     "0.1": {
+      "ratio": 6.930141519226936,
+      "ci95_linearised_t": [
+       6.526398914107955,
+       7.358860852451809
+      ]
+     },
+     "1": {
+      "ratio": 5.923238113444454,
+      "ci95_linearised_t": [
+       5.5703900548010905,
+       6.298436806650847
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.36836017490162715,
+      "ci95_linearised_t": [
+       0.3601202557418869,
+       0.3767886318252851
+      ]
+     },
+     "0.1": {
+      "ratio": 0.34667535014579076,
+      "ci95_linearised_t": [
+       0.3384400070820805,
+       0.35511108581663314
+      ]
+     },
+     "1": {
+      "ratio": 0.2625985631792654,
+      "ci95_linearised_t": [
+       0.25469550552107895,
+       0.2707468482521282
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.38202857109600025,
+      "ci95_linearised_t": [
+       0.37319962190331357,
+       0.39106639066065974
+      ]
+     },
+     "0.1": {
+      "ratio": 0.36634089553895777,
+      "ci95_linearised_t": [
+       0.3572742701151732,
+       0.37563760665166906
+      ]
+     },
+     "1": {
+      "ratio": 0.3055163617619702,
+      "ci95_linearised_t": [
+       0.29568667787696923,
+       0.3156728195346986
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.964221534124634,
+      "ci95_linearised_t": [
+       0.9461692823026918,
+       0.9826182103555464
+      ]
+     },
+     "0.1": {
+      "ratio": 0.9463190006012427,
+      "ci95_linearised_t": [
+       0.9267460127167313,
+       0.9663053723573548
+      ]
+     },
+     "1": {
+      "ratio": 0.8595237311180658,
+      "ci95_linearised_t": [
+       0.8332986995229911,
+       0.8865740997532155
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.827152975623173,
+       0.8921909674900488
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "P32": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.217109499057882,
+      "ci95_linearised_t": [
+       0.2129134729853804,
+       0.22138821898039804
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.2122882986043227,
+       0.22242059434596217
+      ]
+     },
+     "0.1": {
+      "ratio": 0.21765005757953834,
+      "ci95_linearised_t": [
+       0.212982912742798,
+       0.22241947466266035
+      ]
+     },
+     "1": {
+      "ratio": 0.22036652802915666,
+      "ci95_linearised_t": [
+       0.21332862830321198,
+       0.22763661427852497
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.2529039946434723,
+      "ci95_linearised_t": [
+       0.24841021636255994,
+       0.25747906605126847
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.2476275787132333,
+       0.2587247769511558
+      ]
+     },
+     "0.1": {
+      "ratio": 0.25587120374175715,
+      "ci95_linearised_t": [
+       0.25084425515222347,
+       0.26099889297654294
+      ]
+     },
+     "1": {
+      "ratio": 0.2707823290138778,
+      "ci95_linearised_t": [
+       0.26297792486122834,
+       0.2788183447141886
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 7.339141900286809,
+      "ci95_linearised_t": [
+       6.814933808524542,
+       7.903672338705665
+      ]
+     },
+     "0.1": {
+      "ratio": 7.222660848481801,
+      "ci95_linearised_t": [
+       6.706531423206101,
+       7.778511191594947
+      ]
+     },
+     "1": {
+      "ratio": 6.69646090233908,
+      "ci95_linearised_t": [
+       6.213197352515756,
+       7.217312773494781
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.112493279800916,
+      "ci95_linearised_t": [
+       6.67383700069971,
+       7.5799814484395425
+      ]
+     },
+     "0.1": {
+      "ratio": 6.994935650011943,
+      "ci95_linearised_t": [
+       6.5607055304712745,
+       7.457905940230986
+      ]
+     },
+     "1": {
+      "ratio": 6.465822907599647,
+      "ci95_linearised_t": [
+       6.0476169406707045,
+       6.91294873378733
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.24849813958163336,
+      "ci95_linearised_t": [
+       0.24197605984109782,
+       0.2551960116057933
+      ]
+     },
+     "0.1": {
+      "ratio": 0.23786687752665353,
+      "ci95_linearised_t": [
+       0.23117368011778366,
+       0.24475386382849462
+      ]
+     },
+     "1": {
+      "ratio": 0.19628972748612067,
+      "ci95_linearised_t": [
+       0.18912998433634,
+       0.20372051132863286
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.28946763008702475,
+      "ci95_linearised_t": [
+       0.2820903454193031,
+       0.29703784701900987
+      ]
+     },
+     "0.1": {
+      "ratio": 0.27963826410106046,
+      "ci95_linearised_t": [
+       0.2720292566449226,
+       0.287460105261858
+      ]
+     },
+     "1": {
+      "ratio": 0.24119720016262466,
+      "ci95_linearised_t": [
+       0.23289641933222485,
+       0.2497938333835073
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.8584660727243512,
+      "ci95_linearised_t": [
+       0.8431820655219554,
+       0.8740271267066951
+      ]
+     },
+     "0.1": {
+      "ratio": 0.8506234949330436,
+      "ci95_linearised_t": [
+       0.8339154247882486,
+       0.86766632277588
+      ]
+     },
+     "1": {
+      "ratio": 0.813814287038881,
+      "ci95_linearised_t": [
+       0.7906014144270463,
+       0.8377087135223134
+      ],
+      "ci95_two_stage_cluster_bootstrap_own_rng": [
+       0.7863780580194921,
+       0.8427134326603083
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   }
+  },
+  "post": {
+   "P20": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.6997923362692924,
+      "ci95_linearised_t": [
+       0.6845532289155437,
+       0.715370687356223
+      ]
+     },
+     "0.1": {
+      "ratio": 0.6776113376138427,
+      "ci95_linearised_t": [
+       0.6621290492055395,
+       0.6934556419382961
+      ]
+     },
+     "1": {
+      "ratio": 0.5906316592579364,
+      "ci95_linearised_t": [
+       0.574363513441813,
+       0.6073605804577689
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.6324486017522859,
+      "ci95_linearised_t": [
+       0.615598626013338,
+       0.6497597898305819
+      ]
+     },
+     "0.1": {
+      "ratio": 0.6242693520250566,
+      "ci95_linearised_t": [
+       0.6068778283266141,
+       0.6421592710881602
+      ]
+     },
+     "1": {
+      "ratio": 0.5921955702482267,
+      "ci95_linearised_t": [
+       0.5727142261355856,
+       0.6123395882584518
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 5.992873902482725,
+      "ci95_linearised_t": [
+       5.646420099244485,
+       6.360585464737923
+      ]
+     },
+     "0.1": {
+      "ratio": 6.045054369653423,
+      "ci95_linearised_t": [
+       5.6894126898344135,
+       6.422926991631098
+      ]
+     },
+     "1": {
+      "ratio": 6.299911282658275,
+      "ci95_linearised_t": [
+       5.897023403889236,
+       6.730324682650778
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.569315098547836,
+      "ci95_linearised_t": [
+       7.105551571764425,
+       8.063347437907211
+      ]
+     },
+     "0.1": {
+      "ratio": 7.536824612323033,
+      "ci95_linearised_t": [
+       7.0740609688560925,
+       8.029860851779409
+      ]
+     },
+     "1": {
+      "ratio": 7.389457243966058,
+      "ci95_linearised_t": [
+       6.9289208368467,
+       7.880603581156276
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 1.1064809603980803,
+      "ci95_linearised_t": [
+       1.0795704674918432,
+       1.1340622521546593
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0854470677052317,
+      "ci95_linearised_t": [
+       1.057616839642498,
+       1.1140096229823142
+      ]
+     },
+     "1": {
+      "ratio": 0.9973591308870569,
+      "ci95_linearised_t": [
+       0.966047090105506,
+       1.0296860744698764
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0338018179625552,
+      "ci95_linearised_t": [
+       1.0061842021979335,
+       1.0621774785253921
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0210957941788887,
+      "ci95_linearised_t": [
+       0.9929659111547509,
+       1.0500225729575157
+      ]
+     },
+     "1": {
+      "ratio": 0.9741460584685515,
+      "ci95_linearised_t": [
+       0.9443275692247607,
+       1.0049061090198366
+      ]
+     }
+    }
+   },
+   "P24": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.44638743916907786,
+      "ci95_linearised_t": [
+       0.4345977381373957,
+       0.45849696940882756
+      ]
+     },
+     "0.1": {
+      "ratio": 0.4401665349723839,
+      "ci95_linearised_t": [
+       0.42792163381852166,
+       0.4527618217866529
+      ]
+     },
+     "1": {
+      "ratio": 0.4170808722268035,
+      "ci95_linearised_t": [
+       0.40317931429846593,
+       0.43146175363722794
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.45211677338223943,
+      "ci95_linearised_t": [
+       0.4424599479874897,
+       0.4619843619819501
+      ]
+     },
+     "0.1": {
+      "ratio": 0.45112049863238485,
+      "ci95_linearised_t": [
+       0.4410456017215523,
+       0.46142553852019674
+      ]
+     },
+     "1": {
+      "ratio": 0.4474233410890644,
+      "ci95_linearised_t": [
+       0.4357995898946775,
+       0.45935712376342974
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 5.81623574736839,
+      "ci95_linearised_t": [
+       5.398348263137058,
+       6.266472005884935
+      ]
+     },
+     "0.1": {
+      "ratio": 6.008489272997386,
+      "ci95_linearised_t": [
+       5.5704335899099915,
+       6.480993402222394
+      ]
+     },
+     "1": {
+      "ratio": 6.916519831076247,
+      "ci95_linearised_t": [
+       6.379654894914653,
+       7.49856338025491
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 6.519941904879257,
+      "ci95_linearised_t": [
+       6.091961758822038,
+       6.977989049494684
+      ]
+     },
+     "0.1": {
+      "ratio": 6.680163097217357,
+      "ci95_linearised_t": [
+       6.2402124477901255,
+       7.151131372334558
+      ]
+     },
+     "1": {
+      "ratio": 7.402675804329326,
+      "ci95_linearised_t": [
+       6.906584316679772,
+       7.934400935591104
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.4856867404838573,
+      "ci95_linearised_t": [
+       0.4685313576662609,
+       0.5034702715668851
+      ]
+     },
+     "0.1": {
+      "ratio": 0.470038400999725,
+      "ci95_linearised_t": [
+       0.45278186554135913,
+       0.48795262184412064
+      ]
+     },
+     "1": {
+      "ratio": 0.41671349447350836,
+      "ci95_linearised_t": [
+       0.39922614708747833,
+       0.4349668420848009
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.49192047695348745,
+      "ci95_linearised_t": [
+       0.47610273917461676,
+       0.5082637332976889
+      ]
+     },
+     "0.1": {
+      "ratio": 0.48173575451088857,
+      "ci95_linearised_t": [
+       0.46571160437295217,
+       0.4983112617231003
+      ]
+     },
+     "1": {
+      "ratio": 0.447029236749195,
+      "ci95_linearised_t": [
+       0.4303909142989711,
+       0.4643107739252886
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.9873277556806818,
+      "ci95_linearised_t": [
+       0.963807303428306,
+       1.01142219369991
+      ]
+     },
+     "0.1": {
+      "ratio": 0.9757183198431264,
+      "ci95_linearised_t": [
+       0.9513430377480074,
+       1.0007181446674622
+      ]
+     },
+     "1": {
+      "ratio": 0.9321839830966241,
+      "ci95_linearised_t": [
+       0.9046625590970012,
+       0.9605426571530228
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "P28": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.32431940820970706,
+      "ci95_linearised_t": [
+       0.3191884036599318,
+       0.32953289447682527
+      ]
+     },
+     "0.1": {
+      "ratio": 0.31761805444494134,
+      "ci95_linearised_t": [
+       0.31229223214976165,
+       0.3230347031526916
+      ]
+     },
+     "1": {
+      "ratio": 0.2925930449589873,
+      "ci95_linearised_t": [
+       0.2865842090066909,
+       0.298727868695561
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.33635362490025655,
+      "ci95_linearised_t": [
+       0.33047980486959677,
+       0.34233184393274396
+      ]
+     },
+     "0.1": {
+      "ratio": 0.33474598722766347,
+      "ci95_linearised_t": [
+       0.32858875993529646,
+       0.341018591101802
+      ]
+     },
+     "1": {
+      "ratio": 0.32874255129235325,
+      "ci95_linearised_t": [
+       0.321534992263659,
+       0.3361116756511112
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 7.332013509761896,
+      "ci95_linearised_t": [
+       6.8189347079239795,
+       7.883698027620164
+      ]
+     },
+     "0.1": {
+      "ratio": 7.468766275018737,
+      "ci95_linearised_t": [
+       6.944597681164625,
+       8.032498386789545
+      ]
+     },
+     "1": {
+      "ratio": 8.093616809230356,
+      "ci95_linearised_t": [
+       7.516914843135052,
+       8.714563676942703
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.153735964535657,
+      "ci95_linearised_t": [
+       6.737393065389249,
+       7.595807125041806
+      ]
+     },
+     "0.1": {
+      "ratio": 7.268053926367753,
+      "ci95_linearised_t": [
+       6.844827231166132,
+       7.717449409981697
+      ]
+     },
+     "1": {
+      "ratio": 7.782857167351303,
+      "ci95_linearised_t": [
+       7.327021304333234,
+       8.267051939861084
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.36836017490162715,
+      "ci95_linearised_t": [
+       0.3601202557418869,
+       0.3767886318252851
+      ]
+     },
+     "0.1": {
+      "ratio": 0.3532008541810028,
+      "ci95_linearised_t": [
+       0.34505436350077856,
+       0.36153967777285767
+      ]
+     },
+     "1": {
+      "ratio": 0.3017922512613036,
+      "ci95_linearised_t": [
+       0.2940473953855981,
+       0.3097410973558539
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.38202857109600025,
+      "ci95_linearised_t": [
+       0.37319962190331357,
+       0.39106639066065974
+      ]
+     },
+     "0.1": {
+      "ratio": 0.3722476319209657,
+      "ci95_linearised_t": [
+       0.3633350196273136,
+       0.3813788706987328
+      ]
+     },
+     "1": {
+      "ratio": 0.3390783080773857,
+      "ci95_linearised_t": [
+       0.3299237894047968,
+       0.34848684060050045
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.964221534124634,
+      "ci95_linearised_t": [
+       0.9461692823026918,
+       0.9826182103555464
+      ]
+     },
+     "0.1": {
+      "ratio": 0.9488330452455185,
+      "ci95_linearised_t": [
+       0.9300721768202228,
+       0.9679723468643268
+      ]
+     },
+     "1": {
+      "ratio": 0.8900370329570817,
+      "ci95_linearised_t": [
+       0.8687666784907658,
+       0.9118281578331336
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "P32": {
+    "ksum5-sel/inc-sel": {
+     "0": {
+      "ratio": 0.217109499057882,
+      "ci95_linearised_t": [
+       0.2129134729853804,
+       0.22138821898039804
+      ]
+     },
+     "0.1": {
+      "ratio": 0.21551637727833428,
+      "ci95_linearised_t": [
+       0.2111162530104433,
+       0.2200082097557866
+      ]
+     },
+     "1": {
+      "ratio": 0.20953083640407388,
+      "ci95_linearised_t": [
+       0.20438001359751073,
+       0.21481147119722813
+      ]
+     }
+    },
+    "ksum4-sel/inc-sel": {
+     "0": {
+      "ratio": 0.2529039946434723,
+      "ci95_linearised_t": [
+       0.24841021636255994,
+       0.25747906605126847
+      ]
+     },
+     "0.1": {
+      "ratio": 0.2533891612397786,
+      "ci95_linearised_t": [
+       0.24865371764342192,
+       0.25821478818938176
+      ]
+     },
+     "1": {
+      "ratio": 0.25521198767420317,
+      "ci95_linearised_t": [
+       0.24956553913628585,
+       0.2609861877486575
+      ]
+     }
+    },
+    "ksum5-sel/rho-neg": {
+     "0": {
+      "ratio": 7.339141900286809,
+      "ci95_linearised_t": [
+       6.814933808524542,
+       7.903672338705665
+      ]
+     },
+     "0.1": {
+      "ratio": 7.552509019167365,
+      "ci95_linearised_t": [
+       7.012794972120689,
+       8.133760178554773
+      ]
+     },
+     "1": {
+      "ratio": 8.516389107162473,
+      "ci95_linearised_t": [
+       7.905431336149642,
+       9.17456370697174
+      ]
+     }
+    },
+    "ksum5-sel/bsgs-neg": {
+     "0": {
+      "ratio": 7.112493279800916,
+      "ci95_linearised_t": [
+       6.67383700069971,
+       7.5799814484395425
+      ]
+     },
+     "0.1": {
+      "ratio": 7.314383949831345,
+      "ci95_linearised_t": [
+       6.861676908750457,
+       7.796958859622702
+      ]
+     },
+     "1": {
+      "ratio": 8.223069556023065,
+      "ci95_linearised_t": [
+       7.706097483194769,
+       8.774723272143211
+      ]
+     }
+    },
+    "ksum5-sel/inc-w0": {
+     "0": {
+      "ratio": 0.24849813958163336,
+      "ci95_linearised_t": [
+       0.24197605984109782,
+       0.2551960116057933
+      ]
+     },
+     "0.1": {
+      "ratio": 0.24128390437905373,
+      "ci95_linearised_t": [
+       0.23471809636402866,
+       0.24803337882439658
+      ]
+     },
+     "1": {
+      "ratio": 0.21678322469272232,
+      "ci95_linearised_t": [
+       0.21011958294776248,
+       0.223658194295287
+      ]
+     }
+    },
+    "ksum4-sel/inc-w0": {
+     "0": {
+      "ratio": 0.28946763008702475,
+      "ci95_linearised_t": [
+       0.2820903454193031,
+       0.29703784701900987
+      ]
+     },
+     "0.1": {
+      "ratio": 0.28368482675591816,
+      "ci95_linearised_t": [
+       0.27621369910850446,
+       0.29135803615562766
+      ]
+     },
+     "1": {
+      "ratio": 0.26404551529379267,
+      "ci95_linearised_t": [
+       0.2563040235671677,
+       0.2720208336038606
+      ]
+     }
+    },
+    "ksum5-sel/ksum4-sel": {
+     "0": {
+      "ratio": 0.8584660727243512,
+      "ci95_linearised_t": [
+       0.8431820655219554,
+       0.8740271267066951
+      ]
+     },
+     "0.1": {
+      "ratio": 0.8505351066472578,
+      "ci95_linearised_t": [
+       0.8345521865166309,
+       0.8668241235565276
+      ]
+     },
+     "1": {
+      "ratio": 0.8210070315018093,
+      "ci95_linearised_t": [
+       0.802474463162619,
+       0.8399675961262563
+      ]
+     }
+    },
+    "inc-sel/inc-rec": {
+     "0": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "0.1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     },
+     "1": {
+      "ratio": 1.0,
+      "ci95_linearised_t": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   }
+  }
+ },
+ "gae_band_per_curve": {
+  "pre_2026_11_08_study_reading": {
+   "icv1-fp20-t375-aef80152": {
+    "size_bits": 20,
+    "log2_r": 19.816547772454367,
+    "0": {
+     "ic_ksum5_sel": 7.144773738386917,
+     "rho_neg": 1.1279977910913905,
+     "inc_sel": 10.579304569396038,
+     "ksum4_sel": 6.602975768075279,
+     "bsgs_neg": 1.0437470142754233,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.657985849400599,
+     "rho_neg": 1.223676407449225,
+     "inc_sel": 11.587037953880158,
+     "ksum4_sel": 7.235012694450585,
+     "bsgs_neg": 1.1468729136585498,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 12.276894848523737,
+     "rho_neg": 2.084783954669736,
+     "inc_sel": 20.656638414237243,
+     "ksum4_sel": 12.923345031828342,
+     "bsgs_neg": 2.075006008106689,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-t457-f60a16c1": {
+    "size_bits": 20,
+    "log2_r": 19.327164464093237,
+    "0": {
+     "ic_ksum5_sel": 7.590013835216801,
+     "rho_neg": 1.2712487762750375,
+     "inc_sel": 10.740880785772893,
+     "ksum4_sel": 6.933530774141695,
+     "bsgs_neg": 0.936071480105528,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.035734391549267,
+     "rho_neg": 1.3781854383093763,
+     "inc_sel": 11.611232033312504,
+     "ksum4_sel": 7.514514173109827,
+     "bsgs_neg": 1.0281989981145967,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 12.047219398541458,
+     "rho_neg": 2.3406153966184244,
+     "inc_sel": 19.44439326116901,
+     "ksum4_sel": 12.74336476382301,
+     "bsgs_neg": 1.8573466601962156,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-tm1079-bf1bb5fd": {
+    "size_bits": 20,
+    "log2_r": 19.16016441355189,
+    "0": {
+     "ic_ksum5_sel": 7.689460507273325,
+     "rho_neg": 1.3468879133682112,
+     "inc_sel": 10.705559643970672,
+     "ksum4_sel": 6.722082297568782,
+     "bsgs_neg": 1.0853710781964028,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.103088794709668,
+     "rho_neg": 1.459967814671425,
+     "inc_sel": 11.506188208867444,
+     "ksum4_sel": 7.233436443144267,
+     "bsgs_neg": 1.1919484428715414,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 11.82574338163676,
+     "rho_neg": 2.4776869264003496,
+     "inc_sel": 18.711845292938403,
+     "ksum4_sel": 11.835623753323622,
+     "bsgs_neg": 2.1511447249477906,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-tm1141-c50333f6": {
+    "size_bits": 20,
+    "log2_r": 19.48373116316196,
+    "0": {
+     "ic_ksum5_sel": 7.412087381608088,
+     "rho_neg": 1.232501136831842,
+     "inc_sel": 10.610239872526082,
+     "ksum4_sel": 6.706480176630822,
+     "bsgs_neg": 0.8765587988452066,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.87829179444974,
+     "rho_neg": 1.3363543517630305,
+     "inc_sel": 11.50858976836362,
+     "ksum4_sel": 7.282837173554303,
+     "bsgs_neg": 0.9626964066748797,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 12.074131510024607,
+     "rho_neg": 2.2710332861437266,
+     "inc_sel": 19.593738830901472,
+     "ksum4_sel": 12.470050145865644,
+     "bsgs_neg": 1.737934877141937,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-t5097-1f48e65c": {
+    "size_bits": 24,
+    "log2_r": 23.64422300277089,
+    "0": {
+     "ic_ksum5_sel": 6.556810694013688,
+     "rho_neg": 1.078810657547073,
+     "inc_sel": 14.48670596359088,
+     "ksum4_sel": 6.538151385848132,
+     "bsgs_neg": 1.0081089681427144,
+     "inc_w0": 13.529954684219595
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.199985481506746,
+     "rho_neg": 1.1765099435516213,
+     "inc_sel": 15.85096030781252,
+     "ksum4_sel": 7.240386940056513,
+     "bsgs_neg": 1.1085055972456321,
+     "inc_w0": 15.406865896613212
+    },
+    "1": {
+     "ic_ksum5_sel": 12.988558568944276,
+     "rho_neg": 2.055803517592557,
+     "inc_sel": 28.129249405807258,
+     "ksum4_sel": 13.560506927931925,
+     "bsgs_neg": 2.0120752591718922,
+     "inc_w0": 32.29906680815578
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm1215-254f2c18": {
+    "size_bits": 24,
+    "log2_r": 23.85340788819961,
+    "0": {
+     "ic_ksum5_sel": 6.156446637606137,
+     "rho_neg": 1.0643561934017638,
+     "inc_sel": 13.68125414943035,
+     "ksum4_sel": 6.356191021702841,
+     "bsgs_neg": 1.0185861211417007,
+     "inc_w0": 12.727526355868676
+    },
+    "0.1": {
+     "ic_ksum5_sel": 6.767800056079092,
+     "rho_neg": 1.1612910309939553,
+     "inc_sel": 14.986785391776785,
+     "ksum4_sel": 7.0642529157831175,
+     "bsgs_neg": 1.120008063327609,
+     "inc_w0": 14.498319239218203
+    },
+    "1": {
+     "ic_ksum5_sel": 12.269980822335684,
+     "rho_neg": 2.033704569323677,
+     "inc_sel": 26.736566572894684,
+     "ksum4_sel": 13.436809962505594,
+     "bsgs_neg": 2.0328055430007854,
+     "inc_w0": 30.43545518936394
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm2615-5e182037": {
+    "size_bits": 24,
+    "log2_r": 23.2313587511154,
+    "0": {
+     "ic_ksum5_sel": 6.343106411172261,
+     "rho_neg": 1.152087430812702,
+     "inc_sel": 14.929224241380538,
+     "ksum4_sel": 6.471142680984371,
+     "bsgs_neg": 0.9515818090733411,
+     "inc_w0": 13.12762792033307
+    },
+    "0.1": {
+     "ic_ksum5_sel": 6.849373479776104,
+     "rho_neg": 1.2554830587584507,
+     "inc_sel": 16.150058638115947,
+     "ksum4_sel": 7.075194911308813,
+     "bsgs_neg": 1.0463257276537916,
+     "inc_w0": 14.800064019453984
+    },
+    "1": {
+     "ic_ksum5_sel": 11.405777097210681,
+     "rho_neg": 2.1860437102701895,
+     "inc_sel": 27.13756820873463,
+     "ksum4_sel": 12.511664984228792,
+     "bsgs_neg": 1.899020994877847,
+     "inc_w0": 29.851988911542204
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm3365-ba8f1013": {
+    "size_bits": 24,
+    "log2_r": 23.727043478927314,
+    "0": {
+     "ic_ksum5_sel": 6.415485141609046,
+     "rho_neg": 1.0841845839904385,
+     "inc_sel": 13.965014644332106,
+     "ksum4_sel": 6.433292204867466,
+     "bsgs_neg": 0.9284832010442098,
+     "inc_w0": 13.059907057568415
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.051497532052999,
+     "rho_neg": 1.1827272506972772,
+     "inc_sel": 15.267581473938412,
+     "ksum4_sel": 7.133967996326877,
+     "bsgs_neg": 1.0209558116820796,
+     "inc_w0": 14.865092085157459
+    },
+    "1": {
+     "ic_ksum5_sel": 12.775609046048585,
+     "rho_neg": 2.0696112510588267,
+     "inc_sel": 26.99068294039516,
+     "ksum4_sel": 13.440050119461587,
+     "bsgs_neg": 1.853209307422907,
+     "inc_w0": 31.111757333458865
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t12791-9e92c6c2": {
+    "size_bits": 28,
+    "log2_r": 27.670983697309566,
+    "0": {
+     "ic_ksum5_sel": 6.772595648382167,
+     "rho_neg": 0.9147014569913304,
+     "inc_sel": 21.04813806689363,
+     "ksum4_sel": 7.199526540723162,
+     "bsgs_neg": 0.9632791349097237,
+     "inc_w0": 19.202696509852426
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.275133336867943,
+     "rho_neg": 1.0035473306691371,
+     "inc_sel": 22.973587142125158,
+     "ksum4_sel": 7.887226330144103,
+     "bsgs_neg": 1.0594839154026279,
+     "inc_w0": 21.877169455448996
+    },
+    "1": {
+     "ic_ksum5_sel": 11.797972533239927,
+     "rho_neg": 1.8031601937693977,
+     "inc_sel": 40.30262881920889,
+     "ksum4_sel": 14.076524434932582,
+     "bsgs_neg": 1.9253269398387662,
+     "inc_w0": 45.94742596581813
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t20259-8fb841e7": {
+    "size_bits": 28,
+    "log2_r": 27.215986913928436,
+    "0": {
+     "ic_ksum5_sel": 7.065282971623902,
+     "rho_neg": 0.8825886774983195,
+     "inc_sel": 21.850369038721457,
+     "ksum4_sel": 7.230272887513169,
+     "bsgs_neg": 1.0001311237197306,
+     "inc_w0": 18.999781592243995
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.482088702839186,
+     "rho_neg": 0.9678127492911992,
+     "inc_sel": 23.54673204499441,
+     "ksum4_sel": 7.7984878727674705,
+     "bsgs_neg": 1.1000080807419745,
+     "inc_w0": 21.435385386451077
+    },
+    "1": {
+     "ic_ksum5_sel": 11.233340283776739,
+     "rho_neg": 1.7348293954271163,
+     "inc_sel": 38.81399910145095,
+     "ksum4_sel": 12.912422740056188,
+     "bsgs_neg": 1.99890069394217,
+     "inc_w0": 43.35581953431481
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t24271-da5b2687": {
+    "size_bits": 28,
+    "log2_r": 27.610513794307632,
+    "0": {
+     "ic_ksum5_sel": 6.759519096704636,
+     "rho_neg": 1.0163841025589984,
+     "inc_sel": 21.284678385265476,
+     "ksum4_sel": 7.171302621934043,
+     "bsgs_neg": 1.0076346413375754,
+     "inc_w0": 19.124424475966602
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.241687322181888,
+     "rho_neg": 1.115346010131545,
+     "inc_sel": 23.2087559281005,
+     "ksum4_sel": 7.838344692700681,
+     "bsgs_neg": 1.1082514079179198,
+     "inc_w0": 21.757979267558742
+    },
+    "1": {
+     "ic_ksum5_sel": 11.581201351477143,
+     "rho_neg": 2.0060031782844656,
+     "inc_sel": 40.525453813615705,
+     "ksum4_sel": 13.841723329600429,
+     "bsgs_neg": 2.01380230714102,
+     "inc_w0": 45.459972391887966
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-tm5475-0f58a032": {
+    "size_bits": 28,
+    "log2_r": 27.12915013211538,
+    "0": {
+     "ic_ksum5_sel": 7.230511401978396,
+     "rho_neg": 0.9817237230940634,
+     "inc_sel": 21.62083491080749,
+     "ksum4_sel": 7.259391242952973,
+     "bsgs_neg": 0.9189377967168828,
+     "inc_w0": 18.21847668591608
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.651133948002411,
+     "rho_neg": 1.076735734598041,
+     "inc_sel": 23.189705317806347,
+     "ksum4_sel": 7.807916147743428,
+     "bsgs_neg": 1.010674753435497,
+     "inc_w0": 20.456294658212162
+    },
+    "1": {
+     "ic_ksum5_sel": 11.436736862218552,
+     "rho_neg": 1.9318438381338392,
+     "inc_sel": 37.3095389807961,
+     "ksum4_sel": 12.744640290857518,
+     "bsgs_neg": 1.8363073639030236,
+     "inc_w0": 40.59665640887689
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-t8395-a5210489": {
+    "size_bits": 32,
+    "log2_r": 31.47324114508112,
+    "0": {
+     "ic_ksum5_sel": 6.908223106829147,
+     "rho_neg": 0.9715011520708375,
+     "inc_sel": 32.3109466311948,
+     "ksum4_sel": 8.209552426223704,
+     "bsgs_neg": 0.9555545746083597,
+     "inc_w0": 28.717929715821814
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.47461376953031,
+     "rho_neg": 1.0679239357640558,
+     "inc_sel": 34.93186410690186,
+     "ksum4_sel": 8.981910118223572,
+     "bsgs_neg": 1.0510715707237976,
+     "inc_w0": 32.52242221800716
+    },
+    "1": {
+     "ic_ksum5_sel": 12.572129733840782,
+     "rho_neg": 1.9357289890030211,
+     "inc_sel": 58.52012138826544,
+     "ksum4_sel": 15.933129346222385,
+     "bsgs_neg": 1.9107245357627394,
+     "inc_w0": 66.7628547376752
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm14249-af783d1f": {
+    "size_bits": 32,
+    "log2_r": 31.552321360734762,
+    "0": {
+     "ic_ksum5_sel": 6.97222781903697,
+     "rho_neg": 0.9367217833914304,
+     "inc_sel": 31.7547966952171,
+     "ksum4_sel": 8.036218494862895,
+     "bsgs_neg": 1.0804654367459692,
+     "inc_w0": 27.721348883674676
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.573156278611296,
+     "rho_neg": 1.0296857738420033,
+     "inc_sel": 34.3686309121156,
+     "ksum4_sel": 8.797082813772617,
+     "bsgs_neg": 1.1884709949189418,
+     "inc_w0": 31.37856341501717
+    },
+    "1": {
+     "ic_ksum5_sel": 12.981512414780227,
+     "rho_neg": 1.86636168789716,
+     "inc_sel": 57.893138864202086,
+     "ksum4_sel": 15.644861683960116,
+     "bsgs_neg": 2.160521018475697,
+     "inc_w0": 64.29349419709962
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm30557-158f1cf7": {
+    "size_bits": 32,
+    "log2_r": 31.530147947413468,
+    "0": {
+     "ic_ksum5_sel": 6.910704714886179,
+     "rho_neg": 0.9829032204064676,
+     "inc_sel": 32.34686400983548,
+     "ksum4_sel": 7.964228191338422,
+     "bsgs_neg": 0.9260838598759968,
+     "inc_w0": 28.766775163236733
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.493345489682952,
+     "rho_neg": 1.08048142521715,
+     "inc_sel": 35.05086886660372,
+     "ksum4_sel": 8.704332096077083,
+     "bsgs_neg": 1.0186563313618489,
+     "inc_w0": 32.61886155354751
+    },
+    "1": {
+     "ic_ksum5_sel": 12.737112462853915,
+     "rho_neg": 1.9586852685132918,
+     "inc_sel": 59.38691257751797,
+     "ksum4_sel": 15.36526723872503,
+     "bsgs_neg": 1.8518085747345172,
+     "inc_w0": 67.28763906634451
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm70799-e5f3e6f2": {
+    "size_bits": 32,
+    "log2_r": 31.20124644732836,
+    "0": {
+     "ic_ksum5_sel": 7.158375665764917,
+     "rho_neg": 0.9171571129729474,
+     "inc_sel": 32.32211605356518,
+     "ksum4_sel": 8.347526682181027,
+     "bsgs_neg": 0.9675351747414039,
+     "inc_w0": 27.26775128696453
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.6941395226158065,
+     "rho_neg": 1.0080745587792808,
+     "inc_sel": 34.56546157577873,
+     "ksum4_sel": 9.061490322718702,
+     "bsgs_neg": 1.064250453961027,
+     "inc_w0": 30.590137082055204
+    },
+    "1": {
+     "ic_ksum5_sel": 12.516014234273817,
+     "rho_neg": 1.8263315710362817,
+     "inc_sel": 54.755571275700596,
+     "ksum4_sel": 15.48716308755778,
+     "bsgs_neg": 1.934687966937634,
+     "inc_w0": 60.49160923787124
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   }
+  },
+  "table_work_priced_2026_11_08_default": {
+   "icv1-fp20-t375-aef80152": {
+    "size_bits": 20,
+    "log2_r": 19.816547772454367,
+    "0": {
+     "ic_ksum5_sel": 7.144773738386917,
+     "rho_neg": 1.1279977910913905,
+     "inc_sel": 10.579304569396038,
+     "ksum4_sel": 6.602975768075279,
+     "bsgs_neg": 1.0437470142754233,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.867784592862449,
+     "rho_neg": 1.223676407449225,
+     "inc_sel": 12.01329571837408,
+     "ksum4_sel": 7.409844980668794,
+     "bsgs_neg": 1.1468729136585498,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 14.374882283142243,
+     "rho_neg": 2.084783954669736,
+     "inc_sel": 24.91921605917643,
+     "ksum4_sel": 14.671667894010431,
+     "bsgs_neg": 2.075006008106689,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-t457-f60a16c1": {
+    "size_bits": 20,
+    "log2_r": 19.327164464093237,
+    "0": {
+     "ic_ksum5_sel": 7.590013835216801,
+     "rho_neg": 1.2712487762750375,
+     "inc_sel": 10.740880785772893,
+     "ksum4_sel": 6.933530774141695,
+     "bsgs_neg": 0.936071480105528,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.284312231798586,
+     "rho_neg": 1.3781854383093763,
+     "inc_sel": 12.116279073819056,
+     "ksum4_sel": 7.721662373317592,
+     "bsgs_neg": 1.0281989981145967,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 14.532997801034645,
+     "rho_neg": 2.3406153966184244,
+     "inc_sel": 24.494863666234533,
+     "ksum4_sel": 14.814846765900667,
+     "bsgs_neg": 1.8573466601962156,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-tm1079-bf1bb5fd": {
+    "size_bits": 20,
+    "log2_r": 19.16016441355189,
+    "0": {
+     "ic_ksum5_sel": 7.689460507273325,
+     "rho_neg": 1.3468879133682112,
+     "inc_sel": 10.705559643970672,
+     "ksum4_sel": 6.722082297568782,
+     "bsgs_neg": 1.0853710781964028,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.366478273330669,
+     "rho_neg": 1.459967814671425,
+     "inc_sel": 12.041328736859315,
+     "ksum4_sel": 7.452927675328432,
+     "bsgs_neg": 1.1919484428715414,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 14.459638167846748,
+     "rho_neg": 2.4776869264003496,
+     "inc_sel": 24.06325057285711,
+     "ksum4_sel": 14.03053607516528,
+     "bsgs_neg": 2.1511447249477906,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp20-tm1141-c50333f6": {
+    "size_bits": 20,
+    "log2_r": 19.48373116316196,
+    "0": {
+     "ic_ksum5_sel": 7.412087381608088,
+     "rho_neg": 1.232501136831842,
+     "inc_sel": 10.610239872526082,
+     "ksum4_sel": 6.706480176630822,
+     "bsgs_neg": 0.8765587988452066,
+     "inc_w0": null
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.11374075310919,
+     "rho_neg": 1.3363543517630305,
+     "inc_sel": 11.986962255798689,
+     "ksum4_sel": 7.4790446391038445,
+     "bsgs_neg": 0.9626964066748797,
+     "inc_w0": null
+    },
+    "1": {
+     "ic_ksum5_sel": 14.428621096619091,
+     "rho_neg": 2.2710332861437266,
+     "inc_sel": 24.377463705252172,
+     "ksum4_sel": 14.432124801361049,
+     "bsgs_neg": 1.737934877141937,
+     "inc_w0": null
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-t5097-1f48e65c": {
+    "size_bits": 24,
+    "log2_r": 23.64422300277089,
+    "0": {
+     "ic_ksum5_sel": 6.556810694013688,
+     "rho_neg": 1.078810657547073,
+     "inc_sel": 14.48670596359088,
+     "ksum4_sel": 6.538151385848132,
+     "bsgs_neg": 1.0081089681427144,
+     "inc_w0": 13.529954684219595
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.404136609661832,
+     "rho_neg": 1.1765099435516213,
+     "inc_sel": 16.575763095596887,
+     "ksum4_sel": 7.461550662224521,
+     "bsgs_neg": 1.1085055972456321,
+     "inc_w0": 15.772111928790025
+    },
+    "1": {
+     "ic_ksum5_sel": 15.03006985049513,
+     "rho_neg": 2.055803517592557,
+     "inc_sel": 35.37727728365096,
+     "ksum4_sel": 15.77214414961202,
+     "bsgs_neg": 2.0120752591718922,
+     "inc_w0": 35.95152712992391
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm1215-254f2c18": {
+    "size_bits": 24,
+    "log2_r": 23.85340788819961,
+    "0": {
+     "ic_ksum5_sel": 6.156446637606137,
+     "rho_neg": 1.0643561934017638,
+     "inc_sel": 13.68125414943035,
+     "ksum4_sel": 6.356191021702841,
+     "bsgs_neg": 1.0185861211417007,
+     "inc_w0": 12.727526355868676
+    },
+    "0.1": {
+     "ic_ksum5_sel": 6.957674415473767,
+     "rho_neg": 1.1612910309939553,
+     "inc_sel": 15.660901015147166,
+     "ksum4_sel": 7.269950138460683,
+     "bsgs_neg": 1.120008063327609,
+     "inc_w0": 14.838022756939331
+    },
+    "1": {
+     "ic_ksum5_sel": 14.168724416282442,
+     "rho_neg": 2.033704569323677,
+     "inc_sel": 33.477722806598514,
+     "ksum4_sel": 15.493782189281248,
+     "bsgs_neg": 2.0328055430007854,
+     "inc_w0": 33.832490366575236
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm2615-5e182037": {
+    "size_bits": 24,
+    "log2_r": 23.2313587511154,
+    "0": {
+     "ic_ksum5_sel": 6.343106411172261,
+     "rho_neg": 1.152087430812702,
+     "inc_sel": 14.929224241380538,
+     "ksum4_sel": 6.471142680984371,
+     "bsgs_neg": 0.9515818090733411,
+     "inc_w0": 13.12762792033307
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.084929412108642,
+     "rho_neg": 1.2554830587584507,
+     "inc_sel": 16.986358677095264,
+     "ksum4_sel": 7.330380504669062,
+     "bsgs_neg": 1.0463257276537916,
+     "inc_w0": 15.221496271225874
+    },
+    "1": {
+     "ic_ksum5_sel": 13.761336420536061,
+     "rho_neg": 2.1860437102701895,
+     "inc_sel": 35.50056859852782,
+     "ksum4_sel": 15.063520917831289,
+     "bsgs_neg": 1.899020994877847,
+     "inc_w0": 34.066311429261106
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp24-tm3365-ba8f1013": {
+    "size_bits": 24,
+    "log2_r": 23.727043478927314,
+    "0": {
+     "ic_ksum5_sel": 6.415485141609046,
+     "rho_neg": 1.0841845839904385,
+     "inc_sel": 13.965014644332106,
+     "ksum4_sel": 6.433292204867466,
+     "bsgs_neg": 0.9284832010442098,
+     "inc_w0": 13.059907057568415
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.249872130392074,
+     "rho_neg": 1.1827272506972772,
+     "inc_sel": 15.971875705379253,
+     "ksum4_sel": 7.348873811194209,
+     "bsgs_neg": 1.0209558116820796,
+     "inc_w0": 15.220003349096077
+    },
+    "1": {
+     "ic_ksum5_sel": 14.75935502943934,
+     "rho_neg": 2.0696112510588267,
+     "inc_sel": 34.03362525480357,
+     "ksum4_sel": 15.5891082681349,
+     "bsgs_neg": 1.853209307422907,
+     "inc_w0": 34.660869972845056
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t12791-9e92c6c2": {
+    "size_bits": 28,
+    "log2_r": 27.670983697309566,
+    "0": {
+     "ic_ksum5_sel": 6.772595648382167,
+     "rho_neg": 0.9147014569913304,
+     "inc_sel": 21.04813806689363,
+     "ksum4_sel": 7.199526540723162,
+     "bsgs_neg": 0.9632791349097237,
+     "inc_w0": 19.202696509852426
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.603816353044384,
+     "rho_neg": 1.0035473306691371,
+     "inc_sel": 24.106745919735285,
+     "ksum4_sel": 8.214760105005244,
+     "bsgs_neg": 1.0594839154026279,
+     "inc_w0": 22.448513407207084
+    },
+    "1": {
+     "ic_ksum5_sel": 15.084802695004344,
+     "rho_neg": 1.8031601937693977,
+     "inc_sel": 51.63421659531017,
+     "ksum4_sel": 17.351862183543975,
+     "bsgs_neg": 1.9253269398387662,
+     "inc_w0": 51.660865483399
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t20259-8fb841e7": {
+    "size_bits": 28,
+    "log2_r": 27.215986913928436,
+    "0": {
+     "ic_ksum5_sel": 7.065282971623902,
+     "rho_neg": 0.8825886774983195,
+     "inc_sel": 21.850369038721457,
+     "ksum4_sel": 7.230272887513169,
+     "bsgs_neg": 1.0001311237197306,
+     "inc_w0": 18.999781592243995
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.866911776002966,
+     "rho_neg": 0.9678127492911992,
+     "inc_sel": 24.873437781893074,
+     "ksum4_sel": 8.181965410710399,
+     "bsgs_neg": 1.1000080807419745,
+     "inc_w0": 22.104316619670197
+    },
+    "1": {
+     "ic_ksum5_sel": 15.08157101541454,
+     "rho_neg": 1.7348293954271163,
+     "inc_sel": 52.0810564704376,
+     "ksum4_sel": 16.747198119485468,
+     "bsgs_neg": 1.99890069394217,
+     "inc_w0": 50.045131866505976
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-t24271-da5b2687": {
+    "size_bits": 28,
+    "log2_r": 27.610513794307632,
+    "0": {
+     "ic_ksum5_sel": 6.759519096704636,
+     "rho_neg": 1.0163841025589984,
+     "inc_sel": 21.284678385265476,
+     "ksum4_sel": 7.171302621934043,
+     "bsgs_neg": 1.0076346413375754,
+     "inc_w0": 19.124424475966602
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.577331324391014,
+     "rho_neg": 1.115346010131545,
+     "inc_sel": 24.365913215020655,
+     "ksum4_sel": 8.172815114482502,
+     "bsgs_neg": 1.1082514079179198,
+     "inc_w0": 22.341423379873685
+    },
+    "1": {
+     "ic_ksum5_sel": 14.937641373568404,
+     "rho_neg": 2.0060031782844656,
+     "inc_sel": 52.097026682817244,
+     "ksum4_sel": 17.186427547418646,
+     "bsgs_neg": 2.01380230714102,
+     "inc_w0": 51.29441351503741
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp28-tm5475-0f58a032": {
+    "size_bits": 28,
+    "log2_r": 27.12915013211538,
+    "0": {
+     "ic_ksum5_sel": 7.230511401978396,
+     "rho_neg": 0.9817237230940634,
+     "inc_sel": 21.62083491080749,
+     "ksum4_sel": 7.259391242952973,
+     "bsgs_neg": 0.9189377967168828,
+     "inc_w0": 18.21847668591608
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.047714434808197,
+     "rho_neg": 1.076735734598041,
+     "inc_sel": 24.556945599584818,
+     "ksum4_sel": 8.203109989490454,
+     "bsgs_neg": 1.010674753435497,
+     "inc_w0": 21.145663598407513
+    },
+    "1": {
+     "ic_ksum5_sel": 15.402541730276424,
+     "rho_neg": 1.9318438381338392,
+     "inc_sel": 50.98194179858078,
+     "ksum4_sel": 16.696578708327774,
+     "bsgs_neg": 1.8363073639030236,
+     "inc_w0": 47.490345810830384
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-t8395-a5210489": {
+    "size_bits": 32,
+    "log2_r": 31.47324114508112,
+    "0": {
+     "ic_ksum5_sel": 6.908223106829147,
+     "rho_neg": 0.9715011520708375,
+     "inc_sel": 32.3109466311948,
+     "ksum4_sel": 8.209552426223704,
+     "bsgs_neg": 0.9555545746083597,
+     "inc_w0": 28.717929715821814
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.815359311844755,
+     "rho_neg": 1.0679239357640558,
+     "inc_sel": 36.85232333128434,
+     "ksum4_sel": 9.38344656417848,
+     "bsgs_neg": 1.0510715707237976,
+     "inc_w0": 33.490419190476146
+    },
+    "1": {
+     "ic_ksum5_sel": 15.979585156985229,
+     "rho_neg": 1.9357289890030211,
+     "inc_sel": 77.72471363209021,
+     "ksum4_sel": 19.94849380577147,
+     "bsgs_neg": 1.9107245357627394,
+     "inc_w0": 76.44282446236512
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm14249-af783d1f": {
+    "size_bits": 32,
+    "log2_r": 31.552321360734762,
+    "0": {
+     "ic_ksum5_sel": 6.97222781903697,
+     "rho_neg": 0.9367217833914304,
+     "inc_sel": 31.7547966952171,
+     "ksum4_sel": 8.036218494862895,
+     "bsgs_neg": 1.0804654367459692,
+     "inc_w0": 27.721348883674676
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.904689783226991,
+     "rho_neg": 1.0296857738420033,
+     "inc_sel": 36.23717062302841,
+     "ksum4_sel": 9.187763743166887,
+     "bsgs_neg": 1.1884709949189418,
+     "inc_w0": 32.32039064057739
+    },
+    "1": {
+     "ic_ksum5_sel": 16.29684746093718,
+     "rho_neg": 1.86636168789716,
+     "inc_sel": 76.57853597333023,
+     "ksum4_sel": 19.55167097790281,
+     "bsgs_neg": 2.160521018475697,
+     "inc_w0": 73.71176645270188
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm30557-158f1cf7": {
+    "size_bits": 32,
+    "log2_r": 31.530147947413468,
+    "0": {
+     "ic_ksum5_sel": 6.910704714886179,
+     "rho_neg": 0.9829032204064676,
+     "inc_sel": 32.34686400983548,
+     "ksum4_sel": 7.964228191338422,
+     "bsgs_neg": 0.9260838598759968,
+     "inc_w0": 28.766775163236733
+    },
+    "0.1": {
+     "ic_ksum5_sel": 7.827436550739915,
+     "rho_neg": 1.08048142521715,
+     "inc_sel": 36.9338230958288,
+     "ksum4_sel": 9.09802686423438,
+     "bsgs_neg": 1.0186563313618489,
+     "inc_w0": 33.56795433825563
+    },
+    "1": {
+     "ic_ksum5_sel": 16.078023073423548,
+     "rho_neg": 1.9586852685132918,
+     "inc_sel": 78.2164548697687,
+     "ksum4_sel": 19.302214920297992,
+     "bsgs_neg": 1.8518085747345172,
+     "inc_w0": 76.77856691342568
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   },
+   "icv1-fp32-tm70799-e5f3e6f2": {
+    "size_bits": 32,
+    "log2_r": 31.20124644732836,
+    "0": {
+     "ic_ksum5_sel": 7.158375665764917,
+     "rho_neg": 0.9171571129729474,
+     "inc_sel": 32.32211605356518,
+     "ksum4_sel": 8.347526682181027,
+     "bsgs_neg": 0.9675351747414039,
+     "inc_w0": 27.26775128696453
+    },
+    "0.1": {
+     "ic_ksum5_sel": 8.068568510850152,
+     "rho_neg": 1.0080745587792808,
+     "inc_sel": 36.675762416243636,
+     "ksum4_sel": 9.502719529055225,
+     "bsgs_neg": 1.064250453961027,
+     "inc_w0": 31.653822683203884
+    },
+    "1": {
+     "ic_ksum5_sel": 16.260304116617263,
+     "rho_neg": 1.8263315710362817,
+     "inc_sel": 75.85857968034973,
+     "ksum4_sel": 19.89945515092303,
+     "bsgs_neg": 1.934687966937634,
+     "inc_w0": 71.12846524935806
+    },
+    "rho_lt_ksum5_lt_inc_every_weight": true,
+    "ksum4_lt_inc_every_weight": true
+   }
+  }
+ },
+ "gae_band_by_size_mean_of_curves": {
+  "pre_2026_11_08_study_reading": {
+   "P20": {
+    "0": {
+     "ic": 7.459083865621283,
+     "rho": 1.2446589043916203,
+     "inc_sel": 10.658996217916421
+    },
+    "0.1": {
+     "ic": 7.918775207527318,
+     "rho": 1.3495460030482642,
+     "inc_sel": 11.55326199110593
+    },
+    "1": {
+     "ic": 12.055997284681641,
+     "rho": 2.2935298909580593,
+     "inc_sel": 19.60165394981153
+    }
+   },
+   "P24": {
+    "0": {
+     "ic": 6.367962221100283,
+     "rho": 1.0948597164379943,
+     "inc_sel": 14.26554974968347
+    },
+    "0.1": {
+     "ic": 6.967164137353736,
+     "rho": 1.1940028210003262,
+     "inc_sel": 15.563846452910916
+    },
+    "1": {
+     "ic": 12.359981383634807,
+     "rho": 2.0862907620613127,
+     "inc_sel": 27.24851678195793
+    }
+   },
+   "P28": {
+    "0": {
+     "ic": 6.956977279672276,
+     "rho": 0.9488494900356779,
+     "inc_sel": 21.451005100422012
+    },
+    "0.1": {
+     "ic": 7.4125108274728575,
+     "rho": 1.0408604561724806,
+     "inc_sel": 23.229695108256603
+    },
+    "1": {
+     "ic": 11.51231275767809,
+     "rho": 1.8689591514037047,
+     "inc_sel": 39.23790517876791
+    }
+   },
+   "P32": {
+    "0": {
+     "ic": 6.987382826629303,
+     "rho": 0.9520708172104208,
+     "inc_sel": 32.18368084745314
+    },
+    "0.1": {
+     "ic": 7.5588137651100915,
+     "rho": 1.0465414234006225,
+     "inc_sel": 34.72920636534998
+    },
+    "1": {
+     "ic": 12.701692211437186,
+     "rho": 1.8967768791124386,
+     "inc_sel": 57.63893602642152
+    }
+   }
+  },
+  "table_work_priced_2026_11_08_default": {
+   "P20": {
+    "0": {
+     "ic": 7.459083865621283,
+     "rho": 1.2446589043916203,
+     "inc_sel": 10.658996217916421
+    },
+    "0.1": {
+     "ic": 8.158078962775223,
+     "rho": 1.3495460030482642,
+     "inc_sel": 12.039466446212785
+    },
+    "1": {
+     "ic": 14.449034837160681,
+     "rho": 2.2935298909580593,
+     "inc_sel": 24.463698500880064
+    }
+   },
+   "P24": {
+    "0": {
+     "ic": 6.367962221100283,
+     "rho": 1.0948597164379943,
+     "inc_sel": 14.26554974968347
+    },
+    "0.1": {
+     "ic": 7.174153141909079,
+     "rho": 1.1940028210003262,
+     "inc_sel": 16.298724623304643
+    },
+    "1": {
+     "ic": 14.429871429188243,
+     "rho": 2.0862907620613127,
+     "inc_sel": 34.597298485895216
+    }
+   },
+   "P28": {
+    "0": {
+     "ic": 6.956977279672276,
+     "rho": 0.9488494900356779,
+     "inc_sel": 21.451005100422012
+    },
+    "0.1": {
+     "ic": 7.7739434720616405,
+     "rho": 1.0408604561724806,
+     "inc_sel": 24.475760629058456
+    },
+    "1": {
+     "ic": 15.126639203565928,
+     "rho": 1.8689591514037047,
+     "inc_sel": 51.69856038678645
+    }
+   },
+   "P32": {
+    "0": {
+     "ic": 6.987382826629303,
+     "rho": 0.9520708172104208,
+     "inc_sel": 32.18368084745314
+    },
+    "0.1": {
+     "ic": 7.904013539165454,
+     "rho": 1.0465414234006225,
+     "inc_sel": 36.67476986659629
+    },
+    "1": {
+     "ic": 16.153689951990806,
+     "rho": 1.8967768791124386,
+     "inc_sel": 77.09457103888472
+    }
+   }
+  }
+ },
+ "order_holds_across_band": {
+  "pre_2026_11_08": true,
+  "table_work_default": true,
+  "statement": "rho-neg < ksum5-sel < inc-sel at w = 0, 0.1, 1 on all 16 holdout curves under both readings; also ksum4-sel < inc-sel, ksum5-sel and ksum4-sel < inc-w0 (24-32 bits), and bsgs-neg < ksum5-sel, ksum4-sel everywhere. rho is ahead: distance remaining, not a beat."
+ },
+ "dG_count": {
+  "holdout_measured_verified": 5952,
+  "holdout_measured_dG_eq_Q": 5952,
+  "holdout_warmup_dG_eq_Q": 2976,
+  "train_measured_dG_eq_Q": 3264,
+  "train_warmup_dG_eq_Q": 1632,
+  "failures": 0,
+  "workloads": 480,
+  "workloads_with_conflicting_logs": 0
+ },
+ "step4_comparison": {
+  "committed_compare_files": 150,
+  "max_rel_diff_ratio_vs_pre": 1.5539217524825866e-15,
+  "max_rel_diff_ratio_vs_post": 0.2523606364273071,
+  "max_rel_diff_band_triplets": 1.5539217524825866e-15,
+  "max_rel_diff_ci95_linearised_t": 1.9842900222205272e-15,
+  "band_json_rows": 124,
+  "band_json_max_rel_mean_s_pre": 6.478646798884069e-16,
+  "band_json_max_rel_mean_s_post": 0.27818881520814487,
+  "band_json_rank_mismatches": 0,
+  "band_json_ranks": 420,
+  "preflight_json_max_rel": 0.0,
+  "preflight_tablework_json_max_rel": 0.0,
+  "gae_band_per_curve_json_max_rel": 0.0,
+  "readme_brackets": "README brackets equal the committed ci95_bootstrap (ecbench two-stage cluster bootstrap); the validator's two-stage bootstrap with its own RNG lands within 0.002 of each. ecbench's primary ci95 (linearised t) is narrower and matches the validator's linearised interval to 2.0e-15."
+ },
+ "crosschecks": {
+  "ols_exponent_log_total_vs_log_r_per_run_pre": {
+   "rho-neg|w0": 0.4569542814441914,
+   "rho-neg|w0.1": 0.4590200366760303,
+   "rho-neg|w1": 0.4689980604068096,
+   "bsgs-neg|w0": 0.5005469200091728,
+   "bsgs-neg|w0.1": 0.5007265811401154,
+   "bsgs-neg|w1": 0.5015390073777485,
+   "inc-sel|w0": 0.6348413468946169,
+   "inc-sel|w0.1": 0.6342584564219876,
+   "inc-sel|w1": 0.6314139838933154,
+   "ksum4-sel|w0": 0.5252869567683667,
+   "ksum4-sel|w0.1": 0.5255681337354866,
+   "ksum4-sel|w1": 0.5272233988868548,
+   "ksum5-sel|w0": 0.49579091056276126,
+   "ksum5-sel|w0.1": 0.4970608200586168,
+   "ksum5-sel|w1": 0.5040633368702874
+  },
+  "ols_exponent_note": "Validator's own OLS of log(priced GAE) on log(r) over the 384 measured runs per arm; equals analysis/exponents.md to 3 decimals at every arm and weight (estimator identity with ecbench bound fit not established; intervals not checked). ksum5-sel minus inc-sel at w = 0: 0.139.",
+  "ols_exponent_post": {
+   "rho-neg|w0": 0.4569542814441914,
+   "rho-neg|w0.1": 0.4590200366760303,
+   "rho-neg|w1": 0.4689980604068096,
+   "bsgs-neg|w0": 0.5005469200091728,
+   "bsgs-neg|w0.1": 0.5007265811401154,
+   "bsgs-neg|w1": 0.5015390073777485,
+   "inc-sel|w0": 0.6348413468946169,
+   "inc-sel|w0.1": 0.6358435283645983,
+   "inc-sel|w1": 0.639724781619334,
+   "ksum4-sel|w0": 0.5252869567683667,
+   "ksum4-sel|w0.1": 0.5279180427838756,
+   "ksum4-sel|w1": 0.538463661174936,
+   "ksum5-sel|w0": 0.49579091056276126,
+   "ksum5-sel|w0.1": 0.49928974254546454,
+   "ksum5-sel|w1": 0.5143334831125347
+  },
+  "sensitivity_all_counted_work_native": {
+   "P20|ksum5-sel/inc-sel": {
+    "0": 0.6997923362692924,
+    "0.1": 0.5753683509363927,
+    "1": 0.3765055522819483
+   },
+   "P20|ksum4-sel/inc-sel": {
+    "0": 0.6324486017522859,
+    "0.1": 0.5466347630463274,
+    "1": 0.4094813027814946
+   },
+   "P20|ksum5-sel/rho-neg": {
+    "0": 5.992873902482725,
+    "0.1": 6.648925966847064,
+    "1": 9.853178687455976
+   },
+   "P24|ksum5-sel/inc-sel": {
+    "0": 0.44638743916907786,
+    "0.1": 0.3836507368725627,
+    "1": 0.2867600744145813
+   },
+   "P24|ksum4-sel/inc-sel": {
+    "0": 0.45211677338223943,
+    "0.1": 0.39859069521990814,
+    "1": 0.31592493527265564
+   },
+   "P24|ksum5-sel/rho-neg": {
+    "0": 5.81623574736839,
+    "0.1": 6.796528223437477,
+    "1": 11.426537068337788
+   },
+   "P28|ksum5-sel/inc-sel": {
+    "0": 0.32431940820970706,
+    "0.1": 0.2685956228974349,
+    "1": 0.18075409418623067
+   },
+   "P28|ksum4-sel/inc-sel": {
+    "0": 0.33635362490025655,
+    "0.1": 0.29001365397480666,
+    "1": 0.21696452668180138
+   },
+   "P28|ksum5-sel/rho-neg": {
+    "0": 7.332013509761896,
+    "0.1": 8.142283454320527,
+    "1": 11.84456769524378
+   },
+   "P32|ksum5-sel/inc-sel": {
+    "0": 0.217109499057882,
+    "0.1": 0.18819236213118445,
+    "1": 0.14066359359271466
+   },
+   "P32|ksum4-sel/inc-sel": {
+    "0": 0.2529039946434723,
+    "0.1": 0.22380428811968467,
+    "1": 0.17597544464142223
+   },
+   "P32|ksum5-sel/rho-neg": {
+    "0": 7.339141900286809,
+    "0.1": 8.377635481247925,
+    "1": 13.0690016554311
+   },
+   "order_rho_lt_ksum5_lt_inc_all_curves_all_weights": true
+  },
+  "sensitivity_note": "Not a registered or repository reading: charging every counted work_native operation (walk bookkeeping, index builds, row construction) at w on the IC arms keeps every k-sum/inc-sel ratio below 1 and the per-curve order intact; rho records count no such work, so the distance to rho in this reading (up to 13.1x at w = 1) overstates the asymmetry and is not a result.",
+  "freshness": "The 24 curve slugs of this study are distinct; none of the 16 holdout slugs appears in any other research/ file at a0ff77014f (git grep). Records already moved to the artifact store in other studies were not scanned, so this is partial."
+ },
+ "secondary_values": [
+  {
+   "name": "README section 4 (c) derived: inc-w0/inc-rec P24 w=0 ('not a direct comparison')",
+   "claimed": 0.92,
+   "recomputed": 0.9190850850166752,
+   "printed_rounding_of_recomputed": 0.92,
+   "agrees_at_printed_precision": true
+  },
+  {
+   "name": "README section 4 (c) derived: inc-w0/inc-rec P28 w=0 ('not a direct comparison')",
+   "claimed": 0.88,
+   "recomputed": 0.8804410202495928,
+   "printed_rounding_of_recomputed": 0.88,
+   "agrees_at_printed_precision": true
+  },
+  {
+   "name": "README section 4 (c) derived: inc-w0/inc-rec P32 w=0 ('not a direct comparison')",
+   "claimed": 0.88,
+   "recomputed": 0.8736866176278153,
+   "printed_rounding_of_recomputed": 0.87,
+   "agrees_at_printed_precision": false
+  }
+ ],
+ "discrepancies": [
+  {
+   "where": "README.md section 4 (c), third bullet (and the same figures behind section 1 Q3 '8-13%')",
+   "claimed": "0.92, 0.88 and 0.88 at 24, 28 and 32 bits (inc-w0 relative to inc-rec, derived from the k-sum ratios)",
+   "supported_by_records": [
+    0.9191,
+    0.8804,
+    0.8737
+   ],
+   "finding": "At 32 bits the records give 0.8737 (prints as 0.87), not 0.88; the README value matches dividing the rounded ratios 0.217 / 0.248 = 0.875. Off by 0.006 absolute in a secondary, explicitly derived remark; no registered test, verdict or headline number uses it, and the '8-13%' range in section 1 is consistent with 0.874. Correction owed in the README: 0.87 (or 0.874) at 32 bits.",
+   "blocks_validation": false
+  }
+ ],
+ "findings": [
+  "Pricing reading: the study's committed numbers are the pre-2026-11-08 reading. Under the current default (table_insert_attempts priced) no rank or registered verdict changes, but every w > 0 figure moves; the w = 1 distance to rho grows to 6.30x-8.52x. Cite with the reading label.",
+  "Binding: session.json records git_commit = null and git_dirty = null; the measurement binary (fc86ee11, matches BINARY.sha256 and every record) is pinned by hash only. The replay certificate attributes it to 26249b4 plus an uncommitted diff; counts replay identically with a clean build of 6edb2cb36d.",
+  "A/A control: rho-neg-aa equals rho-neg in every counted field on 768 of 768 holdout pairs (deterministic method, same seeds), so in the counted unit it is a duplicate, not a noise estimate; band.json's 'unresolved inside the band' for that pair is a tie. It only informs wall time, which the study does not admit.",
+  "Intervals: README brackets are ecbench's two-stage cluster bootstrap (labelled correctly); the primary linearised ci95 is narrower. No registered verdict depends on which is used (primary upper bounds at w = 0 are at most 0.465 at 24-32 bits; test (d) at 20 bits is unresolved under both).",
+  "The README's 'derived, not a direct comparison' inc-w0/inc-rec values (0.92, 0.88, 0.88) are algebraically identical to the direct pooled ratio of totals (0.9191, 0.8804, 0.8737), because every pair is complete; they lack only an interval.",
+  "Scope disclosed by the study and unchanged: one host (UNQUALIFIED), isolation L0 on every record (counted unit only), no second-host replay of this holdout, no external ECDLP tool, 20-bit incumbent pick on the grid edge, interval scope = workloads (between-curve variance carried only by the per-curve test).",
+  "m = 83 / ECC2K-130 disclosure rules: not applicable (prime-field curves, 20-32 bits)."
+ ],
+ "artifacts": {
+  "dir": "/tmp/claude-0/-home-user/89d98138-21ce-5c29-8de4-5fe8ac9e919c/scratchpad/ksum/validator",
+  "files": {
+   "bootstrap2.json": "12e06b1d8001dda9349e5ff6edf39a3a6eec22e7dd7b363e28c21cbd6f00852f",
+   "bootstrap2.py": "14abc6db5f3e6dfa9e83798d8f637d2bacc5349591cb5f06073d498a21199a75",
+   "build_report.py": "03bbbe7b2aa07dd4821f11feb756c07f70169cad28e1350e09e5ceb185f3e0fc",
+   "check_hashes.py": "647395d456ec01b2dd2740a0955ee60b70795692d69ff9f494a0a5c53d20dc2b",
+   "compare_committed.json": "af8aeab5be7735ae22d83c9f79778d664cd7f61a0175319badab314c245f5a9b",
+   "compare_committed.py": "d5f707b9cc5e22b2a928f3c7cf6ce096d133399cfcc230e7e46cc2ff9898197e",
+   "freshness_grep.txt": "930dcf857bd9792bf01d21f0dcedf131e40dabcf224b4f7a1c5a0fb8d35d6386",
+   "gate_check.py": "9c3c747fbf5be7312a052495ae3a008d7f467f14edd73640d696bfe34754418f",
+   "hashes.json": "f931fed587f8dd25b4e6bdf17281d71a47dc94d5d92197a0f0ab03bb7d366eca",
+   "integrity.json": "93695dfb516b5e962be7463343f83203700c4bf91a9d742862fed15f599c6b8f",
+   "integrity.py": "0f57071fb0a0f98adf4c0abcd120075cabfd6dbca559fd1d205a64fec9852339",
+   "recompute.json": "ad875d83e7caef4b6d70f4fc28ce3eee31a650d108016c883940bdebe6d04fef",
+   "recompute.py": "cd64b03300f7042eb4f089d4b40849b558bc1c11340f8cb82b5ef8c2165786bc",
+   "sensitivity.json": "beaafffda6be4bf072349e614e750cdd3cb3657a86a81639259c896b0e280f63",
+   "sensitivity.py": "8c5e2b68bdd42c4b04fdcf4fc55bf877a35b4d5794ddafd6cb1271d6449c2a06",
+   "survey.py": "e5e06bd144834e2d0fa3da5f06fc25e1c2753efedc9a323109a9de3bf0c717f8",
+   "write_md.py": "ef895533ca840c9228c5652cb00a42c9b85e335140489d36e36e4a28689c37c9"
+  }
+ },
+ "commands": [
+  "python3 -I check_hashes.py ../sessions hashes.json",
+  "python3 -I recompute.py ../sessions recompute.json /home/user/crypto/docs/curves/sources/prime-ksum-pooled-20261029.json",
+  "python3 -I integrity.py ../sessions /home/user/crypto/research/prime_ksum_pooled_20261029 integrity.json",
+  "python3 -I compare_committed.py recompute.json /home/user/crypto/research/prime_ksum_pooled_20261029/analysis .. compare_committed.json",
+  "python3 -I bootstrap2.py ../sessions bootstrap2.json",
+  "python3 -I sensitivity.py ../sessions sensitivity.json",
+  "python3 -I build_report.py"
+ ],
+ "environment": {
+  "python": "3.13.18 (stdlib only)",
+  "host": "Linux 6.18 x86_64 (validator sandbox)",
+  "ecbench_run_by_validator": false
+ }
+}

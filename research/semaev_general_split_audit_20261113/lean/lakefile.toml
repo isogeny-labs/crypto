@@ -1,0 +1,11 @@
+name = "semaev_general_split_audit"
+version = "0.1.0"
+defaultTargets = ["SemaevGeneralSplitAudit"]
+
+[[require]]
+name = "semaev_symmetry_audit"
+path = "../../semaev_symmetry_audit_20261113/lean"
+
+[[lean_lib]]
+name = "SemaevGeneralSplitAudit"
+roots = ["RetainedInterchange", "CubicInterchange", "TowerEvaluation", "ListPermutation", "KernelBase", "ListKernels", "SplitInduction", "UniversalSplit", "NaturalDegree", "LastVariable", "SplitCertificate"]

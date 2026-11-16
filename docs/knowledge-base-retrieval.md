@@ -54,9 +54,36 @@ Top-1 8/9 (88.9%), top-5 9/9 (100%), MRR 0.917.
   session that names a real query the lexical backend misses. Record the query
   and the expected record first, then change the index, then rerun the probe.
 
+## Index fix, 2026-11-06
+
+The `crypto` source root in the shared KB config was a feature-branch checkout
+(`feat/koblitz-norm-base-20261023`, commit `6a0414df`), not `main`. About 800
+current docs, including this page and the new procedure page, were not
+searchable. The root now points at a sparse `main` mirror under
+`research-kb-sources/`, and `docs/session-logs/**` is excluded because those
+records are long, noisy and readable locally.
+
+Measured before and after the refresh, same fixed set:
+
+| query | before | after |
+|:--|--:|--:|
+| how do I query the shared knowledge base and record a receipt | missing | 1 |
+| curve identity across repositories ecdb comparisons | 4 | 4 |
+| top-1 / top-5 / MRR | 8/9, 9/9, 0.825 | 9/10, 10/10, 0.925 |
+
+The procedure gap is closed. The curve-identity row is a duplicate-copy
+question, not a lost record: the same locked `docs/curve-identities.md` exists
+in three repositories and the query also names ecdb. The query now accepts any
+repository's copy or `crypto-autoresearcher:docs/ecdb.md`, and passes at rank
+4 on the ecdb doc. Down-weighting duplicate copies would be a separate ranking
+change, not a reason to revert the index.
+
 ## Rules for changing the set
 
 - Add a query only when a real session needed it, and record the expected
   `repo:path` from the source itself.
 - Never remove a failing query after a change; a lower number is information.
+- A locked shared file that exists in several repositories may list
+  `accept_any` with every copy plus any other correct answer; the rank is the
+  first accepted result. The query still has one intent, not a looser one.
 - Keep the set fixed between index changes so the delta means something.

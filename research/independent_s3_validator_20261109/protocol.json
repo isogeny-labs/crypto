@@ -1,0 +1,475 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "independent-s3-20261109",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/independent_s3_validator_20261109",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "original_requirements": "../theorem_census_20261109/README.md",
+    "formal_source": "lean/ValidatorFoundation.lean"
+  },
+  "question": "Does a separately implemented Rust quadratic-field/point-sum validator reproduce both directions of the recorded S3 prime-field population, locally and on a separately provisioned free GitHub-hosted runner?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Actual finite quadratic extensions supply all base-coordinate square lifts and the actual Mathlib pair oracle matches S3, under its stated hypotheses. Decided by Lean.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Full Rust aggregates match the seen known-answer C++ population on each execution host, with every internal inverse/root/point check passing.",
+      "class": "exact_computation",
+      "decided_by": [
+        "known_answer"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Remote execution requires actual workflow/job output. An API/registration rejection is not-completed, not independent validation.",
+      "class": "exact_computation",
+      "decided_by": [
+        "known_answer"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Compiler/runtime proofs, signed execution verification, binary/S4/S5/degree validation and full independence from the producing author are outside scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "local",
+      "role": "reference",
+      "description": "Fresh local Rust compilation and complete known-answer six-field population",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "275f566e0750db6f3eb58e8325ba03c29e7ab3f5",
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=3",
+            "-C",
+            "overflow-checks=yes",
+            "-D",
+            "warnings",
+            "src/main.rs",
+            "-o",
+            "<OUT>/validator"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "mode": "--prime-s3",
+          "binary_identity": "compiled separately per host; measured before native work"
+        },
+        "env": {
+          "S3_VALIDATOR_ARM": "local"
+        }
+      },
+      "parameters": {
+        "fields": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19
+        ],
+        "models": 942,
+        "tuples": 4188162,
+        "known_zeros": 244236
+      }
+    },
+    {
+      "id": "github-hosted",
+      "role": "reference",
+      "description": "Same frozen Rust source compiled on a distinct standard GitHub-hosted Ubuntu runner; actual job or retained rejection",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=3",
+            "-C",
+            "overflow-checks=yes",
+            "-D",
+            "warnings",
+            "src/main.rs",
+            "-o",
+            "<OUT>/validator"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "mode": "--prime-s3",
+          "binary_identity": "compiled separately per host; measured before native work",
+          "runner": "standard ubuntu-24.04; measured GitHub commit/compiler/binary; frozen file hashes are binding"
+        },
+        "env": {
+          "S3_VALIDATOR_ARM": "github-hosted"
+        }
+      },
+      "parameters": {
+        "workflow": ".github/workflows/theorem-audit-independent-s3.yml",
+        "fields": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19
+        ],
+        "models": 942,
+        "tuples": 4188162,
+        "known_zeros": 244236
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact known-answer replication, no variance or timing inference. Host/compiler variation is measured, not an A/A noise claim."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Actual Lean F3 control54zeros and held-out Rust p3/p23 calibration pass; complete seen C++ population is the fixed known answer."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No sampling or null-distribution inference; exhaustive fixed model/tuple population and exact equality."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "population",
+        "levels": [
+          "Complete six-prime S3 model/tuple population; identical to recorded C++ bounds."
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+        "how": "Frozen Rust source, driver, comparator, workflow and reference hashes."
+      },
+      {
+        "name": "host_compiler_binary",
+        "treatment": "measured",
+        "value": [
+          "local",
+          "standard GitHub-hosted ubuntu24.04"
+        ],
+        "how": "Compile per host, record actual compiler/source/binary/OS/kernel/CPU before native work. No clock comparison."
+      },
+      {
+        "name": "reference",
+        "treatment": "fixed",
+        "value": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+        "how": "Previously seen C++data; no blind/new-discovery claim."
+      },
+      {
+        "name": "order_seeds",
+        "treatment": "fixed",
+        "value": "local then permitted dispatch; no RNG",
+        "how": "Deterministic exhaustive loops; seed0 means no random draw."
+      },
+      {
+        "name": "analysis",
+        "treatment": "fixed",
+        "value": "unmasked exact equality",
+        "how": "Native inline checks and frozen aggregate comparator; no favourable-subset selection."
+      },
+      {
+        "name": "availability",
+        "treatment": "measured",
+        "value": "new manual workflow may require default-branch registration or permissions",
+        "how": "One dispatch request; retain actual rejection as not-completed. No trusted-workflow repurposing."
+      },
+      {
+        "name": "budget",
+        "treatment": "fixed",
+        "value": {
+          "paid_spend": 0,
+          "repository": "isogeny-labs/crypto",
+          "visibility": "public",
+          "runner": "ubuntu-24.04 standard",
+          "no_eks": true,
+          "no_gpu": true,
+          "no_larger_runner": true,
+          "no_secrets": true,
+          "no_cache": true,
+          "no_artifact_upload": true,
+          "billing_url": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+          "billing_text_sha256": "95f86232c84b051913fe421e617df65f9993c6f86ec8e58c4c78ffbdc84fb937"
+        },
+        "how": "Public standard runner only; read-only/no secrets/cache/artifact upload; approved local checkpoints."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "known_answer",
+        "arms": [
+          "local",
+          "github-hosted"
+        ],
+        "differs_in": [
+          "host_compiler_binary"
+        ],
+        "design": "absolute",
+        "threshold": "Each executed complete run must exactly match942models/4188162tuples/244236zeros and all six per-field C++records,0false/missing zeros,0inline failures. Missing remote job is explicitly not-validated."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Local then permitted remote dispatch; exhaustive deterministic equality, no clock/statistical inference.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "No RNG; exhaustive fixed populations."
+    },
+    "instance_sampling": {
+      "rule": "One complete known-answer six-field population on each host; no sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Seen C++ known-answer replication; every field/model/tuple retained."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "No statistical test or confidence interval; alpha is unused schema metadata. Exact complete known-answer checks only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 120,
+      "per_sample_seconds": 30,
+      "threads": 1,
+      "estimated_total_seconds": 180,
+      "measured_on": "Native held-out local p3=0.005s,p23=0.746s; p23 has6156502tuples versus4188162full. Remote host unvisited; explicitly budget proxy, not invented remote timing. Conservative compile60s and native30s per host; queue time excluded."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "fields",
+        "name": "Complete fields",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "Six expected prime-field records, no duplicates/missing fields.",
+        "source": "actual.jsonl/comparison.json",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "models",
+        "name": "Nonsingular models",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "942short models across the six fields.",
+        "source": "actual.jsonl:curves",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "tuples",
+        "name": "Ordered triples",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "4188162ordered base-coordinate triples.",
+        "source": "actual.jsonl:tuples",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "zeros",
+        "name": "S3 zeros",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "244236known-answer zero tuples; both directional discrepancy counts must0.",
+        "source": "actual.jsonl:zeros,false_zeros,missing_zeros",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "comparison",
+        "name": "Known-answer equality",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "Exact per-field aggregate comparison to the pinned seen C++reference.",
+        "source": "comparison.json",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "source/binary/workflow/reference SHA256",
+      "actual compiler,git commit,OS,kernel,CPU",
+      "all outputs/build/native/comparison exits",
+      "GitHub dispatch/job metadata or exact rejection"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "mixed",
+    "queue": "local then GitHub Actions workflow_dispatch",
+    "measurement_class": "search",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One full local call and one permitted manual remote dispatch. Retain every output/rejection; no outcome-dependent rerun.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Compile timeout60s,native30s,remote job5minutes; no paid or alternate-runner retry.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "known_answer_pass for each actually completed exact match. Independent-host replication requires actual GitHub-hosted job evidence; rejection or missing execution is not_validated, never inferred from a prepared workflow.",
+    "comparison_ids": [
+      "known_answer"
+    ],
+    "statistic": "exact complete per-field integer equality and native inverse/root/point checks",
+    "interval": "none_exact",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancies from the fixed reference; no population inference",
+    "verdict_vocabulary": [
+      "known_answer_pass",
+      "not_validated",
+      "discrepancy"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1"
+    },
+    "inputs": [
+      "fixed six-field population",
+      "../theorem_census_20261109/evidence/semaev-native.jsonl"
+    ],
+    "outputs": [
+      "evidence/local/actual.jsonl",
+      "evidence/remote-job.log or dispatch-response.json",
+      "export.json",
+      "reports/run-20261109-independent/report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "reports/run-20261109-independent/validation.svg"
+    ],
+    "report_dir": "reports/run-20261109-independent"
+  },
+  "inadmissible": [
+    "Calling seen C++reference/preflight a blind discovery.",
+    "Claiming independent-host execution before actual job evidence.",
+    "Rerouting a rejected dispatch through a trusted verifier or paid/EKS/larger runner.",
+    "Changing frozen Rust,driver,comparator,workflow or reference after data without a labelled amendment.",
+    "Claiming compiler/runtime proof, signed execution standing or complete binary/S4/S5/degree validation."
+  ],
+  "literature": [
+    {
+      "ref": "Existing S3Roots/S3Completion Lean proofs and recorded C++census; original Semaev PDF prior403",
+      "provenance": "internal",
+      "claim": "Actual S3 point-domain formula and stated conditions; original unread-source gap remains explicit."
+    },
+    {
+      "ref": "Mathlib pinned finite-field square criterion and AdjoinRoot basis; lean/ValidatorFoundation.lean",
+      "provenance": "internal",
+      "claim": "Actual quadratic square-lift/field-cardinality/oracle foundations, not a synthetic operation table."
+    },
+    {
+      "ref": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "provenance": "retrieved",
+      "claim": "Standard public GitHub-hosted runner compute remains free; larger runners billed. Use no cache/artifact upload."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820",
+    "commit": "275f566e0750db6f3eb58e8325ba03c29e7ab3f5",
+    "frozen_at": "2026-11-09T05:43:59Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+    "workflow_sha256": "dd140f522e063b64cb362d9004c3420172058359b63d37c043c71b5941ee6b6a",
+    "reference_sha256": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+    "provenance_sha256": "e43368b1e37a949f42c9dedb47b0b1b84425a15af3b20e2f02eb45d0572f6581",
+    "original_item": 13,
+    "paid_spend": 0,
+    "remote_binary_identity": "Unknown until compiled on the remote host; frozen source/build and recorded actual digest are binding.",
+    "checkpoint_exception": "Approved local checkpoints for this audit; bounded independent files; no paid compute."
+  }
+}

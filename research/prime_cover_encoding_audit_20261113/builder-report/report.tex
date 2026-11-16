@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,graphicx,hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+{\Large Paired graph builder: exact construction checks}\par
+2026-11-13. Unsigned producer evidence [pcc:unverified].
+
+The builder emits direct and graph systems from each identical saved case.
+Every graph polynomial is symbolically substituted before export: all19
+original equations are reproduced coefficient-for-coefficient and all four
+added graph constraints become zero. Source freeze \path{00ffe72fbe};
+prospective development contract \path{bf82ba3d4}.
+
+\begin{center}
+\begin{tabular}{lcc}
+Saved input & Direct $(n,\#eq,\deg_{\max})$ & Graph $(n,\#eq,\deg_{\max})$\\\hline
+Reference & $(18,19,4)$ & $(22,23,4)$\\
+Cubic & $(18,19,12)$ & $(22,23,4)$
+\end{tabular}
+\end{center}
+
+\includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{construction.pdf}
+
+\textbf{Controls.} All 17 tests pass: four builder controls plus 13 maintained
+SHA-256 tests. Independent symmetric scalar S3 on two small fields, exact
+projection for both saved inputs, deterministic lift vectors, changed
+coefficient/image negative controls and chain boundaries. No genuine elliptic
+witness is asserted. Original field-audit output and generic Lean inverse-map
+proof are unchanged; concrete polynomial attachment is checked natively.
+
+\textbf{Artifacts.} JSON coefficients and msolve-style text are pinned by each
+manifest. External consumer ingestion is unvalidated. The exporter requires
+one of the two frozen input hashes and creates a fresh output directory.
+Data statement \path{PCC-20261113-b52e23} is unsigned, not a signed verdict.
+Test001 tool status1 conflicts with explicit process receipt0/17 passes; both
+are retained. Test002 after the output-guard change has tool/process exit0.
+Release build exit0; five dead-code warnings for development controls.
+
+\textbf{Interpretation.} The previous source directly substituted the cubic;
+this explicit graph representation was untested. Its reduced input degree
+justifies a matched comparison. Added variables may erase the benefit;
+elimination returns the same direct system. No bound on solving degree,
+critical pairs, memory or runtime follows. The original finite W gate stands.
+
+\textbf{Next decision.} Validate consumer ingestion and a genuine witness;
+freeze order/resources; obtain live admission; compare complete sparse work on
+identical inputs. No solver/timing run here. Public-input relation finding and
+a uniform sub-exponential bit bound remain unestablished.
+
+\textbf{Sources.} Frozen pilot \path{3466f3be9e}, round5 records/protocol,
+Galbraith15.8.1--15.8.2, prior auxiliary-cover review. KB unavailable; graph
+encoding is standard, with no novelty or exhaustive prior-art claim.
+\end{document}

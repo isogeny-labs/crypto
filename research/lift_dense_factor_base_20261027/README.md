@@ -37,6 +37,23 @@ avoid the twist?
 | prime-degree repulsion, exact all-lift 4-subspace counts / E₄ (curves vs density-paired nulls) | N = 11: 0.921 ± 0.018 vs 1.027 ± 0.053, one-sided permutation p = 2·10⁻⁵ (**confirmed**, H-C); N = 9: 0.68 vs 1.02; N = 13: 0.981 vs 0.994, p = 0.019 |
 | largest all-lift subspace, prime N ≤ 13 (exact) | curve median ≤ null median (4/4, 4/5, 5/5 at N = 9, 11, 13); planted subspaces recovered 100 %. Above N = 13 the budgeted search found 0 of the planted subspaces, so those values are 'found under budget' only |
 
+**Note, 2026-11-06 (2-torsion pairing,
+[`lift_dense_torsion_pairing_20261106`](../lift_dense_torsion_pairing_20261106/README.md),
+[pcc:unverified]).** Adding T = (0, √b) maps x to √b/x, which maps the line
+u·F_{2^d} to itself exactly when u ∈ b^{1/4}·F_{2^d}. That line is valid
+iff Tr_{N/d}(b^{1/4}) = 0. On it:
+
+- the columns pair;
+- each raw relation repeats about 2^{n−1} times in the odd-order part;
+- measured on toy fields, rows per column come to about 2× the standard
+  base, not 2^{n−1}·2.
+
+So when building lines, exclude u ∈ b^{1/4}·F_{2^d}. No row of this study
+is affected:
+
+- none of the 27 twisted lines measured here lies on that line;
+- no c2pnb curve has one (180 and 330 valid u, 0 of them T-stable).
+
 **What it means for the targets.**
 - **ECC2K-130** (N = 131 prime): no gain. Two facts are theorems:
   - the Weil bound caps all-lift dimension at N/2 + 1;

@@ -24,10 +24,11 @@ pub const ID: &str = "ic.aps_v1";
 /// instrument and counts the core work the frozen id leaves in a prose
 /// `unpriced` entry; its `unpriced` names counters only.
 pub const ID_V2: &str = "ic.aps_v2";
+pub const ID_V3: &str = "ic.aps_v3";
 
 /// Both ids run [`solve`].
 pub fn is_aps(id: &str) -> bool {
-    id == ID || id == ID_V2
+    id == ID || id == ID_V2 || id == ID_V3
 }
 pub const PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -97,13 +98,27 @@ pub const PARAMS: &[ParamDecl] = &[
     },
 ];
 
+/// Every search-changing choice is explicit on the new, unfrozen method ID.
+pub const PARAMS_V3: &[ParamDecl] = &[
+    ParamDecl {name:"encoding",default:None,help:"six existing encodings or line_chart3 (two-parameter nonhorizontal chart plus required horizontal cell)"},
+    PARAMS[1],PARAMS[2],PARAMS[3],
+    ParamDecl {name:"subset_size",default:None,help:"0: explicit subset_profile is authoritative on v3"},
+    PARAMS[5],PARAMS[6],PARAMS[7],PARAMS[8],PARAMS[9],PARAMS[10],PARAMS[11],PARAMS[12],
+    ParamDecl {name:"subset_profile",default:None,help:"comma-separated original partition sizes, each 1..4"},
+    ParamDecl {name:"guess",default:None,help:"none or explicit original coordinate index"},
+    ParamDecl {name:"trace",default:None,help:"off or certified; bounded per-target native trace pool"},
+    ParamDecl {name:"trace_entries",default:None,help:"1..16 retained traces"},
+    ParamDecl {name:"trace_words",default:None,help:"1..1000000 retained trace words; transient F4 memory remains separate"},
+    ParamDecl {name:"growth",default:None,help:"none, retained_full or frontier; full and frontier retain identical nested bases"},
+    ParamDecl {name:"growth_ceiling",default:None,help:"1..4 maximum points per partition before a fresh base; at least initial profile"},
+];
+
 #[derive(Clone, Debug)]
 struct Config {
     encoding: Encoding,
     legacy: bool,
     first: bool,
     labels: Labels,
-    size: usize,
     attempts: usize,
     degree: u32,
     budget: Duration,
@@ -112,10 +127,20 @@ struct Config {
     beta: u64,
     lambda: u64,
     prune: bool,
+    profile: Vec<usize>,
+    chart: bool,
+    guess: Option<usize>,
+    trace: bool,
+    trace_entries: usize,
+    trace_words: usize,
+    growth: bool,
+    frontier: bool,
+    growth_ceiling: usize,
 }
 
 impl Config {
     fn parse(m: &ResolvedMethod) -> Result<Self, String> {
+        let v3 = m.id == ID_V3;
         let text = |key: &str| {
             m.params
                 .get(key)
@@ -142,11 +167,43 @@ impl Config {
             "partitioned3" => Encoding::Partitioned3,
             "unordered3" => Encoding::Unordered3,
             "line3" => Encoding::Line3,
+            "line_chart3" if v3 => Encoding::Line3,
             "expanded4" => Encoding::Expanded4,
             "split4" => Encoding::Split4,
             "block_symmetric4" => Encoding::BlockSymmetric4,
             _ => return Err("unsupported APS encoding".into()),
         };
+        let size = if v3 {
+            number("subset_size", 0, 0)? as usize
+        } else {
+            number("subset_size", 1, 4)? as usize
+        };
+        let arity = if matches!(
+            encoding,
+            Encoding::Partitioned3 | Encoding::Unordered3 | Encoding::Line3
+        ) {
+            3
+        } else {
+            4
+        };
+        let profile = if v3 {
+            text("subset_profile")?
+                .split(',')
+                .map(|s| {
+                    s.parse::<usize>()
+                        .map_err(|_| "invalid APS partition profile".to_string())
+                })
+                .collect::<Result<Vec<_>, _>>()?
+        } else {
+            vec![size; arity]
+        };
+        if profile.len() != arity || profile.iter().any(|n| !(1..=4).contains(n)) {
+            return Err("APS profile must have one size 1..4 per original partition".into());
+        }
+        let growth = if v3 { text("growth")? } else { "none" };
+        if !matches!(growth, "none" | "retained_full" | "frontier") {
+            return Err("APS growth must be none, retained_full or frontier".into());
+        }
         let out = Self {
             encoding,
             legacy: choose("roots", "exact", "legacy")?,
@@ -156,7 +213,6 @@ impl Config {
             } else {
                 Labels::Random
             },
-            size: number("subset_size", 1, 4)? as usize,
             attempts: number("attempts", 1, 128)? as usize,
             degree: number("degree", 1, 24)? as u32,
             budget: Duration::from_millis(number("budget_ms", 1, 60_000)?),
@@ -165,6 +221,31 @@ impl Config {
             beta: number("beta", 0, core::MAX_FIELD - 1)?,
             lambda: number("lambda", 0, 1 << 20)?,
             prune: choose("prune", "false", "true")?,
+            profile,
+            chart: v3 && text("encoding")? == "line_chart3",
+            guess: if v3 && text("guess")? != "none" {
+                Some(number("guess", 0, arity as u64 - 1)? as usize)
+            } else {
+                None
+            },
+            trace: v3 && choose("trace", "off", "certified")?,
+            trace_entries: if v3 {
+                number("trace_entries", 1, 16)? as usize
+            } else {
+                1
+            },
+            trace_words: if v3 {
+                number("trace_words", 1, 1_000_000)? as usize
+            } else {
+                1
+            },
+            growth: growth != "none",
+            frontier: growth == "frontier",
+            growth_ceiling: if v3 {
+                number("growth_ceiling", 1, 4)? as usize
+            } else {
+                size
+            },
         };
         if out.legacy && out.first {
             return Err("legacy APS roots require exhaustive stopping".into());
@@ -172,7 +253,7 @@ impl Config {
         if !out.orbit && (out.beta != 0 || out.lambda != 0 || out.prune) {
             return Err("non-orbit APS requires beta=lambda=0 and prune=false".into());
         }
-        if out.orbit && (out.arity() != 3 || out.size > 3) {
+        if out.orbit && (out.arity() != 3 || out.profile.iter().any(|n| *n > 3)) {
             return Err(
                 "cubic orbit APS requires arity three and at most three seed points per partition"
                     .into(),
@@ -180,6 +261,21 @@ impl Config {
         }
         if out.prune && out.encoding != Encoding::Line3 {
             return Err("APS pruning requires line3".into());
+        }
+        if v3 && out.legacy {
+            return Err("APS v3 requires exact-domain traversal".into());
+        }
+        let coordinates = matches!(
+            out.encoding,
+            Encoding::Partitioned3 | Encoding::Expanded4 | Encoding::Split4
+        );
+        if (out.guess.is_some() || out.growth) && !coordinates {
+            return Err("APS guessing/growth requires a coordinate encoding".into());
+        }
+        if out.growth && (out.orbit || out.profile.iter().any(|n| *n > out.growth_ceiling)) {
+            return Err(
+                "growth requires no orbit and a ceiling covering the initial profile".into(),
+            );
         }
         Ok(out)
     }
@@ -212,10 +308,12 @@ pub fn applicable(m: &ResolvedMethod, inst: &PrimeInstance) -> Result<(), String
     if inst.generator.0 >= inst.curve.p || inst.generator.1 >= inst.curve.p {
         return Err("APS generator must have canonical field coordinates".into());
     }
-    if c.arity() * c.size * if c.orbit { 3 } else { 1 } > 32 {
+    if c.profile.iter().sum::<usize>() * if c.orbit { 3 } else { 1 } > 32 {
         return Err("APS expanded base exceeds 32 abscissae".into());
     }
-    if (c.arity() * c.size * if c.orbit { 3 } else { 1 }) as u64 > inst.r.saturating_sub(1) / 2 {
+    if (c.profile.iter().sum::<usize>() * if c.orbit { 3 } else { 1 }) as u64
+        > inst.r.saturating_sub(1) / 2
+    {
         return Err("APS base exceeds subgroup abscissa population".into());
     }
     if c.labels == Labels::Guaranteed {
@@ -370,6 +468,27 @@ struct Attempt {
     error: Option<String>,
     error_stage: Option<&'static str>,
     deadline_exhausted: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    lead: Option<LeadAttempt>,
+}
+
+#[derive(Clone, Serialize)]
+struct LeadAttempt {
+    profile: Vec<usize>,
+    retained_base: bool,
+    new_draws: usize,
+    sampling_complete: bool,
+    skipped_parts: Option<Vec<Vec<u64>>>,
+    cells: Vec<CellExport>,
+    plan_sha256: Option<String>,
+    trace_before: crate::cryptanalysis::f4_fp::TraceStats,
+    trace_after: crate::cryptanalysis::f4_fp::TraceStats,
+}
+#[derive(Clone, Serialize)]
+struct CellExport {
+    system: SystemExport,
+    system_sha256: String,
+    fixed_coordinates: Vec<u64>,
 }
 
 /// The mathematical witness and the timed outcome are separate. A valid late
@@ -460,7 +579,9 @@ pub fn solve(
     q: PrimePoint,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    let v2 = m.id == ID_V2;
+    let v3 = m.id == ID_V3;
+    let profile_ir = v3 && std::env::var("ECBENCH_CALLGRIND_SOLVE").as_deref() == Ok("1");
+    let v2 = m.id == ID_V2 || v3;
     // The core's group-operation and polynomial tallies are per thread: start
     // from zero, before the plan-time checks `applicable` repeats in the solve.
     core::reset_core_work();
@@ -474,7 +595,24 @@ pub fn solve(
     let mut audit_ops = GroupOps::default();
     let mut verification_ops = GroupOps::default();
     let mut counters = BTreeMap::<String, u64>::new();
+    let mut retained: Option<LabeledBase> = None;
+    let mut covered = false;
+    let mut trace_pool = if v3 && c.trace {
+        Some(crate::cryptanalysis::f4_fp::TracePool::new(
+            &format!(
+                "APS:{:?}:chart={}:guess={:?}:prune={}",
+                c.encoding, c.chart, c.guess, c.prune
+            ),
+            c.trace_entries,
+            c.trace_words,
+        )?)
+    } else {
+        None
+    };
     clock.mark(ONLINE[0]);
+    if profile_ir {
+        crate::cryptanalysis::ic_measurement::callgrind_dump(b"ecbench_before_online\0");
+    }
     let target = f.point(q.x, q.y);
     let target_error = if q.infinity || q.x >= inst.curve.p || q.y >= inst.curve.p {
         Some("noncanonical or infinite APS target".into())
@@ -485,6 +623,22 @@ pub fn solve(
         for index in 0..c.attempts {
             clock.mark(ONLINE[0]);
             let started = Instant::now();
+            let old = retained
+                .as_ref()
+                .filter(|b| c.growth && b.parts.iter().any(|p| p.len() < c.growth_ceiling));
+            let profile = old.map_or_else(
+                || c.profile.clone(),
+                |b| {
+                    b.parts
+                        .iter()
+                        .map(|p| (p.len() + 1).min(c.growth_ceiling))
+                        .collect()
+                },
+            );
+            let skipped = old
+                .filter(|_| covered && c.frontier)
+                .map(|b| b.parts.clone());
+            let trace_before = trace_pool.as_ref().map(|p| p.stats()).unwrap_or_default();
             let mut row = Attempt {
                 index,
                 seed: seed.wrapping_add(index as u64),
@@ -499,18 +653,37 @@ pub fn solve(
                 error: None,
                 error_stage: None,
                 deadline_exhausted: false,
+                lead: v3.then(|| LeadAttempt {
+                    profile: profile.clone(),
+                    retained_base: old.is_some(),
+                    new_draws: 0,
+                    sampling_complete: false,
+                    skipped_parts: skipped.clone(),
+                    cells: vec![],
+                    plan_sha256: None,
+                    trace_before: trace_before.clone(),
+                    trace_after: trace_before,
+                }),
             };
             let result = (|| -> Result<(), String> {
                 row.error_stage = Some("sampling");
-                let base = core::sample_base(
-                    &f,
-                    g,
-                    target,
-                    &vec![c.size; c.arity()],
-                    c.labels,
-                    row.seed,
-                    c.draws,
-                )?;
+                let base = if v3 {
+                    let draw = core::leads::sample_growth(
+                        &f, g, target, old, &profile, c.labels, row.seed, c.draws,
+                    )?;
+                    let lead = row.lead.as_mut().unwrap();
+                    lead.new_draws = draw.new_draws;
+                    lead.sampling_complete = draw.complete;
+                    if !draw.complete {
+                        row.base = Some(draw.base);
+                        return Err(
+                            "factor-base sampling budget exhausted; partial draw retained".into(),
+                        );
+                    }
+                    draw.base
+                } else {
+                    core::sample_base(&f, g, target, &c.profile, c.labels, row.seed, c.draws)?
+                };
                 row.base = Some(base);
                 if c.orbit {
                     row.error_stage = Some("orbit");
@@ -539,7 +712,28 @@ pub fn solve(
                     ],
                     _ => base.parts.clone(),
                 };
-                let system = if c.prune {
+                let plan = if v3 && c.chart {
+                    Some(core::leads::line_chart(
+                        &f,
+                        g,
+                        target,
+                        base,
+                        c.prune.then_some((c.beta, c.lambda)),
+                    )?)
+                } else if v3 && (c.guess.is_some() || c.growth) {
+                    Some(core::leads::coordinate_plan(
+                        &f,
+                        &base.parts,
+                        c.encoding,
+                        c.guess,
+                        skipped.as_deref(),
+                    )?)
+                } else {
+                    None
+                };
+                let system = if let Some(plan) = &plan {
+                    plan.first().ok_or("empty APS search plan")?.system.clone()
+                } else if c.prune {
                     core::build_pruned_line_system(&f, g, target, base, c.beta, c.lambda)?
                 } else {
                     core::build_system(&f, &parts, c.encoding)?
@@ -547,6 +741,28 @@ pub fn solve(
                 let export = SystemExport::new(&system);
                 row.system_sha256 = Some(export.sha256()?);
                 row.system = Some(export);
+                let cells = plan.unwrap_or_else(|| {
+                    vec![core::leads::Cell {
+                        system: system.clone(),
+                        fixed_coordinates: vec![],
+                    }]
+                });
+                if let Some(lead) = &mut row.lead {
+                    lead.cells = cells
+                        .iter()
+                        .map(|cell| {
+                            let system = SystemExport::new(&cell.system);
+                            Ok(CellExport {
+                                system_sha256: system.sha256()?,
+                                system,
+                                fixed_coordinates: cell.fixed_coordinates.clone(),
+                            })
+                        })
+                        .collect::<Result<_, String>>()?;
+                    lead.plan_sha256 = Some(digest(
+                        &serde_json::to_value(&lead.cells).map_err(|e| e.to_string())?,
+                    )?);
+                }
                 let Some(remaining) = c
                     .budget
                     .checked_sub(started.elapsed())
@@ -559,6 +775,25 @@ pub fn solve(
                 let mut recovery = None;
                 let algebra = if c.legacy {
                     core::solve_system_reference(&system, f.f.p, c.degree, remaining)?
+                } else if v3 {
+                    core::leads::visit_plan(
+                        &cells,
+                        f.f.p,
+                        c.degree,
+                        remaining,
+                        trace_pool.as_mut(),
+                        |coordinates| {
+                            row.visited_coordinate_sets.push(coordinates.to_vec());
+                            if c.first {
+                                recovery = recovery_context
+                                    .recover_observed(&[coordinates.to_vec()], |p| {
+                                        clock.recovery(p)
+                                    })?;
+                                clock.mark(ONLINE[1]);
+                            }
+                            Ok(recovery.is_some())
+                        },
+                    )?
                 } else {
                     core::visit_system(&system, f.f.p, c.degree, remaining, |coordinates| {
                         row.visited_coordinate_sets.push(coordinates.to_vec());
@@ -609,6 +844,18 @@ pub fn solve(
             // construction/solver/check error ends this execution fail closed.
             let fatal =
                 row.error.is_some() && !matches!(row.error_stage, Some("sampling" | "orbit"));
+            if let Some(lead) = &mut row.lead {
+                lead.trace_after = trace_pool.as_ref().map(|p| p.stats()).unwrap_or_default();
+                if c.growth && lead.sampling_complete {
+                    covered = row.error.is_none()
+                        && row.recovery.is_none()
+                        && row
+                            .algebra
+                            .as_ref()
+                            .is_some_and(core::leads::reusable_coverage);
+                    retained = row.base.clone();
+                }
+            }
             attempts.push(row);
             if checked_witness || fatal {
                 break;
@@ -616,6 +863,9 @@ pub fn solve(
         }
     }
     // Stop before report aggregation/serialization, as other ecbench solvers do.
+    if profile_ir {
+        crate::cryptanalysis::ic_measurement::callgrind_dump(b"ecbench_online\0");
+    }
     let (wall, elapsed) = clock.finish();
     let outcome = if target_error.is_some() {
         "target_error"
@@ -723,7 +973,7 @@ pub fn solve(
         })
         .collect();
     let mut detail = json!({
-        "schema": if v2 { "ecbench.aps/v2" } else { "ecbench.aps/v1" },
+        "schema": if v3 {"ecbench.aps/v3"} else if v2 { "ecbench.aps/v2" } else { "ecbench.aps/v1" },
         "outcome": outcome,
         "target_error": target_error,
         "attempts": attempts,
@@ -749,7 +999,7 @@ pub fn solve(
             ],
         });
     }
-    Ok(SolveReport {
+    let mut report = SolveReport {
         recovered: recovered.map(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from),
         exhausted: recovered.is_none(),
         phases,
@@ -784,7 +1034,22 @@ pub fn solve(
         online: Some(online),
         detail,
         ..Default::default()
-    })
+    };
+    if v3 {
+        let stats = trace_pool.as_ref().map(|p| p.stats()).unwrap_or_default();
+        report.counters.insert(
+            "aps_trace_certification_term_steps_uncharged".into(),
+            stats.certification_term_steps,
+        );
+        report
+            .unpriced
+            .push("aps_trace_certification_term_steps_uncharged".into());
+        report.detail["trace_pool"] = serde_json::to_value(stats).map_err(|e| e.to_string())?;
+        report.detail["core_work"] =
+            serde_json::to_value(core::core_work()).map_err(|e| e.to_string())?;
+        report.detail["coverage_contract"]=json!("An old region is skipped only after this execution retained a complete, non-stopped, non-timeout no-informative-witness traversal. Partial draws and replay failures remain visible. Independent oracle checks are separate.");
+    }
+    Ok(report)
 }
 
 #[cfg(test)]

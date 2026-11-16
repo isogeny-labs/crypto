@@ -1,0 +1,131 @@
+name: Prime-field transfer goal correctness
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/prime_field_transfer_goal_20261116/**'
+      - '.github/workflows/prime-field-transfer-goal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/prime_field_transfer_goal_20261116
+      - name: Install native development dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgmp-dev libssl-dev
+      - name: Reproduce fixed native controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/component_candidate.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/component-candidate
+          /tmp/component-candidate > /tmp/component-native.jsonl
+          cmp /tmp/component-native.jsonl "$study/receipts/round-01/native-01.jsonl"
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/target_precision.cpp" -o /tmp/target-precision
+          /tmp/target-precision > /tmp/component-precision.jsonl
+          cmp /tmp/component-precision.jsonl "$study/receipts/round-01/target-precision-01.jsonl"
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-02/fixture_driver.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/local-fixture
+          for fixture in p17 p257; do
+            timeout 60s /tmp/local-fixture "$fixture" > "/tmp/local-$fixture.jsonl"
+            cmp "/tmp/local-$fixture.jsonl" "$study/receipts/round-02/native-03-$fixture.jsonl"
+          done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-02/public_fixture.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/local-public
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/local-public "$point" > "/tmp/local-public-$point.jsonl"
+            cmp "/tmp/local-public-$point.jsonl" "$study/receipts/round-02/native-04-public-$point.jsonl"
+          done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-03/wild_target.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/cm-target
+          for m in 1 12 24 48 96 112; do
+            timeout 60s /tmp/cm-target "$m" > "/tmp/cm-target-$m.jsonl"
+            cmp "/tmp/cm-target-$m.jsonl" "$study/receipts/round-03/native-01-m$m.jsonl"
+          done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-03/identity_certificate.cpp" -lcrypto -o /tmp/cm-identities
+          /tmp/cm-identities /tmp/cm-idc1 "$study/lean/CMTargetBoundary.lean"
+          for identity in parameter-norm parameter-factor; do
+            cmp "/tmp/cm-idc1/$identity.json" "$study/receipts/round-03/identities/$identity.json"
+          done
+      - name: Reproduce input-selected CM cover examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-04/v4/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-recognizer
+          timeout 60s /tmp/weber-recognizer qualify "$study/receipts/round-04/models/u3-v3.model" -1 > /tmp/weber-u3.jsonl
+          cmp /tmp/weber-u3.jsonl "$study/receipts/round-04/qualify-04-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/weber-recognizer qualify "$study/receipts/round-04/models/u5-v3.model" "$point" > "/tmp/weber-u5-$point.jsonl"
+            cmp "/tmp/weber-u5-$point.jsonl" "$study/receipts/round-04/qualify-04-u5-public-$point.jsonl"
+          done
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-04/root_certificates_v3.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-root-certificates
+          weber_study_root="$PWD/$study"
+          weber_root_replay=$(mktemp -d)
+          mkdir -p "$weber_root_replay/$study/lean"
+          (
+            cd "$weber_root_replay"
+            /tmp/weber-root-certificates "$weber_study_root/receipts/round-04/models/u3.model" "$weber_study_root/receipts/round-04/root-input-01.txt" root-idc "$study/lean/WeberRootBoundaryV3.lean"
+          )
+          cmp "$weber_root_replay/$study/lean/WeberRootBoundaryV3.lean" "$study/lean/WeberRootBoundaryV3.lean"
+          for root in two four; do
+            for part in real imag; do
+              cmp "$weber_root_replay/root-idc/beta-$root-$part.json" "$study/receipts/round-04/root-certificates-03/beta-$root-$part.json"
+            done
+          done
+      - name: Reproduce the bounded Eisenstein metric trial
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-05/v5/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-metric
+          timeout 60s /tmp/weber-metric qualify "$study/receipts/round-04/models/u3-v3.model" -1 > /tmp/weber-metric-u3.jsonl
+          cmp /tmp/weber-metric-u3.jsonl "$study/receipts/round-05/qualify-05-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/weber-metric qualify "$study/receipts/round-04/models/u5-v3.model" "$point" > "/tmp/weber-metric-u5-$point.jsonl"
+            cmp "/tmp/weber-metric-u5-$point.jsonl" "$study/receipts/round-05/qualify-05-u5-public-$point.jsonl"
+          done
+      - name: Reproduce modular CM setup and completed public bins
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          replay=$(mktemp -d)
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/v6/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o "$replay/setup"
+          for u in 3 5 7; do
+            timeout 60s "$replay/setup" setup "$u" "$replay/u$u.model" > "$replay/setup-u$u.jsonl"
+            cmp "$replay/u$u.model" "$study/receipts/round-06/u$u.model"
+          done
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/v7/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o "$replay/recognizer"
+          timeout 60s "$replay/recognizer" qualify "$replay/u3.model" -1 > "$replay/u3.jsonl"
+          cmp "$replay/u3.jsonl" "$study/receipts/round-06/qualify-07-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s "$replay/recognizer" qualify "$replay/u5.model" "$point" > "$replay/u5-$point.jsonl"
+            cmp "$replay/u5-$point.jsonl" "$study/receipts/round-06/qualify-07-u5-public-$point.jsonl"
+          done
+          # u7 public128 calls timed out; their partial bytes are not deterministic replay targets.
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/identity-issuer-v1.cpp" -lcrypto -o "$replay/issuer"
+          "$replay/issuer" "$replay/idc" "$study/lean/SplitPrime199V1.lean"
+          for row in left-row-zero left-row-one right-row-zero right-row-one; do
+            cmp "$replay/idc/$row.json" "$study/receipts/round-06/identity-01/$row.json"
+          done

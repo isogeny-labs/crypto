@@ -24,6 +24,12 @@ use std::{
 };
 use std::{collections::BTreeMap, time::Instant};
 
+/// Replay only (`ecbench::legacy`): count the point sieve as it was before
+/// the finite-difference evaluation of 2026-11-03.
+pub(crate) fn set_legacy_peval_sieve(on: bool) {
+    native_solver::set_legacy_peval_sieve(on);
+}
+
 struct InstalledProgress {
     token: u64,
     sink: progress::AtomicSink,

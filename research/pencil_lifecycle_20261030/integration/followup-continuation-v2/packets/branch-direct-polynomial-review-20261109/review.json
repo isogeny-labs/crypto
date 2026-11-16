@@ -1,0 +1,61 @@
+{
+  "schema": "source-fidelity-review/v1",
+  "status": "source_review_passed_scoped",
+  "source_packet": "branch-direct-polynomial-20261109",
+  "reviewer": "renew_norm",
+  "execution_performed": false,
+  "compiler_status": "not_run",
+  "bindings": {
+    "source-bindings.json": {
+      "sha256": "d67e514b3c17e658d1bc8c675bf96c633ad30e6130ef4e551175e572a73e1b11",
+      "bytes": 3681
+    },
+    "DirectReadback.lean.txt": {
+      "sha256": "e6958a7547ed65dc5cd72d91a3380d9820b846b0a3beffc9bc7113b6738c8245",
+      "bytes": 1235
+    },
+    "PLAN.md": {
+      "sha256": "6a74c73e03df55fd71309c48cc622eecb8deaf9eaaf1feb28ba32f5911f2a9a3",
+      "bytes": 1437
+    },
+    "DirectExpectedFailure.lean.txt": {
+      "sha256": "2b38b890211fe8cdab9a483cea9ab615569b8e19ac0cd5e620c6ddf6d07df99e",
+      "bytes": 137
+    },
+    "DirectBranchControls.lean.txt": {
+      "sha256": "3c342a818c7197eae56d131e452ec5ee2198ea81d61681a0a241c386aa677223",
+      "bytes": 4450
+    },
+    "DirectBranchCoefficientMultiplicity.lean.txt": {
+      "sha256": "5b625d3a2391fb6b8f073205bab30fe911e053cc70c290069bfed8efdc4b72ae",
+      "bytes": 4053
+    },
+    "SESSION.md": {
+      "sha256": "286e2f300187e94f1a3b6c744e2958ba18a66d76e4303b264a088a79884ea244",
+      "bytes": 352
+    },
+    "validation-plan.json": {
+      "sha256": "5b616d28abd3c8a24e426720fab924d193e59fe980eabb42640a3c019cc895bf",
+      "bytes": 3185
+    },
+    "manifest.json": {
+      "sha256": "2b314a6b251a380ec8b04b8d182cf866da0c1b6f8f4220df03421505f01c88fb",
+      "bytes": 1281
+    }
+  },
+  "checks": [
+    "The actual coefficientData theorem hypotheses and conclusion are byte-identical to the previous target statement. Namespace, imports and proof route change; nonzero factors remain conclusions rather than new assumptions. All source-bindings hashes and sizes matched.",
+    "Independent derivation: product support zero and F(a)=0 force N(a)^2=0, hence N(a)=0 in a field. Differentiating P=N^2-b^2 F gives P'(a)=-b^2 F'(a), nonzero from b!=0 and a simple root. Therefore P has multiplicity exactly one. Product multiplicity yields the three-factor sum and nonzero factors.",
+    "The pinned Mathlib one_lt_rootMultiplicity_iff_isRoot needs only nonzero P and returns the root and derivative-root conjunction used here; rootMultiplicity_mul receives separately derived nonzero product hypotheses. The source specialization uses the exact existing source_norm_identity and separability-to-simple-root declarations.",
+    "The rational actual-source fixture retains F=X^5-X, distinct supports X^2+1 and X^2-1, b=-4, residual=-16X, divisibility and explicit Bezout separability proof. It demonstrates simultaneous satisfaction of the actual-source premises at a=0.",
+    "Three additional generic controls retain the norm identity while removing one premise: b=0 permits sum2; nonsimple F=X^2 permits sum2; missing support for F=X permits sum0. These are generic identity controls, correctly not claimed to realize coefficientData. The separate wrong-root expected failure remains at a=2.",
+    "Eighteen named readbacks cover the generic theorem, exact source specialization and all controls. Source inspection found no weakened statement, circular multiplicity premise or extra axiom. Elaborator and kernel acceptance remain unmeasured."
+  ],
+  "remaining": [
+    "Bind the successful Nonbranch artifact and its transitive custody into one finite four-call replay; coordinator allocates and publishes that concrete runner."
+  ],
+  "findings": [],
+  "prior": "Assigned independent source and runner review; assess preserved contracts, premise removal and custody. No claim of blind review: source had been read before this report was serialized.",
+  "kb": "KB unavailable: no loaded search/status tools; scripts/research-kb absent. Used exact retained source/review bindings and pinned Mathlib declarations.",
+  "trust": "Source review is not kernel acceptance or execution admission; compiled dependencies retain existing Lean trust boundary."
+}

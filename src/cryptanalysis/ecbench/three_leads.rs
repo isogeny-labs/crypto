@@ -17,6 +17,7 @@ use std::time::Instant;
 
 #[path = "pencil.rs"]
 mod pencil;
+pub(crate) use pencil::set_legacy_peval_sieve;
 pub(crate) use pencil::ScopedPencilProgress;
 
 /// The frozen pencil id and the id that reports the same solve with its

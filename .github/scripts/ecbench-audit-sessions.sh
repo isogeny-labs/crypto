@@ -154,6 +154,13 @@ xargs -0 -P "$(nproc)" -n 1 bash -c '
     dir="$out.session"
     cp -r "$1" "$dir"
     gzip -dc "$dir/ecbench_records.jsonl.gz" > "$dir/records.jsonl"
+  elif [ -f "$1/plan.json.gz" ] && [ ! -f "$1/plan.json" ]; then
+    # records.jsonl was hydrated from the artifact store (tools/artifacts), so
+    # the first branch did not fire, but plan.json.gz is still the only
+    # committed copy of the plan. Decompress it the same way, in a copy.
+    dir="$out.session"
+    cp -r "$1" "$dir"
+    gzip -dc "$dir/plan.json.gz" > "$dir/plan.json"
   fi
   if ! "$ecbench" verify --dir "$dir" --replay 0 --allow-interrupted --exit-code > "$out.json" 2> "$out.err"; then
     msg=$(echo "$1"; { jq -r ".problems[]" "$out.json" 2> /dev/null || true; cat "$out.err"; } | sed "s/^/    /")
@@ -199,7 +206,9 @@ if [[ "$unbound_count" -gt 0 ]]; then
   rm -f "$report"
 fi
 rm -f "$unbound"
-summary="shard $shard: $bound_count of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete; $defective_count hash-pinned defective sessions fail exactly as pinned, not integrity-passed"
+# $audited is this shard's share; $index counts every non-pinned session in
+# the whole list (sheriff SHF-20261106-a114e7, PPX-6).
+summary="shard $shard: $bound_count of $audited sessions in this shard (of $index in total) pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete; $defective_count hash-pinned defective sessions fail exactly as pinned, not integrity-passed"
 echo "$summary"
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   echo "$summary" >> "$GITHUB_STEP_SUMMARY"
