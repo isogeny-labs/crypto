@@ -26,3 +26,18 @@ each curve's full-rank comparison from raw JSON, independently check scalar
 production source remains reserved by T-6708; the frozen L2 F4/F5/F6 panel
 requires its separate correct-account budget and isolation gate.
 [pcc:unverified]
+
+## Repository release suite
+
+The full `cargo test --release --lib --locked -- --test-threads=4` development
+suite exited 101: 6,416 passed, 16 failed, 135 ignored. The raw output and
+exact result are retained in [TEST_STATUS.json](TEST_STATUS.json),
+`lib-suite.stdout` and `lib-suite.stderr`. Twelve failures are in
+`ml_dataset` report/restore paths that require Linux `/proc` on this macOS
+host; two wide-prime dataset tests lack local files. An ecbench timing-phase
+assertion failed in the suite but passed one exact rerun. The chained-S3
+rank/solve test failed again on an exact rerun with the same `16 != 0`
+assertion. None of this branch's commits since `c2468c8f5d` modifies
+`src/`, and the new standalone test was not part of the `--lib` suite.
+These failures are retained as a validation gap, not silently filtered.
+[pcc:unverified]

@@ -125,3 +125,35 @@
 ### Errors
 
 - The strip warning is nonfatal. No further build error occurred.
+
+## 2026-11-16, repository development suite
+
+### What was done
+
+- Ran the full locked release library suite from commit `58c7557e20` with
+  four test threads. It exited 101 after 844.31 reported test seconds:
+  6,416 passed, 16 failed, 135 ignored. Raw logs and digests are in
+  `TEST_STATUS.json`. [pcc:unverified]
+- Reran the ecbench APS timing test exactly; it passed 1/1. Reran the
+  chained-S3 rank/solve test exactly; it failed again at the same `16 != 0`
+  assertion. The remaining failures are twelve Linux `/proc` report/restore
+  paths and two missing wide-prime dataset files. [pcc:unverified]
+- Checked the branch diff from parent `c2468c8f5d`: it adds only this study
+  directory and its standalone test, with zero `src/` changes.
+
+### Decisions made
+
+- Preserve the failed suite as a real validation gap. Do not alter unrelated
+  production tests to make this source-only collector screen look green.
+- The scientific trial remains gated by the branch-specific checkpoint, and
+  therefore no relation-quality or performance observation exists yet.
+
+### Open threads
+
+- Publish the source-ready PR update with the suite's exact status. Re-run
+  the study only after the resume reservation clears and the S3 gate passes.
+
+### Errors
+
+- One chained-S3 assertion remains reproducible on this checkout; the
+  ecbench timing assertion differed between suite and exact rerun.
