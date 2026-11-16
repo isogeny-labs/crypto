@@ -1,0 +1,7 @@
+# R128 — degree-7 double-root Newton expansion
+
+The actual R51 base equation at the R127 double root, written `F(s,u)=f23(a+s,90+u)` over `F128`, has 52 nonzero bivariate coefficients. Its first `s`-orders at `u`-degrees 0 through 7 are `(1,1,0,0,0,1,0,0)`, and the lower Newton hull is `(0,1)→(2,0)→(7,0)`. The positive edge has slope `−1/2` and residual `84+110Z²`. The transverse coefficient is `∂F/∂s(0,0)=84≠0`, with `84·6=110` in F128. This identifies `u=y+90` as the candidate direct parameter: a simple implicit-function lift should give `s=6u²+…`.
+
+The producer binds the tracked R51 source and the R127 result/source by SHA-256, expands all coefficients by binomial parity, checks the `s=0` specialization, and records every edge support. An independent evaluator reconstructs the same 52 terms by polynomial Horner composition using a separate carryless field implementation. Byte replay, changed-source rejection, and Lean 4.34.1 finite edge/coefficient checks passed. Result SHA-256: `cce71416b01d600abbeedbd86f56f647c6c91b7d2ee536d6f730d5e9c79a739d`. Source/protocol commit: `6f9c2c745`.
+
+The verified edge alone is not a normalized branch count. Next lift `s(u)` directly and check the original source equation, then enter the degree-7 base branch with ramification two and proceed to the degree-16 lambda fiber. The local smoothness criterion is [Stacks 0B8Y](https://stacks.math.columbia.edu/tag/0B8Y). This round is exact local computation with zero cloud cost; no Rust code changed.

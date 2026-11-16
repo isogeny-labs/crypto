@@ -1,0 +1,11 @@
+{
+  "kind": "exact native arithmetic schedule extension, before affected data",
+  "targets": ["P-384", "P-521"],
+  "representations": ["direct public scalar", "explicit forward and dual maps with closure and correction", "verified dual-pair fusion to small-scalar multiplication followed by correction"],
+  "windows": [2,3,4,5,6,7],
+  "fixed_degree_window": 2,
+  "claims": "Correctness and exact schedules only until the full timing protocol and admission source are frozen and published",
+  "baseline": "native-v2 source snapshot and binary checksum",
+  "limits": {"processes":1,"build_seconds":600,"correctness_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+  "boundary": "No end-to-end improvement may be inferred from fewer group operations alone; fixed-base and amortized gains remain separate"
+}

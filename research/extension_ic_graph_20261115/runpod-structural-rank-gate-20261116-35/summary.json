@@ -1,0 +1,714 @@
+{
+  "actual_scalar": 61513282845831007,
+  "comparative_eligibility": false,
+  "complete_cost": false,
+  "cost_ratios": null,
+  "flow": {
+    "attempted": 2,
+    "automatic_retries": 0,
+    "completed": 2,
+    "excluded": 0,
+    "planned": 2
+  },
+  "gate_proof": {
+    "baseline_exact_checks": 2,
+    "candidate_exact_checks": 1,
+    "charged_gate_word_events_lower_bound": 6171,
+    "checks": [
+      {
+        "b_count": 445440,
+        "independent": {
+          "anchored_components": 4,
+          "components": 4,
+          "find_calls": 551,
+          "independent_kernel_dimension": 260,
+          "independent_large_rank": 126,
+          "large_rank_lower_bound": 126,
+          "small_rank_upper_bound": 260,
+          "sources": 386,
+          "successful_unions": 122,
+          "support_entries": 551,
+          "vertices": 126
+        },
+        "permits_exact_check": false,
+        "source_rows": 386
+      },
+      {
+        "b_count": 580608,
+        "independent": {
+          "anchored_components": 2,
+          "components": 2,
+          "find_calls": 731,
+          "independent_kernel_dimension": 388,
+          "independent_large_rank": 127,
+          "large_rank_lower_bound": 127,
+          "small_rank_upper_bound": 388,
+          "sources": 515,
+          "successful_unions": 125,
+          "support_entries": 731,
+          "vertices": 127
+        },
+        "permits_exact_check": true,
+        "source_rows": 515
+      }
+    ],
+    "native_bookkeeping_complete": false,
+    "parent_probe_count_is_source_emission": true,
+    "phase_conservation": {
+      "added_gate_word_events_lower_bound": 6171,
+      "all_phase_counts_conserved": true,
+      "other_native_gate_work_complete": false,
+      "skipped_checkpoint_primitives": {
+        "field_add": 1333560,
+        "field_inv": 29722,
+        "field_mul": 1837310,
+        "field_sqr": 0,
+        "field_sqrt": 0,
+        "hash_probe": 0,
+        "legendre": 0,
+        "modr_add": 5710857,
+        "modr_inv": 687,
+        "modr_mul": 5813150,
+        "rng_words": 0,
+        "word_op": 250206
+      }
+    },
+    "same_checkpoint_schedule": true,
+    "same_collection_endpoint": true,
+    "same_descents": true,
+    "same_original_sources": true,
+    "skipped_exact_checks": 1
+  },
+  "independent_signed_verdict": false,
+  "l": 263807419822068817,
+  "outcomes": [
+    {
+      "accounting": {
+        "complete": false,
+        "excluded_harness_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "excluded_harness_uniform_events": {
+          "calls": 0,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "0",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 0,
+            "integer_mul64": 0
+          },
+          "raw_draws": 0,
+          "rejections": 0,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 0,
+            "integer_shl64": 0,
+            "integer_sub64": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "6349082215578",
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "590289900",
+            "phase": "model",
+            "primitives": {
+              "field_add": 344488,
+              "field_inv": 1555,
+              "field_mul": 406594,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 1020,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "724737812",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 255276,
+              "field_inv": 1,
+              "field_mul": 562022,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2049,
+              "word_op": 4098
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "3431683872836",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 6250483674,
+              "field_inv": 15375814,
+              "field_mul": 1932322912,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6180,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 3162288279
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "2012064498280",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1442062991,
+              "field_inv": 891070,
+              "field_mul": 1444808283,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 116932029,
+              "legendre": 0,
+              "modr_add": 4012,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 5,
+              "word_op": 632578643
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "903928056050",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 5376120,
+              "field_inv": 114695,
+              "field_mul": 7363855,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 21240271,
+              "modr_inv": 2689,
+              "modr_mul": 21645775,
+              "rng_words": 0,
+              "word_op": 938230
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "90760700",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 61080,
+              "field_inv": 172,
+              "field_mul": 66970,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "total_bitops": null,
+        "uniform_sampling": {
+          "calls": 2014,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "50466304",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 2014,
+            "integer_mul64": 2054
+          },
+          "raw_draws": 2054,
+          "rejections": 40,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 2014,
+            "integer_shl64": 2014,
+            "integer_sub64": 4028
+          }
+        }
+      },
+      "actual_scalar": 61513282845831007,
+      "arm": "rank-stop",
+      "candidate_proof": {
+        "accepted_descents": 2,
+        "certificate_replays": 390,
+        "descent_residuals": 2007,
+        "descent_stream_advances": 2006,
+        "full_base": 515,
+        "graph": {
+          "complete_relations": 390,
+          "core_large_vertices": 125,
+          "core_relations": 453,
+          "cycles_closed": 328,
+          "duplicate_relations": 0,
+          "input_large_vertices": 127,
+          "input_relations": 517,
+          "merges": 618,
+          "peeled_relations": 2,
+          "pivots": 125,
+          "rejected_fill": 0
+        },
+        "matrix_rank": 387,
+        "output_nonzeros": 8220,
+        "partial_by_large_count": [
+          62,
+          175,
+          278
+        ],
+        "projection_attempts": 1,
+        "small_base": 386,
+        "target_scalar": 61513282845831007,
+        "verified_original_inputs": 515
+      },
+      "checkpoint_proof": {
+        "all_certificates_replayed": true,
+        "checkpoint_primitives": {
+          "field_add": 3112850,
+          "field_inv": 69377,
+          "field_mul": 4288620,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 13474435,
+          "modr_inv": 1684,
+          "modr_mul": 13727727,
+          "rng_words": 0,
+          "word_op": 592411
+        },
+        "checks": [
+          {
+            "b_count": 445440,
+            "complete_rows": 260,
+            "graph": {
+              "complete_relations": 260,
+              "core_large_vertices": 114,
+              "core_relations": 327,
+              "cycles_closed": 213,
+              "duplicate_relations": 0,
+              "input_large_vertices": 126,
+              "input_relations": 386,
+              "merges": 427,
+              "peeled_relations": 12,
+              "pivots": 114,
+              "rejected_fill": 0
+            },
+            "independent_rank": 260,
+            "rank_target": 385,
+            "ready": false,
+            "solver_modular_muls": 5797808,
+            "source_rows": 386
+          },
+          {
+            "b_count": 580608,
+            "complete_rows": 388,
+            "graph": {
+              "complete_relations": 388,
+              "core_large_vertices": 125,
+              "core_relations": 451,
+              "cycles_closed": 326,
+              "duplicate_relations": 0,
+              "input_large_vertices": 127,
+              "input_relations": 515,
+              "merges": 612,
+              "peeled_relations": 2,
+              "pivots": 125,
+              "rejected_fill": 0
+            },
+            "independent_rank": 385,
+            "rank_target": 385,
+            "ready": true,
+            "solver_modular_muls": 7894034,
+            "source_rows": 515
+          }
+        ],
+        "independent_rank_checks_passed": true
+      },
+      "recorded_inner_wall_ns_practicality_only": 29422362475,
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "excluded_harness_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "excluded_harness_uniform_events": {
+          "calls": 0,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "0",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 0,
+            "integer_mul64": 0
+          },
+          "raw_draws": 0,
+          "rejections": 0,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 0,
+            "integer_shl64": 0,
+            "integer_sub64": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "6106513264792",
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "590289900",
+            "phase": "model",
+            "primitives": {
+              "field_add": 344488,
+              "field_inv": 1555,
+              "field_mul": 406594,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 1020,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "724737812",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 255276,
+              "field_inv": 1,
+              "field_mul": 562022,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2049,
+              "word_op": 4098
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "3431683872836",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 6250483674,
+              "field_inv": 15375814,
+              "field_mul": 1932322912,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6180,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 3162288279
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "2012064498280",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1442062991,
+              "field_inv": 891070,
+              "field_mul": 1444808283,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 116932029,
+              "legendre": 0,
+              "modr_add": 4012,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 5,
+              "word_op": 632578643
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "661359105264",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 4042560,
+              "field_inv": 84973,
+              "field_mul": 5526545,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 15529414,
+              "modr_inv": 2002,
+              "modr_mul": 15832625,
+              "rng_words": 0,
+              "word_op": 694195
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "90760700",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 61080,
+              "field_inv": 172,
+              "field_mul": 66970,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "total_bitops": null,
+        "uniform_sampling": {
+          "calls": 2014,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "50466304",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 2014,
+            "integer_mul64": 2054
+          },
+          "raw_draws": 2054,
+          "rejections": 40,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 2014,
+            "integer_shl64": 2014,
+            "integer_sub64": 4028
+          }
+        }
+      },
+      "actual_scalar": 61513282845831007,
+      "arm": "structural-gate",
+      "candidate_proof": {
+        "accepted_descents": 2,
+        "certificate_replays": 390,
+        "descent_residuals": 2007,
+        "descent_stream_advances": 2006,
+        "full_base": 515,
+        "graph": {
+          "complete_relations": 390,
+          "core_large_vertices": 125,
+          "core_relations": 453,
+          "cycles_closed": 328,
+          "duplicate_relations": 0,
+          "input_large_vertices": 127,
+          "input_relations": 517,
+          "merges": 618,
+          "peeled_relations": 2,
+          "pivots": 125,
+          "rejected_fill": 0
+        },
+        "matrix_rank": 387,
+        "output_nonzeros": 8220,
+        "partial_by_large_count": [
+          62,
+          175,
+          278
+        ],
+        "projection_attempts": 1,
+        "small_base": 386,
+        "target_scalar": 61513282845831007,
+        "verified_original_inputs": 515
+      },
+      "checkpoint_proof": {
+        "all_certificates_replayed": true,
+        "checkpoint_primitives": {
+          "field_add": 1779290,
+          "field_inv": 39655,
+          "field_mul": 2451310,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 7763578,
+          "modr_inv": 997,
+          "modr_mul": 7914577,
+          "rng_words": 0,
+          "word_op": 342205
+        },
+        "checks": [
+          {
+            "b_count": 580608,
+            "complete_rows": 388,
+            "graph": {
+              "complete_relations": 388,
+              "core_large_vertices": 125,
+              "core_relations": 451,
+              "cycles_closed": 326,
+              "duplicate_relations": 0,
+              "input_large_vertices": 127,
+              "input_relations": 515,
+              "merges": 612,
+              "peeled_relations": 2,
+              "pivots": 125,
+              "rejected_fill": 0
+            },
+            "independent_rank": 385,
+            "rank_target": 385,
+            "ready": true,
+            "solver_modular_muls": 7894034,
+            "source_rows": 515
+          }
+        ],
+        "independent_rank_checks_passed": true
+      },
+      "recorded_inner_wall_ns_practicality_only": 29172588931,
+      "verified": true
+    }
+  ],
+  "p": 1009,
+  "rho_parity": false,
+  "schema": "cover.two-lp-structural-gate-analysis/v1",
+  "seed": 347,
+  "source_revision": "c79c11d6c59a7dbbb60c08892ad6587511b115d7",
+  "total_bitops": null
+}

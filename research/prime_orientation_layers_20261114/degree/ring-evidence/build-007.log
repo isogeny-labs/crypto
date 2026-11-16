@@ -1,0 +1,35 @@
+../ring-evidence/draft-007.lean.txt:120:23: error: Application type mismatch: The argument
+  Finsupp.onFinset P.support (fun n => ⟨P.coeff n, ⋯⟩) ?m.19
+has type
+  ℕ →₀ ↥integralRationals
+but is expected to have type
+  AddMonoidAlgebra ↥integralRationals ℕ
+in the application
+  { toFinsupp := Finsupp.onFinset P.support (fun n => ⟨P.coeff n, ⋯⟩) ?m.19 }
+../ring-evidence/draft-007.lean.txt:126:0: error: Not a definitional equality: the left-hand side
+  ↑((liftPoly P hP).coeff n)
+is not definitionally equal to the right-hand side
+  P.coeff n
+../ring-evidence/draft-007.lean.txt:127:47: error: Type mismatch
+  rfl
+has type
+  ?m.14 = ?m.14
+but is expected to have type
+  ↑((liftPoly P hP).coeff n) = P.coeff n
+../ring-evidence/draft-007.lean.txt:133:2: error: Tactic `rfl` failed: The left-hand side
+  integralRationals.subtype ((liftPoly P hP).coeff n)
+is not definitionally equal to the right-hand side
+  P.coeff n
+
+P : ℚ[X]
+hP : Content 0 P
+n : ℕ
+⊢ integralRationals.subtype ((liftPoly P hP).coeff n) = P.coeff n
+'OrientationCoefficientReduction.reduce_zero_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.integral_den_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_compatible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_finite_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.actual_integral_polynomial_product' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
