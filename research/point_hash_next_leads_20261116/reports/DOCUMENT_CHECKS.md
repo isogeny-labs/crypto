@@ -13,6 +13,14 @@ This is producer document/development checking only. [pcc:unverified]
   no field arithmetic, solver, simulation, benchmark or result analysis.
 - Native source inputs remain pinned to the feature snapshots in REPORT.md.
   No native source was edited or requalified by this document-only task.
+- Artifact and 10 MiB size preflights pass with the actual repository
+  configuration materialized. The first artifact check used defaults while
+  `.artifacts/config.json` was sparse, so it incorrectly selected the PDF
+  for storage. Hydrating the unchanged configuration restored the documented
+  PDF keep policy; no waiver or artifact-policy edit was used.
+- The optional curve-name CLI help attempt stopped at a missing sparse
+  `scripts/curve_id.py` import. It is not counted as a completed curve-name
+  check. All proposed panel aliases were read directly from STANDARD_PANEL.md.
 - `benchrec.py gate` was attempted. First, sparse metadata lacked the
   existing integrity-exclusions file; the raw refusal is retained in
   `checks/benchrec-without-exclusions.txt`. After materializing current
