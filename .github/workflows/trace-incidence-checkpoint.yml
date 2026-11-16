@@ -42,7 +42,7 @@ jobs:
           set -euo pipefail
           sha256sum -c research/trace_incidence_20261116/runpod/SOURCES.sha256
           mkdir -p .resume
-          sed "s/SOURCE_REVISION/${GITHUB_SHA}/g" research/trace_incidence_20261116/runpod/RESUME.template.md > .resume/RESUME.md
+          sed -e "s/SOURCE_REVISION/${GITHUB_SHA}/g" -e 's/^# /## /' research/trace_incidence_20261116/runpod/RESUME.template.md > .resume/RESUME.md
       - name: Run standard S3 checkpoint gate
         env:
           CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
@@ -58,6 +58,8 @@ jobs:
           if test -f .resume/.last-push; then checkpoint_state=$(cat .resume/.last-push); fi
           jq -n --arg source "$GITHUB_SHA" --arg closure "$source_hash" --arg protocol "$protocol_hash" --arg state "$checkpoint_state" --argjson status "$status" \
             '{schema:"trace-runpod-checkpoint/v1",source_revision:$source,source_manifest_sha256:$closure,protocol_sha256:$protocol,gate_exit:$status,checkpoint_state:$state}' > "$RUNNER_TEMP/checkpoint-receipt.json"
+          printf 'TRACE_CHECKPOINT_RECEIPT='
+          jq -c . "$RUNNER_TEMP/checkpoint-receipt.json"
           exit "$status"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -88,6 +90,9 @@ jobs:
             -in "$RUNNER_TEMP/upload.private.json" -outform DER \
             -out "$RUNNER_TEMP/result-upload.cms" research/trace_incidence_20261116/runpod/upload-recipient.pem
           rm "$RUNNER_TEMP/upload.private.json"
+          printf 'TRACE_UPLOAD_CIPHERTEXT='
+          base64 -w0 "$RUNNER_TEMP/result-upload.cms"
+          printf '\n'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: trace-runpod-result-upload-${{ github.sha }}
