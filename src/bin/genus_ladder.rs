@@ -33,7 +33,7 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::genus_ladder as gl;
 use crypto_lib::cryptanalysis::genus_ladder::{Arm, IcParams};
-use crypto_lib::cryptanalysis::ic_boundary::RhoWalk;
+use crypto_lib::cryptanalysis::ic_boundary::{RhoWalk, WalkPolicy};
 use crypto_lib::cryptanalysis::quartic_ladder as ql;
 use crypto_lib::cryptanalysis::smith_prop24 as smith;
 use serde_json::{json, Value};
@@ -437,25 +437,40 @@ fn main() -> ExitCode {
                             sge_coord: false,
                         },
                     ),
-                    'R' | 'P' => {
+                    'R' | 'P' | 'B' | 'Q' => {
                         // R: negation-map rho; P: plain rho (walk on points).
-                        let plain = ch == 'P';
+                        // B: negation rho, no per-step window, Brent cycle
+                        // detection (WalkPolicy::v2). Q: plain rho, no window.
+                        let plain = ch == 'P' || ch == 'Q';
                         let expect = (std::f64::consts::PI * *r as f64
                             / if plain { 2.0 } else { 4.0 })
                         .sqrt();
                         let mut rec = head.clone();
-                        rec["arm"] = json!(if plain { "R_rho_plain" } else { "R_rho_neg" });
+                        rec["arm"] = json!(match ch {
+                            'P' => "R_rho_plain",
+                            'Q' => "R_rho_plain_nowin",
+                            'B' => "R_rho_neg_brent",
+                            _ => "R_rho_neg",
+                        });
                         if expect > cfg.rho_cap {
                             rec["kind"] = json!("skip");
                             rec["reason"] = json!("rho_cap");
                             rec["expected_steps"] = json!(expect);
                         } else {
-                            let walk = if plain {
+                            let mut walk = if plain {
                                 RhoWalk::plain()
                             } else {
                                 RhoWalk::negation()
                             };
-                            let o = gl::run_rho_walk(&inst, *seed, walk);
+                            let policy = if ch == 'B' {
+                                WalkPolicy::v2()
+                            } else {
+                                WalkPolicy::legacy()
+                            };
+                            if ch == 'B' || ch == 'Q' {
+                                walk.cycle_window = 0;
+                            }
+                            let o = gl::run_rho_policy(&inst, *seed, walk, policy);
                             rec["kind"] = json!("run");
                             rec["certified"] = json!(o.certified);
                             rec["ok"] = json!(o.recovered == Some(inst.t_secret));
