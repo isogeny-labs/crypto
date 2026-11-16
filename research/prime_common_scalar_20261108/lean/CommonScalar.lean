@@ -5,8 +5,11 @@ namespace CommonScalar
 open CauchyNormalizer
 
 /-- One scalar polynomial in T, not an entry-dependent inverse normalizer. -/
-def normalizer (a : ℕ) (t : ℚ) : ℚ :=
+@[expose] def normalizer (a : ℕ) (t : ℚ) : ℚ :=
   ∑ s ∈ Finset.range (2^(a+1)), baseKernel a s t / (cauchyRho a s)^2
+
+theorem normalizer_formula (a : ℕ) (t : ℚ) :
+    normalizer a t = ∑ s ∈ Finset.range (2^(a+1)), baseKernel a s t / (cauchyRho a s)^2 := rfl
 
 theorem normalizer_node (a m : ℕ) (hm : m < 2^(a+1)) :
     normalizer a ((m : ℚ)-(2^a : ℕ)) = (cauchyRho a m)⁻¹ := by

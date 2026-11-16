@@ -24,6 +24,10 @@ on:
         description: Run the frozen one-target IC/rho panel at 20, 24, 28 and 32 bits on separate Spot Jobs
         type: boolean
         default: false
+      norm_branch_census:
+        description: Run the frozen exact norm-branch rank census as one non-timing Spot command Job
+        type: boolean
+        default: false
       instance_type:
         description: Spot worker type; c8a has one thread per core
         type: string
@@ -136,7 +140,7 @@ jobs:
             examples
       - name: Materialize native build inputs
         working-directory: source
-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
+        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path research/prime_leads_chase_20261113/norm-branch-census --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
       - name: Pull store data needed by the tested source
         working-directory: source
         env:
@@ -163,6 +167,37 @@ jobs:
           rustup toolchain install 1.99.1 --profile minimal --target x86_64-unknown-linux-musl
       - name: Build the tested commit without AWS credentials
         run: control/taskq/deploy/eks-karpenter/build-bundle source "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-build"
+      - name: Build the frozen norm-branch census payload without AWS credentials
+        if: inputs.norm_branch_census
+        working-directory: source
+        run: |
+          set -euo pipefail
+          study=research/prime_leads_chase_20261113/norm-branch-census
+          export CARGO_BUILD_JOBS=2
+          export CARGO_TARGET_DIR="$GITHUB_WORKSPACE/source/target"
+          export RUSTFLAGS='-C target-cpu=x86-64'
+          cargo +1.99.1 build --locked --release --manifest-path "$study/Cargo.toml" \
+            --target x86_64-unknown-linux-musl --bins
+          install -m755 "$CARGO_TARGET_DIR/x86_64-unknown-linux-musl/release/produce" \
+            "$RUNNER_TEMP/isolab-build/norm-branch-produce"
+          install -m755 "$CARGO_TARGET_DIR/x86_64-unknown-linux-musl/release/check" \
+            "$RUNNER_TEMP/isolab-build/norm-branch-check"
+          install -m755 "$study/launch/run.sh" "$RUNNER_TEMP/isolab-build/norm-branch-run"
+          install -m644 "$study/protocol.json" "$RUNNER_TEMP/isolab-build/norm-branch-protocol.json"
+          for binary in norm-branch-produce norm-branch-check; do
+            readelf -h "$RUNNER_TEMP/isolab-build/$binary" | grep -q 'Advanced Micro Devices X86-64'
+            if readelf -l "$RUNNER_TEMP/isolab-build/$binary" | grep -q INTERP; then
+              echo "$binary must be statically linked" >&2
+              exit 2
+            fi
+          done
+          producer_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/norm-branch-produce" | cut -d' ' -f1)
+          checker_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/norm-branch-check" | cut -d' ' -f1)
+          protocol_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/norm-branch-protocol.json" | cut -d' ' -f1)
+          jq --arg producer "$producer_sha" --arg checker "$checker_sha" --arg protocol "$protocol_sha" \
+            '.norm_branch_produce_sha256=$producer | .norm_branch_check_sha256=$checker | .norm_branch_protocol_sha256=$protocol' \
+            "$RUNNER_TEMP/isolab-build/build-info.json" > "$RUNNER_TEMP/isolab-build/build-info.next.json"
+          mv "$RUNNER_TEMP/isolab-build/build-info.next.json" "$RUNNER_TEMP/isolab-build/build-info.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
@@ -170,6 +205,10 @@ jobs:
             ${{ runner.temp }}/isolab-build/ecbench
             ${{ runner.temp }}/isolab-build/isolab-fresh-owner
             ${{ runner.temp }}/isolab-build/build-info.json
+            ${{ runner.temp }}/isolab-build/norm-branch-produce
+            ${{ runner.temp }}/isolab-build/norm-branch-check
+            ${{ runner.temp }}/isolab-build/norm-branch-run
+            ${{ runner.temp }}/isolab-build/norm-branch-protocol.json
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -222,6 +261,18 @@ jobs:
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/isolab-build
+      - name: Validate mutually exclusive experiment modes
+        env:
+          PUBLISH_ONLY: ${{ inputs.publish_only }}
+          SIZE_SWEEP: ${{ inputs.size_sweep }}
+          RESUMABLE: ${{ inputs.resumable }}
+          NORM_BRANCH_CENSUS: ${{ inputs.norm_branch_census }}
+        run: |
+          set -euo pipefail
+          if [[ "$NORM_BRANCH_CENSUS" == true && ( "$PUBLISH_ONLY" == true || "$SIZE_SWEEP" == true || "$RESUMABLE" == true ) ]]; then
+            echo 'norm_branch_census cannot be combined with publish_only, size_sweep, or resumable' >&2
+            exit 2
+          fi
       - name: Install publisher tools when absent
         run: |
           set -euo pipefail
@@ -231,7 +282,7 @@ jobs:
             sudo "$RUNNER_TEMP/awscli-install/aws/install"
           fi
       - name: Read the experiment spec from the tested commit
-        if: '!inputs.publish_only && !inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
         env:
           GH_TOKEN: ${{ github.token }}
           SPEC_PATH: ${{ inputs.spec_path }}
@@ -253,6 +304,25 @@ jobs:
           mask-aws-account-id: true
       - name: Publish the commit image and resolve its immutable digest
         run: taskq/deploy/eks-karpenter/publish-image "$RUNNER_TEMP/isolab-build" "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-image.json"
+      - name: Publish the frozen norm-branch payload as a digest-pinned layer
+        if: inputs.norm_branch_census
+        run: |
+          set -euo pipefail
+          export AWS_CA_BUNDLE="${AWS_CA_BUNDLE:-/etc/ssl/certs/ca-certificates.crt}"
+          [[ -f "$AWS_CA_BUNDLE" ]]
+          layer="$RUNNER_TEMP/norm-branch-layer"
+          install -d -m755 "$layer/usr/local/bin" "$layer/opt/isolab/norm-branch"
+          install -m755 "$RUNNER_TEMP/isolab-build/norm-branch-produce" "$layer/usr/local/bin/norm-branch-produce"
+          install -m755 "$RUNNER_TEMP/isolab-build/norm-branch-check" "$layer/usr/local/bin/norm-branch-check"
+          install -m755 "$RUNNER_TEMP/isolab-build/norm-branch-run" "$layer/opt/isolab/norm-branch/run"
+          install -m644 "$RUNNER_TEMP/isolab-build/norm-branch-protocol.json" "$layer/opt/isolab/norm-branch/protocol.json"
+          python3 taskq/deploy/eks-karpenter/oci-layer-publish.py \
+            --base "$(jq -er .image_uri "$RUNNER_TEMP/isolab-image.json")" \
+            --layer-dir "$layer" --target "$ISOLAB_IMAGE_REPOSITORY" \
+            --tag "gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${SOURCE_REVISION}-norm-branch" \
+            --user 1000:1000 --workdir /work --env HOME=/work \
+            --label "org.opencontainers.image.revision=$SOURCE_REVISION" \
+            --out "$RUNNER_TEMP/norm-branch-image.json"
       - name: Add the trusted recovery runtime
         if: inputs.resumable
         run: taskq/deploy/eks-karpenter/resume/publish-runtime "$RUNNER_TEMP/isolab-image.json" "$RUNNER_TEMP/isolab-recovery-image.json"
@@ -274,7 +344,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
       - name: Prepare the versioned experiment request
-        if: '!inputs.publish_only && !inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
         env:
           INSTANCE_TYPE: ${{ inputs.instance_type }}
           DEADLINE: ${{ inputs.seconds }}
@@ -303,11 +373,67 @@ jobs:
             '{schema:"isolab.eks.request/v1",job:{job_name:$name,instance_type:$instance,seconds:$seconds,spec:$spec[0],build:$build[0]},
               provenance:{harness:"github-actions",source_revision:$rev,workflow_revision:$workflow,run_url:$url}}' > "$RUNNER_TEMP/isolab-request.json"
           taskq/deploy/eks-karpenter/remote/validate-request "$RUNNER_TEMP/isolab-request.json" >/dev/null
+      - name: Prepare the frozen norm-branch command request
+        if: inputs.norm_branch_census
+        env:
+          INSTANCE_TYPE: ${{ inputs.instance_type }}
+          DEADLINE: ${{ inputs.seconds }}
+        run: |
+          set -euo pipefail
+          [[ "$DEADLINE" =~ ^[1-9][0-9]{0,3}$ && "$DEADLINE" -le 1800 ]]
+          protocol_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/norm-branch-protocol.json" | cut -d' ' -f1)
+          recorded_protocol=$(jq -er .norm_branch_protocol_sha256 "$RUNNER_TEMP/isolab-build/build-info.json")
+          [[ "$protocol_sha" == "$recorded_protocol" ]]
+          jq -n --arg name "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-nbc" \
+            --arg image "$(jq -er .image_uri "$RUNNER_TEMP/norm-branch-image.json")" \
+            --arg revision "$SOURCE_REVISION" --arg protocol "$protocol_sha" \
+            --arg instance "$INSTANCE_TYPE" --argjson seconds "$DEADLINE" \
+            '{schema:"isolab.eks.command-request/v1",
+              job:{job_name:$name,image:$image,
+                command:["/opt/isolab/norm-branch/run",$revision,$protocol],
+                cpu:2,memory:"4Gi",seconds:$seconds,isolation_profile:"standard",
+                instance_type:$instance,retries:0,wait_seconds:$seconds},
+              provenance:{harness:"github-actions",source_revision:$revision,
+                study:"prime_leads_chase_20261113/norm-branch-census",
+                protocol_sha256:$protocol,
+                note:"Exact deterministic rank census; wall time is non-scientific."}}' \
+            > "$RUNNER_TEMP/norm-branch-request.json"
+      - name: Launch the frozen norm-branch Spot command Job
+        if: inputs.norm_branch_census
+        run: taskq/deploy/eks-karpenter/remote/launch-remote-command "$RUNNER_TEMP/norm-branch-request.json"
+      - name: Download and independently verify the norm-branch S3 payload
+        if: inputs.norm_branch_census
+        run: |
+          set -euo pipefail
+          receipt="$ISOLAB_CLIENT_OUTPUT/result.json"
+          jq -e '.schema=="isolab.eks.command-result/v1" and .state=="succeeded"
+            and ([.pods[] | select(.exit_code==0)] | length)==1' "$receipt" >/dev/null
+          job=$(jq -er .job_name "$receipt")
+          pod_uid=$(jq -er '.pods[] | select(.exit_code==0) | .uid' "$receipt")
+          artifacts="$RUNNER_TEMP/norm-branch-artifacts"
+          mkdir -p "$artifacts"
+          aws s3 cp "s3://$ISOLAB_BUCKET/runs/$job/$pod_uid/" "$artifacts/" --recursive --only-show-errors
+          (cd "$artifacts" && sha256sum -c SHA256SUMS)
+          cmp "$artifacts/build-info.json" "$RUNNER_TEMP/isolab-build/build-info.json"
+          cmp "$artifacts/protocol.json" "$RUNNER_TEMP/isolab-build/norm-branch-protocol.json"
+          jq -e --arg revision "$SOURCE_REVISION" \
+            --arg protocol "$(sha256sum "$artifacts/protocol.json" | cut -d' ' -f1)" \
+            '.schema=="norm.branch-census/v1" and .source_revision==$revision
+              and .protocol_sha256==$protocol and (.cells|length)==40' \
+            "$artifacts/artifact.json" >/dev/null
+          jq -e --arg revision "$SOURCE_REVISION" \
+            --arg protocol "$(sha256sum "$artifacts/protocol.json" | cut -d' ' -f1)" \
+            '.schema=="norm.branch-census-check/v1" and .source_revision==$revision
+              and .protocol_sha256==$protocol and .pass==true and (.errors|length)==0' \
+            "$artifacts/checker.json" >/dev/null
+          producer_verdict=$(grep -o 'verdict=[A-Z_]*' "$artifacts/producer.stdout")
+          checker_verdict=$(grep -o 'verdict=[A-Z_]*' "$artifacts/checker.stdout")
+          [[ -n "$producer_verdict" && "$producer_verdict" == "$checker_verdict" ]]
       - name: Launch, await and verify the EKS experiment
-        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep'
+        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
         run: taskq/deploy/eks-karpenter/remote/launch-remote "$RUNNER_TEMP/isolab-request.json"
       - name: Submit resumable computation and verify its fresh L2 epoch
-        if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep'
+        if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
         run: |
           set -euo pipefail
           taskq/deploy/eks-karpenter/resume/fetch-client "$RUNNER_TEMP/isolab-recovery-client"
@@ -315,7 +441,7 @@ jobs:
           "$client" submit "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
           "$client" wait "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
       - name: Report the outcome
-        if: always() && !inputs.publish_only && !inputs.size_sweep
+        if: always() && !inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census
         run: |
           if [[ -f "$ISOLAB_CLIENT_OUTPUT/result.json" ]]; then
             if jq -e '.schema=="isolab.eks.recovery-result/v1"' "$ISOLAB_CLIENT_OUTPUT/result.json" >/dev/null; then
@@ -326,6 +452,29 @@ jobs:
               "$ISOLAB_CLIENT_OUTPUT/result.json" >> "$GITHUB_STEP_SUMMARY"
           else
             printf 'No final experiment receipt. Inspect the build, publisher or launcher error.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Retain norm-branch publication, launcher and payload receipts
+        if: always() && inputs.norm_branch_census
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-norm-branch-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/norm-branch-image.json
+            ${{ runner.temp }}/norm-branch-request.json
+            ${{ runner.temp }}/norm-branch-artifacts
+            ${{ github.workspace }}/isolab-launch-output
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Report the norm-branch outcome
+        if: always() && inputs.norm_branch_census
+        run: |
+          if [[ -f "$RUNNER_TEMP/norm-branch-artifacts/checker.stdout" ]]; then
+            verdict=$(grep -o 'verdict=[A-Z_]*' "$RUNNER_TEMP/norm-branch-artifacts/checker.stdout" | cut -d= -f2)
+            artifact_sha=$(sha256sum "$RUNNER_TEMP/norm-branch-artifacts/artifact.json" | cut -d' ' -f1)
+            printf 'Norm-branch census: **%s**.\n\nTested commit: `%s`\n\nArtifact SHA-256: `%s`\n\nExact payload hashes and the independent checker passed; wall time is excluded.\n' \
+              "$verdict" "$SOURCE_REVISION" "$artifact_sha" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf 'Norm-branch census has no verified final payload. Inspect the retained publisher and launcher receipts.\n' >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Retain publication receipts without submitting an experiment
         if: always() && inputs.publish_only
