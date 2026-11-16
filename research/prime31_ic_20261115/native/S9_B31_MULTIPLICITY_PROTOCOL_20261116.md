@@ -30,3 +30,17 @@ PASS as a *generic oracle diagnostic* only if exact-source pinned Rust 1.100.0 C
 NEXT ALGEBRAIC GATE: feed the exact natural-positive Q and d-signature records into a separate blinded **target-conditioned** S9/K–S5 coefficient/root extractor, using the original-ideal and saturation certificates from crypto PRs #4228/#4349. An extractor must recover f(T) and orientation without consulting the 4A oracle. Only then run full rank-32 unknown-target ECDLP and matched cold optimized Wiener–Zuccherato rho plus external PKM/APS/F4.
 
 Sources/prior-lead audit: existing [B31 4+4 protocol](S9_B31_FOUR_PLUS_FOUR_ORACLE_PROTOCOL_20261116.md), [B4/B8 exact support](S9_SIGNED_SUPPORT_CEILING_AND_B8_GATE_20261116.md), [APS vs unfolded rho 48Q](APS_RHO_FOLD_SENSITIVITY_48Q_RESULT_20261116.md), #4228, #4349, #4391, crypto-autoresearcher Semaev alternatives SA-02/SA-14b/SA-24c, cryptanalysis #1536. KB MCP and repository wrapper unavailable in this connector runtime; absence of a search hit cannot establish novelty. No paid EKS, merge, leaderboard edit or independently signed PCC claim authorized by this protocol.
+
+
+## Separately labeled retrospective cross-base regression controls (amendment)
+
+Added **after** observing the earlier oracle's distinct source-specific [successful two-base run 43952234526](https://github.com/isogeny-labs/crypto/actions/runs/43952234526), not to the prospective 32-natural Q selection rule. That GitHub Actions producer log reports first-x 24/24 and Dickson-depth-six **22/24** eight-sum coverage on identical fixed natural public targets, both 618,885 half-sum points with no distinct-four-signature collisions. These outcomes are [pcc:unverified].
+
+The two *known* Dickson misses, with caller-only scalars independently replayed via separate modular curve arithmetic (no signed PCC), are:
+
+| Prior case | Public Q=(x,y) | Caller-verifier k (never passed to oracle) |
+| --- | --- | --- |
+| 4 | (854640086, 1374782344) | 1610011808 |
+| 21 | (1146958692, 202234633) | 1264623843 |
+
+On the *earlier sample*, both cases were positive in the first-x31 base and absent after complete scan of the special Dickson31 four-sum image. Add them as labeled **retrospective cross-base regression controls** in the new Rust source: Dickson target has zero net signatures, first-x target has >=1. Do **not** count them in the new 32-case prospective coverage estimate or claim they are new holdouts. This is a valuable falsifier for the false assumption that any B31 base has 100% eight-leaf target coverage. It does not prove a general coverage fraction or a polynomial extraction method.
