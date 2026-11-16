@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::chained_transfer::ic_control as ic;
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{
-    fb_size, jacobian_order_bsgs, random_curve, run_ic, run_rho, split_order, Arm, IcParams,
-    IcResult, Instance, RhoOut,
+    fb_size, jacobian_order_bsgs, random_curve, run_ic_oracle, run_rho, split_order, Arm, IcParams,
+    IcResult, Instance, RhoOut, SplitOracle, RESTART_DEFAULT,
 };
 use crypto_lib::cryptanalysis::ic_boundary::CountedGroup;
 use serde_json::{json, Value};
@@ -477,7 +477,14 @@ fn main() -> ExitCode {
                                 'B' => Arm::SingleLp,
                                 _ => Arm::DoubleLp,
                             };
-                            let o = run_ic(
+                            // L, M: arm C with the Cardano–Lucas splitting
+                            // test (M also with Cardano root finding).
+                            let (oracle, label) = match a {
+                                'L' => (SplitOracle::Lucas, Some("C_lucas")),
+                                'M' => (SplitOracle::LucasRoots, Some("C_lucas_roots")),
+                                _ => (SplitOracle::Frobenius, None),
+                            };
+                            let o = run_ic_oracle(
                                 inst,
                                 IcParams {
                                     arm,
@@ -486,11 +493,18 @@ fn main() -> ExitCode {
                                     max_trials: 400 * p * p.min(1 << 12),
                                     verify_relations: false,
                                 },
+                                RESTART_DEFAULT,
+                                oracle,
                             );
                             if !o.certified {
                                 *bad.lock().unwrap() = true;
                             }
-                            ic_json(&o, inst, j.seed, j.ci, w_rel, w_la)
+                            let mut v = ic_json(&o, inst, j.seed, j.ci, w_rel, w_la);
+                            v["oracle"] = json!(oracle.name());
+                            if let Some(l) = label {
+                                v["arm"] = json!(l);
+                            }
+                            v
                         }
                     };
                     println!(
@@ -514,7 +528,14 @@ fn main() -> ExitCode {
         let rv: Vec<Value> = rv.into_iter().map(|x| x.1).collect();
         // per-arm means
         let mut arms = serde_json::Map::new();
-        for name in ["A_full", "B_single_lp", "C_double_lp", "R_rho_negation"] {
+        for name in [
+            "A_full",
+            "B_single_lp",
+            "C_double_lp",
+            "C_lucas",
+            "C_lucas_roots",
+            "R_rho_negation",
+        ] {
             let rs: Vec<&Value> = rv.iter().filter(|r| r["arm"] == name).collect();
             if rs.is_empty() {
                 continue;
@@ -560,7 +581,14 @@ fn main() -> ExitCode {
     // fits and crossovers
     let mut fits = serde_json::Map::new();
     let mut cross = serde_json::Map::new();
-    for name in ["A_full", "B_single_lp", "C_double_lp", "R_rho_negation"] {
+    for name in [
+        "A_full",
+        "B_single_lp",
+        "C_double_lp",
+        "C_lucas",
+        "C_lucas_roots",
+        "R_rho_negation",
+    ] {
         for key in [
             "group_ops",
             "total_w0",

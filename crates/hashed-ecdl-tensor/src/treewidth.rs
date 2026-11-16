@@ -848,7 +848,7 @@ mod tests {
         assert!((2..=4).contains(&lower), "{lower}");
         for heuristic in [Heuristic::MinDegree, Heuristic::MinFill] {
             let run = eliminate(&grid, heuristic);
-            assert!(run.width >= 4 && run.width <= 5, "{}", run.width);
+            assert!((4..=5).contains(&run.width), "{}", run.width);
             assert_eq!(width_of_order(&grid, &run.order), Some(run.width));
         }
     }
