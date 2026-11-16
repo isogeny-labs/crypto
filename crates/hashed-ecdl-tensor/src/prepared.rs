@@ -6,6 +6,7 @@
 use crate::arithmetic::{RandomSource, Seeded};
 use crate::curve::{Curve, Point};
 use crate::reduction::{self, Certificate, Config, FactorBase};
+use crate::subgroup::SubgroupPoint;
 use crate::{integrity, invalid, overflow, Meter, Result};
 use std::cell::RefCell;
 use std::collections::{hash_map::RandomState, BTreeMap, HashSet};
@@ -159,6 +160,34 @@ impl<S: BuildHasher + Clone> PairTable<S> {
         if !self.curve.in_subgroup(target, meter)? {
             return Err(invalid("prepared query outside the certified subgroup"));
         }
+        self.decompose_validated(target, smallest_first, statistics, meter)
+    }
+
+    // Only an opaque point admitted by subgroup validation or checked closure
+    // reaches this path. Full curve/subgroup equality binds the owned Curve
+    // clone; hash lookup still supplies no validation or witness trust.
+    pub(crate) fn decompose_subgroup(
+        &self,
+        target: &SubgroupPoint,
+        smallest_first: bool,
+        statistics: &mut Statistics,
+        meter: &mut Meter,
+    ) -> Result<Option<Vec<Point>>> {
+        self.decompose_validated(
+            target.for_curve(&self.curve)?,
+            smallest_first,
+            statistics,
+            meter,
+        )
+    }
+
+    fn decompose_validated(
+        &self,
+        target: &Point,
+        smallest_first: bool,
+        statistics: &mut Statistics,
+        meter: &mut Meter,
+    ) -> Result<Option<Vec<Point>>> {
         add(&mut statistics.queries, 1)?;
         let first =
             usize::from(smallest_first && self.bases[1].threshold() < self.bases[0].threshold());
@@ -383,6 +412,98 @@ mod tests {
             Err(Error::Integrity(_))
         ));
         assert_eq!(statistics.replays, 0);
+    }
+    #[test]
+    fn provenance_queries_keep_first_witness_and_remove_only_revalidation() {
+        use crate::subgroup::SubgroupContext;
+        let mut setup = Meter::new(Limits::default());
+        let curve = curve(&mut setup);
+        let bases = bases(&curve, &mut setup);
+        let table = PairTable::new(&curve, &bases, &mut Statistics::default(), &mut setup).unwrap();
+        let context = SubgroupContext::new(&curve);
+        for scalar in 0..19u8 {
+            let admitted = context
+                .mul(&context.generator(), &scalar.into(), &mut setup)
+                .unwrap();
+            for smallest in [false, true] {
+                let mut checked = Meter::new(Limits::default());
+                let mut trusted = Meter::new(Limits::default());
+                let mut subgroup = Meter::new(Limits::default());
+                assert!(curve.in_subgroup(admitted.point(), &mut subgroup).unwrap());
+                let mut checked_stats = Statistics::default();
+                let mut trusted_stats = Statistics::default();
+                assert_eq!(
+                    table
+                        .decompose(admitted.point(), smallest, &mut checked_stats, &mut checked)
+                        .unwrap(),
+                    table
+                        .decompose_subgroup(&admitted, smallest, &mut trusted_stats, &mut trusted)
+                        .unwrap(),
+                );
+                assert_eq!(checked.used, trusted.used + subgroup.used);
+                assert_eq!(
+                    checked.curve_additions,
+                    trusted.curve_additions + subgroup.curve_additions
+                );
+                assert_eq!(checked_stats.queries, trusted_stats.queries);
+                assert_eq!(checked_stats.lookups, trusted_stats.lookups);
+                assert_eq!(checked_stats.replays, trusted_stats.replays);
+            }
+        }
+        let other_generator = curve
+            .mul(curve.generator(), &2u8.into(), &mut setup)
+            .unwrap();
+        let other_curve = Curve::new(
+            curve.modulus().clone(),
+            curve.a().clone(),
+            curve.b().clone(),
+            curve.order().clone(),
+            other_generator,
+            &mut setup,
+        )
+        .unwrap();
+        let wrong = SubgroupContext::new(&other_curve).generator();
+        let mut stats = Statistics::default();
+        assert!(matches!(
+            table.decompose_subgroup(&wrong, false, &mut stats, &mut setup),
+            Err(Error::Invalid(_))
+        ));
+        assert_eq!(stats.queries, 0);
+        let mut limited = Meter::new(Limits {
+            steps: 0,
+            ..Limits::default()
+        });
+        assert!(matches!(
+            table.decompose_subgroup(&context.generator(), false, &mut stats, &mut limited),
+            Err(Error::Limit(_))
+        ));
+    }
+
+    #[test]
+    fn provenance_queries_replay_even_a_forged_full_point_hit() {
+        use crate::subgroup::SubgroupContext;
+        let mut meter = Meter::new(Limits::default());
+        let curve = curve(&mut meter);
+        let bases = bases(&curve, &mut meter);
+        let mut table =
+            PairTable::new(&curve, &bases, &mut Statistics::default(), &mut meter).unwrap();
+        let foreign = (1..19u8)
+            .map(|k| curve.mul(curve.generator(), &k.into(), &mut meter).unwrap())
+            .find(|p| !table.members[1].contains(p))
+            .unwrap();
+        let raw = curve
+            .add(&table.ordered[0][0], &foreign, &mut meter)
+            .unwrap();
+        let admitted = SubgroupContext::new(&curve)
+            .validate(&raw, &mut meter)
+            .unwrap();
+        table.members[1].insert(foreign);
+        let mut stats = Statistics::default();
+        assert!(matches!(
+            table.decompose_subgroup(&admitted, false, &mut stats, &mut meter),
+            Err(Error::Integrity(_))
+        ));
+        assert_eq!(stats.replays, 0);
     }
     #[test]
     fn fresh_trials_rebuild_tables_before_their_queries() {
