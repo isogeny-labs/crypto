@@ -52,6 +52,33 @@ struct Solution {
 fn addp(x:u64,y:u64)->u64 {let t=x+y;if t>=P{t-P}else{t}}
 fn subp(x:u64,y:u64)->u64 {if x>=y{x-y}else{x+P-y}}
 fn mulp(x:u64,y:u64)->u64 {((x as u128*y as u128)%P as u128) as u64}
+// Exact 2^31-1 reduction, valid for canonical Fp operands. Unlike a
+// u128 general remainder, multiplication fits u64 and two folds suffice.
+#[inline(always)]
+fn mulp_mersenne(x:u64,y:u64)->u64 {
+    debug_assert!(x<P && y<P);
+    let t=x*y;
+    let folded=(t&P)+(t>>31);
+    let reduced=(folded&P)+(folded>>31);
+    if reduced>=P {reduced-P} else {reduced}
+}
+#[inline(always)]
+fn mulp_mode<const FAST:bool>(x:u64,y:u64)->u64 {
+    if FAST {mulp_mersenne(x,y)} else {mulp(x,y)}
+}
+fn pownp_mode<const FAST:bool>(mut x:u64,mut k:u64)->u64 {
+    let mut acc=1u64;
+    while k!=0 {
+        if k&1!=0 {acc=mulp_mode::<FAST>(acc,x);}
+        x=mulp_mode::<FAST>(x,x);
+        k>>=1;
+    }
+    acc
+}
+fn sqrtp_mode<const FAST:bool>(x:u64)->Option<u64> {
+    let r=pownp_mode::<FAST>(x,(P+1)/4);
+    (mulp_mode::<FAST>(r,r)==x).then_some(r)
+}
 fn pown(mut x:u64,mut k:u64,m:u64)->u64 {
     let mut a=1u64;
     while k!=0 {
@@ -178,17 +205,28 @@ fn source_walk_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
 }
 
 // S3(X,Y,U)= a U^2 + b U + c on the original prime31 curve.
-fn s3_coeff(x:u64,y:u64)->(u64,u64,u64) {
+fn s3_coeff_mode<const FAST:bool>(x:u64,y:u64)->(u64,u64,u64) {
     let sum=addp(x,y);
-    let xy=mulp(x,y);
-    let a=mulp(subp(x,y),subp(x,y));
-    let b=subp(0,mulp(2,addp(mulp(sum,addp(xy,PRIME31.a)),mulp(2,PRIME31.b))));
-    let c=subp(mulp(subp(xy,PRIME31.a),subp(xy,PRIME31.a)),
-               mulp(mulp(4,PRIME31.b),sum));
+    let xy=mulp_mode::<FAST>(x,y);
+    let a=mulp_mode::<FAST>(subp(x,y),subp(x,y));
+    let b=subp(0,mulp_mode::<FAST>(2,addp(
+        mulp_mode::<FAST>(sum,addp(xy,PRIME31.a)),
+        mulp_mode::<FAST>(2,PRIME31.b))));
+    let u=subp(xy,PRIME31.a);
+    let cc=mulp_mode::<FAST>(u,u);
+    let c=subp(cc,mulp_mode::<FAST>(mulp_mode::<FAST>(4,PRIME31.b),sum));
     (a,b,c)
 }
+fn s3_coeff(x:u64,y:u64)->(u64,u64,u64) {
+    s3_coeff_mode::<false>(x,y)
+}
+fn s3_eval_mode<const FAST:bool>(coeff:(u64,u64,u64),z:u64)->u64 {
+    let (a,b,c)=coeff;
+    addp(addp(mulp_mode::<FAST>(a,mulp_mode::<FAST>(z,z)),
+        mulp_mode::<FAST>(b,z)),c)
+}
 fn s3_eval(coeff:(u64,u64,u64),z:u64)->u64 {
-    let (a,b,c)=coeff;addp(addp(mulp(a,mulp(z,z)),mulp(b,z)),c)
+    s3_eval_mode::<false>(coeff,z)
 }
 fn signed(ar:&Arithmetic,pt:(u64,u64),s:i8)->Point {
     if s==1 {Some(pt)} else {ar.neg(PRIME31,Some(pt))}
@@ -236,7 +274,7 @@ fn reverse_index(f:&[Labelled])->HashMap<u64,Vec<usize>> {
 /// Algebraic discovery: for each first pair, compute BOTH finite roots of S3
 /// using a single row batch inversion; compare with public third-list x's.
 /// No elliptic additions or known ordinates enter this discovery stage.
-fn algebraic(
+fn algebraic_mode<const FAST:bool>(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
 )->Result<(Option<Solution>,Stats),String> {
     let lookup=reverse_index(&parts[2]);
@@ -248,43 +286,43 @@ fn algebraic(
         let mut denominators=Vec::with_capacity(parts[1].len());
         prefixes.push(1u64);
         for other in &parts[1] {
-            let f=s3_coeff(p.pt.0,other.pt.0);
+            let f=s3_coeff_mode::<FAST>(p.pt.0,other.pt.0);
             let (a,b,c)=f;
             let (denom,sqr) = if a!=0 {
-                let disc=subp(mulp(b,b),mulp(mulp(4,a),c));
+                let disc=subp(mulp_mode::<FAST>(b,b),mulp_mode::<FAST>(mulp_mode::<FAST>(4,a),c));
                 stats.s3_sqrt+=1;
-                let root=sqrtp(disc).ok_or("S3 Fp discriminant nonsquare on rational points")?;
-                (mulp(2,a),Some(root))
+                let root=sqrtp_mode::<FAST>(disc).ok_or("S3 Fp discriminant nonsquare on rational points")?;
+                (mulp_mode::<FAST>(2,a),Some(root))
             } else if b!=0 { (b,None) }
             else {return Err("zero S3 polynomial; cannot discard exceptional branch".into());};
             stats.pair_s3+=1;
-            prefixes.push(mulp(*prefixes.last().ok_or("prefix empty")?,denom));
+            prefixes.push(mulp_mode::<FAST>(*prefixes.last().ok_or("prefix empty")?,denom));
             denominators.push(denom);
             coefficients.push(f);
             sqrts.push(sqr);
         }
         let last=*prefixes.last().ok_or("missing batch prefix")?;
         if last==0 {return Err("zero denominator in rational S3 batch".into());}
-        let mut prod_inv=pown(last,P-2,P);
+        let mut prod_inv=pownp_mode::<FAST>(last,P-2);
         stats.batch_inversions+=1;
         let mut inverses=vec![0u64;parts[1].len()];
         for j in (0..parts[1].len()).rev() {
-            inverses[j]=mulp(prod_inv,prefixes[j]);
-            prod_inv=mulp(prod_inv,denominators[j]);
+            inverses[j]=mulp_mode::<FAST>(prod_inv,prefixes[j]);
+            prod_inv=mulp_mode::<FAST>(prod_inv,denominators[j]);
         }
         if prod_inv!=1 {return Err("batch inverse invariant failed".into());}
         for (j,f) in coefficients.into_iter().enumerate() {
             let (_a,b,c)=f;
             let mut roots=Vec::with_capacity(2);
             if let Some(root)=sqrts[j] {
-                roots.push(mulp(subp(root,b),inverses[j]));
-                roots.push(mulp(subp(subp(0,root),b),inverses[j]));
+                roots.push(mulp_mode::<FAST>(subp(root,b),inverses[j]));
+                roots.push(mulp_mode::<FAST>(subp(subp(0,root),b),inverses[j]));
             } else {
-                roots.push(mulp(subp(0,c),inverses[j]));
+                roots.push(mulp_mode::<FAST>(subp(0,c),inverses[j]));
             }
             roots.sort_unstable();roots.dedup();
             for z in roots {
-                if s3_eval(f,z)!=0 {return Err("incorrect S3 root extraction".into());}
+                if s3_eval_mode::<FAST>(f,z)!=0 {return Err("incorrect S3 root extraction".into());}
                 if let Some(candidates)=lookup.get(&z) {
                     for &k in candidates {
                         stats.matched_x+=1;
@@ -297,6 +335,11 @@ fn algebraic(
         }
     }
     Ok((None,stats))
+}
+fn algebraic(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
+)->Result<(Option<Solution>,Stats),String> {
+    algebraic_mode::<false>(parts,q,ar)
 }
 // Exact same admitted public labelled sets, but group sums generate the x
 // candidates. This is a SEPARATE generic baseline; it never feeds algebraic.
@@ -336,6 +379,11 @@ fn execute_sized(compare:bool,round_limit:usize,q:(u64,u64),count:usize)
 }
 fn execute_sized_mode(compare:bool,round_limit:usize,q:(u64,u64),count:usize,walk:bool)
     ->Result<serde_json::Value,String> {
+    execute_sized_mode_mul(compare,round_limit,q,count,walk,false)
+}
+fn execute_sized_mode_mul(
+    compare:bool,round_limit:usize,q:(u64,u64),count:usize,walk:bool,fast:bool
+) ->Result<serde_json::Value,String> {
     if count<2 || count>8_192 || round_limit==0 || round_limit>64 {
         return Err("inadmissible labelled-list count or trial cap".into());
     }
@@ -359,7 +407,11 @@ fn execute_sized_mode(compare:bool,round_limit:usize,q:(u64,u64),count:usize,wal
         let source_ns=source_start.elapsed().as_nanos();
         let alg_start=Instant::now();
         let additions_before=arithmetic.counts.group_additions;
-        let (solution,stats)=algebraic(&parts,q,&mut arithmetic)?;
+        let (solution,stats)=if fast {
+            algebraic_mode::<true>(&parts,q,&mut arithmetic)?
+        } else {
+            algebraic(&parts,q,&mut arithmetic)?
+        };
         let alg_ns=alg_start.elapsed().as_nanos();
         let algebraic_validation_additions=
             arithmetic.counts.group_additions-additions_before;
@@ -392,6 +444,7 @@ fn execute_sized_mode(compare:bool,round_limit:usize,q:(u64,u64),count:usize,wal
             "round":round,"public_seed":format!("{seed:016x}"),
             "points_per_partition":count,"precompute_labels_ns":source_ns,
             "public_label_source":if walk {"public_additive_walk"} else {"independent_two_scalars"},
+            "field_multiplier":if fast {"mersenne_fold"} else {"u128_mod"},
             "source_point_generation_group_additions":source_additions,
             "rejected_identity":identities,"rejected_global_duplicate_x":duplicate_x,
             "algebraic_S3_pair_roots_ns":alg_ns,"algebraic_visited_pairs":stats.pair_s3,
@@ -678,6 +731,97 @@ fn walk_source_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+fn mersenne_field_confirmation()->Result<serde_json::Value,String>{
+    // New 24-Q target panel distinct from earlier --walk-confirm: identical
+    // walk-labelled source and S3 searches, only field multiplication differs.
+    const CASES:usize=24;
+    let mut rng=0x4d45_5253_5f32_3431_u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut sums=[0u128;3];
+    let mut setups=[0u128;3];
+    let mut pairs=[0u64;3];
+    let mut successes=[0usize;3];
+    for case in 0..CASES {
+        let known=loop {
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k) {break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("fresh walk target is identity")?;
+        let order:[(usize,&str,bool);3]=if case%2==0 {
+            [(0,"u128_mod",false),(1,"mersenne",true),(2,"mersenne_repeat",true)]
+        } else {
+            [(1,"mersenne",true),(2,"mersenne_repeat",true),(0,"u128_mod",false)]
+        };
+        let mut outcomes=Vec::new();
+        for (position,(arm,label,fast)) in order.iter().enumerate() {
+            let v=execute_sized_mode_mul(false,ROUNDS,q,T,true,*fast)?;
+            let attempts=v["attempts"].as_array().ok_or("mersenne no attempts")?;
+            let last=attempts.last().ok_or("mersenne no last attempt")?;
+            let log=last.pointer("/solution/log").and_then(|x|x.as_u64());
+            let solved=v["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if solved && (log!=Some(known) ||
+                verifier.scalar(PRIME31,log.unwrap(),Some(PRIME31.g))!=Some(q)){
+                return Err(format!("mersenne arm {label} wrong scalar on case {case}"));
+            }
+            let cost=v["cold_rust_wall_ns"].as_u64().ok_or("mersenne missing wall")?;
+            let setup=attempts.iter().map(|a|
+                a["precompute_labels_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            let queries=attempts.iter().map(|a|
+                a["algebraic_visited_pairs"].as_u64().unwrap_or(0)).sum::<u64>();
+            let group_ops=attempts.iter().map(|a|
+                a["source_point_generation_group_additions"].as_u64().unwrap_or(0))
+                .sum::<u64>();
+            sums[*arm]+=u128::from(cost);
+            setups[*arm]+=setup;
+            pairs[*arm]+=queries;
+            if solved {successes[*arm]+=1;}
+            outcomes.push(json!({
+                "arm":label,"position":position,"public_target":q,
+                "complete_target_scalar_recovered":solved,"verified_log":log,
+                "rounds":attempts.len(),"cold_wall_ns":cost,
+                "paid_source_setup_ns":setup.to_string(),
+                "algebraic_pair_quadratics":queries,
+                "source_group_additions":group_ops,
+                "unresolved_within_three_rounds":!solved,
+                "attempts":attempts
+            }));
+        }
+        // Order alternates, but every branch must visit the same algebraic
+        // quadratic count on identical public labels; any difference is a
+        // candidate-selection or arithmetic-correctness regression.
+        let ref_pairs=outcomes[0]["algebraic_pair_quadratics"].as_u64();
+        if outcomes.iter().any(|o|o["algebraic_pair_quadratics"].as_u64()!=ref_pairs
+            || o["rounds"].as_u64()!=outcomes[0]["rounds"].as_u64()
+            || o["verified_log"].as_u64()!=outcomes[0]["verified_log"].as_u64()) {
+            return Err(format!("mersenne source/search outputs diverged case {case}"));
+        }
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_answer_caller_verification_only":known,
+            "outcomes":outcomes
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experimental_status":"producer-development Rust paired complete-solver panel, not independent EKS L2/PCC",
+        "classification":"APS 2018 one-relation index-calculus methodology; still generic pair-MITM equivalent",
+        "p":P,"n":N,"cofactor":1,"T":T,"round_cap":ROUNDS,
+        "fresh_public_targets":CASES,
+        "arms":["u128_mod","mersenne","mersenne_repeat"],
+        "successes":successes,
+        "cold_total_ns":sums.map(|v|v.to_string()),
+        "source_setup_total_ns":setups.map(|v|v.to_string()),
+        "algebraic_S3_pair_queries":pairs,
+        "all_success_gate":successes.iter().all(|&v|v==CASES),
+        "paired_design":"alternate original-fast-fast and fast-fast-original; identical walk sources and full cold cost",
+        "scientific_limit":"same-sources old/new Rust, producer only; no independent PCC or external IC-frontier claim",
+        "cases_detail":cases
+    }))
+}
+
 fn heldout_twelve()->Result<serde_json::Value,String>{
     // Caller-side fixture generation; the scalar is never passed to execute().
     // These known answers are verified only after the complete algebraic solve.
@@ -734,6 +878,14 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--mersenne-confirm" {
+        let result=mersenne_field_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        if result["all_success_gate"].as_bool()!=Some(true) {
+            return Err("fresh Mersenne field panel did not complete every scalar".into());
+        }
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--walk-confirm" {
         let result=walk_source_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -761,7 +913,7 @@ fn main()->Result<(),String> {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm|--walk-confirm".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm|--walk-confirm|--mersenne-confirm".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
@@ -773,6 +925,41 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn mersenne_field_mul_canonical_and_s3_equivalent() {
+        let vals=[0,1,2,3,4,31,P/2,P-2,P-1];
+        for &x in &vals {
+            for &y in &vals {
+                assert_eq!(mulp_mersenne(x,y),mulp(x,y));
+            }
+        }
+        let mut seed=0x4d45_5253_5f50_3331u64;
+        for i in 0..100_000u64 {
+            let x=prng(&mut seed)%P;
+            let y=prng(&mut seed)%P;
+            assert_eq!(mulp_mersenne(x,y),mulp(x,y),"pair {i}");
+            if i%101==0 {
+                assert_eq!(s3_coeff_mode::<true>(x,y),s3_coeff_mode::<false>(x,y));
+                let f=s3_coeff_mode::<true>(x,y);
+                let z=prng(&mut seed)%P;
+                assert_eq!(s3_eval_mode::<true>(f,z),s3_eval_mode::<false>(f,z));
+            }
+        }
+        for &v in &vals {
+            assert_eq!(sqrtp_mode::<true>(v),sqrtp_mode::<false>(v));
+        }
+    }
+    #[test]
+    fn mersenne_s3_preserves_complete_public_search_trace() {
+        let slow=execute_sized_mode_mul(false,1,PUBLIC_Q,128,true,false).unwrap();
+        let fast=execute_sized_mode_mul(false,1,PUBLIC_Q,128,true,true).unwrap();
+        assert_eq!(slow["complete_target_scalar_recovered"],fast["complete_target_scalar_recovered"]);
+        assert_eq!(slow["attempts"][0]["algebraic_visited_pairs"],
+            fast["attempts"][0]["algebraic_visited_pairs"]);
+        assert_eq!(slow["attempts"][0]["solution"],
+            fast["attempts"][0]["solution"]);
+    }
+
     #[test]
     fn s3_field_roots_match_ec_semantics() {
         let mut ar=Arithmetic::default();
