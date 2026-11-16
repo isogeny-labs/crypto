@@ -1,0 +1,39 @@
+# DRAFT (L10). Provisional id: re-mint with tools/allocate_id.py --next known_result --area IC.
+# Receipt: ic-prime-eth-leads-20261031/lean/IcTensorRoute.lean (blackbox_balance, no_crossover,
+# crossover_bits, arity_two_blackbox), built 2026-10-31 with Mathlib, axioms propext/Classical.choice/Quot.sound.
+# Labels: Lean-derived inside the stated cost model; the model itself is a plan/reading, not measured.
+id: KR-IC-a10001
+area: index-calculus
+kind: known_negative
+title: Black-box D.1 index calculus cannot cross rho below 2^256-bit groups, and the Bochum arity balance is optimal
+claim: >-
+  Model (assumed, not proved in Lean): relation phase costs 2^{b/m} attempts, each a black-box Boolean
+  tensor contraction of an mb-edge network at 2^{c*m*b/g}, g = sqrt(log2 b), c the unknown constant in
+  Theorem D.1's O(s/sqrt(log s)); linear algebra, m! and polylog factors dropped (all in the direction
+  favourable to index calculus). Inside that model, derived by Lean theorems blackbox_balance (for every
+  real m>0, E(m)^2 >= 4*c*b^2/g, so the Bochum m ~ (log b)^{1/4} is optimal up to the constant),
+  no_crossover (E(m)/b < 1/2 with m >= 3 forces g > 16c), arity_two_blackbox (m = 2 is never below
+  rho for any c >= 0) and crossover_bits (g integer > 16 and g*g <= log2 b gives log2 b > 256). For
+  c >= 1 (an assumption: D.1 states O(.)), crossing rho needs log2 b > 256, i.e. a group of more than
+  2^256 bits; for general c the threshold is log2 b > 256 c^2. Hence the Bochum route is not a
+  usable ECDLP attack at any deployed size unless the contractor exponent on these networks improves
+  from s/sqrt(log s), or relation networks need o(mb) edges.
+status: heuristic
+setting: {field: prime, model: black_box_boolean_tensor_contraction}
+cost: "E(m) = b/m + c*m*b/sqrt(log2 b) bits; minimum 2*b*sqrt(c/g) at m = sqrt(g/c); below b/2 only if log2 b > 256 c^2"
+sources:
+  - ref: KN-LIT-caa51d      # ETH is false (openai/math), Appendix D, Theorem D.1
+    locator: "Appendix D, Thm D.1 (2^{O(s/sqrt(log s))}, black-box vertices)"
+    verification_state: full_text_read   # prior-session reading per LEADS.md s1; not re-checked in L10
+  # TODO before filing: mint a KN-LIT for Akshima et al. (Bochum v0.2, Thm 4, Lemma 11); none exists in knowledge/literature.
+forecloses:
+  - Bochum hashed factor base beats rho
+  - subexponential ECDLP via tensor contraction at practical sizes
+  - choose a larger factor-base arity m to cross rho with the D.1 contractor
+  - D.1 black-box index calculus crossover
+internal:
+  - {ref: LEAD-EXO-hashed-factor-base-tensor-ecdl, relation: extends, note: "constrains it: with c>=1 the conditional theorem is below rho only above 2^256 bits"}
+open: []
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

@@ -1,5 +1,7 @@
 //! Exact source profiles for the four Q28 boundary points.
 use super::*;
+#[path = "coupled22.rs"]
+pub(crate) mod coupled22;
 pub fn profile(dir: &Path) {
     let f = F::new(360, 45);
     let mut records = vec![];

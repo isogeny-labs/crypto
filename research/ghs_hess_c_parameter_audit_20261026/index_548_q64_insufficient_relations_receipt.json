@@ -1,0 +1,21 @@
+{
+  "schema": "ghs-hess-c-parameter-magma/v1",
+  "endpoint": "https://calculator.magma-maths.org/execute",
+  "input_file": "index_548_q64.magma",
+  "input_sha256": "3976f60d4d0d40c903f6f61b4f1f40b87da0e095b71870eee56f787ddd937f86",
+  "http_status": 200,
+  "response": {
+    "success": false,
+    "stdout": "basechange_field 64 degree 4\nideal_basis 10\nideal_basis 8\nideal_basis 7\nideal_basis 8\nlifted_degree 0 0\nlifted_orders false true true\n\nTry to find factor base of size 47\nTry to find 48 relations.\n\nFind splitting multiple of first input\n\nFind splitting multiple of second input\n\nFirst index calculus input: Divisor 1*Place at (s^18 : s^32 : 1) + 1*Place at \n(s^32 : s^45 : 1) + 1*Place at (s^33 : s^61 : 1)\nMultiple of original input: 10\n\nSecond index calculus input: Divisor 1*Place at (s^8 : s^44 : 1) + 1*Place at \n(s^33 : s^27 : 1) + 1*Place at (s^54 : 1 : 1)\nMultiple of original input: 2\n\nSieving\n\nNumber of relations found: 48\nNumber of elements in factor base: 51\nRuntime error: \nNot enough relations found\n\n\n>> print \"index_answer\", answer, \"index_cpu\", Cputime(tic);\n                         ^\nUser error: Identifier 'answer' has not been declared or assigned\n\n>> assert answer*G eq Q;\n          ^\nUser error: Identifier 'answer' has not been declared or assigned\n\n>> print \"source_verified\", answer*G eq Q;\n                            ^\nUser error: Identifier 'answer' has not been declared or assigned\n",
+    "exit_code": 0,
+    "truncated": false,
+    "magma": {
+      "version": "2.30-1",
+      "seed": 1809923051,
+      "time_sec": 0.76,
+      "memory": "32.09MB"
+    },
+    "warnings": [],
+    "error": "An error occurred. See the output for details."
+  }
+}

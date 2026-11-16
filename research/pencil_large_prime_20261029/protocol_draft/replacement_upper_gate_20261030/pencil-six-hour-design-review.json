@@ -1,0 +1,136 @@
+{
+  "schema": "pencil-replacement-upper-gate-independent-design-review/v1",
+  "created_utc": "2026-10-30T05:24:29Z",
+  "reviewer": "/root/ci_audit",
+  "review_mode": "read_only_protocol_and_bound_evidence_review",
+  "protocol": {
+    "path": "research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/protocol.json",
+    "sha256": "9780db72036f40f9ea27137e0b526a0d388b6cd265c130ccb0b70c5767882e11",
+    "freeze_status": "draft",
+    "version": 3
+  },
+  "review_result": "bounded_ready_for_freeze_and_commit_after_declared_prelaunch_bindings; not launch admission",
+  "blocking_findings": [],
+  "checks": {
+    "exact_protocol_bytes": {
+      "passed": true
+    },
+    "prospective_single_replacement": {
+      "passed": true,
+      "observed": "A-known-prior-b1-prospective-replacement is explicitly after known b1 data and before replacement observations; replacement count is one; b1 is retained and excluded; no automatic further scientific retry."
+    },
+    "known_prior_b1_data": {
+      "passed": true,
+      "terminal_state_sha256": "d3985784784f82244779f0db72bb7e996a7947f571e11fa23701bd856d9580be",
+      "observed": "Prior packet records 2 warmups, 0 measured rows and 16 missing slots; no prior row fills replacement coverage and no prior clock or cost ratio is promoted."
+    },
+    "frozen_input_identity": {
+      "passed": true,
+      "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "runtime_image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+      "spec_sha256": "d4ec180d5a2cf65617a5821b565ec0d4952435a77669da65ca77852d2723c32c",
+      "prepared_plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
+      "request_spec_semantically_equal_to_prepared_spec": true,
+      "request_scientific_fields_equal_to_b1": true,
+      "permitted_request_changes": [
+        "run_name",
+        "deadline_unix_seconds"
+      ],
+      "early_rejection_integrated": false
+    },
+    "geometry_and_denominator": {
+      "passed": true,
+      "workloads": 1,
+      "arms": 3,
+      "warmup_rows": 3,
+      "measured_rows": 15,
+      "planned_rows": 18,
+      "measured_pairs": 5,
+      "pricing_cells": 36,
+      "complete_denominator_required": true,
+      "missing_or_ineligible_prices_null": true
+    },
+    "finite_coverage_applicability": {
+      "passed_for_source_applicability": true,
+      "review_sha256": "49eea655a79aa9e055e3ea547d920a669010a5d2616d22a2e292e18e9cda6020",
+      "instrument_source_matches": true,
+      "instrument_binary_matches": true,
+      "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "exact_frozen_body_binding_still_required_before_launch": true
+    },
+    "resource_and_stop_rules": {
+      "passed_as_conditional_guard": true,
+      "authorization_recorded_utc": "2026-10-30T05:17:54Z",
+      "cumulative_active_worker_seconds": 21600,
+      "outer_deadline_utc": "2026-10-30T11:17:54Z",
+      "request_internal_deadline_utc": "2026-10-30T08:10:24Z",
+      "max_active_payloads": 1,
+      "seconds_per_execution": 3600,
+      "memory_bytes": 8589934592,
+      "coefficient_cap": 25000000,
+      "operational_review_sha256": "a865795463c9f24c6f553c6534692c64a1f89e2135a47c4674b56e586dc0d7f0",
+      "limits": "Conditional on normal Kubernetes/OS deadline enforcement, serial payloads and live owner/termination reconciliation; no hard-real-time claim."
+    },
+    "recovery_semantics": {
+      "passed": true,
+      "observed": "Top-level checkpoint policy none describes the fresh benchmark epoch; extensions.computation_epoch separately binds CRIU interval 300, max_restores 1 and invalid post-restore clocks. Counted units remain eligible only subject to replay and identity checks."
+    },
+    "gate_before_cohort": {
+      "passed": true,
+      "requirements": [
+        "complete replacement gate",
+        "all 15 measured source/count observations independently replayed",
+        "independent gate review",
+        "separately frozen prospective full-cohort admission",
+        "remaining resource allowance reconciled"
+      ],
+      "upper_gate_rows_reused_in_cohort": false,
+      "later_cohort_execution_authorized": false
+    },
+    "timing_claim_boundary": {
+      "passed": true,
+      "wall_valid": false,
+      "timing_qualification": false,
+      "original_timing_requirement": "unfulfilled",
+      "observed": "No old or replacement clock ratio can be promoted; short-call and boundary/phase mismatches remain explicit."
+    },
+    "binding_integrity": {
+      "passed": true,
+      "path_hash_bindings_checked": 13,
+      "analysis_source_hashes_checked": 14,
+      "mismatches": []
+    },
+    "native_draft_validation": {
+      "passed": true,
+      "validate_exit": 0,
+      "validator_output_schema": "pencil-native-protocol-validation/v1",
+      "document_modified": false
+    }
+  },
+  "required_before_freeze_or_commit": [
+    "Preserve these exact draft bytes except the mechanical freeze fields and explicit binding of this independent review; any scientific-field edit requires review of the new hash.",
+    "Record the frozen canonical body hash and commit before any replacement observation."
+  ],
+  "required_before_launch": [
+    "Bind external finite-category coverage to the exact frozen canonical body; the source-applicability review alone is not that binding.",
+    "Complete live owner, prior-worker termination, request/client/runtime and cumulative-spend reconciliation.",
+    "Produce the guard/admission receipt; extensions.continuation_envelope.guard_and_admission_receipt is currently null.",
+    "Keep scientific_admission and launch authorization false until those checks pass."
+  ],
+  "required_after_gate_before_any_full_cohort": [
+    "Retain all 18 planned slots and every failure, cap and missing outcome.",
+    "Require all 15 measured source/count observations to pass independent non-wall replay and complete known-answer/source checks.",
+    "Complete independent gate review with all 36 cells exact or null under the complete-denominator rule.",
+    "Freeze and admit a separate prospective full-cohort contract; do not reuse the upper-gate rows as cohort rows and do not reset the shared resource allowance."
+  ],
+  "limitations": [
+    "This is a design and binding review, not a live cloud-state, deployment, execution, mathematical replay or outcome review.",
+    "The operational guard is conditional and does not prove an absolute deadline under arbitrary scheduler, host or enforcement failure.",
+    "The prior source coverage review supports the unchanged finite semantic model only; it is not a CPU, allocator, infrastructure or timing census.",
+    "Validator success establishes schema/admission logic only and is not empirical qualification."
+  ],
+  "new_solver_executions": 0,
+  "new_cloud_actions": 0,
+  "protocol_files_modified": 0
+}

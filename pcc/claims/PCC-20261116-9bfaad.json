@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T08:00:32Z",
+ "id": "PCC-20261116-9bfaad",
+ "kind": "theorem",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d429052c5f4fbfeea06669c637bbe978469448f0505518367a63b7cb12b5da56",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+   "theorem": "CubicNormDescent.recover_base_square_root"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact stated generic CommRing or canonical Fin223 arithmetic; original natural/modular square model only. Field/Jacobian/geometry/native word execution/cost correspondence separate. Immutable source, original dual-gate15/0 data pcc/claims/PCC-20261116-26ec43.json; unsigned until original standing.",
+ "statement": "theorem recover_base_square_root {R : Type} [CommRing R] (D invD u : R) (hinv : invD*D=1) (hu : u^2=D^3) : (u*invD)^2=D"
+}

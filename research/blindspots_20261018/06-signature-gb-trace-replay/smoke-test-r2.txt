@@ -1,0 +1,19 @@
+# Item 06 repair-pass smoke test (before any r2 card), binary built from examples/blindspots_06_signature_gb.rs sha256 48a39c343ff7abee7fb38bb9a0790d10e353c7b71a0eb5b9209ad60425f45dbc
+# old = first-run instrument d9d7ffc3ca8d0cc5ab0fc2bc6ad8a9f3e772419f31ba091919bd4d7256b1a6d1, new = repaired instrument; both rustc -C opt-level=3 -C target-cpu=native
+# 1. b06 selftest (new binary), full output below its criteria lines
+criteria fired in sig over the selftest: K0 107115944 K1 5278789 K2 161226124 K3 602 K4 1738182 singular 85285
+replays: 980 run, 120 own-trace replays of unsat systems refuted without fallback, 619 fell back (never a wrong verdict)
+SELFTEST OK
+# 2. old vs new, held-out target 16 of every cell (not a measured target), arms f4,sig,sig4,sig0,sigc (--touch-ratio 2 --sig-time-limit 25) and f4r,f4n,f4rs (--trace-target 16):
+#    36 rows each; every counted field equal (ms, rss and phase times excluded) in 33 rows. The 3 differing rows are c15-3-4 sig4, sig0, sigc, stopped by the 25 s time limit
+#    (status timelimit in both; touches at the stop differ: 14587358224/13982098243, 15461670138/15267716662, 5323535263/5323839346), which depends on wall time, not on the change.
+# 3. the card 03 long command on the new binary (c17-4-3 target 0, f4,sig --touch-ratio 100 --sig-time-limit 100 --time-limit 90 --total-limit 120, prlimit --as=4294967296):
+#    first run: abort 'memory allocation of 3221225472 bytes failed' (exit -6, Vec<Cand>::grow_one in Sig::step); new binary:
+c17-4-3 t0 f4: refuted D=4 steps=10 zero=7762 touches=319194055 0.8s
+c17-4-3 t0 sig: memcap D=4 steps=3907 zero=8 touches=9326573394 43.1s
+#    exit 0, 44 s, status memcap (the guard stops the step before the doubling reallocation)
+# 4. same command on target 16 (touch cap 100x reached, no abort): 
+c17-4-3 t16 f4: refuted D=4 steps=8 zero=6556 touches=268578599 0.6s
+c17-4-3 t16 sig: touchcap D=5 steps=3116 zero=12 touches=27264185408 83.6s
+# 5. b06 summarize on raw/ of the first run: identical to raw/card-14-summarize.stdout.log except the mem(f4/X) column of two c17-4-3 rows (rss of f4 target 0 now read from the card 02 row, the -long- file is skipped): 4.269/4.272 and 2.042/2.043
+#    r2 override test (staged dir, throwaway): a card-NN-r2 file replaces a row of the same (cell, target, arm) regardless of name order; a -long- file is not read

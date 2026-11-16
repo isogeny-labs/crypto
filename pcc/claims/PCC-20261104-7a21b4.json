@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-04T06:25:04Z",
+ "id": "PCC-20261104-7a21b4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "19e565e33bfda1089d8b6337e9aee1798ef22591",
+  "model": "claude-mythos-5-1",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2b9f6e7c3651040e1fe131a1fe3a85f12bc75516594d605292d4b7c85ec12b21",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SolvingDegreeBound.linear_count_of_gb_in_subspace"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; statement fidelity per research/ecdlp_weakness_lean_20261104/README.md",
+ "statement": "A Groebner basis lying in a finite-dimensional subspace S forces k <= dim(S intersect {totalDegree <= 1}) when the ideal has k linear leading monomials on distinct variables and does not contain 1."
+}

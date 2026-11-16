@@ -10,9 +10,6 @@ representative had no explanation beyond an association with class number.
    p = 7, 13, 37, 41, 43, 47, 53 and 59 reproduce every retained CSV byte for
    byte. p = 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109 and 113 are new. The queue continues through p = 199.
 1. **Every census label through p = 109 is now certified.** A new counter
-   returns a group order only when it is the unique Hasse-interval candidate
-   compatible with the tested points on the curve and its twist. Reruns at
-   p = 7, 13, 37, 41, 43, 47, 53 and 59 reproduce every retained CSV byte for
    byte. p = 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107 and 109 are new. The queue continues through p = 199.
 2. **The number of 8th-power Legendre parameters in a class is an exact
    2-adic formula times a Hurwitz class number.** The formula reproduces
@@ -144,7 +141,6 @@ Hurwitz sum with the 2-part of the conductor removed. For `k ≥ 2`:
 ```
 N₈(t) = H_odd(t) · (2 − s) · 2^(k−2)                      if t ≢ ±(Q+1) (mod 32)
 N₈(t) = H_odd(t) · [5 (2 − s) · 2^(k−2) − 6 (1 − s)]      if t ≡ ±(Q+1) (mod 32)
-```
 
 and `N₈(t) = 0` for `k = 1`, which is the proved theorem. Here `N₈(t)` is
 the number of 8th powers `λ` with `|trace(L_λ)| = t`.
@@ -235,7 +231,6 @@ of −57.1 (z = −2.12), are exploratory, were not registered and are two-sided
 readings of noise-level numbers of rows, so they are not evidence of a
 deficit. p = 113 has 0 / 715,064 depth-1 weak classes.
 **Follow-up so far, four of five fresh primes.** p = 101 came in at 454
-against 453.3 (+0.7), p = 103 at 442 against 460.3 (−18.3), p = 107 at 488
 against 480.2 (+7.8) and p = 109 at 516 against 488.9 (+27.1). The pooled
 statistic over those four is +17.3 with sd 37.6, z = 0.46: no excess (the
 rejection threshold is 2.0). Over all fourteen scored primes the pooled excess
@@ -318,7 +313,6 @@ ISO1_P=19 ISO1_TRACES=t19.txt gp -q -f research/iso1_weak_classes_20261007/resid
 $B/iso1_residual_model exact om19.csv L19.csv
 $B/iso1_residual_model holdout 61 p61.csv L61.csv
 $B/iso1_residual_model predict 71 L71.csv
-```
 
 The model is evaluated natively by `iso1_residual_model`
 ([source](../census_runtime/src/residual_model.rs)). The first evaluations and
@@ -332,3 +326,64 @@ numbers are GRH-conditional. That affects the model's predictions, not the
 census labels. The small-prime census CSVs and the gzipped class-level
 tables are in [data/](data/). This round used PARI/GP 2.15.4 on a 4-core
 Linux container.
+
+
+1. **Every census label through p = 137 is now certified.** A new counter
+   byte. p = 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 and 137 are new. The queue continues through p = 199.
+   67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 and 137, which were predicted before their censuses finished (113 falls 0.6 below its interval, a deficit). The dispersion is
+
+
+
+
+
+
+
+| **127** | **21,682,753** | **46** | resumed\* | **new**: 1,014,958 / 2,032,254 ordinary rows weak; 0 / 1,016,128 depth-1 weak; 1,168 / 1,016,126 high-depth zero |
+| **131** | **24,545,951** | **51** | resumed\* | **new**: 1,114,294 / 2,230,930 ordinary rows weak; 0 / 1,115,466 depth-1 weak; 1,170 / 1,115,464 high-depth zero |
+| **137** | **29,360,973** | **54** | resumed\* | **new**: 1,275,080 / 2,552,584 ordinary rows weak; 0 / 1,276,292 depth-1 weak; 1,212 / 1,276,292 high-depth zero |
+
+
+[p = 71](../certified_20261016/p71_cert.csv.gz) CSVs. \*p = 71 through 137 ran in
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| **127** | post-test prediction (e = 8) | 508,063 | **584** | 568.5 [528.0, 609.0] | **pass** | 0.999 | 0.997 |
+| **131** | post-test prediction (e = 3) | 557,732 | **585** | 589.7 [548.4, 631.0] | **pass** | 1.005 | 0.997 |
+| **137** | post-test prediction (e = 4) | 638,146 | **606** | 613.9 [571.9, 656.0] | **pass** | 1.003 | 0.997 |
+
+
+
+**After the test: p = 127, 131 and 137.** Each prediction was committed before its census finished or started, outside the closed follow-up test; the zero counts are in the table above. Over all eighteen primes from 53 on the pooled excess is +76.7 (sd 74.9, z = 1.02); the e = 3 group (9 primes) gives z = 1.65, and the pooled e ≥ 4 excess is -7.9 (sd 54.7).
+
+
+
+
+
+
+
+
+
+
+* Exact for p ≤ 137: the class labels, certified.
+* Census status: p ≤ 137 complete and certified; the queue runs the remaining
+
+
+
+

@@ -664,6 +664,472 @@ fn specialise(paths: &[String]) {
     }
 }
 
+/// Outcome of one `dreg_closure --fix` record: the closure refutes at ≤ 4,
+/// does not (degree 4 saturated without `1`), or is unmeasured (empty or cut).
+fn fix_outcome(path: &str) -> &'static str {
+    let text = std::fs::read_to_string(path).unwrap_or_default();
+    let Some(line) = text.lines().find(|l| !l.trim().is_empty()) else {
+        return "unmeasured";
+    };
+    let v: Value = serde_json::from_str(line).expect("json");
+    match v["closure_degree"].as_u64() {
+        Some(d) if d <= 4 => "refutes",
+        _ => {
+            let sat4 = v["scan"].as_array().unwrap().iter().any(|s| {
+                s["degree"] == 4 && s["saturated"] == true && s["closure_refuted"] == false
+            });
+            if sat4 {
+                "does not"
+            } else {
+                "unmeasured"
+            }
+        }
+    }
+}
+
+/// Score `research/dreg_closure_guess_20261022` (its PREREGISTRATION.md): one
+/// `dreg_closure --fix` output per `<cell>.d<K>.<arm>.jsonl`, arm `G6` (the
+/// positive control) or `G<K>b<B>` (branch B, 0..2^K, of the K guessed
+/// variables; K is `--k K`, default 4).  Per draw, K guesses suffice when all
+/// 2^K branches refute at ≤ 4 and fail once one branch does not; the run stops
+/// a draw's branches at its first failure.  Controls are valid when G6 refutes
+/// on ≥ 3 of the 4 draws; then ≥ 3 draws sufficing reads "K guesses suffice at
+/// ℓ = 8", ≥ 3 failing reads "K guesses do not suffice", anything else is mixed.
+fn guess(args: &[String]) {
+    let mut k: u32 = 4;
+    let mut paths: Vec<String> = Vec::new();
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if a == "--k" {
+            k = it.next().expect("--k K").parse().expect("K");
+        } else {
+            paths.push(a.clone());
+        }
+    }
+    let nb = 1u32 << k;
+    let words = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    ];
+    let kw = words
+        .get(k as usize)
+        .map_or_else(|| k.to_string(), |w| w.to_string());
+    let mut grid: BTreeMap<(String, u64), BTreeMap<String, &'static str>> = BTreeMap::new();
+    for path in &paths {
+        let name = std::path::Path::new(path)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or("")
+            .trim_end_matches(".jsonl")
+            .to_string();
+        let parts: Vec<&str> = name.split('.').collect();
+        assert_eq!(parts.len(), 3, "{path}: want <cell>.d<K>.<arm>.jsonl");
+        let draw: u64 = parts[1].trim_start_matches('d').parse().expect("d<K>");
+        grid.entry((parts[0].to_string(), draw))
+            .or_default()
+            .insert(parts[2].to_string(), fix_outcome(path));
+    }
+    println!("| cell | draw | G6 (6,6,6) | G{k} branches refuting | G{k} branches not refuting | G{k} unmeasured | {kw} guesses |");
+    println!("|---|--:|---|--:|--:|--:|---|");
+    let (mut g6_ref, mut suffice, mut fail, mut draws) = (0, 0, 0, 0);
+    for ((cell, draw), row) in &grid {
+        draws += 1;
+        let g6 = *row.get("G6").unwrap_or(&"missing");
+        if g6 == "refutes" {
+            g6_ref += 1;
+        }
+        let (mut r, mut n, mut u) = (0, 0, 0);
+        for b in 0..nb {
+            match row.get(&format!("G{k}b{b}")).copied() {
+                Some("refutes") => r += 1,
+                Some("does not") => n += 1,
+                _ => u += 1,
+            }
+        }
+        let verdict = if n > 0 {
+            fail += 1;
+            "do not suffice"
+        } else if r == nb {
+            suffice += 1;
+            "suffice"
+        } else {
+            "incomplete"
+        };
+        println!("| {cell} | {draw} | {g6} | {r} | {n} | {u} | {verdict} |");
+    }
+    println!();
+    let valid = g6_ref >= 3;
+    println!(
+        "Control: G6 refutes on {g6_ref} of {draws} (need ≥ 3) → {}",
+        if valid { "valid" } else { "NOT valid" }
+    );
+    let v = if !valid {
+        "uninformative (control not valid)".to_string()
+    } else if suffice >= 3 {
+        format!("{kw} guesses suffice at ℓ = 8")
+    } else if fail >= 3 {
+        format!("{kw} guesses do not suffice at ℓ = 8")
+    } else {
+        "mixed".to_string()
+    };
+    println!("Draws: {suffice} suffice, {fail} do not → {v}");
+}
+
+/// The registered draw set of `research/dreg_closure_null22_7_20261028`: the first
+/// four unsatisfiable and the first two satisfiable draws in draw order, read
+/// from its frozen draw file.  The scorer works from this set, never from the
+/// files it happens to be given, so a missing draw cannot pass unnoticed.
+const NULL_DRAWS: &str = "research/dreg_closure_null22_7_20261028/draws/m3-22-7.jsonl";
+
+fn registered_from(text: &str) -> Option<(Vec<u64>, Vec<u64>)> {
+    let mut rows: Vec<(u64, bool)> = Vec::new();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        let v: Value = serde_json::from_str(line).ok()?;
+        rows.push((v["draw"].as_u64()?, v["outcome"]["kind"] == "satisfiable"));
+    }
+    rows.sort();
+    let unsat: Vec<u64> = rows.iter().filter(|r| !r.1).map(|r| r.0).take(4).collect();
+    let sat: Vec<u64> = rows.iter().filter(|r| r.1).map(|r| r.0).take(2).collect();
+    (unsat.len() == 4 && sat.len() == 2).then_some((unsat, sat))
+}
+
+/// A satisfiable-draw record is a measured soundness control only when its scan
+/// reached degree 4, saturated there, and does not refute; a capped or short scan
+/// is unmeasured (`None`).  `Some(true)` is a refutation of a satisfiable system.
+fn sound_control(v: &Value) -> Option<bool> {
+    let scan = v["scan"].as_array()?;
+    let d4 = scan.iter().find(|s| s["degree"] == 4)?;
+    if d4["saturated"] != true {
+        return None;
+    }
+    let refuted = v["refuted_satisfiable"] == true
+        || scan
+            .iter()
+            .any(|s| s["xl_refuted"] == true || s["closure_refuted"] == true);
+    Some(refuted)
+}
+
+fn null_verdict(valid: bool, n0_ref: usize, n0_not: usize, n0_unm: usize) -> &'static str {
+    if !valid {
+        "uninformative (controls not valid)"
+    } else if n0_unm > 0 {
+        "incomplete (an N0 run is unmeasured)"
+    } else if n0_not >= 3 {
+        "N0 does not refute on at least 3 draws: the pure l = 7 reading"
+    } else if n0_ref >= 3 {
+        "N0 refutes on at least 3 draws: l = 7-ness alone does not explain the G3 failure"
+    } else {
+        "mixed"
+    }
+}
+
+/// Score `research/dreg_closure_null22_7_20261028` (its PREREGISTRATION.md): one
+/// `dreg_closure` output per `<cell>.d<K>.<arm>.jsonl`, arm `N0` (the unspecialised
+/// system), `B` (the dimension-6 positive control) or `S` (a satisfiable draw,
+/// which the closure must never refute), plus the identity control
+/// `fresh-m3-19-7.d0.jsonl`, compared field by field with the committed
+/// scale-study record.  Fail-closed: the registered draws are enumerated from the
+/// frozen draw file, a missing or short record is unmeasured, and an `S` record
+/// counts only with a saturated degree-4 scan.  Controls are valid when the
+/// identity control matches, `B` refutes on at least 3 of the 4 draws, and both
+/// `S` draws are measured and unrefuted; then `N0` not refuting on at least 3
+/// reads "the pure l = 7 reading", refuting on at least 3 reads "l = 7-ness
+/// alone does not explain it", and anything else is mixed.
+fn matched_null(paths: &[String]) {
+    let mut found: BTreeMap<(u64, String), String> = BTreeMap::new();
+    let mut n7: Option<String> = None;
+    for path in paths {
+        let name = std::path::Path::new(path)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or("")
+            .trim_end_matches(".jsonl")
+            .to_string();
+        if name == "fresh-m3-19-7.d0" {
+            n7 = Some(path.clone());
+            continue;
+        }
+        let parts: Vec<&str> = name.split('.').collect();
+        assert_eq!(parts.len(), 3, "{path}: want <cell>.d<K>.<arm>.jsonl");
+        let draw: u64 = parts[1].trim_start_matches('d').parse().expect("d<K>");
+        found.insert((draw, parts[2].to_string()), path.clone());
+    }
+    let Some((unsat, sat)) = std::fs::read_to_string(NULL_DRAWS)
+        .ok()
+        .and_then(|t| registered_from(&t))
+    else {
+        println!("cannot enumerate the registered draws from {NULL_DRAWS}");
+        println!("Controls: NOT valid");
+        println!("Verdict: incomplete (the registered draw set is unreadable)");
+        return;
+    };
+    let ignored = found
+        .keys()
+        .filter(|(d, a)| !(a == "S" && sat.contains(d)) && !(a != "S" && unsat.contains(d)))
+        .count();
+    println!("| draw | N0 (unspecialised) | B (6,6,6) |");
+    println!("|--:|---|---|");
+    let (mut n0_ref, mut n0_not, mut n0_unm, mut b_ref) = (0, 0, 0, 0);
+    for d in &unsat {
+        let get = |arm: &str| {
+            found
+                .get(&(*d, arm.to_string()))
+                .map_or("missing", |p| fix_outcome(p))
+        };
+        let (n0, b) = (get("N0"), get("B"));
+        match n0 {
+            "refutes" => n0_ref += 1,
+            "does not" => n0_not += 1,
+            _ => n0_unm += 1,
+        }
+        if b == "refutes" {
+            b_ref += 1;
+        }
+        println!("| {d} | {n0} | {b} |");
+    }
+    println!();
+    let identity = n7.as_ref().map(|path| {
+        let got = lines(path);
+        let want = lines("research/dreg_closure_scale_20261016/runs/fresh-m3-19-7.d0.jsonl");
+        let fields = [
+            "degree",
+            "xl_refuted",
+            "closure_refuted",
+            "saturated",
+            "xl_rank",
+            "closure_rank",
+            "columns",
+            "closure_products",
+            "closure_word_ops",
+        ];
+        let g = got.first().and_then(|v| v["scan"].as_array().cloned());
+        let w = want.first().and_then(|v| v["scan"].as_array().cloned());
+        match (g, w) {
+            (Some(g), Some(w)) if !g.is_empty() && g.len() == w.len() => g
+                .iter()
+                .zip(&w)
+                .all(|(a, b)| fields.iter().all(|f| a[*f] == b[*f])),
+            _ => false,
+        }
+    });
+    let (mut sat_refuted, mut sat_unmeasured) = (0, 0);
+    for d in &sat {
+        let outcome = found
+            .get(&(*d, "S".to_string()))
+            .and_then(|p| lines(p).first().and_then(sound_control));
+        match outcome {
+            Some(true) => sat_refuted += 1,
+            Some(false) => {}
+            None => sat_unmeasured += 1,
+        }
+    }
+    println!(
+        "N0: {n0_ref} refute at 4, {n0_not} do not, {n0_unm} unmeasured; B refutes on {b_ref} of {}",
+        unsat.len()
+    );
+    println!(
+        "Identity control (N7 vs the committed scale-study record): {}",
+        match identity {
+            Some(true) => "matches on every non-timing field",
+            Some(false) => "DIFFERS",
+            None => "missing",
+        }
+    );
+    println!(
+        "Soundness: {sat_refuted} of {} registered satisfiable draws refuted ({sat_unmeasured} unmeasured)",
+        sat.len()
+    );
+    if ignored > 0 {
+        println!("Ignored: {ignored} file(s) for draws outside the registered set");
+    }
+    let valid = identity == Some(true) && b_ref >= 3 && sat_refuted == 0 && sat_unmeasured == 0;
+    println!("Controls: {}", if valid { "valid" } else { "NOT valid" });
+    println!("Verdict: {}", null_verdict(valid, n0_ref, n0_not, n0_unm));
+}
+
+/// The graph's counts for `research/dreg_closure_null22_7_20261028`, as JSON on
+/// stdout: per cell, on how many draws the degree-4 closure refutes, read from the
+/// committed records with the same classification the scorers use.  `plot.py` only
+/// draws what this prints.
+fn null_plot_data() {
+    let dir_files = |dir: &str, prefix: &str, suffix: &str| -> Vec<String> {
+        let mut v: Vec<String> = std::fs::read_dir(dir)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter_map(|e| e.file_name().into_string().ok())
+            .filter(|n| n.starts_with(prefix) && n.ends_with(suffix))
+            .map(|n| format!("{dir}/{n}"))
+            .collect();
+        v.sort();
+        v
+    };
+    let count_files = |paths: &[String]| -> (usize, usize) {
+        (
+            paths.iter().filter(|p| fix_outcome(p) == "refutes").count(),
+            paths.len(),
+        )
+    };
+    // A draw counts when it has records and every one of them refutes.
+    let count_draws = |dir: &str, draws: &[u64], pat: &dyn Fn(u64) -> (String, String)| {
+        let mut k = 0;
+        for d in draws {
+            let (pre, suf) = pat(*d);
+            let ps = dir_files(dir, &pre, &suf);
+            if !ps.is_empty() && ps.iter().all(|p| fix_outcome(p) == "refutes") {
+                k += 1;
+            }
+        }
+        (k, draws.len())
+    };
+    let this = "research/dreg_closure_null22_7_20261028/runs";
+    let unsat: Vec<u64> = std::fs::read_to_string(NULL_DRAWS)
+        .ok()
+        .and_then(|t| registered_from(&t))
+        .map(|r| r.0)
+        .unwrap_or_default();
+    let arm = |a: &str| -> Vec<String> {
+        unsat
+            .iter()
+            .map(|d| format!("{this}/m3-22-7.d{d}.{a}.jsonl"))
+            .collect()
+    };
+    let l8 = [0u64, 3, 5, 6]; // the frozen ℓ = 8 draws of the guess studies
+    let scale = "research/dreg_closure_scale_20261016/runs";
+    let g3 = "research/dreg_closure_guess3_20261023/runs";
+    let g4 = "research/dreg_closure_guess_20261022/runs";
+    let mut cells = Vec::new();
+    for (n, nn) in [(19, 40), (21, 42)] {
+        let ps = dir_files(scale, &format!("fresh-m3-{n}-7.d"), ".jsonl");
+        let (k, of) = count_files(&ps);
+        cells.push(("null", format!("unspecialised ℓ=7, n={n}, N={nn}"), k, of));
+    }
+    let (k, of) = count_files(&arm("N0"));
+    cells.push((
+        "this",
+        "unspecialised ℓ=7, n=22, N=43  (this study, N0)".to_string(),
+        k,
+        of,
+    ));
+    let (k, of) = count_draws(g3, &l8, &|d| {
+        (format!("m3-22-8.d{d}.G3b"), ".jsonl".to_string())
+    });
+    cells.push(("g3", "ℓ=8, 3 guesses (7,15,23), N=43".to_string(), k, of));
+    let (k, of) = count_draws(g4, &l8, &|d| {
+        (format!("m3-22-8.d{d}.G4b"), ".jsonl".to_string())
+    });
+    cells.push((
+        "pos",
+        "ℓ=8, 4 guesses (7,15,23,24), N=42".to_string(),
+        k,
+        of,
+    ));
+    let (k, of) = count_draws(g3, &l8, &|d| {
+        (format!("m3-22-8.d{d}.G6"), ".jsonl".to_string())
+    });
+    cells.push((
+        "pos",
+        "ℓ=8, dimension-6 control G6, N=40".to_string(),
+        k,
+        of,
+    ));
+    let (k, of) = count_files(&arm("B"));
+    cells.push((
+        "pos",
+        "ℓ=7, dimension-6 control B, N=40  (this study)".to_string(),
+        k,
+        of,
+    ));
+    let out: Vec<Value> = cells
+        .into_iter()
+        .map(|(kind, label, k, of)| {
+            serde_json::json!({"kind": kind, "label": label, "refuting": k, "of": of})
+        })
+        .collect();
+    println!("{}", serde_json::to_string_pretty(&out).expect("json"));
+}
+
+#[cfg(test)]
+mod null_tests {
+    use super::*;
+
+    fn scan(entries: &[(u64, bool, bool)]) -> Value {
+        // (degree, saturated, refuted)
+        serde_json::json!({
+            "refuted_satisfiable": entries.iter().any(|e| e.2),
+            "scan": entries.iter().map(|e| serde_json::json!(
+                {"degree": e.0, "saturated": e.1, "xl_refuted": false, "closure_refuted": e.2}
+            )).collect::<Vec<_>>(),
+        })
+    }
+
+    #[test]
+    fn a_complete_unrefuted_satisfiable_record_is_measured() {
+        assert_eq!(
+            sound_control(&scan(&[(3, true, false), (4, true, false)])),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn a_capped_or_unsaturated_satisfiable_record_is_unmeasured() {
+        // capped before degree 4: the record is non-empty and says refuted = false
+        assert_eq!(sound_control(&scan(&[(3, true, false)])), None);
+        assert_eq!(sound_control(&scan(&[])), None);
+        assert_eq!(
+            sound_control(&scan(&[(3, true, false), (4, false, false)])),
+            None
+        );
+    }
+
+    #[test]
+    fn a_refuted_satisfiable_record_is_a_soundness_failure() {
+        assert_eq!(
+            sound_control(&scan(&[(3, true, false), (4, true, true)])),
+            Some(true)
+        );
+    }
+
+    fn rows(spec: &[(u64, bool)]) -> String {
+        spec.iter()
+            .map(|(d, sat)| {
+                let kind = if *sat { "satisfiable" } else { "at_least" };
+                format!("{{\"draw\":{d},\"outcome\":{{\"kind\":\"{kind}\"}}}}\n")
+            })
+            .collect()
+    }
+
+    #[test]
+    fn the_registered_set_is_the_first_four_unsat_and_two_sat_in_draw_order() {
+        let t = rows(&[
+            (8, true),
+            (0, true),
+            (1, false),
+            (2, false),
+            (3, false),
+            (4, false),
+            (9, false),
+        ]);
+        assert_eq!(registered_from(&t), Some((vec![1, 2, 3, 4], vec![0, 8])));
+    }
+
+    #[test]
+    fn an_incomplete_draw_file_registers_nothing() {
+        // only three unsatisfiable draws: the set cannot be enumerated, so the scorer fails closed
+        let t = rows(&[(0, true), (8, true), (1, false), (2, false), (3, false)]);
+        assert_eq!(registered_from(&t), None);
+        assert_eq!(registered_from("not json\n"), None);
+    }
+
+    #[test]
+    fn verdicts_fail_closed() {
+        assert!(null_verdict(false, 0, 4, 0).starts_with("uninformative"));
+        assert!(null_verdict(true, 0, 3, 1).starts_with("incomplete"));
+        assert!(null_verdict(true, 0, 4, 0).contains("pure l = 7"));
+        assert!(null_verdict(true, 4, 0, 0).contains("does not explain"));
+        assert_eq!(null_verdict(true, 2, 2, 0), "mixed");
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
@@ -674,9 +1140,12 @@ fn main() {
         Some("closure") => closure(&args[1..]),
         Some("scale") => scale(&args[1..]),
         Some("specialise") => specialise(&args[1..]),
+        Some("null") => matched_null(&args[1..]),
+        Some("null-plot-data") => null_plot_data(),
+        Some("guess") => guess(&args[1..]),
         _ => {
             eprintln!(
-                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES…"
+                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | guess [--k K] FILES… | null FILES… | null-plot-data"
             );
             std::process::exit(2);
         }

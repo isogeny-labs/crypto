@@ -1,0 +1,14 @@
+error[E0502]: cannot borrow `nodes` as immutable because it is also borrowed as mutable
+   --> src/primality.rs:248:63
+    |
+248 |         let mut nodes = source.clone(); nodes[0].factors.push(nodes[0].factors[0].clone()); malformed.push(nodes);
+    |                                         -----            ---- ^^^^^ immutable borrow occurs here
+    |                                         |                |
+    |                                         |                mutable borrow later used by call
+    |                                         mutable borrow occurs here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `hashed-ecdl-tensor` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+
+[end of captured command output]

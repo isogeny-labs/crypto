@@ -1,0 +1,36 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.74in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\title{Finite-branch stalk on the actual weighted-Proj curve}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet records a conditional geometry proof, not a new target experiment or cost comparison. Its editable diagram, gate CSV, Lean source, and axiom log are beside this PDF.
+
+\section*{Checked statement}
+Let $K$ be a field, let $a_3,a_2,a_1,a_0\in K$, and let $a\in K$ be a root of the affine quintic $f$. The new \texttt{finiteBranchProjPoint} places the rational branch point in the $Z$ basic open of the actual weighted $\operatorname{Proj}$. The theorem \texttt{finiteBranchProjStalkIso} gives an isomorphism from its structure-sheaf stalk to the localization of the affine coordinate ring at the branch ideal.
+
+\begin{center}
+\setlength{\fboxsep}{8pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Actual weighted $\operatorname{Proj}$, $Z$ basic open\par\vspace{4pt}
+$\Downarrow$ checked chart isomorphism and open-immersion stalk maps\par\vspace{4pt}
+$\operatorname{Spec}(A)$ at the rational branch point\par\vspace{4pt}
+$\Downarrow$ checked spectrum-stalk localization\par\vspace{4pt}
+$\mathcal O_{\operatorname{Proj},P}\;\cong\;A_{\mathfrak m_P}$\par\vspace{8pt}
+\textbf{Open:} global divisor/Pic$^0$ equation; compiled Rust law
+\end{minipage}}
+\end{center}
+
+The open-subspace stalk identification is described in the Stacks Project, \href{https://stacks.math.columbia.edu/tag/01HD}{Section 26.3}. Here the statement is checked against the repository's actual weighted chart in pinned Lean. The earlier local order-one theorem additionally requires a simple root, $N=(x-a)t$, and unit $B$; this stalk isomorphism does not discharge those hypotheses.
+
+\section*{Verification and limits}
+Direct Lean 4.34.1/Mathlib \texttt{d13f23b} compilation exited zero. The theorem's axiom audit lists only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{79b790e1ca19b2bacc0c93de87ecb787513717beca77846e55a8db14dfc3994d}}.
+
+The theorem does not construct a principal divisor, prove equality in $\mathrm{Pic}^0$, or connect the compiled runtime law to all branches. The previously frozen 1,260-target results, matched-rho controls, and cost ratios remain unchanged.
+\end{document}

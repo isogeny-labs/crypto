@@ -1,0 +1,13 @@
+# Weighted add11 machine expression correspondence
+
+The literal UInt64 weighted add11 distinct-branch payload now has a canonical-output and field-decoding theorem. The exponent-five helper follows the actual Field::pow loop: e=5,2,1,0; accumulator products include 1*a and the final multiplication by a^4; two conditional squares occur. The exact unroll is proved by reflexivity.
+
+Under prime 5<=p<2^31 and eight canonical input words, a finite expression induction composes modular multiplication, addition, negation, subtraction and exponent-five. All six returned q,r,s,t,z,w words are canonical and decode to the existing WeightedAdd11.output field formula with the source parenthesization. Products stay below2^62 and add/sub intermediates below2^32; the bounded primitive lemmas establish value correspondence rather than assuming coefficient identities.
+
+The word guard retains inverse first, doubling second, then equal-cross assertion failure. Nonzero decoded input z and distinct normalized x imply unequal actual cross words, hence the distinct branch. The distinct payload theorem is algebraic and also decodes the raw body outside that guard; source execution reaches that body only after guard dispatch.
+
+Controls check exponent-five at0,3,6 mod7; nonunit-weight payload and distinct dispatch; zero-y inverse precedence; doubling; invalid same-x assertion failure; different raw x values with equal normalized x; noncanonical input and an overflowing UInt64 multiplication boundary. Controls and separate axiom readback exit0. Final axioms are propext, Classical.choice and Quot.sound. Failed attempts are retained: attempt2 omitted definitional word unfolding in four induction cases; attempt4 omitted prime instance on a field-valued cross lemma; controls1 needed explicit canonical-definition unfolding. Final proof has no sorryAx.
+
+Source mapping requires Field.n=1, tables=None, odd-prime path and normal execution/counter headroom. The bounded loop is a source model, not a compiler equivalence theorem. Expression trees establish values, not operation counts or sharing. Counter behavior, inverse/doubling payloads, composition to normalized word Mumford validity, divisor-class addition and whole-walk closure are separate obligations. The field theorem packet remains immutable. No scientific trials or cost measurements were taken; cost_ratio is null. Independent review is pending.
+
+Exact source hashes and mappings: sources.json. Native commands/exits and source snapshots: attempt*/ and controls*/readback1/. Frozen intent: PLAN.md. Prior field proof is WeightedAdd11.lean in the separately hashed producer packet; prior source-bound literature reviews and primitive no-overflow lemmas supply context, with no novelty claim.

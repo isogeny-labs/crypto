@@ -1,0 +1,112 @@
+// Full small-field Hess transfer with smooth-divisor relations and target solve.
+SetSeed(20261027);
+total_wall := Realtime();
+K<w> := GF(4096);
+k<a> := GF(16);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..11]]>;
+E := EllipticCurve([K|1,fromint(32),0,0,fromint(198)]);
+G := E![fromint(199),fromint(2783),1];
+Q := E![fromint(738),fromint(3018),1];
+assert #E eq 4006 and Order(G) eq 2003;
+attack_wall := Realtime();
+cover_wall := Realtime();
+C,h := WeilDescent(E,k,K!1);
+cover_seconds := Realtime(cover_wall);
+assert Genus(C) eq 4;
+J := Jacobian(C);
+map_wall := Realtime();
+D := h(G);
+T := h(Q);
+map_seconds := Realtime(map_wall);
+r := 2003;
+assert D ne J!0 and r*D eq J!0 and r*T eq J!0;
+assert #J mod r eq 0;
+cofactor := #J div r;
+assert GCD(cofactor,r) eq 1;
+f,hh := HyperellipticPolynomials(C);
+R<x> := PolynomialRing(k);
+primitive := PrimitiveElement(k);
+fieldvals := [k!0] cat [primitive^i : i in [0..14]];
+assert #Seqset(fieldvals) eq 16;
+fb := [<cx,cy> : cx in fieldvals, cy in fieldvals |
+       cy^2+Evaluate(hh,cx)*cy eq Evaluate(f,cx)];
+Fbase := [J![x-p[1], R!p[2]] : p in fb];
+assert #fb+1 eq #RationalPoints(C);
+print "cover_seconds", cover_seconds, "map_seconds", map_seconds;
+print "field_moduli", MinimalPolynomial(w), MinimalPolynomial(a);
+print "curve", C;
+print "mapped_generator", D;
+print "mapped_target", T;
+print "genus", Genus(C), "jacobian_order", #J,
+      "subgroup_order", r, "projection_cofactor", cofactor,
+      "factor_base", #fb;
+print "factor_base_points", fb;
+print "preparation_seconds", Realtime(total_wall);
+
+// Every relation is checked as an equality in the target Jacobian before
+// projection to its order-r subgroup. The unknown target scalar is not used.
+relation_wall := Realtime();
+rows := [];
+right := [];
+smooth_count := 0;
+tested := 0;
+state := 20261027;
+F := GF(r);
+for attempt in [1..6000] do
+    state := (1103515245*state+12345) mod 2147483648;
+    aa := state mod r;
+    state := (1103515245*state+12345) mod 2147483648;
+    bb := state mod r;
+    if bb eq 0 then continue; end if;
+    tested +:= 1;
+    P := aa*D+bb*T;
+    if P eq J!0 then continue; end if;
+    factors := Factorization(P[1]);
+    if not &and[Degree(t[1]) eq 1 : t in factors] then continue; end if;
+    smooth_count +:= 1;
+    row := [F!0 : i in [1..#fb+1]];
+    reconstruction := J!0;
+    for term in factors do
+        linear := term[1];
+        multiplicity := term[2];
+        cx := -Coefficient(linear,0)/Coefficient(linear,1);
+        cy := Evaluate(P[2],cx);
+        index := Index(fb,<cx,cy>);
+        assert index ne 0;
+        row[index] +:= F!multiplicity;
+        reconstruction +:= multiplicity*Fbase[index];
+    end for;
+    assert reconstruction eq P;
+    row[#fb+1] := -(F!cofactor)*(F!bb);
+    Append(~rows,row);
+    Append(~right,F!(cofactor*aa));
+    print "relation", #rows, "attempt", attempt,
+          "a", aa, "b", bb,
+          "row", [Integers()!c : c in row],
+          "rhs", Integers()!right[#right];
+    M := Matrix(F,#rows,#fb+1,&cat rows);
+    if Rank(M) eq #fb+1 then
+        print "full_rank_at_attempt", attempt;
+        break;
+    end if;
+end for;
+relation_seconds := Realtime(relation_wall);
+M := Matrix(F,#rows,#fb+1,&cat rows);
+print "attempted", tested, "smooth", smooth_count,
+      "relation_rows", #rows, "matrix_rank", Rank(M),
+      "required_rank", #fb+1, "relation_seconds", relation_seconds;
+assert Rank(M) eq #fb+1;
+linear_wall := Realtime();
+sol := Solution(Transpose(M),Vector(F,right));
+candidate := Integers()!sol[#fb+1];
+linear_seconds := Realtime(linear_wall);
+print "recovered_scalar", candidate, "linear_seconds", linear_seconds;
+verify_wall := Realtime();
+assert T eq candidate*D;
+assert Q eq candidate*G;
+verify_seconds := Realtime(verify_wall);
+print "target_jacobian_verified", true,
+      "source_verified", true, "verify_seconds", verify_seconds,
+      "attack_seconds", Realtime(attack_wall),
+      "total_seconds", Realtime(total_wall);

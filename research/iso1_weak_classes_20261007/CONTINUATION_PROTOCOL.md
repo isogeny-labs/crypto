@@ -115,3 +115,23 @@ stderr receipts and CSV hashes. The queue's GP controls are replaced by the
 certificate itself. The original p = 61 worker on the separate launchd host
 reported no result to this repository. The residual-zero model and its
 registered forward predictions are in `residual_model_20261016/`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+container, with byte-identical output in every case. It completed p = 61 through 137 and

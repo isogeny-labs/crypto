@@ -1,0 +1,17 @@
+pivot column=0 row=1 start=0 scalar=1/1
+swap=1,0
+eliminate row=1 pivot=0 factor=-1/1:1,0,0,0,0,0,0
+
+pivot column=1 row=1 start=1 scalar=1/1
+eliminate row=0 pivot=1 factor=
+skip column=0
+skip column=1
+pivot column=0 row=0 start=0 scalar=1/1
+eliminate row=1 pivot=0 factor=
+eliminate row=2 pivot=0 factor=
+skip column=1
+pivot column=2 row=1 start=1 scalar=1/1
+eliminate row=0 pivot=1 factor=-1/1:1,0,0,0,0,0,0
+
+eliminate row=2 pivot=1 factor=-1/1:0,0,0,0,0,0,0
+

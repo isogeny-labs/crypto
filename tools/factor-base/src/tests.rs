@@ -1,9 +1,11 @@
 use super::*;
+use crate::store::*;
 use arithmetic::*;
 use evaluate::*;
 use num_traits::One;
 use recipe::*;
-use std::path::PathBuf;
+use serde_json::json;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn fixture(binary: Option<usize>) -> CurveSpec {
@@ -89,6 +91,181 @@ fn config() -> Config {
         },
         max_candidates: 256,
         shard_points: 3,
+    }
+}
+
+fn prime_config(recipe: Recipe) -> Config {
+    Config {
+        curve: fixture(None),
+        recipe,
+        max_candidates: 1024,
+        shard_points: 16,
+    }
+}
+
+fn expected_prime_points(curve: &Curve, xs: &std::collections::BTreeSet<N>) -> Vec<Point> {
+    xs.iter()
+        .flat_map(|x| curve.lift(x))
+        .filter(|p| curve.subgroup(p))
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect()
+}
+
+#[test]
+fn prime_cosets_match_full_field_control_and_reject_wrong_order() {
+    let mut c = prime_config(Recipe::PrimeMultiplicativeCoset {
+        order: 100,
+        generator: "2".into(),
+        coset: "3".into(),
+    });
+    let generated = generate(&c).unwrap();
+    let xs = (1..101).map(n).collect();
+    assert_eq!(
+        generated.points,
+        expected_prime_points(&generated.curve, &xs)
+    );
+    assert_eq!(generated.structure["x_candidates"], 100);
+    c.recipe = Recipe::PrimeMultiplicativeCoset {
+        order: 100,
+        generator: "4".into(),
+        coset: "3".into(),
+    };
+    assert!(generate(&c)
+        .err()
+        .unwrap()
+        .to_string()
+        .contains("exact order"));
+    c.recipe = Recipe::PrimeMultiplicativeCoset {
+        order: 3,
+        generator: "2".into(),
+        coset: "3".into(),
+    };
+    assert!(generate(&c).is_err());
+    c.recipe = Recipe::PrimeMultiplicativeCoset {
+        order: 100,
+        generator: "2".into(),
+        coset: "0".into(),
+    };
+    assert!(generate(&c).is_err());
+}
+
+#[test]
+fn prime_dickson_images_match_explicit_cubic_and_enforce_work_cap() {
+    let mut c = prime_config(Recipe::PrimeDicksonImage {
+        degree: 3,
+        parameter: "1".into(),
+        start: "0".into(),
+        step: "1".into(),
+        count: 101,
+    });
+    let curve = Curve::new(c.curve.clone()).unwrap();
+    let xs = (0..101u64)
+        .map(|x| n((x * x * x + 303 - 3 * x) % 101))
+        .collect();
+    let expected = expected_prime_points(&curve, &xs);
+    let generated = generate(&c).unwrap();
+    assert_eq!(generated.points, expected);
+    c.max_candidates = 302;
+    assert!(generate(&c).is_err());
+}
+
+#[test]
+fn prime_torus_traces_match_independent_norm_equation_enumeration() {
+    // Find a public toy generator; production recipes require it explicitly.
+    let generator = (0..101u64)
+        .flat_map(|a| (0..101u64).map(move |b| (a, b)))
+        .find(|&(a, b)| {
+            (a * a + 20200 - 2 * b * b) % 101 == 1 && {
+                // 102=2*3*17; direct powering is a test-only independent field model.
+                let power = |k| {
+                    let mut v = (1u64, 0u64);
+                    for _ in 0..k {
+                        v = ((v.0 * a + 2 * v.1 * b) % 101, (v.0 * b + v.1 * a) % 101);
+                    }
+                    v
+                };
+                power(102) == (1, 0) && [51, 34, 6].iter().all(|k| power(*k) != (1, 0))
+            }
+        })
+        .unwrap();
+    let mut c = prime_config(Recipe::PrimeNormOneTrace {
+        order: 102,
+        generator_real: generator.0.to_string(),
+        generator_imag: generator.1.to_string(),
+        nonsquare: "2".into(),
+        scale: "1".into(),
+        shift: "1".into(),
+    });
+    let generated = generate(&c).unwrap();
+    let xs = (0..101u64)
+        .filter(|a| (0..101u64).any(|b| (a * a + 20200 - 2 * b * b) % 101 == 1))
+        .map(|a| n((2 * a + 1) % 101))
+        .collect();
+    assert_eq!(
+        generated.points,
+        expected_prime_points(&generated.curve, &xs)
+    );
+    assert_eq!(generated.structure["x_candidates"], 52);
+    let archive = temp();
+    let id = build(&c, &archive).unwrap();
+    assert_eq!(verify(&archive, &id).unwrap().1.points, generated.points);
+    std::fs::remove_dir_all(archive).unwrap();
+    if let Recipe::PrimeNormOneTrace { shift, .. } = &mut c.recipe {
+        *shift = "0".into();
+    }
+    // This exact curve/subgroup has no point over the unshifted trace set.
+    // An empty intersection remains an error rather than a manufactured base.
+    assert!(generate(&c).is_err());
+    if let Recipe::PrimeNormOneTrace { nonsquare, .. } = &mut c.recipe {
+        *nonsquare = "4".into();
+    }
+    assert!(generate(&c).is_err());
+}
+
+#[test]
+fn new_prime_recipes_archive_replay_and_canonical_integer_encodings() {
+    for recipe in [
+        Recipe::PrimeMultiplicativeCoset {
+            order: 100,
+            generator: "2".into(),
+            coset: "3".into(),
+        },
+        Recipe::PrimeDicksonImage {
+            degree: 3,
+            parameter: "1".into(),
+            start: "0".into(),
+            step: "1".into(),
+            count: 101,
+        },
+    ] {
+        let c = prime_config(recipe);
+        let path = temp();
+        let id = build(&c, &path).unwrap();
+        let (_, replay) = verify(&path, &id).unwrap();
+        assert_eq!(replay.points, generate(&c).unwrap().points);
+        let mut encoded = c.clone();
+        if let Recipe::PrimeMultiplicativeCoset {
+            generator, coset, ..
+        } = &mut encoded.recipe
+        {
+            *generator = "0x2".into();
+            *coset = "0x3".into();
+        }
+        assert_eq!(build(&encoded, &path).unwrap(), id);
+        std::fs::remove_dir_all(path).unwrap();
+    }
+}
+
+#[test]
+fn committed_structured_prime_examples_materialize_their_subgroup_intersections() {
+    let configs: Vec<Config> =
+        serde_json::from_str(include_str!("../examples/prime-structured.json")).unwrap();
+    assert_eq!(configs.len(), 3);
+    for c in configs {
+        let generated = generate(&c).unwrap();
+        assert!(!generated.points.is_empty());
+        assert!(generated.points.iter().all(|p| generated.curve.subgroup(p)));
     }
 }
 fn workload() -> Workload {
@@ -628,4 +805,53 @@ fn write_public_fixtures() {
         serde_json::to_vec_pretty(&cs).unwrap(),
     )
     .unwrap();
+}
+
+#[test]
+fn derived_relations_match_exhaustive_multisets_on_prime_and_binary_bases() {
+    let mut configs = vec![config()];
+    configs.extend(
+        serde_json::from_str::<Vec<Config>>(include_str!("../examples/prime-structured.json"))
+            .unwrap(),
+    );
+    for c in configs {
+        let root = temp();
+        let id = build(&c, &root).unwrap();
+        let (_, g) = verify(&root, &id).unwrap();
+        let mut targets = sample_targets(&g.curve, 8, 77, "discovery").unwrap();
+        targets.push(targets[0].clone()); // Duplicate public queries retain their own slots.
+        for arity in 2..=4 {
+            let mut w = workload();
+            w.queries = targets.len();
+            w.arity = arity;
+            w.regularity_targets = 0;
+            w.targets = Some(targets.iter().map(Point::spec).collect());
+            let reference = evaluate(&root, &id, &w).unwrap();
+            assert_eq!(reference["semantic"]["relation_status"], "complete");
+            let request = crate::decomposition::Request {
+                targets: w.targets.unwrap(),
+                arity,
+                search_cap: 100000,
+            };
+            let actual = crate::decomposition::evaluate(&root, &id, &request).unwrap();
+            assert_eq!(actual["semantic"]["result"]["complete"], true);
+            assert_eq!(
+                actual["semantic"]["result"]["witnesses"],
+                reference["semantic"]["witnesses"]
+            );
+            assert!(crate::decomposition::replay(&root, &id, &actual).is_ok());
+            let mut forged = actual.clone();
+            forged["semantic"]["result"]["complete"] = json!(false);
+            assert!(crate::decomposition::replay(&root, &id, &forged).is_err());
+        }
+        let capped = crate::decomposition::decompose(&g, &targets, 2, 1).unwrap();
+        assert!(!capped.complete);
+        assert!(capped.witnesses.iter().all(Option::is_none));
+        assert!(crate::decomposition::decompose(&g, &[], 2, 10).is_err());
+        assert!(crate::decomposition::decompose(&g, &targets, 1, 10).is_err());
+        assert!(crate::decomposition::decompose(&g, &targets, 2, 0).is_err());
+        let invalid = Point { x: n(0), y: n(0) };
+        assert!(crate::decomposition::decompose(&g, &[invalid], 2, 100).is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
 }

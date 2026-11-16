@@ -1,0 +1,37 @@
+{
+  "schema": "n83.binary-pair-file-format/v1",
+  "raw_root": "binary-pair-r1",
+  "entrypoint": "instrument run ROOT; instrument replay ROOT",
+  "files": {
+    "protocol-binary-pair.json": "Frozen contract and all12 source/input/base hashes",
+    "inputs/<key>/input.json": "Unchanged saved input metadata including target, curve and base identity",
+    "inputs/<key>/system.sing": "Unchanged complete Singular source, dp order, selector variables and witness suffix",
+    "certificates/field.json": "Rabin irreducibility witness;84-entry Frobenius ladder",
+    "certificates/controls.json": "128 independent multiplication checks,512 Boolean S3 checks,8 explicit small Hilbert matrices, inverse negatives",
+    "certificates/<key>.json": "Full input, original coordinate rows, XOR inclusion witnesses, invertible matrix and inverse, all27 pair-product relation coefficient vectors, degree bounds",
+    "certificates/summary.json": "12 rows with exact degree or explicit error; certificate filenames (hashes in manifest.sha256)",
+    "replay.json": "Fresh-process recomputation result and summary hash",
+    "instrument": "Source-pinned x86_64 native executable",
+    "manifest.sha256": "SHA256 for every raw file except the manifest itself",
+    "status.json": "Producer/replay process exits",
+    "terminal.json": "Batch start/end/status; times diagnostic",
+    "producer.log": "Complete producer output, includes failures",
+    "replay.log": "Complete replay output, includes failures",
+    "development-validation/": "Unit/build/control/Lean logs and outputs",
+    "host.txt": "Host evidence, no timing claim"
+  },
+  "encodings": {
+    "field_elements": "Unsigned DECIMAL strings, bit i is coefficient of z^i;0<=value<2^83. Parse arbitrary-precision integer, never floating point.",
+    "field_modulus_bits": "Lowercase HEX bit polynomial including bit83",
+    "xor_mask": "21-digit lowercase HEX; bit r selects coordinate row r (0..82), not source equation index",
+    "packed_row": "Array of16-digit HEX u64 words, lowest-index word first; bit j%64 of word j/64 is column j",
+    "columns": "column i*ell+j is a_i*b_j, i,j zero-based",
+    "coordinate_equation_ids": "83 entries mapping coordinate r to one-based I[index] in full source;0 means no equation at that coordinate",
+    "matrix": "ell rows by ell columns of decimal field strings, M[k][i]=w_i^(2^k)",
+    "pair_relations": "pair k gives83 coefficients in K multiplying original Q_r. Check all ell^2 coefficients. coefficient_u128le_sha256 is hash of ell^2 16-byte little-endian coefficient encodings in column order.",
+    "hilbert_bounds": "Arrays indexed by total degree0..55; exact INTEGER coefficients. Lower=(1+T)^27, upper=(1+2T)^27. These are bounds, NOT the full exact Hilbert function.",
+    "sha256": "Lowercase SHA256 of exact stored bytes",
+    "input_identifiers": "dataset-family-m2-target_kind; original,baseline,spike40 provenance retained even if sources coincide"
+  },
+  "scope": "Original highest-form ideal only; exact degree requires full source, field, inclusion, inverse, lower and replay checks. Full HF, affine solving degree and global FFD/LFD not asserted."
+}

@@ -1,0 +1,120 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "m = 3 rootfind on the GPU (pair table on the device, batched-inversion runs) with incremental-gauss-echelon, 38/40-bit prime_explicit curves",
+ "description": "research/ic_gpu_rootfind_setup_20261115, frozen before the run (PROTOCOL.md). The device pair-table build with one inversion per run of 16 partners (rf_pair_run) instead of two per cell. Per workload, trials, relations, logarithm and S must be identical across all IC arms. Public synthetic curves; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 179789274499,
+    "a": 179789274496,
+    "b": 173964404864,
+    "group_order": 179789343343,
+    "r": 179789343343,
+    "gx": 59620662219,
+    "gy": 171377409987
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 697556657731,
+    "a": 697556657728,
+    "b": 166992763911,
+    "group_order": 697556764217,
+    "r": 697556764217,
+    "gx": 32890058555,
+    "gy": 671668786987
+   }
+  ],
+  "targets_per_curve": 3,
+  "target_seed": 20261151
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-cpu-echelon-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpup-echelon-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=pairs",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-cpu-echelon-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpup-echelon-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=pairs",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpup-echelon-aa-F4096",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=pairs",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261150,
+  "isolation_required": "L0",
+  "timeout_seconds": 7200
+ }
+}

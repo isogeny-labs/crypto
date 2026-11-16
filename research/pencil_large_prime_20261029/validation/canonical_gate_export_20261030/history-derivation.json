@@ -1,0 +1,36 @@
+{
+  "schema": "pencil-fresh-execution-history-derivation/v1",
+  "scope": "Fresh measured epoch only; prior failed logical-run infrastructure attempt remains separate",
+  "session_id": "ECBS1h4c7220d5a9f6",
+  "attempts": 1,
+  "resumed": 0,
+  "evidence": [
+    {
+      "path": "terminal-controller-state.json",
+      "sha256": "4ae791fc85d39eac2dbde0c828ffb0eccac1ddc7e22cbe15213970fe44f67fcb"
+    },
+    {
+      "path": "fresh-job-exit.json",
+      "sha256": "fb341692bc58a46833d8680d9c6e89b0d8b6cc126591cdf57b5f8a2347e671d4"
+    },
+    {
+      "path": "../actual_gate_results_20261030/fresh-job-terminal.json",
+      "sha256": "7fa440349925a57fbdff18a10713633533111a87cc0796dde8f3cd040759a7e6"
+    }
+  ],
+  "basis": [
+    "Retained submitted benchmark manifest has backoffLimit0 and restartPolicyNever",
+    "Fresh container directly invokes ecbench; no restore command or checkpoint state enters fresh measurement",
+    "Controller terminal state restores0 and generations empty",
+    "Terminal Job status has failed1 and exact matching benchmark Job UID",
+    "Hash-verified job-exit receipt identifies exact fresh PodUID1af573c8-a09c-4dcb-89a4-1af63e1d13e0",
+    "Existing versioned S3 fresh artifact inventory contains exactly this one Pod prefix"
+  ],
+  "qualification": "Latest Pod list is empty after deletion; it is not interpreted as observed restartCount0. Counts derive from the joined retained execution and terminal receipts, not missing status defaults.",
+  "prior_infrastructure_attempt": {
+    "run_name": "pencil-p739-20261029",
+    "reservation_seconds": 180,
+    "part_of_fresh_record_attempts": false
+  },
+  "mathematical_or_clock_qualification_inferred": false
+}

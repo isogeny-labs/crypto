@@ -49,6 +49,7 @@ PLANS = {
         (f"bench-m{m}", ["bench", "--walks", str(m), "--steps", str(4000 * 1024 // m), "--reps", "21", "--arms", "base,pm_score"])
         for m in (8, 16, 32, 64, 128, 1024)
     ],
+    "nistbest2": lambda: shards("e4", 36, 1000, 125, ("--r", "256", "--arms", "nonneg,neg_canon,neg_pm_score")),
     "full": lambda: (
         shards("e1", 32, 2000, 250)
         + shards("e1", 36, 2000, 125)

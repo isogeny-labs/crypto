@@ -1,0 +1,42 @@
+// Append this harness to the definitions preceding /*EXAMPLE*/ in
+// https://math.ie/ecdlp/sourcecode.magma. Author definitions stay unchanged.
+SetColumns(0);
+SetSeed(20261025);
+p := 1021;
+Fp := FiniteField(p);
+A := Fp!1; B := Fp!6;
+E := EllipticCurve([A,B]);
+orderE := Order(E);
+assert orderE eq 991;
+P := E![2,4,1];
+Q := 7*P;
+f3 := SumPol(3,Fp,A,B);
+f4 := SumPol_pr(4,Fp,A,B,f3);
+for m in [3,4] do
+  for ALGORITHM in [1,2,3] do
+    found := false;
+    started := Cputime();
+    for trial in [1..256] do
+      factorbase,relPQ,fbpoly :=
+        factor_base(Fp,P,Q,E,orderE,p,m,ALGORITHM);
+      if ALGORITHM eq 1 then
+        sol := GroebnerAlgo(m,Fp,f3,f4,A,B,fbpoly,factorbase);
+      elif ALGORITHM eq 2 then
+        sol := EvalSm(m,A,B,f3,f4,factorbase,relPQ,E,P,Q,orderE);
+      else
+        sol := SumInF(m,E,factorbase,relPQ,orderE);
+      end if;
+      if #sol ne 0 then
+        recovered := logarithm(sol,factorbase,relPQ,E,P,Q,orderE,ALGORITHM);
+        assert recovered*P eq Q;
+        assert recovered eq 7;
+        printf "PASS m=%o algorithm=%o trials=%o log=%o cpu=%o\n",
+               m,ALGORITHM,trial,recovered,Cputime(started);
+        found := true;
+        break;
+      end if;
+    end for;
+    assert found;
+  end for;
+end for;
+print "ALL SIX CHECKS PASSED";

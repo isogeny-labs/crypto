@@ -96,9 +96,59 @@ fn deny_perf() -> Result<(), String> {
     Err("CRIU computation qualification currently requires Linux x86_64".into())
 }
 
+fn diagnostic_launch_args(args: &[String], derived: &[u8]) -> Result<Option<String>, String> {
+    use std::io::Read;
+    use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
+    if args.len() == 4 {
+        return Ok(None);
+    }
+    if args.len() != 10
+        || args[4] != "--diagnostic-launch"
+        || args[5] != "/work/diagnostic-input/computation-launch.json"
+        || args[6] != "--diagnostic-launch-sha256"
+        || args[8] != "--diagnostic-spec-sha256"
+    {
+        return Err("unsupported explicit diagnostic transport arguments".into());
+    }
+    if digest(derived) != args[9] {
+        return Err("frozen computation-L0 spec bytes differ".into());
+    }
+    let parent = std::fs::symlink_metadata("/work").map_err(|e| e.to_string())?;
+    if !parent.is_dir()
+        || parent.file_type().is_symlink()
+        || parent.uid() != 0
+        || parent.mode() & 0o022 != 0
+    {
+        return Err("diagnostic input parent is not protected".into());
+    }
+    let dir = std::fs::symlink_metadata("/work/diagnostic-input").map_err(|e| e.to_string())?;
+    if !dir.is_dir() || dir.file_type().is_symlink() || dir.uid() != 0 || dir.mode() & 0o222 != 0 {
+        return Err("diagnostic input directory is not root-owned read-only".into());
+    }
+    let file = std::fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NOFOLLOW)
+        .open(&args[5])
+        .map_err(|e| e.to_string())?;
+    let meta = file.metadata().map_err(|e| e.to_string())?;
+    if !meta.is_file() || meta.uid() != 0 || meta.mode() & 0o222 != 0 || meta.len() > 65_536 {
+        return Err("diagnostic input file is not bounded root-owned read-only".into());
+    }
+    let mut raw = Vec::new();
+    file.take(65_537)
+        .read_to_end(&mut raw)
+        .map_err(|e| e.to_string())?;
+    if raw.len() > 65_536 || digest(&raw) != args[7] {
+        return Err("diagnostic launch raw hash mismatch".into());
+    }
+    // No parse/reserialize or expected_spec_sha256 rewriting. ecbench validates
+    // the separately frozen launch against its actual derived-L0 spec identity.
+    Ok(Some(args[5].clone()))
+}
+
 fn run() -> Result<(), String> {
     let args: Vec<_> = std::env::args().collect();
-    if args.len() != 4 {
+    if args.len() != 4 && args.len() != 10 {
         return Err(
             "Usage: isolab-criu-progress /absolute/ecbench INPUT_SPEC OUTPUT_DIRECTORY".into(),
         );
@@ -120,6 +170,7 @@ fn run() -> Result<(), String> {
     let source = std::fs::read(&args[2]).map_err(|e| e.to_string())?;
     let derived =
         serde_json::to_vec_pretty(&computation_spec(&source)?).map_err(|e| e.to_string())?;
+    let diagnostic_launch = diagnostic_launch_args(&args, &derived)?;
     let spec_path = format!("{}.compute-spec.json", args[3]);
     let intent_path = format!("{}.recovery-intent.json", args[3]);
     let write_new = |path: &str, bytes: &[u8]| -> Result<(), String> {
@@ -137,7 +188,7 @@ fn run() -> Result<(), String> {
         return Err("computation output already exists; do not restart a recovered command".into());
     }
     let executable = std::fs::read(&args[1]).map_err(|e| e.to_string())?;
-    let intent = json!({
+    let mut intent = json!({
         "schema":"isolab.criu.computation/v1", "benchmark_timing_valid":false,
         "original_spec_sha256":digest(&source), "computation_spec_sha256":digest(&derived),
         "ecbench_sha256":digest(&executable), "perf_event_policy":"deny",
@@ -145,25 +196,32 @@ fn run() -> Result<(), String> {
         "fresh_benchmark_epoch_required":true,
         "recovery_policy":"CRIU+EBS; resume computation; new warmup, L2 and A/A before admitting timing"
     });
+    if diagnostic_launch.is_some() {
+        intent["diagnostic_transport"] = json!({"schema":"isolab.diagnostic-transport/v1",
+            "launch_sha256":args[7],"spec_bytes_sha256":args[9],"path":args[5]});
+    }
     write_new(&spec_path, &derived)?;
     write_new(
         &intent_path,
         &serde_json::to_vec_pretty(&intent).map_err(|e| e.to_string())?,
     )?;
     deny_perf()?;
-    let e = Command::new(&args[1])
-        .args([
-            "run",
-            "--spec",
-            &spec_path,
-            "--out",
-            &args[3],
-            "--cpus",
-            "none",
-            "--lock",
-            &format!("{}.lock", args[3]),
-        ])
-        .exec();
+    let mut command = Command::new(&args[1]);
+    command.args([
+        "run",
+        "--spec",
+        &spec_path,
+        "--out",
+        &args[3],
+        "--cpus",
+        "none",
+        "--lock",
+        &format!("{}.lock", args[3]),
+    ]);
+    if let Some(path) = diagnostic_launch {
+        command.args(["--diagnostic-launch", &path]);
+    }
+    let e = command.exec();
     Err(format!("cannot exec the computation: {e}"))
 }
 
@@ -177,6 +235,31 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn diagnostic_arguments_absent_or_malformed_do_not_read_files() {
+        let args = vec![
+            "progress".into(),
+            "/ecbench".into(),
+            "input".into(),
+            "/out".into(),
+        ];
+        assert_eq!(diagnostic_launch_args(&args, b"fixture").unwrap(), None);
+        let mut malformed = args.clone();
+        malformed.push("--diagnostic-launch".into());
+        assert!(diagnostic_launch_args(&malformed, b"fixture").is_err());
+        let mut wrong_spec = args;
+        wrong_spec.extend([
+            "--diagnostic-launch".into(),
+            "/work/diagnostic-input/computation-launch.json".into(),
+            "--diagnostic-launch-sha256".into(),
+            digest(b"launch"),
+            "--diagnostic-spec-sha256".into(),
+            digest(b"different spec"),
+        ]);
+        assert!(diagnostic_launch_args(&wrong_spec, b"fixture")
+            .unwrap_err()
+            .contains("spec bytes differ"));
+    }
     #[test]
     fn computation_is_explicitly_l0_and_keeps_workload() {
         let original = json!({"schema":"ecbench.spec/v1", "measurement":{"isolation_required":"L2","rounds":5,"warmup":1}, "workloads":{"seed":73},"arms":[{"name":"reference"}]});

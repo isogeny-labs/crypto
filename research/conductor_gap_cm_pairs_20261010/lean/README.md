@@ -15,7 +15,9 @@ only on group-operation outcomes. These cannot see the endomorphism
 conductor, the j-invariant, or anything else that is not an invariant of
 the group of points. It does **not** cover the Pollard rho and kangaroo
 that ecbench runs. Those choose each step by hashing the point
-representation (`mix(g.key(&pos))`, `src/cryptanalysis/ecbench/generic.rs:275`;
+representation (`mix(g.key(&pos))` in the step loop of `kangaroo` in
+`src/cryptanalysis/ecbench/generic.rs`, line 309 at commit 57fa35852, line
+275 at 11aa00591; re-cited 2026-10-28, SHF-20261028-0f3f64 PPN-7;
 `TunedWalker::index` in `src/cryptanalysis/ic_boundary.rs`). Earlier text
 listed rho and the kangaroo as covered. The sheriff case gives a toy
 demonstration, not on ecbench: on `Z_1019` and its isomorphic image in

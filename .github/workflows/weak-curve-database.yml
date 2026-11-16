@@ -36,12 +36,6 @@ jobs:
         working-directory: research/weak_curve_database_20261012
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - uses: dtolnay/rust-toolchain@stable
       - name: Check source-locked database and graph
         run: |
@@ -58,6 +52,7 @@ jobs:
           cargo test --release --locked
           cargo run --release --locked -- check snapshot.json
           cargo run --release --locked --bin ghs_genus128_cost_audit -- --check
+          cargo run --release --locked --bin check_pratt_certificates
           python3 validate_attack_map.py
           python3 validate_decomposition_properties.py
       - name: Verify WeakCurves artifact hashes
@@ -99,12 +94,6 @@ jobs:
         working-directory: research/weak_curve_database_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build cubic norm-one theorems and replay in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
@@ -120,6 +109,7 @@ jobs:
       - name: Audit transitive axioms
         run: lake env lean AxiomAudit.lean
   p192-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 35 || 25 }}
     defaults:
@@ -127,12 +117,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build P-192 norm theorem and replay in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
@@ -160,6 +144,7 @@ jobs:
       - name: Fresh-check noncollinearity theorem and audit axioms
         run: lake env leanchecker --fresh --verbose NonspecialSupport && lake env lean NonspecialSupport.lean
   p192-line-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -167,12 +152,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build line inverse, support, and Frobenius fiber theorems
         uses: leanprover/lean-action@v1
         with:
@@ -196,6 +175,7 @@ jobs:
       - name: Fresh-check private-column rank theorem and audit axioms
         run: lake env leanchecker --fresh --verbose LineLeafRank && lake env lean LineLeafRank.lean
   p192-line-closure-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -203,12 +183,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check line-closure theorem
         uses: leanprover/lean-action@v1
         with:
@@ -224,6 +198,7 @@ jobs:
       - name: Audit line-closure theorem axioms
         run: lake env lean LineClosure.lean
   p192-line-center-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -231,12 +206,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check line-centering theorems
         uses: leanprover/lean-action@v1
         with:
@@ -252,6 +221,7 @@ jobs:
       - name: Audit line-centering theorem axioms
         run: lake env lean LineCenter.lean
   p192-full-collinearity-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -259,12 +229,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check full-line incidence implication
         uses: leanprover/lean-action@v1
         with:
@@ -280,6 +244,7 @@ jobs:
       - name: Audit full-line incidence theorem axioms
         run: lake env lean FullCollinearity.lean
   p192-residual-discriminant-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -287,12 +252,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check residual-discriminant theorems
         uses: leanprover/lean-action@v1
         with:
@@ -315,12 +274,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build unordered-support and third-pivot theorems
         uses: leanprover/lean-action@v1
         with:
@@ -345,12 +298,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Replay every third-pivot row and independent sorted union
         run: |
           python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
@@ -363,12 +310,6 @@ jobs:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build cross-pivot and grid theorems
         uses: leanprover/lean-action@v1
         with:
@@ -399,12 +340,6 @@ jobs:
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Replay complete-fan rank, reduced rectangles, and grid support
         run: |
           python3 -B research/p192_extension_cover_20261012/line_full_cross_pivot_cycle_rank.py
@@ -422,12 +357,6 @@ jobs:
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -444,12 +373,6 @@ jobs:
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -466,12 +389,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -491,6 +408,7 @@ jobs:
           grep -Ev '  (\.github/(workflows/weak-curve-database\.yml|scripts/test-pr-budgets\.py)|research/p192_extension_cover_20261012/lean/lakefile\.toml)$' research/p192_extension_cover_20261012/reports/run-20261019T1940Z/ARTIFACTS.sha256 | sha256sum -c -
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024/ARTIFACTS.sha256
   leaderboard-lean-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
@@ -498,12 +416,6 @@ jobs:
         working-directory: research/weak_curve_leaderboard_20261012/lean
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build all leaderboard theorem modules
         uses: leanprover/lean-action@v1
         with:
@@ -511,13 +423,15 @@ jobs:
           auto-config: false
           use-mathlib-cache: true
           build: true
-          build-args: 'PrimeExamples OakleyOrders MinimalPairingField RelationSupport WeightedSupport'
+          build-args: 'PrimeExamples OakleyOrders OakleyPrimality MinimalPairingField RelationSupport WeightedSupport'
           test: false
           lint: false
           leanchecker: true
           leanchecker-args: '--fresh --verbose RelationSupport'
       - name: Fresh-kernel replay of Oakley genus theorem
         run: lake env leanchecker --fresh --verbose OakleyOrders
+      - name: Fresh-kernel replay of Oakley Pratt primality certificates
+        run: lake env leanchecker --fresh --verbose OakleyPrimality
       - name: Fresh-kernel replay of weighted relation support
         run: lake env leanchecker --fresh --verbose WeightedSupport
       - name: Audit leaderboard theorem axioms

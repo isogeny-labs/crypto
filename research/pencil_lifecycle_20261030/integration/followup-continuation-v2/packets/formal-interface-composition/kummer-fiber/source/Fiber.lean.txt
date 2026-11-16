@@ -1,0 +1,133 @@
+import Repair
+import SignedPair
+set_option autoImplicit false
+namespace OrdinaryFiber
+variable {K : Type*} [Field K]
+def valid (a0 a1 r0 r1 b0 b1:K) : Prop := b0^2-a0*b1^2=r0 ∧ 2*b0*b1-a1*b1^2=r1
+theorem square_cases (x y:K) (h:x^2=y^2) : x=y ∨ x= -y := by
+ have hz:(x-y)*(x+y)=0 := by calc
+  _ = x^2-y^2 := by ring
+  _ = 0 := sub_eq_zero.mpr h
+ rcases mul_eq_zero.mp hz with h|h
+ · exact Or.inl (sub_eq_zero.mp h)
+ · exact Or.inr (eq_neg_of_add_eq_zero_left h)
+theorem same_slope (a0 a1 r0 r1 b0 b1 c0:K) (ht:(2:K)≠0)
+ (hb:valid a0 a1 r0 r1 b0 b1) (hc:valid a0 a1 r0 r1 c0 b1) (hn:b1≠0) : c0=b0 := by
+ have he:(2*b1)*c0=(2*b1)*b0 := by
+  calc
+   _ = (2*c0*b1-a1*b1^2)+a1*b1^2 := by ring
+   _ = (2*b0*b1-a1*b1^2)+a1*b1^2 := by rw [hc.2,hb.2]
+   _ = _ := by ring
+ exact mul_left_cancel₀ (mul_ne_zero ht hn) he
+theorem neg_valid (a0 a1 r0 r1 b0 b1:K) (h:valid a0 a1 r0 r1 b0 b1) : valid a0 a1 r0 r1 (-b0) (-b1) := by
+ constructor
+ · calc (-b0)^2-a0*(-b1)^2 = b0^2-a0*b1^2 := by ring
+        _ = r0 := h.1
+ · calc 2*(-b0)*(-b1)-a1*(-b1)^2 = 2*b0*b1-a1*b1^2 := by ring
+        _ = r1 := h.2
+theorem shared_square_fiber (a0 a1 r0 r1 b0 b1 c0 c1:K) (ht:(2:K)≠0)
+ (hb:valid a0 a1 r0 r1 b0 b1) (hc:valid a0 a1 r0 r1 c0 c1) (hs:c1^2=b1^2) :
+ (c0=b0 ∧ c1=b1) ∨ (c0= -b0 ∧ c1= -b1) := by
+ by_cases hz:b1=0
+ · have cz:c1=0 := by
+    have h:c1*c1=0 := by simpa [hz,pow_two] using hs
+    exact (mul_self_eq_zero.mp h)
+   have hsq:c0^2=b0^2 := by
+    have hb0:=hb.1; have hc0:=hc.1
+    simp [hz,cz] at hb0 hc0
+    exact hc0.trans hb0.symm
+   rcases square_cases c0 b0 hsq with he|he
+   · exact Or.inl ⟨he,cz.trans hz.symm⟩
+   · exact Or.inr ⟨he,by simp [cz,hz]⟩
+ · rcases square_cases c1 b1 hs with he|he
+   · subst c1
+     exact Or.inl ⟨same_slope _ _ _ _ _ _ _ ht hb hc hz,rfl⟩
+   · have hn: -b1≠0 := neg_ne_zero.mpr hz
+     rw [he] at hc
+     exact Or.inr ⟨same_slope _ _ _ _ _ _ _ ht (neg_valid _ _ _ _ _ _ hb) hc hn,he⟩
+theorem two_candidate_containment (a0 a1 r0 r1 b0 b1:K) (ht:(2:K)≠0)
+ (hb:valid a0 a1 r0 r1 b0 b1) :
+ {c:K×K | valid a0 a1 r0 r1 c.1 c.2 ∧ c.2^2=b1^2} ⊆ {(b0,b1),(-b0,-b1)} := by
+ rintro c ⟨hc,hs⟩
+ rcases shared_square_fiber _ _ _ _ _ _ _ _ ht hb hc hs with h|h
+ · exact Or.inl (Prod.ext h.1 h.2)
+ · exact Or.inr (Prod.ext h.1 h.2)
+-- Literal source pruned.rs degree2 projector, f6 absent (quintic).
+def xi4 (a0 a1 b1 f2 f3 f4 f5:K) := b1^2+(a1^2-a0)*(f5*a1)+a1*(f3-f4*a1)-f2
+-- Literal delta_lift extractor includes f6 because curve() stores seven coefficients.
+def extract (a0 a1 q3 f2 f3 f4 f5 f6:K) := q3-(a1^2-a0)*(f5*a1-f6*(a1^2-a0))-a1*(f3-f4*a1)+f2
+theorem extraction_residual (a0 a1 b1 f2 f3 f4 f5 f6:K) :
+ extract a0 a1 (xi4 a0 a1 b1 f2 f3 f4 f5) f2 f3 f4 f5 f6 = b1^2+f6*(a1^2-a0)^2 := by
+ unfold extract xi4; ring
+theorem quintic_extraction (a0 a1 b1 f2 f3 f4 f5:K) :
+ extract a0 a1 (xi4 a0 a1 b1 f2 f3 f4 f5) f2 f3 f4 f5 0=b1^2 := by
+ rw [extraction_residual]; ring
+end OrdinaryFiber
+namespace SourceChart
+open OrdinaryFiber
+variable {K : Type*} [Field K]
+def q (a0 a1 b1 f2 f3 f4 f5:K) : Fin 4 → K := fun i=>
+ if i=0 then 1 else if i=1 then -a1 else if i=2 then a0 else xi4 a0 a1 b1 f2 f3 f4 f5
+def m0 (l mu nu:K) : Fin 4 → K := fun i=>if i=0 then mu*(l+nu) else if i=1 then (nu*l)*(1+mu) else if i=2 then nu*(l+mu) else (mu*l)*(1+nu)
+def m1 (l mu nu:K) : Fin 4 → K := fun i=>if i=0 then -mu else if i=1 then -(nu*l) else if i=2 then -nu else -(mu*l)
+def m2 (l mu nu:K) : Fin 4 → K := fun i=>if i=0 then mu+1 else if i=1 then l+nu else if i=2 then nu+1 else l+mu
+def c1 (l mu nu:K) (s:Fin 4→K) : RepairClosure.Mat K := fun i j=> s i*(if j=0 then m0 l mu nu i else if j=1 then m1 l mu nu i else if j=2 then m2 l mu nu i else -1)
+def project (l mu nu:K) (s x:Fin 4→K) : Fin 4→K := fun i=>
+ s i*((((0+m0 l mu nu i*x 0)+m1 l mu nu i*x 1)+m2 l mu nu i*x 2)+(-1)*x 3)
+theorem project_eq_linear (l mu nu:K) (s x:Fin 4→K) : project l mu nu s x=RepairClosure.linear (c1 l mu nu s) x := by
+ funext i; norm_num [project,RepairClosure.linear,c1]; ring
+def normalize (x:Fin 4→K) : Fin 4→K := fun i=>x i / x 0
+theorem solve_normalize (m:RepairClosure.Mat K) (x y:Fin 4→K) (a:K)
+ (hm:Function.Injective (RepairClosure.linear m)) (hx:x 0=1) (ha:a≠0)
+ (hs:RepairClosure.linear m y=fun i=>a*RepairClosure.linear m x i) : normalize y=x := by
+ have hy:y=fun i=>a*x i := hm (by rw [RepairClosure.linear_scale];exact hs)
+ funext i
+ simp [normalize,hy,hx,ha]
+theorem ordinary_source_extract (l mu nu:K) (s:Fin 4→K) (a0 a1 b1 f2 f3 f4 f5:K)
+ (y:Fin 4→K) (a:K) (ha:a≠0)
+ (hm:Function.Injective (RepairClosure.linear (c1 l mu nu s)))
+ (hs:RepairClosure.linear (c1 l mu nu s) y=fun i=>a*project l mu nu s (q a0 a1 b1 f2 f3 f4 f5) i) :
+ extract ((normalize y) 2) (-((normalize y) 1)) ((normalize y) 3) f2 f3 f4 f5 0=b1^2 := by
+ rw [project_eq_linear] at hs
+ have hn:=solve_normalize _ (q a0 a1 b1 f2 f3 f4 f5) y a hm (by simp [q]) ha hs
+ rw [hn]
+ simpa [q] using quintic_extraction a0 a1 b1 f2 f3 f4 f5
+end SourceChart
+namespace OrientedFiber
+variable {A B:Type} [AddCommGroup A]
+theorem neighbour_orients (pi:A→B) (g d e:A) (hg:g+g≠0)
+ (he:e=d ∨ e= -d) (hn:pi (g+d)=pi (g+e))
+ (hf:pi (g+d)=pi (g+e) → g+e=g+d ∨ g+e= -(g+d)) : e=d := by
+ rcases he with h|h
+ · exact h
+ · rcases hf hn with hp|hm
+   · exact add_left_cancel hp
+   · exfalso; apply hg
+     calc g+g=(g+e)+(g+d) := by rw [h,add_add_add_comm,neg_add_cancel,add_zero]
+          _=0 := by rw [hm];simp
+end OrientedFiber
+namespace OrdinaryFiber
+variable {K:Type} [Field K] {A B:Type} [AddCommGroup A]
+theorem coefficient_neighbour_orientation (a0 a1 r0 r1 b0 b1 c0 c1:K) (ht:(2:K)≠0)
+ (hb:valid a0 a1 r0 r1 b0 b1) (hc:valid a0 a1 r0 r1 c0 c1) (hs:c1^2=b1^2)
+ (repr:K×K→A) (hneg:∀ x y,repr (-x,-y)= -repr (x,y)) (pi:A→B) (g:A) (hg:g+g≠0)
+ (hn:pi (g+repr (b0,b1))=pi (g+repr (c0,c1)))
+ (hf:pi (g+repr (b0,b1))=pi (g+repr (c0,c1)) → g+repr (c0,c1)=g+repr (b0,b1) ∨ g+repr (c0,c1)= -(g+repr (b0,b1))) :
+ repr (c0,c1)=repr (b0,b1) := by
+ apply OrientedFiber.neighbour_orients pi g _ _ hg _ hn hf
+ rcases shared_square_fiber _ _ _ _ _ _ _ _ ht hb hc hs with h|h
+ · left;rw [h.1,h.2]
+ · right;rw [h.1,h.2,hneg]
+end OrdinaryFiber
+#print axioms OrdinaryFiber.square_cases
+#print axioms OrdinaryFiber.same_slope
+#print axioms OrdinaryFiber.neg_valid
+#print axioms OrdinaryFiber.shared_square_fiber
+#print axioms OrdinaryFiber.two_candidate_containment
+#print axioms OrdinaryFiber.extraction_residual
+#print axioms OrdinaryFiber.quintic_extraction
+#print axioms SourceChart.project_eq_linear
+#print axioms SourceChart.solve_normalize
+#print axioms SourceChart.ordinary_source_extract
+#print axioms OrientedFiber.neighbour_orients
+#print axioms OrdinaryFiber.coefficient_neighbour_orientation

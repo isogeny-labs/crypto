@@ -249,7 +249,10 @@ impl SymCurve for BinaryW {
         let x2 = f.sqr(x);
         let c = gf2w::xor(gf2w::xor(*x, self.a), f.mul(&self.b, &f.inv(&x2)));
         let z = f.solve_quadratic(&c)?;
-        let p = Pt { x: *x, y: f.mul(x, &z) };
+        let p = Pt {
+            x: *x,
+            y: f.mul(x, &z),
+        };
         debug_assert!(self.on_curve(&p));
         self.in_subgroup(&p).then_some(p)
     }
@@ -267,7 +270,11 @@ impl SymCurve for BinaryW {
 
     fn add_batch(&self, acc: &mut [Pt<W3>], jumps: &[Pt<W3>]) -> usize {
         let f = &self.f;
-        let mut den: Vec<W3> = acc.iter().zip(jumps).map(|(a, j)| gf2w::xor(a.x, j.x)).collect();
+        let mut den: Vec<W3> = acc
+            .iter()
+            .zip(jumps)
+            .map(|(a, j)| gf2w::xor(a.x, j.x))
+            .collect();
         let mut scratch = Vec::with_capacity(den.len());
         f.batch_inv(&mut den, &mut scratch);
         let mut skipped = 0;
@@ -500,7 +507,11 @@ impl SymCurve for PrimeW {
 
     fn add_batch(&self, acc: &mut [Pt<E3>], jumps: &[Pt<E3>]) -> usize {
         let mut f = self.c.field.clone();
-        let den: Vec<E3> = acc.iter().zip(jumps).map(|(a, j)| f.sub(j.x, a.x)).collect();
+        let den: Vec<E3> = acc
+            .iter()
+            .zip(jumps)
+            .map(|(a, j)| f.sub(j.x, a.x))
+            .collect();
         let mut prefix = Vec::with_capacity(den.len());
         let mut prod = f.one();
         for d in &den {
@@ -610,12 +621,14 @@ mod tests {
         for _ in 0..8 {
             let x = c.f.random(&mut rng);
             let x2 = c.f.sqr(&x);
-            let rhs = gf2w::xor(
-                gf2w::xor(x, c.a),
-                c.f.mul(&c.b, &c.f.inv(&x2)),
-            );
-            let Some(z) = c.f.solve_quadratic(&rhs) else { continue };
-            let p = Pt { x, y: c.f.mul(&x, &z) };
+            let rhs = gf2w::xor(gf2w::xor(x, c.a), c.f.mul(&c.b, &c.f.inv(&x2)));
+            let Some(z) = c.f.solve_quadratic(&rhs) else {
+                continue;
+            };
+            let p = Pt {
+                x,
+                y: c.f.mul(&x, &z),
+            };
             assert!(c.on_curve(&p));
             assert_eq!(c.in_subgroup(&p), c.mul(&p, &r).is_none());
         }
@@ -631,7 +644,11 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(seed);
         let mut acc: Vec<Pt<C::E>> = (0..33).map(|_| c.random_point(&mut rng)).collect();
         let jumps: Vec<Pt<C::E>> = (0..33).map(|_| c.random_point(&mut rng)).collect();
-        let want: Vec<Pt<C::E>> = acc.iter().zip(&jumps).map(|(a, j)| c.add(a, j).unwrap()).collect();
+        let want: Vec<Pt<C::E>> = acc
+            .iter()
+            .zip(&jumps)
+            .map(|(a, j)| c.add(a, j).unwrap())
+            .collect();
         assert_eq!(c.add_batch(&mut acc, &jumps), 0);
         assert_eq!(acc, want);
     }

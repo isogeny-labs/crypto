@@ -1,0 +1,66 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261029-certicom131-cuda-device-run",
+  "title": "First device run of the ECCp-131 CUDA rho walk: parity gate and one measured rate",
+  "created": "2026-10-29",
+  "authors": ["certicom-131 CUDA port lane"],
+  "status": "blocked",
+  "status_note": "Runnable as written by anyone with one sm_120 GPU; the lanes that wrote and reviewed the port have no GPU and no RunPod key in their session environment, so the card records the run instead of performing it. This is a single device launch, not a rho campaign: no speed claim is made before it runs.",
+  "blocked_on": [
+    "hw:one NVIDIA RTX PRO 6000 (sm_120) with CUDA 12.9 nvcc, or an equivalent sm_120 device, plus a session that can reach it; no GPU and no RunPod API key were available to the authoring lane"
+  ],
+  "links": {
+    "lead": "research/certicom131_cuda_port_20261023/README.md",
+    "notes": [
+      "research/certicom131_cuda_port_20261023/report.pdf",
+      "research/certicom131_cuda_port_20261023/results.json",
+      "research/certicom131_rho_parity_20261023/README.md"
+    ],
+    "prs": []
+  },
+  "question": "On one sm_120 GPU, does the CUDA ECCp-131 rho walk reproduce the CPU end state word for word, and how many walk steps per second does the device sustain?",
+  "decision_value": "A zero-difference device parity result plus a measured steps/s turns the 2^65.3 group-operation estimate for ECCp-131 from an assumption into an extrapolation of a measured rate, and decides whether a GPU rho campaign is worth funding at all; a nonzero difference says the kernels are wrong and the port is abandoned until the arithmetic is fixed, which no amount of CPU emulation could have told us.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": "37d76b61ad4399c376dc5ac97321ee9e49e66747",
+    "build": [
+      ["mkdir", "-p", "research/certicom131_cuda_port_20261023/build"],
+      ["make", "-C", "research/certicom131_cuda_port_20261023", "host-test"]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 8,
+    "disk_gb": 20,
+    "gpu": "1 x NVIDIA RTX PRO 6000 (sm_120, 96 GB)",
+    "est_core_hours": null,
+    "est_wall_hours": 1,
+    "notes": "Cap: exactly one GPU, one container, one working tree. No core-hour estimate is given because no rate has ever been measured on a device; the one-hour wall estimate covers the nvcc build, the host gate and two short launches, and is bounded by run.timeout_per_shard_s."
+  },
+  "run": {
+    "argv": ["make", "-C", "research/certicom131_cuda_port_20261023", "build/cudashim.h", "cuda-run", "SMARCH=sm_120"],
+    "env": {},
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "certicom131-cuda-port/device-run/v1",
+    "verify": ["make", "-C", "research/certicom131_cuda_port_20261023", "host-test"],
+    "land": "research/certicom131_cuda_port_20261023"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": ["XP-20261029-certicom131-cuda-device-run"],
+    "ttl_s": 7200,
+    "env": {"name": "cuda-12.9-sm120", "recipe": "Image with CUDA 12.9 (nvcc, ptxas), g++ and make, built from the pinned commit; the host exposes one sm_120 GPU and no other device is used."},
+    "exec": {"cpus": 4, "memory_mb": 8192, "timeout_s": 1800, "sandbox": "auto", "publish": "runs/XP-20261029-certicom131-cuda-device-run"},
+    "funding": {
+      "units": 131072,
+      "rationale": "One hour of a single GPU at the lowest seed-card funding level: cheap, and the only run that tells us whether the ECCp-131 CUDA port is correct, so it outranks any further CPU twin study of the same walk."
+    }
+  },
+  "owner_hint": "A runner with one sm_120 GPU and a session that carries the RunPod key; an RTX PRO 6000 matches the sm_120 target the port was retargeted for."
+}

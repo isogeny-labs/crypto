@@ -1,0 +1,13 @@
+[package]
+name = "koblitz-carrier-scale31"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+[[bin]]
+name = "cm31"
+path = "src/cm31.rs"

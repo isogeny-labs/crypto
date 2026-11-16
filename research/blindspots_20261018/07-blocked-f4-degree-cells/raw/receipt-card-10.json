@@ -1,0 +1,213 @@
+{
+  "card_id": "CARD-BLINDSPOT-07-10",
+  "card_path": "research/blindspots_20261018/07-blocked-f4-degree-cells/card-10.yaml",
+  "card_sha256": "f842b3bfbdf4cd8081deaf1675ef4b53ceec5a5622b47d2f6b8627c20815c8f9",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-07/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-07/card-10/b07",
+        "examples/blindspots_07_blocked_closure.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.243,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 3.243,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-10/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "15",
+        "--ell",
+        "5",
+        "--basis",
+        "19991,24960,30318,23497,25855",
+        "--xr",
+        "25867",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "l-15-5-4-g14",
+        "--time-limit",
+        "460",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 462.33,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "l-15-5-4-g14",
+      "index": 3,
+      "outputs": {},
+      "seconds": 462.33,
+      "stderr_sha256": "4c4e0b9a0eb020638f791b42492b82446ea331c54a09848b50c2aeddad6530fd",
+      "stderr_tail": [
+        "  [21s] rank 82775 products 129263 pending 1977 basis 998 MiB vm 1123 MiB rss-peak 1121 MiB",
+        "  [42s] rank 110726 products 211177 pending 1586 basis 1325 MiB vm 1459 MiB rss-peak 1459 MiB",
+        "  [62s] rank 124688 products 280826 pending 1330 basis 1511 MiB vm 1622 MiB rss-peak 1622 MiB",
+        "  [83s] rank 140988 products 317678 pending 1348 basis 1850 MiB vm 1981 MiB rss-peak 1977 MiB",
+        "  [104s] rank 147156 products 342243 pending 1310 basis 1986 MiB vm 2096 MiB rss-peak 2107 MiB",
+        "  [129s] rank 155082 products 383187 pending 907 basis 2162 MiB vm 2261 MiB rss-peak 2270 MiB",
+        "  [159s] rank 158447 products 387311 pending 905 basis 2233 MiB vm 2319 MiB rss-peak 2318 MiB",
+        "  [180s] rank 162114 products 395510 pending 862 basis 2304 MiB vm 2381 MiB rss-peak 2433 MiB",
+        "  [200s] rank 166374 products 411873 pending 595 basis 2400 MiB vm 2533 MiB rss-peak 2527 MiB",
+        "  [225s] rank 171356 products 432356 pending 385 basis 2508 MiB vm 2613 MiB rss-peak 2620 MiB",
+        "  [249s] rank 176572 products 448747 pending 726 basis 2601 MiB vm 2733 MiB rss-peak 2732 MiB",
+        "  [274s] rank 180261 products 469209 pending 387 basis 2674 MiB vm 2806 MiB rss-peak 2806 MiB",
+        "  [318s] rank 185902 products 477396 pending 579 basis 2792 MiB vm 2884 MiB rss-peak 2884 MiB",
+        "  [383s] rank 189663 products 481492 pending 497 basis 2877 MiB vm 2979 MiB rss-peak 2979 MiB",
+        "  [418s] rank 193625 products 489686 pending 333 basis 2955 MiB vm 3076 MiB rss-peak 3076 MiB",
+        "  [442s] rank 195375 products 506092 pending 623 basis 2975 MiB vm 3125 MiB rss-peak 3121 MiB"
+      ],
+      "stdout_sha256": "7d9ba0bab951fb6ce2d2f6ed47fa668a3da7aa866a2f05f48aa71722804e09d8",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"l-15-5-4-g14\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"l-15-5-4-g14\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":3,\"columns\":20876,\"status\":\"saturated\",\"refuted\":false,\"rank\":2494,\"products\":3709,\"seed_rows\":45,\"chunks\":4,\"falls\":75,\"new_pivots\":2494,\"word_ops\":6635470,\"word_ops_forward\":431220,\"word_ops_block\":4413501,\"word_ops_pass\":1790749,\"hits_forward\":3968,\"bytes_pass\":4888696,\"bytes_read_forward\":3449760,\"basis_bytes_peak\":3799608,\"rss_peak_kb\":12084,\"secs\":0.016,\"secs_forward\":0.002,\"secs_block\":0.005,\"secs_pass\":0.003,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"l-15-5-4-g14\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":4,\"columns\":251176,\"status\":\"timelimit\",\"refuted\":false,\"rank\":195979,\"products\":518363,\"seed_rows\":45,\"chunks\":128,\"falls\":10914,\"new_pivots\":195979,\"word_ops\":432952870061,\"word_ops_forward\":116186395708,\"word_ops_block\":32063855808,\"word_ops_pass\":284702618545,\"hits_forward\":72929278,\"bytes_pass\":204546836976,\"bytes_read_forward\":929491165664,\"basis_bytes_peak\":3129697624,\"rss_peak_kb\":3205192,\"secs\":462.032,\"secs_forward\":139.128,\"secs_block\":26.086,\"secs_pass\":290.496,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"l-15-5-4-g14\",\"closure_degree\":null,\"last_status\":\"timelimit\",\"rss_peak_kb\":3205192}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-07/card-10/b07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-07/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "32ddb4738b53eb8df11a50417015c21dadafbd5e",
+  "dirty_after": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stdout.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i0.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-10.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-07-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-07-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-07.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/verdict.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/verdict.txt",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

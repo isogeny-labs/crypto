@@ -36,3 +36,17 @@ distinct public targets changes the total method cost.
 The next acceptance test is a native Rust public-target generator and
 batch runner whose exact inputs are committed before execution. This
 protocol does not pre-select a winning prefix or claim a speedup.
+# Full-image setup-reuse gate and execution
+
+The protocol below preceded the executed [60-target study](../different_j_reuse_20261015/RESULTS.md).
+Its V1 target-order leak was corrected before measurement, and the V2
+wrapper failure was preserved. The frozen
+
+
+The native Rust public-target generator and batch runner committed their
+exact inputs before execution. Three V3 and three V4 rounds covered all
+60 distinct targets in seven arms; each version passed 1,260/1,260 separate
+scalar replays and 10,960 relation-witness checks. The V4 whole-process
+child CPU paired full-image/BSGS ratio median was 2.483 at `N=60` on a
+shared host. The next larger-order and direct χ-coordinate gates are
+specified in the [execution study](../different_j_reuse_20261015/NEXT_GATE.md).

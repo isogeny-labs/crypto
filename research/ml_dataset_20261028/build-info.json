@@ -1,0 +1,27 @@
+{
+  "schema": "crypto.ml-dataset.build/v1",
+  "source_commit": "4c94f1dfc9bf2df2290a0645a2de6dada7b3c024",
+  "source_dirty": false,
+  "binary_sha256": "333da60b62312d33efb43ba6c4fb7826d8627c5c2fbf5bfcb7c645eed227222b",
+  "plan_sha256": "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a",
+  "protocol_file_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "build_argv": [
+    "cargo",
+    "build",
+    "--release",
+    "--bin",
+    "crypto",
+    "--locked"
+  ],
+  "provenance_env": {
+    "CRYPTO_BUILD_GIT_COMMIT": "4c94f1dfc9bf2df2290a0645a2de6dada7b3c024",
+    "CRYPTO_BUILD_GIT_DIRTY": "false"
+  },
+  "base_image": "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39",
+  "validation": {
+    "focused_dataset_tests": 49,
+    "focused_failed": 0,
+    "full_library_status": "running"
+  },
+  "scientific_generation_before_build": false
+}

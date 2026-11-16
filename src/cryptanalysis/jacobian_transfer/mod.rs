@@ -41,11 +41,12 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::cover_catalog;
 use crate::cryptanalysis::curve_traits::arith::{factor, log2_abs};
 use crate::cryptanalysis::ec_trapdoor::DescentRow;
 use cost::{CostModel, DestinationCost, DestinationSolver};
 
-pub const SCHEMA: &str = "jacobian-transfers/2";
+pub const SCHEMA: &str = "jacobian-transfers/3";
 
 /// Least genus of a GHS compositum cover in odd characteristic, by the
 /// Frobenius period `n` of the branch set (that is, for `E/F_{q^n}` with
@@ -397,7 +398,12 @@ pub struct TransferFile {
     pub schema: String,
     pub generated_by: String,
     pub what_this_is: String,
-    pub registry_sha256: String,
+    /// The manifest naming the registry rows screened
+    /// (`docs/curves/cover-catalog.json`).
+    pub catalog: String,
+    /// SHA-256 of those rows ([`crate::cryptanalysis::cover_catalog::rows_sha256`]),
+    /// not of the registry file: rows the manifest does not name leave it unchanged.
+    pub catalog_rows_sha256: String,
     pub factor_budget: u64,
     pub cost_model: CostModel,
     pub summary: Summary,
@@ -1004,14 +1010,21 @@ pub fn screen(c: &RegistryCurve, model: &CostModel, budget: u64) -> CurveTransfe
 }
 
 impl TransferFile {
-    pub fn build(registry_text: &str, model: CostModel, budget: u64) -> Result<Self, String> {
+    /// Screen the registry rows the catalog manifest names.
+    pub fn build(
+        registry_text: &str,
+        catalog_text: &str,
+        model: CostModel,
+        budget: u64,
+    ) -> Result<Self, String> {
         use rayon::prelude::*;
-        let curves = read_registry(registry_text)?;
+        let restricted = cover_catalog::restrict(registry_text, catalog_text)?;
+        let curves = read_registry(&restricted)?;
         let records: Vec<CurveTransfers> = curves
             .par_iter()
             .map(|c| screen(c, &model, budget))
             .collect();
-        let digest = crate::hash::sha256::sha256(registry_text.as_bytes());
+        let digest = cover_catalog::rows_sha256(&restricted);
         let mut by_class = BTreeMap::new();
         let mut by_route_kind = BTreeMap::new();
         let mut formula_advantage = Vec::new();
@@ -1039,7 +1052,8 @@ impl TransferFile {
                            on the same subgroup; see docs/curves/JACOBIAN_TRANSFERS.md. Rows are \
                            formulas and leads, never measurements or security claims."
                 .into(),
-            registry_sha256: digest.iter().map(|b| format!("{b:02x}")).collect(),
+            catalog: cover_catalog::MANIFEST_PATH.into(),
+            catalog_rows_sha256: digest,
             factor_budget: budget,
             cost_model: model,
             summary: Summary {
@@ -1080,6 +1094,13 @@ mod tests {
     use super::*;
 
     const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+    const CATALOG: &str = include_str!("../../../docs/curves/cover-catalog.json");
+
+    fn catalog_len() -> usize {
+        serde_json::from_str::<Value>(CATALOG).unwrap()["count"]
+            .as_u64()
+            .unwrap() as usize
+    }
 
     fn registry() -> Vec<RegistryCurve> {
         read_registry(REGISTRY).unwrap()
@@ -1317,8 +1338,13 @@ mod tests {
 
     #[test]
     fn cover_descent_is_priced_at_the_ghs_floor_where_it_exceeds_k() {
-        let file =
-            TransferFile::build(REGISTRY, CostModel::default(), DEFAULT_FACTOR_BUDGET).unwrap();
+        let file = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
         let (mut raised, mut unchanged) = (0, 0);
         for c in file.curves.iter().filter(|c| c.field.kind == "extension") {
             let k = c.field.degree;
@@ -1377,9 +1403,17 @@ mod tests {
 
     #[test]
     fn the_whole_registry_builds_and_round_trips() {
-        let file =
-            TransferFile::build(REGISTRY, CostModel::default(), DEFAULT_FACTOR_BUDGET).unwrap();
-        assert_eq!(file.curves.len(), registry().len());
+        let file = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
+        // The screen covers the catalog's rows, not every registry row.
+        assert_eq!(file.curves.len(), catalog_len());
+        assert!(file.curves.len() <= registry().len());
+        assert_eq!(file.catalog, cover_catalog::MANIFEST_PATH);
         let json = file.to_json();
         assert!(
             !json.contains("null,") || !json.contains("\"log2_cost\": null"),
@@ -1405,10 +1439,41 @@ mod tests {
             }
         }
         // Rebuilding is deterministic.
-        let again =
-            TransferFile::build(REGISTRY, CostModel::default(), DEFAULT_FACTOR_BUDGET).unwrap();
+        let again = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
         assert_eq!(again.to_json(), json);
         assert_eq!(file.summary.curves, file.curves.len());
         assert!(file.find("Oakley Group 3").is_some());
+    }
+
+    #[test]
+    fn registry_rows_outside_the_catalog_leave_the_file_unchanged() {
+        let base = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap()
+        .to_json();
+        // A new registry row the manifest does not name, as a research sweep adds.
+        let mut doc: Value = serde_json::from_str(REGISTRY).unwrap();
+        let mut census = doc["curves"][0].clone();
+        census["slug"] = "icv1-census-row-outside-the-catalog".into();
+        doc["curves"].as_array_mut().unwrap().insert(0, census);
+        let grown = TransferFile::build(
+            &doc.to_string(),
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap()
+        .to_json();
+        assert_eq!(base, grown);
     }
 }

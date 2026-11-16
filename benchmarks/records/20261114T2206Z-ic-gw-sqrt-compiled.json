@@ -1,0 +1,86 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-14T23:03:01+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gw_sqrt_compiled_20261114/run-local.sh",
+        "research/ic_gw_sqrt_compiled_20261114/runs/bin",
+        "research/ic_gw_sqrt_compiled_20261114/runs/local-20261114",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/wf/timing.lock"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T22:06:39+00:00",
+      "wall_s": 3295.9
+    }
+  ],
+  "commit": "7f8e80c1f38f01c21008103a288d5660d58fb257",
+  "commit_dirty": false,
+  "created_utc": "2026-11-14T22:06:17+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-ic-gw-sqrt-compiled"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2206Z-ic-gw-sqrt-compiled",
+  "metrics": [
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "relations_cpu_chain_over_ref_geomean",
+      "note": "L0 CPU at identical counted work, 15 (q,seed) cells, mean of two passes; A/A floor 16.0 percent so not separated from noise; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        65.45,
+        94.38
+      ],
+      "unit": "percent",
+      "value": 84.74
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 5,
+      "name": "total_cpu_dl_chain_over_ref_geomean",
+      "note": "total CPU of the DL arm, geomean over k=18..22; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 96.09
+    }
+  ],
+  "problem": "ic:gw-quartic-dl-sqrt-compiled",
+  "raw": [
+    {
+      "bytes": 43760,
+      "path": "research/ic_gw_sqrt_compiled_20261114/runs-local-20261114.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/50/503df45ab57633a8aa5a21aeebd21eef545981019f6fc1e4b6a550ccaba5622e",
+      "sha256": "503df45ab57633a8aa5a21aeebd21eef545981019f6fc1e4b6a550ccaba5622e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-ic-gw-sqrt-compiled/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261114-ic-gw-sqrt-compiled/sqrt_compiled.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gw-sqrt-compiled",
+  "status": "measured",
+  "summary": "compiled sqrt chain at c_D=1.7, L0: relations.cpu 0.65-0.94 of REF in 15/15 cells (geomean 0.847), A/A floor 0.16 so not separated from noise; counted fields identical (8580); total DL CPU 0.96; pcc:unverified",
+  "validation": null
+}

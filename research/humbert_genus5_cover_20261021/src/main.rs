@@ -10,6 +10,7 @@ mod cover;
 mod curve;
 mod field;
 mod la;
+mod lpsummary;
 mod poly;
 
 use cover::*;
@@ -37,6 +38,12 @@ fn main() {
             }
         }
         Some("verify") => verify(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap()),
+        Some("summarize-lp") => {
+            if let Err(e) = lpsummary::run(&args[2]) {
+                eprintln!("summarize-lp: {e}");
+                std::process::exit(1);
+            }
+        }
         Some("attack") => attack(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap(), &args[5]),
         _ => eprintln!("usage: humbert classify | verify p twist seed | attack p twist seed full|iota"),
     }
@@ -126,10 +133,13 @@ fn verify(p: u64, twist: i32, seed: u64) {
 const DENSE_MAX: usize = 1200;
 
 fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
-    let iota = match arm {
-        "full" => false,
-        "iota" => true,
-        _ => panic!("arm must be full or iota"),
+    // "full" | "iota" | "lp:<alpha>": iota-folded, small factor base of a fraction
+    // alpha of the x-values, single large prime relations combined in pairs
+    let (iota, lp_alpha): (bool, Option<f64>) = match arm {
+        "full" => (false, None),
+        "iota" => (true, None),
+        a if a.starts_with("lp:") => (true, Some(a[3..].parse().expect("lp:<alpha>"))),
+        _ => panic!("arm must be full, iota or lp:<alpha>"),
     };
     let mut rng = Rng(seed);
     let t_all = Instant::now();
@@ -150,7 +160,20 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let x_true = 1 + rng.below(r - 1);
     let q = ce.mul(&gen, x_true as u128);
     eprintln!("[setup] r={} #E={} {:.2}s", r, s.order, t.elapsed().as_secs_f64());
-    let fb = FactorBase::build(&s);
+    let mut fb = FactorBase::build(&s);
+    if let Some(alpha) = lp_alpha {
+        // small base: a seeded random subset of the x-values (its own RNG stream)
+        let mut idx: Vec<usize> = (0..fb.xs.len()).collect();
+        let mut prng = Rng(seed ^ 0x5EED_1A2B);
+        for i in (1..idx.len()).rev() {
+            idx.swap(i, prng.below(i as u64 + 1) as usize);
+        }
+        let k = ((alpha * idx.len() as f64).ceil() as usize).clamp(12, idx.len());
+        idx.truncate(k);
+        idx.sort();
+        fb.pick = idx;
+    }
+    let fb = fb;
     let nodes = Nodes::new(&s);
     eprintln!("[fb] points={}", fb.n_points());
     let t_setup = t.elapsed().as_secs_f64();
@@ -158,7 +181,62 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let nx = fb.xs.len();
     let nfb = fb.n_points();
     // columns
-    let (ncols, inf_col, c_col) = if iota { (nx + 2 - 1, nx + 1 - 1, nx - 1) } else { (nfb + 1 - 1, nfb - 1, usize::MAX) };
+    let nsmall = fb.pick.len();
+    let mut small_col: Vec<Option<usize>> = vec![None; nx]; // compact column of a small x (pinned: None)
+    let mut is_small = vec![false; nx];
+    for (k, &j) in fb.pick.iter().enumerate() {
+        is_small[j] = true;
+        if k > 0 {
+            small_col[j] = Some(k - 1);
+        }
+    }
+    let pinned = fb.pick[0];
+    let (ncols, inf_col, c_col) = if iota { (nsmall + 1, nsmall, nsmall - 1) } else { (nfb + 1 - 1, nfb - 1, usize::MAX) };
+    // big coordinates: key j < nx is Y_j, BIG_C is c, BIG_INF is D_oo
+    let big_c = nx;
+    let big_inf = nx + 1;
+    let merge = |mut row: Vec<(usize, u64)>| -> Vec<(usize, u64)> {
+        row.sort();
+        let mut merged: Vec<(usize, u64)> = Vec::new();
+        for (c, v) in row {
+            match merged.last_mut() {
+                Some(last) if last.0 == c => last.1 = (last.1 + v) % r,
+                _ => merged.push((c, v)),
+            }
+        }
+        merged.retain(|e| e.1 != 0);
+        merged
+    };
+    let to_big = |rel: &Relation| -> Vec<(usize, u64)> {
+        let mut row = Vec::new();
+        for &i in &rel.pts {
+            let j = i / 2;
+            if i % 2 == 0 {
+                row.push((j, 1));
+            } else {
+                row.push((j, r - 1));
+                row.push((big_c, 1));
+            }
+        }
+        let inf = if rel.inf >= 0 { rel.inf as u64 % r } else { r - ((-rel.inf) as u64 % r) };
+        row.push((big_inf, inf));
+        merge(row)
+    };
+    let compact = |big: &[(usize, u64)]| -> Vec<(usize, u64)> {
+        let mut row = Vec::new();
+        for &(k, v) in big {
+            if k == big_c {
+                row.push((c_col, v));
+            } else if k == big_inf {
+                row.push((inf_col, v));
+            } else if k == pinned {
+                // Y_pinned = 0
+            } else {
+                row.push((small_col[k].expect("large prime left in a full relation"), v));
+            }
+        }
+        merge(row)
+    };
     let to_row = |rel: &Relation| -> Vec<(usize, u64)> {
         let mut row: Vec<(usize, u64)> = Vec::new();
         let mut push = |c: Option<usize>, v: u64| {
@@ -206,7 +284,13 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let mut use_quadrics = false;
     let mut switch_at_rows = usize::MAX;
     let mut rows: Vec<Vec<(usize, u64)>> = Vec::new();
+    let mut partials: std::collections::HashMap<usize, Vec<(usize, u64)>> = std::collections::HashMap::new();
+    let mut lp_combined = 0u64;
+    let mut lp_dropped = 0u64;
     let mut target = ncols + 5;
+    // HUMBERT_LA_PRECHECK=1: never start a Wiedemann solve while a column is empty
+    let la_precheck = std::env::var("HUMBERT_LA_PRECHECK").map(|v| v == "1").unwrap_or(false);
+    let mut precheck_extensions = 0u64;
     let mut t_rel = 0.0;
     let mut t_la = 0.0;
     let mut la_mulmods = 0u64;
@@ -221,10 +305,9 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                 hyperplane_relation(&s, &fb, &nodes, &mut rng, &mut st)
             };
             let Some(rel) = rel else { continue };
-            let row = to_row(&rel);
-            let mut key = row.clone();
-            key.sort();
-            let fresh = seen.insert(key);
+            let big = if iota { to_big(&rel) } else { Vec::new() };
+            let row = if iota { big.clone() } else { to_row(&rel) };
+            let fresh = seen.insert(row.clone());
             if !use_quadrics {
                 window.push(fresh);
                 if window.len() >= 200 {
@@ -240,6 +323,41 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                 dup_found += 1;
                 continue;
             }
+            let row = if iota {
+                let lps: Vec<(usize, u64)> = big.iter().cloned().filter(|&(k, _)| k < nx && !is_small[k]).collect();
+                match lps.len() {
+                    0 => compact(&big),
+                    1 => {
+                        let (j, a) = lps[0];
+                        match partials.get(&j) {
+                            None => {
+                                partials.insert(j, big.clone());
+                                continue;
+                            }
+                            Some(first) => {
+                                // new * b - first * a cancels Y_j
+                                let b = first.iter().find(|e| e.0 == j).unwrap().1;
+                                let mut comb: Vec<(usize, u64)> = big.iter().map(|&(k, v)| (k, mulr(v, b, r))).collect();
+                                comb.extend(first.iter().map(|&(k, v)| (k, (r - mulr(v, a, r)) % r)));
+                                let comb = merge(comb);
+                                debug_assert!(comb.iter().all(|e| e.0 >= nx || is_small[e.0]));
+                                lp_combined += 1;
+                                let c = compact(&comb);
+                                if c.is_empty() {
+                                    continue;
+                                }
+                                c
+                            }
+                        }
+                    }
+                    _ => {
+                        lp_dropped += 1;
+                        continue;
+                    }
+                }
+            } else {
+                row
+            };
             sym_rows += rel.sym as u64;
             if use_quadrics {
                 quad_rows += 1;
@@ -247,6 +365,22 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             rows.push(row);
         }
         t_rel += tr.elapsed().as_secs_f64();
+        if la_precheck && ncols > DENSE_MAX {
+            // columns in no relation are certain extra corank: collect more relations
+            // before paying for a Wiedemann solve that is bound to be rejected
+            let mut used = vec![false; ncols];
+            for row in &rows {
+                for &(c, _) in row {
+                    used[c] = true;
+                }
+            }
+            let empty = used.iter().filter(|u| !**u).count();
+            if empty > 0 {
+                precheck_extensions += 1;
+                target += (2 * empty).max(5);
+                continue;
+            }
+        }
         let tl = Instant::now();
 
         let solve = if ncols <= DENSE_MAX {
@@ -287,10 +421,42 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let k4_after_rel = s.k().muls.get();
     let _ = t;
     let xv = sol.x.unwrap();
+    // Y_j for every x with a known log (iota/lp); None where undetermined
+    let mut yv: Vec<Option<u64>> = vec![None; nx];
+    if iota {
+        for j in 0..nx {
+            if j == pinned {
+                yv[j] = Some(0);
+            } else if let Some(c) = small_col[j] {
+                yv[j] = Some(xv[c]);
+            }
+        }
+        let big_val = |k: usize, yv: &Vec<Option<u64>>| -> u64 {
+            if k == big_c {
+                xv[c_col]
+            } else if k == big_inf {
+                xv[inf_col]
+            } else {
+                yv[k].unwrap()
+            }
+        };
+        for (&j, row) in &partials {
+            let mut acc = 0u64;
+            let mut coef = 0u64;
+            for &(k, v) in row {
+                if k == j {
+                    coef = v;
+                } else {
+                    acc = (acc + mulr(v, big_val(k, &yv), r)) % r;
+                }
+            }
+            yv[j] = Some(mulr((r - acc) % r, invr(coef, r), r));
+        }
+    }
+    let lp_known = (0..nx).filter(|&j| !is_small[j] && yv[j].is_some()).count();
     let val = |i: usize| -> u64 {
         if iota {
-            let j = i / 2;
-            let y = if j == 0 { 0 } else { xv[j - 1] };
+            let y = yv[i / 2].expect("log of a point outside the known set");
             if i % 2 == 0 {
                 y
             } else {
@@ -302,11 +468,13 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             xv[i - 1]
         }
     };
+    let known = |i: usize| -> bool { !iota || yv[i / 2].is_some() };
     let x_inf = xv[inf_col];
     // ---- lead 4 checks: iota pairs, X_oo = 4c ------------------------------
-    let c_val = (val(0) + val(1)) % r;
+    // c from the pinned point: always in the small base, so its log is known
+    let c_val = (val(2 * pinned) + val(2 * pinned + 1)) % r;
     let mut iota_pairs_const = true;
-    for j in 0..nx {
+    for j in (0..nx).filter(|&j| known(2 * j)) {
         if (val(2 * j) + val(2 * j + 1)) % r != c_val {
             iota_pairs_const = false;
         }
@@ -336,7 +504,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         let mut lg = (r - mulr(4, x_inf, r)) % r;
         for z in &places {
             place_degs.push(z.len());
-            let pts = descend_place(&s, &fb, &nodes, z, &mut rng, &mut dst);
+            let pts = descend_place(&s, &fb, &nodes, z, &known, &mut rng, &mut dst);
             let mut lz = mulr(2, x_inf, r);
             for &i in &pts {
                 lz = (lz + r - val(i)) % r;
@@ -354,24 +522,30 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let t_ic = t_all.elapsed().as_secs_f64();
     let rss_ic = peak_rss_kb();
     // ---- matched rho on E(F_{q^4})[r] --------------------------------------
-    let rho = pollard_rho(&ce, &gen, &q, r, &mut rng);
+    // HUMBERT_SKIP_RHO=1: no rho run (the instance's rho is measured once, in its baseline arm)
+    let skip_rho = std::env::var("HUMBERT_SKIP_RHO").map(|v| v == "1").unwrap_or(false);
+    let rho = if skip_rho {
+        curve::RhoResult { log: None, steps: 1, seconds: 0.0, k4_muls: 0 }
+    } else {
+        pollard_rho(&ce, &gen, &q, r, &mut rng)
+    };
     let rho_ok = rho.log == Some(x_true);
     let sec_per_step = rho.seconds / rho.steps as f64;
     let expected_rho_steps = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
     println!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
-\"fb_x\":{nx},\"fb_points\":{nfb},\"unknowns\":{ncols},\
-\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
+\"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
 \"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
 \"t_setup\":{t_setup:.4},\"t_relations\":{t_rel:.4},\"t_linear_algebra\":{t_la:.4},\"t_descent\":{t_desc:.4},\"t_ic_total\":{t_ic:.4},\
 \"k4_muls_relations\":{},\"k4_muls_descent\":{},\"peak_rss_kb\":{rss_ic},\
-\"rho_solved\":{rho_ok},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected_rho_steps:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\
+\"rho_skipped\":{skip_rho},\"rho_solved\":{rho_ok},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected_rho_steps:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\
 \"ic_over_rho_time\":{:.4},\"ic_time_in_rho_steps\":{:.1}}}",
-        s.order, s.d_count, st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if ncols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
+        s.order, s.d_count, lp_alpha.unwrap_or(1.0), partials.len(), st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if ncols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
         k4_after_rel - k4_after_setup, k4_after_desc - k4_after_rel,
-        rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, t_ic / rho.seconds, t_ic / sec_per_step
+        rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, if skip_rho { 0.0 } else { t_ic / rho.seconds }, if skip_rho { 0.0 } else { t_ic / sec_per_step }
     );
 }
 
@@ -444,6 +618,18 @@ mod tests {
             assert_eq!(mulr(xd[c], id, r), mulr(xw[c], iw, r));
             assert_eq!(mulr(xd[c], id, r), mulr(hidden[c], invr(hidden[0], r), r));
         }
+    }
+
+    #[test]
+    fn summarize_lp_parses_records_and_rejects_duplicates() {
+        let r = lpsummary::Rec::parse(r#"{"tag":"pre","order":2,"p":4001,"place_degrees":[4, 4],"solved":true,"t_ic_total":5.25}"#).unwrap();
+        assert_eq!((r.s("tag"), r.u("p"), r.b("solved"), r.f("t_ic_total")), ("pre".to_string(), 4001, true, 5.25));
+        let dir = std::env::temp_dir().join(format!("humbert-dup-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("results")).unwrap();
+        std::fs::write(dir.join("results/v2.jsonl"), "{\"tag\":\"pre\",\"p\":1,\"seed\":1}\n{\"tag\":\"pre\",\"p\":1,\"seed\":1}\n").unwrap();
+        let e = lpsummary::run(dir.to_str().unwrap()).unwrap_err();
+        assert!(e.contains("duplicate record"), "{e}");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

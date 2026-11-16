@@ -213,7 +213,9 @@ impl<'c> PrimeSymmetric<'c> {
                     if f.is_zero(d2) {
                         continue; // x_1 = x_2
                     }
-                    let Some(u) = cv.sqrt(&mut f, d2) else { continue };
+                    let Some(u) = cv.sqrt(&mut f, d2) else {
+                        continue;
+                    };
                     let p1 = f.add(e1, u);
                     let x1 = f.mul(p1, inv2);
                     let p2 = f.sub(e1, u);

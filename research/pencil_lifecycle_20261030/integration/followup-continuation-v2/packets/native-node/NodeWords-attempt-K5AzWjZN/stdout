@@ -1,0 +1,29 @@
+/var/tmp/pencil-native-node-20261101-v1/NodeWords.lean:27:29: warning: This simp argument is unused:
+  ComponentMap.insertGraph
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [insertWord, decode, ident, decPot, sd, GraphFind.ident]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeWords.lean:28:29: warning: This simp argument is unused:
+  ComponentMap.insertGraph
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [insertWord, decode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-native-node-20261101-v1/NodeWords.lean:42:5: error: Type mismatch
+  hv.right j a b
+    (Eq.mpr (id (Eq.trans Option.map_eq_some_iff._simp_1 Prod.exists._simp_1))
+      (Eq.mp
+        (Eq.trans
+          (Eq.trans
+            (congrFun' (congrArg Eq (congrArg (Option.map (anchorPairDecode r)) (Fin.lastCases_castSucc j)))
+              (some (a, b)))
+            Option.map_eq_some_iff._simp_1)
+          Prod.exists._simp_1)
+        h))
+has type
+  v j = a + b * k
+but is expected to have type
+  insertValues v z j.castSucc = a + b * k

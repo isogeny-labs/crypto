@@ -4,7 +4,7 @@
 #
 # For every Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
-#     then audit every module the project itself built;
+#     explicitly build every tracked Lean source, then audit every built module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
 # One frozen historical failed source is checked as an expected-failure target
@@ -35,6 +35,7 @@ trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
 # cannot silently turn an unrelated build failure into a passing target.
 archived_failed='research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean'
 archived_failed_sha256='b439d1edbe04798a56012688254ea7bd120494e4fd10856f4bdc0c07796e9d1c'
+# shellcheck disable=SC2016 # The Lean diagnostic contains literal backticks.
 archived_failed_error='error(lean.unknownIdentifier): Unknown constant `Int.mul_two`'
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
@@ -53,7 +54,8 @@ done
 discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
-  git ls-files -- '*lakefile.toml' '*lakefile.lean' | xargs -r -n1 dirname | sort -u
+  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -v '^tools/lean/selftest/' \
+    | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
   git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
     d=$(dirname "$f")
@@ -68,14 +70,28 @@ if [ ${#targets[@]} -eq 0 ]; then mapfile -t targets < <(discover); fi
 if [ $list -eq 1 ]; then printf '%s\n' "${targets[@]}"; exit 0; fi
 [ ${#targets[@]} -gt 0 ] || { echo "no Lean targets found" >&2; exit 3; }
 command -v lake > /dev/null || { echo "lake not on PATH (install elan)" >&2; exit 3; }
+command -v python3 > /dev/null || { echo "python3 not on PATH (target path normalization)" >&2; exit 3; }
 
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
 fail=0
-summary=()
 
 run_target() {
-  local t=$1 slug log status
+  local t slug log status
+  if ! t=$(python3 - "$root" "$1" <<'PY'
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1]).resolve()
+target = (root / sys.argv[2]).resolve(strict=True)
+if not target.is_relative_to(root):
+    raise SystemExit("proof target escapes the repository")
+print(target.relative_to(root).as_posix())
+PY
+  ); then
+    echo "FAIL_target_path $1" >&2
+    return 1
+  fi
   slug=$(echo "$t" | tr '/.' '__')
   log="$scratch/$slug"
   mkdir -p "$log"
@@ -134,13 +150,72 @@ run_target() {
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      local mods
-      mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-        | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-      if [ -z "$mods" ]; then
-        status=FAIL_no_modules
-      elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
-        status=FAIL_audit
+      local f module source_rel target private_dir attempt lake_path
+      local -a sources=() source_paths=() mods=()
+      private_dir="$log/private-olean"
+      mkdir -p "$private_dir"
+      : > "$log/source-build.log"
+      # A default target may omit an entire tracked module. Build each
+      # registered source explicitly; compile an unregistered source in a
+      # private directory so it still reaches the same axiom audit.
+      while IFS= read -r -d '' f; do
+        case "$f" in
+          *.lean) ;;
+          *) continue ;;
+        esac
+        module=$f
+        [ "$t" = . ] || module=${f#"$t"/}
+        case "$module" in
+          lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
+        esac
+        source_rel=${module%.lean}
+        # Quote path components as Lean identifiers: a tracked directory can
+        # contain a hyphen, which Lake otherwise parses as target syntax.
+        module=${source_rel//\//».«}
+        sources+=("+«$module»")
+        source_paths+=("$source_rel")
+        mods+=("«$module»")
+      done < <(cd "$root" && git ls-files -z -- "$t")
+      if [ ${#sources[@]} -eq 0 ]; then
+        status=FAIL_no_sources
+      else
+        if ! lake_path=$(cd "$root/$t" && lake env printenv LEAN_PATH); then
+          echo 'could not read Lake LEAN_PATH' >> "$log/source-build.log"
+          status=FAIL_source_build
+        fi
+        for ((i=0; i<${#sources[@]}; i++)); do
+          [ "$status" = PASS ] || break
+          source_rel=${source_paths[i]}
+          module=${source_rel//\//.}
+          attempt="$log/source-attempt.log"
+          if (cd "$root/$t" && lake build "${sources[i]}") > "$attempt" 2>&1; then
+            cat "$attempt" >> "$log/source-build.log"
+          elif grep -Fq "unknown module \`$module\`" "$attempt"; then
+            cat "$attempt" >> "$log/source-registration.log"
+            target="$private_dir/$source_rel.olean"
+            mkdir -p "$(dirname "$target")"
+            if ! (cd "$root/$t" && LEAN_PATH="$private_dir:$lake_path" \
+              lean -o "$target" "$source_rel.lean") >> "$log/source-build.log" 2>&1; then
+              status=FAIL_source_build
+              break
+            fi
+            printf 'privately compiled %s\n' "$source_rel.lean" >> "$log/source-build.log"
+          else
+            cat "$attempt" >> "$log/source-build.log"
+            status=FAIL_source_build
+            break
+          fi
+        done
+        if [ "$status" = PASS ]; then
+          # Audit exactly the tracked source modules. A previous local build
+          # may have left stale .olean files that are not in this Git tree.
+          if [ ${#mods[@]} -eq 0 ]; then
+            status=FAIL_no_modules
+          elif ! (cd "$root/$t" && LEAN_PATH="$private_dir:$lake_path" \
+            lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
+            status=FAIL_audit
+          fi
+        fi
       fi
     fi
   else
@@ -152,13 +227,14 @@ run_target() {
     toolchain=$(cat "$(dirname "$root/$t")/lean-toolchain" 2>/dev/null || true)
     if ! (cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t") > "$log/build.log" 2>&1; then
       status=FAIL_build
-    elif ! LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- "${trust_args[@]}" "$mod" > "$log/audit.log" 2>&1; then
+    elif ! (cd "$(dirname "$root/$t")" && LEAN_PATH="$dir:${LEAN_PATH:-}" \
+      lean --run "$audit" -- "${trust_args[@]}" "$mod") > "$log/audit.log" 2>&1; then
       status=FAIL_audit
     fi
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
   fi
   # `sorry` that elaborated without being used by a theorem still warns at build time.
-  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log"; then
+  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log" "$log/source-build.log" 2>/dev/null; then
     status=FAIL_sorry_warning
   fi
   echo "$status" > "$log/status"
@@ -169,7 +245,7 @@ run_target() {
   tr=$(grep -o '[0-9]* trusted' "$log/audit.log" 2>/dev/null | grep -o '[0-9]*' || echo 0)
   printf '%-22s %4s thm %3s trusted  %s\n' "$status" "${n:-0}" "${tr:-0}" "$t"
   if [ "$status" != PASS ]; then
-    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" 2>/dev/null | head -5 | sed 's/^/    /'
+    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" "$log/source-build.log" 2>/dev/null | head -5 | sed 's/^/    /'
     return 1
   fi
 }

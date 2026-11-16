@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520">
+ <rect width="1100" height="520" fill="#fff"/>
+ <style>text{font-family:DejaVu Sans,sans-serif;fill:#10213a}.node{fill:#e8f2ff;stroke:#2767b1;stroke-width:2}.open{fill:#f2f3f5;stroke:#818a97;stroke-width:2}.arrow{stroke:#65758b;stroke-width:2;fill:none;marker-end:url(#head)}.small{font-size:15px}.label{font-size:18px;font-weight:bold}</style>
+ <defs><marker id="head" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><path d="M0 0L10 3.5L0 7" fill="#65758b"/></marker></defs>
+ <text x="40" y="42" font-size="24" font-weight="bold">Actual weighted-Proj curve: local Noetherianity</text>
+ <text x="40" y="68" class="small">Blue: checked Lean declaration. Gray: open proof gate. Arrows: dependencies, not measured cost.</text>
+ <rect class="node" x="42" y="120" width="270" height="92" rx="12"/><text class="label" x="62" y="152">Infinity chart ring</text><text class="small" x="62" y="177">Noetherian; Field K</text>
+ <rect class="node" x="42" y="260" width="270" height="92" rx="12"/><text class="label" x="62" y="292">Affine chart ring</text><text class="small" x="62" y="317">Noetherian; Field K</text>
+ <rect class="node" x="390" y="190" width="270" height="92" rx="12"/><text class="label" x="410" y="222">Whole curve</text><text class="small" x="410" y="247">Locally Noetherian</text>
+ <rect class="open" x="740" y="120" width="310" height="92" rx="12"/><text class="label" x="760" y="152">All closed-point orders</text><text class="small" x="760" y="177">coheight-one bridge open</text>
+ <rect class="open" x="740" y="260" width="310" height="92" rx="12"/><text class="label" x="760" y="292">Principal divisor / Pic⁰</text><text class="small" x="760" y="317">source allocation open</text>
+ <path class="arrow" d="M312 166L390 225"/><path class="arrow" d="M312 306L390 248"/><path class="arrow" d="M660 236L740 168"/><path class="arrow" d="M895 212L895 260"/>
+ <text x="42" y="405" class="small">Additional inputs: the existing two-basic-open cover and chart scheme isomorphisms.</text>
+ <text x="42" y="433" class="small">Whole-curve integrality separately assumes a separable quintic; this local Noetherian theorem does not.</text>
+ <text x="42" y="467" class="small">Source: WeightedProjLocallyNoetherian.lean; status rows: local-noetherian.csv.</text>
+</svg>

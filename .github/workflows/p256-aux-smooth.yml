@@ -1,0 +1,30 @@
+name: P-256 auxiliary native development checks
+on:
+  pull_request:
+    paths:
+      - research/p256_aux_smooth_20261114/**
+      - .github/workflows/p256-aux-smooth.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/p256_aux_smooth_20261114
+      - name: Install native development dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ libgmp-dev libssl-dev pkg-config
+      - name: Native arithmetic, complete charts and exact relation replay
+        run: research/p256_aux_smooth_20261114/run_checks.sh "$RUNNER_TEMP/aux-native"
+      - name: Replay committed factor-base and polynomial bytes
+        run: diff -rq research/p256_aux_smooth_20261114/evidence/native "$RUNNER_TEMP/aux-native/native"
+      - name: Native CAS export and synthetic solution reader
+        run: research/p256_aux_smooth_20261114/run_adapter_checks.sh "$RUNNER_TEMP/aux-adapter"
+      - name: Replay committed CAS inputs
+        run: |
+          diff -rq research/p256_aux_smooth_20261114/evidence/adapter/native "$RUNNER_TEMP/aux-adapter/native"
+          diff -rq research/p256_aux_smooth_20261114/evidence/adapter/magma "$RUNNER_TEMP/aux-adapter/magma"

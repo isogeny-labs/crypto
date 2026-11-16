@@ -16,6 +16,10 @@ lists the change and the old value. The F9 records (`controls/hec_ic_control*.js
 `certificates/run-log.json` are the original measured run and were not regenerated, so the
 timings in `run-log.json` are those of the v1 suite.
 
+The v2 regeneration wrote over the v1 certificates, index and report files in place. They are
+restored byte for byte under [`v1/`](v1/README.md) (from commit `3f31162cd`, the study as it stood
+before PR #2658) so that both sets are in the tree. Every file outside `v1/` is v2.
+
 **Status of every number below.** Cost rows are formula-level estimates from the repository's frozen
 `CostModel` unless a row says `measured`; no cost cell of any certificate is measured. What *was*
 executed is stated per row (map status, subgroup status). Nothing here is an ECDLP speedup, a key

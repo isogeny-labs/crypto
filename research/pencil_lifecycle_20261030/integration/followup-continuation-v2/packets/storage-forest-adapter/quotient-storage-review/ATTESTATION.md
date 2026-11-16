@@ -1,0 +1,1 @@
+Producer residual_source; reviewer monic_review. Postpublication independent review; local source-first obligations preceded new proof bodies. Prior monic/quotient and dependency familiarity disclosed, not blind. Exact publication and native source bindings verified. No official scientific promotion.

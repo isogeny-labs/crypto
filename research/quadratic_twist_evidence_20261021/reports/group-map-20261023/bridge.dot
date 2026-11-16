@@ -1,0 +1,25 @@
+digraph GroupBridge {
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.2, ranksep=0.28,
+         fontname="Helvetica", fontsize=11,
+         label="group-map-20261023: actual-point Lean proofs; no solver-cost conclusion", labelloc=b];
+  node [shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0369a1",
+        fontname="Helvetica", fontsize=12, margin=0.12];
+  edge [color="#0369a1", fontname="Helvetica", fontsize=10, arrowsize=0.75];
+  field [label="Finite odd k; nonsquare d; u^2=d in K\nE: y^2=x^3+ax+b elliptic"];
+  source [label="E_d(k): Y^2=X^3+d^2 a X+d^3 b\nACTUAL nonsingular point group"];
+  minus [label="All Q in E(K) with Frob(Q)=-Q\nACTUAL minus subgroup"];
+  plus [label="Rational base-change points\nEXACTLY Frob(Q)=Q"];
+  relation [label="A + psi(P) = R with A,R rational\nPROVED: 2 psi(P)=O", fillcolor="#dcfce7", color="#15803d"];
+  odd [label="Also rP=O and gcd(2,r)=1\nPROVED: P=O; A=R after lifting", fillcolor="#dcfce7", color="#15803d"];
+  limits [label="OPEN: general normalization; exceptional S3/S4 lifts\npairing reduction; universal trace-zero geometry",
+          fillcolor="#fff7ed", color="#c2410c", fontsize=11];
+  {rank=same; source; minus;}
+  {rank=same; plus; relation;}
+  field -> source [label="Delta(E_d)=d^6 Delta(E)"];
+  source -> minus [dir=both, label="PROVED group isomorphism\n(X,Y) -> (X/d,Y/(d*u)); O -> O"];
+  field -> plus [label="roots of X^q-X descend to k"];
+  minus -> relation;
+  plus -> relation;
+  relation -> odd;
+  odd -> limits [style=dashed, color="#c2410c", label="does not discharge"];
+}

@@ -1,0 +1,85 @@
+2026-10-27 PR #2709 merged-head validation
+
+Exact head and merge audit
+  head: 4eaf3ba978cb3a4fd6a7346e94ea9f6df4b7119c
+  tree: 8c199d7847e95e5240c46adf746cffff0acef536
+  first parent: 08b4080d16e432c8e43aa0ff270e14cd2bc5c4e5
+  second parent: f8bb1f99258e62d18b20e51dabc0078233f2acee
+
+The second parent is the fetched live main branch. A read-only git merge-tree
+reported no conflicts. The remotely created tree exactly matched the local
+merge-tree digest before an expected-head-guarded, non-force ref update. The
+trace-line source, replay, protocol and prospective specifications are unchanged
+from the reviewed PR source; main contributed its own lift-dense follow-up
+research and session-log entries.
+
+Integrity before reconciliation
+  DESIGN.sha256: all 6 files OK.
+  validation/LOGS.sha256: all 5 pre-existing files OK.
+  SOURCE.sha256: 4 files OK; only methods.rs differed because the preceding
+  main merge renamed the separate hyperelliptic registration. SOURCE.sha256
+  is updated to the exact merged byte hash
+  b35fc57c267210657521e40f80fdca7a651d800b8868c34f67c33633e378a5dc.
+
+Focused commands on exact head
+  cargo test --release --lib --locked -j 1 \
+    --config 'profile.release.opt-level=0' trace_line
+  Result: exit 0; 4 passed, 0 failed, 5036 filtered out.
+
+  cargo test --release --example trace_line_replay --locked -j 1 \
+    --config 'profile.release.opt-level=0'
+  Result: exit 0; 1 passed, 0 failed.
+
+Targeted rechecks of previously diagnosed base/fixture failures
+  cargo test --release --lib --locked -j 1 \
+    --config 'profile.release.opt-level=0' \
+    cryptanalysis::ecbench::hyper_ic::tests::
+  Result: exit 0; 7 passed, 0 failed, 5033 filtered out.
+
+  cargo test --release --lib --locked -j 1 \
+    --config 'profile.release.opt-level=0' \
+    cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity
+  Result: exit 0; 1 passed, 0 failed, 5039 filtered out.
+
+  The first rule-v8 recheck failed only because the tracked parameter files
+  were outside the sparse checkout. After materialising exactly the six tracked
+  parameter directories, the same command for
+  cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files
+  exited 0 with 1 passed, 0 failed and 5039 filtered out.
+
+These targeted rechecks retire the earlier diagnosed test symptoms on this
+base. They are not a completed whole-library run.
+
+Current-head CI and artifact blocker
+  size: success.
+  review: success.
+  recompute: success.
+  migrate: success.
+  changed-file rustfmt: success.
+  clippy (cd_attack): success.
+  backend-leaderboard current: failure in job 122394072183.
+
+The current job hydrated docs/backend-leaderboard/leaderboard.json through the
+tracked artifact manifest. Backend formatting, all 24 unit tests and strict
+Clippy passed. The deterministic view check then failed only with:
+  stale backend leaderboard: docs/backend-leaderboard/leaderboard.json
+
+The tracked lock expects generated leaderboard digest
+16b0fd0e9a68483556b6d2e714de96e25004dfd5c423398bf74b3171d30ce6b5,
+but docs/backend-leaderboard/.artifacts.json still points to old object
+074eafcf56e144fae0668391f2115be4c5d40cd101c1fb1e9191521391cb06be.
+The earlier native reseal therefore updated the tracked lock and HTML without
+publishing and replay-verifying the artifact-backed leaderboard object.
+
+The exact remaining repair is to publish the generated leaderboard.json bytes
+through the repository's write-once artifact-store workflow, update and verify
+docs/backend-leaderboard/.artifacts.json, and rerun the native --check plus CI on
+the resulting expected-head-guarded commit. This session has no authorised
+artifact-store write credentials. It did not fabricate the pointer, retry the
+policy-rejected maintainer-only seal, or bypass remote upload/replay.
+
+No benchmark, ecbench session, solver execution, paid experiment, relation-yield
+measurement or performance measurement was run. Algebraic C1, complete native
+pricing, final protocol freeze, exact registry/EC1 admission, authorised EKS/S3
+experiment execution, matched Pollard rho and independent-host validation remain
+open. No C1 or end-to-end gain is claimed.

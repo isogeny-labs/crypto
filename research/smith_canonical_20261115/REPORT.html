@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Smith canonical map</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}table{border-collapse:collapse;margin:8px 0;font-size:9pt}th,td{border:1px solid #d8d7d2;padding:3px 6px}th{background:#f1f0ec}code{font-size:9pt;background:#f4f3ef;padding:0 2px}pre{background:#f4f3ef;padding:8px;font-size:8.5pt;white-space:pre-wrap}h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Smith canonical map</h1>
+</header>
+<h1
+id="results-the-canonical-map-psi-x---c-of-smiths-trigonal-construction">Results:
+the canonical map psi: X -&gt; C of Smith’s trigonal construction</h1>
+<p>Study <code>smith_canonical_20261115</code>. Module
+<code>src/cryptanalysis/smith_canonical.rs</code>. Protocol
+<code>PROTOCOL.md</code>, sha256
+<code>519b465adfe5bf218189bc190a9b028646477ed4ce9bf55d401747c010e0b8ae</code>,
+frozen 2026-11-15T02:31:04Z; first sweep cell started 02:31:11Z. Raw
+output: <code>raw/cell_{A..E}.log</code>; aggregate:
+<code>summary.json</code>.</p>
+<p>All statements below are <code>[pcc:unverified]</code> assertions of
+this session (no pcc claim was filed, no independent validator has
+replayed the run). Toy primes; no cost claim, no comparison with rho, no
+leaderboard row.</p>
+<h2 id="what-was-built">What was built</h2>
+<p><code>psi(t; b) = T(t) (b0 : b1 : b2)</code> with the symmetric
+matrix <code>T_ik = [x^2]( x^(i+k) D adj(F mod G) mod G )</code> in
+<code>F_p[t]</code>. The three coordinates are the traces along Smith’s
+correspondence <code>R</code> of the differentials
+<code>x^i dx / y</code> of <code>H</code> (derivation in the module
+doc). No singularity analysis of the plane model and no Riemann-Roch
+computation is used. <code>C</code> is the unique quartic through the
+images of the points of <code>X</code> over <code>U</code>.
+<code>Psi</code> to <code>Pic^0(C)</code> uses
+<code>plane_quartic_pic</code> unchanged; the class of a conjugate pair
+is built from the <code>F_p</code>-conics through the pair and the base
+point.</p>
+<p>This is not the route suggested in the brief (adjoints of
+<code>Phi(t, rho) = 0</code>). The plane model is still supported as an
+input (<code>psi_t_rho</code>), by lifting <code>(t, rho)</code> to
+<code>X</code>.</p>
+<h2 id="positive-control-smiths-example-1-f_37-unit-tests">Positive
+control: Smith’s Example 1 (F_37), unit tests</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fitted quartic (mons_of_degree(4) order)</td>
+<td><code>[1,26,36,29,22,36,21,26,24,13,15,36,12,15,36]</code>, 52
+distinct fit points</td>
+</tr>
+<tr class="even">
+<td>independent differentials, no conic, no cubic, one quartic</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>smooth</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td><code>#C(F_37^k)</code>, k = 1, 2, 3</td>
+<td>42, 1342, 50070</td>
+</tr>
+<tr class="odd">
+<td><code>#H(F_37^k)</code>, k = 1, 2, 3</td>
+<td>42, 1342, 50070</td>
+</tr>
+<tr class="even">
+<td>same counts from the printed zeta numerator</td>
+<td>42, 1342, 50070; <code>#J = 55666</code></td>
+</tr>
+<tr class="odd">
+<td>printed quartic, same three counts</td>
+<td>42, 1342, 50070</td>
+</tr>
+<tr class="even">
+<td>projectively equivalent to the printed quartic over F_37</td>
+<td>yes: exactly one projectivity found by exhaustive search over frames
+of rational points, <code>[[32,3,15],[27,32,34],[9,1,9]]</code>; it maps
+all 42 rational points onto the printed curve</td>
+</tr>
+<tr class="odd">
+<td><code>psi</code> of the image points on <code>C</code></td>
+<td>60/60</td>
+</tr>
+<tr class="even">
+<td><code>psi</code> from <code>(t, rho)</code></td>
+<td>60/60; 58 at smooth points of the plane model, 2 at a node (two
+lifts, the right one among them)</td>
+</tr>
+<tr class="odd">
+<td><code>psi</code> at points with <code>t</code> in
+<code>F_37^2 \ F_37</code></td>
+<td>11 plane points found by search, 11 mapped onto <code>C</code></td>
+</tr>
+<tr class="even">
+<td>line sections through conjugate pairs give one class</td>
+<td>28 lines, 15 through conjugate pairs, all equal</td>
+</tr>
+<tr class="odd">
+<td>principal divisors map to 0</td>
+<td>8/8; perturbed: 8/8 nonzero</td>
+</tr>
+<tr class="even">
+<td>two representations of a class agree</td>
+<td>10/10</td>
+</tr>
+<tr class="odd">
+<td><code>Psi(D1 + D2) = Psi(D1) + Psi(D2)</code></td>
+<td>10/10</td>
+</tr>
+<tr class="even">
+<td><code>#J_H Psi(D) = 0</code></td>
+<td>10/10</td>
+</tr>
+<tr class="odd">
+<td><code>ord D / ord Psi(D)</code></td>
+<td>1 (6 classes), 2 (4 classes)</td>
+</tr>
+<tr class="even">
+<td>rational 2-torsion killed iff in <code>S</code></td>
+<td>1/1 (the one nonzero rational 2-torsion class is in
+<code>S</code>)</td>
+</tr>
+<tr class="odd">
+<td>DLP transfer, <code>k = 22359</code></td>
+<td><code>ord D = ord Psi(D) = 27833</code>;
+<code>Psi([k]D) = [k]Psi(D)</code>; BSGS on <code>C</code> returns
+22359</td>
+</tr>
+<tr class="even">
+<td>perturbed <code>T</code> (negative control)</td>
+<td>fit fails</td>
+</tr>
+<tr class="odd">
+<td><code>count_quartic_points</code> vs brute-force enumerator</td>
+<td>equal (q = 7: k = 1, 2, 3; q = 11: k = 1, 2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sweep-over-random-smith-positive-curves-frozen-protocol">Sweep
+over random Smith-positive curves (frozen protocol)</h2>
+<p>70 curves, none dropped. The canonical map was built on all 70; no
+curve gave a conic (no hyperelliptic <code>X</code>), and no
+<code>FAIL</code> row.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>cell</th>
+<th>p</th>
+<th>deg F</th>
+<th>curves</th>
+<th>fit points (min-max)</th>
+<th>dim 3, one quartic</th>
+<th>smooth</th>
+<th><code>#C = #H</code> over</th>
+<th>psi on C</th>
+<th>(t, rho) input (at nodes)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>37</td>
+<td>7</td>
+<td>20</td>
+<td>40-72</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>k = 1,2,3: 20/20</td>
+<td>1228/1228</td>
+<td>1228/1228 (70)</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>101</td>
+<td>7</td>
+<td>20</td>
+<td>124-188</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>k = 1,2,3: 20/20</td>
+<td>3468/3468</td>
+<td>3468/3468 (40)</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>211</td>
+<td>7</td>
+<td>10</td>
+<td>324-384</td>
+<td>10/10</td>
+<td>10/10</td>
+<td>k = 1,2: 10/10</td>
+<td>4092/4092</td>
+<td>4092/4092 (22)</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td>37</td>
+<td>8</td>
+<td>10</td>
+<td>36-60</td>
+<td>10/10</td>
+<td>10/10</td>
+<td>k = 1,2,3: 10/10</td>
+<td>608/608</td>
+<td>608/608 (22)</td>
+</tr>
+<tr class="odd">
+<td>E</td>
+<td>101</td>
+<td>8</td>
+<td>10</td>
+<td>140-168</td>
+<td>10/10</td>
+<td>10/10</td>
+<td>k = 1,2,3: 10/10</td>
+<td>1780/1780</td>
+<td>1780/1780 (16)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>cell</th>
+<th>relations -&gt; 0</th>
+<th>perturbed -&gt; nonzero</th>
+<th>curves with no relation run</th>
+<th>repr</th>
+<th>additivity</th>
+<th><code>#J_H</code>-annihilated</th>
+<th>order ratio 1 / 2 / 4 / 8</th>
+<th>2-torsion agree (in S / not in S)</th>
+<th>DLP verified</th>
+<th>k recovered exactly</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>169/169</td>
+<td>169/169</td>
+<td>1</td>
+<td>200/200</td>
+<td>200/200</td>
+<td>200/200</td>
+<td>116 / 84 / 0 / 0</td>
+<td>104/104 (42 / 62)</td>
+<td>20/20</td>
+<td>16/20</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>200/200</td>
+<td>200/200</td>
+<td>0</td>
+<td>200/200</td>
+<td>200/200</td>
+<td>200/200</td>
+<td>72 / 128 / 0 / 0</td>
+<td>108/108 (50 / 58)</td>
+<td>20/20</td>
+<td>20/20</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>100/100</td>
+<td>100/100</td>
+<td>0</td>
+<td>100/100</td>
+<td>100/100</td>
+<td>100/100</td>
+<td>47 / 53 / 0 / 0</td>
+<td>34/34 (20 / 14)</td>
+<td>10/10</td>
+<td>10/10</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td>29/29</td>
+<td>29/29</td>
+<td>7</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+</tr>
+<tr class="odd">
+<td>E</td>
+<td>99/99</td>
+<td>99/99</td>
+<td>0</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+<td>not run</td>
+</tr>
+</tbody>
+</table>
+<p>Reading the columns:</p>
+<ul>
+<li>“DLP verified”: <code>Psi([k]D) = [k]Psi(D)</code> with
+<code>[k]D</code> computed on <code>H</code> and moved to <code>C</code>
+independently of <code>D</code>, and the BSGS logarithm on
+<code>C</code> equal to <code>k</code> modulo <code>ord Psi(D)</code>.
+“k recovered exactly”: the logarithm equals <code>k</code> itself. The
+four curves of cell A where it does not are those where
+<code>ord Psi(D) = ord D / 2</code>: the transfer loses the 2-part that
+lies in the kernel, as it must. Orders of <code>Psi(D)</code> ranged 832
+to 32202 (A), 43176 to 576044 (B), 138376 to 5032808 (C).</li>
+<li>“2-torsion”: every nonzero rational 2-torsion class
+<code>(u, 0)</code> of <code>J_H</code>. 112 classes in <code>S</code>
+all map to 0; 134 classes outside <code>S</code> all map to a nonzero
+class. Membership in <code>S</code> is decided from <code>N, D</code> by
+polynomial arithmetic, without <code>psi</code>.</li>
+<li>The order ratio is 1 or 2 on all 500 classes, never 4 or 8, as it
+must be for a kernel of exponent 2.</li>
+</ul>
+<h2 id="checks-that-did-not-run">Checks that did not run</h2>
+<ul>
+<li>Cells D, E (deg F = 8): checks 7-9 are not implemented (no
+<code>J_H</code> arithmetic for the even-degree model). Stated in the
+protocol.</li>
+<li>Relations: on 1 curve of cell A (i = 19) and 7 curves of cell D no
+pair of split functions was found within the search budget (few usable
+points at p = 37; the 0/0 rows). Those curves have no relation evidence.
+For the cell A curve the class checks 7-9 ran and passed; the 7 cell D
+curves have no evidence for C2 at all; only C1 is supported there.</li>
+<li>Where fewer than 10 relation pairs are listed for a curve, the two
+functions drawn were identical and the pair was skipped.</li>
+<li>Cell C: <code>#C(F_p^3)</code> not counted (protocol).</li>
+</ul>
+<h2 id="deviations-from-the-protocol">Deviations from the protocol</h2>
+<ul>
+<li>None in the sweep: same binary for all five cells (sha256
+<code>184217c0348c37bcc3fb11e2205c2f2dce8fecab125ab5df8e07606274bf3715</code>,
+source sha256
+<code>7ec3a7193780ffa90242cd831e006f017ab3b4c2fd878012f58b932fb5f430cb</code>),
+seeds and counts as frozen, cells run in the order A, D, B, E, C.</li>
+<li>After the sweep the source changed in three places, none in the
+instrument: an import moved into the test module, the unit test for
+<code>t</code> in <code>F_p^2</code> now tries twelve values of
+<code>t</code> instead of one (the single value used first happened to
+have no <code>F_p^2</code> point over it), and the module doc gained two
+sections. The unit tests were rerun on the final source: 9 passed, 1
+ignored (the sweep).</li>
+<li>The identity <code>Psi([P-P']) + Psi([P'-P'']) = Psi([P-P''])</code>
+of the brief is formal under the definition; it is a unit test (50/50)
+and is not counted as evidence (stated in the protocol before the
+freeze).</li>
+<li>The brief’s “kernel elements <code>[(W') - (W'')]</code>” were
+tested through every rational 2-torsion class rather than through
+<code>smith_prop24</code>’s pair list.</li>
+</ul>
+<h2 id="proven-by-code-and-assumed">Proven by code, and assumed</h2>
+<p>Checked by exact computation on every curve of the table:</p>
+<ul>
+<li>the three coordinate functions are linearly independent on
+<code>X</code>, the image lies on no conic or cubic and on exactly one
+quartic, which is smooth;</li>
+<li>that quartic has the point counts of <code>H</code> over the listed
+fields (so, with k = 1, 2, 3, the same zeta function);</li>
+<li>for deg F = 7: <code>Psi</code> is well defined on the tested
+classes (independent representations agree), additive, annihilated by
+<code>#J_H(F_p)</code>, kills the rational part of <code>S</code> and no
+other rational 2-torsion, and carries a planted logarithm.</li>
+</ul>
+<p>Follows from those by a standard argument, not separately computed:
+<code>psi</code> is birational onto <code>C</code> (a non-constant map
+from a genus-3 curve to a smooth plane quartic not through a conic has
+degree 1), hence <code>C</code> is the canonical model of
+<code>X</code>.</p>
+<p>Assumed, not checked:</p>
+<ul>
+<li>Smith’s theorem that <code>R</code> induces an isogeny
+<code>J_H -&gt; J_X</code> with kernel <code>S</code> (used to derive
+<code>T</code>; only its consequences above are tested);</li>
+<li>that the fitted quartic equals the canonical image at the points of
+<code>X</code> not evaluated: the fibres over <code>t = infinity</code>
+and over the <code>t</code> outside <code>U</code>. The zeta match
+covers them in aggregate only;</li>
+<li>the kernel beyond rational 2-torsion: classes of <code>S</code> that
+are rational as a set but whose elements are not rational are not tested
+one by one;</li>
+<li>correctness of <code>plane_quartic_pic</code> (its own study) and of
+<code>smith_trigonal::image_points</code>;</li>
+<li>nothing is claimed for primes beyond 211.</li>
+</ul>
+<h2 id="not-produced">Not produced</h2>
+<p>No figure, PDF, benchmark record or leaderboard row: this is an exact
+correctness study with no timing or cost measurement. No pcc claim
+filed.</p>
+</body>
+</html>

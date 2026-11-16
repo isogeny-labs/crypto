@@ -1,0 +1,61 @@
+{
+  "schema": "research.software-equivalence-result/v1",
+  "evidence_kind": "fixed-fixture software validation",
+  "scientific_execution": false,
+  "models": 21,
+  "transition_rows": 84,
+  "regular_rows": 63,
+  "forced_fallback_rows": 21,
+  "matched_semantic_fields": [
+    "next",
+    "choice",
+    "labels",
+    "fallback",
+    "fallback_checks",
+    "transition_checks",
+    "validation_failed"
+  ],
+  "successful_repair_slots": 0,
+  "dispatcher_cases": 54,
+  "counter_deltas": {
+    "False": {
+      "m": [
+        24
+      ],
+      "a": [
+        36
+      ],
+      "i": [
+        4
+      ]
+    },
+    "True": {
+      "m": [
+        304
+      ],
+      "a": [
+        376
+      ],
+      "i": [
+        24
+      ]
+    }
+  },
+  "cost_ratio": null,
+  "missing_coverage": [
+    "successful geometric repair",
+    "full collector run",
+    "timing or end-to-end cost comparison"
+  ],
+  "attempts": [
+    {
+      "exit_code": 101,
+      "phase": "wrapper compilation",
+      "error": "E0308 map key type; corrected in additive amendment"
+    },
+    {
+      "exit_code": 0,
+      "phase": "compile and all fixed checks"
+    }
+  ]
+}

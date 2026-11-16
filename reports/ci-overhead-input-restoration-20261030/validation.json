@@ -1,0 +1,44 @@
+{
+  "at": "2026-10-30T11:37:41.321720+00:00",
+  "native_source_equivalent_to": "954c0bb023f33657fe3cb6b95720f572655d0b12",
+  "integration_source": "fc20878632a5ab12b607fbe8f2671396bd349e7f",
+  "default_native_src_manifest_pathcrate_diff": "empty",
+  "artifact_controls": {
+    "passed": 28,
+    "returncode": 0,
+    "seconds": 2.334
+  },
+  "checks": [
+    {
+      "check": "affected-benchmark",
+      "command": [
+        "python3",
+        "scripts/validation_gate.py",
+        "evidence",
+        "benchmarks/20261022-ecbench-harness-overhead"
+      ],
+      "returncode": 0
+    },
+    {
+      "check": "workflow-wiring",
+      "command": [
+        "python3",
+        "tools/artifacts/wire_workflows.py",
+        "--check",
+        ".github/workflows/validation-gate.yml"
+      ],
+      "returncode": 0
+    },
+    {
+      "check": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0
+    }
+  ],
+  "full62_local_suite": "61 passed, committed-tree control failed because sparse unrelated inputs are absent. This is not a complete gate pass; raw failure retained. Fresh full hosted gate is required.",
+  "research_execution": "No new benchmark, scalar replay, isolation claim or performance conclusion."
+}

@@ -137,7 +137,7 @@ pub struct TrialLine {
 #[derive(Clone, Debug)]
 pub enum Line {
     Header(Header),
-    Baseline(BaselineLine),
+    Baseline(Box<BaselineLine>),
     Trial(TrialLine),
 }
 
@@ -163,7 +163,9 @@ impl Line {
         let bad = |e: serde_json::Error| e.to_string();
         match kind.as_str() {
             "header" => serde_json::from_value(v).map(Line::Header).map_err(bad),
-            "baseline" => serde_json::from_value(v).map(Line::Baseline).map_err(bad),
+            "baseline" => serde_json::from_value(v)
+                .map(|b| Line::Baseline(Box::new(b)))
+                .map_err(bad),
             "trial" => serde_json::from_value(v).map(Line::Trial).map_err(bad),
             other => Err(format!("unknown store line kind `{other}`")),
         }
@@ -217,7 +219,7 @@ impl Store {
         let (mut baselines, mut trials) = (vec![], vec![]);
         for line in it {
             match line {
-                Line::Baseline(b) => baselines.push(b),
+                Line::Baseline(b) => baselines.push(*b),
                 Line::Trial(t) => trials.push(t),
                 Line::Header(_) => {
                     return Err("a second study header in the middle of the store".into())
@@ -267,7 +269,7 @@ impl Store {
         let (mut baselines, mut trials) = (vec![], vec![]);
         for line in it {
             match line {
-                Line::Baseline(b) => baselines.push(b),
+                Line::Baseline(b) => baselines.push(*b),
                 Line::Trial(t) => trials.push(t),
                 Line::Header(_) => {
                     return Err("a second study header in the middle of the store".into())
@@ -282,7 +284,7 @@ impl Store {
     }
 
     pub fn append_baseline(&mut self, line: BaselineLine) -> Result<(), String> {
-        write_line(&mut self.file, &Line::Baseline(line.clone()))?;
+        write_line(&mut self.file, &Line::Baseline(Box::new(line.clone())))?;
         self.baselines.push(line);
         Ok(())
     }

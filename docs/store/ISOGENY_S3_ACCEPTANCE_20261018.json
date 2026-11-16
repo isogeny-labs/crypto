@@ -1,0 +1,35 @@
+{
+  "schema": "crypto.isogeny-walk-s3-acceptance/v1",
+  "date_utc": "2026-10-18",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261018T003500Z-isogeny-6bf9842e-1173-4d0a-baad-3287c5b846a9",
+  "run_id": "custom-1edf769be4a17a8d",
+  "binary_sha256": "575e542f87c72d270fe2940884cd02c836f04b18b09fa69a1344b6c3656f801e",
+  "source": {
+    "field_prime": 271,
+    "curve_a": 1,
+    "curve_b": 19,
+    "subgroup_order": 281,
+    "generator": [3, 7],
+    "degrees": [11],
+    "curves": 3,
+    "certified_edges": 2
+  },
+  "files_sha256": {
+    "curves.yaml": "7a103b2bba51a24d880fb5a89770e9138bd9f3713c0dffe8225fb4eccb24b691",
+    "isogeny_routes.json": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+    "walk.json": "5c8e721bcab3f7a0a52e699f5f5440f69792dfb5f47926396b11b92d9ef0eda0"
+  },
+  "results": {
+    "publish_complete_marker": true,
+    "head_complete_marker_bytes": 1834,
+    "fetch_objects_hash_checked": 3,
+    "download_equals_source_for_all_files": true,
+    "downloaded_route_verify": "pass",
+    "objects_removed_from_unique_prefix": 4,
+    "head_after_delete_http_status": 404
+  },
+  "limits": "This verifies one public three-curve walk with two certified degree-11 edges. It does not validate larger graph uploads or concurrent publishers."
+}

@@ -13,8 +13,9 @@ instance of it.
 An earlier version of this comment said Pollard rho and the kangaroo are
 instances of this model. The implementations that ecbench measures are
 not. They choose each step by hashing the point's representation:
-`mix(g.key(&pos))` in the kangaroo (`src/cryptanalysis/ecbench/generic.rs`,
-line 275) and `mix(self.g.key(x))` in the rho walk
+`mix(g.key(&pos))` in the kangaroo (step loop of `kangaroo` in
+`src/cryptanalysis/ecbench/generic.rs`, line 309 at commit 57fa35852, line
+275 at 11aa00591; re-cited 2026-10-28, SHF-20261028-0f3f64 PPN-7) and `mix(self.g.key(x))` in the rho walk
 (`src/cryptanalysis/ic_boundary.rs`, `TunedWalker::index`). Here `Alg.next`
 never receives an element or a representation, so the theorem below says
 nothing about those walks. The sheriff case ran a toy demonstration, not

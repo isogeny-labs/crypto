@@ -1,0 +1,276 @@
+{
+  "schema": "hildebrand-box-asymptotic-source-plan/v1",
+  "created": "2026-11-14T11:38:14.467075+00:00",
+  "formal": {
+    "project": "research/hildebrand_box_asymptotic_audit_20261114/lean",
+    "theorem": "HildebrandBoxAsymptoticAudit.corrected_box_asymptotic_certificate",
+    "statement": "theorem corrected_box_asymptotic_certificate : (∀ d : ℕ, Tendsto (fun n : ℕ => ((n-1).descFactorial d : ℝ)/(n : ℝ)^d) atTop (𝓝 1)) ∧ (∀ (d : ℕ), 2 ≤ d → ∀ (ε : ℝ), 0<ε → Tendsto (sourceWidth d ε) atTop atTop ∧ (∀ n : ℕ, (sourceWidth d ε n)^d=sourceCoefficient d ε*(n : ℝ)^(d-1)) ∧ Tendsto (correctionFactor d ε) atTop (𝓝 1)) ∧ (∀ (d : ℕ) (ε : ℝ) (p : ℕ) (m : Fin d → ℤ) (i : Fin d), cellLower d ε p m i=(m i : ℝ)*(ε/2)^(1/(d : ℝ))* (p : ℝ)^(((d : ℝ)-1)/(d : ℝ))/(2*(p : ℝ)) ∧ cellUpper d ε p m i=((m i : ℝ)+1)*(ε/2)^(1/(d : ℝ))* (p : ℝ)^(((d : ℝ)-1)/(d : ℝ))/(2*(p : ℝ))) ∧ (∀ (p d : ℕ) [Fact p.Prime] (a₀ : ZMod p) (h : d ≤ p-1), Fintype.card (FullSupports p d a₀)=(p-1).descFactorial d ∧ sourceLaw p d a₀ h=@uniformLaw (FullSupports p d a₀) inferInstance (full_support_nonempty a₀ h)) ∧ (∀ (d : ℕ), 2 ≤ d → ∀ (ε : ℝ), 0<ε → ∃ N : ℕ, ∃ hN : d+1 ≤ N, ∀ (p : ℕ) [Fact p.Prime] (hp : N ≤ p) (a₀ j : ZMod p), j ≠ 0 → ∀ m : Fin d → ℤ, sourceProbability p d a₀ j (dimension_fits hN hp) (cellLower d ε p m) (cellUpper d ε p m) ≤ 1.1*(ε/2)/((2 : ℝ)^d*(p : ℝ))) ∧ (∀ ε : ℝ, (∀ n : ℕ, sourceWidth 1 ε n=ε/4) ∧ ¬ Tendsto (sourceWidth 1 ε) atTop atTop) ∧ (∀ (p : ℕ) [Fact p.Prime], 3 ≤ p → cellProbability p=1/((p-1 : ℕ) : ℝ) ∧ ¬ cellProbability p ≤ printedBound p) ∧ (¬ ∃ N : ℕ, ∀ (p : ℕ) [Fact p.Prime], N ≤ p → 3 ≤ p → cellProbability p ≤ printedBound p)",
+    "decl_sha256": "ac4b0f9ca0aed6dcff2ab1d2c9f94db4b35439e81fd4401d449e0a85e544ce54",
+    "scope": "Corrected Hildebrand author-preprint Lemma2, k=d+1>=3: for every fixed d>=2 and epsilon>0 there exists a threshold independent of integer cell shifts, fixed first support point and nonzero Fourier index, such that for every sufficiently large prime the actual full-conditional uniform support-box probability is <=literal1.1*(epsilon/2)/(2^d*p). Literal real-power endpoints are bound. Actual support cardinality and source uniform-law equality are derived. Actual descending-factorial normalization tends1, source integer-coordinate width tends infinity with exact dth-power identity, and the resulting correction factor tends1; no asymptotic/probability/mixing premise supplied. For k2 the source width is exactly epsilon/4 and does not tend to infinity. The preceding actual acknowledged k2 singleton probability/no-eventual-prime-bound counter is included. Standard foundations/default limits; no holes/custom axioms/native evaluation/raised limits/global flags/waivers/native experiment/paid compute/upload. This proves corrected counting, preserves the qualified mixing theorems and leaves the stronger expected random-support mixing exponent open. No novelty claim.",
+    "sources": [
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+        "bytes": 4718,
+        "sha256": "b52bbe21e0157df1def29b77daa23dc6ba816ccd2abfe42ac29c9e885d0659bd"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/BoxAsymptotic.lean",
+        "bytes": 5658,
+        "sha256": "14dc10a6753d6ee05585567ec79ce4a500a04638c632c9e3288ea68ca49f726b"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/BoxAsymptoticCertificate.lean",
+        "bytes": 2724,
+        "sha256": "f977f7f7adeb7cd477751ea87582fbcf3f7f7ab29fe6ea3f35b0d6e2dcbbdac8"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/DenominatorLimits.lean",
+        "bytes": 2529,
+        "sha256": "adf214266606cef15b1961f529648bb942446726ef552723d6820e885c600b47"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/SourceWidths.lean",
+        "bytes": 2499,
+        "sha256": "0842bc0d95fd211b5f920a14ef13818cead2e9b2d514b6a9af39ceda8132ea82"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/CellProbability.lean",
+        "bytes": 1609,
+        "sha256": "6c8f1d4fb155a94933221adf2b7c13cda19cb177fe6179864cb6ae46edb6e1ac"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/CenteredCell.lean",
+        "bytes": 3713,
+        "sha256": "b54ec689b1a3cb11cbc241729d8bd31280129134f282c87248d1dab06cf8c158"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+        "bytes": 3524,
+        "sha256": "ada870ea6fd8545943f33542161c09ce2cfab73922b8022988a1340da22557f0"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/GeneralSupports.lean",
+        "bytes": 3997,
+        "sha256": "6ca43ada50ac3fea0010e53b9d71bce575fa31f6af3708b66d271456fce52974"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/InjectiveSampling.lean",
+        "bytes": 3431,
+        "sha256": "c7add4beaf1aa2f5e98a536f847bfb67090e070a3a5408a45c21e65a439be0bb"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/IntegerCounts.lean",
+        "bytes": 1525,
+        "sha256": "b7f30750940945c8067e9ce30b0bdc5c83a51c8455721f4fbd96d43e99bebc2d"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/PrimeFieldBoxes.lean",
+        "bytes": 5801,
+        "sha256": "e768e03339bd2153a9a39647b4435d6854a10a0689d13db1c65c7e0fad40061c"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/UniformEvents.lean",
+        "bytes": 2076,
+        "sha256": "b9ffb9280d6a38a815e5c79bfb8910577c6371efc5f2a6167110a572499ce915"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean",
+        "bytes": 5558,
+        "sha256": "22c81842c4402fc536128b11218617d9b63bf90bb648d65ee941e48f305c3fed"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lakefile.toml",
+        "bytes": 343,
+        "sha256": "cf5f5773ce63826f5b6bac191b74157d94945ff26972b23ad8ead49927f89c68"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4825,
+        "sha256": "6351d41de90a95b7bbe7ebcf16fb5e52d419703e05d5a9b040100fc44488476e"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lakefile.toml",
+        "bytes": 347,
+        "sha256": "51f6b7a49f25e089a4d586312110e6ae7251f567e0065cf8f0de29c078f2c32a"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4412,
+        "sha256": "5cc2de693ffc8ce870fcbd704af2e4c419c7862bb13d6d30f7f5a5c5c08b9b73"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lakefile.toml",
+        "bytes": 325,
+        "sha256": "aa47cdee2c72cf15656c69065a620af69ea1a7bd98e72b63c0f514864af3f41c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4043,
+        "sha256": "e8067fb860c1ccd6159daa180ee871af2d94d72a3fd65cdd97f205e4f4cc6a3d"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "e78ce13d461503c1e1cfcd78289586d99f17f00c1a757f4e0b2d61e0d430e129"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3690,
+        "sha256": "0bb802dd0905e950265a6f107ceff9f534c12d5036a89a552d643b0508f447f8"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 306,
+        "sha256": "5cf902fcb4908f6a1935ba0cd3735d4e91e2c4d2a1ba37617302439679d91af1"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3397,
+        "sha256": "c1f50dd86468022811659b7d11f1bc3e613ece5e63048a972635635f8bd5bb91"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BoxAsymptotic",
+    "BoxAsymptoticCertificate",
+    "CellProbability",
+    "CenteredCell",
+    "DenominatorLimits",
+    "FairKernel",
+    "GeneralSupports",
+    "InjectiveSampling",
+    "IntegerCounts",
+    "PrimeFieldBoxes",
+    "SourceWidths",
+    "UniformChoices",
+    "UniformEvents",
+    "WeightedKernel"
+  ],
+  "artifacts": [
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 13990,
+      "sha256": "6acf8a26e0f0ffb3e8885d7340fe5e9ae961b253cbc0e8a769d576c13bb7f70d"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/evidence/attempts.json",
+      "bytes": 18156,
+      "sha256": "284fce842ce4bc57315cd2c6ea863c57b30971b0ae4b19f63ed03bacfdfc7009"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 933,
+      "sha256": "902271e9d13da856588679d90af30db552ef79c86c593a2f2bfb47788920693a"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/evidence/gate.json",
+      "bytes": 1275,
+      "sha256": "0983efac1dc93f684012a489a30abfec8cfe4a7650df6fbb3681b72ba9cde54f"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/evidence/source-review.json",
+      "bytes": 6498,
+      "sha256": "06e27b6bdb972f8e15906d854e2071960edad06ea69edf6d4d31e78a0b6c8df0"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/proof-map.json",
+      "bytes": 2587,
+      "sha256": "1607a3493cc6603707aad8937df7a47909374de9624ff167dddffcafeff0dcb0"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/render_report.py",
+      "bytes": 6160,
+      "sha256": "b5c2c1562720f35ddcca7c8b294cfc06cc96d515bb9a9189b30331aeedbfa55c"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/reports/corrected-box-asymptotic.svg",
+      "bytes": 1430,
+      "sha256": "847c5fd4944b4d336a9e2d75b1c44c2688cdc07d0128ed853bb418de64899d41"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/reports/layout.json",
+      "bytes": 276,
+      "sha256": "ac33de4a37a8a5d4fa1da70478eee30ecf217a6a1a72d66a12eddc62a749ce51"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/reports/report.pdf",
+      "bytes": 47466,
+      "sha256": "38d73d35531b9ebd4552d6ccbb1cce35bf33dbcf611570730141e73e670296a7"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 21,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "corrected_source_box_lemma_closed": true,
+    "literal_real_power_endpoints_and_decimal_constant": true,
+    "actual_full_uniform_conditional_support_space": true,
+    "normalized_actual_descending_factorial_limit_derived": true,
+    "source_width_growth_and_power_derived": true,
+    "threshold_uniform_in_cell_and_index_and_first_point": true,
+    "known_k_two_counter_retained": true,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_later_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

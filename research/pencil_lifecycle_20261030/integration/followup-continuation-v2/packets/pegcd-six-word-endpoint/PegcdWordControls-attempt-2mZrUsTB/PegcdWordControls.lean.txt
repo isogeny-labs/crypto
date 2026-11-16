@@ -1,0 +1,21 @@
+import PegcdWordOutput
+set_option autoImplicit false
+namespace PegcdWord
+private def z0 := initial [16,0,1] [16,1]
+private def z1 := advance 17 z0 [1,1] []
+theorem control_exact_run : Run 17 z0 z1 :=
+ Run.next z0 1 [1,1] [] z1 (by decide) (by decide) (Run.stop z1 (by decide))
+theorem control_exact_output : finish 17 z1=some ([16,1],[],[1]) := by decide +kernel
+private def w0 := initial [1,0,1] [1,1]
+private def w1 := advance 17 w0 [16,1] [2]
+private def w2 := advance 17 w1 [9,9] []
+theorem control_two_step_run : Run 17 w0 w2 :=
+ Run.next w0 1 [16,1] [2] w2 (by decide) (by decide)
+   (Run.next w1 2 [9,9] [] w2 (by decide) (by decide) (Run.stop w2 (by decide)))
+theorem control_nonmonic_output : finish 17 w2=some ([1],[9],[9,8]) := by
+ simp [w2,w1,w0,advance,initial,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots]
+ decide
+theorem control_subtraction_sign : w1.t1=[1,16] ∧ w1.t1≠[16,1] := by
+ simp [w1,w0,advance,initial,ResidualWord.psub,ResidualWord.padd,ResidualWord.pneg,ResidualWord.slots]
+ decide
+end PegcdWord

@@ -424,9 +424,7 @@ without `--derive-twists`; p = 37, 41, 43 used twist derivation.
 The p = 11 and 17 orbit-derived CSVs correct the two anomalous
 individual counts. The p = 47 command was:
 
-```sh
 RAYON_NUM_THREADS=4 target/release/examples/iso1_class_census 47 research/iso1_weak_classes_20261007/p47_orbit.csv --derive-twists --orbit-quotient
-```
 
 The [orbit validation receipt](orbit_run_receipt.txt) records its binary
 hash and build snapshot. Current `main` has unrelated duplicate Rust
@@ -471,3 +469,58 @@ The [theorem continuation receipt](theorem_validation_20261008.txt) records
 the exact p = 7 and p = 13 checks, generalized controls, native tests,
 PDF compilation, and the running queue's source freeze. Failed preliminary
 API and launch attempts remain explicitly recorded alongside the successful runs.
+
+
+
+> The certified census continues past p = 59; p = 61 through 137 are complete. Inside the
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

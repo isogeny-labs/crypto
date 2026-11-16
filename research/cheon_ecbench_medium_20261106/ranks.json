@@ -1,0 +1,233 @@
+[
+  {
+    "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+    "unit": "ecbench.gae",
+    "domain_id": "ECDOM1hda52cee5db35",
+    "entries": [
+      {
+        "method": "cheon.pplus1_comb",
+        "bound_id": "ECBND1h946fa2347b66",
+        "is_frontier": true,
+        "ops": 0.656563991159101,
+        "lo": 0.4834228658293667,
+        "hi": 0.8454028589463813,
+        "oracle_queries": 0.0005863091059254773,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1he76af9184de3",
+        "is_frontier": true,
+        "ops": 1.142743273766427,
+        "lo": 0.8397381744808142,
+        "hi": 1.456767229652389,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      }
+    ]
+  },
+  {
+    "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+    "unit": "ecbench.gae+band(w=0.1)",
+    "domain_id": "ECDOM1hef860bc4dfb7",
+    "entries": [
+      {
+        "method": "cheon.pplus1_comb",
+        "bound_id": "ECBND1h19d7b33fe816",
+        "is_frontier": true,
+        "ops": 0.6703890294835922,
+        "lo": 0.4933118787089256,
+        "hi": 0.863904677213661,
+        "oracle_queries": 0.0005863091059254773,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1hee56c8d4301d",
+        "is_frontier": true,
+        "ops": 1.2569721294331908,
+        "lo": 0.9237004328295968,
+        "hi": 1.6023696719635978,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      }
+    ]
+  },
+  {
+    "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+    "unit": "ecbench.gae+band(w=1)",
+    "domain_id": "ECDOM1h8fd940f495eb",
+    "entries": [
+      {
+        "method": "cheon.pplus1_comb",
+        "bound_id": "ECBND1h420a3b18139d",
+        "is_frontier": true,
+        "ops": 0.7948143744040136,
+        "lo": 0.5803316576879861,
+        "hi": 1.0309394388941486,
+        "oracle_queries": 0.0005863091059254773,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1h50156a9fb265",
+        "is_frontier": true,
+        "ops": 2.2850318304340655,
+        "lo": 1.6793607579686438,
+        "hi": 2.912791652764477,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      }
+    ]
+  },
+  {
+    "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+    "unit": "ecbench.gae",
+    "domain_id": "ECDOM1h8d05bac67097",
+    "entries": [
+      {
+        "method": "cheon.pminus1_comb",
+        "bound_id": "ECBND1h9b939ef3e3a4",
+        "is_frontier": true,
+        "ops": 0.6475889633770121,
+        "lo": 0.5137358587760718,
+        "hi": 0.8183420333021671,
+        "oracle_queries": 0.00003084316314662998,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1hc9785405132e",
+        "is_frontier": true,
+        "ops": 1.1138965250444213,
+        "lo": 0.846445871690073,
+        "hi": 1.4083851132375056,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1h518bc90ba0a6",
+        "is_frontier": true,
+        "ops": 1.1902166377768508,
+        "lo": 0.904377355056543,
+        "hi": 1.4963993902657051,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "cheon.pminus1_naive",
+        "bound_id": "ECBND1h7d73ad979cf9",
+        "is_frontier": false,
+        "ops": 13.814316332536135,
+        "lo": 10.618567120281089,
+        "hi": 16.929369878613386,
+        "oracle_queries": 0.00003683198911669057,
+        "dominated_by": [
+          "ECBND1h518bc90ba0a6",
+          "ECBND1hc9785405132e"
+        ]
+      }
+    ]
+  },
+  {
+    "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+    "unit": "ecbench.gae+band(w=0.1)",
+    "domain_id": "ECDOM1h8817bf314e4f",
+    "entries": [
+      {
+        "method": "cheon.pminus1_comb",
+        "bound_id": "ECBND1hbf99fdbe12d0",
+        "is_frontier": true,
+        "ops": 0.6902058713402898,
+        "lo": 0.5434366722957658,
+        "hi": 0.8733766046170917,
+        "oracle_queries": 0.00003084316314662998,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1h1e5fcb2b45bb",
+        "is_frontier": true,
+        "ops": 1.2252405477965782,
+        "lo": 0.9310480384652092,
+        "hi": 1.5491557734807626,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1hcc11f2dd232b",
+        "is_frontier": true,
+        "ops": 1.309183592169465,
+        "lo": 0.9947508380647044,
+        "hi": 1.6459477335760135,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "cheon.pminus1_naive",
+        "bound_id": "ECBND1hce3177314f02",
+        "is_frontier": false,
+        "ops": 13.860730514060217,
+        "lo": 10.650715308758755,
+        "hi": 16.98733416469388,
+        "oracle_queries": 0.00003683198911669057,
+        "dominated_by": [
+          "ECBND1h1e5fcb2b45bb",
+          "ECBND1hcc11f2dd232b"
+        ]
+      }
+    ]
+  },
+  {
+    "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+    "unit": "ecbench.gae+band(w=1)",
+    "domain_id": "ECDOM1hf55d42d12e08",
+    "entries": [
+      {
+        "method": "cheon.pminus1_comb",
+        "bound_id": "ECBND1hbe1d16b441d7",
+        "is_frontier": true,
+        "ops": 1.0737580430097868,
+        "lo": 0.808987589092983,
+        "hi": 1.376206636383019,
+        "oracle_queries": 0.00003084316314662998,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1hb67bc37b394f",
+        "is_frontier": true,
+        "ops": 2.2273367525659906,
+        "lo": 1.6925739397280062,
+        "hi": 2.816090934478084,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "rho.negation",
+        "bound_id": "ECBND1hb0e348895cd3",
+        "is_frontier": true,
+        "ops": 2.3798861817029944,
+        "lo": 1.8081121851381516,
+        "hi": 2.991882823368791,
+        "oracle_queries": 0.0,
+        "dominated_by": []
+      },
+      {
+        "method": "cheon.pminus1_naive",
+        "bound_id": "ECBND1h9a96be7a7a0c",
+        "is_frontier": false,
+        "ops": 14.278458147776885,
+        "lo": 10.952677884695142,
+        "hi": 17.521629551670088,
+        "oracle_queries": 0.00003683198911669057,
+        "dominated_by": [
+          "ECBND1hb0e348895cd3",
+          "ECBND1hb67bc37b394f"
+        ]
+      }
+    ]
+  }
+]

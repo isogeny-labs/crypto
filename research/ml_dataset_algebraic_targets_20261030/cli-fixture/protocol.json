@@ -1,0 +1,78 @@
+{
+  "schema": "software-cli-fixture/v1",
+  "purpose": "Actual native v6 export, deterministic re-export and direct identity replay on retained curve/twist software fixtures",
+  "n": 7,
+  "m": 3,
+  "shards": [
+    62,
+    63
+  ],
+  "source_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "input_archive_sha256": "937e0c59108d438807c25ecb938903889cd36a7553ad968ff9a1811a1fb2221f",
+  "reference_archive_sha256": "d9de8a9e690728de95584ad807b97331c645a9c6b8c4319bff46e5845f92ae9d",
+  "reference_features": [
+    {
+      "path": "export-62/features.jsonl",
+      "sha256": "d1ec48de1993f9911d8c48bd86e97275ec2078425b87b8144dfd586061c1e46d"
+    },
+    {
+      "path": "export-62/prefix-features.jsonl",
+      "sha256": "9e957fb13ab37879f85bb52d971a88546acff46bcffb459ff737a4d533c6ce27"
+    },
+    {
+      "path": "export-63/features.jsonl",
+      "sha256": "38177f32bd7d2677df94d97664620d7ca0e24cfc84685c4904e0af34e9437ca2"
+    },
+    {
+      "path": "export-63/prefix-features.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_cells": [
+    {
+      "shard": 62,
+      "manifest_path": "shard-62/cells/000000000062/manifest.json",
+      "manifest_sha256": "d24a740d0838388c68ae0696b966c3967f1ab13123955305e9deafff925a5862",
+      "reference_audit_path": "export-62/restricted/prefix-records.jsonl",
+      "reference_audit_sha256": "69834ca66f179913d3eab67c4fc590bbffddda18db4f0abb722a7181c39f0aa3",
+      "expected_basis_rows_by_node": [{"node":0,"rows":4},{"node":1,"rows":3},{"node":2,"rows":2},{"node":3,"rows":1}],
+      "expected_verified_nonzero_rows": 10,
+      "expected_verified_zero_rows": 0,
+      "expected_unknown_suffix_records": 0
+    },
+    {
+      "shard": 63,
+      "manifest_path": "shard-63/cells/000000000063/manifest.json",
+      "manifest_sha256": "93e236822a4edb2b65c7baa0794e9642bb1915cf031bb2fa28db628de0fb70e9",
+      "reference_audit_path": "export-63/restricted/prefix-records.jsonl",
+      "reference_audit_sha256": "e0f31260fe9d5ab1be155024f725f6885d54d1cb6459f529d6eba2b58cd092fd",
+      "expected_basis_rows_by_node": [{"node":0,"rows":1}],
+      "expected_verified_nonzero_rows": 1,
+      "expected_verified_zero_rows": 0,
+      "expected_unknown_suffix_records": 0
+    }
+  ],
+  "source_binding_scope": "Pinned receipt and cell manifests; native export verifies each manifest-bound artifact. Archive hashes identify durable restore objects but this local fixture does not download or hash archives.",
+  "expected_row_count_basis": "Retained v5 ideal-equality certificates have 4+3+2+1 nonempty right_from_left identities on the curve and one on the twist; expect all eleven rows admitted without consequence-channel censoring.",
+  "commands": [
+    "export curve",
+    "immutable curve retry",
+    "export twist",
+    "immutable twist retry",
+    "reject rehashed changed consequence by deterministic regeneration"
+  ],
+  "checks": [
+    "source/reference identity",
+    "v6 three-file allowlist",
+    "all artifact hashes/sizes",
+    "all feature identities",
+    "algebraic joins and outcome counts",
+    "exact public input, ring, binding and graph structural keys; initial inputs equal frozen static reference",
+    "static and branch feature bytes equal frozen reference",
+    "source inventory unchanged"
+  ],
+  "independent_implementation": false,
+  "standalone_external_consequence_record_verifier": false,
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

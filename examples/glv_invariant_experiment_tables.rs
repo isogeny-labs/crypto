@@ -12,7 +12,7 @@
 //! Python") and reproduce its output byte for byte on the merged files,
 //! Python's float formatting included.
 
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::env;
@@ -1984,6 +1984,414 @@ fn e18(o: &mut String, rows: &[&Value]) {
     }
 }
 
+/// E19 (goal G2, note §9.5): the `k = 4` index calculus end to end with the
+/// weighted `D₄` solve.  Every phase in `F_p` multiplications (the matrix
+/// at `16` per mod-`n` multiplication), against the mean of that curve's
+/// negation-folded walks; the handover re-derived from E19's own constants
+/// by §11.16's `p* = y·(cols/p)·C·√h / (S_rho·(1 − r))`, `n* = p*⁴/h`.
+fn e19(o: &mut String, rows: &[&Value]) {
+    pipeline_tables(o, rows, "E19", "the weighted D₄ solve", "negation");
+}
+
+/// E24 (§9.13): E19's tables on the `V₄` line.
+fn e24(o: &mut String, rows: &[&Value]) {
+    pipeline_tables(
+        o,
+        rows,
+        "E24",
+        "the V₄-invariant solve on the V₄ line",
+        "negation",
+    );
+}
+
+/// E25 (§9.15): both arms on each GLS curve.  Each arm gets E24's tables
+/// against the matched `⟨±ψ⟩` walk; then the paired table, one row per curve,
+/// and the gates G2.33–G2.37.
+fn e25(o: &mut String, rows: &[&Value]) {
+    let arm = |a: &str| -> Vec<&Value> {
+        rows.iter()
+            .copied()
+            .filter(|r| r["arm"].as_str() == Some(a))
+            .collect()
+    };
+    let (a, b) = (arm("A"), arm("B"));
+    pipeline_tables(
+        o,
+        &a,
+        "E25 arm A",
+        "the V₄ fold on GLS curves (control)",
+        "±ψ",
+    );
+    pipeline_tables(o, &b, "E25 arm B", "the ⟨V₄, ψ⟩ fold on GLS curves", "±ψ");
+    o.push_str(
+        "#### E25 — the two arms on one curve
+
+",
+    );
+    o.push_str("| p | seed | log2 n | cols A / B | y A | y B | y B / A | S A | S B | S A / S B | rho neg | rho ±ψ | neg / ±ψ steps | S A / rho neg | S B / rho ±ψ | improvement |
+");
+    o.push_str(
+        "|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+",
+    );
+    let mut steps = Vec::new();
+    let mut gates = [true; 4];
+    for rb in sorted(&b, &["bits", "seed"]) {
+        let Some(ra) = a
+            .iter()
+            .find(|r| r["p"] == rb["p"] && r["seed"] == rb["seed"])
+        else {
+            continue;
+        };
+        let y = |r: &Value| fl(r, "residuals") / fl(r, "folded.relations");
+        let cols = fl(ra, "folded.columns") / fl(rb, "folded.columns");
+        let yr = y(rb) / y(ra);
+        let sr = fl(ra, "total_muls") / fl(rb, "total_muls");
+        let st = fl(rb, "rho_negation_steps") / fl(rb, "rho_matched_steps");
+        let imp = (fl(ra, "total_muls") / fl(ra, "rho_negation_muls")) / fl(rb, "ratio");
+        steps.push(st);
+        gates[0] &= (1.9..=2.0).contains(&cols);
+        gates[1] &= (0.8..=1.25).contains(&yr);
+        gates[2] &= (1.6..=2.4).contains(&sr);
+        gates[3] &= (1.1..=2.0).contains(&imp);
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} / {} | {:.1} | {:.1} | {:.2} | {} | {} | {:.2} | {} | {} | {:.2} | {} | {} | {:.2} |",
+            py_str(at(rb, "p")),
+            py_str(at(rb, "seed")),
+            fl(rb, "bits"),
+            py_str(at(ra, "folded.columns")),
+            py_str(at(rb, "folded.columns")),
+            y(ra),
+            y(rb),
+            yr,
+            g3(fl(ra, "total_muls")),
+            g3(fl(rb, "total_muls")),
+            sr,
+            g3(fl(rb, "rho_negation_muls")),
+            g3(fl(rb, "rho_matched_muls")),
+            st,
+            g3(fl(ra, "total_muls") / fl(ra, "rho_negation_muls")),
+            g3(fl(rb, "ratio")),
+            imp,
+        );
+    }
+    let ms = mean(&steps);
+    let _ = writeln!(
+        o,
+        "
+Gates on every curve: G2.33 cols A / B in [1.9, 2.0]: {}; G2.34 y B / A in [0.8, 1.25]: {}; G2.35 S A / S B in [1.6, 2.4]: {}; G2.36 neg / ±ψ steps mean {:.3} in [1.2, 1.6]: {}, improvement in [1.1, 2.0]: {}.\n",
+        yes(gates[0]),
+        yes(gates[1]),
+        yes(gates[2]),
+        ms,
+        yes((1.2..=1.6).contains(&ms)),
+        yes(gates[3]),
+    );
+}
+
+fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str, walk: &str) {
+    let rows = sorted(rows, &["bits", "seed"]);
+    let _ = writeln!(
+        o,
+        "### {id} — the k = 4 index calculus end to end with {what}\n"
+    );
+    o.push_str("| p | seed | log2 n | h | base | cols | targets | unsolved | reruns | decompositions (off base, check failures) | rows | y | core (φ) | C median | C mean | correct (log, walks) |\n");
+    o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|--:|--:|:--|\n");
+    for r in &rows {
+        let y = fl(r, "residuals") / fl(r, "folded.relations");
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} | {} | {} | {} | {} | {} | {} ({}, {}) | {} | {:.1} | {} ({:.3}) | {} | {} | {}, {} |",
+            py_str(at(r, "p")),
+            py_str(at(r, "seed")),
+            fl(r, "bits"),
+            py_str(at(r, "cofactor")),
+            py_str(at(r, "base_points")),
+            py_str(at(r, "folded.columns")),
+            py_str(at(r, "residuals")),
+            py_str(at(r, "unsolved")),
+            py_str(at(r, "reruns")),
+            py_str(at(r, "decompositions")),
+            py_str(at(r, "off_base")),
+            py_str(at(r, "check_failures")),
+            py_str(at(r, "folded.relations")),
+            y,
+            py_str(at(r, "folded.unknowns")),
+            fl(r, "folded.phi"),
+            g3(fl(r, "call.median")),
+            g3(fl(r, "call.mean")),
+            yes(bool_at(r, "folded.correct")),
+            yes(r["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|w| bool_at(w, "correct"))),
+        );
+    }
+    let _ = writeln!(
+        o,
+        "\n#### {id} — where the multiplications go, and the distance to rho\n"
+    );
+    let _ = writeln!(o, "| p | seed | precompute | base | generation | Weil | solves | lift-back | checks | LA ×16 | solves share | other than solves | S total | rho ({walk}) | S / rho | registered 0.584·C/p, C = 1.3e9 | measured / registered | 0.584·C/p at this curve's mean C | measured / that |");
+    o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let mut fit: Vec<(f64, f64)> = Vec::new();
+    for r in &rows {
+        let tot = fl(r, "total_muls");
+        let solves = fl(r, "weil_muls") + fl(r, "solve_muls");
+        let reg = 0.584 * 1.3e9 / fl(r, "p");
+        let pred = 0.584 * fl(r, "call.mean") / fl(r, "p");
+        fit.push((fl(r, "n"), fl(r, "ratio")));
+        let _ = writeln!(
+            o,
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {:.2} % | {:.3} % | {} | {} | {} | {} | {:.2} | {} | {:.2} |",
+            py_str(at(r, "p")),
+            py_str(at(r, "seed")),
+            g3(fl(r, "precompute_muls")),
+            g3(fl(r, "base_muls")),
+            g3(fl(r, "generation_muls")),
+            g3(fl(r, "weil_muls")),
+            g3(fl(r, "solve_muls")),
+            g3(fl(r, "lift_muls")),
+            g3(fl(r, "check_muls")),
+            g3(fl(r, "la_fp_muls")),
+            100.0 * solves / tot,
+            100.0 * (tot - solves) / tot,
+            g3(tot),
+            g3(fl(r, "rho_matched_muls")),
+            g3(fl(r, "ratio")),
+            g3(reg),
+            fl(r, "ratio") / reg,
+            g3(pred),
+            fl(r, "ratio") / pred,
+        );
+    }
+    let _ = writeln!(
+        o,
+        "\nFitted exponent of S / rho in n: {} over {} curves.\n",
+        fmt_f(fit_exponent(&fit)),
+        fit.len()
+    );
+    let _ = writeln!(
+        o,
+        "#### {id} — unpriced native work at 0, 0.1 and 1 GAE (AGENTS.md §5a)\n"
+    );
+    o.push_str("Native work: one operation per Macaulay-matrix entry (rows · cols of each call's last degree) for the index calculus, one per step for each walk; a GAE is one affine addition in E(F_{p⁴}) at the curve's measured F_p multiplications.\n\n");
+    o.push_str("| p | seed | GAE (F_p mults) | S / rho at 0 | at 0.1 | at 1 | order holds |\n|--:|--:|--:|--:|--:|--:|:--|\n");
+    for r in &rows {
+        let gae = fl(r, "fp_muls_per_add");
+        let at_g = |g: f64| {
+            (fl(r, "total_muls") + g * gae * fl(r, "macaulay_entries"))
+                / (fl(r, "rho_matched_muls") + g * gae * fl(r, "rho_matched_steps"))
+        };
+        let v = [at_g(0.0), at_g(0.1), at_g(1.0)];
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} | {} | {} | {} |",
+            py_str(at(r, "p")),
+            py_str(at(r, "seed")),
+            gae,
+            g3(v[0]),
+            g3(v[1]),
+            g3(v[2]),
+            yes(v.iter().all(|&x| x > 1.0)),
+        );
+    }
+    // §11.16's handover from E19's own constants: pooled over every curve
+    // (the registered G2.13), and over the largest p only, where rho's
+    // set-up is the smallest share of its cost.
+    let _ = write!(o, "\n#### {id} — the handover from {id}'s own constants\n\n| curves | y (pooled) | cols / p | C (mean of means) | h | S_rho ({walk}) | r = LA / rho | p* | log2 n* |\n|:--|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let pmax = rows.iter().map(|r| fl(r, "p")).fold(0.0, f64::max);
+    let largest: Vec<&Value> = rows
+        .iter()
+        .copied()
+        .filter(|r| fl(r, "p") == pmax)
+        .collect();
+    for (label, set) in [
+        ("all (registered)", rows.clone()),
+        ("largest p only", largest),
+    ] {
+        let pool = |f: &dyn Fn(&Value) -> f64| -> f64 {
+            mean(&set.iter().map(|r| f(r)).collect::<Vec<_>>())
+        };
+        let y = set.iter().map(|r| fl(r, "residuals")).sum::<f64>()
+            / set.iter().map(|r| fl(r, "folded.relations")).sum::<f64>();
+        let cols_p = pool(&|r| fl(r, "folded.columns") / fl(r, "p"));
+        let c = pool(&|r| fl(r, "call.mean"));
+        let h = pool(&|r| fl(r, "cofactor"));
+        let s_rho = pool(&|r| fl(r, "rho_matched_muls") / fl(r, "n").sqrt());
+        let r_la = pool(&|r| fl(r, "la_fp_muls") / fl(r, "rho_matched_muls"));
+        let p_star = y * cols_p * c * h.sqrt() / (s_rho * (1.0 - r_la));
+        let n_star = p_star.powi(4) / h;
+        let _ = writeln!(
+            o,
+            "| {label} ({}) | {y:.1} | {cols_p:.3} | {} | {h:.2} | {s_rho:.1} | {r_la:.3} | {} | {:.1} |",
+            set.len(),
+            g3(c),
+            g3(p_star),
+            n_star.log2()
+        );
+    }
+}
+
+/// Least squares `log₂ y = a + b·log₂ x`: `(a, b)`.
+fn fit_line(points: &[(f64, f64)]) -> Option<(f64, f64)> {
+    let b = fit_exponent(points)?;
+    let pts: Vec<(f64, f64)> = points.iter().map(|(x, y)| (x.log2(), y.log2())).collect();
+    let a = mean(&pts.iter().map(|p| p.1 - b * p.0).collect::<Vec<_>>());
+    Some((a, b))
+}
+
+/// E20 (goal G2, note §9.7): double large primes on the `τ_T`-folded `D₄`
+/// base, every trial charged at E19's weighted `C`, in the ic_next10 ladder
+/// (`--arms d4dlp`).  Units are the ladder's: GAE (one `E(F_{p⁴})` addition,
+/// `97` `F_p` multiplications).  The relation phase is `trials · C / 97`; the
+/// rest of each arm's charged cost (linear algebra, merges, base) is "other".
+/// Crossovers come from power laws fitted in `p` per phase, extrapolated.
+fn e20(o: &mut String, rows: &[&Value]) {
+    let rows = sorted(rows, &["p", "seed"]);
+    o.push_str(
+        "### E20 — double large primes on the τ_T-folded D₄ base, charged at the weighted C\n\n",
+    );
+    o.push_str("| p | seed | log2 r | h | cols full / small | trials full | trials DLP | DLP / full trials | LA full (GAE) | LA DLP (GAE) | S full / rho-neg | S DLP / rho-neg | S DLP / S full | correct (full, DLP, null = full) |\n");
+    o.push_str("|--:|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|\n");
+    let arm = |r: &Value, name: &str| -> Option<Value> {
+        r["arms"]
+            .as_array()?
+            .iter()
+            .find(|a| a["arm"].as_str() == Some(name))
+            .cloned()
+    };
+    let (mut rf, mut lf, mut rd, mut ld, mut rho, mut ratio) =
+        (vec![], vec![], vec![], vec![], vec![], vec![]);
+    let (mut bf, mut bd) = (vec![], vec![]);
+    let mut log2h = Vec::new();
+    for r in &rows {
+        let (Some(f), Some(d), Some(z)) = (arm(r, "d4"), arm(r, "d4-dlp"), arm(r, "d4-dlp-null"))
+        else {
+            continue;
+        };
+        let sq = fl(r, "r").sqrt();
+        let p = fl(r, "p");
+        let rel = |a: &Value| fl(a, "trials") * fl(a, "c4_fp_mults") / 97.0;
+        let la = |a: &Value| (fl(a, "la_modr_mults") + fl(a, "merge_modr_mults")) * 16.0 / 97.0;
+        let other = |a: &Value| fl(a, "S_charged") * sq - rel(a);
+        let rho_s = fl(r, "rho.rho-neg.mean_S");
+        rf.push((p, rel(&f)));
+        lf.push((p, la(&f)));
+        rd.push((p, rel(&d)));
+        ld.push((p, la(&d)));
+        bf.push((p, other(&f) - la(&f)));
+        bd.push((p, other(&d) - la(&d)));
+        rho.push((p, rho_s * sq));
+        ratio.push((p, fl(&d, "trials") / fl(&f, "trials")));
+        log2h.push((fl(r, "group_order") / fl(r, "r")).log2());
+        let walks_ok = r["rho"]["rho-neg"]["runs"]
+            .as_array()
+            .is_some_and(|w| w.iter().all(|w| bool_at(w, "correct")));
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} | {} / {} | {} | {} | {:.2} | {} | {} | {} | {} | {:.2} | {}, {}, {} |",
+            py_str(at(r, "p")),
+            py_str(at(r, "seed")),
+            fl(r, "log2_r"),
+            py_str(at(r, "cofactor")),
+            py_str(at(r, "y_columns")),
+            py_str(at(&d, "small_columns")),
+            py_str(at(&f, "trials")),
+            py_str(at(&d, "trials")),
+            fl(&d, "trials") / fl(&f, "trials"),
+            g3(la(&f)),
+            g3(la(&d)),
+            g3(fl(&f, "S_charged") / rho_s),
+            g3(fl(&d, "S_charged") / rho_s),
+            fl(&d, "S_charged") / fl(&f, "S_charged"),
+            yes(bool_at(&f, "correct")),
+            yes(bool_at(&d, "correct")),
+            yes(bool_at(&z, "correct")
+                && fl(&z, "trials") == fl(&f, "trials")
+                && fl(&z, "S_charged") == fl(&f, "S_charged")
+                && walks_ok),
+        );
+    }
+    // Phases: relation, linear algebra (and merges), base and generation,
+    // per arm; rho.  Fitted freely, and with the theory's exponents imposed
+    // (relation p¹ / p^{3/2}, linear algebra p² / p^{3/2}, base p, rho p²),
+    // only the constants fitted.
+    let phases: [(&str, &Vec<(f64, f64)>, f64); 7] = [
+        ("relation, full", &rf, 1.0),
+        ("linear algebra and merges, full", &lf, 2.0),
+        ("base and generation, full", &bf, 1.0),
+        ("relation, DLP", &rd, 1.5),
+        ("linear algebra and merges, DLP", &ld, 1.5),
+        ("base and generation, DLP", &bd, 1.0),
+        ("rho-neg", &rho, 2.0),
+    ];
+    let free: Vec<Option<(f64, f64)>> = phases.iter().map(|(_, v, _)| fit_line(v)).collect();
+    let imposed: Vec<(f64, f64)> = phases
+        .iter()
+        .map(|(_, v, b)| {
+            let a = mean(
+                &v.iter()
+                    .map(|(x, y)| y.log2() - b * x.log2())
+                    .collect::<Vec<_>>(),
+            );
+            (a, *b)
+        })
+        .collect();
+    o.push_str(
+        "\n| phase | fitted exponent in p | theory exponent | curves |\n|:--|--:|--:|--:|\n",
+    );
+    for ((nm, v, b), f) in phases.iter().zip(&free) {
+        let _ = writeln!(
+            o,
+            "| {nm} | {} | {b} | {} |",
+            fmt_f(f.map(|f| f.1)),
+            v.len()
+        );
+    }
+    let _ = writeln!(
+        o,
+        "\nTargets per full relation, DLP / full: fitted exponent in p {} over {} curves.\n",
+        fmt_f(fit_exponent(&ratio)),
+        ratio.len()
+    );
+    let h = mean(&log2h);
+    let lp0 = rf.iter().map(|x| x.0.log2()).fold(0.0, f64::max);
+    let at = |f: (f64, f64), lp: f64| 2f64.powf(f.0 + f.1 * lp);
+    // The first log₂ p above the measured range where total g ≤ total k.
+    let cross = |fs: &[(f64, f64)], g: &[usize], k: &[usize]| -> Option<f64> {
+        let tot = |ix: &[usize], lp: f64| ix.iter().map(|&i| at(fs[i], lp)).sum::<f64>();
+        let mut lp = lp0;
+        while lp < 400.0 {
+            if tot(g, lp) <= tot(k, lp) {
+                return Some(4.0 * lp - h);
+            }
+            lp += 0.01;
+        }
+        None
+    };
+    let fmt_n = |v: Option<f64>| v.map_or("none below 2^1600".into(), |v| format!("2^{v:.0}"));
+    let (full, dlp, rho_ix) = ([0usize, 1, 2], [3usize, 4, 5], [6usize]);
+    let mut table = format!("| crossover (extrapolated; log2 n = 4·log2 p − log2 h, mean log2 h = {h:.2}) | fitted exponents | theory exponents |\n|:--|--:|--:|\n");
+    let free_ok: Option<Vec<(f64, f64)>> = free.iter().copied().collect();
+    for (label, g, k) in [
+        ("DLP below full", &dlp[..], &full[..]),
+        ("DLP below rho-neg", &dlp[..], &rho_ix[..]),
+        ("full below rho-neg", &full[..], &rho_ix[..]),
+    ] {
+        let a = free_ok
+            .as_ref()
+            .map_or("—".into(), |fs| fmt_n(cross(fs, g, k)));
+        let _ = writeln!(
+            table,
+            "| {label} | {a} | {} |",
+            fmt_n(cross(&imposed, g, k))
+        );
+    }
+    o.push_str(&table);
+}
+
 fn e13_ok(r: &Value) -> bool {
     ["d3_fold12", "d3_fold6", "s3_fold12", "s3_fold6"]
         .iter()
@@ -2403,19 +2811,213 @@ fn e15(o: &mut String, rows: &[&Value]) {
     }
 }
 
+/// The study summary the leaderboard copies (`AGENTS.md` §7b): per `p`, the
+/// E19 (`D₄`) and E24 (`V₄`) end-to-end `S / rho` ranges, their ratio range
+/// paired by seed, the per-call `C` medians, and each pipeline's handover from
+/// its own constants (§11.16's model, every curve pooled).  Usage:
+/// `glv_invariant_experiment_tables --k4-summary OUT.json E19_FILES… -- E24_FILES…`.
+fn k4_summary(args: &[String]) {
+    let out = &args[0];
+    let split = args
+        .iter()
+        .position(|a| a == "--")
+        .expect("-- between E19 and E24 files");
+    let read = |files: &[String]| -> Vec<Value> {
+        files
+            .iter()
+            .flat_map(|f| {
+                let v: Value = serde_json::from_str(&fs::read_to_string(f).unwrap()).unwrap();
+                v.as_array().cloned().unwrap_or_default()
+            })
+            .collect()
+    };
+    let e19 = read(&args[1..split]);
+    let e24 = read(&args[split + 1..]);
+    let handover = |rows: &[Value]| -> f64 {
+        let m = |f: &dyn Fn(&Value) -> f64| mean(&rows.iter().map(f).collect::<Vec<_>>());
+        let y = rows.iter().map(|r| fl(r, "residuals")).sum::<f64>()
+            / rows.iter().map(|r| fl(r, "folded.relations")).sum::<f64>();
+        let cols_p = m(&|r| fl(r, "folded.columns") / fl(r, "p"));
+        let c = m(&|r| fl(r, "call.mean"));
+        let h = m(&|r| fl(r, "cofactor"));
+        let s_rho = m(&|r| fl(r, "rho_matched_muls") / fl(r, "n").sqrt());
+        let r_la = m(&|r| fl(r, "la_fp_muls") / fl(r, "rho_matched_muls"));
+        let p_star = y * cols_p * c * h.sqrt() / (s_rho * (1.0 - r_la));
+        (p_star.powi(4) / h).log2()
+    };
+    let mut ps: Vec<u64> = e19
+        .iter()
+        .chain(&e24)
+        .map(|r| r["p"].as_u64().unwrap())
+        .collect();
+    ps.sort_unstable();
+    ps.dedup();
+    let range = |v: &[f64]| -> Value {
+        if v.is_empty() {
+            Value::Null
+        } else {
+            json!([
+                v.iter().copied().fold(f64::MAX, f64::min),
+                v.iter().copied().fold(0.0, f64::max)
+            ])
+        }
+    };
+    let rows: Vec<Value> = ps
+        .iter()
+        .map(|&p| {
+            let a: Vec<&Value> = e19.iter().filter(|r| r["p"].as_u64() == Some(p)).collect();
+            let b: Vec<&Value> = e24.iter().filter(|r| r["p"].as_u64() == Some(p)).collect();
+            let ratios: Vec<f64> = a
+                .iter()
+                .filter_map(|x| {
+                    b.iter()
+                        .find(|y| y["seed"] == x["seed"])
+                        .map(|y| fl(x, "ratio") / fl(y, "ratio"))
+                })
+                .collect();
+            let bits = a.first().or(b.first()).map(|r| fl(r, "bits"));
+            json!({
+                "p": p, "log2_n": bits,
+                "e19_s_over_rho": range(&a.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+                "e24_s_over_rho": range(&b.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+                "e19_over_e24_by_seed": range(&ratios),
+                "e19_c_median": range(&a.iter().map(|r| fl(r, "call.median")).collect::<Vec<_>>()),
+                "e24_c_median": range(&b.iter().map(|r| fl(r, "call.median")).collect::<Vec<_>>()),
+                "curves": [a.len(), b.len()],
+            })
+        })
+        .collect();
+    let all_correct = e19.iter().chain(&e24).all(|r| {
+        bool_at(r, "folded.correct")
+            && fl(r, "check_failures") == 0.0
+            && fl(r, "rows_readd_failures") == 0.0
+            && r["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|w| bool_at(w, "correct"))
+    });
+    let summary = json!({
+        "schema": "crypto.glv_k4_pipeline_summary/v1",
+        "study": "research/glv_k4_pipeline_d4_20261017/",
+        "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6, §9.14",
+        "class": "engineering",
+        "before": "E19: tau_T line, weighted D4 solve (degree 26, quotient 512)",
+        "after": "E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64)",
+        "e19_curves": e19.len(), "e24_curves": e24.len(), "all_verified": all_correct,
+        "e19_handover_log2_n": handover(&e19), "e24_handover_log2_n": handover(&e24),
+        "e24_s_over_rho_all": range(&e24.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+        "rows": rows,
+    });
+    fs::write(out, serde_json::to_string_pretty(&summary).unwrap() + "\n").expect("write summary");
+}
+
+/// E25's study summary for the leaderboard: per curve, both arms on one GLS
+/// curve, and the handover from arm B's own constants.  Usage:
+/// `glv_invariant_experiment_tables --gls-summary OUT.json E25_FILES…`.
+fn gls_summary(args: &[String]) {
+    let rows: Vec<Value> = args[1..]
+        .iter()
+        .flat_map(|f| {
+            let v: Value = serde_json::from_str(&fs::read_to_string(f).unwrap()).unwrap();
+            v.as_array().cloned().unwrap_or_default()
+        })
+        .collect();
+    let arm = |a: &str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|r| r["arm"].as_str() == Some(a))
+            .collect()
+    };
+    let (a, b) = (arm("A"), arm("B"));
+    let handover = |set: &[&Value]| -> f64 {
+        let m = |f: &dyn Fn(&Value) -> f64| mean(&set.iter().map(|r| f(r)).collect::<Vec<_>>());
+        let y = set.iter().map(|r| fl(r, "residuals")).sum::<f64>()
+            / set.iter().map(|r| fl(r, "folded.relations")).sum::<f64>();
+        let cols_p = m(&|r| fl(r, "folded.columns") / fl(r, "p"));
+        let h = m(&|r| fl(r, "cofactor"));
+        let s_rho = m(&|r| fl(r, "rho_matched_muls") / fl(r, "n").sqrt());
+        let r_la = m(&|r| fl(r, "la_fp_muls") / fl(r, "rho_matched_muls"));
+        let p_star = y * cols_p * m(&|r| fl(r, "call.mean")) * h.sqrt() / (s_rho * (1.0 - r_la));
+        (p_star.powi(4) / h).log2()
+    };
+    let curves: Vec<Value> = sorted(&b, &["bits", "seed"])
+        .into_iter()
+        .filter_map(|rb| {
+            let ra = a.iter().find(|r| r["p"] == rb["p"] && r["seed"] == rb["seed"])?;
+            Some(json!({
+                "p": rb["p"], "seed": rb["seed"], "log2_n": fl(rb, "bits"), "cofactor": rb["cofactor"],
+                "columns": [ra["folded"]["columns"], rb["folded"]["columns"]],
+                "s_a_over_s_b": fl(ra, "total_muls") / fl(rb, "total_muls"),
+                "s_a_over_rho_negation": fl(ra, "total_muls") / fl(ra, "rho_negation_muls"),
+                "s_b_over_rho_psi": fl(rb, "ratio"),
+                "negation_over_psi_steps": fl(rb, "rho_negation_steps") / fl(rb, "rho_matched_steps"),
+            }))
+        })
+        .collect();
+    let all_verified = rows.iter().all(|r| {
+        bool_at(r, "folded.correct")
+            && fl(r, "check_failures") == 0.0
+            && fl(r, "rows_readd_failures") == 0.0
+            && r["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|w| bool_at(w, "correct"))
+    });
+    let summary = json!({
+        "schema": "crypto.glv_gls_v4_summary/v1",
+        "study": "research/glv_gls_v4_20261018/",
+        "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.15, §9.16",
+        "class": "engineering",
+        "before": "arm A: the V4-folded base on the same GLS curve (4 points a column)",
+        "after": "arm B: the same points folded by <V4, psi> (8 points a column), against the matched <±psi> walk",
+        "curves": curves.len(), "all_verified": all_verified,
+        "handover_log2_n_a": handover(&a), "handover_log2_n_b": handover(&b),
+        "rows": curves,
+    });
+    fs::write(
+        &args[0],
+        serde_json::to_string_pretty(&summary).unwrap() + "\n",
+    )
+    .expect("write summary");
+}
+
 fn main() {
+    if env::args().nth(1).as_deref() == Some("--gls-summary") {
+        gls_summary(&env::args().skip(2).collect::<Vec<_>>());
+        return;
+    }
+    if env::args().nth(1).as_deref() == Some("--k4-summary") {
+        k4_summary(&env::args().skip(2).collect::<Vec<_>>());
+        return;
+    }
     let mut rows: Vec<Value> = Vec::new();
     for path in env::args().skip(1) {
         let text = fs::read_to_string(&path).unwrap_or_else(|e| panic!("{path}: {e}"));
-        let v: Value = serde_json::from_str(&text).unwrap_or_else(|e| panic!("{path}: {e}"));
-        // `{"rows": [...]}` (this binary's runners) or a bare array (`quartic_folds`).
-        rows.extend(
-            v["rows"]
+        // `{"rows": [...]}` (this binary's runners), a bare array
+        // (`quartic_folds`), or JSON lines (the ic_next10 ladder).
+        let parsed: Vec<Value> = match serde_json::from_str::<Value>(&text) {
+            Ok(v) => v["rows"]
                 .as_array()
                 .or(v.as_array())
                 .cloned()
                 .unwrap_or_default(),
-        );
+            Err(_) => text
+                .lines()
+                .filter(|l| !l.trim().is_empty())
+                .map(|l| serde_json::from_str(l).unwrap_or_else(|e| panic!("{path}: {e}")))
+                .collect(),
+        };
+        for mut v in parsed {
+            let ladder_dlp = v["item"].as_str() == Some("ic_next10_01_fp4_ladder")
+                && v["arms"]
+                    .as_array()
+                    .is_some_and(|a| a.iter().any(|a| a["arm"].as_str() == Some("d4-dlp")));
+            if ladder_dlp {
+                v["experiment"] = Value::from("e20");
+            }
+            rows.push(v);
+        }
     }
     let mut by: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
     for r in &rows {
@@ -2423,7 +3025,7 @@ fn main() {
     }
     let mut o = String::new();
     type Printer = fn(&mut String, &[&Value]);
-    let printers: [(&str, Printer); 18] = [
+    let printers: [(&str, Printer); 22] = [
         ("e1", e1),
         ("e2", e2),
         ("e3", e3),
@@ -2440,6 +3042,10 @@ fn main() {
         ("e13", e16),
         ("e17", e17),
         ("e18", e18),
+        ("e19", e19),
+        ("e20", e20),
+        ("e24", e24),
+        ("e25", e25),
         ("e14", e14),
         ("e15", e15),
     ];

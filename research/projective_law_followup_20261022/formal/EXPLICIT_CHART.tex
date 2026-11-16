@@ -1,0 +1,29 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,xcolor}
+\title{Explicit infinity-chart local ring\\\large Formal proof boundary and open geometry}
+\author{Independent review packet}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Checked in pinned Lean 4.34.1.} For arbitrary field $K$ and coefficients $a_3,a_2,a_1,a_0\in K$, let
+\[
+A=K[z,w]/\bigl(w^2-z(1+a_3z^2+a_2z^3+a_1z^4+a_0z^5)\bigr),
+\qquad \mathfrak m=\ker(A\xrightarrow{(z,w)\mapsto(0,0)}K).
+\]
+The explicit quotient and localization $A_{\mathfrak m}$ are constructed, rather than postulated. The proof shows that $\mathfrak m$ is maximal and equals $(z,w)$, that $A_{\mathfrak m}$ is Noetherian and local, and that the image of $u=1+a_3z^2+a_2z^3+a_1z^4+a_0z^5$ is a unit. From $w^2=zu$, its maximal ideal is $(w)$. The theorem audit prints only standard axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+\medskip\noindent\textbf{Proof boundary.} Integrality of $A$ is still open in Lean. The proposed route is Eisenstein in $w$ at the prime $z$ over $K[z]$, with a separately checked multivariable-polynomial equivalence. Therefore the domain and DVR bridge for $A_{\mathfrak m}$ is also open. The constructed localization has not been identified with the infinity stalk of the smooth projective completion. Principal divisor, Mumford reduction, $\operatorname{Pic}^0$ transfer, and Rust semantics are further open obligations. No end-to-end target result or cost ratio is asserted by this packet.
+
+\begin{center}
+\begin{tabular}{p{0.43\linewidth}p{0.38\linewidth}l}\toprule
+Object or implication & Source theorem & Status\\\midrule
+Quotient, origin, coordinate ideal & \texttt{originIdeal\_eq\_chartCoordinateIdeal} & Checked\\
+Noetherian local ring & \texttt{originStalk\_noetherian} & Checked\\
+Unit factor, maximal ideal $(w)$ & \texttt{originStalk\_maximalIdeal\_eq\_span\_w} & Checked\\
+Domain/DVR/projective stalk & No theorem yet & Open\\
+Divisor and $\operatorname{Pic}^0$ bridge & No theorem yet & Open\\\bottomrule
+\end{tabular}
+\end{center}
+\noindent Source: \texttt{Common22ExplicitChart.lean}. Machine-readable inventory: \texttt{explicit-chart.csv}. Dependency diagram: \texttt{explicit-chart.svg}. The final pinned Lean replay exited 0 and printed all 13 theorem axiom audits without an error; each audit listed only the standard axioms noted above.
+\end{document}
