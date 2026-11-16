@@ -60,7 +60,8 @@ normpath() {
 # Paths the Rust code compiles in or reads, one per line.
 candidates() {
   local roots=() r file line target
-  for r in src tests benches examples build.rs $(cargo_targets); do
+  for r in src tests benches examples build.rs $(cargo_targets) \
+    $(cargo_path_deps | sed -n 's#^/\(.*\)/$#\1#p'); do
     [ -e "$r" ] && roots+=("$r")
   done
   [ ${#roots[@]} -gt 0 ] || return 0
@@ -110,17 +111,23 @@ cargo_targets() {
 # its declared target paths, not its data, so heavy crates stay light.
 cargo_path_deps() {
   [ -f Cargo.toml ] || return 0
-  local queue=(.) seen=" " dir dep norm t
+  local queue=(.) seen=" " dir dep norm t manifest
   while [ ${#queue[@]} -gt 0 ]; do
     dir=${queue[0]}
     queue=("${queue[@]:1}")
-    [ -f "$dir/Cargo.toml" ] || continue
+    if [ -f "$dir/Cargo.toml" ]; then
+      manifest=$(cat "$dir/Cargo.toml")
+    else
+      # A fresh sparse clone has not materialized its path dependencies yet.
+      # Discover their manifests and transitive dependencies from the commit.
+      manifest=$(git show "HEAD:$dir/Cargo.toml" 2>/dev/null) || continue
+    fi
     if [ "$dir" != . ]; then
       echo "/$dir/Cargo.toml"
       echo "/$dir/Cargo.lock"
       echo "/$dir/build.rs"
       echo "/$dir/src/"
-      sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "$dir/Cargo.toml" |
+      sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' <<< "$manifest" |
         while IFS= read -r t; do
           t=$(realpath -m --relative-to=. "$dir/$(dirname "$t")")
           case "$t" in .|..*) ;; *) echo "/$t/" ;; esac
@@ -132,7 +139,7 @@ cargo_path_deps() {
       case "$seen" in *" $norm "*) continue ;; esac
       seen="$seen$norm "
       queue+=("$norm")
-    done < <(grep -oE '\{[^}]*\bpath[[:space:]]*=[[:space:]]*"[^"]+"' "$dir/Cargo.toml" |
+    done < <(grep -oE '\{[^}]*\bpath[[:space:]]*=[[:space:]]*"[^"]+"' <<< "$manifest" |
       sed -E 's/.*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
   done | sort -u
 }
@@ -235,6 +242,10 @@ saved_paths() {
 }
 
 apply() {
+  render "$@" | git sparse-checkout set --no-cone --stdin
+  # The first pass brings cold path dependencies onto disk. Read their source
+  # references too (for example include_str! fixtures outside src/) before
+  # declaring the checkout ready to build.
   render "$@" | git sparse-checkout set --no-cone --stdin
   status
 }
