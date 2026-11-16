@@ -2702,9 +2702,9 @@ mod tests {
                 let a=if i%41==0{0}else if i%41==1{N-1}else{prng(&mut rng)%N};
                 let b=if i%47==0{0}else if i%47==1{N-1}else{prng(&mut rng)%N};
                 let actual=joint_public_jac(a,b,q,gq);
-                let expected=ar.add(PRIME31,
-                    ar.scalar(PRIME31,a,Some(PRIME31.g)),
-                    ar.scalar(PRIME31,b,Some(q)));
+                let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+                let bq=ar.scalar(PRIME31,b,Some(q));
+                let expected=ar.add(PRIME31,ag,bq);
                 if let Some(point)=expected{
                     assert_ne!(actual.z,0);
                     assert_eq!(normalize_jac_batch(&[(actual,a,b)]).unwrap()[0].pt,point);
