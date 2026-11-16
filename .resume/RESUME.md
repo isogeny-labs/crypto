@@ -7640,3 +7640,21 @@ Full actual-head/source CI byte custody, original eight policy objects plus new 
 
 ## Errors
 No native source modification/retry after original unit. Both b signs pass curve checks so orientation is not certified. Initial report layout issues corrected before7557ce; full initial rendered pages remain in scratch. Prior frozen source-label/type/sparse/transport/policy failures remain retained. PR4455 merge does not imply green CI, accepted complete artifacts or signed mathematical standing. Metadata-only timestamp labels in the new custody files are ingestion labels; raw API and files retain actual event times. [pcc:unverified]
+
+
+---
+
+2026-11-16T23:50:14.573352+00:00
+# Preserve PR4455 whole CI/forks and preregister independent chart trace audit11
+
+## What was done
+PCC-20261116-ff85b3: four whole providerZIPs/276 full members/eight Root435 and Consumer43437/66 theorem outputs0 failing0 trusted, sixteen complete logs/five whole ledgers. Whole354-file2003140B archive retained. PR4455 partial episodeE-3d53f9133879/lessonsO-3037d0a1f481, three visible follow-up SHA-only rule classifications with explicit ingestion-proxy times; revert check dueNov30T23:17:13. Outcome d870495/tag exact readback0. PCC-20261116-922e58: trace audit11 prospective protocol and full transcript/CSV hashes frozen before code/calls. KB unavailable; CT49/50/full native source and report-evidence/ecdlp-surfaces/higher-genus primary fallback read; Conductor127. [pcc:unverified]
+
+## Decisions made
+Independent standalone Rust/u128/extended-Euclid/iterative polynomial/square-table/Sylvester determinant audit of all exact ordered records, six full semantic mutants and timing-only positive, no producer rerun. Source tag before compile, immutable qualifier/j1/120s. Separate new research area avoids touching old completed proof workflow areas. Never push closed4455. Fetch completed origin/maina11edb4d before append. [pcc:unverified]
+
+## Open threads
+Implement/audit11, then balanced divisor/Richelot charts and orientation. New canonical intake on actual current main with full original ledger/keyring/claims hydration; <=30-check successor PR; original store and required CI gates. Original fullLP and admitted strongest-baseline costs remain open; paidSTOP/vault persist. [pcc:unverified]
+
+## Errors
+ct628 current-main ledger CLI exit0 printed no-base-ledger because its promisor blob was missing. Reject it as a prefix check: exact757254B blob materialization then unchanged CLI1, semantic divergence after1216 (original1258, merged/main1222, session1263 then new records). No reset/choose/rechain; original hydrated90ea prefix remains separate. Both original/final CI canary69/69 then ledger missing-claim_type errors, S3Head403 and pre-existing duplicate workflow run225/226. Original54workflows exceeded30budget; actual23. Main90ea→80a external full path delta413998D/9002A/46M preserved losslessly, no unrelated repair. Episode first call used URL where int required and unsupported unresolved-incident token; no episode mutation occurred; corrected only closure metadata, full original caller retained. No green/signed inference. [pcc:unverified]
