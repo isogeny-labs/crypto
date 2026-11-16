@@ -1,3 +1,2499 @@
+# Current checkpoint:40COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet then integrate
+
+GoalACTIVE, Rust graph IC+cheap extension-field relation finder toward rho parity.
+ALL measurements Runpod; Rust science; no subagents/stop_goal. Every ownpod32–40DELETED.
+40source538919f948c4b162bba52b1ef3a0802fcfedafed/solePOST20221:03:37Z.
+Bothworkers/copiedqualifier0; actualfullbase492/rank491 in452608Bfullsmooth versus
+251904Bquadraticremaindergraph. Candidate10277partial/10071vertices/206collisionrows+
+285full rows yields491independentrows. Baseline492fullrows. Candidate10581hits,
+19refusals,0duplicates;246exactcohortprefixes/fullsourceidentity. Allsource/norm/
+Cantor/witness/projection/everyrank+productprefix/phases/prices/sampling/endpointsPASS.
+ObservedINCOMPLETEtotal3398555767878→2289343806734bitops;Relations2830056314080→
+1665824481400;LA567245453290→622265324826. MoreLA,lowerrecordedRelations+total.
+Completecosts/bands/ratiosnull, no newscalar orfullpipelinegainclaim.1coldround0warm/
+retry/excluded;115.112swholepracticality. Inner37.159/21.990s endsbeforeJSON,process
+39.831/75.234s includesoutput,candidatesystem51.454s preserved/no wall-speedclaim.
+PCCc26441UNVERIFIED, sourcefa3defUNVERIFIED; no signed/canonicaladmission.
+328publishedsourceblobs/portablecustodyhashPASS, privatepatternscanPASS.
+LOCAL/workspace/ic-runpod-runs/runpod-extension-remainders-20261116-40/returned/task/run
+raw952844/17538263B,export23756493B;2181BsummaryGit. Packetstudy/runpod-extension-
+remainders-20261116-40,bench20261116-runpod-extension-remainders. FinalonepagePDFVIEWED,
+exactfigurehashPASS;initialbadbarlabelrender/figuresLOCALhashbound,notdeleted.
+Ownzx071ey7jqvmdlDELETE204+independentGET40421:07Z/guardmarked;actualCPU11/4vCPU/
+8GiBcpu3c/.12h/pinnedRustimage/1800slifetime. Statuskeyexit_code0, earliercode:null
+wasmissingprojectedkey,notfailure. No active compiler/scientificjob/ownedpaidpod.
+
+NEXTpublish40packet/lesson/PCC/journal/resume/studyREADME, PRactual40AFTERproselint0.
+Then41productionintegration: inspectpublic/private six-pointdescent and protected
+projection interfaces, reuse verifiedquadraticconstructor+signedclass graph in
+actualscalarrecovery. Need meaningfulnativecontrols/source freeze/build/sourcepublish
+BEFORE freshRunpodcall. Candidatecomponentviabilityjustifies integration; do not
+repriceoldcohorts/claimcompletecost/parity. No41protocol/callselectedyet.
+Private auth /tmp/ic-runpod-auth-location; neverprintkey/header/token/envresponses.
+Task40 receipts retained;allownpodsdeleted. SourcePCCproof/oldleadpinnedunchanged.
+Canonical siblingprotocolsourceVLT1encrypted/unavailable;don'tprintit again.
+Avoid silent speculative loops; concrete tools/commentary<=60seconds.
+
+--- Previous checkpoint retained verbatim ---
+
+# Current checkpoint:40READY; publish source before sole Runpod call
+
+Goal ACTIVE: Rust graph IC/extension-field relation finding toward rho parity.
+ALL scientific measurements Runpod; Rust science; no subagents/stop_goal.
+40 new examples jv_sieve_extension_remainders/check, research helper/collector/checker.
+Final v5 source frozen: producer5PASS, independent qualifier22PASS, strictClippy/build0;
+source manifest328, binaries pinned; original7production39files unchanged.
+Positive/first-arm-failure/create-new transport controls PASS. SourcePCCfa3defUNVERIFIED.
+Protocol extension-remainder-plan.json + AMENDMENT_35_EXTENSION_REMAINDERS.md.
+Exact39public-only input SHA07915bb6d6cb22867f5c36b7cf6ffbfd6f10902025488ad074df94e7448c1159;
+seed379,m9,fullbase100%,maxp²B,65536sourcecap; stop actual fullbase-1rank at complete1024B.
+Baseline fullsmooth vs canonical signed irreducible quadratic Mumford class anchors,
+original-source cancellation witnesses; independent Cantor EVERYoriginal and u128
+EVERYprojection/rank/product prefix; principal binding/phase/prices/common cohort.
+No scalar recovery/fullpipeline gain; costs incomplete/nulltotal/band/ratios.
+
+Own40pod zx071ey7jqvmdl CREATED21:01:45Z,4vCPU8GiBcpu3c0.12USDh,pinned Rust image;
+1800s DELETE guardian active; safe allocation metadata validation/runpod40-allocation.json.
+NO scientific dispatch yet. Bounds300s/worker,700whole,900qualifier. Need >=1640remaining
+at wrapper start. Publish/push source/controls/journal/resume, explicit feature fetch,
+prepare-extension-remainder-runpod.sh NEW40stage. Private auth pointer
+/tmp/ic-runpod-auth-location (NEVER print secret/header/envresponse); task40-header,
+pod40.id, cleanup-guard40.sh/privatecreate40receipts. APIkeyneverpassedPod.
+Existing bootstrap37 unchanged exact native capture. Stage intended
+/workspace/ic-runpod-runs/runpod-extension-remainders-20261116-40.
+POST /run ONCE only; then readonly monitor/collect originals+hashes, IMMEDIATE ownpod
+DELETE+independentabsence check/guardmark, then sourceblob reconstruction/report.
+All other ownpods32–39deleted. Do not touch unrelated accountpods.
+Sourcepublished39ddefdb2bf7a2ce9cdf2899e76962baae53ac485b/PR4288updated.
+S3gate1 missingAWS/token; prioruserRunpodauthorizationpersists/no needask.
+Concrete tool actions/commentary<=60seconds; avoid long speculative silent analysis.
+
+
+# Current checkpoint:39COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.
+UserRustscience/ALLfuturemeasurementsRunpod. No subagents/stopgoal.
+ALLownedpaidpods32–39DELETED; no compiler/scientificjobactive. Privateauthpointer
+/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/envresponses/
+copyAPIkeytopod. No needaskcredentials/profile. <=60seccommentary/concreteactions.
+
+39sourceb2cf8aaf10aa667e20d4d512a92a6a9d24c4524d before solePOST20220:05:50Z.
+p1009seed367/L263807419864521289,all3actualscalar216251322113766629/copiedqualifier0.
+ObservedINCOMPLETEwhole6787702462546IC/7919959237308graph/7541914541330reuse;
+LA320975823394IC/764235601774graph/386190905796reuse. ALLnon-LApairedgraphphases
+identical. Exactsource/descent/endpoint/checkpointmatrix/rank/finalprojection
+identity;independentcert/target/gate/kernel/projectedrows/scopedcounts/conservation
+PASS. fullbase492/small418/sources514/descents2/residuals3427;hom/fullrank417/419,
+quotientrank2,affinerows419→124. Removedoldsolver/conversion9159251M/8983271A/
+419Inv/189285words;added1121M/1532A/2Inv/1016069words. No old38/37composition.
+Nativegapsremainunrankable/nullfullcost/band/ratios/no parityclaim. Onecoldround
+0warm/retry/excluded,143.652swholepracticality. PCCc04e84UNVERIFIED;
+lessonsO-58f8fa379af1/T-0d6c39488ba6/O-65676b6db774. SourcePCC7d680eunverified.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-production-quotient-20261116-39/
+returned/task/run:546374Bbaselinegraph/560194Breuse/1135238BexportLOCALhashbound;
+31888Bsummary/7403BICraw/smallmetadataGit.317committedsourcepostcallreconstruction/
+portablepre/preworker/post/qualifiedhashPASS;privatepatternscanPASS. Own39
+kt5m0imke1z53cCPU4/8/.12h/pinnedimage/actualCPU24 DELETE204+GET40420:09:48Z
+AFTERcollection;privateguardmarker1800sguardinert. FinalONEPAGEPDFVIEWEDunclipped/
+exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS. Packetresearch/.../
+runpod-production-quotient-20261116-39;benchmarks/20261116-runpod-production-quotient.
+No raw/qualifier/summaryrewrites. Compactpresentationseparateschema;originalsummary
+alsoGitfits. CurrentstudyREADMEchangedPOSTCALLforreportlink,old317manifestbinds
+originalb2blobs,notcurrentREADME. Don'trerun/reprice39.
+
+NEXTcommit/pushfinished39packet/PCC/lesson/journal/resume/studyREADME,PRactual39
+AFTERproselint0. RegularPR4288/automerge/requiredCIreviewunconfirmed/no manualmerge.
+Latest aebCIEMPTY19:22;newpublicationpermitsread. CachedlatestPRbodytoolstoremay
+havebeenresetbyenvironmentstartup; /tmp/ic-quotient38-pr-body.txt contains38body,
+orfetchcurrentGitHubmetadata. Sourceb2newproductionflagnotyetinPRbody.
+
+NEXTTECHNICAL relationfinderlead: currentverified_relation removesFp-smallroots,
+requiresremainingquadraticFp-split,allfullsupportinoriginalFpbase. Proposedretain
+irreduciblequadraticMumfordD=(U,V)overFp²asonecanonical±remainder-classvertex;
+repeatdescriptorscancel,possiblyextendaccepteduniverse. NOTSELECTED40yet.
+LEAD_EXTENSION_QUADRATIC_REMAINDERS.md+extension-remainder-lead-review/layout-v2/
+report.pdf(VIEWED)listcompetinghypotheses/proofcontrols. Initialclippedlayout/
+PCC8e1cabpinnedsource/manifestretainedexact;don'teditpinnedLEADnoteorinitialfigfiles.
+ActualsourcelineconventionsA=a0+t*s*a1,C=sqrt(s)B,y=-A/C,F=A²−C²H;forcoprime
+quadraticU|F,V=-A/CmodU,mustcheckV²=HmodU,norm/poles/squarefreeness/point signs/
+principal-divisoridentity/independentJacobianreplay/canonicalorientation/witnesses.
+Remainderclassesmaybecomposite,don'tcallthemprimewithoutqualification.
+KBexact/negativeunavailablevalidation/extension-remainder-kb-*.log. m8finite
+Bspaceceil(p/2),m9p²; no m8protocol. Don'tassumeendomorphism/j0/tracezeroalpha.
+
+PossibleIMPLEMENTATION ROUTE toavoidanotherRootrebuildbeforecomponentviability:
+newstandaloneRustEXAMPLEusingexistingPUBLIC library APIs (TwoLargePrimeSieve::new/
+setup/base/sieve_line, Ctx/Fq/FpRing/Line,line_poly,prime_hyperelliptic ops Div/Hyp),
+newremainderhelperinexample/research; existingRootRlibfromb2cachecanlinkwithout
+librarysourcechange. Needinspectactualpublicpoly/fieldAPIs/build.rs beforedeciding.
+ComparefixedmatchedBcohort fullFpfullsmoothversusverifiedquadraticremainders,
+recordpartialdescriptors/collisionrank/certificates/algebraiccost,allfailures.
+Firstnativehand+Jacobiancontrols/protocolsourcepublishedBEFOREnewRunpoddata.
+No40code/protocol/callyet. Afterviabilityintegratepipeline;candidatewall/costunknown.
+Focusoneconcretecode/datastep;don'tspend10minspeculatingIR/Lean/endomorphisms.
+
+PRODUCTION39codefullyintegrated/sourceb2: sharedhelper
+src/cryptanalysis/jv_homogeneous_quotient.rs (nativepathwrapper),readonlypivotgetter
+actualRREF,constructcheckedkernelatreadycheckpoint,chargeinitial/projectionevents,
+2colCountedRelationSystem. OptionalAPI+--reuse-homogeneous-basisrequiresstructuralgate/
+rankstride;oldentrypoint/defaults retained. Serializeexplicitrank/productscope;
+actualquotientrank2,independentfullrank419. All34libtestsPASS/2oldignored,3example,
+54nativequalifier/strictClippy/build/actualwrappertransport+firstfailure/capturePASS.
+Workspace-startupinterruptedinitiallocaltestcompile;samefrozen7sourceresumptionPASS.
+No activecompilers;DON'Trebuildunchangedcode. Runtimeoutertoolcouldreport1despite
+explicitcapturedcargo0;useactualexitfiles+logs. No globalparent-suitePASSclaimed.
+
+RECENTADMIN: packagingguardinitiallyrefusedstaleorigintrackingrefafterpush;explicit
+fetchmadeb2matchandpassedbeforefirstscience. prepare...requirespublishedHEADmatching
+originref,soALWAYSexplicitfeaturefetchAFTERpushifremote.fetchonlymainconfigured.
+Combinedpostcallexportrejectedforoptionalrm-fscratchcleanup;rerunwithoutdeletion
+completedexport. Invalidouter-envelopejqtempscratchannotatednotusedasdata. Avoid
+rm-fstylecommands(rejectedbyruntime);preserveoruseapprovedsaferfilehandling.
+
+# Current checkpoint:39SOURCE READY; ownedRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/Rust graphIC+cheapextension-field relationfinder towardrho parity.
+UserRustscience/allfuturemeasurementsRunpod. No subagents/stopgoal.
+Allold32–38ownedpodsDELETED. NEWOWN39kt5m0imke1z53cCPU4/8/.12h/pinnedRustimage
+created20:01:51Z/1800sDELETEguardian+GraphQLfallbackactive. Healthready/startedfalse
+20:02:53Z. Privateauthpointer/tmp/ic-runpod-auth-location:pod39.id/task39-token/header.
+NEVERprintcredentials/headers/tokens/envresponses/copyAPIkeytoPod.
+
+39Amendment34/production-quotient-plan.json FRESHp1009seed367/85percent/stride32,
+modeorderic/structural-gate/quotient-reuse. Onecoldround0warm/retry,
+60fixture300worker1000whole1800runner8GiBfirstallowedCPU.
+AllSOURCECHECKSFINISHED:productionreleasebinary/strictlib+exampleClippyPASS;
+library34PASS/2oldignoredand3exampletestsPASS(capturedexit0). Nativequalifier54
+PASS/strictClippy/build/actual3armtransport+firstfailurecontinuation/capture
+controlsPASS. Frozen7root+11protocolhashesPASS.317source/binarymanifestsPASS.
+PCC7d680eUNVERIFIED. No compiler/scientificjobactive; no39callyet.
+Workspaceinterruptionofinitialtestcompilepreserved,unchanged-source resumption
+PASS;don'treruntests. No globalparent-suitePASSclaim.
+
+NEXTcommit/PUSHcleansource/spec/manifestsBEFOREprepare-production-quotient-runpod.sh
+/workspace/ic-runpod-runs/runpod-production-quotient-20261116-39. Preparerrequires
+HEADmatchingpublishedoriginref. Upload/POSTONCE; do notredispatchuncertainPOST.
+Read-onlystatus/flow;collectexactarchive/portablepre/preworker/post/qualifiedhashes,
+thenimmediatelyDELETEown39+GET404(orGraphQLfallback)/markprivatepod-ID.deleted.
+Don'tletoptionalfile-readstopcleanup. Reconstruct317sourceblobs/checkcredentials.
+Reportproduction-quotient-render +compactpresentationifneeded +report.typ;
+VIEWallPDFpages/exactbenchmarkcopies/hash/PCC/lesson/journal/commit/PRactual.
+Nativegapspersist/allfullcosts/bands/ratiosnull/no parity;don'tcompose38/37.
+Goalactiveandnextconcreteleadafteractual39result.
+
+Implementation:sharedchecked38helperat src/cryptanalysis/jv_homogeneous_quotient.rs,
+nativepathwrapper;actualRREFreadonlypivotaccess;retainedkernelatreadycheckpoint;
+chargedinitial/dotprojectionevents,2colCountedRelationSystem; newoptionalAPI/CLI
+--reuse-homogeneous-basisrequiresstructuralgate/stride. Oldpath/defaultunchanged.
+Explicitquotientrank/productscopes,initial/perattempt/finalcounts/projectedrows.
+Source/descent/endpoint/projectionidentityandallphaseconservationmandatory.
+Actual2colrank2isnotpretendedfullmatrixrank;independentfullrankcheckedseparately.
+
+38publishedaeb810daf/PRactual38updated/PCC2ed91bUNVERIFIED;alloldrecordsbelow.
+Latest aebCIworkflow/statusEMPTY19:22;requiredgatesunconfirmed/no manualmerge.
+NewpublicationpermitsCIread. Nopostcallraw/checker/summaryrewrites.
+StaticUNSELECTEDnewleadLEAD_EXTENSION_QUADRATIC_REMAINDERS.md+extension-remainder-
+lead-review/layout-v2/report.pdf(VIEWED). ExistingFp-onlycofactorrestriction;
+proposednorm-verifiedMumforddegree2remainderclassoverFp²forgraphcancellation,
+withproof/verification/collision/costobligations. No implementation/protocol/
+measurement/noveltyclaim. PCC8e1cabunverifiedpinsoriginalsource/initialfigmanifest;
+initialclippedlayoutpreserved;correctedlayout-v2hashes/separateREADME. Don'tedit
+pinnedLEADnoteorinitialfiguremanifest. m8finiteBspaceceil(p/2),m9p²;notselected.
+
+Maintain<=60seccommentary/concreteactions;avoidlengthyspeculationorunchangedbuilds.
+
+# Current checkpoint:39production source implemented; ROOTBUILD/TESTS RUNNING
+
+ALLownedpaidpods32–38deleted/no39podallocated. No scientificmeasurementactive.
+Privateauthpointer/tmp/ic-runpod-auth-location persists;neverprintkey/header/
+token/envresponses/copyAPIkeytopod. Don'taskcredentials/profileagain.
+
+38publishedaeb810dafac99a98517641c905aba4ca4013d289/PR4288actual38updatedlint0.
+PCC2ed91bUNVERIFIED. Sixrecordedpairsalltarget10013957165807875/checksPASS,
+product/countdataandcustodybelow. FinalonepagePDFVIEWED/exactcopieshashPASS.
+Own38DELETE204/GET40419:17:15Z. Latest aeb CIworkflow/statusEMPTY19:22,
+requiredgatesunconfirmed/no manualmerge. No artifactbotchangeobservedyet.
+
+NEW39DIRTYPRODUCTIONCODE: pure38helpermoved(sharednativepathwrapper)to
+src/cryptanalysis/jv_homogeneous_quotient.rs;readonlypivotgetterRelationSystem/
+CountedRelationSystem;homogeneous_system retainsactualRREFinfo/constructschecked
+kernelwhenready;chargedkernel/projectiondelta,2columnCountedRelationSystem.
+Newrun_two_large_prime_dlp_on_with_quotient_reuseexport/--reuse-homogeneous-basis
+requiresstructuralgate+rankstride. Oldentrypoints/defaultoutputpreserved.
+Serializehomogeneous_quotient_reuse.initial_basis/attempts.projected_rows/
+actual2colRREFproducts/subtractions/norm/rank/extra_counts/final_extra_counts,
+explicitrank/productscope. last_rankisactualQUOTIENTRANK(2),notfakefullrank.
+Samecerts/descents/ellipticverificationrequired. Nativegapsremainexplicit.
+
+IMPORTANTACTIVEEXECsession76237: local cargo build --release --example
+jv_sieve_two_large_prime_dlp_compare >validation/production-quotient-driver-build.log;
+ON SUCCESS then cargo test --release --lib jv_sieve >production-quotient-library-tests.log;
+ON SUCCESS then cargo test --release --example... >production-quotient-example-tests.log.
+Eachphasewrites*.exit-code.txt. ROOTbuildbegan~19:29;couldtake9m+12m+seconds.
+Wait/pollnonblocking/readlog; DON'TEDIT7FROZENROOTSOURCESwhilecompilerreads.
+FROZEN /tmp/ic-production-quotient39-source-before-checks.sha256 (7files).
+StrictROOTlib/exampleClippyPASS actualcapturedexit0 (logquotient-production-clippy.*).
+Tooloutercellsometimesreports1despiteactualexplicitCargoexit0+PASStests;retain
+receipts/inspectactualstatusfiles,don'tassumetestfailure/rerunjusttogreen.
+No globalfull-parent-suitePASSclaim;knownunrelatedparentfailuresretained.
+
+NATIVE39qualifierproduction-quotient-analysis.rs:54testsPASS, capturedexit0,
+strictClippyPASScapturedexit0. Includesoldindependentcert/rank/gateproofs+
+componentu128oracle,uniquekernel/projectedrows/actualtarget/exact2colcounts,
+all-phaseconservationbaseline−oldaffinesolver/denseconversion+newsolver/
+conversion+kernel/projection;checkpointonlykernelchange. Completehand-record
+andforgedfield/eachphasecontrols. componentquotient-analysisOracle/driver now
+pub(crate),balancegate/gate_checkpub(crate)forread-onlyreuse;oldmathunchanged.
+Nativeexec71321(finalbuild+transport+capture+hashchecks)likelydone;inspectresult.
+Logsproduction-quotient-native-{final-tests,clippy,build}.* actualexit0needed.
+Actualwrapperthreepathsandfirst-armfailurecontinuationPASS;capturerusttest
+PASS. Protocolhashfreeze /tmp/ic-production-quotient39-protocol-before-checks.sha256.
+
+39Amendment34/production-quotient-plan.jsonFRESHp1009seed367/85percent/stride32,
+60fixture300worker1000whole1800runner8GiB4vCPU<=0.40USDh.
+run-production-quotient-task.sh attemptsall3afterfailure,stdoutseparateworkerraw.
+prepare-production-quotient-runpod.sh requirescleanpublishedHEADmatchingoriginref,
+futurevalidation/production-quotient-source/build.sha256+runpod39-allocation.json.
+Nativephasechart/compactprojection/reporttemplatesready (production-quotient-*).
+Sourcecode/parser/opencostsneedallfinalchecks+freshmanifests BEFOREpublication/
+anyRunpod39call. No39sourcePCC/manifests/allocation/callyet.
+
+NEXTfinishrootchecks,inspecteveryresult;hashsourceunchanged. Thenfinalnative
+checks onlyasneeded/freezeexpandedsource+binarymanifests/sourcePCC,provisionown
+1800sguardCPU(usingprivateRunpodauth/APIv2pinnedimage),journal/resume/cleancommit
+PUSHbeforeimmutableprepare/upload/POSTONCE. CaptureTTL1800accepted;needlocal
+cleanupguardwithsleep1800(notold900/2700). Collect/portable/sourcecustody/input/
+credentialchecksTHENDELETEownpod+absence,allreports/PDFVIEW/exactcopies/PCC/
+lesson/journal/PR. No39dataassertedyet;doNOTcompose38/37costs. Keepgoalactive.
+
+Maintain<=60seccommentary/concreteactions. Don'tspend10minspeculatingendo/CM/
+nativeIR/m8withoutreadingactualsource/choosingprotocol. All39codeaboveimplemented,
+don'trestart/rederive. Rootcompilerworkcanoverlapindependentnative/docswork.
+
+# Current checkpoint:38COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+UserRustscience/allfuturemeasurementsRunpod; no subagents/stopgoal.
+ALLownedpaidpods32–38DELETED; no scientificjob/compileractive. Privateauthpointer
+/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/envresponses.
+
+38source05e224b7d3b365c38142da44615d927ef019961c before solePOST20219:15:57Z.
+Siximmutable37graphmatrixpairs, bothchargeoriginalhomogeneouscheckpoint;
+baselinefullaffineRREFvscheckedcodim1kernel+rowprojection+2columnsolve.
+Allrecover10013957165807875. Independentcolumn-keyed/u128/Fermatoraclechecks
+ALLaffineprefixstatesandALLsemanticcounters,homstate/rank/counters,unique
+kernel,everyprojectedrow,target,newknownwordeventconservationandpricesPASS.
+Productbaseline→reuse:16383236→8172740,16389886→8176423,21503906→10728194,
+21170395→10553767,28506830→14222697,28427218→14196730. Newwordevents
+904649/904649/1080050/1093244/1792010/1937091charged.85/32observedincomplete
+887810478528→442994121632. Allnativegapsstillunrankable/fulltotals/band/ratios
+null/no newDLP/no37end-to-endrepricing/composition/parity. No36zeroskipstacking.
+Oneworker6pairs0warm/retry/excluded,worker/copiedqualifier0,5.027swholepracticality.
+PCC-20261116-2ed91bUNVERIFIED.26qualifier/23driver tests/strictClippy/build/
+actualwrappertransport/capturecontrolsPASS.307committedsource/portablehash
+PASS; all6inputcmp37exact. InitialClippy/sourcecheckissuesretained/fixedprecall.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-homogeneous-quotient-20261116-38/
+returned/task/run:1270892Braw/4050969Bexport/6originalsLOCALhashbound,
+10221BsummaryGitpacket. Originalsource307blobsreconstructedpostcallPASS.
+Ownh5315kmxrjchl8CPU4/8/.12h/pinnedimage/actualCPU25 v2DELETE204/GET404
+19:17:15Zaftercollection;privateguardmarker/900s guardinert. FinalONEPAGEPDF
+VIEWED/unclipped/exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS.
+Packetresearch/.../runpod-homogeneous-quotient-20261116-38;benchmarks/
+20261116-runpod-homogeneous-quotient. No raw/qualifier/summaryrewritten.
+LessonsO-b90531ea2d12/T-a860388fa213/O-ca41826b2ee4. L-7abc30ad110b nowadopted
+2distincttransportconfirmations; instructionfoldedinto report-evidenceSKILL.
+
+NEXTcommit/push38finishedpacket/PCC/lesson/journal/resume/studyREADME/skill,
+thenPRactual38afterlint0. Source307manifesthistorical05;studyREADMEchanged
+POSTCALLforreportlink,originalsourceblobsPASS. Don'trerun/reprice38.
+NEXTTECHNICAL implementoptionalproductionbasisreuse,thenfreshmatchedfullpipeline
+Runpodmeasurement(no subtracting38from37). Rootcode currentlyUNCHANGEDby38;
+helpernative_analysis/src/homogeneous_quotient.rs canmove/sharedpathinto
+src/cryptanalysis;newRelationSystem/CountedRelationSystemreadonlypivotgetter,
+retainactualhomcheckpointRREF,checkedkernel,chargekernel/projectionincrements,
+solve2cols+actualellipticreplay. Preserveolddefaults/API/streams/certificates.
+Need explicitnewcounter/rankscope/qualifier ratherthanpretending2columnlegacy
+productsareoldfullmatrixcounts. Freshsource/spec/binariesbeforefuture39call.
+No39implementation/protocol/callselectedyet;avoidlengthydesignloops,startcode.
+
+37published92c2dc008/PRupdated, all7knownscalar; priorrecordsbelowunchanged.
+Latest92cCIworkflow/statusEMPTY19:03;requiredgatesunconfirmed/no manualmerge.
+NewpublicationpermitsCIread. Keepgoalactive and<=60seccommentary/concreteactions.
+
+# Current checkpoint:38SOURCE READY; ownedRunpodCPUready/notdispatched
+
+GoalACTIVE/RustgraphIC+cheapextension-field relationfinderresearchtowardrho parity.
+UserRustscience/Runpodmeasurements. No subagents/stopgoal. Allold32–37ownedpodsdeleted.
+NEWOWN38h5315kmxrjchl8CPU4/8/.12h/pinnedRustimagecreated19:14:37Z,
+900s localDELETEguardian+GraphQLfallbackactive. Healthready/startedfalse19:14:50.
+Privateauthpointer/tmp/ic-runpod-auth-location:pod38.id/task38-token/header.
+NEVERprintcredentials/headers/tokens/envresponse/copyAPIkeytoPod.
+
+38Amendment33/quotient-plan.json ALLsiximmutable37graphraws(allSHAfrozen).
+Pairbaselineoriginalhomogeneouscheckpoint+fullaffineRREFversussamecheckpoint+
+checkedcodim1kernel+rowprojection+two-columnsolve. Preservezero-normalization
+behavior(no36composition). InitialcheckpointchargedBOTHarms;candidatekernel
+negations/dotproducts/adds/knownwordeventscharged; nativegapsremainunrankable.
+No newDLPsample/end-to-end37repricing/composition/full-costratio/parity.
+Oneworker6pairs0warm/retry60worker180whole900runner8GiBfirstallowedCPU.
+26qualifier/23driver tests/strictClippy/build/actualwrappertransport/capture
+auth-oncecontrolsPASS.307source/binaryhashPASS; PCC1fe548UNVERIFIED.
+No compileractive. InitialClippyfixed/retained; unexpectedoutertest1diagnosed
+withsame-sourceexplicitcargoexit0/26+23PASS,alllogsretained.
+
+NEXTcommit/pushcleansource/spec/manifestsbeforeprepare-quotient-runpod.sh NEWSTAGE
+/workspace/ic-runpod-runs/runpod-factor-base-balance-20261116-37/returned/task/run.
+Upload/POSTONCE; collectexactarchiveandportablepre/preworker/post/qualifiedhashes,
+thenimmediatelyv2DELETEown38+GET404(orGraphQLfallback)/markprivatepod-ID.deleted.
+Don'tredispatchuncertainPOST. Nooptionalfile-readbeforecleanup. Postcall307source
+blobreconstruction, allinputcmp/SHA/credentialscans. Renderquotient-render/
+quotient-report.typ,VIEWallPDFpages/exactbenchmarkcopies/hash/PCC/lesson/journal/
+commit/PRactual. Thenintegratemeasuredreuseintooptionalproductionpipelineand
+freshend-to-endmeasurement;keepgoalactive. No38resultyet.
+
+37published92c2dc008/PRactual37updatedlint0;sourcef3beforecall,all7recover
+10013957165807875. Alloldsource/custody/reportdetailsbelowunchanged. Latest92cCI
+workflow/statusEMPTY19:03,requiredgatesunconfirmed/no manualmerge. Current307
+manifestbindsthisnewsource;old297manifesthistoricalf3,donotrunoncurrentworktree.
+Maintain<=60seccommentary/concreteactions; avoidlongspeculation.
+
+# Current checkpoint:37COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/Rust graphIC+cheap extension-field relationfinding towardrho parity.
+UserRustscience/allfuturemeasurementRunpod. No subagents/stopgoal.
+Allownedpaidpods32–37DELETED; no compiler/scientificjobactive. Privateauthpointer
+Don'taskcredential/profileagain. Needconcreteactionloops/<=60seccommentary.
+
+37sourcef3e76f16a85c30cc4018183b864083fe030e6307beforeonePOST20218:53:43Z.
+p1009seed359/L263807419874170961,7/7actualscalar10013957165807875;copiedqualifier0.
+ICobservedincomplete3241959371026;graph75/32 4634237434948,75/128 4628340096078,
+85/32 4152078192556,85/128 4234576160840,95/32 4171549682926,95/128 4560298544450.
+No ratios/fullcost/band/ranking/parity/composition. Allgraphfullbase517/two
+accepteddescents/969residuals/onefullrankcheckpoint. Smallbases387/439/491.
+Bvalues500736/499712/365568/380928/303104/362496.85/32lowestobservedgraph,
+stillaboveIC; largerbasecutsrelationbutraisesLA; spacingnotmonotonic.
+Allaffinecerts/target/checkpoint/gateBFS+denseLPprefix/schedule/charge/common
+prefixesPASS.297committedsourcepostcallreconstruction+portablehashPASS.
+Onecoldround0warm/retry,215.886swholepracticality. PCC7fa174UNVERIFIED;
+lessonsO-07916303e648/T-0d411ade4ed1;newvisualoutcomeinledger.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-factor-base-balance-20261116-37/
+returned/task/run:76096Bsummary/3434418Bexport/six498081–593059Bgraphraws;
+7395BICraw/smallmetadataGitpacket. No truncation/rewrites.297f3sourceblobs
+reconstructedunderstage/committed-source-postcall. Ownnyebuop20aauuvCPU4/8/.12h,
+actualCPU1,v2DELETE204/GET40418:57:55Zaftercollection;privateguardmarkerset.
+FinalonepagePDFVIEWED(exactcopies/hashPASS)afterpresentation-onlySVGheight
+fix;initialfigures/sourceLOCALhashbound. Newbalance-compact Rustprojects
+originalsummaryto11344Bpresentation.json/new schema;originalsummaryunchanged.
+Packetresearch/.../runpod-factor-base-balance-20261116-37;benchmarks/
+20261116-runpod-factor-base-balance. Historicalf3renderer/studyREADMEchanged
+POSTCALLforpresentation/link;original297committedblobsPASS,don'trerun37.
+
+NEXTcommit/pushfinished37packet/PCC/lesson/journal/resume/studyREADME/native
+presentationhelper,thenPRactual37afterlint0. RegularPR4288/automerge/required
+CIreviewunconfirmed/no manualmerge. NewpublicationpermitsCIread.
+NextleadUNDERREVIEW(notselected38yet): retainhomogeneousRREFkernelinstead
+ofdiscarding/re-solvingfullaffinematrix. Rankn−1givesonefreefactor-logscalar,
+so projectaffinerowstoatmost2unknowns(includingtarget). Needactualmatrix/
+independentkernel+targetproofs/countedwork/nativecontrols and sourceprotocol
+publishedBEFOREnextRunpodcall. DoNOTcompose37with36or34. Couldfirstreplayexact
+savedmatrixcomponentincludingcheckpointinBOTHarmcosts,thenproductionintegration.
+37s85-r32raw557137B SHA8f0473a700564c9110fa4779282583e34354909c45e7bce2f28c26e2709f1a0c,
+checkpoint439columns/rank438/10726931products/459rows. InputchoiceNOTfrozen38.
+KBquotientexact/negativeunavailable/tmp/ic-quotient-kb-{exact,negative}.log.
+Readactualhomogeneous_rankandtargetsolve/CountedRelationSystem. Existingfull
+RREFalreadyforward/backwardzeroskips;36normalizationnotproductionintegratedyet.
+Keepgoalactiveandexecuteoneconcreteleadafterpublication;don'tlengthyspeculate.
+
+# Current checkpoint:37SOURCE READY; owned Runpod CPU provisioned/not dispatched
+
+GoalACTIVE/Rust graphIC+cheap extension-field relation finding towardrho parity.
+UserRunpod-only measurements/Rust scientific code. No subagents/stopgoal.
+36publishedc443226ef/PRupdatedafterlint0. Allold32–36ownedpodsdeleted.
+NEWOWN37nyebuop20aauuv CPU4vCPU8GiBcpu3c0.12USDh created18:52:12Z,
+2700s localDELETEguardian+GraphQLfallback active. No37scientificdispatch yet.
+Privateauthpointer/tmp/ic-runpod-auth-location->pod37.id/task37-header/token.
+
+37Amendment32/balance-plan.json p1009seed359,IC+sixgraph75/85/95percent crossed
+strides32/128,allgraphstructural-gated,fullp²budget/8192residuals/32descents.
+Onecoldround0warm/retry,300worker2300whole2700runner8GiBfirstallowedCPU.
+Everyarmattempted/failures/capsretained. Newnativequalifier25tests/strictClippy/
+buildPASS; graphprefixBFS+denseLPrank/charge/schedule, allsuccessfulaffine/rank/
+actualtargetproofs,common descentandsamefractionoriginalsourceprefixes.
+Transportactual7paths+deliberatefirstarmfailurecontinuationcontrolsPASS;
+Rustcaptureauth/oncecontrol+warnings-deniedcompilePASS.297source/binaryhashPASS.
+Productiondriverbytesandc79production sourceunchanged;noRootrebuildneeded.
+PCC-20261116-cca062UNVERIFIED. Incompletecosts/nulltotals/bands/ratiospersist.
+
+NEXTcommit/pushcleansource/spec/manifestsbeforeprepare-balance-runpod.sh NEWSTAGE.
+EnsureCPUhealthand>=2410sremaining,upload/POSTONCE. Collectexactarchive/portable
+pre/preworker/post/qualified/sourcehashesTHENimmediatelydeleteownpod+confirm
+absence/markprivatepod-ID.deleted. DoNOTredispatchuncertainPOST. Failurelogs
+mustnotpreventcleanup. Finalrenderbalance-render/balance-report.typ/PDFVIEWall
+pages/exactbenchmarkcopies/hash/PCC/lesson/journal/PR. Keepgoalactive.
+No37resultyet;doNOTcompose34–36costs. Currentc443workflow/statusEMPTY18:45,
+requiredCIreviewunconfirmed/no manualmerge. <=60seccommentary/concreteactions.
+
+# Current checkpoint:36COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/RustgraphIC+cheapalgebraicrelationfinderresearchtowardrho parity.
+UserallscienceRust/allfuturemeasurementsRunpod. No subagents/stopgoal.
+ALLownpaidpods32/33/34/35/36DELETED;no compiler/scientificjobactive.
+Privateauthpointer/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/
+envresponses/copyAPIkeytoPod. Don'taskcredential/profileagain.
+
+36source6a8258839beforeoneRunpodPOST20218:19:40Z. Immutable35candidateinput
+571735B SHA11ac30e4e22202b12dd79fe9d30085b15979b89a47809e7e876f9017a875cfe3,
+originalsourcec79. Bothmodes+separatecolumn-keyedu128oracle matchALL390inserted
+pivotstates/actualscalar61513282845831007/rank387/columns387;batchtargetmatches.
+Baseline7897311M→candidate7791779M,normalization150156→44624M;105532zero products
+avoided/150156addedzero-testwordeventscharged. Subtractions7747155/inverses387,
+factorconstructions72593/scanprofilesunchanged. Incompleteobservedbitops
+326047986000→321779117640. Nativegapspersist,no ratio/band/completecost,
+NOnewDLPsample/NO35end-to-end repricing/composition/NOproductionintegrationyet.
+1pairedreplay0warm/retry,worker+copiedqualifierexit0,1.543swholepracticality
+includesdiagnostichashing/baselinezero-observer. PCC77059aUNVERIFIED;
+lessonO-b66f645e86d7.20qualifier/18driver/sourceClippy/build/transportcontrolspass.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-recorded-zero-normalization-20261116-36/
+returned/task/run:109777Braw/685889Bexport/571735Binputuntruncated/hashbound;
+2880BsummaryGitpacket. All290committedsource/input/portablepre/preworker/post/
+qualifiedhashPASS. Originalinputcmp35exact;credentialsabsent. Ownpodh0vdoz5vz4mtn3
+CPU4vCPU8GiB0.12USDh/actualCPU47v2DELETE204+GET40418:21:55Zaftercollection;
+privatepod-ID.deletedmarker/900sguardinert. FinalonepagePDFVIEWED/exactPDF/SVG/
+150dpiPNG/nativefigurecopieshashPASS. No originalraw/qualifier/summarymodified.
+Packetresearch/.../runpod-recorded-zero-normalization-20261116-36;benchmarks/
+20261116-runpod-zero-normalization. CurrentlyDIRTYpacket/PCC/lesson/journal/resume/
+studyREADME;nextcommitpushandPRactual36afterPCCproselint0.
+
+NEXTafterpublication: focusactualrelation/descentfinderparameterbalanceusing
+existingRustcode/flagsbeforeanotherRREFrewrite. Possiblefactor-base-fraction
+sweep(existing--small-percent)onfreshmatchedpubliccurvewithstructuralgate,
+compareoriginalICcontext; readactualconstructor/collector+JV3.3/KBbeforechoosing.
+No37protocol/call/implementationselectedyet. Do NOTcompose36numberswith35or34;
+no computedfullpipelinegain. ActualEllEhasgenerala2/a4fromalpha/sigmaalpha,
+notanassumedj0model;don'timplementorder3CMfoldwithoutsource/applicabilitycheck.
+Thebroadnew-sparse-RREFrewritepremisewasalreadyrefutedbyactualexistingzeroskips.
+
+Keepgoalactive. Completeparity/publicunknown-logcohort/strongestreferences/full
+unpricedcountrequirementsremainopen,notablockertoconcretework. No manualmerge;
+PR4288regular/automerge/requiredCIreviewunconfirmed. Last7fCIread17:53EMPTY,
+newpublicationeventcanread;don'tbusypoll. ArtifactbotifPNGmigrationinspect/FF/
+exactignoredPNGrestorefromLOCAL/hash;neverreaddignoredPNG. Maintain<=60secprogress
+commentary;don'tspend5-14minonspeculativealgebrawithouttoolactions. Chooseone
+concretelead, nativecontrols, freeze/publishBEFOREnextRunpodcall.
+
+# Current checkpoint:36SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/RustICgraph+cheapalgebraicfinderresearchtowardrho parity,Runpodonly
+measurements. No subagents. AllscienceRust. Authpersists/privatepointer
+/tmp/ic-runpod-auth-location;NEVERprintkey/headers/tokens/envresponses/copyAPIkeytoPod.
+
+NEWOWN36PODh0vdoz5vz4mtn3:officialv2CPU4vCPU8GiB0.12USDh/pinnedRustimage,
+900sDELETEguardian(withGraphQLfallback)active. Healthready/startedfalse18:18.
+Privatepod36.id/task36-header/token. No36scientificdispatch/dataYET.
+Allold32/33/34/35ownpodsdeleted.900sttlrequiresremaining>=300beforecall;
+publish/packagepromptlyafterthissourcecommit. No compileractive.
+
+36Amendment31/normalization-plan.json: EXACT35candidateinput571735B SHA256
+11ac30e4e22202b12dd79fe9d30085b15979b89a47809e7e876f9017a875cfe3 at
+/workspace/ic-runpod-runs/runpod-structural-rank-gate-20261116-35/returned/task/run/structural-gate.raw.json.
+RecordedmatrixcomponentONLY/no newDLP/end-to-end35repricing/composition.
+Originalsourcec79c11d6c59a7dbbb60c08892ad6587511b115d7,expected7897311products/
+rank387/columns387/scalar61513282845831007. TwoRREFmodes inONEpairedreplayworker:
+faithfulShoup/u128/inverse/update/targetorder baseline versus skip-zero pivot
+normalization(coefficients+RHS). Existingforward/backwardzeroskipsPRESERVED.
+Solversgetonlymatrix/modulus/target, recordedreferencesemittedaftercomputation.
+Independentcolumn-keyedu128oraclechecksEVERYinsertstateandactualzero-count;
+separatebatchtargetcheck. Productdeltaequalszeros;adds/inv/scans/factorcounts
+same. Candidatezero-testswordeventscharged; nativeothergapsremainunrankable.
+Timingincludesdiagnostichashing/baselinezero-observer/practicalityONLY.
+1pairedreplay,0warm/retry,60worker180whole900runner8GiBfirstallowedCPU.
+
+SourcechecksALLPASS:18driver/20qualifiertests,strictClippy/buildincludingrenderer;
+handcounts/small+widefields/out-of-orderpivots/inconsistentinputs/forgedcounts,
+statesandcompletenesscontrols. Nativeactualwrappercreate-newraw/stdoutcontroland
+Rustcaptureauth/once/warnings-deniedbuildPASS.290source/input/binarymanifestsPASS.
+PCC-20261116-3cbd79unverified. InitialClippyunusedfields/importsfixed/retainedlog.
+No full-libraryrebuildneeded(nativeanalysiscratesourceonly).
+
+NEXTcommit/pushclean36source/spec/manifestsBEFOREprepare-normalization-runpod.sh
+NEW36STAGE INPUT-RAW,uploadimmutablebundleandPOSTrunONCE. Genericcaptureusesrun-task.sh.
+Afterfinishedcollectexactarchive,portablepre/preworker/post/qualifiedhashesand
+sourcecustody,THENimmediatev2DELETE+GET404(orGraphQLfallback). Markprivate
+pod-ID.deleted. Missinganalysislogmustnotstopcleanup. Do NOTredispatchuncertainPOST.
+Reportnormalization-render/normalization-report.typ,inspectEVERYfinalPDFpage,
+exactPDF/SVG/150dpiPNGbenchmarkcopies/largeoriginalLOCALhashcustody. ActualdataPCC,
+lesson/journal/commit/PRupdate;goalactive. No36resultclaimedyet.
+
+35result7f60931a3published/PRupdated,c79sourcebeforecall,actual6171gatewords/
+1of2checksskipped/identicalstreams+scalar, allsource/custody/qualifierPASS. Graph
+LAincomplete903928056050→661359105264,whole6349082215578→6106513264792;
+notcomposablewithfuture36. All35and34origdata/reports/custodybelowunchanged.
+No fullparityadmission/completecost;requiredCIreviewunconfirmed/no manualmerge.
+Keep<=60seccommentary/concreteactions;avoidlongspeculationorunnecessaryrootbuild.
+
+# Current checkpoint:35PUBLISHED/PRUPDATED; no owned paid pod active
+
+35results7f60931a3fede3e33974070a93717b28c73b8dd9PUSHED/PR4288actual35updated
+PCCproselint0. ResultPCC7e4f97unverified; allactual35source/data/cleanup/reportbelow.
+No compiler/scientificjob/OWNpaidRunpodactive; all32/33/34/35ownpodsdeleted.
+GoalACTIVE/no stopgoal/subagents. AllfuturemeasurementsRunpod(userexplicit), Rust
+scienceonly. Privateauthpointer/tmp/ic-runpod-auth-location persists; NEVERprint
+key/headers/tokens/envresponses/passAPIkeytopod. Don'taskcredential/profileagain.
+
+NEXTsourceinspectioncompleted: residual_walk::RelationSystem::insert_by ALREADY
+skipszeropivotcoefficientsinforwardupdatesandusesnonzerosupportinbackwardupdates.
+Do NOT writearedundantwholesale sparseRREFrewrite. Normalizationstilldense;
+nextpossiblecandidateisatinyimmutablematrixreplayquantifyingzero-normalization
+orremainingcoefficient-scanworkBEFORErootintegration. Couldchooseotherleadwith
+KB/sourceevidence. No36protocol/implementation/callselectedyet. Neverassumegain,
+repriceoldrecordsorcomposecrosscohortsubtotals. KBstatus/exact/negativequeries
+unavailable/tmp/ic-sparse-rref-kb-{status,search1,search2}.log;actualsourcewasread.
+Avoidfiveminutesofspeculation; chooseoneconcretecode/datastepandexecute.
+
+7fCIread17:53workflows/statusEMPTY,requiredgatesunconfirmed;regularPR/automerge,
+no manualmerge. Nextcheck>=18:43unlesspublicationevent. ArtifactbotifPNGmigration
+inspectdiff/FF/exactsparsebenchrestore/ignoredPNGfromLOCAL/hash;neverreaddignoredPNG.
+Historical35source280manifestbindsc79, currentstudyREADMEchangedPOSTCALLasnoted.
+No outstandingfailedmeasurementtoretry. Keepgoalactive; fullrho-parityrequirements
+stillopenwithoutblockingindependentcode/experiments. Maintaincommentary<=60sec.
+
+# Current checkpoint:35COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE:Rust graphIC/extension-field algebraic relationfinder work and Runpod
+measurements towardrho parity. UserrequiresRust/noPython science,Runpodbackend.
+No subagents. All OWN paidpodsDELETED; no compiler/scientificjobactive.
+Privateauthpointer/tmp/ic-runpod-auth-location, NEVERprintkey/headers/tokens/env.
+Authorizationpersists; don'taskprofile/credential. No stopgoal(no blocker).
+
+35sourcec79c11d6c59a7dbbb60c08892ad6587511b115d7PUSHEDbeforeonePOST20217:32:54Z.
+p1009seed347/L263807419822068817,bothactualscalar61513282845831007.2workers+
+copiedRustqualifierexit0,61.186swholepracticalityonly,1round0warm/retry.
+Gateavoids1of2fullcheckswithsameoriginals/descents/endpoint/sourcestrideschedule.
+Prefix386sourcesLP-rank126upper260<target385skip;515sourcesLP-rank127upper388
+permitactualrankcheck.515originals/2descents2007resids/390affinecerts/targetrank387,
+zero fallback/fill.6171knownaddedwordeventscharged. ObservedINCOMPLETEbitops:
+LA903928056050→661359105264;whole6349082215578→6106513264792. OtherphasesEXACTLYequal.
+Removedcheckpoint5,813,150modrM/5,710,857modrA/687modrInvplusfield/wordevents.
+NativeDSU/othergapsremain,allunrankable,total/band/ratiosnull,noT0bestIC/T1rho.
+IndepBFS+denseLPrankallprefixes/permittedfullcheckpoint equality/cert/target/
+allphaseconservationPASS. PCC-20261116-7e4f97UNVERIFIED,lessonO-b0a0e7894c9c.
+
+ExactLOCAL /workspace/ic-runpod-runs/runpod-structural-rank-gate-20261116-35/returned/task/run.
+684527Bbaseline/571735Bcandidate/1271442BexportLOCALuntruncated/hashbound;
+20965BsummaryandmetadataGitpacket. Sealedbundle/source/binaries/returnedarchive
+alsoLOCAL. All280committedsourceblobs(postcallreconstructed)+portablepre/preworker/
+post/qualifiedhashPASS;nocredentialsinbundleorreturnedrun. Ownpod0e3b53r1g9y4qr
+CPU4vCPU8GiBcpu3c0.12USDh/actualCPU63:officialv2DELETE204+GET40417:36:06Zafter
+collection;privatepod-ID.deletedmarker,guardianinert. Old32/33/34ownpodsdeleted too.
+Final35onepagePDFVIEWED/exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS.
+Packetresearch/.../runpod-structural-rank-gate-20261116-35,benchmark
+benchmarks/20261116-runpod-structural-rank-gate. No originalraw/checker/summaryedited.
+
+Currentc79+DIRTY35packet/PCC/lesson/journal/resume/mainstudyREADME. Needcommit/push
+finishedpacketandPRactual35afterPCCproselint0. Source280manifesthistoricalc79;
+mainstudyREADMEchangedPOSTCALLandisnotexpectedtomatcholdmanifestoncurrentworktree.
+Don'trerun/reprice35. Nativeexportself-described/noncanonicalasbefore.
+
+NEXTafterpublication: readactualremainingtargetsolver/denseRREFsource and its
+operationcounts/KBpriorworkbeforeselectingsparsezero-elisionoravoidedrepeated
+elimination. No36protocol/callselectedornewimplementationyet. Considerimmutable
+recorded-matrixRunpodcomponentreplaybeforeanotherlengthyrootbuild. Keepcurrent
+strongactualscalar/cert/targetchecksandoriginalstreams;don'tsilentlyrelaxcriterion
+orcomposecrosscohortcosts. Avoidlongspeculation: chooseoneconcretecode/datastep,
+logdecision, nativecontrols,source/specpublishedBEFOREnewmeasurement.
+
+34matchedoriginalIC/graph/fourrhooptionspublished3cc53e0d1/PRupdatedandfully
+preserved; observedincompletevaluesbelowareNOTcomposablewith35. Completeparity
+needsfullaccounting/publicunknown-logcohorts/controls/strongestreferences,stillopen.
+PR4288regular/automerge/no manualmerge;3ccCIread17:14workflow/statusEMPTY.
+Newpublicationeventmayberead;artifactbotifPNGmigrationinspect/FF/restoreexact
+ignoredPNGfromLOCAL/hash,neverreaddignoredPNG. Alltests/sourcechecksforc79passed:
+strictlib/exampleClippy,30sievepass2oldignored,3examplepass,19qualifierpass,4pure
+helpercontrols,2armtransport/oldcollision/captureauth-oncecontrols,productionbuild.
+Maintaincommentary<=60sec/concreteactionloops;nosourcecodeneedlesslyrebuild.
+
+# Current checkpoint:35SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/RustgraphICintegrationandRunpodmeasurementsuntilrho parity; no subagents.
+UserRunpodbackendauthorizationpersists; allscientificcodeRust. Don'taskprofile/key.
+34published3cc53e0d1/PRactualresultupdated/PCCc57d97+8b685eunverified; sourcea06
+precededsole34call. All6sameactualscalar89981502037382902, incomplete/unrankable
+subtotals documentedbelow.34ownpodcy2tbnhzgtwr6ecollected/hashthenGraphQLterminated/
+lookupnull17:07:01Z(afterlegacyRESTproxy403),noactive34. Allold32/33ownpodsdeleted.
+
+NEWOWN35POD0e3b53r1g9y4qr allocatedviaapi.runpod.io/v2/pods,CPU4vCPU8GiBcpu3c
+0.12USDh,pinnedofficialRustimage.2700s localDELETEguardianwithGraphQLfallbackactive.
+Healthready/startedfalse17:30. PrivateauthONLYpointer/tmp/ic-runpod-auth-location:
+pod35.id/task35-header/task35-token,APIheaderNEVERprint/passintoPod/repo/logs.
+No35scientificdispatch/dataYET. Deadlinevalidation/runpod35-allocation.json;
+newtasksrequire>=2110sremainingbeforemeasurement. Startsourcepublication/packagepromptly.
+Initialv2create422unsupportedcommandfieldbeforeallocation;correctcmdfieldthen201,
+safevalidationerrorretained. Bootstrapprocps/nonloginbash/absoluteRustcompiler.
+
+35Amendment30/structural-gate-plan.json p1009FRESHseed347; samebinary/publicinput
+baseline rankstop75/stride128/fullp² andopt-in--structural-rank-gate. Exactoriginal
+sources/descents/endpoint/checkpointscheduleidentity,independentBFS+denseLPrankallgate
+prefixes,permittedfullcheckpointequality,allprimitivephasechangesmustequalomitted
+checkpointvectorspluschargedknowngatewords. Exactrank/affinetarget/ellipticverification
+stillmandatory. Onecoldround0warm/retry,900worker1900whole2700runner8GiB.
+Componentonly;noT0bestIC/T1rho,total/band/ratiosnull,nativeDSU+othergapsremain.
+
+AllsourcechecksFINISHED:strictlibrary/exampleClippyPASS,30sieve testsPASS/2existing
+ignored,3exampletestsPASS,productionexamplebuildPASS(job81217completeexit0).
+Productionhelper4standalonecontrols;independentqualifier19tests/Clippy/buildPASS;
+actualtwo-armtransportandold33collisionnegativecontrolPASS;Rustcaptureauth/once
+controlandwarnings-deniedcompilePASS.280source/buildmanifestsPASS,5rootfrozen
+hashesunchanged. SourcePCC3c284f+6489baunverified. No compileractive.
+
+NEXTcommit/pushcleansource/spec/manifests/receiptsBEFOREprepare-structural-gate-runpod.sh
+NEW35stage,uploadimmutablebundle/POSTrunONCE. GenericRustcaptureacceptsrun-task.sh;
+preparerpackagesnewtaskunderthatname. Wrapperstdout.summaryvsworkerrawseparate.
+GETstatus/artifactswithPRIVATEtask35-headeronly. Neverredispatchonnetworkdoubt.
+Collectexactarchiveafterfinished+ready;verifyportablepre/preworker/post/qualified+
+sourcehashcustodythenimmediateDELETEown35viaofficialv2andconfirmabsence(orGraphQL
+fallback). Setprivatepod-ID.deletedsoidleDELETEguardianinert. Missinganalysislog
+mustnotabortcleanup. Keepallfailed/censoredrecordsandcriteriaunchanged.
+
+Thenrenderstructural-gate-render+structural-gate-report.typ;inspectallfinalPDFpages,
+exactPDF/SVG/150dpiPNGbenchmarkcopies,originalraw>64KiBLOCALhashbound/source/binaries.
+PublishactualPCC/result/lesson/journal/PR. No manualmerge/CIbypass. Current3ccCIread
+17:14workflows/statusEMPTY/unconfirmed. Keepgoalactive/nextimprovementafterresult.
+S3checkpointgateabsentAWS/tokenretained; userexplicitRunpoddirectionauthorizes
+backendcontinuationwithpublishedsource/immutablecustody, noS3uploadclaim.
+Maintain<=60seccommentary/concreteactionloops,avoidlengthyspeculation.
+
+# Current checkpoint:34COMPLETE/COLLECTED/TERMINATED; graph-gate root checks running
+
+GoalACTIVE:Rust elliptic graphIC/extension-field relationfinder integration and
+Runpod measurements towardrho parity. UserallscienceRust/noPython, allmeasurements
+Runpod. No subagents. Do not stopgoal. All OWN paidpodsDELETED/absent; no cloudjob.
+
+34sourcea06c298bc63f3e2d1fd04d5900c8b4fda46a7798pushedBEFOREsingle34dispatch202.
+OwnCPUcy2tbnhzgtwr6e/4vCPU8GiB0.12USDh/pinnedRustimage/actualCPU71. Sixworkers+
+copiedRustqualifierexit0,971.404swholepracticalityonly,1round0warm/retry.
+p1009seed337/L263807419626071897, allactualscalar89981502037382902.
+ObservedINCOMPLETEbitops:4789001535986IC/7145741221826graph/
+122280490918974plain1/208968828976322neg1/414751415176544plain16/
+164267600135514neg16. Missingnativecounts=>ALLUNRANKABLE,total/band/ratiosnull.
+Known-answerfixturewithheld-outparentanswerNOTT1unknown-log. Noparityclaim.
+Graph487full365smallbase,493sources(66/178/249),2descents1396resids,
+374affinecertreplays/targetrank366;checkpoint243then364target364/allcertsPASS.
+271committedsourceblobpostcallrehashPASS;allportablepre/preworker/post/qualifiedPASS.
+PCCc57d97results/8b685ecustodyUNVERIFIED. FinalonepagePDFVIEWED/exactcopies/hashPASS.
+
+LOCALexactcustody /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-34/
+returned/task/run;645207Bgraphraw/731419BnativeexportLOCALhashbound;37630Bsummary
+andallsixother-smallrawsGitpacket,benchmarkPDF/SVG/150dpiPNG. Sealedbundle/source/
+binaries/returnedarchivealsoLOCAL. NoAPIkey/tasktokeninbundleorreturnedrun.
+RESTcleanupCONNECT403(proxy,noproviderresponse),oneadminretryfailed. Official
+GraphQLpodTerminateacceptedHTTP200/noerrors,subsequentpodlookupnullHTTP200.
+Actualcleanupreceipt17:07:01Z,privatepod-ID.deletedmarker;guardinert. Don'tclaim
+REST204/404for34. Alloldown32/33podsdeleted. AuthONLYprivatepointer
+/tmp/ic-runpod-auth-location;NEVERprintheaders/tokens/envresponses;userauthorization
+persists. FutureRESTrouteifblockeduseofficialGraphQLdocumentedCPUprovisionfallback.
+
+CURRENTDIRTYNEXTCODE(no35scientificprotocol/callyet): productionhelper
+src/cryptanalysis/jv_large_prime_rank_bound.rs;oldresearchhelperpathnowincludes
+exactsameproductionfile. Separatepublic opt-in run_two_large_prime_dlp_on_with_structural_gate,
+newexample--structural-rank-gateflag. Defaults/oldoptions/outputschemaavailable.
+Gatekeepssamebaselinecheckpointsource-stridescheduleevenwhenitsboundskipsadoomed
+check,retainsfullrank/affinedescent/ellipticverification. Source-prefixstatesrecorded.
+Knowninitialization/supportread/parentprobe/boundreadwordschargedlowerbound,
+remainingDSUbookkeepinggapexplicit. Actualgatealgorithmnotperformancemeasuredyet.
+
+Rootnativecheckjob81217(inexecsession)STRICTClippyPASS1m45s, nowcargo release
+LIBTEST compilation started~17:03; maytake~20min. Thenqueued sieve tests,example3tests,
+productionexamplebuild,finalsourcehashrecheck. DO NOTeditrootfrozenfileswhilebuildreads.
+Frozen5rootpathhashes/tmp/ic-structural-integrated-final-source-before-checks.sha256.
+OldinitialClippyinterrupt143retained;processesconfirmedZbeforefinalscheduleedit/restart.
+Standaloneproduction-source4controlsPASS. Independent structural-gate-analysis
+nativequalifierBFS+denseLPrankchecks(oldhelperNOTincluded),checksallskip-prefixes,
+source/descent/checkpointscheduleidentityandprimitivephaseconservation.
+Finalqualifier19tests/strictClippy/buildPASS(session38374finished);sourcehashPASS
+/tmp/ic-structural-qualifier-final-before-tests.sha256. No35data/protocolselectedyet.
+
+NEXT: commit/push34packetONLY(keepunvalidatedrootcodeout),updatePRactual34afterPCC
+proselint0. Finishrootchecks/candidatecodejournal/PCC; thenfreeze35matchedbaseline
+rankstopvsstructuralgateRunpodexperiment(2workersprobably1900whole/2700runner,
+planNOTYETSELECTED). Needprocpsbootstrap/stdoutsummaryseparate(Rusttransportcontrol).
+No scientificretryof33. Preservefailed33packet/reportandoldtestfailures.
+PR4288regular/automerge,requiredCI/reviewunconfirmed/no manualmerge. Artifactbotif
+laterPNGmigrationinspect/FFnonoverlap/exactignoredPNGrestorefromLOCAL/hash.
+Maintaincommentary<=60sec/concreteactionloops;avoidlongspeculativeplanning.
+
+# Current checkpoint:34RUNNING ON RUNPOD; do not redispatch
+
+Sourcea06c298bc63f3e2d1fd04d5900c8b4fda46a7798(clean/pushed)precededone34dispatch202.
+Ownpodcy2tbnhzgtwr6e/4vCPU8GiB0.12USDh/pinnedRustimage/7200sDELETEguardian.
+Privateauthpointer/tmp/ic-runpod-auth-location (pod34.id/task34-header/token).
+NEVERprintcredentials/envresponses/passAPIkeytoPod. UserRunpodauthorizationpersists.
+LOCALstage /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-34.
+GETstatus https://PODID-8000.proxy.runpod.net/status withPRIVATEtask34-header;
+GETartifacts afterfinished,collect exactarchiveverifyportablepre/preworkers/post/
+qualifiedhashes THENimmediateDELETEownpod+confirm404,privatepod-ID.deletedmarker.
+Do not letmissinganalysislogabortcleanup. OriginalcopiedRustqualifier runsremotely.
+16:55flowIC/rankstop/rho-plain1exited0;rho-negation1inflight,remainingbatch16both.
+900sperworker/5500whole/7200runner/0warmandretries,correctedseed337. No finalresultyet.
+
+33failedBEFOREscientificcode(all6AlreadyExists stdout/rawcollision). Exactpacket/PCC
+b60806andcleanup204/404preserved;old33pod3lmv488eiypxctdeleted16:43:31Z.
+Correctedwrapper/NativeRusttransport-onlynegativeandpositivecontrolsbothpass.
+33failurePDFfinalonepageVIEWED/benchmarkPDFSVG150dpiPNGexact/hashPASS;
+initialfullSHAoverflowdraftretainedLOCAL/hashbound,presentationonlyfixed.
+
+PostcallRustportfolio-render(Clippy/buildPASS)+portfolio-report.typreadyfor34data.
+No frozen34source/worker/checker/criteriachanged. Completecost/band/ratiosnull,
+allarmsunrankable; held-outplantedanswerisNOTT1unknown-log. GoalACTIVE/no subagents.
+Newstandalone structural_rank_bound.rs pureRustcandidate,4meaningfulunitcontrols
+PASSincluding8192weightedstream-prefixdense-rankchecksacrossfields3/103.
+PCCfc956dunverified,sourcefrozenbeforetests. CandidateNOTintegrated/measuredyet.
+NEXTafter34packet: productionopt-instructuralgateintegration/chargeoverhead/Runpod
+matchedrankstopcomparison. Thiscanavoidimpossiblefullrankcheckpointwork; exact
+rank/affinedescent/scalarverificationremain. No35protocolselectedyet.
+
+CIread16:54a06workflows/statusEMPTY/unconfirmed;regularPR4288automerge/no manualmerge.
+No blocker; don'tstopgoal. Maintain<=60seccommentary/concreteactionloops.
+
+# Current checkpoint:34SOURCE READY;33transport failure preserved/deleted
+
+User wants Rust graphIC/rhoparity research on Runpod. GoalACTIVE/no subagents.
+Trial33failed BEFOREscientificcode:stdoutredirectcreatedworkerraw--out paths,
+all6AlreadyExists. Originalpacket research/.../runpod-ic-graph-rho-portfolio-20261116-33,
+PCCb60806unverified, allportablehashPASS,ownpod3lmv488eiypxctdeleted204/40416:43:31Z.
+ExactLOCALcustody /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-33.
+
+Correctedactualwrapper keepsstdout.summary/rawseparate, requiresps/procpsbootstrap.
+NativeRusttransport-onlycontrolrejectsold33exactly/acceptsall6newpaths(noECscience).
+Qualifier33tests/strictClippy/buildPASS, finalsourcehashPASS. PCC5199ccunverified.
+NewAmendment29/portfolio-plan p1009FRESHseed337, same6arms/costgaps/budgetsas28.
+prepare-portfolio-runpod.sh usesvalidation/portfolio34-{source,build}.sha256 and
+runpod34-allocation.json. No library/workerbinarychange.34scientificNOTDISPATCHEDyet.
+NewownCPU4vCPU8GiB0.12USDh/pinnedimage/7200sDELETEguardian; podID/privateheader
+ONLYauthdirpointer/tmp/ic-runpod-auth-location (pod34.id/task34-header/token).
+NEVERprintkey/envorcopycredentials. Alloldownpodsdeleted, no unrelatedpodchanges.
+
+NEXTpublishcleansource/spec+271source/buildhashbeforeprepareNEW34stage, uploadand
+POST/runONCE. BindfirstallowedCPU;900sworker5500swhole0warm/retry8GiB/7200srunnerttl.
+Collectafterfinished,portablehashcheckthenimmediateDELETEown34+confirm404+private
+pod-ID.deletedmarker. Missinganalysislogmustnotstopcleanup. Retainfullfailuredata.
+ReportPDF/SVG/150dpiPNG/inspectallpages, actualresultPCC/lesson/commitPRupdate.
+Completecost/band/ratiosNULLallarmsunrankable; held-outplantedanswerNOTT1unknownlog.
+No manualmerge. S3checkpointunavailablepreviously;userexplicitRunpoddirectionpersists.
+Maintaincommentary<=60s;chooseconcretecode/dataactions,avoidlongspeculation.
+
+# Current checkpoint:33SOURCE READY; Runpod provisioning, no scientific dispatch
+
+GoalACTIVE: Rust elliptic graph IC integration and Runpod measurements toward rho parity.
+User requires Rust, no Python science, Runpod backend. No subagents authorized.
+Protocol: research/extension_ic_graph_20261115/AMENDMENT_28_SAME_BINARY_PORTFOLIO.md
+Plan: research/extension_ic_graph_20261115/portfolio-plan.json. p1009 seed331,
+same executable/public-only input for IC, rank-stop75/stride128/fullp² and
+plain/negation rho batch1/16,r256/DPpolicy. Held-out planted answer is NOT unknown-log.
+One round,0warm/retry,900s each5500s whole8GiB. All partial prices unrankable,
+complete totals/band/ratios null, no parity claim. Check exact scalar/certificates/
+checkpoint ranks/phase accounting; retain failures and continue remaining arms.
+
+Root example tests1+3/strictClippy pass; standalone qualifier tests33+17+16 and
+strictClippy/build, Rust transport control+warnings-denied build pass. Earlier
+parallel fixture foreign-hook fail retained and fixed with owner claims. Old31/32
+summary byte equality checked in new copied directories. Source manifest269files
+and binary manifest PASS. PCC source/preregistration f276fb and007ffe unverified.
+Source changes two example files, narrow pub(crate) pure qualifier helper reuse,
+new native portfolio analyzer/task/prepare/protocol; no library source changed.
+
+Private API auth directory pointer /tmp/ic-runpod-auth-location; NEVER print key,
+headers,tasktokens or fullcreate.env. pod33.id identifies OWN new CPU4vCPU8GiB
+allocation, $0.12h expected/max0.40h, 7200s local DELETE guardian active.
+validation/runpod33-allocation.json/deployment-public.json safe source receipts.
+No API key passed to Pod; separate task33-header/token removed from child env.
+All previous OWN32pods deleted, never alter unrelated account pods.
+
+NEXT: finish source publication clean BEFORE immutable prepare/upload/onePOSTrun.
+Package command prepare-portfolio-runpod.sh NEW-STAGE; then use private task33-header
+for PUT/bundle, POST/run ONCE, GET/status/artifacts. Never redispatch on network doubt.
+Runner first allowed CPU freezes before call; require remaining>=5710seconds.
+Original copied Rust qualifier runs on Runpod; all original raw/source/binaries/
+pre/preworkers/post/qualified custody hashes. Collect exact archive+verify then DELETE
+OWN33pod+confirm404,markprivatepod-ID.deleted. Complete final report onepage inspected,
+PDF/SVG/150dpiPNG exactcopies, originals LOCAL/hashbound, large raw>64KiB staysLOCAL.
+Actual stage path and podID added before dispatch. No measurement33data yet.
+
+Stopping: failed/censored calls retained, no unchanged rerun. Continue goal after
+result; no stop_goal unless achieved or same external blocker three goal turns.
+CheckpointS3 still unavailable; explicit user Runpod direction persists, do not ask
+credentials/profile. PR4288 regular/automergeenabled, no manualmerge/gatebypass.
+Maintain <=60sec progress commentary; avoid long speculative planning without tools.
+
+# Current checkpoint:32PUBLISHED; fair reference portfolio/comparison next
+
+32packet c906c4e2f5061c2942daa845af3e881a63d7d109PUSHED/PRupdatedPCCproselint0.
+NativeRunpodmeasurementPASS/detailsbelow; sourceafdfc612...publishedbeforecall.
+Noownedpaidpodactive:corrected s1ngkkcetckkq6collected/hashcheckedthenDELETE204+
+GET404; failedstartup3aqk0v57a1udnqDELETE204beforedata/replacement. No compiler/job.
+GoalACTIVE/no stopgoal/subagents. USERREQUIRESALLFUTUREMEASUREMENTSRUNPOD.
+Privateauthpointer/tmp/ic-runpod-auth-location; NEVERprintheader/tokens/envresponses,
+nevercopysourcedatasecrets. Authpersists; don'taskprofile/credentialagain.
+
+CurrentresultCIread16:15c906 workflows/status/reviews/threadsEMPTY/checkruns0,
+requiredgatesunconfirmed. PR4288regular/automergeenabled. No manualmerge/bypass.
+NextCI>=17:05absentnewpublicationevent. Artifactbot32PNGmigrationnotobservedyet;
+iffuturebotdiffonlyPNGmanifest/ignore,inspect/FF/exactsparsebenchrestore/ignoredPNG
+fromLOCALstage/hash,neverreaddignoredPNG. Finishedsource/dataready/cleanbeforethis
+handoff; coverage-note.jsonpostcalladditionkeepsoriginalraw/qualifier/summaryexact.
+
+NEXT: reviewlatestjournal + actual32data, KB/sourcebeforeselectingfairrhoportfolio
+andmatchedIC/graph/rhoRunpodcohort. Nativepricingchangesbatchingtradeoffs, so
+don'tassumebatch16cheapest. No newtrialselected. Avoidfiveminutesofspeculative
+arithmetic/PRNG/IR/coordinateplanningwithouttoolsorcommentary. Chooseoneconcrete
+nextcode/data step,logdecision, nativechecks thenfreeze/publishBEFOREnewmeasure.
+Existingexample-onlyextensionscanreusecachedlibrary; don'tneedlesslyrebuild19min.
+Accountingscopeclarification: legacyharness_pricesinsidecountedreferenceandnew
+Harnessnativecalibrationoutsideexplicitrho_tally; wholeprocesswallincludesthem.
+Eliminateorreport/chargecalibrationbeforenewcompletecoldcomparison; don'twholehook
+snapshot+rho_tallydoublecount. LegacyTUNED/RNG/nativebookkeepinggapsremainopen.
+
+# Previous checkpoint:32FINISHED ON RUNPOD; publish packet, no paid pod active
+
+Sourceafdfc612cc74eba2ce59d6ec059412a81fab557aPUSHEDbeforesealedbundle/sole
+POST/run. USERbackendRunpodauthpersists; privateheaderdirectorypointer
+/tmp/ic-runpod-auth-location, NEVERprintsecrets/APIresponses.env. NoAPIkeyinpod/
+source/bundle; separateephemeralcapturetokenremovedfrommeasurementenv.
+Native32CPU-onlypod s1ngkkcetckkq6 (4vCPU/8GiB/$0.12h,pinnedRustimage)
+actualCPU37. Publicp101seed317,L265379843621, bothactualscalar72701199046,
+469686IDENTICALsemanticsteps/operationtrace; native+outerellreplay/heldout,
+nativecalibration/independentphasecounts/price/outerresidualallPASS. Nativeinverse
+80M42A1I vslegacyharness150M104A1I; product/square55M44Aboth. Observedpartial
+subtotal117413099033harness/114521413145native. Accountingcorrection,NOalgorithm
+gain/ICcomparison/parity/oldrecordrepricing. TUNED/RNG/bookkeepinggapsremain.
+Remoteexit0/0.491secpracticalityONLY;fixture+2workers6flowrecords/0warm/noretry.
+OriginalcopiedRustqualifierexit0writesexact8900Bsummary+32309Bnativeexport.
+Harnessraw11175B/native12361B, allscientificdatafitsGit/exactcopies.
+
+LOCALoriginalcollectedcustody:
+/workspace/ic-runpod-runs/runpod-rho-native-price-validation-20261116-32/
+returned/task/run. Sealedbundle+returnedgzip+source/binariesalsoinparentstage.
+All264source/precall/preworker/postcall/qualifiedhashPASS(remoteANDlocalportable)
+BEFOREpostcalldocedits. Credentialscanofrawbundle/source/binaries/returnedrun
+foundnoAPIkeyortasktoken. CollectedBEFOREDELETE204andGET404confirmed16:02:43Z;
+cleanup.jsonproof. Previousfailedbootstrap3aqk0v57a1udnqalsoDELETE204before
+replacement; neitherownpodactive. Bothlocalguardsinertbyprivate.deletedmarkers.
+No compiler/scientificjob. GoalACTIVE/no stopgoal/subagents.
+
+Packetresearch/.../runpod-rho-native-price-validation-20261116-32 +benchmarks/
+20261116-runpod-native-rho-prices:singlefinalPDFpageVIEWED/exactPDF/SVG/150dpiPNG
+copieshashPASS/localoriginals. PresentationusesactualCPU37insteadfrozendraftCPU0;
+originaltemplateLOCALhashbound, raw/qualifier/criteria/summaryunchanged.
+PCC-20261116-0e87ecstandingunverified; lessonO-f75f4193badb. Currentafdfc+DIRTY
+32packet/PCC/lesson/journal/resume/mainREADME. Nextcommit/push/updatePRactual32,
+artifactbotinspect/FF/restoreignoredPNG/hash. No newtrialselectedyet.
+Afterpublication: selectfairnative/tunedreferenceparameterportfolio andactual
+matchedIC/graph/rhoRunpodcomparisonundernewfrozenprotocol; don'tassumebatch16
+cheapest. Nativebookkeeping/RNG/tunedpricecoverage remainopen. Keepallfuture
+MEASUREMENTSonRunpod(userexplicit), localsourcebuild/unitchecksokay. Avoidlong
+speculativeformula/numericalderivationloops; chooseconcretecode/data step.
+
+# Previous checkpoint:32SOURCE READY; Runpod runner provisioning, NOT MEASURED
+
+USERswitchedpendingmeasurementtoRunpodandprovidedserviceauth. CredentialONLYprivate
+tempheader outsideGit: directorypointer/tmp/ic-runpod-auth-location. NEVERprintheader/
+tokens/APIresponses.env. Readpointertogetprivateheader,task-header,pod.id,cleanupguard
+receipts. No actualsecretinresume/source/logs. APIkeyneverpassedtopod; separateephemeral
+Rustcapturetokenused. UserauthforRunpodpersists/no furtherpermissionquestion.
+
+Currentownpod s1ngkkcetckkq6 (4vCPU/8GiB/cpu3c/$0.12h),45minlocalDELETEguard
+active; exactdeadlinevalidation/runpod32-allocation.json. PREVIOUSpod3aqk0v57a1udnq
+bootstraploginPATHhidrustc; sourcebootlogsretainedredacted/DELETE204confirmed,
+validation/runpod32-startup-cleanup.json. No scientificattemptonfailedpod.
+Correctedstartupbash-candabsolute/usr/local/cargo/bin/rustc; immutableRustimage
+sha256:4b68057dc8c103af4fa66b5cd29f21b18afec79fadfcd8fb91e295e939f0690c.
+CPUonly,notouchunrelatedpods. Newpodhealthcheckpending; APIHeaderauthonlyofficial
+REST, task-headeronlyhttps://PODID-8000.proxy.runpod.net. GET/healthor/status,
+PUT/bundle upload, POST/run ONCE, GET/artifacts afterfinished. NativeRustserver
+runpod_capture.rs test/warnings-deniedcompilePASS. Existingroot11Rho/1publicworker
+tests/twoexamplesbuild/ClippyPASS,frozen2rootsourcehashPASS; standalone16checks
+latestRunpodbackendqualification/Clippy/buildpendingfinalread. No compileractive.
+
+Newprepare-rho-native-runpod.shsealsPUBLISHEDcleanGit/source+buildhashesintoNEW
+stagingdir; copiesnativeworker/generator/qualifier,run-rho-native-task.sh,plan,
+allocation,sourcearchive,resume/compilerandrelativebundlemanifest. Secretsnevercopied.
+Remote taskguardsremaininglifetime>=2110sec,firstallowedCPU,payloadhash,no compiler,
+create-newrun,900worker1900whole60fixture1round0warm/noretry. Originalcopiedqualifier
+runsREMOTEaftermeasurement; allrelativepre/post/preworker/qualifiedhashes portable.
+Native32casefreshp101seed317,harnessvsnativepriceSAMEconfiguredwalk, noIC/rhoparity.
+Protocol27/planbackendnowrunpod_user_authorized. Finalnativecheckscompletebutstill
+DIRTYsource/docs/journal/PCC/lessons. Needfreshsource/buildmanifestCOMMIT+PUSHclean
+BEFOREprepare/upload/POSTrun. Scientific32NOTSTARTED. Guarddeadline45minfromnewpod
+creation~15:55UTC; startwithin~10minelsepreflightrefuses, neverrelaxscientificbudget.
+AftercollectionDELETEownpodimmediatelyviaRESTandconfirm, markprivatepod-ID.deleted
+soownedguardianwon'tre-delete. Capturecleanupreceiptwithoutsecret. No leakedpaidpod.
+GoalACTIVE/no stopgoal/subagents. Existing31publishedcontentbelowunchanged.
+
+# Previous checkpoint:32SELECTED; native rho calibration build active (16 November15:27Z)
+
+CurrentHEADe4ebceecd61fb1705922ca9c490d030626e8a062+DIRTYnativeRhoactual
+towercalibration/comparatoropt-in/tests/qualifier/protocol/docs/journal. No32call/rundir.
+GoalACTIVE/no stopgoal/subagents; userlocalorRunpodauthpersists.
+
+ImplementedArith<const COUNT=false>; truecalibrationhooksactualprime-field
+product/sum/subtractionincldeferredproducts; falseproductionkeepssamewalkmath/RNG.
+Existinginv_modhookonce. measure_native_fq3_primsseparatelegacyharness/TUNED.
+ExistinggraphIC/rhocomparatornew--native-rho-pricesrequires--bitops, recordsnative
+calibrationvectors/marker/removesexactresolvedgap. rho_tallyonlyexplicitcounts+
+separateouterreplay; nowholehooksnapshotdoublecount. Nestedpublicpointanswerfields
+denyunknown. Tests handFp2counts/values, mult-primebasis/random/squares/inverses,
+unchangedsemanticwalk/actualscalar andphaseinversecontrols. Expectedsourcevectors
+M/S55M44A,inv80M42A1I NOTyetnewscientificallymeasured/citedasobserved.
+
+Initialstrictlibrary/exampleClippyPASS. Two rootsourcesfrozensince15:19,
+/tmp/ic-rho-native-root-source-before-tests.sha256PASS. Queue78246:
+finalClippy THENcargo testrelease--libjv_rho_strong::tests THENtouchedgraphcompare
+exampletest THENbuildgraphcompare+twoLPpublicfixturegenerator. STILLRUNNING;
+inspectvalidation/rho-native-{final-clippy,library-tests,public-worker-tests,
+example-build}.log. DO NOTeditrootfileswhilecompilerreads/no timingwhilecompiling.
+
+Standalone rho-native-price-analysis usesindependenthigh-levelphasevectors/
+calibration/bitoprepricing plusmatchingouterreplayresiduals andsemanticwork.
+Initial14tests/build/ClippyPASS; extra3rdhandphasecontrol/OPScleanupadded,
+latestphase-tests/clippy/buildcheckpending. No rootdependency. Thinwrapper
+run-rho-native-local.shcopiesdrivergraphcompare+fixture-drivertwoLPcompare;
+workerJSONisstdoutredirecttoraw.json(no--out). Publicfixtureonlyworkers,
+samep101seed317/negation/batch16/r256/DPpolicy. Amendment27/rho-native-plan.json/
+NATIVE_RHO_PRICE_REVIEW.md/rho-native-report.typprospectivecriteria.
+
+SELECTED32conditionalnativechecks/sourcepublication: freshp101seed317,
+harnesspricesthennativeprices,1validation0warm/CPU0/8GiB/900worker1900whole
+60fixture/noretry. Requirebothactualscalar/native+extraell/heldout,samesemantic
+walk/operationtrace,exactnativecalibration,independentphasevector/reprice/sums,
+matchingouterreplayresidual. Noparity/ICcomparison/algorithmgain/newcompleteprice/
+oldrecordrepricing. TUNEDcredits/RNG/bookkeepinggapsremainexplicit.
+Needfinalchecks/freshsource/buildmanifestsCOMMIT+PUSHcleanBEFOREsolecall
+/workspace/ic-local-runs/local-rho-native-price-validation-20261116-32.
+Thenoriginalcopiedqualifier/exports/hashes/summary/report/viewallpages/exact
+benchmarkcopies/publication. No32data yet. No newnumericpriceobservations.
+
+# Previous checkpoint:31PUBLISHED; native rho pricing controls next
+
+31packet32a51abdc8931378c3603d7b5938585e2e6f8aa8PUSHED/PRupdatedafterPCCproselint0.
+Artifactbot2d3068867da325b76a429e58d47c47b8599f6442inspecteddiffPNGmigrationonly,
+FFintegrated/exactsparsebenchrestore+ignoredPNGhashPASS/neverreaddignoredPNG.
+No compiler/scientificjob. GoalACTIVE/no stopgoal. All31detailsbelowretained.
+CI32a51at15:08appreview+migrateSUCCESS,workflow/status/reviews/threadsEMPTY,
+requiredgatesunconfirmed. PR4288regular/automergeenabled/no manualmerge/bypass.
+NextCIread>=15:58absentnewsource/publicationevent; don'tbusypoll.
+
+NEXTtechnicalstep: readSTRONG_RHO_ACCOUNTING_FOLLOWUP.md/latestjournal, logselection
+fornativeRhoarithmeticpricecontrols, editactualRustmodule/tests, finishsourcechecks,
+thenfreeze/sourcepublishbeforeanynewmeasure. ActualnativeArith inversiondiffersfrom
+ICFq3harness; TUNED24/18/62legacycreditsarenotcompletenativebitopcounts. Avoid
+wholehooksnapshot+reconstructedrho_tallydoublecount. No newnumericprice/protocol
+selectedyet; don'tspend8minutesrederivinguntestedformulas/alternativealgorithms.
+No paidresource/credentialquestion; userlocalorRunpodauthpersists.
+
+# Previous checkpoint:31FINISHED; publish then native rho pricing (16 November15:06Z)
+
+Source564853c1e5d9708cbe462f5487b8198b63738298publishedBEFOREsole31call.
+Run/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31 exits0,
+194.973sec/fixture+3workers/3starts3complete. All3actualscalar146169426957327337,
+native+extraellreplay/heldout. CopiedRustqualifier fullrecovery/rank/prefixTRUE.
+Fixed2LP1018081B/643sources/521rowsrank371 vsrankstop798720B/497sources/376rows
+rank371. Both2descents/2087residuals/2086advances. Small370/full494.
+Checkpoint1B574464/369sources/247certs/rank247<369; checkpoint2B798720/
+497sources/374certs/rank369READY. All621checkpoint+376finalcertreplaysPASS,
+exactsourceprefix/common-descent-prefix/phasecountercontainmentPASS.
+Observedpartialsubtotal5086671014334IC/8264537803730fixed/7496753787480rankstop;
+relation5875912460348fixed->4608739628848rankstop;LA291342950896->790731766146.
+No completecost/speed/rho ranking, no crossruncomposition/retry/relaxedgate.
+
+All230source/precall/preworker/posthashPASS BEFOREpostcalldocedits. ICraw7398B/
+summary24073BexactGit+local/allprogressfit64KiB. Fullfixedraw505331B/rankraw621964B/
+nativeexport1151925B LOCALexact/hashbound, immutablecopiedbins/qualifier/wrapper/
+source/hostfactsretained. NativeexportNONCANONICALexplicit; encryptedschemaunreadable.
+PCC-20261116-6dce0fstandingunverified, lessonO-a1b447014ab6scopeoutcome.
+SinglefinalPDFpageviewed/exactPDF/SVG/150dpiPNGcopieshashPASS. Initialtableclipping
+andprosetypofixedpresentationonly; frozenoriginaltemplate/initialrenderLOCALhashbound.
+No compiler/scientificjob. Current564853+DIRTY31packet/resume/journal/mainREADME/PCC/lesson.
+
+NEXTcommit/pushpacket/updatePRactual31theninspectartifactbot/FF/restoreignoredPNG/hash,
+neverreaddignoredPNG. Afterpublication implementnativeRhopricingcontrols per
+STRONG_RHO_ACCOUNTING_FOLLOWUP.md: actualArith inversiondiffersfromharnessFq3Prims,
+TUNEDlegacycreditsnotcompletenativebitopprice; doNOTwholehooksnapshot+rho_tallydoublecount.
+No newrho numericprice/protocolselectedyet. KB/primary/source receiptsdoneforreview;
+logselection/newsourcecontrols/freezeprotocolbeforeanynewmeasure. GoalACTIVE/local
+authorized/no stopgoal/subagents/manualmerge. CI564853last14:58next>=15:48absent
+publicationevent. RegularPR4288automergeenabled/requiredgatesreviewunconfirmed.
+
+# Previous checkpoint:31RUNNING on published source (16 November14:59Z)
+
+Source564853c1e5d9708cbe462f5487b8198b63738298PUSHED/remoteconfirmed/cleanBEFORE
+sole31call. All230source+2binaryhashPASS. Session36216run
+/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31. Fixtureexit0,
+originalICstarted; inspectflow/status thenfixed2LP/rankstop. Nativequeuefinished,
+no compiler. Do notlaunchagain/retry/raisebounds. Existing900worker/2800whole/
+60fixture/CPU0/8GiB/1round0warm/noretry frozen. Poll<=50sec withcommentary<=60sec.
+Afterrun originalcopiedanalyzer RUN-DIR NEW-SUMMARYwritesraw-export.json too;
+pre/post/preworker/sourcehashchecks, preservefullraw/proofsLOCALif>64KiB andexact
+summary/flow/hashGit, report/viewallpages/exactbenchmarkcopies/publication.
+PRsourceupdated/PCCproselint0findings;CI56485314:58reviewSUCCESS/migrateINPROGRESS,
+othersEMPTY/requiredgatesunconfirmed;next>=15:48absentevent/newpublication.
+No31resultyet. GoalACTIVE/no stopgoal/subagents/manualmerge.
+
+# Previous checkpoint:31SOURCE READY, NOT RUN (16 November14:58Z)
+
+Nativequeue25349FINISHED:26sievepass/2existingignored, public-input1/1,
+productionexamplebuild andfinal library/examplestrictClippyPASS. Twofrozen
+rootsourcehashesPASS. Standalone17rank-stop/14oldfullchecks/build/ClippyPASS,
+old29summaryreplaybyteexact. No livecompiler/scientificjob, no31rundir/data.
+Nextfreshsource/buildmanifests,COMMIT/PUSHcleanSOURCE/spec thensole31wrapper
+local-cover-two-lp-rank-stop-20261116-31. Originalcopiedqualifier/exports/hash/
+report/viewallpages/exactbenchcopies/publicationrequired. Sourceandcomparison
+scope unchanged. Strongrhoaccountingfollowup documented(no newprice/runselected).
+GoalACTIVE/localauthorized; no stopgoal/subagents/manualmerge.
+
+# Previous checkpoint:31SELECTED; opt-in rank stop native build active (16 November14:47Z)
+
+30PUBLISHEDacfad811d49fda20f41694abbd63379339a0e5e8/PCCfollowupefddb3f61;
+bot8c79fbd4eFFintegrated30PNGmigrationonly/exactsparsebenchrestore+ignoredPNGhashPASS.
+CurrentHEAD8c79fbd4e+DIRTYrankstopcode/qualifier/protocol/docs/journal. No31call/rundir.
+
+TwoLargePrimeDlpOptions.collection_rank_stride optional/defaultNone/skipSerializeNone.
+Afterwhole1024Bbatch, first>=small-1sources thenstridefreshsources: filter_checked
+allcurrenthomogeneoussources/everycertreplay/exactCountedRREFrank; stop>=small-1.
+Readinessheuristiconly; existingaffinedescent/targetsolve/actualellipticreplayrequired.
+Allcheckpoints/certificates/Bcounts/sourceprefixes/graph/rank/legacyM/primitivesretained,
+allcheckpointworkinLA, RNGstreamsunchanged. Newdependent-row/nativeboundtest.
+Rootlibrary/exampleClippyPASS; sourcefrozen14:37 /tmp/ic-rank-stop-root-source-before-tests.sha256
+PASS. Nativequeue25349 cargo testrelease--libjv_sieve THENpublicexampletest THENbuild,
+STILLRUNNING; inspectvalidation/rank-stop-{sieve-tests,public-input-tests,example-build}.log.
+DO NOTmutate2rootsourceswhilecompilerreads ormeasurewhilecompiling.
+
+Standalone rank-stop-analysis17checks(14inherited+3specific)/oldfull14/build/ClippyPASS.
+Original29summaryreanalysisbyteexact. Newfullhelperwrapperspreserveoldfixedbudgetchecks;
+rank-stoppedwrapperexplicit; newqualifierindependentcheckpointreplay/rank/stride/phase
+containment/finalaffineactualscalar/prefixbinding. NativeRustraw-export writesall3workers,
+fixture/plan/flow/summary/BLAKE3pins; selfdescribedNONCANONICALschema. Canonicalskill/
+schemas siblingVLT1encrypted/unreadable; receiptvalidation/rank-stop-canonical-protocol-access.log.
+Neverprintciphertext. FailedinitialCLI/format/deadcodeClippylogsretained/fixed.
+
+SELECTEDAmendment26/rank-stop-plan.json/run-rank-stop-local.sh/rank-stop-report.typ/
+RANK_STOP_REVIEW.md: freshp1009seed311,m9,small75%,full1018081Bbudget,stride128,
+samebinaryoriginalIC/fixed2LP/rankstop2LP;1validation0warm,CPU0/8GiB/900worker2800whole
+60fixture/noretry. Source/spec/manifestsCOMMIT+PUSHcleanBEFOREsolecall
+/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31.
+Require3actualscalars/native+outerreplay/heldout, exactsourceprefix+commondescentprefix,
+everycheckpoint/finalcertreplay/independentrank/target/count/phasepricechecks.
+Allcompletecost/comparative/rhofalse,totalnull,wallspracticalityonly,noratios/crossruncomposition.
+Needfinishnativequeue, source/buildmanifest+sourcepublication, sole31call/copiedqualifier/
+rawexport/exactcustody/summary/flow/report/vieweverypage/benchmarkcopies/publication.
+Sourcepreparerooteditscomplete. No31data yet. GoalACTIVE/localauthorized/no subagents.
+
+# Previous checkpoint:30FINISHED; publish packet then collection optimization (16 November14:32Z)
+
+Source3acefa56fbd026257f03d962a2d2009559daf8de publishedBEFOREsole30call.
+Run/workspace/ic-local-runs/local-recorded-rref-counter-20261116-30 exits0,
+1start/1completion,1run0warm/CPU0/1GiB/60sec/noretry. CopiedRustqualifierPASS:
+sameactualscalar147253026768918773/rank398/7711970legacyproducts;
+new7711970ModrMul/7553168ModrAdd/398ModrInv/noinverse-doublecharge/otherforeign0.
+Targetdeterminedafter471of1122savedrows; subtotal318388587084incompletearithmetic
+bitops. No newrelation/descent/fullDLP/sample/speedclaim/crossruncomposition.
+All194source/pre/posthashPASS. Raw1368B/summary1230BexactGit+local, immutable
+1020695BinputLOCALhashbound. FinalsinglePDFpageviewed/exactfigcopieshashPASS.
+PCC-20261116-07f0b2standingunverified. Goalactive; no stopgoal/subagents.
+Nextcommit/pushpacket/updatePR, thenreview/selectincrementalcollectiontoavoid
+29fixedcohortoversupply. NOTselected/implementedyet. Readlatestjournal/KB/primary
+beforecode. No livecompiler/scientificjob. CI3aceat14:31appreview+migrateSUCCESS,
+othersEMPTY/requiredgatesreviewunconfirmed;next>=15:21absentevent/newsource.
+Do notmanualmerge/bypass, regularPR4288automergeenabled.
+
+# Previous checkpoint:30SOURCE READY, NOT RUN (16 November14:28Z)
+
+Native checks finished: adapter3/3, sieve25pass/2existingignored, sampler2/2,
+public-input1/1, productiontwoexamples andlibrary/twoexamplesstrictClippyPASS.
+Standalonecounterqualifier13checks/build/ClippyPASS. FivefrozenrootsourcehashesPASS.
+No activecompiler/scientificjob. No30rundir/call/data yet. Nextfreshsource/build
+manifests,commit/pushcleanSOURCE/spec, thensole60secCPU0/1GiBreplay perAmendment25
+andrun-rref-counter-local.sh. Source/input/prepostcustody/copiedqualifier/report
+required. Userlocal/Runpod authorizationpersists; checkpointuploadunavailable,
+preservecurrentgatefailure andlocal+Gitcheckpoints. GoalACTIVE.
+
+# Previous checkpoint:30selected; counted RREF native checks active (16 November14:18Z)
+
+29PUBLISHED0fcdf7cc53aca5ad74e2c961cfcf785456165221/PRactualscalar+gapupdated.
+Artifactbot56b327155FFintegrated/exactignored29PNGrestored/hashPASS,neverreadd.
+CurrentHEAD56b327155+DIRTYcountedRREFcode/replay/analyzer/protocol/docs/journal/
+lessonO-81fdaf761e20. No30scientificcall/data/rundir yet. GoalACTIVE/no stopgoal/subagents.
+
+NEWCountedRelationSystem wrapper src/cryptanalysis/jv_counted_linear.rs,
+pubexportfromtwo_large_prime; newclassifiedhook_muls in jv_bitops. Generic
+RelationSystem/residual_walk unchanged. Delegatesinsert, exactproducts=legacyopsdelta;
+adds=delta-(cols+1)ifindependent/else delta; existinginv_modhooksnotchargedagain.
+2LPfullrunneruseswrapper. Testhand11M5A2I; wideordinary/Shouppaths preservevalues/
+legacyops, batchfield/scalar/other classification. Replayexample jv_relation_counter_replay
+readsimmutable29matrix andstopsatdeterminedtarget; parsing/mappingoutsidecounterinterval.
+Native scans/fixedfactor setup remainexplicitlyunpriced; no primarytotal/composition.
+
+Finallibrary/twoexamplesstrictClippy PASS; initialNoPriceconversion/unusedFile errors
+retained/fixed. Root5filesfrozensince14:08; /tmp/ic-rref-counted-root-source-before-tests.sha256
+PASS. Queued session84549 nativeadapter3,fullsieve,uniform,publicinputtest/prodbuild
+STILLRUNNING; checkvalidation/rref-counted-{adapter-tests,sieve-tests,uniform-tests,
+public-input-tests,example-build}.log. DO NOT editrootfileswhilecompilerreads/timemeasure.
+Standalone rref-counter-analysis13tests(12shared+1newhand/tamper)/build/strictClippyPASS.
+RREF_COUNTED_ADAPTER_REVIEW.md recordscontract/sourcebasis. KB/Conductorabsent
+receipts/tmp/ic-rref-accounting-{kb-search1,kb-search2,conductor}.log.
+
+SELECTEDProspectiveAmendment25/rref-counter-replay-plan.json/run-rref-counter-local.sh/
+rref-counter-report.typ: immutable29inputSHA2560f035fbd976dd7575206427fa28057502778742410059494f7a0d280e4967de0
+(1020695B),originalsourceaf48df0d30dccce461370cc8e787a45c2640134d,
+p1009,l263807419983680297,target397,398columns/rank398,legacyM7711970,
+scalar147253026768918773. 1run0warm/60sec/CPU0/1GiB/noretry. RequireModrMullegacy,
+ModrAdd=legacy-rank*(cols+1),Inv=rank/zeroOtherforeign/exactreprice/samevalues.
+No newrelation/descent/fullDLP, no primaryratio/rho/fullprice/crossruncomposition.
+Afterfinalnativechecks: freshsource/buildmanifest,COMMIT/PUSHcleanSOURCE/spec
+BEFOREsolecall /workspace/ic-local-runs/local-recorded-rref-counter-20261116-30.
+Thenoriginalcopiedanalyzer/raw/inputproofLOCALif>64KiB/summary/flow/hash/report/
+viewallpages/exactbenchcopies/publication. No30call/data yet.
+
+Nextalgorithmwork aftercounterclosure: adaptive/streamingLPcollection toavoid
+29fixedspaceoversupply(1122rows/rank398),NOTselectedyet. Complete strongest-rho
+pricing/nativecoverage remainsopen. No longspeculation loops; tools/action/
+commentary<=60s. CIlastaf48at13:38appreview+migrateSUCCESS/othersEMPTY,
+requiredgatesreviewunconfirmed;next>=14:28absentevent/newsourcepublication.
+PR4288regular/automerge/no manualmerge. Userlocal/Runpod authpersists/S3upload
+stillunavailable; don'taskcredentials. AllclaimsPCCunverified.
+
+# Previous checkpoint:29FINISHED, publish then RREF arithmetic coverage (16 November13:53Z)
+
+Sourceaf48df0d30dccce461370cc8e787a45c2640134d PUBLISHEDBEFOREsole29call.
+Run /workspace/ic-local-runs/local-cover-two-lp-dlp-validation-20261116-29
+exit0/125.248s,fixture+2workerssuccessful/2starts2complete. Bothactualscalars
+147253026768918773/native+extraellreplay/heldoutagreement. CopiedRustqualifier
+fullrecoveryTRUE/independentaffineTargetSAME;172source/precall/preworkers/posthashPASS.
+Candidatefullbase530/small397/1018081B/534807lines/1253verifiedsources
+(132zero,467one,654twoLP),2descents/1019residuals1018advances. Graph1255inputs/
+133LPvertices/pivots1646merges990cycles/0peelingfillfallback ->1122rows/replays,
+21271nnz/rank398/1solveattempt. Fullcost/comparative/rhoFALSE,totalNULL.
+Originalsummary14738B+ICraw7384BexactGit,2LPraw1020695BLOCALexact/hashbound.
+SinglePDFpagevisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS/originalsLOCAL.
+No activecompiler/scientificjob. LastHEADaf48+DIRTY29packet/journal/resume.
+
+CRITICALPOSTCALLCOVERAGE: RelationSystem local residual_walk::mul_mod/sub_mod
+andFixedFactor::mul haveNOmodularhooks. Recordedlegacyproducts7711970 outside
+primitivesubtotal; subtractioncountnotseparatelyemitted; inv_mod alreadyhooked.
+Do NOT inferRREFspeed/costfromobservedLA11316546940. Raw/originalqualifier/summary
+UNCHANGED; coverage-audit.json/postcallreportnote explicit. Wholeobservedsubtotal
+3080275208820IC vs7186744533268candidate;relationphase1679089021154vs6152303556284,
+sofixedfullBspaceoversupplyconcreteissue. RREFmissingmathmeansstillno primaryranking.
+
+NEXTcommit/push29packet/updatePRactualscalar+gapbeforefurthercode. Thenlog/select
+exactRREFmul/addhookpatch(withoutinvdoublecharge), small/wide/legacyvalue controls,
+possiblynative replay of immutable29matrix forcounterconservation beforeanynew
+wholetrial. Neednotrerunwhole29unchanged. Adaptive/streamingLPcollectionavoidoversupply
+isfuturealgorithmidea, NOTyetselected/protocolled. Do notspend5-8minutesonspeculation;
+shorttool/actionloops,commentary<=60s. GoalACTIVE/localusable/no stopgoal/subagents.
+
+PR4288regular/automerge/no manualmerge. CIlastaf48read13:38appreview+migrateSUCCESS/
+otherlistsEMPTY/requiredgatesreviewUNCONFIRMED;next>=14:28absentevent/newpublication.
+S3uploadunavailable,userexplicitlocalorRunpodauthorizationpersists;Git/localcustody
+usable,no credentialquestions. Preservealloldnegative/censoredprotocols/results.
+
+# Previous checkpoint:29SOURCE READY, NOTRUN (16 November13:36Z)
+
+NEWtypedaffine/protectedtarget2LPfullpipeline+publicworkers implemented,
+allfinalsourcechecksPASS. Native22sieve(twoignored)/12genericfilter/3RREF/
+newpublicinput1/oldworker1;library/3examplesstrictClippy/actual3builds;
+metadata-onlycalibrationemissionexample rebuilt/retested/linted. Qualifier14
+(12shared+2new) +component12/build/strictClippy PASS;old28summaryBYTEEXACT.
+Rootlibraryfrozenduringnativechecks. Original6filebefore-testhashprecedes
+example-onlymetadatachange; distinct /tmp/ic-two-lp-dlp-post-metadata-root-source.sha256
+ALLPASS. No livecompiler/scientificjob. No29rundir/data existsyet.
+
+FILESnew src/cryptanalysis/jv_sieve_two_large_prime_dlp.rs and publicexample
+examples/jv_sieve_two_large_prime_dlp_compare.rs; parent2LPhelperrefactored
+to share checked_inputs/filter_and_replay, olddefaultpathsunchanged.
+run_two_large_prime_dlp_on: uniqueBcollector, typedverified6pointdescent,
+protecttargetcolumnsmall_count with-b/RHSa, LPeliminate/replay, incremental
+RelationSystem targetsolve, actualellipticreplay. Fatalcert/wrongscalarstops;
+no oldsolvefallback. Reportsallhomrows/descentprefixes/attempts/finalcerts.
+Newworkerpublicserde rejectsanswerfields, generatorseparate/Spec.d0; oneclaimed
+Rayonthread. Legacyunitcalibration emittedseparately/excludedICsubtotal but
+includedcapturedprocesswall. Allcompletecost/primarycomparativeflagsfalse.
+
+SELECTEDProspectiveAmendment24/cover-two-lp-dlp-validation-plan.json +
+run-two-lp-dlp-local.sh/two-lp-dlp-report.typ: p1009fresh307,m9,75%smallbase,
+full1018081B,8192residualcap/32accepteddescents, originalICthen2LP,
+1validation0warm/noRho/AA/ratios,900worker1900whole/60fixtureCPU0/8GiB/noretry.
+Requireheldoutactualscalars/native+extraellreplay, true2LP/nontrivialcycle,
+allaffinecertificates and independentlydeterminedtarget, flow/phaseprice/
+selecteduniform/zeroOTHERforeign. Rustqualifier two-lp-dlp-analysis checks
+RUN-DIR/status+6flow+public/privatebinding+linearproof+scalar+prices; no signed
+independentJacobianverdict. BEFOREsolecall mustfreshsource/buildmanifests,
+COMMIT/PUSH cleanSOURCE/spec to PR4288, then
+/workspace/ic-local-runs/local-cover-two-lp-dlp-validation-20261116-29.
+Wrappercopiesimmutablebins/source; distinctpre-workers.sha256 capturespublic/
+parentfixture+argvBEFOREeitherattack. Afterexit originalcopiedqualifier/newsummary,
+fullrawLOCALif>64KiB+hash,fullflow/report/inspectallpages/exactbenchcopies/publication.
+No29measurementyet. CurrentHEADb8001c4a3 +DIRTYnewfullcode/docs/qualifier/prep/lessonO.
+
+28PUBLISHEDf96518ee578a4572451d776adc55cb659a131193/PRactualrank29vs114updated.
+Artifactbotb8001c4a3 FF integrated/exactignored28PNGrestored/hashPASS,neverreadd.
+ScopedoutcomeO-a66fa8db423e recorded. KB/Conductorabsent/fallbacksourcesread;
+newreceiptsvalidation/two-lp-dlp-{kb-search1,kb-search2,conductor,checkpoint-gate}.log.
+S3gatefailsmissingprofile/token; userexplicitlocalorRunpod overridesbackend,
+no credentialrequest/S3uploadassertion. GoalACTIVE/localusable/no stopgoal/subagents.
+CIlastd2at12:47appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesunconfirmed,
+next>=13:37absentevent/newsourcepublication. PRregular/automerge/no manualmerge.
+Fullcoldstrongrho costs remainopen; no parityclaim fromimplementation orrankgain.
+
+# Previous checkpoint:28FINISHED, publish packet then target integration (16 November12:50Z)
+
+Sourced2c2e7f947ce1ea549c74532424207e7c8c8879d publishedBEFOREsole28call.
+Run /workspace/ic-local-runs/local-cover-two-lp-component-20261116-28 exits0/46.497s,
+2starts2complete. p1009seed293/m9/75%smallbase:fullbase500/small375/300000uniqueB/
+148948orderedlines,cohortdigestf5c0015aebd3ab5482ff104ddb5eafef003fab91450b94ece745b1f49dc60300.
+Smooth29inputs/29rows/rank29/261nnz;2LP229inputs(29zero,93one,107twoLP)/116LPvertices/
+31peeled/84pivots/168merges/85cycles/0fillrefusals ->114rows/rank114/2183nnz,all114replayed.
+Originalcopiedqualifier binding/replay/price/flowTRUE,nontrivial2LPTRUE;completeFALSE,
+totalNULL,comparative/fullDLP/rhoFALSE. Partialprimitivesubtotals1729950841332vs1743212955422,
+NOprice/speedratio. Rankincrease85equationsonmatchedreducedbasecohortonly.
+All145source/preposthashPASS. Originalsummary12146B+smoothraw17548BexactGit;
+2LPraw112999BLOCALexact/hashbound. SinglePDFpagevisuallyinspected/exactbench
+PDF/SVG/150dpiPNGhashPASS;originalsalsoLOCAL. No activecompiler/scientificjob.
+
+NEXTcommit/push28packet/updatePRactualresult BEFOREnextimplementation, thenintegrate
+verifieddescent/targetrows intoactualLPgraphelimination andsolve/replayactualscalar.
+Needmorebasisrelationsthanrank114for375smallpoints;fullBspacep²=1018081atdegree9,
+but NOnewprotocol/budget/parameters selected yet. Do not treat fixedcohort114asfullbasis
+orDLPprogresscostclaim. ComponentcurrentAPIhomogeneousonly; target/descentintegration
+isnewwork needingrecordedselection/sourcechecks/newprotocol. Usergoalactive/localusable.
+No stopgoal/subagents. PR4288regular/automerge/no manualmerge. CIlastd2read12:47:
+appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesreviewUNCONFIRMED;next>=13:37
+absentevent/newsourcepublication. LastHEADd2+DIRTY28packet/journal/resume. S3gateunavailable,
+userlocalauthorizationpersists. Preservefrozenprotocols/raw/failedlintlogs/oldnegativefindings.
+
+# Previous checkpoint:28SOURCE READY, NOTRUN (16 November12:45Z)
+
+ALLfinalnativechecksPASS:21sieve(twoignored),12generic/MSTfilter,1executedpublicworker,
+actualnewprobe/oldworkerbuilds,library/twoexamplesstrictClippy;qualifier12tests/build/
+strictClippy.Threebefore-test root hashesPASS. No livecompiler/scientificjob.
+Amendment23/plan/wrapper/report fixed; nextfreshsource/buildmanifest thencommit/PUSH
+cleansource/spec BEFOREsolecall to
+/workspace/ic-local-runs/local-cover-two-lp-component-20261116-28.
+Thenoriginalcopiedanalyzer/fullrawLOCALif>64KiB/exactsummary/flow/hash/report/viewallpages/
+exactbenchmarkcopies/publication. Requiredpositive2LP/nontrivialcycle/positiverank;
+cohortidentities/phaseprices/sourcebindings/certificates/exitflowzero mustpass.
+No completecost/fullDLP/rhorankingfromcomponent. Full2LPtargetdescentnextopenwork.
+LastcleanHEAD16f8275d9+DIRTYnewcode/sourceprep;ROOTsourcesfrozensince12:27.
+GoalACTIVE/localusable/no stopgoal/subagents. S3gateagainfailedmissingprofile/token;
+userlocalauthorizationpersists, receiptvalidation/two-lp-checkpoint-gate.log.
+
+# Previous checkpoint:2LPimplemented;28NOTRUN; native build active (16 November12:42Z)
+
+27packet2aca6d9deb9fe3e608b75015998807653d00941d PUBLISHED/PRactualresultupdated.
+Artifactbot16f8275d9FFintegrated;exactignored27PNGrestored/hashPASS,neverreadd.
+CURRENTHEAD16f8275d9 +DIRTY new2LPcode/docs/qualifier/protocol andO-998c1cf09f2a.
+GoalACTIVE/localusable/no stopgoal/subagents. No scientificjob28ornewrundir yet.
+
+SELECTED actualalgorithm: JV§3.3 adapted2LPsmallFpbase/splitquadratic. Implemented
+jv_sieve::two_large_prime public API: reducedprefixsetup,m-2threshold, peel small
+roots/remainingdegree<=2Fproots, Jacobianverifiedsources, protectedprivatepartial
+binding/modulus/cover checks, genericLPfilter+allcertificate replays ->SparseRel.
+Nativeprobe newexample jv_sieve_two_large_prime_probe has matched smooth/2LP modes,
+separate enum/extract RNGs, incidence/sharedfixedBcohort/linehash; outputsfullinput
+relations/certificates andpartialphasecounts. FullDLPdescent/targetNOTintegratedyet.
+
+Checks: final library/2examples strictClippy PASS. Nativejv_sieve21(twoignored),
+12generic/MSTfilter PASS. Originalpublicworker test/production probe build STILL
+compiles session83168 (normalrootlib rustc62559 started12:38). Do NOT edit root
+sources during compilation orrun timing. Three-file /tmp/ic-two-lp-root-source-before-tests.sha256
+PASS. Logs validation/two-lp-{sieve-tests,filter-tests,existing-worker-test,example-build}.log.
+IndependentRustqualifier two-lp-component-analysis:12tests/build/strictClippy PASS,
+including coefficient replay, exactrank/dependence/wideprime, source/identity/price
+tamper/cohort/refusedpromotion controls; checks allzeroexit +exact4event flow.
+No independentJacobianverdict; collector verifies actualsources, qualifiermodularonly.
+
+ProspectiveAmendment23/cover-two-lp-component-plan.json +run-two-lp-local.sh/report:
+p1009fresh293,m9,75%prefixbase,300000uniqueB, smooththen2LP,1validation0warm,
+900worker1900whole/CPU0/8GiB/noretry. Require samecohortdigest/linecount, actual2LP
+sources/nontrivialcycle/positiverank, binding/cert/price/conservation/zeroOTHERforeign.
+NoAA/ratios/ranking/fullDLP/rho;totalnull/completefalse. Wrapperthin/syntaxPASS.
+NEXTfinishnativebuild/root-hashcheck, freshsource/build manifests, commit/PUSH clean
+SOURCE/spec BEFORESOLEcall to /workspace/ic-local-runs/local-cover-two-lp-component-20261116-28.
+exactbenchmarkcopies/publication. No measured2LPdata existsyet.
+
+PrimaryJVauthorPDFhash7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38
+local/tmp/ic-cover-decomp-primary.{pdf,txt},§3.3/§6. NotirreducFp²LPs/noexponenttransfer.
+KBMCPabsent/wrapperstatus+3queriesfailed:/tmp/ic-adapted-2lp-kb-*.log.
+Conductorabsent:/tmp/ic-adapted-2lp-conductor.log;scopeannouncedbeforeedits.
+Initialunused-p/2needlessborrow/rangeloop lint failures retained, fixedfinalPASS.
+S3checkpointuploadunavailable;userexplicitlocalorRunpod overridesbackend, Git+localcustody
+usable;don'taskcredentials. PR4288regular/automerge;CIrequiredgatesunconfirmed,
+next>=12:58absentevent/newsourcepublication. No manualmerge/bypass.
+
+# Previous checkpoint:27FINISHED, publish packet (16 November12:13Z)
+
+Source15121ac779cef32bc173916e74ce26e2a3976f09 publishedbeforeSOLE27call.
+Run /workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27
+exit0/69.824s/2starts2complete; bothactualscalar119700578327681984/native+outerreplay.
+Pivot520->390/390replayed/0fallback/foreign0/OTHER0. OriginalcopiedRustqualifier
+global[]/endpoint+3countercriterionTRUE;completeFALSE,totalNULL,eligibility/followupFALSE.
+ICcalls2540/draws2618/reject78/knownintprice64315008;graph2410/2479/69/60901824.
+Unpricedsub/clz/shiftcountsconserved. Fullraw71991B LOCALexact+hash;fullsummary56332B
+exactGit; nativeRustflow2960B/source/build/strictClippyPASS.119frozen/preposthashPASS.
+FinalsinglePDFpagevisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS;originalsLOCAL.
+FrozenTypsttemplatefailedreservedshowhelper;originalsource/logretained,localpresentation
+copyrenamedhelperdisplay_value,dataunchanged. No scientific/compilejobactive.
+
+NEXTcommit/pushpacket/updatePRactual27result thenactualadapted2LPfinderreview/selection.
+KBMCPabsent/wrapper3queriesfailed(noexecutable),/tmp/ic-adapted-2lp-kb-*.log.
+JVprimary§3.3 smallFpabscissae/splitremainingquadratic,NOTirreducFp²largeprimes.
+Userstrongestcontinuationcheaperalgebraicfinder+graph;currentarbitrarycolumnprojection
+densifiesprojectedsolve(25),MSTfillguardrejects23. No newfinderimplementation/protocol
+selectedyet. Needreviewbaseline/exactcontracts thenimplementRustsourcechecks beforetrial.
+GoalACTIVE/no stopgoal/subagents;localworks. PR4288regular/automerge/no manualmerge.
+CIlast15121at12:08 appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesunconfirmed;
+next>=12:58absentevent/newsourcepublication.
+
+# Previous checkpoint:27SOURCE READY, NOT RUN (16 November12:07Z)
+
+FinalselectedsamplerchecksALLPASS:2native sampler tests(65,536outputs/finalRNGstate),
+19cover(oneignored),19sieve(twoignored),2Wiedemann,1BM,1publicworker; actualproduction
+build andlibrary/example strictClippy. Analyzer28tests/build/strictClippy PASS.
+Original21/23/24/25/26summaries BYTEEXACT. No activecompiler/scientificjob.
+Root sixfile before-check hashes stillPASS. NewAmendment22/plan/report selected:
+p1009fresh281, nativeICthenPivotgraph,1validation0warm,900worker1900whole/CPU0/8GiB/
+noretry. Requiredthreecountedmarkers inclselecteduniform,positivecalls/rejections,
+drawconservation/phaseprices/unpricedcounts,actualscalarreplay/nontrivialgraph/
+nofallback/zeroOTHERforeign. Allcompletefalse,totalnull,eligibility/followupfalse.
+MUSTcommit/publishcleanSOURCE/spec/manifests BEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27.
+Thenoriginalcopiedanalyzer/fullraw(if>64KiBLOCALoriginal+hash/fullsummary/compactflow)/
+hash/report/publish. No performanceclaim fromaccounting. GoalACTIVE/no stopgoal/subagents.
+Afterpacket actualnextalgorithmlead: JVprimary§3.3 adapted2LPsmallFpbase/splitquadratic;
+needsKBfallbackreview/selection/prospectiveprotocolbeforeimplementation/trial.
+
+# Previous checkpoint: selected uniform sampler checks (16 November12:03Z)
+
+NEW DIRTY sampler patch implemented; root code frozen before builds.
+Native65,536sample/finalstate equivalence and rejection/price tests PASS;
+19cover(oneignored),19sieve(twoignored),2Wiedemann,1BM PASS. Analyzer28tests,
+strictClippy/build and library/example strictClippy PASS. Original21/23/24/25/26
+summary replays BYTEEXACT; receipt validation/uniform-rng-historical-replay.log.
+Queued session85125 now compiles publicworker example test/production binary
+(cargo60013/rustc60021 at12:02); DO NOT edit root sources during compile or
+launch scientific timing. Check validation/uniform-rng-example-{test,build}.log.
+Session25333 native tests finished; source hash /tmp/ic-uniform-root-source-before-checks.sha256
+PASS. No scientific job/new trial protocol yet. Last sourcepublished c818cc531.
+After finalworker/build checks, log+select prospective once-only diagnostic,
+publish source/spec/manifests BEFORE call. Then continue strongestreference and
+native gaps / algebraic finder and fill control toward requested rho parity.
+All totals still null/completefalse/no ranking. GoalACTIVE/no stopgoal/subagents.
+
+# Previous checkpoint:26PUBLISHED; RNG/native-price review next (16 November11:30Z)
+
+26packetPUBLISHED2a13f5c8acea5e37bfa73d4a5ca3087c8b286ced;PR4288rewritten
+aroundfinalRustimplementation/actualevidence/remaininggaps,titleupdated.
+RegularOPEN/automergeENABLEDconfirmed,no manualmerge. Artifactbot6309b997a
+FFintegrated; exactignored26PNGrestoredfromlocal/hashPASS,neverreaddPNG.
+No activecompiler/scientificjob. GoalACTIVE/no stopgoal/no subagents.
+All26sourcechecks and2actualDLP/counterchecksPASS asbelow;primarycostunknown.
+
+NEXT ACTION: readlatestjournal +exact pinnedrand0.8.8 uniform sampler/other
+RNGcalls andnativecontainer/strongRhoprice sources. KBunavailable,primary
+sourcefallbackalreadyused. PreserveoldRNGstreams/APIs/legacyrecords. No new
+samplerrewrite orscientificprotocolselected. Needsource/pricecoveragecontract
+beforecode,source/specpublishedbeforeanytrial. No paidcloud needed/localworks.
+Potential actual optimizedextension/tunedRhopricing needsprimaryreview; never
+treatlegacyfloatTUNEDorpartialrho_tallyascomplete. Don'tcomposeoldpartialwalls.
+CurrentCIrequiredgatesreviewUNCONFIRMED,next>=12:09absentevent/sourcepublication.
+ReportinglessonsO-45e77eaf0e65/T-a92dc834b60a/T-5851ab7c5c2c recordedwith26evidence.
+
+# Previous checkpoint:26FINISHED, publish packet/continue coverage (16 November11:26Z)
+
+26source d30b6e4a81c48e4c4a7302f0a1b535bb956ac70b PUBLISHED beforeSOLEcall.
+Run /workspace/ic-local-runs/local-cover-native-scans-validation-20261116-26
+exit0/73.538s/2starts2complete. Both actualscalar197564087855217396/native+outer
+groupreplay. Pivot509->382/382witnessreplays/0fallback/foreign0/OTHER0.
+Both3008descentresids->6016modradds, solverwordevents16843827/30794405 vsRNG509/382.
+Requiredmarkers/exercisedcounts pass; ORIGINALcopiedanalyzer global[]/criterionTRUE,
+butcompleteFALSE,totalNULL,eligibilityFALSE/followupFALSE. No speed/rhoparityclaim.
+Exactraw59502B/fullsummary40074B/progress/runtime/fullflow/hashesinGit+local.
+All101source/preposthashesPASS. Final1PDFpagevisuallyinspected;exactbenchPDF/SVG/
+150dpiPNGhashesPASS,originalsalsolocal. Study local-cover-native-scans-validation-20261116-26;
+bench20261116-cover-native-scans-validation. No activejobs/compilers.
+
+Nativecodechecks1BM/1eq/2Wiedemann/19sieve(twoignored)/1worker,27analyzer,
+actualbuilds+strictClippyPASS; old21/23/24/25summariesBYTEEXACT. Patchiscounting,
+notalgorithmperformanceimprovement. RNGstreams/legacyops/defaultserdefieldskept.
+NEXTcommit/push26packet/updatePRactualresult/checkpoint, thenexactRNGdraw/rejection
+source review +nativecontainers +complete strongestRhopricing. No nextscientific
+protocol or samplerrewrite selected yet. GoalACTIVE/localusable/no stopgoal/subagents.
+
+CurrentHEADd30+DIRTY26packet/journal/resume. LastPRbodypending26willberewritten
+aroundfinalimplementation/actualevidence(no historicalwallrank). CIlastd30 at11:19:
+appreview+migrateSUCCESS,otherlistsEMPTY,requiredgates/reviewUNCONFIRMED;
+NEXT>=12:09absentevent/newpublication. PR4288regular/automerge/no manualmerge.
+Valgrind3.28.0localinstalled/smokeonly, NOcrypto audit run. SourceRand0.8.8
+uniform.rs526-563read:loopmaydrawmultiple rawwords; currentnominalrng_words
+doesnotcloseRNGcoverage. Keepcompletecostunknown. Prior25fillnegative and23MST
+refusal/22censorunchanged. AllclaimsPCCunverified.
+
+# Previous checkpoint:26SOURCE READY,26NOTRUN (16 November11:18Z)
+
+Nativepatch countsWiedemann/BM data scans/comparisons;shortcircuitanswercompare;
+coverresidualscalarlabels useam (2modradds/residual,values/RNGunchanged). Old
+arithmetic/legacyops/defaultreportstays; worker countedspecificmarkers only.
+SourcechecksALLPASS:1BMhand5M3A2I15word3legacy,1eqcounter,2Wiedemann,19sieve
+(twoignored),1executedworker;library/example/analyzerstrictClippy+actualbuilds;
+27analyzertests. 21/23/24/25summariesreplayBYTEEXACT. No activecompiler/science.
+
+ProspectiveAmendment21/cover-native-scans-validation-plan.json: p1009fresh277,
+oneICthenPivotgraph,1validation0warm/noRho/AA/ratios;900each1900wholeCPU0/8GiB/
+noretry/incidence+sharedboth. REQUIREDitems nativeLA scans and residualscalaradds:
+solvewords>RNGwords;positivedescentresids withModrAdd>=2*resids. Alsoactualscalars,
+nontrivialgraphnofallback,zeroOTHER/foreign,detailedshapes/phaseprice/sumchecks.
+101filesvalidation/cover-native-scans-source.sha256 PASS,distinctbuildreceipt.
+MUSTcommit/publishcleansource/specBEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-native-scans-validation-20261116-26.
+26NOdata/job yet. Afterexit ORIGINALcopiedanalyzer/fullflow/hash/report/publish.
+
+25PUBLISHED262f5b9ca994c6a2d537bf8527b9e5c7d7acea8d/PRactualresultupdated.
+Artifactbot6fba1e5ce FF integrated, exactignored25PNGrestored/hashPASS.
+CurrentHEAD6fba1e5ce+DIRTY26source/prep/journal. DoNOTreaddignoredmigratedPNGs.
+25actualscalar102559623889752301both;525/4721nnz->394/12982nnz,source2c5e;
+observedsolver364321367580->666381953262,filter806228620,replay869597544;
+completecostunknown/no ranking. Prior24/23/22unchanged. GoalACTIVE/localworks.
+
+NEXTafter26: RNG/containercoverage and strongestRhopricing. Rand0.8.8 official
+uniform.rs526-563read:sample_single_inclusive rejectionloop canconsume>1rawdraw;
+currentnominalRNGwordcounterdoesNOTcloseRNGcoverage. No samplerrewrite selected.
+Valgrind3.28.0installed+smokeonly, NOcrypto instructionaudit. Don'tclaimcomplete
+primarytotal/Rhoparity from partialbitops or oldwall/crossruncomposition.
+No stopgoal/subagents. AllclaimsPCCunverified. CIlast2c5e10:35 requiredgatesunknown;
+NEXT>=11:25absentnewsourceevent. PR4288same/automerge,no manualmerge.
+
+# Previous checkpoint:25FINISHED, publish then next coverage (16 November10:42Z)
+
+25source2c5e02b34cb2d56dc392cd3b1f57d706d0d7b24a PUBLISHED beforeSOLEcall.
+Run /workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25
+exit0/59.361s/2starts2complete. Both actualscalar102559623889752301/native+outer
+groupreplay. Pivot525->394/394witnessreplays/0fallback/foreign0/OTHER0.
+ORIGINALcopiedRustanalyzer global[]/detail+endpointTRUE;completeFALSE,totalNULL,
+comparativeFALSE/followupFALSE. Exactraw52524B/fullsummary39727B inGit+local.
+96source/preposthashesPASS. Final1PDFpagevisuallyinspected/exactbenchPDF/SVG/
+150dpiPNGhashPASS. Study local-cover-subcounts-validation-20261116-25;
+bench20261116-cover-subcounts-diagnostic. No livejobs/compilers.
+
+ACTUALOBSERVATIONS: Originalsolver525rows4721nnz /364321367580bitops;
+projectedsolver394rows12982nnz /666381953262bitops. Filter806228620,
+replay869597544, unallocatedLA1039744BOTH. OneWiedemanncall/arm.
+ExtraOBSERVEDLAwork lies inDENSERprojectedsolve, notmainlyfilter/witnessreplay.
+Mapping/output0meansNOHOOKS/completecostUNKNOWN. Fullobservedsubtotals
+3935679644920nativeIC/4239416056766graphIC, incomplete/NOratio/ranking.
+Don'tcompose24/25costs orcallprimaryrho parity. Nextworkcoverage/scalar/native
+RNGandstrongestRhoprices; anyfilteroptimizationmustcontrolfill.
+
+NEXTpublish25packet/updatePRactualresult BEFOREnextcode/selectedexperiment.
+No nextalgorithm/scientificprotocolselectedyet. GoalACTIVE/localusable/no stopgoal.
+Valgrind3.28.0INSTALLEDand/bin/truesmokePASS,/workspace/ic-local-tools/valgrind-install;
+NOcrypto instructionaudit run. Native25sourcechecks19sieve(twoignored)/1worker/
+26analyzer,actualbuilds+strictClippyPASS;21/23/24summaryreplaysBYTEEXACT.
+CurrentHEAD2c5e+DIRTY25packet/journal/resume. RawValgrindlogtrailing-space3lines
+preserved;sourcecheckexcludedONLYthatlog,cmpwithlocaloriginalpassed.
+CIlast2c5e10:35 appreviewSUCCESS/migrateINPROGRESS, otherlistsEMPTY,
+requiredgatesreviewUNCONFIRMED;NEXT>=11:25absentevent/newpublication.
+PR4288same/regular/automerge/no manualmerge. AllclaimsPCCunverified.
+
+# Previous checkpoint:25SOURCE READY,25NOTRUN (16 November10:33Z)
+
+Native final subcount checks ALLPASS:19sieve/graph(twoexistingignored),1executed
+publicworker;actualproduction/analyzerbuilds,library/example/analyzerstrictClippy;
+26analyzertests. Newanalyzerreplays21/23/24summaries BYTEEXACT. SourcechangesONLY
+optional graph work_native mapping/filter/replay/output counts+matrixnnz and
+separateWiedemann call counts withattempt identity. Olddefaults/API/optionskept.
+Analyzerchecksflow/shapes/positivefilter+replay/counts<=LA,remainder,overflow/tamper.
+No completecost/rankingpromotion. Rootcodefrozensincefinalchecks.
+
+ProspectiveAmendment20/cover-subcounts-validation-plan.json: p1009fresh271,
+oneICthenoriginalPivotgraph,1validation0warm/noRho/AA/ratios/CI;900worker1900whole,
+CPU0/8GiB/noretry/incidence+sharedboth. Requireactualfullrecovery+nontrivialaccepted
+graphnofallback+zeroOTHER/foreign+exactdetailedcounts/positivefilter+replay/validsum.
+96filesvalidation/cover-subcounts-source.sha256 PASS,distinctbuildreceipt.
+MUSTcommit/publishcleanSOURCE/SPECbeforeSOLEwrappercall to
+/workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25.
+25NOdata/job yet. AfterexitORIGINALcopiedanalyzer/fullflow/hash/report/publish.
+
+24PUBLISHEDa02eb15a4f136d0ec1f079a057cc662efaec6bb1, actualscalarbothcorrect,
+graph519->389nofallback,diagnosticpassbutcompletefalse/no comparativeverdict.
+Artifactbot1068e8556 FF integrated;exactignoredPNGrestored/hashPASS.NeverreaddPNG.
+CurrentHEAD1068e8556 plusDIRTY25prep. No livecompiler orscientificjob.
+Preparationrootcheckwasstoppedafterattemptfieldsfinalized; logsretained as
+*-preparation* and finalchecks rerun/pass. Initialanalyzeremptyunitlintretained/fixed.
+
+Valgrind3.28.0 NOWINSTALLED /workspace/ic-local-tools/valgrind-install,
+officialsource/hash+setupreceiptsvalidation/valgrind-local-*. /bin/trueCallgrind
+smokePASS; NOcrypto instructionaudit run. Neitherthatnorallunitchecksclosesnative
+coverage. COUNTING_COVERAGE.md namesstillmissinggraph/scalar/RNG/nativework and
+strongestRhoprices. GoalACTIVE/localworks/no stopgoal/subagents.
+
+FutureLITERATUREPOINTER only: JVprimary§3.3 adapted2LP usesSMALLSUBSET ofFp
+abscissae;remainingdegree2factor mustSPLIT overFp. NOTirreducquadFp²variant.
+Paper§6usesdegree8manysurplusrelations; currentm9capacity/u64boundsneedrespect.
+No newfinderselected/implemented/trial fromthispointer. After25useobservedsubcosts
+beforeoptimization. Prior23MSTrefusal/22censorunchanged. AllclaimsPCCunverified.
+CIlastb16110:01requiredgatesunconfirmed;NEXT>=10:51absentnewsourceevent.
+PR4288same/regular/automerge/no manualmerge. origin/mainadvancedtod2f6c9e3f;
+donotmergeunrelatedmainmidtrial,preserveallsharedjournal/ledgerbyteswhenintegrating.
+
+# Previous checkpoint:24finished, publish packet then coverage (16 November10:06Z)
+
+Sourceb161085c8a85b6891681c40b3ac8f1840f300d36 published beforeSOLE24call.
+Run /workspace/ic-local-runs/local-cover-accounting-validation-20261116-24
+exit0/60.313s/2starts2complete. Bothactualscalar220308746551549747/native+outer
+groupreplay. Pivotgraph519->389/389witnessreplays/0fallback. Bothforeign0/OTHER0;
+ORIGINALcopiedanalyzer global[]/endpoint+accountingcriterionTRUE, butcomparative
+eligibilityFALSE/followupFALSE/completeFALSE/totalNULL exactlyasfrozen.
+NativeIC/graph observedpricedsubtotals3474643743588/3760737383246;
+LA356048989504/642142629162, otherphasecostsMATCH. Incomplete/no ratio/ranking;
+DO NOTattributeextraLAcostspecificallytofilter,replayorWiedemannwithoutsubcounts.
+
+Exactraw48253B/summary22227B/progress/runtime/flow/custodyinGit+local.
+Final1pagePDFvisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS.
+Study local-cover-accounting-validation-20261116-24, bench20261116-cover-accounting-diagnostic.
+Originaltemplatebooleanstr()error retainedlocalreport-initial.typ/build-initial.log;
+reportcopyrepr(bool)fix only, frozen sourcetemplate/summaryunchanged.
+Source88/preposthashesPASS. No activejobs/compiler. NEXTpublishpacket/updatePR,
+thenconcretesubcomponentaccounting/sourceaudit+instructiontoolsetup.
+No nextscientificcomparisonselected. GoalACTIVE/localworks/no stopgoal/subagents.
+
+Valgrind3.28.0 officialsourceDOWNLOADEDONLY/workspace/ic-local-tools,
+SHA2569f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c,
+publishedSHA1matches; Callgrindmanualread,/tmp/ic-{valgrind-current,callgrind-manual}.html.
+Neitherperf/Valgrindinstalledyet, no auditrun. COUNTING_COVERAGE.md namesgraph
+maps/normalization/scheduling/replaybookkeeping,2inline scalaradds/residual+4initial
+RNGdraws, native/RNGcoverage,strongestRho pricing. Need distinguishprojection,
+replayandWiedemann observedcost before optimizing; all stillwithinoriginalgoal.
+CIcurrentb161read10:01listsEMPTY/requiredgatesreviewUNCONFIRMED;
+NEXT>=10:51absentnewpublicationevent. PR4288same/regular/automerge/no manualmerge.
+
+# Previous checkpoint: accounting source ready,24NOTRUN (16 November10:00Z)
+
+All native checks PASS:12 generic/MSTfilter (768map-oracle merges + exact
+3mul/2add/1inv/23word kernel),17sieve/graph(twoignored),1executed public-worker
+test (old+countedRho recoveractualscalar/foreign0/other0). Library/example/analyzer
+strictClippy, actualproduction/analyzerbuilds PASS;22analyzertests incl7bitopvectors.
+Newanalyzerreplays21PASS+23negative summaries BYTEEXACT. Initialincludedbitop
+enum-naminglint retained/resolvedonlyonincludedmodule; noassertionweakening.
+
+Rustmodulargraphhooks+sortedAXPY integrated. --bitops optin usesclaimedRayon1,
+oldformatwithoutflag; additivework_native observedprimitives/phases/subtotals,
+completeFALSE,totalNULL,explicitgaps. Rhoexplicitrho_tally+outerreplayONLY avoids
+snapshotdoublecount. Analyzerrepricesfixedunit/checkssums/zeroOTHER+foreign,
+rejectstampering/promotedcompleteness; evenPASS cannotauthorizecomparison.
+
+Amendment19/cover-accounting-validation-plan.json prospective24: p1009fresh269,
+oneICthenoriginalPivotgraph/1validation0warm/noRho/AA/ratios/CI;900worker1900whole,
+CPU0/8GiB/noretry/incidence+sharedboth. 88filesvalidation/cover-accounting-source.sha256
+PASS; distinctbuildmanifest. MUSTpublishcleansource/spec BEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-accounting-validation-20261116-24.
+No24data/job yet. AfterexitORIGINALcopiedanalyzer/rawflow/hash/report/publish.
+
+COUNTING_COVERAGE.md namesmissinggraphmaps/normalization/replaybookkeeping,
+descentinline2scalaradds/residual+4initialRNGdraws, native/RNGcoverage and strongest
+Rho pricing. These are nextwork, NOTexternalblocker. Primarytotalunknown, noprimary
+parityassertion. Valgrind/perfnotinstalled; officialValgrind3.28.0source downloaded
+/workspace/ic-local-tools/valgrind-3.28.0.tar.bz2 SHA2569f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c;
+publishedSHA1matches, manualread. No install/audit run yet. DoNOTcompileinstall
+during24. GoalACTIVE/localworks/no stopgoal/no subagents.
+
+PR4288same/regular/automerge, no manualmerge. CI09:45on22327listsEMPTY/appreview+
+migratesuccess;requiredgatesreviewunconfirmed.NEXT>=10:35absentnewsourceevent.
+Stage22censor/23MSTrefusalunchanged/published. AllclaimsPCCunverified.
+
+# Current checkpoint:23published; nextaccountinglead (16 November ~09:10Z)
+
+STAGE23FINISHED/FAILEDPROJECTIONCRITERION, actualrecoveriesBOTHCORRECT.
+Sourcea457ec75b8657c211da69b4dc658c4e698a5888a, sole
+/workspace/ic-local-runs/local-cover-mst-validation-20261116-23 exit0/27.517s.
+Bothactualscalar66296859173437586/native+outergroupreplay. MST127trees/1703edges/
+19297evaluations/maxdegree51/0budgetrefusal. Candidate509rows4577nnz->382rows10904nnz;
+proxyguardREFUSES (1),0admitted/0replayedrows,originalsolvefallback1recoverstrue.
+Originalcopiedanalyzer9873Bsummary global[]/validationfalse/followupfalse/comparativefalse.
+No performanceverdictorwrong-scalar failure. Exactraw37296B/summary/progress/prepost
+hashes/reportonepageALLinGitandlocal; PDFvisuallyinspected, exactbenchPDF/SVG/150dpiPNG
+hasheschecked/originalsalsolocal. PublishedRESULTafd4c579f8a8a353cdbddf5ad45b3246b6057a5d,
+PR4288bodyactual23negative+22censor. DoNOTretryunchanged/rewritehistorical76sourcehashes.
+No activejobs/compilers. GoalACTIVE/localworks; no stopgoal/no subagents.
+
+NEXTSELECTEDLEAD: complete COUNTEDCOSTaccounting of ALREADYVALIDATED cover+Pivotgraph
+usingexistingbitop/v1 harness. Readprimarysource/kernelcoverage BEFOREcode; review
+examples/jv_cover_ic_vs_rho_bitops.rs +src/cryptanalysis/jv_bitops.rs +docs/units/BITOPS.md,
+jv_rho_strong::rho_tally/nativearithprices vsstrongestcredit. KB2queries unavailable
+/tmp/ic-graph-bitops-kb-search{1,2}.log. Countsprimary/wallpracticality perAGENTS2185.
+Currentgenericlarge_prime_filter helpers(add_mod/mul_mod/inverse_mod)BYPASShooks,
+Word/stdcontainercoverage incomplete. Don'tclaimprimaryparityfromlegacyorwallpartial.
+Review existing sparseAXPY kernels inresearch/pencil_large_prime_20261029/src/sparse.rs,
+genericWorkRow.axpy/normalise(BTreeMap); a sortedmerge/countedadaptermayreuseframework.
+Thisisaccountingimplementationworknotexternalblocker. No nextcode/trialyet. Adaptive
+MSTbest-prefix/variable-columnstopping is a SEPARATEfuturecandidate, notselected;
+fixed75%matrixfillnegativepreserved. DoNOTspendnewlongwall-onlycohortbeforeaccounting.
+
+NATIVECODEALLBUILT/CHECKED: newlarge_prime_filter_mst.rs637lines, additive
+jv_sieve::run_cover_sieve_dlp_on_with_mst_filter +--mst-graph+explicitstrategybinding,
+protectedtarget/witnessreplay/atomiccaps/proxyguard. Originaloptions/functions/default
+serializedfieldskept. Tests10filter+17sieve(2ignored)+19cover(1ignored)+1example;
+actualproduction/analyzerbuilds+strictClippyPASS. Nativeanalysis46executions36distinct
+10dupPASS; 20/21/22summaryreplayBYTEEXACT. Standaloneprototypealso10pass/buildClippy.
+Initialtuplealiaslint+analyzercollapsibleiflintfixed/logsretained,noassertweakening.
+Source/tests/review+Amend18/planpublisheda457BEFORE23call. RawmatrefusedBEFOREinput
+witnessreplay orcandidateWiedemann, so neverclaimcandidateitselfgroupvalidated.
+
+STAGE22published1abc/aaebotffintegrated/exactPNGsrestored/hashpass. Source23b,
+3600.002scensor124,36planned26starts25complete6warm19measure3correctrounds,
+inflightmeasurement3graph_b,10unattempted. All25completevalid/8graph516->387nofallback.
+Fullsummary13765B, raw350106BLOCALONLY/compactflow28058B inGit. AllCIsnull/ineligible/
+followupfalse/parityfalse. Partialoutergraph/IC1.01269,graph/rho.05724,IC/rho.05652
+AREDESCRIPTIVEONLY.No cross-runratiocomposition.Report2pagesallinspectedoriginalplotkept,
+separateRustpresentationaxesfix+dependencylock.No stop atcomponentorpartialcomparison.
+
+CIlast08:55ona457appsreview/migratesuccess;requiredgate/size/artifacts/reviewUNCONFIRMED.
+NEXT>=09:45absentevent. SamePR4288regular/automerge;no manualmerge/bypass. /usr/bin/git
+only;partial+sparseclone avoidgitarchive/broadsparseapply. Fetchmainbeforejournalappend,
+preserveallsharedentries+ledgers. AllclaimsPCCunverified/no signed independent/admittedrows.
+
+# Current checkpoint: STAGE23RUNNING (16 November ~08:55Z)
+
+Source/spec a457ec75b8657c211da69b4dc658c4e698a5888a PUBLISHED before solecall.
+Run /workspace/ic-local-runs/local-cover-mst-validation-20261116-23, session65029.
+76manifestPASS/sourceclean/noLIVEcompiler. p1009seed263 oneICthenoneMSTgraph,
+0warm/noAA/rho/ratio/CI;900worker/1900whole/CPU0/8GiB/no retry. Bothsameincidence/shared.
+Originaldriver/analyzer/sourcecheckpoint/host captured. DO NOTcompile/changecode/
+parameters/launchnewtrial orrestartwrapper. Checkexitfile+actualprocessifsessionlost.
+AfteractualexitORIGINALcopiedanalyzer/prepost/fullflow/report/publish. Requireboth
+actualscalar+groupreplay ANDnontrivialMSTprojectionnofallback; a refusalcanstill
+recoverviaoldsolvebutfailsprojectioncriterion. No23resultyet.
+
+NativeSOURCECHECKSPASS10filter17sieve(2ignored)19cover(1ignored)1example,
+actualproduction/analyzerbuilds+strictClippy. Analysis46executions36distinct10dup,
+20/21/22summariesbyteexact. MSTnew637linemodule/targetprotection+replay/proxyguard,
+APIadditive andexplicitCLI/source/strategybinding. No speedclaimfromproxy.
+22censorfullpacketpublished1abc/aaeartifact restoredchecked, currentPRbodyactual
+MST23running+22censor. Primarycountedcostgapremains:genericgraphhelpersbypass
+jv_bitops; existingcountedharness/sourcebookreviewedinlatestjournal. Nextlead
+accountingpointerONLY, no code/protocolselected there. GoalACTIVE/localworks.
+CIcurrenta457read08:55: appsreview/migratesuccess,requiredgate/size/artifacts/review
+unconfirmed. NEXT>=09:45absentevent. No stopgoal/subagents/ledgeredits.
+
+# Current checkpoint: MST SOURCE CHECKS PASS,23NOTRUN
+
+Actualnativeproductionbuild+publicworkerexampletestPASS.10filter/17sieve+graph
+(2ignored)/19cover(1ignored)/1example;allnative/analyzerbuilds+strictClippyPASS.
+Analyzer46executions36distinct10dupPASS;newanalyzerreplays20/21/22BYTEEXACT.
+Standalone10tests/buildClippyPASS(initialtuplealiaslintretained);nativeinitial
+analyzercollapsibleiflintfixed/logretained. NewgenericMSTsrcnative637lines, additive
+API&CLI,originaloptions/functions/serializeddefaultskept,proxyguard/no speedclaim.
+SOURCE/PREFLIGHTREADY:76-filevalidation/cover-mst-source.sha256. Amend18 +
+cover-mst-validation-plan.json: p1009seed263,1nativeICthen1MSTgraph,0warm/noAA/
+rho/ratios/CI;900each1900wholeCPU0/8GiB/no retry,incidence/sharedboth. MUSTpublish
+cleanSOURCEbeforeSOLEcreate-newwrappercall to
+/workspace/ic-local-runs/local-cover-mst-validation-20261116-23.
+23NOdata/no processesactive. Afterexitoriginalcopiedanalyzer/hashes/fullflow/report.
+Requireactualbothgrouprecoveries+nontrivialacceptedMSTprojectionno fallback;
+refusalretained andfailscriterion, nochanged22gate. GoalACTIVE/localworks.
+
+22completeCENSORpublished1abc1f671/aaebotffintegrated&PNGsrestored/hashespass.
+25/36complete3/5roundsallscalarsvalid,8graph516->387/no fallback. Fullsummary13765B,
+raw350106BLOCAL, compactflow/report2pagesinGit;allCIsnull/ineligible/no parity.
+CurrentCOUNTEDcostgapreview:existingjv_cover_ic_vs_rho_bitops.rs +jv_bitops +
+docs/units/BITOPS.md read. Currentgenericgraphmodularhelpersbypasshooks; wall is
+onlypracticaldiagnostic, cannotprimarycountedcostclaim. Futureaccountingpointer,
+NOnewcode/protocolselectedthereyet. KBnew2queriesunavailable/tmp/ic-graph-bitops-*.
+NextCI>=08:47absentevent/newsourceevent. PR4288same/automerge/requiredgatesunconfirmed.
+No stopgoal/subagents/ledgeredits. Historymanifestsunaltered.
+
+# Current checkpoint: native MST port compiling;23not run
+
+Stage22 FINISHED/PUBLISHED1abc1f671, artifact-onlyaaeffintegrated/exact22PNGsrestored/hashpass.
+22exit124/3600.002s,36planned26starts25complete6warm19measure3correctrounds,
+inflightmeasurement3/graph_b,10unattempted. All25completedscalarvalid;8graph516->387/
+387replays/no fallback. Eligibilityfalse/allCIsnull/followupfalse/parityfalse. Full13765B
+originalsummary/compactflow/progress/reports in study;350106BraworiginalLOCALonly.
+BothPDFpagesinspected, presentation-onlyRustaxesfixpreservesoriginalplot+summary.
+PR4288bodyactual22censor. Nevercomposepartialratiosasgain/parity. GoalACTIVE/localworks.
+
+MST standalone10testsPASS(5old+5new,576rowspaces3primes/64exhaustive4nodeMST/caps/
+witness/nonunits). Actualstandalonebuild/ClippyPASS afterinheritedduplicate_keytuplealias;
+initiallintlogretained. /workspace/ic-mst-prototype remainsreferencebutactualnativefiles
+nowPORTEDANDDIRTYINROOT. Genericnewsrc/cryptanalysis/large_prime_filter_mst.rs637lines;
+parentpubexports+tuplealias; additivejv_sieve::run_cover_sieve_dlp_on_with_mst_filter;
+protectedtarget/MST/proxyguard/chosenrowsreplay; optionalstats/zero-skipkeepoldreport;
+explicit--mst-graph +planstrategyworkerbinding; wrapperarchivesnewmodule.
+No mathspeedclaimfromproxy. SourcesMST_FILTER_REVIEW.md.
+
+NativeCargolibtest compilation session91887 STARTED~08:19, stillCompilecrypto at08:28.
+DO NOT duplicatebuild/cancelwithoutreason. Aftercompletion run remaininglibfilters
+jv_sieve+jv_cover, thenlib/exampleClippy BEFOREproductionexamplebuild+test. No scientific
+jobactive. StandaloneprotoCargo test3+derivedTypedsourcealreadyvalid butnativepending.
+
+NativeANALYZERDONE:46executionsPASS(36distinct/10importeddup),actualbuild/ClippyPASS;
+initialcollapsible-iflintfixed/logretained. Newanalyzer reproduces20/21/22summariesBYTEEXACT
+in/tmp/ic-stage{20,21,22}-mst-backcompat; no scientificdatarewrites. Nativeplotreadablehorizontal.
+
+CONDITIONALnextstage23selectedprospectively AFTERallnativechecks+cleanpublishedsource:
+AMENDMENT_18_MST_FILTER.md / cover-mst-validation-plan.json: p1009freshseed263,
+exact2freshworkersICthenMSTgraph/1round0warm/noAA,rho,ratios,CI;900each1900whole,
+CPU0/8GiB/noretry;incidence/sharedboth. Requirebothactualfullrecoveries+nontrivial
+acceptedMSTgraph/no fallbackbeforeANYnewtimingcomparison. 23NOTRUN, source未published.
+Needfinalsourcechecks, manifestvalidation/cover-mst-source.sha256 includeNEWmodule+review+
+AMEND18+plan, commit/push SOURCE BEFOREsolewrappercall tocreate-new
+ThisdoesNOTpass22failedgate. Parentfullsuiteknownfailures/interruptedremain,noglobalpass.
+
+CIlast07:57:28on811f: appreview/migratesuccess,requiredgate/size/artifacts/reviewunconfirmed;
+NEXT>=08:47absentevent. PR4288same/automerge,nomanualmerge. No stopgoal/no subagents.
+Historicalmanifestsunchanged. AllnewclaimsPCCunverified/no admittedrows/keyledgermutations.
+
+# Current checkpoint: Stage22 FINISHED CENSORED, MST still UNCOMPILED
+
+22source23b4c1a70, /workspace/ic-local-runs/local-cover-comparison-20261116-22
+exit124/3600.002s.36planned26attempted25completed(6warm19measure),3complete/correct
+rounds; in-flightmeasurement3/graph_b;10unattempted. No liveworker. Originalcopied
+analyzer analysis-original/summary.json13765B/global[],allCIsNULL/eligibilityfalse/
+followupfalse/parityfalse. Raw350106B staysLOCAL(>64KiB), hash+compactflow inGit.
+Partialdescriptiveoutermean graph/IC1.0126858172,graph/rho.0572353510,IC/rho.0565183693;
+NOTeligiblegain/parity (5roundsrequired). Allpre/posthashesPASS. LASTgraphprogress
+recordsdescent3648; exactcutphase/partialwallUNKNOWN. BashCPUomitsinflightdescendant.
+
+NEXT finish22evidence/report/PDFallpages/copies/hashes, commit/push/updatePRbody
+BEFORE anyMSTbuild. Template/tmp/ic-cover-comparison-report-template.typ unrendered.
+Then standalone /workspace/ic-mst-prototype Cargo tests/buildClippy, retainfailures.
+Allsrc+integrationoverlays formatted/parsedonly, NOcompiler/testexecutionever.
+source-only-checkpoint.sha256 current; before-strategy-binding oldhashreceiptretained.
+Overlayexplicitgraphstrategymetadatawasstrengthenedfornonstring/missingdeclarations,
+newMSTvalidationworkeridentitytestwritten. Otherdraftdetailsbelow. DoNOTclaimtype/
+behaviorpass untilactualchecks. No new scientific trial selected. GoalACTIVE/localworks.
+CIlast07:57:28on811fce17c: appsreview/migratesuccess, requiredgate/size/artifacts/reviews
+unconfirmed; NEXT>=08:47absentevent. PR4288same/automerge/gatespending.
+
+# Current checkpoint: benchmark running, uncompiled prototype prepared
+
+Stage22STILLRUNNING session72120, run /workspace/ic-local-runs/local-cover-comparison-20261116-22,
+ORIGINALcopiedsource23b4c1a70 andplanUNCHANGED.36processes/900worker/3600cohort,
+started~07:04:40Z, bound~08:04:40Z. Checkactualexit-code/processbeforeanything.
+DO NOTrestartwrapper,compile,changebenchmarkparameters,binaries/source,orlaunchnewtrial.
+Afteractualexit ORIGINALcopiedanalyzer, fullflow/preposthashes/report/publish FIRST.
+Reporttemplate/tmp/ic-cover-comparison-report-template.typ (unrendered).
+
+IndependentUNCOMPILED Rust prototype /workspace/ic-mst-prototype. src/mst.rs now637lines
+formatted/parsedonly;5testgroups intended576randomprojection/64exhaustiveMST/caps/units/
+witness checks NOT RUN. src/lib.rs exactparentgenericfiltercopy+childmodule. parent-source.sha256.
+Integrationoverlays (alloutsidecheckout) in integration/:
+large_prime_filter.rs (+pubexports),large_prime_filter_mst.rs(exactdraft),jv_sieve_graph.rs
+(newMstOptionalStats/zero-skippedcostguardcounter, newproject_mst, proxyguardwidth*nnz,
+allwitnessreplay,targetpreserved),jv_sieve.rs(additivewith_mst_filterAPI/privatebool helper;
+OLDoptions&APIsunchanged),jv_sieve_graph_compare.rs(--mst-graph/workerflag/event&workerstrategy),
+run-local.sh(planstrategyflag),cover-{graph,validation}-analysis.rs(modebinding/MSTcounter/
+refusal-vs-projectiontests). RustfmtallmodifiedRustoverlaysparse;bashsyntaxpasses. NOBUILD/TEST.
+source-only-checkpoint.sha256 pinsdraft. MustNOTcopy/builduntil22ended+packetpreserved.
+Afterend firststandaloneprototypeCargo test/buildClippy, fixrealerrorsretainlogs,
+thenport/reviewnewcorechecks+fullgroupendpointvalidationbeforeanynewperformanceprotocol.
+No claimedwallgainfromdimension*nnzproxy. PrimaryMSTreviewreceipts inlatestjournal.
+GoalACTIVE/localworks, PR4288same. CIreview>=07:57absentevent,gatesunconfirmed.
+
+# Running comparison + isolated prototype checkpoint (16 November)
+
+Stage22 STILLRUNNING session72120. Originalcopiedsource23b4c1a70, plan unchanged,
+p1009seed257,36processes/3600cohort/900worker, bound~08:04:40Z. DO NOTcompile,
+changeitsparameters/source/binaries, restartwrapper orlaunchanothertrial. Afterexit
+originalcopiedRustanalyzer/flow/preposthashes/report/publish FIRST.
+
+Independent UNCOMPILED Rust draft outsidecheckout: /workspace/ic-mst-prototype.
+Parent lib.rs exactgenericfiltercopy+childmodule; src/mst.rs423lines contains
+Prim coefficient-normalizedMST projection with witnesses/caps and5testgroups
+(576randomrowspaces/64exhaustive4nodechecksplanned), NONE BUILT OR RUN.
+Integrationoverlays in /workspace/ic-mst-prototype/integration arepreparationONLY;
+do notcopytorepo/buildbefore22ends/preserved. Intendedfurthercostguard may reject
+projected dimension*nnz regression; do notclaimwallgain. ReadCavallarCWIprimary
+SHA2e511f1130d420143161357d50aaae129ebd51554270e3d09a61265e0c102dc5 pp6–9;
+CADOmergeblob0e41569a1e097a413ad9a25ce23372f9c3aeaae4 actualMSTcalls1035–1050,
+mst.hblobe967a31f37a63260b2ef82eba19fc236870a3ccf. KB2queriesunavailablelogs/tmp/ic-fill-cost-kb-*.
+GoalACTIVE/localworks. CIreviewnext>=07:57absentevent; gatesunconfirmed. PR4288same.
+
+# Running update (07:12Z, 16 November)
+
+Stage22ACTIVE session72120/runlocal-cover-comparison-20261116-22. FirstRHOwarmup
+passes actualscalar+native/outerreplay, secondICwarmuppasses; graph_bwarmuprunning,
+5attempts4completionsat07:12. NO finalmeasuredcomparison. Frozen3600cohortbound
+unchanged, no retries/compilation. ReporttemplatepreparedONLY/tmp/ic-cover-comparison-report-template.typ,
+renderafterexit. Originalcopiedanalyzer afterexit, allrawflow/hashes/report/publication.
+CI>=07:57absentevent. GoalACTIVE/localworks. No independent signed verdict.
+
+# Current checkpoint (07:07Z, 16 November)
+
+Stage22STILLRUNNING session72120, source23b4c1a70923c40aa2501e538bca0f159c941d69.
+Run /workspace/ic-local-runs/local-cover-comparison-20261116-22; source/specfrozen.
+BothIC&graphwarmupsvalid, firstrhowarmuprunning; no measuredcomparisonyet.
+Originalcall07:04:40Z;whole3600s =>~08:04:40Zbound,worker900s. NEVERrestart
+wrapper ifsessionlost: checkexitfile/worker.pid/ps. DO NOTcompile/sourceedit/
+changeparameters/terminateearly/launchanothertrial. Afteractualexit original
+copiedanalyzer,rawflow/preposthashes,report/copies/publication/updatePR.
+NextCI/review>=07:57absentevent; latest23b07:06:58 workflows/status/reviews/threads
+empty, appreview/migratesuccess, REQUIREDgate/size/artifactsUNCONFIRMED. No merge.
+GoalACTIVE/localworks; no stopgoal. Stage21pass publisheda36packet/720artifact,
+Stage20censorunchanged. ReadonlyJV12twoLPcofactorpointer NOTimplemented/selected.
+
+# Current checkpoint (07:05Z, 16 November)
+
+STAGE22 RUNNING, session72120, source23b4c1a70923c40aa2501e538bca0f159c941d69
+publishedbefore solewrappercall. Run=/workspace/ic-local-runs/local-cover-comparison-20261116-22.
+72manifestPASS, sourceclean/noLIVEcompiler.36freshcoldprocessesplanned,
+6warm30measure;IC/graph/rho6armsreverseodd, p1009seed257 incidence/sharebothIC.
+CPU0/8GiB/900perworker/3600whole/no retry. No fullcomparisonyet. DO NOT compile,
+changeparameters/source, launchmoretrials or analyzeearly as final. Checkexitfile
+and actualprocess beforeanyrepeat ifsessionlost. No stoppingearly. Afterexit
+ORIGINALcopiedanalyzer/rawflow/preposthashes/report/publish. Singletonparityfalse.
+21PASSa36fullpacket;20censorunchanged. GoalACTIVE/localworks, no exogenousblocker.
+PR4288body21passneeds22running. CI/reviewnext07:07absentevent, nogatesconfirmed.
+
+# Current checkpoint (07:04Z, 16 November)
+
+Stage21completePASS/fullpacketpublisheda36d41e26, artifact7201ffintegrated.
+Stage22 SOURCE READY, NOtimingyet. Amendment17/cover-comparison-plan: p1009seed257,
+explicitincidence/sharedbothIC, nativeIC/graph/rho6armsreverseodd,1warm5measure,
+36childexecs,CPU0/8GiB/900worker/3600whole/no retries. SingletonparityALWAYSfalse.
+Controllerexplicitrecipeflag+progress, nestedtimeout--foreground reachescohort
+cancellation. Rustanalysisbindsrecipe/timeout/modeeveryrow; newtampertest.
+41analysisexecutionspass(33distinct/8duplicateimported),1exampletest/builds/
+Clippypass; newanalysisreproduces20and21byteexact. Source manifestready. Need
+commit/pushcleanSOURCE BEFOREsolewrappercall to create-new
+/workspace/ic-local-runs/local-cover-comparison-20261116-22.
+Noactiveprocess. GoalACTIVE/localworks. PR4288body21pass,currentgateunconfirmed;
+nextCI07:07absentevent. DoNOTstopgoal. Historicalmanifestsunaltered.
+
+# Current checkpoint (06:59Z, 16 November)
+
+STAGE21 FINISHED PASS, source8ab624189, sole runlocal-cover-sieve-validation-20261116-21,
+exit0/40.445s,2starts/completions. OriginalcopiedRustanalyzeranalysis-original:
+full_recovery_validation_passedTRUE/global[]/comparativeFALSE. Bothactualscalar
+72041284332044320/l263807420025969577, native+outer replay. Graph488->366rows,
+366replays,122pivots1094merges,0fallback/refusal. No AA/ratioinference.
+Allpre/posthashes recheck. No processesactive. Need finish21exactraw47187B/
+summary/progress/custody/report andbenchmarkcopies, publish/updatePR BEFORE
+newlead. EndpointgateallowsNEWseparatelyfrozencomparison, not20failedgatepassing.
+Readnative/priorstrongrho timings for affordable22protocol; nonechosenyet.
+GoalACTIVE/localworks. PRbodycurrently21running; nextCI07:07absentevent.
+
+# Current checkpoint (06:58Z, 16 November)
+
+STAGE21 RUNNING, session70800, source8ab624189bd8743f4857658d275e15aa8315d1ba
+publishedbefore solewrappercall. Run=/workspace/ic-local-runs/local-cover-sieve-validation-20261116-21.
+70manifestPASS, clean source/no live compiler, driver/analyzer/host/sourcecheckpoint
+captured. Public p1009seed251; first ICworker collectingm9relations. Exactlytwo
+freshworkersICthenGraph,900s each/1900whole/CPU0/8GiB/no retry. No completedendpoint
+yet. Checkexitfile/processbeforeanyaction ifsessionlost. DoNOT compile/change
+source or parameters, terminateearly, or launchmoretrials. Original20gatefailed;
+21isnoncomparativevalidation, noAA/rho/ratio. Incidence+shareexplicitbotharms.
+Afterexit originalcopiedanalyzer/rawflow/preposthashes/report. Needbothactual
+scalars+native/outergroupreplay+nontrivialgraph nofallbackbeforeNEWprotocol.
+GoalACTIVE; localworks. PR4288bodyupdatepending21running. CI07:07nextabsentevent.
+
+# Current checkpoint (06:57Z, 16 November)
+
+Stage20censor PUBLISHED22b0d7836; artifact-only f15a0ebc6 ff integrated.
+Stage21 SOURCE IN PROGRESS, no scientific data / benchmark active.
+New Amendment16 and cover-validation-plan.json: capacity candidate list selects
+p1009 by native m9 model>=1.25*p; freshseed251. Exactly IC then graph once,
+no warmup/AA/rho/ratios. Worker900s/cohort1900s/CPU0/8GiB/no retry. Both arms
+explicit incidence+share opt-ins, progress stderr persists from start. Original
+20gate remains failed, NOT a scale followup. Separate Rust validation analyzer
+requires both actualscalars and group replay + nontrivial graph no fallback.
+Analyzer tests/build/Clippy pass; final example checks session83386. Need
+manifest, check/commit/push SOURCE BEFORE sole wrappercall to create-new
+/workspace/ic-local-runs/local-cover-sieve-validation-20261116-21.
+No new call launched. Future comparison must be separately frozen after valid
+endpoints. GoalACTIVE; userauthorizeslocal/runpod; local works. No subagents.
+PR4288 open regular/automerge, gates/review unconfirmed; nextCI07:07absentevent.
+Do not stopgoal. Historical manifests unchanged. Journal current06:57.
+
+# Resume: native Rust graph IC toward rho parity
+
+## Current checkpoint (06:38Z, 16 November)
+
+STAGE20FINISHED,CENSORED. Source2cb41746eb2076eec7e509315a012fc3a7653e5a,
+run /workspace/ic-local-runs/local-cover-sieve-graph-20261116-20 exit124,
+real900.003s.36planned,1attempted(warmup0ic_a),0completed,35unattempted.
+No measuredrounds/recoveryoutput, graph/rhoUNATTEMPTED. Allratios/intervalsNULL.
+OriginalcopiedRustanalyzerfullsummary2326B/globalproblems[] forrecordedprefix,
+scaleconditionfalse/parityfalse. No retries. The original20gate FAILS; don't
+launch its scale followup or claim mathincorrectness/speed from a budgetcensor.
+
+Fullpre/posthasheschecked. Exactsmallraw1210BalsoinGitstudyfolder. One-page
+PDFvisuallyinspected; exactbenchPDF/SVG/150dpiPNGcopies/hasheschecked, original
+imagesalsolocal20. Folder local-cover-sieve-graph-20261116-20. Needcommit/push
+thisfinishedpacketandupdatePRbody(currently20starting). Parent&workerended;
+worker32277zombieunderPID1, no LIVEbenchmark. NeverkillPID1. Shelltimeuser.372s
+and.04%EXCLUDEunreapedchildatcensor, NOTtotalCPUusage; reportdocuments this.
+Primary900.003outerwallstillretainsallspenttime. Firstworkerinternalphaseunknown.
+
+Nextwork afterpublication: capacity-selected VALIDATION design (not passing20
+as if successful). Native relations_estimate/b_space and ignoredp101m11case
+explain why undersizedpilot may exhaustlowcapacity families, but no profile
+diagnoses20phase. Needprimary/source review +newfrozenamendmentbeforeanytrial.
+Consider direct full-recovery control at a capacity-sufficient field, with
+persistent progress logs, before new performance comparison. NO21plan/code/data
+chosenyet. GoalACTIVE. Userpermitslocal/runpod; localworks, no exogenousblocker.
+
+Sourcevalidation remains15cover/sievepass(2existingignored),5filter,9rho,
+1public-only/actualscalarworker,29analysis,actualreleasebuilds+ClippyPASS.
+66oldmanifestremains2cbsourcebytes; postdataREADMEchangesarehistoricaldiff,
+doNOTrewriteoldmanifest. CI/reviewlast06:17, next07:07absentevent; no gatespass.
+
+## Prior running checkpoint (06:26Z, superseded pending states)
+
+STAGE20 RUNNING. Source/spec2cb41746eb2076eec7e509315a012fc3a7653e5apublished
+before solewrappercall. Run=/workspace/ic-local-runs/local-cover-sieve-graph-20261116-20.
+Session34930; checkexit-code.txt/worker.pid andactualprocessbeforeanyretryifAPI
+sessionmissing. 66manifestpathsPASS, sourcewasCLEAN, noLIVEcompilers. Original
+driver/analyzer/sourcecheckpoint/raw/host/prehashcaptured. Firstwarmic_a hasnot
+returned atlatest06:23observation. Planned36childexecs,900sWHOLEcohortbound.
+DO NOT terminateearly/changeparameters/compile or launchmoreexperiments.
+No completedcomparison yet. Ifcensoredretainexactstart/inflight/unattempted;
+do notinferincorrectness or speed from missingoutputs. Analyzeoriginalcopied
+analyzeronlyAFTERexit, thenfullflow/report/posthashes before nextlead.
+
+PR4288title/bodyupdatednewweakfamily/currentpilotstarting. CI/reviews06:17on2cb:
+appreview/migrateSUCCESS;workflow/status/review/threadsEMPTY;requiredgate/size/
+artifactsUNCONFIRMED. Nextchecknotbefore07:07absentevent, no merge/bypass.
+GoalACTIVE; userobjectivecontinueuntilrho parity OR giveup. Localworks, noblocker.
+
+Read-onlysourcehypothesisduringwait: nativeautomaticcollectionstartsm9 andcan
+exhaustsmall-fieldfamiliesbeforeupwardm; relations_estimate/b_space and ignored
+p101fulltest(m_final11)showwhycapacityreviewmatters. ThisdoesNOTidentifywhich
+phasecurrentworkerisin. No newtrialselected; preservefrozen20anddo notretry.
+
+## Prior validated source checkpoint (06:14Z, superseded pending states)
+
+STAGE20IMPLEMENTED/VALIDATED, NOT TIMED. WeakFp6cover/univariate-sieve existing
+finder now has opt-in graph/hypergraph projection before Wiedemann. Retain75%
+basecolumns+ALWAYStarget; original-input combinations replayed, cap/refusal/
+wrongprojectedrecovery triggers chargedoriginalsolve. Old default API/serialized
+report retained. Legacy graph arithmetic counts explicitly incomplete; wall primary.
+Core src/cryptanalysis/jv_sieve_graph.rs + hooks jv_sieve.rs. Strongrho new
+strong_rho_counted_with_scalar returns actual scalar; old walk/report unchanged.
+
+New example jv_sieve_graph_compare spawns FRESH EXEC workers per arm; public-only
+fixture, zero legacyanswerplaceholder, ICtransfer rebuilt INSIDE child solve.
+Native+outer full EllE scalar replay, then parent heldoutanswer check. Native
+knownanswerflags FALSE EXPECTED (solvernevergetsanswer), actualverified true.
+Sixarms ic_a/graph_a/rho_a/ic_b/graph_b/rho_b reverseodd,1warm5rounds. NewRust
+cover-graph-analysis handles public BLAKE3 family, source/order/starts/exits,
+signatures (stripONLYwall fields), actualscalar/placeholder, bothAA clocks,
+graph stats, censor/nullincompleteCI and observedcohortexit. 7newanalysis tests
++22oldanalysis pass; allanalysis build/Clippy pass. Wholecurve duplicate detection.
+
+VALIDATION PASS:15cover/sieve tests (2existing ignored long),5genericfilter,
+9strongrho,1example actualscalar/noanswerworker check,29analysis total.
+Actualproductionexample build +library/example Clippy PASS. Initial range-style
+Clippyerror fixed/logretained. Firstcompile intentionally canceled to add scalar
+API; zombie rustc30487 underPID1 (stateZ) executesnothing. Wrapper now uses ps/awk
+to reject LIVE compiler processes, ignoringzombies, dependencieschecked.
+DoNOT use plainpgrep as scientificguard or killPID1. No compiler/jobsactive.
+
+AMENDMENT_15_COVER_GRAPH.md + cover-graph-pilot-plan.json: p127seed239,
+36childexecs(6warm30measure),CPU0/8GiB/900sWHOLEcohort,no retries. Nativefast
+linear/stop64/degree24/tracefalse/margin1.25; graph75%,cap4096, rho neg/batch16/
+r256 and public-order DPbits rule. Pilotparityflag ALWAYS false. Scaleallowed
+only completecorrect controls+nontrivial graph projection; no speed requirement
+on undersizedpilot. AllJVchildoverridesremoved. Primary outercoldprocesswall,
+innerwallalso retained. Legacyunitcosts incomplete. No canonicaladmission.
+
+Need final cover-graph-source.sha256, COMMIT/PUSH source/spec FIRST then single
+wrapper /workspace/ic-local-runs/local-cover-sieve-graph-20261116-20. NO20DATA.
+NativeanalysisCargo addedblake3 dependency, lockupdated. Oldmanifestsunchanged.
+RootREADME/PR neednewweakfamilyscope; currentPRbody onlythrough19. LastCI/review
+05:14on a3c02:appmigrate/reviewSUCCESS, gate/size/artifactsunconfirmed;nextallowed
+06:04(NOWallowed), doonceafternewsourcepublication. No merge/bypass. GoalACTIVE.
+
+Stage19allpacketPUBLISHED a3c02eacd0602bf7a3048d6af3a95591b48b3143, bodyupdated.
+No newdata since. Standardpanel currentorigin/main read, no matchingweakFp6
+family. PrimaryJV12sections3.2/3.3/nativefilter/strongreference/priorcrossover
+scope/gaps receipts in Amendment15/COVER_SIEVE_REVIEW +journal06:14.
+
+## Prior evidence checkpoint (05:11Z, superseded pending states)
+
+STAGE19COMPLETE,NEGATIVE. Source1de7ddec033ba24e158c9aa3ee6893897deec4abpublished
+before solelocalcall. Exit0in29.356s,864starts/completions,144warm720measure,
+36fixtures/6912coordinates. Canonicaloutputsallmatchdensequalifier,global[],
+allcoldlearning/edgeintegerpartition/source/family/order/semanticchecksPASS.
+34eligibleALL34lose,means1.2207646428–2.3837251276,lowerintervalsallabove1.
+AArejections:p67s193b2,p67s197b2. Largest12allcontrolledlose1.797290–2.208839,
+eachfirstmeasuredpool7accepted:91product+665chain+196direct=952obligations,
+7336witnesschecks,0resource-refusal. Largestgains0,fullICfollowupfalse,none
+launched. No jobsactive. No retries. Full47262-byte originalRustsummaryretained.
+
+All4finalPDFpagesvisuallyinspected; exactbenchPDF/SVG/150dpiPNGcopies/hashesdone,
+originalPNGsalsolocal19. Allraw/source/binary/preposthasheschecked. Frozen56file
+manifeststays1de7bytes; renderedlocalreportfixesTypstcomparisonspacing,boolean
+formatandproseonly, hashesinlocal-evidence. RootstudyREADMEpostdatachangesare
+historicalmanifestdifference; DONOTrewritefrozenmanifest. Finishedpacketneed
+commit/pushandPRbodyupdate(currentbodysays19starting). Stage18publishedalready.
+
+Latestvalidation49cubic+10pool+5S4example+22analysischecks,actualreleasebuilds+
+allClippyPASS. Two independentreviewpointers(COVER_SIEVE_REVIEW.md and
+BORDER_CERTIFICATE_REVIEW.md)haveprimary/KBfallbackreceipts; no newmethod/trial
+chosenafter19. Finishpublishingbeforedecision. GoalACTIVE; no overallparity.
+CI/reviewlast04:23,next05:13absentevent;nogate/size/artifactsconfirmed. Localworks.
+
+## Prior source checkpoint (05:03Z, superseded pending states)
+
+STAGE19SOURCE/VALIDATIONDONE, NOTTIMED. All49cubicreleasechecks +10genericpool/
+paircertificatechecks+5S4examplechecks+22analysischecks PASS. Actual3example
+binaries/analyzersbuild, library/examples/analyzerClippy-Dwarnings PASS.
+The queued secondcargo testwouldwaitbehindproductionrebuild; canceledONLY
+waitingcargo29071 andranSAMEcompiledtestbinaryfilterdirectly,10pass0fail.
+No duplicate test run. Logsretainedincludinginitialtest-onlyPolytypeerror.
+CLIhelp/wrapperbashsyntax/old18byteexactsummaryrecompute PASS. 56-filefrozen
+validation/pair-certificate-source.sha256checks. Needcommit/pushsource/spec
+BEFOREsinglewrappercalllocal-pair-certificate-20261116-19. No compiler/jobactive.
+
+Newread-onlyBORDER_CERTIFICATE_REVIEW.md: primaryKehrein–KreuzerDefinitions1/15,
+Proposition16read, SHA8c928f34f99e94670ff62c0553cc9dae5129bcde808d77e31eb11a2d097be1b5
+Exactcommutingcompletebordergraphs+originalinputevaluation+bothidealinclusions
+wouldberequiredforfuturecertificate.
+Readoldnegativeborderlazyelimination11.12–11.14, correctedceiling1.002x;
+no ceilingtransfer or performanceclaim for a different replaycertificate.
+KBtwoborderqueriesunavailable, receipts /tmp/ic-border-certificate-kb-*.log.
+NOimplementation/trialselectedofthatmethod. Current19planremainsPAIRGRAPH.
+
+Afterpublish/run,analyze864batchesretainalloutcomesandreportbeforeanynextlead.
+FullIConlyif frozen6largestgain/certified-pruningcriterion passes. GoalACTIVE.
+CI/reviewnext05:13absentevent; nogatesconfirmed. Keepold56manifestafterdata.
+
+## Previous implementation checkpoint (04:53Z, superseded pending states)
+
+STAGE18PUBLISHED e5c28d471 + artifact-only58a7f1ed2fast-forward. PR4288body
+updatedactualnegative18. Allraw/presentationhasheschecked;exactPNGsrestoredonly
+targetbenchdirectoriesafterff, originalsremainlocal. No mergegatesconfirmed.
+
+STAGE19IMPLEMENTED/NOTTIMED: nativeBuchbergerpair-dependencygraph certificates,
+explicitTracePool::new_pair_graph/S4TraceState::new_pair_graph/F4TracePairGraph,
+CLIf4-trace-pair-graph. Everyinputreduction/nativeprovenance/fullquotient/root/
+groupgatekept. Exhaustivecheckerandtermkernel/defaultsunchanged. Prior-certified
+edgesonly; product/chain/direct/witness/refusalcounters,100kpair/1mwitnesscaps.
+PrimaryPerryarxiv0906.4358section2Theorems2/3field/admissible-orderreviewdone,
+SHAab9aa3eeb81128f3f016cff9860f1cae711208de804b3e56986832210a3261ec.
+KBstatus/twoqueriesunavailable, receipts /tmp/ic-trace-ordered-kb-*.log.
+
+AMENDMENT_14_PAIR_CERTIFICATE.md+pair-certificate-plan.json frozen:
+p67/127/1039,seeds191/193/197,36distinct-eight-residualfixtures,864batches,
+1warm5rounds,CPU0/8GiB/900s/no-retries. FullICviability>=6largestcontrolled
+gainswithacceptedANDprunedreplay,completecorrectexit0cohort. NO19DATAexists.
+Analyzer22tests/build/ClippyPASS; old18summaryrecomputesbyteexact. Library49cubic
++10pooltestsCOMPILEsession61445. Production3examples/build/tests/ClippyQUEUE
+session51271. Initialtest-onlyPolytypeerrorretained/fixed; no otherfailureyet.
+DoNOTduplicatejobsorchangecoremidcompile. Needinspectlogs,sourcehashmanifest,
+commit/pushsource/specBEFOREwrapper local-pair-certificate-20261116-19.
+
+Independentcover/sieveread-onlyreviewinCOVER_SIEVE_REVIEW.md: primaryauthor
+CoverDecompPDFsections3.2/3.3readSHA7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38,
+existingnativejv_cover/jv_sieve+exactledger/crossoverblobs. WeakFp6scopeonly,
+strongerrhoreferenceunresolved/pricing/reproductioncaveats; no newlead/trial
+selectedthere. KBqueriesunavailable. Thisreviewisnotparityevidence.
+
+GoalACTIVE;currentCI/reviewlast04:23,nextnotbefore05:13absentevent. Localworks.
+
+## Prior evidence checkpoint (04:38Z, superseded pending states)
+
+STAGE18COMPLETE,negative. Published source f8c6f8b891cbca871da3323f915dd9b71d195c2e
+precedes sole local18call. Exit0,131.978s,864starts/completions,144warm720measure,
+36fixtures/6912coordinates. All outputs canonicaldenseequal, protocolglobal[],
+allcoldlearning/source/family/order/semantic checks pass. 33eligible ALL33lose,
+ratios2.98064–16.08599,lowerintervalsallabove1. ThreeAArejectionsretained.
+Largest12allcontrolledlose11.8229–14.9565despite6or7acceptedreplaysper8calls.
+allows_later_frozen_full_ic=false;NOfullIC18followup. No trials or compilers active.
+
+Full39910-byte summary/flow/raw/source/binary/prepost hashes retained. Four-page
+finalPDFallpagesvisuallyinspected, exactbenchPDF/SVG/150dpiPNGcopies/hashesdone;
+PNGsalsopreservedlocal18. Evidencefolderlocal-certified-s4-trace-20261116-18.
+Needcommit/pushthisfinishedpacketandupdatePR4288bodycurrentlycovers16/17only.
+Currentvalidation49cubic+5pool+5S4example+21analysischecksandactualreleasebuilds/
+ClippyPASS. No independentverdict, admission or whole-parent-pass asserted.
+
+Nextreview actual certification path before selecting a new cheaper exact
+method; NO nextlead/trialchosen. FreshKB/primaryreceiptneeded. Keepoldchecks,
+no unchangedretries, no uncheckedbasis. GoalACTIVE, localbackendworking.
+CI/reviews last04:23f8c6:appmigrate/reviewSUCCESS, requiredgate/size/artifacts
+unconfirmed;nextreadnotbefore05:13absentevent. No merge/bypass. Mainfetched
+beforejournal;preserveallincomingjournal/ledgerrecordsifintegratingmain.
+
+## Previous source checkpoint (04:15Z, superseded pending states)
+
+STAGE18SOURCEIMPLEMENTED/VALIDATED,NOTTIMED. CertifiednativeF4TracePoolwired
+throughS4TraceStateboundtocurve/field/generator/subgroup/originaltarget; varying
+residualsinsidefamily. Everyinput/Buchbergercheckkept, crate-onlyrunvisibility.
+Oldbasiscubic/groupchecksandchargedfallbackpreserved. ExplicitF4TraceDelayed,
+CLIf4-trace-delayed; olddefaultsunchanged. NewcompletecoordinateAPIandfullIC
+graph/pivotprefixunitcasesPASS. StatecoldperICarm/percomponentbatch,capacity4,
+total1mwords; learning/reject/cert/extraction/destructionchargedinsidebatch.
+
+ValidationALLDONE49targetedcubicrelease+5genericpooltests+5S4exampletests+
+21native-analysis tests(9main+3oldcomponent+9newtrace),actual3examples/analyzers
+releasebuilds,library/examples/analyzerClippy-DwarningsPASS. No jobsactive.
+Logscapturedvalidation/certified-trace-*. Mainplotlabelnewmodeonlyaddedafter
+tests, actualanalyzersrebuilt/linted; no numericalcodechanged. Wrapperbashsyntax
+passes;driverhelp/optionsverified. Needcreatefinalsourcemanifest,commit/push
+SOURCE/SPECBEFOREwrapper. Sourceuncommitted,NO18DATA.
+
+FrozenAMENDMENT_13_CERTIFIED_TRACE.md+certified-trace-plan.json:p67/127/1039,
+seeds173/179/181,32publicscalarresiduals1..32perinstance,4groups*8DISTINCTXs,
+fresh_a/trace_a/fresh_b/trace_b,1warm5round,864batchstarts/executionsplanned
+(144warm720measure),6912coordinatesolves,CPU0/8GiB/900s/no-retries.
+Densequalification/symbolic/inputfixtureoutsidephaseREPORTED;notfullICorρ.
+Newexamplegaudry_cubic_s4_trace_compare+nativebin s4-trace-analysis+wrapperkind
+s4-trace-component. Strongmetadata/order/A/A/coldlearning/outputchecks, None
+neverempty; exactcensorstarts+noincompleteCI. Analysisreadsadjacentexit-code.txt;
+missing/nonzeroexitcannotauthorizefullICevenallrowsflushed. Positive6caseand
+negative/tampertestsPASS. Followuprequiresalloutputsvalid/no censor/atleast6
+of12largestfieldcontrolledgainswithacceptedcertifiedreplay. Newfullicplanonly
+AFTERoutcome;nevercomposephaseratiosintopipelinegains.
+
+PrimaryreviewDONE:Joux–VitseauthorPDFsection4p15–17andapplicability,
+URLhttps://www-fourier.ujf-grenoble.fr/~viva/research/articles/DLFq5.pdf,
+SHA6f3268a0ef8c50b51a79f8b64deff0c60374228a827bea73d4e590284cb68377,
+local/tmp/ic-joux-vitse-f4-remake.{pdf,txt}. Web403/timeoutsbutcurlSUCCEEDED.
+No paperfactor/failureprobabilitytransfertoourcubic(square)systems. Nativepool
+contracts/caps/damaged/coefficienttestsreviewed;KBstatus+2queriesunavailable,
+Conductorunavailable; receiptsinAmendment13. No noveltyclaim.
+
+PR4288currentpublished7cbdbd078(autofast-forwardonly17overviewPNGartifactmove
+afterabe2d908fstage17reports). Currenttree18source/docsareUNCOMMITTED. Old16/17
+evidenceandbodypublished;fullgoalACTIVE,noparity. LastCI03:16on9db2appchecks
+migrate/reviewsuccess;gate/size/artifactspending,nextallowed04:06(NOWallowed,
+deferuntilnewsourcepublished). Lastformalreviews03:30empty,next04:20absentevent.
+No merge/bypass. Mainadvancing,fetchbeforejournalappend;normalintegrationlater
+preserveALLsharedrecords+append-onlyledger. Localworks,noauthquestionneeded.
+
+## Previous checkpoint (03:31Z, superseded pending states)
+
+STAGE17FINISHED onpublished73efa9eb5beforecall. Authorizedlocaldir
+/workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17exit0,19.901s,
+810starts/completions(135warm675measure),allscalar/stream/group/residualand
+pseudo/delayedsemantic-productchecksPASS,globalproblems[],noflight/retries.
+26/27strataeligible;onlydelayedp127s163AAfails. Threepairedcomparisonsallretained:
+- delayed/prepared:8eligible,all8upperCI<1,cost.813273–.931118,1rejected.
+- delayed/pseudo:8eligible,2gains(p523s157.925107CI.862710–.982982;
+  p1039s167.844276CI.653159–.981533),6inconclusive,1rejected.
+- pseudo/prepared:9eligible,5gains,4inconclusive.
+Nolocalparityflag;largestdelayed/rho3.166/4.523/3.606(s157/163/167). All9
+mechanismdiagnosticsfirstrepeateddecomposablex;noindependentdensityproof.
+
+Final6pagePDFALLpagesinspected;originalplotlabeloverlapfixedbyshorterRustlabel
+"Delayed pair"(singlepost-callsourceconstantchange), nativeanalyzerrebuiltand
+fullnumericalsummaryBYTE-IDENTICAL49826B. Originalcopiedanalyzer+originalfigures
+localunchanged. Oldfrozen44filemanifestMUSTremain73efa9eb5bytes;currentplotlabel
+differsintentionally,DO NOTrewriteoldhashes. Local-evidence.jsonrecordsold/new
+summary/analyzer/codehashesandpost-callpresentation-onlyscope. ExactbenchPDF/SVG/
+150dpiPNGcopies/hashesdone,copiesalsoinlocalrunoutsideGit.Allraw/preposthashespass.
+
+FINISHEDEVIDENCEcurrentlyUNCOMMITTED;needcommit/pushsamePR4288/updateactualbody
+(currentlybodycovers16). No jobsactive. Source73efchecks:46cubicrelease+5S4+
+12analysis,actualbinaries/ClippyallPASS. No whole-parentpassorsignedindependent
+verdict. Review/threads03:30bothEMPTY,nextnotbefore04:20. Status/checkrun03:16
+on9db:migrate/reviewappcheckssuccess;no gate/size/artifactsconfirmation,next
+statusnotbefore04:06absentevent. No merge/bypass. GoalACTIVE. Afterpublication,
+primary/KB/source-reviewnextcheaperS4relationgeneration/trace-reuselead;NOnew
+mechanism/protocol/codechosenyet. Localbackendworking,noexternalblocker.
+
+## Source validation checkpoint (03:24Z, superseded pending states)
+
+STAGE17IMPLEMENTED,NOTTIMED. ExplicitDelayedPseudoRemainderPairOnly/CLI
+delayed-pseudo-pairdoesguardedPoly5convolution inu64sum<2^43,p<2^20,
+normalizedcoefficients,degree<=4; fallbackoldscalaroutsideguard. Sameperproduct
+mul/addhooksandsemanticcount. Pseudoremainders/rootRNG/sampler/rho/graphunchanged.
+Newboundary/fallback/differentialtestsandfullsemantic/prefixcontrolsintegrated.
+
+Libraryrelease46cubictestsPASS(session41998finished);capturedvalidation/delayed-poly-library-tests.log.
+Actualexamplesbuild/all5tests/ClippyPASS(session11154finished),alllogscaptured
+validation/delayed-poly-*. Nocompileractive. Nativeanalysis9main+3component
+testsPASS,actualbuild/ClippyPASS; addsoptionalpaired_semantic_oraclesrejecting
+changed/missingcountsandmisdeclaredpairs. Old16summaryreproducesBYTE-EXACT.
+Logs capturedvalidation/delayed-poly-*. DoNOTduplicatejobs.
+
+FrozenAMENDMENT_12_DELAYED_POLYNOMIALS.md+delayed-pseudo-pair-plan.json:
+p127/523/1039,seeds157/163/167,oracleorderdelayed-pseudo,prepared,pseudo,
+810exec135warm675measure,3directpairs,extraexactsemanticpseudo/delayedcontrol.
+SameCPU0/8GiB/900s/no-retries/startmarkers/coldwall. New44filesourcehashmanifest
+validation/delayed-poly-source.sha256created/checked. OLDfrozenhashesuntouched.
+PrimaryreviewofficialLinboxFFLASfgemvlines226–324SHA9d2b4579...unchanged,
+fullURL/hash/amathguardinAmendment12. KBstatus+2queriesandConductorunavailable.
+No noveltyclaim. Plannednewdir/workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17UNSTARTED.
+ALLchecksdone;needcommit/pushsource/specBEFOREwrapper. No17datayet.
+
+Prior16evidence/source/browsingPUBLISHEDf33d904b7,883f2ce1c,e6c8a7d1e;
+PR4288title/bodyupdatedactualresults. Autoartifactcommit9db04b5caffintegrated:
+only3report-pagePNGmovedtomanifest/.gitignore. PreservedoriginalPNGsinlocal16
+custodyandrestoredignoredlocalcopies,allbotmanifest/presentationhashesmatch.
+Sparseffprunedtargetbenchdirectory;ONLYexacttargetrestoredusinggitrestore
+--ignore-skip-worktree-bits, nobroadsparseapply. Currentuncommittedworkis17code/
+protocol/analysis/log/resume. No stage17data. CIlaststatus02:26emptyfor7bab;
+nextallowed03:16,review02:39empty. Mainadvancing,fetchedbeforelogs;known
+newAGENTSrulereadandpanelrationale. GoalACTIVE; no stop_goal or permissionask.
+
+## Previous checkpoint (02:55Z, superseded pending states)
+
+STAGE16FINISHED: sourcef33d904b7b7b61250152559caac37b7ce62694fdpublished
+samePR4288beforecall. /workspace/ic-local-runs/local-pseudo-pair-20261116-16
+exit0,15.151s,540starts/completions(90warm/450measure),allscalar/pairedstream
+controls,globalproblems[],noinflight/unattempted/retries. Nativeanalysis7/9direct
+eligible,3upperCIbelow1:p523s139=.856082(CI.807806–.910758),p523s151=.915386
+(CI.902050–.928918),p1039s151=.789050(CI.762706–.827729).4eligibleinconclusive,
+2directAArejected.16/18individualstrataeligible. Nolocalparityflag;candidate
+p1039rho2.389/27.847/9.369(s139/149/151). All9diagnostictargetsfinishatfirst
+repeateddecomposablex,consistentgenericcoalescence,notnewdensity/exponentproof.
+
+Nativefullsummary31523Bcopiedbyte-exactto study/local-pseudo-pair-20261116-16;
+flow/source/rawcustody/hash/prepostchecked,3pagePDFcompiledandALLpagesinspected,
+exactbenchPDF/SVG+150dpiPNGplotandreportcopies/hashescompleted. Finishedevidence
+currentlyUNCOMMITTED. Needjournalfinishentry,commit/push/updatePRactualresults
+(bodycurrentlysourcepublishedtrialrunning). No jobsactive. Do NOTrepeatunchanged
+trialtoimprovecontrols. Nexttechnicalreview:guardeddelayed/narrowarithmeticin
+tinydegree<=4polynomialworkspace, followingmeasuredKrylovkerneltechnique;NO
+newleadcodeorplanimplemented. Primary/KBreceiptbeforeselection. GoalACTIVE.
+
+## Source validation checkpoint (02:50Z, superseded pending states)
+
+Merged-source validation ALL DONE and published as7bab7eefe on samePR4288:
+43cubicrelease tests, packed-liftcached/uncachedregression,5S4exampletests,
+actualexamplesbuilds,library/examplesClippy-Dwarnings. Prior02:11pendingstates
+belowarehistorical. CIstatus/workflowsqueried02:26for7babreturnedempty;next
+checknotbefore03:16unlessevent. No mergegatepass;no bypass. Mainfetchedagain
+a4dc85728;newAGENTSinstructionsread(standardpanelrationaleincluded;samestudyPR).
+
+NEXTLEADSELECTED: explicit Rust PseudoRemainderPairOnly / CLIpseudo-pair,
+inversion-freeremainderGCDstepsbutfinalmonicnormalization+sharedrootrecovery.
+Implementationdoneinprepared/cubic/driver;oldbaseline/defaultspreserved.
+Newpolynomialdifferential/plantedfactorandfullgraph/pivot/fresh/longstream
+testsadded. ALL45cubicrelease-librarytestsPASS, all5S4exampletestsPASS,
+actualgraph/probe/analyzerbuildsPASS, nativeanalysis8main+3componenttestsPASS,
+library/examples/analyzerClippy-DwarningsPASS. No compileractive. Captured
+validation/pseudo-*. Needcommit/pushsource/specbeforelocalwrapper. No pseudo
+data yet. InitialparallelS4exampletesthad2semantic-counterfailures;identical
+binaryserialdiagnosticpassesall5. NativeF4defaultcounterisprocessglobal;
+test-onlymutexfixesdefaultcommandwithoutweakeningassertions. Originalfailure
+anddiagnosticretained. Core45testsnotinvalidatedbyexample-onlyharnesschange.
+
+Primaryreviewandfrozenplan AMENDMENT_11_PSEUDO_REMAINDERS.md:
+FLINTdivremofficialpageidentitylc(B)^dA=BQ+R,finitefieldnonzeroscaleunit;
+SHA4bf0b619ea45a849bf26da51951bb89feaa046c01ed438284d62c1feda3a7688;
+local/tmp/ic-flint-pseudodiv-primary.html. KBMCP/wrapperunavailable;conductor
+unavailable. No noveltyclaim. Frozenpseudo-pair-plan.json:p127/523/1039,
+freshseeds139/149/151,preparedthenpseudo,540exec90warm450measure,1warm5round,
+CPU0/8GiB/900s/no-retries,paired_oraclesexactstream/scalarchecks,existingrho.
+Manifestvalidation/pseudo-source.sha256createdandchecked(42files). Plannednewdir
+/workspace/ic-local-runs/local-pseudo-pair-20261116-16unstarted. Needreportall
+directcandidate/referenceandrhooutcomeswithAArejectionsretained. GoalACTIVE.
+
+## Previous checkpoint (02:11Z, superseded pending states)
+
+All measurements finished; no experiment running. Reports14/15and exact browsing copies are published as f0b1693ce on PR4288.14complete199.383s,360executions,allscalar/streamprefixcontrols,7/12timingeligible,solecontrolled directdelayed/dense0.857(CI0.819–0.904).15censored900.005s,224attempts/223completions/1knowninflight/16unattempted;pairall4controlled1.24–2.13rho,no parity. Final6reportpagesinspected,fullflow/rawsourcehashesretained. Source6eacb4fd2only; do notattribute data to merged source.
+
+Local mainmerge8a60abdc1(parentmainb478a9770)DONE, notyetpushed. Journal400incoming+38ownold-day blocks and9incoming+13ownnew-day blocks preserved/orderaudited. Ledgerexactincoming; noledgeredits. Resumeincomingarchive preserved with3markerlinesindented/reversible;5old branch-onlyjournalmarkerssimilarlyindented, factsunchanged. Rawsourcecopies/audithelper/tmp/ic-main-reconcile; validation/main-journal-merge-audit.txt. PRbasehygienepassesapartfromintentionalrawlogEOFblanklines. IncominghistoricalSVGwhitespace/markersnotrewritten. No unresolvedindexpaths.
+
+Mergedmainhadcompileerrorin src/cryptanalysis/koblitz_index_calculus.rs:1646:cachedlift_x_packed returnedVec despitepackedtuple signature. MinimalUNCOMMITTED2linereturnrepair (none,0)and([point,neg],2), preservingloweringwrapper. Basefailurelogcaptured. Postrepair43cubicreleasetestsPASS, existingcached/uncachedorderedliftregressionPASS,productionlibraryClippy-DwarningsPASS. Session76350librarytestfinished. Session53690stillrunningexampletest/build/Clippy/runner checks, /tmp/ic-merged-main-{s4-example-tests,examples-build,examples-clippy,runner-tests}.log; lastRustlibnon-testcodegenstarted~02:08. DoNOTduplicatethesejobs ortimeexperimentsuntilcompilersgone. SourcefixdoesnotaffectmeasuredF3core, butcurrentmergedsourcevalidationmustfinishbeforepush.
+
+Currentuncommittedfiles:2linepackedfix, capturedvalidationlogs, newjournalentry, thisresume. Needfinish53690checks, preservefailuresifany,commit/pushmergefix+handofflogsnormal,samePR. Currentoriginmainmayhaveadvancedafterb478; inspecthotfilesandmergecautiously, donotchaseirrelevantchangeswithunnecessarynewmeasurements. PRbodyupdatedactual14/15andpendingmergevalidation,lint0. Remoteheadf0b1693ce. LastactualCI/reviewquery01:12returnednostatus/workflows/reviewsfor6eac;nextcheckafterpublishisallowed(nowpast02:02), then50min/4hcadence,nobusypoll. Mergeonlycurrentgate/size/artifactsPASS,no bypass.
+
+NexttechnicalreviewDONE:TracePool(sourcef4_fp/reuse.rs)certifieseveryacceptedreplaywithinputreductions+allBuchbergerpairs,caps/termsteps/fallbackcharged; rawf4_replayaloneisnotvalidsolver. Publicpoolbasisrunisprivate;publicsolve_visit_reusingincludesrecursiveextraction. KBstatus/twotracequeriesunavailable;sourcecontract/readtestsrecorded,no novelty. NEXTselectboundednativephase-wallprofilingbeforeoptimizingtraceornormalforms; no profiling/replaycodeorplanimplementedyet. perf/valgrindnotinstalled;kernelperf_event_paranoid2. Do notinferwalldominancefrompartialFPcounts. GoalACTIVE,no parityclaim,no cloudblocker,localauthorized.
+
+## Earlier detailed handoff (current checkpoint above supersedes pending states)
+
+User requires Rust, asks to keep improving toward rho parity, and authorizes local or Runpod. Use local; no cloud spend/Runpod. /workspace/crypto, branch feat/extension-ic-graph-elimination, regular PR4288, auto-merge enabled. Goal ACTIVE; no parity or completion claim. All producer results pcc:unverified; no independent signed verdict, standard lab admission, strongest-external comparison or admitted leaderboard row. Canonical schema sources are encryptedVLT1; no key, don't cat them again. KB MCP/wrapper unavailable, primary/source reviews recorded. /usr/bin/git only; fetch --no-tags --recurse-submodules=no. Never git archive or broad sparse reapply; tree diffs --no-renames. No subagents authorized.
+
+CURRENT finished source: 6eacb4fd2 published on samePR. Contains existing protected graph/pivot LPcollector, symmetric/prepared S3, charged radding32/long sampler, native S4/F4 finite quotients, scalar sparse FGLM and guarded delayed graph kernels. Solver modes F4Groebner,F4Krylov,F4KrylovDelayed; CLI f4,f4-krylov,f4-krylov-delayed. Defaults unchanged. Sparse extraction requires full BMdegreeD,nonsingular, exact vectorrecurrence/inverse/Hankel/original-equation/cubic checks; charged dense/oracle fallback, separate projection RNG. Delayed dots guard<=64normalizedterms,p<2^20,sum<2^46, semantic hooks/productcounts equal. No rho fallback. Stats counters partial; cold wall primary. New full-driver opt-in starts+Rustanalysis count exact attempts/unmatched arm; old outputs supported unchanged.
+
+Validation at frozen source:43targetedcubicrelease-librarytests,5S4exampletests(alltiny+holdouts, independent signed-group fallback regression, dense/scalar/delayed exact outputs/FPcounts/graphprefix), library+examplesClippy-Dwarnings, actualreleasebinaries. Nativeanalysis8main+3componenttests/build/Clippy. Historical08/11and09/10whole summaries byte-identical under extended analyzer. First overlystrict test requiring every dense solveSome failed atp7s3d171; bothAPIsNoneisdocumentedunsupported, corrected toexactOptionequality and strengthened with independent groupfallback test; original failure retained. Inherited whole-parent failures/interrupted run retained; no global pass. Logs/manifests inresearch/extension_ic_graph_20261115/validation. Historical source hashes NEVER rewritten; current presentation changes can make old manifests fail, their original commits/checkpoints remain pinned.
+
+Latest completed block14/15source6eacb4fd2, identicalcopiedbinary/source/noedits/retries:
+- /workspace/ic-local-runs/local-delayed-ic-small-20261116-14: exit0,199.383s,360starts+360completions(60warmup/300measure), all12strata correct5/5,dense/delayed relationdigest/residual/groupwork/scalar controls equal.7strataeligible. Sole fullycontrolled direct comparison p127seed109delayed/densegraphwall0.857127(CI0.818625–0.903635); other3direct comparisonsAAineligible. Nativeinterstage receipt allowed15.
+- /workspace/ic-local-runs/local-delayed-ic-scale-20261116-15: timeout124at900.005s,224starts/223completions(40warmup/183measure),1inflight,16unattemptedof240planned;491rawrowsincluding44diagnostics. Inflightp1039seed113,F4KrylovDelayed,measure1,graph. Partial-armwallunknown, neverimpute.7complete strata+1incompletewith1of5measuredrounds. Pairall4controls pass graph/rho1.24356,1.74141(p523s109/113),2.13461,1.76323(p1039s109/113). Candidatep523s113eligible722.825; p523s109480.774andp1039s109792.349AArejected; lastone-round645.222diagnosticonly/no usableinterval. No parityflag. No unchangedrerun. Allraw/copiedbinaries/source/host/preposthashes local.
+- Four-page14andtwo-page15PDFs, native summaries/plots/flow/runtime/preposthashpackets and exactbenchPDF/SVG/150dpiPNG complete, all6finalpagesinspected. Sourcefrozen14/15protocolAMENDMENT_10_DELAYED_FULL_IC.md,plansdelayed-ic-{small,scale}-plan.json;39-filemanifest. Currentuncommittedwork onlyfinalevidence/presentation/journal/resume, readycommitbeforemerge.
+
+Earlier native datasets allretained under /workspace/ic-local-runs and study:
+02–07=1740IC/rhoexecutions/290warmups, allrecover, AA failuresretained.17/18epochmechanismcasesfinishfirstrepeateddecomposablex, consistentgenericcoalescence, notindependentICdensity.
+08basisprobe864eightcallbatches,33/36eligiblebasis/fulloldMCA0.135–0.173,twoMCNone+oneAAinvalid; no pipelineinference.
+09fullF4small360execallcontrols,10scale900scensor181completedof240, exactextraattemptsunknown(no starts then), no imputation.
+11scalarKrylovcoordinatephase7cac567a4:864batches/36systems alloutputs+controls, allfirstprojection/no fallback;means0.997815–1.389575,two near-tiesbelow1CIcross1,noneacceptedgain.
+12delayed_vs_scalarona633ce5a8:864batches,35/36controlledall35upper<1,oneAAfailp67s89r0;means0.634–0.787;semanticFPcounts/dim equal. All12p1039passfrozen>=6criterion; localreceiptpinned.
+13freshdelayed_v_dense samea633source/binary:864batches,33controlled32upper<1;3AAfail(p67s107r2,p127s101r1,p127s103r2),onenear-tie(p127s103r0),all12p1039pass;means0.734–0.968. This completecoordinatephase excludes sharedsymbolic/input/qualification reportedseparately; no crossrunratio composition. 3pageeachPDFs andexactbrowsingcopies published. Fullnative summaries>64KiBstaylocal;compact~52KiBexportsdisclose omittedduplicatepayloads andpinfullhash; acceptance/ratio/controlfieldsunchanged.
+
+Primary reviews: Faugere–Mou arxiv1304.1238v1section3.1/Thm3.1/Algo2; PDF/tmp/extension-ic-sparse-fglm-primary.pdf SHA5074b642b97f027057eafb88b87141eb256eb4b1e717e2291486c37b13eb616b. Matrix construction excludedinthepapercomplexitybut includedhere. OfficialFFLASfflas_fgemv.inl LazyTagbounds/blocknormalizationread, /tmp/ic-fflas-fgemv-primary.inl SHA9d2b4579095e7ba5799d9a4dbd04726ae3e9dbea7647382a3f3161e02f0cd970. NativeF4lazyaccumulators reviewed. vanOorschot–Wiener authorpreprint JoC97.pdf4.1/5.1 coalescingtrails. No noveltyclaim. Nexttechnicalreview(notimplementationyet): nativeF4trace/replay and phaseprofiling, avoidguessingwalldominancefrompartialFPcounts. First KB/literaturesource receipt perAGENTS.
+
+PR maintenance: safe earliermergecc9985aa0 ofautomatede821head; audit /tmp/ic-maintenance-merge kept276incomingblocks+18ownsuffixblocks. Latest published source/evidence6eacb4fd2; componentearliercommits7cac,a633. PRbody lastupdated01:08withcompleted12/13and14/15starting; updateactual14/15outcomes aftercommit. Readonly01:12CI/review check returned noheadworkflowruns/statuses/reviews. Do notpollbefore~02:02absentevent. Merge onlycurrentgate/size/artifactsPASS, no bypass. Main likelyconflictsjournals; Copilotoldrequestexpired/fallbackalreadydocumented. FetchlatestmainandPRexplicitrefs, NOFORCEPUSH. Current main92b7b35... checkedfrommergebasebb701... ~2480unrelatedfiles,119Rustpaths, incomingrootlibrarymodulesbutnohotcubic/F4/AGENTS changes. Refetchbeforemerge. No science/compilerjobsactive. Allledgerchangesincomingonly; thissessionnevereditedledger.
+
+NEXT: commitfinished14/15evidence/presentation/log/resume and normalpush(ormergecurrentremoteifraced). Reconcile main via normalmerge, not rebase. Preserve allincomingjournalblocks/order plus onlyourpost-common additions; common historicalblocks updatedincomingmustnotbeoverwritten. 2026-11-16likelyadd/add, usemultisetblockunionwithchronologicalinsertionandnativeaudit(no Python). SavebothsidesoutsideGit. Preserveincomingresumeversion (canarchiveunchangedbelowcurrentactivehandoff) andincomingledgerbyte-exact; don'tpickfrozenledgerconflictsides. Mainhaslargeunrelatedadds; disablemergerenamedetectiontoavoidhydration. Recheckhotfiles/Cargo; validatecurrentmergedsourceappropriately(targetedtests/examples/Clippy; fullparentinheritedfailuresstillknown). Commit/pushsamePR, updateresults/gates/review. Then primary/native-source reviewoftrace/replay/profilingandselectnextboundedalgebraicimprovement;goalstaysACTIVE. Do not substitute genericrho recovery forICor infer parityfromweaklocalflag. Localbackendworking,nocloudblocker, no permissionquestionneeded.
+
+
+---
+
+# Incoming main handoffs (archived; active task is above)
+
+The incoming file already contained conflict-marker text. Only those marker lines below are indented for literal archival display; removing that indentation recovers the exact incoming bytes. Original source: main commit b478a9770ea35f84bddf4e9b9ffbf7efeab30f06, path .resume/RESUME.md. Local original: /tmp/ic-main-reconcile/resume.theirs.
+
+# Current chord proof task - source only
+## Goal
+Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
+## Lead / hypothesis
+The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
+## Spec
+research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
+## State
+New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+## Next steps
+Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
+## Runs in flight
+None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
+## Stop and success conditions
+Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
+
+# Preserved incoming resume (historical task state)
+# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
+
+
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
+
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
+
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
+
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
+
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
+
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+    <<<<<<< HEAD
+## Open questions
+- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
+- /home/user/crypto-autoresearcher is half-switched, pending the owner.
+
+# Preserved previous branch resume (historical task state)
+# Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
+
+Complete the arity dimension of elliptic-curve index calculus with the
+preregistered cells no record covers: PKM prime towers at m = 5 (N = 10, 15,
+20); chained-S3 SAT with a Frobenius-union base at m = 5 and 6 on Koblitz
+n = 23..41; the same at n = 83 with the cell cap lifted to 1800 s. Study
+directory `research/arity_completion_20261104/` (README there), PR #3378.
+
+Prime towers: D(m=5, N=10) in {6, 7}, D(m=5, N=15) in {7, 8}, D(m=5, N=20)
+>= 8 or capped; tower kind does not change D; N = 15 finishes in 7200 s and
+8 GiB. Kill: D >= 8 at N <= 15 closes m = 5 on prime towers.
+Koblitz: m = 5, 6 decide at n = 23 within 600 s for S = 2; cost grows so that
+n = 37, 41 cap at m = 6; planted controls always recover; n = 83 stays
+undecided at 1800 s; no decided query at n >= 31 under the 188 s m = 4
+root-table parity point. Kill: K4 and K5 both supported.
+
+- `research/arity_completion_20261104/prime_tower_m5/protocol.json`, frozen at
+  commit 1fd6ece55f (sha 2b82eecd…); commands in arms[*].instrument.flags.
+- `research/arity_completion_20261104/koblitz_m5_m6/protocol.json` + grid.tsv
+  + run_shard.sh (freeze block records its commit once frozen).
+- Cards: `research/arity_completion_20261104/cards/CARD-arity-prime-m5-*.yaml`
+  (lint CARD OK); Koblitz cards follow the same pattern after its freeze.
+- Instruments: `examples/pkm_tower_pilot.rs` (engine tower, p 2013265921),
+  `examples/n83_msweep_cell.rs` (chain-s3 and chain-s3-orbit, union:S base).
+
+- Protocols validated with crypto-autoresearcher tools/experiment_protocol.py
+  (main commit, files fetched raw); prime-tower frozen before data.
+- No cell has run. Development release builds in /dev/shm only.
+- Launch gates fail in the authoring container: STS InvalidClientTokenId, no
+  checkpoint upload token (problems/arity-completion-launch-gates.md).
+
+1. From a session with account 104186811093 (or an upload token): push this
+   checkpoint, run the build cards, re-dispatch the director with the binary
+   sha256 for the cell cards, submit through isolab-eks per AGENTS.md §9a.
+2. Run controls first; a failed control voids the study (both protocols).
+3. analyze.py per study; export with experiment_protocol.py from-rows;
+   report, figure, PDF; no leaderboard row (stage diagnostics).
+4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
+
+Multi-curve re-baseline done (PCC-20261105-37a78d): plateau 1.57-1.91x rho across five family curves per size; next: owner decision or new structural idea.
+Specs: research/curve25519_autolab_20261104/multicurve/spec-k*.json (frozen before data); siblings from `curve25519_family siblings`. Binaries rebuilt from main.
+After it: add-raw, metric per size (mean S/rho over curves and its curve-to-curve spread), close the record, pcc claim, README row, commit, PR. If the incumbents' ratios move materially, update the ledger incumbents and OBSTRUCTION.md.
+
+Stop: per-cell caps in the protocols; Part A stops at a given m after two
+consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
+decided cell with a verified planted control; the preregistered kill criteria
+close the respective m >= 5 lines. No cap is raised after the freezes.
+
+# Round 5 (2026-11-04, written before any round-5 run): solver side
+
+## Derived first (no runs; awk on recorded logs)
+- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
+- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
+
+## Test H: character-hybrid on the separators
+Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
+2 branches per separator.
+- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
+- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
+- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
+- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
+
+## Round 5, test H outcome (recorded before test L)
+- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
+- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
+- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
+
+## Test L (fat-leaf tree, written before any L run)
+- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
+- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
+- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
+- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
+
+## Test Y (function coupling, written before any Y run)
+- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
+- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
+- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
+- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
+- Cells: m3 at t4 and t5, k0.
+
+## Round 6 (2026-11-04): local long run of the P2 cell m5 t4 (written before the run)
+- The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
+- Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
+- Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
+
+## Round 7d: decisive Riemann–Roch cell (written before the run)
+- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
+- Reading, from round7_rr's kill criterion:
+  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
+  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
+  - D_RR ≥ 9 means no gain at m = 5.
+  - Cut off again: undecided.
+
+## Round 7e: E1Q at m4 t5 (written before the run)
+- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
+- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
+- Reading:
+  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
+  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
+
+
+# Current twist proof continuation, 2026-11-06
+All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
+
+New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+    =======
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
+    >>>>>>> origin/main
+=======
 # Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
@@ -4038,5 +6534,6 @@ Current S3403 remains, old startup failure historical; initial metadata/prose/in
 
 
 
+>>>>>>> theirs
 >>>>>>> theirs
 >>>>>>> theirs
