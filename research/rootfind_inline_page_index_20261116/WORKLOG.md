@@ -150,3 +150,78 @@ held file. [pcc:unverified]
 - The original synthetic test checked 15 rather than 16 occupied slots
   in one page. Actual-curve parity was unaffected; the control is being
   strengthened before the final source-bound result.
+
+## 2026-11-16T11:26Z — Final source-bound parity and visual record
+
+### What was done (commands, files, features)
+
+- From source commit `c3ad96f431`, the final dependency-free unit binary
+  passed 4/4 tests and the final Cargo library harness passed 9/9 tests.
+  The complete K13/K19/K23 `INLINE_PARITY_JSON` records equal the earlier
+  passing curve run. Final UTC seconds, raw stdout/stderr and process-level
+  `time -l` counters are retained in `unit-final.*` and `curve-final.*`.
+- `derive_results.py` asserts source and binary hashes, all fixed counts,
+  prior paged-result identity, complete collision/group-check counts,
+  page accounting and equality of the two passing curve records.
+  `verify_storage.sh` separately checked the arithmetic with `jq` and
+  exited zero.
+- Wrote a bounded observation report, editable Graphviz diagram, SVG
+  backing chart and two-page Typst PDF. Opened and visually checked both
+  rendered PDF pages. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Preserve the result as a standalone representation screen. It has no
+  collector timing, process RSS or complete F4/F5/F6 comparison.
+- Run the repository's required release library suite before publishing
+  the branch. Keep its output distinct from the experiment records.
+
+### Open threads (unfinished, pick up next time)
+
+- Run the release library validation, inspect failures, finish source and
+  artifact checks, commit and open a ready stacked PR.
+
+### Errors (what went wrong, how it was handled)
+
+- None in the final source-bound tests or report rendering.
+
+## 2026-11-16T11:48Z — Release suite partial failure and fixture diagnosis
+
+### What was done (commands, files, features)
+
+- Ran `cargo test --release --lib -- --test-threads 4` using Rust 1.99.1,
+  with stdout, stderr, UTC timestamps and `/usr/bin/time -l` counters in
+  `lib-validation.*`. The release build completed in 8m36s; the test
+  runner announced 6,567 tests. Before interruption, 2,796 tests had
+  reported `ok` and five ecbench band/compare tests had reported `FAILED`.
+  The run exited 101 after SIGINT to the test process at 11:44:17Z.
+- Reran one failing test directly from the built release binary with
+  `--exact ... --nocapture`. It failed in `band.rs:1191` because the
+  artifact-managed `sessions/k20-s0/records.jsonl` was absent. The
+  manifest lists its SHA-256 and 2,293,097-byte expected size.
+- Checked Conductor before hydrating the fixture. T-6701 holds its exact
+  path with exclusive write scope, so no hydration or fixture edit was
+  attempted. `lib-validation-diagnostic.*` preserves the panic and
+  command outcome. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Classify the broad suite as incomplete and failing. The isolated
+  diagnosis establishes the missing fixture for one failure only; do not
+  infer that it explains all five.
+- Preserve the focused 4/4 and 9/9 parity checks as the source-bound
+  correctness evidence. They do not depend on the missing fixture.
+
+### Open threads (unfinished, pick up next time)
+
+- Once T-6701 releases the path, hydrate the artifact and rerun the
+  affected band/compare tests. Complete a broad release suite in a
+  separately recorded run if needed for a passing repository-wide gate.
+- Finish record validation, commit and open the ready stacked PR.
+
+### Errors (what went wrong, how it was handled)
+
+- Five ecbench tests failed during the broad run. The single isolated
+  diagnostic named a missing artifact; the held path prevented repair in
+  this task. The red suite was interrupted after unrelated long tests
+  sustained high CPU use; the output and stop were preserved.
