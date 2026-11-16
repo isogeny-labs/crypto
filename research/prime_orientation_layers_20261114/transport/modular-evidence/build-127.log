@@ -1,0 +1,25 @@
+'OrientationActualPruningCount.card_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.card_one_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.card_one_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.lower_node_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-127.lean.txt:218:2: error: Tactic `split_ifs` failed: no if-then-else conditions to split
+
+u k : ℕ
+w : ℤ
+hk : 3 ≤ k
+rb : MomentLabels u k
+hb : ↑rb.2 < k
+⊢ rb ∈ {rb | (↑rb.2 + if ↑rb.2 % 2 = 1 then 1 else 0) < k ∧ w + ↑↑rb.2 + ↑(if ↑rb.2 % 2 = 1 then 1 else 0) = w + 2} ↔
+    ↑rb.2 = 1 ∨ ↑rb.2 = 2
+../modular-evidence/draft-127.lean.txt:214:51: warning: This simp argument is unused:
+  Finset.mem_filter
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [selectedFiber, Finset.product_eq_sprod, Finset.mem_univ, Finset.mem_product, Finset.mem_insert,
+    Finset.mem_singleton, true_and, Fin.ext_iff, keep, gain, oddMode, newWeight]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'OrientationEvenModePolicy.shifted_injective' depends on axioms: [propext, Quot.sound]
+'OrientationEvenModePolicy.weight_fiber_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationEvenModePolicy.one_fiber_count' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationEvenModePolicy.even_policy_right_integral' depends on axioms: [propext, Classical.choice, Quot.sound]

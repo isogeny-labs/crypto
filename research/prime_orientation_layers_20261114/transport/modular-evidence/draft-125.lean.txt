@@ -1,0 +1,122 @@
+module
+public import OrientationStudyBase121
+import all OrientationStudyBase121
+public section
+noncomputable section
+namespace OrientationActualPruningCount
+open Polynomial Finset OrientationMoment OrientationRetainedRescaling OrientationOddRescaling OrientationActualPruning
+
+def live (u k q : ℕ) : Finset (MomentLabels u k) := univ.filter (keep q)
+
+theorem card_live (u k q : ℕ) :
+    Fintype.card {rb : MomentLabels u k // keep q rb}=(live u k q).card := by
+  unfold live
+  exact Fintype.card_subtype (keep q)
+
+theorem live_zero (u k : ℕ) : live u k 0=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  unfold keep gain
+  simp only [ite_self,add_zero]
+  exact rb.2.isLt
+
+theorem card_zero (u k : ℕ) : Fintype.card {rb : MomentLabels u k // keep 0 rb}=2^u*k := by
+  rw [card_live,live_zero,Finset.card_univ]
+  exact moment_label_count u k
+
+def lastOdd (k : ℕ) (hk : 2 ≤ k) : Fin k := ⟨2*(k/2)-1,by omega⟩
+
+theorem live_two (u k : ℕ) (hk : 2 ≤ k) :
+    live u k 2=(univ : Finset (OrientationLeading.Labels u)).product ((univ : Finset (Fin k)).erase (lastOdd k hk)) := by
+  apply Finset.ext
+  intro rb
+  simp only [live,Finset.product_eq_sprod,Finset.mem_filter,Finset.mem_univ,Finset.mem_product,Finset.mem_erase,
+    true_and,and_true,ne_eq,Fin.ext_iff,lastOdd,keep,gain,oddMode]
+  have hb := rb.2.isLt
+  split_ifs with ho <;> omega
+
+theorem card_two (u k : ℕ) (hk : 2 ≤ k) :
+    Fintype.card {rb : MomentLabels u k // keep 2 rb}=2^u*(k-1) := by
+  rw [card_live,live_two u k hk,Finset.product_eq_sprod,Finset.card_product,
+    Finset.card_erase_of_mem (Finset.mem_univ (lastOdd k hk))]
+  simp only [Finset.card_univ,Fintype.card_fin]
+
+theorem live_small (u k q : ℕ) (hk : k ≤ 1) : live u k q=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  have hb := rb.2.isLt
+  have hz : rb.2.val=0 := by omega
+  have hn : ¬oddMode rb := by
+    unfold oddMode
+    rw [hz]
+    decide
+  unfold keep
+  rw [gain_even q rb hn,add_zero]
+  exact hb
+
+theorem card_small (u k q : ℕ) (hk : k ≤ 1) :
+    Fintype.card {rb : MomentLabels u k // keep q rb}=2^u*k := by
+  rw [card_live,live_small u k q hk,Finset.card_univ]
+  exact moment_label_count u k
+
+def last (k : ℕ) (hk : 0 < k) : Fin k := ⟨k-1,by omega⟩
+
+theorem live_one_even (u k : ℕ) (hk : 0 < k) (he : k%2=0) :
+    live u k 1=(univ : Finset (OrientationLeading.Labels u)).product ((univ : Finset (Fin k)).erase (last k hk)) := by
+  apply Finset.ext
+  intro rb
+  simp only [live,Finset.product_eq_sprod,Finset.mem_filter,Finset.mem_univ,Finset.mem_product,Finset.mem_erase,
+    true_and,and_true,ne_eq,Fin.ext_iff,last,keep,gain,oddMode]
+  have hb := rb.2.isLt
+  split_ifs with ho <;> omega
+
+theorem card_one_even (u k : ℕ) (hk : 0 < k) (he : k%2=0) :
+    Fintype.card {rb : MomentLabels u k // keep 1 rb}=2^u*(k-1) := by
+  rw [card_live,live_one_even u k hk he,Finset.product_eq_sprod,Finset.card_product,
+    Finset.card_erase_of_mem (Finset.mem_univ (last k hk))]
+  simp only [Finset.card_univ,Fintype.card_fin]
+
+theorem live_one_odd (u k : ℕ) (he : k%2=1) : live u k 1=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  have hb := rb.2.isLt
+  unfold keep gain oddMode
+  split_ifs with ho <;> omega
+
+theorem card_one_odd (u k : ℕ) (he : k%2=1) :
+    Fintype.card {rb : MomentLabels u k // keep 1 rb}=2^u*k := by
+  rw [card_live,live_one_odd u k he,Finset.card_univ]
+  exact moment_label_count u k
+
+theorem lower_node_count (u i k : ℕ) (hi : i+3 ≤ u) (hk : 2 ≤ k) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*(k-1) := by
+  have hq : min 2 (u-i-1)=2 := by omega
+  rw [hq]
+  exact card_two u k hk
+
+theorem highest_node_count (u i k : ℕ) (hi : u=i+1) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*k := by
+  have hq : min 2 (u-i-1)=0 := by omega
+  rw [hq]
+  exact card_zero u k
+
+theorem penultimate_even_count (u i k : ℕ) (hi : u=i+2) (hk : 0 < k) (he : k%2=0) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*(k-1) := by
+  have hq : min 2 (u-i-1)=1 := by omega
+  rw [hq]
+  exact card_one_even u k hk he
+
+theorem penultimate_odd_count (u i k : ℕ) (hi : u=i+2) (he : k%2=1) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*k := by
+  have hq : min 2 (u-i-1)=1 := by omega
+  rw [hq]
+  exact card_one_odd u k he
+
+end OrientationActualPruningCount
+#print axioms OrientationActualPruningCount.card_two
+#print axioms OrientationActualPruningCount.card_one_even
+#print axioms OrientationActualPruningCount.card_one_odd
+#print axioms OrientationActualPruningCount.lower_node_count

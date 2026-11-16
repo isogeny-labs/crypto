@@ -1,0 +1,25 @@
+module
+public import Mathlib.Data.Matrix.Block
+public section
+namespace CryptoLean.MatrixRestriction
+open Matrix
+variable {R α β γ : Type*} [CommRing R] [Fintype β]
+
+theorem product_restrict_middle (A : Matrix α β R) (B : Matrix β γ R)
+    (keep : β → Prop) [DecidablePred keep]
+    (hzero : ∀ i j,¬keep j → A i j=0) :
+    A*B=A.submatrix id (fun j : {j // keep j} => j.val)*
+      B.submatrix (fun j : {j // keep j} => j.val) id := by
+  have hz : A.toBlock (fun _ => True) (fun j => ¬keep j)=0 := by
+    apply Matrix.ext
+    intro i j
+    exact hzero i.val j.val j.property
+  have H := Matrix.toBlock_mul_eq_add (fun _ => True) keep (fun _ => True) A B
+  rw [hz,Matrix.zero_mul,add_zero] at H
+  apply Matrix.ext
+  intro i k
+  have he := congrArg (fun M : Matrix {x : α // True} {y : γ // True} R => M ⟨i,trivial⟩ ⟨k,trivial⟩) H
+  simpa only [Matrix.toBlock_apply,Matrix.mul_apply,Matrix.submatrix_apply] using he
+
+end CryptoLean.MatrixRestriction
+#print axioms CryptoLean.MatrixRestriction.product_restrict_middle

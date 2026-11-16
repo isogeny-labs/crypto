@@ -1,0 +1,274 @@
+module
+public import OrientationStudyBase121
+import all OrientationStudyBase121
+public section
+noncomputable section
+namespace OrientationActualPruningCount
+open Polynomial Finset OrientationMoment OrientationRetainedRescaling OrientationOddRescaling OrientationActualPruning
+
+def live (u k q : ℕ) : Finset (MomentLabels u k) := univ.filter (keep q)
+
+theorem card_live (u k q : ℕ) :
+    Fintype.card {rb : MomentLabels u k // keep q rb}=(live u k q).card := by
+  unfold live
+  exact Fintype.card_subtype (keep q)
+
+theorem live_zero (u k : ℕ) : live u k 0=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  unfold keep gain
+  simp only [ite_self,add_zero]
+  exact rb.2.isLt
+
+theorem card_zero (u k : ℕ) : Fintype.card {rb : MomentLabels u k // keep 0 rb}=2^u*k := by
+  rw [card_live,live_zero,Finset.card_univ]
+  exact moment_label_count u k
+
+def lastOdd (k : ℕ) (hk : 2 ≤ k) : Fin k := ⟨2*(k/2)-1,by omega⟩
+
+theorem live_two (u k : ℕ) (hk : 2 ≤ k) :
+    live u k 2=(univ : Finset (OrientationLeading.Labels u)).product ((univ : Finset (Fin k)).erase (lastOdd k hk)) := by
+  apply Finset.ext
+  intro rb
+  simp only [live,Finset.product_eq_sprod,Finset.mem_filter,Finset.mem_univ,Finset.mem_product,Finset.mem_erase,
+    true_and,and_true,ne_eq,Fin.ext_iff,lastOdd,keep,gain,oddMode]
+  have hb := rb.2.isLt
+  split_ifs with ho <;> omega
+
+theorem card_two (u k : ℕ) (hk : 2 ≤ k) :
+    Fintype.card {rb : MomentLabels u k // keep 2 rb}=2^u*(k-1) := by
+  rw [card_live,live_two u k hk,Finset.product_eq_sprod,Finset.card_product,
+    Finset.card_erase_of_mem (Finset.mem_univ (lastOdd k hk))]
+  simp only [Finset.card_univ,Fintype.card_fin]
+
+theorem live_small (u k q : ℕ) (hk : k ≤ 1) : live u k q=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  have hb := rb.2.isLt
+  have hz : rb.2.val=0 := by omega
+  have hn : ¬oddMode rb := by
+    unfold oddMode
+    rw [hz]
+    decide
+  unfold keep
+  rw [gain_even q rb hn,add_zero]
+  exact hb
+
+theorem card_small (u k q : ℕ) (hk : k ≤ 1) :
+    Fintype.card {rb : MomentLabels u k // keep q rb}=2^u*k := by
+  rw [card_live,live_small u k q hk,Finset.card_univ]
+  exact moment_label_count u k
+
+def last (k : ℕ) (hk : 0 < k) : Fin k := ⟨k-1,by omega⟩
+
+theorem live_one_even (u k : ℕ) (hk : 0 < k) (he : k%2=0) :
+    live u k 1=(univ : Finset (OrientationLeading.Labels u)).product ((univ : Finset (Fin k)).erase (last k hk)) := by
+  apply Finset.ext
+  intro rb
+  simp only [live,Finset.product_eq_sprod,Finset.mem_filter,Finset.mem_univ,Finset.mem_product,Finset.mem_erase,
+    true_and,and_true,ne_eq,Fin.ext_iff,last,keep,gain,oddMode]
+  have hb := rb.2.isLt
+  split_ifs with ho <;> omega
+
+theorem card_one_even (u k : ℕ) (hk : 0 < k) (he : k%2=0) :
+    Fintype.card {rb : MomentLabels u k // keep 1 rb}=2^u*(k-1) := by
+  rw [card_live,live_one_even u k hk he,Finset.product_eq_sprod,Finset.card_product,
+    Finset.card_erase_of_mem (Finset.mem_univ (last k hk))]
+  simp only [Finset.card_univ,Fintype.card_fin]
+
+theorem live_one_odd (u k : ℕ) (he : k%2=1) : live u k 1=univ := by
+  unfold live
+  apply Finset.filter_eq_self.mpr
+  intro rb _
+  have hb := rb.2.isLt
+  unfold keep gain oddMode
+  split_ifs with ho <;> omega
+
+theorem card_one_odd (u k : ℕ) (he : k%2=1) :
+    Fintype.card {rb : MomentLabels u k // keep 1 rb}=2^u*k := by
+  rw [card_live,live_one_odd u k he,Finset.card_univ]
+  exact moment_label_count u k
+
+theorem lower_node_count (u i k : ℕ) (hi : i+3 ≤ u) (hk : 2 ≤ k) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*(k-1) := by
+  have hq : min 2 (u-i-1)=2 := by omega
+  rw [hq]
+  exact card_two u k hk
+
+theorem highest_node_count (u i k : ℕ) (hi : u=i+1) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*k := by
+  have hq : min 2 (u-i-1)=0 := by omega
+  rw [hq]
+  exact card_zero u k
+
+theorem penultimate_even_count (u i k : ℕ) (hi : u=i+2) (hk : 0 < k) (he : k%2=0) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*(k-1) := by
+  have hq : min 2 (u-i-1)=1 := by omega
+  rw [hq]
+  exact card_one_even u k hk he
+
+theorem penultimate_odd_count (u i k : ℕ) (hi : u=i+2) (he : k%2=1) :
+    Fintype.card {rb : MomentLabels u k // keep (min 2 (u-i-1)) rb}=2^u*k := by
+  have hq : min 2 (u-i-1)=1 := by omega
+  rw [hq]
+  exact card_one_odd u k he
+
+end OrientationActualPruningCount
+#print axioms OrientationActualPruningCount.card_two
+#print axioms OrientationActualPruningCount.card_one_even
+#print axioms OrientationActualPruningCount.card_one_odd
+#print axioms OrientationActualPruningCount.lower_node_count
+
+namespace OrientationEvenModePolicy
+open Polynomial Finset OrientationMoment OrientationLeading OrientationRetainedRescaling
+  OrientationActualPruning OrientationRescaledCreation OrientationRetainedObjects
+  OrientationChartDegree OrientationOddRescaling
+
+abbrev Selected (u k q : ℕ) := {rb : MomentLabels u k // keep q rb}
+
+def shiftedLabel (q : ℕ) {u k : ℕ} (rb : Selected u k q) : MomentLabels u k :=
+  (rb.val.1,⟨rb.val.2.val+gain q rb.val,rb.property⟩)
+
+theorem shifted_first (q : ℕ) {u k : ℕ} (rb : Selected u k q) :
+    (shiftedLabel q rb).1=rb.val.1 := by unfold shiftedLabel;rfl
+
+theorem shifted_second (q : ℕ) {u k : ℕ} (rb : Selected u k q) :
+    (shiftedLabel q rb).2.val=rb.val.2.val+gain q rb.val := by unfold shiftedLabel;rfl
+
+def newWeight (w : ℤ) (q : ℕ) {u k : ℕ} (rb : MomentLabels u k) : ℤ :=
+  w+rb.2.val+(gain q rb:ℤ)
+
+theorem shifted_weight (w : ℤ) (q : ℕ) {u k : ℕ} (rb : Selected u k q) :
+    OrientationModeProfile.modeWeight w (shiftedLabel q rb)=newWeight w q rb.val := by
+  unfold OrientationModeProfile.modeWeight newWeight shiftedLabel
+  simp only [Nat.cast_add]
+  ring
+
+theorem shifted_injective (u k q : ℕ) (hq : q=0 ∨ q=2) :
+    Function.Injective (shiftedLabel q (u:=u) (k:=k)) := by
+  intro r s h
+  have hr := congrArg (fun rb : MomentLabels u k => rb.1) h
+  have hb := congrArg (fun rb : MomentLabels u k => rb.2.val) h
+  rw [shifted_first,shifted_first] at hr
+  rw [shifted_second,shifted_second] at hb
+  apply Subtype.ext
+  apply Prod.ext
+  · exact hr
+  · apply Fin.ext
+    rcases hq with rfl | rfl
+    · simp only [gain,ite_self,add_zero] at hb
+      exact hb
+    · by_cases hor : oddMode r.val
+      · rw [gain_odd 2 _ hor] at hb
+        by_cases hos : oddMode s.val
+        · rw [gain_odd 2 _ hos] at hb
+          omega
+        · rw [gain_even 2 _ hos] at hb
+          unfold oddMode at hor hos
+          omega
+      · rw [gain_even 2 _ hor] at hb
+        by_cases hos : oddMode s.val
+        · rw [gain_odd 2 _ hos] at hb
+          unfold oddMode at hor hos
+          omega
+        · rw [gain_even 2 _ hos] at hb
+          omega
+
+def embedding (u k q : ℕ) (hq : q=0 ∨ q=2) : Selected u k q ↪ MomentLabels u k :=
+  ⟨shiftedLabel q,shifted_injective u k q hq⟩
+
+theorem shifted_sides (i q : ℕ) {u k : ℕ} (rb : Selected u k q) :
+    OrientationModeProfile.targetBit i (shiftedLabel q rb)=OrientationModeProfile.targetBit i rb.val ∧
+    OrientationModeProfile.sourceBit i (shiftedLabel q rb)=OrientationModeProfile.sourceBit i rb.val := by
+  unfold OrientationModeProfile.targetBit OrientationModeProfile.sourceBit shiftedLabel
+  exact ⟨rfl,rfl⟩
+
+theorem weight_fiber_bound (u k q : ℕ) (hq : q=0 ∨ q=2) (w z : ℤ) :
+    Fintype.card {rb : Selected u k q // newWeight w q rb.val=z} ≤ 2^u := by
+  let f : {rb : Selected u k q // newWeight w q rb.val=z} →
+      {rb : MomentLabels u k // OrientationModeProfile.modeWeight w rb=z} :=
+    fun rb => ⟨shiftedLabel q rb.val,(shifted_weight w q rb.val).trans rb.property⟩
+  have hf : Function.Injective f := by
+    intro r s h
+    apply Subtype.ext
+    have H := congrArg Subtype.val h
+    exact (shifted_injective u k q hq) H
+  exact (Fintype.card_le_of_injective f hf).trans (OrientationModeProfile.weight_fiber_count u k w z)
+
+theorem actual_left_newWeight (a u i k q : ℕ) (m : ℕ → ℕ) (hiu : i < u) (hu : u ≤ a)
+    (x : OrientationLeading.Ports a) (rb : MomentLabels u k) :
+    OrientationAnchor.Content (newWeight (jetWeight a u i m) q rb) (left a u i k q m x rb) := by
+  unfold newWeight
+  exact left_weight a u i k q m hiu hu x rb
+
+def selectedFiber (u k q : ℕ) (w z : ℤ) : Finset (MomentLabels u k) :=
+  univ.filter (fun rb => keep q rb ∧ newWeight w q rb=z)
+
+theorem one_fiber_pair (u k : ℕ) (w : ℤ) (hk : 3 ≤ k) :
+    selectedFiber u k 1 w (w+2)=(univ : Finset (OrientationLeading.Labels u)).product
+      ({⟨1,by omega⟩,⟨2,by omega⟩} : Finset (Fin k)) := by
+  apply Finset.ext
+  intro rb
+  unfold selectedFiber
+  rw [Finset.mem_filter]
+  simp only [Finset.product_eq_sprod,Finset.mem_univ,Finset.mem_product,
+    Finset.mem_insert,Finset.mem_singleton,true_and,Fin.ext_iff]
+  unfold keep gain oddMode newWeight
+  have hb := rb.2.isLt
+  split_ifs with ho <;> omega
+
+theorem one_fiber_count (u k : ℕ) (w : ℤ) (hk : 3 ≤ k) :
+    (selectedFiber u k 1 w (w+2)).card=2^u*2 := by
+  rw [one_fiber_pair u k w hk,Finset.product_eq_sprod,Finset.card_product]
+  have hne : (⟨1,by omega⟩:Fin k)≠⟨2,by omega⟩ := by
+    intro h
+    have H := congrArg Fin.val h
+    change 1=2 at H
+    omega
+  rw [Finset.card_pair_eq_two_iff.mpr hne]
+  simp only [Finset.card_univ,Fintype.card_fin]
+
+theorem one_fiber_exceeds_old (u k : ℕ) (w : ℤ) (hk : 3 ≤ k) :
+    2^u < (selectedFiber u k 1 w (w+2)).card := by
+  rw [one_fiber_count u k w hk]
+  have hp : 0 < 2^u := by positivity
+  omega
+
+def evenGain (u i : ℕ) : ℕ := if i+3 ≤ u then 2 else 0
+
+theorem evenGain_cases (u i : ℕ) : evenGain u i=0 ∨ evenGain u i=2 := by
+  unfold evenGain
+  split_ifs <;> simp
+
+theorem evenGain_le_available (u i : ℕ) : evenGain u i ≤ min 2 (u-i-1) := by
+  unfold evenGain
+  split_ifs <;> omega
+
+theorem even_policy_right_integral (a u i k : ℕ) (t : RetainedNode a) (n : ℕ → ℕ)
+    (hi : padicValInt 2 t.val=i) (hiu : i < u) (hu : u ≤ a)
+    (rb : MomentLabels u k) (y : OrientationLeading.Ports a) :
+    OrientationAnchor.Content 0 (scaledTrimmedRight a u i k (evenGain u i) t.val (fun j => 4*n j) rb y) := by
+  by_cases h : i+3 ≤ u
+  · have hg : evenGain u i=min 2 (u-i-1) := by
+      unfold evenGain
+      rw [ite_eq_left h]
+      omega
+    rw [hg]
+    exact scaled_trimmed_integral a u i k t n hi hiu hu rb y
+  · have hg : evenGain u i=0 := by unfold evenGain;exact ite_eq_right h
+    rw [hg]
+    have hz : gain 0 rb=0 := by simp only [gain,ite_self]
+    simp only [scaledTrimmedRight,hz,pow_zero,inv_one,map_one,one_mul]
+    exact trimmed_right_integral a u i k t.val (fun j => 4*n j) t.property.2 t.property.1 hi hiu hu rb y
+
+theorem even_policy_capacity (u i k : ℕ) (w z : ℤ) :
+    Fintype.card {rb : Selected u k (evenGain u i) // newWeight w (evenGain u i) rb.val=z} ≤ 2^u :=
+  weight_fiber_bound u k (evenGain u i) (evenGain_cases u i) w z
+
+end OrientationEvenModePolicy
+#print axioms OrientationEvenModePolicy.shifted_injective
+#print axioms OrientationEvenModePolicy.weight_fiber_bound
+#print axioms OrientationEvenModePolicy.one_fiber_count
+#print axioms OrientationEvenModePolicy.even_policy_right_integral

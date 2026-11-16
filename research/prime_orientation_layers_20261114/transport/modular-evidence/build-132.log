@@ -1,0 +1,54 @@
+'OrientationNonscalarOrigin.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-132.lean.txt:80:0: error: Not a definitional equality: the left-hand side
+  ↑((blocks u) p)
+is not definitionally equal to the right-hand side
+  ↑p.2 + 2 ^ u * ↑p.1
+
+Note: This theorem is exported from the current module. This requires that all definitions that need to be unfolded to prove this theorem must be exposed.
+../modular-evidence/draft-132.lean.txt:88:53: error: unsolved goals
+u : ℕ
+p : Fin 2 × Labels u
+⊢ (blocks u) (Prod.map (⇑Fin.revPerm) (⇑(Equiv.refl (Labels u))) p) = (blocks u) (p.1.rev, p.2)
+../modular-evidence/draft-132.lean.txt:90:4: warning: This simp argument is unused:
+  Equiv.refl_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [pairing, Equiv.trans_apply, Equiv.symm_apply_apply, Equiv.prodCongr_apply, Fin.revPerm_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-132.lean.txt:90:21: warning: This simp argument is unused:
+  Fin.revPerm_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [pairing, Equiv.trans_apply, Equiv.symm_apply_apply, Equiv.prodCongr_apply, Equiv.refl_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-132.lean.txt:97:36: error(lean.unknownIdentifier): Unknown constant `Fin.rev_val`
+../modular-evidence/draft-132.lean.txt:99:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  0 ≤ a ≤ 1
+where
+ a := ↑↑p.1
+../modular-evidence/draft-132.lean.txt:105:13: warning: Possibly looping simp theorem: `Nat.add_mod`
+
+Hint: You can disable a simp theorem from the default simp set by passing `- theoremName` to `simp`.
+../modular-evidence/draft-132.lean.txt:105:25: warning: Possibly looping simp theorem: `Nat.mul_mod`
+
+Hint: You can disable a simp theorem from the default simp set by passing `- theoremName` to `simp`.
+../modular-evidence/draft-132.lean.txt:105:2: error: Tactic `simp` failed with a nested error:
+maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+../modular-evidence/draft-132.lean.txt:134:49: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../modular-evidence/draft-132.lean.txt:134:49: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+'OrientationPairedOrigin.pairing_no_fixed' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_matching' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_oneModTwo' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_inverse_integral' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

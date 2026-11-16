@@ -1,0 +1,15 @@
+# Focused selector-count import instance
+
+Above structures andlaws exactlymap013. Accepted predecessor121/receipt069source ispackaged ashash-pinned imported OrientationStudyBase121;newdeltaONLYcontainscountsection andcorrectowning OrientationLeading.Labels fromLeading79. No oldmathrewritten or newtrusted axioms.
+
+Existing named APIs:Fintype.card_subtype,Finset.filter/product/erase/card laws,oldMomentLabels/count interface andactualkeep/gain frombase121. Exactprimaryownerread;KB unavailable. No genericbijection/cardinalityinduction.
+
+Missing equalities:sameactualselector sets/cases/cardinalities asfailed122123;onlyimportpackaging/fullyqualified ownerdifferent. Source508 predecessor declarations notnewcountresults. Newdelta countmustreportedseparatelyfromimport-inclusive sum.
+
+Probe:base sourceSHAab37a418d5d2f2500f541dc324463aec9b1e1783a61e9b945dbf5192f8e121cb;distinctreadonlyqualifier,exclusivefutureprecall,inputhashguard. AlllocalderivedcacheoutputsremainUNTRACKED. Newmoduleintegrationnot sharedfreshcoverage.
+
+Inheritance:allbaseobjects importedasexistingsemanticobjects;oldsource/claims/pins exact;actualcountsetidentity thenexistingcardlaws. No namespaceguessing,oldstatementreissue or prooflimit/trust/opacityoption.
+
+Administrative note:scopedbasemoduleaudit launched afteritsinput-preparation failedwrongcwd. ItsresultmustbePOSTCALL/unpreregistered,not reconstructedprecall. Thefutureimport-inputmanifestisprospective fordelta calls only. No unchangedreruntogetproceduralgreen.
+
+Boundary:sameexactnominalsurvivors,not rank/runtime/netgain. One-bitweightedfiber collision remainsfuturetest. [pcc:unverified]

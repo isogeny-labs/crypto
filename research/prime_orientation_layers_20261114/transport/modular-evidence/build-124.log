@@ -1,0 +1,133 @@
+../modular-evidence/draft-124.lean.txt:37:24: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 2
+  a - 2*b ≥ 4
+where
+ a := ↑k
+ b := ↑↑rb.2 / 2
+../modular-evidence/draft-124.lean.txt:37:24: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 2
+  a - 2*b ≥ 1
+where
+ a := ↑k
+ b := ↑↑rb.2 / 2
+../modular-evidence/draft-124.lean.txt:34:52: warning: This simp argument is unused:
+  Finset.mem_product
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_erase, true_and, and_true, ne_eq, Fin.ext_iff,
+    lastOdd, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:34:71: warning: This simp argument is unused:
+  Finset.mem_erase
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, true_and, and_true, ne_eq,
+    Fin.ext_iff, lastOdd, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:35:13: warning: This simp argument is unused:
+  and_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, ne_eq,
+    Fin.ext_iff, lastOdd, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:35:22: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, and_true,
+    Fin.ext_iff, lastOdd, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:35:28: warning: This simp argument is unused:
+  Fin.ext_iff
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, and_true,
+    ne_eq, lastOdd, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:41:32: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  #(?s ×ˢ ?t)
+in the target expression
+  #(univ.product (univ.erase (lastOdd k hk))) = 2 ^ u * (k - 1)
+
+u k : ℕ
+hk : 2 ≤ k
+⊢ #(univ.product (univ.erase (lastOdd k hk))) = 2 ^ u * (k - 1)
+../modular-evidence/draft-124.lean.txt:73:24: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 1
+  a - b ≥ 2
+where
+ a := ↑k / 2
+ b := ↑↑rb.2 / 2
+../modular-evidence/draft-124.lean.txt:73:24: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 1
+  a - b ≥ 1
+where
+ a := ↑k / 2
+ b := ↑↑rb.2 / 2
+../modular-evidence/draft-124.lean.txt:70:52: warning: This simp argument is unused:
+  Finset.mem_product
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_erase, true_and, and_true, ne_eq, Fin.ext_iff,
+    last, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:70:71: warning: This simp argument is unused:
+  Finset.mem_erase
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, true_and, and_true, ne_eq,
+    Fin.ext_iff, last, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:71:13: warning: This simp argument is unused:
+  and_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, ne_eq,
+    Fin.ext_iff, last, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:71:22: warning: This simp argument is unused:
+  ne_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, and_true,
+    Fin.ext_iff, last, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:71:28: warning: This simp argument is unused:
+  Fin.ext_iff
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [live, Finset.mem_filter, Finset.mem_univ, Finset.mem_product, Finset.mem_erase, true_and, and_true,
+    ne_eq, last, keep, gain, oddMode]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-124.lean.txt:77:40: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  #(?s ×ˢ ?t)
+in the target expression
+  #(univ.product (univ.erase (last k hk))) = 2 ^ u * (k - 1)
+
+u k : ℕ
+hk : 0 < k
+he : k % 2 = 0
+⊢ #(univ.product (univ.erase (last k hk))) = 2 ^ u * (k - 1)
+'OrientationActualPruningCount.card_two' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.card_one_even' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.card_one_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualPruningCount.lower_node_count' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -1,0 +1,10 @@
+docs/matrix-restriction/source-001.lean.txt:22:2: error: Type mismatch: After simplification, term
+  he
+ has type
+  @Eq R (∑ j, A i j * B j k) (∑ j, A i ↑j * B (↑j) k)
+but is expected to have type
+  @Eq R (∑ j, A i j * B j k) (∑ j, A (id i) ↑j * B (↑j) (id k))
+'CryptoLean.MatrixRestriction.product_restrict_middle' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

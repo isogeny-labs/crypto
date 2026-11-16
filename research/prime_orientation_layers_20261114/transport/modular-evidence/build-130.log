@@ -1,0 +1,11 @@
+../modular-evidence/draft-130.lean.txt:31:2: warning: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp only [delta, Nat.cast_zero, sub_self, base, eval_mul, eval_C, hp, mul_zero]
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+../modular-evidence/draft-130.lean.txt:64:8: error(lean.unknownIdentifier): Unknown constant `Polynomial.natDegree_add_le.trans`
+'OrientationNonscalarOrigin.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_degree' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

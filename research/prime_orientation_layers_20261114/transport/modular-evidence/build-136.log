@@ -1,0 +1,102 @@
+'OrientationNonscalarOrigin.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_no_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_matching' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_oneModTwo' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_inverse_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-136.lean.txt:179:13: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  NonAssocSemiring (Ports (u + 1))
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../modular-evidence/draft-136.lean.txt:186:71: error: unsolved goals
+case pos
+u : ℕ
+m : ℕ → ℕ
+x y : Ports (u + 1)
+h✝ : (pairing u) x = y
+⊢ ↑((((sorry ()) fun x => ⟨-weight u m x, ⋯⟩) * (Equiv.toPEquiv (pairing u)).toMatrix) x y) = -weight u m x
+
+case neg
+u : ℕ
+m : ℕ → ℕ
+x y : Ports (u + 1)
+h✝ : ¬(pairing u) x = y
+⊢ (((sorry ()) fun x => ⟨-weight u m x, ⋯⟩) * (Equiv.toPEquiv (pairing u)).toMatrix) x y = 0
+../modular-evidence/draft-136.lean.txt:187:20: warning: declaration uses `sorry`
+../modular-evidence/draft-136.lean.txt:187:59: warning: This simp argument is unused:
+  Matrix.diagonalRingHom_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [origin, originUnit, Units.val_mul, Units.coe_map, rowUnits, permutationUnit, Matrix.diagonal_mul,
+    Equiv.Perm.permMatrix, PEquiv.toMatrix_toPEquiv_apply, Pi.single_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-136.lean.txt:188:29: warning: This simp argument is unused:
+  Matrix.diagonal_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [origin, originUnit, Units.val_mul, Units.coe_map, Matrix.diagonalRingHom_apply, rowUnits,
+    permutationUnit, Equiv.Perm.permMatrix, PEquiv.toMatrix_toPEquiv_apply, Pi.single_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-136.lean.txt:189:4: warning: This simp argument is unused:
+  PEquiv.toMatrix_toPEquiv_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [origin, originUnit, Units.val_mul, Units.coe_map, Matrix.diagonalRingHom_apply, rowUnits,
+    permutationUnit, Matrix.diagonal_mul, Equiv.Perm.permMatrix, Pi.single_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-136.lean.txt:189:35: warning: This simp argument is unused:
+  Pi.single_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [origin, originUnit, Units.val_mul, Units.coe_map, Matrix.diagonalRingHom_apply, rowUnits,
+    permutationUnit, Matrix.diagonal_mul, Equiv.Perm.permMatrix, PEquiv.toMatrix_toPEquiv_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-136.lean.txt:205:39: error: tactic execution is stuck, goal contains metavariables
+  ?m.17 ℚ X
+../modular-evidence/draft-136.lean.txt:209:5: error: Function expected at
+  actualKernel
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `actualKernel` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-136.lean.txt:213:4: error: Function expected at
+  actualKernel
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `actualKernel` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-136.lean.txt:219:5: error: Function expected at
+  actualKernel
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `actualKernel` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-136.lean.txt:223:5: error: Function expected at
+  actualKernel
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `actualKernel` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+'OrientationPairedOrigin.origin_entry' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.origin_two_sided_inverse' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_origin' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_diagonal_zero' depends on axioms: [propext, sorryAx]
+'OrientationPairedOrigin.actual_degree' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
