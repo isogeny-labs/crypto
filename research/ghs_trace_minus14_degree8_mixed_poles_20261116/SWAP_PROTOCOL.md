@@ -1,0 +1,9 @@
+# Companion rational-branch-swap screen
+
+Frozen source: `swap_closure.sage`, SHA-256 `b5b8729e78d98ce4967b3f52a3e3a607dc32069546b715dbd4029d6d8f0a53ed`.
+
+Search the denominator `B=L³(x-c)⁴` for all eight trace −14 source/carrier representative pairs. Here L is the unique K-linear branch factor of f and c is each of 242 K-points away from L. CRT enumerates the 243 root assignments on the five remaining quadratic branch factors. The x⁹ coefficient of the reduced numerator is a degree-at-most-four polynomial in c; all its roots are tested, with a full 242-value fallback if it vanishes identically. Every candidate with degree eight receives exact gcd, divisibility, squarehood, and final full-identity checks.
+
+This companion is needed for coordinate-orbit scope. The 12 carrier equations are degree-11 monic transforms by PGL2(F3). Such a transform either fixes the rational point at infinity or exchanges it with the sole finite rational branch point L. Under exchange, a degree-eight denominator `L^r D` of degree b transforms, up to nonzero scaling and transformed nonbranch factors, into `L^(8-b) D'`. Thus `L(x-c)^4` and `L³(x-c)^4` are paired; the latter was not in the main six-shape source. The previously frozen `L⁵(x-c)²` screen pairs with `L(x-c)²`. Every claimed orbit transfer must still check transformed numerators and the actual carrier maps; this statement is a denominator-shape argument, not an independent cover-elimination receipt.
+
+Run: `sage swap_closure.sage FMASK BMASK > swap_FMASK_BMASK.json 2> swap_FMASK_BMASK.stderr`. All eight cells receive source-bound raw receipts. Positive hits require independent map replay and the complete subgroup and attack pipeline. A zero hit excludes this named shape on the representative models only until the orbit-transfer argument is separately checked.
