@@ -1,3 +1,33 @@
+# Resume: crypto @ claude/leads-20261113 (PR #4065)
+
+## Goal
+Owner (2026-11-16): "Yes do all the above optimizations in workflow in parallel" — the leads of
+la_solver_20261116: faster relation collection, threaded LA, fix the dlpx clique/precheck loop
+and retest excess 2–5 %. (The L2 rerun needs isolab-eks; no AWS identity in this session.)
+
+## Spec
+research/humbert_genus5_cover_20261021/levers_20261116/PROTOCOL.md, frozen before data.
+Binary levers_20261116/bin/humbert-v6 sha256 85be709b… (rebuild: cargo build --release at the
+protocol commit). Runner: BIN=levers_20261116/bin/humbert-v6 BIN_SHA256_PREFIX=85be709b
+PRIMES=<q> levers_20261116/run_v6.sh levers_20261116/campaign/q<q>; resume with SEEDS=.
+
+## State
+Levers built/verified by workflow wf_ff8cffdd-dad (scratchpad levers/{rel,la,clique}), merged
+into src/ (relfast.rs new; la.rs threaded engine; filter.rs safe clique rule), 12 tests pass.
+Smoke q16001 s1: counted fields equal v5; dlpf t_ic 24.2 s -> 4.7 s with REL_FAST+LA_THREADS=4.
+Campaign under bench record benchmarks/records/<stamp>-humbert-genus5-levers.json.
+S3 checkpoint unavailable (no AWS identity); the branch push is the durable copy.
+
+## Done (2026-11-16T08:00Z)
+Campaign complete: 135/135 solved, counted identity 75/75. Report and PDF in levers_20261116/,
+benchmarks/20261116-humbert-genus5-levers, record closed as measured.
+
+## Next
+Leads: re-balance factor base under cheap relations; setup speed; matched 4-thread rho; L2 rerun.
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
+=======
 # Resume: pair-index timing on codex/rootfind-pair-index-timing-20261116
 
 This is the current branch handoff. The older rootfinding and unrelated
@@ -4136,4 +4166,5 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
 All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
 
 New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+>>>>>>> theirs
 >>>>>>> theirs
