@@ -19,3 +19,14 @@ theorem class_lower_bound : 2^52 < (M-1)/2 := by decide
 #print axioms correction_lt_one
 #print axioms class_lower_bound
 end Curve25519TorusArithmetic
+
+/- Concrete block-size obligations only, not a probability theorem. -/
+namespace Curve25519TorusArithmetic
+def birthdaySamples : Nat := 268951465398242860562463204936310
+theorem birthday_minimum : 2 ≤ birthdaySamples := by decide
+theorem birthday_completeness : 1600*birthdaySamples^2 ≤ W0 := by decide
+theorem birthday_soundness : W0 ≤ 2304*(birthdaySamples-1)^2 := by decide
+#print axioms birthday_minimum
+#print axioms birthday_completeness
+#print axioms birthday_soundness
+end Curve25519TorusArithmetic

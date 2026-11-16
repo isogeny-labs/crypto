@@ -54,3 +54,25 @@ Final gate receipt: [gate-v1](gate-v1/), four theorems and zero trusted-native
 exceptions. `#print axioms` reports no axioms for the four declarations.
 PCC-20261115-2deca4 records this narrow producer check; signed independent
 standing is separate. No geometric theorem is assumed as a Lean axiom.
+
+## Birthday diagnostic arithmetic instance, 2026-11-16
+
+Six gate fields: (1) same Core Nat ordered semiring and Decidable structure;
+(2) same Core of_decide_eq_true, used as stated; (3) birthdaySamples is the
+explicit native-planner integer 268951465398242860562463204936310 and W0 is
+the existing instance, not a copied definition; (4) the earlier Core assembly
+probe applies unchanged, and by decide checks the three actual inequalities;
+(5) no missing arithmetic component, but the finite-IID moment/second-moment
+and binomial monotonicity instances are not formalized here; (6) operations,
+order and reflection inherit Core exactly as before. No limit is raised.
+
+| Statement | Kind | Owner | Structure and hypotheses |
+|---|---|---|---|
+| birthday_minimum | Instance obligation | This study | Core Nat; fixed block length |
+| birthday_completeness | Instance obligation | This study | Core Nat; fixed block length and existing W0 |
+| birthday_soundness | Instance obligation | This study | Core Nat; fixed block length and existing W0 |
+
+These endpoints prove only the finite integer thresholds. Existing generic
+finite-support Cauchy–Schwarz belongs to CryptoLean.Group.PartiteCoverage;
+new reusable probability/counting laws would belong in crypto-lean. This
+study introduces no law of probability and assumes no probability axiom.

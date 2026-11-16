@@ -4,7 +4,7 @@
 - **Kind:** proof gap; implementation gap; measurement gap
 - **Affected work:** [native study](../research/curve25519_torus_native_20261115/README.md), [frozen energy draft](../research/curve25519_torus_native_20261115/theory-v1/energy-lemma.md), [related factor-base obstruction](factor-base-shape-to-successful-work.md)
 - **Next action owner:** Curve25519 torus campaign
-- **Last updated:** 2026-11-15
+- **Last updated:** 2026-11-16
 
 ## Problem
 
@@ -40,6 +40,22 @@ The first condition would establish a distribution component. The others are
 still needed for the requested exponent change.
 
 ## Next discriminating step
+
+The [16 November scaling audit](../research/curve25519_torus_native_20261115/reports/scaling-audit-v1/REPORT.md)
+adds a parameter gate for the proposed six-summand alternative: cap yield
+at one, charge all setup/kernel/memory work, and establish a suitable base
+cardinality before transferring a numeric model to an actual solver.
+The current transport lower-bound integer exceeds the unit-constant
+sixth-root target; this is a finite arithmetic observation, not exclusion
+of an asymptotic family. Many-coset candidates still lack admissibility and
+recognition-cost certification. PCC-20261116-ebfd31, 76dc04 and d45270.
+[pcc:unverified]
+
+The [private-coefficient clarification](../research/curve25519_torus_native_20261115/energy-test-v1/RANKFREE_REDUCTION.md)
+proposes replacing a statistical row-rank assumption with a common-column,
+tag-blind kernel protocol. Scalar-field endpoints and finite controls are
+available, while the actual point/selection bridge remains open. This is
+not a new decomposition-cost bound. PCC-20261116-f0439a. [pcc:unverified]
 
 - **Action:** freeze the four-point public-input solver protocol and qualify its isolated runtime. Generic recovery, union membership, mutation controls and actual-field M=1 native diagnostics are implemented in cryptanalysis; they do not replace full-base discovery. [pcc:unverified]
 - **Inputs and controls:** actual-field known-witness construction, all eight cofactor sections, M=1 complete-oracle diagnostics, and separately sampled label-hidden targets. The diagnostics do not substitute for the full base.
