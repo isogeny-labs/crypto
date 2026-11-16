@@ -236,3 +236,27 @@ then combine all classes and audit the fixed-carrier bound.
 ### Errors
 
 None in the three-pole counted runs.
+
+## 2026-11-15 23:35 America/Los_Angeles
+
+### What was done
+
+Committed three-pole receipts and result at `ec293d780656`. Copied and
+parameter-adapted the existing exact sparse and one-variable linear-square
+sources from trace `+26` to this fixed trace-`+22` carrier. Wrote a frozen
+completion protocol. No counted completion run had begun at this entry.
+
+### Decisions made
+
+Reuse the established CRT and coefficient-elimination algorithms, changing
+only the exact source and carrier equations. This completes the shapes
+needed before a full normalized degree-seven claim.
+
+### Open threads
+
+Commit source and run four cells (sparse and linear for masks 68 and 84),
+then audit the denominator partition and combine receipts.
+
+### Errors
+
+None in source preparation.
