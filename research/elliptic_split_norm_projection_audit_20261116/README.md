@@ -62,3 +62,5 @@ scheme ramification, P1/global reciprocity, arbitrary divisor representatives/
 isogeny comparison/general geometric descent/canonical Tate/general MOV-FR and
 full fourteen-item closure remain open. The normalized split finite case is
 closed at the stated guard. [pcc:unverified]
+
+Publication: ready [PR #4384](https://github.com/isogeny-labs/crypto/pull/4384), new follow-up stacked on #3739 after external merge #4377. Remote proof `d7a2975764337d0b226bb75e2a1c6409f9d7a372` and local receipt `d13ce623b43851b4f52e47b3499fd3c865ac81db` share tree `9133cd58a45d11c48611fa5608a4501adc82b790`. Anonymous fetch completed; fresh exact head/body/title/open/ready matched. Body has4119characters. All39pinsets3756entries/78scope links match;632nonemptyledgerprefix preserved through633. Current-head CI/review/signing pending. [pcc:unverified]
