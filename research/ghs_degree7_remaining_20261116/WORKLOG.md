@@ -53,3 +53,28 @@ Complete and audit b=68 and b=84; then address other denominator classes.
 
 Initial solver logic treated positive-dimensional ideals as censored. The
 amended bounded enumeration resolves them or records a solver error.
+
+## 2026-11-15 22:55 America/Los_Angeles
+
+### What was done
+
+Started b=68 and b=84 finite-field recovery runs at source `79da85c9c7e2`.
+Both remained active after several minutes. A process sample of b=68 showed
+the cost concentrated in repeated NTL polynomial gcds in the univariate
+fallback. Sent SIGINT to both processes; both exited 130 without a final JSON
+receipt. Changed the fallback to take degree-at-most-two roots from the first
+nonzero polynomial and verify all remaining equations.
+
+### Decisions made
+
+The two interrupted runs are incomplete evidence, and the edited source must
+be committed before restarting both targets.
+
+### Open threads
+
+Commit, rerun, audit all cells and exact identities; continue the other shapes.
+
+### Errors
+
+Univariate gcd was needlessly expensive. Direct root filtering is exact here
+because every specialized equation is quadratic or lower in `w`.

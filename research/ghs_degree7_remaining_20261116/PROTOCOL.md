@@ -37,6 +37,14 @@ and takes all common univariate `w` roots. The code checks all three
 original equations on every candidate. This is an exact finite-field
 completion for those cells. The amendment is committed before the next run.
 
+Second amendment, 16 November UTC: the first finite-field fallback used a
+polynomial gcd for every specialized pair and was stopped before a receipt
+after spending several minutes in NTL gcd. Since each specialized equation
+has degree at most two in `w`, the source now takes the roots of the first
+nonzero equation and checks every other equation there. If all vanish, it
+enumerates `w∈K`. This is the same exact solution set and avoids the costly
+gcd. The two interrupted runs are not counted as completed cells.
+
 Sources checked: the repository's three degree-seven protocols and trace-`+22`
 results; [Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
 for the existence ceiling (not an executable map); the 2015 Iijima–Momose–Chao

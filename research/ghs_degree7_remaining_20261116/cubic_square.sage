@@ -60,9 +60,10 @@ def recover_positive_dim(eqs):
             continue
         for tv in K:
             polys = [F(sv, tv, W) for F in eqs]
-            g = gcd(polys)
-            ws = K if g == 0 else g.roots(multiplicities=False)
-            out.extend((sv, tv, wv) for wv in ws)
+            first = next((p for p in polys if p != 0), None)
+            ws = K if first is None else first.roots(multiplicities=False)
+            out.extend((sv, tv, wv) for wv in ws
+                       if all(p(wv) == 0 for p in polys))
     return out
 
 for choices in itertools.product(range(3), repeat=5):
