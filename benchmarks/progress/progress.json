@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1312Z-exact-frontier-complete-paid-screen-20261116",
+  "latest_record": "20261116T1321Z-exact-frontier-selected-paired-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 216,
+    "measured": 217,
     "open": 1
   },
   "repo": "crypto",
@@ -13790,7 +13790,7 @@
     {
       "better": "neutral",
       "first": 45.0,
-      "latest": 192.0,
+      "latest": 108.0,
       "latest_derived": {},
       "metric": "complete_matching_answers",
       "points": [
@@ -13937,6 +13937,18 @@
           "spread": null,
           "summary": "Only fixedLAST/index31 frontier admits;192match/4paidrecoveries/0contention/pinsunchanged. Screen only, no paired confirmation. PCCa780ec/877bd3 unsigned.",
           "value": 192.0
+        },
+        {
+          "commit": "b07ab881b491",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T1321Z-exact-frontier-selected-paired-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All6AAgates pass/21blocks/108matching/pinsunchanged/0contention. Both original full-paid adjustedlowers>15, registered numeric15flagtrue; unsigned knownLASTfixture, no fastest/fresh/signed claim. PCC370e58/fd9d91.",
+          "value": 108.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -14128,6 +14140,58 @@
       ],
       "problem": "kernel:certified-relations-grevlex",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 16.91998407691807,
+      "latest": 16.91998407691807,
+      "latest_derived": {},
+      "metric": "last_star_n16_s7_expanded_regeneration_over_candidate_full_paid",
+      "points": [
+        {
+          "commit": "b07ab881b491",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 21,
+          "record": "20261116T1321Z-exact-frontier-selected-paired-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            16.106180418585414,
+            17.749762518404783
+          ],
+          "summary": "All6AAgates pass/21blocks/108matching/pinsunchanged/0contention. Both original full-paid adjustedlowers>15, registered numeric15flagtrue; unsigned knownLASTfixture, no fastest/fresh/signed claim. PCC370e58/fd9d91.",
+          "value": 16.91998407691807
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 22.418113595636463,
+      "latest": 22.418113595636463,
+      "latest_derived": {},
+      "metric": "last_star_n16_s7_f4_regeneration_over_candidate_full_paid",
+      "points": [
+        {
+          "commit": "b07ab881b491",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 21,
+          "record": "20261116T1321Z-exact-frontier-selected-paired-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            20.881658886835677,
+            23.838810858477782
+          ],
+          "summary": "All6AAgates pass/21blocks/108matching/pinsunchanged/0contention. Both original full-paid adjustedlowers>15, registered numeric15flagtrue; unsigned knownLASTfixture, no fastest/fresh/signed claim. PCC370e58/fd9d91.",
+          "value": 22.418113595636463
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
