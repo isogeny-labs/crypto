@@ -4,27 +4,13 @@
   "commands": [
     {
       "argv": [
-        "env",
-        "BIN=research/humbert_genus5_cover_20261021/dlp_filter_20261115/bin/humbert-v4",
-        "BIN_SHA256_PREFIX=5924fd1b",
-        "research/humbert_genus5_cover_20261021/dlp_filter_20261115/run_v4.sh",
-        "research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign"
-      ],
-      "cwd": ".",
-      "exit": null,
-      "note": "added by hand: the session's 2 h background limit killed the launcher (and benchrec run) after 117/120 rows, so benchrec could not write this entry; wall_s is the limit, not a measurement",
-      "started_utc": "2026-11-15T07:31:19+00:00",
-      "wall_s": 7200.0
-    },
-    {
-      "argv": [
         "bash",
         "-c",
         "for k in 3 4 5: HUMBERT_LA_PRECHECK=1 HUMBERT_SKIP_RHO=1 research/humbert_genus5_cover_20261021/dlp_filter_20261115/bin/humbert-v4 attack 24001 1 5 <arm (5+k)%6> >> research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign/results/v4.jsonl (rows tagged resumed:true)"
       ],
       "cwd": "research/humbert_genus5_cover_20261021/dlp_filter_20261115",
       "exit": 0,
-      "note": "added by hand: resume of the last instance's 3 missing arms, same binary (sha256 checked), protocol order",
+      "note": "added by hand: resume of the last instance's 3 missing arms, same binary (sha256 checked), protocol order; the 117 rows before it came from the killed launcher, recorded as censored in 20261116T0532Z-humbert-genus5-dlp-filter-killed-launch.json",
       "started_utc": null,
       "wall_s": null
     }

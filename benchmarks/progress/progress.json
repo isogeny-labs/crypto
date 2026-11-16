@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261116T0059Z-humbert-genus5-la-solver",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 8,
+    "censored": 10,
     "invalid": 4,
-    "measured": 199,
+    "measured": 202,
     "open": 1
   },
   "repo": "crypto",
@@ -8401,6 +8401,424 @@
       ],
       "problem": "ic:gw-quartic-dl-sqrt-compiled",
       "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 0.968,
+      "latest": 0.968,
+      "latest_derived": {},
+      "metric": "aa_dlpf50_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.962,
+            1.002
+          ],
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.968
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5126,
+      "latest": 0.5126,
+      "latest_derived": {},
+      "metric": "cand_dlp50_over_lp50_max",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 20,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 0.5126
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.21,
+      "latest": 1.21,
+      "latest_derived": {
+        "value_over_reference": 1.21
+      },
+      "metric": "dlpf50_ic_over_rho_exp_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 1.21
+          },
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.21
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.031,
+      "latest": 1.031,
+      "latest_derived": {},
+      "metric": "dlpx_over_dlpf_t_ic_median_q32003",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 1.031
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.36,
+      "latest": 0.36,
+      "latest_derived": {
+        "value_over_reference": 0.36
+      },
+      "metric": "ic_over_rho_dlpf_l1_q32003",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 0.36
+          },
+          "n": 5,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 0.36
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.65,
+      "latest": 1.65,
+      "latest_derived": {
+        "value_over_reference": 1.65
+      },
+      "metric": "ic_over_rho_expected_dlp50_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "value_over_reference": 1.65
+          },
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 1.65
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.13,
+      "latest": 2.13,
+      "latest_derived": {},
+      "metric": "la_mulmods_dlp50_over_lp50_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 2.13
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.203,
+      "latest": 0.203,
+      "latest_derived": {},
+      "metric": "la_mulmods_dlpf_l1_over_w2",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 15,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.2,
+            0.204
+          ],
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 0.203
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.967,
+      "latest": 0.967,
+      "latest_derived": {},
+      "metric": "lp50_over_dlp50_t_ic_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 0.967
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.02,
+      "latest": 1.02,
+      "latest_derived": {},
+      "metric": "lp50_over_dlpf50_t_ic_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.89,
+            1.07
+          ],
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.02
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.773,
+      "latest": 0.773,
+      "latest_derived": {},
+      "metric": "mm_dlpf50_over_dlp50_max",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 20,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.773
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.688,
+      "latest": 0.688,
+      "latest_derived": {},
+      "metric": "mm_dlpf50_over_dlpm50_max",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 20,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.688
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.627,
+      "latest": 1.627,
+      "latest_derived": {},
+      "metric": "mm_dlpf50_over_lp50_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.627
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "one_solve_failures",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 90,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 1.406,
+      "latest": 1.406,
+      "latest_derived": {},
+      "metric": "pre_over_dlp50_t_ic_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.174,
+            1.952
+          ],
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 1.406
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.416,
+      "latest": 2.416,
+      "latest_derived": {},
+      "metric": "t_ic_dlpf_w2_over_l1_q32003",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.369,
+            2.533
+          ],
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 2.416
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.193,
+      "latest": 0.193,
+      "latest_derived": {},
+      "metric": "t_la_dlpf_l1_over_w2_median",
+      "points": [
+        {
+          "commit": "df3578d1bc17",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 15,
+          "record": "20261116T0059Z-humbert-genus5-la-solver",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
+          "value": 0.193
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
     },
     {
       "better": "neutral",

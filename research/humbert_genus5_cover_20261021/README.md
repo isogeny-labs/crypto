@@ -66,3 +66,25 @@ assertion [pcc:unverified], not a leaderboard row.
   (Markowitz) merge rule.
 - The runner hit the session's 2 h background limit at 117/120 rows; the last instance's three missing
   arms ran afterwards with the same binary and are tagged `resumed: true`.
+
+## One-solve Lanczos and excess + clique removal (2026-11-16, `la_solver_20261116/`)
+
+Frozen protocol `la_solver_20261116/PROTOCOL.md` (with a launch-splitting addendum written before
+analysis); 120 runs (q = 16001, 24001, 32003; 5 seeds; 8 arms); all correctness gates, including the
+end-to-end check x·P = Q, pass; C0 control exact (20/20 replays of `v4`, identical candidates across
+solvers, identical dlpx A/A counted fields); report `la_solver_20261116/REPORT.pdf`. Unisolated L0
+wall time, unverified assertion [pcc:unverified], not a leaderboard row.
+
+- S1–S4 hold [pcc:unverified]: one Wiedemann solve is exactly 0.500× two; scalar Lanczos is 0.40× one
+  Wiedemann solve, counting every Lanczos mulmod. The incumbent dlpf:0.5 with Lanczos needs 0.203×
+  the counted LA, and t_LA is 0.19×. Paired t_ic of old (w2) over new (l1) is 1.89×, 2.16× and 2.42×
+  at q = 16001, 24001 and 32003. There were 0 failures in 90 one-solve runs.
+- G1 holds: with l1, dlpf is faster than lp on 15/15 instances (median 1.51–1.59×).
+- G2 holds: the best median IC / expected-steps rho is 0.55 (q = 24001) and 0.36 (32003); against
+  negation-map rho it is 0.78 and 0.51. This is the expected toy crossover of the cover attack
+  (slope 1.36 vs rho's about 2) against this crate's scalar rho, not a break.
+- X1 holds weakly (dlpx 0.96× dlpf's mulmods); X2 is falsified (dlpx is faster on 1/5 and 0/5 seeds).
+  Found a feedback loop: clique removal empties factor-base columns, the precheck then raises the target,
+  and so on (17 087 extensions and 2637 s at q = 24001 seed 5).
+- Next step (proposed): relation collection is now 62% of dlpf's time; then block Lanczos on 4 cores;
+  then an L2 rerun with a replay certificate so dlpf50_l1 can reach the leaderboard.
