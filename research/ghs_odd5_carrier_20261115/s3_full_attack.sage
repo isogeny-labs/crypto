@@ -127,21 +127,27 @@ def canon(Pt,aa,bb):
  return min(choices,key=lambda z:key(z[0]))
 def rho_trial(seed):
  rng=random.Random(int(seed));start=time.process_time_ns()
- steps=[(rng.randrange(r),rng.randrange(r)) for _ in range(16)]
- jumps=[u*P+v*Q for u,v in steps]
- aa=rng.randrange(r);bb=rng.randrange(r);D=aa*P+bb*Q
- seen={};count=0
- while count<20000:
-  D,aa,bb=canon(D,aa,bb);state=key(D) if not D.is_zero() else ('O',)
-  if state in seen:
-   aa0,bb0=seen[state];den=(bb-bb0)%r
-   if den:
-    candidate=((aa0-aa)*inverse_mod(den,r))%r
-    if candidate*P==Q:return {'cpu_s':(time.process_time_ns()-start)/1e9,'steps':count,'scalar':int(candidate)}
-   seen={}
-  seen[state]=(aa,bb)
-  j=sum((i+1)*v for i,v in enumerate(state))%len(jumps) if state!=('O',) else 0
-  D+=jumps[j];aa=(aa+steps[j][0])%r;bb=(bb+steps[j][1])%r;count+=1
+ count=0
+ for restart in range(100):
+  steps=[(rng.randrange(r),rng.randrange(r)) for _ in range(16)]
+  jumps=[u*P+v*Q for u,v in steps]
+  aa=rng.randrange(r);bb=rng.randrange(r);D=aa*P+bb*Q
+  seen={}
+  for _ in range(5000):
+   D,aa,bb=canon(D,aa,bb);state=key(D) if not D.is_zero() else ('O',)
+   if state in seen:
+    aa0,bb0=seen[state];den=(bb-bb0)%r
+    if den:
+     candidate=((aa0-aa)*inverse_mod(den,r))%r
+     if candidate*P==Q:
+      return {'cpu_s':(time.process_time_ns()-start)/1e9,'steps':count,
+              'restarts':restart,'scalar':int(candidate)}
+    break
+   seen[state]=(aa,bb)
+   j=hashlib.blake2s(bytes(state),digest_size=2).digest()[0]%len(jumps) if state!=('O',) else 0
+   D+=jumps[j];aa=(aa+steps[j][0])%r;bb=(bb+steps[j][1])%r;count+=1
+   if count>=20000:break
+  if count>=20000:break
  raise RuntimeError('rho cap reached')
 rho=[rho_trial(20261116+i) for i in range(30)]
 assert all(z['scalar']==secret for z in rho)
