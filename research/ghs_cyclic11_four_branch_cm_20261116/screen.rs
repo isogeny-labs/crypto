@@ -58,7 +58,7 @@ fn main() {
     let mut mismatches = Vec::new();
     let mut bound_ten_patterns = BTreeSet::<[i64; 4]>::new();
     let mut rows = 0_usize;
-    for a in 1..=10 {
+    for a in 1_i64..=10 {
         for b in 1..=10 {
             for c in 1..=10 {
                 let d = (-(a + b + c)).rem_euclid(11);
