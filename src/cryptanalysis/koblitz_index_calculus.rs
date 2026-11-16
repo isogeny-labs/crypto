@@ -1632,6 +1632,21 @@ pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint>
 /// 2). The single-word factor-base selection builds on this so that a
 /// point is lowered to a `BinaryPoint` once, at the end.
 fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) {
+    let inverse = if coordinate == 0 {
+        0
+    } else {
+        curve.field.inv(coordinate)
+    };
+    lift_x_packed_with_inverse(curve, coordinate, inverse)
+}
+
+/// The ordered packed lift after its abscissa inverse has been supplied.
+/// Keeping the root selection here shared preserves the legacy point order.
+fn lift_x_packed_with_inverse(
+    curve: &FastCurve,
+    coordinate: u64,
+    inverse: u64,
+) -> ([FastPoint; 2], usize) {
     debug_assert!(curve.n % 2 == 1);
     let field = &curve.field;
     let none = [FastPoint::INFINITY; 2];
@@ -1639,7 +1654,6 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
         let point = FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1));
         return ([point, FastPoint::INFINITY], 1);
     }
-    let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
     if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
         let Some(root) = curve.half_trace_root_cached(rhs) else {
@@ -3017,6 +3031,24 @@ pub fn build_standard_subspace_factor_base(
     kc: &KoblitzCurve,
     ell: u32,
 ) -> Result<FrobeniusFactorBase, String> {
+    build_standard_subspace_factor_base_with_lifts(kc, ell, false)
+}
+
+/// Opt-in standard-subspace base using one batch inversion for the ordered
+/// abscissae. The ordinary builder remains the ecbench path until its
+/// factor-base work ledger prices the changed field-operation mix.
+pub fn build_standard_subspace_factor_base_batch_lifts(
+    kc: &KoblitzCurve,
+    ell: u32,
+) -> Result<FrobeniusFactorBase, String> {
+    build_standard_subspace_factor_base_with_lifts(kc, ell, true)
+}
+
+fn build_standard_subspace_factor_base_with_lifts(
+    kc: &KoblitzCurve,
+    ell: u32,
+    batch_lifts: bool,
+) -> Result<FrobeniusFactorBase, String> {
     if ell == 0 || ell > 20 || ell >= kc.n {
         return Err("standard-subspace dimension must be 1..=20 and smaller than n".into());
     }
@@ -3029,11 +3061,28 @@ pub fn build_standard_subspace_factor_base(
     }
     let fast = (kc.n % 2 == 1).then(|| FastCurve::new(&kc.curve)).flatten();
     let mut points = Vec::new();
-    for x in &subspace {
-        points.extend(match &fast {
-            Some(curve) => points_with_x_fast(curve, x),
-            None => points_with_x(&kc.curve, x),
-        });
+    if batch_lifts {
+        if let Some(curve) = &fast {
+            let packed: Vec<u64> = subspace
+                .iter()
+                .map(|x| curve.field.from_element(x))
+                .collect();
+            let mut inverses = packed.clone();
+            let mut scratch = Vec::new();
+            curve.field.batch_inv(&mut inverses, &mut scratch);
+            for (&coordinate, &inverse) in packed.iter().zip(&inverses) {
+                let (lifts, count) = lift_x_packed_with_inverse(curve, coordinate, inverse);
+                points.extend(lifts[..count].iter().map(|&point| curve.lower(point)));
+            }
+        }
+    }
+    if !batch_lifts || fast.is_none() {
+        for x in &subspace {
+            points.extend(match &fast {
+                Some(curve) => points_with_x_fast(curve, x),
+                None => points_with_x(&kc.curve, x),
+            });
+        }
     }
     if points.is_empty() {
         return Err("standard subspace contains no rational curve point".into());
@@ -17870,6 +17919,69 @@ mod tests {
             seen[cached.1] = true;
         }
         assert_eq!(seen, [true; 3]);
+    }
+
+    #[test]
+    fn batched_packed_lifts_match_individual_lifts() {
+        for n in [5, 7, 13, 17, 23] {
+            let kc = KoblitzCurve::new(0, n).unwrap();
+            let fast = FastCurve::new(&kc.curve).unwrap();
+            let samples = if n <= 7 { 1u64 << n } else { 128 };
+            let mut rng = StdRng::seed_from_u64(73015 + u64::from(n));
+            let coordinates: Vec<u64> = (0..samples)
+                .map(|i| {
+                    if n <= 7 || i == 0 {
+                        i
+                    } else {
+                        rng.gen_range(0..1u64 << n)
+                    }
+                })
+                .collect();
+            let mut inverses = coordinates.clone();
+            fast.field.batch_inv(&mut inverses, &mut Vec::new());
+            let mut counts = [false; 3];
+            for (&coordinate, &inverse) in coordinates.iter().zip(&inverses) {
+                let expected = lift_x_packed(&fast, coordinate);
+                let batched = lift_x_packed_with_inverse(&fast, coordinate, inverse);
+                assert_eq!(batched, expected, "n={n}, x={coordinate}");
+                let cached =
+                    crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                        lift_x_packed_with_inverse(&fast, coordinate, inverse)
+                    });
+                assert_eq!(cached, expected, "cached n={n}, x={coordinate}");
+                counts[batched.1] = true;
+            }
+            if n == 5 {
+                assert_eq!(counts, [true; 3]);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_standard_subspace_base_matches_legacy_order_and_columns() {
+        for (n, ell) in [(5, 2), (7, 3), (13, 5), (17, 6), (23, 8)] {
+            let kc = KoblitzCurve::new(0, n).unwrap();
+            let old = build_standard_subspace_factor_base(&kc, ell).unwrap();
+            let new = build_standard_subspace_factor_base_batch_lifts(&kc, ell).unwrap();
+            assert_eq!(new.domain, old.domain, "n={n}");
+            assert_eq!(new.ell, old.ell, "n={n}");
+            assert_eq!(new.f_j, old.f_j, "n={n}");
+            assert_eq!(new.linearised_exponents, old.linearised_exponents, "n={n}");
+            assert_eq!(new.subspace, old.subspace, "n={n}");
+            assert_eq!(new.subspace_basis, old.subspace_basis, "n={n}");
+            assert_eq!(new.points, old.points, "n={n}");
+            assert_eq!(new.orbits, old.orbits, "n={n}");
+            assert_eq!(new.orbit_of, old.orbit_of, "n={n}");
+            assert_eq!(new.signed_orbits, old.signed_orbits, "n={n}");
+            assert_eq!(new.signed_orbit_of, old.signed_orbit_of, "n={n}");
+        }
+        let kc = KoblitzCurve::new(0, 5).unwrap();
+        for ell in [0, 5, 21] {
+            assert_eq!(
+                build_standard_subspace_factor_base_batch_lifts(&kc, ell).unwrap_err(),
+                build_standard_subspace_factor_base(&kc, ell).unwrap_err()
+            );
+        }
     }
 
     #[test]
