@@ -45,3 +45,10 @@ Source command:
 cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
 cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --mersenne-confirm
 ```
+
+
+## Follow-on optimized one-target Rust CLI exact-head evidence
+
+A later source commit exposed `--walk-mersenne-one` while keeping the original modes unchanged. The **full new CLI** passed exact-source [GitHub Actions run 43804915562](https://github.com/isogeny-labs/crypto/actions/runs/43804915562), job 133093351405, tested head `710aeb31fda4933a43f95a1500df2f098f043910`, after the paired experiment above. The existing Rust example release unit tests and all frozen prior methods also passed, plus the new single-call execution. On the published public Q=(1477799919,824532935), the optimized walk/Mersenne CLI correctly recovered the unknown log **1038579171**, replayed the complete group identity, and reported **23.058090 ms** in-process fully cold wall, **199,680** S3 quadratic trials, `field_multiplier=mersenne_fold`. The known secret is not passed to the solver. [Exact-source one-target JSON](APS_MERSENNE_ONE_TARGET_CI_20261116.json).
+
+This 23.06ms sample and the earlier 24-Q matched experiment are separate measurement populations. Neither is a fair *new* same-run comparison to optimized negation rho, BSGS or mature external PKM/APS. The source is Rust-only, and the original 24-Q matching report remains immutable at its earlier SHA.
