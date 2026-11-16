@@ -37,10 +37,10 @@ development checks, not an isolated timing comparison. The native incidence
 panel uses p83/p97 and B2/3/4; it is separate from the historical growing-B
 timing panel. [pcc:unverified]
 
-The norm/GCD stage remains O(B²) degree-B quotient products. Matched native
-timing, stronger external root-finding controls, larger-field datum setup and
-rho comparisons now have a descriptive Runpod run below; independent signed
-replay, wider-field support and admission remain pending.
+The norm/GCD stage remains O(B²) degree-B quotient products. Native complete
+costs and the explicit rho configuration now have a descriptive Runpod run.
+Stronger external tuning, wider-field support, independent signed replay and
+isolated admission remain pending.
 No overall runtime ratio is inferred from a component count. [pcc:unverified]
 
 | Requested deliverable | Current status and evidence |
