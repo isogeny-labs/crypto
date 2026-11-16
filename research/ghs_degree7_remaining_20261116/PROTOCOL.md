@@ -29,6 +29,14 @@ and wall/CPU timing in a separate receipt per target. Any hit requires
 independent algebraic replay, morphism degree, explicit subgroup image, full
 GHS solve, matched rho, and a fresh publication-priority search.
 
+Amendment, 16 November UTC, after the first b=68 run: 11 of 243 ideals
+were positive dimensional, so the initial receipt remains partial. The
+amended source enumerates `s∈K` for those ideals, solves the specialized
+two-variable ideal when zero dimensional, and otherwise enumerates `t∈K`
+and takes all common univariate `w` roots. The code checks all three
+original equations on every candidate. This is an exact finite-field
+completion for those cells. The amendment is committed before the next run.
+
 Sources checked: the repository's three degree-seven protocols and trace-`+22`
 results; [Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
 for the existence ceiling (not an executable map); the 2015 Iijima–Momose–Chao

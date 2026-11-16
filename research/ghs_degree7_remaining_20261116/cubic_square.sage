@@ -38,12 +38,32 @@ for i, q in enumerate(Q):
 P = PolynomialRing(K, names=('s', 't', 'w'), order='degrevlex')
 s, t, w = P.gens()
 hc = [w^2, 2*t*w, t^2+2*s*w, 2*s*t+2*w, s^2+2*t, 2*s, P(1)]
-counts = {'systems': 0, 'zero_dimensional': 0, 'censored_systems': 0,
+counts = {'systems': 0, 'zero_dimensional': 0, 'positive_dimensional': 0,
+          'censored_systems': 0,
           'parameter_solutions': 0, 'allowed_cubics': 0,
           'numerator_degree_seven': 0, 'coprime': 0,
           'f_divides': 0, 'full_equation_hits': 0}
 censored = []
 hits = []
+P2 = PolynomialRing(K, names=('t0', 'w0'), order='degrevlex')
+t0, w0 = P2.gens()
+S = PolynomialRing(K, 'W'); W = S.gen()
+
+def recover_positive_dim(eqs):
+    """Enumerate one field coordinate, then solve the remaining exact system."""
+    out = []
+    for sv in K:
+        specialized = [F(sv, t0, w0) for F in eqs]
+        J = P2.ideal(specialized)
+        if J.dimension() == 0:
+            out.extend((sv, K(sol[t0]), K(sol[w0])) for sol in J.variety(ring=K))
+            continue
+        for tv in K:
+            polys = [F(sv, tv, W) for F in eqs]
+            g = gcd(polys)
+            ws = K if g == 0 else g.roots(multiplicities=False)
+            out.extend((sv, tv, wv) for wv in ws)
+    return out
 
 for choices in itertools.product(range(3), repeat=5):
     counts['systems'] += 1
@@ -53,19 +73,17 @@ for choices in itertools.product(range(3), repeat=5):
     I = P.ideal(eqs)
     try:
         if I.dimension() != 0:
-            censored.append({'choices': list(choices), 'reason': 'positive_dimensional',
-                             'dimension': int(I.dimension())})
-            counts['censored_systems'] += 1
-            continue
-        solutions = I.variety(ring=K)
+            counts['positive_dimensional'] += 1
+            solutions = recover_positive_dim(eqs)
+        else:
+            counts['zero_dimensional'] += 1
+            solutions = [(K(sol[s]), K(sol[t]), K(sol[w])) for sol in I.variety(ring=K)]
     except Exception as exc:
         censored.append({'choices': list(choices), 'reason': type(exc).__name__,
                          'detail': str(exc)[:300]})
         counts['censored_systems'] += 1
         continue
-    counts['zero_dimensional'] += 1
-    for sol in solutions:
-        sv, tv, wv = (K(sol[g]) for g in (s, t, w))
+    for sv, tv, wv in solutions:
         assert all(F(sv, tv, wv) == 0 for F in eqs)
         counts['parameter_solutions'] += 1
         H = x^3 + sv*x^2 + tv*x + wv
