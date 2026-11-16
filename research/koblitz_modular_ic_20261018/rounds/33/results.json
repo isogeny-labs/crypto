@@ -1,0 +1,253 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 33,
+  "status": "construction progress; geometric and target-factor gates remain",
+  "construction_counts": {
+    "descended_sections": 68,
+    "quadratic_space_dimension": 196,
+    "cubic_space_dimension": 324,
+    "evaluated_degree83_points": 10,
+    "padding_closed_points": 2,
+    "padding_point_degree": 5,
+    "twist_projective_quadrics": 2150
+  },
+  "runs": [
+    {
+      "attempt": "desc33-01",
+      "native_exit": 0,
+      "singular_errors": true,
+      "terminal_marker": false,
+      "status": "rejected",
+      "recorded_results": [
+        "DESC33_PRODUCT_RESULT 2 columns=2346 spaceRank33=196 precision=257 F2_coordinates=all recombination=all"
+      ]
+    },
+    {
+      "attempt": "desc33-02",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "DESC33_PRODUCT_RESULT 2 columns=2346 spaceRank33=196 precision=257 F2_coordinates=all recombination=all",
+        "DESC33_PRODUCT_RESULT 3 columns=13328 spaceRank33=324 precision=389 F2_coordinates=all recombination=all"
+      ]
+    },
+    {
+      "attempt": "eval33-01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "EVAL33_RESULT point-r1-f2-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r1-f2-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r1-f3-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r1-f3-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r2-f2-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r2-f2-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r2-f3-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r2-f3-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r3-f2-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r3-f2-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r3-f3-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r3-f3-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r4-f2-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r4-f2-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r4-f3-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r4-f3-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r5-f2-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r5-f2-2D columns=196 rank=83 kernel=113 recombination=all",
+        "EVAL33_RESULT point-r5-f3-D columns=68 rank=68 kernel=0 recombination=all",
+        "EVAL33_RESULT point-r5-f3-2D columns=196 rank=83 kernel=113 recombination=all"
+      ]
+    },
+    {
+      "attempt": "lean-local33-01",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2,
+      "failing": 0,
+      "trusted": 0
+    },
+    {
+      "attempt": "lean33-01",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected"
+    },
+    {
+      "attempt": "lean33-02",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 5,
+      "failing": 0,
+      "trusted": 0
+    },
+    {
+      "attempt": "local33-check83-01",
+      "native_exit": 124,
+      "singular_errors": false,
+      "terminal_marker": false,
+      "status": "capped",
+      "recorded_results": []
+    },
+    {
+      "attempt": "local33-compact-check5-01",
+      "native_exit": 0,
+      "singular_errors": true,
+      "terminal_marker": true,
+      "status": "rejected",
+      "recorded_results": []
+    },
+    {
+      "attempt": "local33-compact-dump01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": []
+    },
+    {
+      "attempt": "local33-diagnostic01",
+      "native_exit": 0,
+      "singular_errors": true,
+      "terminal_marker": true,
+      "status": "rejected",
+      "recorded_results": [
+        "LOCAL33_GENERIC_DIAGNOSTIC vdim=32 basis_count=6"
+      ]
+    },
+    {
+      "attempt": "local33-diagnostic02",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "LOCAL33_GENERIC_DIAGNOSTIC vdim=32 basis_count=6",
+        "LOCAL33_POINT_DIAGNOSTIC q=1 maximal_minors_unit=1",
+        "LOCAL33_POINT_DIAGNOSTIC q=2 maximal_minors_unit=1"
+      ]
+    },
+    {
+      "attempt": "local33-function01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": []
+    },
+    {
+      "attempt": "local33-generate01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": []
+    },
+    {
+      "attempt": "local33-quotient01",
+      "native_exit": 124,
+      "singular_errors": false,
+      "terminal_marker": false,
+      "status": "capped",
+      "recorded_results": [
+        "LOCAL33_DIRECT_QUOTIENT omit=1 generators=10 exact_lift=pass",
+        "LOCAL33_DIRECT_QUOTIENT omit=2 generators=10 exact_lift=pass",
+        "LOCAL33_DIRECT_QUOTIENT omit=3 generators=7 exact_lift=pass"
+      ]
+    },
+    {
+      "attempt": "pad33-01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": []
+    },
+    {
+      "attempt": "padding-deck33-01",
+      "native_exit": 0,
+      "singular_errors": true,
+      "terminal_marker": true,
+      "status": "rejected",
+      "recorded_results": [
+        "PAD33_DECK_RESULT class=1 T2_frobenius=0 sigma_other_class=0 E_closed_divisor=0",
+        "PAD33_DECK_RESULT class=2 T2_frobenius=0 sigma_other_class=0 E_closed_divisor=0"
+      ]
+    },
+    {
+      "attempt": "padding-deck33-02",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "PAD33_DECK_RESULT class=1 T2_frobenius=1 sigma_other_class=2 E_closed_divisor=0",
+        "PAD33_DECK_RESULT class=2 T2_frobenius=1 sigma_other_class=1 E_closed_divisor=0"
+      ]
+    },
+    {
+      "attempt": "padding33-tangent01",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "PADDING33_TOTAL_TANGENT q=1 rank=3 determinant=0",
+        "PADDING33_TOTAL_TANGENT q=2 rank=3 determinant=0"
+      ]
+    },
+    {
+      "attempt": "quadrics33-01",
+      "native_exit": 0,
+      "singular_errors": true,
+      "terminal_marker": false,
+      "status": "rejected",
+      "recorded_results": []
+    },
+    {
+      "attempt": "quadrics33-02",
+      "native_exit": 0,
+      "singular_errors": false,
+      "terminal_marker": true,
+      "status": "accepted",
+      "recorded_results": [
+        "QUADRICS33_RESULT variables=68 monomials=2346 multiplication_rank=196 independent_equations=2150 native_roundtrip=all"
+      ]
+    }
+  ],
+  "evaluation": {
+    "source_support_degree": 83,
+    "section_dimension": 68,
+    "section_evaluation_rank": 68,
+    "quadratic_dimension": 196,
+    "quadratic_evaluation_rank": 83,
+    "quadratic_kernel_dimension": 113,
+    "all_ten_points_checked": true,
+    "IC_relation_rank": null,
+    "wrapper_reconciliation": "eval33-wrapper-reconciliation.json"
+  },
+  "local_geometry": {
+    "padding_maximal_minors_unit": true,
+    "padding_total_tangent_rank": 3,
+    "padding_tangent_only_not_dimension_proof": true,
+    "generic_fiber_dimension_over_F2_u": 32,
+    "compact_syzygy_presentation_accepted": false,
+    "global_normalization_complete": false,
+    "proper_polarized_factor_embedding": false
+  },
+  "formal": {
+    "named_theorems": 6,
+    "audited_declarations": 7,
+    "native_arrays_imported": false,
+    "geometric_bridge_formalized": false
+  },
+  "performance_measured": false,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "full_root_suite_passed": false
+}

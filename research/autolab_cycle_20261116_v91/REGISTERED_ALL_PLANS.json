@@ -1,0 +1,152 @@
+[
+  {
+    "id": "separator-images-oracles-20261116-v91",
+    "hypothesis": "Exactimageannihilatorpredicate versusstrongmatrix/normalizedAS;polynomialprefixcolumnstream mayreduce complete conditionalfiber cost",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.separator_images_20261116_v91.oracles",
+      "separator-images-oracles-20261116-v91",
+      "oracles_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/separator_images_20261116_v91/cold.py",
+      "research/separator_images_20261116_v91/common.py",
+      "research/separator_images_20261116_v91/child.py",
+      "research/separator_images_20261116_v91/oracles.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/separator_images_20261116_v91/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/separator_images_20261116_v91/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/separator_images_20261116_v91/oracles_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/separator_images_20261116_v91/cold.py": "1dd1545d958f9cd4dc9fefa4b3ff32d3e6d30ececc7e26534f15639bd3b6fbf1",
+      "research/separator_images_20261116_v91/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/separator_images_20261116_v91/child.py": "1208f49fb485180ea3d06b6b57797412e791c07b194a596fee125bbb67462e8a",
+      "research/separator_images_20261116_v91/oracles.py": "72e9867f3a2164660c26a587d885542cbb3e3c879b6ee93db4f087a86ae53c46",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/separator_images_20261116_v91/PROOF_AND_REVIEW.md": "576fbb5aa30c9d25e61da619645ee7e78ba6aff8c223c422d398664e0a00346c",
+      "research/separator_images_20261116_v91/DATA.json": "ddb06b4288c2e56a06cd1890790c35c8f31329b0cfb4fad3e62b51c2e2865f44"
+    }
+  },
+  {
+    "id": "separator-images-cold-20261116-v91",
+    "hypothesis": "Exactimageannihilatorpredicate versusstrongmatrix/normalizedAS;polynomialprefixcolumnstream mayreduce complete conditionalfiber cost",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.separator_images_20261116_v91.cold",
+      "separator-images-cold-20261116-v91",
+      "cold_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/separator_images_20261116_v91/cold.py",
+      "research/separator_images_20261116_v91/common.py",
+      "research/separator_images_20261116_v91/child.py",
+      "research/separator_images_20261116_v91/oracles.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/separator_images_20261116_v91/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/separator_images_20261116_v91/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/separator_images_20261116_v91/cold_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "separator-images-oracles-20261116-v91"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/separator_images_20261116_v91/cold.py": "1dd1545d958f9cd4dc9fefa4b3ff32d3e6d30ececc7e26534f15639bd3b6fbf1",
+      "research/separator_images_20261116_v91/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/separator_images_20261116_v91/child.py": "1208f49fb485180ea3d06b6b57797412e791c07b194a596fee125bbb67462e8a",
+      "research/separator_images_20261116_v91/oracles.py": "72e9867f3a2164660c26a587d885542cbb3e3c879b6ee93db4f087a86ae53c46",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/separator_images_20261116_v91/PROOF_AND_REVIEW.md": "576fbb5aa30c9d25e61da619645ee7e78ba6aff8c223c422d398664e0a00346c",
+      "research/separator_images_20261116_v91/DATA.json": "ddb06b4288c2e56a06cd1890790c35c8f31329b0cfb4fad3e62b51c2e2865f44"
+    }
+  },
+  {
+    "id": "separator-whole-cells-20261116-v91c",
+    "hypothesis": "Acommonleftnullspacecertificatecanrejectanentireaffineu-cellbyspanrelaxationwhilepreservingalloriginalconditionalS3roots",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.separator_cells_20261116_v91c.worker",
+      "separator-whole-cells-20261116-v91c",
+      "raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/separator_cells_20261116_v91c/common.py",
+      "research/separator_cells_20261116_v91c/worker.py",
+      "research/separator_cells_20261116_v91c/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/separator_cells_20261116_v91c/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/separator_cells_20261116_v91c/raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "separator-images-oracles-20261116-v91"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/separator_cells_20261116_v91c/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/separator_cells_20261116_v91c/worker.py": "b9bdbfce5da042fb472dbf3621353b981399585f1b046bb4159524bf02142041",
+      "research/separator_cells_20261116_v91c/PROOF_AND_REVIEW.md": "7fea0acf2a93f8900458d5f5794343d7d4d126cb164b0809d9b58197b53a8268",
+      "research/separator_cells_20261116_v91c/DATA.json": "8eedc1c4ca5e4b85d90771b19dc7ad5e9e958847a0f5c0ebab3c36059e873533"
+    }
+  }
+]

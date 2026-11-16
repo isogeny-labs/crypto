@@ -23,7 +23,7 @@ token=$(printf '%s\n%s\n%s\n' "$digest" "$run_request_sha" "$buildspec_sha" \
   | sha256sum | cut -d ' ' -f1)
 jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$token" \
   --arg run_request_sha "$run_request_sha" --arg buildspec "$buildspec_arn" \
-  '{projectName:$project,idempotencyToken:$token,timeoutInMinutesOverride:100,
+  '{projectName:$project,idempotencyToken:$token,timeoutInMinutesOverride:130,
     buildspecOverride:$buildspec,environmentVariablesOverride:[
       {name:"ISOLAB_REQUEST_KEY",value:$key,type:"PLAINTEXT"},
       {name:"ISOLAB_RUN_REQUEST_SHA256",value:$run_request_sha,type:"PLAINTEXT"}]}' \
@@ -32,7 +32,7 @@ jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$t
 aws codebuild start-build --cli-input-json "file://$output/start-request.json" > "$output/build-start.json"
 build_id=$(jq -er .build.id "$output/build-start.json")
 printf 'Launcher: %s\n' "$build_id"
-# The CodeBuild project has a 100-minute terminal bound. Allow one hour beyond
+# The CodeBuild launcher has a 130-minute terminal bound. Allow one hour beyond
 # the requested EKS deadline for provisioning, receipt verification and a
 # definitive launcher status, while remaining below the Actions job bound.
 duration=$(jq -er .job.seconds "$output/request.json")

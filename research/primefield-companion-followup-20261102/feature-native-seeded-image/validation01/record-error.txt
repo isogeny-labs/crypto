@@ -1,0 +1,1 @@
+First metadata capture failed with FileNotFoundError for repository-root driver.rs. rustc dep-info paths were relative to the qualification directory, but record.py resolved them from caller cwd. Fixed to resolve each path against its own directory. No build or native assertion failed; no receipt or PCC claim was emitted by the failed capture.

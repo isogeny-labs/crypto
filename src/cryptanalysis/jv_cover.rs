@@ -132,8 +132,10 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
-        super::jv_bitops::rng_words(2);
-        E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
+        E2([
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+        ])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
     pub fn sqrt(&self, a: &E2, rng: &mut StdRng) -> Option<E2> {

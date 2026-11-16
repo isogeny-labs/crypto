@@ -1,0 +1,13 @@
+digraph admission_v2 {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.3", ranksep="0.42"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=13,
+        color="#243b53", fillcolor="#f4f8fc", margin="0.15,0.1"];
+  edge [color="#526b80", penwidth=1.35, arrowsize=0.65];
+  old [label="v1 request\n2 rounds; no reference", fillcolor="#fff0e8"];
+  gate [label="EKS contract\nL2; >=5 rounds; warmup\nreference + matching A/A", fillcolor="#e9f0fb"];
+  fixed [label="v2 fixed cell\nF6 reference + batch A/A\n8 targets x 6 rounds = 144", fillcolor="#e8f6f1"];
+  panel [label="Frozen full panel\n560 processes, unchanged", fillcolor="#e8f6f1"];
+  old -> gate [label="refused"];
+  gate -> fixed [label="pre-data amendment"];
+  fixed -> panel [label="only after admission"];
+}

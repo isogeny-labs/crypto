@@ -1,0 +1,17 @@
+p=101;
+E=ellinit([Mod(2,p),Mod(3,p)]);T=ellinit([Mod(8,p),Mod(24,p)]);G=Mod(1,p)*[1,39];Q=ellmul(E,G,37);
+ck(c,s)=if(!c,error(s));
+canonpt(xx)={my(z=Mod(xx^3,p)+E.a4*xx+E.a6,yy);if(!issquare(z),return([]));yy=lift(sqrt(z));[Mod(xx,p),Mod(min(yy,p-yy),p)]};
+makebase(kind,nb,sh,hh,ord)={my(xs=Set([]),sc=0,z,xx,bb);if(kind==0,for(j=0,p-1,sc++;if(j!=lift(G[1])&&canonpt(j)!=[],xs=setunion(xs,[j]));if(#xs+1==nb,break)),for(j=1,ord-1,sc=j;z=ellmul(if(kind>=2,T,E),hh,j);xx=lift(z[1]/if(kind>=2,2,1)+sh);if(xx!=lift(G[1])&&canonpt(xx)!=[],xs=setunion(xs,[xx]));if(#xs+1==nb,break)));bb=concat([G],vector(#xs,j,canonpt(xs[j])));[bb,sc]};
+summ(bb,ii,mask)={my(acc=[0],z);for(j=1,#ii,z=bb[ii[j]+1];if(bittest(mask,j-1),z=ellneg(E,z));acc=elladd(E,acc,z));acc};
+collectcat(bb,tt,arity)={my(out=vector(#tt,j,List()),ii,z);for(i=0,#bb-1,for(j=i,#bb-1,for(k=0,if(arity==3,#bb-1,0),ii=if(arity==3,[i,j,k],[i,j]);for(mask=0,2^arity-1,z=summ(bb,ii,mask);for(oi=1,#tt,if(z==tt[oi],listput(out[oi],[ii,mask]);break))))));vector(#tt,j,Vec(out[j]))};
+torow(w,off,nb)={my(v=vector(nb+2));for(j=1,#w[1],v[w[1][j]+1]+=if(bittest(w[2],j-1),-1,1));v[nb+1]=-1;v[nb+2]=off;lift(v*Mod(1,823))};
+allrows(c2,c3,ed,nb,mode,on)={my(v=List(),ar=vector(nb+2),rr);ar[1]=1;ar[nb+2]=1;listput(v,ar);if(on,for(i=1,#ed,ar=vector(nb+2);ar[ed[i][2]+1]=1;ar[ed[i][1]+1]-=ed[i][3];listput(v,lift(ar*Mod(1,823)))));for(m=2,3,if(mode==m||mode==23,rr=if(m==2,c2,c3);for(j=0,15,for(k=1,#rr[j+1],listput(v,torow(rr[j+1][k],j,nb))))));Set(Vec(v))};
+tt=vector(16,j,elladd(E,Q,ellmul(E,G,j-1)));
+z=makebase(0,4,1,G,96);bb=z[1];ck(lift(bb)==[[1,39],[3,6],[5,21],[9,12]]&&z[2]==10,"control base");
+ck(collectcat(bb,tt,2)==[[[[2,3],0]],[],[],[],[],[],[],[],[],[[[3,3],0]],[],[],[],[[[3,3],3]],[],[]],"control complete catalogs");
+ck(collectcat(bb,tt,3)==[[],[[[0,2,3],0],[[0,3,2],0],[[1,3,3],0],[[2,3,0],0],[[3,3,1],0]],[[[1,1,3],3],[[1,3,1],5]],[],[],[[[1,3,3],6],[[2,2,2],0],[[3,3,1],3]],[],[],[[[0,3,3],1],[[1,2,3],1],[[1,3,2],1],[[2,2,3],7],[[2,3,1],4],[[2,3,2],7],[[3,3,0],4]],[],[[[0,3,3],0],[[3,3,0],0]],[],[[[0,3,3],7],[[3,3,0],7]],[],[[[0,3,3],6],[[1,2,3],6],[[1,3,2],6],[[2,2,3],0],[[2,3,1],3],[[2,3,2],0],[[3,3,0],3]],[]],"control complete catalogs");
+z=makebase(1,4,1,G,96);bb=z[1];ck(lift(bb)==[[1,39],[21,32],[61,19],[96,26]]&&z[2]==10,"control base");
+ck(collectcat(bb,tt,2)==[[],[],[],[[[1,1],3]],[[[0,3],1],[[1,2],0]],[],[[[0,3],0]],[],[],[],[],[],[],[],[],[]],"control complete catalogs");
+ck(collectcat(bb,tt,3)==[[[[0,0,2],4],[[0,2,0],2]],[],[[[0,1,1],7],[[1,1,0],7],[[1,2,3],5],[[1,3,2],3],[[2,3,1],6]],[[[0,0,3],3],[[0,1,2],1],[[0,2,1],1],[[0,3,0],5],[[1,2,0],4]],[[[0,1,1],6],[[1,1,0],3]],[[[0,0,3],1],[[0,0,3],2],[[0,1,2],0],[[0,2,1],0],[[0,3,0],1],[[0,3,0],4],[[1,1,3],1],[[1,1,3],2],[[1,2,0],0],[[1,3,1],1],[[1,3,1],4],[[2,2,3],1],[[2,2,3],2],[[2,3,2],1],[[2,3,2],4],[[3,3,3],1],[[3,3,3],2],[[3,3,3],4]],[],[[[0,0,3],0],[[0,3,0],0]],[],[[[1,2,2],1],[[2,2,1],4]],[[[2,3,3],7],[[3,3,2],7]],[],[[[2,3,3],0],[[3,3,2],0]],[[[1,2,2],6],[[2,2,1],3]],[],[[[0,0,3],7],[[0,3,0],7]]],"control complete catalogs");
+ma=Mod(1,101)*[1,0,0;0,1,1];ka=matker(ma);ck(sum(j=1,matsize(ka)[2],ka[3,j]!=0)>0,"ambiguous control");mf=Mod(1,101)*Mat([0,0,1]);kf=matker(mf);ck(matrank(mf)==1&&sum(j=1,matsize(kf)[2],kf[3,j]!=0)==0,"rank deficient target fixed");ck(ma*(Mod(1,101)*[0,-1,1]~)==matrix(2,1,i,j,Mod(0,101)),"rectangular kernel control");print("RANK_REPAIR_DEVELOPMENT_CONTROLS_OK");

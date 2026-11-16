@@ -1,0 +1,13 @@
+# Complete centroid h-domain and trace-degenerate cases
+
+The exact h-cover experiment passed352complete tiny domains and8128literal hchecks across GF4/GF8/GF16/GF32. It confirmed76empty domains and76nonempty trace-degenerate cases, so a blanket dimension-d assumption would be wrong. The general rule is empty when Tr(z) is outside Tr(V); otherwise dimension d+1-rank(Tr|V).
+
+For the actual GF(2^83)target and18dimensional factor base, the65x83affine system has rank65and an independent18vector kernel basis. It certifies exactly262144admissible hvalues, all nonzero; the earlier fixedh belongs and0/1do not. This is a complete necessary centroid chart cover for the finite quintic norm representation, not an enumeration or solve of all source/ghost charts.
+
+Sparse linearized coefficients certify the product of every actualh as3197590743228091714093730 and the sum of their reciprocals as5619891371804393147818154. Tiny exhaustive products/inverse sums agreed. Actual aggregate identities follow from the split affine root polynomial and its derivative, without materializing the262144values.
+
+One frozen experiment ran through lab.runner resume/run-ready with90seconds/4GiB/onecore. Worker0.667595058seconds,peakRSS154324KiBincludingfullfixtureparsing. RawSHA2561cae9d46d578598c9ed9302d453e7eebc0e4976706cab3bee4bff7d5bc832723,3632bytes. The portable standard-library verifier independently rebuilt tiny cardinalities, actualrows/rank/basis and aggregate identities and passed. A verifier draft token-spacing error was retained and corrected before publication; frozenworker/raw were unchanged.
+
+Next_AS_STRATA.md derives the h-independent AS right-hand trace Tr(A+z), and exact ordinary/degenerate fiber sizes for the next coefficient. A fresh bounded all-h trace-mask census can test the predicted absence of degenerate charts and preserve any enlarged fibers. No such census ran here. Prior factorization gains remain exploratory, noisy and rejection-limited; focus on whole-cell rejection rather than claim global benefit from successful extraction alone.
+
+The requested8x objective and unchanged genuine-F4/F5/F6 gate remain open: no original339-variable complete root set, source/ghost/chart closure,20hard completed comparisons or qualified end-to-end gain. Known AS/trace/subspace-polynomial identities do not establish novelty. Sole-model preparation is separate from independent algorithmic verification/externaladmission. Internal management provenance stays separate from this public mathematics checkpoint. Restore exact raw through artifact references if relocated and run REPLAY_RECORDED.py; never overwrite evidence.

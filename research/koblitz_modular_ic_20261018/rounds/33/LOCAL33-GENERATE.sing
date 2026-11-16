@@ -1,0 +1,73 @@
+ring localGeneric33=(2,u),(n,l,v),dp;
+poly rnLoc33=(u+1)*v+1;poly cnLoc33=rnLoc33+u^3;
+poly bLoc33=rnLoc33*cnLoc33/u^7;poly cLoc33=cnLoc33/u^4;
+if(u*cLoc33^2+bLoc33+cLoc33!=0 || (u+1)*v*cLoc33+bLoc33*u^3+cLoc33!=0){ERROR("LOCAL33_PLANE_INVERSE");}
+map sourceLoc33=r,n,l,bLoc33,cLoc33;
+ideal rawLoc33=sourceLoc33(original);poly baseLoc33=v^2+v+u^3+u;
+ideal baseIdealLoc33=std(ideal(baseLoc33));
+if(reduce(rawLoc33[1],baseIdealLoc33)!=0 || reduce(rawLoc33[2],baseIdealLoc33)!=0){ERROR("LOCAL33_TATE_NOT_BASE_MULTIPLE");}
+poly gcdLoc33=gcd(rawLoc33[1],rawLoc33[2]);poly hLoc33=gcdLoc33/baseLoc33;
+if(hLoc33*baseLoc33!=gcdLoc33){ERROR("LOCAL33_TATE_GCD_FACTOR");}
+ideal tateLoc33=rawLoc33[1],rawLoc33[2];matrix bezoutLoc33=lift(tateLoc33,ideal(gcdLoc33));
+matrix gcdCheckLoc33=matrix(tateLoc33)*bezoutLoc33;
+if(gcdCheckLoc33[1,1]!=gcdLoc33){ERROR("LOCAL33_TATE_BEZOUT");}
+ideal JLoc33=reduce(rawLoc33[3],baseIdealLoc33),reduce(rawLoc33[4],baseIdealLoc33),reduce(rawLoc33[5],baseIdealLoc33),baseLoc33;
+print("LOCAL33_BEGIN_SYZ");module syzLoc33=syz(JLoc33);matrix SLoc33=matrix(syzLoc33);
+int colsLoc33=ncols(SLoc33);matrix zeroSLoc33[1][colsLoc33];
+if(matrix(JLoc33)*SLoc33!=zeroSLoc33){ERROR("LOCAL33_GENERIC_SYZYGY_IDENTITY");}
+print("LOCAL33_SYZ_COLUMNS "+string(colsLoc33));
+proc collectDenLoc33(poly f,list ds){
+ int i;int j;int found;number d;
+ for(i=1;i<=size(f);i++){
+  d=denominator(leadcoef(f[i]));
+  if(d!=1){found=0;for(j=1;j<=size(ds);j++){if(ds[j]==d){found=1;}}if(found==0){ds[size(ds)+1]=d;}}
+ }
+ return(ds);
+}
+list dsLoc33;int iLoc33;int jLoc33;
+for(iLoc33=1;iLoc33<=5;iLoc33++){dsLoc33=collectDenLoc33(rawLoc33[iLoc33],dsLoc33);}
+for(iLoc33=1;iLoc33<=4;iLoc33++){dsLoc33=collectDenLoc33(JLoc33[iLoc33],dsLoc33);}
+dsLoc33=collectDenLoc33(hLoc33,dsLoc33);
+for(iLoc33=1;iLoc33<=2;iLoc33++){dsLoc33=collectDenLoc33(bezoutLoc33[iLoc33,1],dsLoc33);}
+for(iLoc33=1;iLoc33<=4;iLoc33++){for(jLoc33=1;jLoc33<=colsLoc33;jLoc33++){dsLoc33=collectDenLoc33(SLoc33[iLoc33,jLoc33],dsLoc33);}}
+number DLoc33=1;for(iLoc33=1;iLoc33<=size(dsLoc33);iLoc33++){DLoc33=DLoc33*number(dsLoc33[iLoc33]);}
+proc emitLoc33(link out,string lhs,poly value){
+ int k;for(k=1;k<=size(value);k++){if(denominator(leadcoef(value[k]))!=1){ERROR("LOCAL33_UNCLEARED_COEFFICIENT");}}
+ write(out,lhs+"="+string(value)+";");
+}
+link outLoc33="ASCII:w local-certificate.sing";open(outLoc33);
+write(outLoc33,"ring localCert33=2,(n,l,v,u),dp;poly localBase33=v^2+v+u^3+u;poly localDenominator33;poly localTateFactor33;ideal localTateNumerators33;matrix localTateBezout33[2][1];ideal localOriginalQR33;ideal localSource33;");
+write(outLoc33,"matrix localSyzygies33[4]["+string(colsLoc33)+"];");
+emitLoc33(outLoc33,"localDenominator33",poly(DLoc33));emitLoc33(outLoc33,"localTateFactor33",DLoc33*hLoc33);
+for(iLoc33=1;iLoc33<=2;iLoc33++){
+ emitLoc33(outLoc33,"localTateNumerators33["+string(iLoc33)+"]",DLoc33*rawLoc33[iLoc33]);
+ emitLoc33(outLoc33,"localTateBezout33["+string(iLoc33)+",1]",DLoc33*bezoutLoc33[iLoc33,1]);
+}
+for(iLoc33=1;iLoc33<=3;iLoc33++){emitLoc33(outLoc33,"localOriginalQR33["+string(iLoc33)+"]",DLoc33*rawLoc33[iLoc33+2]);}
+for(iLoc33=1;iLoc33<=4;iLoc33++){
+ emitLoc33(outLoc33,"localSource33["+string(iLoc33)+"]",DLoc33*JLoc33[iLoc33]);
+ for(jLoc33=1;jLoc33<=colsLoc33;jLoc33++){emitLoc33(outLoc33,"localSyzygies33["+string(iLoc33)+","+string(jLoc33)+"]",DLoc33*SLoc33[iLoc33,jLoc33]);}
+}
+close(outLoc33);
+execute(read("local-certificate.sing"));
+int ncolsCheck33=ncols(localSyzygies33);matrix zeroCheck33[1][ncolsCheck33];
+if(matrix(localSource33)*localSyzygies33!=zeroCheck33){ERROR("LOCAL33_POLYNOMIAL_SYZYGY_IDENTITY");}
+matrix tateCheck33=matrix(localTateNumerators33)*localTateBezout33;
+if(tateCheck33[1,1]!=localDenominator33*localTateFactor33*localBase33){ERROR("LOCAL33_POLYNOMIAL_TATE_IDENTITY");}
+int iiLocal33;int jjLocal33;int rrLocal33;int ccLocal33;int targetRowLocal33;
+for(iiLocal33=1;iiLocal33<=2;iiLocal33++){if(reduce(localTateNumerators33[iiLocal33],std(ideal(localBase33)))!=0){ERROR("LOCAL33_POLYNOMIAL_TATE_DIVISIBILITY");}}
+for(iiLocal33=1;iiLocal33<=3;iiLocal33++){if(reduce(localOriginalQR33[iiLocal33]+localSource33[iiLocal33],std(ideal(localBase33)))!=0){ERROR("LOCAL33_POLYNOMIAL_QR_CONGRUENCE");}}
+matrix badSyzygies33=localSyzygies33;badSyzygies33[4,1]=badSyzygies33[4,1]+1;
+if(matrix(localSource33)*badSyzygies33==zeroCheck33){ERROR("LOCAL33_CORRUPTION_ACCEPTED");}
+ideal localMinors33;ideal localOpenProducts33;int localProductsCount33;
+for(iiLocal33=1;iiLocal33<=3;iiLocal33++){
+ matrix minorLocal33[3][3];targetRowLocal33=0;
+ for(rrLocal33=1;rrLocal33<=4;rrLocal33++){if(rrLocal33!=iiLocal33){targetRowLocal33++;for(ccLocal33=1;ccLocal33<=3;ccLocal33++){minorLocal33[targetRowLocal33,ccLocal33]=diff(localSource33[rrLocal33],var(ccLocal33));}}}
+ localMinors33[iiLocal33]=det(minorLocal33);
+ for(jjLocal33=1;jjLocal33<=ncolsCheck33;jjLocal33++){localProductsCount33++;localOpenProducts33[localProductsCount33]=localSyzygies33[iiLocal33,jjLocal33]*localMinors33[iiLocal33];}
+}
+link openOut33="ASCII:w local-open-products.sing";open(openOut33);write(openOut33,"ideal localOpenProducts33;");
+for(iiLocal33=1;iiLocal33<=localProductsCount33;iiLocal33++){write(openOut33,"localOpenProducts33["+string(iiLocal33)+"]="+string(localOpenProducts33[iiLocal33])+";");}
+close(openOut33);
+print("LOCAL33_POLYNOMIAL_IDENTITIES_PASS products="+string(localProductsCount33));
+print("LOCAL33_GENERATE_ALL_CHECKS_PASS");quit;
