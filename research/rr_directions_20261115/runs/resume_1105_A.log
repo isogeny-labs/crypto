@@ -1,0 +1,11 @@
++ /home/user/crypto/target/release/examples/rr_quadratic_panel --out runs/f1_ladder_20261115 --m 13 --ell 6 --first-draw 5 --arms rr4 --solvers sat --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
+MASK_BITS = 128
+m13_l6_d5_rr4 sat nv=19 np=26 deg=4 truth_tot=63 truth_dist=60 truth0_tot=63 truth0_dist=60 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=10642 wall=0.67 tfa=63 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l6_d6_rr4 sat nv=19 np=27 deg=4 truth_tot=30 truth_dist=30 truth0_tot=30 truth0_dist=30 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=4923 wall=0.35 tfa=30 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l6_d7_rr4 sat nv=19 np=27 deg=4 truth_tot=6 truth_dist=6 truth0_tot=6 truth0_dist=6 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=102309 wall=7.28 tfa=6 ndx=null xlc=null xlcomplete=null skipped=null
++ /home/user/crypto/target/release/examples/rr_quadratic_panel --out runs/f1_ladder_20261115 --m 13 --ell 6 --first-draw 6 --arms norm --solvers sat,f4 --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
+MASK_BITS = 128
+m13_l6_d6_norm sat nv=44 np=52 deg=3 truth_tot=30 truth_dist=30 truth0_tot=30 truth0_dist=30 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=31933 wall=0.84 tfa=30 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l6_d6_norm f4 nv=44 np=52 deg=3 truth_tot=30 truth_dist=30 truth0_tot=30 truth0_dist=30 decided=false sd=4 dr=4 rows=70576 nsol=null ver=null status=null model_ok=null confl=null wall=41.92 tfa=30 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l6_d7_norm sat nv=44 np=52 deg=3 truth_tot=6 truth_dist=6 truth0_tot=6 truth0_dist=6 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=155534 wall=5.83 tfa=6 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l6_d7_norm f4 nv=44 np=52 deg=3 truth_tot=6 truth_dist=6 truth0_tot=6 truth0_dist=6 decided=false sd=4 dr=4 rows=73392 nsol=null ver=null status=null model_ok=null confl=null wall=43.71 tfa=6 ndx=null xlc=null xlcomplete=null skipped=null

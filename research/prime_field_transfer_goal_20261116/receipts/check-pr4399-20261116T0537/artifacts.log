@@ -1,0 +1,403 @@
+﻿2026-11-16T04:50:51.8854472Z Current runner version: '2.338.2'
+2026-11-16T04:50:51.8880454Z ##[group]Runner Image Provisioner
+2026-11-16T04:50:51.8881403Z Hosted Compute Agent
+2026-11-16T04:50:51.8882111Z Version: 20261103.629
+2026-11-16T04:50:51.8882758Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-16T04:50:51.8883535Z Build Date: 2026-11-03T17:26:59Z
+2026-11-16T04:50:51.8884280Z Worker ID: {47071f2e-8a5a-447e-b494-a038a6f86073}
+2026-11-16T04:50:51.8884998Z Region: eastus
+2026-11-16T04:50:51.8885639Z Cloud: Azure
+2026-11-16T04:50:51.8886598Z ##[endgroup]
+2026-11-16T04:50:51.8888266Z ##[group]Operating System
+2026-11-16T04:50:51.8888955Z Ubuntu
+2026-11-16T04:50:51.8889467Z 24.04.5
+2026-11-16T04:50:51.8890051Z LTS
+2026-11-16T04:50:51.8890573Z ##[endgroup]
+2026-11-16T04:50:51.8891186Z ##[group]Runner Image
+2026-11-16T04:50:51.8891824Z Image: ubuntu-24.04
+2026-11-16T04:50:51.8892376Z Version: 20261111.370.1
+2026-11-16T04:50:51.8893735Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261111.370/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-16T04:50:51.8895365Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261111.370
+2026-11-16T04:50:51.8896766Z ##[endgroup]
+2026-11-16T04:50:51.8898004Z ##[group]GITHUB_TOKEN Permissions
+2026-11-16T04:50:51.8899957Z Contents: read
+2026-11-16T04:50:51.8900711Z Metadata: read
+2026-11-16T04:50:51.8901331Z ##[endgroup]
+2026-11-16T04:50:51.8903891Z Secret source: Actions
+2026-11-16T04:50:51.8904886Z Cache mode: write
+2026-11-16T04:50:51.8906144Z Prepare workflow directory
+2026-11-16T04:50:51.9305718Z Prepare all required actions
+2026-11-16T04:50:51.9354506Z Getting action download info
+2026-11-16T04:50:52.0812974Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-16T04:50:52.2999135Z Complete job name: artifacts
+2026-11-16T04:50:52.3846472Z ##[group]Run sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+2026-11-16T04:50:52.3847567Z [36;1msudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \[0m
+2026-11-16T04:50:52.3848420Z [36;1m  /usr/local/.ghcup /opt/hostedtoolcache/CodeQL[0m
+2026-11-16T04:50:52.3873910Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:50:52.3874920Z env:
+2026-11-16T04:50:52.3875586Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:50:52.3876532Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:50:52.3877412Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:50:52.3878248Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:50:52.3879110Z ##[endgroup]
+2026-11-16T04:52:23.5632648Z ##[group]Run actions/checkout@v4
+2026-11-16T04:52:23.5633030Z with:
+2026-11-16T04:52:23.5633289Z   fetch-depth: 2
+2026-11-16T04:52:23.5633548Z   filter: blob:none
+2026-11-16T04:52:23.5633828Z   repository: isogeny-labs/crypto
+2026-11-16T04:52:23.5636800Z   token: ***
+2026-11-16T04:52:23.5637075Z   ssh-strict: true
+2026-11-16T04:52:23.5637339Z   ssh-user: git
+2026-11-16T04:52:23.5637602Z   persist-credentials: true
+2026-11-16T04:52:23.5637895Z   clean: true
+2026-11-16T04:52:23.5638170Z   sparse-checkout-cone-mode: true
+2026-11-16T04:52:23.5638507Z   fetch-tags: false
+2026-11-16T04:52:23.5638779Z   show-progress: true
+2026-11-16T04:52:23.5639040Z   lfs: false
+2026-11-16T04:52:23.5639296Z   submodules: false
+2026-11-16T04:52:23.5639583Z   set-safe-directory: true
+2026-11-16T04:52:23.5639892Z   allow-unsafe-pr-checkout: false
+2026-11-16T04:52:23.5640222Z env:
+2026-11-16T04:52:23.5640457Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:52:23.5640747Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:52:23.5641102Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:52:23.5641403Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:52:23.5641723Z ##[endgroup]
+2026-11-16T04:52:23.8642554Z Syncing repository: isogeny-labs/crypto
+2026-11-16T04:52:23.8644199Z ##[group]Getting Git version info
+2026-11-16T04:52:23.8644685Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-16T04:52:23.8645302Z [command]/usr/bin/git version
+2026-11-16T04:52:23.8746686Z git version 2.56.1
+2026-11-16T04:52:23.8770278Z ##[endgroup]
+2026-11-16T04:52:23.8787146Z Temporarily overriding HOME='/home/runner/work/_temp/6997dd93-2e82-40b2-acf0-2fec5d6e8128' before making global git config changes
+2026-11-16T04:52:23.8788911Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T04:52:23.8793713Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-16T04:52:23.8858949Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-16T04:52:23.8863408Z ##[group]Initializing the repository
+2026-11-16T04:52:23.8869693Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-16T04:52:23.8989548Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-16T04:52:23.8990615Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-16T04:52:23.8991688Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-16T04:52:23.8992643Z hint: call:
+2026-11-16T04:52:23.8993184Z hint:
+2026-11-16T04:52:23.8993974Z hint: 	git config --global init.defaultBranch <name>
+2026-11-16T04:52:23.8994584Z hint:
+2026-11-16T04:52:23.8995114Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-16T04:52:23.8996177Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-16T04:52:23.8996943Z hint:
+2026-11-16T04:52:23.8997362Z hint: 	git branch -m <name>
+2026-11-16T04:52:23.8997830Z hint:
+2026-11-16T04:52:23.8998453Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-16T04:52:23.9000398Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-16T04:52:23.9014959Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-16T04:52:23.9075000Z ##[endgroup]
+2026-11-16T04:52:23.9075693Z ##[group]Disabling automatic garbage collection
+2026-11-16T04:52:23.9080224Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-16T04:52:23.9115591Z ##[endgroup]
+2026-11-16T04:52:23.9116465Z ##[group]Setting up auth
+2026-11-16T04:52:23.9125156Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T04:52:23.9167487Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T04:52:23.9639908Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T04:52:23.9686949Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T04:52:23.9940557Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T04:52:23.9984989Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T04:52:24.0230451Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-16T04:52:24.0279881Z ##[endgroup]
+2026-11-16T04:52:24.0280542Z ##[group]Fetching the repository
+2026-11-16T04:52:24.0293750Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=2 origin +a53866d99cf5b52e8c5e7f79f1fb8f275513273d:refs/remotes/pull/4399/merge
+2026-11-16T04:52:24.8465735Z From https://github.com/isogeny-labs/crypto
+2026-11-16T04:52:24.8466627Z  * [new ref]           a53866d99cf5b52e8c5e7f79f1fb8f275513273d -> pull/4399/merge
+2026-11-16T04:52:24.8471082Z ##[endgroup]
+2026-11-16T04:52:24.8471936Z ##[group]Determining the checkout info
+2026-11-16T04:52:24.8474952Z ##[endgroup]
+2026-11-16T04:52:24.8486270Z [command]/usr/bin/git sparse-checkout disable
+2026-11-16T04:52:24.8573123Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-16T04:52:24.8622326Z ##[group]Checking out the ref
+2026-11-16T04:52:24.8627442Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/4399/merge
+2026-11-16T04:55:59.1132414Z Updating files:   0% (1/328583)
+2026-11-16T04:55:59.1613442Z Updating files:   0% (3086/328583)
+2026-11-16T04:55:59.8114271Z Updating files:   1% (3286/328583)
+2026-11-16T04:56:00.3104573Z Updating files:   2% (6572/328583)
+2026-11-16T04:56:00.9143672Z Updating files:   2% (7144/328583)
+2026-11-16T04:56:01.1127370Z Updating files:   3% (9858/328583)
+2026-11-16T04:56:01.2272832Z Updating files:   3% (11936/328583)
+2026-11-16T04:56:01.5627108Z Updating files:   4% (13144/328583)
+2026-11-16T04:56:02.1127193Z Updating files:   5% (16430/328583)
+2026-11-16T04:56:02.1350586Z Updating files:   5% (19686/328583)
+2026-11-16T04:56:02.4435114Z Updating files:   6% (19715/328583)
+2026-11-16T04:56:02.8187864Z Updating files:   7% (23001/328583)
+2026-11-16T04:56:03.0752699Z Updating files:   8% (26287/328583)
+2026-11-16T04:56:03.2077750Z Updating files:   9% (29573/328583)
+2026-11-16T04:56:04.1132594Z Updating files:   9% (29986/328583)
+2026-11-16T04:56:04.6368371Z Updating files:   9% (31123/328583)
+2026-11-16T04:56:05.1157352Z Updating files:  10% (32859/328583)
+2026-11-16T04:56:06.0578541Z Updating files:  10% (33725/328583)
+2026-11-16T04:56:06.1129811Z Updating files:  11% (36145/328583)
+2026-11-16T04:56:06.4113284Z Updating files:  11% (36701/328583)
+2026-11-16T04:56:06.8707476Z Updating files:  12% (39430/328583)
+2026-11-16T04:56:07.0956354Z Updating files:  13% (42716/328583)
+2026-11-16T04:56:07.1125610Z Updating files:  14% (46002/328583)
+2026-11-16T04:56:07.4833690Z Updating files:  14% (46202/328583)
+2026-11-16T04:56:07.6567323Z Updating files:  15% (49288/328583)
+2026-11-16T04:56:07.9084128Z Updating files:  16% (52574/328583)
+2026-11-16T04:56:08.1126489Z Updating files:  17% (55860/328583)
+2026-11-16T04:56:08.2458380Z Updating files:  17% (58184/328583)
+2026-11-16T04:56:08.8729419Z Updating files:  18% (59145/328583)
+2026-11-16T04:56:09.1131970Z Updating files:  19% (62431/328583)
+2026-11-16T04:56:09.1427683Z Updating files:  19% (65340/328583)
+2026-11-16T04:56:09.3912445Z Updating files:  20% (65717/328583)
+2026-11-16T04:56:09.6141466Z Updating files:  21% (69003/328583)
+2026-11-16T04:56:09.8242210Z Updating files:  22% (72289/328583)
+2026-11-16T04:56:10.1127029Z Updating files:  23% (75575/328583)
+2026-11-16T04:56:10.1366868Z Updating files:  23% (78427/328583)
+2026-11-16T04:56:10.4774530Z Updating files:  24% (78860/328583)
+2026-11-16T04:56:10.8920458Z Updating files:  25% (82146/328583)
+2026-11-16T04:56:11.1127446Z Updating files:  26% (85432/328583)
+2026-11-16T04:56:11.2947179Z Updating files:  26% (86882/328583)
+2026-11-16T04:56:11.5200979Z Updating files:  27% (88718/328583)
+2026-11-16T04:56:11.7856810Z Updating files:  28% (92004/328583)
+2026-11-16T04:56:12.1126922Z Updating files:  29% (95290/328583)
+2026-11-16T04:56:13.1242663Z Updating files:  29% (97470/328583)
+2026-11-16T04:56:14.1904309Z Updating files:  29% (97579/328583)
+2026-11-16T04:56:14.6320482Z Updating files:  29% (97825/328583)
+2026-11-16T04:56:15.1127190Z Updating files:  30% (98575/328583)
+2026-11-16T04:56:15.2333859Z Updating files:  30% (100379/328583)
+2026-11-16T04:56:15.3965587Z Updating files:  31% (101861/328583)
+2026-11-16T04:56:15.7240493Z Updating files:  32% (105147/328583)
+2026-11-16T04:56:15.9534027Z Updating files:  33% (108433/328583)
+2026-11-16T04:56:16.1126924Z Updating files:  34% (111719/328583)
+2026-11-16T04:56:16.1841220Z Updating files:  34% (113717/328583)
+2026-11-16T04:56:16.4354580Z Updating files:  35% (115005/328583)
+2026-11-16T04:56:16.6802906Z Updating files:  36% (118290/328583)
+2026-11-16T04:56:16.8672614Z Updating files:  37% (121576/328583)
+2026-11-16T04:56:17.1127053Z Updating files:  38% (124862/328583)
+2026-11-16T04:56:17.1551120Z Updating files:  38% (127648/328583)
+2026-11-16T04:56:17.3780604Z Updating files:  39% (128148/328583)
+2026-11-16T04:56:17.5439748Z Updating files:  40% (131434/328583)
+2026-11-16T04:56:17.7180369Z Updating files:  41% (134720/328583)
+2026-11-16T04:56:17.8874016Z Updating files:  42% (138005/328583)
+2026-11-16T04:56:18.0609432Z Updating files:  43% (141291/328583)
+2026-11-16T04:56:18.1127021Z Updating files:  44% (144577/328583)
+2026-11-16T04:56:18.2576987Z Updating files:  44% (145334/328583)
+2026-11-16T04:56:18.4289346Z Updating files:  45% (147863/328583)
+2026-11-16T04:56:18.6108616Z Updating files:  46% (151149/328583)
+2026-11-16T04:56:18.9275772Z Updating files:  47% (154435/328583)
+2026-11-16T04:56:19.1126880Z Updating files:  48% (157720/328583)
+2026-11-16T04:56:19.6269361Z Updating files:  48% (159298/328583)
+2026-11-16T04:56:19.7581592Z Updating files:  49% (161006/328583)
+2026-11-16T04:56:20.1203107Z Updating files:  50% (164292/328583)
+2026-11-16T04:56:20.6760902Z Updating files:  50% (166396/328583)
+2026-11-16T04:56:21.1126848Z Updating files:  51% (167578/328583)
+2026-11-16T04:56:21.6627257Z Updating files:  51% (168519/328583)
+2026-11-16T04:56:21.9911177Z Updating files:  52% (170864/328583)
+2026-11-16T04:56:22.1125942Z Updating files:  53% (174149/328583)
+2026-11-16T04:56:22.1922886Z Updating files:  53% (175890/328583)
+2026-11-16T04:56:22.4214560Z Updating files:  54% (177435/328583)
+2026-11-16T04:56:22.7297273Z Updating files:  55% (180721/328583)
+2026-11-16T04:56:22.8968484Z Updating files:  56% (184007/328583)
+2026-11-16T04:56:23.1126808Z Updating files:  57% (187293/328583)
+2026-11-16T04:56:23.1519169Z Updating files:  57% (189885/328583)
+2026-11-16T04:56:23.5541121Z Updating files:  58% (190579/328583)
+2026-11-16T04:56:23.9179426Z Updating files:  59% (193864/328583)
+2026-11-16T04:56:24.1128755Z Updating files:  60% (197150/328583)
+2026-11-16T04:56:24.1583124Z Updating files:  60% (199639/328583)
+2026-11-16T04:56:24.4181503Z Updating files:  61% (200436/328583)
+2026-11-16T04:56:25.1126571Z Updating files:  62% (203722/328583)
+2026-11-16T04:56:25.1405734Z Updating files:  62% (206482/328583)
+2026-11-16T04:56:25.4666738Z Updating files:  63% (207008/328583)
+2026-11-16T04:56:25.9622193Z Updating files:  64% (210294/328583)
+2026-11-16T04:56:26.1143274Z Updating files:  65% (213579/328583)
+2026-11-16T04:56:27.1126188Z Updating files:  65% (214016/328583)
+2026-11-16T04:56:27.4331246Z Updating files:  65% (215611/328583)
+2026-11-16T04:56:28.1417597Z Updating files:  66% (216865/328583)
+2026-11-16T04:56:28.8134389Z Updating files:  66% (217624/328583)
+2026-11-16T04:56:29.2091248Z Updating files:  67% (220151/328583)
+2026-11-16T04:56:30.1183668Z Updating files:  67% (220832/328583)
+2026-11-16T04:56:31.1129521Z Updating files:  67% (221248/328583)
+2026-11-16T04:56:31.1848719Z Updating files:  67% (222702/328583)
+2026-11-16T04:56:31.9065243Z Updating files:  68% (223437/328583)
+2026-11-16T04:56:32.1126627Z Updating files:  69% (226723/328583)
+2026-11-16T04:56:32.1214962Z Updating files:  69% (229883/328583)
+2026-11-16T04:56:32.3153130Z Updating files:  70% (230009/328583)
+2026-11-16T04:56:32.4941142Z Updating files:  71% (233294/328583)
+2026-11-16T04:56:32.6855003Z Updating files:  72% (236580/328583)
+2026-11-16T04:56:32.8799081Z Updating files:  73% (239866/328583)
+2026-11-16T04:56:33.1499608Z Updating files:  74% (243152/328583)
+2026-11-16T04:56:33.1662651Z Updating files:  74% (246128/328583)
+2026-11-16T04:56:33.3325748Z Updating files:  75% (246438/328583)
+2026-11-16T04:56:33.5137924Z Updating files:  76% (249724/328583)
+2026-11-16T04:56:33.7865851Z Updating files:  77% (253009/328583)
+2026-11-16T04:56:33.9734028Z Updating files:  78% (256295/328583)
+2026-11-16T04:56:34.1993762Z Updating files:  79% (259581/328583)
+2026-11-16T04:56:34.3855549Z Updating files:  79% (260387/328583)
+2026-11-16T04:56:34.6602614Z Updating files:  80% (262867/328583)
+2026-11-16T04:56:34.9284443Z Updating files:  81% (266153/328583)
+2026-11-16T04:56:35.1127316Z Updating files:  82% (269439/328583)
+2026-11-16T04:56:35.2141222Z Updating files:  82% (271874/328583)
+2026-11-16T04:56:35.4195543Z Updating files:  83% (272724/328583)
+2026-11-16T04:56:35.6030574Z Updating files:  84% (276010/328583)
+2026-11-16T04:56:35.8429695Z Updating files:  85% (279296/328583)
+2026-11-16T04:56:36.1127608Z Updating files:  86% (282582/328583)
+2026-11-16T04:56:36.2487977Z Updating files:  86% (283754/328583)
+2026-11-16T04:56:36.5305700Z Updating files:  87% (285868/328583)
+2026-11-16T04:56:36.9440938Z Updating files:  88% (289154/328583)
+2026-11-16T04:56:37.1126821Z Updating files:  89% (292439/328583)
+2026-11-16T04:56:37.1951997Z Updating files:  89% (294797/328583)
+2026-11-16T04:56:38.1157200Z Updating files:  90% (295725/328583)
+2026-11-16T04:56:38.2907329Z Updating files:  90% (298274/328583)
+2026-11-16T04:56:38.9503250Z Updating files:  91% (299011/328583)
+2026-11-16T04:56:39.1355231Z Updating files:  92% (302297/328583)
+2026-11-16T04:56:39.2539557Z Updating files:  92% (304354/328583)
+2026-11-16T04:56:39.5729754Z Updating files:  93% (305583/328583)
+2026-11-16T04:56:39.7303996Z Updating files:  94% (308869/328583)
+2026-11-16T04:56:40.0696982Z Updating files:  95% (312154/328583)
+2026-11-16T04:56:40.1126886Z Updating files:  96% (315440/328583)
+2026-11-16T04:56:40.3644094Z Updating files:  96% (315858/328583)
+2026-11-16T04:56:41.1141804Z Updating files:  97% (318726/328583)
+2026-11-16T04:56:41.2114356Z Updating files:  97% (321893/328583)
+2026-11-16T04:56:42.1482504Z Updating files:  98% (322012/328583)
+2026-11-16T04:56:43.1584448Z Updating files:  98% (324516/328583)
+2026-11-16T04:56:43.3957122Z Updating files:  98% (324799/328583)
+2026-11-16T04:56:43.7957349Z Updating files:  99% (325298/328583)
+2026-11-16T04:56:43.7969703Z Updating files: 100% (328583/328583)
+2026-11-16T04:56:43.7970107Z Updating files: 100% (328583/328583), done.
+2026-11-16T04:56:44.2320070Z Note: switching to 'refs/remotes/pull/4399/merge'.
+2026-11-16T04:56:44.2320669Z 
+2026-11-16T04:56:44.2321061Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-16T04:56:44.2321805Z changes and commit them, and you can discard any commits you make in this
+2026-11-16T04:56:44.2322530Z state without impacting any branches by switching back to a branch.
+2026-11-16T04:56:44.2322962Z 
+2026-11-16T04:56:44.2323242Z If you want to create a new branch to retain commits you create, you may
+2026-11-16T04:56:44.2323942Z do so (now or later) by using -c with the switch command. Example:
+2026-11-16T04:56:44.2324325Z 
+2026-11-16T04:56:44.2324483Z   git switch -c <new-branch-name>
+2026-11-16T04:56:44.2324736Z 
+2026-11-16T04:56:44.2324885Z Or undo this operation with:
+2026-11-16T04:56:44.2325123Z 
+2026-11-16T04:56:44.2325243Z   git switch -
+2026-11-16T04:56:44.2325423Z 
+2026-11-16T04:56:44.2326297Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-16T04:56:44.2326722Z 
+2026-11-16T04:56:44.2327157Z HEAD is now at a53866d99c Merge e398666199bdf5f1987ee7f5b7f796cb85a29092 into 88112c5a930009c883059c1c2e3c6c92c4b23f18
+2026-11-16T04:56:44.3112766Z ##[endgroup]
+2026-11-16T04:56:44.3170238Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T04:56:44.3205560Z a53866d99cf5b52e8c5e7f79f1fb8f275513273d
+2026-11-16T04:56:44.3440758Z ##[group]Run python3 -m unittest tools/artifacts/test_artifacts.py
+2026-11-16T04:56:44.3441305Z [36;1mpython3 -m unittest tools/artifacts/test_artifacts.py[0m
+2026-11-16T04:56:44.3750783Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:56:44.3751078Z env:
+2026-11-16T04:56:44.3751305Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:56:44.3751596Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:56:44.3751925Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:56:44.3752217Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:56:44.3752540Z ##[endgroup]
+2026-11-16T04:56:51.0028463Z .........................artifacts: not a sha256 digest: '../../etc/passwd'
+2026-11-16T04:56:59.4684284Z ................
+2026-11-16T04:56:59.4684834Z ----------------------------------------------------------------------
+2026-11-16T04:56:59.4685288Z Ran 41 tests in 14.867s
+2026-11-16T04:56:59.4685436Z 
+2026-11-16T04:56:59.4685518Z OK
+2026-11-16T04:56:59.4860929Z ##[group]Run python3 -B .github/scripts/test_artifact_prefetch.py -v
+2026-11-16T04:56:59.4861454Z [36;1mpython3 -B .github/scripts/test_artifact_prefetch.py -v[0m
+2026-11-16T04:56:59.4880246Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:56:59.4880501Z env:
+2026-11-16T04:56:59.4880693Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:56:59.4880935Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:56:59.4881214Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:56:59.4881463Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:56:59.4881750Z ##[endgroup]
+2026-11-16T04:56:59.6203803Z test_cached_objects_need_no_further_fetch (__main__.BloblessPrefetch.test_cached_objects_need_no_further_fetch) ... ok
+2026-11-16T04:56:59.6715083Z test_empty_diff_needs_no_fetch (__main__.BloblessPrefetch.test_empty_diff_needs_no_fetch) ... ok
+2026-11-16T04:56:59.7306643Z test_fetch_failure_is_not_reported_as_a_pass (__main__.BloblessPrefetch.test_fetch_failure_is_not_reported_as_a_pass) ... ok
+2026-11-16T04:56:59.7793409Z test_invalid_revisions_and_batch_limits_fail (__main__.BloblessPrefetch.test_invalid_revisions_and_batch_limits_fail) ... ok
+2026-11-16T04:56:59.8806180Z test_real_missing_blobs_are_fetched_in_batches_without_checkout (__main__.BloblessPrefetch.test_real_missing_blobs_are_fetched_in_batches_without_checkout) ... ok
+2026-11-16T04:56:59.8806942Z 
+2026-11-16T04:56:59.8807107Z ----------------------------------------------------------------------
+2026-11-16T04:56:59.8807471Z Ran 5 tests in 0.340s
+2026-11-16T04:56:59.8807614Z 
+2026-11-16T04:56:59.8807703Z OK
+2026-11-16T04:56:59.8981867Z ##[group]Run if [ "pull_request" != pull_request ]; then exit 0; fi
+2026-11-16T04:56:59.8982376Z [36;1mif [ "pull_request" != pull_request ]; then exit 0; fi[0m
+2026-11-16T04:56:59.8982861Z [36;1mif python3 tools/artifacts/artifacts.py check HEAD^1 HEAD; then exit 0; fi[0m
+2026-11-16T04:56:59.8983329Z [36;1mif [ "$LARGE_FILE_OK" = true ]; then[0m
+2026-11-16T04:56:59.8983739Z [36;1m  echo "::warning::data files committed under the large-file-ok label"[0m
+2026-11-16T04:56:59.8984136Z [36;1m  exit 0[0m
+2026-11-16T04:56:59.8984336Z [36;1mfi[0m
+2026-11-16T04:56:59.8984527Z [36;1mexit 1[0m
+2026-11-16T04:56:59.9002718Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:56:59.9002975Z env:
+2026-11-16T04:56:59.9003168Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:56:59.9003422Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:56:59.9003705Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:56:59.9003953Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:56:59.9004230Z   LARGE_FILE_OK: false
+2026-11-16T04:56:59.9004496Z ##[endgroup]
+2026-11-16T04:57:00.0002935Z artifacts check: no data files committed
+2026-11-16T04:57:00.0148246Z ##[group]Run python3 tools/artifacts/wire_workflows.py --check
+2026-11-16T04:57:00.0148737Z [36;1mpython3 tools/artifacts/wire_workflows.py --check[0m
+2026-11-16T04:57:00.0193332Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:57:00.0193746Z env:
+2026-11-16T04:57:00.0194015Z   GIT_AUTHOR_NAME: ci
+2026-11-16T04:57:00.0194289Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-16T04:57:00.0194584Z   GIT_COMMITTER_NAME: ci
+2026-11-16T04:57:00.0194838Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-16T04:57:00.0195119Z ##[endgroup]
+2026-11-16T04:57:03.0467205Z benchmarks/20261029-ic-packed-filter/VALIDATION.json: validator report research/ic_packed_filter_20261029/validation/validator-report.json is store-backed and not hydrated, so its raw_data cannot be read; its whole study is pulled instead
+2026-11-16T04:57:05.6741678Z ic-generic-backend-qualification-v2.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:05.6742790Z ic-generic-backend-qualification-v2.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:05.6824942Z ic-generic-backend-qualification-v3.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:05.6826629Z ic-generic-backend-qualification-v3.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:06.2666764Z isolab-experiment.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:06.2667795Z isolab-experiment.yml: checkout into a `path:` left unwired
+2026-11-16T04:57:08.5929782Z 
+2026-11-16T04:57:08.5931099Z 32 workflow(s) lack the pull step they need or carry a stale one; run python3 tools/artifacts/wire_workflows.py
+2026-11-16T04:57:08.5943894Z compact-orbit-n61-isolated.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5945472Z compact-orbit-n61-single-target-isolated.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5947167Z frozen-workflow-replays.yml: needs `Pull store data this workflow reads (tools/artifacts)` for research/notes/ecc2k130
+2026-11-16T04:57:08.5948655Z ic-autolab.yml: needs `Pull store data this workflow reads (tools/artifacts)` for docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+2026-11-16T04:57:08.5950118Z ic-leaderboard-replay.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5962085Z ic-leaderboard.yml: needs `Pull store data this workflow reads (tools/artifacts)` for backlog/XP-20261029-packed-filter benchmarks/20261018-k4-gls-v4 benchmarks/20261030-prime-ksum-pooled benchmarks/20261111-mt-fieldops-ic4 benchmarks/20261111-mt-fieldops-v3 benchmarks/20261112-mt-fieldops-v4 benchmarks/20261112-mt-fieldops-v5 docs/curves experiments/31_solve_cost experiments/37_solver_b_pivot_count experiments/46_pivot_rules_confirm3 experiments/47_macaulay_entries experiments/48_twist24_shortfall research/e32_handover_ladder_20261031 research/e33_solver_b_pivot_count_20261031 research/e34_twist24_cheap_rep_20261031 research/e39_pivot_rules_confirm3_20261102 research/e40_macaulay_entries_20261102 research/ecbench_generator_orbit_20261022 research/f4_fp_ic_effect_20261018 research/fes_then_batched_20261112 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023 research/ic_cover_weakclass_20261023 research/ic_d4_char2_lever_20261023 research/ic_gw_bl_reuse_20261115 research/ic_gw_fasthash_20261114 research/ic_gw_nrm_lz_20261115 research/ic_packed_filter_20261029 research/ic_tableb_ksum_20261115 research/jv_sieve_line_vs_rho_20261103 research/jv_walk_charge_20261111 research/kummer_coordinates_20261022 research/kummer_differential_collector_20261022 research/ml_cryptanalysis_pt_lgrow_k1_20261114 research/mt_fieldops_v5_20261112/results/holdout research/n83_e2e_finalist_results_20261017 research/notes/ecc2k130 research/pencil_sparse_20261022 research/pfdr_other_families_20261101 research/pkm_symmetric_lead1_20261026 research/postgb_linear_stage_20261026 research/prime_base_oracle_tuning_20261029 research/prime_ksum_pooled_20261029 research/projective_law_followup_20261022 research/quartic_dl1_cd_sqrt_20261113/combo research/three_leads_e2e_20261018/results research/twist_index_calculus_20261020 research/validation_sweep_20261019
+2026-11-16T04:57:08.5973968Z ic-research.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5975241Z koblitz-stage90-current-audit.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5976869Z koblitz-stage93-current-audit.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5978156Z n83-bloom-profile.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5979449Z n83-factor-base-confirm.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5980736Z n83-highk-beyond4405.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5981939Z n83-k-abba.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5983136Z n83-k-neighborhood.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5984435Z n83-k3250-sparse-fresh.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5986134Z n83-k3350-reverse.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5987383Z n83-k3350-sparse-fresh.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5988666Z n83-k5500-highmem-capacity.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5989957Z n83-k5500-highmem-full.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5991876Z n83-nearby-grid-confirm16.yml: needs `Pull store data this workflow reads (tools/artifacts)` for docs/curves docs/ecbench research/n83_final_extended_20261018 research/n83_online_finalists_20261018 research/n83_root4_frontier_current_20261018
+2026-11-16T04:57:08.5993834Z n83-root11-bloom-sparse.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5995127Z n83-root11-bloom.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5996483Z n83-root4-highk.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5997629Z n83-root4-vs-root11.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.5998851Z n83-sparse-canonical.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6000184Z n83-tier1-bloom-reserve.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6001567Z n83-tier1-combined.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6002945Z n83-tier1-refine-reserve.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6004377Z p192-geometry-collector-lean.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6005792Z p192-overlap-anchor-lean.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6007733Z prime-field-transfer-goal.yml: needs `Pull store data this workflow reads (tools/artifacts)` for research/prime_field_transfer_goal_20261116
+2026-11-16T04:57:08.6009174Z weak-curve-database.yml: stale `Pull store data this workflow reads (tools/artifacts)`: the workflow names no moved data
+2026-11-16T04:57:08.6161727Z ##[error]Process completed with exit code 1.
+2026-11-16T04:57:08.6327572Z Post job cleanup.
+2026-11-16T04:57:08.7229558Z [command]/usr/bin/git version
+2026-11-16T04:57:08.7308402Z git version 2.56.1
+2026-11-16T04:57:08.7353726Z Temporarily overriding HOME='/home/runner/work/_temp/798f99ff-4d4f-46e2-a6ad-6ce914b3aa70' before making global git config changes
+2026-11-16T04:57:08.7354764Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T04:57:08.7360641Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-16T04:57:08.7403408Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T04:57:08.7442883Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T04:57:08.8387297Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T04:57:08.8431730Z http.https://github.com/.extraheader
+2026-11-16T04:57:08.8446498Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-16T04:57:08.8499999Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T04:57:08.9294978Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T04:57:08.9344055Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T04:57:09.0517474Z Cleaning up orphan processes
+2026-11-16T04:57:09.2157802Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

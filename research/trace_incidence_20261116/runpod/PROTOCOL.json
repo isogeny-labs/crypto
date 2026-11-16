@@ -1,0 +1,73 @@
+{
+  "schema": "trace-runpod-protocol/v1",
+  "canonical_protocol_validation": "Unavailable: canonical sibling skill/schema source is encrypted VLT1 in this runtime. This is a frozen descriptive execution protocol; no validated ecbench or statistical tier claim.",
+  "id": "trace-incidence-runpod-20261116-a1",
+  "source_revision": "Exact enclosing published commit, separately bound by the S3 checkpoint receipt and deployment request",
+  "provider": "Runpod, explicitly selected by user",
+  "image": "debian:trixie-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392",
+  "cost_ceiling_usd": 1,
+  "pods": 1,
+  "automatic_retries": 0,
+  "vcpu_count": 8,
+  "memory_ceiling_gib": 16,
+  "cpu_flavor": "cpu5c",
+  "pod_price_ceiling_usd_per_hour": 0.5,
+  "container_disk_gib": 20,
+  "persistent_volume_gib": 0,
+  "maximum_seconds_from_creation": 1800,
+  "worker_timeout_seconds": 1500,
+  "single_row_timeout_seconds": 45,
+  "parallel_measured_rows": 1,
+  "measurement_threads": 1,
+  "isolation": "Shared Runpod CPU host. Cgroup limits and CPU affinity recorded; L2 not asserted.",
+  "warmup_rounds": 1,
+  "measured_rounds": 5,
+  "primary_inputs": {
+    "source": "historical/prime_fixtures/b???_c?_natural_s?.json",
+    "sizes_B": [8,16,32,64,128],
+    "curves_per_size": 3,
+    "public_targets_per_curve": 4,
+    "target_count": 60,
+    "subgroup_path": "r approximately 8 B^3, original public curves and P,Q retained",
+    "pool_generation": "Fresh native mt19937_64 plus uniform_int_distribution public alpha*P+beta*Q. Frozen pool points are not reused and validation scalars are not read.",
+    "attempts_per_target_maximum": 4,
+    "attempt_seed": "public_seed + attempt*2654435761 for attempt 0..3, same for every arm and round",
+    "stopping": "first informative relation; retain prior misses; four misses are censored. Execution/construction failures stop that arm-target and are retained, not counted as misses."
+  },
+  "incidence_arms": ["known","known-aa","pairs","trace","dense","pullback","pullback-isogeny"],
+  "controls": {
+    "negative": "natural misses in the unfiltered random-labelled panel",
+    "positive": "fixed paper roots and nonlinear-control.json with an independently checked frozen pair witness",
+    "aa": "known/known-aa and pullback/pullback-aa timings, same inputs and code; temporal measurement noise rather than new algorithmic randomness",
+    "reference": "Frozen streamed batched pair algorithm plus original quotient/GCD and paper dense/trace code; strongest-external-tool status not asserted",
+    "external_roots": "FLINT nmod_poly_roots on identical fixed paper polynomial, randomized external control",
+    "rho": "Existing prime_fast::rho_parallel through trace_incidence_rho: one thread, negation, table_bits4, walkers8, dp_bits0, max_steps10000000. Configuration is explicit, not a claim of globally optimal tuning."
+  },
+  "auxiliary_data": {
+    "construction": "Lazy only for nonlinear selected GCD. Native PARI/GP ellcard/factor/ellgroup, at most128 candidates and15s per invocation; largest prime factor at most1024 and even curve order.",
+    "basis": "Correct PARI second generator with an explicitly charged elllog before native direct-product validation; supplied invariant factors alone are insufficient.",
+    "isogeny": "Classical rational two-isogeny, then independent counted PARI codomain basis construction and native validation. Original target labels stay on the original target curve.",
+    "failure": "Retained construction failure, never free preprocessing or a relation miss"
+  },
+  "translation_panel": {
+    "source": "historical/fast_trace/results/fixtures and results_large/fixtures",
+    "arms": ["trace","dense"],
+    "cases": ["generic","collision","exception_plus","exception_minus"],
+    "maximum_degree": 256,
+    "scope": "Complete translation with field setup, least nonsquare, collisions and exceptional handling. Frozen support verification is timed separately."
+  },
+  "fixed_root_panel": {
+    "input": "paper degree10 polynomial over F83",
+    "arms": ["dense","trace","pullback","dense-isogeny","trace-isogeny","pullback-isogeny","flint","pullback-aa"],
+    "repetitions_per_row": 32,
+    "scope": "Given literal datum; native validation each call. Isogeny arms additionally construct and validate their complete toy codomain datum each call. FLINT requires no auxiliary datum."
+  },
+  "order": "Rotate arm order by round; reverse dense/trace translation order on odd rounds. Fixed source/input/seed identities.",
+  "timing": "Native steady_clock plus getrusage(RUSAGE_SELF+RUSAGE_CHILDREN). Complete cost includes public parsing/validation, pool construction/rejections, misses, any lazy auxiliary construction/validation, norm/GCD, root extraction, witness recovery and original-curve scalar check. Process startup/output and peak RSS additionally recorded by /usr/bin/time. GP time is never omitted.",
+  "memory": "Fresh process per row; parent high-water RSS and maximum child high-water RSS reported separately. No measured concurrent-sum or allocated-capacity substitution.",
+  "failure_policy": "Retain nonzero exits, build failures, row timeouts and unfinished global deadline. Do not reduce the matrix or restart a measurement after seeing results.",
+  "analysis": "Descriptive medians and per-round paired ratios only, with all raw rows and failures. No fitted asymptotic exponent, p-value, fastest-tool claim, L2 claim, leaderboard or tier promotion.",
+  "cleanup": "External local supervisor collects output, verifies archive hash, uploads to the narrowly scoped approved S3 destination, then DELETEs only the recorded pod; also DELETE on the original absolute deadline.",
+  "credentials": "Runpod key and temporary upload signing material stay outside Git and remote job. Only a public ephemeral encryption certificate is committed; S3 upload token is encrypted to its private counterpart.",
+  "claims": [{"class":"comparative/statistical","status":"hypothesis only","statement":"The source-coordinate representation may lower complete cost after all setup and recovery is charged; this run records descriptive evidence rather than a validated speed claim."}]
+}

@@ -239,6 +239,17 @@
      "value": 4.669
     },
     {
+     "anchor": "#n83-padd-rank-stage-20261019",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "Measured cold one-target IC/rho after padd: 52.8 [45.0, 63.2] from 20 paired IC points and 60 same-point rho draws; before padd 58.9 [50.3, 70.3]. IC remains slower than rho. The rank-stage component is 1.2194x [1.2155, 1.2233]; cold wall saving is 12.487 s [12.248, 12.723]. IC used 4 threads and rho 1 on one GitHub ubuntu-24.04 runner.",
+     "label": "N83 K1120/root11 padd rank-stage, cold one-target IC/rho (20 points)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/70fad47cb9736b33e4dfb971b460ce918261c03b/research/n83_padd_rank_20261019/RESULT.md",
+     "unit": "cold wall ratio IC / rho",
+     "value": 52.8
+    },
+    {
      "anchor": "#lab-planner-validation",
      "class": "engineering",
      "date": "2026-10-21",
@@ -542,6 +553,15 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
     },
     {
+     "anchor": "#isogeny-conductor-gap-round5-20261018",
+     "class": "engineering",
+     "date": "2026-10-18",
+     "detail": "Two audited ecbench sessions (912 records) on the 16 round-4 cofactor curves (h = 4 and 72, 18 to 30 bits). Clearing the cofactor of the small-abscissa base keeps every pair sum in E[r]; the best cleared-base arm costs 0.705x (h = 4) and 0.275x (h = 72) the best fiber-closed arm, against the predicted h^(-1/3). The best cell is S = 14.58 against the session's own rho at 2.00 on the same curve; every IC cell is above rho at every weight of the 0/0.1/1 pricing band, and log2(IC/rho) still rises with size (slope 0.122 and 0.068). IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly.",
+     "label": "Conductor-gap round 5: best cold cell, cofactor-cleared MITM pair table on icv1-fp22-tm1504-967cbbde (h = 72, 22-bit)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md",
+     "unit": "counted GAE lower-bound diagnostic",
+     "value": 7.29
      "anchor": "#three-leads-e2e-0",
      "class": "accounting",
      "date": "2026-10-19",
@@ -1038,6 +1058,28 @@
      "class": "engineering",
      "anchor": "#n83-tier1-finalist-20261017",
      "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md"
+    },
+    {
+     "anchor": "#lab-ecbench-all",
+     "class": "accounting",
+     "date": "2026-10-26",
+     "detail": "ic-pair-rule over rho-neg per target in bitop/v1 gates, `ecbench amortize` over the committed bitop-ladder hold-out sessions (80 verified runs per arm and curve, both arms completely priced), re-read with the target-aware reusable/per-target split: rho-neg's set-up uses the target, so none of it is reusable and rho's per-target cost rises to its whole total; IC's reusable work is unchanged. Per-target ratio 4.406 at r = 2^16 (was 6.364 under the stored split), 4.41-58.92 across 16-40 bits (stored 5.81-58.94); the correction matters most at small r, where set-up is a larger share. The cold ratio (total/total) is unchanged, 6.23 at 16 bits to 78.3 at 40, and the break-even window is null on every curve under both splits: rho stays cheaper per target and cold. Class accounting: a re-priced split, not an IC improvement; the stored-split figure is kept in the detail as 'was'.",
+     "label": "ic_acct2: per-target IC/rho under the target-aware split, closest cell icv1-fp16-t73-6dc97f36 (r = 2^16)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct2_setup_20261021/README.md",
+     "unit": "bitop/v1 gates per target",
+     "value": 4.4057560478065305
+    },
+    {
+     "anchor": "#lab-ecbench-all",
+     "class": "accounting",
+     "date": "2026-10-26",
+     "detail": "ic-pair-rule over rho-neg per target in bitop/v1 gates, `ecbench amortize` over the committed bitop-ladder hold-out sessions (80 verified runs per arm and curve, both arms completely priced), re-read with the target-aware reusable/per-target split: rho-neg's set-up uses the target, so none of it is reusable and rho's per-target cost rises to its whole total; IC's reusable work is unchanged. Per-target ratio 58.916 at r = 2^40 (was 58.940 under the stored split): at the largest hold-out size set-up is a negligible share, so the correction barely moves the ratio and the gap to rho per target grows with r. Cold ratio 78.26, unchanged. Class accounting: a re-priced split, not an IC improvement.",
+     "label": "ic_acct2: per-target IC/rho under the target-aware split, largest cell icv1-fp40-tm924137-0ecaaeb9 (r = 2^40)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct2_setup_20261021/README.md",
+     "unit": "bitop/v1 gates per target",
+     "value": 58.91643100772734
     }
    ],
    "role": "context"

@@ -1,0 +1,43 @@
+Study: full_trace_zero_variety_20261109
+Date: 2026-11-09 UTC
+Repository: isogeny-labs/crypto
+Parent revision before this extension: e935281643caa6082a96f4cae0b203639c63db16
+Exact new source identity: ../SOURCES.sha256 (paths relative to repository root).
+Workspace: /workspace/crypto-trace, branch codex/ecc2k-trace-homomorphism.
+Host: Linux 6.18.57 x86_64 GNU/Linux, shared managed development workspace.
+Toolchain: rustc1.99.1 (58cf8f9c3 2026-10-13), cargo1.99.1 (5f94df478 2026-08-27), LLVM23.1.1.
+Profile: ordinary unoptimized development/test; no CPU isolation or performance claim.
+Seeds: exhaustive deterministic small-field enumeration; wide G/Q are production fixtures;
+SAT controls are deterministic. Polynomial certificate seed20261109; extra replay seeds in source.
+
+Final focused check, exit0:
+cargo test --locked --manifest-path research/full_trace_zero_variety_20261109/native/Cargo.toml -- --nocapture --test-threads=1
+Output: native-tests.txt; 10 tests pass. The bounded x-only control outcome is UNKNOWN.
+The printed test-harness elapsed duration is not a benchmark measurement.
+
+Root production integration type-check, exit0:
+cargo check --lib --no-default-features
+Output: root-cargo-check.txt. No whole-root test pass is asserted.
+
+Exporter, exit0:
+cargo run --locked --quiet --manifest-path research/full_trace_zero_variety_20261109/native/Cargo.toml -- factored /workspace/scratch/ecc2k130-full-trace-zero-factored.json
+Summary: ../ecc2k130-factored-summary.json. Generated ANF is outside repository, reproducible via command.
+The optional output path must not already exist. Monomial serialization is documented in README.md.
+
+Identity certificate generation/replay, exit0:
+cargo run --locked --quiet --manifest-path research/full_trace_zero_variety_20261109/native/Cargo.toml --bin certify_trace_identity
+stdout: ../trace-telescoping.identity.json; stderr: identity-check.txt.
+Production issue/check_with_extra; prime2^61-1, 32+32 points; no independent checker or formal proof.
+Committed certificate additionally replays at another32 extra points and rejects a changed statement in the focused suite.
+
+Earlier attempt:
+Same cargo test command before deadline and full-point pin controls were added.
+The wide native chain control pinned x only and was interrupted with SIGINT after90+ seconds.
+Output: interrupted-wide-control.txt. Prior source is superseded; raw output does not claim a final exit summary.
+Replacement: x-only n83 control capped at1 second/2000 conflicts; UNKNOWN retained.
+Separate fully pinned G,-G,G witness at n83/n131: 10-second/10000-conflict correctness controls return SAT.
+No natural degree131 relation query, EKS job, paid run or benchmark record was attempted.
+
+PDF rendering: Typst0.15.1 using /workspace/scratch/report-venv/bin/python.
+First rendering failed on an unescaped hash sign, corrected before generating the PDF.
+Final report.pdf has3 pages; all pages rasterized with pdftoppm and visually inspected.
