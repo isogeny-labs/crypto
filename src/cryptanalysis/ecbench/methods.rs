@@ -1187,6 +1187,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_COUNTED_PARAMS,
         },
         MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
+        },
+        MethodDecl {
             id: "ic.tensor_contraction_v1",
             family: "ic",
             summary: "toy index calculus with m keyed SHA-256 hashed factor bases (|F_i| ≈ (2r)^(1/m)), each relation found by exact sparse tensor contraction of the whole-point network (crates/ecdl-tensor-ic); exponential, about r point additions per relation; contraction rows, factor-base listing and elimination counted unpriced",
@@ -3762,6 +3770,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
