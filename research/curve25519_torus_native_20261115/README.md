@@ -2,6 +2,15 @@
 
 ## Current reduction and revised scaling plan
 
+The [many-coset construction](reports/many-cosets-v1/REPORT.md) now supplies
+conditional cardinality/admissibility and complete q-power membership
+endpoints for the20633-by213156431 raw index family. Native Rust records43
+fixed controls and a20633-label membership table. A separate degree endpoint
+bounds any nonzero univariate polynomial vanishing on those raw coordinates.
+Point normalization/indexing and target-conditioned decomposition remain the
+next application obligations. PCC-20261116-ac25ef, cc48bc and1aecf2.
+[pcc:unverified]
+
 Read the [retained-row contract addendum](reports/query-row-contract-v1/REPORT.md)
 with both reports below. Their independent-row-tag and P+B*D/y+L model
 retains at most one checked row per fresh private-coefficient query.
@@ -29,9 +38,10 @@ The [new plan and cost audit](reports/scaling-audit-v1/REPORT.md),
 models for four, five, six and eight summands. Ten named Lean endpoints
 cover rational numeric-model minima and concrete parameter inequalities;
 none supplies a real solver cost or yield theorem. The actual current base
-bound exceeds the unit-constant sixth-root target, so six-sum work first
-needs an admissible parameter/recognition-cost analysis. The two many-coset
-products are arithmetic proposals, not constructed bases.
+bound exceeds the unit-constant sixth-root target. Its two many-coset products
+were arithmetic proposals at publication; the new version above adds the
+conditional raw-coordinate construction and native recognition for one of
+them. Neither version supplies a normalized point base or real solver cost.
 PCC-20261116-ebfd31, 76dc04 and d45270. [pcc:unverified]
 
 The next scientific gate is a genuinely costed fixed-base batch or structured
