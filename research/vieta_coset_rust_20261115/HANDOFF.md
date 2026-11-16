@@ -1,5 +1,43 @@
 # Vieta Rust port: continuation receipt
 
+## Half-GCD and general rational towers — 16 November, 20:26 UTC
+
+User authorized all four next steps. Source9d2106eb2a implements opt-in HalfGcd,
+generic homogeneous rational-map towers, every-sibling split certification,
+charged construction, poles/diagonal/identity cases and normalized Vélu2 maps.
+Full shared-source12 unit groups/5 CLI tests and two additional positive
+integration tests, formatting/clippy pass. Root full release-library preparation
+hit180s compiling; no full-root-suite pass. All original manifest files still match.
+
+New main panel240/240 successful/replayed,0 failed/missing;60 warmup calls and180
+retained, n3/population/configuration. Main supervisor19:51:06–20:11:42UTC exit0;
+unmodified isolation wall1233.621504883s, otherCPU1.17s, RSS12800KiB, detected
+contention=false. Clocks remain belowL2. Preflight60 calls separately replayed;
+its supervisors were lost on reconnect while original native processes continued,
+so aggregate exit/start/wall/isolation receipt are unknown. No retry; preserve
+null-exit command and supervision-loss receipt. Main uses persistent supervision.
+
+Mixed result: word62/m16384 half total809643807 vs Newton1168899513, paired1.4437;
+P224/m2048 half30590000 vs Newton22039580 (regression). All measured rational
+half counts regress; generic full-fiber certification dominates cold P224 cases.
+Keep default/backends explicit. Frozen native summary/replay,95 raw pointers,
+6 metrics and the closed censored1938 record are complete. Both exports pass
+with file verification. No new benchmark rerun or cloud/S3 operation is needed.
+
+Pending statements: c8911d primary data,9dc34f calibration supervision loss,
+640dba finite degree audit; all unverified. Original480062 hand bound unchanged;
+independent general proof review still external. See next-20261116/RESULTS.md,
+report.pdf, DEGREE_AUDIT.md and AUDIT_ADDENDUM.md. All figures have SVG/PNG copies
+under benchmarks/20261116-vieta-half-gcd-rational; no protected promotion.
+
+PR4410 is still open on da24eab090 before final publication. Main advanced to
+b02431b26e; integrate by documented normal timeout fallback, preserving exact
+main ledger prefix plus only unchanged missing local bodies, complete journal
+block multisets and append-only lessons. Regenerate progress after metadata
+merge and retain all frozen pins. Then push final results/update PR title/body,
+inspect actual current-head gates/reviews once, rearm bounded follow-up if needed.
+Prior gates failed shared artifact credentials; never bypass or claim green CI.
+
 ## Bounded follow-up — 16 November, 17:51 UTC
 
 PR4410 old headf4b8640f21 is open; its prior CI has size/PCC/replay/native
