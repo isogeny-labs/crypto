@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0351Z-hec-tensor631",
+  "latest_record": "20261116T0611Z-hec-direct-profile",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 216,
+    "measured": 217,
     "open": 1
   },
   "repo": "crypto",
@@ -10587,6 +10587,209 @@
       ],
       "problem": "ic:gw-quartic-dl-sqrt-compiled",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.000696510375,
+      "latest": 0.000696510375,
+      "latest_derived": {
+        "value_over_reference": 6.641501
+      },
+      "metric": "g2_target0_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 6.641501
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.000104872437,
+          "reference_kind": "baseline",
+          "spread": [
+            0.000673927063,
+            0.000853559875
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.000696510375
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000591815062,
+      "latest": 0.000591815062,
+      "latest_derived": {
+        "value_over_reference": 4.902111
+      },
+      "metric": "g2_target1_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 4.902111
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.000120726562,
+          "reference_kind": "baseline",
+          "spread": [
+            0.000589260375,
+            0.000613252625
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.000591815062
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001412171875,
+      "latest": 0.001412171875,
+      "latest_derived": {
+        "value_over_reference": 3.660699
+      },
+      "metric": "g3_target0_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 3.660699
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.000385765625,
+          "reference_kind": "baseline",
+          "spread": [
+            0.001151596375,
+            0.001474177125
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.001412171875
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001108880187,
+      "latest": 0.001108880187,
+      "latest_derived": {
+        "value_over_reference": 3.014691
+      },
+      "metric": "g3_target1_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 3.014691
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.0003678255,
+          "reference_kind": "baseline",
+          "spread": [
+            0.001095096375,
+            0.001177830688
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.001108880187
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000979958313,
+      "latest": 0.000979958313,
+      "latest_derived": {
+        "value_over_reference": 3.025024
+      },
+      "metric": "g4_target0_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 3.025024
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.000323950563,
+          "reference_kind": "baseline",
+          "spread": [
+            0.000912596375,
+            0.001129984375
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.000979958313
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000929976563,
+      "latest": 0.000929976563,
+      "latest_derived": {
+        "value_over_reference": 3.109558
+      },
+      "metric": "g4_target1_full_solve_wall",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 3.109558
+          },
+          "n": 5,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": 0.000299070313,
+          "reference_kind": "baseline",
+          "spread": [
+            0.000926304688,
+            0.000983901063
+          ],
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 0.000929976563
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 8160.0,
+      "latest": 8160.0,
+      "latest_derived": {},
+      "metric": "verified_complete_calls",
+      "points": [
+        {
+          "commit": "5efdf3e7ec5d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0611Z-hec-direct-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+          "value": 8160.0
+        }
+      ],
+      "problem": "ic:hec-direct-profile-g234",
+      "unit": "count"
     },
     {
       "better": "lower",
