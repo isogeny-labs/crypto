@@ -1,0 +1,16 @@
+# s7 first-target cover-search cost amendment
+
+16 November 2026 UTC. The earlier [s7 result](../ghs_twist_s7_attack_20261116/S7_RESULT.md) and pages 13–15 of its PDF report state a **231.125131 CPU-second GHS solve** and **3268.034356 CPU-second same-target Frobenius-aware rho solve**, yielding a **14.14× ratio**. That GHS figure starts with the explicit degree-seven cover already supplied. It includes source setup, map evaluation, factor-base setup, relation collection, linear algebra, target descent and verification. This amendment separately charges the saved targeted cover-search run to show how the comparison changes for a first target on the fixed carrier. It does not rewrite the earlier immutable receipts. Finite claims remain [pcc:unverified] until PCC admission.
+
+The exact source is `E^-/F_(3^35): v²=u³+u²+2(a+a³)`, `a⁵+2a+1=0` over F3, with prime subgroup order `r=185302017921931` and target `Q=12345P`. The genus-five carrier is `Y^-: y²=2(x^11+x^9+2x^8+x^7+2x^5+x³+x²+x+1)` over F_(3^7). The cover is the ordinary quadratic twist of the mask-30 positive-trace cover. The saved positive-target quadratic-square search found exactly one degree-seven cover for mask 30 in its specified shapes; its [JSON receipt](../ghs_odd5_carrier_20261115/degree7_quadratic_square_30.json) source hash matches the committed search program, and its [`/usr/bin/time -l` record](../ghs_odd5_carrier_20261115/degree7_quadratic_square_30.stderr) gives 186.99 user plus 2.24 system CPU seconds. The [repricing receipt](cost_amendment.json) binds those files, the full GHS solve receipt and the rho receipt by SHA-256.
+
+| Comparison on the same P and Q | CPU seconds | Rho/GHS ratio |
+|---|---:|---:|
+| Supplied cover: full GHS relation and target solve | 231.125131 | 14.14 |
+| Targeted fixed-carrier cover search | 189.23 | — |
+| Targeted search plus GHS solve | approximately 420.36 | approximately 7.77 |
+| Matched order-seven-Frobenius rho | 3268.034356 | 1.00 |
+
+The 420.36-second composite uses an external search-process CPU measurement rounded to 0.01 second plus stitched in-process GHS CPU. The rho CPU is in-process. Interpreter startup is included in the search time but excluded from both solve totals, so the composite is **a documented mixed-convention estimate**, not a uniformly instrumented full-run measurement. It charges only the single targeted mask-30 search on the already selected carrier and does not charge discovering that carrier, screening other source models or failed prior cover shapes. Those broader research costs are not known as a single per-target attack cost. The 14.14× supplied-cover and approximately 7.77× targeted-search comparisons are both observed for one validation target and one implementation pair; collision-time variance and alternative optimizations remain material.
+
+The exact negative-trace curve is a potentially vulnerable **exact instance under these measured conditions**. The twist and cover/decomposition method are established prior art, and no independent new eligible family or new attack method is established. A wider vulnerability claim needs a repeatable cost model across targets and a separately constructed family with explicit nonzero subgroup maps. This amendment supersedes any reading of the 231.125131 seconds as including the initial cover search.
