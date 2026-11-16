@@ -3584,8 +3584,9 @@ pub fn wiedemann_u64(
     let b: Vec<u64> = rows.iter().map(|r| r.rhs).collect();
     words(rows.len() as u64); // RHS scan
     for _attempt in 0..3 {
-        let u: Vec<u64> = (0..ncols).map(|_| rng.gen_range(0..n)).collect();
-        super::jv_bitops::rng_words(ncols as u64);
+        let u: Vec<u64> = (0..ncols)
+            .map(|_| super::jv_bitops::uniform_mod_u64(rng, 0, n))
+            .collect();
         let mut seq = Vec::with_capacity(2 * ncols);
         let mut v = b.clone();
         for _ in 0..2 * ncols {

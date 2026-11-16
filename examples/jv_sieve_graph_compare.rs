@@ -179,6 +179,7 @@ fn solve_worker_inner(
     // Public-domain validation above is excluded. Everything from the public
     // curve to the recovered scalar and its replay below is cold attack work.
     let before = bitops::snapshot();
+    let uniform_before = accounting.then(bitops::uniform_snapshot);
     let other_before = bitops::snapshot_other();
     let _attack = bitops::enter(Phase::Model);
     let (scalar, work, native_verified, capped, rho_work) = if method == "rho" {
@@ -284,7 +285,14 @@ fn solve_worker_inner(
                 "executed modular hooks and observed native events",
             )
         };
-        let native = accounting_json(&tally, phases, curve, method, pricing);
+        let mut native = accounting_json(&tally, phases, curve, method, pricing);
+        let uniforms = bitops::uniform_snapshot()
+            .since(&uniform_before.expect("counting snapshot"))
+            .expect("monotone sampling counters");
+        let sampling_phases:Vec<_>=phases.iter().map(|&phase|json!({"phase":phase.name(),"events":bitops::uniform_json(&uniforms.phases[phase as usize]).expect("sampling counters fit")})).collect();
+        native["uniform_sampling"] = json!({"schema":"cover.uniform-sampling-diagnostic/v1","complete":false,
+            "scope":"selected Fq-coordinate, Wiedemann-vector and initial cover-label samplers; generator and other paths remain incomplete",
+            "phases":sampling_phases,"total":bitops::uniform_json(&uniforms.sum(phases).expect("sampling sum fits")).expect("sampling counters fit")});
         let other_after = bitops::snapshot_other();
         result["work_native"] = native;
         result["work_native"]["other_modulus_ops"] = json!(Phase::IC
@@ -328,7 +336,7 @@ fn accounting_json(
         ]
     };
     json!({"schema":"cover.graph.accounting-diagnostic/v1", "unit":"bitop/v1",
-        "counted_items":if method=="rho" {Vec::<&str>::new()} else {vec!["counted:modular_la_native_scans", "counted:cover_residual_scalar_additions"]},
+        "counted_items":if method=="rho" {Vec::<&str>::new()} else {vec!["counted:modular_la_native_scans", "counted:cover_residual_scalar_additions", "counted:selected_modular_uniform_draws"]},
         "complete":false, "total_bitops":Value::Null, "comparison_eligible":false,
         "pricing":pricing, "phases":phase_rows, "observed_primitives":bitops::prims_json(&total),
         "diagnostic_priced_bitops":total.bitops(&widths).expect("known primitives").to_string(),

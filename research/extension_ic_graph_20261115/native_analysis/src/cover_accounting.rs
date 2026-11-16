@@ -67,6 +67,58 @@ fn declared_price(v: &Value, expected: u128) -> bool {
     v.as_str() == Some(expected.to_string().as_str())
 }
 
+fn uniform_event(v: &Value) -> Option<[u64; 4]> {
+    let c = v["calls"].as_u64()?;
+    let d = v["raw_draws"].as_u64()?;
+    let r = v["rejections"].as_u64()?;
+    let other = v["other_modulus_calls"].as_u64()?;
+    if v["schema"] != "modular-uniform-events/v1"
+        || v["complete"] != false
+        || other != 0
+        || d != c.checked_add(r)?
+        || (c == 0 && d != 0)
+        || v["priced_native"]["integer_mul64"] != d
+        || v["priced_native"]["integer_add64"] != c
+        || v["unpriced_native"]["integer_sub64"] != c.checked_mul(2)?
+        || v["unpriced_native"]["integer_clz64"] != c
+        || v["unpriced_native"]["integer_shl64"] != c
+        || !declared_price(
+            &v["known_native_priced_bitops"],
+            (d as u128)
+                .checked_mul(bitops::int_mul(64))?
+                .checked_add((c as u128).checked_mul(bitops::int_add(64))?)?,
+        )
+    {
+        return None;
+    }
+    Some([c, d, r, other])
+}
+
+fn uniform_sampling(v: &Value, outer: &Value) -> Option<()> {
+    if v["schema"] != "cover.uniform-sampling-diagnostic/v1" || v["complete"] != false {
+        return None;
+    }
+    let rows = v["phases"].as_array()?;
+    if rows.len() != PHASES.len() {
+        return None;
+    }
+    let primitive_phases = outer["phases"].as_array()?;
+    let mut sum = [0u64; 4];
+    for (i, (row, name)) in rows.iter().zip(PHASES).enumerate() {
+        if row["phase"] != name {
+            return None;
+        }
+        let c = uniform_event(&row["events"])?;
+        if c[1] > primitive_phases.get(i)?["primitives"]["rng_words"].as_u64()? {
+            return None;
+        }
+        for (slot, n) in sum.iter_mut().zip(c) {
+            *slot = slot.checked_add(n)?;
+        }
+    }
+    (uniform_event(&v["total"])? == sum).then_some(())
+}
+
 pub(super) fn valid(v: &Value, family: &Value) -> bool {
     validate(v, family).is_some()
 }
@@ -118,6 +170,9 @@ fn validate(v: &Value, family: &Value) -> Option<()> {
             *slot = slot.checked_add(n)?;
         }
     }
+    if let Some(sampling) = v.get("uniform_sampling") {
+        uniform_sampling(sampling, v)?;
+    }
     let cost = price(&sum, &w)?;
     (cost > 0
         && counts(&v["observed_primitives"])? == sum
@@ -164,6 +219,15 @@ pub(super) fn required_items(work: &Value, outer: &Value, required: &[&str]) -> 
                 .iter()
                 .find(|p| p["phase"] == "descent")?;
             if descent["primitives"]["modr_add"].as_u64()? < additions {
+                return None;
+            }
+        }
+        if required.contains(&"counted:selected_modular_uniform_draws") {
+            let sampling = &outer["uniform_sampling"];
+            uniform_sampling(sampling, outer)?;
+            if sampling["total"]["calls"].as_u64()? == 0
+                || sampling["total"]["rejections"].as_u64()? == 0
+            {
                 return None;
             }
         }
@@ -426,6 +490,46 @@ mod tests {
         let mut bad = outer.clone();
         bad["counted_items"] = json!([required[0], required[0]]);
         assert!(!required_items(&work, &bad, &required));
+    }
+
+    #[test]
+    fn selected_uniform_events_reprice_and_keep_unpriced_counts() {
+        fn event(c: u64, d: u64) -> Value {
+            json!({"schema":"modular-uniform-events/v1","complete":false,"calls":c,"raw_draws":d,"rejections":d-c,"other_modulus_calls":0,
+                "priced_native":{"integer_mul64":d,"integer_add64":c},"known_native_priced_bitops":(d as u128*24256+c as u128*320).to_string(),
+                "unpriced_native":{"integer_sub64":2*c,"integer_clz64":c,"integer_shl64":c}})
+        }
+        let mut rows: Vec<_> = PHASES
+            .into_iter()
+            .map(|name| json!({"phase":name,"events":event(0,0)}))
+            .collect();
+        rows[6]["events"] = event(1, 2);
+        let sampling = json!({"schema":"cover.uniform-sampling-diagnostic/v1","complete":false,"phases":rows,"total":event(1,2)});
+        let mut phases: Vec<_> = PHASES
+            .into_iter()
+            .map(|name| json!({"phase":name,"primitives":tally(0)}))
+            .collect();
+        phases[6]["primitives"]["word_op"] = json!(4);
+        phases[6]["primitives"]["rng_words"] = json!(2);
+        let outer = json!({"phases":phases,"uniform_sampling":sampling,"counted_items":["counted:selected_modular_uniform_draws"]});
+        assert!(uniform_sampling(&sampling, &outer).is_some());
+        assert!(required_items(
+            &Value::Null,
+            &outer,
+            &["counted:selected_modular_uniform_draws"]
+        ));
+        for bad in 0..6 {
+            let mut s = sampling.clone();
+            match bad {
+                0 => s["total"]["known_native_priced_bitops"] = json!("0"),
+                1 => s["phases"][6]["events"]["rejections"] = json!(0),
+                2 => s["total"]["unpriced_native"]["integer_clz64"] = json!(0),
+                3 => s["total"]["complete"] = json!(true),
+                4 => s["phases"][6]["events"]["other_modulus_calls"] = json!(1),
+                _ => s["phases"][6]["phase"] = json!("model"),
+            }
+            assert!(uniform_sampling(&s, &outer).is_none(), "case {bad}");
+        }
     }
     #[test]
     fn projection_and_solve_counts_partition_the_observed_phase() {

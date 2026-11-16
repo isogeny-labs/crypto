@@ -62,6 +62,10 @@ use super::bitops::{Field, NoPrice, Prim, Widths};
 use crate::prime_hyperelliptic::ops::KINDS;
 pub use crate::prime_hyperelliptic::ops::{Kind, OpTally};
 
+#[path = "jv_bitops_uniform.rs"]
+mod uniform;
+pub use uniform::{uniform_json, uniform_mod_u64, uniform_snapshot, UniformCounts, UniformTally};
+
 static ENABLED: AtomicBool = AtomicBool::new(false);
 /// Set once any hook fires on a thread that did not [`claim`] the tally.
 /// A flag written only on its first change, so threads that are not

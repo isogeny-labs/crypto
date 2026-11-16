@@ -62,6 +62,7 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/gaudry_cubic_s4_f4.rs \
   src/cryptanalysis/gaudry_cubic_krylov.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
+  src/cryptanalysis/jv_bitops_uniform.rs \
   src/cryptanalysis/f4_fp.rs src/cryptanalysis/f4_fp src/cryptanalysis/groebner_f4.rs src/cryptanalysis/fx_hash.rs \
   examples/gaudry_cubic_graph_compare.rs examples/gaudry_cubic_s4_f4_probe.rs \
   examples/gaudry_cubic_s4_trace_compare.rs \

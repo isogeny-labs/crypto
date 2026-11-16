@@ -56,6 +56,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             ![
                 "counted:modular_la_native_scans",
                 "counted:cover_residual_scalar_additions",
+                "counted:selected_modular_uniform_draws",
             ]
             .contains(m)
         })

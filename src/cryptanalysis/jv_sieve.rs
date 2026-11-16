@@ -2017,13 +2017,16 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
     // ── the residual stream for the descent: R = aG′ + bQ′, R₀ + i·M
     ctx.f.reset_muls();
     let stream_guard = enter(Phase::Descent);
-    let (al, be) = (rng.gen_range(1..l), rng.gen_range(1..l));
+    let (al, be) = (
+        super::jv_bitops::uniform_mod_u64(&mut rng, 1, l),
+        super::jv_bitops::uniform_mod_u64(&mut rng, 1, l),
+    );
     let step = jac.add(
         &jac.mul(&spec.gj, al as u128),
         &jac.mul(&spec.qj, be as u128),
     );
-    let mut a = rng.gen_range(0..l);
-    let mut b = rng.gen_range(1..l);
+    let mut a = super::jv_bitops::uniform_mod_u64(&mut rng, 0, l);
+    let mut b = super::jv_bitops::uniform_mod_u64(&mut rng, 1, l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
     rep.setup_muls = ctx.f.muls() + spec.transfer_muls + line_muls;
     drop(stream_guard);

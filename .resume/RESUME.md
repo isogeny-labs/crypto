@@ -1,4 +1,39 @@
-# Current checkpoint:26PUBLISHED; RNG/native-price review next (16 November11:30Z)
+# Current checkpoint:27SOURCE READY, NOT RUN (16 November12:07Z)
+
+FinalselectedsamplerchecksALLPASS:2native sampler tests(65,536outputs/finalRNGstate),
+19cover(oneignored),19sieve(twoignored),2Wiedemann,1BM,1publicworker; actualproduction
+build andlibrary/example strictClippy. Analyzer28tests/build/strictClippy PASS.
+Original21/23/24/25/26summaries BYTEEXACT. No activecompiler/scientificjob.
+Root sixfile before-check hashes stillPASS. NewAmendment22/plan/report selected:
+p1009fresh281, nativeICthenPivotgraph,1validation0warm,900worker1900whole/CPU0/8GiB/
+noretry. Requiredthreecountedmarkers inclselecteduniform,positivecalls/rejections,
+drawconservation/phaseprices/unpricedcounts,actualscalarreplay/nontrivialgraph/
+nofallback/zeroOTHERforeign. Allcompletefalse,totalnull,eligibility/followupfalse.
+MUSTcommit/publishcleanSOURCE/spec/manifests BEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27.
+Thenoriginalcopiedanalyzer/fullraw(if>64KiBLOCALoriginal+hash/fullsummary/compactflow)/
+hash/report/publish. No performanceclaim fromaccounting. GoalACTIVE/no stopgoal/subagents.
+Afterpacket actualnextalgorithmlead: JVprimary§3.3 adapted2LPsmallFpbase/splitquadratic;
+needsKBfallbackreview/selection/prospectiveprotocolbeforeimplementation/trial.
+
+# Previous checkpoint: selected uniform sampler checks (16 November12:03Z)
+
+NEW DIRTY sampler patch implemented; root code frozen before builds.
+Native65,536sample/finalstate equivalence and rejection/price tests PASS;
+19cover(oneignored),19sieve(twoignored),2Wiedemann,1BM PASS. Analyzer28tests,
+strictClippy/build and library/example strictClippy PASS. Original21/23/24/25/26
+summary replays BYTEEXACT; receipt validation/uniform-rng-historical-replay.log.
+Queued session85125 now compiles publicworker example test/production binary
+(cargo60013/rustc60021 at12:02); DO NOT edit root sources during compile or
+launch scientific timing. Check validation/uniform-rng-example-{test,build}.log.
+Session25333 native tests finished; source hash /tmp/ic-uniform-root-source-before-checks.sha256
+PASS. No scientific job/new trial protocol yet. Last sourcepublished c818cc531.
+After finalworker/build checks, log+select prospective once-only diagnostic,
+publish source/spec/manifests BEFORE call. Then continue strongestreference and
+native gaps / algebraic finder and fill control toward requested rho parity.
+All totals still null/completefalse/no ranking. GoalACTIVE/no stopgoal/subagents.
+
+# Previous checkpoint:26PUBLISHED; RNG/native-price review next (16 November11:30Z)
 
 26packetPUBLISHED2a13f5c8acea5e37bfa73d4a5ca3087c8b286ced;PR4288rewritten
 aroundfinalRustimplementation/actualevidence/remaininggaps,titleupdated.
