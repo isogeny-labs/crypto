@@ -1,0 +1,406 @@
+{
+ "status": "unvalidated pre-gate",
+ "curve": "E-222 (registry other/E-222)",
+ "p": "0x3fffffffffffffffffffffffffffffffffffffffffffffffffffff8b",
+ "d": 160102,
+ "r": "0xffffffffffffffffffffffffffff70cbc95e932f802f31423598cbf",
+ "h": 4,
+ "rG_is_identity": {
+  "edwards_affine": true,
+  "edwards_ext": true,
+  "weier_affine": true,
+  "weier_jacobian": true
+ },
+ "agree_20_scalars": true,
+ "agree_count": 20,
+ "n_scalars": 200,
+ "seed": 1,
+ "pricing": {
+  "S": 0.8,
+  "D": 0.1,
+  "A": 0.0,
+  "I_over_M": [
+   1,
+   20,
+   80,
+   100
+  ]
+ },
+ "python_I_over_M_diagnostic": 38.0,
+ "counts": {
+  "smult": {
+   "Edwards affine, binary": {
+    "M": 3264.8,
+    "S": 0.0,
+    "D": 326.48,
+    "A": 1305.92,
+    "I": 326.48,
+    "M_eq_I1": 3623.9,
+    "M_eq_I20": 9827.0,
+    "M_eq_I80": 29415.8,
+    "M_eq_I100": 35945.4,
+    "M_eq_I100_A0.05": 36010.7
+   },
+   "Edwards extended, binary, mixed add": {
+    "M": 1743.06,
+    "S": 872.34,
+    "D": 108.59,
+    "A": 2286.725,
+    "I": 1.0,
+    "M_eq_I1": 2452.8,
+    "M_eq_I20": 2471.8,
+    "M_eq_I80": 2531.8,
+    "M_eq_I100": 2551.8,
+    "M_eq_I100_A0.05": 2666.1
+   },
+   "Edwards extended, binary, unified add": {
+    "M": 1853.66,
+    "S": 872.28,
+    "D": 108.82,
+    "A": 2288.23,
+    "I": 1.0,
+    "M_eq_I1": 2563.4,
+    "M_eq_I20": 2582.4,
+    "M_eq_I80": 2642.4,
+    "M_eq_I100": 2662.4,
+    "M_eq_I100_A0.05": 2776.8
+   },
+   "Edwards extended, 4-bit window": {
+    "M": 1427.835,
+    "S": 867.2,
+    "D": 63.515,
+    "A": 1962.205,
+    "I": 1.0,
+    "M_eq_I1": 2128.9,
+    "M_eq_I20": 2147.9,
+    "M_eq_I80": 2207.9,
+    "M_eq_I100": 2227.9,
+    "M_eq_I100_A0.05": 2326.1
+   },
+   "Weierstrass affine, binary": {
+    "M": 655.35,
+    "S": 545.755,
+    "D": 0.0,
+    "A": 2402.21,
+    "I": 327.675,
+    "M_eq_I1": 1419.6,
+    "M_eq_I20": 7645.5,
+    "M_eq_I80": 27306.0,
+    "M_eq_I100": 33859.5,
+    "M_eq_I100_A0.05": 33979.6
+   },
+   "Weierstrass Jacobian, binary, mixed add (producer path)": {
+    "M": 1207.99,
+    "S": 2185.28,
+    "D": 0.0,
+    "A": 5245.605,
+    "I": 1.0,
+    "M_eq_I1": 2957.2,
+    "M_eq_I20": 2976.2,
+    "M_eq_I80": 3036.2,
+    "M_eq_I100": 3056.2,
+    "M_eq_I100_A0.05": 3318.5
+   },
+   "Weierstrass Jacobian, binary, general add": {
+    "M": 1636.405,
+    "S": 2288.495,
+    "D": 0.0,
+    "A": 5119.505,
+    "I": 1.0,
+    "M_eq_I1": 3468.2,
+    "M_eq_I20": 3487.2,
+    "M_eq_I80": 3547.2,
+    "M_eq_I100": 3567.2,
+    "M_eq_I100_A0.05": 3823.2
+   },
+   "Weierstrass Jacobian, 4-bit window": {
+    "M": 1087.405,
+    "S": 2041.715,
+    "D": 0.0,
+    "A": 4528.895,
+    "I": 1.0,
+    "M_eq_I1": 2721.8,
+    "M_eq_I20": 2740.8,
+    "M_eq_I80": 2800.8,
+    "M_eq_I100": 2820.8,
+    "M_eq_I100_A0.05": 3047.2
+   }
+  },
+  "single": {
+   "Edwards affine add": {
+    "M": 10,
+    "S": 0,
+    "D": 1,
+    "A": 4,
+    "I": 1,
+    "M_eq_I1": 11.1,
+    "M_eq_I20": 30.1,
+    "M_eq_I80": 90.1,
+    "M_eq_I100": 110.1
+   },
+   "Edwards extended unified add (HWCD)": {
+    "M": 9,
+    "S": 0,
+    "D": 1,
+    "A": 7,
+    "I": 0,
+    "M_eq_I1": 9.1,
+    "M_eq_I20": 9.1,
+    "M_eq_I80": 9.1,
+    "M_eq_I100": 9.1
+   },
+   "Edwards extended mixed add (Z2=1)": {
+    "M": 8,
+    "S": 0,
+    "D": 1,
+    "A": 7,
+    "I": 0,
+    "M_eq_I1": 8.1,
+    "M_eq_I20": 8.1,
+    "M_eq_I80": 8.1,
+    "M_eq_I100": 8.1
+   },
+   "Edwards extended dedicated doubling": {
+    "M": 4,
+    "S": 4,
+    "D": 0,
+    "A": 7,
+    "I": 0,
+    "M_eq_I1": 7.2,
+    "M_eq_I20": 7.2,
+    "M_eq_I80": 7.2,
+    "M_eq_I100": 7.2
+   },
+   "Weierstrass affine add": {
+    "M": 2,
+    "S": 1,
+    "D": 0,
+    "A": 6,
+    "I": 1,
+    "M_eq_I1": 3.8,
+    "M_eq_I20": 22.8,
+    "M_eq_I80": 82.8,
+    "M_eq_I100": 102.8
+   },
+   "Weierstrass affine doubling": {
+    "M": 2,
+    "S": 2,
+    "D": 0,
+    "A": 8,
+    "I": 1,
+    "M_eq_I1": 4.6,
+    "M_eq_I20": 23.6,
+    "M_eq_I80": 83.6,
+    "M_eq_I100": 103.6
+   },
+   "Weierstrass Jacobian add (add-2007-bl)": {
+    "M": 11,
+    "S": 5,
+    "D": 0,
+    "A": 13,
+    "I": 0,
+    "M_eq_I1": 15.0,
+    "M_eq_I20": 15.0,
+    "M_eq_I80": 15.0,
+    "M_eq_I100": 15.0
+   },
+   "Weierstrass Jacobian mixed add (madd-2007-bl)": {
+    "M": 7,
+    "S": 4,
+    "D": 0,
+    "A": 14,
+    "I": 0,
+    "M_eq_I1": 10.2,
+    "M_eq_I20": 10.2,
+    "M_eq_I80": 10.2,
+    "M_eq_I100": 10.2
+   },
+   "Weierstrass Jacobian doubling (dbl-2007-bl)": {
+    "M": 2,
+    "S": 8,
+    "D": 0,
+    "A": 17,
+    "I": 0,
+    "M_eq_I1": 8.4,
+    "M_eq_I20": 8.4,
+    "M_eq_I80": 8.4,
+    "M_eq_I100": 8.4
+   }
+  }
+ },
+ "smult_no_final_affine": {
+  "Edwards extended, binary, mixed add": {
+   "M": 1739.7,
+   "S": 871.9,
+   "D": 108.475,
+   "A": 2285.15,
+   "I": 0.0
+  },
+  "Weierstrass Jacobian, binary, mixed add": {
+   "M": 1198.9,
+   "S": 2179.6,
+   "D": 0.0,
+   "A": 5231.15,
+   "I": 0.0
+  }
+ },
+ "sqrt_exponent_shapes": {
+  "euler_bits": 221,
+  "euler_popcount": 217,
+  "root_bits": 220,
+  "root_popcount": 217,
+  "euler_counts": {
+   "S": 220,
+   "M": 216
+  },
+  "root_counts": {
+   "S": 219,
+   "M": 216
+  }
+ },
+ "fb_element_counted_mean": {
+  "M": 330.63,
+  "S": 334.14,
+  "D": 0.0,
+  "A": 17.05,
+  "I": 0.51
+ },
+ "qr_fraction_observed": 0.507,
+ "h2_replacement_part": {
+  "M": 3490.4,
+  "S": 1743.8,
+  "D": 217.95,
+  "A": 4580.3,
+  "I": 1.0
+ },
+ "trial": {
+  "modelA_fb8_I1": {
+   "smult_part_cur": 5918.2,
+   "trial_cur": 8298.2,
+   "smult_share_cur": 0.7132,
+   "smult_part_h2": 4908.2,
+   "trial_h2": 7288.2,
+   "trial_ratio_h2_over_cur": 0.8783
+  },
+  "modelA_fb8_I20": {
+   "smult_part_cur": 5975.2,
+   "trial_cur": 8431.2,
+   "smult_share_cur": 0.7087,
+   "smult_part_h2": 4927.2,
+   "trial_h2": 7383.2,
+   "trial_ratio_h2_over_cur": 0.8757
+  },
+  "modelA_fb8_I80": {
+   "smult_part_cur": 6155.2,
+   "trial_cur": 8851.2,
+   "smult_share_cur": 0.6954,
+   "smult_part_h2": 4987.2,
+   "trial_h2": 7683.2,
+   "trial_ratio_h2_over_cur": 0.868
+  },
+  "modelA_fb8_I100": {
+   "smult_part_cur": 6215.2,
+   "trial_cur": 8991.2,
+   "smult_share_cur": 0.6913,
+   "smult_part_h2": 5007.2,
+   "trial_h2": 7783.2,
+   "trial_ratio_h2_over_cur": 0.8656
+  },
+  "modelA_fb32_I1": {
+   "smult_part_cur": 5918.2,
+   "trial_cur": 15438.2,
+   "smult_share_cur": 0.3833,
+   "smult_part_h2": 4908.2,
+   "trial_h2": 14428.2,
+   "trial_ratio_h2_over_cur": 0.9346
+  },
+  "modelA_fb32_I20": {
+   "smult_part_cur": 5975.2,
+   "trial_cur": 15799.2,
+   "smult_share_cur": 0.3782,
+   "smult_part_h2": 4927.2,
+   "trial_h2": 14751.2,
+   "trial_ratio_h2_over_cur": 0.9337
+  },
+  "modelA_fb32_I80": {
+   "smult_part_cur": 6155.2,
+   "trial_cur": 16939.2,
+   "smult_share_cur": 0.3634,
+   "smult_part_h2": 4987.2,
+   "trial_h2": 15771.2,
+   "trial_ratio_h2_over_cur": 0.931
+  },
+  "modelA_fb32_I100": {
+   "smult_part_cur": 6215.2,
+   "trial_cur": 17319.2,
+   "smult_share_cur": 0.3589,
+   "smult_part_h2": 5007.2,
+   "trial_h2": 16111.2,
+   "trial_ratio_h2_over_cur": 0.9303
+  },
+  "modelB_fb8_I1": {
+   "smult_part_cur": 5918.2,
+   "trial_cur": 10705.9,
+   "smult_share_cur": 0.5528,
+   "smult_part_h2": 4908.2,
+   "trial_h2": 9695.9,
+   "trial_ratio_h2_over_cur": 0.9057
+  },
+  "modelB_fb8_I20": {
+   "smult_part_cur": 5975.2,
+   "trial_cur": 10840.0,
+   "smult_share_cur": 0.5512,
+   "smult_part_h2": 4927.2,
+   "trial_h2": 9792.0,
+   "trial_ratio_h2_over_cur": 0.9033
+  },
+  "modelB_fb8_I80": {
+   "smult_part_cur": 6155.2,
+   "trial_cur": 11263.6,
+   "smult_share_cur": 0.5465,
+   "smult_part_h2": 4987.2,
+   "trial_h2": 10095.6,
+   "trial_ratio_h2_over_cur": 0.8963
+  },
+  "modelB_fb8_I100": {
+   "smult_part_cur": 6215.2,
+   "trial_cur": 11404.8,
+   "smult_share_cur": 0.545,
+   "smult_part_h2": 5007.2,
+   "trial_h2": 10196.8,
+   "trial_ratio_h2_over_cur": 0.8941
+  },
+  "modelB_fb32_I1": {
+   "smult_part_cur": 5918.2,
+   "trial_cur": 25068.8,
+   "smult_share_cur": 0.2361,
+   "smult_part_h2": 4908.2,
+   "trial_h2": 24058.8,
+   "trial_ratio_h2_over_cur": 0.9597
+  },
+  "modelB_fb32_I20": {
+   "smult_part_cur": 5975.2,
+   "trial_cur": 25434.4,
+   "smult_share_cur": 0.2349,
+   "smult_part_h2": 4927.2,
+   "trial_h2": 24386.4,
+   "trial_ratio_h2_over_cur": 0.9588
+  },
+  "modelB_fb32_I80": {
+   "smult_part_cur": 6155.2,
+   "trial_cur": 26588.8,
+   "smult_share_cur": 0.2315,
+   "smult_part_h2": 4987.2,
+   "trial_h2": 25420.8,
+   "trial_ratio_h2_over_cur": 0.9561
+  },
+  "modelB_fb32_I100": {
+   "smult_part_cur": 6215.2,
+   "trial_cur": 26973.6,
+   "smult_share_cur": 0.2304,
+   "smult_part_h2": 5007.2,
+   "trial_h2": 25765.6,
+   "trial_ratio_h2_over_cur": 0.9552
+  }
+ }
+}

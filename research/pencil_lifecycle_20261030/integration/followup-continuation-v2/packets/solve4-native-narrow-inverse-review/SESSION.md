@@ -1,0 +1,1 @@
+T1478: frozenplan precedes producerproof read; root confirmed published378d3fc before read/replay. Single300s/8GiB reviewer wrapper passed17.024424s,21namedaxioms and4own controls. No runtime/index changes. Archive preserves complete private replay and recursive inventories. Parent handles publication.

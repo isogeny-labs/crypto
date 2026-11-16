@@ -354,6 +354,8 @@ pub fn ladder_curve(bits: u32) -> Curve {
         r: order,
         cofactor: 1,
         generator: (g.x, g.y),
+
+        representation: None,
     };
     assert_eq!(inst.curve_id().slug, slug, "ICV1 slug matches the registry");
     Curve {

@@ -1,0 +1,257 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 10,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T04:45:29Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11407580",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:32:41Z",
+            "message": "0/3 nodes are available: 1 Insufficient cpu, 1 Insufficient memory, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T04:45:29Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5f862a479617b",
+                "namespace": "isolab",
+                "resourceVersion": "11422442",
+                "uid": "1aad86a4-c448-4e49-a20b-e21c385db2e7"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 8,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T04:45:30Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11407581",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:20:39Z",
+            "message": "Failed to schedule pod, did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); node limits have been exhausted for nodepool (NodePool=cpu-spot); did not tolerate taint (taint=isolab.dev/measurement=l2:NoSchedule)",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T04:45:30Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5f862fc933d5e",
+                "namespace": "isolab",
+                "resourceVersion": "11418348",
+                "uid": "a3508faa-1e10-4726-9f7c-3fdb5c335398"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 23,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:22:25Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11407581",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:46:10Z",
+            "message": "0/4 nodes are available: 1 Insufficient cpu, 1 Insufficient memory, 1 node(s) had untolerated taint(s), 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/4 nodes are available: 4 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:22:25Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fa66c5080ab2",
+                "namespace": "isolab",
+                "resourceVersion": "11426908",
+                "uid": "b7191045-5760-400d-95e6-caf8d6cd5894"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 4,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:25:47Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11418922",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:46:02Z",
+            "message": "Failed to schedule pod, did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); node limits have been exhausted for nodepool (NodePool=cpu-spot); node limits have been exhausted for nodepool (NodePool=cpu-l2-spot)",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:25:47Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fa95b3acd76a",
+                "namespace": "isolab",
+                "resourceVersion": "11426859",
+                "uid": "df1cad44-05c4-4fe9-8599-79df9b48b457"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:35:49Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11422419",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:35:49Z",
+            "message": "Failed to schedule pod, did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); node limits have been exhausted for nodepool (NodePool=cpu-spot); all available instance types exceed limits for nodepool (NodePool=cpu-l2-spot)",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:35:49Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fb21e56cd3bc",
+                "namespace": "isolab",
+                "resourceVersion": "11423425",
+                "uid": "a4cb8af9-afbf-42d4-8a2a-1b62659cc3ed"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 3,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:46:16Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11423641",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:46:20Z",
+            "message": "0/4 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 2 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/4 nodes are available: 4 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:46:16Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fbb3cb646d6c",
+                "namespace": "isolab",
+                "resourceVersion": "11426995",
+                "uid": "01ecd255-b1e6-4d05-965c-392c4c383dab"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:46:17Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11426944",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:46:17Z",
+            "message": "Pod should schedule on: nodeclaim/cpu-spot-7bzgm",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:46:17Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fbb4270d9a16",
+                "namespace": "isolab",
+                "resourceVersion": "11426977",
+                "uid": "02c2c733-8aee-4194-a7f2-84712d4e37ab"
+            },
+            "reason": "Nominated",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-08T05:46:54Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm",
+                "namespace": "isolab",
+                "resourceVersion": "11426944",
+                "uid": "d3d86828-dde3-4ced-9584-0b5c35aa8d9a"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-08T05:46:54Z",
+            "message": "0/5 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 3 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/5 nodes are available: 5 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-11-08T05:46:54Z",
+                "name": "pq2-msolve-n37-e63bf8e5-s8kgm.18e5fbbcc75bac25",
+                "namespace": "isolab",
+                "resourceVersion": "11427315",
+                "uid": "ad23d142-5945-41f9-84ed-ee8b0a6da523"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

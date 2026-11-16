@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T05:52:48Z",
+ "id": "PCC-20261112-4286c9",
+ "kind": "theorem",
+ "producer": {
+  "commit": "59d2ac7063567dd733cfeb0f62d3c54480b95c48",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "af8fa2ffcff63a0cdca685d33ee808c3709fe4cae8c2481e71c4223a6aba4e15",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/QuarticFibre.lean",
+   "theorem": "QuarticFibre.ordinate_denominator_inverse"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful finite-algebra identities over an explicit commutative quotient ring,including nilpotents. Inverse/curve hypotheses explicit;actual fields,divisors,proper curve maps,Picard and global degree geometry remain written.",
+ "statement": "theorem ordinate_denominator_inverse {K : Type} [CommRing K] (f m y q yi qi : K) (hfibre : f*m^2=y^2*q^6) (hy : y*yi=1) (hq : q*qi=1) : m*(f*m*yi^2*qi^6)=1"
+}

@@ -1,0 +1,10 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",nodesep=0.4,ranksep=0.4];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#34556b"];
+ h [label="p prime >=5; gcd(t,p)!=1\nExplicit Hasse premise t^2<=4p\nArithmetic forces t=0",fillcolor="#fff2cf"];
+ d [label="Any integer r>2\nr divides #E=p+1\np=-1 mod r"];
+ e [label="Exact modular order2\nNo r-prime assumption",fillcolor="#d4eedb"];
+ f [label="Actual positive control\nE/F7: y^2=x^3+x, #E=8\nP=(3,3), order(P)=8\norder(7 mod8)=2",fillcolor="#d4eedb"];
+ h -> d; d -> e; {rank=same; e; f;} e -> f [style=dashed,label=" control"];
+}

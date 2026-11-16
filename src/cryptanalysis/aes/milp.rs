@@ -47,12 +47,9 @@
 //! - [`active_sboxes_for_trail`] — given an explicit activity pattern
 //!   per round (a candidate "trail"), verify that it satisfies the
 //!   branch-number constraints and return its active S-box count.
-//! - [`enumerate_low_weight_trails`] — exhaustively enumerate single-
-//!   active-byte starting trails over 1-, 2-, and 3-round AES and
-//!   return the minimum active S-box count. The classical bounds 1,
-//!   5, and 9 emerge.
-//! - A 4-round bound check via an explicit "diagonal" trail that
-//!   achieves the 25-active-S-box minimum.
+//! - [`enumerate_low_weight_trails`] — a legacy accessor for stored
+//!   classical lower bounds over 1–4 rounds. It does not perform
+//!   enumeration or produce a trail certificate.
 //!
 //! For higher round counts, point your favourite MILP solver at the
 //! constraint set above.
@@ -113,13 +110,16 @@ pub fn column_weights(p: &ActivityPattern) -> [u32; 4] {
     w
 }
 
-/// Check the branch-number-5 constraint for a single MC step: given
-/// input column pattern `(in_active_count, out_active_count)`, return
-/// true iff the trail can be realised. The constraint is
-/// `in + out ≥ 5` when at least one side is active.
+/// Check necessary MixColumns activity conditions for one column. A zero
+/// input has zero output and vice versa; when both are nonzero, the
+/// branch-number condition is `in + out >= 5`. Passing does not certify
+/// a realizable pair of exact byte differences.
 pub fn mc_branch_number_ok(input_active: u32, output_active: u32) -> bool {
-    if input_active == 0 && output_active == 0 {
-        return true;
+    if input_active > 4 || output_active > 4 {
+        return false;
+    }
+    if input_active == 0 || output_active == 0 {
+        return input_active == 0 && output_active == 0;
     }
     input_active + output_active >= 5
 }
@@ -127,10 +127,10 @@ pub fn mc_branch_number_ok(input_active: u32, output_active: u32) -> bool {
 /// Count active S-boxes for an explicit trail of activity patterns
 /// `[round_0_input, round_1_input, …, round_n_input]`. Each pair of
 /// adjacent patterns is connected by `SR ∘ MC`; the function verifies
-/// the branch-number constraint at every transition and returns
-/// `Some(total)` if the trail is valid.
+/// necessary activity constraints at every transition and returns
+/// `Some(total)` if none is violated. It does not certify an exact trail.
 pub fn active_sboxes_for_trail(trail: &[ActivityPattern]) -> Option<u32> {
-    if trail.is_empty() {
+    if trail.is_empty() || !trail[0].iter().any(|&active| active) {
         return None;
     }
     let mut total = 0u32;
@@ -155,8 +155,8 @@ pub fn active_sboxes_for_trail(trail: &[ActivityPattern]) -> Option<u32> {
     Some(total)
 }
 
-/// Enumerate single-active-byte starting trails over `rounds` rounds
-/// and return the minimum active S-box count. Exhaustive search.
+/// Return stored classical lower bounds for 1–4 rounds. Despite its legacy
+/// name, this function does not enumerate trails or certify a solution.
 pub fn enumerate_low_weight_trails(rounds: usize) -> u32 {
     // For 1 round: minimum is 1 (the active starting byte).
     if rounds == 1 {
@@ -167,14 +167,7 @@ pub fn enumerate_low_weight_trails(rounds: usize) -> u32 {
     if rounds == 2 {
         return 5;
     }
-    // For 3 rounds: start with 1 active byte, → 4 active in column,
-    // → SR distributes across 4 columns (1 each), → MC forces ≥ 4 in
-    // each column = 16 ... but that doesn't match the classical 9.
-    //
-    // The classical bound of 9 active S-boxes for 3 rounds comes from
-    // the "two-round propagation" theorem. Specifically a trail of
-    // active counts 1, 4, 4 sums to 9; this is achievable by careful
-    // MC choices. Enumeration would confirm.
+    // Legacy reference bound; this function does not construct a witness.
     if rounds == 3 {
         return 9;
     }
@@ -203,6 +196,9 @@ mod tests {
     #[test]
     fn branch_number_constraint() {
         assert!(mc_branch_number_ok(0, 0));
+        assert!(!mc_branch_number_ok(0, 4));
+        assert!(!mc_branch_number_ok(4, 0));
+        assert!(!mc_branch_number_ok(1, 5));
         assert!(!mc_branch_number_ok(1, 1)); // 2 < 5
         assert!(!mc_branch_number_ok(2, 2)); // 4 < 5
         assert!(mc_branch_number_ok(1, 4));
@@ -226,6 +222,8 @@ mod tests {
         let r0 = canonical_pattern([1, 0, 0, 0]);
         let r1 = canonical_pattern([1, 0, 0, 0]);
         assert!(active_sboxes_for_trail(&[r0, r1]).is_none());
+        assert!(active_sboxes_for_trail(&[[false; 16], [false; 16]]).is_none());
+        assert!(active_sboxes_for_trail(&[[false; 16], [true; 16]]).is_none());
     }
 
     #[test]

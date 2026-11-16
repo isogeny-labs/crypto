@@ -1,0 +1,34 @@
+import MixedGeneric
+open Polynomial MixedCancellation MixedGeneric
+example : (curve (1:ℚ) (-1) 1 0) = (X^2+1)^2+X*(X^2+1)*(X^2-X-1) := by
+ simp [curve]; ring
+example : let a : WeightedAdd11.Input ℚ := ⟨0,64,2,2⟩
+ let b : D2 ℚ := ⟨0,81,0,0,3,2⟩
+ (output a b 0).z ≠ 0 ∧ (output a b 0).w ≠ 0 ∧ validTwo (curve 1 (-1) 1 0) (output a b 0) := by
+ apply weighted_generic_preserves
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [genericK]
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4+X-1,?_⟩
+   simp [curve]; ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3-X+1,?_⟩
+   simp [curve]; ring
+example : let c := output (⟨0,64,2,2⟩:WeightedAdd11.Input ℚ) (⟨0,81,0,0,3,2⟩:D2 ℚ) 0
+ nq c = -1 ∧ nr c = -1 ∧ ns c = -1 ∧ nt c = -2 := by
+ norm_num [output,outputWith,genericK,genericA,rawW3,rawY3,nq,nr,ns,nt]
+example : MixedCancellation.support (0:ℚ) 0 ∣ curve 1 0 0 1-(ordinate 0 (-1))^2 := by
+ have h := affine_generic_valid (1:ℚ) 0 0 1 0 1 0 1 0 1 (by norm_num)
+   (by norm_num [curve]; exact ⟨X^4+X^2,by ring⟩)
+   (by norm_num [MixedCancellation.support,curve,ordinate]; exact ⟨X^3,by ring⟩)
+ simpa [oq,orr] using h
+example : dispatch (⟨0,0,1,1⟩:WeightedAdd11.Input ℚ) (⟨0,0,0,0,1,1⟩:D2 ℚ) 0 = none := by
+ simp [dispatch,genericK]
+example : ¬ (X:ℚ[X]) ∣ curve 2 (-1) 1 0-1 := by
+ intro h
+ obtain ⟨q,hq⟩ := h
+ have hc := congrArg (fun p : ℚ[X] => p.coeff 0) hq
+ norm_num [curve] at hc

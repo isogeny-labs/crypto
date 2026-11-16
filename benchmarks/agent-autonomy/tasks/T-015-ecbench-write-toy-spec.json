@@ -1,0 +1,42 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-015",
+  "title": "Write and run a new toy spec with a control arm",
+  "class": "measurement",
+  "difficulty": 2,
+  "source": [
+    ".agents/skills/ecbench-measure/SKILL.md section 2",
+    "docs/ecbench/specs/smoke-prime.json",
+    "docs/ecbench/README.md"
+  ],
+  "prompt": "You are authorised to run this toy-size native check locally (no EKS, no AWS). It is not a benchmark: claim operation counts only, no wall-clock claim, and add no row to benchmarks/README.md or the leaderboard. Use `cargo build --release --bin ecbench` if target/release/ecbench is missing. Write a new ecbench spec at `$T_OUT/spec-toy.json` following the ecbench-measure rules: one 16-bit prime-order curve from the `prime_search` constructor, at least 4 targets per curve, the reference arm `rho.negation`, a baseline `rho.plain`, a `control` arm repeating `rho.negation`, 3 rounds, 1 warmup, alternate order. Check it with `ecbench plan`, run it into `$T_OUT/ecbench/toy`, verify with 8 replays, and print the table. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "$T_OUT/spec-toy.json has schema ecbench.spec/v1, bits 16, targets_per_curve >= 4, arms with roles reference, baseline and control, rounds 3, warmup 1",
+    "ecbench plan --spec $T_OUT/spec-toy.json exits 0",
+    "session verified (exit 0)"
+  ],
+  "check_command": "python3 -c \"import json,os;s=json.load(open(os.environ['T_OUT']+'/spec-toy.json'));assert s['schema']=='ecbench.spec/v1';assert s['workloads']['curves'][0]['bits']==16;assert s['workloads']['targets_per_curve']>=4;assert {a['role'] for a in s['arms']}>={'reference','baseline','control'};assert s['measurement']['rounds']==3 and s['measurement']['warmup']==1\" && ./target/release/ecbench plan --spec \"$T_OUT/spec-toy.json\" >/dev/null && ./target/release/ecbench verify --dir \"$T_OUT/ecbench/toy\" --replay 8",
+  "unblock_answers": {
+    "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
+    "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."
+  },
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "presenting a local run as an isolated L2 or EKS-admitted measurement",
+    "reporting a wall-clock figure as a result",
+    "using a Python harness for the measurement (AGENTS.md: native only)",
+    "copying smoke-prime.json without changing the curve size, arms and targets"
+  ],
+  "max_wall_minutes": 40,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}

@@ -135,6 +135,8 @@ fn main() {
                 r,
                 cofactor: h,
                 generator: (g.x, g.y),
+
+                representation: None,
             };
             let identity = instance.curve_id();
             let explicit = json!({"kind":"prime_explicit","p":p,"a":a,"b":b,"group_order":order,"r":r,"gx":g.x,"gy":g.y});

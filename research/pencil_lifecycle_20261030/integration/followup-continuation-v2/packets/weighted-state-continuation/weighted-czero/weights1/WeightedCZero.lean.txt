@@ -1,0 +1,58 @@
+import CurvePoint
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace WeightedCZero
+open Polynomial CZeroInterpolation CZeroOutput
+variable {K : Type*} [Field K]
+structure D2 (K : Type*) where
+ q : K
+ r : K
+ s : K
+ t : K
+ z : K
+ w : K
+structure D1 (K : Type*) where
+ x : K
+ y : K
+ z : K
+ w : K
+
+def weight (q r s t z w : K) : D2 K := ⟨q*z^2,r*z^4,s*z^3*w,t*z^5*w,z,w⟩
+def cross (a b : D2 K) : D2 K :=
+ ⟨a.q*b.z^2,a.r*b.z^4,(a.s*b.z^3)*b.w,(a.t*b.z^5)*b.w,a.z*b.z,a.w*b.w⟩
+def payload (a b : D2 K) : D1 K :=
+ let ca:=cross a b
+ let cb:=cross b a
+ let bb:=bnum ca.q ca.r cb.q cb.r
+ let aa:=anum ca.q ca.r ca.s ca.t cb.q cb.r cb.s cb.t
+ let bw:=bb*(a.w*b.w)
+ let bw2:=bw*bw
+ let q1bw2:=ca.q*bw2
+ let x:=(ca.q+cb.q)*bw2+aa*aa
+ let y:=(aa*(q1bw2+x)-ca.s*(bb*bw2))*x+(aa*ca.r-ca.t*bb)*(bw2*bw2)
+ ⟨x,y,bw*(a.z*b.z),1⟩
+
+theorem cross_weight (q r s t z w q' r' s' t' z' w' : K) :
+ cross (weight q r s t z w) (weight q' r' s' t' z' w')=
+ weight q r s t (z*z') (w*w') := by
+ simp only [cross,weight,D2.mk.injEq]
+ constructor; ring
+ constructor; ring
+ constructor; ring
+ constructor; ring
+ exact ⟨rfl,rfl⟩
+
+theorem b_scale (q1 r1 q2 r2 z : K) :
+ bnum (q1*z^2) (r1*z^4) (q2*z^2) (r2*z^4)=bnum q1 r1 q2 r2*z^8 := by
+ unfold bnum; ring
+
+theorem a_scale (q1 r1 s1 t1 q2 r2 s2 t2 z w : K) :
+ anum (q1*z^2) (r1*z^4) (s1*z^3*w) (t1*z^5*w)
+ (q2*z^2) (r2*z^4) (s2*z^3*w) (t2*z^5*w)=anum q1 r1 s1 t1 q2 r2 s2 t2*z^9*w := by
+ unfold anum; ring
+
+theorem c_scale (q1 r1 s1 t1 q2 r2 s2 t2 z w : K) :
+ cnum (q1*z^2) (r1*z^4) (s1*z^3*w) (t1*z^5*w)
+ (q2*z^2) (r2*z^4) (s2*z^3*w) (t2*z^5*w)=cnum q1 r1 s1 t1 q2 r2 s2 t2*z^7*w := by
+ unfold cnum; ring
+end WeightedCZero

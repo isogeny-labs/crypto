@@ -1,0 +1,107 @@
+--- a/src/cryptanalysis/hashed_ecdl.rs
++++ b/src/cryptanalysis/hashed_ecdl.rs
+@@ -1020,7 +1020,7 @@
+             if let Some(points) = found? {
+                 let stage = Instant::now();
+                 let rel = Relation { u, v, points };
+-                check_relation(curve, &fixed, &bases, &rel)?;
++                check_collected_relation(curve, &bases, &rel, target)?;
+                 relations.push(rel);
+                 stats.targets += stage.elapsed();
+                 if relations.len() == n + 1 {
+@@ -1207,6 +1207,32 @@
+     }
+ }
+ 
++// Collection already computed target=[u]P+[v]Q immediately before the query.
++// Check every returned point and the affine tuple sum against that exact target.
++// Only the collector uses this helper; independent certificate replay below
++// always recomputes the target from the recorded u/v with check_relation.
++fn check_collected_relation(
++    curve: &Curve,
++    bases: &[Vec<Point>],
++    rel: &Relation,
++    target: Point,
++) -> Result<(), Error> {
++    if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
++        return Err(Error::Verification);
++    }
++    let mut sum = None;
++    for (base, &point) in bases.iter().zip(&rel.points) {
++        if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
++            return Err(Error::Verification);
++        }
++        sum = curve.add_valid(sum, point);
++    }
++    if sum != target {
++        return Err(Error::Verification);
++    }
++    Ok(())
++}
++
+ fn check_relation(
+     curve: &Curve,
+     fixed: &FixedPair,
+@@ -1298,6 +1324,62 @@
+     use super::*;
+     fn fixture() -> (Curve, Point) {
+         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
++    }
++
++    #[test]
++    fn collected_relation_reuses_target_but_full_replay_recomputes_it() {
++        let (curve, p) = fixture();
++        let q = curve.mul(p, 42).unwrap();
++        let config = Config {
++            m: 3,
++            tau: Some(40),
++            seed: 111,
++            max_trials: 16,
++            ..Config::default()
++        };
++        let cert = solve(&curve, p, q, &config).unwrap();
++        let bases: Vec<_> = cert
++            .hashes
++            .iter()
++            .map(|h| h.enumerate(&curve).unwrap())
++            .collect();
++        let fixed = FixedPair::new(&curve, p, q);
++        for rel in &cert.relations {
++            let target = fixed.evaluate(&curve, rel.u, rel.v);
++            assert_eq!(
++                check_collected_relation(&curve, &bases, rel, target),
++                check_relation(&curve, &fixed, &bases, rel)
++            );
++            let wrong = curve.add(target, p).unwrap();
++            assert_eq!(
++                check_collected_relation(&curve, &bases, rel, wrong),
++                Err(Error::Verification)
++            );
++            for point in [None, Some((0, 0)), Some((211, 33))] {
++                let mut bad = rel.clone();
++                bad.points[0] = point;
++                assert_eq!(
++                    check_collected_relation(&curve, &bases, &bad, target),
++                    Err(Error::Verification)
++                );
++            }
++            let mut bad = rel.clone();
++            bad.u = curve.r;
++            assert_eq!(
++                check_collected_relation(&curve, &bases, &bad, target),
++                Err(Error::Verification)
++            );
++            bad = rel.clone();
++            bad.points.pop();
++            assert_eq!(
++                check_collected_relation(&curve, &bases, &bad, target),
++                Err(Error::Verification)
++            );
++        }
++        let mut bad = cert.clone();
++        bad.relations[0].u = (bad.relations[0].u + 1) % curve.r;
++        assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
++        verify(&curve, p, q, &cert).unwrap();
+     }
+ 
+     #[test]

@@ -1,0 +1,42 @@
+{
+  "item": 12,
+  "title": "Conformal solving-degree / resource surrogate",
+  "original_requirement": "Fit solving-degree surface over n,ell,m,presentation,order using all prior toy cells and conformal bounds to choose expensive measurements.",
+  "acceptance_criteria": [
+    "Deduplicate complete source receipts; retain timeout/OOM as censored outcomes.",
+    "Predict degree,memory,completion cost separately; compare simple deterministic baselines.",
+    "Freeze holdout/prospective cells and report coverage only under justified sampling/exchangeability."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/results"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/fit.py"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/ic_descent_degrees.rs"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Existing heterogeneous result schemas need receipt-aware extraction and degree-definition reconciliation.",
+    "No trained surrogate/conformal calibration or prospective sampling/coverage protocol bound; do not use extrapolation coverage as a theorem."
+  ],
+  "dependencies": [
+    4,
+    5
+  ],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "A surrogate for the solving-degree surface over n, ℓ, m, presentation and order, fitted with conformal bounds on the hundreds of toy cells already measured, to decide which expensive runs to buy."
+}

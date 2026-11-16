@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Prime-field transfer goal: component targets</title>
+  <style>
+    html {
+      font-size: 10pt;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="/usr/share/javascript/mathjax/MathJax.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Prime-field transfer goal: component targets</h1>
+<p class="date">16 November 2026 — research round one</p>
+</header>
+<p>The goal is an efficient map from an arbitrary public point on a
+prime-field curve to a demonstrably easier target, preserving the
+unknown scalar. <strong>That map has not been constructed; the goal
+remains active.</strong> This round checks one curve-model component and
+rejects two specific shortcuts. [pcc:unverified]</p>
+<figure>
+<img src="route.png" style="width:90.0%"
+alt="What is available and what the transfer still needs" />
+<figcaption aria-hidden="true">What is available and what the transfer
+still needs</figcaption>
+</figure>
+<h2 id="a-concrete-incompatible-pair">A concrete incompatible pair</h2>
+<p>On the rational curve <span
+class="math inline">\(y^2+xy=x^3-64x+288\)</span>, use <span
+class="math inline">\(S=(4,8)\)</span> and <span
+class="math inline">\(T=(2,12)\)</span>. Its split multiplicative
+component group at 2 is <span class="math inline">\(\mathbf Z/5\mathbf
+Z\)</span>. Cremona’s consistent component labels are <span
+class="math inline">\(\kappa(S)=2\)</span>, <span
+class="math inline">\(\kappa(T)=1\)</span>. At the good source prime 59,
+the group has 65 points and cofactor 13:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Encoded source point</th>
+<th>Independently lifted component label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span
+class="math inline">\(P=\operatorname{red}_{59}([13]S)=(11,28)\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td><span
+class="math inline">\(Q=\operatorname{red}_{59}([13]T)=(11,20)=-P\)</span></td>
+<td><span class="math inline">\(3\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Both source points have order five. A homomorphism sending <span
+class="math inline">\(P\)</span> to <span
+class="math inline">\(1\)</span> must send <span
+class="math inline">\(Q\)</span> to <span
+class="math inline">\(-1=4\)</span>, so these labels fail. The exact
+rational kernel witness <span
+class="math inline">\(U=[13](T-[4]S)\)</span> reduces to <span
+class="math inline">\(O\)</span> at 59 but has component label <span
+class="math inline">\(4\)</span>. Lean checks the literal source points,
+orders, negation and label incompatibility. The component interpretation
+is a written argument using the classical local map.
+[pcc:unverified]</p>
+<h2 id="the-model-constructor-is-a-separate-component">The model
+constructor is a separate component</h2>
+<p>For an odd source prime <span class="math inline">\(p\)</span> and
+public order <span class="math inline">\(r\)</span>, store an integral
+model as <span class="math inline">\(A_1=1+2^{r+1}c_1\)</span>, <span
+class="math inline">\(A_i=2^{r+1}c_i\)</span> for <span
+class="math inline">\(i=2,3,4\)</span>, and <span
+class="math inline">\(A_6=2^r c_6\)</span>. The small <span
+class="math inline">\(c_i\)</span> are chosen by modular arithmetic,
+with <span class="math inline">\(c_6\)</span> odd. The model reduces to
+the specified source coefficients; its classical local type at 2 is
+split <span class="math inline">\(I_r\)</span>. Its component quotient
+has order <span class="math inline">\(r\)</span>, rather than being an
+elliptic point group over <span class="math inline">\(\mathbf
+F_2\)</span>. [pcc:unverified]</p>
+<p>Checks cover three bounded models, six rejected mutations and one
+256-bit coefficient projection against OpenSSL. Expanding <span
+class="math inline">\(2^r\)</span> takes <span
+class="math inline">\(r+1\)</span> bits; no point lift is provided.
+[pcc:unverified]</p>
+<h2 id="target-precision-must-retain-the-component-label">Target
+precision must retain the component label</h2>
+<p>The next candidate would extract a label from a consistently selected
+torsion branch. A fixed low-precision coordinate pair is insufficient
+for that target. The separate classical Tate control has period <span
+class="math inline">\(q=2^r\)</span> and auditor parameters <span
+class="math inline">\(u=2^k\)</span>, <span class="math inline">\(1\le
+k&lt;r\)</span>. These are target-side known labels, never an evaluator
+for unknown source scalars. [pcc:unverified]</p>
+<figure>
+<img src="precision.png" style="width:100.0%"
+alt="Recorded collisions at five bits of absolute precision" />
+<figcaption aria-hidden="true">Recorded collisions at five bits of
+absolute precision</figcaption>
+</figure>
+<p>At absolute precision <span class="math inline">\(N\)</span>, every
+label <span class="math inline">\(N\le k\le r-N\)</span> has both
+coordinates zero modulo <span class="math inline">\(2^N\)</span>. All
+nine predeclared native cases, <span
+class="math inline">\(r\in\{19,83,127\}\)</span> and <span
+class="math inline">\(N\in\{3,5,8\}\)</span>, match the predicted
+collision counts. The chart shows the three <span
+class="math inline">\(N=5\)</span> cases. Every enumerated residue is
+also checked against the reduced cubic. No runtime is measured.
+[pcc:unverified]</p>
+<p>This rejects only fixed low absolute precision as a faithful
+encoding. Valuations stored separately or a direct component-label
+extractor remain open possibilities. A usable extractor must match the
+<strong>same global torsion branch and places for every input</strong>,
+without reconstructing the scalar or silently changing the target’s
+orientation.</p>
+<h2 id="evidence-and-next-obligation">Evidence and next obligation</h2>
+<p>The unchanged local Lean gate audits <strong>16 theorems, zero
+failing, zero trusted native exceptions</strong>. The explicit axiom
+audit uses only the standard foundations. Claim
+<code>PCC-20261116-a3e9e1</code> concerns the concrete label
+incompatibility; <code>PCC-20261116-4d7a4e</code> and
+<code>PCC-20261116-3bd2b2</code> retain native observations. All remain
+unsigned. The nodal polynomial identity has native receipt
+<code>IDC1hcad63e1a0fbc75b5</code> and an exact Lean proof pointer; the
+issuer is a producer check, not independent Rust replay.
+[pcc:unverified]</p>
+<p>The next obligation is a component extractor over an actual torsion
+algebra with source-branch data, followed by all-input orientation
+controls and growing-order costs. A compact description of an algebraic
+root alone does not implement its valuation at another prime. This round
+establishes no novel efficient map, general impossibility theorem or
+practical attack.</p>
+<p>Sources: <a
+href="https://johncremona.github.io/papers/component.pdf">Cremona
+(2008), sections 1–2</a>; <a
+href="https://www.math.brown.edu/~jhs/Presentations/ECC4FacesOfLifts.pdf">Silverman’s
+lifting framework</a>; <a
+href="https://www.kantmath.de/publications/papers/weil_descent.pdf">Gaudry–Hess–Smart</a>;
+the committed CT83–94 notes. Full sources, commands, raw receipts and
+proof boundaries are in the study’s <a href="../README.md">README</a>,
+<a href="../GOAL.md">GOAL</a>, <a href="../PROOF-MAP.md">proof map</a>,
+and <a href="../receipts/round-01/">receipts</a>.</p>
+</body>
+</html>

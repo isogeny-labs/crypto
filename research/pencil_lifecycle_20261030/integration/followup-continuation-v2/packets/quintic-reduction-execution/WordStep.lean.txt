@@ -1,0 +1,15 @@
+import Pegcd
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest NativeDivision PencilWordRefinement
+theorem actual_division_step (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (hm:b.getLast?=some a)
+ (A B:(ZMod p.toNat)[X]) (z:State (ZMod p.toNat))
+ (h0:z.r0=wordsPoly p input) (h1:z.r1=wordsPoly p b) (hv:Valid A B z) :
+ ∃q out, NonmonicDivision.divide p a b input input.length=some (q,out) ∧
+ Canon p out ∧ Normal out ∧ (out=[] ∨ out.length<b.length) ∧
+ Valid A B (step z q (wordsPoly p out)) := by
+ obtain ⟨q,out,ho,hc,hno,he,hs⟩ := NonmonicDivision.divide_total p a b input hp hb ha hn hbs hi hm input.length le_rfl
+ exact ⟨q,out,ho,hc,hno,hs,step_valid A B z q (wordsPoly p out) (by simpa [h0,h1] using he) hv⟩
+end Pegcd

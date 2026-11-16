@@ -1,0 +1,32 @@
+--- a/recover_impl_uncached.rs
++++ b/recover_boundary_impl.rs
+@@ -114,7 +114,7 @@
+     }
+     Some(std::array::from_fn(|i| mat[i][4]))
+ }
+-fn general(k: [u64; 4], theta: &Value, p: u64) -> Option<[u64; 4]> {
++fn general_homogeneous(k: [u64; 4], theta: &Value, p: u64) -> Option<[u64; 4]> {
+     let (l, mu, nu) = (
+         theta["lambda"].as_u64().unwrap(),
+         theta["mu"].as_u64().unwrap(),
+@@ -145,13 +145,13 @@
+         row[4] = k[j];
+         row
+     });
+-    let out = solve4(system, p)?;
+-    if out[0] == 0 {
+-        return None;
+-    }
+-    let unit = inv(out[0], p);
+-    Some(out.map(|z| m(z, unit, p)))
+-}
++    solve4(system,p)
++}
++fn general(k:[u64;4],theta:&Value,p:u64)->Option<[u64;4]>{
++ let out=general_homogeneous(k,theta,p)?;
++ if out[0]==0{return None;}let unit=inv(out[0],p);Some(out.map(|z|m(z,unit,p)))
++}
++
+ fn curve(theta: &Value, p: u64) -> Vec<u64> {
+     let (l, mu, nu) = (
+         theta["lambda"].as_u64().unwrap(),

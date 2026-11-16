@@ -1,0 +1,36 @@
+{
+  "schema": "weil-divisor-choice-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "weil-divisor-choice-certificate",
+      "expected_decl_sha256": "2c2c650e7341720a2c8e4e3a290e87ee62224df0b4af1ea50f1b412d8249d270",
+      "full_characters": 1289,
+      "full_decl_sha256": "2c2c650e7341720a2c8e4e3a290e87ee62224df0b4af1ea50f1b412d8249d270",
+      "full_normalized_signature": "theorem actual_weil_divisor_choice_certificate (K : Type*) [Field K] [DecidableEq K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0) : (∀ D : W.Point →₀ ℤ,divisorDegree W D=0→∀ T : Finset W.Point, ∃ (S : W.Point) (h : W.FunctionFieldˣ), Disjoint (shiftedRepresentative W S (divisorPointSum W D)).support T ∧ functionDivisor W h h.ne_zero=shiftedRepresentative W S (divisorPointSum W D)-D) ∧ (∀ n : ℤ,∀ A : DivisorPair W n,pairValue W n A^n=1 ∧ pairValue W n (swapPair W n A)=(pairValue W n A)⁻¹) ∧ (∀ n : ℤ,∀ A B : DivisorPair W n,A.D=B.D→A.E=B.E→pairValue W n A=pairValue W n B) ∧ (∀ n : ℤ,∀ A B : DivisorPair W n, divisorPointSum W A.D=divisorPointSum W B.D→ divisorPointSum W A.E=divisorPointSum W B.E→pairValue W n A=pairValue W n B) ∧ (∀ n : ℤ,∀ D : W.Point →₀ ℤ,divisorDegree W D=0→n • divisorPointSum W D=0→ ∃ f : W.FunctionFieldˣ,functionDivisor W f f.ne_zero=n • D) ∧ (∀ n : ℤ,∀ P Q : W.Point,n • P=0→n • Q=0→ ∃ A : DivisorPair W n,divisorPointSum W A.D=P ∧ divisorPointSum W A.E=Q) ∧ (∀ A : DivisorPair W 0,pairValue W 0 A=1) ∧ (binaryCurve.Δ≠0 ∧ binaryPoint≠0 ∧ binaryPoint≠ -binaryPoint ∧ (∀ R : binaryCurve.Point,R=0 ∨ R=binaryPoint ∨ R= -binaryPoint) ∧ ¬∃ S : binaryCurve.Point, Disjoint (shiftedRepresentative binaryCurve S binaryPoint).support {0,binaryPoint})",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_weil_divisor_choice_certificate",
+        "end_byte": 2009,
+        "file": "/workspace/scratch/weil-divisor-choice-binding-input01/ChoiceCertificate.lean",
+        "qualified_decl_id": "WeilDivisorChoiceAudit.actual_weil_divisor_choice_certificate",
+        "signature": "theorem actual_weil_divisor_choice_certificate\n    (K : Type*) [Field K] [DecidableEq K] [IsAlgClosed K]\n    (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0) :\n    (∀ D : W.Point →₀ ℤ,divisorDegree W D=0→∀ T : Finset W.Point,\n      ∃ (S : W.Point) (h : W.FunctionFieldˣ),\n        Disjoint (shiftedRepresentative W S (divisorPointSum W D)).support T ∧\n        functionDivisor W h h.ne_zero=shiftedRepresentative W S (divisorPointSum W D)-D) ∧\n    (∀ n : ℤ,∀ A : DivisorPair W n,pairValue W n A^n=1 ∧\n      pairValue W n (swapPair W n A)=(pairValue W n A)⁻¹) ∧\n    (∀ n : ℤ,∀ A B : DivisorPair W n,A.D=B.D→A.E=B.E→pairValue W n A=pairValue W n B) ∧\n    (∀ n : ℤ,∀ A B : DivisorPair W n,\n      divisorPointSum W A.D=divisorPointSum W B.D→\n      divisorPointSum W A.E=divisorPointSum W B.E→pairValue W n A=pairValue W n B) ∧\n    (∀ n : ℤ,∀ D : W.Point →₀ ℤ,divisorDegree W D=0→n • divisorPointSum W D=0→\n      ∃ f : W.FunctionFieldˣ,functionDivisor W f f.ne_zero=n • D) ∧\n    (∀ n : ℤ,∀ P Q : W.Point,n • P=0→n • Q=0→\n      ∃ A : DivisorPair W n,divisorPointSum W A.D=P ∧ divisorPointSum W A.E=Q) ∧\n    (∀ A : DivisorPair W 0,pairValue W 0 A=1) ∧\n    (binaryCurve.Δ≠0 ∧ binaryPoint≠0 ∧ binaryPoint≠ -binaryPoint ∧\n      (∀ R : binaryCurve.Point,R=0 ∨ R=binaryPoint ∨ R= -binaryPoint) ∧\n      ¬∃ S : binaryCurve.Point,\n        Disjoint (shiftedRepresentative binaryCurve S binaryPoint).support {0,binaryPoint})",
+        "start_byte": 475
+      },
+      "recorded_statement": "theorem actual_weil_divisor_choice_certificate (K : Type*) [Field K] [DecidableEq K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0) : (∀ D : W.Point →₀ ℤ,divisorDegree W D=0→∀ T : Finset W.Point, ∃ (S : W.Point) (h : W.FunctionFieldˣ), Disjoint (shiftedRepresentative W S (divisorPointSum W D)).support T ∧ functionDivisor W h h.ne_zero=shiftedRepresentative W S (divisorPointSum W D)-D) ∧ (∀ n : ℤ,∀ A : DivisorPair W n,pairValue W n A^n=1 ∧ pairValue W n (swapPair W n A)=(pairValue W n A)⁻¹) ∧ (∀ n : ℤ,∀ A B : DivisorPair W n,A.D=B.D→A.E=B.E→pairValue W n A=pairValue W n B) ∧ (∀ n : ℤ,∀ A B : DivisorPair W n, divisorPointSum W A.D=divisorPointSum W B.D→ divisorPointSum W A.E=divisorPointSum W B.E→pairValue W n A=pairValue W n B) ∧ (∀ n : ℤ,∀ D : W.Point →₀ ℤ,divisorDegree W D=0→n • divisorPointSum W D=0→ ∃ f : W.FunctionFieldˣ,functionDivisor W f f.ne_zero=n • D) ∧ (∀ n : ℤ,∀ P Q : W.Point,n • P=0→n • Q=0→ ∃ A : DivisorPair W n,divisorPointSum W A.D=P ∧ divisorPointSum W A.E=Q) ∧ (∀ A : DivisorPair W 0,pairValue W 0 A=1) ∧ (binaryCurve.Δ≠0 ∧ binaryPoint≠0 ∧ binaryPoint≠ -binaryPoint ∧ (∀ R : binaryCurve.Point,R=0 ∨ R=binaryPoint ∨ R= -binaryPoint) ∧ ¬∃ S : binaryCurve.Point, Disjoint (shiftedRepresentative binaryCurve S binaryPoint).support {0,binaryPoint})",
+      "recorded_text_sha256": "2c2c650e7341720a2c8e4e3a290e87ee62224df0b4af1ea50f1b412d8249d270",
+      "source_plan": "research/weil_divisor_choice_audit_20261116/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "WeilDivisorChoiceAudit.actual_weil_divisor_choice_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "After actual completed gate02; samehost/prover procedural written-header check, no independent compiler/parser/physicalhost assurance."
+}

@@ -1,0 +1,44 @@
+{
+  "item": 4,
+  "title": "Four m-sum variety presentations",
+  "original_requirement": "At (m,ell)=(3,4),(4,3), measure solving degree across Semaev y elimination, unprojected addition, binary Edwards and theta/Mobius presentations, on one curve/base.",
+  "acceptance_criteria": [
+    "Equivalent transported factor base and exact same target law across four presentations.",
+    "Exhaustive toy solution correspondence with exceptional/denominator strata handled.",
+    "Degree, variable count, Macaulay size and complete solve cost reported; presentation reduction is not automatically a gain."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/descend.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/symmodel.py"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/binary_semaev_chain_sat.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/binary_semaev_s4.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/jv_quintic_edwards.rs"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Unprojected addition, binary Edwards and theta/Mobius descended encodings plus equivalence maps need implementation.",
+    "jv_quintic_edwards is prime extension-field work, not the required binary presentation comparison.",
+    "koblitz_presentation_sweep varies curve and factor-base representation, not these four equations."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Presentation search for the m-sum variety in the binary descent. Semaev's elimination of y is one presentation. The unprojected addition law, binary Edwards, theta coordinates on E^{m−1} and Möbius frames are others, and the descended degree depends on the choice. The Edwards rejection in the ledger was prime-field yield only, and your own notes say other quotient presentations are not ruled out. Falsifier: D at (3,4) and (4,3) across four presentations with one base."
+}

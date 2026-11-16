@@ -227,12 +227,63 @@ a priced one. Each is dated, and its tests are in
 | family `extension`, slug `icv1-f2m<N>-…` | `F_{2^N}` | `gaudry_quartic_bin`'s `y² + xy = x³ + ax² + b` over `F_{2^{4m}}`, `N = 4m`, `field_bits = m`; a binary field is priced by its degree, whatever tower the code computes in |
 | family `extension`, slug `icv1-fp<b>k4-…` | `F_{p⁴}`, `p` of `b` bits | the `F_{p⁴}` convention above |
 
-Left unpriced on purpose:
+Left unpriced on purpose (both decided on 2026-11-07, below):
 
 - `abscissae_enumerated_uncharged`: the counter is the size of the enumerated
   weight set, not the number of subsets summed nor their weight, so one
   increment has no fixed primitive sum.
 - `solver_conflicts`: a CDCL conflict is not a fixed number of primitives.
+
+### 2026-10-29 (packed pair-table filter)
+
+| counter or family | rule | why |
+|---|---|---|
+| `table_filter_bit_sets` | `6 · word_op` | `mitm-prime-blocked:m=2,filter=1`: one bit set per stored entry of the packed pair table's membership filter (the key shift, the multiply-shift hash, the word index and bit shift, the OR); the probe's filter read happens inside a lookup the oracle already counts |
+| `sibling_second_points` | `field_sqr + 2 · field_add` | `wwalk:...,sib=m,pool=M`: a sibling pair is charged as one group addition plus this, and performs `inv + 2 mul + 2 sqr + 8 add`, so the second x-only point `x(P − J)` is the difference to the addition's `inv + 2 mul + sqr + 6 add`; the band prices it at `w` (`band::SIBLING_WORK_COUNTERS`, marker `counted:sibling_second_points`) |
+| `sibling_lift_products` | `field_mul + 2 · field_add` | the same walk: the continuing child's `y` (one product, two subtractions), once a parent; marker `counted:sibling_lift_products` |
+
+The filter's memory (8 to 16 bits per stored entry) is not added to the
+`bitop/v2` oracle-table term, which prices `table_insert_attempts · (κ + w)`
+and so already bounds the packed table from above by more than the filter
+adds.
+
+### 2026-11-07 (rho cycle windows)
+
+The short-cycle windows of the rho walks did work that no counter saw
+(`research/rho_cycle_window_bitops_20261107`).
+
+| counter or walk | rule | why |
+|---|---|---|
+| `cycle_window_word_ops` (`work_native` of a tuned rho walk's `search` phase) | `word_op` | `ic_boundary`'s tuned walker and its lanes compare each step's key with every entry of the recent-point ring (16), test the ring index on each push (2) and, on a hit, re-scan to the hit, search the cycle for its least key and test the repeat |
+| `brent_word_ops` (same place, `WalkPolicy::v2`) | `word_op` | Brent's least-key update, checkpoint test and power-of-two test per step, and the repeat test of a detected cycle |
+| `hyperelliptic_ic_bench`, active `CycleWindow` (the default `DistinguishedPointsNegationFullWidthCollideFirst` and `…CycleEscape`) | `word_op` per hash compare of the window scan (newest first, to the match or through all 32) and one per push; the escape step's RNG draw, branch index and two `modr_add`, as the gap-limit escape; the collide-first solve and its check in `linear_algebra` and `verification` | the walk's `ops` tally; `RhoResult::window_charges` reports the window's share. A passive window (`DistinguishedPointsNegationFullWidth`) is an instrument the walk does not consult and stays uncharged |
+
+Holding the window's entries is memory, and clearing it resets a length
+(control); neither is charged. The window counters are `work_native`, never
+counters, so committed rho records (which carry none) replay and price as
+before; a record written before 2026-11-07 is short of the window's word
+operations, a lower bound on the walk it records. The `bitop/v1` total of
+the default hyperelliptic walk before this change is its total minus
+`window_charges` at the row's widths.
+
+### 2026-11-07 (the counters left unpriced on purpose, decided)
+
+Each counter the 2026-10-21 extension left unpriced, and the uncounted work it
+named, is decided here from what the code executes per unit. No primitive
+weight and no vector changes (`committed_vectors_are_frozen`), and no record
+that was complete changes.
+
+| counter or item | decision | rule or reason |
+|---|---|---|
+| `abscissae_enumerated_uncharged` (`cyclotomic`, `onb-weight`) | **priced from the parameters** | `CyclotomicField::weight_set` sums every `w`-subset of its atoms (`p = 2n + 1` powers of γ, or the `n` ONB elements) with `w` additions and inserts the sum into an ordered set (one keyed-set probe): `C(atoms, w) · (w·field_add + hash_probe)`, read from the `factor_base` parameter and the curve's degree, never from the count (the deduplicated set's size). A record without a parseable `w`, or whose count exceeds `C(atoms, w)`, keeps it unpriced. The field's construction (the root-of-unity search's exponentiations, the ONB inversion) and the `points_with_x` lift test of each abscissa visited have no counter: such records carry `known_uncounted` item `cyclotomic_field_construction_and_abscissa_lift_tests` |
+| `sqrt_solves` over `F_{2^n}` (`field_sqrt` over a binary field) | **priced as the Artin–Schreier lift** | on `y² + xy = x³ + ax² + b` no square root is taken: the counter counts `lift_x` attempts (`gaudry_quartic_bin`, as every binary `points_with_x`), each `x²`, `1/x²`, `b·x⁻²`, two additions and the half-trace solve: `field_sqr + field_inv + field_mul + 2·field_add + as_solve`. `bin-t-line` records also carry `known_uncounted` item `bin_t_line_abscissa_map_and_lift_tails` (the map `t ↦ β(t + 1)/t` and a successful lift's product, sign draw and negation) |
+| `field_sqrt` over `F_{p⁴}` | kept unpriced | `gaudry_quartic::Fp4::sqrt` is Tonelli–Shanks with a random non-residue search and an input-dependent loop: a non-square input costs one exponentiation by `(q − 1)/2`, `q = p⁴` (about `6b` `F_{p⁴}` products), a square at least four (about `24b`) plus about `6b` for each random non-residue trial (geometric, mean 2) and the loop's squarings, so no fixed primitive sum exists, and an allowance in the manner of `F_p`'s (`2b` products) would undercount a square input several-fold. The 7 `icv1-fp5k4-…` `ic.pipeline` records stay incomplete (they are incomplete through the solver gap and the five index-calculus items as well) |
+| `solver_conflicts` (`sat-cdcl` records written before `bitop_complete`) | kept unpriced | `sat.rs` charges a conflict's analysis by the literals of the conflict clause and of every reason clause visited, its backjump by the trail entries undone, and propagation by the watch-list clauses scanned (`Solver::word_ops`); none is fixed per conflict, and the old records carry conflicts, decisions and propagations but no clause or literal visits. Re-executing the 8 smallest committed records (`research/ecbench_yield_sweep_20261004/sessions/koblitz`, seqs 3–48) on the counted engine reproduces their conflicts and propagations exactly and gives 3,092–3,185 word operations a conflict on one arm (`sub6-da-sat`) and 4,595–4,712 on the other (`sub8-da-sat`); a propagation is 50.6–53.0. No constant fits either within 1%. The 29 records stay incomplete; a re-run on the current binary prices them exactly (`bitop_complete = 1`), which is the route (`research/bitop_audit_pricing_20261107/sat/`) |
+| `solver_F_q_multiplications` (`d4-bin-macaulay`) | kept unpriced | the count is not one primitive: `BinD4Oracle` adds `F_q` products, `F_q` inversions (one each) and the large-prime merge's products modulo `r` (`lp_merge_mulmods`) into the same total; the `F_q` arithmetic is a log/exp table lookup, and the engine's additions and Macaulay builds have no counter (`solver_engine_work`). The 17 `icv1-f2m…` records stay incomplete |
+| `solver_F_p_multiplications` (`gaudry-d4`) | kept unpriced | the count is modelled, not executed: an `F_{p⁴}` product is charged 13 or 19 `F_p` products (Karatsuba or schoolbook, against the convention's 16) and an inversion 16 plus an uncounted `F_p` inversion. The 7 `icv1-fp5k4-…` records stay incomplete |
+| `solver_F_p_multiplications_(grid)` (`pkm-semaev`) | kept unpriced | `PkmSemaev::grid` adds 6 a `S₃` evaluation where the closure executes 8 `mulm` (two by small constants) and its additions, 2 per one-variable candidate where 3 `mulm` run, and 8 per pair test where 8 run: a modelled count, not the products executed. The 104 records stay incomplete |
+| `solver_F_p_multiply-adds_(elimination_only)` (`pkm-semaev`) | kept unpriced | the elimination's multiply-adds are counted and nothing else of the engine (the system build, the trace fallback, the root extraction); pricing them would raise a lower bound and complete nothing. The 8 records stay incomplete |
+| `CM_FOLDED_NATIVE_GAP` (`ic.cm_folded_*`) | kept listed | `folded.cpp` computes inversions and roots by `power` (a variable-length square-and-multiply), relation signatures as `std::to_string` strings in a `std::set`, pivots by `power(row[k], r − 2, r)`, and the CM map, none with a counter. The doublings' and mixed additions' field additions are fixed by `group.hpp`'s formulas and could be priced, but that would raise 477 committed lower bounds without completing any record, so it is left for the owner. The 477 records stay incomplete until the backend counts its work |
 
 Work that was never counted stays listed: the five index-calculus items
 (`gauss_column_scans_and_pivot_inversions`, `relation_row_construction`,
@@ -254,7 +305,10 @@ version re-prices the whole history without re-running it.
 
 ## `bitop/v2`: memory
 
-`bitop/v2` is `bitop/v1` plus a declared memory term.  A table-based method
+`bitop/v2` is `bitop/v1` plus a declared memory term. Its eight open
+definition choices are listed, with evidence and a recommendation each, under
+"Open definition choices" below; every one is recommended, pending owner
+sign-off, not settled.  A table-based method
 trades gates for memory, and a unit that counts gates alone can flatter it;
 `bitop/v2` makes the trade visible without touching the gate figure.  It is
 frozen as this section states it; the entry widths are in
@@ -385,6 +439,35 @@ Where the two orders disagree, the arms trade gates for memory and
 `bitop/v2` ranks neither; the comparison reports both figures.  A lower
 bound in either figure ranks nothing against a complete one, as in
 `bitop/v1`.
+
+### Open definition choices: recommended, pending owner sign-off
+
+The eight definition choices PR #2639 left to the owner are **not settled**.
+The rules above are what the code computes today. Each recommendation below
+is **recommended, pending owner sign-off**, and none is implemented: every
+one would change a `bitop/v2` figure, and no change was clearly better than
+the frozen rule on the evidence. No `bitop/v1` figure depends on any of
+them.
+
+The evidence comes from `examples/bitop_v2_choices.rs`, which prices each
+alternative beside the frozen rule:
+
+- the 12,080 verified records of the 25 hold-out sessions of
+  `research/bitop_ladder_20261019` (P16–P40: 560 records a session for P16–P28, 400 for P29–P40);
+- the 477 `ic.cm_folded_*` records of the archive.
+
+Outputs are in `research/bitop_audit_pricing_20261107/v2/`.
+
+| # | choice | frozen rule | what the alternative changes on committed records | recommendation (pending owner sign-off) |
+|--:|:--|:--|:--|:--|
+| 1 | sum or max of the terms | sum | generic methods have one term: no change. `ic.pipeline`: sum/max is 1.37 median, [1.03, 1.61]. No ranking of the 393 hold-out arm pairs changes | **keep the sum**: the base and the tables live through the relation search, and the max under-declares by at most the number of terms |
+| 2 | dense or sparse matrix | dense `rows·columns·w` | sparse (non-zeros at construction, `row_build_modr_adds`, times `w + ⌈log₂ columns⌉`) is 23.7× smaller median, [6, 1,111]. The matrix is 24% of the IC sum (median, max 34%), so the IC total falls 1.29× median (max 1.48×). IC costs 3.9–193× the generic arms in gates and 11–10⁶× in `at`, so no IC-versus-generic order can flip | **keep dense** as the declared bound: the hold-out's `incremental-gauss` builds every row as `|F| + 1` zeroed words (`row_build_words`), so dense is what the measured code holds. Report the sparse figure beside it as a diagnostic, and adopt it only for a sparse engine that records its peak non-zeros |
+| 3 | insert attempts as the table bound | `Σ table_insert_attempts · (κ + w)` | attempts never exceed the `2^κ` field-element keys (max 3.1% of them, median 0.1%), so collisions can make attempts exceed entries kept by about `attempts/2^{κ+1}`, at most 1.6% here. The table is 73% of the IC sum (median, [62%, 97%]) | **keep attempts**: an upper bound that is tight to about 2% on the hold-out, read from a counter every current record carries |
+| 4 | kangaroo distinguished-point width | `2κ + 2w` | an affine point, one distance and the herd bit, `2κ + w + 1`, cuts the kangaroo's memory by `w − 1` bits an entry. Pairs ranked under the rule, `bsgs.negation` against `kangaroo.vow`: 8 → 6 of 25 | **adopt `2κ + w + 1`** for kangaroo entries: it is what the walk stores, and the shared width over-declares the kangaroo only. It moves 2 hold-out rankings to "trade", so it needs the owner |
+| 5 | `at = bitops × memory_bits` and its ranking rule | rank only where the gate and `at` orders agree | every IC-versus-generic pair agrees (204/204). The rule leaves the true trades unranked: `bsgs` against `kangaroo` 17/25, `bsgs` against `rho` 22/50, and IC against IC (two IC arms on one curve) 17/39 | **keep** both the product and the rule: they rank where nothing trades and say "trade" otherwise. A single `at` order would rank BSGS against rho by memory alone |
+| 6 | what `bound fit --unit bitop/v2` does | fits the `bitop/v1` gates; memory-incomplete records are lower bounds | across the 25 hold-out sizes the memory exponents differ from the gate exponents (slope against `log₂ r`: rho 0.57 gates / 0.30 memory / 0.87 `at`; kangaroo 0.60 / 0.31 / 0.91; BSGS 0.60 / 0.55 / 1.16; IC 0.71 / 0.65 / 1.36) | **fit memory and `at` as two further exponents** beside the gate fit, each with its interval, so that v2 has a slope of its own: today v2's fit is v1's with lower-bound marks |
+| 7 | excluding walk state | excluded | the jump table and walks in flight at the distinguished-point width are, as a share of the declared total: rho median 13%, max 3.4×; kangaroo median 3%, max 12×; IC median 0.45%, max 13%. No hold-out ranking changes | **include the jump table** (from the `jumps` / `jump_count` / `walk_jumps` counters records already carry) as a `walk` term: at small sizes it exceeds the stored table, and leaving it out flatters the walks there |
+| 8 | native backends' completeness | read `native_table_bytes_uncharged`; base, matrix and tables unpriced | all 477 `ic.cm_folded_*` records are memory-incomplete (`factor_base.signed_points`, `factor_base.columns`, `matrix_rows`, `table_insert_attempts`), the same records that are gate-incomplete (`CM_FOLDED_NATIVE_GAP`) | **keep them incomplete**, and have a backend declare each structure's bytes (base, matrix, tables) the way it declares its table. Mapping its outcome counters (`native_rank_uncharged`, `native_pair_table_keys_uncharged`) to entries would be a guess |
 
 ### Where it is emitted
 

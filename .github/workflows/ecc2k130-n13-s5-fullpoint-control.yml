@@ -20,8 +20,13 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify frozen source, input archive and syntax
-        run: python3 research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_s5_fullpoint_control_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Replay only the n2 toy complete-model control
-        run: |
-          python3 research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/selftest.py > /tmp/s5-toy-selftest.json
-          cmp /tmp/s5-toy-selftest.json research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/evidence/toy_selftest.json
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/selftest.py > /tmp/s5-toy-selftest.json
+            cmp /tmp/s5-toy-selftest.json research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/evidence/toy_selftest.json
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_s5_fullpoint_control_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

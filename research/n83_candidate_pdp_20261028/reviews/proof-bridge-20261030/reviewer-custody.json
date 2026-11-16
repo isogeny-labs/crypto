@@ -1,0 +1,13 @@
+{
+  "schema": "n83.proof-bridge-reviewer-custody/v1",
+  "archive_uri": "s3://setec-astronomy-artifacts/runs/n83-proof-bridge-review-20261030/reviewer-outputs.tar.gz",
+  "archive_bytes": 10694746,
+  "archive_sha256": "053d4ba4a2ffd491216f7ff873dfd273b667971436caa91bd593deabd52f129e",
+  "roundtrip_byte_equal": true,
+  "contents": "All three reviewer output directories, including raw build tree, native executable, Rust sources and preserved Python deviation",
+  "restored_native_binary_replay": "passed; exact output byte comparison against native-replay.json",
+  "replay_inputs": "Existing immutable supplement at original absolute paths, not a relocated input tree; supplement archive separately restored and compared byte-identically",
+  "native_binary_sha256": "c4c4a1ca9375dd16033a291ca67a25d068ad60af090d0c70064574dbc6607401",
+  "supplement_archive_roundtrip_byte_equal": true,
+  "independent_case_count": 1
+}

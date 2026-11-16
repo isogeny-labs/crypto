@@ -1,0 +1,12 @@
+--- clippy-passed/diagnostics.rs
++++ with-numeric-seed-fixture/diagnostics.rs
+@@ -581,6 +581,9 @@
+         let m = ingest(&d, &c, &r).unwrap();
+         assert_eq!(m.entries.len(), 1);
+         assert_eq!(m.record_sha256, sha256_hex(&r));
++        let mut numeric_seed:Value=serde_json::from_slice(&r).unwrap();
++        numeric_seed["algorithm_seed"]=c.identity.seed.into();
++        assert!(ingest(&d,&c,&serde_json::to_vec(&numeric_seed).unwrap()).is_err());
+         assert!(!m.counter_semantics_verified);
+         assert_eq!(m.durability_confirmed, None);
+         let mut wrong = c.clone();

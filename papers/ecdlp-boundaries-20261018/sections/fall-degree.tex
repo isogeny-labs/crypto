@@ -1,0 +1,109 @@
+\section{First fall comparisons and degree-four measurements}
+\subsection{A comparison of two degree conventions}
+
+Nagao's Definitions 5 and 6 distinguish a degree in
+$\F_p[X_1,\ldots,X_N]$ from a degree after reduction modulo the field
+equations. Lemma 4 compares $d_F(F)$ to $d'_F(F\cup S_{\rm fe})$, with
+$S_{\rm fe}=\{X_i^p-X_i\}$ \cite{nagao2015}. The frozen extraction explicitly
+places the field equations outside the true-side generator set in that
+lemma. The programme's current certificate code makes the intended
+comparison convention explicit \cite{nagaoCertificate}.
+
+For the equality convention, a fall at $D$ has products $g_i f_i$ whose
+maximum degree is exactly $D$, and whose nonzero sum has degree strictly
+less than $D$. In the fake quantity every product and the sum is first
+reduced modulo $S_{\rm fe}$. The requirement that the maximum is attained
+must be checked; a low-degree element in a span alone is insufficient.
+
+\begin{proposition}[Existing counterexample, equality convention]
+Over $\F_2$, the universal inequality $d_F\leq d'_F$ fails. Two recorded
+witnesses are
+\[
+ F_A=\{X^2Y,\;XY+X\},\qquad
+ F_B=\{X_1X_2+X_3,\;X_1X_3+X_2\}.
+\]
+The current certificate tests assign fake degree $2$ and true degree $3$
+to each witness, for either true-side placement of the field equations.
+\end{proposition}
+
+The witnesses and exact test assertions are in
+\art{crypto-autoresearcher:tools/lemma4_inside_form.py} and its test module.
+For $F_B$, take $g_1=1$ and $g_2=X_1+1$. Boolean reduction gives
+\[
+ \overline{f_1+(X_1+1)f_2}=X_2+X_3,
+ \quad \deg\overline{f_1}=\deg\overline{(X_1+1)f_2}=2.
+\]
+The ordinary products attain degree $3$, not $2$. The tests separately
+check all degree-two scalar combinations when field equations are
+adjoined, and exhibit a degree-three fall. These checks are finite
+certificates for the stated polynomial systems, not elliptic-curve
+instances or measurements of an F4 run.
+
+\paragraph{The printed inequality reading is a separate axis.}
+The source prints a $\geq$ form of the degree condition. Under the
+programme's padding analysis that reading collapses the quantity to one
+plus the least degree of a nonzero ideal element. The current test class
+\art{TestTheGeReadingVoidsOnlyOnePlacement} distinguishes the true-side
+placement as follows, for both witnesses:
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Condition reading & True-side generators & True & Fake \\
+\midrule
+Equality & $F$ & 3 & 2 \\
+Equality & $F\cup S_{\rm fe}$ & 3 & 2 \\
+Literal $\geq$ & $F$ & 3 & 2 \\
+Literal $\geq$ & $F\cup S_{\rm fe}$ & 2 & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Thus the assertion that the literal reading always voids the
+counterexample is too broad. The historical finding
+\art{KN-FIND-936151} contains that broader wording; the later tests
+explicitly correct it. Both are retained in the source inventory. The
+frozen extracted Lemma 4 names $F$ on the true side, but a final
+publication still owes a fresh PDF-level transcription of both definitions
+and their intended reading. These sources do not prove or disprove
+Nagao's Proposition 5 by another argument, nor a complexity conclusion
+for ECDLP. The programme itself withholds the broader derived claim.
+
+\subsection{What the binary degree measurements actually establish}
+
+Semaev's Assumption 1 concerns $d_{F4}$ for the Boolean system equivalent
+to his chained equations, with subspace dimension $k=\lceil n/m\rceil$
+\cite{semaev2015}. It is distinct from Nagao's separately numbered
+Assumption 1, from first fall degree, from a one-pass Macaulay rank, and
+from a bounded-degree mutant closure. Confusing these quantities can
+turn a valid computation into an invalid refutation.
+
+The closure-at-scale study \cite{closureScale} reports eight unsatisfiable
+$m=3$ draws at $(n,\ell)=(19,7)$ and $(21,7)$ for which the complete
+degree-four mutant closure saturates without containing $1$. It also
+reports degree-four refutation on its other listed cells, including the
+$m=4$ cells through $\ell=4$. This is a failure of a uniform
+constant-four closure model in that representation. It does not follow
+merely from a timeout: the report says these particular closures
+converged. A new verifier would still need the retained instance, closure
+basis, closure-stability checks and non-membership evidence before
+certifying an individual negative instance afresh.
+
+\status{The broad claim that these records refute Semaev's Assumption 1
+is not established.} The programme's own correction
+\art{KN-FIND-9cba50} records that an earlier ladder used
+Frobenius-invariant subspaces of dimension $\operatorname{ord}_n(2)$,
+which need not equal $\lceil n/m\rceil$, and that its degree meters were
+not interchangeable with $d_{F4}$. Conversely, the two $m=3$ cells just
+listed do have $\ell=\lceil n/m\rceil$; calling them off-diagonal does
+not fix the metric issue. A verified bridge from saturated mutant
+closure to the precise F4 quantity remains necessary in either case.
+
+There is also positive counterevidence against a naive degree-meter
+identification. At the separately archived $n=17,m=2,\ell=9$ cell,
+plain degree-four Macaulay left 62 unsatisfiable targets unresolved;
+the subsequent mutant closure refuted all 62 with checked witnesses
+\cite{closureCorrection}. Therefore non-refutation by plain Macaulay
+was not itself evidence that mutant refutation degree exceeded four.
+No statement about cryptographic-size degrees follows from this finite
+example. Likewise, fitting either of two surviving degree-growth models
+does not logically refute every possible $m=4$ degree surface outside
+the measured cells.
