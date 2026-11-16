@@ -48,6 +48,75 @@ pub fn generate(p: u64, n: usize, seed: u64) -> Result<Fixture, String> {
     if ![2147483647, 9007199254740881].contains(&p) || !(2..=6).contains(&n) {
         return Err("fixture grid: stated primes and 2..6 variables".into());
     }
+    let mut edges = BTreeSet::new();
+    for i in 0..n - 1 {
+        edges.insert((i, i + 1));
+    }
+    if n > 2 {
+        edges.insert((0, n - 1));
+    }
+    generate_impl(p, n, seed, edges, format!("p{p}-cycle{n}-seed{seed}"))
+}
+/// Explicit bounded graph fixtures. Solver inputs contain equations only;
+/// public witness/scalars remain generation/checking data outside construction.
+pub fn generate_graph(
+    p: u64,
+    n: usize,
+    seed: u64,
+    edges: &[(usize, usize)],
+) -> Result<Fixture, String> {
+    if ![2147483647, 9007199254740881].contains(&p) || !(2..=8).contains(&n) || edges.len() > 16 {
+        return Err("graph fixture grid: stated primes, 2..8 variables, <=16 edges".into());
+    }
+    let mut normalized = BTreeSet::new();
+    for &(a, b) in edges {
+        if a >= n || b >= n || a == b || !normalized.insert((a.min(b), a.max(b))) {
+            return Err("invalid/duplicate graph edge".into());
+        }
+    }
+    let mut reached = vec![false; n];
+    reached[0] = true;
+    let mut queue = VecDeque::from([0]);
+    while let Some(v) = queue.pop_front() {
+        for &(a, b) in &normalized {
+            let next = if a == v {
+                Some(b)
+            } else if b == v {
+                Some(a)
+            } else {
+                None
+            };
+            if let Some(w) = next {
+                if !reached[w] {
+                    reached[w] = true;
+                    queue.push_back(w);
+                }
+            }
+        }
+    }
+    if reached.iter().any(|x| !*x) {
+        return Err("graph fixture must be connected".into());
+    }
+    let label = normalized
+        .iter()
+        .map(|(a, b)| format!("{a}-{b}"))
+        .collect::<Vec<_>>()
+        .join("_");
+    generate_impl(
+        p,
+        n,
+        seed,
+        normalized,
+        format!("p{p}-graph{n}-{label}-seed{seed}"),
+    )
+}
+fn generate_impl(
+    p: u64,
+    n: usize,
+    seed: u64,
+    edges: BTreeSet<(usize, usize)>,
+    id: String,
+) -> Result<Fixture, String> {
     let mut state = seed;
     let mut points = Vec::new();
     let mut scalars = Vec::new();
@@ -65,13 +134,6 @@ pub fn generate(p: u64, n: usize, seed: u64) -> Result<Fixture, String> {
     }
     if points.len() != n {
         return Err("point fixture generation cap".into());
-    }
-    let mut edges = BTreeSet::new();
-    for i in 0..n - 1 {
-        edges.insert((i, i + 1));
-    }
-    if n > 2 {
-        edges.insert((0, n - 1));
     }
     let mut f = Vec::new();
     for (i, j) in edges {
@@ -97,7 +159,7 @@ pub fn generate(p: u64, n: usize, seed: u64) -> Result<Fixture, String> {
         polynomials: f,
     };
     let result = Fixture {
-        id: format!("p{p}-cycle{n}-seed{seed}"),
+        id,
         system,
         witness: points.iter().map(|r| r.0).collect(),
         public_scalars: scalars,
@@ -128,6 +190,61 @@ pub fn witness_check(system: &System, witness: &[u64]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn graph_validation_rejects_bad_shapes_before_point_generation() {
+        let p = 2147483647;
+        for edges in [
+            vec![],
+            vec![(0, 0)],
+            vec![(0, 3)],
+            vec![(0, 1), (1, 0)],
+            vec![(0, 1)],
+        ] {
+            assert!(generate_graph(p, 3, 7, &edges).is_err());
+        }
+        assert!(generate_graph(p, 9, 7, &[(0, 1)]).is_err());
+        assert!(generate_graph(1u64 << 53, 3, 7, &[(0, 1), (1, 2)]).is_err());
+        assert!(generate(p, 7, 7).is_err(), "legacy admission is unchanged");
+    }
+    #[test]
+    fn explicit_graphs_preserve_witnesses_and_original_input_identities() {
+        let p = 2147483647;
+        for n in [6, 7, 8] {
+            let order: Vec<usize> = match n {
+                6 => vec![0, 1, 2, 5, 3, 4],
+                7 => vec![0, 1, 2, 6, 3, 4, 5],
+                _ => vec![0, 1, 2, 3, 7, 4, 5, 6],
+            };
+            let path: Vec<_> = order.windows(2).map(|w| (w[0], w[1])).collect();
+            let fixture = generate_graph(p, n, 7, &path).unwrap();
+            assert!(witness_check(&fixture.system, &fixture.witness));
+            let f = fixture.system.decode().unwrap();
+            let pairs = cheap::consequences(&f, n, p);
+            assert_eq!(pairs.len(), n - 1);
+            assert!(pairs
+                .iter()
+                .all(|r| verify(&r.cubic_difference, &f, p) && verify(&r.cubic_syzygy, &f, p)));
+        }
+    }
+    #[test]
+    fn graph_entry_matches_legacy_cycle_interface_on_both_fields() {
+        for p in [2147483647, 9007199254740881] {
+            for n in [2, 3, 4, 6] {
+                let mut cycle: Vec<_> = (0..n - 1).map(|i| (i, i + 1)).collect();
+                if n > 2 {
+                    cycle.push((0, n - 1));
+                }
+                let old = generate(p, n, 7).unwrap();
+                let explicit = generate_graph(p, n, 7, &cycle).unwrap();
+                assert_eq!(
+                    serde_json::to_vec(&old.system).unwrap(),
+                    serde_json::to_vec(&explicit.system).unwrap()
+                );
+                assert_eq!(old.witness, explicit.witness);
+                assert_eq!(old.public_scalars, explicit.public_scalars);
+            }
+        }
+    }
     #[test]
     fn shared_point_inputs_have_valid_witnesses_and_certificates() {
         for p in [2147483647, 9007199254740881] {

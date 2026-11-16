@@ -198,6 +198,9 @@ fn basis_hash(b: &Basis) -> String {
     hash(&serde_json::to_vec(&rows).unwrap())
 }
 fn prepare(root: &Path, mode: &str) -> Result<()> {
+    if mode == "graph-screen" {
+        return prepare_graphs(root);
+    }
     let roster: Vec<_> = match mode {
         "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
         "pilot" => [3, 4, 6]
@@ -239,6 +242,104 @@ fn prepare(root: &Path, mode: &str) -> Result<()> {
         &json!({"schema":"local-compact-inputs/v1","mode":mode,"cases":cases}),
     )
 }
+type GraphDefinition = (&'static str, Vec<(usize, usize)>);
+fn graph_roster(n: usize) -> Result<Vec<GraphDefinition>> {
+    let (path, balanced, cycle) = match n {
+        6 => (
+            vec![0, 1, 2, 5, 3, 4],
+            vec![(5, 3), (5, 4), (3, 0), (3, 1), (4, 2)],
+            vec![0, 3, 1, 5, 2, 4],
+        ),
+        7 => (
+            vec![0, 1, 2, 6, 3, 4, 5],
+            vec![(6, 4), (6, 5), (4, 0), (4, 1), (5, 2), (5, 3)],
+            vec![0, 4, 1, 6, 2, 5, 3],
+        ),
+        8 => (
+            vec![0, 1, 2, 3, 7, 4, 5, 6],
+            vec![(7, 5), (7, 6), (5, 2), (5, 3), (6, 4), (2, 0), (4, 1)],
+            vec![0, 4, 1, 6, 2, 7, 3, 5],
+        ),
+        _ => return Err("graph screen n must be 6/7/8".into()),
+    };
+    let path = path.windows(2).map(|w| (w[0], w[1])).collect();
+    let mut cycle_edges: Vec<_> = cycle.windows(2).map(|w| (w[0], w[1])).collect();
+    cycle_edges.push((*cycle.last().unwrap(), cycle[0]));
+    Ok(vec![
+        ("path", path),
+        ("balanced", balanced),
+        ("star", (0..n - 1).map(|i| (i, n - 1)).collect()),
+        ("permuted-cycle", cycle_edges),
+    ])
+}
+fn screen_score(s: &Value) -> Option<f64> {
+    if s["status"] != "screen_complete" || s["eligible_for_preregistered_followup"] != true {
+        return None;
+    }
+    let rows = s["comparisons"].as_array()?;
+    if rows.len() != 2 || rows[0]["control"] != "f4" || rows[1]["control"] != "certified" {
+        return None;
+    }
+    let mut score = f64::INFINITY;
+    for row in rows {
+        let r = row["full_cost_single_call_ratio"].as_f64()?;
+        if !r.is_finite() || r < 10. {
+            return None;
+        }
+        score = score.min(r);
+    }
+    Some(score)
+}
+fn select_screen_family(summaries: &[Value]) -> Value {
+    let mut selected = None;
+    let mut best = f64::NEG_INFINITY;
+    for s in summaries {
+        if let Some(score) = screen_score(s) {
+            if score > best {
+                best = score;
+                selected = Some(s["id"].clone());
+            }
+        }
+    }
+    selected.unwrap_or(Value::Null)
+}
+fn prepare_graphs(root: &Path) -> Result<()> {
+    fs::create_dir(root)?;
+    let mut cases = Vec::new();
+    for n in [6, 7, 8] {
+        for (name, edges) in graph_roster(n)? {
+            let start = Instant::now();
+            let system = workload::generate_graph(P, n, 7, &edges)?.system;
+            let id = format!("{name}-n{n}-s7");
+            let dir = root.join(&id);
+            fs::create_dir(&dir)?;
+            let f = system.decode()?;
+            let bytes = serde_json::to_vec(&system)?;
+            write_new(&dir.join("system.json"), &bytes)?;
+            for algorithm in ["std", "slimgb"] {
+                write_new(
+                    &dir.join(format!("{algorithm}.sing")),
+                    singular_code(&system, &f, algorithm).as_bytes(),
+                )?;
+            }
+            let ms = format!(
+                "{}\n{}\n{}\n",
+                system.variables.join(","),
+                P,
+                f.iter()
+                    .map(|f| expr(f, &system.variables))
+                    .collect::<Vec<_>>()
+                    .join(",\n")
+            );
+            write_new(&dir.join("input.ms"), ms.as_bytes())?;
+            cases.push(json!({"id":id,"topology":name,"variables":n,"seed":7,"edges":edges,"input_sha256":hash(&bytes),"preparation_ns":ns(start)}));
+        }
+    }
+    save(
+        &root.join("manifest.json"),
+        &json!({"schema":"graph-screen-inputs/v1","mode":"graph-screen","cases":cases}),
+    )
+}
 struct Runner {
     worker: PathBuf,
     singular: PathBuf,
@@ -247,6 +348,8 @@ struct Runner {
     worker_hash: String,
     global: Instant,
     case: Instant,
+    global_limit: Duration,
+    case_limit: Duration,
 }
 impl Runner {
     fn process(
@@ -256,9 +359,10 @@ impl Runner {
         input: Option<&Path>,
         prefix: &Path,
     ) -> Result<(std::process::ExitStatus, Vec<u8>, u64)> {
-        let remaining = Duration::from_secs(1800)
+        let remaining = self
+            .global_limit
             .saturating_sub(self.global.elapsed())
-            .min(Duration::from_secs(1200).saturating_sub(self.case.elapsed()))
+            .min(self.case_limit.saturating_sub(self.case.elapsed()))
             .min(Duration::from_secs(30));
         if remaining.is_zero() {
             return Err("original pilot/case deadline exhausted".into());
@@ -444,7 +548,8 @@ fn run(
 ) -> Result<()> {
     let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
     let qualification = manifest["mode"] == "qualification";
-    if !qualification && manifest["mode"] != "pilot" {
+    let graph_screen = manifest["mode"] == "graph-screen";
+    if !qualification && !graph_screen && manifest["mode"] != "pilot" {
         return Err("unknown prepared mode".into());
     }
     let worker_hash = file_hash(&worker)?;
@@ -459,6 +564,8 @@ fn run(
         worker_hash,
         global: Instant::now(),
         case: Instant::now(),
+        global_limit: Duration::from_secs(if graph_screen { 600 } else { 1800 }),
+        case_limit: Duration::from_secs(if graph_screen { 180 } else { 1200 }),
     };
     save(
         &out.join("pre-call.json"),
@@ -488,6 +595,52 @@ fn run(
                     .as_u64()
                     .ok_or("missing preparation cost")?,
             )?;
+            if graph_screen {
+                let mut calls = Vec::new();
+                let mut successful = Vec::new();
+                for arm in ARMS {
+                    match runner.sample(
+                        arm,
+                        &input,
+                        &dir.join(format!("screen-{}", arm_name(arm))),
+                        n,
+                        &reference,
+                        &input_hash,
+                    ) {
+                        Ok(sample) => {
+                            calls.push(json!({"arm":arm,"status":"complete","sample":sample}));
+                            successful.push(sample);
+                        }
+                        Err(e) => {
+                            calls.push(json!({"arm":arm,"status":"failed","reason":e.to_string()}))
+                        }
+                    }
+                }
+                let complete = successful.len() == 3;
+                let comparisons = if complete {
+                    let paid = |s: &Sample| -> Result<u64> {
+                        Ok(s.worker_wall_ns
+                            .checked_add(s.validation_wall_ns)
+                            .and_then(|x| x.checked_add(setup))
+                            .ok_or("screen cost overflow")?)
+                    };
+                    let candidate = &successful[2];
+                    let c_full = paid(candidate)?;
+                    let rows:Vec<_>=successful[..2].iter().map(|s|Ok(json!({"control":s.arm,"native_single_call_ratio":s.worker_wall_ns as f64/candidate.worker_wall_ns as f64,"full_cost_single_call_ratio":paid(s)? as f64/c_full as f64}))).collect::<Result<_>>()?;
+                    json!(rows)
+                } else {
+                    Value::Null
+                };
+                let eligible = complete
+                    && comparisons
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .all(|r| r["full_cost_single_call_ratio"].as_f64().unwrap() >= 10.);
+                let screen = json!({"schema":"graph-screen-case/v1","id":id,"topology":item["topology"],"variables":n,"seed":7,"edges":item["edges"],"input_sha256":input_hash,"worker_sha256":runner.worker_hash,"reference_basis_sha256":basis_hash(&reference),"setup_wall_ns":setup,"calls":calls,"comparisons":comparisons,"eligible_for_preregistered_followup":eligible,"status":if complete{"screen_complete"}else{"screen_incomplete"},"standing":"one planned call per arm; no A/A, confidence interval, confirmed gain or family standing"});
+                save(&dir.join("screen-transcript.json"), &screen)?;
+                return Ok(screen);
+            }
             transcript = Some(Case {
                 schema: "compact-speed-transcript/v1".into(),
                 prime: P,
@@ -586,9 +739,14 @@ fn run(
     let unchanged = file_hash(&runner.worker)? == runner.worker_hash
         && file_hash(&runner.singular)? == singular_hash
         && file_hash(&runner.msolve)? == msolve_hash;
+    let selected = if graph_screen {
+        select_screen_family(&summaries)
+    } else {
+        Value::Null
+    };
     save(
         &out.join("summary.json"),
-        &json!({"schema":"local-compact-summary/v1","mode":manifest["mode"],"identities_unchanged":unchanged,"scope":"unsigned producer L0 exploration; not formal protocol admission, independent replay or fresh family confirmation","cases":summaries}),
+        &json!({"schema":"local-compact-summary/v1","mode":manifest["mode"],"identities_unchanged":unchanged,"scope":"unsigned producer L0 exploration; not formal protocol admission, independent replay or fresh family confirmation","selected_followup_family":selected,"cases":summaries}),
     )?;
     if !unchanged {
         return Err("executable identity changed during run".into());
@@ -600,11 +758,89 @@ fn main() -> Result<()> {
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
     Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
-    _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
+    _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn legacy_cycles_match_original_measured_input_hashes() {
+        let expected = [
+            (
+                3,
+                101,
+                "03df9a50153c547305c76f2b29228e592b3437c39ae61a28051e0985731fd184",
+            ),
+            (
+                3,
+                307,
+                "6205704ddf23b2c8e90e97c1985ab0e8dc15f40a0343accbb4e466ccb748dfa3",
+            ),
+            (
+                3,
+                911,
+                "2295ce56363ecdc00187dfd6be090fcfa28b7eef8eb1abde7baceb28a0620b76",
+            ),
+            (
+                4,
+                101,
+                "b216e2697ed9e620c0eb6287c2952359b15e4a8704dbbceedeac43a00bb35c08",
+            ),
+            (
+                4,
+                307,
+                "1304d8c53c17e1e70210f5b1f256e25b4e25e5ff7f31274ef7d0ccf6222302ad",
+            ),
+            (
+                4,
+                911,
+                "fc26b0269928209598b755c26e1967bb3ab2d6031e317c80c231538a06e6a506",
+            ),
+            (
+                6,
+                101,
+                "25d5cc7ef27544bdb7a89dc4f86e9d3bbe6e3ff678f9169eeda8eb029e01294d",
+            ),
+            (
+                6,
+                307,
+                "c6fa6935298c3760b480f6493581cb13f1afa7f5fc62fdef18f91ffa48dcb750",
+            ),
+            (
+                6,
+                911,
+                "cef8a012c9c5c9d1e4c03cf0755df2bcc75af6d4e9e13b384ccb2477966ca12d",
+            ),
+        ];
+        for (n, seed, golden) in expected {
+            let s = workload::generate(P, n, seed).unwrap().system;
+            assert_eq!(hash(&serde_json::to_vec(&s).unwrap()), golden);
+        }
+    }
+    #[test]
+    fn graph_roster_and_paid_selection_are_fixed() {
+        for n in [6, 7, 8] {
+            let rows = graph_roster(n).unwrap();
+            assert_eq!(
+                rows.iter().map(|r| r.0).collect::<Vec<_>>(),
+                ["path", "balanced", "star", "permuted-cycle"]
+            );
+            assert_eq!(rows[0].1.len(), n - 1);
+            assert_eq!(rows[3].1.len(), n);
+        }
+        let record = |id, f, e, status| json!({"id":id,"status":status,"eligible_for_preregistered_followup":true,"comparisons":[{"control":"f4","full_cost_single_call_ratio":f,"native_single_call_ratio":100.},{"control":"certified","full_cost_single_call_ratio":e,"native_single_call_ratio":100.}]});
+        assert!(
+            select_screen_family(&[record("synthetic-low", 2., 20., "screen_complete")]).is_null()
+        );
+        assert_eq!(
+            select_screen_family(&[
+                record("synthetic-first", 12., 20., "screen_complete"),
+                record("synthetic-tie", 12., 30., "screen_complete"),
+                record("synthetic-failed", 100., 100., "screen_incomplete")
+            ]),
+            json!("synthetic-first")
+        );
+    }
     #[test]
     fn exact_signed_singular_and_msolve_agree() {
         let s = singular_basis("POLY\nTERM:1:1,0\nTERM:-1:0,0\nENDPOLY\nDONE", 2).unwrap();
