@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct110/**'
       - '.github/workflows/ct110-two-integral-order.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct110/**'
       - '.github/workflows/ct110-two-integral-order.yml'
   workflow_dispatch:
 jobs:
   certify-two-order:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

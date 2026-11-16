@@ -13,6 +13,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct92/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "research/cross_characteristic_global_torsion_20261112/ct86/**"
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
@@ -26,6 +27,7 @@ on:
 
 jobs:
   independent-exact-arithmetic:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
