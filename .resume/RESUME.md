@@ -1,3 +1,37 @@
+# Current checkpoint:40READY; publish source before sole Runpod call
+
+Goal ACTIVE: Rust graph IC/extension-field relation finding toward rho parity.
+ALL scientific measurements Runpod; Rust science; no subagents/stop_goal.
+40 new examples jv_sieve_extension_remainders/check, research helper/collector/checker.
+Final v5 source frozen: producer5PASS, independent qualifier22PASS, strictClippy/build0;
+source manifest328, binaries pinned; original7production39files unchanged.
+Positive/first-arm-failure/create-new transport controls PASS. SourcePCCfa3defUNVERIFIED.
+Protocol extension-remainder-plan.json + AMENDMENT_35_EXTENSION_REMAINDERS.md.
+Exact39public-only input SHA07915bb6d6cb22867f5c36b7cf6ffbfd6f10902025488ad074df94e7448c1159;
+seed379,m9,fullbase100%,maxp²B,65536sourcecap; stop actual fullbase-1rank at complete1024B.
+Baseline fullsmooth vs canonical signed irreducible quadratic Mumford class anchors,
+original-source cancellation witnesses; independent Cantor EVERYoriginal and u128
+EVERYprojection/rank/product prefix; principal binding/phase/prices/common cohort.
+No scalar recovery/fullpipeline gain; costs incomplete/nulltotal/band/ratios.
+
+Own40pod zx071ey7jqvmdl CREATED21:01:45Z,4vCPU8GiBcpu3c0.12USDh,pinned Rust image;
+1800s DELETE guardian active; safe allocation metadata validation/runpod40-allocation.json.
+NO scientific dispatch yet. Bounds300s/worker,700whole,900qualifier. Need >=1640remaining
+at wrapper start. Publish/push source/controls/journal/resume, explicit feature fetch,
+prepare-extension-remainder-runpod.sh NEW40stage. Private auth pointer
+/tmp/ic-runpod-auth-location (NEVER print secret/header/envresponse); task40-header,
+pod40.id, cleanup-guard40.sh/privatecreate40receipts. APIkeyneverpassedPod.
+Existing bootstrap37 unchanged exact native capture. Stage intended
+/workspace/ic-runpod-runs/runpod-extension-remainders-20261116-40.
+POST /run ONCE only; then readonly monitor/collect originals+hashes, IMMEDIATE ownpod
+DELETE+independentabsence check/guardmark, then sourceblob reconstruction/report.
+All other ownpods32–39deleted. Do not touch unrelated accountpods.
+Sourcepublished39ddefdb2bf7a2ce9cdf2899e76962baae53ac485b/PR4288updated.
+S3gate1 missingAWS/token; prioruserRunpodauthorizationpersists/no needask.
+Concrete tool actions/commentary<=60seconds; avoid long speculative silent analysis.
+
+--- Previous checkpoint retained verbatim ---
+
 # Current checkpoint:39COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
 
 GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.
