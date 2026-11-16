@@ -117,7 +117,9 @@ function trackedFiles() {
     !/(^|\/)(target|node_modules)\//.test(file) &&
     !file.startsWith("docs/session-logs/") &&
     !file.startsWith("docs/ecdlp-hardness-corpus/") &&
-    !/\/verification\/[^/]+\/run[^/]*\/source\//.test(file));
+    !/\/verification\/[^/]+\/run[^/]*\/source\//.test(file) &&
+    // byte-identical copies frozen for a validator report's raw_data pins
+    !/\/validation\/(docs|research)\//.test(file));
 }
 const unlinked = [];
 const tracked = corpus.nodes.filter(node => (node.citation_patterns ?? []).length > 0);

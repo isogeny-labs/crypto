@@ -1,0 +1,35 @@
+Constructor arithmetic and Frobenius at223
+The exact constructor predicates, cubic base nonroot certificate, two basis-generator identities and 
+stated coefficient fixed subspace are kernel checked. Both unchanged original Lean4.35/4.34.1 
+gates pass13 audited declarations/0 trusted, including12 new named theorems. Datacf6114 
+retains whole source/logs and twelve exact original PCC bindings. Claims remain unsigned. 
+[pcc:unverified]
+Match the constructor’s arithmetic predicates
+Original expression
+Exact arithmetic at q223
+Guard; exponent
+223 mod12=7; (223−1)/3=74
+First candidate2
+2⁷⁴ mod223=1: skipped
+Next candidate3
+3⁷⁴ mod223=183≠1: accepted
+Coefficients
+w=183; w² mod223=39
+Natural cubic size
+223³=11,089,567
+The two-candidate certificate identifies the first accepted mathematical predicate starting at2. It 
+does not prove Rust powmod/loop/compiler semantics. A separate theorem checks all223 base 
+residues have no cubic root of3. It does not enumerate223³ coefficient triples or construct an 
+extension field/irreducibility object. [pcc:unverified]
+Explicit characteristic and basis hypotheses
+For a commutative ring with stated characteristic223 and z³=3, standard power grouping and the 
+computed coefficient give the following exact identities. The generic coefficient equality is proved 
+by characteristic-aware ring normalization. [pcc:unverified]
+𝑧223 = (𝑧3)
+74𝑧= 374𝑧= 183𝑧
+(𝑧2)
+223 = (𝑧223)
+2 = 39𝑧2
+The coefficients183 and39 are each distinct from1 and cube to1 in Fin223. This supplies the stated 
+diagonal coefficient action shown on the next page. Actual coefficient embedding and full q-power/
+field correspondence remain separate. [pcc:unverified]

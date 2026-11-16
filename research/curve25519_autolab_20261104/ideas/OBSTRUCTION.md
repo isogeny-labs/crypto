@@ -47,3 +47,21 @@ This is the obstruction future rounds should be measured against. The audit trig
 
 - It is not a lower bound for all algorithms. Shoup's bound covers generic algorithms, and these curves are concrete.
 - It does not exclude a decomposition whose relations come from algebra rather than collisions and that costs less than sqrt(r) per relation. That is the open problem the algebraic track measures.
+
+## Where the incumbents' remaining headroom is (2026-11-07)
+
+Measured on the multi-curve re-baseline records (`multicurve/`, claim `PCC-20261105-37a78d`; mean over 120 runs per size) [pcc:unverified]:
+
+| k | total S | probes (units of sqrt(r)) | table build and the rest | floor for two unknown seeds |
+|--:|--:|--:|--:|--:|
+| 20 | 2.601 | 1.078 | 1.52 | 1.662 |
+| 24 | 2.112 | 0.393 | 1.72 | 1.662 |
+| 28 | 1.869 | 0.365 | 1.50 | 1.662 |
+| 32 | 1.930 | 0.496 | 1.43 | 1.662 |
+
+- At k = 28 and 32 the incumbents sit 12 to 16 percent above the collision floor of 1.662. That gap is the most any change inside this family can recover, and it would reach the floor only if table length, probe count and verification were all at their optimum together.
+- The jump set-up (the doubled multiples of the two seeds and G, and the jump assembly) costs a few hundred group additions out of tens of thousands, about 1 to 2 percent of S. Shaving it cannot be resolved by a holdout of the size the loop uses (a paired interval of about plus or minus 12 percent at 32 targets x 2 rounds), so it is not worth a round.
+- The table walk to rank-2 seed rows is about 1.3 sqrt(r) of the total, and it is set by the collision count, not by the implementation.
+- At k = 20 the box incumbent spends 1.08 sqrt(r) on probes. That is the one place with a lever larger than noise, and it is a probe-side question about the coefficient box, not about set-up.
+
+So the generic track has no remaining lever that a round of this loop could resolve, other than a probe-side look at k = 20 and a fresh structural idea.

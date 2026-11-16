@@ -1,0 +1,18 @@
+    gens->linear_form_base_coef++;
+    const int32_t bcf = gens->linear_form_base_coef;
+    k = 1;
+    if (info_level > 0) {
+        printf("\nAdding a linear form with an extra variable ");
+        printf("(lowest w.r.t. monomial order)\n");
+        printf("[coefficients of linear form are k^%d for k looping over variable index 1...n]\n", bcf - 1);
+    }
+    if (gens->field_char > 0) {
+        for (i = len_old; i < len_new - 1; ++i) {
+            gens->cfs[i]  = ((int32_t)(pow(k, bcf - 1)) % gens->field_char);
+            k++;
+        }
+        gens->cfs[len_new - 1]  = 1;
+        k++;
+    } else {
+        for (i = 2*len_old; i < 2*len_new; i += 2) {
+          mpz_set_ui(*(gens->mpz_cfs[i]), (int32_t)(pow(k, bcf - 1)));

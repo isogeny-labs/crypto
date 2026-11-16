@@ -125,3 +125,30 @@ the first R1/R2 solves).**
 - **Q1-b.** The verdict stays as registered on the degree-29 data.
 - **Scheduling.** These solves start only after the main run finishes,
   because degree 32 needs about 7.5 GB.
+
+**A2 (2026-11-06, the owner's request; registered before its own data,
+after the main run and A1 were merged in PR #3582).**
+
+- **What prompted it.** With the first random A, curve 1's conj targets
+  `planted`, `common0` and `planted3_0` reach quotient dimension 4,095,
+  4,094 and 4,095, not 4,096. A1 showed the dimension does not change at
+  Macaulay 30–32.
+- **Follow-up.** Each curve 1 conj target with a decomposition into at
+  most 3 factor-base points gets 3 more transformed solves at Macaulay
+  degree 29. Each uses a fresh A_j (j = 1, 2, 3), drawn from its own seed
+  independent of the R2 and R3 draws. The targets are `planted`,
+  `common0`, `planted3_0` and `planted3_1`; the last reached 4,096 with
+  the first A and serves as the control. That is 12 solves, run with
+  `--a2 3 --only-curve 1 --only-arm conj`. Each row records A and its
+  seed.
+- **Rule M3**, per target that fell short with the first A:
+  - **chart-dependent:** if some A_j gives dim = 4,096, the missing
+    solutions lay on the first chart's hyperplane at infinity;
+  - **chart-independent:** if every A_j gives the same dimension as the
+    first A, the shortfall does not depend on the chart. The candidates are
+    then a multiple point or a positive-dimensional component, which are
+    reported, not decided;
+  - **mixed:** if the dimensions differ but none reaches 4,096, report it.
+- **Control.** `planted3_1` should give 4,096 under every A_j.
+- **Q2 again.** On every A2 solve, the solver must still equal the oracle.
+- The verdicts on the main run and A1 are unchanged.

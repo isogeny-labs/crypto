@@ -4,9 +4,16 @@ public section
 namespace CauchyNormalizer
 
 /-- Actual original puncture kernel on the shifted source grid. -/
-def baseKernel (a k : ℕ) (t : ℚ) : ℚ :=
+@[expose] def baseKernel (a k : ℕ) (t : ℚ) : ℚ :=
   (∏ j ∈ Finset.range (2^(a+1)), if j=k then 1 else t-((j : ℚ)-(2^a : ℕ))) /
     shiftedPuncture (2^(a+1)-1) (2^a) (2^a)
+
+/-- Public product API; the definition is unchanged. Used by the subsequent
+coefficientwise local-series proof, rather than assuming a polynomial model. -/
+theorem baseKernel_formula (a k : ℕ) (t : ℚ) :
+    baseKernel a k t =
+      (∏ j ∈ Finset.range (2^(a+1)), if j=k then 1 else t-((j : ℚ)-(2^a : ℕ))) /
+        shiftedPuncture (2^(a+1)-1) (2^a) (2^a) := rfl
 
 theorem baseKernel_node (a k m : ℕ) (hm : m < 2^(a+1)) :
     baseKernel a k ((m : ℚ)-(2^a : ℕ)) =

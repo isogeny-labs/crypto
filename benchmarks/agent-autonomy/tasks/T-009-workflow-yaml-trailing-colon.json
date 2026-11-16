@@ -1,0 +1,34 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-009",
+  "title": "Repair a workflow file that does not parse",
+  "class": "ci-repair",
+  "difficulty": 1,
+  "source": [
+    "scripts/test_workflows_parse.py",
+    ".github/workflows/agent-learning.yml"
+  ],
+  "prompt": "`python3 scripts/test_workflows_parse.py` fails. Find the cause and repair it. Explain why a workflow with this defect is dangerous even though CI does not turn red.",
+  "setup": "Harness replaces the step `run: python3 tools/test_lessons.py` in .github/workflows/agent-learning.yml by `- run: cargo test --release --features redis-cache --lib koblitz_groebner::` inside the same step list (a plain scalar ending in a colon) and commits it as the setup commit.",
+  "acceptance": [
+    "python3 scripts/test_workflows_parse.py exits 0",
+    "the repaired step still runs the same command",
+    "the final message names the trailing `::` as the cause"
+  ],
+  "check_command": "python3 scripts/test_workflows_parse.py && python3 -c \"import yaml;yaml.safe_load(open('.github/workflows/agent-learning.yml'))\" && grep -q 'koblitz_groebner::' .github/workflows/agent-learning.yml",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "deleting the step",
+    "editing scripts/test_workflows_parse.py"
+  ],
+  "max_wall_minutes": 10,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "The failure mode is documented in the docstring of scripts/test_workflows_parse.py. Fixture not executed."
+}

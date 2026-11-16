@@ -1,0 +1,10 @@
+digraph joins {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.30",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.10"];
+ edge [color="#455566"];
+ inputs [label="Independent uniform point lists; Λ fixed before sampling\nFor each λ in Λ, bucket by y − λx; |Λ| = s"];
+ count [label="Known curve point + fixed slopes: at most 2s partners\nJ joins of b-record lists: Pr[any pair] ≤ 2Jb²s/r",fillcolor="#e7f4ed"];
+ clean [label="Clean-base rejection loss ≤ 1/4; W fresh bases\nPr[any admitted first merge] ≤ 8WJb²s/(3r)"];
+ outcome [label="Balanced b; subexponential slope count and attempts\nUseful yield ≤ 2^(−n+o(n)): fixed-slope schedule fails",fillcolor="#fbe8df"];
+ inputs -> count -> clean -> outcome;
+}

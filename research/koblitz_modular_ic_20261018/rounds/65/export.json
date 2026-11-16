@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R65-FIRST-FROBENIUS",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "first-frobenius65-01",
+      "path": "runs/first-frobenius65-01/protocol.json",
+      "sha256": "0436aca188ea9472b5217cfc6ac6c45c7116d8702896f69e91d4cdacf06e32f2",
+      "frozen_revision": "c4ab3bfaaad41a9be5f8342f93361ebd43ce1901"
+    },
+    {
+      "attempt": "lattice65-01",
+      "path": "runs/lattice65-01/protocol.json",
+      "sha256": "28d41a8ba1af7691d329ec52176a7513861cf129f3ee0e566a0c17b64f55d7da",
+      "frozen_revision": "aeaec5218339b5c03837d87d36e5f1a2403e77ec"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "cf93062ec75f006f437694e8f85d06f62714361bf3c5ff8f0cb240a246e9eccf"
+  },
+  "flow": {
+    "accepted": 2,
+    "rejected": 0,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual source-byte and exact contract checks only",
+  "notes": "Complete first trace-dual Frobenius step: quotient160, square-map rank80/survivors80, first PID lattice rank32 and quotient80; further steps required for equality."
+}

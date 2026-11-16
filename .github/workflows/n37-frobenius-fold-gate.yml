@@ -64,6 +64,28 @@ jobs:
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_frobenius_fold_gate_20261003
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures research/notes/ecc2k130/n37_four_policy_pdp_20261003 research/notes/ecc2k130/n37_four_policy_support_20261003 research/notes/ecc2k130/n37_frobenius_fold_gate_20261003 research/notes/ecc2k130/n37_native_m6_mitm_20261002
       # This byte-matching historical source snapshot is checked separately
       # from current-tree producer/parity checks below.
       - uses: actions/checkout@v4
@@ -95,13 +117,16 @@ jobs:
           toolchain: '1.98'
           components: rustfmt
       - uses: Swatinem/rust-cache@v2
-      - name: Check frozen source hashes and formatting
+      - name: Check archived inputs and current build lock
         run: |
           printf '%s  %s\n' \
             'ed66c80bc96eb576e006fb220eb914b4aae73e56348fb9c13b2df2a8005bffd2' examples/n37_frobenius_fold_gate.rs \
             '792a118ae3fb5a86ea6c1657c50f59013679307bf65f96c75b72f0b24f3eec93' examples/n37_frobenius_fold_replay.rs \
+            'ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90' research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock \
             | sha256sum --check
           rustfmt --edition 2021 --check examples/n37_frobenius_fold_gate.rs examples/n37_frobenius_fold_replay.rs
+          # The archived lock is historical evidence. The current manifest is
+          # built with the repository's tracked lock, which must resolve as-is.
       - name: Build native producer and independent replay
         run: cargo build --release --locked --example n37_frobenius_fold_gate --example n37_frobenius_fold_replay
       - name: Verify preserved raw runs and deterministic projection

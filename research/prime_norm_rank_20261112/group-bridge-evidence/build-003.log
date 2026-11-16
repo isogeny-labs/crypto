@@ -1,0 +1,24 @@
+✖ [2060/2061] Building NormGroupBridge (2.0s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormGroupBridge.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.setup.json --json
+error: NormGroupBridge.lean:126:58: expected token
+error: NormGroupBridge.lean:123:5: failed to synthesize instance of type class
+  AddCommMonoid W.Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: NormGroupBridge.lean:126:26: type expected, got
+  (FractionalIdeal ?m.57 : (P : Type ?u.52) → [inst : CommRing P] → [Algebra ?m.53 P] → Type ?u.52)
+error: NormGroupBridge.lean:126:7: Missing cases:
+error: NormGroupBridge.lean:148:5: failed to synthesize instance of type class
+  AddCommMonoid W.Point
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+info: NormGroupBridge.lean:151:0: 'NormGroupBridge.quotientFinite' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:152:0: 'NormGroupBridge.idealsEqualOfDimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:153:0: 'NormGroupBridge.pointIdealsCoprime' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:154:0: 'NormGroupBridge.pointQuotientDimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:155:0: 'NormGroupBridge.principalPointProduct' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:156:0: 'NormGroupBridge.pointSumOfPrincipal' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:157:0: 'NormGroupBridge.normDegreePointSum' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- NormGroupBridge
+error: build failed

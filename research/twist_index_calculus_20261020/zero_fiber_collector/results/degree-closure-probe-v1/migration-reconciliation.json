@@ -1,0 +1,48 @@
+{
+  "schema": "twist-study-migration-reconciliation/v1",
+  "date_utc": "2026-10-25",
+  "approved_receipt_path": "/srv/experiments/agent-migration/handoff-receipt.json",
+  "approved_receipt_sha256": "a16037f61139810dcb13bea313349a2f9d4f1a43471c7ffc04ea3e1828dac0c1",
+  "approved_receipt_unchanged": true,
+  "diem": {
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "original_deadline_unix_seconds": 1792521741.993407,
+    "pending": false,
+    "launcher_pid": null,
+    "managed_owner": "spot-diem-recovery.service",
+    "managed_owner_state": "inactive/dead",
+    "restarted": false
+  },
+  "legacy_freeze_followup": {
+    "task": "T-8",
+    "state": "cancelled",
+    "original_authorization": "Validate all 52 saved records after the existing generator, without repeating generation",
+    "original_52_record_gate_met": false,
+    "saved_script_git_blob": "bc200ff668b8d8a825489b425bdb756b1e11084b",
+    "saved_script_bytes": 10822,
+    "saved_script_gate_rechecked": "generation_complete AND exactly 52 records AND no live generator",
+    "action": "Leave quiesced; no restarted generator, waiter or freeze"
+  },
+  "eks": {
+    "namespace": "isolab",
+    "listed_jobs": 28,
+    "succeeded": 18,
+    "failed": 10,
+    "nonterminal": 0,
+    "study_job": "twist-joint-capability-20261024-v1",
+    "study_job_current_state": "NotFound",
+    "study_job_retained_outcome": "DeadlineExceeded before any science command ran",
+    "new_submissions_or_role_changes": false
+  },
+  "existing_local_owners": [
+    {"unit": "twist-zero-pipeline-panel-v1.service", "main_pid": 3372809, "state": "active/running"},
+    {"unit": "twist-collision-certificate-panel-v1.service", "main_pid": 3540174, "state": "active/running"}
+  ],
+  "existing_original_189_plus_21_panel": "Complete; no repeat",
+  "conductor": {"task": "T-91", "status": "failed", "attempt": 4, "max_attempts": 4, "action": "Read history and check scopes only; no reset, claim, new executor or lease bypass"},
+  "cloud_environment_plugin": "environment_status is not present in the active tool inventory; no readiness inference or credential discovery",
+  "credentials": "No credential dump, global profile, identity override or new service access",
+  "scope": "Infrastructure reconciliation only; current local services retain their frozen sources, inputs and per-execution budgets."
+}

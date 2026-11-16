@@ -215,10 +215,13 @@ def random_subspace(F, d, rnd):
                     m = F.add(m, g)
             span = new
         if len(span) == p ** d:
+            if EXCL and any(g and F.frob(g) in (g, F.neg(g)) for g in span):
+                continue  # A6: drop degenerate V (contains g with g^p = +-g)
             return sorted(span)
 
 
 SYM = bool(int(os.environ.get("TZ_SYM", "0")))
+EXCL = bool(int(os.environ.get("TZ_EXCL", "0")))
 SUB = 3  # A2: small factor-base size for the unsaturated arm
 _F = {}
 

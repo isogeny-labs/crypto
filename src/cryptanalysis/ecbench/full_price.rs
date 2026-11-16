@@ -56,6 +56,25 @@ pub const UNITS: &[&str] = &[
     "word_xor",
 ];
 
+/// Units a table row may carry but need not: the solver and oracle unit
+/// keys of 2026-11-12 (`ic_boundary::SOLVER_UNIT_KEYS` without the `ns_per_`
+/// prefix).  `ecbench price-units` measures none of them and
+/// `full_prices.json` has none, so a counter priced only by one of these
+/// stays `*_uncharged` and the record stays a lower bound, exactly as
+/// before; a row that gains the unit prices it.  Solver blocks are not
+/// repriced here (their `solver_*` unpriced entries are kept as they are).
+pub const OPTIONAL_UNITS: &[&str] = &[
+    "conflict",
+    "monomial_op",
+    "monomial_test",
+    "word_op",
+    "vector_xor_8x32",
+    "vector_xor_16x32",
+    "f4_muladd",
+    "fp_mul",
+    "hashed_tensor_step",
+];
+
 /// How one counter is charged: work already inside the phase's
 /// additions and doublings (or a count of outcomes, not of work), or a
 /// sum of units.
@@ -174,6 +193,17 @@ fn rule(counter: &str) -> Option<Rule> {
         }
         // Writing the base: one word store per eight bytes.
         "factor_base_vec_bytes_floor_uncharged" => Units(&[("word_xor", 0.125)]),
+        // Optional units (`OPTIONAL_UNITS`): priced only by a row that has
+        // the unit; otherwise `price` returns `None` and the counter stays
+        // unpriced.
+        "hashed_tensor_steps" => Units(&[("hashed_tensor_step", 1.0)]),
+        "pkm_system_fp_mults_uncharged"
+        | "pkm_grid_fp_mults_uncharged"
+        | "pkm_shared_poly_fp_mults_uncharged"
+        | "pkm_trace_learn_spec_fp_mults_uncharged"
+        | "pkm_t0_base_map_fp_mults_uncharged"
+        | "pkm_base_check_fp_mults_uncharged"
+        | "pkm_t0_target_fp_mults_uncharged" => Units(&[("fp_mul", 1.0)]),
         _ => return None,
     })
 }
@@ -196,18 +226,27 @@ pub fn row(slug: &str) -> Result<BTreeMap<String, f64>, String> {
             .ok_or_else(|| format!("full_prices.json row {slug} lacks `{u}`"))?;
         out.insert((*u).to_string(), v);
     }
+    for u in OPTIONAL_UNITS {
+        if let Some(v) = r.get(*u).and_then(Value::as_f64) {
+            out.insert((*u).to_string(), v);
+        }
+    }
     Ok(out)
 }
 
-/// Price one counter; `None` when no rule covers it.
+/// Price one counter; `None` when no rule covers it, or when the rule
+/// needs a unit the table does not carry (an [`OPTIONAL_UNITS`] entry no
+/// row has measured).
 fn price(counter: &str, count: u64, units: &BTreeMap<String, f64>) -> Option<f64> {
     match rule(counter)? {
         Rule::InGroupOps => Some(0.0),
-        Rule::Units(us) => Some(
-            us.iter()
-                .map(|(u, k)| k * units[*u] * count as f64)
-                .sum::<f64>(),
-        ),
+        Rule::Units(us) => {
+            let mut g = 0.0;
+            for (u, k) in us {
+                g += k * units.get(*u)? * count as f64;
+            }
+            Some(g)
+        }
     }
 }
 
@@ -508,5 +547,69 @@ mod tests {
         assert_eq!(rep.unpriced, vec!["mystery_work_uncharged".to_string()]);
         let lookup = row(&slug).unwrap()["lookup"];
         assert!((rep.total_gae - (12.0 + 4.0 * lookup)).abs() < 1e-9);
+    }
+
+    /// The solver/oracle unit counters have rules, but their units are
+    /// optional and no row of the table measures them: on every row they
+    /// stay unpriced, exactly as an unknown counter does.  A table that
+    /// carries the unit prices them.
+    #[test]
+    fn solver_unit_counters_stay_unpriced_until_a_row_carries_their_unit() {
+        let doc: Value = serde_json::from_str(FULL_PRICES).unwrap();
+        let rep_with = || SolveReport {
+            recovered: None,
+            exhausted: false,
+            phases: vec![PhaseRecord {
+                name: "relations".into(),
+                adds: 10,
+                native: [
+                    ("hashed_tensor_steps".to_string(), 8u64),
+                    ("pkm_grid_fp_mults_uncharged".to_string(), 5),
+                ]
+                .into_iter()
+                .collect(),
+                ..Default::default()
+            }],
+            total_gae: 0.0,
+            automorphisms_used: 2,
+            counters: BTreeMap::new(),
+            unpriced: vec!["solver_conflicts_uncharged".into()],
+            deterministic: true,
+            nondeterminism: vec![],
+            solve_wall_ns: 0,
+            factor_base: None,
+            detail: json!({}),
+            online: None,
+            online_error: None,
+            solver: None,
+            field_ops: None,
+        };
+        for slug in doc["instances"].as_object().unwrap().keys() {
+            for u in OPTIONAL_UNITS {
+                assert!(!row(slug).unwrap().contains_key(*u), "{slug}: {u}");
+            }
+            let mut rep = rep_with();
+            reprice(&mut rep, "ic", slug).unwrap();
+            assert_eq!(
+                rep.unpriced,
+                vec![
+                    "hashed_tensor_steps_uncharged".to_string(),
+                    "pkm_grid_fp_mults_uncharged".to_string(),
+                    "solver_conflicts_uncharged".to_string(),
+                ],
+                "{slug}"
+            );
+            assert_eq!(rep.total_gae, 10.0);
+        }
+        let slug = doc["instances"].as_object().unwrap().keys().next().unwrap();
+        let mut units = row(slug).unwrap();
+        units.insert("hashed_tensor_step".into(), 3.0);
+        units.insert("fp_mul".into(), 0.5);
+        let mut rep = rep_with();
+        let by = reprice_with(&mut rep, "ic", &units);
+        assert_eq!(rep.unpriced, vec!["solver_conflicts_uncharged".to_string()]);
+        assert_eq!(by["hashed_tensor_steps"], 24.0);
+        assert_eq!(by["pkm_grid_fp_mults_uncharged"], 2.5);
+        assert_eq!(rep.total_gae, 36.5);
     }
 }

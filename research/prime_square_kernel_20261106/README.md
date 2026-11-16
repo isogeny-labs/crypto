@@ -72,12 +72,13 @@ Hermite/basis costs before an end-to-end comparison. [pcc:unverified]
 
 ## Actual execution status
 
-**Full panel: NOT RUN.** Backend exception is pending. EKS is the repository
-default; the session has no EKS MCP/AWS caller or live shared-budget readback.
-The available GitHub workflow builds a fixed ecbench bundle, not this custom
-C++ workload. No unrelated integration fixture was submitted as a substitute.
-The user has been asked whether to authorize the bounded local exact panel;
-no absence of reply is treated as approval.
+**2026-11-07: both full panel invocations completed under the approved local
+override.** Replay is byte-identical and independent native recount matches
+all5376 original/candidate tuple counts. The result is mixed: Newton1200
+fewer/144 more; Smith1104 fewer/240 more. No rows were excluded. The original
+export-layout error and rejected post-data repair remain explicit validation
+failures. See [full results](RESULTS_local_20261107.md). Claim a69063 has
+standing unverified; no timing or ECDLP speedup is claimed. [pcc:unverified]
 
 **Development controls: executed.** Strict C++20/GMP build and fixed units
 pass: normalized node5 remains5; unnormalized25 is rejected; normalizer second
