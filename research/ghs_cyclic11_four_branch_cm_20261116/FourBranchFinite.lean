@@ -68,6 +68,28 @@ theorem cm_three_descended :
 theorem cm_five_descended :
     fifthTrace (-3) 5 = 57 ∧ fifthTrace 3 5 = -57 := by decide
 
+/- These checks consume the native character-count outputs as fixed inputs.
+   They do not certify the finite-field count or quotient geometry. -/
+def f243Trace (n : Nat) : Int := (240 - 11 * Int.ofNat n) / 10
+def f3125Trace (n : Nat) : Int := (3122 - 11 * Int.ofNat n) / 10
+theorem rational_f243_trace_checks :
+    f243Trace 0 = 24 ∧ f243Trace 20 = 2 ∧ f243Trace 30 = -9 ∧
+    fifthTrace 2 3 = 2 := by decide
+theorem rational_f3125_trace_checks :
+    f3125Trace 282 = 2 ∧ f3125Trace 262 = 24 ∧
+    2 % 5 ≠ 0 ∧ 24 % 5 ≠ 0 ∧
+    2 * 2 < 4 * 3125 ∧ 24 * 24 < 4 * 3125 := by decide
+theorem rational_f3125_no_prime_field_descent :
+    ((List.range 9).map (fun n => Int.ofNat n - 4)).all
+      (fun s => decide (fifthTrace s 5 ≠ 2 ∧ fifthTrace s 5 ≠ 24)) = true := by decide
+theorem rational_f3125_source_orders :
+    3125 + 1 - 2 = 3124 ∧ 3125 + 1 - 24 = 3102 := by decide
+theorem discriminant_prime_checks :
+    (2 : Int)^2 - 4*3125 = -12496 ∧
+    (24 : Int)^2 - 4*3125 = -11924 ∧
+    (-12496 : Int) % 71 = 0 ∧
+    (-11924 : Int) % 47 = 14 := by decide
+
 #print axioms slice_one
 #print axioms slice_ten
 #print axioms all_slices
@@ -77,5 +99,10 @@ theorem cm_five_descended :
 #print axioms cm_enumeration_caps
 #print axioms cm_three_descended
 #print axioms cm_five_descended
+#print axioms rational_f243_trace_checks
+#print axioms rational_f3125_trace_checks
+#print axioms rational_f3125_no_prime_field_descent
+#print axioms rational_f3125_source_orders
+#print axioms discriminant_prime_checks
 
 end GHSCyclic11FourBranch

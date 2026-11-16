@@ -32,6 +32,15 @@
 | `slice_one` ... `slice_ten`, `all_slices` | finite instances | this study | each fixed first exponent 1..10 |
 | `aggregate_arithmetic` | finite instance | this study | ten identical slice counts |
 | `cm_trace_three`, `cm_trace_five`, `cm_enumeration_caps` | finite instances | this study | fixed p=3,5 Hasse intervals |
+| `rational_f243_trace_checks`, `rational_f3125_trace_checks`, `rational_f3125_no_prime_field_descent`, `rational_f3125_source_orders` | finite arithmetic instances | this study | native character counts supplied as fixed numerals |
+| `discriminant_prime_checks` | finite arithmetic instance | this study | fixed traces 2,24 and primes 71,47; does not prove the polynomial discriminant formula or integral Tate theorem |
+
+The later trace declarations check arithmetic consequences of `N=0,20,30`
+at p=3 and `N=282,262` at p=5. The final declaration checks the
+residual discriminant factor modulo the candidate subgroup primes. The
+file does not derive the character counts from field operations,
+certify the smooth quotient, prove the discriminant identity, or
+construct an isogeny.
 
 The finite certificate uses only kernel `decide`; no `native_decide`,
 custom axiom or increased resource limit is planned.
