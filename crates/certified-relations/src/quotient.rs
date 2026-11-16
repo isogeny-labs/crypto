@@ -3,6 +3,12 @@
 use super::projection::times;
 use super::*;
 pub mod compact;
+/// Explicit research capacity; the default remains the frozen eight-variable API.
+pub const MAX_VARIABLES: usize = if cfg!(feature = "scale-screen") {
+    16
+} else {
+    8
+};
 const POLY_CAP: usize = 5000;
 const PROOF_CAP: usize = 50000;
 const REDUCTION_CAP: usize = 100000;
@@ -326,7 +332,7 @@ fn solve_impl(
     p: u64,
     breadth_first: bool,
 ) -> Result<(Vec<Row>, Info), String> {
-    if !(3..=8).contains(&n)
+    if !(3..=MAX_VARIABLES).contains(&n)
         || p < 3
         || inputs.len() > 32
         || inputs

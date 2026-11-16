@@ -43,7 +43,7 @@ fn valid_poly(f: &Poly, n: usize, p: u64, max_degree: usize, max_terms: usize) -
         })
 }
 fn admitted(inputs: &[Poly], n: usize, p: u64) -> bool {
-    (3..=8).contains(&n)
+    (3..=MAX_VARIABLES).contains(&n)
         && p >= 3
         && p <= i64::MAX as u64
         && prime(p)
@@ -315,6 +315,21 @@ fn solve_impl(inputs: &[Poly], n: usize, p: u64, all_vertices: bool) -> Result<O
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn research_capacity_is_explicit_and_bounded() {
+        for n in [3, 8, 9, 16, 17] {
+            let input = vec![BTreeMap::from([(vec![0; n], 1)])];
+            assert_eq!(admitted(&input, n, 2147483647), n <= MAX_VARIABLES);
+        }
+        assert_eq!(
+            MAX_VARIABLES,
+            if cfg!(feature = "scale-screen") {
+                16
+            } else {
+                8
+            }
+        );
+    }
     #[test]
     fn compact_chain_keeps_existing_fixed_case_bases_and_smaller_six_cycle_proofs() {
         for p in [2147483647, 9007199254740881] {

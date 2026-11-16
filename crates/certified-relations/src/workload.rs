@@ -68,6 +68,27 @@ pub fn generate_graph(
     if ![2147483647, 9007199254740881].contains(&p) || !(2..=8).contains(&n) || edges.len() > 16 {
         return Err("graph fixture grid: stated primes, 2..8 variables, <=16 edges".into());
     }
+    generate_checked_graph(p, n, seed, edges)
+}
+/// Explicit capacity experiment. Original fixture entry points keep their limits.
+#[cfg(feature = "scale-screen")]
+pub fn generate_scale_graph(
+    p: u64,
+    n: usize,
+    seed: u64,
+    edges: &[(usize, usize)],
+) -> Result<Fixture, String> {
+    if ![2147483647, 9007199254740881].contains(&p) || !(2..=16).contains(&n) || edges.len() > 16 {
+        return Err("scale fixture grid: stated primes, 2..16 variables, <=16 edges".into());
+    }
+    generate_checked_graph(p, n, seed, edges)
+}
+fn generate_checked_graph(
+    p: u64,
+    n: usize,
+    seed: u64,
+    edges: &[(usize, usize)],
+) -> Result<Fixture, String> {
     let mut normalized = BTreeSet::new();
     for &(a, b) in edges {
         if a >= n || b >= n || a == b || !normalized.insert((a.min(b), a.max(b))) {
@@ -190,6 +211,19 @@ pub fn witness_check(system: &System, witness: &[u64]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "scale-screen")]
+    #[test]
+    fn scale_entry_keeps_old_admission_and_legacy_values() {
+        let p = 2147483647;
+        assert!(generate_graph(p, 9, 7, &[]).is_err());
+        assert!(generate_scale_graph(p, 17, 7, &[]).is_err());
+        assert!(generate_scale_graph(p, 16, 7, &[(0, 16)]).is_err());
+        let edges = [(0, 1), (1, 2)];
+        assert_eq!(
+            serde_json::to_vec(&generate_graph(p, 3, 7, &edges).unwrap().system).unwrap(),
+            serde_json::to_vec(&generate_scale_graph(p, 3, 7, &edges).unwrap().system).unwrap()
+        );
+    }
     #[test]
     fn graph_validation_rejects_bad_shapes_before_point_generation() {
         let p = 2147483647;

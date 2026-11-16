@@ -7,6 +7,9 @@ publish = false
 
 [workspace]
 
+[features]
+scale-screen = ["certified-relations/scale-screen"]
+
 [dependencies]
 certified-relations = { path = "../../../crates/certified-relations" }
 serde = { version = "1", features = ["derive"] }

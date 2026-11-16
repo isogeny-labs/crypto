@@ -199,7 +199,10 @@ fn basis_hash(b: &Basis) -> String {
 }
 fn prepare(root: &Path, mode: &str) -> Result<()> {
     if mode == "graph-screen" {
-        return prepare_graphs(root);
+        return prepare_graphs(root, false);
+    }
+    if mode == "scale-screen" {
+        return prepare_graphs(root, true);
     }
     let roster: Vec<_> = match mode {
         "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
@@ -321,6 +324,17 @@ fn graph_plan() -> Result<Vec<(usize, GraphDefinition)>> {
     }
     Ok(plan)
 }
+fn scale_plan() -> Vec<(usize, GraphDefinition)> {
+    [10, 12, 16]
+        .into_iter()
+        .flat_map(|n| {
+            [
+                (n, ("star-first", (1..n).map(|i| (0, i)).collect())),
+                (n, ("star-last", (0..n - 1).map(|i| (i, n - 1)).collect())),
+            ]
+        })
+        .collect()
+}
 /// Graph descriptor for x0-first elimination; not a grevlex solving degree.
 fn induced_width(n: usize, edges: &[(usize, usize)]) -> usize {
     let mut neighbors = vec![BTreeSet::new(); n];
@@ -345,12 +359,32 @@ fn induced_width(n: usize, edges: &[(usize, usize)]) -> usize {
     }
     width
 }
-fn prepare_graphs(root: &Path) -> Result<()> {
+fn prepare_graphs(root: &Path, scale: bool) -> Result<()> {
+    if scale && !cfg!(feature = "scale-screen") {
+        return Err("scale-screen requires the explicit research feature".into());
+    }
+    let plan = if scale { scale_plan() } else { graph_plan()? };
+    let mode = if scale {
+        "scale-screen"
+    } else {
+        "graph-screen"
+    };
     fs::create_dir(root)?;
     let mut cases = Vec::new();
-    for (n, (name, edges)) in graph_plan()? {
+    for (n, (name, edges)) in plan {
         let start = Instant::now();
-        let system = workload::generate_graph(P, n, 7, &edges)?.system;
+        let system = if scale {
+            #[cfg(feature = "scale-screen")]
+            {
+                workload::generate_scale_graph(P, n, 7, &edges)?.system
+            }
+            #[cfg(not(feature = "scale-screen"))]
+            {
+                return Err("scale-screen feature disabled".into());
+            }
+        } else {
+            workload::generate_graph(P, n, 7, &edges)?.system
+        };
         let id = format!("{name}-n{n}-s7");
         let dir = root.join(&id);
         fs::create_dir(&dir)?;
@@ -377,7 +411,7 @@ fn prepare_graphs(root: &Path) -> Result<()> {
     }
     save(
         &root.join("manifest.json"),
-        &json!({"schema":"graph-screen-inputs/v1","mode":"graph-screen","cases":cases}),
+        &json!({"schema":"graph-screen-inputs/v1","mode":mode,"cases":cases}),
     )
 }
 struct Runner {
@@ -588,7 +622,7 @@ fn run(
 ) -> Result<()> {
     let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
     let qualification = manifest["mode"] == "qualification";
-    let graph_screen = manifest["mode"] == "graph-screen";
+    let graph_screen = manifest["mode"] == "graph-screen" || manifest["mode"] == "scale-screen";
     if !qualification && !graph_screen && manifest["mode"] != "pilot" {
         return Err("unknown prepared mode".into());
     }
@@ -803,11 +837,30 @@ fn main() -> Result<()> {
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
     Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
-    _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
+    _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn larger_star_roster_preserves_shallow_depth_and_input_budget() {
+        let plan = scale_plan();
+        assert_eq!(plan.len(), 6);
+        for (index, (n, (name, edges))) in plan.into_iter().enumerate() {
+            assert_eq!(n, [10, 12, 16][index / 2]);
+            assert_eq!(edges.len(), n - 1);
+            assert!(edges.len() * 2 <= 32);
+            if index % 2 == 0 {
+                assert_eq!(name, "star-first");
+                assert!(edges.iter().all(|(a, b)| *a == 0 && *b > 0));
+                assert_eq!(induced_width(n, &edges), n - 1);
+            } else {
+                assert_eq!(name, "star-last");
+                assert!(edges.iter().all(|(a, b)| *a < n - 1 && *b == n - 1));
+                assert_eq!(induced_width(n, &edges), 1);
+            }
+        }
+    }
     #[test]
     fn legacy_cycles_match_original_measured_input_hashes() {
         let expected = [

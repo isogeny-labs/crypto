@@ -6,6 +6,9 @@ publish = false
 
 [workspace]
 
+[features]
+scale-screen = ["certified-relations/scale-screen"]
+
 [dependencies]
 crypto_lib = { package = "crypto", path = "../../..", default-features = false }
 certified-relations = { path = "../../../crates/certified-relations" }

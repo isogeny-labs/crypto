@@ -67,7 +67,7 @@ fn run(start: Instant) -> Result<Value, String> {
     }
     let system: System = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
     let n = system.variables.len();
-    if !(3..=8).contains(&n)
+    if !(3..=certified_relations::quotient::MAX_VARIABLES).contains(&n)
         || system.polynomials.is_empty()
         || system.polynomials.len() > 2000
         || system.polynomials.iter().any(|f| {
