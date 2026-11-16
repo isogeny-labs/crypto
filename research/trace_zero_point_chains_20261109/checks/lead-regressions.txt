@@ -1,0 +1,56 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto-trace/research/trace_zero_leads_20261109/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.75s
+     Running unittests src/lib.rs (research/trace_zero_leads_20261109/native/target/debug/deps/trace_zero_leads-660506f9da9e3e94)
+
+running 7 tests
+test tests::actual_polynomial_windows_restrict_the_second_bit_before_elimination ... WINDOW n=83 d=8 polar=0 q_linear=0 q_quadratic=0 product_dim=15 compact_vars=90 compact_terms=1105
+WINDOW n=83 d=16 polar=0 q_linear=0 q_quadratic=0 product_dim=31 compact_vars=98 compact_terms=2245
+WINDOW n=131 d=8 polar=0 q_linear=0 q_quadratic=0 product_dim=15 compact_vars=138 compact_terms=1552
+WINDOW n=131 d=16 polar=0 q_linear=0 q_quadratic=0 product_dim=31 compact_vars=146 compact_terms=3076
+ok
+test tests::certified_domain_and_explicit_points_match_group_enumeration_including_sign_restrictions ... ok
+test tests::committed_integral_polarization_certificate_replays_and_rejects_tampering ... ok
+test tests::invalid_restrictions_are_rejected_without_approximating_the_base ... ok
+test tests::quadratic_bit_matches_independent_subtrace_and_polar_form ... ok
+test tests::restricted_models_match_exact_point_set_and_each_other_exhaustively ... RESTRICTED n=3 d=1 mode=Raw points=0 variables=4 equations=4 degree=2
+RESTRICTED n=3 d=1 mode=Compact points=0 variables=3 equations=3 degree=2
+RESTRICTED n=3 d=1 mode=Factored points=0 variables=4 equations=4 degree=2
+RESTRICTED n=5 d=2 mode=Raw points=4 variables=7 equations=6 degree=2
+RESTRICTED n=5 d=2 mode=Compact points=4 variables=6 equations=5 degree=2
+RESTRICTED n=5 d=2 mode=Factored points=4 variables=7 equations=6 degree=2
+RESTRICTED n=5 d=4 mode=Raw points=10 variables=9 equations=6 degree=2
+RESTRICTED n=5 d=4 mode=Compact points=10 variables=8 equations=5 degree=3
+RESTRICTED n=5 d=4 mode=Factored points=10 variables=9 equations=6 degree=2
+RESTRICTED n=7 d=3 mode=Raw points=2 variables=10 equations=8 degree=2
+RESTRICTED n=7 d=3 mode=Compact points=2 variables=9 equations=7 degree=2
+RESTRICTED n=7 d=3 mode=Factored points=2 variables=10 equations=8 degree=2
+ok
+test tests::wide_certified_domain_needs_no_ordinate_witness_to_replay_the_identity_control ... CERTIFIED_X_ONLY n=83 outcome=Sat variables=415 clauses=415 xors=166; constructed singleton-domain correctness control
+CERTIFIED_X_ONLY n=131 outcome=Sat variables=655 clauses=655 xors=262; constructed singleton-domain correctness control
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+
+     Running unittests src/bin/certify_subtrace_polarization.rs (research/trace_zero_leads_20261109/native/target/debug/deps/certify_subtrace_polarization-6a7552906d27c4c5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (research/trace_zero_leads_20261109/native/target/debug/deps/trace_zero_leads-0185786dddb19fb5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests trace_zero_leads
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

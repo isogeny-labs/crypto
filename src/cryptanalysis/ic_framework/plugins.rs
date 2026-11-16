@@ -1,0 +1,7691 @@
+//! # The factor bases, oracles and matrices that ship with the framework.
+//!
+//! Each of these wraps a component the repository already measures, so
+//! a framework run reproduces a ledger row rather than approximating
+//! one.  They are also the worked examples: a new plug-in looks like
+//! these, and `docs/ic/FRAMEWORK.md` walks through writing one.
+//!
+//! ## Factor bases
+//!
+//! | name | regime | what it is |
+//! |:--|:--|:--|
+//! | `prime-abscissa` | prime | the smallest abscissae carrying a point, one column each |
+//! | `known-log` | prime | `±[s_i]G`, one column each, every logarithm known so there is no linear algebra; `scalars=progression` (default) is `s_i = i`, `scalars=random` seeded uniform scalars |
+//! | `binary-subspace` | binary, Koblitz | points whose abscissa lies in an `F_2`-subspace |
+//! | `koblitz-orbit` | Koblitz | the same, each signed Frobenius orbit folded onto one column |
+//! | `compact-orbit-scan` | Koblitz | deterministic raw-abscissa scan, subgroup projection and signed Frobenius closure |
+//! | `cyclotomic` | Koblitz, `2n+1` prime | the γ-weight-`w` abscissae `Σ_{k∈S} γ^k` (lead A2), projected and folded like `compact-orbit-scan` |
+//! | `onb-weight` | Koblitz, `2n+1` prime | ONB Hamming-weight-`w` abscissae, projected and folded like `cyclotomic` (low-HW D\* hypothesis) |
+//! | `glv-orbit` | prime | the closure of the smallest abscissae under the curve's automorphism group, each orbit folded onto one column (`j = 0`: 6 points a column, `j = 1728`: 4, generic: 2) |
+//! | `gls-line` | GLS over `F_{p²}` | the `ψ`-stable line `x ∈ u·s·F_p`, each `⟨−1, ψ⟩`-orbit folded onto one column (4 points a column) |
+//!
+//! The column map is the interesting part.  `koblitz-orbit` gives a
+//! whole orbit of `2n` points one unknown, which cuts the relations
+//! needed by `2n`; setting its `no_fold` parameter gives the control
+//! that shows what the fold buys.  That pair is the one place this
+//! ledger records an *advance* in the `AGENTS.md` §3 sense rather than
+//! engineering, and it is a two-word change in a sweep file.
+//!
+//! ## Decomposition oracles
+//!
+//! | name | summands | how |
+//! |:--|:--|:--|
+//! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table |
+//! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P` |
+//! | `mitm-prime-batch` | 2 | the same folded prime pair table, built with one batched inversion per abscissa row and x-only sums |
+//! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
+//! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
+//! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
+//! | `mitm-frobenius-lazy-counted` | 2 or 3 | the same entries and probe; a hit names its summands' orbit members then, not every base point at build |
+//! | `mitm-frobenius-layout-counted` | 2 or 3 | the same entries and probe on a base laid out by orbit (`compact-orbit-scan`): members named by index, and half the same-orbit pairs added |
+//! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
+//! | `chained-x` | 2, 3 or 4 | Koblitz subspace bases: the chained `x`-frame descent (`groebner_decompose`), `m − 1` Semaev `S₃` links solved by boolean F4 with splitting |
+//!
+//! The pair table is where memory buys time, and `mitm`'s
+//! `negation_folded` parameter halves the additions that build it.
+
+use crate::cryptanalysis::pq_groebner_f2::mask_low64;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::time::{Duration, Instant};
+
+use num_traits::ToPrimitive;
+use rand::SeedableRng;
+
+use super::large_prime::{LargePrimeCollector, LargePrimeConfig};
+use super::stages::{
+    BooleanSystem, DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost,
+    SolverTotals, SolverVerdict, SystemShape, SystemSolver,
+};
+use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstance};
+use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
+use crate::cryptanalysis::ic_boundary::{
+    binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
+    prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
+    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, WSumTable, WalkOpts, WalkTable,
+};
+use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
+use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
+use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
+use crate::cryptanalysis::koblitz_groebner::{f4_word_ops_thread, FieldStructure, SolverEngine};
+use crate::cryptanalysis::koblitz_index_calculus::build_frobenius_factor_base_from_divisor;
+use crate::cryptanalysis::koblitz_symmetrised::{
+    build_symmetrised_factor_base, build_symmetrised_system, frobenius_view_of_symmetrised,
+    symmetrised_groebner_decompose, SymmetrisedFactorBase,
+};
+use crate::cryptanalysis::pq_descent_symbolic::{descend, max_n_prime, SymbolicDescent};
+use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
+
+// ── Factor bases ───────────────────────────────────────────────────
+
+/// The smallest abscissae of a prime-field curve that carry a point,
+/// one column each.
+pub struct PrimeAbscissaBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
+    fn name(&self) -> &str {
+        "prime-abscissa"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        if let Some(below) = params.get("below") {
+            return format!("every abscissa in [1, {below}) carrying a point, one column each");
+        }
+        if params.get("size") == Some("auto") {
+            return format!(
+                "the round({} * r^(1/3)) smallest abscissae carrying a point, one column each",
+                params.get("scale").unwrap_or("0.5")
+            );
+        }
+        match params.get("stride") {
+            None | Some("1") => format!(
+                "the {} smallest abscissae carrying a point, one column each",
+                params.get("size").unwrap_or("?")
+            ),
+            Some(stride) => format!(
+                "{} abscissae carrying a point, scanned at stride {stride} modulo p, one column each",
+                params.get("size").unwrap_or("?")
+            ),
+        }
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "size",
+                "abscissae in the base; the family optimum is about #E^(1/3); `auto` takes \
+                 round(scale * r^(1/3)), at least 4",
+            ),
+            (
+                "scale",
+                "with size=auto: the constant c of B = c * r^(1/3); default 0.5 (the pair-table \
+                 oracle's B(B+1) build against its r * N/(2B^2) trials with N ~ 0.6 B)",
+            ),
+            (
+                "stride",
+                "fixed nonzero abscissa stride modulo p; default 1",
+            ),
+            (
+                "below",
+                "instead of size: every abscissa in [1, below) carrying a point (Semaev's naive \
+                 small-abscissa base; with below = 2^T it is the point set of pkm-semaev's bits=T)",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        if let Some(below) = params.get("below") {
+            if params.get("size").is_some() || params.get("stride").is_some() {
+                return Err("prime-abscissa: below= replaces size= and stride=".into());
+            }
+            let below: u64 = below
+                .parse()
+                .map_err(|_| "below must be an unsigned integer".to_string())?;
+            let curve = &self.instance.curve;
+            if below < 2 || below > curve.p {
+                return Err(format!("below must lie in 2..=p = {}", curve.p));
+            }
+            // The scan below takes abscissae 1, 2, ... in order, so "every
+            // carrier below B" is that scan stopped after this many. The
+            // count repeats the scan's Legendre symbols, uncharged: the
+            // baseline is, if anything, under-charged by them.
+            let size = (1..below)
+                .filter(|&x| curve.legendre(curve.rhs(x)) >= 0)
+                .count();
+            if size == 0 {
+                return Err(format!("no abscissa in [1, {below}) carries a point"));
+            }
+            return Ok(prime_factor_base(self.instance, size));
+        }
+        let size = if params.get("size") == Some("auto") {
+            let scale: f64 = params.get("scale").map_or(Ok(0.5), |v| {
+                v.parse::<f64>()
+                    .ok()
+                    .filter(|c| c.is_finite() && *c > 0.0)
+                    .ok_or_else(|| "scale must be a positive number".to_string())
+            })?;
+            ((scale * (self.instance.r as f64).cbrt()).round() as usize).max(4)
+        } else {
+            if params.get("scale").is_some() {
+                return Err("prime-abscissa: scale= needs size=auto".into());
+            }
+            params.u64("size")? as usize
+        };
+        if size == 0 {
+            return Err("factor base size must be positive".into());
+        }
+        let stride = params.get("stride").map_or(Ok(1u64), |s| {
+            s.parse::<u64>()
+                .map_err(|_| "stride must be an unsigned integer".to_string())
+        })?;
+        if stride == 0 || stride >= self.instance.curve.p {
+            return Err("stride must lie in 1..p".into());
+        }
+        if stride == 1 {
+            Ok(prime_factor_base(self.instance, size))
+        } else {
+            Ok(prime_factor_base_strided(self.instance, size, stride))
+        }
+    }
+}
+
+/// Scan rational points, project by the cofactor, and retain distinct signed
+/// subgroup points. This is a different base from `prime-abscissa`: the
+/// abscissae after projection need not be small.
+pub struct PrimeProjectedAbscissaBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+#[cfg(test)]
+mod projected_prime_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::Calibration;
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
+
+    fn fixture() -> PrimeInstance {
+        let curve = PrimeCurve {
+            p: 113,
+            a: 19,
+            b: 2,
+        };
+        let mut ops = GroupOps::default();
+        for x in 1..113 {
+            if let Some(y) = curve.sqrt(curve.rhs(x)) {
+                let g = curve.mul(&mut ops, PrimePoint::affine(x, y), 16);
+                if !g.infinity && curve.mul(&mut ops, g, 7).infinity {
+                    return PrimeInstance {
+                        name: "projected-control".into(),
+                        curve,
+                        group_order: 112,
+                        r: 7,
+                        cofactor: 16,
+                        generator: (g.x, g.y),
+
+                        representation: None,
+                    };
+                }
+            }
+        }
+        panic!("control generator missing")
+    }
+    #[test]
+    fn projected_base_checks_membership_and_counts_projection() {
+        let inst = fixture();
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: 7,
+            cofactor: 16,
+            group_order: 112,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let (_, params) =
+            Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=64").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        assert_eq!(fb.columns, 2);
+        assert_eq!(fb.points.len(), 4);
+        assert!(ops.scalar_mults >= 4);
+        assert!(fb.cost.get("projected_base_membership_checks_uncharged") >= 2);
+        for p in &fb.points {
+            assert!(inst.curve.is_on_curve(*p));
+            assert!(!p.infinity);
+            assert!(inst.curve.mul(&mut ops, *p, 7).infinity);
+        }
+        let (_, bad) = Params::parse_spec("prime-projected-abscissa:size=4,scan_cap=64").unwrap();
+        assert!(PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx, &bad, &mut ops)
+            .is_err());
+    }
+    #[test]
+    fn projected_relations_recover_every_nonzero_control_log() {
+        let inst = fixture();
+        for k in 1..7 {
+            let mut scratch = GroupOps::default();
+            let q = inst.curve.mul(&mut scratch, inst.generator_point(), k);
+            let ctx = InstanceCtx {
+                group: &inst.curve,
+                generator: inst.generator_point(),
+                target: q,
+                r: 7,
+                cofactor: 16,
+                group_order: 112,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let (_, params) =
+                Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=64").unwrap();
+            let spec = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: params,
+                oracle: "mitm".into(),
+                oracle_params: Params::default(),
+                targets: Targets::Random,
+                linalg: "incremental-gauss-full-rank-checked".into(),
+                max_trials: 1000,
+                seed: 21,
+                ..Default::default()
+            };
+            let rep = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut MitmOracle::new(2),
+                u64::MAX,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            assert_eq!(rep.recovered, Some(k));
+            assert!(
+                inst.curve
+                    .mul(&mut scratch, inst.generator_point(), rep.recovered.unwrap())
+                    == q
+            );
+        }
+    }
+}
+
+impl FactorBaseBuilder<PrimeCurve> for PrimeProjectedAbscissaBase<'_> {
+    fn name(&self) -> &str {
+        "prime-projected-abscissa"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!("{} distinct signed subgroup columns from cofactor-projected raw abscissae; scan cap {}",
+            params.get("size").unwrap_or("?"), params.get("scan_cap").unwrap_or("?"))
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "size",
+                "distinct negation pairs in the selected prime subgroup",
+            ),
+            ("scan_cap", "maximum raw abscissae scanned; required"),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let inst = self.instance;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.group_order != inst.group_order {
+            return Err("projected base context does not match its instance".into());
+        }
+        let size = params.u64("size")?;
+        let cap = params.u64("scan_cap")?;
+        if inst.r < 5 || size == 0 || size > (inst.r - 1) / 2 || cap == 0 || cap >= inst.curve.p {
+            return Err("projected base needs 0<size<=(r-1)/2 and 0<scan_cap<p".into());
+        }
+        let start = Instant::now();
+        let curve = &inst.curve;
+        let mut seen = BTreeSet::new();
+        let mut points = Vec::new();
+        let mut columns = Vec::new();
+        let mut coefficients = Vec::new();
+        let mut scanned = 0;
+        let mut sqrts = 0;
+        let mut projected = 0;
+        let mut checked = 0;
+        let mut duplicates = 0;
+        for x in 1..=cap {
+            scanned += 1;
+            let rhs = curve.rhs(x);
+            if curve.legendre(rhs) < 0 {
+                continue;
+            }
+            sqrts += 1;
+            let Some(y) = curve.sqrt(rhs) else {
+                continue;
+            };
+            let point = curve.mul(ops, PrimePoint::affine(x, y), inst.cofactor);
+            projected += 1;
+            if point.infinity {
+                continue;
+            }
+            checked += 1;
+            if !curve.mul(ops, point, inst.r).infinity {
+                return Err(
+                    "cofactor projection produced a point outside the selected subgroup".into(),
+                );
+            }
+            if !seen.insert(point.x) {
+                duplicates += 1;
+                continue;
+            }
+            let point = if point.y <= curve.p - point.y {
+                point
+            } else {
+                curve.neg(point)
+            };
+            let col = seen.len() - 1;
+            points.extend([point, curve.neg(point)]);
+            columns.extend([col, col]);
+            coefficients.extend([1, inst.r - 1]);
+            if seen.len() as u64 == size {
+                break;
+            }
+        }
+        if seen.len() as u64 != size {
+            return Err(format!(
+                "projected base scan exhausted: {} of {size} columns after {scanned} abscissae",
+                seen.len()
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            self.describe(params),
+            points,
+            columns,
+            coefficients,
+            size as usize,
+            |p| curve.key(p),
+            |p| curve.key(&curve.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        fb.cost.count("abscissae_scanned", scanned);
+        fb.cost.count("legendre_symbols", scanned);
+        fb.cost.count("sqrt_solves", sqrts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost
+            .count("projected_base_membership_checks_uncharged", checked);
+        fb.cost
+            .count("projected_base_dedup_probes_uncharged", checked);
+        fb.cost.count("projected_base_duplicate_points", duplicates);
+        fb.cost
+            .count("projected_base_column_map_entries_uncharged", 2 * size);
+        Ok(fb)
+    }
+}
+
+/// **The known-log base:** `F_G(B) = { ±[i]G : 1 ≤ i ≤ B }`, one column
+/// per `i`, the column's unknown being `log_G([i]G) = i`.
+///
+/// Every logarithm is free, so one verified relation
+/// `[a]G + [b]Q = Σ ±[iⱼ]G` gives `k` directly and the pipeline skips
+/// linear algebra (`FactorBase::known_logs`).  Construction is `B`
+/// incremental additions, charged to the base's `PhaseCost`.  The points
+/// all lie in `⟨G⟩`, so on a cofactor-`h` curve no class condition applies.
+///
+/// This is a generic precomputation table (Bernstein–Lange shape): with a
+/// membership-testing oracle it is an arbitrary set of `B` points and it
+/// cannot beat `√r`.  It is measured against the abscissa base to show how
+/// much of that base's cost is its algebra.  No security statement.
+pub struct KnownLogBase;
+
+impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
+    fn name(&self) -> &str {
+        "known-log"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        match params.get("scalars") {
+            Some("random") => format!(
+                "±[s_i]G for {} seeded uniform scalars s_i, one column each, every logarithm known",
+                params.get("size").unwrap_or("?")
+            ),
+            _ => format!(
+                "±[i]G for 1 ≤ i ≤ {}, one column each, every logarithm known",
+                params.get("size").unwrap_or("?")
+            ),
+        }
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "size",
+                "columns B (need 2·B < r); the family optimum is about #E^(1/3)",
+            ),
+            (
+                "scalars",
+                "progression (default): s_i = i, built by B−1 additions; random: s_i uniform in [1, r−1], one charged scalar multiplication each",
+            ),
+            (
+                "seed",
+                "random only: seed of the scalar stream (default 20261019); the base is fixed per (G, size, seed)",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let size = params.u64("size")?;
+        if size == 0 {
+            return Err("factor base size must be positive".into());
+        }
+        if size.checked_mul(2).is_none_or(|t| t >= ctx.r) {
+            return Err(format!(
+                "known-log size {size} needs 2·size < r = {}, so that ±[i]G are distinct",
+                ctx.r
+            ));
+        }
+        let random = match params.get("scalars") {
+            None | Some("progression") => false,
+            Some("random") => true,
+            Some(other) => {
+                return Err(format!(
+                    "known-log scalars is progression or random, not {other}"
+                ))
+            }
+        };
+        let start = Instant::now();
+        let g = ctx.group;
+        let mut points = Vec::with_capacity(2 * size as usize);
+        let mut col_of = Vec::with_capacity(2 * size as usize);
+        let mut coef_of = Vec::with_capacity(2 * size as usize);
+        let mut logs = Vec::with_capacity(size as usize);
+        let mut multiple = ctx.generator;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(params.u64_or("seed", 20261019)?);
+        let mut used = HashSet::new();
+        for i in 1..=size {
+            let s = if random {
+                // Distinct classes {s, r − s}, so ±[s]G never repeats a point.
+                loop {
+                    let s = rand::Rng::gen_range(&mut rng, 1..ctx.r);
+                    if !used.contains(&s) && !used.contains(&(ctx.r - s)) {
+                        used.insert(s);
+                        break s;
+                    }
+                }
+            } else {
+                i
+            };
+            multiple = if random {
+                g.mul(ops, ctx.generator, s)
+            } else if i > 1 {
+                g.add(ops, multiple, ctx.generator)
+            } else {
+                multiple
+            };
+            logs.push(s);
+            points.push(multiple);
+            col_of.push((i - 1) as usize);
+            coef_of.push(1);
+            points.push(g.neg(multiple));
+            col_of.push((i - 1) as usize);
+            coef_of.push(ctx.r - 1);
+        }
+        let mut fb = FactorBase::from_column_map(
+            if random {
+                format!("±[s_i]G, {size} seeded uniform scalars")
+            } else {
+                format!("±[i]G, 1 ≤ i ≤ {size}")
+            },
+            points,
+            col_of,
+            coef_of,
+            size as usize,
+            |p| g.key(p),
+            |p| g.key(&g.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.known_logs = Some(logs);
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        if random {
+            fb.cost.count("known_log_scalar_mults", size);
+        } else {
+            fb.cost.count("known_log_additions", size.saturating_sub(1));
+        }
+        Ok(fb)
+    }
+}
+
+/// Points of a binary curve whose abscissa lies in an `F_2`-subspace
+/// of the field, one column per abscissa.
+pub struct BinarySubspaceBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
+    fn name(&self) -> &str {
+        "binary-subspace"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        if params.get("basis").is_some() {
+            return format!(
+                "points whose abscissa lies in the explicitly recorded {}-dimensional subspace",
+                params.get("dimension").unwrap_or("?")
+            );
+        }
+        format!(
+            "points whose abscissa lies in the {}-dimensional subspace spanned by {{1, z, …}}",
+            params.get("dimension").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "dimension",
+                "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
+            ),
+            (
+                "basis",
+                "optional explicit full-rank polynomial-basis words separated by semicolons",
+            ),
+            (
+                "select",
+                "optional subspace selection: `prefix` (default, <1, z, ...>), `strict4e` (sieve-built subspace with every abscissa in 4E; Koblitz a=0, odd n, h=4 only) or `gated-rank` (best of `candidates` draws by the rank-aware key); excludes `basis`",
+            ),
+            ("seed", "seed of `select` (default 1); deterministic per seed"),
+            ("candidates", "`select=gated-rank` only: sieve draws (default 16)"),
+            ("m", "`select=gated-rank` only: summands of the ceiling (default 3)"),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let dim = params.u64("dimension")?;
+        if !(1..=30).contains(&dim) {
+            return Err(format!("subspace dimension {dim} outside 1..=30"));
+        }
+        // Validate before narrowing: e.g. 2^32 + 3 must not become dimension 3.
+        let dim = dim as u32;
+        let select = params.get("select").unwrap_or("prefix");
+        if select != "prefix" && params.get("basis").is_some() {
+            return Err("`select` and an explicit `basis` are mutually exclusive".into());
+        }
+        if matches!(select, "strict4e" | "gated-rank") {
+            use crate::cryptanalysis::ic_framework::subspace_select as ss;
+            if let Some(why) = ss::strict4e_refusal(self.instance) {
+                return Err(format!("select={select} refused: {why}"));
+            }
+            if dim >= self.instance.n {
+                return Err(format!("subspace dimension {dim} must be below n"));
+            }
+            let seed = params.u64_or("seed", 1)?;
+            let start = Instant::now();
+            let map = ss::X4Map::build(self.instance);
+            let sel = if select == "strict4e" {
+                ss::strict4e_sieve(&map, dim, seed)?
+            } else {
+                let k = params.u64_or("candidates", 16)? as u32;
+                let m = params.u64_or("m", 3)? as u32;
+                ss::gated_rank_select(self.instance, &map, dim, seed, k, m)?.0
+            };
+            let mut fb = binary_subspace_factor_base(self.instance, &sel.basis);
+            // Unpriced native work of the selection (AGENTS.md section 5a).
+            fb.cost.count(
+                "strict4e_membership_tests_uncharged",
+                1u64 << self.instance.n,
+            );
+            fb.cost
+                .count("strict4e_sieve_lookups_uncharged", sel.lookups);
+            fb.cost.count("strict4e_x4_in_span", sel.x4_in_span);
+            fb.cost.count("strict4e_span_nonzero", sel.span_nonzero);
+            fb.cost
+                .count("strict4e_fallback_steps", u64::from(sel.fallback_steps));
+            fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
+            return Ok(fb);
+        }
+        if select != "prefix" {
+            return Err(format!(
+                "unknown select `{select}`; try prefix, strict4e or gated-rank"
+            ));
+        }
+        let basis: Vec<u64> = if let Some(text) = params.get("basis") {
+            let basis: Vec<u64> = text
+                .split(';')
+                .map(|word| {
+                    if let Some(word) = word.strip_prefix("0x") {
+                        u64::from_str_radix(word, 16)
+                    } else {
+                        word.parse()
+                    }
+                })
+                .collect::<Result<_, _>>()
+                .map_err(|e| format!("invalid explicit subspace basis: {e}"))?;
+            if basis.len() != dim as usize
+                || basis.iter().any(|x| *x == 0 || *x >> self.instance.n != 0)
+            {
+                return Err("explicit basis dimension or field word is invalid".into());
+            }
+            let mut pivots = [0u64; 64];
+            for &word in &basis {
+                let mut word = word;
+                while word != 0 {
+                    let k = 63 - word.leading_zeros() as usize;
+                    if pivots[k] == 0 {
+                        pivots[k] = word;
+                        break;
+                    }
+                    word ^= pivots[k];
+                }
+                if word == 0 {
+                    return Err("explicit subspace basis is linearly dependent".into());
+                }
+            }
+            basis
+        } else {
+            (0..dim).map(|k| 1u64 << k).collect()
+        };
+        Ok(binary_subspace_factor_base(self.instance, &basis))
+    }
+}
+
+/// **The Frobenius closure of a prefix subspace** (lead L5, the ordered
+/// τ-slot relation space): every point whose abscissa lies in
+/// `σ^t(V)` for some `t`, `V = ⟨1, z, …, z^{d−1}⟩`, each signed Frobenius
+/// orbit folded onto one column with weights `±λ^t`.  `V` itself is not
+/// Frobenius-stable, so the closure has about `n·|F_V|` points on about
+/// `|F_V|/2` columns.  The base records `V`'s basis as its
+/// `subspace_basis`, so the algebraic oracle can descend with summand
+/// `i` over `σ^{j_i}(V)` (`descent-algebraic:slots=all`) and the lifted
+/// abscissae are abscissae of base points; the pair-table oracles run on
+/// it like on any closed base.
+pub struct KoblitzClosureBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzClosureBase<'_> {
+    fn name(&self) -> &str {
+        "koblitz-closure"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the signed Frobenius closure of the {}-dimensional prefix subspace, one column per orbit",
+            params.get("dimension").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "dimension",
+            "F_2-dimension of the seed subspace V = <1, z, ...>; the base is the union of the Frobenius images of V's points",
+        )]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("koblitz-closure requires a Koblitz curve")?;
+        let dim = params.u64("dimension")? as u32;
+        if dim == 0 || dim > 24 {
+            return Err(format!("subspace dimension {dim} outside 1..=24"));
+        }
+        let n = inst.n as usize;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let r = ctx.r;
+        let basis: Vec<u64> = (0..dim).map(|k| 1u64 << k).collect();
+        let g = ctx.group;
+        let mut points = Vec::new();
+        let mut col_of = Vec::new();
+        let mut coef_of = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let (mut solves, mut frob) = (0u64, 0u64);
+        for idx in 1..(1u64 << dim) {
+            let mut x = 0u64;
+            for (j, &e) in basis.iter().enumerate() {
+                if (idx >> j) & 1 == 1 {
+                    x ^= e;
+                }
+            }
+            solves += 1;
+            for seed in inst.points_with_x(x) {
+                if seen.contains(&seed.pack()) {
+                    continue;
+                }
+                // One column for the signed orbit of `seed`.
+                let column = columns;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                let mut fresh = false;
+                for _ in 0..n {
+                    if seen.insert(member.pack()) {
+                        fresh = true;
+                        points.push(member);
+                        col_of.push(column);
+                        coef_of.push(coefficient);
+                        let neg = g.neg(member);
+                        seen.insert(neg.pack());
+                        points.push(neg);
+                        col_of.push(column);
+                        coef_of.push((r - coefficient) % r);
+                    }
+                    member = inst.fast.frobenius_k(member, 1);
+                    frob += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % r as u128) as u64;
+                }
+                if fresh {
+                    columns += 1;
+                }
+            }
+        }
+        if columns == 0 {
+            return Err("the closure base is empty".into());
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!("Frobenius closure of the prefix subspace of dimension {dim}"),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        fb.subspace_basis = Some(basis);
+        fb.dimension = Some(dim);
+        fb.cost.count("abscissae_scanned", solves);
+        fb.cost.count("as_solves", solves);
+        fb.cost.count("frobenius_maps", frob);
+        Ok(fb)
+    }
+}
+
+/// A Koblitz base with each signed Frobenius orbit folded onto one
+/// column: `2n` points, one unknown.
+pub struct KoblitzOrbitBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+/// A signed-Frobenius-orbit base whose abscissa subspace is contained in
+/// `ker Tr_{F_{2^n}/F_2}`.  This is an executable factor-base policy rather
+/// than merely a score attached to a search candidate: a divisor that is not
+/// trace-zero is rejected before relation collection starts.
+pub struct KoblitzTraceZeroBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzTraceZeroBase<'_> {
+    fn name(&self) -> &str {
+        "koblitz-trace-zero"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the trace-zero Frobenius-invariant abscissa subspace selected by divisor {}, each signed orbit folded onto one column",
+            params.get("divisor").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "divisor",
+                "`;`-separated factors of x^n - 1; the resulting invariant subspace must lie in the absolute-trace kernel",
+            ),
+            (
+                "projected",
+                "1 to fold by the signed Frobenius orbits of the cofactor projections [h]P instead of \
+                 of the raw points: orbits whose projections coincide or are Frobenius translates \
+                 share one column (on a base closed under +T, P and P + T do), which is the column \
+                 count the relation matrix actually has to determine",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let kc = self
+            .instance
+            .koblitz
+            .as_ref()
+            .ok_or("koblitz-trace-zero requires a Koblitz curve")?;
+        let idx = divisor_indices(params)?;
+        let frob = build_frobenius_factor_base_from_divisor(kc, &idx)
+            .ok_or_else(|| format!("no invariant subspace for divisor {idx:?}"))?;
+        if !subspace_is_trace_zero(kc, &frob) {
+            return Err(format!(
+                "divisor {idx:?} is not trace-zero: at least one abscissa has absolute trace one"
+            ));
+        }
+        let fold = if params.flag("projected") {
+            ColumnFold::ProjectedSignedFrobeniusOrbit
+        } else {
+            ColumnFold::SignedFrobeniusOrbit
+        };
+        koblitz_factor_base(
+            self.instance,
+            &frob,
+            fold,
+            format!(
+                "trace-zero invariant subspace, divisor {idx:?}, dimension {}{}",
+                frob.ell,
+                if params.flag("projected") {
+                    ", columns merged by cofactor projection"
+                } else {
+                    ""
+                }
+            ),
+        )
+        .ok_or_else(|| "the trace-zero subspace produced no usable factor base".into())
+    }
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
+    fn name(&self) -> &str {
+        "koblitz-orbit"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the Frobenius-invariant subspace spanned by divisor factors {}, {}",
+            params.get("divisor").unwrap_or("?"),
+            if params.flag("no_fold") {
+                "one column per abscissa (the unfolded control)"
+            } else {
+                "each signed Frobenius orbit folded onto one column"
+            }
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "halftrace_tables",
+                "0 (default) preserves legacy halftrace squarings; 1 builds a lazy byte-table cache in the charged factor-base phase, preserving ordered points",
+            ),
+            (
+                "divisor",
+                "`;`-separated indices into the factorisation of the Frobenius characteristic \
+                 polynomial, e.g. `divisor=1;2` (a `,` would end the parameter on the command \
+                 line); the invariant subspace they span becomes the abscissa set. This is \
+                 the knob that chooses the base, so sweeping it sweeps factor bases",
+            ),
+            (
+                "no_fold",
+                "1 to give every abscissa its own column: the control that shows what the fold buys",
+            ),
+            (
+                "projected",
+                "1 to fold by the signed Frobenius orbits of the cofactor projections [h]P instead of \
+                 of the raw points: orbits whose projections coincide or are Frobenius translates \
+                 share one column (on a base closed under +T, P and P + T do), which is the column \
+                 count the relation matrix actually has to determine",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let kc = self
+            .instance
+            .koblitz
+            .as_ref()
+            .ok_or("this instance is not a Koblitz curve, so it has no Frobenius to fold by")?;
+        let idx = divisor_indices(params)?;
+        let cached = match params.u64_or("halftrace_tables", 0)? {
+            0 => false,
+            1 => true,
+            _ => return Err("halftrace_tables must be 0 or 1".into()),
+        };
+        let frob = with_cached_point_lifts(cached, || {
+            build_frobenius_factor_base_from_divisor(kc, &idx)
+        })
+        .ok_or_else(|| format!("no invariant subspace for divisor {idx:?} on this curve"))?;
+        let fold = if params.flag("no_fold") {
+            ColumnFold::Abscissa
+        } else if params.flag("projected") {
+            ColumnFold::ProjectedSignedFrobeniusOrbit
+        } else {
+            ColumnFold::SignedFrobeniusOrbit
+        };
+        koblitz_factor_base(
+            self.instance,
+            &frob,
+            fold,
+            format!(
+                "invariant subspace, divisor {idx:?}, dimension {}",
+                frob.ell
+            ),
+        )
+        .ok_or_else(|| "the invariant subspace produced no usable factor base".into())
+    }
+}
+
+/// `generator_orbit` of `compact-orbit-scan`: absent or 0 is the archived
+/// scan, 1 seeds column 0 with the generator's orbit.
+fn generator_orbit(params: &Params) -> Result<bool, String> {
+    match params.get("generator_orbit") {
+        None => Ok(false),
+        Some(_) => match params.u64("generator_orbit")? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("generator_orbit must be 0 or 1, not {v}")),
+        },
+    }
+}
+
+/// The archived compact-orbit producer's public, deterministic raw-x scan.
+/// All group work is charged to `ops`; native field and container work is
+/// retained on the base as priced counters or explicit lower-bound gaps.
+pub struct CompactOrbitScanBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
+    fn name(&self) -> &str {
+        "compact-orbit-scan"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the first {} distinct projected signed Frobenius orbits from raw x <= {}",
+            params.get("columns").unwrap_or("?"),
+            params.get("raw_x_cap").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("columns", "number of distinct signed Frobenius orbits"),
+            (
+                "raw_x_cap",
+                "inclusive maximum raw abscissa; exhaustion is an error",
+            ),
+            (
+                "norm",
+                "Z[tau]-multiplier closure (lead A1): also take alpha(P) for every alpha = a + b*tau of norm a^2 - ab + 2b^2 <= norm, with weight (a + b*lambda) on P's column; 0 or absent for the plain {+-tau^k} orbits",
+            ),
+            (
+                "generator_orbit",
+                "1: column 0 is the signed Frobenius orbit of the generator G itself, whose logarithm is known (no lift, cofactor projection, order or eigenvalue check: the instance's lambda is used as the signed-Frobenius rho uses it), so the relation search needs one row fewer; the other columns come from the raw-x scan. 0 or absent: every column from the scan",
+            ),
+        ]
+    }
+
+    fn known_column_logs(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        // x = h·log_G(seed) with seed = G (see collect_and_solve_relations).
+        Ok(if generator_orbit(params)? {
+            vec![(0, ctx.cofactor % ctx.r)]
+        } else {
+            Vec::new()
+        })
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("compact-orbit-scan requires a Koblitz curve")?;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.field_degree != Some(inst.n) {
+            return Err("compact-orbit-scan context does not match its binary instance".into());
+        }
+        let columns =
+            usize::try_from(params.u64("columns")?).map_err(|_| "columns does not fit in usize")?;
+        let raw_x_cap = params.u64("raw_x_cap")?;
+        let norm_cap = match params.get("norm") {
+            None => 0i64,
+            Some(_) => params.u64("norm")? as i64,
+        };
+        // Multipliers a + b*tau of norm a^2 - ab + 2b^2 <= norm_cap, one per
+        // associate class up to sign and Frobenius (the orbit loop below
+        // supplies +-tau^k alpha(P); duplicates are dropped by key).
+        let mut multipliers: Vec<(i64, i64)> = Vec::new();
+        if norm_cap > 0 {
+            let bound = (norm_cap as f64).sqrt() as i64 + 2;
+            for a in -bound..=bound {
+                for b in -bound..=bound {
+                    if (a, b) == (0, 0) || a * a - a * b + 2 * b * b > norm_cap {
+                        continue;
+                    }
+                    multipliers.push((a, b));
+                }
+            }
+        }
+        let mut multiplier_points = 0u64;
+        let from_generator = generator_orbit(params)?;
+        if from_generator && !multipliers.is_empty() {
+            return Err("generator_orbit=1 does not combine with norm > 0".into());
+        }
+        if columns == 0 || raw_x_cap == 0 || inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2)
+        {
+            return Err(
+                "compact-orbit-scan requires positive columns and cap and odd degree < 64".into(),
+            );
+        }
+        // The archived source selects the half-trace root first. The
+        // framework's linear Artin-Schreier solver can choose its other
+        // valid root, changing representatives, point order and base hash.
+        let source_curve = FastBinaryCurve::new(&inst.irreducible, inst.a)
+            .ok_or("compact-orbit source curve is outside its field limit")?;
+        let orbit_size = (inst.n as usize)
+            .checked_mul(2)
+            .ok_or("orbit size overflows usize")?;
+        let capacity = columns
+            .checked_mul(orbit_size)
+            .ok_or("factor base size overflows usize")?;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let g = ctx.group;
+        let mut seen = HashSet::new();
+        let mut points = Vec::with_capacity(capacity);
+        let mut col_of = Vec::with_capacity(capacity);
+        let mut coef_of = Vec::with_capacity(capacity);
+        let mut scanned = 0u64;
+        let mut lifts = 0u64;
+        let mut projected = 0u64;
+        let mut key_squares = 0u64;
+        let mut frobenius_maps = 0u64;
+        let mut equation_checks = 0u64;
+        let max_x = raw_x_cap.min((1u64 << inst.n) - 1);
+        if from_generator {
+            // Column 0: the generator's own orbit. G is the instance's point
+            // of order r, so there is nothing to lift, project or order-check.
+            // Its coefficients use the instance's lambda unchecked, as the
+            // signed-Frobenius rho does; a wrong lambda would fail the final
+            // [d]G = Q verification that every arm pays, not return a wrong d.
+            let seed = ctx.generator;
+            if g.is_identity(&seed) || seed.x <= 1 {
+                return Err("generator_orbit=1 needs a generator with x > 1".into());
+            }
+            equation_checks += 1;
+            if !inst.fast.is_on_curve(seed) {
+                return Err("the generator is off curve".into());
+            }
+            let mut x = seed.x;
+            let mut key = x;
+            for _ in 1..inst.n {
+                x = inst.gf.sqr(x);
+                key = key.min(x);
+                key_squares += 1;
+            }
+            seen.insert(key);
+            let mut member = seed;
+            let mut coefficient = 1u64;
+            for _ in 0..inst.n {
+                equation_checks += 1;
+                if !inst.fast.is_on_curve(member) {
+                    return Err("a Frobenius image of the generator is off curve".into());
+                }
+                points.push(member);
+                col_of.push(0);
+                coef_of.push(coefficient);
+                points.push(g.neg(member));
+                col_of.push(0);
+                coef_of.push((ctx.r - coefficient) % ctx.r);
+                member = inst.fast.frobenius_k(member, 1);
+                frobenius_maps += 1;
+                coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+            }
+            if member != seed || coefficient != 1 {
+                return Err("the generator's Frobenius orbit is not closed".into());
+            }
+        }
+        for raw_x in 1..=max_x {
+            if seen.len() == columns {
+                break;
+            }
+            scanned += 1;
+            for source_point in source_curve.points_with_x(inst.b, raw_x) {
+                let (x, y) = source_point.ok_or("raw-x lift unexpectedly returned infinity")?;
+                let point = FastPoint::affine(x, y);
+                lifts += 1;
+                let seed = g.mul(ops, point, ctx.cofactor);
+                if g.is_identity(&seed) || seed.x <= 1 {
+                    continue;
+                }
+                projected += 1;
+                equation_checks += 1;
+                if !inst.fast.is_on_curve(seed) {
+                    return Err(format!("projected point from raw x {raw_x} is off curve"));
+                }
+                let mut x = seed.x;
+                let mut key = x;
+                for _ in 1..inst.n {
+                    x = inst.gf.sqr(x);
+                    key = key.min(x);
+                    key_squares += 1;
+                }
+                if !seen.insert(key) {
+                    continue;
+                }
+                if !g.is_identity(&g.mul(ops, seed, ctx.r)) {
+                    return Err(format!(
+                        "projected point from raw x {raw_x} has wrong order"
+                    ));
+                }
+                if g.mul(ops, seed, lambda) != inst.fast.frobenius_k(seed, 1) {
+                    return Err(format!(
+                        "Frobenius eigenvalue check failed for raw x {raw_x}"
+                    ));
+                }
+                frobenius_maps += 1;
+                let column = seen.len() - 1;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    equation_checks += 1;
+                    if !inst.fast.is_on_curve(member) {
+                        return Err(format!("Frobenius image from raw x {raw_x} is off curve"));
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err(format!("Frobenius orbit from raw x {raw_x} is not closed"));
+                }
+                // Lead A1: the orbits of alpha(P) = [a]P + [b]tau(P) for the
+                // small-norm multipliers, weight (a + b*lambda)*lambda^t.
+                if !multipliers.is_empty() {
+                    let tau_seed = inst.fast.frobenius_k(seed, 1);
+                    let r128 = ctx.r as u128;
+                    let to_scalar = |v: i64| -> u64 { v.rem_euclid(ctx.r as i64) as u64 };
+                    let mut local_seen: HashSet<u64> = HashSet::new();
+                    for &(a, b) in &multipliers {
+                        let sa = to_scalar(a);
+                        let sb = to_scalar(b);
+                        let pa = if sa == 0 {
+                            g.identity()
+                        } else {
+                            g.mul(ops, seed, sa)
+                        };
+                        let pb = if sb == 0 {
+                            g.identity()
+                        } else {
+                            g.mul(ops, tau_seed, sb)
+                        };
+                        let image = g.add(ops, pa, pb);
+                        if g.is_identity(&image) {
+                            continue;
+                        }
+                        // Skip images already in the base (an associate of a
+                        // Frobenius power, or a repeat), by orbit key.
+                        let mut xk = image.x;
+                        let mut key = xk;
+                        for _ in 1..inst.n {
+                            xk = inst.gf.sqr(xk);
+                            key = key.min(xk);
+                        }
+                        if !local_seen.insert(key) || seen.contains(&key) {
+                            continue;
+                        }
+                        let weight =
+                            ((sa as u128 + (sb as u128 * lambda as u128) % r128) % r128) as u64;
+                        let mut member = image;
+                        let mut coefficient = weight;
+                        for _ in 0..inst.n {
+                            points.push(member);
+                            col_of.push(column);
+                            coef_of.push(coefficient);
+                            points.push(g.neg(member));
+                            col_of.push(column);
+                            coef_of.push((ctx.r - coefficient) % ctx.r);
+                            member = inst.fast.frobenius_k(member, 1);
+                            frobenius_maps += 1;
+                            coefficient = ((coefficient as u128 * lambda as u128) % r128) as u64;
+                            multiplier_points += 2;
+                        }
+                        if member != image {
+                            return Err(format!(
+                                "multiplier orbit from raw x {raw_x} is not closed"
+                            ));
+                        }
+                    }
+                }
+                if seen.len() == columns {
+                    break;
+                }
+            }
+            if seen.len() == columns {
+                break;
+            }
+        }
+        if seen.len() != columns {
+            return Err(format!(
+                "raw-x cap {raw_x_cap} exhausted after {scanned} abscissae with {} of {columns} orbits",
+                seen.len()
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            if from_generator {
+                format!(
+                    "the generator's signed Frobenius orbit and the first {} projected orbits, raw x <= {raw_x_cap}",
+                    columns - 1
+                )
+            } else {
+                format!("first {columns} projected signed Frobenius orbits, raw x <= {raw_x_cap}")
+            },
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        // Each orbit was pushed seed-first as (σ^t(S), −σ^t(S)) for
+        // t = 0..n; multiplier orbits share a column but follow the same
+        // order, so the layout holds for them too.
+        fb.frobenius_orbit_layout = Some(inst.n);
+        // `from_column_map`'s inserts, lookups and negations are in this
+        // builder's `hash_probes_uncharged` and `point_negations_uncharged`
+        // below; only its abscissa sort is new.
+        fb.cost.work_native.remove("index_inserts");
+        fb.cost.work_native.remove("index_point_negations");
+        fb.cost.count("abscissae_scanned_uncharged", scanned);
+        fb.cost.count("inversions", scanned);
+        fb.cost.count("legacy_as_solves_uncharged", scanned);
+        fb.cost.count("point_lifts_uncharged", lifts);
+        fb.cost.count(
+            "lift_field_squares_uncharged",
+            scanned * inst.n as u64 + lifts / 2 * (inst.n as u64 - 1),
+        );
+        fb.cost
+            .count("lift_field_multiplies_uncharged", scanned + lifts / 2);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost
+            .count("curve_equation_checks_uncharged", equation_checks);
+        fb.cost
+            .count("min_key_field_squares_uncharged", key_squares);
+        fb.cost.count("frobenius_maps", frobenius_maps);
+        // Only with multipliers: a plain scan's counters (and the frozen
+        // evidence built from them) stay exactly what they were.
+        if !multipliers.is_empty() {
+            fb.cost.count("multiplier_points", multiplier_points);
+        }
+        fb.cost.count(
+            "hash_probes_uncharged",
+            projected + fb.points.len() as u64 * 3,
+        );
+        fb.cost.count(
+            "point_negations_uncharged",
+            lifts / 2 + columns as u64 * inst.n as u64 + fb.points.len() as u64,
+        );
+        fb.cost
+            .count("factor_point_inserts_uncharged", fb.points.len() as u64);
+        fb.cost.count(
+            "factor_base_vec_bytes_floor_uncharged",
+            (fb.points.len() * std::mem::size_of::<FastPoint>()
+                + fb.col_of.len() * std::mem::size_of::<usize>()
+                + fb.coef_of.len() * std::mem::size_of::<u64>()
+                + fb.neg_index.len() * std::mem::size_of::<usize>()) as u64,
+        );
+        Ok(fb)
+    }
+}
+
+/// **The cyclotomic-sparse base** (lead A2): abscissae `x = Σ_{k∈S} γ^k`
+/// with `|S| = w`, `γ` a primitive `(2n+1)`-th root of unity — the second
+/// Frobenius-stable family at prime `n`, with a polynomial membership
+/// description (`cyclotomic_factor_base`).  Each abscissa's rational
+/// points are projected into the subgroup by the cofactor and the
+/// projected signed Frobenius orbits are folded onto one column each
+/// with weights `±λ^t`, exactly as `compact-orbit-scan` does for raw
+/// abscissae.  Needs `2n + 1` prime with `ord_{2n+1}(2) = n`
+/// (`n ∈ {11, 23, 35, 39, …}` in the single-word range).
+pub struct CyclotomicBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CyclotomicBase<'_> {
+    fn name(&self) -> &str {
+        "cyclotomic"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "projected signed Frobenius orbits of the gamma-weight-{} abscissae (gamma a primitive (2n+1)-th root of unity)",
+            params.get("w").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "w",
+                "gamma-weight of the abscissae: x = sum of w distinct powers of gamma; the set has C(2n+1, w) elements",
+            ),
+            (
+                "columns",
+                "optional cap on the number of distinct projected signed orbits, in canonical abscissa order; 0 or absent takes them all",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        use crate::cryptanalysis::cyclotomic_factor_base::CyclotomicField;
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("cyclotomic requires a Koblitz curve")?;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.field_degree != Some(inst.n) {
+            return Err("cyclotomic context does not match its binary instance".into());
+        }
+        let w = usize::try_from(params.u64("w")?).map_err(|_| "w does not fit in usize")?;
+        let column_cap = match params.get("columns") {
+            None => 0usize,
+            Some(_) => usize::try_from(params.u64("columns")?)
+                .map_err(|_| "columns does not fit in usize")?,
+        };
+        if inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2) {
+            return Err("cyclotomic requires an odd degree < 64".into());
+        }
+        let field = CyclotomicField::new(&inst.irreducible, inst.n)?;
+        let abscissae = field.gamma_weight_set(w)?;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let g = ctx.group;
+        let mut seen = HashSet::new();
+        let mut points = Vec::new();
+        let mut col_of = Vec::new();
+        let mut coef_of = Vec::new();
+        let (mut lifts, mut projected, mut frobenius_maps) = (0u64, 0u64, 0u64);
+        'outer: for x in &abscissae {
+            let raw_x = x.raw_bits().first().copied().unwrap_or(0);
+            for point in inst.points_with_x(raw_x) {
+                lifts += 1;
+                let seed = g.mul(ops, point, ctx.cofactor);
+                if g.is_identity(&seed) {
+                    continue;
+                }
+                projected += 1;
+                let mut xk = seed.x;
+                let mut key = xk;
+                for _ in 1..inst.n {
+                    xk = inst.gf.sqr(xk);
+                    key = key.min(xk);
+                }
+                if !seen.insert(key) {
+                    continue;
+                }
+                if !g.is_identity(&g.mul(ops, seed, ctx.r)) {
+                    return Err(format!("projected point from x {raw_x} has wrong order"));
+                }
+                let column = seen.len() - 1;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    if !inst.fast.is_on_curve(member) {
+                        return Err(format!("Frobenius image from x {raw_x} is off curve"));
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err(format!("Frobenius orbit from x {raw_x} is not closed"));
+                }
+                if column_cap > 0 && seen.len() == column_cap {
+                    break 'outer;
+                }
+            }
+        }
+        let columns = seen.len();
+        if columns == 0 {
+            return Err(format!(
+                "no gamma-weight-{w} abscissa carries a subgroup point on {}",
+                inst.name
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} projected signed Frobenius orbits of the {} gamma-weight-{w} abscissae",
+                abscissae.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        fb.cost
+            .count("abscissae_enumerated_uncharged", abscissae.len() as u64);
+        fb.cost.count("point_lifts_uncharged", lifts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost.count("frobenius_maps", frobenius_maps);
+        Ok(fb)
+    }
+}
+
+/// Projected signed Frobenius orbits of the ONB Hamming-weight-`w`
+/// abscissae. Same fold as [`CyclotomicBase`]; the generator set is the
+/// normal basis rather than powers of γ. Spec: `onb-weight:w=W[,columns=N]`.
+pub struct OnbWeightBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for OnbWeightBase<'_> {
+    fn name(&self) -> &str {
+        "onb-weight"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "projected signed Frobenius orbits of the ONB Hamming-weight-{} abscissae",
+            params.get("w").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "w",
+                "ONB Hamming weight of the abscissae; the set has C(n, w) elements before curve filtering",
+            ),
+            (
+                "columns",
+                "optional cap on the number of distinct projected signed orbits, in canonical abscissa order; 0 or absent takes them all",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        use crate::cryptanalysis::cyclotomic_factor_base::CyclotomicField;
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("onb-weight requires a Koblitz curve")?;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.field_degree != Some(inst.n) {
+            return Err("onb-weight context does not match its binary instance".into());
+        }
+        let w = usize::try_from(params.u64("w")?).map_err(|_| "w does not fit in usize")?;
+        let column_cap = match params.get("columns") {
+            None => 0usize,
+            Some(_) => usize::try_from(params.u64("columns")?)
+                .map_err(|_| "columns does not fit in usize")?,
+        };
+        if inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2) {
+            return Err("onb-weight requires an odd degree < 64".into());
+        }
+        let field = CyclotomicField::new(&inst.irreducible, inst.n)?;
+        let abscissae = field.onb_weight_set(w)?;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let g = ctx.group;
+        let mut seen = HashSet::new();
+        let mut points = Vec::new();
+        let mut col_of = Vec::new();
+        let mut coef_of = Vec::new();
+        let (mut lifts, mut projected, mut frobenius_maps) = (0u64, 0u64, 0u64);
+        'outer: for x in &abscissae {
+            let raw_x = x.raw_bits().first().copied().unwrap_or(0);
+            for point in inst.points_with_x(raw_x) {
+                lifts += 1;
+                let seed = g.mul(ops, point, ctx.cofactor);
+                if g.is_identity(&seed) {
+                    continue;
+                }
+                projected += 1;
+                let mut xk = seed.x;
+                let mut key = xk;
+                for _ in 1..inst.n {
+                    xk = inst.gf.sqr(xk);
+                    key = key.min(xk);
+                }
+                if !seen.insert(key) {
+                    continue;
+                }
+                if !g.is_identity(&g.mul(ops, seed, ctx.r)) {
+                    return Err(format!("projected point from x {raw_x} has wrong order"));
+                }
+                let column = seen.len() - 1;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    if !inst.fast.is_on_curve(member) {
+                        return Err(format!("Frobenius image from x {raw_x} is off curve"));
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err(format!("Frobenius orbit from x {raw_x} is not closed"));
+                }
+                if column_cap > 0 && seen.len() == column_cap {
+                    break 'outer;
+                }
+            }
+        }
+        let columns = seen.len();
+        if columns == 0 {
+            return Err(format!(
+                "no ONB weight-{w} abscissa carries a subgroup point on {}",
+                inst.name
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} projected signed Frobenius orbits of the {} ONB weight-{w} abscissae",
+                abscissae.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        fb.cost
+            .count("abscissae_enumerated_uncharged", abscissae.len() as u64);
+        fb.cost.count("point_lifts_uncharged", lifts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost.count("frobenius_maps", frobenius_maps);
+        Ok(fb)
+    }
+}
+
+/// The prime-field analogue of `koblitz-orbit`: the `size` smallest
+/// abscissae, closed under the curve's automorphism group and folded
+/// one orbit to a column.  `group` picks the group (`auto` takes what
+/// the curve has); `no_fold` keeps the closed point set and folds by
+/// negation only, which is the control that shows what the fold buys
+/// on the same points.  See `glv_invariant_base`.
+pub struct GlvOrbitBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for GlvOrbitBase<'_> {
+    fn name(&self) -> &str {
+        "glv-orbit"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the closure of the {} smallest abscissae under the {} automorphism group, {}",
+            params.get("size").unwrap_or("?"),
+            params.get("group").unwrap_or("auto"),
+            if params.flag("no_fold") {
+                "folded by negation only (the control)"
+            } else {
+                "each orbit folded onto one column"
+            }
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "size",
+                "seed abscissae; the base is their closure under the group (3× as many on j = 0, 2× on j = 1728)",
+            ),
+            (
+                "group",
+                "auto (what the curve has), negation, j0 or j1728",
+            ),
+            (
+                "no_fold",
+                "1 to fold the same points by negation only: the control that shows what the fold buys",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("factor base size must be positive".into());
+        }
+        let group = AutomorphismGroup::parse(params.get("group").unwrap_or("auto"))?;
+        let (fb, _) = glv_orbit_base(self.instance, size, group, !params.flag("no_fold"))?;
+        Ok(fb)
+    }
+}
+
+/// **Lead A1 on a prime-field CM curve**: the `Z[φ]` multiplier closure
+/// over the curve's small CM endomorphism (`D = −7, −8`: degree 2;
+/// `D = −11`: degree 3; or the free automorphism of a `j = 0` / `1728` curve), the prime-field twin of
+/// `compact-orbit-scan:norm=N`.  Every seed `P` contributes, for each
+/// `α = a + bφ` of norm `a² + t·ab + d·b² ≤ norm` (`φ² − tφ + d = 0`),
+/// the point `α(P) = [a]P + [b]φ(P)` on `P`'s column with weight
+/// `a + bλ`, so `K` seeds behave like `K·M` independent points for the
+/// pair table while the rank stage needs `K + 1` relations.  `norm = 0`
+/// takes the seeds alone (the control).  The endomorphism comes from
+/// `glv_invariant_base::velu_degree{2,3}_endomorphisms`; its evaluation
+/// is charged as one inversion-equivalent group addition per image.
+pub struct CmMultiplierBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "cm-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its Z[phi] multiples of norm <= {} on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("norm").unwrap_or("0")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "norm",
+                "include alpha(P) for every alpha = a + b*phi of norm <= this; 0 or absent: seeds only",
+            ),
+            ("endo", "index of the curve's CM endomorphism; default 0"),
+            (
+                "mult",
+                "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        use crate::cryptanalysis::glv_invariant_base::{
+            smallest_abscissa_points, velu_degree2_endomorphisms, velu_degree3_endomorphisms,
+            Endomorphism,
+        };
+        let inst = self.instance;
+        let g = ctx.group;
+        let r = ctx.r;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let norm_cap = match params.get("norm") {
+            None => 0i64,
+            Some(_) => params.u64("norm")? as i64,
+        };
+        let which = match params.get("endo") {
+            None => 0usize,
+            Some(_) => params.u64("endo")? as usize,
+        };
+        let mut endos: Vec<Box<dyn Endomorphism<PrimeCurve>>> = Vec::new();
+        // The curve's own automorphism (`j = 0`: zeta_3, `j = 1728`: i) is
+        // free to evaluate; it comes first, after the leading negation.
+        if let Ok(gens) = crate::cryptanalysis::glv_invariant_base::automorphism_generators(
+            inst,
+            AutomorphismGroup::Auto,
+        ) {
+            endos.extend(gens.into_iter().skip(1));
+        }
+        for e in velu_degree2_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        for e in velu_degree3_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        let mult = match params.get("mult") {
+            None => 1i64,
+            Some(_) => params.u64("mult")?.max(1) as i64,
+        };
+        if norm_cap > 0 && endos.is_empty() {
+            return Err(
+                "cm-multiplier needs a curve with a rational degree-2 or degree-3 CM endomorphism (--family d7, d8 or d11)".into(),
+            );
+        }
+        let endo = endos.get(which);
+        let (lambda, degree, trace) = match endo {
+            Some(e) => {
+                let l = e.eigenvalue();
+                let d = e.degree() as i64;
+                let lm = l as i128;
+                let rm = r as i128;
+                let t = (-8i64..=8)
+                    .find(|&t| (lm * lm - t as i128 * lm + d as i128).rem_euclid(rm) == 0)
+                    .ok_or("eigenvalue does not satisfy a small characteristic polynomial")?;
+                (l, d, t)
+            }
+            None => (0, 0, 0),
+        };
+        let mut multipliers: Vec<(i64, i64)> = Vec::new();
+        if norm_cap > 0 {
+            let bound = ((4 * norm_cap) as f64).sqrt() as i64 + 2;
+            for a in -bound..=bound {
+                for b in -bound..=bound {
+                    if (a, b) != (0, 0) && a * a + trace * a * b + degree * b * b <= norm_cap {
+                        multipliers.push((a, b));
+                    }
+                }
+            }
+        }
+        for m in 2..=mult {
+            if !multipliers.contains(&(m, 0)) {
+                multipliers.push((m, 0));
+            }
+        }
+        let to_scalar = |v: i64| -> u64 { v.rem_euclid(r as i64) as u64 };
+        let mut points: Vec<PrimePoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut endo_applies = 0u64;
+        let push_pair = |points: &mut Vec<PrimePoint>,
+                         col_of: &mut Vec<usize>,
+                         coef_of: &mut Vec<u64>,
+                         q: PrimePoint,
+                         column: usize,
+                         weight: u64| {
+            points.push(q);
+            col_of.push(column);
+            coef_of.push(weight);
+            let nq = g.neg(q);
+            if nq != q {
+                points.push(nq);
+                col_of.push(column);
+                coef_of.push((r - weight) % r);
+            }
+        };
+        // Seeds: the smallest abscissae (one per sign pair), projected into
+        // the order-r subgroup; a little slack covers projections that
+        // collide or vanish.
+        let candidates = smallest_abscissa_points(inst, 2 * size + 16);
+        let mut last_x = u64::MAX;
+        for cand in &candidates {
+            if cand.x == last_x {
+                continue;
+            }
+            last_x = cand.x;
+            let seed = if ctx.cofactor == 1 {
+                *cand
+            } else {
+                g.mul(ops, *cand, ctx.cofactor)
+            };
+            let nseed = g.neg(seed);
+            if g.is_identity(&seed) || seen.contains(&g.key(&seed)) || seen.contains(&g.key(&nseed))
+            {
+                continue;
+            }
+            seen.insert(g.key(&seed));
+            seen.insert(g.key(&nseed));
+            let column = columns;
+            columns += 1;
+            push_pair(&mut points, &mut col_of, &mut coef_of, seed, column, 1);
+            if !multipliers.is_empty() {
+                let phi_seed = match endo {
+                    Some(e) if multipliers.iter().any(|&(_, mb)| mb != 0) => {
+                        endo_applies += 1;
+                        if e.degree() > 1 {
+                            ops.adds += 1; // an inversion-equivalent evaluation of phi
+                        }
+                        e.apply(g, seed)
+                    }
+                    _ => g.identity(),
+                };
+                for &(ma, mb) in &multipliers {
+                    let sa = to_scalar(ma);
+                    let sb = to_scalar(mb);
+                    let pa = if sa == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, seed, sa)
+                    };
+                    let pb = if sb == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, phi_seed, sb)
+                    };
+                    let image = g.add(ops, pa, pb);
+                    if g.is_identity(&image) {
+                        continue;
+                    }
+                    let nimg = g.neg(image);
+                    if seen.contains(&g.key(&image)) || seen.contains(&g.key(&nimg)) {
+                        continue;
+                    }
+                    seen.insert(g.key(&image));
+                    seen.insert(g.key(&nimg));
+                    let weight = ((sa as u128 + (sb as u128 * lambda as u128) % r as u128)
+                        % r as u128) as u64;
+                    push_pair(
+                        &mut points,
+                        &mut col_of,
+                        &mut coef_of,
+                        image,
+                        column,
+                        weight,
+                    );
+                }
+            }
+            if columns == size {
+                break;
+            }
+        }
+        if columns < size {
+            return Err(format!("only {columns} of {size} seeds found"));
+        }
+        let curve = &inst.curve;
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} seeds with Z[phi] multiples of norm <= {norm_cap} ({} points)",
+                points.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| curve.key(p),
+            |p| curve.key(&curve.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.cost.count("endomorphism_applies", endo_applies);
+        Ok(fb)
+    }
+}
+
+/// **Integer-multiple closure on any binary curve** (lead A1 without an
+/// endomorphism): each seed `P` (a point with one of the smallest
+/// abscissae, projected into the order-`r` subgroup) contributes
+/// `[m]P` for `m = 1..=mult` on its own column with weight `m`, built by
+/// repeated addition (one group addition per multiple).  `K` seeds then
+/// behave like `K * mult` independent points for the pair table while
+/// the rank stage needs only `K + 1` relations.  Nothing here uses
+/// structure, so it applies to a random curve; as `K -> 1` it becomes a
+/// baby-step/giant-step table (the honest limit of the idea).
+pub struct BinaryMultiplierBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinaryMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "binary-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its multiples [1..{}]P on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("mult").unwrap_or("1")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "mult",
+                "include [m]P for m = 2..=mult with weight m; 1 or absent: seeds only",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let inst = self.instance;
+        let g = ctx.group;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let mult = match params.get("mult") {
+            None => 1u64,
+            Some(_) => params.u64("mult")?.max(1),
+        };
+        let mut points: Vec<FastPoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut x = 1u64;
+        let cap = (1u64 << inst.n.min(40)).min(1 << 24);
+        while columns < size {
+            if x >= cap {
+                return Err(format!("only {columns} of {size} seeds in {cap} abscissae"));
+            }
+            let candidates = inst.points_with_x(x);
+            x += 1;
+            let Some(&cand) = candidates.first() else {
+                continue;
+            };
+            let seed = if ctx.cofactor == 1 {
+                cand
+            } else {
+                g.mul(ops, cand, ctx.cofactor)
+            };
+            if g.is_identity(&seed) {
+                continue;
+            }
+            let column = columns;
+            let mut member = seed;
+            let mut added = 0usize;
+            for m in 1..=mult {
+                if m > 1 {
+                    member = g.add(ops, member, seed);
+                }
+                if g.is_identity(&member) {
+                    break;
+                }
+                let nm = g.neg(member);
+                if seen.contains(&g.key(&member)) || seen.contains(&g.key(&nm)) {
+                    continue;
+                }
+                seen.insert(g.key(&member));
+                seen.insert(g.key(&nm));
+                let weight = m % ctx.r;
+                points.push(member);
+                col_of.push(column);
+                coef_of.push(weight);
+                added += 1;
+                if nm != member {
+                    points.push(nm);
+                    col_of.push(column);
+                    coef_of.push((ctx.r - weight) % ctx.r);
+                }
+            }
+            if added > 0 {
+                columns += 1;
+            } else {
+                // Roll back nothing: no point of this seed was kept.
+                continue;
+            }
+        }
+        FactorBase::from_column_map(
+            format!(
+                "{columns} seeds with multiples [1..{mult}]P ({} points)",
+                points.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )
+    }
+}
+
+/// The `ψ`-stable line of a GLS twist over `F_{p²}`, folded by
+/// `⟨−1, ψ⟩`; `no_fold` folds the same points by negation only.  See
+/// `gls_fp2`.
+pub struct GlsLineBase<'i> {
+    pub instance: &'i GlsInstance,
+}
+
+impl FactorBaseBuilder<Fp2Curve> for GlsLineBase<'_> {
+    fn name(&self) -> &str {
+        "gls-line"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "the ψ-stable line x ∈ u·s·F_p, {}",
+            if params.flag("no_fold") {
+                "folded by negation only (the control)"
+            } else {
+                "each ⟨−1, ψ⟩-orbit folded onto one column"
+            }
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "no_fold",
+            "1 to fold the same points by negation only: the control that shows what the fold buys",
+        )]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<Fp2Curve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<Fp2Point>, String> {
+        let (fb, _) = gls_line_base(self.instance, !params.flag("no_fold"))?;
+        Ok(fb)
+    }
+}
+
+// ── Decomposition oracles ──────────────────────────────────────────
+
+/// `counters` with the marker that says the oracle's set-up counts all
+/// its table work (`ecbench::work::known_uncounted`).
+fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
+    counters.insert("counted:table_insert_attempts".to_string(), 1);
+    counters
+}
+
+/// Test `R − P ∈ F` for every signed base point: no table, `|F|` group
+/// operations a target, and the honest baseline every table oracle is
+/// an improvement on.
+pub struct SubtractOracle;
+
+impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
+    fn name(&self) -> &str {
+        "subtract"
+    }
+
+    fn summands(&self) -> u32 {
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "for each signed base point P, test whether R − P is in the base".into()
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // No table: nothing is inserted.
+        table_counted(BTreeMap::new())
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        for (i, p) in fb.points.iter().enumerate() {
+            let rest = ctx.group.add(ops, point, ctx.group.neg(*p));
+            counters.lookups += 1;
+            let key = ctx.group.key(&rest);
+            if let Some(j) = fb.index_of_key(key) {
+                return Some(vec![i, j]);
+            }
+        }
+        None
+    }
+}
+
+/// Meet in the middle over a pair table: memory for time, the lever
+/// that makes a two-summand search `O(1)` a target instead of `O(|F|)`.
+pub struct MitmOracle {
+    m: u32,
+    lines: bool,
+    table: Option<PairTable>,
+}
+
+impl MitmOracle {
+    pub fn new(m: u32) -> Self {
+        Self {
+            m,
+            lines: false,
+            table: None,
+        }
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
+    fn name(&self) -> &str {
+        "mitm"
+    }
+
+    fn summands(&self) -> u32 {
+        self.m
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), {}",
+            if params.flag("negation_folded") {
+                "built with the negation fold"
+            } else {
+                "built in full"
+            }
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "negation_folded",
+                "1 to build only one of each ±pair, halving the table's additions",
+            ),
+            (
+                "layout",
+                "map (default) or lines (cache-line pair index and relation guard)",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        self.lines = match params.get("layout") {
+            None | Some("map") => false,
+            Some("lines") => true,
+            Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
+        };
+        if self.lines && !params.flag("negation_folded") {
+            return Err("layout=lines requires negation_folded=1".into());
+        }
+        let table = if self.lines {
+            PairTable::build_negation_folded_lines(ctx.group, fb)
+        } else if params.flag("negation_folded") {
+            PairTable::build_negation_folded(ctx.group, fb)
+        } else {
+            PairTable::build(ctx.group, fb)
+        };
+        // The table's construction is part of the pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(PairTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<G>, point: &G::Elt) {
+        if let Some(table) = &self.table {
+            table.prefetch(ctx.group, point);
+        }
+    }
+
+    fn line_guard(&self) -> bool {
+        self.lines
+    }
+}
+
+/// One probe per target into a table of every signed `k`-sum of the base
+/// ([`KSumTable`]): the `mitm` lever pushed from pairs to triples or
+/// quadruples, trading a smaller base for a larger table.
+pub struct KSumOracle {
+    k: u32,
+    table: Option<KSumTable>,
+    /// `free=1`: the build's key collisions are verified and handed to
+    /// the relation loop as target-free rows, once, with the first trial.
+    free: bool,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
+}
+
+impl KSumOracle {
+    pub fn new(k: u32) -> Self {
+        Self {
+            k,
+            table: None,
+            free: false,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+        }
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
+    fn name(&self) -> &str {
+        "ksum"
+    }
+
+    fn summands(&self) -> u32 {
+        self.k
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        format!(
+            "a table of every signed {}-sum of the base, built with the negation fold and probed once per target",
+            self.k
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
+            ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+            ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        self.free = params.flag("free");
+        self.free_pending = self.free;
+        let table = KSumTable::build_negation_folded_opts(
+            ctx.group,
+            fb,
+            self.k,
+            self.free,
+            params.flag("prune"),
+        )?;
+        // The table's construction is part of the pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(KSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        if self.free_pending {
+            self.free_pending = false;
+            if let Some(table) = self.table.as_ref() {
+                let (rows, checked) = table.free_rows(ctx.group, fb, ctx.r, ops);
+                self.free_checked = checked;
+                self.free_emitted = rows.len() as u64;
+                out.extend(rows.into_iter().map(|columns| Relation::Row {
+                    columns,
+                    a: 0,
+                    b: 0,
+                }));
+            }
+        }
+        if let Some(summands) = self.decompose(ctx, fb, ops, counters, point) {
+            out.push(Relation::Summands(summands));
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        if self.free {
+            m.insert("free_collisions_checked".to_string(), self.free_checked);
+            m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        }
+        m
+    }
+}
+
+/// One probe per target into a coefficient-box table over the base's
+/// `C` abscissae ([`WSumTable`], proposal P3): every `Σ e_c·P_c` with
+/// `|e_c| ≤ coef`, so a relation has only `C` unknown columns.
+pub struct WSumOracle<E> {
+    table: Option<WSumTable<E>>,
+    /// `free=1`: the build's key collisions are verified and handed to
+    /// the relation loop as target-free rows, once, with the first trial.
+    free: bool,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
+}
+
+impl<E> WSumOracle<E> {
+    pub fn new() -> Self {
+        Self {
+            table: None,
+            free: false,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+        }
+    }
+}
+
+impl<E> Default for WSumOracle<E> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
+    fn name(&self) -> &str {
+        "wsum"
+    }
+
+    fn summands(&self) -> u32 {
+        // Distinct columns a relation touches: one per seed.
+        self.table.as_ref().map_or(1, |t| t.c as u32)
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "a table of every Σ e_c·P_c over the base's abscissae with |e_c| ≤ coef, \
+         one entry per negation orbit, probed once per target"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("coef", "coefficient bound B, 1 to 255 (C ≤ 8 seeds, ((2B+1)^C − 1)/2 ≤ 2^26)"),
+            ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let b = params.u64("coef").map_err(|e| format!("wsum: {e}"))?;
+        self.free = params.flag("free");
+        self.free_pending = self.free;
+        let table = WSumTable::build(ctx.group, fb, b, self.free)?;
+        // The table's construction (multiples included) is part of the
+        // pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(WSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        _a: u64,
+        _b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        if self.free_pending {
+            self.free_pending = false;
+            if let Some(table) = self.table.as_ref() {
+                let (rows, checked) = table.free_rows(ctx.group, fb, ctx.r, ops);
+                self.free_checked = checked;
+                self.free_emitted = rows.len() as u64;
+                out.extend(rows.into_iter().map(|columns| Relation::Row {
+                    columns,
+                    a: 0,
+                    b: 0,
+                }));
+            }
+        }
+        if let Some(summands) = self.decompose(ctx, fb, ops, counters, point) {
+            out.push(Relation::Summands(summands));
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        if self.free {
+            m.insert("free_collisions_checked".to_string(), self.free_checked);
+            m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        }
+        m
+    }
+}
+
+/// One probe per target into a random-jump walk table over the base's two
+/// seeds ([`WalkTable`], proposal P2): `E_t = E_{t−1} + J_{h_t}` for
+/// `T = round(x·√r)` steps, so a relation has only two unknown columns and
+/// the table's own key collisions are target-free rows over them.
+///
+/// Parameters: `x` (table size in units of `√r`, in `(0, 4]`), `jumps`
+/// (default 16, 2 to 64), `grow` (1: extend the walk, charged, until the
+/// first verified free row, capped at `2·T` entries; default 0), `seed`
+/// (default 0, mixed with the seeds' keys).  A base of one abscissa is
+/// accepted with `g=1` (`F = 1`): jumps `[α_j]P1 + [γ_j]G`, a collision is
+/// the one-column affine row `du·s1 = −dz`, and `grow` stops at rank 1.
+/// With `tw=1` (needs `g=1`, `grow=2` and a one-seed base) the target is
+/// inside the walk ([`TargetWalk`]): jumps `[α]P1 + [γ]G + [β]Q`, every
+/// collision is the row `du·s1 + db·log Q = −dz`, the walk stops at the
+/// first two independent rows, and they are handed to the loop with the
+/// first trial (probes run only if the cap `3T` was reached below rank 2);
+/// `cj=1` (needs `tw=1` or `tw=2`) builds the jumps by chained additions.
+/// With `tw=2` (needs `g=1`, `grow=2` and a TWO-seed base) the target walk
+/// carries both seeds: jumps `[α]P1 + [α']P2 + [γ]G + [β]Q`, every collision
+/// is the row `du1·s1 + du2·s2 + db·log Q = −dz` (rows whose seed part is
+/// zero modulo `r` are dropped), the walk stops at rank 3, cap `3T`.
+/// `lazy=1` (needs `g=1`; for the walk table, `tw=1` and `tw=2`) skips the
+/// per-collision recomputation: a row is kept on its exact key match.  The
+/// pipeline's own `[d]G = Q` check still runs and is charged; a target walk
+/// also runs that check once itself when its rows reach full rank, and on a
+/// failure recomputes (charged) and drops the bad rows and keeps walking.
+/// The verified free rows are
+/// handed to the relation loop once, with the first trial, as
+/// `Relation::Row { a: 0, b: 0 }`.  A probe hit `±E_t` is a
+/// `Relation::Row` with the trial's own `(a, b)` and the columns
+/// `(±u_t, ±v_t)`: the (large) coefficients are never expanded into
+/// repeated summands, so [`DecompositionOracle::decompose`] has no
+/// `Summands` form to return and answers `None`.
+pub struct WWalkOracle<E> {
+    table: Option<WalkTable<E>>,
+    /// The `tw=1` walk (then `table` is `None`).
+    tw_table: Option<TargetWalk<E>>,
+    free_pending: bool,
+    free_checked: u64,
+    free_emitted: u64,
+    probe_hits: u64,
+    /// `lcheck=1` (with `tw=1|2`): both `[d]G = Q` checks read the target
+    /// walk's stored `[2^i]G` ladder.
+    lcheck: bool,
+}
+
+impl<E> WWalkOracle<E> {
+    pub fn new() -> Self {
+        Self {
+            table: None,
+            tw_table: None,
+            free_pending: false,
+            free_checked: 0,
+            free_emitted: 0,
+            probe_hits: 0,
+            lcheck: false,
+        }
+    }
+
+    /// The table of the last `prepare`, for reports and tests.
+    pub fn table(&self) -> Option<&WalkTable<E>> {
+        self.table.as_ref()
+    }
+
+    /// The `tw=1` walk of the last `prepare`, for reports and tests.
+    pub fn target_walk(&self) -> Option<&TargetWalk<E>> {
+        self.tw_table.as_ref()
+    }
+
+    /// With `lcheck=1`: the target walk's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`], already paid for in `prepare`), for the
+    /// pipeline's recovery check
+    /// ([`collect_and_solve_relations_touching_ladder`]); `None` otherwise.
+    ///
+    /// [`collect_and_solve_relations_touching_ladder`]: crate::cryptanalysis::ic_boundary::collect_and_solve_relations_touching_ladder
+    pub fn recovery_ladder(&self) -> Option<Vec<E>>
+    where
+        E: Copy + PartialEq,
+    {
+        self.tw_table
+            .as_ref()
+            .filter(|_| self.lcheck)
+            .map(TargetWalk::g_ladder)
+    }
+}
+
+impl<E> Default for WWalkOracle<E> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
+    fn name(&self) -> &str {
+        "wwalk"
+    }
+
+    fn summands(&self) -> u32 {
+        // Distinct columns a relation touches: one per seed.
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "a table of x·√r steps of a random-jump walk E_t = E_(t-1) + J_h over the base's two \
+         abscissae, one entry per negation orbit, probed once per target; its key collisions \
+         are target-free rows over the two seed columns"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("x", "table size in units of √r, T = round(x·√r), x in (0, 4] (required)"),
+            ("jumps", "jump count, 2 to 64 (default 16); J_j = [α_j]P1 + [β_j]P2, α_j, β_j uniform in [1, round(1.2·√T)]"),
+            ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries; 2 (needs g=1): until two independent verified rows pin both seed logs, at most 3T (default 0)"),
+            ("g", "1: every jump also carries [γ_j]G, γ_j uniform in [1, r), and entries track z mod r; a collision is the affine row du·s1 + dv·s2 = −dz (default 0)"),
+            ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
+            ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
+            ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
+            ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("lcheck", "1 (needs tw=1 or tw=2): the [d]G = Q checks (the build's lazy final check, charged as tw_lazy_check_*, and the pipeline's recovery check, charged to the verification phase's group ops, where the pipeline reads the oracle's recovery ladder) compute [d]G from the [2^i]G ladder (i < bits(r)) that the target walk's set-up already doubled and paid for, one addition per set bit of d (the first free) instead of a double-and-add; the ladder is retained at no group operation; walk, stream, collisions, rows and entries are unchanged, only the check counts move (default 0)"),
+            ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
+            ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
+            ("aut", "3 (needs tw=1 or tw=2; j = 0 prime curves over p ≡ 1 mod 3 with 3 | r − 1): orbit-canonical keys under the order-3 automorphism ζ₃(x, y) = (ωx, y) = [κ](x, y) and negation (A = 6): each stored or probed point is keyed by min(x, ωx, ω²x), two field multiplications, listed as the unpriced counter aut_canonicalisations_uncharged exactly as rho.cubic lists its canonicalisations_uncharged (the §5a band charges it at w; bitop/v1 prices it as 2 field multiplications and 2 word compares); the rotation is stored with the entry, and a collision at rotation difference d is the row of E_t = ±[κ^d]E_s (the kept coefficients scaled by κ^d mod r), with lazy, cv=0, sib and the verified recomputation unchanged; the [κ]G = ζ₃(G) check is charged to the set-up (default off)"),
+            ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 127 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery (default 1)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let x: f64 = params
+            .get("x")
+            .ok_or_else(|| "wwalk: missing parameter `x`".to_string())?
+            .parse()
+            .map_err(|_| format!("wwalk: parameter `x` is not a number: `{}`", params.0["x"]))?;
+        let jumps = params
+            .u64_or("jumps", 16)
+            .map_err(|e| format!("wwalk: {e}"))?;
+        let jumps = usize::try_from(jumps).map_err(|_| "wwalk: jumps too large".to_string())?;
+        let seed = params
+            .u64_or("seed", 0)
+            .map_err(|e| format!("wwalk: {e}"))?;
+        let grow = match params.get("grow") {
+            None => 0u8,
+            Some("true" | "yes") => 1,
+            Some(v) => v
+                .parse::<u8>()
+                .ok()
+                .filter(|g| *g <= 2)
+                .ok_or_else(|| format!("wwalk: grow is 0, 1 or 2, not `{v}`"))?,
+        };
+        let opts = WalkOpts {
+            g_jumps: params.flag("g"),
+            grow,
+        };
+        let tw = match params.get("tw") {
+            None | Some("0" | "false" | "no") => 0usize,
+            Some("1" | "true" | "yes") => 1,
+            Some("2") => 2,
+            Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+        };
+        let (cj, lazy) = (params.flag("cj"), params.flag("lazy"));
+        if cj && tw == 0 {
+            return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
+        }
+        let lcheck = params.flag("lcheck");
+        if lcheck && tw == 0 {
+            return Err("wwalk: lcheck=1 needs tw=1 or tw=2".into());
+        }
+        self.lcheck = lcheck;
+        if lazy && !opts.g_jumps {
+            return Err("wwalk: lazy=1 needs g=1".into());
+        }
+        let cv = wwalk_cv(params)?;
+        if !cv && tw == 0 {
+            return Err("wwalk: cv=0 needs tw=1 or tw=2".into());
+        }
+        if !cv && lazy {
+            return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+        }
+        let sib = match (params.get("sib"), params.get("pool")) {
+            (None, None) => None,
+            (Some(_), None) => return Err("wwalk: sib=m needs pool=M".into()),
+            (None, Some(_)) => return Err("wwalk: pool=M needs sib=m".into()),
+            (Some(_), Some(_)) => {
+                if tw == 0 {
+                    return Err("wwalk: sib needs tw=1 or tw=2".into());
+                }
+                let m = params.u64_or("sib", 0).map_err(|e| format!("wwalk: {e}"))?;
+                let pool = params
+                    .u64_or("pool", 0)
+                    .map_err(|e| format!("wwalk: {e}"))?;
+                Some((
+                    usize::try_from(m).map_err(|_| "wwalk: sib too large".to_string())?,
+                    usize::try_from(pool).map_err(|_| "wwalk: pool too large".to_string())?,
+                ))
+            }
+        };
+        let aut = match params.get("aut") {
+            None | Some("0" | "1" | "off" | "no" | "false") => false,
+            Some("3") => true,
+            Some(v) => return Err(format!("wwalk: aut is 3 (or off), not `{v}`")),
+        };
+        if aut && tw == 0 {
+            return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
+        }
+        if tw > 0 {
+            if !opts.g_jumps || grow != 2 {
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
+            }
+            if aut && sib.is_some() && !cv {
+                return Err("wwalk: sib with cv=0 is not supported".into());
+            }
+            let walk = if aut {
+                TargetWalk::build_lcheck(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    cj,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    sib,
+                    true,
+                    lcheck,
+                )?
+            } else if sib.is_some() {
+                if !cv {
+                    return Err("wwalk: sib with cv=0 is not supported".into());
+                }
+                // `build_ext_sib` (chained jumps) with `lcheck`.
+                TargetWalk::build_lcheck(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    true,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    sib,
+                    false,
+                    lcheck,
+                )?
+            } else {
+                // `build_ext_cv` with `lcheck`.
+                TargetWalk::build_lcheck(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    cj,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    None,
+                    false,
+                    lcheck,
+                )?
+            };
+            self.free_pending = true;
+            self.free_checked = walk.collisions.len() as u64;
+            self.free_emitted = walk.rows.len() as u64;
+            self.probe_hits = 0;
+            ops.merge(walk.build_ops);
+            self.table = None;
+            self.tw_table = Some(walk);
+            return Ok(());
+        }
+        self.tw_table = None;
+        let table = WalkTable::build_lazy(
+            ctx.group,
+            Some(ctx.generator),
+            fb,
+            ctx.r,
+            x,
+            jumps,
+            opts,
+            seed,
+            lazy,
+        )?;
+        self.free_pending = true;
+        self.free_checked = table.collisions.len() as u64;
+        self.free_emitted = table.rows.len() as u64;
+        self.probe_hits = 0;
+        // The walk, the jump set-up and the row verification are part of
+        // the pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        if let Some(walk) = &self.tw_table {
+            return table_counted(walk.work_counters());
+        }
+        table_counted(
+            self.table
+                .as_ref()
+                .map(WalkTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        _ops: &mut GroupOps,
+        _counters: &mut OracleCounters,
+        _point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        None
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+        a: u64,
+        b: u64,
+    ) -> Vec<Relation> {
+        let mut out = Vec::new();
+        if let Some(walk) = self.tw_table.as_ref() {
+            if self.free_pending {
+                self.free_pending = false;
+                out.extend(walk.rows.iter().map(|row| Relation::Row {
+                    columns: row.columns.clone(),
+                    a: row.a,
+                    b: row.b,
+                }));
+            }
+            // Full rank (two independent rows with one seed, three with
+            // two) pins log Q: no probe is needed.
+            if walk.rank < walk.need() {
+                if let Some((sign, u, z, be)) =
+                    walk.probe(ctx.group, ops, &mut counters.lookups, point)
+                {
+                    self.probe_hits += 1;
+                    let row = walk.hit_row(fb, ctx.r, a, b, sign, u, z, be);
+                    out.push(Relation::Row {
+                        columns: row.columns,
+                        a: row.a,
+                        b: row.b,
+                    });
+                }
+            }
+            return out;
+        }
+        let Some(table) = self.table.as_ref() else {
+            return out;
+        };
+        if self.free_pending {
+            self.free_pending = false;
+            // `Σ coef·x = h·(a + b·d)` with `b = 0`: a collision's affine
+            // row `du·s1 + dv·s2 = −dz` carries `a = −dz` (zero without
+            // `g=1`).
+            out.extend(
+                table
+                    .rows
+                    .iter()
+                    .zip(&table.row_consts)
+                    .map(|(columns, &konst)| Relation::Row {
+                        columns: columns.clone(),
+                        a: konst,
+                        b: 0,
+                    }),
+            );
+        }
+        if let Some((sign, u, v, z)) = table.probe_z(ctx.group, ops, &mut counters.lookups, point) {
+            let columns = table.hit_columns(fb, ctx.r, sign, u, v);
+            self.probe_hits += 1;
+            let a = WalkTable::<G::Elt>::hit_const(ctx.r, a, sign, z);
+            out.push(Relation::Row { columns, a, b });
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut m = BTreeMap::new();
+        m.insert("free_collisions_checked".to_string(), self.free_checked);
+        m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        m.insert("probe_hits".to_string(), self.probe_hits);
+        if let Some(walk) = &self.tw_table {
+            m.extend(walk.breakdown_counters());
+        }
+        if let Some(table) = &self.table {
+            if table.lazy {
+                m.insert("wwalk_lazy".to_string(), 1);
+                m.insert(
+                    "wwalk_lazy_certified_rows".to_string(),
+                    table.lazy_certified,
+                );
+            }
+        }
+        m
+    }
+
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        WWalkOracle::recovery_ladder(self)
+    }
+}
+
+/// `wwalk`'s `cv` parameter: absent or `1` recomputes every key collision
+/// (the committed walk), `0` does not.
+pub fn wwalk_cv(params: &Params) -> Result<bool, String> {
+    match params.get("cv") {
+        None | Some("1") => Ok(true),
+        Some("0") => Ok(false),
+        Some(v) => Err(format!("wwalk: cv is 0 or 1, not `{v}`")),
+    }
+}
+
+/// The two-summand prime MITM search with the same probe and table keys as
+/// `mitm`, but a batched-inversion, x-only table construction.  The
+/// `blocked` form (`mitm-prime-blocked`) builds the same table in
+/// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
+pub struct PrimeBatchMitmOracle {
+    blocked: bool,
+    lines: bool,
+    table: Option<PairTable>,
+}
+
+impl PrimeBatchMitmOracle {
+    pub fn new() -> Self {
+        Self {
+            blocked: false,
+            lines: false,
+            table: None,
+        }
+    }
+
+    pub fn blocked() -> Self {
+        Self {
+            blocked: true,
+            lines: false,
+            table: None,
+        }
+    }
+
+    fn name_str(&self) -> &'static str {
+        if self.blocked {
+            "mitm-prime-blocked"
+        } else {
+            "mitm-prime-batch"
+        }
+    }
+}
+
+impl Default for PrimeBatchMitmOracle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
+    fn name(&self) -> &str {
+        self.name_str()
+    }
+
+    fn summands(&self) -> u32 {
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        if self.blocked {
+            "negation-folded pair table built with batched prime-field inversions, \
+             inserted in cache-sized pieces; identical MITM probe"
+                .into()
+        } else {
+            "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
+                .into()
+        }
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        if self.blocked {
+            &[
+                ("m", "must be 2"),
+                (
+                    "filter",
+                    "0 (default) or 1: a membership filter of about a byte per entry in front of \
+                     the packed table, so a missing key costs one bit read (packed layout only)",
+                ),
+            ]
+        } else {
+            &[
+                ("m", "must be 2"),
+                (
+                    "layout",
+                    "map (default) or lines (cache-line pair index and relation guard)",
+                ),
+            ]
+        }
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let allowed = |key: &String| {
+            key == "m" || (self.blocked && key == "filter") || (!self.blocked && key == "layout")
+        };
+        if params.u64_or("m", 2)? != 2 || !params.0.keys().all(allowed) {
+            return Err(if self.blocked {
+                format!("{} accepts only m=2 and filter=0|1", self.name_str())
+            } else {
+                format!("{} accepts only m=2", self.name_str())
+            });
+        }
+        let filtered = match params.u64_or("filter", 0)? {
+            0 => false,
+            1 => true,
+            other => {
+                return Err(format!(
+                    "{}: filter must be 0 or 1, not {other}",
+                    self.name_str()
+                ))
+            }
+        };
+        self.lines = match params.get("layout") {
+            None | Some("map") => false,
+            Some("lines") if !self.blocked => true,
+            Some("lines") => return Err("mitm-prime-blocked does not accept layout=lines".into()),
+            Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
+        };
+        let table = if self.blocked {
+            PairTable::build_negation_folded_prime_blocked_with(ctx.group, fb, filtered)?
+        } else if self.lines {
+            PairTable::build_negation_folded_prime_batch_lines(ctx.group, fb)?
+        } else {
+            PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
+        };
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(PairTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        decompose_mitm(ctx.group, fb, self.table.as_ref()?, 2, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
+        if let Some(table) = &self.table {
+            table.prefetch(ctx.group, point);
+        }
+    }
+
+    fn line_guard(&self) -> bool {
+        self.lines
+    }
+}
+
+/// **Single-large-prime residual sweep** (lead `ICP-residual-partial-relations`).
+///
+/// For a target `R = [a]G + [b]Q` it forms every residual `Z_i = R − P_i`
+/// over the base's `2|F_x|` signed points, one group addition each (charged
+/// exactly as `subtract` charges its candidates), and stores `Z_i` under its
+/// abscissa together with `(a, b, i)`.  Two stored residuals with equal
+/// abscissa are equal up to sign, `R − P_i = t (R' − P_i')`, which is the
+/// base-only relation
+///
+/// ```text
+///   (a − t a') + (b − t b') d = log P_i − t log P_i' .
+/// ```
+///
+/// No pair table is built and no residual is required to land in the base:
+/// the unknown point `Z` is the "large prime" and a collision is its
+/// pairing.  A residual that is the identity is `R = P_i`, a one-column row.
+///
+/// What it costs is the point of the lead: the number of stored residuals
+/// needed for `|F_x|` collisions is about `sqrt(2 r |F_x|)`, so the relation
+/// phase is a birthday search whose price falls as the base shrinks, and
+/// the table it needs grows with the same square root (reported as
+/// `residuals_stored`).  It is a different search from the pair table's,
+/// not a faster one.
+pub struct ResidualSweepOracle {
+    /// Residuals kept at most; later ones are still looked up.
+    cap: usize,
+    /// Identify `Z` with `−Z` (the signed-class fold).  Off: only equal points collide.
+    fold: bool,
+    /// Distinguished-point filter: only residuals whose hashed abscissa has this
+    /// many trailing zero bits are stored or probed.
+    dp_bits: u32,
+    /// Also probe the negation-folded pair table once a target (hybrid).
+    pairs: bool,
+    table: Option<PairTable>,
+    negs: Vec<PrimePoint>,
+    /// key -> (a, b, index, y bit)
+    store: HashMap<u64, (u64, u64, u32, bool)>,
+    stored: u64,
+    sweeps: u64,
+    collisions: u64,
+    identity_hits: u64,
+    cap_misses: u64,
+    dp_skipped: u64,
+    pair_hits: u64,
+}
+
+fn sweep_mix(x: u64) -> u64 {
+    let mut z = x.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
+}
+
+impl ResidualSweepOracle {
+    pub fn new() -> Self {
+        Self {
+            cap: 1 << 24,
+            fold: true,
+            dp_bits: 0,
+            pairs: false,
+            table: None,
+            negs: Vec::new(),
+            store: HashMap::new(),
+            stored: 0,
+            sweeps: 0,
+            collisions: 0,
+            identity_hits: 0,
+            cap_misses: 0,
+            dp_skipped: 0,
+            pair_hits: 0,
+        }
+    }
+}
+
+impl Default for ResidualSweepOracle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
+    fn name(&self) -> &str {
+        "residual-sweep"
+    }
+
+    fn summands(&self) -> u32 {
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "every residual R − P_i of a target stored by abscissa; a collision of two residuals is a \
+         base-only relation (single large prime, no pair table unless pairs=1)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "must be 2"),
+            ("cap", "most residuals kept (default 16777216)"),
+            ("fold", "1 (default): Z and −Z collide; 0: only equal points collide"),
+            (
+                "dp",
+                "k (default 0): store and probe only residuals whose hashed abscissa has k trailing zero bits",
+            ),
+            (
+                "pairs",
+                "1: also probe the negation-folded pair table once a target (hybrid); default 0",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        const KEYS: [&str; 5] = ["m", "cap", "fold", "dp", "pairs"];
+        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| !KEYS.contains(&key.as_str())) {
+            return Err("residual-sweep accepts only m=2, cap, fold, dp and pairs".into());
+        }
+        self.cap = params.u64_or("cap", 1 << 24)? as usize;
+        self.fold = params.u64_or("fold", 1)? != 0;
+        self.dp_bits = params.u64_or("dp", 0)? as u32;
+        if self.dp_bits > 40 {
+            return Err("residual-sweep dp must be at most 40".into());
+        }
+        self.pairs = params.u64_or("pairs", 0)? != 0;
+        self.negs = fb.points.iter().map(|p| ctx.group.neg(*p)).collect();
+        self.store.clear();
+        self.table = None;
+        if self.pairs {
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+            ops.merge(table.build_ops);
+            self.table = Some(table);
+        }
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(PairTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        _fb: &FactorBase<PrimePoint>,
+        _ops: &mut GroupOps,
+        _counters: &mut OracleCounters,
+        _point: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        None
+    }
+
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        a: u64,
+        b: u64,
+    ) -> Vec<Relation> {
+        let r = ctx.r;
+        let g = ctx.group;
+        let mut out = Vec::new();
+        self.sweeps += 1;
+        if let Some(table) = self.table.as_ref() {
+            if let Some(summands) = decompose_mitm(g, fb, table, 2, ops, counters, point) {
+                self.pair_hits += 1;
+                out.push(Relation::Summands(summands));
+            }
+        }
+        let dp_mask = (1u64 << self.dp_bits) - 1;
+        for (i, neg) in self.negs.iter().enumerate() {
+            let z = g.add(ops, point, *neg);
+            if g.is_identity(&z) {
+                self.identity_hits += 1;
+                out.push(Relation::Row {
+                    columns: vec![(fb.col_of[i], fb.coef_of[i] % r)],
+                    a,
+                    b,
+                });
+                continue;
+            }
+            if self.dp_bits > 0 && sweep_mix(z.x) & dp_mask != 0 {
+                self.dp_skipped += 1;
+                continue;
+            }
+            counters.lookups += 1;
+            let ybit = z.y > g.neg(z).y;
+            let key = if self.fold {
+                z.x
+            } else {
+                (z.x << 1) | u64::from(ybit)
+            };
+            match self.store.get(&key) {
+                Some(&(a2, b2, i2, ybit2)) => {
+                    let i2 = i2 as usize;
+                    let t_plus = !self.fold || ybit == ybit2;
+                    self.collisions += 1;
+                    let (ra, rb, second) = if t_plus {
+                        (
+                            (a + r - a2) % r,
+                            (b + r - b2) % r,
+                            (r - fb.coef_of[i2] % r) % r,
+                        )
+                    } else {
+                        ((a + a2) % r, (b + b2) % r, fb.coef_of[i2] % r)
+                    };
+                    out.push(Relation::Row {
+                        columns: vec![(fb.col_of[i], fb.coef_of[i] % r), (fb.col_of[i2], second)],
+                        a: ra,
+                        b: rb,
+                    });
+                }
+                None => {
+                    if self.store.len() < self.cap {
+                        self.store.insert(key, (a, b, i as u32, ybit));
+                        self.stored += 1;
+                    } else {
+                        self.cap_misses += 1;
+                    }
+                }
+            }
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        BTreeMap::from([
+            ("residuals_stored".to_string(), self.stored),
+            ("sweeps".to_string(), self.sweeps),
+            ("collisions".to_string(), self.collisions),
+            ("identity_hits".to_string(), self.identity_hits),
+            ("cap_misses".to_string(), self.cap_misses),
+            ("dp_skipped".to_string(), self.dp_skipped),
+            ("pair_hits".to_string(), self.pair_hits),
+        ])
+    }
+}
+
+/// One abscissa of the base as the root-finding sweep sees it: both
+/// coordinates of its positive representative in Montgomery form, and the
+/// indices of `P` and `−P` in the run's base.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct SweepRep {
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) plus: usize,
+    pub(crate) minus: usize,
+}
+
+/// Direct-subtraction root finding on a prime curve: the decomposition
+/// oracle of `prime_fast::collect_relations`
+/// (`RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md` §2), inside `ic.pipeline`.
+///
+/// The Semaev `S₃` root in the third variable is literally `x(R ∓ F_i)`,
+/// so a two-summand sweep over the base needs no summation polynomial,
+/// no Gröbner basis and no square root: the `x_R − x_i` of every
+/// abscissa are inverted together by Montgomery's trick (one field
+/// inversion a target), `λ` for `R − F_i` and `R + F_i` share that
+/// inverse, and each resulting point is looked up in the base (`m = 2`)
+/// or probed against the negation-folded pair table (`m = 3`).
+///
+/// It is the `subtract` oracle's search — the same `2·|F_x|` candidate
+/// points a target, found in the same order — on `prime_fast`'s
+/// arithmetic.  It is charged exactly as `subtract` is: one group addition
+/// per candidate point, so the two arms read the same `S` and differ in
+/// the constant the unit does not see (one batched inversion against
+/// `2·|F_x|`), which the record keeps as `inversions` (counted, priced
+/// only where the curve has a pinned ratio) and as wall time.  Every hit
+/// is re-added in the group on the ledger before it is returned.
+pub struct RootfindSubtractOracle<'i> {
+    m: u32,
+    instance: &'i PrimeInstance,
+    field: Option<Fp64>,
+    reps: Vec<SweepRep>,
+    table: Option<PairTable>,
+    diffs: Vec<u64>,
+    degenerate: Vec<bool>,
+    scratch: Vec<u64>,
+    /// Hits whose summands did not re-add to the target in the group.
+    /// Must stay zero.
+    pub mismatches: u64,
+    /// `bitop/v1`-only work of the sweep (`relation_work_native`): the
+    /// batched inversion's `3k` products and the two conversions into
+    /// Montgomery form a target, and the `k` differences `x_R − x_i`.
+    /// The candidate points' own products are inside the group addition
+    /// each is charged as.
+    sweep_field_muls: u64,
+    sweep_field_adds: u64,
+    /// `m = 3` with the pair table built elsewhere (`rootfind-subtract-gpu`,
+    /// `probe_build=pairs`): `prepare` builds no table, and the builder
+    /// charges the build and supplies its work counters here.
+    defer_table: bool,
+    deferred_table_work: BTreeMap<String, u64>,
+}
+
+impl<'i> RootfindSubtractOracle<'i> {
+    pub fn new(m: u32, instance: &'i PrimeInstance) -> Self {
+        Self {
+            m,
+            instance,
+            field: None,
+            reps: Vec::new(),
+            table: None,
+            diffs: Vec::new(),
+            degenerate: Vec::new(),
+            scratch: Vec::new(),
+            mismatches: 0,
+            sweep_field_muls: 0,
+            sweep_field_adds: 0,
+            defer_table: false,
+            deferred_table_work: BTreeMap::new(),
+        }
+    }
+
+    /// Build no pair table in `prepare` (`m = 3`); the caller builds it,
+    /// charges it, and passes its [`PairTable::work_counters`] to
+    /// [`Self::set_deferred_table_work`].
+    pub(crate) fn defer_pair_table(&mut self) {
+        self.defer_table = true;
+    }
+
+    pub(crate) fn set_deferred_table_work(&mut self, work: BTreeMap<String, u64>) {
+        self.deferred_table_work = work;
+    }
+}
+
+impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
+    fn name(&self) -> &str {
+        "rootfind-subtract"
+    }
+
+    fn summands(&self) -> u32 {
+        self.m
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        match self.m {
+            2 => "every x(R ∓ F_i) from one Montgomery batched inversion, each looked up in the \
+                  base (prime_fast's direct-subtraction root finding)"
+                .into(),
+            _ => "every R ∓ F_i from one Montgomery batched inversion, each probed against the \
+                  negation-folded pair table (prime_fast's direct-subtraction root finding)"
+                .into(),
+        }
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "m",
+            "summands, 2 or 3; 3 builds the negation-folded pair table",
+        )]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if !(2..=3).contains(&self.m) {
+            return Err(format!(
+                "rootfind-subtract takes m = 2 or 3, got {}",
+                self.m
+            ));
+        }
+        for key in params.0.keys() {
+            if key != "m" {
+                return Err(format!(
+                    "rootfind-subtract reads only `m`; `{key}` would change the method's identity \
+                     without changing the search"
+                ));
+            }
+        }
+        let p = self.instance.curve.p;
+        if p != ctx.group.p {
+            return Err("rootfind-subtract was built for another curve".into());
+        }
+        if p < 5 || p & 1 == 0 || p >= (1u64 << PRIME_FAST_MAX_BITS) {
+            return Err(format!(
+                "rootfind-subtract needs an odd prime 3 < p < 2^{PRIME_FAST_MAX_BITS}"
+            ));
+        }
+        let f = Fp64::new(p);
+        let mut reps = Vec::with_capacity(fb.abscissa_list.len());
+        for x in &fb.abscissa_list {
+            let idx = fb
+                .x_index
+                .get(x)
+                .ok_or("every listed abscissa is indexed")?;
+            let plus = *idx.first().ok_or("an abscissa with no point")?;
+            let minus = idx.get(1).copied().unwrap_or(plus);
+            let pt = fb.points[plus];
+            if pt.infinity || pt.x != *x {
+                return Err("the base's abscissa index does not match its points".into());
+            }
+            reps.push(SweepRep {
+                x: f.to_mont(pt.x),
+                y: f.to_mont(pt.y),
+                plus,
+                minus,
+            });
+        }
+        self.diffs = vec![0; reps.len()];
+        self.degenerate = vec![false; reps.len()];
+        self.reps = reps;
+        self.field = Some(f);
+        if self.m == 3 && !self.defer_table {
+            let table = PairTable::build_negation_folded(ctx.group, fb);
+            ops.merge(table.build_ops);
+            self.table = Some(table);
+        }
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        let mut out = self
+            .table
+            .as_ref()
+            .map(PairTable::work_counters)
+            .unwrap_or_else(|| self.deferred_table_work.clone());
+        // The sweep's `x_index` read per abscissa, and its two
+        // conversions into Montgomery form.
+        let k = self.reps.len() as u64;
+        if k > 0 {
+            crate::cryptanalysis::ic_boundary::bump_counter(&mut out, "lookups", k);
+            out.insert("montgomery_conversions".to_string(), 2 * k);
+        }
+        table_counted(out)
+    }
+
+    fn relation_work_native(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.sweep_field_muls > 0 {
+            out.insert("sweep_field_muls".to_string(), self.sweep_field_muls);
+        }
+        if self.sweep_field_adds > 0 {
+            out.insert("sweep_field_adds".to_string(), self.sweep_field_adds);
+        }
+        out
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        let f = self.field?;
+        if point.infinity {
+            return None;
+        }
+        let g = ctx.group;
+        let xr = f.to_mont(point.x);
+        let yr = f.to_mont(point.y);
+        ops.field_ops.muls += 2;
+        // One inversion for the whole sweep: `(x_R − x_i)⁻¹` for every
+        // abscissa.  An abscissa equal to `x_R` means `R = ±F_i`; that
+        // row is taken on the ledger below, exactly as `subtract` takes
+        // it, so the two oracles examine the same candidates in the same
+        // order whatever the target.
+        let k = self.reps.len();
+        for (i, rep) in self.reps.iter().enumerate() {
+            let d = f.sub(xr, rep.x);
+            self.degenerate[i] = d == 0;
+            self.diffs[i] = if d == 0 { f.one } else { d };
+        }
+        f.batch_inv(&mut self.diffs, &mut self.scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * k as u64;
+        self.sweep_field_muls += 2 + 3 * k as u64;
+        self.sweep_field_adds += k as u64;
+        for i in 0..k {
+            let rep = self.reps[i];
+            if self.degenerate[i] {
+                for summand in [rep.plus, rep.minus] {
+                    let t = g.add(ops, point, g.neg(fb.points[summand]));
+                    if let Some(found) = self.lookup(ctx, fb, ops, counters, point, summand, t) {
+                        return Some(found);
+                    }
+                }
+                continue;
+            }
+            let inv = self.diffs[i];
+            // `T = R − ε·F_i`: ε = +1 adds `−F_i = (x_i, −y_i)`, so
+            // `λ = (−y_i − y_R)/(x_i − x_R) = (y_R + y_i)/(x_R − x_i)`;
+            // ε = −1 adds `F_i`, `λ = (y_R − y_i)/(x_R − x_i)`.  Each `T`
+            // is one group addition's result and is charged as one; its
+            // field work (two multiplications, one squaring, two
+            // conversions out of Montgomery form counted as
+            // multiplications) is tallied beside the ledger's.
+            let lam_minus = f.mul(f.add(yr, rep.y), inv);
+            let lam_plus = f.mul(f.sub(yr, rep.y), inv);
+            for (summand, lam) in [(rep.plus, lam_minus), (rep.minus, lam_plus)] {
+                let x3 = f.sub(f.sub(f.sqr(lam), xr), rep.x);
+                let y3 = f.sub(f.mul(lam, f.sub(xr, x3)), yr);
+                ops.adds += 1;
+                ops.field_ops.muls += 4;
+                ops.field_ops.sqrs += 1;
+                let t = PrimePoint::affine(f.from_mont(x3), f.from_mont(y3));
+                if let Some(found) = self.lookup(ctx, fb, ops, counters, point, summand, t) {
+                    return Some(found);
+                }
+            }
+        }
+        None
+    }
+}
+
+impl RootfindSubtractOracle<'_> {
+    /// The prepared sweep: the field and one representative per abscissa,
+    /// in the order `decompose` walks them (`rootfind-subtract-gpu`).
+    pub(crate) fn sweep(&self) -> Option<(Fp64, &[SweepRep])> {
+        Some((self.field?, &self.reps))
+    }
+
+    /// The pair table's abscissae (`m = 3`), for the device probe set.
+    pub(crate) fn pair_abscissae(&self) -> Option<Vec<u64>> {
+        self.table.as_ref()?.map_abscissae()
+    }
+
+    /// What `decompose` charges for a target before its first candidate:
+    /// the two conversions into Montgomery form and the batched inversion
+    /// over the `k` abscissae.
+    pub(crate) fn charge_sweep_setup(&mut self, ops: &mut GroupOps, counters: &mut OracleCounters) {
+        let k = self.reps.len() as u64;
+        ops.field_ops.muls += 2;
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * k;
+        self.sweep_field_muls += 2 + 3 * k;
+        self.sweep_field_adds += k;
+    }
+
+    /// What `decompose` charges per non-degenerate candidate point, before
+    /// its lookup.
+    pub(crate) fn charge_candidate(ops: &mut GroupOps) {
+        ops.adds += 1;
+        ops.field_ops.muls += 4;
+        ops.field_ops.sqrs += 1;
+    }
+
+    /// Is `t = R − F_summand` a base point (`m = 2`), or a pair sum
+    /// (`m = 3`)?  A hit is re-added in the group before it is returned.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn lookup(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        summand: usize,
+        t: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        let g = ctx.group;
+        if g.is_identity(&t) {
+            counters.lookups += 1;
+            return None;
+        }
+        match self.m {
+            2 => {
+                counters.lookups += 1;
+                let j = fb.index_of_key(g.key(&t))?;
+                // Fail closed: `F_summand + T` must be `R` in the group,
+                // on the ledger.
+                if g.add(ops, fb.points[summand], fb.points[j]) == point {
+                    return Some(vec![summand, j]);
+                }
+                self.mismatches += 1;
+                counters.frobfold_mismatches += 1;
+                None
+            }
+            _ => {
+                let table = self.table.as_ref()?;
+                let (j, k) = table.probe(g, fb, ops, &mut counters.lookups, t)?;
+                Some(vec![summand, j, k])
+            }
+        }
+    }
+}
+
+/// Meet in the middle on a table folded by the signed Frobenius: the
+/// same probe over a table `2n` times smaller.
+///
+/// With `large_primes=1` or `2` (and `m=3`) the oracle runs the same
+/// probe loop through the large-prime collector
+/// ([`LargePrimeCollector`]), which keeps partial relations whose
+/// residual lies in a bounded domain `D` of `lp_domain_factor · |F|`
+/// signed points and returns the complete relations they merge into;
+/// see `ic_framework::large_prime`.
+pub struct FrobeniusMitmOracle<'i> {
+    m: u32,
+    instance: &'i BinaryInstance,
+    table: Option<FrobeniusPairTable>,
+    large: Option<LargePrimeCollector<'i>>,
+    count_setup: bool,
+    lazy_members: bool,
+    layout_members: bool,
+}
+
+impl<'i> FrobeniusMitmOracle<'i> {
+    pub fn new(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            m,
+            instance,
+            table: None,
+            large: None,
+            count_setup: false,
+            lazy_members: false,
+            layout_members: false,
+        }
+    }
+
+    pub fn new_counted(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            m,
+            instance,
+            table: None,
+            large: None,
+            count_setup: true,
+            lazy_members: false,
+            layout_members: false,
+        }
+    }
+
+    /// [`new_counted`](Self::new_counted) over a table that names the
+    /// orbit members of a hit when it happens
+    /// ([`FrobeniusPairTable::build_lazy`]) instead of for every base
+    /// point at build.  The same entries and relations; less set-up work.
+    pub fn new_lazy_counted(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            lazy_members: true,
+            ..Self::new_counted(m, instance)
+        }
+    }
+
+    /// [`new_counted`](Self::new_counted) over the table of a base laid
+    /// out by orbit ([`FrobeniusPairTable::build_layout`]): the same
+    /// entries and relations, no Frobenius map or member lookup at build
+    /// or at a hit, and the same-orbit pairs added once per rotation
+    /// class.  Refuses a base without the layout.
+    pub fn new_layout_counted(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            layout_members: true,
+            ..Self::new_counted(m, instance)
+        }
+    }
+
+    /// The large-prime collector of this run, when `large_primes` is set.
+    pub fn large_prime_collector(&self) -> Option<&LargePrimeCollector<'i>> {
+        self.large.as_ref()
+    }
+
+    /// The first error the collector's exact eliminator returned, if any.
+    pub fn large_prime_error(&self) -> Option<&str> {
+        self.large.as_ref().and_then(|lp| lp.last_error())
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
+    fn name(&self) -> &str {
+        if self.layout_members {
+            "mitm-frobenius-layout-counted"
+        } else if self.lazy_members {
+            "mitm-frobenius-lazy-counted"
+        } else if self.count_setup {
+            "mitm-frobenius-counted"
+        } else {
+            "mitm-frobenius"
+        }
+    }
+
+    fn summands(&self) -> u32 {
+        self.m
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        match LargePrimeConfig::from_params(params) {
+            Ok(Some(config)) => format!(
+                "a pair table folded by the signed Frobenius, one entry per orbit, plus a large-prime collector with up to {} residuals in a domain of {} × |F| signed points",
+                config.large_primes, config.domain_factor
+            ),
+            _ => "a pair table folded by the signed Frobenius, one entry per orbit".into(),
+        }
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 2 or 3"),
+            (
+                "large_primes",
+                "0 (default), 1 or 2 residual points outside the base a partial relation may carry; needs m=3",
+            ),
+            (
+                "lp_domain_factor",
+                "size of the large-prime domain D as a multiple of |F| in signed points (default 10); D is the next projected signed Frobenius orbits of the raw-x scan after the base's",
+            ),
+            (
+                "lp_raw_x_cap",
+                "inclusive raw-abscissa cap of the scan that materialises D (default 2^40)",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if let Some(config) = LargePrimeConfig::from_params(params)? {
+            if self.m != 3 {
+                return Err("large_primes needs the three-summand probe loop (m=3)".into());
+            }
+            if self.lazy_members || self.layout_members {
+                return Err(
+                    "large_primes is not implemented for the lazy- or layout-member table".into(),
+                );
+            }
+            // The collector builds the classic table itself (its direct
+            // path is the plain probe) and the large table beside it.
+            self.large = Some(LargePrimeCollector::new(
+                self.instance,
+                ctx,
+                fb,
+                config,
+                ops,
+            )?);
+            self.table = None;
+            return Ok(());
+        }
+        if self.layout_members && fb.frobenius_orbit_layout != Some(self.instance.n) {
+            return Err(
+                "mitm-frobenius-layout-counted needs a base laid out by orbit (compact-orbit-scan)"
+                    .into(),
+            );
+        }
+        let table = if self.layout_members {
+            FrobeniusPairTable::build_layout(self.instance, fb)
+        } else if self.lazy_members {
+            FrobeniusPairTable::build_lazy(self.instance, fb)
+        } else {
+            FrobeniusPairTable::build(self.instance, fb)
+        }
+        .ok_or("this instance has no Koblitz structure to fold by")?;
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // The large-prime collector builds its own tables, which this
+        // does not count: its records keep `table_insert_attempts` listed.
+        if self.large.is_some() {
+            return BTreeMap::new();
+        }
+        let Some(table) = &self.table else {
+            return BTreeMap::new();
+        };
+        let mut out = table.work_counters();
+        if !self.count_setup {
+            // The uncounted variant's `setup_native` leaves the build's
+            // canonicalisations, Frobenius maps and orbit lookups out.
+            for (name, v) in table.build_counters() {
+                *out.entry(name).or_insert(0) += v;
+            }
+        }
+        table_counted(out)
+    }
+
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        let mut counts = BTreeMap::new();
+        if let Some(lp) = &self.large {
+            counts.extend(lp.setup_counters());
+        }
+        if self.count_setup {
+            if let Some(table) = &self.table {
+                counts.insert("canonicalisations".into(), table.build_canonicalisations);
+                counts.insert("frobenius_maps".into(), table.build_frobenius_maps);
+                counts.insert("lookups".into(), table.build_lookups);
+                counts.insert("pair_table_entries".into(), table.entries);
+                counts.insert("pair_table_representatives".into(), table.representatives);
+            }
+        }
+        counts
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        decompose_mitm_frobenius(ctx.group, fb, table, self.m, ops, counters, point)
+    }
+
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+        a: u64,
+        b: u64,
+    ) -> Vec<Relation> {
+        match self.large.as_mut() {
+            Some(lp) => lp.decompose(ctx, fb, ops, counters, point, a, b),
+            None => match self.decompose(ctx, fb, ops, counters, point) {
+                Some(summands) => vec![Relation::Summands(summands)],
+                None => Vec::new(),
+            },
+        }
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        self.large
+            .as_ref()
+            .map(|lp| lp.relation_counters())
+            .unwrap_or_default()
+    }
+}
+
+// ── The bridge to the solver plug point ────────────────────────────
+
+/// Holds a [`SystemSolver`] and the record of what it cost, so an
+/// algebraic oracle can be written without repeating the bookkeeping.
+///
+/// This is what makes the solver plug point reachable from a whole
+/// pipeline: swap `buchberger-f2` for `sat-cdcl` and the change
+/// propagates through the relation phase to the recovered key, with
+/// every stage still counted.
+pub struct SolverHarness {
+    pub solver: Box<dyn SystemSolver>,
+    pub params: Params,
+    pub budget: Option<Duration>,
+    last_shape: Option<SystemShape>,
+    last_cost: Option<SolverCost>,
+    /// Targets whose solver hit its budget.  Counted, never silently
+    /// folded into "did not decompose": an oracle that did that would
+    /// quietly lower its own hit rate and make the relation phase it
+    /// feeds unmeasurable.
+    pub budget_exceeded: u64,
+}
+
+impl SolverHarness {
+    pub fn new(solver: Box<dyn SystemSolver>, params: Params, budget: Option<Duration>) -> Self {
+        Self {
+            solver,
+            params,
+            budget,
+            last_shape: None,
+            last_cost: None,
+            budget_exceeded: 0,
+        }
+    }
+
+    /// Solve one descended system, recording what it cost.
+    pub fn solve(&mut self, system: &BooleanSystem) -> SolverVerdict {
+        let shape = system.shape();
+        self.last_shape = Some(shape.clone());
+        if !self.solver.accepts(&shape) {
+            self.last_cost = None;
+            self.budget_exceeded += 1;
+            return SolverVerdict::BudgetExceeded;
+        }
+        let (verdict, cost) = self.solver.solve(system, &self.params, self.budget);
+        self.last_cost = Some(cost);
+        if matches!(verdict, SolverVerdict::BudgetExceeded) {
+            self.budget_exceeded += 1;
+        }
+        verdict
+    }
+
+    pub fn shape(&self) -> Option<&SystemShape> {
+        self.last_shape.as_ref()
+    }
+
+    pub fn cost(&self) -> Option<&SolverCost> {
+        self.last_cost.as_ref()
+    }
+}
+
+// ── The algebraic oracle ───────────────────────────────────────────
+
+/// Descend the Semaev polynomial over the base's abscissa subspace and
+/// hand the boolean system to the chosen [`SystemSolver`].
+///
+/// This is the oracle that makes the solver plug point reach the `S`
+/// column: swap `buchberger-f2` for `sat-cdcl` and the change
+/// propagates through the relation phase to the recovered logarithm,
+/// with every stage still counted.  It requires a factor base whose
+/// abscissae form an `F_2`-subspace — `binary-subspace` and
+/// `koblitz-orbit` both record theirs in `FactorBase::subspace_basis`.
+///
+/// ## What it charges
+///
+/// The descent and the solver are engine work, not group operations,
+/// and are reported through [`DecompositionOracle::solver_totals`] in
+/// the solver's own unit; the runner prices them into `S`.  Lifting a
+/// solution back to signed base points costs real group additions,
+/// which are charged to `ops` like any other oracle's.
+///
+/// ## The cap
+///
+/// The descent is symbolic — the summation polynomial expanded in
+/// `F_{2^n}[v]/(v² − v)` term by term — so it builds no table and is
+/// capped only by the monomial mask: `m·n' ≤ 64` boolean variables,
+/// `n' ≤ 32` at two summands and `n' ≤ 21` at three.  What limits a
+/// row above that is the engine, which says so through `accepts`.
+pub struct DescentAlgebraicOracle<'i> {
+    summands: u32,
+    instance: &'i BinaryInstance,
+    v_basis: Vec<u64>,
+    /// Ordered τ-slots (lead L5): `None` is the plain descent (every
+    /// summand over `V`); `Some(n)` tries, per target, the systems with
+    /// summand 2 over `σ^{j}(V)` for `j = 0, …, n−1` (and summand 3 over
+    /// `V`), stopping at the first that lifts.
+    slot_rotations: Option<u32>,
+    harness: SolverHarness,
+    totals: SolverTotals,
+    /// Systems the solver decided satisfiable none of whose solutions
+    /// lifted to base points summing to the target.  Expected, not a
+    /// defect: a summation polynomial vanishes over the algebraic
+    /// closure, so a solution may name abscissae whose points live on
+    /// the quadratic twist (`y ∈ F_{2^{2n}}`, never in the base), and
+    /// the pair table never sees those.  Reported as
+    /// `unliftable_systems` beside `lift_failures` so the hit rate can
+    /// be read against what the solver actually found.
+    pub unliftable: u64,
+}
+
+impl<'i> DescentAlgebraicOracle<'i> {
+    pub fn new(
+        summands: u32,
+        instance: &'i BinaryInstance,
+        solver: Box<dyn SystemSolver>,
+        solver_params: Params,
+        budget: Option<Duration>,
+    ) -> Self {
+        let totals = SolverTotals {
+            solver: solver.name().to_string(),
+            ..Default::default()
+        };
+        Self {
+            summands,
+            instance,
+            v_basis: Vec::new(),
+            slot_rotations: None,
+            harness: SolverHarness::new(solver, solver_params, budget),
+            totals,
+            unliftable: 0,
+        }
+    }
+
+    /// The descent with summand 2 over `σ^{j}(V)`: the τ-slot system.
+    fn descend_slot(&self, x_r: u64, j: u32) -> SymbolicDescent {
+        let gf = &self.instance.gf;
+        // The `j` squarings of each basis element (field squarings, put
+        // through the descent's own counter so they reach the same
+        // block) and the copies of the bases.
+        charge_slot_bases(self.v_basis.len() as u64, j, self.summands);
+        let shifted: Vec<u64> = self
+            .v_basis
+            .iter()
+            .map(|&e| (0..j).fold(e, |acc, _| gf.sqr(acc)))
+            .collect();
+        let mut bases = vec![self.v_basis.clone(), shifted];
+        if self.summands == 3 {
+            bases.push(self.v_basis.clone());
+        }
+        crate::cryptanalysis::pq_descent_symbolic::descend_with_bases(
+            gf,
+            self.instance.b,
+            x_r,
+            &bases,
+        )
+        .expect("prepare checked the dimension")
+    }
+
+    pub fn solver_name(&self) -> &str {
+        self.harness.solver.name()
+    }
+
+    /// The descended system for a target abscissa; its `lift` maps a
+    /// solution back to abscissae.  `prepare` must have run.
+    fn descend(&self, x_r: u64) -> SymbolicDescent {
+        descend(
+            &self.instance.gf,
+            self.instance.b,
+            x_r,
+            &self.v_basis,
+            self.summands,
+        )
+        .expect("prepare checked the dimension")
+    }
+}
+
+fn system_of(sys: &SymbolicDescent) -> BooleanSystem {
+    BooleanSystem {
+        equations: sys.equations.clone(),
+        n_vars: sys.n_vars,
+    }
+}
+
+/// The descent's slot bases, as primitives: `n'·j` squarings and the
+/// `(m + 1)·n'` words of the basis copies.
+fn charge_slot_bases(n_prime: u64, j: u32, summands: u32) {
+    crate::cryptanalysis::pq_descent_symbolic::add_descent_work(
+        crate::cryptanalysis::pq_descent_symbolic::DescentWork {
+            field_sqrs: n_prime * u64::from(j),
+            word_ops: n_prime * (1 + u64::from(summands)),
+            ..Default::default()
+        },
+    );
+}
+
+/// The work an algebraic oracle does on one descended system outside the
+/// descent and the solver, in `bitop/v1` primitives added to `extra`
+/// (the oracle's solver block, so that the relation phase is complete
+/// when the solver's count is): the descent's own counters
+/// ([`take_descent_work`](crate::cryptanalysis::pq_descent_symbolic::take_descent_work)),
+/// the copy of the equations into the [`BooleanSystem`] (a word a term)
+/// and `shape_calls` shape computations ([`BooleanSystem::shape_word_ops`]).
+pub(crate) fn charge_system_build(
+    extra: &mut BTreeMap<String, u64>,
+    system: &BooleanSystem,
+    shape: &SystemShape,
+    shape_calls: u64,
+) {
+    crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
+    let terms: u64 = system.equations.iter().map(|p| p.terms.len() as u64).sum();
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_word_ops",
+        terms + shape_calls * system.shape_word_ops(shape),
+    );
+}
+
+/// The hash probes of one `lift_abscissae` call on `xs`: one per
+/// abscissa looked up, stopping at the first the base does not hold.
+/// (The additions it performs are charged to `ops` already.)
+pub(crate) fn lift_probes(fb: &FactorBase<FastPoint>, xs: &[u64], lifted: bool) -> u64 {
+    if lifted {
+        return xs.len() as u64;
+    }
+    let mut probes = 0u64;
+    for x in xs {
+        probes += 1;
+        if !fb.x_index.contains_key(x) {
+            break;
+        }
+    }
+    probes
+}
+
+/// Charge one lift of a solution to `extra`: the descent counter's share
+/// ([`SymbolicDescent::lift`]'s bit tests and field adds) and the probes
+/// of [`lift_probes`].
+pub(crate) fn charge_lift(
+    extra: &mut BTreeMap<String, u64>,
+    fb: &FactorBase<FastPoint>,
+    xs: &[u64],
+    lifted: bool,
+) {
+    crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_hash_probes",
+        lift_probes(fb, xs, lifted),
+    );
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // No table: the descent builds each target's system in the
+        // relation phase, charged to the solver block.
+        table_counted(BTreeMap::new())
+    }
+
+    fn name(&self) -> &str {
+        "descent-algebraic"
+    }
+
+    fn summands(&self) -> u32 {
+        self.summands
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        format!(
+            "Weil-descend S_{} over the base's abscissa subspace and solve with {}",
+            self.summands + 1,
+            self.harness.solver.name()
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 2 (descends S3) or 3 (descends S4)"),
+            (
+                "slots",
+                "ordered tau-slots (Koblitz): `all` tries summand 2 over every Frobenius image of V per target; absent for the plain descent",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        self.slot_rotations = match params.get("slots") {
+            None | Some("0") | Some("none") => None,
+            Some("all") => {
+                if self.instance.koblitz.is_none() {
+                    return Err(
+                        "slots need a Koblitz curve (the Frobenius must be an endomorphism)".into(),
+                    );
+                }
+                Some(self.instance.n)
+            }
+            Some(other) => return Err(format!("unknown slots value `{other}`; use all")),
+        };
+        if !(2..=3).contains(&self.summands) {
+            return Err(format!(
+                "descent-algebraic takes m = 2 or 3, got {}",
+                self.summands
+            ));
+        }
+        let basis = fb.subspace_basis.as_ref().ok_or(
+            "descent-algebraic needs a factor base whose abscissae form an F_2-subspace; \
+             use binary-subspace or koblitz-orbit",
+        )?;
+        let cap = max_n_prime(self.summands);
+        if basis.len() as u32 > cap {
+            return Err(format!(
+                "the descent's monomial mask holds n' ≤ {cap} at m = {}; this base has n' = {}",
+                self.summands,
+                basis.len()
+            ));
+        }
+        self.v_basis = basis.clone();
+        // Every system on one base has the same shape, so descend one
+        // abscissa now and let the engine decline the shape here, once,
+        // with a reason a sweep can report — rather than target by
+        // target, which would run the whole relation phase for nothing.
+        let _ = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
+        let probe = system_of(&self.descend(self.instance.generator.x));
+        let shape = probe.shape();
+        charge_system_build(&mut self.totals.extra, &probe, &shape, 1);
+        if !self.harness.solver.accepts(&shape) {
+            return Err(format!(
+                "solver `{}` declines a system of {} unknowns and {} equations; \
+                 use a smaller base or another engine",
+                self.harness.solver.name(),
+                shape.n_vars,
+                shape.n_equations
+            ));
+        }
+        Ok(())
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        if self.v_basis.is_empty() {
+            return None;
+        }
+        // Descend, solve, and lift every solution until one sums to R;
+        // with slots, one system per rotation of the second summand.
+        let rotations = self.slot_rotations.unwrap_or(1);
+        for j in 0..rotations {
+            // Work left on this thread's descent counter by anything else
+            // is not this target's.
+            let _ = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
+            let sys = if self.slot_rotations.is_some() {
+                self.descend_slot(point.x, j)
+            } else {
+                self.descend(point.x)
+            };
+            let system = system_of(&sys);
+            let shape = system.shape();
+            let verdict = self.harness.solve(&system);
+            let exceeded = matches!(verdict, SolverVerdict::BudgetExceeded);
+            let found = matches!(&verdict, SolverVerdict::Solved(s) if !s.is_empty());
+            self.totals
+                .absorb_outcome(&shape, self.harness.cost(), exceeded, found);
+            // The descent, the copy, and two shape computations (here and
+            // in the harness).
+            charge_system_build(&mut self.totals.extra, &system, &shape, 2);
+            crate::cryptanalysis::ic_boundary::bump_counter(
+                &mut self.totals.extra,
+                "slot_systems",
+                1,
+            );
+            let SolverVerdict::Solved(solutions) = verdict else {
+                continue;
+            };
+            for v in solutions {
+                let xs = sys.lift(mask_low64(v));
+                let lifted = crate::cryptanalysis::ic_boundary::lift_abscissae(
+                    ctx.group, fb, ops, &xs, point,
+                );
+                charge_lift(&mut self.totals.extra, fb, &xs, lifted.is_some());
+                if let Some(indices) = lifted {
+                    crate::cryptanalysis::ic_boundary::bump_counter(
+                        &mut self.totals.extra,
+                        "slot_hits",
+                        1,
+                    );
+                    *self
+                        .totals
+                        .extra
+                        .entry(format!("slot_hit_rotation_{j}"))
+                        .or_insert(0) += 1;
+                    return Some(indices);
+                }
+                counters.lift_failures += 1;
+            }
+            self.unliftable += 1;
+            counters.unliftable_systems += 1;
+        }
+        None
+    }
+
+    fn last_system(&self) -> Option<SystemShape> {
+        self.totals.shape.clone()
+    }
+
+    fn solver_totals(&self) -> Option<SolverTotals> {
+        Some(self.totals.clone())
+    }
+}
+
+// ── The symmetrised Koblitz base and oracle ────────────────────────
+
+/// Parse a `divisor` parameter: indices into
+/// [`crate::cryptanalysis::koblitz_index_calculus::all_factors_of_x_n_minus_1`],
+/// separated by `;` (a `,` would split the plug-in spec itself; a `,` is
+/// still accepted here for a [`Params`] built in code, but
+/// [`Params::parse_spec`] never lets one through from a command line).
+fn divisor_indices(params: &Params) -> Result<Vec<usize>, String> {
+    let raw = params
+        .get("divisor")
+        .ok_or("missing parameter `divisor`; try 0;1 (index 0 is x + 1)")?;
+    let idx: Result<Vec<usize>, String> = raw
+        .split([',', ';'])
+        .filter(|s| !s.is_empty())
+        .map(|s| {
+            s.trim()
+                .parse::<usize>()
+                .map_err(|_| format!("divisor index `{s}` is not a number"))
+        })
+        .collect();
+    let idx = idx?;
+    if idx.is_empty() {
+        return Err("parameter `divisor` selected no factors".into());
+    }
+    Ok(idx)
+}
+
+/// `F_u = { P : u(P) ∈ V }` for the frame `u = 1/(x + 1)` and a
+/// Frobenius-invariant subspace `V ∋ 1`, each signed Frobenius orbit
+/// folded onto one column.
+///
+/// This is the base of `research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md`
+/// §8: the rational 2-torsion point `T = (0, 1)` acts on the `x`-line
+/// as `x ↦ 1/x`, the frame turns that into `u ↦ u + 1`, and a subspace
+/// containing `1` is closed under it for free.  `T` itself (`u = 1`) is
+/// a base point.  The abscissae of `F_u` are *not* an `F_2`-subspace,
+/// so the `descent-algebraic` oracle cannot run on this base; the
+/// `symmetrised` oracle is the one that can, and `mitm-frobenius` runs
+/// on it like on any other.  The same `divisor` handed to
+/// `koblitz-orbit` gives the `x`-frame base `F_x` for the same `V`,
+/// which is the matched control.
+pub struct KoblitzSymmetrisedBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
+    fn name(&self) -> &str {
+        "koblitz-symmetrised"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "F_u = {{P : 1/(x + 1) ∈ V}} for the Frobenius-invariant V ∋ 1 of divisor {}, {}",
+            params.get("divisor").unwrap_or("?"),
+            if params.flag("no_fold") {
+                "one column per abscissa (the unfolded control)"
+            } else {
+                "each signed Frobenius orbit folded onto one column"
+            }
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "divisor",
+                "`;`-separated indices into the factorisation of xⁿ − 1, e.g. `divisor=0;1` (a `,` \
+                 would end the parameter on the command line); index 0 is x + 1, which must be \
+                 included so that 1 ∈ V; the same indices on koblitz-orbit give the x-frame base \
+                 for the same V",
+            ),
+            (
+                "no_fold",
+                "1 to give every abscissa its own column: the control that shows what the fold buys",
+            ),
+            (
+                "projected",
+                "1 to fold by the signed Frobenius orbits of the cofactor projections [h]P instead of \
+                 of the raw points: orbits whose projections coincide or are Frobenius translates \
+                 share one column (on a base closed under +T, P and P + T do), which is the column \
+                 count the relation matrix actually has to determine",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let kc = self
+            .instance
+            .koblitz
+            .as_ref()
+            .ok_or("this instance is not a Koblitz curve, so it has no 1/(x + 1) frame")?;
+        let idx = divisor_indices(params)?;
+        // The subspace, its lifts and its orbit view are charged to the
+        // base's phase in `bitop/v1` alone (`tally_*`, `ecbench::work`):
+        // `koblitz_factor_base` then counts its own indexes.
+        let tally_before = crate::cryptanalysis::bitop_tally::snapshot();
+        let fb_u = build_symmetrised_factor_base(kc, &idx).ok_or_else(|| {
+            format!(
+                "no symmetrised base for divisor {idx:?}: the subspace must contain 1 \
+                 (include index 0, the factor x + 1) and be a proper invariant subspace"
+            )
+        })?;
+        let view = frobenius_view_of_symmetrised(kc, &fb_u)
+            .ok_or("the u-frame base has no Frobenius-orbit view; this is a bug")?;
+        let tally = crate::cryptanalysis::bitop_tally::snapshot().since(tally_before);
+        let fold = if params.flag("no_fold") {
+            ColumnFold::Abscissa
+        } else if params.flag("projected") {
+            ColumnFold::ProjectedSignedFrobeniusOrbit
+        } else {
+            ColumnFold::SignedFrobeniusOrbit
+        };
+        let mut fb = koblitz_factor_base(
+            self.instance,
+            &view,
+            fold,
+            format!(
+                "u-frame invariant subspace, divisor {idx:?}, dimension {}, {} points including T",
+                fb_u.ell,
+                fb_u.points.len()
+            ),
+        )
+        .ok_or_else(|| "the u-frame subspace produced no usable factor base".to_string())?;
+        tally.add_work_native(&mut fb.cost.work_native);
+        // `koblitz_factor_base` also counts this base's Artin–Schreier
+        // lifts and orbit walks from its size, as the native `as_solves`
+        // and `frobenius_maps`.  The tally above already holds that work,
+        // so those natives stay in the record (replay compares `native`)
+        // but are marked so that `bitop/v1` does not price them twice.
+        crate::cryptanalysis::bitop_tally::mark_tallied(
+            &mut fb.cost.work_native,
+            &["as_solves", "frobenius_maps"],
+        );
+        // The base is the subspace V of the u-frame, so a frozen copy
+        // carries its dimension and basis (single words, as the
+        // x-frame bases do) rather than only a description.
+        fb.dimension = Some(fb_u.ell as u32);
+        fb.subspace_basis = Some(
+            fb_u.v_basis
+                .iter()
+                .map(|v| u64::try_from(v.to_biguint()).unwrap_or(0))
+                .collect(),
+        );
+        Ok(fb)
+    }
+}
+
+/// Decompose over `F_u` by solving the symmetrised summation polynomial
+/// in the invariants `w = u² + u`, `s = Σu` with the repository's
+/// boolean matrix-F4 and splitting (`koblitz_symmetrised`).
+///
+/// The system has `m(ℓ − 1) + 1` unknowns of boolean degree 2 at
+/// `m = 2` and 4 at `m = 3`, against `m·ℓ` unknowns of degree 2 and 6
+/// for the direct `x`-frame descent on the same `V`.  A root lifts to
+/// points summing to `R` or to `R + T`; both are relations over `F_u`,
+/// and the second carries `T` as an extra summand.
+///
+/// ## What it charges
+///
+/// The solve is engine work, reported through `solver_totals` in the
+/// same unit and by the same rule as the `inherited-f4` adapter (word
+/// XORs counted, priced by the runner); lifting a root back to signed
+/// base points goes through the framework's own `lift_abscissae`, so
+/// its group additions are charged to `ops` exactly as the
+/// `descent-algebraic` oracle's are.
+///
+/// In `bitop/v1` the record is complete: every solve carries the whole
+/// call (the system's build, the engine's matrices, the lifts) as
+/// `bitop_*` keys with `bitop_complete = 1`, and `prepare` — the rebuild
+/// of `F_u`, the point-for-point membership check, the field tables and
+/// the generator's system — is charged to the `oracle_setup` phase as
+/// `tally_*` counters with the `counted:table_insert_attempts` marker
+/// (it builds no table).  `peak_bytes` stays 0: the engine reports no
+/// memory, and memory is reported, never priced.
+///
+/// ## Parameters
+///
+/// `m` (2 or 3), `divisor` (the base's; copied from the factor base
+/// when omitted on the command line), `engine`
+/// (`inherited-f4` default, `matrix-f4`, `matrix-f5`), `max_degree`
+/// (Macaulay cap, default 3: the cap is absolute, so the degree-4
+/// `m = 3` system still builds its own degree at the root) and
+/// `node_budget` (algebraic reduction calls before a solve gives up,
+/// default 4096; splitting decisions are counted separately).
+pub struct SymmetrisedOracle<'i> {
+    summands: u32,
+    instance: &'i BinaryInstance,
+    fb_u: Option<SymmetrisedFactorBase>,
+    st: Option<FieldStructure>,
+    engine: SolverEngine,
+    node_budget: usize,
+    shape: Option<SystemShape>,
+    totals: SolverTotals,
+    /// What `prepare` tallied, for the `oracle_setup` phase.
+    setup_tally: crate::cryptanalysis::bitop_tally::Tally,
+    /// Solves whose root lifted in the `u`-frame but whose abscissae
+    /// did not re-lift through the framework's sign resolution; must
+    /// stay zero, and is reported so that it can be seen to.
+    pub unliftable: u64,
+    /// Targets with `u(R) ∈ {0, ∞}` or an oversize layout, which the
+    /// system cannot be built for.
+    pub unbuildable: u64,
+}
+
+impl<'i> SymmetrisedOracle<'i> {
+    pub fn new(summands: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            summands,
+            instance,
+            fb_u: None,
+            st: None,
+            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+            node_budget: 4096,
+            shape: None,
+            totals: SolverTotals::default(),
+            setup_tally: Default::default(),
+            unliftable: 0,
+            unbuildable: 0,
+        }
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
+    fn name(&self) -> &str {
+        "symmetrised"
+    }
+
+    fn summands(&self) -> u32 {
+        self.summands
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "solve the symmetrised S_{} in w = u² + u, s = Σu over F_u with {} (Macaulay cap {}, {} reduction calls)",
+            self.summands + 1,
+            params.get("engine").unwrap_or("inherited-f4"),
+            params.get("max_degree").unwrap_or("3"),
+            params.get("node_budget").unwrap_or("4096"),
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 2 (symmetrised S3) or 3 (symmetrised S4)"),
+            (
+                "divisor",
+                "the koblitz-symmetrised base's divisor; copied from the base when omitted",
+            ),
+            ("engine", "inherited-f4 (default), matrix-f4 or matrix-f5"),
+            (
+                "max_degree",
+                "highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "algebraic reduction calls before a solve gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if !(2..=3).contains(&self.summands) {
+            return Err(format!(
+                "symmetrised takes m = 2 or 3, got {}",
+                self.summands
+            ));
+        }
+        let kc = self
+            .instance
+            .koblitz
+            .as_ref()
+            .ok_or("symmetrised needs a Koblitz instance")?;
+        let idx = divisor_indices(params)?;
+        // Everything below is set-up work `bitop/v1` prices from
+        // `setup_work_native`; nothing of it is in `native`, so committed
+        // records replay unchanged.
+        let tally_before = crate::cryptanalysis::bitop_tally::snapshot();
+        let fb_u = build_symmetrised_factor_base(kc, &idx)
+            .ok_or_else(|| format!("no symmetrised base for divisor {idx:?}"))?;
+        // The base the runner built must be this F_u, point for point:
+        // a mismatched divisor would make every relation a lie.
+        crate::cryptanalysis::bitop_tally::word_ops(1);
+        if fb_u.points.len() != fb.points.len() {
+            return Err(format!(
+                "symmetrised needs the koblitz-symmetrised base with the same divisor: \
+                 F_u has {} points, the base has {}",
+                fb_u.points.len(),
+                fb.points.len()
+            ));
+        }
+        for p in &fb_u.points {
+            // The packed lift (two words) and one probe of the base's index.
+            crate::cryptanalysis::bitop_tally::word_ops(2);
+            crate::cryptanalysis::bitop_tally::hash_probes(1);
+            let key = self.instance.fast.lift(p).pack();
+            if fb.index_of_key(key).is_none() {
+                return Err(
+                    "symmetrised needs the koblitz-symmetrised base with the same divisor: \
+                     a point of F_u is not in the base"
+                        .into(),
+                );
+            }
+        }
+        let max_degree = params.u64_or("max_degree", 3)? as u32;
+        self.engine = match params.get("engine").unwrap_or("inherited-f4") {
+            "inherited-f4" => SolverEngine::InheritedF4 { max_degree },
+            "matrix-f4" => SolverEngine::MatrixF4 { max_degree },
+            "matrix-f5" => SolverEngine::MatrixF5 { max_degree },
+            other => {
+                return Err(format!(
+                    "unknown engine `{other}`; try inherited-f4, matrix-f4 or matrix-f5"
+                ))
+            }
+        };
+        self.node_budget = params.u64_or("node_budget", 4096)? as usize;
+        // The structure constants: one product of basis monomials per
+        // entry of the `n × n` table, and a word to store it.
+        crate::cryptanalysis::bitop_tally::field_ops(0, u64::from(kc.n) * u64::from(kc.n), 0, 0);
+        crate::cryptanalysis::bitop_tally::word_ops(u64::from(kc.n) * u64::from(kc.n));
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        // Every system on one base has the same shape; build one for the
+        // generator so the report's degree columns come from a real
+        // system, and so an oversize layout is refused here, once.
+        let g = self.instance.fast.lower(self.instance.generator);
+        let sys = build_symmetrised_system(kc, &fb_u, &g, self.summands as usize, &st).ok_or_else(
+            || {
+                format!(
+                    "the symmetrised system for dimension {} at m = {} exceeds the Boolean-variable \
+                     layout or the generator has u ∈ {{0, ∞}}",
+                    fb_u.ell, self.summands
+                )
+            },
+        )?;
+        let system = BooleanSystem {
+            equations: sys.equations,
+            n_vars: sys.n_vars,
+        };
+        let shape = system.shape();
+        crate::cryptanalysis::bitop_tally::word_ops(system.shape_word_ops(&shape));
+        self.shape = Some(shape);
+        self.setup_tally = crate::cryptanalysis::bitop_tally::snapshot().since(tally_before);
+        self.totals = SolverTotals {
+            solver: format!(
+                "symmetrised {} (cap {}, budget {})",
+                match self.engine {
+                    SolverEngine::InheritedF4 { .. } => "inherited-f4",
+                    SolverEngine::MatrixF4 { .. } => "matrix-f4",
+                    SolverEngine::MatrixF5 { .. } => "matrix-f5",
+                    _ => "engine",
+                },
+                max_degree,
+                self.node_budget
+            ),
+            ..Default::default()
+        };
+        self.fb_u = Some(fb_u);
+        self.st = Some(st);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // No table: nothing is inserted.  The set-up's own work is the
+        // tally `prepare` took.
+        let mut out = BTreeMap::new();
+        self.setup_tally.add_work_native(&mut out);
+        table_counted(out)
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let (Some(fb_u), Some(st), Some(shape)) = (&self.fb_u, &self.st, &self.shape) else {
+            return None;
+        };
+        let kc = self.instance.koblitz.as_ref()?;
+        let target = self.instance.fast.lower(point);
+        let before = f4_word_ops_thread();
+        let tally_before = crate::cryptanalysis::bitop_tally::snapshot();
+        let started = Instant::now();
+        let outcome = symmetrised_groebner_decompose(
+            kc,
+            fb_u,
+            st,
+            &target,
+            self.summands as usize,
+            self.engine,
+            self.node_budget,
+        );
+        let word_xors = f4_word_ops_thread().wrapping_sub(before);
+        let wall_ns = started.elapsed().as_nanos() as u64;
+        let Some(out) = outcome else {
+            self.unbuildable += 1;
+            return None;
+        };
+        let mut extra = BTreeMap::new();
+        extra.insert("splits".to_string(), out.effort);
+        extra.insert("oversize".to_string(), out.oversize as u64);
+        extra.insert("used_t".to_string(), u64::from(out.used_t));
+        // The whole call in `bitop/v1` primitives: the engine's word XORs
+        // and everything else `bitop_tally` saw on this thread (the
+        // system's build, the solver's matrices, scans and lifts).
+        crate::cryptanalysis::bitop_tally::snapshot()
+            .since(tally_before)
+            .put_complete(&mut extra, word_xors);
+        let cost = SolverCost {
+            ops: word_xors,
+            // The same unit string as the `inherited-f4` adapter, so the
+            // runner prices both arms by the same rule.
+            op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
+            wall_ns,
+            // The engine reports no memory figure; reported, never priced.
+            peak_bytes: 0,
+            degree_reached: Some(out.built_degree),
+            solving_degree: None,
+            timed_out: !out.complete,
+            extra,
+        };
+        self.totals
+            .absorb_outcome(shape, Some(&cost), !out.complete, out.relation.is_some());
+        let indices = out.relation?;
+        // Re-lift through the framework so the sign resolution is charged
+        // exactly as it is for the x-frame oracle.  `T` (x = 0) is a base
+        // point like any other, so a relation through `R + T` lifts too.
+        let xs: Vec<u64> = indices
+            .iter()
+            .map(|&i| self.instance.fast.lift(&fb_u.points[i]).x)
+            .collect();
+        match crate::cryptanalysis::ic_boundary::lift_abscissae(ctx.group, fb, ops, &xs, point) {
+            Some(found) => Some(found),
+            None => {
+                counters.lift_failures += 1;
+                self.unliftable += 1;
+                None
+            }
+        }
+    }
+
+    fn last_system(&self) -> Option<SystemShape> {
+        self.shape.clone()
+    }
+
+    fn solver_totals(&self) -> Option<SolverTotals> {
+        Some(self.totals.clone())
+    }
+}
+
+// ── The chained x-frame descent as an oracle ────────────────────────
+
+/// Why one call of [`ChainedXOracle`] ended, with what it consumed:
+/// the per-target record the discrepancy protocol of round 6 (R6.1)
+/// asks every driver to keep.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct ChainedXCall {
+    /// `found`, `refuted` (the solve completed without a liftable root),
+    /// `budget` (the node budget ran out), `unbuildable` (no system for
+    /// this target) or `lift_failure` (a root whose abscissae did not
+    /// re-lift through the framework's sign resolution).
+    pub outcome: &'static str,
+    /// Algebraic reductions consumed: the unit `node_budget` caps.
+    pub reductions: u64,
+    pub splits: u64,
+    pub word_xors: u64,
+    pub wall_ns: u64,
+}
+
+/// Decompose over an `F_2`-subspace base by the library's chained
+/// `x`-frame descent ([`groebner_decompose`]): `m − 1` Semaev `S₃`
+/// links with `(m − 2)·n` free intermediate abscissae, solved by the
+/// repository's boolean F4 with splitting.
+///
+/// This is the system round 4 (lead 16.1) found feasible wherever the
+/// symmetrised oracle is, which `ic` could not run before: the
+/// `descent-algebraic` oracle is the direct `S_{m+1}` descent only.
+/// `m = 2, 3, 4`; the layout has `m·ℓ + (m − 2)·n` unknowns and is
+/// refused above the engine's 64.
+///
+/// ## What it charges
+///
+/// Engine work in word XORs, through `solver_totals`, in the same unit
+/// string and by the same rule as the `inherited-f4` adapter and the
+/// `symmetrised` oracle; the sign resolution goes through the
+/// framework's `lift_abscissae`, so its group additions are charged to
+/// `ops`.
+///
+/// ## Parameters
+///
+/// `m` (2, 3 or 4), `engine` (`inherited-f4` default, `matrix-f4`,
+/// `matrix-f5`), `max_degree` (Macaulay cap, default 3), `node_budget`
+/// (algebraic reduction calls before a solve gives up, default 4096) and
+/// `trace` (`1` keeps a [`ChainedXCall`] per call in `calls`).
+pub struct ChainedXOracle<'i> {
+    summands: u32,
+    instance: &'i BinaryInstance,
+    view: Option<crate::cryptanalysis::koblitz_index_calculus::FrobeniusFactorBase>,
+    index_of: std::collections::HashMap<(num_bigint::BigUint, num_bigint::BigUint), usize>,
+    st: Option<FieldStructure>,
+    engine: SolverEngine,
+    node_budget: usize,
+    shape: Option<SystemShape>,
+    totals: SolverTotals,
+    trace: bool,
+    /// One record per call when `trace=1`.
+    pub calls: Vec<ChainedXCall>,
+    /// Roots that lifted in the descent but not through the framework.
+    pub unliftable: u64,
+    /// Targets the system could not be built for.
+    pub unbuildable: u64,
+}
+
+impl<'i> ChainedXOracle<'i> {
+    pub fn new(summands: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            summands,
+            instance,
+            view: None,
+            index_of: Default::default(),
+            st: None,
+            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+            node_budget: 4096,
+            shape: None,
+            totals: SolverTotals::default(),
+            trace: false,
+            calls: Vec::new(),
+            unliftable: 0,
+            unbuildable: 0,
+        }
+    }
+
+    /// Unknowns of the chained layout for subspace dimension `ell`.
+    pub fn layout_vars(m: usize, ell: usize, n: usize) -> usize {
+        m * ell + m.saturating_sub(2) * n
+    }
+
+    fn record(&mut self, call: ChainedXCall) {
+        if self.trace {
+            self.calls.push(call);
+        }
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
+    fn name(&self) -> &str {
+        "chained-x"
+    }
+
+    fn summands(&self) -> u32 {
+        self.summands
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "chained x-frame descent: {} S3 links over the base's subspace, {} (Macaulay cap {}, {} reduction calls)",
+            self.summands.saturating_sub(1),
+            params.get("engine").unwrap_or("inherited-f4"),
+            params.get("max_degree").unwrap_or("3"),
+            params.get("node_budget").unwrap_or("4096"),
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 2, 3 or 4 (m − 1 chained S3 links)"),
+            ("engine", "inherited-f4 (default), matrix-f4 or matrix-f5"),
+            (
+                "max_degree",
+                "highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "algebraic reduction calls before a solve gives up (default 4096)",
+            ),
+            (
+                "trace",
+                "1 keeps a per-call record (outcome, reductions, XORs)",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if !(2..=4).contains(&self.summands) {
+            return Err(format!(
+                "chained-x takes m = 2, 3 or 4, got {}",
+                self.summands
+            ));
+        }
+        let kc =
+            self.instance.koblitz.as_ref().ok_or(
+                "chained-x needs a Koblitz instance (the library's chained descent is b = 1)",
+            )?;
+        let words = fb.subspace_basis.as_ref().ok_or(
+            "chained-x needs a factor base whose abscissae form an F_2-subspace; \
+             use binary-subspace or koblitz-orbit",
+        )?;
+        let n = kc.n;
+        let basis: Vec<crate::binary_ecc::F2mElement> = words
+            .iter()
+            .map(|&w| crate::binary_ecc::F2mElement::from_biguint(&num_bigint::BigUint::from(w), n))
+            .collect();
+        let vars = Self::layout_vars(self.summands as usize, basis.len(), n as usize);
+        if vars > crate::cryptanalysis::koblitz_groebner::MAX_VARS {
+            return Err(format!(
+                "the chained layout at m = {} needs {vars} unknowns (dimension {}, n = {n}); \
+                 the engine holds {}",
+                self.summands,
+                basis.len(),
+                crate::cryptanalysis::koblitz_groebner::MAX_VARS
+            ));
+        }
+        let view =
+            crate::cryptanalysis::koblitz_symmetrised::plain_subspace_factor_base(kc, &basis)
+                .ok_or("the base's subspace basis is not linearly independent")?;
+        // The descent names points of its own view.  Every base point must
+        // be one of them; a view point the base leaves out (`binary-subspace`
+        // drops the abscissa 0) is removed from the lift's index, so a root
+        // through it is never returned as a relation.
+        let mut index_of = view.index_map();
+        let mut in_base = 0usize;
+        for p in &view.points {
+            if fb.index_of_key(self.instance.fast.lift(p).pack()).is_some() {
+                in_base += 1;
+            } else {
+                index_of.remove(&crate::cryptanalysis::koblitz_index_calculus::point_key(p));
+            }
+        }
+        if in_base != fb.points.len() {
+            return Err(format!(
+                "chained-x: {} of the base's {} points lie over the base's subspace; \
+                 the base is not the subspace base its basis names",
+                in_base,
+                fb.points.len()
+            ));
+        }
+        let max_degree = params.u64_or("max_degree", 3)? as u32;
+        self.engine = match params.get("engine").unwrap_or("inherited-f4") {
+            "inherited-f4" => SolverEngine::InheritedF4 { max_degree },
+            "matrix-f4" => SolverEngine::MatrixF4 { max_degree },
+            "matrix-f5" => SolverEngine::MatrixF5 { max_degree },
+            other => {
+                return Err(format!(
+                    "unknown engine `{other}`; try inherited-f4, matrix-f4 or matrix-f5"
+                ))
+            }
+        };
+        self.node_budget = params.u64_or("node_budget", 4096)? as usize;
+        self.trace = params.u64_or("trace", 0)? == 1;
+        let st = FieldStructure::new(n, &kc.curve.irreducible);
+        let g = self.instance.fast.lower(self.instance.generator);
+        let crate::binary_ecc::BinaryPoint::Affine { x: x_g, .. } = &g else {
+            return Err("the generator is the point at infinity".into());
+        };
+        let sys = crate::cryptanalysis::koblitz_groebner::build_decomposition_system(
+            &basis,
+            x_g,
+            &kc.curve.b,
+            self.summands as usize,
+            &st,
+        )
+        .ok_or("the chained system could not be built for the generator")?;
+        self.shape = Some(
+            BooleanSystem {
+                equations: sys.equations,
+                n_vars: sys.n_vars,
+            }
+            .shape(),
+        );
+        self.totals = SolverTotals {
+            solver: format!(
+                "chained-x {} (cap {}, budget {})",
+                match self.engine {
+                    SolverEngine::InheritedF4 { .. } => "inherited-f4",
+                    SolverEngine::MatrixF4 { .. } => "matrix-f4",
+                    SolverEngine::MatrixF5 { .. } => "matrix-f5",
+                    _ => "engine",
+                },
+                max_degree,
+                self.node_budget
+            ),
+            ..Default::default()
+        };
+        self.index_of = index_of;
+        self.view = Some(view);
+        self.st = Some(st);
+        self.calls.clear();
+        Ok(())
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let kc = self.instance.koblitz.as_ref()?;
+        let (Some(view), Some(st), Some(shape)) = (&self.view, &self.st, &self.shape) else {
+            return None;
+        };
+        let target = self.instance.fast.lower(point);
+        let before = f4_word_ops_thread();
+        let started = Instant::now();
+        let (relation, stats) = crate::cryptanalysis::koblitz_index_calculus::groebner_decompose(
+            kc,
+            view,
+            &self.index_of,
+            st,
+            &target,
+            self.summands as usize,
+            self.engine,
+            self.node_budget,
+        );
+        let word_xors = f4_word_ops_thread().wrapping_sub(before);
+        let wall_ns = started.elapsed().as_nanos() as u64;
+        let mut call = ChainedXCall {
+            outcome: "refuted",
+            reductions: stats.reductions as u64,
+            splits: stats.splits as u64,
+            word_xors,
+            wall_ns,
+        };
+        if stats.unsupported {
+            self.unbuildable += 1;
+            call.outcome = "unbuildable";
+            self.record(call);
+            return None;
+        }
+        let shape = shape.clone();
+        let exhausted = stats.exhausted;
+        let mut extra = BTreeMap::new();
+        extra.insert("splits".to_string(), stats.splits as u64);
+        extra.insert("reductions".to_string(), stats.reductions as u64);
+        extra.insert("oversize".to_string(), stats.oversize as u64);
+        let cost = SolverCost {
+            ops: word_xors,
+            op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
+            wall_ns,
+            peak_bytes: 0,
+            degree_reached: Some(stats.max_degree_built),
+            solving_degree: None,
+            timed_out: exhausted,
+            extra,
+        };
+        self.totals
+            .absorb_outcome(&shape, Some(&cost), exhausted, relation.is_some());
+        let Some(indices) = relation else {
+            call.outcome = if exhausted { "budget" } else { "refuted" };
+            self.record(call);
+            return None;
+        };
+        let xs: Vec<u64> = indices
+            .iter()
+            .map(|&i| self.instance.fast.lift(&view.points[i]).x)
+            .collect();
+        match crate::cryptanalysis::ic_boundary::lift_abscissae(ctx.group, fb, ops, &xs, point) {
+            Some(found) => {
+                call.outcome = "found";
+                self.record(call);
+                Some(found)
+            }
+            None => {
+                counters.lift_failures += 1;
+                self.unliftable += 1;
+                call.outcome = "lift_failure";
+                self.record(call);
+                None
+            }
+        }
+    }
+
+    fn last_system(&self) -> Option<SystemShape> {
+        self.shape.clone()
+    }
+
+    fn solver_totals(&self) -> Option<SolverTotals> {
+        Some(self.totals.clone())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::koblitz_instance;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
+
+    /// The command-line form of a multi-factor divisor, end to end from
+    /// the plug-in string to the indices both Koblitz bases read.
+    #[test]
+    fn divisor_indices_parse_the_semicolon_form_from_a_plugin_string() {
+        for spec in [
+            "koblitz-orbit:divisor=1;2",
+            "koblitz-symmetrised:divisor=1;2",
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            assert_eq!(divisor_indices(&params).unwrap(), vec![1, 2], "{spec}");
+        }
+        let (_, params) = Params::parse_spec("koblitz-orbit:divisor=0,no_fold=1").unwrap();
+        assert_eq!(divisor_indices(&params).unwrap(), vec![0]);
+    }
+
+    /// The comma form never reaches `divisor_indices` from a command
+    /// line: the spec parser refuses it first, and says why.
+    #[test]
+    fn the_comma_form_is_refused_before_the_plugin_sees_it() {
+        let err = Params::parse_spec("koblitz-orbit:divisor=1,2").unwrap_err();
+        assert!(err.contains("`divisor=1;2`"), "{err}");
+    }
+
+    #[test]
+    fn divisor_indices_reject_a_missing_empty_or_non_numeric_value() {
+        let mut p = Params::default();
+        assert!(divisor_indices(&p)
+            .unwrap_err()
+            .contains("missing parameter `divisor`"));
+        p.set("divisor", ";");
+        assert!(divisor_indices(&p)
+            .unwrap_err()
+            .contains("selected no factors"));
+        p.set("divisor", "1;x");
+        assert!(divisor_indices(&p)
+            .unwrap_err()
+            .contains("`x` is not a number"));
+    }
+
+    fn koblitz_ctx<'a>(
+        inst: &BinaryInstance,
+        g: &'a BinaryGroup<'a>,
+    ) -> InstanceCtx<'a, BinaryGroup<'a>> {
+        InstanceCtx {
+            group: g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        }
+    }
+
+    #[test]
+    fn cached_halftrace_factor_base_preserves_order_columns_and_coefficients() {
+        let inst = koblitz_instance(1, 9).unwrap();
+        let group = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &group);
+        let builder = KoblitzOrbitBase { instance: &inst };
+        let (_, baseline) = Params::parse_spec("koblitz-orbit:divisor=2").unwrap();
+        let (_, candidate) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=1").unwrap();
+        let mut ops = GroupOps::default();
+        let old = builder.build(&ctx, &baseline, &mut ops).unwrap();
+        let new = builder.build(&ctx, &candidate, &mut ops).unwrap();
+        assert_eq!(new.points, old.points);
+        assert_eq!(new.col_of, old.col_of);
+        assert_eq!(new.coef_of, old.coef_of);
+        assert_eq!(new.columns, old.columns);
+        let (_, invalid) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=2").unwrap();
+        assert!(builder.build(&ctx, &invalid, &mut ops).is_err());
+    }
+
+    /// Every relation the chained oracle returns re-sums to its target,
+    /// every completed refusal agrees with exhaustive enumeration over
+    /// the base, and the per-call trace accounts for every call.
+    #[test]
+    fn chained_x_relations_resum_and_refutations_match_enumeration() {
+        let inst = koblitz_instance(1, 11).expect("registered n11 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &g);
+        let (_, base_params) = Params::parse_spec("binary-subspace:dimension=5").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &base_params, &mut ops)
+            .unwrap();
+        let fc = &inst.fast;
+        for m in [2u32, 3] {
+            let (_, params) =
+                Params::parse_spec(&format!("chained-x:m={m},node_budget=4096,trace=1")).unwrap();
+            let mut oracle = ChainedXOracle::new(m, &inst);
+            oracle.prepare(&ctx, &fb, &params, &mut ops).unwrap();
+            let mut counters = OracleCounters::default();
+            let (mut found, mut refuted) = (0, 0);
+            let mut target = inst.generator;
+            for _ in 0..24 {
+                target = fc.add(target, fc.add(inst.generator, target));
+                let decomposes = match m {
+                    2 => fb
+                        .points
+                        .iter()
+                        .any(|&p| fb.index_of_key(fc.add(target, fc.neg(p)).pack()).is_some()),
+                    _ => fb.points.iter().any(|&p| {
+                        fb.points.iter().any(|&q| {
+                            let rest = fc.add(fc.add(target, fc.neg(p)), fc.neg(q));
+                            fb.index_of_key(rest.pack()).is_some()
+                        })
+                    }),
+                };
+                match oracle.decompose(&ctx, &fb, &mut ops, &mut counters, target) {
+                    Some(idx) => {
+                        assert_eq!(idx.len(), m as usize);
+                        let sum = idx
+                            .iter()
+                            .fold(FastPoint::INFINITY, |s, &i| fc.add(s, fb.points[i]));
+                        assert_eq!(sum, target, "m = {m}: relation does not re-sum");
+                        found += 1;
+                    }
+                    None => {
+                        let last = oracle.calls.last().unwrap();
+                        if last.outcome == "refuted" {
+                            assert!(!decomposes, "m = {m}: refuted a decomposable target");
+                            refuted += 1;
+                        }
+                    }
+                }
+            }
+            assert_eq!(oracle.calls.len(), 24);
+            assert!(found > 0, "m = {m}: no relation in 24 targets");
+            assert!(found + refuted > 12, "m = {m}: mostly budget-limited");
+            let totals = oracle.solver_totals().unwrap();
+            assert_eq!(totals.calls, 24);
+            assert!(totals.ops > 0);
+        }
+    }
+
+    /// The layout guard and the arity guard refuse in `prepare`, once.
+    #[test]
+    fn chained_x_refuses_bad_arity_and_oversize_layouts() {
+        let inst = koblitz_instance(1, 11).expect("registered n11 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &g);
+        let mut ops = GroupOps::default();
+        let (_, base_params) = Params::parse_spec("binary-subspace:dimension=5").unwrap();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &base_params, &mut ops)
+            .unwrap();
+        let params = Params::default();
+        let err = ChainedXOracle::new(5, &inst)
+            .prepare(&ctx, &fb, &params, &mut ops)
+            .unwrap_err();
+        assert!(err.contains("m = 2, 3 or 4"), "{err}");
+        assert_eq!(ChainedXOracle::layout_vars(4, 9, 17), 70);
+        // n = 17, dimension 8, m = 4: 4·8 + 2·17 = 66 > 64.
+        let inst13 = koblitz_instance(1, 17).expect("registered n17 Koblitz instance");
+        let g13 = BinaryGroup(&inst13.fast);
+        let ctx13 = koblitz_ctx(&inst13, &g13);
+        let (_, big) = Params::parse_spec("binary-subspace:dimension=8").unwrap();
+        let fb_big = BinarySubspaceBase { instance: &inst13 }
+            .build(&ctx13, &big, &mut ops)
+            .unwrap();
+        let err = ChainedXOracle::new(4, &inst13)
+            .prepare(&ctx13, &fb_big, &params, &mut ops)
+            .unwrap_err();
+        assert!(err.contains("66 unknowns"), "{err}");
+    }
+
+    /// Every point of a `cm-multiplier` base is `[coefficient]` times its
+    /// column's seed (the first point of the column, weight 1), on `j = 0`
+    /// (free automorphism) and `D = -7` (degree-2 Velu endomorphism), so every
+    /// relation row over the base is a true logarithm identity.
+    #[test]
+    fn cm_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        use crate::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
+        for (family, seed) in [(CmFamily::J0, 7u64), (CmFamily::D7, 31)] {
+            let inst = generate_cm_instance(family, 24, seed, 8).unwrap();
+            let curve = inst.curve.clone();
+            let ctx = InstanceCtx {
+                group: &curve,
+                generator: inst.generator_point(),
+                target: inst.generator_point(),
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let mut ops = GroupOps::default();
+            let (_, params) = Params::parse_spec("cm-multiplier:size=5,norm=32").unwrap();
+            let fb = CmMultiplierBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            assert_eq!(fb.columns, 5);
+            assert!(
+                fb.points.len() > 5 * 2 * 3,
+                "multiples add points ({family:?})"
+            );
+            let mut seeds: Vec<Option<PrimePoint>> = vec![None; fb.columns];
+            for (i, p) in fb.points.iter().enumerate() {
+                if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                    seeds[fb.col_of[i]] = Some(*p);
+                }
+            }
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let seed = seeds[fb.col_of[i]].expect("every column has a weight-1 seed");
+                assert_eq!(
+                    curve.mul(&mut check, seed, fb.coef_of[i]),
+                    *p,
+                    "{family:?} point {i}"
+                );
+            }
+        }
+    }
+
+    /// Every point of a `binary-multiplier` base is `[coefficient]` times
+    /// its column's seed (the weight-1 point), so each relation row over the
+    /// base is a true logarithm identity on a curve with no endomorphism use.
+    #[test]
+    fn binary_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        let inst = koblitz_instance(1, 9).expect("registered n9 Koblitz instance");
+        let group = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut ops = GroupOps::default();
+        let (_, params) = Params::parse_spec("binary-multiplier:size=3,mult=6").unwrap();
+        let fb = BinaryMultiplierBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        assert_eq!(fb.columns, 3);
+        assert!(fb.points.len() > 3 * 2, "multiples add points");
+        let mut seeds: Vec<Option<FastPoint>> = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                seeds[fb.col_of[i]] = Some(*p);
+            }
+        }
+        let mut check = GroupOps::default();
+        for (i, p) in fb.points.iter().enumerate() {
+            let seed = seeds[fb.col_of[i]].expect("weight-1 seed per column");
+            assert_eq!(group.mul(&mut check, seed, fb.coef_of[i]), *p, "point {i}");
+        }
+    }
+
+    #[test]
+    fn trace_zero_factor_base_is_an_executable_policy() {
+        let inst = koblitz_instance(1, 9).expect("registered n9 Koblitz instance");
+        let group = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut ops = GroupOps::default();
+        let (_, trace_zero) = Params::parse_spec("koblitz-trace-zero:divisor=1").unwrap();
+        let base = KoblitzTraceZeroBase { instance: &inst }
+            .build(&ctx, &trace_zero, &mut ops)
+            .expect("a divisor omitting x + 1 is trace-zero");
+        assert!(base.columns > 0);
+
+        let (_, trace_one) = Params::parse_spec("koblitz-trace-zero:divisor=0").unwrap();
+        let error =
+            match (KoblitzTraceZeroBase { instance: &inst }).build(&ctx, &trace_one, &mut ops) {
+                Err(error) => error,
+                Ok(_) => panic!("a divisor containing x + 1 must be rejected"),
+            };
+        assert!(error.contains("not trace-zero"), "{error}");
+    }
+
+    /// Freeze the entire producer support, not merely its size or first
+    /// representative. This is the preregistered gate before fresh Q.
+    #[test]
+    fn compact_orbit_scan_matches_archived_n37_source42() {
+        let inst = koblitz_instance(0, 37).expect("registered n37 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let (_, params) =
+            Params::parse_spec("compact-orbit-scan:columns=42,raw_x_cap=1000000").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = CompactOrbitScanBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        let source = std::fs::read_to_string(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl"
+        ))
+        .unwrap();
+        let frozen: serde_json::Value =
+            serde_json::from_str(source.lines().next().unwrap()).unwrap();
+        let coordinates: Vec<[u64; 2]> =
+            serde_json::from_value(frozen["factor_base_point_coordinates"].clone()).unwrap();
+        let labels: Vec<[u64; 2]> =
+            serde_json::from_value(frozen["factor_base_point_labels"].clone()).unwrap();
+        let representatives: Vec<[u64; 2]> =
+            serde_json::from_value(frozen["factor_base_representatives"].clone()).unwrap();
+        assert_eq!(fb.columns, 42);
+        assert_eq!(fb.points.len(), 3108);
+        assert_eq!(coordinates.len(), fb.points.len());
+        assert_eq!(labels.len(), fb.points.len());
+        assert_eq!(representatives.len(), fb.columns);
+        for (i, p) in fb.points.iter().enumerate() {
+            assert_eq!([p.x, p.y], coordinates[i], "point {i}");
+            assert_eq!([fb.col_of[i] as u64, fb.coef_of[i]], labels[i], "label {i}");
+        }
+        for (column, rep) in representatives.iter().enumerate() {
+            let p = fb.points[column * 2 * inst.n as usize];
+            assert_eq!([p.x, p.y], *rep, "representative {column}");
+        }
+        let mut base_hash = blake3::Hasher::new();
+        base_hash.update(b"compact-orbit-constructed-base-v1");
+        for (i, p) in fb.points.iter().enumerate() {
+            for word in [p.x, p.y, fb.col_of[i] as u64, fb.coef_of[i]] {
+                base_hash.update(&word.to_le_bytes());
+            }
+        }
+        assert_eq!(
+            base_hash.finalize().to_hex().as_str(),
+            frozen["base_hash"].as_str().unwrap()
+        );
+        assert_eq!(
+            frozen["base_hash"].as_str().unwrap(),
+            "8423b135df3515b0e284126d9eeb95f71e3901ae12908b3cad8eb03d1f31d4bc"
+        );
+        assert!(ops.scalar_mults > 0 && fb.cost.get("inversions") > 0);
+        assert!(fb.cost.get("min_key_field_squares_uncharged") > 0);
+    }
+}
+
+#[cfg(test)]
+mod explicit_subspace_tests {
+    use super::*;
+    #[test]
+    fn explicit_basis_preserves_the_legacy_points_and_rejects_bad_bases() {
+        let inst = crate::cryptanalysis::ic_boundary::koblitz_instance(1, 7).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let builder = BinarySubspaceBase { instance: &inst };
+        let (_, plain) = Params::parse_spec("binary-subspace:dimension=3").unwrap();
+        let (_, explicit) =
+            Params::parse_spec("binary-subspace:dimension=3,basis=0x1;0x2;0x4").unwrap();
+        let a = builder
+            .build(&ctx, &plain, &mut GroupOps::default())
+            .unwrap();
+        let b = builder
+            .build(&ctx, &explicit, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(a.points, b.points);
+        assert_eq!(a.col_of, b.col_of);
+        assert_eq!(a.coef_of, b.coef_of);
+        assert_eq!(a.subspace_basis, b.subspace_basis);
+        for recipe in [
+            "binary-subspace:dimension=3,basis=1;2;3",
+            "binary-subspace:dimension=3,basis=1;2",
+            "binary-subspace:dimension=3,basis=1;2;128",
+            "binary-subspace:dimension=3,basis=1;2;0",
+            "binary-subspace:dimension=3,basis=1;2;2",
+            "binary-subspace:dimension=3,basis=1;2;",
+            "binary-subspace:dimension=3,basis=1;2;0xg",
+            "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+            "binary-subspace:dimension=3,basis=1;2;4,select=gated-rank",
+            "binary-subspace:dimension=4294967299,basis=1;2;4",
+            "binary-subspace:dimension=4294967299",
+            "binary-subspace:dimension=0,basis=1",
+            "binary-subspace:dimension=31,basis=1",
+            "binary-subspace:dimension=18446744073709551615,basis=1",
+        ] {
+            let (_, bad) = Params::parse_spec(recipe).unwrap();
+            assert!(
+                builder.build(&ctx, &bad, &mut GroupOps::default()).is_err(),
+                "accepted invalid recipe: {recipe}"
+            );
+        }
+    }
+}
+
+/// Why `wsum` with `targets=stride-generator` meets dependent rows that
+/// `targets=walk` does not: the hits of the progression `R_k = Q + [k]G`
+/// are not independent box entries.  Whenever a short seed relation
+/// `w·S = [m]G` holds (`w` a difference of two box points, `m` a small
+/// integer, here found by the test and not assumed), `R_k = T_e` gives
+/// `R_{k+m} = T_{e+w}`: the hit repeats `m` steps later, on the line
+/// `e + t·w`, with `b = 1` in every row.  Rows `(e, −1 | k)` on one line
+/// are rank 2.  A walk row carries a random `b`, which breaks the line.
+/// The dependence is arithmetic, not a row-handling defect.
+#[cfg(test)]
+mod wsum_stride_dependence_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        Calibration, CountedGroup, PrimeCurve, PrimeInstance, PrimePoint, WSumTable,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    /// The `train-k32` curve of the round-28 session: `r = 536884639`,
+    /// cofactor 8, `log2 r = 29`.
+    fn instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "train-k32".into(),
+            curve: PrimeCurve {
+                p: 4294967197,
+                a: 1173263412,
+                b: 337904346,
+            },
+            group_order: 4295077112,
+            r: 536884639,
+            cofactor: 8,
+            generator: (1431665017, 592057774),
+
+            representation: None,
+        }
+    }
+
+    fn ctx<'a>(inst: &'a PrimeInstance, q: PrimePoint) -> InstanceCtx<'a, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn base_params() -> Params {
+        Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=32")
+            .unwrap()
+            .1
+    }
+
+    fn dependent_runs(inst: &PrimeInstance, targets: Targets, runs: u64) -> (u64, u64) {
+        let (mut dependent, mut found) = (0, 0);
+        for s in 0..runs {
+            let mut ops = GroupOps::default();
+            let q = inst
+                .curve
+                .mul(&mut ops, inst.generator_point(), 12345 + 7919 * s);
+            let spec = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base_params(),
+                oracle: "wsum".into(),
+                oracle_params: Params::parse_spec("wsum:coef=120,free=1").unwrap().1,
+                targets,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let rep = run_pipeline(
+                &ctx(inst, q),
+                &spec,
+                &PrimeProjectedAbscissaBase { instance: inst },
+                &mut WSumOracle::<PrimePoint>::new(),
+                u64::MAX,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            dependent += u64::from(rep.linear_algebra.dependent > 0);
+            found += rep.decomposition.relations_found;
+        }
+        (dependent, found)
+    }
+
+    #[test]
+    fn stride_generator_hits_repeat_along_a_short_seed_relation() {
+        let inst = instance();
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let mut build_ctx_ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, gen), &base_params(), &mut build_ctx_ops)
+            .unwrap();
+        let table = WSumTable::build(g, &fb, 120, true).unwrap();
+
+        // Hits of Q + [k]G: (k, e) with e·S = R_k, four hits per target.
+        let mut runs: Vec<Vec<(u64, Vec<i64>)>> = Vec::new();
+        for s in 0..12u64 {
+            let q = g.mul(&mut ops, gen, 12345 + 7919 * s);
+            let (mut hits, mut point, mut lookups) = (Vec::new(), q, 0u64);
+            for k in 0..400_000u64 {
+                if k > 0 {
+                    point = g.add(&mut ops, point, gen);
+                }
+                if g.is_identity(&point) {
+                    continue;
+                }
+                if let Some(summands) = table.probe(g, &fb, &mut ops, &mut lookups, point) {
+                    // Recover e from the signed summands: +1 per seed
+                    // index, −1 per negated one (seeds sit at even index).
+                    let mut e = vec![0i64; table.c];
+                    for i in summands {
+                        e[fb.col_of[i]] += if i % 2 == 0 { 1 } else { -1 };
+                    }
+                    hits.push((k, e));
+                    if hits.len() == 4 {
+                        break;
+                    }
+                }
+            }
+            runs.push(hits);
+        }
+
+        // Every pair of hits obeys (e' − e)·S = [k' − k]G, by group
+        // arithmetic, with no logarithm known.
+        let seeds = |e: &[i64], ops: &mut GroupOps| {
+            let mut acc = g.identity();
+            for (c, &ec) in e.iter().enumerate() {
+                let p = fb.points[fb.col_of.iter().position(|&x| x == c).unwrap()];
+                let t = g.mul(ops, p, ec.unsigned_abs());
+                acc = g.add(ops, acc, if ec < 0 { g.neg(t) } else { t });
+            }
+            acc
+        };
+        let mut progressions = 0;
+        for hits in &runs {
+            for i in 0..hits.len() {
+                for j in i + 1..hits.len() {
+                    let (ki, ei) = &hits[i];
+                    let (kj, ej) = &hits[j];
+                    let w: Vec<i64> = ei.iter().zip(ej).map(|(a, b)| b - a).collect();
+                    let lhs = seeds(&w, &mut ops);
+                    let rhs = g.mul(&mut ops, gen, kj - ki);
+                    assert_eq!(lhs, rhs, "(e'−e)·S = [Δk]G must hold");
+                }
+            }
+            // A progression: three hits k, k+m, k+2m on the line e + t·w.
+            for i in 0..hits.len().saturating_sub(2) {
+                let ((k0, e0), (k1, e1), (k2, e2)) = (&hits[i], &hits[i + 1], &hits[i + 2]);
+                if k1 - k0 == k2 - k1 {
+                    let w0: Vec<i64> = e0.iter().zip(e1).map(|(a, b)| b - a).collect();
+                    let w1: Vec<i64> = e1.iter().zip(e2).map(|(a, b)| b - a).collect();
+                    assert_eq!(w0, w1, "equal Δk, equal Δe: the hits are collinear");
+                    // The relation both rows reveal: w·S = [m]G, m small.
+                    eprintln!("progression m={} w={:?} e0={:?}", k1 - k0, w0, e0);
+                    progressions += 1;
+                }
+            }
+        }
+        for (s, hits) in runs.iter().enumerate() {
+            let rows: Vec<String> = hits
+                .iter()
+                .map(|(k, e)| format!("(e1,e2,a,b)=({},{},{},1)", e[0], e[1], k))
+                .collect();
+            eprintln!("target {s}: {}", rows.join(" "));
+        }
+        assert!(
+            progressions > 0,
+            "the curve's seeds have a short relation w·S = [m]G, so some target has a progression"
+        );
+    }
+
+    #[test]
+    fn stride_generator_runs_are_dependent_and_walk_runs_are_not() {
+        let inst = instance();
+        let (walk_dep, walk_found) = dependent_runs(&inst, Targets::Walk, 8);
+        let (stride_dep, stride_found) = dependent_runs(&inst, Targets::StrideGenerator, 8);
+        eprintln!("walk: dependent runs {walk_dep}/8, relations {walk_found}");
+        eprintln!("stride-generator: dependent runs {stride_dep}/8, relations {stride_found}");
+        assert_eq!(walk_dep, 0, "random (a, b) rows are independent");
+        assert_eq!(walk_found, 8 * 3);
+        assert!(stride_dep >= 1, "progression rows are collinear");
+        assert!(stride_found > walk_found);
+    }
+}
+
+/// `wwalk` end to end on the `train-k32` curve: the planted logarithm is
+/// recovered with walk targets and with stride-generator targets, the
+/// free rows hold, and the fraction of bases with a verified free row is
+/// reported against the proposal's `1 − exp(−x²)`.
+#[cfg(test)]
+mod wwalk_pipeline_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{Calibration, PrimeCurve, PrimeInstance, PrimePoint};
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    fn instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "train-k32".into(),
+            curve: PrimeCurve {
+                p: 4294967197,
+                a: 1173263412,
+                b: 337904346,
+            },
+            group_order: 4295077112,
+            r: 536884639,
+            cofactor: 8,
+            generator: (1431665017, 592057774),
+
+            representation: None,
+        }
+    }
+
+    fn ctx<'a>(inst: &'a PrimeInstance, q: PrimePoint) -> InstanceCtx<'a, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn base_params(scan: u64) -> Params {
+        Params::parse_spec(&format!("prime-projected-abscissa:size=2,scan_cap={scan}"))
+            .unwrap()
+            .1
+    }
+
+    /// One run: (verified, free rows emitted, probe hits, steps grown).
+    /// The oracle's own seed is `s`, so every run walks another path over
+    /// the same two seeds.
+    fn run(inst: &PrimeInstance, targets: Targets, spec: &str, s: u64) -> (bool, u64, u64, u64) {
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base_params(32),
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        (
+            rep.verified && rep.recovered == Some(planted),
+            ctr["free_rows_emitted"],
+            ctr["probe_hits"],
+            oracle.table().unwrap().grown_steps,
+        )
+    }
+
+    #[test]
+    fn wwalk_recovers_the_planted_log_with_walk_and_stride_targets() {
+        let inst = instance();
+        for (targets, label) in [
+            (Targets::Walk, "walk"),
+            (Targets::StrideGenerator, "stride-generator"),
+        ] {
+            for spec in ["wwalk:x=1.2", "wwalk:x=0.6", "wwalk:x=0.6,grow=1"] {
+                let (mut ok, mut rows, mut hits, mut grown, mut no_row) = (0, 0, 0, 0, 0);
+                let n = 16;
+                for s in 0..n {
+                    let (verified, free, probe_hits, g) = run(&inst, targets, spec, s);
+                    assert!(verified, "{label} {spec} s={s}: planted log not recovered");
+                    ok += 1;
+                    rows += free;
+                    hits += probe_hits;
+                    grown += u64::from(g > 0);
+                    no_row += u64::from(free == 0);
+                    // With a free row two hits pin the log; without, three.
+                    assert!(
+                        probe_hits >= if free > 0 { 2 } else { 3 },
+                        "{label} {spec} s={s}: {probe_hits} hits with {free} free rows"
+                    );
+                }
+                eprintln!(
+                    "{label} {spec}: recovered {ok}/{n}, runs without a free row {no_row}, \
+                     free rows {rows}, mean hits {:.2}, runs that grew {grown}",
+                    hits as f64 / n as f64
+                );
+                assert_eq!(ok, n);
+                if spec.contains("grow") {
+                    assert!(grown > 0, "{label}: growth never exercised");
+                } else if spec.contains("0.6") {
+                    assert!(no_row > 0, "{label}: the no-free-row path never exercised");
+                }
+            }
+        }
+    }
+
+    /// One run in full: the report beside the oracle's counters.
+    struct Full {
+        verified: bool,
+        free_rows: u64,
+        hits: u64,
+        rows_used: u64,
+        steps: u64,
+        t: u64,
+        rank2: bool,
+        gae: f64,
+        setup_gae: f64,
+        s: f64,
+    }
+
+    fn run_full(inst: &PrimeInstance, targets: Targets, spec: &str, s: u64) -> Full {
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base_params(32),
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        let table = oracle.table().unwrap();
+        Full {
+            verified: rep.verified && rep.recovered == Some(planted),
+            free_rows: ctr["free_rows_emitted"],
+            hits: ctr["probe_hits"],
+            rows_used: rep.linear_algebra.rows,
+            steps: table.steps,
+            t: table.t,
+            rank2: table.seed_rank(inst.r) == 2,
+            gae: rep.total_gae,
+            setup_gae: rep.decomposition.setup.gae,
+            s: rep.s,
+        }
+    }
+
+    /// `g=1,grow=2`: both seed logs are pinned by the free rows, so one
+    /// probe hit solves the target, with walk and stride-generator targets.
+    /// A row `Relation::Row { a != 0, b: 0 }` is read by the loop as
+    /// `Σ coef·x = h·a`, which this recovery (cofactor 8) confirms.
+    #[test]
+    fn wwalk_g_grow2_recovers_with_one_probe_hit() {
+        let inst = instance();
+        for (targets, label) in [
+            (Targets::Walk, "walk"),
+            (Targets::StrideGenerator, "stride-generator"),
+        ] {
+            let (mut rank2, mut hits1, n) = (0, 0, 16);
+            for s in 0..n {
+                let f = run_full(&inst, targets, "wwalk:x=1.0,g=1,grow=2", s);
+                assert!(f.verified, "{label} s={s}: planted log not recovered");
+                if f.rank2 {
+                    rank2 += 1;
+                    assert_eq!(f.hits, 1, "{label} s={s}: rank-2 rows, {} hits", f.hits);
+                    assert!(f.free_rows >= 2);
+                    hits1 += 1;
+                } else {
+                    // Capped at 3T below rank 2: more hits needed.
+                    assert_eq!(f.steps, 3 * f.t);
+                    assert!(f.hits >= 2, "{label} s={s}: {} hits", f.hits);
+                }
+            }
+            eprintln!("{label} wwalk:x=1.0,g=1,grow=2: rank-2 tables {rank2}/{n}, solved by one hit {hits1}");
+            assert!(rank2 >= n / 2);
+        }
+    }
+
+    /// The trend before an ecbench round: `g=0,grow=1` against
+    /// `g=1,grow=2`, 16 runs each at x in {0.8, 1.0, 1.2}.
+    #[test]
+    fn wwalk_g_trend_report() {
+        let inst = instance();
+        let sqrt_r = (inst.r as f64).sqrt();
+        let n = 16u64;
+        eprintln!("spec | mean rows used | mean hits | mean steps/sqrt(r) | mean GAE | mean build GAE | S=GAE/sqrt(r)");
+        for x in ["0.8", "1.0", "1.2"] {
+            for spec in [
+                format!("wwalk:x={x},grow=1"),
+                format!("wwalk:x={x},g=1,grow=2"),
+            ] {
+                let (mut rows, mut hits, mut steps, mut gae, mut setup, mut s_sum) =
+                    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                for s in 0..n {
+                    let f = run_full(&inst, Targets::Walk, &spec, s);
+                    assert!(f.verified, "{spec} s={s}");
+                    rows += f.rows_used as f64;
+                    hits += f.hits as f64;
+                    steps += f.steps as f64 / sqrt_r;
+                    gae += f.gae;
+                    setup += f.setup_gae;
+                    s_sum += f.s;
+                }
+                let n = n as f64;
+                eprintln!(
+                    "{spec} | {:.2} | {:.2} | {:.3} | {:.0} | {:.0} | {:.3}",
+                    rows / n,
+                    hits / n,
+                    steps / n,
+                    gae / n,
+                    setup / n,
+                    s_sum / n
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn wwalk_free_row_fraction_against_the_proposal() {
+        use crate::cryptanalysis::ic_boundary::WalkTable;
+        let inst = instance();
+        let g = &inst.curve;
+        let mut cap_ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(
+                &ctx(&inst, inst.generator_point()),
+                &base_params(32),
+                &mut cap_ops,
+            )
+            .unwrap();
+        for x in [0.6f64, 1.2] {
+            let (mut bases, mut with_row, mut rows) = (0u64, 0u64, 0u64);
+            for s in 0..300u64 {
+                // The same two seeds, another walk (jumps and steps) each time.
+                let t = WalkTable::build(g, &fb, inst.r, x, 16, false, s).unwrap();
+                bases += 1;
+                with_row += u64::from(!t.rows.is_empty());
+                rows += t.rows.len() as u64;
+                // Every row holds as a group equation: recompute the
+                // collision from scratch is done inside `build`; here, the
+                // count must agree with the verified collisions.
+                assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            }
+            let pred = 1.0 - (-x * x).exp();
+            // The grown walk from the same x0: how far it goes to a row.
+            let (mut g_rows, mut g_steps) = (0u64, 0u64);
+            for s in 0..300u64 {
+                let t = WalkTable::build(g, &fb, inst.r, x, 16, true, s).unwrap();
+                g_rows += u64::from(!t.rows.is_empty());
+                g_steps += t.steps;
+            }
+            eprintln!(
+                "x0={x} grow: fraction with a row {:.3} (cap 2x0), mean steps/T0 {:.3}",
+                g_rows as f64 / 300.0,
+                g_steps as f64 / 300.0 / (x * (inst.r as f64).sqrt()).round()
+            );
+            eprintln!(
+                "x={x}: walks {bases} over one seed pair, fraction with a verified free row {:.3} (prediction 1-exp(-x^2) = {pred:.3}), mean rows {:.3} (x^2 = {:.3})",
+                with_row as f64 / bases as f64,
+                rows as f64 / bases as f64,
+                x * x
+            );
+        }
+    }
+
+    /// `tw=1` (target in the walk, one-seed base) end to end on
+    /// `train-k32`, plain and chained jumps (`cj=1`): the planted log is
+    /// recovered with stride-generator targets; a walk that reached rank 2
+    /// solves on the first trial with no probe; the ledger breakdown sums to
+    /// the oracle set-up; the chained jumps cost fewer set-up additions; and
+    /// the option refusals hold.
+    #[test]
+    fn wwalk_target_in_walk_recovers_on_the_first_trial() {
+        let inst = instance();
+        let one = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+            .unwrap()
+            .1;
+        let run_tw = |spec: &str, s: u64| {
+            let planted = 12345 + 7919 * s;
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+            let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: one.clone(),
+                oracle: name,
+                oracle_params,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let rep = run_pipeline(
+                &ctx(&inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+            assert!(oracle.table().is_none(), "tw=1 builds no WalkTable");
+            let walk = oracle.target_walk().expect("tw=1 builds a TargetWalk");
+            let mut sum = walk.setup_ops;
+            sum.merge(walk.walk_ops);
+            sum.merge(walk.verify_ops);
+            assert_eq!(
+                sum.gae(),
+                rep.decomposition.setup.gae,
+                "{spec} s={s}: ledgers"
+            );
+            assert_eq!(ctr["tw_walk_adds"], walk.steps);
+            (
+                rep.verified && rep.recovered == Some(planted),
+                ctr["tw_rank"],
+                ctr["probe_hits"],
+                rep.decomposition.targets_tried,
+                walk.setup_ops.adds,
+                walk.steps as f64 / (inst.r as f64).sqrt(),
+            )
+        };
+        let n = 12u64;
+        let mut setup_adds = [0u64; 2];
+        for (i, spec) in [
+            "wwalk:x=1.5,g=1,grow=2,tw=1",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut steps = 0.0;
+            for s in 0..n {
+                let (ok, rank, hits, trials, adds, st) = run_tw(spec, s);
+                assert!(ok, "{spec} s={s}: planted log not recovered");
+                if rank == 2 {
+                    assert_eq!(hits, 0, "{spec} s={s}: rank 2 needs no probe");
+                    assert_eq!(trials, 1, "{spec} s={s}: rank 2 solves on trial 1");
+                }
+                setup_adds[i] += adds;
+                steps += st;
+            }
+            eprintln!(
+                "{spec}: recovered {n}/{n}, mean walk steps {:.3} sqrt(r), mean set-up adds {:.1}",
+                steps / n as f64,
+                setup_adds[i] as f64 / n as f64
+            );
+        }
+        assert!(
+            setup_adds[1] * 2 < setup_adds[0],
+            "chained jumps should at least halve the set-up additions: {setup_adds:?}"
+        );
+        // Refusals: tw without g or grow=2, cj without tw, tw on two seeds.
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), 777);
+        let fb1 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &one, &mut ops)
+            .unwrap();
+        let fb2 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &base_params(32), &mut ops)
+            .unwrap();
+        for (fb, spec, needle) in [
+            (&fb1, "wwalk:x=1.5,grow=2,tw=1", "tw=1 needs g=1 and grow=2"),
+            (
+                &fb1,
+                "wwalk:x=1.5,g=1,grow=1,tw=1",
+                "tw=1 needs g=1 and grow=2",
+            ),
+            (&fb1, "wwalk:x=1.5,g=1,grow=2,cj=1", "cj=1 needs tw=1"),
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=1", "exactly 1 abscissa"),
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let err = DecompositionOracle::<PrimeCurve>::prepare(
+                &mut oracle,
+                &ctx(&inst, q),
+                fb,
+                &params,
+                &mut ops,
+            )
+            .unwrap_err();
+            assert!(err.contains(needle), "{spec}: {err}");
+        }
+    }
+
+    /// What one pipeline run of a `wwalk` spec leaves, for the pairings
+    /// below.
+    struct Pair {
+        verified: bool,
+        gae: f64,
+        verify_gae: f64,
+        ctr: BTreeMap<String, u64>,
+        trials: u64,
+        steps: u64,
+    }
+
+    fn run_pair(spec: &str, size: u64, targets: Targets, s: u64) -> Pair {
+        let inst = instance();
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let base = Params::parse_spec(&format!("prime-projected-abscissa:size={size},scan_cap=32"))
+            .unwrap()
+            .1;
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base,
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(&inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: &inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        let steps = oracle
+            .target_walk()
+            .map(|w| w.steps)
+            .or_else(|| oracle.table().map(|t| t.steps))
+            .unwrap();
+        Pair {
+            verified: rep.verified && rep.recovered == Some(planted),
+            gae: rep.total_gae,
+            verify_gae: rep.verify.gae,
+            ctr,
+            trials: rep.decomposition.targets_tried,
+            steps,
+        }
+    }
+
+    /// `sib=m,pool=M` through the parameter parser and the pipeline: the
+    /// planted log is recovered and the pipeline's own `[d]G = Q` check
+    /// passes with one and two seeds, verified and lazy; the second-point
+    /// counter and its marker are emitted; the option refusals hold.
+    #[test]
+    fn wwalk_sibling_points_recover_end_to_end() {
+        for (spec, size) in [
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1,sib=4,pool=32", 2u64),
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1,sib=8,pool=64", 2),
+            ("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4,pool=32", 1),
+        ] {
+            let mut full = 0u64;
+            for s in 0..12u64 {
+                for lazy in ["", ",lazy=1"] {
+                    let a = run_pair(&format!("{spec}{lazy}"), size, Targets::StrideGenerator, s);
+                    assert!(a.verified, "{spec}{lazy} s={s}: planted log not recovered");
+                    assert!(a.ctr["tw_sib_pairs"] + a.ctr["tw_sib_degenerate"] > 0);
+                    assert!(a.ctr["tw_sib_second_points"] <= a.ctr["tw_sib_pairs"]);
+                    if lazy.is_empty() {
+                        full += 1;
+                    } else {
+                        assert_eq!(a.ctr["tw_lazy_failures"], 0);
+                    }
+                }
+            }
+            assert_eq!(full, 12);
+        }
+        for bad in [
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,pool=32",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4,pool=3",
+            "wwalk:x=1.5,g=1,grow=2,sib=4,pool=32",
+        ] {
+            let inst = instance();
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), 77);
+            let (_, p) = Params::parse_spec(bad).unwrap();
+            let fb = PrimeProjectedAbscissaBase { instance: &inst };
+            let base = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+                .unwrap()
+                .1;
+            let _ = (&fb, &base);
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base,
+                oracle: "wwalk".into(),
+                oracle_params: p,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 1000,
+                seed: 1,
+                ..Default::default()
+            };
+            let res = run_pipeline(
+                &ctx(&inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut oracle,
+                77,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            );
+            assert!(res.is_err(), "{bad} should be refused");
+        }
+    }
+
+    /// Prime-order curves above the old `r < 2^31` limit: `sib`, `lazy=1`
+    /// and `cv=0` on the two-seed walk recover and verify the planted log at
+    /// r ≈ 2^34 and r ≈ 2^38 (the `u128` coefficient word, `TW_COEF_BITS`),
+    /// and the plain `WalkTable` keeps its 32-bit refusal there.
+    #[test]
+    fn wwalk_target_walk_runs_above_two_to_the_31() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
+        for bits in [35u32, 39] {
+            let spec = CurveSpec::PrimeOrbitShape {
+                shape: "generic_a_minus_3".into(),
+                bits,
+                seed: 7,
+            };
+            let Instance::Prime(inst) = spec.build().unwrap() else {
+                panic!("a prime instance");
+            };
+            assert!(inst.r >= 1 << 31, "r={} is not above 2^31", inst.r);
+            let base = Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=32")
+                .unwrap()
+                .1;
+            let pre = "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1";
+            for (arm, s) in [
+                (format!("{pre},lazy=1,sib=8,pool=256"), 1u64),
+                (format!("{pre},sib=8,pool=64"), 2),
+                (format!("{pre},lazy=1"), 3),
+                (format!("{pre},cv=0"), 4),
+            ] {
+                let planted = (inst.r / 3 + 7919 * s) % inst.r;
+                let mut ops = GroupOps::default();
+                let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+                let (name, oracle_params) = Params::parse_spec(&format!("{arm},seed={s}")).unwrap();
+                let ps = PipelineSpec {
+                    factor_base: "prime-projected-abscissa".into(),
+                    factor_base_params: base.clone(),
+                    oracle: name,
+                    oracle_params,
+                    targets: Targets::StrideGenerator,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 5_000_000,
+                    seed: s,
+                    ..Default::default()
+                };
+                let mut oracle = WWalkOracle::<PrimePoint>::new();
+                let rep = run_pipeline(
+                    &ctx(&inst, q),
+                    &ps,
+                    &PrimeProjectedAbscissaBase { instance: &inst },
+                    &mut oracle,
+                    planted,
+                    &Calibration {
+                        ns_per_add: 1.0,
+                        ns_per_double: 1.0,
+                        ..Default::default()
+                    },
+                    None,
+                )
+                .unwrap_or_else(|e| panic!("{arm} at {bits} bits: {e}"));
+                assert!(
+                    rep.verified && rep.recovered == Some(planted),
+                    "{arm} at {bits} bits: planted log not recovered"
+                );
+                if arm.contains("sib") {
+                    let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+                    assert!(ctr["tw_sib_pairs"] > 0);
+                }
+            }
+        }
+        // The plain walk table still packs coefficients in 32 bits.
+        let r = 1u64 << 39;
+        let opts = crate::cryptanalysis::ic_boundary::WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        assert!(crate::cryptanalysis::ic_boundary::wwalk_plan_check(r, 2.0, 16, opts).is_err());
+        assert!(crate::cryptanalysis::ic_boundary::wwalk_plan_check_bits(
+            r,
+            2.0,
+            16,
+            opts,
+            crate::cryptanalysis::ic_boundary::TW_COEF_BITS
+        )
+        .is_ok());
+    }
+
+    /// `aut=3` on `j = 0`, `b = 7` prime-order curves: orbit-canonical keys
+    /// under `ζ₃` recover and verify the planted log with lazy, verified,
+    /// `cv=0`, sibling and one-seed walks; rotated collisions occur and are
+    /// solved; every canonicalisation charges two field multiplications;
+    /// curves without the structure and `tw=0` are refused.
+    #[test]
+    fn wwalk_aut3_recovers_on_j0_curves_and_refuses_elsewhere() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
+        let build = |shape: &str, bits: u32, seed: u64| {
+            let Instance::Prime(inst) = (CurveSpec::PrimeOrbitShape {
+                shape: shape.into(),
+                bits,
+                seed,
+            })
+            .build()
+            .unwrap() else {
+                panic!("a prime instance");
+            };
+            inst
+        };
+        let run = |inst: &PrimeInstance, arm: &str, size: u64, s: u64| {
+            let planted = (inst.r / 5 + 7919 * s) % inst.r;
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+            let base =
+                Params::parse_spec(&format!("prime-projected-abscissa:size={size},scan_cap=32"))
+                    .unwrap()
+                    .1;
+            let (name, oracle_params) = Params::parse_spec(&format!("{arm},seed={s}")).unwrap();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base,
+                oracle: name,
+                oracle_params,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let rep = run_pipeline(
+                &ctx(inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: inst },
+                &mut oracle,
+                planted,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            );
+            (rep, oracle, planted)
+        };
+        let pre2 = "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1";
+        let mut rotated = 0u64;
+        for (bits, cseed) in [(28u32, 3u64), (34, 5)] {
+            let inst = build("j0_b7", bits, cseed);
+            for (arm, size) in [
+                (format!("{pre2},lazy=1,aut=3"), 2u64),
+                (format!("{pre2},aut=3"), 2),
+                (format!("{pre2},cv=0,aut=3"), 2),
+                (format!("{pre2},lazy=1,sib=8,pool=256,aut=3"), 2),
+                (
+                    "wwalk:x=2.0,g=1,grow=2,tw=1,cj=1,lazy=1,aut=3".to_string(),
+                    1,
+                ),
+            ] {
+                for s in 0..4u64 {
+                    let (rep, oracle, planted) = run(&inst, &arm, size, s);
+                    let rep = rep.unwrap_or_else(|e| panic!("{arm} at {bits} bits: {e}"));
+                    assert!(
+                        rep.verified && rep.recovered == Some(planted),
+                        "{arm} at {bits} bits s={s}: planted log not recovered"
+                    );
+                    let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+                    assert!(
+                        ctr["aut_canonicalisations_uncharged"] > 0,
+                        "{arm}: no canonicalisation"
+                    );
+                    rotated += ctr["tw_aut_rotated_collisions"];
+                    let walk = oracle.target_walk().unwrap();
+                    assert!(walk.walk_ops.field_ops.muls >= 2 * walk.aut_canonicalisations);
+                }
+            }
+        }
+        // About two thirds of the collisions join different rotations.
+        assert!(rotated > 0, "no rotated collision was ever solved");
+        // Refusals: a curve without ζ₃, and the plain walk table.
+        let a3 = build("generic_a_minus_3", 28, 3);
+        let (rep, _, _) = run(&a3, &format!("{pre2},lazy=1,aut=3"), 2, 0);
+        assert!(rep.is_err(), "aut=3 on an a = -3 curve should be refused");
+        let j0 = build("j0_b7", 28, 3);
+        let (rep, _, _) = run(&j0, "wwalk:x=2.0,g=1,grow=2,aut=3", 2, 0);
+        assert!(rep.is_err(), "aut=3 without tw should be refused");
+    }
+
+    /// `tw=2` (size-2 `prime-projected-abscissa` base) and `lazy=1`, end to
+    /// end on `train-k32` (cofactor 8): the planted log is recovered and
+    /// verified; a rank-3 walk solves on the first trial without a probe; a
+    /// lazy arm has the walk, probe and collision counters of its verified
+    /// twin and no verify ledger, its total is lower, and the pipeline's own
+    /// charged check still runs (`verify` phase).  The option refusals hold.
+    #[test]
+    fn wwalk_two_seed_target_walk_and_lazy_recover_with_identical_walks() {
+        let n = 12u64;
+        // (spec, base size, lazy twin)
+        for (spec, size) in [
+            ("wwalk:x=1.5,g=1,grow=2,tw=2", 2u64),
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1", 2),
+            ("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1", 1),
+        ] {
+            let need = if size == 2 { 3 } else { 2 };
+            let (mut eager_gae, mut lazy_gae, mut rank_full) = (0.0, 0.0, 0u64);
+            for s in 0..n {
+                let a = run_pair(spec, size, Targets::StrideGenerator, s);
+                let b = run_pair(&format!("{spec},lazy=1"), size, Targets::StrideGenerator, s);
+                assert!(a.verified, "{spec} s={s}: planted log not recovered");
+                assert!(b.verified, "{spec},lazy s={s}: planted log not recovered");
+                assert!(b.verify_gae > 0.0, "the pipeline's final check is charged");
+                assert_eq!(b.ctr["tw_lazy_failures"], 0);
+                for key in [
+                    "tw_steps",
+                    "tw_collisions",
+                    "tw_rows",
+                    "tw_rank",
+                    "tw_walk_adds",
+                    "tw_setup_adds",
+                    "tw_setup_doubles",
+                    "probe_hits",
+                    "free_rows_emitted",
+                ] {
+                    assert_eq!(a.ctr[key], b.ctr[key], "{spec} s={s}: {key}");
+                }
+                assert_eq!(a.steps, b.steps);
+                assert_eq!(b.ctr["tw_verify_adds"], 0);
+                assert_eq!(b.ctr["tw_lazy_certified_rows"], b.ctr["tw_collisions"]);
+                assert_eq!(a.trials, b.trials);
+                if size == 2 {
+                    assert_eq!(a.ctr["tw_seeds"], 2);
+                }
+                if a.ctr["tw_rank"] == need {
+                    rank_full += 1;
+                    assert_eq!(
+                        a.ctr["probe_hits"], 0,
+                        "{spec} s={s}: full rank needs no probe"
+                    );
+                    assert_eq!(a.trials, 1);
+                }
+                eager_gae += a.gae;
+                lazy_gae += b.gae;
+            }
+            eprintln!(
+                "{spec}: {n}/{n} recovered, full rank in {rank_full}, total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}"
+            );
+            assert!(rank_full > 0);
+            assert!(lazy_gae < eager_gae, "{spec}: lazy is not cheaper");
+        }
+        // The C = 2 walk table, stride-generator targets: `lazy=1` leaves the
+        // walk, rows and probes alone and removes `verify_ops`.
+        let (mut eager_gae, mut lazy_gae) = (0.0, 0.0);
+        for s in 0..n {
+            let spec = "wwalk:x=1.0,g=1,grow=2";
+            let a = run_pair(spec, 2, Targets::StrideGenerator, s);
+            let b = run_pair(&format!("{spec},lazy=1"), 2, Targets::StrideGenerator, s);
+            assert!(a.verified && b.verified, "inc s={s}");
+            assert_eq!(a.steps, b.steps);
+            assert_eq!(a.ctr["probe_hits"], b.ctr["probe_hits"]);
+            assert_eq!(a.ctr["free_rows_emitted"], b.ctr["free_rows_emitted"]);
+            assert_eq!(
+                a.ctr["free_collisions_checked"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert_eq!(a.trials, b.trials);
+            assert_eq!(
+                b.ctr["wwalk_lazy_certified_rows"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert!(b.verify_gae > 0.0);
+            assert!(b.gae <= a.gae, "inc+lazy costs more at s={s}");
+            eager_gae += a.gae;
+            lazy_gae += b.gae;
+        }
+        eprintln!("inc: total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}");
+        assert!(lazy_gae < eager_gae);
+        // Refusals.
+        let inst = instance();
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), 777);
+        let one = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+            .unwrap()
+            .1;
+        let fb1 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &one, &mut ops)
+            .unwrap();
+        let fb2 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &base_params(32), &mut ops)
+            .unwrap();
+        for (fb, spec, needle) in [
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=2,lazy=1", ""),
+            (&fb1, "wwalk:x=1.5,g=1,grow=2,tw=2", "exactly 2 abscissae"),
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=3", "tw is 0, 1 or 2"),
+            (&fb2, "wwalk:x=1.5,grow=2,tw=2", "tw=2 needs g=1 and grow=2"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=1,tw=2",
+                "tw=2 needs g=1 and grow=2",
+            ),
+            (&fb2, "wwalk:x=1.5,lazy=1", "lazy=1 needs g=1"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=2,cj=1",
+                "cj=1 needs tw=1 or tw=2",
+            ),
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let res = DecompositionOracle::<PrimeCurve>::prepare(
+                &mut oracle,
+                &ctx(&inst, q),
+                fb,
+                &params,
+                &mut ops,
+            );
+            if needle.is_empty() {
+                assert!(res.is_ok(), "{spec}: {res:?}");
+            } else {
+                let err = res.unwrap_err();
+                assert!(err.contains(needle), "{spec}: {err}");
+            }
+        }
+    }
+}
+
+/// **`layout=lines` is a memory layout, not a different oracle.**  The
+/// opt-in cache-line pair index and prefetched relation guard (#3116)
+/// must leave every observable of the default (`map`) layout unchanged:
+/// the decomposition of every target, the counted group operations and
+/// native counters of the table build and of every probe, the relation
+/// stream the pipeline collects, and the solved logarithm.  Checked on
+/// several small prime-field curves and seeds, for both oracles that
+/// accept the option: `mitm:negation_folded=1` and `mitm-prime-batch:m=2`.
+#[cfg(test)]
+mod layout_lines_equality_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        find_prime_order_curve, prime_factor_base, prime_instance_for, Calibration, CountedGroup,
+        PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+    use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// The two oracle specs that accept `layout`, as the CLI spells them.
+    const SPECS: [&str; 2] = ["mitm:negation_folded=1", "mitm-prime-batch:m=2"];
+
+    /// Small prime-field curves: four roster curves and two curves drawn
+    /// by `find_prime_order_curve` off the roster, with a base size each.
+    fn curves() -> Vec<(PrimeInstance, usize)> {
+        vec![
+            (prime_instance_for(14, 1), 16),
+            (prime_instance_for(16, 1), 24),
+            (prime_instance_for(18, 1), 32),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(15, 20261106), 20),
+            (find_prime_order_curve(17, 3116), 28),
+        ]
+    }
+
+    fn oracle_for(name: &str) -> Box<dyn DecompositionOracle<PrimeCurve>> {
+        match name {
+            "mitm" => Box::new(MitmOracle::new(2)),
+            "mitm-prime-batch" => Box::new(PrimeBatchMitmOracle::new()),
+            other => panic!("no oracle {other}"),
+        }
+    }
+
+    /// `(name, default params, lines params)` for one spec string.
+    fn arms(spec: &str) -> (String, Params, Params) {
+        let (name, map) = Params::parse_spec(spec).unwrap();
+        let (_, lines) = Params::parse_spec(&format!("{spec},layout=lines")).unwrap();
+        assert_eq!(lines.get("layout"), Some("lines"));
+        assert_eq!(map.get("layout"), None);
+        (name, map, lines)
+    }
+
+    fn ctx(inst: &PrimeInstance, target: PrimePoint) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    /// The explicit `layout=map` spelling is the default, and the lines
+    /// layout is the only arm that turns the line guard on.
+    #[test]
+    fn layout_map_is_the_default_and_lines_selects_the_line_guard() {
+        let (inst, size) = curves().remove(1);
+        let fb = prime_factor_base(&inst, size);
+        let c = ctx(&inst, inst.generator_point());
+        for spec in SPECS {
+            let (name, map, lines) = arms(spec);
+            let (_, explicit) = Params::parse_spec(&format!("{spec},layout=map")).unwrap();
+            for (params, guard) in [(&map, false), (&explicit, false), (&lines, true)] {
+                let mut oracle = oracle_for(&name);
+                oracle
+                    .prepare(&c, &fb, params, &mut GroupOps::default())
+                    .unwrap();
+                assert_eq!(oracle.line_guard(), guard, "{spec} {params:?}");
+            }
+        }
+    }
+
+    /// Table build and every probe: same decompositions (as summand
+    /// indices and as the relations the pipeline is handed), same group
+    /// operations, same native counters, target by target.
+    #[test]
+    fn layout_lines_gives_identical_decompositions_and_counted_operations() {
+        for (inst, size) in curves() {
+            let fb = prime_factor_base(&inst, size);
+            let g = inst.generator_point();
+            let c = ctx(&inst, g);
+            for spec in SPECS {
+                let (name, map_params, line_params) = arms(spec);
+                let mut map = oracle_for(&name);
+                let mut lines = oracle_for(&name);
+                let mut map_build = GroupOps::default();
+                let mut line_build = GroupOps::default();
+                map.prepare(&c, &fb, &map_params, &mut map_build).unwrap();
+                lines
+                    .prepare(&c, &fb, &line_params, &mut line_build)
+                    .unwrap();
+                let label = format!("{} {spec}", inst.name);
+                assert!(!map.line_guard() && lines.line_guard(), "{label}");
+                assert_eq!(map_build, line_build, "{label}: build ops");
+                assert!(map_build.adds > 0, "{label}: the build counted nothing");
+                assert_eq!(
+                    map.setup_work_native(),
+                    lines.setup_work_native(),
+                    "{label}: build work"
+                );
+                assert_eq!(map.summands(), lines.summands(), "{label}");
+                for seed in [1u64, 7, 20261106] {
+                    let mut rng = StdRng::seed_from_u64(seed ^ inst.r);
+                    let mut map_ops = GroupOps::default();
+                    let mut line_ops = GroupOps::default();
+                    let mut map_ctr = OracleCounters::default();
+                    let mut line_ctr = OracleCounters::default();
+                    let mut hits = 0u64;
+                    let mut setup = GroupOps::default();
+                    for trial in 0..3000u64 {
+                        let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+                        let point = inst.curve.mul(&mut setup, g, a);
+                        let point = inst.curve.add(
+                            &mut setup,
+                            point,
+                            inst.curve.mul(&mut GroupOps::default(), g, b),
+                        );
+                        lines.touch(&c, &point);
+                        let m = map.decompose(&c, &fb, &mut map_ops, &mut map_ctr, point);
+                        let l = lines.decompose(&c, &fb, &mut line_ops, &mut line_ctr, point);
+                        assert_eq!(m, l, "{label} seed {seed} trial {trial}");
+                        if let Some(w) = &m {
+                            hits += 1;
+                            let sum = w.iter().fold(None::<PrimePoint>, |acc, &i| {
+                                Some(match acc {
+                                    None => fb.points[i],
+                                    Some(s) => {
+                                        inst.curve.add(&mut GroupOps::default(), s, fb.points[i])
+                                    }
+                                })
+                            });
+                            assert_eq!(sum, Some(point), "{label}: a wrong decomposition");
+                        }
+                        let mr: Vec<Relation> = map.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut map_ops,
+                            &mut map_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        let lr: Vec<Relation> = lines.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut line_ops,
+                            &mut line_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        assert_eq!(mr, lr, "{label} seed {seed} trial {trial}: relations");
+                    }
+                    assert!(hits > 0, "{label} seed {seed}: no target decomposed");
+                    assert_eq!(map_ops, line_ops, "{label} seed {seed}: probe ops");
+                    assert_eq!(
+                        format!("{map_ctr:?}"),
+                        format!("{line_ctr:?}"),
+                        "{label} seed {seed}: probe counters"
+                    );
+                    assert!(map_ctr.lookups > 0, "{label}: no lookup counted");
+                }
+                assert_eq!(
+                    map.relation_counters(),
+                    lines.relation_counters(),
+                    "{label}: relation counters"
+                );
+            }
+        }
+    }
+
+    fn assert_same_run(map: &RunReport, lines: &RunReport, label: &str) {
+        assert_eq!(map.recovered, lines.recovered, "{label}: recovered");
+        assert_eq!(map.verified, lines.verified, "{label}: verified");
+        assert_eq!(map.exhausted, lines.exhausted, "{label}: exhausted");
+        let (fm, fl) = (&map.factor_base, &lines.factor_base);
+        assert_eq!(fm.columns, fl.columns, "{label}");
+        assert_eq!(fm.signed_points, fl.signed_points, "{label}");
+        assert_eq!(fm.cost.group_ops, fl.cost.group_ops, "{label}: base ops");
+        assert_eq!(fm.cost.native, fl.cost.native, "{label}: base native");
+        let (dm, dl) = (&map.decomposition, &lines.decomposition);
+        assert_eq!(dm.targets_tried, dl.targets_tried, "{label}: targets");
+        assert_eq!(dm.relations_found, dl.relations_found, "{label}: relations");
+        assert_eq!(dm.setup.group_ops, dl.setup.group_ops, "{label}: setup ops");
+        assert_eq!(dm.setup.native, dl.setup.native, "{label}: setup native");
+        assert_eq!(dm.setup.work_native, dl.setup.work_native, "{label}");
+        assert_eq!(dm.setup.gae, dl.setup.gae, "{label}: setup gae");
+        assert_eq!(
+            dm.cost.group_ops, dl.cost.group_ops,
+            "{label}: relation ops"
+        );
+        assert_eq!(dm.cost.native, dl.cost.native, "{label}: relation native");
+        assert_eq!(dm.cost.work_native, dl.cost.work_native, "{label}");
+        assert_eq!(dm.cost.gae, dl.cost.gae, "{label}: relation gae");
+        let (lm, ll) = (&map.linear_algebra, &lines.linear_algebra);
+        assert_eq!(
+            (lm.rows, lm.rank, lm.dependent, lm.work),
+            (ll.rows, ll.rank, ll.dependent, ll.work),
+            "{label}: linear algebra"
+        );
+        assert_eq!(lm.cost.native, ll.cost.native, "{label}");
+        assert_eq!(map.verify.group_ops, lines.verify.group_ops, "{label}");
+        assert_eq!(map.total_gae, lines.total_gae, "{label}: total gae");
+        assert_eq!(map.s, lines.s, "{label}: S");
+    }
+
+    /// End to end: the same relation counts, the same counted cost in
+    /// every phase, and the same solved logarithm, with walk, random and
+    /// batched-lane targets (the lane source is the one that prefetches).
+    #[test]
+    fn layout_lines_solves_the_same_logarithm_at_the_same_counted_cost() {
+        let calib = Calibration::default();
+        let mut solved = 0;
+        for (inst, size) in curves() {
+            let g = inst.generator_point();
+            for planted_seed in [11u64, 30_011, 20_261_106] {
+                let planted = planted_seed % inst.r;
+                let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+                let c = ctx(&inst, q);
+                for spec in SPECS {
+                    let (name, map_params, line_params) = arms(spec);
+                    for targets in [Targets::Walk, Targets::Random, Targets::WalkPrimeBatch16] {
+                        for seed in [7u64, 3116] {
+                            let run = |params: &Params| {
+                                let mut spec = PipelineSpec {
+                                    factor_base: "prime-abscissa".into(),
+                                    oracle: name.clone(),
+                                    oracle_params: params.clone(),
+                                    targets,
+                                    max_trials: 2_000_000,
+                                    seed,
+                                    ..Default::default()
+                                };
+                                spec.factor_base_params.set("size", size.to_string());
+                                let mut oracle = oracle_for(&name);
+                                run_pipeline(
+                                    &c,
+                                    &spec,
+                                    &PrimeAbscissaBase { instance: &inst },
+                                    oracle.as_mut(),
+                                    planted,
+                                    &calib,
+                                    None,
+                                )
+                                .unwrap()
+                            };
+                            let map = run(&map_params);
+                            let lines = run(&line_params);
+                            let label = format!(
+                                "{} {spec} {} seed {seed} planted {planted}",
+                                inst.name,
+                                targets.name()
+                            );
+                            assert_same_run(&map, &lines, &label);
+                            if map.verified {
+                                assert_eq!(map.recovered, Some(planted), "{label}");
+                                solved += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Six curves × three logs × two specs × three sources × two seeds.
+        assert_eq!(solved, 216, "every configuration should solve");
+    }
+}
+
+#[cfg(test)]
+mod free_rows_probe {
+    //! Feasibility probe (not a result): how many target-free relations the
+    //! Frobenius-folded pair table's build-time key collisions give on the
+    //! frozen orbit panel, and their rank over the column unknowns mod r.
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::koblitz_instance;
+    use crate::cryptanalysis::koblitz_fast::FrobeniusCanon;
+    use num_traits::ToPrimitive;
+    use std::collections::HashMap;
+
+    fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+        ((a as u128 * b as u128) % r as u128) as u64
+    }
+    fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = mulmod(acc, a, r);
+            }
+            a = mulmod(a, a, r);
+            e >>= 1;
+        }
+        acc
+    }
+    fn rank(rows: &[Vec<u64>], cols: usize, r: u64) -> usize {
+        let mut piv: Vec<Option<Vec<u64>>> = vec![None; cols];
+        let mut rk = 0;
+        for row in rows {
+            let mut v = row.clone();
+            for c in 0..cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                match &piv[c] {
+                    Some(p) => {
+                        let f = v[c];
+                        for k in c..cols {
+                            v[k] = (v[k] + r - mulmod(f, p[k], r)) % r;
+                        }
+                    }
+                    None => {
+                        let inv = powmod(v[c], r - 2, r);
+                        for k in c..cols {
+                            v[k] = mulmod(v[k], inv, r);
+                        }
+                        piv[c] = Some(v);
+                        rk += 1;
+                        break;
+                    }
+                }
+            }
+            if rk == cols {
+                break;
+            }
+        }
+        rk
+    }
+
+    #[test]
+    #[ignore]
+    fn frobenius_table_free_rows_probe() {
+        let panel: &[(u8, u32, usize)] = &[
+            (0, 13, 1),
+            (1, 17, 1),
+            (0, 19, 2),
+            (0, 23, 3),
+            (1, 29, 1),
+            (0, 31, 2),
+            (0, 37, 8),
+            (0, 41, 90),
+        ];
+        for &(a, n, c) in panel {
+            let inst = koblitz_instance(a, n).expect("instance");
+            let g = BinaryGroup(&inst.fast);
+            let ctx = InstanceCtx {
+                group: &g,
+                generator: inst.generator,
+                target: inst.generator,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: Some(inst.n),
+            };
+            let (_, params) = Params::parse_spec(&format!(
+                "compact-orbit-scan:columns={c},raw_x_cap=100000000"
+            ))
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = CompactOrbitScanBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            let r = inst.r;
+            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r)
+                .to_u64()
+                .unwrap();
+            let canon = FrobeniusCanon::new(&inst.gf, inst.n).unwrap();
+            let f = fb.points.len();
+            let cols = fb.columns;
+            // Orbit representatives exactly as FrobeniusPairTable::build_inner.
+            let mut orbit_of = vec![0u32; f];
+            let mut reps: Vec<usize> = Vec::new();
+            let mut idx: HashMap<u64, u32> = HashMap::new();
+            for i in 0..f {
+                let key = canon.canon(fb.points[i].x);
+                let next = reps.len() as u32;
+                let id = *idx.entry(key).or_insert(next);
+                if id == next {
+                    reps.push(i);
+                }
+                orbit_of[i] = id;
+            }
+            let mut map: HashMap<u64, (usize, usize, u32, FastPoint)> = HashMap::new();
+            let (mut attempts, mut collisions, mut mismatches) = (0u64, 0u64, 0u64);
+            let mut rows: Vec<Vec<u64>> = Vec::new();
+            let mut ops2 = GroupOps::default();
+            for (orbit, &rep) in reps.iter().enumerate() {
+                for j in 0..f {
+                    if (orbit_of[j] as usize) < orbit {
+                        continue;
+                    }
+                    let u = g.add(&mut ops2, fb.points[rep], fb.points[j]);
+                    if u.infinity {
+                        continue;
+                    }
+                    attempts += 1;
+                    let (key, t_u) = canon.canon_with_shift(u.x);
+                    match map.get(&key) {
+                        None => {
+                            map.insert(key, (rep, j, t_u, u));
+                        }
+                        Some(&(i0, j0, t0, u0)) => {
+                            collisions += 1;
+                            let t = (t0 + n - t_u) % n;
+                            let v = inst.fast.frobenius_k(u0, t);
+                            let s_neg = if v == u {
+                                false
+                            } else if v == g.neg(u) {
+                                true
+                            } else {
+                                mismatches += 1;
+                                continue;
+                            };
+                            let mut row = vec![0u64; cols];
+                            for &k in &[rep, j] {
+                                let col = fb.col_of[k];
+                                row[col] = (row[col] + fb.coef_of[k] % r) % r;
+                            }
+                            let lt = powmod(lambda, t as u64, r);
+                            for &k in &[i0, j0] {
+                                let col = fb.col_of[k];
+                                let mut term = mulmod(lt, fb.coef_of[k] % r, r);
+                                if !s_neg {
+                                    term = (r - term) % r;
+                                }
+                                row[col] = (row[col] + term) % r;
+                            }
+                            if row.iter().any(|&x| x != 0) {
+                                rows.push(row);
+                            }
+                        }
+                    }
+                }
+            }
+            let rk = rank(&rows, cols, r);
+            println!(
+                "n{n} a{a} c{cols} |F| {f} reps {} entries {} attempts {attempts} collisions {collisions} nonzero rows {} rank {rk} (need {}) mismatches {mismatches} r 2^{:.1}",
+                reps.len(),
+                map.len(),
+                rows.len(),
+                cols.saturating_sub(1),
+                (r as f64).log2()
+            );
+        }
+    }
+}
+
+// ── k-sum folded by the signed Frobenius (Koblitz) ───────────────────
+
+/// Most `k`-sum completions [`FrobeniusKSumTable::build`] agrees to try:
+/// a guard against a base whose folded table would not fit in memory.
+pub const FROB_KSUM_MAX_ATTEMPTS: u64 = 1 << 28;
+
+use crate::cryptanalysis::ic_boundary::{fast_map, FastMap};
+
+/// **A table of every signed `k`-sum of a Frobenius-closed base, folded by
+/// the signed Frobenius `⟨σ, −1⟩`** (Koblitz curves, `k = 3` to `5`).
+///
+/// `σ` is a group automorphism, so `σ^t(Σ ε_i P_i) = Σ ε_i σ^t(P_i)`, and
+/// the `2n` images of a sum share one canonical name of its abscissa
+/// ([`FrobeniusCanon`]).  The table keeps one sum per such orbit: the
+/// first summand is the representative of the least orbit the sum meets
+/// (the rotation and sign that bring a summand there are absorbed by the
+/// fold), the others are base points at strictly later positions of the
+/// orbit-sorted base, no two on one abscissa.  About `1/(2n)` of the
+/// unfolded table of the same signed points.
+///
+/// A probe canonicalises the target's abscissa once; the entry's shift and
+/// the target's give the rotation `t`; the summands `σ^t(P_i)` are read
+/// from an orbit-member index built once (`n − 1` Frobenius maps and
+/// lookups a base point, charged at build); `k − 1` additions confirm
+/// `±R`.  A relation is a [`Relation::Summands`] over base points, which
+/// the base's column map turns into `±λ^t` coefficients on orbit columns.
+pub struct FrobeniusKSumTable {
+    /// Canonical key → (packed summand indices, the entry's shift).
+    map: FastMap<(u64, u8)>,
+    canon: crate::cryptanalysis::koblitz_fast::FrobeniusCanon,
+    /// `member_of[i·n + t]`: the base index of `σ^t(P_i)`.
+    member_of: Vec<u32>,
+    n: u32,
+    bits: u32,
+    pub k: u32,
+    pub entries: u64,
+    pub representatives: u64,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    /// Canonicalisations of the build: one a base point (the orbit
+    /// pass) and one a completed sum.
+    pub build_canonicalisations: u64,
+    pub build_frobenius_maps: u64,
+    pub build_lookups: u64,
+    /// Completed sums offered to the map, kept or not.
+    pub insert_attempts: u64,
+}
+
+impl FrobeniusKSumTable {
+    pub fn build(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        k: u32,
+    ) -> Result<Self, String> {
+        use crate::cryptanalysis::ic_boundary::ksum_index_bits;
+        if !(3..=5).contains(&k) {
+            return Err(format!("ksum-frobenius needs m = 3, 4 or 5, not {k}"));
+        }
+        let bits = ksum_index_bits(k);
+        let f = fb.points.len();
+        if f >= 1 << bits {
+            return Err(format!(
+                "ksum-frobenius packs base indices in {bits} bits; the base has {f} points (fewer than {} are allowed)",
+                1u64 << bits
+            ));
+        }
+        if inst.koblitz.is_none() {
+            return Err("ksum-frobenius needs a Koblitz curve".into());
+        }
+        let start = Instant::now();
+        let n = inst.n as usize;
+        let g = BinaryGroup(&inst.fast);
+        let canon = crate::cryptanalysis::koblitz_fast::FrobeniusCanon::new(&inst.gf, inst.n)
+            .ok_or("no normal basis found for the Frobenius canonical form")?;
+        // The orbit-member index: σ^t(P_i) for every base point.
+        let mut member_of = vec![0u32; f * n];
+        let (mut frob, mut lookups) = (0u64, 0u64);
+        for i in 0..f {
+            let mut p = fb.points[i];
+            member_of[i * n] = i as u32;
+            for t in 1..n {
+                p = inst.fast.frobenius_k(p, 1);
+                frob += 1;
+                lookups += 1;
+                let idx = *fb
+                    .point_index
+                    .get(&p.pack())
+                    .ok_or("ksum-frobenius needs a base closed under the Frobenius")?;
+                member_of[i * n + t] = idx as u32;
+            }
+        }
+        // Orbits by the canonical name of the abscissa (±P share it), the
+        // representative the first point of each in index order.
+        let mut orbit_of = vec![0u32; f];
+        let mut rep_of_orbit: Vec<usize> = Vec::new();
+        let mut canons = 0u64;
+        {
+            let mut orbit_index: FastMap<u32> = fast_map(f / n + 1);
+            for i in 0..f {
+                canons += 1;
+                let key = canon.canon(fb.points[i].x);
+                let next = rep_of_orbit.len() as u32;
+                let id = *orbit_index.entry(key).or_insert(next);
+                if id == next {
+                    rep_of_orbit.push(i);
+                }
+                orbit_of[i] = id;
+            }
+        }
+        // Orbit-sorted positions: each orbit's block starts at its
+        // representative.
+        let mut order: Vec<usize> = (0..f).collect();
+        order.sort_by_key(|&i| (orbit_of[i], i));
+        let mut block_start = vec![0usize; rep_of_orbit.len()];
+        for (pos, &i) in order.iter().enumerate().rev() {
+            block_start[orbit_of[i] as usize] = pos;
+        }
+        // Completions tried: Σ_o C(f − start_o − 1, k − 1).
+        let choose = |a: u64, b: u64| -> u64 {
+            (0..b).fold(1u64, |c, i| c.saturating_mul(a.saturating_sub(i)) / (i + 1))
+        };
+        let estimate = block_start
+            .iter()
+            .map(|&s| choose((f - s - 1) as u64, u64::from(k - 1)))
+            .fold(0u64, |a, b| a.saturating_add(b));
+        if estimate > FROB_KSUM_MAX_ATTEMPTS {
+            return Err(format!(
+                "a Frobenius-folded {k}-sum table over {f} points would try about {estimate} sums, above the limit {FROB_KSUM_MAX_ATTEMPTS}"
+            ));
+        }
+        let mut t = Self {
+            map: fast_map((estimate / 2).min(1 << 24) as usize + 1),
+            canon,
+            member_of,
+            n: inst.n,
+            bits,
+            k,
+            entries: 0,
+            representatives: rep_of_orbit.len() as u64,
+            build_ops: GroupOps::default(),
+            build_wall_ns: 0,
+            build_canonicalisations: canons,
+            build_frobenius_maps: frob,
+            build_lookups: lookups,
+            insert_attempts: 0,
+        };
+        let mut idx = [u32::MAX; 5];
+        for (o, &rep) in rep_of_orbit.iter().enumerate() {
+            idx[0] = rep as u32;
+            t.extend(
+                &g,
+                fb,
+                &order,
+                1,
+                block_start[o] + 1,
+                fb.points[rep],
+                &mut idx,
+            );
+        }
+        t.entries = t.map.len() as u64;
+        t.build_wall_ns = start.elapsed().as_nanos() as u64;
+        Ok(t)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn extend(
+        &mut self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        order: &[usize],
+        depth: usize,
+        from: usize,
+        partial: FastPoint,
+        idx: &mut [u32; 5],
+    ) {
+        let last = depth + 1 == self.k as usize;
+        for pos in from..order.len() {
+            let j = order[pos];
+            // Distinct abscissae: never a point beside its negative.
+            let neg = fb.neg_index[j] as u32;
+            if idx[..depth].contains(&neg) {
+                continue;
+            }
+            let s = g.add(&mut self.build_ops, partial, fb.points[j]);
+            if g.is_identity(&s) {
+                continue;
+            }
+            idx[depth] = j as u32;
+            if last {
+                self.build_canonicalisations += 1;
+                self.insert_attempts += 1;
+                let (key, shift) = self.canon.canon_with_shift(s.x);
+                let bits = self.bits;
+                let packed = idx[..self.k as usize]
+                    .iter()
+                    .rev()
+                    .fold(0u64, |w, &i| (w << bits) | u64::from(i));
+                self.map.entry(key).or_insert((packed, shift as u8));
+            } else {
+                self.extend(g, fb, order, depth + 1, pos + 1, s, idx);
+            }
+        }
+        idx[depth] = u32::MAX;
+    }
+
+    /// The build's work that only `bitop/v1` prices.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        let canon = self.canon.build_work();
+        for (name, v) in [
+            ("table_insert_attempts", self.insert_attempts),
+            ("canon_build_word_ops", canon.word_ops),
+            ("canon_build_field_sqrs", canon.field_sqrs),
+        ] {
+            if v > 0 {
+                out.insert(name.to_string(), v);
+            }
+        }
+        out
+    }
+
+    /// Signed indices of `k` base points summing to `target`, if some
+    /// `⟨σ, −1⟩`-image of a stored sum is `±target`: one canonicalisation,
+    /// one probe, `k − 1` additions.
+    pub fn probe(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        ctr: &mut OracleCounters,
+        target: FastPoint,
+    ) -> Option<Vec<usize>> {
+        if g.is_identity(&target) {
+            return None;
+        }
+        ctr.canonicalisations += 1;
+        let (key, t_r) = self.canon.canon_with_shift(target.x);
+        ctr.lookups += 1;
+        let &(packed, t_u) = self.map.get(&key)?;
+        let n = self.n;
+        // x_R = σ^t(x_U), t = t_u − t_r (as FrobeniusPairTable::probe).
+        let t = ((u32::from(t_u) + n - t_r) % n) as usize;
+        let mask = (1u64 << self.bits) - 1;
+        let summands: Vec<usize> = (0..self.k)
+            .map(|d| {
+                let i = ((packed >> (d * self.bits)) & mask) as usize;
+                self.member_of[i * n as usize + t] as usize
+            })
+            .collect();
+        let mut s = fb.points[summands[0]];
+        for &i in &summands[1..] {
+            s = g.add(ops, s, fb.points[i]);
+        }
+        if s == target {
+            Some(summands)
+        } else if s == g.neg(target) {
+            Some(summands.iter().map(|&i| fb.neg_index[i]).collect())
+        } else {
+            ctr.frobfold_mismatches += 1;
+            None
+        }
+    }
+}
+
+/// `ksum-frobenius:m=3|4|5`: one probe a target into a
+/// [`FrobeniusKSumTable`] over a Frobenius-closed Koblitz base
+/// (`koblitz-standard-subspace`, `koblitz-closure`, `compact-orbit-scan`).
+/// Every group operation, Frobenius map, lookup and canonicalisation of
+/// the build and of every probe is counted.
+pub struct FrobeniusKSumOracle<'i> {
+    k: u32,
+    instance: &'i BinaryInstance,
+    table: Option<FrobeniusKSumTable>,
+}
+
+impl<'i> FrobeniusKSumOracle<'i> {
+    pub fn new(k: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            k,
+            instance,
+            table: None,
+        }
+    }
+
+    pub fn table(&self) -> Option<&FrobeniusKSumTable> {
+        self.table.as_ref()
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusKSumOracle<'_> {
+    fn name(&self) -> &str {
+        "ksum-frobenius"
+    }
+
+    fn summands(&self) -> u32 {
+        self.k
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        format!(
+            "a table of every signed {}-sum of a Frobenius-closed base, one entry per signed Frobenius orbit, probed once per target",
+            self.k
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "m",
+            "summands, 3 to 5 (base of fewer than 4096 signed points, closed under the Frobenius)",
+        )]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        _params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let table = FrobeniusKSumTable::build(self.instance, fb, self.k)?;
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(FrobeniusKSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        let mut counts = BTreeMap::new();
+        if let Some(table) = &self.table {
+            counts.insert("canonicalisations".into(), table.build_canonicalisations);
+            counts.insert("frobenius_maps".into(), table.build_frobenius_maps);
+            counts.insert("lookups".into(), table.build_lookups);
+            counts.insert("ksum_table_entries".into(), table.entries);
+            counts.insert("ksum_table_representatives".into(), table.representatives);
+        }
+        counts
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, counters, point)
+    }
+}
+
+#[cfg(test)]
+mod ksum_frobenius_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{koblitz_instance, Calibration};
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    fn ctx<'a>(
+        inst: &BinaryInstance,
+        g: &'a BinaryGroup<'a>,
+        q: FastPoint,
+    ) -> InstanceCtx<'a, BinaryGroup<'a>> {
+        InstanceCtx {
+            group: g,
+            generator: inst.generator,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        }
+    }
+
+    /// Every probe hit re-sums to its target, the fold leaves no
+    /// mismatches, and the folded table finds every decomposition the
+    /// unfolded `KSumTable` over the same signed points finds.
+    #[test]
+    fn folded_ksum_agrees_with_the_unfolded_table() {
+        let inst = koblitz_instance(1, 17).expect("K1 n17");
+        let g = BinaryGroup(&inst.fast);
+        let c = ctx(&inst, &g, inst.generator);
+        let (_, params) = Params::parse_spec("koblitz-closure:dimension=2").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = KoblitzClosureBase { instance: &inst }
+            .build(&c, &params, &mut ops)
+            .unwrap();
+        for k in [3u32, 4] {
+            let folded = FrobeniusKSumTable::build(&inst, &fb, k).unwrap();
+            let full = KSumTable::build_negation_folded(&g, &fb, k).unwrap();
+            assert!(
+                folded.entries * inst.n as u64 <= full.entries,
+                "k={k}: {} folded entries against {} unfolded",
+                folded.entries,
+                full.entries
+            );
+            let mut ctr = OracleCounters::default();
+            let mut lk = 0u64;
+            let (mut both, mut only_full, mut only_fold) = (0, 0, 0);
+            for e in 1..inst.r.min(4000) {
+                let q = g.mul(&mut ops, inst.generator, e);
+                let a = full.probe(&g, &fb, &mut ops, &mut lk, q);
+                let b = folded.probe(&g, &fb, &mut ops, &mut ctr, q);
+                if let Some(w) = &b {
+                    assert_eq!(w.len(), k as usize);
+                    let mut s = fb.points[w[0]];
+                    for &i in &w[1..] {
+                        s = g.add(&mut ops, s, fb.points[i]);
+                    }
+                    assert_eq!(s, q, "k={k} e={e}");
+                }
+                match (a.is_some(), b.is_some()) {
+                    (true, true) => both += 1,
+                    (true, false) => only_full += 1,
+                    (false, true) => only_fold += 1,
+                    _ => {}
+                }
+            }
+            assert_eq!(ctr.frobfold_mismatches, 0);
+            assert!(both > 0, "k={k}: no hits");
+            assert_eq!(only_full, 0, "k={k}: the fold lost decompositions");
+            // The unfolded table keeps one sum per key and sees nothing
+            // the fold misses; the fold can see more (distinct-abscissa
+            // sums both cover), so only the one direction is asserted.
+            std::hint::black_box(only_fold);
+        }
+    }
+
+    /// End to end: the pipeline recovers planted logs on a small Koblitz
+    /// curve with the folded oracle over a Frobenius-closed base (two
+    /// projected signed Frobenius orbits).
+    #[test]
+    fn ksum_frobenius_recovers_planted_logs() {
+        let inst = koblitz_instance(1, 17).expect("K1 n17");
+        let g = BinaryGroup(&inst.fast);
+        for k in [3u32, 4] {
+            for s in 0..3u64 {
+                let planted = (1234 + 977 * s) % inst.r;
+                let mut ops = GroupOps::default();
+                let q = g.mul(&mut ops, inst.generator, planted);
+                let c = ctx(&inst, &g, q);
+                let (fb_name, fb_params) =
+                    Params::parse_spec("compact-orbit-scan:columns=2,raw_x_cap=1000000").unwrap();
+                let (name, oracle_params) =
+                    Params::parse_spec(&format!("ksum-frobenius:m={k}")).unwrap();
+                let ps = PipelineSpec {
+                    factor_base: fb_name,
+                    factor_base_params: fb_params,
+                    oracle: name,
+                    oracle_params,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 5_000_000,
+                    seed: s,
+                    ..Default::default()
+                };
+                let mut oracle = FrobeniusKSumOracle::new(k, &inst);
+                let rep = run_pipeline(
+                    &c,
+                    &ps,
+                    &CompactOrbitScanBase { instance: &inst },
+                    &mut oracle,
+                    planted,
+                    &Calibration {
+                        ns_per_add: 1.0,
+                        ns_per_double: 1.0,
+                        ..Default::default()
+                    },
+                    None,
+                )
+                .unwrap();
+                assert!(
+                    rep.verified && rep.recovered == Some(planted),
+                    "k={k} s={s}: planted log not recovered"
+                );
+                let native = DecompositionOracle::<BinaryGroup>::setup_native(&oracle);
+                assert!(native["canonicalisations"] > 0 && native["frobenius_maps"] > 0);
+            }
+        }
+    }
+}

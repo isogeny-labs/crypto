@@ -1,0 +1,11 @@
+digraph completion {
+ graph [rankdir=TB, bgcolor="white", nodesep=0.35, ranksep=0.45, fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4ff", color="#385b80", fontname="Helvetica", fontsize=13, margin="0.16,0.10"];
+ edge [color="#385b80"];
+ {rank=same; a [label="Actual negative-pole chart\nconstructed weighted unit"]; b [label="Actual finite schedule\nnonnegative gains"]}
+ {rank=same; c [label="Every coefficient n+1\nnormalized weight at least n"]; d [label="Constructed feasible list\nterminal Fibonacci mass bound"]}
+ {rank=same; e [label="Polynomial matrix factors\n2^u labels, residual content 1"]; f [label="Exact diagonal degree\nactual polynomial budget bound"]}
+ a -> c -> e; b -> d -> f;
+ g [label="OPEN: all required chart/precision layers\nactual weighted mode inventory and total bit cost", fillcolor="#fff2d9",color="#9b6d1d"];
+ e -> g [style=dashed]; f -> g [style=dashed];
+}

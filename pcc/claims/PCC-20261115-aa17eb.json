@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T16:59:44Z",
+ "id": "PCC-20261115-aa17eb",
+ "kind": "execution",
+ "producer": {
+  "commit": "6f1bd2d9c2c7426f3c8d64b12b73bfd30bcc24c5",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/shared-proof-build.txt",
+    "sha256": "45e93b2a4bdbffa86144a7fb4d4d5ed221f16c7e9ebb82a38be36fd660a8f993"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/shared-proof-audit.txt",
+    "sha256": "37320d171d1ef51cdda3c29b23a52570eac642a3648d389bbb9a7bf8ac42f30a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/shared-proof-summary.txt",
+    "sha256": "06c898e6ffbea7ff41cc22379fd7e13a289496dd89ce814cab08c0ba9f378b65"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/shared-source-bindings.sha256",
+    "sha256": "03215770ad19bb40eb6380a1798b4cd39fe479df5b5192aa59691e7feb18b5b2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/minimal_transport",
+ "statement": "Pinned shared crypto-lean f74b0e8 passes the canonical local proof gate: 115 theorems audited, zero failing and zero trusted native exceptions, including seven new generic norm lemmas. The arithmetic proof gate does not establish the geometric Jacobian bridge, native qualification or a speedup."
+}
