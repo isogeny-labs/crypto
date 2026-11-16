@@ -103,7 +103,15 @@ The isogeny-assisted extension of GHS is established by
 [Galbraith and Smart](https://www.cryptrec.go.jp/exreport/cryptrec-ex-1029-2001.pdf)
 and discussed by [Karabina et al.](https://math.dartmouth.edu/~carlp/WeilDescent-Product.pdf).
 [Tian](https://arxiv.org/pdf/2012.07173) gives a distinct explicit isogeny
-transfer in degree three. The earlier repository
+transfer in degree three, including image recovery on the Jacobian.
+[Tian--Li--Wang--Yu 2018](https://doi.org/10.1007/s10623-018-0457-6)
+already constructs odd-characteristic degree-three covers for cofactor-two
+elliptic curves. [Iijima--Momose--Chao 2015](https://eprint.iacr.org/2015/805.pdf)
+states a complete classification of direct `(2,...,2)` covers in odd
+characteristic for prime extension degrees two, three, five and seven; its
+indexed abstract was checked, while the PDF endpoint returned HTTP 403.
+Those works limit claims about general cofactor-two and direct-cover families,
+but do not imply a classification of all Jacobian isogeny carriers. The earlier repository
 `research/ghs_cover_census_n5_20261013/README.md` excludes low-genus direct
 `(2,...,2)` covers for the relevant order class, but does not give these exact
 maps. The local LMFDB snapshot already lists the Weil-polynomial isogeny class
