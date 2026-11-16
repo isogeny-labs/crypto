@@ -7588,3 +7588,20 @@ Current S3403 remains, old startup failure historical; initial metadata/prose/in
 >>>>>>> theirs
 >>>>>>> theirs
 >>>>>>> theirs
+
+---
+
+2026-11-16T22:26:21.539543+00:00
+# Resume chained transfers from verified main and preregister chart boundary [pcc:unverified]
+
+## What was done
+PCC-20261116-a2257a: exact main90ea full1216-row ledger/keyring verified before37 new complete bindings and after intake; all274 frozen08/09 files685126B/old source/report/failure evidence, whole merged13ZIP924member21log custody and legacy forks retained. Current Root37/66 zero-failure replays retained with one-comment auditor dependency change. Chart12-fixture prospective protocol809f0c, primary exact Git blobs and final inspected one-page report pcc/claims/PCC-20261116-4f4e0c.json prepared before implementation. [pcc:unverified]
+
+## Decisions made
+Continue on /workspace/crypto-chained-main-validated, lane/chained-transfers, base90ea. Publish completed archival intake and chart protocol as a regular PR, then implement the frozen Rust correctness unit. No new Lean declaration while the shared field/representation assembly is unfinished. Keep old Rooteb3 and Consumere079/forks and every old scientific/proof result unchanged. [pcc:unverified]
+
+## Open threads
+Normal commit/push/regular lane PR and own scoped CI/full original store/PCC gates; chart coefficient/point/infinity units, then actual balanced divisor/Richelot orientation and nontrivial transfer chains. Original LP60/240/62/360/witness/7controls/feedback/post, qualified runtime/admission/strongest matched costs, accepted legacy ledger reconciliation remain open. Paid STOPe42949/locked autoresearcher8edec422 persist. [pcc:unverified]
+
+## Errors
+Rejected incomplete sparse01 had missing base ledger/keyring and38-row fork; its canonical labels934bce are explicitly rejected, whole failed intake/index preserved, never rechained.02 begins with exact1216-row base and passes original prefix. New unindexed failed Git transport cache was removed only after fullSHA/error/no-live-Git checks; old scientific data/partials/indexed objects remain. New-clone automatic GC had already completed before stop, now disabled; raw old-pack retention is not claimed for that repack. Metadata syntax/missing-blob/encoding failures retained; targeted API text matches exact Git blobs. Original branches/indices untouched; no new science/paid/signed or field/Jacobian/cost promotion. [pcc:unverified]
