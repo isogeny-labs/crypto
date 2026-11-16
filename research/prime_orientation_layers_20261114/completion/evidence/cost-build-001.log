@@ -1,0 +1,21 @@
+../evidence/cost-draft-001.lean.txt:33:42: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+../evidence/cost-draft-001.lean.txt:33:54: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+../evidence/cost-draft-001.lean.txt:33:42: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../evidence/cost-draft-001.lean.txt:33:54: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../evidence/cost-draft-001.lean.txt:54:40: error: mod_cast has type
+  5 ^ k * m (2 * k) ≤ K * (4 ^ k * 2 ^ (a - 2 * k))
+but is expected to have type
+  5 ^ k * m (2 * k) ≤ K * 4 ^ k * 2 ^ (a - 2 * k)
+'OrientationBudgetScale.fibonacci_geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBudgetScale.actual_terminal_relative_scale' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,258 @@
+module
+public import OrientationLeading
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationHierarchy
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+public section
+noncomputable section
+namespace OrientationRefinement
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationJet OrientationLeading
+
+def NearOne (k : ℤ) (q : ℚ) : Prop := VBound k (q-1)
+
+theorem NearOne.integral {k : ℤ} {q : ℚ} (hk : 0 ≤ k) (h : NearOne k q) :
+    VBound 0 q := by
+  simpa only [sub_add_cancel] using
+    (h.mono hk).add (Or.inr (by simp) : VBound 0 (1:ℚ))
+
+theorem NearOne.one (k : ℤ) : NearOne k 1 := by simp [NearOne,VBound]
+
+theorem NearOne.mul {k : ℤ} {q r : ℚ} (hk : 0 ≤ k)
+    (hq : NearOne k q) (hr : NearOne k r) : NearOne k (q*r) := by
+  have h := (show VBound k ((q-1)*r) by
+    simpa only [add_zero] using VBound.mul hq (hr.integral hk)).add hr
+  unfold NearOne
+  convert h using 1
+  ring
+
+theorem NearOne.pow {k : ℤ} {q : ℚ} (hk : 0 ≤ k) (h : NearOne k q)
+    (n : ℕ) : NearOne k (q^n) := by
+  induction n with
+  | zero => simpa using NearOne.one k
+  | succ n ih => simpa only [pow_succ] using ih.mul hk h
+
+theorem NearOne.prod {ι : Type*} (S : Finset ι) (q : ι → ℚ) (k : ℤ)
+    (hk : 0 ≤ k) (h : ∀ j ∈ S, NearOne k (q j)) : NearOne k (∏ j ∈ S,q j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using NearOne.one k
+  | @insert j S hj ih =>
+    rw [prod_insert hj]
+    exact (h j (mem_insert_self _ _)).mul hk
+      (ih (by intro z hz; exact h z (mem_insert_of_mem hz)))
+
+theorem masks_stable (u v x z y : ℕ) (hu : u ≤ v)
+    (h : x % 2^v = z % 2^v) : mask u x y = mask u z y := by
+  ext j
+  by_cases hj : j < u
+  · have hb := matching_bits v x z j (by omega) h
+    simp [mask,mem_range,hj,hb]
+  · simp [mask,mem_range,hj]
+
+theorem displacement_difference (x z y : ℕ) :
+    delta x y-delta z y = delta x z := by unfold delta; ring
+
+/-- A literal denominator ratio; the precision cost is its actual valuation. -/
+theorem denominator_ratio (v x z y : ℕ) (q : ℚ)
+    (h : x % 2^v = z % 2^v) (hd : q-delta x y ≠ 0) :
+    NearOne ((v:ℤ)-padicValRat 2 (q-delta x y))
+      ((q-delta z y)/(q-delta x y)) := by
+  have he : (q-delta z y)/(q-delta x y)-1 =
+      (delta x y-delta z y)/(q-delta x y) := by field_simp [hd]; ring
+  unfold NearOne
+  rw [he,displacement_difference]
+  exact vbound_div (displacement_bound v x z h)
+
+theorem selected_denominator_le (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    padicValRat 2 ((2:ℚ)^j-delta x y) ≤ (j:ℤ) := by
+  rw [selected_denominator_valuation u x y j hj]
+  exact_mod_cast min_le_left j (chartOrder u x y)
+
+theorem anchor_denominator_ratio (u v x z y j : ℕ)
+    (h : x % 2^v = z % 2^v) (hj : j ∈ mask u x y) :
+    NearOne ((v:ℤ)-u+1) (((2:ℚ)^j-delta z y)/((2:ℚ)^j-delta x y)) := by
+  have hh := denominator_ratio v x z y ((2:ℚ)^j) h (denominator_ne_zero u x y j hj)
+  have hv := selected_denominator_le u x y j hj
+  have hju : j < u := mem_range.mp (mem_filter.mp hj).1
+  exact hh.mono (by omega)
+
+theorem crossing_denominator_le (x y i : ℕ) (hc : x.testBit i = y.testBit i) :
+    padicValRat 2 (poleQ i-delta x y) ≤ (i:ℤ) := by
+  by_cases he : x=y
+  · subst y
+    simp only [delta,sub_self,sub_zero,poleQ_value]
+    rfl
+  · rw [crossing_denominator x y i he hc]
+    exact min_le_left _ _
+
+theorem base_denominator_ratio (u v i x z y : ℕ) (hi : i < u)
+    (h : x % 2^v = z % 2^v) (hc : x.testBit i = y.testBit i) :
+    NearOne ((v:ℤ)-u+1) ((poleQ i-delta z y)/(poleQ i-delta x y)) := by
+  have hh := denominator_ratio v x z y (poleQ i) h
+    (sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole x y i hc)))
+  have hv := crossing_denominator_le x y i hc
+  exact hh.mono (by omega)
+
+
+def correctionRatio (u x z y : ℕ) (m : ℕ → ℕ) : ℚ :=
+  ∏ j ∈ mask u x y, (((2:ℚ)^j-delta z y)/((2:ℚ)^j-delta x y))^m j
+
+theorem correction_ratio_near (u v x z y : ℕ) (m : ℕ → ℕ)
+    (hu : u ≤ v) (h : x % 2^v = z % 2^v) :
+    NearOne ((v:ℤ)-u+1) (correctionRatio u x z y m) := by
+  apply NearOne.prod
+  · omega
+  · intro j hj
+    exact (anchor_denominator_ratio u v x z y j h hj).pow (by omega) (m j)
+
+theorem actual_correction_comparison (u v x z y i : ℕ) (m : ℕ → ℕ)
+    (hu : u ≤ v) (h : x % 2^v = z % 2^v) :
+    (correction u x y m).eval (poleQ i) =
+      (correction u z y m).eval (poleQ i)*correctionRatio u x z y m := by
+  have hmask := masks_stable u v x z y hu h
+  have hf (j : ℕ) (hj : j ∈ mask u x y) :
+      (factor (delta x y) j).eval (poleQ i) =
+        (factor (delta z y) j).eval (poleQ i)*
+          (((2:ℚ)^j-delta z y)/((2:ℚ)^j-delta x y)) := by
+    rw [factor_eval,factor_eval]
+    have hd := denominator_ne_zero u x y j hj
+    have hz := denominator_ne_zero u z y j (hmask ▸ hj)
+    field_simp [hd,hz]
+  simp only [correction,eval_prod,eval_pow]
+  rw [← hmask]
+  calc
+    _ = ∏ j ∈ mask u x y,
+      ((factor (delta z y) j).eval (poleQ i)*
+        (((2:ℚ)^j-delta z y)/((2:ℚ)^j-delta x y)))^m j := by
+        apply prod_congr rfl
+        intro j hj
+        rw [hf j hj]
+    _ = _ := by simp only [mul_pow,prod_mul_distrib,correctionRatio]
+
+def comparisonRatio (u v i x z y : ℕ) (m : ℕ → ℕ) : ℚ :=
+  ((poleQ i-delta z y)/(poleQ i-delta x y))*correctionRatio u x z y m
+
+theorem comparison_ratio_near (u v i x z y : ℕ) (m : ℕ → ℕ)
+    (hi : i < u) (hu : u ≤ v) (h : x % 2^v = z % 2^v)
+    (hc : x.testBit i = y.testBit i) :
+    NearOne ((v:ℤ)-u+1) (comparisonRatio u v i x z y m) := by
+  exact (base_denominator_ratio u v i x z y hi h hc).mul (by omega)
+    (correction_ratio_near u v x z y m hu h)
+
+theorem actual_jet_comparison (a u v i x z y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hz : z < 2^a) (hy : y < 2^a)
+    (hi : i < u) (hu : u ≤ v) (hv : v ≤ a)
+    (h : x % 2^v = z % 2^v) (hc : x.testBit i = y.testBit i) :
+    firstJet a u i x y m/diagonalJet a u i m =
+      (firstJet a u i z y m/diagonalJet a u i m)*comparisonRatio u v i x z y m := by
+  have hb := matching_bits v x z i (by omega) h
+  have hzc : z.testBit i = y.testBit i := hb.symm.trans hc
+  rw [normalized_firstJet a u i x y m hx hy (by omega) hc,
+    normalized_firstJet a u i z y m hz hy (by omega) hzc,
+    actual_correction_comparison u v x z y i m hu h]
+  dsimp [comparisonRatio]
+  field_simp [sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole z y i hzc))]
+
+theorem crossing_normalized_integral (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hm : ∀ j < u, 0 < m j) (hc : x.testBit i = y.testBit i) :
+    VBound 0 (firstJet a u i x y m/diagonalJet a u i m) := by
+  by_cases he : x % 2^u = y % 2^u
+  · exact (matching_firstJet_one a u i x y m hx hy hi hu he).integral
+  · exact (nonmatching_firstJet_even a u i x y m hx hy hi hu hc he hm).mono (by decide)
+
+theorem actual_precision_comparison (a u v i x z y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hz : z < 2^a) (hy : y < 2^a)
+    (hi : i < u) (hu : u ≤ v) (hv : v ≤ a)
+    (hm : ∀ j < u, 0 < m j)
+    (h : x % 2^v = z % 2^v) (hc : x.testBit i = y.testBit i) :
+    VBound ((v:ℤ)-u+1)
+      (firstJet a u i x y m/diagonalJet a u i m-
+        firstJet a u i z y m/diagonalJet a u i m) := by
+  have hb := matching_bits v x z i (by omega) h
+  have hzc : z.testBit i = y.testBit i := hb.symm.trans hc
+  have hp := crossing_normalized_integral a u i z y m hz hy hi (by omega) hm hzc
+  have hr := comparison_ratio_near u v i x z y m hi hu h hc
+  have ht : VBound ((v:ℤ)-u+1)
+      ((comparisonRatio u v i x z y m-1)*
+        (firstJet a u i z y m/diagonalJet a u i m)) := by
+    simpa only [add_zero] using VBound.mul hr hp
+  rw [actual_jet_comparison a u v i x z y m hx hz hy hi hu hv h hc]
+  convert ht using 1
+  ring
+
+
+/-- A literal source row, never an assumed good representative. -/
+def representative (a v : ℕ) (hv : v ≤ a) (r : Labels v) : Ports a :=
+  ⟨r.val, lt_of_lt_of_le r.isLt (Nat.pow_le_pow_right (by decide) hv)⟩
+
+def precisionRight (a u v i : ℕ) (hv : v ≤ a) (m : ℕ → ℕ) :
+    Matrix (Labels v) (Ports a) ℚ :=
+  fun r y => normalizedCrossing a u i m (representative a v hv r) y
+
+theorem precision_right_integral (a u v i : ℕ) (hv : v ≤ a) (m : ℕ → ℕ)
+    (hi : i < u) (hu : u ≤ v) (hm : ∀ j < u, 0 < m j)
+    (r : Labels v) (y : Ports a) : VBound 0 (precisionRight a u v i hv m r y) := by
+  unfold precisionRight normalizedCrossing
+  split_ifs with hc
+  · exact crossing_normalized_integral a u i _ y.val m (representative a v hv r).isLt
+      y.isLt hi (by omega) hm hc
+  · exact VBound.zero 0
+
+theorem precision_product (a u v i : ℕ) (hv : v ≤ a) (m : ℕ → ℕ)
+    (x y : Ports a) :
+    (leftFactor a v*precisionRight a u v i hv m) x y =
+      normalizedCrossing a u i m
+        (representative a v hv ⟨x.val % 2^v,Nat.mod_lt _ (by positivity)⟩) y := by
+  let r0 : Labels v := ⟨x.val % 2^v,Nat.mod_lt _ (by positivity)⟩
+  have hz (r : Labels v) (hr : r ≠ r0) : leftFactor a v x r = 0 := by
+    unfold leftFactor
+    split_ifs with he
+    · exact False.elim (hr (Fin.ext he.symm))
+    · rfl
+  have hs : (∑ r : Labels v,leftFactor a v x r*precisionRight a u v i hv m r y) =
+      leftFactor a v x r0*precisionRight a u v i hv m r0 y :=
+    Finset.sum_eq_single r0 (by intro r _ hr; rw [hz r hr,zero_mul])
+      (by intro h; exact False.elim (h (mem_univ _)))
+  rw [Matrix.mul_apply,hs]
+  simp [leftFactor,precisionRight,r0]
+
+/-- Arbitrary first-jet precision; the actual refinement cost is 2^v labels. -/
+theorem actual_precision_factorization (a u v i : ℕ) (hv : v ≤ a) (m : ℕ → ℕ)
+    (hi : i < u) (hu : u ≤ v) (hm : ∀ j < u, 0 < m j) (x y : Ports a) :
+    VBound ((v:ℤ)-u+1)
+      (normalizedCrossing a u i m x y-(leftFactor a v*precisionRight a u v i hv m) x y) := by
+  rw [precision_product]
+  let z : Ports a := representative a v hv ⟨x.val % 2^v,Nat.mod_lt _ (by positivity)⟩
+  have hz : z.val = x.val % 2^v := rfl
+  have hmod : x.val % 2^v = z.val % 2^v := by rw [hz,Nat.mod_mod]
+  have hb := matching_bits v x.val z.val i (by omega) hmod
+  change VBound _ (normalizedCrossing a u i m x y-normalizedCrossing a u i m z y)
+  by_cases hc : x.val.testBit i = y.val.testBit i
+  · have hzc : z.val.testBit i = y.val.testBit i := hb.symm.trans hc
+    simp only [normalizedCrossing,hc,hzc,ite_true]
+    exact actual_precision_comparison a u v i x.val z.val y.val m x.isLt z.isLt y.isLt
+      hi hu hv hm hmod hc
+  · have hzc : z.val.testBit i ≠ y.val.testBit i := by rwa [← hb]
+    simp [normalizedCrossing,hc,hzc,VBound]
+
+/-- The selected construction really has 2^v inner labels. -/
+theorem precision_label_count (v : ℕ) : Fintype.card (Labels v) = 2^v := by
+  exact Fintype.card_fin _
+
+/-- At full row refinement the same construction gives the exact actual matrix. -/
+theorem full_row_factorization (a u i : ℕ) (m : ℕ → ℕ) (x y : Ports a) :
+    (leftFactor a a*precisionRight a u a i le_rfl m) x y = normalizedCrossing a u i m x y := by
+  rw [precision_product]
+  have hz : representative a a le_rfl ⟨x.val % 2^a,Nat.mod_lt _ (by positivity)⟩ = x := by
+    apply Fin.ext
+    exact Nat.mod_eq_of_lt x.isLt
+  rw [hz]
+
+end OrientationRefinement

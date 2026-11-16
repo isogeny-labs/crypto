@@ -1,0 +1,43 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R87-DIAMOND-RELATIVE-EQUATION",
+  "version": 1,
+  "goal": "test preservation of the complete degree-16 relative source equation under the R85/R86 rational diamond map",
+  "claims": [{"id": "relative_pullback87", "class": "exact_computation", "statement": "denominator-cleared full relative equation has zero remainder and a full lift in the original source ideal; a corrupted lambda shift does not"}],
+  "arms": {
+    "reference": "R50 accepted monic relative source equations",
+    "candidate": "R85 base map plus R86 affine lambda map",
+    "positive": ["source polynomial and denominator bounds", "zero ideal remainder", "full lift equality"],
+    "negative": ["lambda1+1 shift has nonzero ideal remainder"],
+    "baseline": {"not_applicable_reason": "exact symbolic identity"},
+    "A_A": {"not_applicable_reason": "deterministic polynomial reduction"}
+  },
+  "variables": {
+    "fixed": ["F2 relative degree-16 equation", "h^64 D^16 clearing", "one Singular/FLINT thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["source term count", "pullback term count", "ideal remainder", "lift equality", "corruption remainder", "exit and errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method": "fixed", "reason": "exact algebra", "seeds": [87]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["one full pullback remainder", "one full lift", "one corruption rejection"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh relative87-01 RELATIVE87.sing RELATIVE87_ALL_CHECKS_PASS"],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB_native": 4194304,
+    "threads": 1,
+    "seed": 87,
+    "queue": "one serial math job",
+    "source_gate": "committed Git bytes and verified donor manifest",
+    "checkpoint": "existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit 0, exact marker, zero native ? errors, denominator bound, zero remainder, full lift equality, nonzero corrupted remainder",
+    "failure": "retain raw failure and freeze a repair under a fresh attempt ID"
+  },
+  "analysis": {
+    "method": "termwise denominator clearing followed by polynomial ideal reduction and lift over F2",
+    "scope": "relative equation preservation on rational registered open; no normalization or 32-generator regularity conclusion"
+  }
+}
