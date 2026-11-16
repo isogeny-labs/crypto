@@ -1,6 +1,60 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (06:14Z, 16 November)
+## Current checkpoint (06:38Z, 16 November)
+
+STAGE20FINISHED,CENSORED. Source2cb41746eb2076eec7e509315a012fc3a7653e5a,
+run /workspace/ic-local-runs/local-cover-sieve-graph-20261116-20 exit124,
+real900.003s.36planned,1attempted(warmup0ic_a),0completed,35unattempted.
+No measuredrounds/recoveryoutput, graph/rhoUNATTEMPTED. Allratios/intervalsNULL.
+OriginalcopiedRustanalyzerfullsummary2326B/globalproblems[] forrecordedprefix,
+scaleconditionfalse/parityfalse. No retries. The original20gate FAILS; don't
+launch its scale followup or claim mathincorrectness/speed from a budgetcensor.
+
+Fullpre/posthasheschecked. Exactsmallraw1210BalsoinGitstudyfolder. One-page
+PDFvisuallyinspected; exactbenchPDF/SVG/150dpiPNGcopies/hasheschecked, original
+imagesalsolocal20. Folder local-cover-sieve-graph-20261116-20. Needcommit/push
+thisfinishedpacketandupdatePRbody(currently20starting). Parent&workerended;
+worker32277zombieunderPID1, no LIVEbenchmark. NeverkillPID1. Shelltimeuser.372s
+and.04%EXCLUDEunreapedchildatcensor, NOTtotalCPUusage; reportdocuments this.
+Primary900.003outerwallstillretainsallspenttime. Firstworkerinternalphaseunknown.
+
+Nextwork afterpublication: capacity-selected VALIDATION design (not passing20
+as if successful). Native relations_estimate/b_space and ignoredp101m11case
+explain why undersizedpilot may exhaustlowcapacity families, but no profile
+diagnoses20phase. Needprimary/source review +newfrozenamendmentbeforeanytrial.
+Consider direct full-recovery control at a capacity-sufficient field, with
+persistent progress logs, before new performance comparison. NO21plan/code/data
+chosenyet. GoalACTIVE. Userpermitslocal/runpod; localworks, no exogenousblocker.
+
+Sourcevalidation remains15cover/sievepass(2existingignored),5filter,9rho,
+1public-only/actualscalarworker,29analysis,actualreleasebuilds+ClippyPASS.
+66oldmanifestremains2cbsourcebytes; postdataREADMEchangesarehistoricaldiff,
+doNOTrewriteoldmanifest. CI/reviewlast06:17, next07:07absentevent; no gatespass.
+
+## Prior running checkpoint (06:26Z, superseded pending states)
+
+STAGE20 RUNNING. Source/spec2cb41746eb2076eec7e509315a012fc3a7653e5apublished
+before solewrappercall. Run=/workspace/ic-local-runs/local-cover-sieve-graph-20261116-20.
+Session34930; checkexit-code.txt/worker.pid andactualprocessbeforeanyretryifAPI
+sessionmissing. 66manifestpathsPASS, sourcewasCLEAN, noLIVEcompilers. Original
+driver/analyzer/sourcecheckpoint/raw/host/prehashcaptured. Firstwarmic_a hasnot
+returned atlatest06:23observation. Planned36childexecs,900sWHOLEcohortbound.
+DO NOT terminateearly/changeparameters/compile or launchmoreexperiments.
+No completedcomparison yet. Ifcensoredretainexactstart/inflight/unattempted;
+do notinferincorrectness or speed from missingoutputs. Analyzeoriginalcopied
+analyzeronlyAFTERexit, thenfullflow/report/posthashes before nextlead.
+
+PR4288title/bodyupdatednewweakfamily/currentpilotstarting. CI/reviews06:17on2cb:
+appreview/migrateSUCCESS;workflow/status/review/threadsEMPTY;requiredgate/size/
+artifactsUNCONFIRMED. Nextchecknotbefore07:07absentevent, no merge/bypass.
+GoalACTIVE; userobjectivecontinueuntilrho parity OR giveup. Localworks, noblocker.
+
+Read-onlysourcehypothesisduringwait: nativeautomaticcollectionstartsm9 andcan
+exhaustsmall-fieldfamiliesbeforeupwardm; relations_estimate/b_space and ignored
+p101fulltest(m_final11)showwhycapacityreviewmatters. ThisdoesNOTidentifywhich
+phasecurrentworkerisin. No newtrialselected; preservefrozen20anddo notretry.
+
+## Prior validated source checkpoint (06:14Z, superseded pending states)
 
 STAGE20IMPLEMENTED/VALIDATED, NOT TIMED. WeakFp6cover/univariate-sieve existing
 finder now has opt-in graph/hypergraph projection before Wiedemann. Retain75%

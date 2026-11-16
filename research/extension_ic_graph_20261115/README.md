@@ -12,8 +12,11 @@ filtering before its linear solve. This is a restricted weak elliptic family
 over Fp6. Target coordinates stay protected, output rows carry replayed input
 combinations, and failures invoke the charged original solve. The cold-process
 comparison includes native sieve IC and negation/batched-inversion rho on the
-same public challenge. [Frozen pilot](cover-graph-pilot-plan.json), not timed
-yet. Workers receive no planted answer and rebuild their own public transfer.
+same public challenge. The [frozen pilot](local-cover-sieve-graph-20261116-20/report.pdf)
+ends at900.003seconds during its first ICwarmup: one start, zero completions,
+35unattempted executions. No ratio or interval is available, and its frozen
+scale condition fails. Workers receive no planted answer and rebuild their
+own public transfer.
 [pcc:unverified]
 
 ## Three graph representations in the Rust integration
