@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T17:15:28Z",
+ "id": "PCC-20261116-c81a6e",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/geometry_identity.cpp",
+    "sha256": "6fea8ff788cb37e46206de2ad032e58369281819663ece4056fc78ba0379e715"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-geometry-identity.sh",
+    "sha256": "91668b9cd9958d0a45ba9374609e26c95476288b41ca903e967bab2bc2292315"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/geometry-identity-v1/riemann-form.identity.json",
+    "sha256": "034aaf80ca3e5319a62b49fee59a051e6024648aad5933a26699c5f8b9a20c22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/geometry-identity-v1/pre-call-manifest.sha256",
+    "sha256": "f6af3c64a8b6f4225e78747d5ea797a26fb58a4c2c43ec4e6fbf7d181497fdd7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The native geometry_identity producer issues an evaluated identity.certificate/v1 for the structural Riemann quartic expansion over 2^61-1, with deterministic derived points and added-one corruption checks. This does not verify the actual P-192 or Fp24 coefficient computations and has no independent signature."
+}
