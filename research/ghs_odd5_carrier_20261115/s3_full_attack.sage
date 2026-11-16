@@ -157,6 +157,10 @@ rho=[rho_trial(20261116+i) for i in range(30)]
 assert all(z['scalar']==secret for z in rho)
 out={'schema':'ghs.odd5.s3-full-attack/v1','source_sha256':hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),
  'bmask':30,'q':27,'source_order':int(N),'r':int(r),'validation_scalar':secret,
+ 'field_modulus':[int(c) for c in L.modulus().list()],
+ 'small_field_modulus':[int(c) for c in k.modulus().list()],
+ 'a_embedding':[int(c) for c in a.polynomial().list()],
+ 'small_field_embedding':[int(c) for c in e3(k.gen()).polynomial().list()],
  'factor_base_size':n,'factor_base_rational_points':len(pts),'relation_attempts':attempts,'accepted_relations':len(rows),
  'relation_rank':int(M.rank()),'descent_attempts':descent_attempts,'recovered_scalar':int(recover),
  'timing':timing,'rho_eigenvalue':lam,'rho_trials':rho,'rho_median_cpu_s':sorted(z['cpu_s'] for z in rho)[len(rho)//2],
