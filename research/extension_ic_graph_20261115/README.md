@@ -339,3 +339,11 @@ scalar after full elliptic replay; graph projects488rows to366 with366replays
 and zero fallback solves. This once-only protocol produces no comparative
 ratio or interval. It permits designing a new frozen comparison; it does not
 change the earlier pilot's failed gate. [pcc:unverified]
+
+The [fresh controlled weak-cover comparison](local-cover-comparison-20261116-22/report.pdf)
+retains a second budget censor:3600.002seconds,25of36executions complete and
+three of five measured rounds. All25completed solves recover correctly, and
+all eight completed graph arms project516rows to387 with every output replayed
+and no fallback. The frozen comparison remains ineligible with null intervals;
+partial descriptive ratios are retained in the report and full Rustsummary,
+without a gain or parity verdict. [pcc:unverified]

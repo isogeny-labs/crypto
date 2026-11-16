@@ -1,3 +1,25 @@
+# Current checkpoint: Stage22 FINISHED CENSORED, MST still UNCOMPILED
+
+22source23b4c1a70, /workspace/ic-local-runs/local-cover-comparison-20261116-22
+exit124/3600.002s.36planned26attempted25completed(6warm19measure),3complete/correct
+rounds; in-flightmeasurement3/graph_b;10unattempted. No liveworker. Originalcopied
+analyzer analysis-original/summary.json13765B/global[],allCIsNULL/eligibilityfalse/
+followupfalse/parityfalse. Raw350106B staysLOCAL(>64KiB), hash+compactflow inGit.
+Partialdescriptiveoutermean graph/IC1.0126858172,graph/rho.0572353510,IC/rho.0565183693;
+NOTeligiblegain/parity (5roundsrequired). Allpre/posthashesPASS. LASTgraphprogress
+recordsdescent3648; exactcutphase/partialwallUNKNOWN. BashCPUomitsinflightdescendant.
+
+NEXT finish22evidence/report/PDFallpages/copies/hashes, commit/push/updatePRbody
+BEFORE anyMSTbuild. Template/tmp/ic-cover-comparison-report-template.typ unrendered.
+Then standalone /workspace/ic-mst-prototype Cargo tests/buildClippy, retainfailures.
+Allsrc+integrationoverlays formatted/parsedonly, NOcompiler/testexecutionever.
+source-only-checkpoint.sha256 current; before-strategy-binding oldhashreceiptretained.
+Overlayexplicitgraphstrategymetadatawasstrengthenedfornonstring/missingdeclarations,
+newMSTvalidationworkeridentitytestwritten. Otherdraftdetailsbelow. DoNOTclaimtype/
+behaviorpass untilactualchecks. No new scientific trial selected. GoalACTIVE/localworks.
+CIlast07:57:28on811fce17c: appsreview/migratesuccess, requiredgate/size/artifacts/reviews
+unconfirmed; NEXT>=08:47absentevent. PR4288same/automerge/gatespending.
+
 # Current checkpoint: benchmark running, uncompiled prototype prepared
 
 Stage22STILLRUNNING session72120, run /workspace/ic-local-runs/local-cover-comparison-20261116-22,
