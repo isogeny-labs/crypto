@@ -1,0 +1,80 @@
+{
+  "source_commit": "e060f3ee6",
+  "exit_code": 101,
+  "compiler_messages": [
+    {
+      "rendered": "error[E0425]: cannot find function `is_univariate` in this scope\n   --> src/projection.rs:418:17\n    |\n418 |                 is_univariate(&r.poly, expected.variable) && degree(&r.poly) == expected.degree\n    |                 ^^^^^^^^^^^^^ not found in this scope\n    |\nnote: function `crate::quotient::is_univariate` exists but is inaccessible\n   --> src/quotient.rs:45:1\n    |\n 45 | fn is_univariate(f: &Poly, t: usize) -> bool {\n    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "function `crate::quotient::is_univariate` exists but is inaccessible",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 1586,
+              "byte_start": 1542,
+              "column_end": 45,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/quotient.rs",
+              "is_primary": true,
+              "label": "not accessible",
+              "line_end": 45,
+              "line_start": 45,
+              "suggested_replacement": null,
+              "suggestion_applicability": null,
+              "text": [
+                {
+                  "highlight_end": 45,
+                  "highlight_start": 1,
+                  "text": "fn is_univariate(f: &Poly, t: usize) -> bool {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "level": "error",
+      "message": "cannot find function `is_univariate` in this scope",
+      "spans": [
+        {
+          "byte_end": 13792,
+          "byte_start": 13779,
+          "column_end": 30,
+          "column_start": 17,
+          "expansion": null,
+          "file_name": "src/projection.rs",
+          "is_primary": true,
+          "label": "not found in this scope",
+          "line_end": 418,
+          "line_start": 418,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 30,
+              "highlight_start": 17,
+              "text": "                is_univariate(&r.poly, expected.variable) && degree(&r.poly) == expected.degree"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "E0425",
+        "explanation": "An unresolved name was used.\n\nErroneous code examples:\n\n```compile_fail,E0425\nsomething_that_doesnt_exist::foo;\n// error: unresolved name `something_that_doesnt_exist::foo`\n\n// or:\n\ntrait Foo {\n    fn bar() {\n        Self; // error: unresolved name `Self`\n    }\n}\n\n// or:\n\nlet x = unknown_variable;  // error: unresolved name `unknown_variable`\n```\n\nPlease verify that the name wasn't misspelled and ensure that the\nidentifier being referred to is valid for the given situation. Example:\n\n```\nenum something_that_does_exist {\n    Foo,\n}\n```\n\nOr:\n\n```\nmod something_that_does_exist {\n    pub static foo : i32 = 0i32;\n}\n\nsomething_that_does_exist::foo; // ok!\n```\n\nOr:\n\n```\nlet unknown_variable = 12u32;\nlet x = unknown_variable; // ok!\n```\n\nIf the item is not defined in the current module, it must be imported using a\n`use` statement, like so:\n\n```\n# mod foo { pub fn bar() {} }\n# fn main() {\nuse foo::bar;\nbar();\n# }\n```\n\nIf the item you are importing is not defined in some super-module of the\ncurrent module, then it must also be declared as public (e.g., `pub fn`).\n"
+      }
+    },
+    {
+      "rendered": "For more information about this error, try `rustc --explain E0425`.\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "level": "failure-note",
+      "message": "For more information about this error, try `rustc --explain E0425`.",
+      "spans": [],
+      "code": null
+    }
+  ]
+}
