@@ -1,0 +1,89 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R81-EXPLICIT-CANDIDATE-F4-MAPS",
+  "version": 1,
+  "goal": "extract and verify complete coordinate maps to all four rejected-candidate F4 prime quotients",
+  "claims": [
+    {
+      "id": "candidate_maps81",
+      "class": "exact_computation",
+      "statement": "all four candidate quotient maps are explicit, dimension two and ideal-equal to the computed minimal primes"
+    }
+  ],
+  "arms": {
+    "reference": "R80 complete radical and prime-degree census",
+    "candidate": "22 coordinate images per prime and bidirectional ideal equality",
+    "positive": [
+      "each map quotient dimension two",
+      "all prime generators reduce modulo map ideal",
+      "all map generators reduce modulo prime",
+      "two maps distinct per component"
+    ],
+    "negative": [],
+    "baseline": {
+      "not_applicable_reason": "exact candidate algebra computation"
+    },
+    "A_A": {
+      "not_applicable_reason": "deterministic complete components"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "retained R50 candidate bytes",
+      "both p=0 components",
+      "one thread",
+      "1200 seconds each",
+      "4 GiB virtual"
+    ],
+    "measured": [
+      "four coordinate maps",
+      "ideal containment checks",
+      "exit/errors/hashes"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete components and primes",
+    "seeds": [
+      81
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact algebra"
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "all 88 variable codes",
+    "four generator indices",
+    "four verified ideal equalities"
+  ],
+  "execution": {
+    "launchers": [
+      "REPLAY_CAS.sh candidate-v0-81-01 ZERO81.sing CANDIDATE_V0_81_ALL_CHECKS_PASS",
+      "REPLAY_CAS.sh candidate-v1-81-01 ONE81.sing CANDIDATE_V1_81_ALL_CHECKS_PASS"
+    ],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 81,
+    "queue": "one math job at a time",
+    "source_gate": "frozen Git bytes and donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw copies"
+  },
+  "stopping": {
+    "accept": "both programs exit0, exact markers, zero native errors and all map/ideal assertions",
+    "failure": "retain raw failure/timeout; freeze repair before new ID"
+  },
+  "analysis": {
+    "method": "derive coordinate maps to F4 and check bidirectional ideal equality",
+    "scope": "rejected candidate only; no source-field or normality certification"
+  }
+}

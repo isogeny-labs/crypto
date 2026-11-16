@@ -1,0 +1,30 @@
+{
+  "schema": "structured-fb-source-methodology-review/v1",
+  "created_at": "2026-11-14T13:34:07.661124+00:00",
+  "scope": "Literal tracked source/report review only, not rerun or actual execution attestation; historical report lacks raw-input/source-version binding. No timing/correctness/absence or new algorithm claim.",
+  "files": [
+    {
+      "source_path": "research/ecdlp_autolab/structured_fb_additive.sage",
+      "source_commit": "43b457291f5b99ae1c23c4057b34ad07bdb07b41",
+      "git_blob": "8502ef603d68c7bf5b72d5dfb1cd258de08f2775",
+      "snapshot": "research/prime_orientation_layers_20261114/completion/prior-review/structured_fb_additive.sage.txt",
+      "bytes": 5643,
+      "sha256": "1f03a4bed42a085ad132f8de22d0ddddb23e716f64f1b7fcbd9d4b77256815ba"
+    },
+    {
+      "source_path": "research/ecdlp_autolab/structured_fb_additive_result.md",
+      "source_commit": "43b457291f5b99ae1c23c4057b34ad07bdb07b41",
+      "git_blob": "8f2cae070c1e9c5d5b21e36b489dc940042c77e5",
+      "snapshot": "research/prime_orientation_layers_20261114/completion/prior-review/structured_fb_additive_result.md.txt",
+      "bytes": 2932,
+      "sha256": "d89dc215ba3b178f368a1e50ea868df1fe1c02552845060417ac4c3d1871957d"
+    }
+  ],
+  "observations": [
+    "Constructor filters nonliftable candidates while scanning an arithmetic progression, returns upon reaching size, and does not enforce constant gaps or compare the resulting constraint to the intended full falling-factorial polynomial.",
+    "Tracked Method C has two factor-base variables X2,X3 in F3(xR,X2,X3); pair-sum control tests R-fb[k]=fb[i]+fb[j], using three factor-base points.",
+    "Sage set_random_seed(42) does not seed secrets.randbelow, which selects secret and query scalar coefficients; the two arms choose independent query targets.",
+    "Method C increments the relation counter on coordinate membership without a signed point identity check in that branch. This is a source-level validation gap, not a demonstrated false Semaev witness.",
+    "The report itself flags filtered-natural-order degeneration, but d>1 is not required for a genuine arithmetic progression: any nonzero constant step including1 is valid if no candidates are skipped."
+  ]
+}

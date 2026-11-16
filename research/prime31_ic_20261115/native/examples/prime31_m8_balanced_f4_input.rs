@@ -337,7 +337,8 @@ fn main()->Result<(),String>{
     if args.len()>1 || (!args.is_empty()
         && args[0]!="--probe-f4" && args[0]!="--panel-f4"
         && args[0]!="--ablate-f4" && args[0]!="--preeliminate-w-f4"
-        && args[0]!="--split-s4-f4" && args[0]!="--m8-s3chain-f4") {
+        && args[0]!="--split-s4-f4" && args[0]!="--m8-s3chain-f4"
+        && args[0]!="--anchor2-m6-f4") {
         return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4|--split-s4-f4|--m8-s3chain-f4]".into());
     }
     let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
@@ -346,6 +347,7 @@ fn main()->Result<(),String>{
     let preeliminate_w=args.first().is_some_and(|v|v=="--preeliminate-w-f4");
     let split_s4_f4=args.first().is_some_and(|v|v=="--split-s4-f4");
     let m8_s3chain_f4=args.first().is_some_and(|v|v=="--m8-s3chain-f4");
+    let anchor2_m6_f4=args.first().is_some_and(|v|v=="--anchor2-m6-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -365,6 +367,101 @@ fn main()->Result<(),String>{
     let polys:Vec<_>=fixed.iter().map(|p|ring.from_raw(&p.raw_tower())).collect();
     let nf_terms:Vec<_>=polys.iter().map(|p|p.len()).collect();
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
+
+
+    // Two *public, charged* pinned factor-base points lower the remaining
+    // eight-summand equation to an actual target-dependent six-summand ideal.
+    // No pair-sum catalogue, scalar label, or known-root injection is used
+    // on the frozen natural panel. This is a resource gate, not an ECDLP solve.
+    if anchor2_m6_f4 {
+        let r6=six_ring(fb.terminal);
+        r6.check();
+        let left=six_input(&fixed[0],&r6)?;
+        let right=six_input(&fixed[1],&r6)?;
+        let anchor_a=fb.points[0];
+        let anchor_b=fb.points[1];
+        let anchor_sum=ar.add(e,Some(anchor_a),Some(anchor_b))
+            .ok_or("two fixed factor-base anchors cancel")?;
+        let shifted_target=|r:(u64,u64),ar:&mut Arithmetic| -> Result<(u64,u64),String> {
+            ar.add(e,Some(r),ar.neg(e,Some(anchor_sum)))
+                .ok_or("anchored residual target is point at infinity".to_string())
+        };
+        let six:Vec<_>=fb.points.iter().copied().skip(2).take(6).collect();
+        if six.len()!=6 {return Err("missing six positive-control leaves".into());}
+        let residual=summands(&mut ar,&six,0,6)
+            .ok_or("six-point known positive control is identity")?;
+        let full=ar.add(e,Some(residual),Some(anchor_sum))
+            .ok_or("known positive with anchors is identity")?;
+        if shifted_target(full,&mut ar)?!=residual {
+            return Err("anchor subtraction does not reconstruct positive target".into());
+        }
+        let pu=summands(&mut ar,&six,0,3).ok_or("known m6 u=O")?;
+        let pv=summands(&mut ar,&six,3,6).ok_or("known m6 v=O")?;
+        let mut known=vec![0u64;6*DEPTH+2];
+        for (i,point) in six.iter().enumerate() {
+            known[i*DEPTH]=point.0;
+            for level in 1..DEPTH {
+                let previous=known[i*DEPTH+level-1];
+                known[i*DEPTH+level]=sub(mul(previous,previous),2);
+            }
+        }
+        known[6*DEPTH]=pu.0;
+        known[6*DEPTH+1]=pv.0;
+        let positive_target=six_input(&s3(&u,&v,&Polynomial::constant(residual.0)),&r6)?;
+        let positive_input=vec![left.clone(),right.clone(),positive_target];
+        if positive_input.iter().any(|poly|r6.eval(poly,&known)!=0) {
+            return Err("anchored m6 positive six-leaf witness lost in polynomial projection".into());
+        }
+        let positive=capped_f4(&positive_input,&r6,Some(&known))?;
+        let panel:Panel=serde_json::from_str(
+            include_str!("../M8_NATURAL_F4_PANEL_20261115.json"))
+            .map_err(|err|err.to_string())?;
+        if panel.rows.len()!=16
+            || panel.rows.iter().filter(|row|row.split_witness_count>0).count()!=5 {
+            return Err("anchored m6 frozen natural panel changed".into());
+        }
+        let mut outcomes=Vec::with_capacity(panel.rows.len());
+        for (i,row) in panel.rows.iter().enumerate() {
+            if row.index!=i || row.a>=e.n || row.b==0 || row.b>=e.n {
+                return Err(format!("bad frozen mask at anchored row {i}"));
+            }
+            let ag=ar.scalar(e,row.a,Some(e.g));
+            let bq=ar.scalar(e,row.b,Q);
+            let r=ar.add(e,ag,bq)
+                .ok_or("anchored natural public mask at infinity")?;
+            if [r.0,r.1]!=row.target {
+                return Err(format!("anchored natural public mask mismatch at row {i}"));
+            }
+            let shifted=shifted_target(r,&mut ar)?;
+            let target_poly=s3(&u,&v,&Polynomial::constant(shifted.0));
+            let input=vec![left.clone(),right.clone(),six_input(&target_poly,&r6)?];
+            let f4=capped_f4(&input,&r6,None)?;
+            outcomes.push(json!({
+                "index":i,"public_R":r,"shifted_R":shifted,
+                "registered_m8_restricted_split_positive":row.split_witness_count>0,
+                "note":"old m8 split label is NOT a witness label for anchored m6",
+                "f4":f4
+            }));
+        }
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "scope":"exact anchored six-summand target-dependent bounded Rust F4, no root extraction or ECDLP",
+            "curve_prime":P,"curve_order":e.n,
+            "base_size":fb.points.len(),
+            "public_positive_anchors":[anchor_a,anchor_b],
+            "anchor_sum":anchor_sum,
+            "tower_variables_before":48,"sum_variables_before":3,
+            "tower_variables_after":36,"sum_variables_after":2,
+            "algebraic_equations":"S4(three leaves,u); S4(three leaves,v); S3(u,v,x(R-A-B))",
+            "positive_six_leaf_control":{"public_target":full,
+                "residual_target":residual,"f4":positive,
+                "witness_used_only_for_f4_soundness":true},
+            "natural_panel_count":outcomes.len(),"natural_outcomes":outcomes,
+            "cost_note":"F4 ms and muladds omit input construction, curve operations, root extraction and full cold solve",
+            "correctness_note":"No censored run is a negative relation proof; signed point-lift and exception handling required"
+        }));
+        return Ok(());
+    }
 
     if split_s4_f4 {
         // Matched, bounded presentation ablation on an *already witnessed*
