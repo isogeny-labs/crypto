@@ -833,7 +833,6 @@ pub fn run_sieve_ic(inst: &Instance, prm: SieveParams) -> SieveResult {
             continue;
         }
         let mut w_nat = Nat::default();
-        let dense = s.res.attempts > 1;
         let mut answer = None;
         let certify = |t: u64, sv: &mut Solver| -> bool {
             let inst = sv.inst;
@@ -1053,6 +1052,7 @@ mod tests {
                             coord_square: true,
                             unit_t: true,
                             ferrari: false,
+                            sge_coord: false,
                         },
                     );
                     let bn = b.rel.mul + b.rel.add + b.la.mul + b.la.add;

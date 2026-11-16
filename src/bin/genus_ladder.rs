@@ -18,6 +18,9 @@
 //! elimination before Wiedemann (`w_max = W`, `fill_max = F`), named
 //! `<arm>+sge(W,F)`; the arm without it runs and is recorded unchanged.
 //! Protocol of the merge: `research/genus_ladder_sge_20261115/PROTOCOL.md`.
+//! Arm `s` is arm `w` with the merge: `--sge W,F` (default 4,1.5) reduces the
+//! peeled core, then the coordinate Wiedemann solves the reduced matrix; the
+//! arm is named `...+sgecoord+sge(W,F)` and only runs merged.
 //! One JSON object per line.  Protocol:
 //! `research/genus_ladder_20261114/PROTOCOL.md`.  All figures are
 //! `[pcc:unverified]`.
@@ -398,6 +401,7 @@ fn main() -> ExitCode {
                             coord_square: true,
                             unit_t: false,
                             ferrari: false,
+                            sge_coord: false,
                         },
                     ),
                     'f' => (
@@ -407,6 +411,20 @@ fn main() -> ExitCode {
                             coord_square: true,
                             unit_t: true,
                             ferrari: true,
+                            sge_coord: false,
+                        },
+                    ),
+                    // s: w + structured Gaussian elimination, then the
+                    // coordinate solve on the reduced matrix (needs --sge;
+                    // without it the single setting 4,1.5 is used).
+                    's' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: false,
+                            sge_coord: true,
                         },
                     ),
                     'w' => (
@@ -416,6 +434,7 @@ fn main() -> ExitCode {
                             coord_square: true,
                             unit_t: true,
                             ferrari: false,
+                            sge_coord: false,
                         },
                     ),
                     'R' | 'P' => {
@@ -459,7 +478,21 @@ fn main() -> ExitCode {
                     }
                     _ => continue,
                 };
-                let settings = std::iter::once(None).chain(cfg.sge.iter().copied().map(Some));
+                let settings: Vec<Option<gl::SgeParams>> = if ext.sge_coord {
+                    // arm s has no unmerged run: the merge is the arm
+                    if cfg.sge.is_empty() {
+                        vec![Some(gl::SgeParams {
+                            w_max: 4,
+                            fill_max: 1.5,
+                        })]
+                    } else {
+                        cfg.sge.iter().copied().map(Some).collect()
+                    }
+                } else {
+                    std::iter::once(None)
+                        .chain(cfg.sge.iter().copied().map(Some))
+                        .collect()
+                };
                 for sge in settings {
                     let o = gl::run_ic_ext(
                         &inst,
@@ -486,12 +519,17 @@ fn main() -> ExitCode {
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
                     rec["arm"] = json!(format!(
-                        "{}{}{}{}{}{}",
+                        "{}{}{}{}{}{}{}",
                         o.arm,
                         if pre { "+pre" } else { "" },
-                        if ext.coord_square { "+coord" } else { "" },
+                        if ext.coord_square || ext.sge_coord {
+                            "+coord"
+                        } else {
+                            ""
+                        },
                         if ext.unit_t { "+unitT" } else { "" },
                         if ext.ferrari { "+ferrari" } else { "" },
+                        if ext.sge_coord { "+sgecoord" } else { "" },
                         suffix
                     ));
                     rec["la_fallbacks"] = json!(o.la_fallbacks);

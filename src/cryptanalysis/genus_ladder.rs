@@ -1383,6 +1383,16 @@ pub struct IcExt {
     /// parity prefilter, at genus 4; undecided cases fall back to the
     /// baseline test.  Needs [`IcParams::prefilter`].
     pub ferrari: bool,
+    /// Structured Gaussian elimination ([`sge_reduce`], with the
+    /// [`SgeParams`] of [`IcParams::sge`]) on the peeled core, then the
+    /// coordinate Wiedemann on a random square row subset of the *reduced*
+    /// matrix, the target column mapped through the renumbering.  A failed
+    /// certificate falls back, in the same attempt and counted, to the
+    /// baseline [`wiedemann`] on the same reduced matrix (the merge is not
+    /// repeated).  Needs [`IcParams::sge`]; without it this flag does nothing.
+    /// Merged rows carry non-unit entries, which [`ic_control`]'s `mat_vec`
+    /// charges one multiplication each per product (a `±1` entry is free).
+    pub sge_coord: bool,
 }
 
 /// Run one index-calculus arm on an instance.  The structure is
@@ -1669,7 +1679,21 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             ok
         };
         let mut answer = None;
-        if ext.coord_square && prm.sge.is_none() {
+        // The reduced core of `sge_coord`, kept for the certified fallback.
+        let mut reduced: Option<(Vec<Row>, usize, u32)> = None;
+        if let (true, Some(sp)) = (ext.sge_coord, prm.sge) {
+            let mut s_nat = Nat::default();
+            let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+            res.la_sge.merge(s_nat);
+            res.la.merge(s_nat);
+            res.sge = st;
+            let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
+            }
+            reduced = Some((red, rcc, rct));
+        } else if ext.coord_square && prm.sge.is_none() {
             let t = wiedemann_coord(&core, cc, ct as usize, r, &mut rng, true, &mut w_nat);
             match t.map(to_log) {
                 Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
@@ -1678,6 +1702,10 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         }
         if answer.is_none() {
             let sol = match prm.sge {
+                _ if reduced.is_some() => {
+                    let (red, rcc, rct) = reduced.as_ref().expect("checked");
+                    wiedemann(red, *rcc, r, &mut rng, true, &mut w_nat).map(|x| x[*rct as usize])
+                }
                 None => wiedemann(
                     &core,
                     cc,
@@ -2215,16 +2243,19 @@ mod tests {
                     coord_square: true,
                     unit_t: false,
                     ferrari: false,
+                    sge_coord: false,
                 },
                 IcExt {
                     coord_square: false,
                     unit_t: true,
                     ferrari: false,
+                    sge_coord: false,
                 },
                 IcExt {
                     coord_square: true,
                     unit_t: true,
                     ferrari: false,
+                    sge_coord: false,
                 },
             ] {
                 let x = run_ic_ext(&inst, prm, ext);
@@ -2236,6 +2267,7 @@ mod tests {
                         coord_square: true,
                         unit_t: false,
                         ferrari: false,
+                        sge_coord: false,
                     })
                 {
                     assert_eq!(x.relations, base.relations);
@@ -2308,6 +2340,81 @@ mod tests {
         }
     }
 
+    /// `sge_coord` (merge, then the coordinate solve on a square subset of the
+    /// reduced matrix) certifies at genus 3 and 4, reproduces the relation
+    /// phase of arm w, and where the merge shrank the matrix and neither run
+    /// fell back it spends fewer LA multiplications than arm w.
+    #[test]
+    fn sge_coord_certifies_and_cuts_la() {
+        let w = IcExt {
+            coord_square: true,
+            unit_t: true,
+            ferrari: false,
+            sge_coord: false,
+        };
+        let s = IcExt {
+            sge_coord: true,
+            ..w
+        };
+        let mut shrank = 0;
+        for (p, g) in [(131u64, 3u32), (257, 3), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            for sp in [
+                SgeParams {
+                    w_max: 4,
+                    fill_max: 1.5,
+                },
+                SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                },
+            ] {
+                let mut prm = prm(p, g, Arm::DoubleLp, true, None);
+                prm.verify_relations = true;
+                prm.restart = restart_sqrt(inst.r);
+                let a = run_ic_ext(&inst, prm, w);
+                prm.sge = Some(sp);
+                let b = run_ic_ext(&inst, prm, s);
+                let tag = format!("p={p} g={g} {sp:?}");
+                assert!(b.certified && b.bad_relations == 0, "{tag}");
+                assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                assert_eq!(
+                    b.la.mul,
+                    b.la_graph.mul + b.la_peel.mul + b.la_sge.mul + b.la_wied.mul
+                );
+                if b.attempts == a.attempts && b.relations == a.relations {
+                    assert_eq!((b.sge.rows_in, b.sge.cols_in), (b.core_rows, b.core_cols));
+                    eprintln!(
+                        "sge_coord {tag}: cols {}->{} nnz {}->{} generic {}->{} fb {}/{} \
+                         la_wied mul {} add {} (w: {} {}) la mul {} (w {})",
+                        b.sge.cols_in,
+                        b.sge.cols_out,
+                        b.sge.nnz_in,
+                        b.sge.nnz_out,
+                        b.sge.generic_in,
+                        b.sge.generic_out,
+                        b.la_fallbacks,
+                        a.la_fallbacks,
+                        b.la_wied.mul,
+                        b.la_wied.add,
+                        a.la_wied.mul,
+                        a.la_wied.add,
+                        b.la.mul,
+                        a.la.mul
+                    );
+                    if b.sge.cols_out * 10 <= b.sge.cols_in * 8
+                        && b.la_fallbacks == 0
+                        && a.la_fallbacks == 0
+                    {
+                        shrank += 1;
+                        assert!(b.la_wied.mul < a.la_wied.mul, "{tag}");
+                    }
+                }
+            }
+        }
+        eprintln!("sge_coord: matrices shrunk by 20% or more in {shrank} runs");
+    }
+
     /// The Ferrari arm certifies at genus 4 and spends fewer relation-phase
     /// multiplications per trial than the same arm without it.
     #[test]
@@ -2328,6 +2435,7 @@ mod tests {
                 coord_square: true,
                 unit_t: true,
                 ferrari: false,
+                sge_coord: false,
             };
             let fer = IcExt {
                 ferrari: true,

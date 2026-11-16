@@ -108,8 +108,6 @@ struct Mid1 {
 
 #[derive(Clone, Copy)]
 struct Mid2 {
-    a: JDiv,
-    b: JDiv,
     vp: [u64; MX],
     q2: [u64; MX],
     lead: u64,
@@ -581,13 +579,7 @@ impl FastJ {
         if lead == 0 || dq != g {
             return Stage2::Done(self.fallback(s.a, s.b));
         }
-        Stage2::Mid(Mid2 {
-            a: s.a,
-            b: s.b,
-            vp,
-            q2,
-            lead,
-        })
+        Stage2::Mid(Mid2 { vp, q2, lead })
     }
 
     /// Whether stage 3 needs an inversion of `lead` (genus 4).
