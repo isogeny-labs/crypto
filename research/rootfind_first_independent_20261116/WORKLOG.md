@@ -97,3 +97,31 @@
 
 - Toolchain selection needed explicit Cargo and rustc paths. The active
   resume-file reservation prevents a branch-specific checkpoint.
+
+## 2026-11-16, locked build and admission decision
+
+### What was done
+
+- Committed the manifest and lockfile at `ea2fc503bf`, then repeated the
+  compile-only release command with `--locked`. Exit code was zero; raw
+  stderr, empty stdout and the executable digest are bound in
+  `BUILD_STATUS.json`. No test or scientific trial executed. [pcc:unverified]
+- Read-only `scripts/checkpoint.sh status` reported filled resume sections
+  and a stale last push. Direct inspection found merge markers at lines 66,
+  198 and 202 and descriptions of unrelated studies. [pcc:unverified]
+
+### Decisions made
+
+- Record a compile-only readiness result and an explicit run admission
+  obstruction. Do not use the current shared resume file for this branch.
+
+### Open threads
+
+- Commit and push the source and status, update the existing stacked PR,
+  and reconcile the shared session log when T-6720 releases it.
+- Recheck T-6342's scope release before the fixed scientific run. A clean
+  branch-specific S3 checkpoint and passing gate are its exit criteria.
+
+### Errors
+
+- The strip warning is nonfatal. No further build error occurred.
