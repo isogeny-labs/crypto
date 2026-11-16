@@ -1,7 +1,36 @@
 {
   "branch": "lane/vieta-coset-closeout",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/next-20261116/run/preflight-isolation.jsonl",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "900",
+        "bash",
+        "research/vieta_coset_rust_20261115/next-20261116/run/bin/run-panel.sh",
+        "preflight",
+        "research/vieta_coset_rust_20261115/next-20261116/run/preflight",
+        "research/vieta_coset_rust_20261115/next-20261116/run/bin/qualifier"
+      ],
+      "cwd": ".",
+      "wall_s": null,
+      "exit": null,
+      "supervisor_interrupted": true,
+      "receipt": "research/vieta_coset_rust_20261115/next-20261116/run/preflight-supervision-loss.json",
+      "precall_created_utc": "2026-11-16T19:39:08.334333+00:00",
+      "started_utc": null
+    }
+  ],
   "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
   "commit_dirty": true,
   "created_utc": "2026-11-16T19:38:23+00:00",

@@ -367,8 +367,8 @@
       "fixed_seconds": null,
       "per_sample_seconds": null,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "Before any calls. Separate calibration covers every actual size/field/representation, two inputs and all five arms; native forecast to be incorporated into main before primary freeze. The900/3600s hard caps are not fitted forecasts."
+      "estimated_total_seconds": 1302.351079378,
+      "measured_on": "All6 exact configuration classes, two inputs/all5 arms. Frozen native forecast at next-20261116/run/forecast.json; fixed+8*maximum observed input cost per class. Native stage durations only: supervisor loss means no admitted aggregate calibration clock. Planning projection, no timing claim; hard main envelope3600s."
     }
   },
   "metrics": {
@@ -547,11 +547,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "ac9f3009b19ef044ca5a7ae0b483dd8f4f2924e8ccb827ed6bba584447dbb586",
+    "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+    "frozen_at": "2026-11-16T19:49:33Z",
+    "filed_before_affected_data": true
   },
   "invalidation_rules": [
     "Counted results require complete-set equality and separate-process replay.",
@@ -598,6 +598,87 @@
     "standard_panel_exception": "Use existing word62/P224 component curves to attribute the algorithm change, no prime-group assertion for word62. Rational fixtures certify all fibers and have a different field subset; no cross-representation speed claim.",
     "binary_custody": "Immutable ignored local cache; exact Git sources/compiler/build/lockfile and binary SHA published; no remote binary-archive availability claim.",
     "primary_warmups": 2,
-    "primary_retained": 6
+    "primary_retained": 6,
+    "preflight_forecast": {
+      "configs": [
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 2.253187627,
+          "forecast_seconds": 359.102207027,
+          "group": "coset:p224:m2048",
+          "max_input_seconds": 44.606127425000004,
+          "observed_input_seconds": {
+            "0": 44.606127425000004,
+            "1": 43.086863075
+          },
+          "planned_primary_inputs": 8
+        },
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 0.151416762,
+          "forecast_seconds": 220.930007778,
+          "group": "coset:word62:m16384",
+          "max_input_seconds": 27.597323877,
+          "observed_input_seconds": {
+            "0": 27.597323877,
+            "1": 24.148040186
+          },
+          "planned_primary_inputs": 8
+        },
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 0.064801865,
+          "forecast_seconds": 70.64587076100001,
+          "group": "coset:word62:m8192",
+          "max_input_seconds": 8.822633612,
+          "observed_input_seconds": {
+            "0": 7.876579297999999,
+            "1": 8.822633612
+          },
+          "planned_primary_inputs": 8
+        },
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 2.803958769,
+          "forecast_seconds": 117.210160081,
+          "group": "rational:p224:m128",
+          "max_input_seconds": 14.300775164,
+          "observed_input_seconds": {
+            "0": 14.171207232999999,
+            "1": 14.300775164
+          },
+          "planned_primary_inputs": 8
+        },
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 11.210531735,
+          "forecast_seconds": 489.902761599,
+          "group": "rational:p224:m512",
+          "max_input_seconds": 59.836528732999994,
+          "observed_input_seconds": {
+            "0": 59.836528732999994,
+            "1": 58.997917730000005
+          },
+          "planned_primary_inputs": 8
+        },
+        {
+          "failed_calibration_calls": 0,
+          "fixed_seconds": 0.901493436,
+          "forecast_seconds": 44.560072132,
+          "group": "rational:word62:m2048",
+          "max_input_seconds": 5.457322337,
+          "observed_input_seconds": {
+            "0": 5.457322337,
+            "1": 5.382437324
+          },
+          "planned_primary_inputs": 8
+        }
+      ],
+      "hard_primary_envelope_seconds": 3600,
+      "method": "fixed+8*max(observed two input costs), includes five arms/draw/verifier; diagnostic clocks, not an interval or guarantee",
+      "schema": "vieta-next-preflight-forecast/v1",
+      "sum_of_complete_class_point_forecasts_seconds": 1302.351079378
+    },
+    "supervision": "Main launched under nohup+setsid with persistent supervisor status/log, new isolated admission. No changes to source/binary/analysis/matrix/seeds/limits/N. Prior calibration controller loss disclosed; no native retry."
   }
 }
