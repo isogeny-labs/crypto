@@ -1,0 +1,167 @@
+{
+    "Reservations": [
+        {
+            "ReservationId": "r-0cf2413ccb48d0b15",
+            "OwnerId": "104186811093",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2026-10-19T13:16:30+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-0139422f2b412eab4"
+                            }
+                        }
+                    ],
+                    "ClientToken": "n83-cache-20261019-us-east-1f",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "InstanceLifecycle": "spot",
+                    "NetworkInterfaces": [
+                        {
+                            "Association": {
+                                "IpOwnerId": "amazon",
+                                "PublicDnsName": "ec2-18-232-54-18.compute-1.amazonaws.com",
+                                "PublicIp": "18.232.54.18"
+                            },
+                            "Attachment": {
+                                "AttachTime": "2026-10-19T13:16:29+00:00",
+                                "AttachmentId": "eni-attach-006abc40e42211868",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-0a723165c7351c46a",
+                                    "GroupName": "n83-cache-east-20261019-8cde893"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "16:ff:e7:2c:f1:3b",
+                            "NetworkInterfaceId": "eni-05784c04b5c8ed74b",
+                            "OwnerId": "104186811093",
+                            "PrivateDnsName": "ip-172-31-72-188.ec2.internal",
+                            "PrivateIpAddress": "172.31.72.188",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Association": {
+                                        "IpOwnerId": "amazon",
+                                        "PublicDnsName": "ec2-18-232-54-18.compute-1.amazonaws.com",
+                                        "PublicIp": "18.232.54.18"
+                                    },
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-72-188.ec2.internal",
+                                    "PrivateIpAddress": "172.31.72.188"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-0c343d40111cce085",
+                            "VpcId": "vpc-0397e0d8755d751fc",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-0a723165c7351c46a",
+                            "GroupName": "n83-cache-east-20261019-8cde893"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "SpotInstanceRequestId": "sir-zr27qyxg",
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "n83-cache-east-20261019-8cde893"
+                        },
+                        {
+                            "Key": "Study",
+                            "Value": "n83-xor-cache-retry"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 4,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 2,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-10-19T13:16:29+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default"
+                    },
+                    "CurrentInstanceBootMode": "uefi",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-0355f2d911a051a3a",
+                    "ImageId": "ami-0567589d25e06853e",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-172-31-72-188.ec2.internal",
+                    "PublicDnsName": "ec2-18-232-54-18.compute-1.amazonaws.com",
+                    "StateTransitionReason": "",
+                    "KeyName": "n83-cache-east-20261019-8cde893",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "c7i.2xlarge",
+                    "LaunchTime": "2026-10-19T13:16:29+00:00",
+                    "Placement": {
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1f"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-0c343d40111cce085",
+                    "VpcId": "vpc-0397e0d8755d751fc",
+                    "PrivateIpAddress": "172.31.72.188",
+                    "PublicIpAddress": "18.232.54.18"
+                }
+            ]
+        }
+    ]
+}

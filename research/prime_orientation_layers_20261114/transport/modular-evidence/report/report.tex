@@ -1,0 +1,161 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.72in]{geometry}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt}
+\begin{document}
+\begin{center}{\Large Actual modular right coefficients}\\[4pt]
+Local proof continuation --- 15 November 2026\end{center}
+\textbf{Working result.} Draft018 locally elaborates 97 theorem statements,
+including earlier local scalar/common/modular statements, with exit 0 and no
+warnings. The final printed central dependency list contains standard Lean
+foundations only. This is local draft acceptance, outside the audited
+OrientationTransport53/shared57/fresh project and all old frozen checkpoints.
+All records are unsigned/defaultnot\_covered [pcc:unverified].
+
+The actual absolute-right coefficient has a constructed integer numerator
+and positive integer denominator, a derived work-precision budget, and a
+finite coefficient-box expression formula agreeing with its canonical
+reduction at creation precision. This report separates these identities from
+construction and total operation costs, which remain open [pcc:unverified].
+
+\textbf{Exact signed scalar reduction.} For an actual integral rational$q$
+and constructed representation$n=dq$, with$n\in\mathbb Z$ and$d>0$, set
+\[
+ E=v_2(d),\qquad d=2^E o,\qquad o\text{ odd}.
+\]
+Integrality derives$2^E\mid n$. Reduce the numerator first modulo$2^{p+E}$,
+divide its unsigned integer residue by$2^E$, then invert only the odd part:
+\[
+ \operatorname{reduce}_p(q)=
+ \left(\frac{n\bmod 2^{p+E}}{2^E}\right)o^{-1}
+ \quad\text{in }\mathbb Z/2^p\mathbb Z.
+\]
+Division is integer division before entry into the final residue ring.
+There is no inverse of2 in characteristic$2^p$. Negative/zero numerators and
+$p=0$ remain covered. The unsigned representative is linked to signed integer
+reduction by the pinned Mathlib \texttt{ZMod.val\_intCast} theorem
+[pcc:unverified].
+
+\textbf{Actual polynomial representation.} Root/factor charts, finite
+products, normalization, row numerator and geometric approximation are
+constructed from scalar atoms. For actual$D$, the clearing recurrence is
+\[
+ R_0=0,\qquad R_{k+1}=dR_k+d(d-A)^k,\qquad A=dD.
+\]
+It maps exactly to$d^k\sum_{j<k}(1-D)^j$ and commutes with finite-ring
+coefficient mapping. Scalar multiplication, outer coefficient extraction,
+inner trimming and the crossing mask preserve the original right factor.
+No favorable numerator representation is supplied [pcc:unverified].
+
+\textbf{Evidence.} Local data PCC-20261115-b9a902 (actual modular interface),
+-d2b931 (denominator budget), -95ef07 (finite extraction), -fe493f
+(box evaluator), -111e64 (actual expressions), -b029b5 (final interface).
+Exact local receipts001--009 and all accepted/failed source/log/exit files
+are retained. These data records do not confer signed verification.
+
+\newpage
+\begin{center}{\Large Derived actual denominator and work precision}\end{center}
+Use actual signed grid$[-2^a,2^a)$, nonzero retained node$t$ with$v_2(t)=i$,
+$i<u\le a$, and the existing actual labels/ports. No positive retained
+multiplicity or favorable local jet is added to the domain. Let
+\[
+ H_a=2^{a+1}(2a+1),\qquad
+ S=a+1+2H_a+i+\sum_{j<u}(2j+i+1)m_j.
+\]
+These are the earlier actual normalizer and diagonal rational-size budgets.
+The bound$\operatorname{Bits}(B,q)$ controls both reduced numerator and
+positive denominator by$2^B$; inversion preserves that bound
+[pcc:unverified].
+
+Let$r(x)=x\bmod2^u$ and$M(x,y)$ be the actual mask. Define exactly
+\[
+ F(x,y)=\sum_{j\in M(x,y)}(j+a+1)m_j,
+\]
+\[
+ B_N(x,y)=(3a+2)+S+H_a+F(r(x),y),
+\]
+\[
+ B_D(x,y)=(3a+2)+(u+2a+1)
+       +\sum_{j\in M(x,y)}(u+j+a+1)m_j.
+\]
+Every actual affine root chart contributes denominator 1: its coefficients
+are integers. The factor-chart numerator also contributes denominator 1;
+only its actual inverse displacement denominator is charged. Finite products
+combine these with actual normalizer, diagonal and chart-slope denominators.
+This derives the row numerator bound$2^{B_N}$ and geometric bound$2^{kB_D}$,
+without a supplied small-height witness [pcc:unverified].
+
+For actual label$(r,b)$ and creation index$k=\max(0,p-w)$, the constructed
+right denominator satisfies
+\[
+ d_{r,b,y}\le2^{B_R},\qquad B_R=b+B_N(r,y)+kB_D(r,y).
+\]
+Coefficient extraction and trimming retain that denominator; the noncrossing
+zero branch uses denominator 1. Hence
+\[
+ E=v_2(d_{r,b,y})\le B_R,\qquad p+E\le p+B_R.
+\]
+Every mask term and multiplicity remains charged. These are explicit upper
+bounds on a constructed denominator, not an optimal precision claim or a
+runtime bound. They may substantially overestimate the reduced denominator
+[pcc:unverified].
+
+\textbf{Exact declarations.} \texttt{absoluteRightRep\_bound},
+\texttt{actual\_right\_modular\_with\_budget},
+\texttt{finiteExtract\_intCast},
+\texttt{actual\_finite\_right\_coefficient}.
+See draft018 and local receipts005/006/009. Old scalar/common51 and
+Transport151/final16 artifact bytes are preserved [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Coefficient boxes and the actual expression bridge}\end{center}
+An arithmetic expression uses integer literals, inner/outer variables,
+addition, negation and multiplication. Construct actual expressions from
+the representation constructors, sorted finite products, repeated powers
+and the cleared geometric recurrence. The actual denominator expression is
+constructed too; it is not a supplied witness [pcc:unverified].
+
+An$h\times z$ box stores coefficients$[H^bZ^n]$ with$b<h,n<z$.
+Zero extension and antidiagonal convolution give exactly the same retained
+coefficients as full polynomial arithmetic. Evaluation over
+$\mathbb Z/2^q\mathbb Z$ agrees with casting the integer polynomial result.
+One convolution uses
+\[
+ \sum_{b<h}\sum_{n<z}(b+1)(n+1)\le(hz)^2
+\]
+scalar products, and each individual box has$hz$ slots. This is neither a
+complete ring-operation count nor an overall memory bound: recursive
+intermediates can occupy multiple boxes [pcc:unverified].
+
+For a requested coefficient, the actual approximation expression is evaluated
+in a box$(b+1)\times(n+1)$ at$q=p+E$. The actual inverse-power numerator,
+trim-zero and noncrossing branches then feed finite extraction. The theorem
+\texttt{OrientationNumeratorCode.boundedRightEntry\_correct} equates this
+formula with the canonical actual absolute-right coefficient at creation
+precision. The target factor keeps its creation index; the original immutable
+creation-data interface is not constructed here [pcc:unverified].
+
+\begin{center}
+\includegraphics[width=\linewidth,height=1.65in,keepaspectratio]{dependencies.pdf}
+\end{center}
+
+\textbf{Next dependency.} Code certificates and denominator projections still
+refer to representation data. No compiler/erasure theorem guarantees that
+constructing them avoids integer-polynomial work. Build a scalar-only
+expression/denominator object independent of polynomial representation data,
+prove its equality, and charge expression size, enumeration, scalar inputs,
+powers/DAG construction, modular arithmetic and total bit/entry cost.
+The current powers repeat factors; no fast-power result is claimed.
+All$2^u k$ labels remain charged. Original creation, weighted modes, child
+networks, recovery/recursion and public extraction costs remain open
+[pcc:unverified].
+
+\textbf{Sources and failures.} Actual chart/grid/mask/normalizer/diagonal/
+absolute-right sources; pinned Mathlib rational heights/denominators,
+Nat/Int valuations and ModEq, ZMod.Basic, Finset.Sort/products and
+PowerSeries.Trunc. KB unavailable as logged; standard algebra reused without
+novelty claims. All failed drafts and raw logs are retained. No timing,
+native, paid/cloud or attack campaign was launched [pcc:unverified].
+\end{document}

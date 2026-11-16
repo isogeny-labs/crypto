@@ -1,0 +1,11 @@
+name = "three_tangent_pairing_audit"
+version = "0.1.0"
+defaultTargets = ["ThreeTangentPairingAudit"]
+
+[[require]]
+name = "bk_three_normalization_audit"
+path = "../../bk_three_normalization_audit_20261114/lean"
+
+[[lean_lib]]
+name = "ThreeTangentPairingAudit"
+roots = ["TangentScalar", "TangentPoint", "TangentCharacter", "TangentPerfect", "TangentCovariance", "TangentCoordinates", "TangentFrobenius", "TangentControls", "TangentNecessity", "TangentCertificate"]

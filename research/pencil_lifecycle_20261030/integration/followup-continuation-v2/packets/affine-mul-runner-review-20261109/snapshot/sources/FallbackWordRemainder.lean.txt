@@ -1,0 +1,57 @@
+import FallbackWordInvariant
+set_option autoImplicit false
+namespace FallbackGeometry
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+def remainder (p : UInt64) (a b : List UInt64) : Option (List UInt64) :=
+ match b.getLast? with
+ | none => none
+ | some last => (NonmonicStorage.wordDiv p last b a a.length).map Prod.snd
+
+theorem remainder_total (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (ha : Canon p a) (hc : Canon p b)
+ (hn : Normal b) (hbn : wordsPoly p b ≠ 0) :
+ ∃ r, remainder p a b=some r ∧ Canon p r ∧ Normal r ∧
+ r.length<b.length ∧ wordsPoly p b ∣ wordsPoly p a-wordsPoly p r := by
+ have he : b ≠ [] := by intro h; apply hbn; simp [h,wordsPoly,listPoly]
+ have hl : (b.getLast he).toNat < p.toNat := hc _ (List.getLast_mem he)
+ have hln : b.getLast he ≠ 0 := by
+   intro h
+   exact hn (by simp [List.getLast?_eq_some_getLast he,h])
+ obtain ⟨q,r,hd,_,hcr,hnr,heq,hs⟩ := PegcdWord.division_total p (b.getLast he) a b hp hb hl hln ha hc
+   (List.getLast?_eq_some_getLast he)
+ have hshort : r.length < b.length := by
+   rcases hs with hh | hh
+   · subst r; simpa using List.length_pos_iff.mpr he
+   · exact hh
+ refine ⟨r,?_,hcr,hnr,hshort,?_⟩
+ · simp [remainder,List.getLast?_eq_some_getLast he,hd]
+ · refine ⟨wordsPoly p q,?_⟩
+   rw [heq]
+   ring
+
+theorem remainder_valid {R : Type*} [CommRing R] (u f w r : R)
+ (hv : u ∣ f-w*w) (hr : u ∣ w-r) : u ∣ f-r*r := by
+ have h := dvd_add hv (dvd_mul_of_dvd_left hr (w+r))
+ convert h using 1 <;> ring
+
+theorem fallback_prepared_exists (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hna : Normal ua) (hnb : Normal ub)
+ (hanz : wordsPoly p ua ≠ 0) (hbnz : wordsPoly p ub ≠ 0)
+ (hvalidA : wordsPoly p ua ∣ wordsPoly p f-wordsPoly p va*wordsPoly p va)
+ (hvalidB : wordsPoly p ub ∣ wordsPoly p f-wordsPoly p vb*wordsPoly p vb) :
+ ∃ ch : FallbackWord.Chain p ua ub va vb, ∃ u w r,
+ FallbackWord.Divided p ua ub va vb f ch u w ∧ remainder p w u=some r ∧
+ Canon p r ∧ Normal r ∧ r.length<u.length ∧
+ wordsPoly p u ∣ wordsPoly p f-wordsPoly p r*wordsPoly p r := by
+ obtain ⟨ch,u,w,hdiv⟩ := FallbackWord.fallback_divisions_exist p ua ub va vb f hp hb hua hub hva hvb hf hna hnb hanz hbnz hvalidA
+ have hv := word_quotient_valid p ua ub va vb f ch u w hdiv hp hb hua hub hva hvb hf hanz hvalidA hvalidB
+ have hcu : Canon p u := hdiv.2.2.1
+ have hcw : Canon p w := hdiv.2.2.2.1
+ have hnu : Normal u := hdiv.2.2.2.2.1
+ have hunz : wordsPoly p u ≠ 0 := hdiv.2.2.2.2.2.2.2.2
+ obtain ⟨r,hr,hcr,hnr,hs,hcong⟩ := remainder_total p w u hp hb hcw hcu hnu hunz
+ exact ⟨ch,u,w,r,hdiv,hr,hcr,hnr,hs,remainder_valid _ _ _ _ hv hcong⟩
+end FallbackGeometry

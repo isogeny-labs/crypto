@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""Draw the checked R99 resultant tower and recorded degrees."""
+from pathlib import Path
+
+out = Path(__file__).with_name("diagram.svg")
+out.write_text('''<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+<rect width="900" height="260" fill="white"/>
+<text x="32" y="35" font-size="20" font-family="sans-serif">R99 exact resultant tower</text>
+<rect x="30" y="75" width="235" height="92" rx="8" fill="#dceafa" stroke="#285f9f"/>
+<text x="45" y="105" font-size="17" font-family="sans-serif">G51: degree 16 in lambda</text>
+<text x="45" y="133" font-size="15" font-family="sans-serif">f51: degree 7 in y</text>
+<path d="M270 120 L340 120" stroke="#285f9f" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="350" y="75" width="220" height="92" rx="8" fill="#dceafa" stroke="#285f9f"/>
+<text x="364" y="105" font-size="16" font-family="sans-serif">Res(lambda derivative)</text>
+<text x="364" y="133" font-size="15" font-family="sans-serif">nonzero in F2(x)[y]</text>
+<path d="M575 120 L645 120" stroke="#285f9f" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="650" y="75" width="220" height="92" rx="8" fill="#dceafa" stroke="#285f9f"/>
+<text x="662" y="105" font-size="16" font-family="sans-serif">Norm in F2(x)</text>
+<text x="662" y="133" font-size="15" font-family="sans-serif">num degree 1968 / x^2608</text>
+<text x="44" y="225" font-size="15" font-family="sans-serif">Run norm99-01: native exit 0; fresh replay byte-identical; 74 numerator terms</text>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#285f9f"/></marker></defs>
+</svg>\n''')

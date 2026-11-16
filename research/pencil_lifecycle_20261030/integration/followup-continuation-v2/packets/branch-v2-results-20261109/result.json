@@ -1,0 +1,68 @@
+{
+  "schema": "branch.native-archival-review/v1",
+  "recorded_machine_status": "failed",
+  "runtime_rerun": false,
+  "independent_kernel_replay": false,
+  "freeze_sha256": "4974f9673e7b5a4cd76ad558e798625ba144e1e6231838f03b6fa9fcab128861",
+  "planned_calls": 18,
+  "actual_calls": 14,
+  "successful_calls": 13,
+  "failed_module": "BranchRootMultiplicity",
+  "failed_call": 14,
+  "errors": [
+    "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109/BranchRootMultiplicity.lean:86:4: error: Type mismatch: After simplification, term",
+    "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109/BranchRootMultiplicity.lean:99:41: error: unsolved goals",
+    "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109/BranchRootMultiplicity.lean:117:2: error: unsolved goals",
+    "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109/BranchRootMultiplicity.lean:146:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern"
+  ],
+  "local_failed_axiom_output_contains_sorryAx": true,
+  "planned_readback_names": 13,
+  "actual_planned_readback_names": null,
+  "planned_readback_status": "not_reached",
+  "expected_failure_control_status": "not_reached",
+  "target_theorem_compile_status": "not_reached",
+  "pre_post_dependency_hashes_equal": true,
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "all_copied_source_hashes_match": true,
+  "runtime_pre_post_hashes_match": true,
+  "all_phase_terminal_owners_confirmed": true,
+  "phases": [
+    {
+      "phase": "pre",
+      "passed": true,
+      "elapsed_seconds": 103.90075859503122,
+      "invocation_id": "c532d745cdd7442b97396ff734815fb1"
+    },
+    {
+      "phase": "compiler",
+      "passed": false,
+      "elapsed_seconds": 397.6134130839491,
+      "invocation_id": "bbb9315242ff4528a76ea73df83a07f1"
+    },
+    {
+      "phase": "post",
+      "passed": true,
+      "elapsed_seconds": 30.45365134999156,
+      "invocation_id": "0a26332edc21484d81146c937e0fb996"
+    }
+  ],
+  "attempt_elapsed_seconds": 532.0833356159856,
+  "charged_seconds": 3600,
+  "campaign_charged_after_attempt_seconds": 16260,
+  "resources": {
+    "cpu": 1,
+    "memory_gib": 8,
+    "swap": 0,
+    "tasks": 128
+  },
+  "archived_files": 97,
+  "archive_sha256": "e1ff226f5b21897dc0f0159b82af266b3847b7e92290790f45460aef0c0e38c2",
+  "archive_bytes": 2997050,
+  "limitations": [
+    "Source review supports scoped statement but native replay exposes dependency elaboration defects",
+    "No independent binary kernel rechecker",
+    "Shared-cache pre/post identity does not exclude transient concurrent modification",
+    "First thirteen successful compiler calls do not establish the unrun target theorem or controls"
+  ]
+}

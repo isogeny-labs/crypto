@@ -1,0 +1,87 @@
+{
+  "formal": {
+    "claim_id": "PCC-20261112-cb73f6",
+    "actual_verdict": {
+      "claim_id": "PCC-20261112-cb73f6",
+      "claim_sha256": "55357ea50859987f261c01ef4d336c5f77eeae0bb7f41b22df7b86d1432fb6fc",
+      "commit": "0c151089509591b2b285bb539a2d9bb06bb82cbb",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/rho_constant_audit_20261112/lean (ReportedMeans.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-12T23:03:20Z",
+      "verifier_host": "2d18c814bc7e"
+    },
+    "signed_standing": {
+      "claim_id": "PCC-20261112-cb73f6",
+      "claim_sha256": "55357ea50859987f261c01ef4d336c5f77eeae0bb7f41b22df7b86d1432fb6fc",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "native": {
+    "claim_id": "PCC-20261112-06eb58",
+    "actual_verdict": {
+      "claim_id": "PCC-20261112-06eb58",
+      "claim_sha256": "3e88b3585a19cc29492b83a77d654838a009025a91fe5a6510e0005bd26869f9",
+      "commit": "0c151089509591b2b285bb539a2d9bb06bb82cbb",
+      "proofs": [
+        {
+          "kind": "attestation",
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ],
+          "reasons": [],
+          "verdict": "not_covered"
+        }
+      ],
+      "reasons": [
+        "claim kind measurement is not covered: recompute; replay"
+      ],
+      "schema": "pcc.verdict/v1",
+      "verdict": "not_covered",
+      "verified_at": "2026-11-12T23:03:21Z",
+      "verifier_host": "2d18c814bc7e"
+    },
+    "signed_standing": {
+      "claim_id": "PCC-20261112-06eb58",
+      "claim_sha256": "3e88b3585a19cc29492b83a77d654838a009025a91fe5a6510e0005bd26869f9",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "schema": "rho-report-verification/v1",
+  "source_commit": "0c151089509591b2b285bb539a2d9bb06bb82cbb",
+  "source_plan": "sources.json",
+  "all_source_and_native_artifact_pins_match": true,
+  "formal_source_files": 4,
+  "declaration_sha256": "13773bdc8a2afb0d915a6367179888e314290ba9b0638cf657958b7c194da8ea",
+  "reports": [
+    {
+      "path": "reports/run-20261112T2225Z/report.pdf",
+      "bytes": 40967,
+      "sha256": "24a8708dce7c3e1ebb20617bedbed72d148cc8054003466752fa203cc169d209",
+      "pages": 1,
+      "all_pages_visually_inspected": true
+    },
+    {
+      "path": "reports/run-20261112T2233Z/report.pdf",
+      "bytes": 48743,
+      "sha256": "4a22ac3e7454973b14e70c297f267ab40f0e85d7fb80c2a346c3c71df1e60be6",
+      "pages": 3,
+      "all_pages_visually_inspected": true
+    }
+  ],
+  "formal_scope": "Exact arithmetic on displayed recorded integer totals: four rational normalized-mean intervals, setup/search/internal-check sums, emitted-counter weight0/1 ordering reversal, and each fixed mean above sqrt(pi/4). No native execution authenticity, actual curve-order proof, compiler refinement, expected-cost or asymptotic theorem.",
+  "independent_host": false,
+  "paid_compute_and_storage": 0
+}

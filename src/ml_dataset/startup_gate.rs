@@ -436,6 +436,8 @@ fn validate_delivery(
             remote: Some(config.generate.remote.clone()),
             budget: local.paths.budget_args(),
             budget_cell_envelope: Some(local.paths.admission.join("cell-envelope.json")),
+            snapshot_seconds: 30,
+            snapshot_timeout_seconds: 120,
         },
         bundle: bundle.clone(),
         owner: actual_owner.clone(),
@@ -1436,6 +1438,8 @@ mod tests {
                 "filed_before_affected_data":true,"frozen_at":"2026-10-29T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
+                                channels: None,
+                factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![7],
                 arities: vec![2],
@@ -1451,6 +1455,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: Vec::new(),
             };
             let plan_bytes = serde_json::to_vec_pretty(&plan).unwrap();
             fs::write(&paths.plan, &plan_bytes).unwrap();

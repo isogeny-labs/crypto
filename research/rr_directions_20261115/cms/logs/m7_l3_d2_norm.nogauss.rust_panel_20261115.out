@@ -1,0 +1,68 @@
+c GAUSSCONF max_num_matrices=0 autodisable=1 max_matrix_rows=2000 max_matrix_columns=1000 min_gauss_xor_clauses=2
+c -- header says num vars:            126
+c -- header says num clauses:         364
+c -- clauses added: 336
+c -- xor clauses added: 28
+c -- vars added 126
+c [find&init matx] performing matrix init
+c [gauss] XOR-encoding clauses are not detached, so no need to reattach them.
+c [xor-rem-unconnected] left with 28 xors from 28 non-empty xors T: 0.00
+c [xor-together] xored together: 0 orig xors: 28 new xors: 28 T: 0.00
+c [xor-rem-unconnected] left with 28 xors from 28 non-empty xors T: 0.00
+c [xor-clean-equiv] removed equivalent xors: 0 left with: 28
+c [matrix] unused xors from cleaning: 0
+c [matrix] UNused matrix        28 x  126  density:0.2375  xorlen avg: 29.93
+c [matrix] unused matrices: 1 of which too few rows: 0
+c [matrix] Using 0 matrices recovered from 0 xors T: 0.00 T-out: N
+c [branch] adjusting to: vsid (from: vsid) var_decay:0.95 descr: VSIDS
+c rst  geom  stb   vs     1   111     497  3231   233    3.96    3.83    16    38    55     2   13.14   12.94
+c rst  geom  stb   vs     2   234     497  3231   233    3.96    3.83    28    69   134     3   12.99   12.85
+c  res  pol bran  nres  conf freevar  IrrL  IrrB l/longC  l/allC RedL0 RedL1 RedL2  RedB l/longC  l/allC
+c rst  geom  stb   vs     3   369     497  3231   233    3.96    3.83    35    82   247     5   13.14   12.99
+c rst  geom  stb   vs     4   516     497  3231   233    3.96    3.83    42   132   337     5   14.96   14.84
+c rst  geom  stb   vs     5   678     497  3231   233    3.96    3.83    58   183   432     5   14.12   14.03
+c rst  geom  stb   vs     6   855     497  3231   233    3.96    3.83    63   269   518     5   13.95   13.88
+c rst  geom  stb   vs     7   907     497  3231   233    3.96    3.83    63   279   560     5   13.82   13.75
+c ------- FINAL TOTAL SEARCH STATS ---------
+c UIP search time          : 0.01        (77.29     % time)
+c restarts                 : 7           (129.57    confls per restart)
+c blocked restarts         : 0           (0.00      per normal restart)
+c time                     : 0.01        
+c decisions                : 1224        (0.00      % random)
+c propagations             : 83K         (7799K     props/s)
+c decisions/conflicts      : 1.35        
+c conflicts                : 907         
+c conf lits non-minim      : 20419       (22.51     lit/confl)
+c conf lits final          : 13.75       
+c red which0               : 63          (6.95      % of confl)
+c props/decision           : 0.00        
+c props/conflict           : 0.00        
+c 0-depth assigns          : 0           (0.00      % vars)
+c 0-depth assigns by CNF   : 0           (0.00      % vars)
+c reduceDB time            : 0.00        (0.00      % time)
+c OccSimplifier time       : 0.00        (0.00      % time)
+c [occur] 0.00 is overhead
+c [occur] link-in T: 0.00 cleanup T: 0.00
+c [occ-substr] long subBySub: 0 subByStr: 0 lits-rem-str: 0 T: 0.00
+c SCC time                 : 0.00        (0.00      % time)
+c [scc] new: 0 BP 0M  T: 0.00
+c vrep replace time        : 0.00        (0.00      % time)
+c vrep tree roots          : 0           
+c vrep trees' crown        : 0           (0.00      leafs/tree)
+c distill long time        : 0.00        (0.00      % time)
+c distill bin time         : 0.00        (0.00      % time)
+c strength cache-irred time: 0.00        (0.00      % time)
+c strength cache-red time  : 0.00        (0.00      % time)
+c avg cls in red 0         : 39.75       
+c avg cls in red 1         : 125.59      
+c avg cls in red 2         : 283.38      
+c Conflicts in UIP         : 907         (65548.89  confl/time_this_thread)
+c Max Memory (rss) used    : 5692 kB     
+c Total time (this thread) : 0.01        
+c DRIVER conflicts: 907
+c DRIVER decisions: 1224
+c DRIVER propagations: 83411
+c DRIVER solve_cpu_s: 0.011564
+c DRIVER solve_wall_s: 0.011666
+s SATISFIABLE
+v 1 2 3 4 5 -6 -7 8 -9 -10 11 -12 13 -14 15 -16 17 18 -19 -20 21 -22 23 24 25 -26 -27 -28 29 -30 -31 -32 -33 -34 -35 -36 37 -38 39 40 41 42 -43 -44 -45 -46 -47 48 49 -50 -51 52 -53 -54 -55 -56 -57 -58 -59 -60 -61 -62 63 -64 -65 66 -67 68 69 70 71 72 -73 -74 -75 -76 -77 -78 -79 80 -81 -82 -83 -84 85 86 -87 -88 -89 90 -91 -92 -93 94 -95 -96 -97 -98 -99 -100 -101 -102 -103 -104 -105 -106 -107 108 109 110 111 112 -113 -114 -115 -116 -117 -118 -119 120 -121 -122 -123 -124 -125 -126 0
