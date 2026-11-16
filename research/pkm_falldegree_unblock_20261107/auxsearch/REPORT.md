@@ -53,6 +53,40 @@ the means sit about 13% high, all three inside H's interval. The protocol allows
 
 ![fig](fig1.svg)
 
+## Amendment A1: exact finite-p prediction and a confirmatory run (2026-11-15/16)
+
+Frozen before data (`AMENDMENT_A1.md`, commit `1eb46c2a0f`).
+
+**Exact prediction.** The number of accepted (a, b) is (p − 1)/2 · Σ_s [H(4p − s²) − H((4p − s²)/4)], summed over
+traces s ≡ p + 1 (mod 2^t), with H the Hurwitz class number computed by counting reduced forms (`exact/hurwitz.c`).
+- **Check.** At p = 257, 263 and 769 the formula equals a full enumeration of every curve at every t.
+- **At P1.** The expected tries are 0.992–1.025 × 2^t for t ≤ 14, then 1.048 at t = 15 and 0.923 at t = 16. Finite p
+  therefore does not explain an excess of 13%.
+
+**Run.** Fresh seeds: 600 per t at t = 12, 13, 14 and 200 per t at t = 15, 16. That is 2,200 searches with the same
+binary, stderr empty, and each output an exact in-order prefix of its shard. The session machine restarted once
+mid-run and the processes resumed; no row was lost or repeated.
+
+| t | n | mean tries / 2^t | exact E / 2^t | 99% interval | z |
+|--:|--:|--:|--:|:--|--:|
+| 12 | 600 | 1.028 | 1.010 | [0.91, 1.12] | +0.43 |
+| 13 | 600 | 1.003 | 1.025 | [0.92, 1.14] | −0.52 |
+| 14 | 600 | 0.910 | 0.997 | [0.89, 1.10] | −2.13 |
+| 15 | 200 | 0.982 | 1.048 | [0.87, 1.26] | −0.89 |
+| 16 | 200 | 1.023 | 0.923 | [0.76, 1.10] | +1.53 |
+
+**Readings, as frozen.**
+- The exact model holds at t = 12..16.
+- The pooled z over t = 12..14 is −1.28: no miss.
+- The first sweep's +13% at t = 12..14 did not recur. The A1 means are 1.03, 1.00 and 0.91. It reads as chance.
+- Pooling both runs (800 per t) gives 1.055, 1.034 and 0.965, all inside their intervals.
+- The cost per curve tried stays about 1,660 group operations up to t = 16.
+
+The pilot's search therefore behaves exactly as uniform sampling of (a, b) with the cyclic-2-Sylow acceptance rule
+predicts. The single searches in the iso-a/iso-14 towers were ordinary draws from it. Files: `AMENDMENT_A1.md`,
+`exact/` (`hurwitz.c`, `traces.*`, `predict_exact.py`, `predict_exact.json`), `a1.*`, `analyze_a1.py`,
+`a1_summary.json`.
+
 ## Files
 
 - `PROTOCOL.md`, `predict.py` (frozen before data).
