@@ -21,8 +21,11 @@ Archives/envelopes retain the executables and raw compiler output
 COMPACT_SPEED_PROTOCOL.md and claim 228ef7 preregister the requested 15x
 validation-inclusive target against both optimized F4 and the expanded route.
 No scientific timing is admitted; current checkpoint token/env/AWS transport
-are absent. An async question requests an already configured environment,
-without asking for credentials in chat. Native F4 remains unsupported on the
+are absent. The user selected restoration here. AWS CLI is installed, but its
+standard provider chain finds no caller. Managed status shows no secret or
+identity binding; the offered environment tools are read-only. Binding a
+checkpoint token through current-chat settings remains necessary. Read
+compact-development/CHECKPOINT_ACCESS.md. Native F4 remains unsupported on the
 53-bit prime. Do not infer runtime gains from unit clocks or cofactor counts.
 
 The following sections describe the preceding expanded integration and its

@@ -80,9 +80,11 @@ seeds. A storage reduction cannot satisfy this runtime rule
 
 No scientific timing is admitted yet: the current environment has no configured
 S3 checkpoint upload transport. The maintained EKS route also requires its
-commit-image, isolation, receipt and known-budget checks. An async question
-asks for an already configured environment without requesting credentials in
-chat. Continue the actual timing after those dependencies are available; do
+commit-image, isolation, receipt and known-budget checks. The user requested
+restoration here. CLI installation and a standard identity probe are complete,
+but the current environment has no credential binding and its offered tools
+cannot write configuration. Read compact-development/CHECKPOINT_ACCESS.md.
+Continue the actual timing after those dependencies are available; do
 not promote the earlier standalone denominator or development clocks.
 
 Sources checked (KB): unavailable, with the fallback primary-source review
