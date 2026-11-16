@@ -56,6 +56,9 @@ jobs:
       - name: Same twelve held-out prime31 Q across five Rust APS partition sizes
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-sweep
+      - name: Fresh 24-target Rust APS paired size confirmation with A/A
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-confirm
       - name: Twelve held-out complete prime31 Rust APS logarithms
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
