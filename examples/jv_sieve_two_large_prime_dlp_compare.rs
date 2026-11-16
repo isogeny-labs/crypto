@@ -7,8 +7,10 @@ use crypto_lib::cryptanalysis::{
     jv_sieve::{
         self as sieve,
         two_large_prime::{
-            run_two_large_prime_dlp_on, run_two_large_prime_dlp_on_with_quotient_reuse,
-            run_two_large_prime_dlp_on_with_structural_gate, TwoLargePrimeDlpOptions,
+            run_extension_remainder_dlp_on, run_two_large_prime_dlp_on,
+            run_two_large_prime_dlp_on_with_quotient_reuse,
+            run_two_large_prime_dlp_on_with_structural_gate, ExtensionRemainderDlpOptions,
+            TwoLargePrimeDlpOptions,
         },
     },
     residual_walk::is_prime_u64,
@@ -17,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
     fs::{File, OpenOptions},
+    io::{BufWriter, Write},
     path::PathBuf,
     time::Instant,
 };
@@ -136,6 +139,13 @@ impl PublicCurve {
 }
 
 fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, String> {
+    if matches!(method, "extension-full-smooth" | "extension-remainders")
+        && args.small_percent != 100
+    {
+        return Err(
+            "extension-remainder methods require the full factor base (--small-percent 100)".into(),
+        );
+    }
     if args.reuse_homogeneous_basis
         && (method != "two-lp"
             || !args.structural_rank_gate
@@ -182,7 +192,11 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
                 else if args.structural_rank_gate {run_two_large_prime_dlp_on_with_structural_gate(&spec,args.seed,options)?}
                 else {run_two_large_prime_dlp_on(&spec,args.seed,options)?}
             },
-            _=>return Err("method must be ic, two-lp or rho".into()),
+            "extension-full-smooth"|"extension-remainders"=>{
+                let options=ExtensionRemainderDlpOptions{quadratic_remainders:method=="extension-remainders",b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents};
+                run_extension_remainder_dlp_on(&spec,args.seed,options)?
+            },
+            _=>return Err("method must be ic, two-lp, extension-full-smooth, extension-remainders or rho".into()),
         };
         drop(model);
         let verified={let _v=work::enter(Phase::Verification);let f=Fq3::new(curve.p);let ec=EllE::new(&f,&alpha);scalar.is_some_and(|d|d>0&&d<curve.l&&ec.mul(&g,d)==q)};
@@ -255,7 +269,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             args.method.as_deref().ok_or("worker needs --method")?,
         )?
     };
-    serde_json::to_writer(file, &result)?;
+    // Buffer capture output without changing the measured primitive interval.
+    let mut writer = BufWriter::new(file);
+    serde_json::to_writer(&mut writer, &result)?;
+    writer.flush()?;
     println!(
         "{}",
         serde_json::to_string(

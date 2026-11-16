@@ -1,0 +1,13 @@
+{
+  "schema": "selected-root-build/v1",
+  "source_commit": "e060f3ee6",
+  "class": "development release correctness qualification",
+  "executable": {
+    "path": "/workspace/relation-native-qualifiers/selected-worker-e060f3ee6-01",
+    "sha256": "fe702714c54ef960e5c39dd35f39403b89e4a65ef5a09d1901358882af94139e",
+    "bytes": 6923632
+  },
+  "command": "CARGO_BUILD_JOBS=2 cargo test --release --locked --no-run --test native_api --test root_worker --manifest-path research/relation_degree_trace_20261115/rust-integration/Cargo.toml --target-dir target --message-format=json",
+  "transform": "separate copy, strip debug, read-only before hash",
+  "build_json_sha256": "feb256f82a04ecb56e8c089dfc59270f00de885673003921382466335a353bb1"
+}

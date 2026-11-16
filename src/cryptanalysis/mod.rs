@@ -317,6 +317,7 @@ pub mod mq_fes;
 pub mod mq_monica;
 pub mod multi_key_hnp;
 pub mod native_signed_mitm;
+pub mod nist_cover_quartic;
 pub mod nist_seed_provenance;
 pub mod nonanom_formal_log;
 pub mod orbit_homology;
