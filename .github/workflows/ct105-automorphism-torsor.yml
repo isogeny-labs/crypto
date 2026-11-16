@@ -1,0 +1,47 @@
+name: CT105 local Hensel and cyclic Frobenius torsor
+on:
+  push:
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct105/**"
+      - ".github/workflows/ct105-automorphism-torsor.yml"
+  pull_request:
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct105/**"
+      - ".github/workflows/ct105-automorphism-torsor.yml"
+  workflow_dispatch:
+jobs:
+  exact-ct105:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Four-way independent Hensel and projective Frobenius replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct105
+          python3 -B "$D/ct105_source_hensel.py" > /tmp/ct105-py.json
+          python3 -O -B "$D/ct105_source_hensel.py" > /tmp/ct105-pyopt.json
+          node "$D/ct105_source_hensel_independent.js" > /tmp/ct105-js.json
+          node --no-opt "$D/ct105_source_hensel_independent.js" > /tmp/ct105-jsopt.json
+          cmp /tmp/ct105-py.json /tmp/ct105-pyopt.json
+          cmp /tmp/ct105-py.json /tmp/ct105-js.json
+          cmp /tmp/ct105-py.json /tmp/ct105-jsopt.json
+          printf '%s  %s\n' 84f85287e92d6113581703ddd8da5b4089af26d3b3c67f1fa4eaa33605509265 /tmp/ct105-py.json | sha256sum -c
+          python3 -B "$D/ct105_frobenius_torsor.py" > /tmp/ct105-tor-py.json
+          python3 -O -B "$D/ct105_frobenius_torsor.py" > /tmp/ct105-tor-pyopt.json
+          node "$D/ct105_frobenius_torsor_independent.js" > /tmp/ct105-tor-js.json
+          node --no-opt "$D/ct105_frobenius_torsor_independent.js" > /tmp/ct105-tor-jsopt.json
+          cmp /tmp/ct105-tor-py.json /tmp/ct105-tor-pyopt.json
+          cmp /tmp/ct105-tor-py.json /tmp/ct105-tor-js.json
+          cmp /tmp/ct105-tor-py.json /tmp/ct105-tor-jsopt.json
+          printf '%s  %s\n' f79acb7467a3a50f745ef6032aa2823e6933b09e2ffb72cadc21402c7825fafb /tmp/ct105-tor-py.json | sha256sum -c
+          python3 -B "$D/ct105_source_hensel.py" --point 19,22 > /tmp/ct105-point-py.json
+          node "$D/ct105_source_hensel_independent.js" --point 19,22 > /tmp/ct105-point-js.json
+          cmp /tmp/ct105-point-py.json /tmp/ct105-point-js.json
+          if python3 -B "$D/ct105_source_hensel.py" --point 19,23 >/dev/null 2>&1; then
+            echo "Python accepted invalid oriented public point"; exit 1
+          fi
+          if node "$D/ct105_source_hensel_independent.js" --point 19,23 >/dev/null 2>&1; then
+            echo "JavaScript accepted invalid oriented public point"; exit 1
+          fi
