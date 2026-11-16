@@ -61,6 +61,16 @@ theorem degree_five_assignment_count :
     (1 : Nat) * 3^5 + 5 * 3^4 + 242 * 3^5 +
     10 * 3^3 + 1210 * 3^4 + 58801 * 3^5 = 14446377 := by decide
 
+theorem degree_six_denominator_count :
+    (1 : Nat) + 1 + 5 + 242 + 1 + 5 + 242 + 10 + 1210 + 58801 = 60518 := by decide
+
+theorem degree_six_assignment_count :
+    (1 : Nat) * 3^5 + 1 * 3^5 + 5 * 3^4 + 242 * 3^5 +
+    1 * 3^5 + 5 * 3^4 + 242 * 3^5 + 10 * 3^3 +
+    1210 * 3^4 + 58801 * 3^5 = 14506074 := by decide
+
+theorem degree_six_lambda_count : (10 : Nat) * 3^3 * (3^5 - 1) = 65340 := by decide
+
 theorem trace26_ten_target_count : (1 : Nat) + 9 = 10 := by decide
 
 theorem trace26_class_screen_sizes :
@@ -85,6 +95,9 @@ theorem trace26_cover_degrees_coprime_to_109 :
 #print axioms degree_four_assignment_count
 #print axioms degree_five_denominator_count
 #print axioms degree_five_assignment_count
+#print axioms degree_six_denominator_count
+#print axioms degree_six_assignment_count
+#print axioms degree_six_lambda_count
 #print axioms trace26_ten_target_count
 #print axioms trace26_class_screen_sizes
 #print axioms trace26_cover_degrees_coprime_to_109
