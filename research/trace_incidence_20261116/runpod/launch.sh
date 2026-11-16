@@ -43,6 +43,7 @@ if [[ $status != 200 && $status != 201 ]]; then
 fi
 pod_id=$(jq -er '.id' "$out/create.private.json") || { echo 'No unique created pod; do not retry automatically' >&2; exit 5; }
 printf '%s\n' "$pod_id" > "$out/pod-id.txt"
+trap 'curl --config "$auth" --silent --show-error --max-time 20 -X DELETE "https://rest.runpod.io/v1/pods/$pod_id" > "$out/launcher-error-delete.private.txt" || true' EXIT
 if ! jq -e '(.costPerHr|tonumber)<=0.5 and .vcpuCount==8 and .memoryInGb<=16' "$out/create.private.json" >/dev/null; then
   curl --config "$auth" --silent --show-error --max-time 20 -X DELETE "https://rest.runpod.io/v1/pods/$pod_id" > "$out/admission-delete.private.json"
   echo 'Allocated pod exceeded the frozen price/resource ceiling and was deleted' >&2
@@ -51,6 +52,8 @@ fi
 jq --arg source "$source_revision" --argjson created "$created" \
   '{schema:"trace-runpod-deployment/v1",source_revision:$source,pod_id:.id,pod_name:.name,image:.imageName,price_per_hour_usd:.costPerHr,vcpu_count:.vcpuCount,memory_gb:.memoryInGb,created_epoch:$created,deadline_epoch:($created+1800),cost_ceiling_usd:1}' "$out/create.private.json" > "$out/deployment.json"
 printf '%s\n' "$nonce" > "$out/result-namespace.private.txt"
-cp "$checkpoint" "$out/checkpoint-receipt.json"
+if [[ $(readlink -f "$checkpoint") != $(readlink -f "$out/checkpoint-receipt.json") ]]; then
+  cp "$checkpoint" "$out/checkpoint-receipt.json"
+fi
 printf 'Pod %s allocated; starting bounded collection and cleanup supervisor.\n' "$pod_id"
 exec bash "$here/supervise.sh" "$out" "$auth" "$upload"

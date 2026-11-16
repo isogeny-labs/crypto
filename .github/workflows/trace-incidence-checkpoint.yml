@@ -43,6 +43,10 @@ jobs:
           sha256sum -c research/trace_incidence_20261116/runpod/SOURCES.sha256
           mkdir -p .resume
           sed -e "s/SOURCE_REVISION/${GITHUB_SHA}/g" -e 's/^# /## /' research/trace_incidence_20261116/runpod/RESUME.template.md > .resume/RESUME.md
+          if test -f research/trace_incidence_20261116/runpod/RUN_STATE.json; then
+            printf '\n## Actual Runpod run state\n' >> .resume/RESUME.md
+            cat research/trace_incidence_20261116/runpod/RUN_STATE.json >> .resume/RESUME.md
+          fi
       - name: Run standard S3 checkpoint gate
         env:
           CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
