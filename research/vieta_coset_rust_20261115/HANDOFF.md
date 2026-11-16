@@ -1,5 +1,34 @@
 # Vieta Rust port: continuation receipt
 
+## Automated merge audit and repair — 16 November, 21:53 UTC
+
+PR4410 advanced automatically todb2b11314c by merging maina8b29cbbe0 into97fea7bf45.
+Its ledger preserved exact main-parent prefix and both entry multisets, but
+the journal lost/changed52 first-parent block occurrences (subsection removal
+and reduced multiplicities). The source/data/report/closed1938 record and this
+study's pinned claims are unchanged. See evidence/automated-merge-audit-20261116T2147Z.json.
+
+Documented Copilot-timeout fallback explained in comment6930422374. Normal merge
+04f1ae77db restores all parent journal multisets plus the local publication
+receipt. Current main90ea6cb424 then integrated normally:971 main blocks plus67
+missing unchanged bodies,1038 total before this new status entry. Exact main
+ledger1216 entries is byte prefix plus6 unchanged local bodies via official
+append_entry,1222 entries; chains/prefix pass. All335 lesson entries validate.
+
+Current main reproduction now has147 missing claim_type errors (3194 exact
+main claim blobs), identical to head; the earlier125-error receipt is historical.
+The same unchanged historical record20261105T0828Z-icb-large-prime-n53-s1-archive
+still stops global records/progress checking. Do not rewrite unrelated closed
+records/claims or weaken gates. Scoped1938 record validates95 hashes/6 metrics,
+both file-verified exports pass,9 qualified source/binary files match, artifacts
+policy passes. No tests/benchmarks were rerun for this metadata-only repair.
+Five specific scientific claim files and all proof pins are unchanged.
+
+See evidence/followup-reconciliation-20261116T2152Z.json and new paired PCC logs.
+Publish this repair on the same lane, inspect resulting head once, keep MERGE
+auto-merge subject to gate/size/artifacts and review/thread rules. Matrix complete;
+no measurement/cloud/S3 action. Independent signed standing remains pending.
+
 ## Final local publication checks — 16 November, 20:42 UTC
 
 Main672067a75a is now merged normally asbd24461be9, after reconciliation697964fedd.

@@ -1,0 +1,36 @@
+{
+  "schema": "selected-source-relationship/v1",
+  "native_build_source": "e060f3ee6ca50f257c37e10453f28606a30e22d8",
+  "corrected_core_test_source": "fc85acc268c349189fccb091188b214938b745d8",
+  "class": "post-build source metadata; not independent execution proof",
+  "projection_production_prefix_equal": true,
+  "projection_cfg_test_suffix_only_difference": true,
+  "unchanged_relevant_files": [
+    {
+      "path": "crates/certified-relations/src/quotient/compact.rs",
+      "sha256": "17175b6e2194ac6fd0c0be3f35c5fb59c00c3243a91ce8438749e68eb58d86a5",
+      "bytes": 15527
+    },
+    {
+      "path": "src/cryptanalysis/f4_fp/certified.rs",
+      "sha256": "b0763935a7bece860f4724445ae9a4d9891c3d52b03bc8806fa68e987e3ff307",
+      "bytes": 10634
+    },
+    {
+      "path": "research/relation_degree_trace_20261115/rust-integration/src/bin/native-root-worker.rs",
+      "sha256": "c82013e9ed6aa97a7db26075a18fd365d989dc5a8c683d11f61a809ed79f23f1",
+      "bytes": 8266
+    },
+    {
+      "path": "research/relation_degree_trace_20261115/rust-integration/tests/native_api.rs",
+      "sha256": "2a23becc996e3b20417ef556ea60bf786dd8ceeabff0c5eb08562a1627b5969e",
+      "bytes": 6334
+    },
+    {
+      "path": "research/relation_degree_trace_20261115/rust-integration/tests/root_worker.rs",
+      "sha256": "0dd2329e4133c134ca1445d36e13fec50d23697ec4658604bea6f6c5cecccaae",
+      "bytes": 3757
+    }
+  ],
+  "diff": "diff --git a/crates/certified-relations/src/projection.rs b/crates/certified-relations/src/projection.rs\nindex b939499d6..2a730a05c 100644\n--- a/crates/certified-relations/src/projection.rs\n+++ b/crates/certified-relations/src/projection.rs\n@@ -416,5 +416,9 @@ mod tests {\n             .iter()\n             .find(|r| {\n-                is_univariate(&r.poly, expected.variable) && degree(&r.poly) == expected.degree\n+                r.poly.keys().all(|m| {\n+                    m.iter()\n+                        .enumerate()\n+                        .all(|(i, e)| i == expected.variable || *e == 0)\n+                }) && degree(&r.poly) == expected.degree\n             })\n             .unwrap();\n"
+}
