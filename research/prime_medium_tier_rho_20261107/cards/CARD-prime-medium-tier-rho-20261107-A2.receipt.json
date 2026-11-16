@@ -1,0 +1,376 @@
+{
+  "card_id": "CARD-prime-medium-tier-rho-20261107-A2",
+  "card_path": "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.yaml",
+  "card_sha256": "7d105850aae68b5d4c85b3b4138bd28031cc538ea86a2f96cf2fde3d4f0b1cd2",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.689,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 4.689,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "634b38b652c38aff1f342fa17f83f4904a91f6f1a2f4f23d798c6f2e9bc0ca2e",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T000726Z-413a4292bdc0/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.158,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.158,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "704cca8f4253c98e5702b989bf8dceb05516a3bbe56c2374a173a4bf29e14c23",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_tier_rho_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "target/release/examples/prime_medium_tier_rho_rfit"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.082,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "frozen-ecbench-sha",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.082,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "912bc0d67e12d9b7cb49bcf393ccfc70716c18c5b62b7b6d48137dccc8c70a71",
+      "stdout_tail": [
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9  /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "7457cb7ce67a6eff8137606150779c8f268450857595c140903d3b5697210768  target/release/examples/prime_medium_tier_rho_rfit"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "[inputs | .ok == true and .session_status == \"complete\" and (.problems | length) == 0] | length == 6 and all",
+        "research/prime_medium_tier_rho_20261107/sessions/J1.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J2.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J3.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J4.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J5.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J6.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.015,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audits-pass",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.015,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sh",
+        "research/prime_medium_tier_rho_20261107/fit.sh"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 38.586,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fit",
+      "index": 6,
+      "outputs": {
+        "docs/bounds/FRONTIER.md": "3fa2a7ad6051f2b2c4774d476b0a5d8714c304a1010adacb5911d772b03d2adb",
+        "docs/bounds/frontier.json": "28d651e4ce23f8812fa9d03043506fc3332ff4c69fe0a17b04ba96c6134de7e9",
+        "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json": "4d9e66d54e0fc22c2b022552ea06637318b7046c42671d0861700a44d20df393",
+        "docs/bounds/records/prime-medium-bsgs-neg-w1.json": "5b497f60646ccd67bc12bfcff325ba0908428899dcc75937fd9ee9d4e6f2c12e",
+        "docs/bounds/records/prime-medium-bsgs-neg.json": "9dbd5f5cc151fdb62da625838e3d4c551f358169a72addb5ea7261980c15e75a",
+        "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json": "65e2a5ef682e51a775480354d5dff1725d644830539ce559eff5578876224ca3",
+        "docs/bounds/records/prime-medium-rho-neg-v2-w1.json": "e68e16d8155d9617eed4155688434d0671fbfc6557d0af46faf3f24987c1f23d",
+        "docs/bounds/records/prime-medium-rho-neg-v2.json": "a62891bfb63fddaf31986908a039ecdbf8d752102748da86fe9af0cddef6dcc0",
+        "docs/bounds/records/prime-medium-rho-neg-w0.1.json": "f869e052a23e36199dd74d964dc246a0bf173ca54770b5628406de9bee280d2a",
+        "docs/bounds/records/prime-medium-rho-neg-w1.json": "37aeb464f253aefa5913ffc0f78ef8c972a9c3baa2300781b668d44e2a707e8a",
+        "docs/bounds/records/prime-medium-rho-neg.json": "c257355cb57f846528ef18fc875825883172b08c7905735070dfbdde09b56d7b",
+        "docs/bounds/records/prime-medium-rho-plain-w0.1.json": "17b2566afb771571164a8850f0e6489014945e4fe5a655cd39dadd63d6f9e746",
+        "docs/bounds/records/prime-medium-rho-plain-w1.json": "5355ebba70fea21fc8660c21cad9a25bfdef4f48880050e4180f62e1f8448819",
+        "docs/bounds/records/prime-medium-rho-plain.json": "03955be07df72848a9acef56c6d189f28773993479d47d8b0ca69b157e38a353",
+        "research/prime_medium_tier_rho_20261107/analysis/rfit-bsgs-neg.json": "de24ba6b648410b7c0c9f782e664ab92f97bf4dc9adb6c6762af40d844dbb101",
+        "research/prime_medium_tier_rho_20261107/analysis/rfit-rho-neg.json": "75138f833f2389d8595459047f433f71fb109399049522a5c001df55ed7466f0",
+        "research/prime_medium_tier_rho_20261107/analysis/rfit-rho-plain.json": "e44b8ec6c3590d6c509a9f5b7053078104818921b5bea53ba14fed4a23981382"
+      },
+      "seconds": 38.586,
+      "stderr_sha256": "4e00d3036aa26fff49b190a25df8aff0dc995726cf750129dd687561a27fae2e",
+      "stderr_tail": [
+        "docs/bounds/records/prime-medium-rho-neg-v2.json: re-derived ECBND1hd41f030a1cbf OK",
+        "wrote docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json (sha256 65e2a5ef682e51a775480354d5dff1725d644830539ce559eff5578876224ca3)",
+        "ECBND1hf922997c935e rho.negation_v2 (medium): exponent on 10 size(s), 480 verified runs; ops 1.176\u00d7 floor, \u03b1 0.491 ; admissible",
+        "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json: re-derived ECBND1hf922997c935e OK",
+        "wrote docs/bounds/records/prime-medium-rho-neg-v2-w1.json (sha256 e68e16d8155d9617eed4155688434d0671fbfc6557d0af46faf3f24987c1f23d)",
+        "ECBND1hfefc9d7bd95f rho.negation_v2 (medium): exponent on 10 size(s), 480 verified runs; ops 2.139\u00d7 floor, \u03b1 0.491 ; admissible",
+        "docs/bounds/records/prime-medium-rho-neg-v2-w1.json: re-derived ECBND1hfefc9d7bd95f OK",
+        "koblitz planted toy ECDOM1h080dd3dc639e: 11 bound(s), 5 on the frontier; ops leader \u2013 (none named; tie set of 3); 22 listed, not ranked",
+        "koblitz planted medium ECDOM1h3962632c9fe8: 4 bound(s), 2 on the frontier; ops leader ECBND1hcf69c27b4978; 16 listed, not ranked",
+        "prime planted medium ECDOM1h60fe9630e4bd: 0 bound(s), 0 on the frontier; ops leader \u2013; 4 listed, not ranked",
+        "prime planted medium ECDOM1h8604ed49f755: 0 bound(s), 0 on the frontier; ops leader \u2013; 4 listed, not ranked",
+        "prime planted medium ECDOM1h8817bf314e4f: 4 bound(s), 4 on the frontier; ops leader ECBND1h720f068c8c71; 8 listed, not ranked",
+        "prime planted medium ECDOM1h8d05bac67097: 4 bound(s), 3 on the frontier; ops leader ECBND1h9b939ef3e3a4; 8 listed, not ranked",
+        "prime planted medium ECDOM1h8fd940f495eb: 2 bound(s), 2 on the frontier; ops leader ECBND1hf39923f02d49; 4 listed, not ranked",
+        "prime planted medium ECDOM1h94dcaaa9a5db: 0 bound(s), 0 on the frontier; ops leader \u2013; 4 listed, not ranked",
+        "prime planted toy ECDOM1ha1f283af3a5d: 18 bound(s), 10 on the frontier; ops leader \u2013 (none named; tie set of 6); 17 listed, not ranked",
+        "prime planted medium ECDOM1hda52cee5db35: 2 bound(s), 2 on the frontier; ops leader ECBND1h946fa2347b66; 4 listed, not ranked",
+        "prime planted medium ECDOM1hef860bc4dfb7: 2 bound(s), 2 on the frontier; ops leader ECBND1hd6c041802dca; 4 listed, not ranked",
+        "prime planted medium ECDOM1hf55d42d12e08: 4 bound(s), 4 on the frontier; ops leader ECBND1hbf445c8fc209; 8 listed, not ranked",
+        "6 inadmissible bound(s) listed"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J1/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J1.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J2/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J2.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J3/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J3.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J4/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J4.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J5/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J5.audit.json",
+        "research/prime_medium_tier_rho_20261107/sessions/J6/records.jsonl",
+        "research/prime_medium_tier_rho_20261107/sessions/J6.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.1,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.1,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ddcda9761a53dfa7ee21576b272f19695726c081b984596890f523d87dfddf56",
+      "stdout_tail": [
+        "12 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "--all"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 16.177,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload",
+      "index": 8,
+      "outputs": {},
+      "seconds": 16.177,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/record_bounds.sh",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.915,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-bounds",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.915,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7523ee0dfd30b669c223dcfce8755a82e58f59e2be42e99d193fc681b6e1db5f",
+      "stdout_tail": [
+        "recorded 12 metrics in benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "413a4292bdc0610575320b6cc78485cf970471b0",
+  "dirty_after": [
+    "docs/bounds/FRONTIER.md",
+    "docs/bounds/frontier.json",
+    "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json",
+    "docs/bounds/records/prime-medium-bsgs-neg-w1.json",
+    "docs/bounds/records/prime-medium-bsgs-neg.json",
+    "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json",
+    "docs/bounds/records/prime-medium-rho-neg-v2-w1.json",
+    "docs/bounds/records/prime-medium-rho-neg-v2.json",
+    "docs/bounds/records/prime-medium-rho-neg-w0.1.json",
+    "docs/bounds/records/prime-medium-rho-neg-w1.json",
+    "docs/bounds/records/prime-medium-rho-neg.json",
+    "docs/bounds/records/prime-medium-rho-plain-w0.1.json",
+    "docs/bounds/records/prime-medium-rho-plain-w1.json",
+    "docs/bounds/records/prime-medium-rho-plain.json",
+    "enchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+    "research/prime_medium_tier_rho_20261107/analysis/rfit-bsgs-neg.json",
+    "research/prime_medium_tier_rho_20261107/analysis/rfit-rho-neg.json",
+    "research/prime_medium_tier_rho_20261107/analysis/rfit-rho-plain.json",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.assessment.yaml",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.add-raw.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.add-raw.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.audits-pass.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.audits-pass.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.checkpoint-gate.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.checkpoint-gate.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.fit.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.fit.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.frozen-ecbench-sha.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.frozen-ecbench-sha.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.protocol-check.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.protocol-check.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.protocol-frozen-hash.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.protocol-frozen-hash.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.record-bounds.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.record-bounds.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.upload.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.upload.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.yaml"
+  ],
+  "dirty_before": [
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.assessment.yaml",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

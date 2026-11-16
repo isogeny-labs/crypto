@@ -1,0 +1,26 @@
+group seed on_curve base_pts hits mul-adds(1e9) rate/1e9 expected(model)
+top     50  22  44   14   3.541  3.954  14.22
+top     23  21  42   27   3.539  7.628  13.57
+top     26  21  42   15   3.541  4.237  13.58
+top     41  20  40   16   3.541  4.519  12.93
+top     43  20  40   15   3.541  4.236  12.93
+top     58  20  40   23   3.540  6.498  12.93
+top     55  19  38   18   3.540  5.084  12.28
+top     57  19  38   18   3.540  5.084  12.28
+bottom  39  10  20    4   3.542  1.129   6.47
+bottom  42  11  22    5   3.542  1.412   7.11
+bottom  25  12  24    6   3.542  1.694   7.76
+bottom  59  12  24    8   3.542  2.259   7.76
+bottom  35  13  26    7   3.541  1.977   8.41
+bottom  40  13  26    6   3.542  1.694   8.41
+bottom  24  14  28    7   3.541  1.977   9.05
+bottom  28  14  28    8   3.541  2.259   9.05
+
+top: 146 hits / 28.3 = 5.155 [4.353, 6.062]; model expects 104.7 (95% count interval 85..125) -> H15 NOT SUPPORTED
+
+bottom: 51 hits / 28.3 = 1.800 [1.340, 2.367]; model expects 64.0 (95% count interval 49..80) -> H15 SUPPORTED
+H13 top vs bottom: ratio 2.86, one-sided exact conditional p = 4.087e-12 -> SUPPORTED
+H14 top lower bound 4.353 vs 2.909 -> SUPPORTED
+H16 tower ops all 40 candidates 107041 vs 1e-3 x top F4 mul-adds 2.83e+07 -> SUPPORTED
+descriptive: top rate / unscreened = 1.77; bottom rate / unscreened = 0.62; bottom interval [1.340, 2.367]
+descriptive: Spearman on-curve vs arm rate over 16 arms = 0.813

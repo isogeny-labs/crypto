@@ -17,9 +17,12 @@ session's setup.
 ## What it does
 
 1. **Disk.** Applies the `harness` sparse profile to the crypto checkout
-   (`scripts/sparse-checkout.sh`; [sparse-checkout.md](sparse-checkout.md)).
-   The large `research/` archives stay in git but off disk.
-   `CRYPTO_SPARSE_PROFILE=minimal|full` changes the profile.
+   (`scripts/sparse-checkout.sh`; [sparse-checkout.md](sparse-checkout.md))
+   and to the crypto-autoresearcher checkout (`tools/sparse_checkout.py`; its
+   `docs/sparse-checkout.md`). The large `research/` archives, experiment run
+   directories and reference bundles stay in git but off disk, and each tool's
+   `add --path P/` brings a path back. `CRYPTO_SPARSE_PROFILE=minimal|full`
+   and `CRYPTO_AR_SPARSE_PROFILE=full` change the profiles.
 2. **Tools and repositories.** Runs `scripts/setup-workstation.sh` without its
    control-plane step. That covers apt build tools, PARI/GP, FLINT,
    PostgreSQL, Rust, Go, Node, uv, Conductor, cairn, the codex, opencode and gh
@@ -30,7 +33,9 @@ session's setup.
    the server until a checkout needs them. Each repository then gets its
    virtualenv.
 3. **Credentials.** Installs a git credential helper for `https://github.com`
-   that reads `GH_APP_*` or `GH_SERVICE_TOKEN` when git needs a credential.
+   that reads `GH_APP_*`, `GH_SERVICE_TOKEN`, or else `GH_TOKEN`/`GITHUB_TOKEN`
+   when git needs a credential. The fallback lets a session clone a sibling
+   repository that the session's own git proxy does not cover.
    gh, aws, kubectl and the agent CLIs read their own variables. Writes
    `~/.config/cloud-setup/env` (PATH, mode 600) and sources it from `~/.bashrc`
    and `~/.profile`. It prints the names of the credential variables it can
@@ -40,6 +45,15 @@ session's setup.
 
 The Conductor control plane and the cairn node are processes. The SessionStart
 hook (`.claude/hooks/session-start.sh`) starts them in each session.
+
+**Containers restored from a cache.** On 2026-11-02, a test session in an
+environment whose setup-script field had just changed got a container whose
+session-start log was a day older. None of the files `cloud-setup.sh` leaves
+behind were present, so the setup script had not run in it. The SessionStart
+hooks run in every session, so they cover this case. crypto's hook runs
+`setup-workstation.sh` with the credential helper and installs the lean Sage
+build in the background. crypto-autoresearcher's hook runs `cloud-setup.sh`
+itself.
 
 ## Credentials
 
@@ -56,7 +70,7 @@ The script writes no credentials. Set them in the environment's settings:
 
 | Service | Variables |
 | --- | --- |
-| GitHub | `GH_TOKEN` (gh), or `GH_SERVICE_TOKEN`, or `GH_APP_ID` + `GH_APP_INSTALLATION_ID` + `GH_APP_PRIVATE_KEY` (git and gh) |
+| GitHub | `GH_APP_ID` + `GH_APP_INSTALLATION_ID` + `GH_APP_PRIVATE_KEY`, or `GH_SERVICE_TOKEN`, or `GH_TOKEN`/`GITHUB_TOKEN` (git, in that order; gh reads `GH_TOKEN` itself) |
 | AWS, S3 checkpoints | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` [+ `AWS_SESSION_TOKEN`], `AWS_REGION`, `CHECKPOINT_BUCKET` |
 | Iso Lab | `ISOLAB_URL`, or `KUBECONFIG` + `ISOLAB_KUBE_CONTEXT` |
 | Conductor | `CONDUCTOR_ENDPOINT` + `CONDUCTOR_TOKEN` (shared control plane) |
@@ -66,10 +80,24 @@ The script writes no credentials. Set them in the environment's settings:
 ## Disk
 
 Claude Code clones the repositories attached to the environment in full before
-the setup script runs. With all four attached, that is about 30 GB, and the
-lean Sage build no longer fits. Attach only the repositories a session works
-in and let this script partial-clone the others. The sparse profile frees the
-crypto checkout's research archives either way.
+the setup script runs. With all four attached, that left 821 MiB free in a
+session on 2026-11-01. The two harness profiles freed 11.3 GiB there:
+5.6 GiB from crypto (39,782 of 164,471 files off disk) and 5.7 GiB from
+crypto-autoresearcher (44,704 of 151,565). That leaves room for the lean Sage
+build.
+
+crypto-autoresearcher's whole-ledger sweeps (`validate_ledger`,
+`goal_portfolio_health`, `portfolio_kpis`) refuse a sparse checkout, and the
+coordination skills run them. For a coordination session, opt that checkout
+out on the setup line itself, since the setup script cannot read the
+environment's variables in Claude Code:
+
+```sh
+CRYPTO_AR_SPARSE_PROFILE=full bash crypto/scripts/cloud-setup.sh
+```
+
+or run `python3 tools/sparse_checkout.py disable` in the session. That needs
+about 6 GiB free again.
 
 `WITH_SAGE=0` skips Sage, `WITH_LEAN=1` adds elan for cryptanalysis's Lean
 proofs, and `SETUP_SKIP` takes more `setup-workstation.sh` components to skip

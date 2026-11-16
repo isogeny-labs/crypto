@@ -1,0 +1,431 @@
+{
+  "amendments": [
+    {
+      "changes": [
+        "Replace lightweight native-only record with complete official experiment.protocol/v1 schema",
+        "Keep the same twelve-cell scientific matrix and resource caps"
+      ],
+      "filed": "2026-11-01",
+      "filed_before_affected_data": true,
+      "id": "A-v2-official-schema",
+      "reason": "Version 1 had 48 official schema findings despite passing native preflight; zero cells were generated",
+      "supersedes_fields": [
+        "protocol.json",
+        "plan.json"
+      ]
+    }
+  ],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "native run cell manifests and restricted witnesses"
+    ],
+    "outputs": [
+      "dataset verify JSON",
+      "dataset report summary.json",
+      "dataset export manifest.json"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Six n24 cells across three families and paired twists",
+      "id": "native-enumerate-n24",
+      "instrument": {
+        "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "1c869a18dc60d207393e50b4fda6f2c7bd399e35",
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "max_cases": "12",
+          "memory_mib": "2048",
+          "seconds_per_case": "30",
+          "trace_mib": "64"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arities": [
+          2
+        ],
+        "factor_base_size": 8,
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "field_sizes": [
+          24
+        ],
+        "method": "enumerate",
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 10000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Six n25 cells across three families and paired twists",
+      "id": "native-enumerate-n25",
+      "instrument": {
+        "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "1c869a18dc60d207393e50b4fda6f2c7bd399e35",
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "max_cases": "12",
+          "memory_mib": "2048",
+          "seconds_per_case": "30",
+          "trace_mib": "64"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arities": [
+          2
+        ],
+        "factor_base_size": 8,
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "field_sizes": [
+          25
+        ],
+        "method": "enumerate",
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 10000
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "Codex dataset campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "C-n24",
+        "C-n25"
+      ],
+      "id": "C1",
+      "text": "All twelve planned cells retain a terminal outcome, pass native artifact-hash and known-answer replay, and appear in native report and strict export."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "No timed or statistical comparison is made",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No statistical null-population claim is made",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every synthetic target retains a known scalar independently checked by native replay; no decomposition detector is being evaluated",
+      "present": false
+    }
+  },
+  "created": "2026-11-01",
+  "decision_rule": {
+    "comparison_ids": [
+      "C-n24",
+      "C-n25"
+    ],
+    "effect_size_measure": "verified cells out of twelve planned",
+    "interval": "none, finite exact matrix",
+    "multiple_comparison_correction": "none",
+    "statistic": "integer count of verified planned cells",
+    "text": "C1 is supported only when twelve terminal receipts independently verify and all twelve occur in native report and strict export",
+    "threshold": "12/12",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 30,
+      "interval_seconds": 30,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "cpus": 1,
+      "instance_type": "local diagnostic EC2",
+      "spot": false
+    },
+    "queue": "none",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 600
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "4b3650e18187860993b45926900c9ed26714d6188cef0b3c6119243a70e9cc0c",
+    "commit": "36d83603eb4aea397de27673f3a7c59affbbb576",
+    "frozen_at": "2026-11-01T22:58:18Z",
+    "filed_before_affected_data": true
+  },
+  "hypotheses": [],
+  "inadmissible": [
+    "No claim of general ECDLP scalar recovery, comparative speed or model efficacy",
+    "No exact FFD/LFD or complete instruction-to-solve label from this panel",
+    "No silent replacement of timeout or budget-exhausted status with success"
+  ],
+  "invalidation_rules": [
+    "A cell with failed artifact hashes or known-answer replay invalidates C1 and remains in the denominator",
+    "Budget and timeout outcomes remain censored native statuses; no scalar-solve claim is inferred"
+  ],
+  "links": {
+    "note": "Version 1 passed native preflight but failed the official schema with 48 findings; no cell was generated before this amendment.",
+    "source_session": "crypto:research/ml_dataset_n24_n25_20261101",
+    "spec": "crypto:research/ml_dataset_n24_n25_20261101/plan-v2.json"
+  },
+  "literature": [
+    {
+      "claim": "Prime-field summation-polynomial context; its initial construction assumes characteristic other than two or three",
+      "provenance": "retrieved",
+      "ref": "https://eprint.iacr.org/2004/031.pdf",
+      "verified_by": "paper Section 2, 2026-11-01"
+    },
+    {
+      "claim": "Frobenius-invariant factor-base conditions for subfield curves; not assumed for ordinary binary",
+      "provenance": "retrieved",
+      "ref": "https://sacworkshop.org/SAC20/files/preproceedings/18-IndexCalculus.pdf",
+      "verified_by": "paper abstract and Section 3, 2026-11-01"
+    },
+    {
+      "claim": "paired-twist bounded native enumeration precedent with censored outcomes",
+      "provenance": "internal",
+      "ref": "crypto:research/ml_dataset_binary23_m3_15_enum_20261031/report/run.md",
+      "verified_by": "read and compared on 2026-11-01"
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [
+      "complete_candidate_tests"
+    ],
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256",
+      "plan_sha256",
+      "protocol_sha256",
+      "native_status",
+      "artifact_sha256",
+      "known_answer_replay"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "sum",
+        "definition": "number of the twelve planned cells whose terminal artifacts hash-check and whose public target replays against the restricted known-answer witness",
+        "id": "replay_pass",
+        "kind": "exact",
+        "name": "native replay pass",
+        "resolution": "1 cell",
+        "source": "dataset verify terminal JSON",
+        "uncertainty": "none_exact",
+        "unit": "cells"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "native enumerate completed candidate-test events within each cell; null when the native counter is incomplete",
+        "id": "complete_candidate_tests",
+        "kind": "counted",
+        "name": "complete candidate tests",
+        "resolution": "1 candidate",
+        "source": "cell measurement telemetry",
+        "uncertainty": "none_exact",
+        "unit": "candidates"
+      }
+    ]
+  },
+  "protocol_id": "ML-N24-N25-CROSS-FAMILY-20261101",
+  "question": "Does the native dataset CLI retain and independently replay all twelve bounded n24/n25 m2 enumerate cells across Koblitz, ordinary-binary, prime and paired twists?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "One arm and a fixed full matrix; order is not compared",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "No comparative arm; native verifier must read restricted known-answer witness",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Deterministic full cross-product of two sizes, three families and two twist settings with one curve seed, generator and key"
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "nonce": null,
+      "note": "One seed frozen in the bound native plan before any data",
+      "seeds": [
+        20261101
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "per-family and twist terminal status grid"
+    ],
+    "report_dir": "research/ml_dataset_n24_n25_20261101",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 12,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Complete twelve-cell finite functional matrix, no sampling inference",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 360.1,
+      "fixed_seconds": 0.1,
+      "measured_on": "Upper execution cap from native 30-second per-cell limit, not a timing estimate",
+      "per_sample_seconds": 30.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Attempt each of the twelve planned cells once, then stop; a persistence or replay error stops the wave"
+    }
+  ],
+  "study_dir": "research/ml_dataset_n24_n25_20261101",
+  "variable_ledger": {
+    "aa_not_applicable": "No timing or comparative inference",
+    "comparisons": [
+      {
+        "arms": [
+          "native-enumerate-n24"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "C-n24",
+        "threshold": "6/6 retained and replayed"
+      },
+      {
+        "arms": [
+          "native-enumerate-n25"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "C-n25",
+        "threshold": "6/6 retained and replayed"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "native preflight embeds and verifies clean source provenance",
+        "name": "source_and_binary",
+        "treatment": "fixed",
+        "value": "commit 1c869a18; binary sha256 c42ca189"
+      },
+      {
+        "how": "frozen plan; one curve seed, generator and key per cell",
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261101
+      },
+      {
+        "how": "native generate flags and plan",
+        "name": "resource_caps",
+        "treatment": "fixed",
+        "value": "30 s, 2 GiB, 64 MiB trace, 10000 work units per cell"
+      },
+      {
+        "how": "native diagnostic wall and process records; no timed claim",
+        "name": "host_load",
+        "treatment": "measured"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          24,
+          25
+        ],
+        "name": "field_bits"
+      },
+      {
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "name": "family"
+      },
+      {
+        "levels": [
+          false,
+          true
+        ],
+        "name": "twist"
+      }
+    ]
+  },
+  "version": 2
+}

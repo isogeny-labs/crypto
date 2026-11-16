@@ -1,0 +1,52 @@
+{
+  "schema": "miller-affine-ideal-source-review/v1",
+  "primary": {
+    "author": "Steven D. Galbraith",
+    "title": "Mathematics of Public Key Cryptography, chapter26, extended corrected version2.0",
+    "URL": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+    "bytes": 222784,
+    "PDF_pages": 16,
+    "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+    "read_scope": "Printed574-577/PDF2-5 freshly full text and visual read in preceding work; not all16pages. Definition26.3.4 and equations26.1/26.2 Miller line/divisor expressions."
+  },
+  "interpretation": "Affine chord ideal product and actual three-torsion tangent cube supply finite-affine ideal multiplicities. These are actual Mathlib CoordinateRing ideals, not a redefinition of a projective divisor. Point evaluation is the actual AdjoinRoot ring homomorphism. Infinity pole/valuation and canonical pairing remain distinct unproved obligations.",
+  "prior_custom_sources": [
+    {
+      "name": "MillerCurve.lean",
+      "bytes": 2458,
+      "sha256": "689300e3c8e6ecf23da0ed27b455193d8ca8c530d259b7e91ed8757b471325b9",
+      "fully_read": true,
+      "byte_checked_against_frozen_plan": true
+    },
+    {
+      "name": "MillerExpressions.lean",
+      "bytes": 2286,
+      "sha256": "b9fb8a504e1fdfa078809837286c3510e48e6dd9030fc9fd8f0f6d9f86e09422",
+      "fully_read": true,
+      "byte_checked_against_frozen_plan": true
+    },
+    {
+      "name": "TangentCertificate.lean",
+      "bytes": 2998,
+      "sha256": "d7175fee80e0509aff462bb679f1c50dd19bb7a494de05b1dac0d47492b8be1b",
+      "fully_read": true,
+      "byte_checked_against_frozen_plan": true
+    }
+  ],
+  "prior_coverage": "Prior MillerCurve, MillerExpressions, TangentCertificate give actual point arithmetic, numerical expressions and polynomial intersection identities. Those do not already prove the actual principal ideal equality. Broad census/gap/prior READMEs searched before approach. No prior custom proof modules copied or imported; original files unchanged. Point construction pattern and mathematical argument credited.",
+  "official_APIs": [
+    "Mathlib Affine.Point actual CoordinateRing/FunctionField/domain/XClass/YClass and XYIdeal product/negative product identities",
+    "Ideal.mem_span_singleton_mul and pow_mem_pow",
+    "Polynomial.Bivariate AdjoinRoot.evalEval and evalEval_mk"
+  ],
+  "KB": "MCP absent; fresh status, two mechanism-negative searches, theorem query all127; Conductor127. Explicit prior/primary/official fallback, no absence or novelty claim.",
+  "execution_errors": "All failed builds preserved, including attempt03 unchanged rebuild caused by wrong relative edit/snapshot paths. No cryptographic Python experiment.",
+  "boundaries": [
+    "Projective infinity pole/valuation/canonical principal divisor not established.",
+    "No translation pullback/Weil reciprocity/isogeny/Lang/Cartier/Jacobian/canonical Weil-Tate/MOV-FR bridge.",
+    "No independent implementation/physical-host validator or kernel parser/hash/compiler refinement.",
+    "All14 incomplete; no canonical corpus promotion/novelty/signed-standing claim."
+  ],
+  "copyright": "Copyrighted primary PDF/text/visual files local only. Only bibliographic metadata/hashes/read scope committed.",
+  "signed_standing": "unverified"
+}

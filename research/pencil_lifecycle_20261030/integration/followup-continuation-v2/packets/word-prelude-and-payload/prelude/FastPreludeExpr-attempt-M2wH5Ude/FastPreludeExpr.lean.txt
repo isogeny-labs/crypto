@@ -1,0 +1,95 @@
+import FastBatchInverse
+import FastCRTCertificates
+set_option autoImplicit false
+namespace FastPrelude
+open PencilWordRefinement
+inductive Expr where
+ | leaf : UInt64 → Expr
+ | mul : Expr → Expr → Expr
+ | add : Expr → Expr → Expr
+ | sub : Expr → Expr → Expr
+
+def Expr.good (p : UInt64) : Expr → Prop
+ | .leaf a => a.toNat<p.toNat
+ | .mul a b | .add a b | .sub a b => a.good p ∧ b.good p
+
+def Expr.word (p : UInt64) : Expr → UInt64
+ | .leaf a => a
+ | .mul a b => (a.word p*b.word p)%p
+ | .add a b => wordAdd p (a.word p) (b.word p)
+ | .sub a b => wordSub p (a.word p) (b.word p)
+
+def Expr.field (p : UInt64) : Expr → ZMod p.toNat
+ | .leaf a => (a.toNat : ZMod p.toNat)
+ | .mul a b => a.field p*b.field p
+ | .add a b => a.field p+b.field p
+ | .sub a b => a.field p-b.field p
+
+theorem Expr.composition (p : UInt64) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (e : Expr) (hg : e.good p) :
+ (e.word p).toNat<p.toNat ∧ ((e.word p).toNat : ZMod p.toNat)=e.field p := by
+ induction e with
+ | leaf a => exact ⟨hg,rfl⟩
+ | mul a b ia ib =>
+   have ha:=ia hg.1
+   have hc:=ib hg.2
+   exact ⟨uint64_mul_canonical p _ _ hp,by
+    change (((a.word p*b.word p)%p).toNat : ZMod p.toNat)=_
+    rw [uint64_mul_decode p _ _ hb ha.1 hc.1,ha.2,hc.2];rfl⟩
+ | add a b ia ib =>
+   have ha:=ia hg.1
+   have hc:=ib hg.2
+   have hh:=wordAdd_composition p _ _ hp hb ha.1 hc.1
+   exact ⟨hh.1,by simpa only [Expr.word,Expr.field,ha.2,hc.2] using hh.2⟩
+ | sub a b ia ib =>
+   have ha:=ia hg.1
+   have hc:=ib hg.2
+   have hh:=wordSub_composition p _ _ hp hb ha.1 hc.1
+   exact ⟨hh.1,by simpa only [Expr.word,Expr.field,ha.2,hc.2] using hh.2⟩
+
+structure Inputs where
+ qa ra sa ta qb rb sb tb : UInt64
+
+def Inputs.canonical (p : UInt64) (w : Inputs) : Prop :=
+ w.qa.toNat<p.toNat ∧ w.ra.toNat<p.toNat ∧ w.sa.toNat<p.toNat ∧ w.ta.toNat<p.toNat ∧
+ w.qb.toNat<p.toNat ∧ w.rb.toNat<p.toNat ∧ w.sb.toNat<p.toNat ∧ w.tb.toNat<p.toNat
+
+def aa (w : Inputs) : Expr := .sub (.leaf w.qa) (.leaf w.qb)
+def bb (w : Inputs) : Expr := .sub (.leaf w.ra) (.leaf w.rb)
+def cc (w : Inputs) : Expr := .sub (.leaf w.sb) (.leaf w.sa)
+def dd (w : Inputs) : Expr := .sub (.leaf w.tb) (.leaf w.ta)
+def normExpr (w : Inputs) : Expr :=
+ .add (.sub (.mul (bb w) (bb w)) (.mul (.mul (aa w) (bb w)) (.leaf w.qb)))
+ (.mul (.mul (aa w) (aa w)) (.leaf w.rb))
+def s1Expr (w : Inputs) : Expr := .sub (.mul (cc w) (bb w)) (.mul (aa w) (dd w))
+def s0Expr (w : Inputs) : Expr :=
+ .add (.mul (dd w) (.sub (bb w) (.mul (aa w) (.leaf w.qb))))
+ (.mul (.mul (aa w) (cc w)) (.leaf w.rb))
+
+def normWord (p : UInt64) (w : Inputs) : UInt64 :=
+ let a := wordSub p w.qa w.qb
+ let b := wordSub p w.ra w.rb
+ wordAdd p (wordSub p ((b*b)%p) ((((a*b)%p)*w.qb)%p)) ((((a*a)%p)*w.rb)%p)
+def s1Word (p : UInt64) (w : Inputs) : UInt64 :=
+ let a := wordSub p w.qa w.qb
+ let b := wordSub p w.ra w.rb
+ let c := wordSub p w.sb w.sa
+ let d := wordSub p w.tb w.ta
+ wordSub p ((c*b)%p) ((a*d)%p)
+def s0Word (p : UInt64) (w : Inputs) : UInt64 :=
+ let a := wordSub p w.qa w.qb
+ let b := wordSub p w.ra w.rb
+ let c := wordSub p w.sb w.sa
+ let d := wordSub p w.tb w.ta
+ wordAdd p ((d*wordSub p b ((a*w.qb)%p))%p) ((((a*c)%p)*w.rb)%p)
+
+theorem literal_norm (p : UInt64) (w : Inputs) : normWord p w=(normExpr w).word p := rfl
+theorem literal_s1 (p : UInt64) (w : Inputs) : s1Word p w=(s1Expr w).word p := rfl
+theorem literal_s0 (p : UInt64) (w : Inputs) : s0Word p w=(s0Expr w).word p := rfl
+
+theorem expressions_good (p : UInt64) (w : Inputs) (hw : w.canonical p) :
+ (normExpr w).good p ∧ (s1Expr w).good p ∧ (s0Expr w).good p := by
+ rcases hw with ⟨hqa,hra,hsa,hta,hqb,hrb,hsb,htb⟩
+ simp only [normExpr,s1Expr,s0Expr,aa,bb,cc,dd,Expr.good]
+ simp [hqa,hra,hsa,hta,hqb,hrb,hsb,htb]
+end FastPrelude

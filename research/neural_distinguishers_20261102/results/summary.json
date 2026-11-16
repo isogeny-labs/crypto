@@ -1,0 +1,396 @@
+{
+  "bonferroni": {
+    "alpha": 0.01,
+    "family": 21,
+    "z": 3.52
+  },
+  "cells": [
+    {
+      "aa_seed_difference": 0.00009899999999996023,
+      "cell": "speck-r3",
+      "cipher": "speck32_64",
+      "models": [
+        {
+          "accuracy": 0.999298,
+          "advantage": 0.499298,
+          "bonferroni_lower": 0.998989,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.999139,
+            0.999428
+          ]
+        },
+        {
+          "accuracy": 0.955132,
+          "advantage": 0.455132,
+          "bonferroni_lower": 0.953075,
+          "mlp_beats_this_baseline": true,
+          "model": "logreg",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.953997,
+            0.956239
+          ]
+        },
+        {
+          "accuracy": 0.965614,
+          "advantage": 0.465614,
+          "bonferroni_lower": 0.963798,
+          "mlp_beats_this_baseline": true,
+          "model": "difference_table_nb",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.964614,
+            0.966587
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.500008,
+        "at_chance": true,
+        "wilson95": [
+          0.497301,
+          0.502714
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "positive_control",
+      "rounds": 3,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": -0.00006799999999995698,
+      "cell": "speck-r5",
+      "cipher": "speck32_64",
+      "models": [
+        {
+          "accuracy": 0.877548,
+          "advantage": 0.377548,
+          "bonferroni_lower": 0.874325,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.875762,
+            0.879312
+          ]
+        },
+        {
+          "accuracy": 0.751694,
+          "advantage": 0.251694,
+          "bonferroni_lower": 0.74747,
+          "mlp_beats_this_baseline": true,
+          "model": "logreg",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.749347,
+            0.754025
+          ]
+        },
+        {
+          "accuracy": 0.750206,
+          "advantage": 0.25020600000000004,
+          "bonferroni_lower": 0.745974,
+          "mlp_beats_this_baseline": true,
+          "model": "difference_table_nb",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.747855,
+            0.752542
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.501823,
+        "at_chance": true,
+        "wilson95": [
+          0.499117,
+          0.50453
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "target",
+      "rounds": 5,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": -0.0009989999999999721,
+      "cell": "speck-r6",
+      "cipher": "speck32_64",
+      "models": [
+        {
+          "accuracy": 0.69384,
+          "advantage": 0.19384,
+          "bonferroni_lower": 0.689341,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.691339,
+            0.69633
+          ]
+        },
+        {
+          "accuracy": 0.583633,
+          "advantage": 0.08363299999999996,
+          "bonferroni_lower": 0.578833,
+          "mlp_beats_this_baseline": true,
+          "model": "logreg",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.580962,
+            0.5863
+          ]
+        },
+        {
+          "accuracy": 0.574989,
+          "advantage": 0.07498899999999997,
+          "bonferroni_lower": 0.570176,
+          "mlp_beats_this_baseline": true,
+          "model": "difference_table_nb",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.572311,
+            0.577663
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.50042,
+        "at_chance": true,
+        "wilson95": [
+          0.497713,
+          0.503126
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "target",
+      "rounds": 6,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": 0.0012440000000000229,
+      "cell": "speck-r7",
+      "cipher": "speck32_64",
+      "models": [
+        {
+          "accuracy": 0.519012,
+          "advantage": 0.01901200000000003,
+          "bonferroni_lower": 0.514153,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.516307,
+            0.521717
+          ]
+        },
+        {
+          "accuracy": 0.500801,
+          "advantage": 0.0008010000000000517,
+          "bonferroni_lower": 0.49594,
+          "mlp_beats_this_baseline": true,
+          "model": "logreg",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.498094,
+            0.503508
+          ]
+        },
+        {
+          "accuracy": 0.500069,
+          "advantage": 0.00006899999999998574,
+          "bonferroni_lower": 0.495208,
+          "mlp_beats_this_baseline": true,
+          "model": "difference_table_nb",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.497362,
+            0.502776
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.502182,
+        "at_chance": true,
+        "wilson95": [
+          0.499475,
+          0.504889
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "target",
+      "rounds": 7,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": 0.0,
+      "cell": "aes-r2",
+      "cipher": "aes128",
+      "models": [
+        {
+          "accuracy": 1.0,
+          "advantage": 0.5,
+          "bonferroni_lower": 0.999905,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.999971,
+            1.0
+          ]
+        },
+        {
+          "accuracy": 1.0,
+          "advantage": 0.5,
+          "bonferroni_lower": 0.999905,
+          "mlp_beats_this_baseline": false,
+          "model": "logreg",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.999971,
+            1.0
+          ]
+        },
+        {
+          "accuracy": 1.0,
+          "advantage": 0.5,
+          "bonferroni_lower": 0.999905,
+          "mlp_beats_this_baseline": false,
+          "model": "difference_table_nb",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.999971,
+            1.0
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.499634,
+        "at_chance": true,
+        "wilson95": [
+          0.496927,
+          0.502341
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "positive_control",
+      "rounds": 2,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": 0.0010980000000000434,
+      "cell": "aes-r3",
+      "cipher": "aes128",
+      "models": [
+        {
+          "accuracy": 0.499756,
+          "advantage": -0.00024400000000002198,
+          "bonferroni_lower": 0.494895,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.497049,
+            0.502463
+          ]
+        },
+        {
+          "accuracy": 0.504639,
+          "advantage": 0.004638999999999949,
+          "bonferroni_lower": 0.499777,
+          "mlp_beats_this_baseline": false,
+          "model": "logreg",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.501932,
+            0.507345
+          ]
+        },
+        {
+          "accuracy": 0.522102,
+          "advantage": 0.022101999999999955,
+          "bonferroni_lower": 0.517244,
+          "mlp_beats_this_baseline": false,
+          "model": "difference_table_nb",
+          "verdict": "distinguishes",
+          "wilson95": [
+            0.519398,
+            0.524806
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.498756,
+        "at_chance": true,
+        "wilson95": [
+          0.49605,
+          0.501463
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "target",
+      "rounds": 3,
+      "valid": true
+    },
+    {
+      "aa_seed_difference": -0.0012050000000000116,
+      "cell": "aes-r4",
+      "cipher": "aes128",
+      "models": [
+        {
+          "accuracy": 0.501602,
+          "advantage": 0.0016019999999999923,
+          "bonferroni_lower": 0.496741,
+          "mlp_beats_this_baseline": null,
+          "model": "mlp",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.498895,
+            0.504309
+          ]
+        },
+        {
+          "accuracy": 0.501534,
+          "advantage": 0.0015340000000000353,
+          "bonferroni_lower": 0.496672,
+          "mlp_beats_this_baseline": false,
+          "model": "logreg",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.498827,
+            0.50424
+          ]
+        },
+        {
+          "accuracy": 0.501595,
+          "advantage": 0.001595000000000013,
+          "bonferroni_lower": 0.496733,
+          "mlp_beats_this_baseline": false,
+          "model": "difference_table_nb",
+          "verdict": "no distinguisher found at this size",
+          "wilson95": [
+            0.498888,
+            0.504301
+          ]
+        }
+      ],
+      "negative_control": {
+        "accuracy": 0.498917,
+        "at_chance": true,
+        "wilson95": [
+          0.49621,
+          0.501624
+        ]
+      },
+      "positive_controls_detected": true,
+      "role": "target",
+      "rounds": 4,
+      "valid": true
+    }
+  ],
+  "decision_rule": "PROTOCOL.md §6",
+  "schema": "neural-distinguishers.summary/v1"
+}

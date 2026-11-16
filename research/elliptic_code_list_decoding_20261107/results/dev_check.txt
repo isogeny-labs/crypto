@@ -1,0 +1,32 @@
+# DEVELOPMENT CHECK ONLY (tiny cases, p in [200,1100)); not a measurement  [pcc:unverified]
+
+k=2 B=40 p=881 N=863 (prime order, G*N=O verified)
+  plant=false relations=1 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=2 (<=k:true) singular_S=0 d0_time=77.867µs
+    gae: E1=40 E2=40 D1=0 | D1 native=2580 (fmul 900 finv 80 cmp 820)
+    agreement histogram (agreement:codewords) 0:842 1:38 2:1
+  plant=true relations=1 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=2 (<=k:true) singular_S=0 d0_time=70.757µs
+    gae: E1=40 E2=40 D1=0 | D1 native=2580 (fmul 900 finv 80 cmp 820)
+    agreement histogram (agreement:codewords) 0:842 1:38 2:1
+
+k=3 B=36 p=1009 N=1049 (prime order, G*N=O verified)
+  plant=false relations=8 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=3 (<=k:true) singular_S=0 d0_time=231.178141ms
+    gae: E1=1260 E2=1260 D1=0 | D1 native=47778 (fmul 20652 finv 1296 cmp 8400)
+    agreement histogram (agreement:codewords) 0:982379 1:35088 2:606 3:8
+  plant=true relations=13 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=3 (<=k:true) singular_S=0 d0_time=157.932085ms
+    gae: E1=1260 E2=1260 D1=0 | D1 native=47778 (fmul 20652 finv 1296 cmp 8400)
+    agreement histogram (agreement:codewords) 0:982374 1:35103 2:591 3:13
+
+k=4 B=30 p=251 N=257 (prime order, G*N=O verified)
+  plant=false relations=106 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=4 (<=k:true) singular_S=10 d0_time=2.136245767s
+    gae: E1=8555 E2=1305 D1=0 | D1 native=398296 (fmul 191577 finv 12200 cmp 39552)
+    agreement histogram (agreement:codewords) 0:14028462 1:1683386 2:97671 3:3626 4:106
+  plant=true relations=114 E1==E2==D1==D0:true all_verified:true planted_recovered:true max_agreement_over_code=4 (<=k:true) singular_S=10 d0_time=2.030379856s
+    gae: E1=8555 E2=1305 D1=0 | D1 native=397906 (fmul 191403 finv 12200 cmp 39510)
+    agreement histogram (agreement:codewords) 0:14028470 1:1683354 2:97719 3:3594 4:114
+t_GS(B=36,k=2)=7 > k
+t_GS(B=36,k=3)=9 > k
+t_GS(B=36,k=4)=11 > k
+t_GS(B=36,k=5)=13 > k
+t_GS(B=36,k=6)=14 > k
+
+CHECK PASS

@@ -1,0 +1,39 @@
+--- v2-draft/durable_io.py
++++ root-library-validation-20261109/durable_io.py
+@@ -44,7 +44,11 @@
+     assert a['attempts']==1 and a['automatic_retry'] is False
+     assert len(a['exact_tests'])==4 and len(set(a['exact_tests']))==4
+     cost=a['cost'];ceiling=cost['finite_dollar_ceiling_usd'];estimate=cost['worst_case_incremental_usd']
+-    assert finite_number(ceiling) and ceiling>0 and finite_number(estimate) and 0<estimate<=ceiling
++    waived=cost.get('mode')=='owner-waived-dollar-facts/v1'
++    if waived:
++        assert ceiling is None and estimate is None
++    else:
++        assert finite_number(ceiling) and ceiling>0 and finite_number(estimate) and 0<estimate<=ceiling
+     for n,digest in a['recipe_files'].items():
+         assert Path(n).name==n and hashlib.sha256((p/n).read_bytes()).hexdigest()==digest,n
+     required={'durable_io.py','durable-launcher.py','durable-worker.py','source-bindings.json','fixture.json','candidate.patch','recipe-proposal.json','materialized-inputs.json'}
+@@ -55,10 +59,19 @@
+     pub=a['publication'];assert pub['verified_github_commit']
+     allocation=json.loads((p/cost['receipt_file']).read_text())
+     assert allocation['approved'] is True and allocation['one_attempt_limit']==1
+-    for k in ['total_ceiling_usd','existing_debit_usd','maximum_incremental_usd']:
+-        assert finite_number(allocation[k]) and allocation[k]>=0
+-    assert ceiling<=allocation['maximum_incremental_usd']
+-    assert allocation['existing_debit_usd']+ceiling<=allocation['total_ceiling_usd']
++    if waived:
++        assert allocation['schema']=='owner-dollar-facts-waiver/v1'
++        assert allocation['scope']=='pencil-continuation-20261109-root-library-validation'
++        assert allocation['dollar_values']=='unknown_not_asserted'
++        assert allocation['deadline']==a['absolute_deadline']=='2026-11-10T05:11:39+00:00'
++        assert allocation['active_worker_seconds_ceiling']==43200
++        assert allocation['validation_attempt_seconds']==a['limits']['total_seconds']==1800
++        assert allocation['preserve_resource_and_ownership_checks'] is True
++    else:
++        for k in ['total_ceiling_usd','existing_debit_usd','maximum_incremental_usd']:
++            assert finite_number(allocation[k]) and allocation[k]>=0
++        assert ceiling<=allocation['maximum_incremental_usd']
++        assert allocation['existing_debit_usd']+ceiling<=allocation['total_ceiling_usd']
+     assert a['inputs_sha256']==a['recipe_files']['materialized-inputs.json']
+     assert set(a['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+     assert type(a['lease']['fencing_epoch']) is int and a['lease']['fencing_epoch']>0

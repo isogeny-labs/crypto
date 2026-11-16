@@ -1,0 +1,24 @@
+{
+  "status": "not_admitted",
+  "required": {
+    "materialized-inputs.json": {
+      "sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+      "source": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+      "mode": "reuse exact manifest with artifact metadata; no regeneration"
+    },
+    "current-cache.json": {
+      "sha256": null,
+      "source": "/home/ec2-user/pencil-validation-receipts/t1992-cache-snapshot-20261109/current-cache.json"
+    },
+    "snapshot-result.json": null,
+    "snapshot-terminal.json": null,
+    "parser-qualification-result.json": null,
+    "parser-qualification-terminal.json": null,
+    "independent-review.json": null,
+    "publication.json": null,
+    "current-ledger.json": null,
+    "lease-readback.json": null,
+    "serial-terminal.json": null
+  },
+  "instruction": "Finalize recipe_files with actual receipt hashes, current_cache_sha256 and input manifest binding. Set actual campaign accounting only from coordinator ledger. Preserve the source recipe and exact_tests. Under coordinator release, finalize actual bindings and admitted true; publish/read back those exact final admission bytes before launch. Do not change fields after publication readback."
+}

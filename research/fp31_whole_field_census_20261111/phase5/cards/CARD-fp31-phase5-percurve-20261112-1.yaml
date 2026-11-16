@@ -1,0 +1,121 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fp31-phase5-percurve-20261112-1
+experiment_id: fp31_whole_field_census_20261111
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 5f8552da4ca3bbddbd4c1f572db3fbb40b3985dc
+receipt: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.receipt.json
+binds:
+  - {path: research/fp31_whole_field_census_20261111/phase5/PROTOCOL.md, sha256: 2a8467cffde3788fc629072a5ad084e06e1eeb0e6395b2aa90394ae953e2b0f3}
+  - {path: research/fp31_whole_field_census_20261111/phase5/run_phase5.sh, sha256: fd378c37b57e2ece211e4cc4e7802da3ee2972aebfddb5f0216ba0d58121887e}
+  - {path: research/fp31_whole_field_census_20261111/phase3/classes.json, sha256: f5e04adc98f8eb3d7b6f2c84849640f63acd3fcf7cb1a69ab107e8cc087a5d10}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/followup.rs, sha256: 48e1d925be328a6a6bdf5a44c5ea49716028abbd1fe1c22b1088ac6f0ea9efdf}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/stats.rs, sha256: df661a281eda8d7a1e5458e5c4dc9ea68152504e3bfcc3c1aa9684c5ccf0c468}
+  - {path: target/release/ecbench, sha256: 86a9421ddd9881665af24006d9505497fc2fab58e99890aa8af2a7972425254a}
+  - {path: research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census, sha256: 8690aaf9c643595af4356cbba1fcb9b3538631d2b8558c55f98cdeac2733360e}
+must_not_exist:
+  - research/fp31_whole_field_census_20261111/phase5/runs
+  - research/fp31_whole_field_census_20261111/phase5/analysis_rho.json
+  - research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json
+  - research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json
+commands:
+  - id: run-phase5
+    argv:
+      - research/fp31_whole_field_census_20261111/phase5/run_phase5.sh
+      - target/release/ecbench
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - research/fp31_whole_field_census_20261111/phase5/runs
+    env:
+      BENCHREC: benchmarks/records/20261112T0419Z-fp31-per-curve-cost-randomised.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 21600
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.run-phase5.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.run-phase5.stderr
+  - id: analyze-rho
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - p5-analyze
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase5/runs
+      - --kind
+      - rho
+      - --sessions
+      - "8"
+      - --out
+      - research/fp31_whole_field_census_20261111/phase5/analysis_rho.json
+    env:
+      BENCHREC: benchmarks/records/20261112T0419Z-fp31-per-curve-cost-randomised.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-rho.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-rho.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase5/analysis_rho.json]
+  - id: analyze-ic3
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - p5-analyze
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase5/runs
+      - --kind
+      - ic3
+      - --sessions
+      - "4"
+      - --out
+      - research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json
+    env:
+      BENCHREC: benchmarks/records/20261112T0419Z-fp31-per-curve-cost-randomised.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-ic3.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-ic3.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json]
+  - id: analyze-ic2
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - p5-analyze
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase5/runs
+      - --kind
+      - ic2
+      - --sessions
+      - "4"
+      - --out
+      - research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json
+    env:
+      BENCHREC: benchmarks/records/20261112T0419Z-fp31-per-curve-cost-randomised.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-ic2.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.analyze-ic2.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json]
+bus_address: executor-mechanical-fp31-phase5
+background: true
+write_scope: [research/fp31_whole_field_census_20261111/phase5/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the receipt and the run directory as they are.
+  - The tool reports that a bound digest does not match; run nothing further.
+notes: >-
+  Local route (PROTOCOL.md section 7: no AWS identity), isolation L2; ecbench refuses L2 runs on a busy host and grades
+  each row. Nothing else may run on the host during this card (PROTOCOL.md section 4). CHECKPOINT_SKIP is set because
+  the checkpoint hook would otherwise refuse ecbench launchers until a resume checkpoint is pushed to S3, which needs
+  AWS. The benchmark record is benchmarks/records/20261112T0419Z-fp31-per-curve-cost-randomised.json. The first command
+  (48 classes x 16 sessions, estimated 3.6 h) runs detached and the tool exits 4; run `python3 tools/task_card.py wait`
+  on this card and repeat it for as long as it exits 4. run_phase5.sh exits 0 even when a session prints FAILED; the
+  script prints one line per session, beginning with ok, skip or FAILED, and a FAILED session is recorded as missing
+  and not retried or replaced (PROTOCOL.md section 4). The two binaries are untracked build outputs bound by sha256 only.

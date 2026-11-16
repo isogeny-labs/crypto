@@ -1,0 +1,104 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fp31-phase3-icyield-20261112-2
+experiment_id: fp31_whole_field_census_20261111
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 01e781cdcfacef1e4f35e030eeb414d88933b3a3
+receipt: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.receipt.json
+binds:
+  - {path: research/fp31_whole_field_census_20261111/phase3/PROTOCOL.md, sha256: 572f7dfb512221e64184bf2aceec14a546d668d6a3d4987841d3c10366e3eeea}
+  - {path: research/fp31_whole_field_census_20261111/phase3/classes.json, sha256: f5e04adc98f8eb3d7b6f2c84849640f63acd3fcf7cb1a69ab107e8cc087a5d10}
+  - {path: research/fp31_whole_field_census_20261111/phase3/run_phase3.sh, sha256: bd0df125c4b46edcb243290f65d1d25b24b384b7876031eefd4439151ed941fd}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/phase3.rs, sha256: 598201f3587a0be6f32ea7b16bbfc71b39493e3d812ffa3a9ce1e061763a3214}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/stats.rs, sha256: df661a281eda8d7a1e5458e5c4dc9ea68152504e3bfcc3c1aa9684c5ccf0c468}
+  - {path: target/release/ecbench, sha256: 86a9421ddd9881665af24006d9505497fc2fab58e99890aa8af2a7972425254a}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool, sha256: f0fdbe84017a22aa0d38d999d7e2ccf96423ca3ac8bd9a369c977cf526d533e8}
+  - {path: research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census, sha256: 54c05dc2461a3b7268dd1c1f01eab6824bbc564bb4a817893abed45b68c3cc63}
+must_not_exist:
+  - research/fp31_whole_field_census_20261111/phase3/analysis_m3.json
+  - research/fp31_whole_field_census_20261111/phase3/analysis_m2.json
+commands:
+  - id: run-phase3
+    argv:
+      - research/fp31_whole_field_census_20261111/phase3/run_phase3.sh
+      - target/release/ecbench
+      - research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - research/fp31_whole_field_census_20261111/phase3/runs
+    env:
+      BENCHREC: benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json
+      BENCHREC_ISOLATION: L1
+      CHECKPOINT_SKIP: no-aws-identity-local-L1-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.run-phase3.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.run-phase3.stderr
+  - id: analyze-m3
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - ic-analyze
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase3/runs
+      - --m
+      - "3"
+      - --out
+      - research/fp31_whole_field_census_20261111/phase3/analysis_m3.json
+      - --perms
+      - "20000"
+    env:
+      BENCHREC: benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json
+      BENCHREC_ISOLATION: L1
+      CHECKPOINT_SKIP: no-aws-identity-local-L1-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.analyze-m3.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.analyze-m3.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase3/analysis_m3.json]
+  - id: analyze-m2
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - ic-analyze
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase3/runs
+      - --m
+      - "2"
+      - --out
+      - research/fp31_whole_field_census_20261111/phase3/analysis_m2.json
+      - --perms
+      - "20000"
+    env:
+      BENCHREC: benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json
+      BENCHREC_ISOLATION: L1
+      CHECKPOINT_SKIP: no-aws-identity-local-L1-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.analyze-m2.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.analyze-m2.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase3/analysis_m2.json]
+bus_address: executor-mechanical-fp31-phase3
+background: true
+write_scope: [research/fp31_whole_field_census_20261111/phase3/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the receipt and the run directory as they are.
+  - The tool reports that a bound digest does not match; run nothing further.
+notes: >-
+  Local route at isolation L1, a deviation recorded in PROTOCOL.md section 7 (no AWS identity; the EKS dispatch
+  accepts only ecbench specs from main). CHECKPOINT_SKIP is set because the checkpoint hook would otherwise refuse
+  ecbench launchers until a resume checkpoint is pushed to S3, which needs AWS. The benchmark record is
+  benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json. The first command (96 cells: 48 classes times
+  m in 3 and 2, estimated 1.6 h) runs detached and the tool exits 4; run `python3 tools/task_card.py wait` on this
+  card and repeat it for as long as it exits 4. run_phase3.sh exits 0 even when a cell prints FAILED; the script
+  prints one line per cell, beginning with ok, skip or FAILED, and a FAILED cell is recorded and not retried
+  (PROTOCOL.md section 4). The three binaries are untracked build outputs bound by sha256 only.
+  Attempt 2 of CARD-fp31-phase3-icyield-20261112-1, which was lost to a container restart (task_card.py wait exited 5,
+  lost at command 1; loss record benchmarks/losses/20261112-card-fp31-phase3-icyield-20261112-1-01-run-phase3.json).
+  Context is in research/fp31_whole_field_census_20261111/phase3/RESTART_NOTE.md: 37 of the 96 cells (m = 3, c008 to
+  c044) finished with done markers under phase3/runs/, so phase3/runs is not in must_not_exist and run_phase3.sh skips
+  those cells; the interrupted cell c045_m3 was moved to phase3/runs/_interrupted/c045_m3-attempt1/ and is rerun from
+  scratch. Commands, argv, env, timeouts, write_scope and binds are identical to attempt 1 apart from the card id, the
+  commit, must_not_exist and the stdout and stderr file names.

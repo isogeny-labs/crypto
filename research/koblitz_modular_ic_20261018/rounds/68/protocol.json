@@ -1,0 +1,26 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R68-FOURTH-FROBENIUS",
+  "version": 1,
+  "goal": "test all eight classes of V3/O and reconstruct the fourth descending Frobenius lattice",
+  "claims": [{"id": "fourth_frobenius68", "class": "exact_computation", "statement": "The complete eight-class square-preimage kernel defines a checked rank32 fourth PID lattice; a zero square rank with quotient length zero certifies stabilization"}],
+  "arms": {
+    "reference": "R67 sealed polynomial and field third-lattice bases; R52 full source multiplication table",
+    "candidate": "complete module kbase, rational denominator-remainder square map, full binary kernel and PID lattice",
+    "positive": ["all eight quotient classes", "all 32 source square columns", "both V3 inverse products", "every remainder reconstruction", "all kernel products", "all 32 new basis squares"],
+    "negative": ["altered nonzero kernel rejected when applicable", "changed inverse rejected"],
+    "baseline": {"not_applicable_reason": "exact algebra"},
+    "A_A": {"not_applicable_reason": "complete deterministic quotient"}
+  },
+  "variables": {"fixed": ["rank32 affine source", "complete eight-class quotient", "all 32 source squares", "1200sec/4GiB", "one Singular/FLINT thread", "one math job"], "measured": ["binary rows/rank/nullity", "new quotient length", "basis-square checks", "exit/errors/UTC/hashes"], "statistical": "not applicable"},
+  "randomization": {"method": "fixed", "reason": "complete quotient", "seeds": [68]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["full eight-class square map", "binary row/rank/nullity", "V4/O quotient length", "32 basis-square checks"],
+  "execution": {"launcher": "REPLAY_CAS.sh fourth-frobenius68-01 FOURTH_FROBENIUS68.sing FOURTH_FROBENIUS68_ALL_CHECKS_PASS", "backend": "original manually authorized local Singular", "timeout_seconds": 1200, "virtual_KiB": 4194304, "threads": 1, "seed": 68, "CPU_affinity": "not pinned", "queue": "one math job at a time; R67 terminal and published", "source_gate": "copied source/protocol/driver bytes match Git; all donor hashes", "checkpoint": "existing checkpoint gate; immutable raw copies"},
+  "stopping": {"accept": "exit0/exact marker/no whitespace-question-mark errors and every assertion", "failure": "retain partials/errors/caps; repair under fresh revision without narrowing eight classes"},
+  "analysis": {"kind": "complete exact quotient, binary rational-remainder kernel and reconstructed lattice", "comparative": false},
+  "scope": "fourth affine Frobenius step; normalization only if equality checked",
+  "literature": [{"url": "https://www.math.purdue.edu/~iswanso/intclSinghSwanson.pdf", "use": "descending Frobenius normalization theorem"}],
+  "validation_note": "canonical schema/checker unavailable in selected index; manual contract and source-byte checks only"
+}

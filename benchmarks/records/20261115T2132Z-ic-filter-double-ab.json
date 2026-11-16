@@ -1,0 +1,362 @@
+{
+  "branch": "aburan28/laughing-darwin-3qdnk2",
+  "closed_utc": "2026-11-15T22:08:24+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=/dev/shm/fdab/ic",
+        "ISO=/tmp/claude-0/rulev9/bin/isolated_bench",
+        "bash",
+        "research/ic_tool_program/explorations/filter-double-20261115/ab/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T21:32:57+00:00",
+      "wall_s": 2073.476
+    }
+  ],
+  "commit": "2826b353f98c91b58278df3425b5a04e91e400b7",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T21:32:53+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ic-filter-double"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2132Z-ic-filter-double-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "collect_single_over_doubled_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0630331408112088,
+        1.1249220806680211
+      ],
+      "unit": "ratio",
+      "value": 1.0996385745907045
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "collect_aa_k0n53",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9758018259571236,
+        1.0176740308735146
+      ],
+      "unit": "ratio",
+      "value": 0.9935932860469807
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "filter_single_over_doubled_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.225829845422297,
+        1.3423376748488516
+      ],
+      "unit": "ratio",
+      "value": 1.2944251904039803
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "filter_aa_k0n53",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9511772843015918,
+        1.0536215064537593
+      ],
+      "unit": "ratio",
+      "value": 0.9991725107503957
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "admitted_single_over_doubled_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.4826899800443893,
+        2.7174251311293083
+      ],
+      "unit": "ratio",
+      "value": 2.60729240581533
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "admitted_aa_k0n53",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.962455760187498,
+        1.052731552711639
+      ],
+      "unit": "ratio",
+      "value": 1.0002249485271448
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "build_single_over_doubled_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9817663846605311,
+        1.0429527268792707
+      ],
+      "unit": "ratio",
+      "value": 1.0122252208564697
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "build_aa_k0n53",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9148986609247828,
+        1.0222508794676612
+      ],
+      "unit": "ratio",
+      "value": 0.970128248245923
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "setup_single_over_doubled_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0463499904992302,
+        1.0811703185044066
+      ],
+      "unit": "ratio",
+      "value": 1.062414092641178
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "setup_aa_k0n53",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9710272039905103,
+        1.017033244801555
+      ],
+      "unit": "ratio",
+      "value": 0.9931878940906476
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "collect_single_over_doubled_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0626082086389348,
+        1.1150021012169142
+      ],
+      "unit": "ratio",
+      "value": 1.0789368965136354
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "collect_aa_k0n61",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9640228893025966,
+        1.0162249677390807
+      ],
+      "unit": "ratio",
+      "value": 0.980559856788509
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "filter_single_over_doubled_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1758443563487844,
+        1.2358777251779893
+      ],
+      "unit": "ratio",
+      "value": 1.2095500396428485
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "filter_aa_k0n61",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9686130186943898,
+        1.0236769218442299
+      ],
+      "unit": "ratio",
+      "value": 0.9908117684022968
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "admitted_single_over_doubled_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.500478369643154,
+        2.654160332791119
+      ],
+      "unit": "ratio",
+      "value": 2.573647068364809
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "admitted_aa_k0n61",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9633635219831673,
+        1.0151837880178802
+      ],
+      "unit": "ratio",
+      "value": 0.9908515592794462
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "build_single_over_doubled_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9356056526775712,
+        1.053593418587798
+      ],
+      "unit": "ratio",
+      "value": 0.9871286540703486
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "build_aa_k0n61",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9798306203714428,
+        1.0540970157404068
+      ],
+      "unit": "ratio",
+      "value": 1.0123265869528344
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "setup_single_over_doubled_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; filter = filter+admitted stages; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.044807069517664,
+        1.0987128375824735
+      ],
+      "unit": "ratio",
+      "value": 1.0658220940279266
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "setup_aa_k0n61",
+      "note": "A/A single/single; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9678871677965422,
+        1.0362867746515256
+      ],
+      "unit": "ratio",
+      "value": 0.986175075247113
+    }
+  ],
+  "problem": "ic:koblitz_setup_phase",
+  "raw": [
+    {
+      "bytes": 183492,
+      "path": "/tmp/claude-0/-home-user/7f658e4a-7634-5acc-b973-cdb225b38f41/scratchpad/fd-runs.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3a/3a90a82cd3ade8a3dc046009cd5a4df777b74c2251880488e046d6e6a27832e8",
+      "sha256": "3a90a82cd3ade8a3dc046009cd5a4df777b74c2251880488e046d6e6a27832e8",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ic-filter-double/report.pdf",
+    "png": [
+      "benchmarks/20261115-ic-filter-double/ab.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ic-filter-double/ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-filter-double-ab",
+  "status": "measured",
+  "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+  "validation": null
+}

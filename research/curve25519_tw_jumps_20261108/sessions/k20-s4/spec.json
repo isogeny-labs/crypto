@@ -1,0 +1,99 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-j16",
+   "role": "baseline"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=2,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-j2",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=4,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-j4",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=8,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-j8",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=32,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-j32",
+   "role": "candidate"
+  }
+ ],
+ "description": "research/curve25519_tw_jumps_20261108: F=1 target-in-walk arm (tw=1,cj=1) with jumps=2,4,8,16,32 vs rho-neg, one public target per session. Frozen before data (PROTOCOL.md). Public synthetic Curve25519-family miniature; no security claim.",
+ "label": "tw jump count, single target, k=20, session 4",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 64,
+  "seed": 20261110204,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261110704,
+  "targets_per_curve": 1
+ }
+}

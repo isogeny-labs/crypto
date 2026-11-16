@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 64/64 | 16.057 | 17.564 | 31.130 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc-aa | 64/64 | 16.057 | 17.564 | 31.130 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 64/64 | 0.965 | 1.055 | 1.864 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg-aa | 64/64 | 0.965 | 1.055 | 1.864 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | sel | 64/64 | 17.034 | 17.423 | 20.924 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm27314-a41e3b62 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs sel | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs sel | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs sel | rho-neg < sel |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg-aa vs sel | rho-neg-aa < sel |
