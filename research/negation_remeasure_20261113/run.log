@@ -1,0 +1,114 @@
+ 04:20:02 up  1:25,  0 user,  load average: 1.94, 1.91, 1.85
+v3 p=211: gate cand 9 rho 428 ic 3419 trials 226 la 14633 -> reproduces the record
+v3 p=211: done in 2.3s
+v3 p=419: gate cand 27 rho 357 ic 8475 trials 542 la 51976 -> reproduces the record
+v3 p=419: done in 2.3s
+v3 p=821: gate cand 2 rho 370 ic 11353 trials 851 la 164828 -> reproduces the record
+v3 p=821: done in 2.5s
+v3 p=1619: gate cand 1 rho 847 ic 34521 trials 1653 la 603721 -> reproduces the record
+v3 p=1619: done in 2.9s
+wrote research/negation_remeasure_20261113/remeasure_v3.json
+section v3: 10.0s
+cover p=211: gate reproduces the record
+cover p=211: done in 2.1s
+cover p=419: gate reproduces the record
+cover p=419: done in 2.3s
+cover p=821: gate reproduces the record
+cover p=821: done in 2.5s
+cover p=1619: gate reproduces the record
+cover p=1619: done in 3.0s
+cover p=3203: gate reproduces the record
+cover p=3203: done in 3.9s
+cover p=6421: gate reproduces the record
+cover p=6421: done in 8.8s
+cover p=12841: gate reproduces the record
+cover p=12841: done in 20.7s
+wrote research/negation_remeasure_20261113/remeasure_cover.json
+section cover: 43.4s
+ 04:21:01 up  1:26,  0 user,  load average: 2.84, 2.17, 1.94
+tower p=8009 inst 0: r=2017 #E=8068 done in 27.8s (transfer 12.8s), skipped []
+tower p=8009 inst 1: r=3943 #E=7886 done in 12.7s (transfer 3.4s), skipped []
+tower p=16001 inst 0: r=4003 #E=16012 done in 53.4s (transfer 22.7s), skipped []
+tower p=8009 inst 2: r=4007 #E=8014 done in 13.7s (transfer 3.9s), skipped []
+tower p=16001 inst 1: r=7901 #E=15802 done in 54.4s (transfer 21.9s), skipped []
+tower p=4001 inst 0: r=1013 #E=4052 done in 4.2s (transfer 1.7s), skipped []
+tower p=16001 inst 2: r=8111 #E=16222 done in 57.7s (transfer 21.5s), skipped []
+tower p=4001 inst 1: r=1019 #E=4076 done in 4.4s (transfer 1.6s), skipped []
+tower p=4001 inst 2: r=1021 #E=4084 done in 4.2s (transfer 1.5s), skipped []
+tower p=2003 inst 0: r=1021 #E=2042 done in 1.6s (transfer 0.5s), skipped []
+tower p=2003 inst 1: r=1039 #E=2078 done in 1.7s (transfer 0.4s), skipped []
+tower p=1009 inst 0: r=257 #E=1028 done in 0.9s (transfer 0.5s), skipped []
+tower p=503 inst 0: r=269 #E=538 done in 0.4s (transfer 0.1s), skipped []
+tower p=1009 inst 1: r=491 #E=982 done in 0.7s (transfer 0.2s), skipped []
+tower p=1009 inst 2: r=479 #E=958 done in 0.7s (transfer 0.2s), skipped []
+tower p=2003 inst 2: r=971 #E=1942 done in 1.6s (transfer 0.5s), skipped []
+tower p=503 inst 1: r=241 #E=482 done in 0.4s (transfer 0.1s), skipped []
+tower p=251 inst 0: r=127 #E=254 done in 0.2s (transfer 0.1s), skipped []
+tower p=503 inst 2: r=269 #E=538 done in 0.3s (transfer 0.1s), skipped []
+tower p=251 inst 1: r=127 #E=254 done in 0.2s (transfer 0.1s), skipped []
+tower p=251 inst 2: r=67 #E=268 done in 0.3s (transfer 0.2s), skipped []
+tower p=251: gate reproduces the record
+tower p=503: gate reproduces the record
+tower p=1009: gate reproduces the record
+tower p=2003: gate reproduces the record
+tower p=4001: gate reproduces the record
+tower p=8009: gate reproduces the record
+tower p=16001: gate reproduces the record
+wrote research/negation_remeasure_20261113/remeasure_tower.json
+section tower: 69.7s
+ 04:22:28 up  1:27,  0 user,  load average: 4.51, 3.25, 2.37
+tower p=32003 inst 2: r=16057 #E=32114 done in 226.0s (transfer 103.8s), skipped []
+tower p=32003 inst 0: r=8059 #E=32236 done in 226.5s (transfer 105.7s), skipped []
+tower p=32003 inst 1: r=16069 #E=32138 done in 230.7s (transfer 103.6s), skipped []
+tower p=32003: gate reproduces the record
+wrote research/negation_remeasure_20261113/remeasure_tower_p32003.json
+section tower: 232.1s
+stage 32003 exit 0
+ 04:26:20 up  1:31,  0 user,  load average: 5.85, 6.06, 3.85
+tower p=64007 inst 2: r=16069 #E=64276 done in 590.3s (transfer 311.7s), skipped []
+tower p=64007 inst 1: r=31907 #E=63814 done in 620.4s (transfer 308.6s), skipped []
+tower p=64007 inst 0: r=31973 #E=63946 done in 625.6s (transfer 308.6s), skipped []
+tower p=64007: gate reproduces the record
+wrote research/negation_remeasure_20261113/remeasure_tower_p64007.json
+section tower: 626.9s
+stage 64007 exit 0
+aut-check run (curves only, no measurement): tower --tag _aut
+tower p=32003 inst 0: r=8059 #E=32236 done in 155.6s (transfer 155.6s), skipped []
+tower p=32003 inst 1: r=16069 #E=32138 done in 125.5s (transfer 125.5s), skipped []
+tower p=32003 inst 2: r=16057 #E=32114 done in 116.5s (transfer 116.4s), skipped []
+tower p=16001 inst 0: r=4003 #E=16012 done in 28.3s (transfer 28.3s), skipped []
+tower p=16001 inst 1: r=7901 #E=15802 done in 22.2s (transfer 22.2s), skipped []
+tower p=64007 inst 1: r=31907 #E=63814 done in 452.2s (transfer 452.2s), skipped []
+tower p=64007 inst 0: r=31973 #E=63946 done in 452.5s (transfer 452.5s), skipped []
+tower p=8009 inst 1: r=3943 #E=7886 done in 5.0s (transfer 5.0s), skipped []
+tower p=8009 inst 0: r=2017 #E=8068 done in 6.2s (transfer 6.2s), skipped []
+tower p=64007 inst 2: r=16069 #E=64276 done in 459.7s (transfer 459.7s), skipped []
+tower p=16001 inst 2: r=8111 #E=16222 done in 12.4s (transfer 12.4s), skipped []
+tower p=4001 inst 0: r=1013 #E=4052 done in 2.4s (transfer 2.4s), skipped []
+tower p=2003 inst 0: r=1021 #E=2042 done in 0.6s (transfer 0.6s), skipped []
+tower p=8009 inst 2: r=4007 #E=8014 done in 3.9s (transfer 3.9s), skipped []
+tower p=4001 inst 1: r=1019 #E=4076 done in 1.9s (transfer 1.9s), skipped []
+tower p=2003 inst 2: r=971 #E=1942 done in 0.5s (transfer 0.5s), skipped []
+tower p=2003 inst 1: r=1039 #E=2078 done in 0.6s (transfer 0.6s), skipped []
+tower p=1009 inst 0: r=257 #E=1028 done in 0.5s (transfer 0.5s), skipped []
+tower p=1009 inst 1: r=491 #E=982 done in 0.2s (transfer 0.2s), skipped []
+tower p=4001 inst 2: r=1021 #E=4084 done in 1.6s (transfer 1.6s), skipped []
+tower p=1009 inst 2: r=479 #E=958 done in 0.3s (transfer 0.3s), skipped []
+tower p=503 inst 0: r=269 #E=538 done in 0.1s (transfer 0.1s), skipped []
+tower p=251 inst 0: r=127 #E=254 done in 0.1s (transfer 0.1s), skipped []
+tower p=503 inst 1: r=241 #E=482 done in 0.1s (transfer 0.1s), skipped []
+tower p=503 inst 2: r=269 #E=538 done in 0.1s (transfer 0.1s), skipped []
+tower p=251 inst 1: r=127 #E=254 done in 0.1s (transfer 0.1s), skipped []
+tower p=251 inst 2: r=67 #E=268 done in 0.1s (transfer 0.1s), skipped []
+tower p=251: gate reproduces the record
+tower p=503: gate reproduces the record
+tower p=1009: gate reproduces the record
+tower p=2003: gate reproduces the record
+tower p=4001: gate reproduces the record
+tower p=8009: gate reproduces the record
+tower p=16001: gate reproduces the record
+tower p=32003: gate reproduces the record
+tower p=64007: gate reproduces the record
+wrote research/negation_remeasure_20261113/remeasure_tower_aut.json
+section tower: 462.4s
+stage aut exit 0

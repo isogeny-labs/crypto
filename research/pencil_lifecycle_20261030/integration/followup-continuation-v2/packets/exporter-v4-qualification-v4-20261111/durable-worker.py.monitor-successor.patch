@@ -1,0 +1,83 @@
+--- exporter-v4-qualification-v3-20261111/durable-worker.py
++++ exporter-v4-qualification-v4-20261111/durable-worker.py
+@@ -1,6 +1,8 @@
+ #!/usr/bin/env python3
+ import datetime, hashlib, json, math, os, re, resource, shutil, signal, stat, subprocess, sys, time, traceback
+ from pathlib import Path
++from concurrent_tree import scan_regular_tree
++from concurrent_traversal_control import run_control
+ P=Path(__file__).resolve().parent
+ from durable_io import atomic_json, flush_logs, load_admission, durable_limits
+ F=load_admission(P)
+@@ -74,6 +76,13 @@
+ def traversal_error(error):
+  raise error
+ 
++def retain_transient_scan_events(row,scope,scan):
++ count=len(scan['transient_missing'])
++ if count:
++  row['transient_missing_events']=row.get('transient_missing_events',0)+count
++  samples=row.setdefault('transient_missing_samples',[])
++  samples.extend({'scope':scope,'path':path} for path in scan['transient_missing'][:max(0,32-len(samples))])
++
+ ENV={'PATH':F['toolchain']+'/bin:/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','CARGO_HOME':str(STAGE/'cargo-home'),'CARGO_TARGET_DIR':str(STAGE/'target'),'CARGO_BUILD_JOBS':'1','RUSTC':F['toolchain']+'/bin/rustc','TMPDIR':str(STAGE/'tmp'),'RUST_TEST_THREADS':'1','RUST_BACKTRACE':'0','SIGNED_BUILD_END_MONOTONIC':str(BUILD_END),'QUAL_SOURCE_REVISION':'f3c1b8cc7663ca7d15374ae5e9a16c86839c9d18','QUAL_SOURCE_SHA256':F['source_manifest_sha256']}
+ def command(label,argv,cwd=None):
+  global ACTIVE
+@@ -91,30 +100,17 @@
+      durable_last=time.monotonic();checkpoint('running-'+label)
+     if time.monotonic()-last>1:
+      last=time.monotonic(); total=0;target=STAGE/'target'
+-     try:target_stat=target.lstat()
++     try:target_mode=target.lstat().st_mode
+      except FileNotFoundError:
+-      assert label=='materialize','target absent after materialization'
+-      target_stat=None
+-     if target_stat is not None:
+-      assert stat.S_ISDIR(target_stat.st_mode),str(target)
+-      for base,dirs,names in os.walk(target,onerror=traversal_error):
+-       for name in names:
+-        f=Path(base)/name
+-        try:st=f.lstat()
+-        except FileNotFoundError:continue
+-        assert stat.S_ISREG(st.st_mode),str(f)
+-        total+=st.st_size
++      assert label=='materialize','target absent after materialization';target_mode=None
++     if target_mode is not None:
++      assert stat.S_ISDIR(target_mode),str(target)
++      target_scan=scan_regular_tree(target,mutable_missing_roots=(target,))
++      total=target_scan['total_bytes'];retain_transient_scan_events(row,'target',target_scan)
+      row['peak_observed_target_bytes']=max(row.get('peak_observed_target_bytes',0),total)
+      assert total<=6*1024**3,'6GiB target threshold'
+-     workspace_bytes=0
+-     for base,dirs,names in os.walk(W,followlinks=False,onerror=traversal_error):
+-      for n in dirs:assert stat.S_ISDIR((Path(base)/n).lstat().st_mode)
+-      for n in names:
+-       f=Path(base)/n
+-       try:st=f.lstat()
+-       except FileNotFoundError:continue
+-       assert stat.S_ISREG(st.st_mode),str(f)
+-       workspace_bytes+=st.st_size
++     workspace_result=scan_regular_tree(W,mutable_missing_roots=(target,STAGE/'tmp'))
++     workspace_bytes=workspace_result['total_bytes'];retain_transient_scan_events(row,'workspace',workspace_result)
+      assert workspace_bytes<=8*1024**3,'private workspace8GiB ceiling'
+      logbytes=sum(f.stat().st_size for f in OUT.glob('*.std*'))
+      row['peak_observed_log_bytes']=max(row.get('peak_observed_log_bytes',0),logbytes)
+@@ -171,6 +167,18 @@
+  PERMIT_REQUIRED=True;checkpoint('containment-and-permit-verified')
+  R['build_deadline_monotonic']=BUILD_END
+  for name,h in F['packet_files'].items():assert H(P/name)==h,name
++ control_root=W/'concurrent-tree-control'
++ checkpoint('before-concurrent-traversal-control');control_start=time.monotonic()
++ control_result=run_control(control_root)
++ control_elapsed=time.monotonic()-control_start
++ assert control_elapsed<=30 and control_result['status']=='passed' and control_result['fail_closed_count']==5
++ assert all(control_result['positive_controls'].values())
++ assert all(row['rejected'] is True for row in control_result['negative_controls'])
++ shutil.rmtree(control_root)
++ assert {entry.name for entry in W.iterdir()}=={'workspace-owner.json'}
++ R['concurrent_traversal_control']=control_result
++ R['concurrent_traversal_control']['elapsed_seconds']=control_elapsed
++ checkpoint('concurrent-traversal-control-passed');guard()
+  command('materialize',['/usr/bin/python3','-B',str(P/'materialize.py')],cwd=P)
+  materialized=json.loads((W/'materialization.json').read_text());assert materialized['status']=='passed' and materialized['build_end_monotonic']==BUILD_END
+  assert materialized['cache_mode_inventory_sha256']==H(P/'cache-mode-inventory.json') and materialized['cache_modes_verified']==2165 and materialized['cache_executable_modes_verified']==82

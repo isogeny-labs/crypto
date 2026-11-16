@@ -329,3 +329,13 @@ Sources checked: research-kb and Conductor are not installed in this environment
 - `research/open_leads_execution_20261108/DECISIONS.md` (item 1);
 - `examples/{prime_fall_degree_tools,pfd_grid_zeros,pkm_tower_pilot}.rs` (scorer, gate3, ns-degree, controls);
 - `research/prime_fall_degree_t14_20261101/README.md`.
+
+## Stage C (pointer, added 2026-11-09)
+
+Stage C and gate G4 (job `pfd-c-20261108`) are reported in [`RESULTS_STAGE_C.md`](RESULTS_STAGE_C.md), under Amendments 1-11. In brief, `[pcc:unverified]`:
+
+- G4 passed (32 planted draws), on the same image and binaries as `pfd-a`, so **U4 above is met**: stage A is no longer conditional on G4.
+- G1 passed.
+- G3 for stage C: "not run (tool defect)" in `pfd-c` (Amendment 11), then **passed on the `m <= 6` cells** in the separate job `pfd-g3c-20261109` (98 capped runs, 0 disagreements). The `m >= 7` cells are "G3 not applicable (F4 engine capacity)". Under Amendment 11's stop rule the study continues.
+- H-m reads "grows in m" on all six ladders.
+- The stage C `m = 2` systems repeat this file's `t = 2, 3` rows exactly, so nothing above changes.

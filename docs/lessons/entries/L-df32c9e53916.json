@@ -1,0 +1,14 @@
+{
+  "action": "remove any stale socket file first, wait for the daemon's 'listening' log line rather than the socket file, and kill the daemon on every exit path including aborts",
+  "created": "2026-11-15T06:17:09Z",
+  "evidence": [
+    "research/ic_gpu_rootfind_m3_20261115/VALIDATION_REVIEW.md (finding 9); job_rf3.sh fix in commit 4961ee3cd1"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "gpu"
+  ],
+  "trigger": "a pod job starts a daemon that listens on a Unix socket and waits for it",
+  "why": "a socket file outlives its daemon: the wait ends at once, the backend check reads an empty log and aborts, and the aborted path left a daemon running"
+}

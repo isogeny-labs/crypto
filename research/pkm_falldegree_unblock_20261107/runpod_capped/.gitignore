@@ -1,0 +1,9 @@
+# Raw results trees of this route: their files go to S3 by SHA-256 through tools/benchrec.py (add-raw, upload);
+# the manifests, admission lines and receipts stay in git.
+/results/
+# Re-include the receipts' and fixtures' .log files, which the local rule research/*_20261107/**/*.log in
+# .git/info/exclude would hide (run.log and fetch.log are receipts; the fixture logs carry the pilot peak lines).
+!/receipts/**/*.log
+!/receipts_dev/**/*.log
+!/tests/fixtures/**/*.log
+!/smoke/**/*.log

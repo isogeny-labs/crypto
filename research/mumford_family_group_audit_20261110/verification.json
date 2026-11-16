@@ -1,0 +1,57 @@
+{
+  "schema": "mumford-growing-family-group-verification/v1",
+  "created": "2026-11-10T13:29:24.209041+00:00",
+  "source_commit": "1eb963ad4659a8a24e95e807b39a18bace3337ff",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/mumford_family_group_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 64,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/mumford_family_group_audit_20261110/evidence/attempts.tar.gz",
+    "files": 22,
+    "roundtrip_equal": true
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-e41dcb",
+    "claim_sha256": "5ce19fcbd4b0d3dce6e5b703a9442f4fbef5423a4c0bb6aff9d2180723b72b0a",
+    "commit": "1eb963ad4659a8a24e95e807b39a18bace3337ff",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/mumford_family_group_audit_20261110/lean (GeneratorAgreement.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T13:28:02Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-e41dcb",
+    "claim_sha256": "5ce19fcbd4b0d3dce6e5b703a9442f4fbef5423a4c0bb6aff9d2180723b72b0a",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Actual normalized all-pair arithmetic on the n-member family, signed-residue bijection and addition consistency, unique output before group transport, checked cyclic group law, actual generator coordinates/ordern, every member generated, and equality with prior actualStep. No geometric Picard/Jacobian or full ambient group structure.",
+  "report": {
+    "pages": 2,
+    "bytes": 51476,
+    "sha256": "c393517caa0a92446415cc7187f2979b411b32c879aed12e5bff0bc45c35cc5c",
+    "inspection": "Both final pages visually inspected; no clipping."
+  },
+  "ledger_prefix": {
+    "base": "605674387bf23cac50351a3aa26ca069806ea100",
+    "nonempty_prefix_matches": true
+  }
+}

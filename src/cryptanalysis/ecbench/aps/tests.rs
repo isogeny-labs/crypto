@@ -45,6 +45,8 @@ fn fixture() -> (PrimeInstance, PrimePoint) {
         r: 107,
         cofactor: 1,
         generator: (78, 4),
+
+        representation: None,
     };
     let q = inst
         .curve
@@ -337,6 +339,7 @@ fn late_or_unverified_witnesses_are_retained_without_becoming_timed_successes() 
         error: None,
         error_stage: None,
         deadline_exhausted: false,
+        lead: None,
     };
     let budget = Duration::from_nanos(20);
     let mut on_time = row.clone();

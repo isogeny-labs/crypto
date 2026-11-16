@@ -11,7 +11,7 @@ obstruction.
 | P1 RR-Dickson torus | `p1_rr_dickson/` | **rule 5**, stage-level positive at m = 3 (RR below T on D and widest at m3 t3, t4 on T24 and T31; D identical with the Kummer tower); rule 6 undecided [pcc:unverified] | [RESULTS](p1_rr_dickson/RESULTS.md), report PDF, record 20261107T2145Z |
 | P2 twist-pure coset | `p2_twist_coset/` | **rule 4**, toy-scale gain at stage level; index-calculus gain (c_max/c_mean)^(m−1) ≈ 1.9 / 3.5 at t = 4, decaying with t [pcc:unverified] | [RESULTS](p2_twist_coset/RESULTS.md), report PDF, record 20261107T2144Z |
 | P3 seed negative control | `p3_cross_trace/` | **rule 2**, null: 0 of 14 covariate tests significant; split-prime seed closed for the coordinate track at 2^24, 2^28; rho walk found defective [pcc:unverified] | [RESULTS](p3_cross_trace/RESULTS.md), report PDF, record 20261107T2144Z (P3) |
-| Lean obligations | `aburan28/crypto-lean` PR #3 | seven declarations, standard axioms only (local build) [pcc:unverified] | `CryptoLean.SplitPrime.Obstruction` |
+| Lean obligations | `aburan28/crypto-lean` PR #3 | 13 declarations (10 theorems, 3 definitions), standard axioms only (local build); isogenies, Lenstra's identification and Shoup's bound are not formalized [pcc:unverified] | `CryptoLean.SplitPrime.Obstruction` |
 | Red team (P1, P2) | `red-team-p1-p2.md` | corrections folded into P1 and P2 RESULTS | |
 
 ### Round 2 (protocols `*/PROTOCOL-R2.md`, merged in #3693)
@@ -22,6 +22,13 @@ obstruction.
 | P1 m5 t4 (first m = 5 cell with a tower) | **undecided**: RR timed out at 3 h (D ≥ 6), T capped at 13 GiB (D ≥ 9); needs a larger host and about a day |
 | P2 unplanted targets | **coset-independence holds exactly**: identical F4 work across cosets, primes and towers; the stage gain holds for the whole relation search |
 | P3 rho rerun (walk v2) | **null**: 0 of 7 tests, every CI within ±0.19 %; walk defect resolved (A/A r 0.027 / 0.009) |
+
+
+### Round 3 (protocol `p1_rr_dickson/PROTOCOL-R3.md`)
+
+| follow-up | outcome |
+|---|---|
+| P1 m5 t4 on Iso Lab EKS, 56–60 GiB, 24 h | **still undecided** [pcc:unverified]: T capped at 56 GiB after 5.9 h (D ≥ 9, widest ≥ 1,305,345, up from 662,876); all three RR attempts were lost to Spot interruptions (15 min, 2 h 33 min, 52 min) in the degree-7 step and supply no bound. Needs RR on a host that is not reclaimed (On-Demand or a qualified resumable route). |
 
 ## Rules shared by the three protocols
 

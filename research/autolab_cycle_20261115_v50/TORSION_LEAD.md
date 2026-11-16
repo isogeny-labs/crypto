@@ -1,0 +1,5 @@
+# Binary torsion-triple lead, not executed
+
+For B=1, S3(x,y,z)=(xy+xz+yz)²+xyz+1. With source degree<=17 its degree<=68<83, so a zero in the actual field lifts to a polynomial identity. Any common irreducible factor of two sources contradicts the constant1 term; hence sources are pairwise coprime. Their product is a square, forcing each source to be a square inF2[T]. Taking square roots preserves the identity; infinite Frobenius descent forces constant sources. This excludes nonconstant polynomial triples summing toO under this identity. In the actual A0/B1 curve constants0,1 have rational lifts, so all-ghost triple-O cases cannot arise this way.
+
+For a triple summing to the rational two-torsion point P0=(0,1), use x(P+P0)=1/x. Multiplying S3(x,y,1/z)=0 by z² gives D²+D+S²=0, D=xyz,S=x+y+z. This is binary-linear in the52 D coordinates and18 S coordinates, even though factor support is not. Compute its exact kernel; factor each bounded D and enumerate complete three-factor allocations only if the kernel/work bounds permit. Do not assume its dimension or emptiness. This branch is not yet tested, and a full original-chain completeness proof remains open.

@@ -1,0 +1,146 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ladder_wwalk_ksum_20261115 36-bit ladder curve, test panel",
+ "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho or BSGS). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 68719476731,
+    "a": 68719476728,
+    "b": 33,
+    "group_order": 68719022539,
+    "r": 68719022539,
+    "gx": 2,
+    "gy": 51741851039
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 20261118801,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "ksum5-sel",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=25",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum6-sel",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=19",
+     "oracle": "ksum:m=6",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum7-sel",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=16",
+     "oracle": "ksum:m=7",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum8-model",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=15",
+     "oracle": "ksum:m=8",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c2-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c2-x06",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c1",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=16,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119301,
+  "isolation_required": "L0",
+  "timeout_seconds": 86400
+ }
+}

@@ -1,0 +1,7 @@
+# G3 workflow-context correction
+
+Frozen before the corrective edit. First own CI43379511138 on sourcea719 is rejected before any jobs/check runs. Original independent actionlint1.7.7 (published release checksum checked) identifies runner.temp at job-level env as unavailable; the official GitHub contexts table confirms runner belongs to step env. Keep the original API, workflow and linter output. [pcc:unverified]
+
+Move only CARGO_TARGET_DIR to the replay step env. Keep the native arithmetic, four tests, all fixture expectations, CLI and proof statements unchanged. Preserve the original reference.sha256 bytes and plan8de56f as the historical341-selected-input record. Add reference-02.sha256, update only the thin driver reference filename, and bind the two current control-file hashes plus both original trusted-native.txt manifests. This adds custody for the original proof policy without changing it. Local actionlint, bash syntax and portable hash checks must pass before normal publication; the actual new CI must execute every original native/CLI/proof/PCC phase. No GitHub validation pass or native acceptance follows from fixing the YAML alone.
+
+Root02 has separately terminated124 with2133finalguards0 after entering6330tests. The first exact native failure diagnostic reports a missing original ecbench records.jsonl, not an arithmetic failure in the G3 adapter; the global suite is unresolved. Keep that evidence and investigate hydration separately. Native source3c162f3/CLI188d44/focused2d6fec and mathematical scope remain unchanged. [pcc:unverified]

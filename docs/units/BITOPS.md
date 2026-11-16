@@ -150,6 +150,29 @@ scans, read-back, the splitting tree's substitutions and scans, and the
 `F_{2^n}` operations of the summation-polynomial build and of each lift.
 Across calls the flag holds only while every call set it.
 
+A phase with no solver block to carry those keys — a base builder, an
+oracle's `prepare` — reports what the same tally saw as the `work_native`
+counters `tally_word_ops`, `tally_hash_probes`, `tally_field_adds`,
+`tally_field_muls`, `tally_field_sqrs` and `tally_field_invs`, priced at one
+primitive each (`Tally::add_work_native`). The `koblitz-symmetrised` base
+(its subspace, lifts and Frobenius-orbit view) and the `symmetrised` oracle's
+set-up (the rebuilt `F_u`, the membership check, the field tables and the
+generator's system, in the `oracle_setup` phase) are charged this way, so a
+record of that oracle is complete; its engine reports no memory figure, and
+`peak_bytes` stays 0, reported and never priced.
+
+When a phase's tally already holds work that a native counter of the same
+phase also counts, the phase carries the marker `tallied:<native>` in
+`work_native` and that native counter is not priced in that phase: the work
+is charged once, as the tally. The native counter stays in the record, so
+replay (which compares `native`) and the GAE conversion are unchanged. The
+`koblitz-symmetrised` base marks `tallied:as_solves` and
+`tallied:frobenius_maps`: `koblitz_factor_base` counts the base's
+Artin–Schreier lifts and orbit walks from its size, and the builder's tally
+already counts both where they execute. Records written before the marker
+(the ic-acct-7 session `ECBS1h6fd757ff9d9f` among them) are repriced by
+`ecbench work` under this rule, since `work` is never stored by replay.
+
 A record whose counters include one with no `bitop/v1` rule has no total. Its
 `work.complete` is `false` and the unpriced counters are named. An unknown
 cost is never written as zero.
@@ -239,6 +262,8 @@ Left unpriced on purpose (both decided on 2026-11-07, below):
 | counter or family | rule | why |
 |---|---|---|
 | `table_filter_bit_sets` | `6 · word_op` | `mitm-prime-blocked:m=2,filter=1`: one bit set per stored entry of the packed pair table's membership filter (the key shift, the multiply-shift hash, the word index and bit shift, the OR); the probe's filter read happens inside a lookup the oracle already counts |
+| `sibling_second_points` | `field_sqr + 2 · field_add` | `wwalk:...,sib=m,pool=M`: a sibling pair is charged as one group addition plus this, and performs `inv + 2 mul + 2 sqr + 8 add`, so the second x-only point `x(P − J)` is the difference to the addition's `inv + 2 mul + sqr + 6 add`; the band prices it at `w` (`band::SIBLING_WORK_COUNTERS`, marker `counted:sibling_second_points`) |
+| `sibling_lift_products` | `field_mul + 2 · field_add` | the same walk: the continuing child's `y` (one product, two subtractions), once a parent; marker `counted:sibling_lift_products` |
 
 The filter's memory (8 to 16 bits per stored entry) is not added to the
 `bitop/v2` oracle-table term, which prices `table_insert_attempts · (κ + w)`
@@ -263,6 +288,23 @@ before; a record written before 2026-11-07 is short of the window's word
 operations, a lower bound on the walk it records. The `bitop/v1` total of
 the default hyperelliptic walk before this change is its total minus
 `window_charges` at the row's widths.
+
+### 2026-11-07 (ic-acct-7, complete counters)
+
+| counter or family | rule | why |
+|---|---|---|
+| `combination_modr_muls` | `modr_mul` | a product modulo `r` in a column-log combination: `ic.shared_rank`'s descent `Σ coef·log` and `·h⁻¹`, the `h⁻¹ = h^{r−2}` exponentiation's products, a full-rank check's `coef·log` |
+| `combination_modr_adds` | `modr_add` | a sum modulo `r` in the same combinations (`Σ`, and `− a` for the residual shift) |
+
+`ic.shared_rank` also writes, at the site that does the work, the counters the
+2026-10-16 instrumentation already prices: `target_rng_draws` (every 64-bit
+word its `StdRng` hands out, counted by a forwarding wrapper, for the rank
+trials and the residual shifts), `row_build_words`, `row_build_modr_adds`,
+`row_build_modr_muls` (its rows, the transcript's copy and the target's
+dense row), its matrix's `gauss_entries_scanned` and `pivot_inversion_steps`,
+the folded table's `table_insert_attempts`, one
+`curve_equation_checks_uncharged` for the target's `is_on_curve`, and the
+`counted:` markers of the four items it had not counted.
 
 ### 2026-11-07 (the counters left unpriced on purpose, decided)
 

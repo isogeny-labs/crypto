@@ -1,0 +1,1 @@
+Use python -m research.autolab_cycle_20261115_v46.REPLAY_RECORDED_V2. The initial replay compared in-memory integer-key dictionaries and tuples to their JSON string-key/list representations and raised AssertionError. V2 canonicalizes both through JSON before comparison; no scientific worker, source input or raw evidence was changed. Initial source and empty result are retained.

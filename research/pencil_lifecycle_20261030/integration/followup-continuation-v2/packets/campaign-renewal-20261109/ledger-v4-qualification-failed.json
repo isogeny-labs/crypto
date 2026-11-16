@@ -1,0 +1,111 @@
+{
+  "schema": "pencil.campaign-ledger/v1",
+  "campaign_id": "pencil-continuation-20261109",
+  "ceiling_seconds": 43200,
+  "deadline_utc": "2026-11-10T05:11:39Z",
+  "entries": [
+    {
+      "id": "norm-manifest-recovery",
+      "status": "charged",
+      "seconds": 60,
+      "basis": "Conservative bounded charge for the two archive downloads and member hash/extraction; no generator",
+      "evidence": "../nonbranch-successor-20261109/artifact-recovery.json"
+    },
+    {
+      "id": "materializer-fault-qualification",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1,
+      "source_sha256": "efe039f547b2eaf0b590c0ff236b7932f12fcf0158b4dc6d845712c322c64d56",
+      "result": "/var/tmp/pencil-materializer-qualification-20261109/result.json"
+    },
+    {
+      "id": "materializer-t1953",
+      "status": "charged",
+      "seconds": 900,
+      "attempts": 1
+    },
+    {
+      "id": "root-library-software-qualification",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1,
+      "condition": "materializer terminal custody established; no overlap"
+    },
+    {
+      "id": "root-library-t1958",
+      "status": "charged",
+      "seconds": 1800,
+      "attempts": 1
+    },
+    {
+      "id": "nonbranch-norm-20261109",
+      "status": "charged",
+      "seconds": 2400,
+      "attempts": 1
+    },
+    {
+      "id": "native-log-qualification-t1971",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1
+    },
+    {
+      "id": "root-library-v2-t1970",
+      "status": "charged",
+      "seconds": 1800,
+      "attempts": 1,
+      "outcome": "failed_timestamp_parse_during_compilation",
+      "terminal_receipt": "/home/ec2-user/pencil-validation-receipts/t1970-root-library-20261109/root-terminal.json"
+    },
+    {
+      "id": "branch-coefficient-replay-20261109",
+      "status": "charged",
+      "seconds": 3600,
+      "attempts": 1,
+      "outcome": "failed_at_BranchConjugateOrders",
+      "observed_elapsed_seconds": 474.944561981014
+    },
+    {
+      "id": "lease-time-qualification-20261109",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1
+    },
+    {
+      "id": "cache-snapshot-t1992",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1
+    },
+    {
+      "id": "root-library-v3-t1992",
+      "status": "charged",
+      "seconds": 1800,
+      "attempts": 1,
+      "outcome": "failed_supervisor_permit_during_compilation",
+      "terminal_receipt": "/home/ec2-user/pencil-validation-receipts/t1992-root-library-20261109-control/root-terminal.json"
+    },
+    {
+      "id": "branch-coefficient-replay-v2-20261109",
+      "status": "charged",
+      "seconds": 3600,
+      "attempts": 1,
+      "outcome": "failed_BranchRootMultiplicity",
+      "observed_elapsed_seconds": 532.0833356159856
+    },
+    {
+      "id": "root-v4-permit-qualification",
+      "status": "charged",
+      "seconds": 60,
+      "attempts": 1,
+      "outcome": "fixture_startup_datetime_shadowing",
+      "observed_elapsed_seconds": 0.064546608,
+      "terminal_receipt": "/var/tmp/pencil-root-v4-permit-qualification-20261109-control/terminal.json"
+    }
+  ],
+  "charged_seconds": 16320,
+  "reserved_seconds": 0,
+  "unreserved_seconds": 26880,
+  "max_active_payloads": 1
+}

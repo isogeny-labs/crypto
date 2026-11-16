@@ -29,8 +29,10 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::Instant;
 
+use crypto_lib::cryptanalysis::ic_boundary::invmod;
 use crypto_lib::cryptanalysis::isogeny_walk::field::Field;
 use crypto_lib::cryptanalysis::isogeny_walk::poly;
+use crypto_lib::cryptanalysis::prime_fast::MulModN;
 use num_bigint::BigUint;
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
@@ -40,12 +42,27 @@ use serde_json::json;
 
 // ---------------------------------------------------------------- F_p, p < 2^62
 
+/// `F_p` for a prime `5 ≤ p < 2^62`.  Products go through
+/// [`MulModN`] (Montgomery, no `__umodti3` library call) and inverses
+/// through `ic_boundary::invmod` (word-division Euclid).  Both return the
+/// value the earlier `u128 %` and `i128` Euclid returned for every input
+/// (the remainder and the inverse are unique; out-of-range operands take
+/// the old code), so every walk, `iters`, `k` and log line is unchanged;
+/// only wall time (`ns`) differs, so rows from before and after this
+/// change must not be pooled on time (assessment 2026-11-10, R1).
 #[derive(Clone, Copy)]
 struct Fp {
     p: u64,
+    mm: MulModN,
 }
 
 impl Fp {
+    fn new(p: u64) -> Self {
+        Fp {
+            p,
+            mm: MulModN::new(p),
+        }
+    }
     fn add(&self, a: u64, b: u64) -> u64 {
         let s = a + b;
         if s >= self.p {
@@ -69,7 +86,7 @@ impl Fp {
         }
     }
     fn mul(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 * b as u128) % self.p as u128) as u64
+        self.mm.mul(a, b)
     }
     fn sm(&self, k: u64, a: u64) -> u64 {
         self.mul(k % self.p, a)
@@ -124,7 +141,18 @@ impl Fp {
     }
 }
 
+/// `a⁻¹ mod m` by `ic_boundary::invmod` (word-division Euclid; 32-bit
+/// steps for a modulus below 2^32), falling back to the `i128` Euclid
+/// below only for a non-invertible `a`, to keep its panic.  The inverse
+/// is unique, so both give the same value.
 fn inv_mod(a: u64, m: u64) -> u64 {
+    if let Some(x) = invmod(a, m) {
+        return x;
+    }
+    inv_mod_i128(a, m)
+}
+
+fn inv_mod_i128(a: u64, m: u64) -> u64 {
     let (mut r0, mut r1) = (m as i128, a as i128);
     let (mut s0, mut s1) = (0i128, 1i128);
     while r1 != 0 {
@@ -138,6 +166,36 @@ fn inv_mod(a: u64, m: u64) -> u64 {
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
+}
+
+/// `(a + b) % n`, by one compare-and-subtract when both are reduced (the
+/// walk coefficients always are); the same value for every input.
+#[inline(always)]
+fn add_n(a: u64, b: u64, n: u64) -> u64 {
+    if a < n && b < n {
+        let s = a + b;
+        if s >= n {
+            s - n
+        } else {
+            s
+        }
+    } else {
+        (a + b) % n
+    }
+}
+
+/// `(n - a) % n` without the division when `a` is reduced.
+#[inline(always)]
+fn neg_n(a: u64, n: u64) -> u64 {
+    if a < n {
+        if a == 0 {
+            0
+        } else {
+            n - a
+        }
+    } else {
+        (n - a) % n
+    }
 }
 
 fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
@@ -565,8 +623,8 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
             (
                 (x.0, f.neg(x.1)),
                 (c.0, f.neg(c.1)),
-                (n - a) % n,
-                (n - b) % n,
+                neg_n(a, n),
+                neg_n(b, n),
                 true,
             )
         } else {
@@ -603,7 +661,7 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
                 iters += 1;
                 run += 1;
                 tried += 1;
-                let (na, nb) = ((a + s.0) % n, (b + s.1) % n);
+                let (na, nb) = (add_n(a, s.0, n), add_n(b, s.1, n));
                 let Some(nx) = e.add(f, Some(x), Some(s.2)) else {
                     // naP + nbQ = O.
                     if nb != 0 {
@@ -640,7 +698,7 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
                     restarts += 1;
                     continue 'restart;
                 };
-                (x, c, a, b, _) = canon(d, (ma + ma) % n, (mb + mb) % n);
+                (x, c, a, b, _) = canon(d, add_n(ma, ma, n), add_n(mb, mb, n));
                 recent.clear();
             }
             recent.push_back((c.0, x, a, b));
@@ -702,8 +760,8 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
             let s = &steps[(c.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize];
             iters += 1;
             run += 1;
-            a = (a + s.0) % n;
-            b = (b + s.1) % n;
+            a = add_n(a, s.0, n);
+            b = add_n(b, s.1, n);
             match e.add(f, Some(x), Some(s.2)) {
                 Some(nx) => {
                     x = nx;
@@ -1188,6 +1246,9 @@ struct Args {
     j1728: bool,
     /// `p,a,b`: measure this curve instead of searching for one.
     curve: Option<(u64, u64, u64)>,
+    /// `x,y`: the generator `P` on the root (a point of order `n`), e.g. one
+    /// carried there by an isogeny from another volcano; drawn when absent.
+    generator: Option<(u64, u64)>,
     /// `#E(F_p)` for `--curve`; counted when absent.
     order: Option<u64>,
     /// `native` (this binary's walk) or `ca` (`ca solve --alg rho`).
@@ -1239,6 +1300,7 @@ fn parse_args() -> Args {
         j0: false,
         j1728: false,
         curve: None,
+        generator: None,
         order: None,
         engine: "native".into(),
         walk: "native".into(),
@@ -1341,6 +1403,20 @@ fn parse_args() -> Args {
                 }
                 a.curve = Some((v[0], v[1], v[2]));
             }
+            "--generator" => {
+                let v: Vec<u64> = val
+                    .split(',')
+                    .map(|x| {
+                        x.trim()
+                            .parse()
+                            .unwrap_or_else(|_| die("--generator takes X,Y in decimal"))
+                    })
+                    .collect();
+                if v.len() != 2 {
+                    die("--generator takes X,Y");
+                }
+                a.generator = Some((v[0], v[1]));
+            }
             "--order" => {
                 a.order = Some(
                     val.parse()
@@ -1365,7 +1441,7 @@ fn parse_args() -> Args {
                     "volcano-rho: one ECDLP instance carried to every level of an ell-isogeny volcano,
 Pollard rho measured on each curve.
 
-  your curve:   volcano-rho --curve P,A,B [--order N] [options]
+  your curve:   volcano-rho --curve P,A,B [--order N] [--generator X,Y] [options]
   search one:   volcano-rho [--bits 40] [--depth 3] [--crater any|split|inert|ramified] [--j0|--j1728]
                             [--max-cofactor 64] [options]
 
@@ -1376,7 +1452,8 @@ options: [--ell 3] [--seed 1] [--trials 100] [--per-level 10] [--controls 3]
 
 --curve takes y^2 = x^3 + Ax + B over F_P, P prime < 2^62, in decimal. The
 generator (cofactor times a seeded random point) and the secret k are drawn
-from --seed. --engine ca runs `ca solve --alg rho` from the cryptanalysis
+from --seed; --generator X,Y fixes the generator instead (a point of order n
+on the curve, e.g. one carried there by an isogeny, as volcano-gap does). --engine ca runs `ca solve --alg rho` from the cryptanalysis
 repository on every curve (--ca-arg passes extra options, e.g. --no-negation).
 The native walk runs on {{R, -R}} (negation map, look-ahead, short-cycle escape
 by doubling); --negation off walks on points, as before 2026-10-20.
@@ -1487,7 +1564,7 @@ fn search(args: &Args, rng: &mut SmallRng) -> Found {
                 break c;
             }
         };
-        let f = Fp { p };
+        let f = Fp::new(p);
         for _ in 0..200 {
             tried += 1;
             let e = Curve {
@@ -1542,7 +1619,7 @@ fn from_curve(args: &Args, (p, a, b): (u64, u64, u64), rng: &mut SmallRng) -> Fo
     if !(5..1 << 62).contains(&p) || !is_prime(p) {
         die("--curve needs a prime 5 <= p < 2^62");
     }
-    let f = Fp { p };
+    let f = Fp::new(p);
     let e = Curve { a: a % p, b: b % p };
     if e.j(&f).is_none() {
         die("singular curve: 4a^3 + 27b^2 = 0 mod p");
@@ -1683,10 +1760,18 @@ fn main() {
     // The instance: P of order n, Q = kP.
     let e0 = found.root;
     let cof = found.order / n;
-    let p0 = loop {
-        if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
-            break pt;
+    let p0 = match args.generator {
+        Some(g) => {
+            if !e0.on(&f, Some(g)) || e0.mul(&f, Some(g), n).is_some() {
+                die("--generator is not a point of order n on the curve");
+            }
+            g
         }
+        None => loop {
+            if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
+                break pt;
+            }
+        },
     };
     assert!(e0.mul(&f, Some(p0), n).is_none());
     let k_planted = rng.gen_range(1..n);
@@ -2134,6 +2219,8 @@ fn main() {
         "command": std::env::args().collect::<Vec<_>>().join(" "),
         "params": {"bits": args.bits, "ell": ell, "depth": args.depth, "seed": args.seed, "crater": args.crater,
                    "curve": args.curve.map(|(p, a, b)| [p, a, b]), "order": args.order,
+                   "generator": args.generator.map(|(x, y)| [x, y]),
+                   "engine": args.engine, "walk": args.walk, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
                    "engine": args.engine, "walk": args.walk, "negation": args.negation, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
                    "trials": args.trials, "per_level": args.per_level, "dp_bits": dp_bits,
                    "max_cofactor": args.max_cofactor, "controls": args.controls},
@@ -2225,7 +2312,7 @@ mod tests {
 
     /// The registered prime-order curve `find_prime_order_curve(16, 59297)`.
     fn instance(k: u64) -> (Fp, Instance, u64) {
-        let f = Fp { p: 53411 };
+        let f = Fp::new(53411);
         let curve = Curve { a: 4589, b: 186 };
         let p = (43982, 22687);
         let q = curve.mul(&f, Some(p), k).expect("1 <= k < n");
@@ -2257,7 +2344,7 @@ mod tests {
         // A 28-bit prime-order curve (research/rho_negation_audit_20261020,
         // #E counted by this binary): the 32-jump negation walk needs a group
         // well above 2^16 before its look-ahead and escapes stop showing.
-        let f = Fp { p: 259_182_139 };
+        let f = Fp::new(259_182_139);
         let curve = Curve {
             a: 256_310_742,
             b: 86_097_094,
