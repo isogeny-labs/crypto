@@ -14,3 +14,9 @@ Duke-hosted primary PDF returned403; author NCSU copy succeeded. No execution fa
 
 ## Completed synthetic gate
 Frozen ef4473fcf94a/checkpoint043823Z gate executed once:36streams,1440prefixes, independent rank/containment and full operator basis checks pass, exit0/empty stderr. Constructed fixture:98431expandednonzeros,2560nodes,512leafentries,1535sums; conservative multiplication bound3582perapply. This is a representation diagnostic on a synthetic stream. Next actual-curve gate frozen separately, explicit solver retained as correctness oracle.
+
+## Completed actual-curve gate and next decision
+Frozenbe5e94cd2808/checkpoint043935Z executed once:12exact reference comparisons and3additional supplied-target recoveries pass, all emitted full operators and transposes pass basis checks, exit0/emptystderr. Circuit multiplication bound exceeds expanded nnz in all15cases (e.g.g2:911versus524, g4:339versus160). This rejects promoting the first circuit representation on these controls. Root cause visible in raw leaves: cumulative walk-count vectors remain repeatedly stored. Next hypothesis: share walk-count prefixes inside the circuit while preserving original relation rows, not difference the rows sent to the solver. Separate protocol/source freeze required before execution.
+
+## Prefix preparation error
+The source-generation edit initially expected indentation absent from the authoritative clone; it stopped before creating the new binary source. The subsequent build consequently found no prefix binary. Retained BUILD-PREFIX-INITIAL.txt, corrected markers from actual source and rebuilt before any execution. No scientific gate ran during this preparation error.
