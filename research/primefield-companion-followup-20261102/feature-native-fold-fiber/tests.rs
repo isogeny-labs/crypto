@@ -1,0 +1,41 @@
+use super::*;
+fn chi(a:u64,r:u64)->i8{if a==0{0}else{if pow(a,(r-1)/2,r)==1{1}else{-1}}}
+fn eval(v:&[u64],x:u64,r:u64)->u64{v.iter().rev().fold(0,|a,&b|(mul(a,x,r)+b)%r)}
+fn order_root(r:u64,m:usize)->u64{(1..r).find(|&z|(1..m).all(|i|pow(z,i as u64,r)!=1)&&pow(z,m as u64,r)==1).unwrap()}
+#[test]fn exact_lift_and_retained_prefixes(){
+ let(mut cases,mut prefixes,mut singles,mut zero_images)=(0,0,0,0);
+ for r in [7,13,17,31,41,97]{for m in 2..=8{if (r-1)%m as u64!=0{continue}let f=Fold::new(r,m,order_root(r,m),8,r as usize).unwrap();
+  for k in 0..r{let z=pow((k+1)%r,m as u64,r);if z==0{zero_images+=1}let mut history=vec![(0,chi(k,r))];
+   for b in 1..=6.min(r-1){for a in f.offsets(1,b).unwrap(){history.push((a,chi((k+a)%r,r)))}
+    let state=f.lift(1,z,&history,60).unwrap();let expected:Vec<_>=(0..r).filter(|&x|pow((x+1)%r,m as u64,r)==z&&history.iter().all(|&(a,s)|chi((x+a)%r,r)==s)).collect();
+    let got:Vec<_>=(0..r).filter(|&x|eval(state.polynomial(),x,r)==0).collect();assert_eq!(got,expected);assert_eq!(state.moments().count as usize,expected.len());assert!(got.contains(&k));prefixes+=1;
+   }if f.lift(1,z,&history,60).unwrap().moments().singleton.is_some(){singles+=1}cases+=1;
+  }
+ }}println!("lift_cases={cases} prefix_sets={prefixes} final_singletons={singles} zero_images={zero_images}");
+ let f=Fold::new(13,3,3,3,5).unwrap();assert!(matches!(f.lift(0,2,&[],1),Err(Error::Domain)));assert!(matches!(f.lift(0,1,&[(0,1)],0),Err(Error::Limit)));assert!(f.lift(0,1,&[(13,1)],1).is_err());assert!(f.lift(0,1,&[(0,2)],1).is_err());assert_eq!(f.lift(0,1,&[(0,1),(0,-1)],2).unwrap().moments().count,0);
+}
+#[test]fn public_single_chart_and_boundaries(){
+ let(mut total,mut solved,mut unresolved,mut replay,mut extra,mut zero,mut calls)=(0,0,0,0,0,0,0);
+ for(r,p,a,b,base,m,zeta,rounds)in [(13,7,0,3,[1,2],3,3,6),(13,7,0,3,[1,2],6,4,6),(479,509,2,10,[3,68],2,478,20)]{
+  let inner=PublicRecovery::new(p,a,b,r,base,m,zeta,8,300,64,[0,1],rounds,1000).unwrap();let runner=SingleRecovery::new(inner,200,&[0,1,2,3,4,5,6]).unwrap();
+  let targets:Vec<_>=if r==13{(0..r).map(|k|{let mut c=Counts::default();(k,PublicRecovery::pair(runner.inner.multiple(k,&mut c)))}).collect()}else{include_str!("../feature-native-monomial-recovery/recovery.tsv").lines().skip(1).map(|s|{let v:Vec<_>=s.split('\t').collect();let k=v[0].parse::<u64>().unwrap();(k,if k==0{None}else{Some([v[1].parse().unwrap(),v[2].parse().unwrap()])})}).collect()};
+  for(k,t)in targets{total+=1;match runner.recover(t).unwrap(){FiberOutcome::Recovered{value,route,stats}=>{assert_eq!(value,k);assert!(stats.retained<=200);assert!(stats.replayed<=stats.retained);solved+=1;calls+=stats.outer.source_calls;match route{"retained-signs"=>{assert_eq!(stats.extra_queries,0);replay+=1},"extra-sign"|"extra-zero"=>extra+=1,_=>zero+=1}},FiberOutcome::Unresolved{stats,..}=>{unresolved+=1;calls+=stats.outer.source_calls}}}
+ }
+ assert_eq!(total,46);assert!(replay>0);println!("public_cases={total} recovered={solved} unresolved={unresolved} retained_routes={replay} extra_routes={extra} endpoint_identity={zero} source_calls={calls}");
+ let inner=||PublicRecovery::new(509,2,10,479,[3,68],2,478,2,240,64,[0,1],2,100).unwrap();assert!(SingleRecovery::new(inner(),0,&[]).is_err());assert!(SingleRecovery::new(inner(),4,&[479]).is_err());
+ let runner=SingleRecovery::new(inner(),1,&[]).unwrap();match runner.recover(Some([209,180])).unwrap(){FiberOutcome::Unresolved{phase,stats,..}=>{assert_eq!(phase,"image");assert_eq!(stats.outer.source_calls,1);assert_eq!(stats.retained,1)},_=>panic!("cap not enforced")};assert!(runner.recover(Some([0,0])).is_err());
+ // Final point verification rejects a candidate even if a caller constructs a false one.
+ assert!(matches!(runner.finish(3,Some([209,180]),"control",FiberStats::default()),Err(Error::Verification)));
+}
+#[test]fn exact_pair_separation_count(){let mut pairs=0;for r in [5,7,13,17,31]{for k in 0..r{for t in 0..r{if k==t{continue}let count=(0..r).filter(|&a|chi((k+a)%r,r)==chi((t+a)%r,r)).count();assert_eq!(count as u64,(r-3)/2);pairs+=1;}}}println!("pair_separation_counts={pairs}");}
+
+#[test]fn remaining_fiber_queries_and_exhaustion(){
+ let build=|offsets:&[u64]|SingleRecovery::new(PublicRecovery::new(7,0,3,13,[1,2],6,4,6,3,64,[0,1],2,30).unwrap(),20,offsets).unwrap();
+ let full=build(&[1,2,3,4,5,6]);let empty=build(&[]);let mut ordinary=0;let mut endpoint=0;
+ for k in 1..13{let mut count=Counts::default();let point=full.inner.multiple(k,&mut count);let target=PublicRecovery::pair(point);let z=pow(k,6,13);
+  let fiber=full.inner.fold.lift(0,z,&[],0).unwrap();assert_eq!(fiber.moments().count,6);
+  match full.refine_fiber(target,point,fiber,FiberStats::default()).unwrap(){FiberOutcome::Recovered{value,route,stats}=>{assert_eq!(value,k);assert!(stats.extra_queries>0);assert_eq!(stats.replayed,0);if route=="extra-sign"{ordinary+=1}else{assert_eq!(route,"extra-zero");endpoint+=1}},_=>panic!("expected refinement")};
+  let fiber=empty.inner.fold.lift(0,z,&[],0).unwrap();assert!(matches!(empty.refine_fiber(target,point,fiber,FiberStats::default()),Ok(FiberOutcome::Unresolved{phase:"fiber",degree:6,..})));
+ }
+ assert!(ordinary>0);assert!(endpoint>0);println!("conditional_fiber_cases=12 ordinary_routes={ordinary} zero_routes={endpoint} exhausted_controls=12");
+}

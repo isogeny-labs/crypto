@@ -1,0 +1,39 @@
+{
+  "status": "failed",
+  "commands": [
+    {
+      "label": "materialize",
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/materialize.py"
+      ],
+      "pid": 2350915,
+      "pgid": 2350915,
+      "reaped_exit_code": -9,
+      "reaped": true,
+      "elapsed_seconds": 0.11502473399741575
+    }
+  ],
+  "errors": [
+    {
+      "repr": "FileNotFoundError(2, 'No such file or directory')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/durable-worker.py\", line 190, in <module>\n    command('materialize',['/usr/bin/python3','-B',str(P/'materialize.py')],cwd=P)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/durable-worker.py\", line 95, in command\n    for base,dirs,names in os.walk(STAGE/'target',onerror=traversal_error):\n  File \"/usr/lib64/python3.9/os.py\", line 360, in _walk\n    onerror(error)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/durable-worker.py\", line 76, in traversal_error\n    raise error\n  File \"/usr/lib64/python3.9/os.py\", line 357, in _walk\n    scandir_it = scandir(top)\nFileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/pencil-signed-kummer-combined-v3-20261111/cache/target'\n"
+    }
+  ],
+  "invocation_id": "c0a0b44b313d47119b8adb24c2269294",
+  "source_scope": "fixed28 signed +7 Labels; at most11 full739 driver calls,2 forced native probes,4 adapter negatives",
+  "phase": "terminal",
+  "elapsed_seconds": 0.40308172401273623,
+  "cgroup": {
+    "path": "/sys/fs/cgroup/system.slice/pencil-signed-kummer-combined-v3-20261111.service",
+    "inode": 2909937,
+    "controls": {
+      "cpu.max": "200000 100000",
+      "memory.max": "17179869184",
+      "memory.swap.max": "0",
+      "pids.max": "512"
+    }
+  },
+  "build_deadline_monotonic": 429287.466053516
+}

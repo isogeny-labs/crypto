@@ -1,0 +1,112 @@
+[
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_mul_value",
+    "claim": "pcc/claims/PCC-20261116-c44007.json",
+    "normalized_statement": "theorem word_mul_value (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : (wordMul a b).toNat=(a.toNat*b.toNat)%223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_mul_value",
+      "decl_sha256": "980cf6c746c7e2fc39db307b7a26d9236e21ea21e16ec0aad9518fede2e4efe1"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_mul_canonical",
+    "claim": "pcc/claims/PCC-20261116-dd35b8.json",
+    "normalized_statement": "theorem word_mul_canonical (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : (wordMul a b).toNat<223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_mul_canonical",
+      "decl_sha256": "3663c90e41511ba70999090e9276ce5d8ad0f836b8420f8d0df8df9fe00bfb19"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_sub_value",
+    "claim": "pcc/claims/PCC-20261116-102d1d.json",
+    "normalized_statement": "theorem word_sub_value (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : (wordSub a b).toNat= if b.toNat\u2264a.toNat then a.toNat-b.toNat else a.toNat+223-b.toNat",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_sub_value",
+      "decl_sha256": "ba71311335a8812adda8eacfb09efd231ec9c57e40b71f7d61f2f572d425206f"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_sub_canonical",
+    "claim": "pcc/claims/PCC-20261116-97daa6.json",
+    "normalized_statement": "theorem word_sub_canonical (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : (wordSub a b).toNat<223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_sub_canonical",
+      "decl_sha256": "d73eb04a66aad8de8b75a5095311db422b72799051fd3afd53d944477e1cf77a"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_mul_decode",
+    "claim": "pcc/claims/PCC-20261116-7d4fda.json",
+    "normalized_statement": "theorem word_mul_decode (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : decodeWord (wordMul a b)=decodeWord a*decodeWord b",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_mul_decode",
+      "decl_sha256": "56d935c8cf8c12fa91982f6789e73bb099d1cad929af65fb6a8b2129c55ff268"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_sub_decode",
+    "claim": "pcc/claims/PCC-20261116-cb3e26.json",
+    "normalized_statement": "theorem word_sub_decode (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : decodeWord (wordSub a b)=decodeWord a-decodeWord b",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_sub_decode",
+      "decl_sha256": "d76fae63d6d0a0a664801fb9f27e50040c3eec50e856b00fa8974dcc3294a81f"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_cofactor_canonical",
+    "claim": "pcc/claims/PCC-20261116-c286e4.json",
+    "normalized_statement": "theorem word_cofactor_canonical (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : (wordCofactor a b c).1.toNat<223 \u2227 (wordCofactor a b c).2.1.toNat<223 \u2227 (wordCofactor a b c).2.2.toNat<223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_cofactor_canonical",
+      "decl_sha256": "4481b23286d612a4d6e311347125aaf94a19c8cd3784f0a3cc98ae48867494a2"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_cofactor_decode",
+    "claim": "pcc/claims/PCC-20261116-2b087a.json",
+    "normalized_statement": "theorem word_cofactor_decode (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : decodeTriple (wordCofactor a b c)= ((decodeWord a)^2-3*decodeWord b*decodeWord c, 3*(decodeWord c)^2-decodeWord a*decodeWord b, (decodeWord b)^2-decodeWord a*decodeWord c)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_cofactor_decode",
+      "decl_sha256": "3f49b35a19fc2d046db36d095c51308c4981d545fd923d469ea6b18a218e8760"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.word_cofactor_exact_values",
+    "claim": "pcc/claims/PCC-20261116-265ccd.json",
+    "normalized_statement": "theorem word_cofactor_exact_values (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : (wordCofactor a b c).1.toNat= ((decodeWord a)^2-3*decodeWord b*decodeWord c).val \u2227 (wordCofactor a b c).2.1.toNat= (3*(decodeWord c)^2-decodeWord a*decodeWord b).val \u2227 (wordCofactor a b c).2.2.toNat= ((decodeWord b)^2-decodeWord a*decodeWord c).val",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.word_cofactor_exact_values",
+      "decl_sha256": "e731fef81479318bfaf31afe58693553ca3bf84b54672581bd79238bfe025cbe"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.canonical_word_controls",
+    "claim": "pcc/claims/PCC-20261116-839962.json",
+    "normalized_statement": "theorem canonical_word_controls : wordCofactor 1 1 1=(221,2,0) \u2227 wordCofactor 0 1 1=(220,3,1)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.canonical_word_controls",
+      "decl_sha256": "f213a950786b48e2afe3fa12fc764c1aebb6b13460c7c74f2d6419376944ddc7"
+    }
+  },
+  {
+    "theorem": "CubicCofactorWordBridge22307.noncanonical_overflow_control",
+    "claim": "pcc/claims/PCC-20261116-e9369d.json",
+    "normalized_statement": "theorem noncanonical_overflow_control : wordMul (UInt64.ofNat (2^63)) 2=0 \u2227 decodeWord (wordMul (UInt64.ofNat (2^63)) 2)\u2260 decodeWord (UInt64.ofNat (2^63))*decodeWord 2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+      "theorem": "CubicCofactorWordBridge22307.noncanonical_overflow_control",
+      "decl_sha256": "45960038ea4591d66e05f103edbf97e5a0b9a34a58058744bf44041881de6eb5"
+    }
+  }
+]
