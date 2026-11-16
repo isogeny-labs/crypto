@@ -1,0 +1,58 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-native-natural-1m-k2048-v18",
+  "card_path": "/home/ec2-user/scratch/n83-natural-1m-20261020/cards/k2048-v18.json",
+  "card_sha256": "b8f39abdcee92c78d210e6027d69e880f3600d6d213c9547015d91b352b23b82",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/bin/runner-v18",
+        "run",
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/specs-v18/k2048.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 15.12057284,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "k2048-v18",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/config.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/custody.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/inspect-final.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/inspect-live.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/isolation-after.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/isolation-before.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/memory-profile.jsonl": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/outer.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/spec.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/stderr.log": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v18/stdout.log": null
+      },
+      "seconds": 15.12057284,
+      "stderr_sha256": "6ff0a04105b987dc3e4e7bce8aeafdf11cfa4cfb56f4976fa6a06a4ab1d6ba03",
+      "stderr_tail": [
+        "Error: \"cannot open lock /tmp/crypto-bench.lock: Permission denied (os error 13)\""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "c601582357842feb5a99807341687cdb7abed81c",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

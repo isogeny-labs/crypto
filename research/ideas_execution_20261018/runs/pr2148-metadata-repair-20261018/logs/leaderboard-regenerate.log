@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 2140, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 2112, in main
+    doc = build()
+          ^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 728, in build
+    frontier_audit = latest_frontier_audit()
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 626, in latest_frontier_audit
+    audit = load(SOURCES["frontier_audit"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 198, in load
+    return json.loads((REPO / rel).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto/research/ecbench_frontier_20261013/frontier-data.json'

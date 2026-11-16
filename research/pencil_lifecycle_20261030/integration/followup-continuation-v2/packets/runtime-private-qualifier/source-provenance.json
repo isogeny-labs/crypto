@@ -1,0 +1,39 @@
+{
+  "schema": "private.qualifier.source-provenance/v1",
+  "preserved_sources": {
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualifier-v5/supervise.py": {
+      "sha256": "5dc1c3f6261bc5d8e38b7efb454058044a4658b18603553757a9c5a42419e240",
+      "bytes": 24692
+    },
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualifier-v5/head_contract.py": {
+      "sha256": "832f72588d276f9b35c2dc8904e7cb34eabe8508722c6bbaca64ca8dea6ab749",
+      "bytes": 1350
+    },
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualifier-v5/binding.template.json": {
+      "sha256": "a2ef8f19bdb156c3b637d178da349e08f5dc6945bdc69f76c962562049bbf61e",
+      "bytes": 1836
+    },
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/preexec-native-controls-v2/gate.c": {
+      "sha256": "e5b9111d2ceb14ef0cf62555b92ccec04257f3b7209a1a04aaf2db99f05b3c45",
+      "bytes": 5450
+    },
+    "/usr/share/man/man1/docker-create.1.gz": {
+      "sha256": "3755abdfa39f0c4f1f4a6b5edabee4aaa828ae4d6f7e170939a1508c9ea95f2f",
+      "bytes": 2570
+    },
+    "/usr/share/man/man5/systemd.resource-control.5.gz": {
+      "sha256": "da4f404c9d5b162424eb67c785e8f7cde081b8f22b246682c8585a1b0c7a8ca1",
+      "bytes": 14311
+    },
+    "/usr/share/man/man8/dockerd.8.gz": {
+      "sha256": "ca6d94ef27b54f496892b7169dd7842a7a68c7a2c3b4f79393b0d3641fb0d503",
+      "bytes": 6472
+    }
+  },
+  "primary_document_findings": [
+    "Docker create supports explicit cgroup parent.",
+    "Dockerd cgroup v2 defaults to systemd when available; this packet requires explicit cgroupfs.",
+    "systemd Delegate permits private subhierarchy below service; daemon membership alone is insufficient for containers."
+  ],
+  "originals_modified": false
+}

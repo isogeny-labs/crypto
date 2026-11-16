@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "62eb73f0dd6ec4d9fbefdc8f890cf2f77731d3d4a5b98613dd47ad00957135bf"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "76c21683f216f8a7591d2a219380bb1b37e9e072d298d3baeff2cd08073d3471"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/mt_rho_start_fix_20261111/PROTOCOL.md: the v2 rho reference (cheapest of rho, rho2, rho2x, rhoseq x kappa 0.5/0.7/1.0) rerun with the restart fix",
+  "unit": "GAE per target from counted F_p I, M, S (I = 10M, S = M, 1 GAE = I + 2M + S) plus h GAE per hash/solver op",
+  "binary_or_process": "target/release/examples/mt_fieldops built from the commit in every row of the study's rows.jsonl (after the restart fix 75dbc70b36)",
+  "matches_protocol": true,
+  "strongest_available": false,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 76.815,
+    "rho": 79.15
+   },
+   "0.1": {
+    "ic": 83.709,
+    "rho": 86.041
+   },
+   "1": {
+    "ic": 145.795,
+    "rho": 148.058
+   }
+  },
+  "order_holds_across_band": false,
+  "note": "band for 25 b, T = 16384 against the fixed harness rho family. NOT the strongest rho: with Kuhn-Struik retention (validator) IC4 is dearer at h = 0 (1.12-1.17x) and the v2 decisions become 0 cheaper / 6 unranked / 12 dearer. Validator status insufficient_evidence; this gate does not pass."
+ }
+}

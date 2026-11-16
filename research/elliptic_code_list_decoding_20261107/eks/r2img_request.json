@@ -1,0 +1,23 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "ecld-panel-20261107",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:a361afc0755649e32453e3140260bf58ed0a85975d5998c3d30d056bde5bc568",
+    "command": [
+      "/opt/ecld/entry.sh"
+    ],
+    "cpu": 2,
+    "memory": "2Gi",
+    "seconds": 21600,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 60
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "elliptic_code_list_decoding_20261107",
+    "protocol_sha256": "e8481f7c5df55ad8d91358c0b8519c5c63e3852dc3865f79b4f05a0465d4ac43",
+    "note": "r2img 2026-11-08. One Job runs the 64 frozen lines of ecld_jobs.txt sequentially on one thread (PROTOCOL.md section 5), uploading each line output and SHA256SUMS to ISOLAB_RESULTS_URI. Binary built with rustc -O (musl) from ecld_toy.rs sha256 de901e23...; planned total ~70 CPU-min, seconds=21600 gives about 5x margin."
+  }
+}

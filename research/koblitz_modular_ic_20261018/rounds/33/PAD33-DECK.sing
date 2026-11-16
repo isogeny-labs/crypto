@@ -1,0 +1,51 @@
+ideal padDeckResidue33=std(ideal(T^2+T+1));
+proc samePadDeck33(list leftPad,list rightPad){int i;for(i=1;i<=4;i++){if(leftPad[i]!=rightPad[i]){return(0);}}return(1);}
+proc frobPadDeck33(list pointPad){list imagePad;int i;for(i=1;i<=4;i++){imagePad[i]=pointPad[i]^2;}return(imagePad);}
+proc stepPadDeck33(list p){
+ number b=p[1];number c=p[2];number l=p[3];number n=p[4];number A=1+c;
+ if(c==0){ERROR("PAD33_DECK_C_EXCEPTION");}number s=b/c+A;number v=s*(A+s);
+ if(v==0){ERROR("PAD33_DECK_NORMALIZATION_EXCEPTION");}number u=b*c/v;if(u==0){ERROR("PAD33_DECK_U_EXCEPTION");}
+ return(list(v/u^2,1+A/u,(l+s)/u,(l*b+n+b*c)/u^3));
+}
+proc sourcePadDeck33(list p){
+ number b=p[1];number c=p[2];number l=p[3];number n=p[4];
+ map ev=r,n+b*T,l+(1+c)*T,b,c;
+ if(size(reduce(ev(original),padDeckResidue33))!=0){ERROR("PAD33_DECK_SOURCE_EQUATION");}
+ ideal units=ev(registered);int i;ideal unitIdealPadDeck33;
+ for(i=1;i<=8;i++){unitIdealPadDeck33=padDeckResidue33,units[i];if(std(unitIdealPadDeck33)[1]!=1){ERROR("PAD33_DECK_SOURCE_UNIT");}}
+}
+int qi33;int step33;int ri33;int fi33;int matches33;int foundClass33;int foundFrob33;
+intmat closedAction33[2][10];intmat closedOffsets33[2][10];intvec weightsPad33=4,1,-1,1,-1,-4,-1,1,-1,1;
+list startPad33;list currentPad33;list conjugatePad33;list sigmaPad33;intvec aggregatePad33;
+for(qi33=1;qi33<=2;qi33++){
+ startPad33=paddingRepresentatives33[qi33];currentPad33=startPad33;aggregatePad33=intvec(0,0);
+ for(step33=0;step33<10;step33++){
+  sourcePadDeck33(currentPad33);matches33=0;
+  for(ri33=1;ri33<=2;ri33++){
+   conjugatePad33=paddingRepresentatives33[ri33];
+   for(fi33=0;fi33<5;fi33++){
+    if(samePadDeck33(currentPad33,conjugatePad33)==1){matches33++;foundClass33=ri33;foundFrob33=fi33;}
+    conjugatePad33=frobPadDeck33(conjugatePad33);
+   }
+  }
+  if(matches33!=1){ERROR("PAD33_DECK_NOT_UNIQUE_CLOSED_MATCH");}
+  closedAction33[qi33,step33+1]=foundClass33;closedOffsets33[qi33,step33+1]=foundFrob33;
+  aggregatePad33[foundClass33]=aggregatePad33[foundClass33]+weightsPad33[step33+1];
+  if(step33==5){
+   sigmaPad33=list(startPad33[1],startPad33[2],startPad33[3]+1+startPad33[2],startPad33[4]+startPad33[1]);
+   if(samePadDeck33(currentPad33,sigmaPad33)==0){ERROR("PAD33_DECK_FIFTH_NOT_SIGMA");}
+  }
+  currentPad33=stepPadDeck33(currentPad33);
+ }
+ if(samePadDeck33(currentPad33,startPad33)==0){ERROR("PAD33_DECK_TENTH_NOT_IDENTITY");}
+ if(closedAction33[qi33,3]!=qi33 || closedOffsets33[qi33,3]==0 || closedAction33[qi33,6]==qi33){ERROR("PAD33_DECK_C5_OR_SIGMA_CONTROL");}
+ if(aggregatePad33[1]!=0 || aggregatePad33[2]!=0){ERROR("PAD33_DECK_E_PADDING_NOT_ZERO");}
+ print("PAD33_DECK_RESULT class="+string(qi33)+" T2_frobenius="+string(closedOffsets33[qi33,3])+" sigma_other_class="+string(closedAction33[qi33,6])+" E_closed_divisor=0");
+}
+link outPadDeck33="ASCII:w padding-deck-action.sing";open(outPadDeck33);
+write(outPadDeck33,"intmat paddingClosedAction33[2][10];intmat paddingClosedOffsets33[2][10];");
+for(qi33=1;qi33<=2;qi33++){for(step33=1;step33<=10;step33++){
+ write(outPadDeck33,"paddingClosedAction33["+string(qi33)+","+string(step33)+"]="+string(closedAction33[qi33,step33])+";paddingClosedOffsets33["+string(qi33)+","+string(step33)+"]="+string(closedOffsets33[qi33,step33])+";");
+}}
+close(outPadDeck33);
+print("PAD33_DECK_ALL_CHECKS_PASS");quit;

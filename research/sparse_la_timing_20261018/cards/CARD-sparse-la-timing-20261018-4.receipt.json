@@ -1,0 +1,70 @@
+{
+  "card_id": "CARD-sparse-la-timing-20261018-4",
+  "card_path": "research/sparse_la_timing_20261018/cards/CARD-sparse-la-timing-20261018-4.yaml",
+  "card_sha256": "fc537c6f3295d16c0de001d9cb163d0b165a69ddbab130bfe1e9eaa2ad688bef",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/sparse_la_timing_20261018/sessions/fp4-p29-r2",
+        "--replay-all",
+        "--out",
+        "research/sparse_la_timing_20261018/sessions/fp4-p29-r2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4533.939,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-fp4-p29-r2",
+      "index": 1,
+      "outputs": {
+        "research/sparse_la_timing_20261018/sessions/fp4-p29-r2.audit.json": "841ee42d97e44b08d6854af900f0bea8b2063a13d1a70ea9adbb57b3171fae18"
+      },
+      "seconds": 4533.939,
+      "stderr_sha256": "0151549c221ead1cf9e899bff2a9111e4f89c05aaf6c603f31678fa48bd75017",
+      "stderr_tail": [
+        "receipt sha256 841ee42d97e44b08d6854af900f0bea8b2063a13d1a70ea9adbb57b3171fae18",
+        "audit OK: 20 records, 20 verified, 20 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "841ee42d97e44b08d6854af900f0bea8b2063a13d1a70ea9adbb57b3171fae18",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 19,",
+        "      \"record_id\": \"ECR1hc37588325944\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"283ca6c32b0666e4fbf73036b7bf5dc20acf1ca8bfc185326e75ba9ccfecc12c\",",
+        "    \"plan.json\": \"4d586f017b803bfd0a8ded466dab00fce6e4c8c2d0b3295ee63be2109e2eb1b2\",",
+        "    \"records.jsonl\": \"b5a87d471afcd0a509d4eb4aae79e3e790962c827813035c734f9d2d2e9e511c\",",
+        "    \"session.json\": \"42fda7447df66a062491b87c2ef3af2489f9b88c3879842b1670fb9b265adb49\",",
+        "    \"spec.json\": \"11a4ccce02616e7867caba3626066b59d411d437a3fc77a4dbe82b129a8d5cc0\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"1ecb215410267fb4895a91f5c4fe5403a357d86da1f2576257298573f1dc43a1\",",
+        "  \"auditor_env_class_id\": \"ECBENV2hfc2a87283245\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h5c241205fd5c\",",
+        "  \"audited_unix_ms\": 1792378676112",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "5ff80b5de644231842d52c2f0c61fbcf28ca68b8",
+  "dirty_after": [],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

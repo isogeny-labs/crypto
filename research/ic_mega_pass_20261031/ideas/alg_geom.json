@@ -1,0 +1,124 @@
+{
+ "lens": "algebraic geometry",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/alg_geom.json",
+ "searches": [
+  {
+   "query": "Semaev summation polynomial Weil descent saturation singular locus diagonal Groebner degree of regularity",
+   "engine": "WebSearch 2026-10-31",
+   "hits": [
+    "arXiv:1503.08001 Kosters-Yeo",
+    "arXiv:1906.05594 / JMC 2017-0022 Kousidis-Wiemers",
+    "arXiv:1505.02532 Huang-Kosters-Yang-Yeo",
+    "ePrint 2015/1121"
+   ],
+   "finding": "no paper saturates descended S_3 by the diagonal/branch/discriminant ideal or studies its singular locus or semi-normality; Huang-Kosters-Yang-Yeo bound last fall degree independently of n only in an expanded variable set"
+  }
+ ],
+ "ideas": [
+  {
+   "id": "MP-alg_geom-1",
+   "title": "Branch-locus saturation of the descended decomposition scheme (singular-locus stripping)",
+   "statement": "The binary-descended S_3 scheme X_V={S_3(x1,x2,x_R)=0} \u2229 V^2 plus field equations carries non-transversal solutions on the branch locus of the summation cover (x1=x2, i.e. 2P=R; x_i=0 points of order 2; the conductor locus of the non-normal image of E\u00d7E -> S_3 surface). The hypothesis is that growth of the last fall degree d_F with n comes from these degenerate solutions and the syzygies they force, not from the generic relations. Saturating by the discriminant ideal (x1+x2)\u00b7x1\u00b7x2, or adding the Rabinowitsch variable t\u00b7(x1+x2)\u00b7x1\u00b7x2=1, removes only O(1) useful relations and could cap d_F.",
+   "mechanism": "The S_3 surface is the birational image of Km(E\u00d7E) under (P,Q) -> (x(P),x(Q),x(P+Q)). It is singular along the images of the 16 Kummer nodes and the diagonal and is not normal. On a semi-normal or normalised model the restricted ideal can have a smaller Castelnuovo-Mumford regularity. The Rabinowitsch-saturated system is the algebraic surrogate for working on the resolution.",
+   "wall_bypassed": "First-fall-degree constant / lever 1 (KN-OPEN-8f3d27, -3c8f51): the measured d_F>=5 at n=33..45 is a property of the presentation. The corpus GAP 'Semi-normality (Yokoyama), singular loci and Betti tables of the Semaev ideal' has no card.",
+   "why_wall_hypotheses_fail": "The closure states d_ff=2 and d_F<=k+2 with certified >=5 for the RAW presentation. It also notes that d_F depends on the presentation, not on the ideal. Saturation changes the ideal: it removes embedded and degenerate points. That case lies outside the closure's scope.",
+   "nongenericity_argument": "Weil descent is the field-representation door of the generic oracle bound. If saturated d_F stays bounded by f(m) as n grows, the classic Gaudry/Diem subexponential heuristic for binary curves revives, with oracle cost polynomial in 2^{l\u00b7d_F}, and B\u00b7D^2 << N follows at l\u2248n/m. If saturated d_F tracks raw d_F, the result is accounting only.",
+   "prior_art": "Kosters-Yeo arXiv:1503.08001; Huang-Kosters-Yang-Yeo arXiv:1505.02532; Kousidis-Wiemers JMC 2019; Petit-Quisquater 2012; Yokoyama semi-normality (named in frontier rows KR-IC-401ebf); FGHR symmetries. None saturates by the branch locus (searched; see searches[0]).",
+   "novelty_status": "novelty_unverified (one web search found no prior saturation/singular-locus treatment; programme corpus grep-verified gap)",
+   "falsifier": {
+    "design": "Over F_2 with msolve, using K_0-type and random ordinary curves over F_{2^n}, n in {13,17,19,21,23,25}, l in {4,5,6}, take 20 random targets R each. Build the descended S_3 system in 2l binary variables plus field equations, in two forms: (A) raw; (B) raw plus a Rabinowitsch variable t with t\u00b7D(x1,x2)-1, where D=(x1+x2)\u00b7x1\u00b7x2 is descended through one auxiliary F_{2^n} variable. Record the max F4 step degree (msolve -v 2 log) and the solution count. Control: random quadratic system with the same counts.",
+    "prediction_if_true": "(B) has max degree <= (A) minus 1 on at least 80% of instances for n>=21, and the (B) degree is flat in n across 13..25 while the (A) degree rises.",
+    "prediction_if_false": "(B) max degree is equal to or higher than (A) (the extra variable costs at least 1) with the same n-trend: the singular locus is not the source of growth, and lever 1 must look elsewhere.",
+    "tools": "python3 (system generation over F_{2^n} via polynomial basis), msolve",
+    "toy_params": "n=13..25, l=4..6, 20 targets per cell",
+    "cpu_minutes": 15
+   },
+   "risk": "With field equations the ideal is already radical and zero-dimensional, so saturation only deletes points and may leave the regularity unchanged. The extra variable t inflates the degree.",
+   "expected_class": "theory"
+  },
+  {
+   "id": "MP-alg_geom-2",
+   "title": "Splitting the solving degree into curve part vs descent part via the Sym^m(E) projective ideal (Green syzygy regularity)",
+   "statement": "Embed Sym^m(E) by T_{m,L}, deg L=m+2 (arXiv 2610.16350). Its homogeneous ideal has regularity bounded in m alone, independent of the field. Intersecting with the Weil-restricted linear condition 'all m points have x in V' gives the decomposition scheme. If the regularity of the intersection equals reg(Sym^m E) + reg(descent) additively, as for a regular-sequence-like intersection, then d_F growth in n is attributable entirely to the field and subspace equations. That gives a proof route for lever 1 (a lower bound) through the regularity of the linear-subspace Weil restriction.",
+   "mechanism": "Separates the summation-cover geometry, which has fixed regularity and N_p syzygies, from the descent. The new step relative to the literature flag is to compute the regularity of the restricted system in Sym coordinates, the elementary symmetric e_k, rather than in x_i.",
+   "wall_bypassed": "Lever 1 is open. Lit-flagged item arXiv:2610.16350 is a new source; the corpus GAP 'Betti/syzygy tables of the Semaev ideal' has no card.",
+   "why_wall_hypotheses_fail": "No closure bounds d_F from below or above as n grows. This is a proof device, not a route around a wall.",
+   "nongenericity_argument": "Accounting/theory. It changes no exponent by itself. It decides whether a bounded-f(m) d_F is possible, which is the advance condition for binary curves.",
+   "prior_art": "Green N_p theorems for symmetric products (arXiv 2610.16350); Huang-Kosters-Yang-Yeo; Kosters-Yeo; Petit-Quisquater; Caminata-Gorla solving degree vs d_reg (arXiv 2304.13485).",
+   "novelty_status": "novelty_unverified",
+   "falsifier": {
+    "design": "Over F_p (p=2^10+7) and F_{2^n} (n=7..13), compute the Hilbert series and regularity of the Sym^2(E) and Sym^3(E) ideals with msolve or sympy linear algebra on the T_{m,L} embedding. Then add the descended subspace equations in e-coordinates (n=7..13, l=3..5) and measure the max F4 degree. Compare with reg(Sym)+reg(subspace-only system).",
+    "prediction_if_true": "The measured restricted d_F equals reg(Sym^m E) + g(n,l) with g matching the pure subspace system (residual 0 or 1 in all cells).",
+    "prediction_if_false": "The residual is non-additive and grows with n (interaction term): curve and descent cannot be separated, and the proof route closes.",
+    "tools": "python3, sympy, msolve",
+    "toy_params": "m=2,3; n=7..13; l=3..5; 10 targets per cell",
+    "cpu_minutes": 18
+   },
+   "risk": "Char-2 behaviour of N_p is unknown. Small n may not show growth (measured D is flat until n\u224833).",
+   "expected_class": "accounting"
+  },
+  {
+   "id": "MP-alg_geom-3",
+   "title": "Abel-Jacobi linear-fibre presentation: decomposition as splitting of a norm form over a P^{m-1} fibre, with Veronese linearisation",
+   "statement": "The fibre of Sym^m(E) -> E over R is the linear system |(m-1)O+R| \u2245 P^{m-1}. Write f = \u03a3 a_j \u03c6_j in the Riemann-Roch space. Then Norm_{x}(f) = F_a(X) = \u220f(X - x_i) has coefficients QUADRATIC in a. Decomposition becomes: find a with F_a splitting over V, i.e. e_k(x_1..x_m) = q_k(a) for quadratic forms q_k. Replace a by the Veronese monomials a_i a_j (Sym^2 linearisation). After descent, the q_k(a) constraints become linear in the Veronese variables, and the hard part reduces to binary e_k(x) of degree k plus a rank-1 (Veronese) condition.",
+   "mechanism": "This trades the 2^{m-2}-degree Semaev polynomial for degree-m elementary-symmetric equations plus a determinantal (rank-1 Veronese) variety of fixed degree. The determinantal ideal has known, n-independent linear resolutions (Eagon-Northcott), so any growth must sit in the e_k part.",
+   "wall_bypassed": "First-fall-degree / PKM-tower closure: PKM d_ff=4 constant, d_F presentation-dependent. The new presentation has a different ideal generator structure.",
+   "why_wall_hypotheses_fail": "The PKM closure concerns rational-map towers and the raw Semaev presentation. The fibre-linear (Riemann-Roch) presentation with Veronese linearisation is a third presentation whose d_F has not been measured in the programme ledger.",
+   "nongenericity_argument": "Same as MP-alg_geom-1: it is non-generic only if d_F stays bounded in n at l\u2248n/m. Otherwise it is a presentation constant.",
+   "prior_art": "Huang-Kosters-Yang-Yeo arXiv:1505.02532 (split/HFE-style variables bound the last fall degree independently of n but with many variables); Amadori-Pintore-Sala (Riemann-Roch on prime fields); Galbraith-Gebregiyorgis 2014 (intermediate variables); Petit-Kosters-Messeng PKC 2016; Joux-Vitse split variables. The Veronese/determinantal reformulation is likely not in these but is unchecked.",
+   "novelty_status": "novelty_unverified (probably close to HKYY 1505.02532; must be diffed)",
+   "falsifier": {
+    "design": "Binary ordinary curve, m=3, n in {13,15,17,19,21}, l=floor(n/3)+{0,1}, 20 targets. Build (A) descended S_4 and (B) the fibre system: a in F_{2^n}^2 affine, Veronese variables, e_k(x)=q_k(a) for k=1..3, x_i in V, plus 2x2-minor equations of the Veronese matrix. Run msolve over F_2 and compare max degree, wall time and number of solutions; both must agree on the solution count.",
+    "prediction_if_true": "max degree of (B) <= 4 for all n, while (A) degree rises; wall-time ratio (A)/(B) grows with n.",
+    "prediction_if_false": "(B) max degree >= (A), or grows at the same rate: the Riemann-Roch presentation reproduces the HKYY variable blow-up and is a relabelling.",
+    "tools": "python3, msolve",
+    "toy_params": "m=3, n=13..21, l=4..8",
+    "cpu_minutes": 20
+   },
+   "risk": "The Veronese variables multiply the variable count by about n\u00b7m^2/2. The HKYY bound is already known to be achieved only with polynomially many extra variables, which keeps the exponent.",
+   "expected_class": "relabelling"
+  },
+  {
+   "id": "MP-alg_geom-4",
+   "title": "Alternative elliptic fibrations of Km(E\u00d7E) as decomposition coordinates",
+   "statement": "The S_3 surface is birational to the Kummer surface Km(E\u00d7E), which carries several elliptic fibrations (Oguiso's classification for Km(E1\u00d7E2)). The standard decomposition uses the fibration by x(P+Q)=const. A different fibration \u03c0': Km -> P^1 with section gives a 2-parameter description (t, point on fibre) in which a degree-1 or degree-2 coordinate of the factor-base condition might become LINEAR in the fibration parameter. That would turn 'x1,x2 in V' into a subspace condition on t plus a fibre condition, with lower descended degree.",
+   "mechanism": "Re-fibring the Kummer surface uses non-homomorphic correspondences (graphs of fibration maps), so transport conservation does not apply. The question is whether some fibration's base parameter is an affine-linear function of (x1,x2) modulo the branch curve, which would make the descent conditions bilinear and not quartic.",
+   "wall_bypassed": "Transport conservation (homomorphic only) and curve-model representation closure (LEAD-EXO-curve-model-representation; its scope explicitly does not address Kummer surfaces of products).",
+   "why_wall_hypotheses_fail": "The fibration change is not a group homomorphism E->E' and not a change of model of E. It is a birational self-map or re-fibring of the decomposition surface itself, so neither closure's hypothesis (homomorphism / P^1 coordinate on E) holds.",
+   "nongenericity_argument": "Constant factor unless the descended degree of the base-membership condition in the new fibration drops strictly (4 -> 2). Even then the degree change is in d_ff, and the advance needs d_F bounded. Honest classification: theory, with a small chance of advance.",
+   "prior_art": "Oguiso 1989 (Jacobian fibrations on Km(E1\u00d7E2)); Kuwata-Shioda (elliptic parameters and Mordell-Weil of Km(E\u00d7E)); Semaev 2004. No ECDLP use known to me.",
+   "novelty_status": "novelty_unverified",
+   "falsifier": {
+    "design": "PARI/sympy over F_p (p~2^16) and over F_{2^11}: implement the Kuwata-Shioda elliptic parameters for Km(E\u00d7E) (at least 3 non-standard fibrations). For each, compute the bidegree in (x1,x2) of the base parameter t and the degree of the fibre-to-(x1,x2) map. Then for binary n=13..19, l=4..6, descend the condition 'x1,x2 in V' through t and measure first fall degree and max F4 degree with msolve against the standard S_3 system.",
+    "prediction_if_true": "Some fibration has t of bidegree (1,1) or lower with fibre degree 2, and its descended system shows max degree at least 1 below standard for n>=17.",
+    "prediction_if_false": "Every fibration parameter has bidegree >= (2,2) in (x1,x2), or the descended degree is the same: the re-fibring is a relabelling.",
+    "tools": "python3, sympy, cypari2, msolve",
+    "toy_params": "p=65537; n=11..19; l=4..6",
+    "cpu_minutes": 20
+   },
+   "risk": "The factor-base condition is attached to x1,x2 individually, and any fibration's base parameter mixes them. Degree is likely conserved by a Bezout-type count on the surface.",
+   "expected_class": "theory"
+  },
+  {
+   "id": "MP-alg_geom-5",
+   "title": "Extension-field genus-2 gluing with Frobenius-descended (2,2)-kernel over F_{p^k}: Richelot as a second torsion direction in the trace-zero part",
+   "statement": "The same-field Prym route is closed for prime-field sources, but the closure scope leaves extension-field sources open. For E/F_{p^2} (or F_{2^{2k}}) with rational E[2], glue E with its Frobenius conjugate E^\u03c3 along E[2] \u2245 E^\u03c3[2] (anti-isometry from \u03c3), giving a genus-2 curve C over F_p with J(C) ~ Res_{F_{p^2}/F_p}E. Index calculus in J(C)(F_p) with a genus-2 Gaudry factor base (degree-1 divisors over F_p) then decomposes E(F_{p^2}) elements with base size p and no Weil-descent subspace. This is the genus-2 analogue of the trace-zero transfer, built by Richelot/Kani gluing.",
+   "mechanism": "Kani gluing produces a genus-2 curve C over the SMALL field whose Jacobian is (2,2)-isogenous to the Weil restriction. Gaudry's genus-2 index calculus has cost O~(p^{2-2/g}) = O~(p) against rho's p on E(F_{p^2}). This is the known GHS-like ingredient for k=2, made explicit via Richelot.",
+   "wall_bypassed": "Prym same-field closure (scope: prime-field sources only) and LEAD-TRF-second-torsion-direction (Balasubramanian-Koblitz; scope: rational N-torsion line over the same field).",
+   "why_wall_hypotheses_fail": "The source curve is over F_{p^2}, an extension field, where the closure explicitly does not apply. The kernel E[2] is 2-primary, so it does not need a second r-torsion direction.",
+   "nongenericity_argument": "For E/F_{p^2}, N\u2248p^2 and rho costs \u2248p. Genus-2 IC over F_p costs O~(p^{2-2/g})=O~(p) for g=2, so it is equal to rho up to logs. At best this is a constant factor, and it is known (GHS/Scholten, k=2). Honest classification: relabelling/known, kept as a calibration of the Richelot/Prym toolchain on extension fields. It does not apply to ECCp-131 or ECC2-131 (prime degree, no quadratic subfield).",
+   "prior_art": "Kani 1997; Howe-Leprevost-Poonen 2000 (gluing along 2-torsion); Frey 2001 / Galbraith 2003 (Weil descent of E/F_{p^2}); Gaudry 2009 (decomposition over extension fields); Diem 2003 (GHS for k=2,3); Scholten 2003 (Weil restriction of E/F_{p^2} as genus-2 Jacobian, the same construction).",
+   "novelty_status": "closed_known (Scholten 2003 / Diem: E over F_{p^2} with rational 2-torsion and Weil restriction isogenous to a genus-2 Jacobian over F_p is classical)",
+   "falsifier": {
+    "design": "PARI: p in [2^12,2^16], E/F_{p^2} with full rational 2-torsion. Build the Scholten genus-2 curve C/F_p, check charpoly(J(C)) = charpoly(Res E) via hyperellcharpoly. Run genus-2 Gaudry IC (sympy LA) for DLP in the r-part with r | #E(F_{p^2}) prime, and count GAE against rho on E(F_{p^2}).",
+    "prediction_if_true": "IC/rho cost ratio < 1 and decreasing as p grows (exponent p^{1}\u00b7polylog vs p).",
+    "prediction_if_false": "Ratio >= 1 across p (matches the known GHS k=2 accounting); the construction serves only as a validated Richelot/Prym toolchain on extension fields.",
+    "tools": "gp (hyperellcharpoly), cypari2, numpy",
+    "toy_params": "p=4099..65537, k=2",
+    "cpu_minutes": 15
+   },
+   "risk": "Known result; included as a calibration only. Prime-degree targets are untouched.",
+   "expected_class": "relabelling"
+  }
+ ]
+}

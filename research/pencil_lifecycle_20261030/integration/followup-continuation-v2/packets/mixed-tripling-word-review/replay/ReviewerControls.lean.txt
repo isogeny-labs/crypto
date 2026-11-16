@@ -1,0 +1,29 @@
+import WordTriple
+open Polynomial PencilWordRefinement
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+example : (5*(4:UInt64))%5=0 ∧ (8*(4:UInt64))%5=2 ∧ (10*(6:UInt64))%7=4 := by decide
+example : (10*(2147483646:UInt64)).toNat=21474836460 := by decide
+example : ¬ (⟨0,7,1,1⟩:WordD1).canonical 7 := by unfold WordD1.canonical;decide
+example : let a : WordD1 := ⟨0,1,1,1⟩
+ let b : WeightedWord := ⟨0,0,0,1,1,1⟩
+ let c := tripleWords 7 0 0 0 a
+ a.y≠0 ∧ tripleWordDispatch 7 0 0 0 a b=some c ∧ c.canonical 7 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 0 0 0) := by
+ apply repeated_word_preserves 7 (by decide) (by decide) 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring
+ · decide
+ · decide
+ · decide
+#print PencilWordRefinement.repeated_word_preserves

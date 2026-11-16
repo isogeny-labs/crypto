@@ -1,0 +1,57 @@
+{
+  "artifact_sha256": {
+    "research/rootfind_binary_dense_probe_20261116/.gitattributes": "522a30002a36a878203a8c5c6336fcccef62e6b219e764855781e12b12137948",
+    "research/rootfind_binary_dense_probe_20261116/PLAN-K13-DENSE.json": "d73733e20b9c36511b99fe154bef4ae1f6c42c6769e6971405b054917fd2a306",
+    "research/rootfind_binary_dense_probe_20261116/PROTOCOL.md": "6e75a43cbd6ff107fd5e9bfdcbb906d81550b675e28aabf4654479bbda196250",
+    "research/rootfind_binary_dense_probe_20261116/REPORT.md": "129a4cf95edf8f629182738541d8923da6e10640534a97223ba92447739a47c4",
+    "research/rootfind_binary_dense_probe_20261116/SPEC-K13-DENSE-PLAN.json": "3cd1f7d849f6b598fe2509a94573dc5a7d4a6fd4a592490c1ae27d520f1eaf9d",
+    "research/rootfind_binary_dense_probe_20261116/build.stderr": "b9aeb58107ca97317577f659382a07303c3fac46e0a49235d6f0e21c6b2318ac",
+    "research/rootfind_binary_dense_probe_20261116/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_binary_dense_probe_20261116/dense_storage.svg": "c462bb6a883cd30431aa43d05f69944d0b859eb2f5d42d737a44dcbf93b0fc4c",
+    "research/rootfind_binary_dense_probe_20261116/diagram.dot": "ca14789d7b51fb2b9679c5d80a183bc843bad7d080e36c41e7870a7930249511",
+    "research/rootfind_binary_dense_probe_20261116/diagram.svg": "72bdd4eac1bea3b2a455b8cb9187c6a00e35c2579d9098ea8c0f231f865c5e03",
+    "research/rootfind_binary_dense_probe_20261116/make_visuals.py": "247fce28387e9680588854305633fd8cd294beffd35d68371e82a0b20614bd09",
+    "research/rootfind_binary_dense_probe_20261116/report.pdf": "7075af69ec5697f6631a5d14165258ec114253555f05cf301431c7947ccc67b7",
+    "research/rootfind_binary_dense_probe_20261116/report.typ": "a542f8b8223da52d2783636ccf6bf3cccc84c19ba8ef1ab3bfd09b22d6eb42af",
+    "research/rootfind_binary_dense_probe_20261116/test-bin.stderr": "18d569c1ffd10bd30490b8cf66e63d099f549239b44a9b13fcf1fd429f37b01b",
+    "research/rootfind_binary_dense_probe_20261116/test-bin.stdout": "d1ddfe8f8435f884ecb8d271fd12168c9cfba9da3737db3a9f39f92f6303441b",
+    "research/rootfind_binary_dense_probe_20261116/test-lib.stderr": "21496f5ecb4a876d79d5423462e77a172c04f3fc8ed26e11a8627e6db12e8054",
+    "research/rootfind_binary_dense_probe_20261116/test-lib.stdout": "9343079a6acdd89cb13911ca7cd7e6c866f44872f5156c331acecf5d8ca9faf4",
+    "src/bin/ecbench/pdp3_koblitz.rs": "f3358ee12560c1f7b882173f1b1dac87c48658d93a096792fd297ad64501bdac",
+    "src/cryptanalysis/ic_boundary.rs": "e76c46312b2eedce8f1530937c95c91364427204e3fbca496ad4290ca9eef4a9"
+  },
+  "independent_replays": 0,
+  "plan": {
+    "arms": 4,
+    "executed": 0,
+    "scheduled_executions": 144,
+    "spec_id": "ECS1h7bd090d1bd39",
+    "workloads": 4
+  },
+  "protocol_commit": "4ae60f1f92",
+  "release_binary_sha256": "2d9307249c036f5744551035d88c72c85193fa96f72b0ba4d8863ece42c96fd9",
+  "schema": "rootfind-binary-dense-probe-validation/v1",
+  "source_commit": "de23b92b5e4929a4fa44926155c1e6d67f41ee26",
+  "status": "correctness_and_plan_only",
+  "test_commands": [
+    {
+      "command": "cargo test --release --lib binary_dense_probe_preserves_torsion_first_witness_and_sign -- --nocapture",
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 1
+    },
+    {
+      "command": "cargo test --release --bin ecbench -- --nocapture",
+      "exit_code": 0,
+      "failed": 0,
+      "ignored": 1,
+      "passed": 21
+    },
+    {
+      "command": "python3 tools/pcc/pcc.py lint-prose research/rootfind_binary_dense_probe_20261116/PROTOCOL.md research/rootfind_binary_dense_probe_20261116/REPORT.md",
+      "exit_code": 0,
+      "findings": 0
+    }
+  ],
+  "timing_executions": 0
+}

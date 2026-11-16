@@ -1,0 +1,154 @@
+{
+  "main": "FunctionDivisorFinitenessAudit.function_divisor_finiteness_certificate",
+  "binding": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+  "custom_imports": {
+    "FieldValuation": "research/function_divisor_finiteness_audit_20261115/lean/FieldValuation.lean",
+    "LineEvaluation": "research/function_divisor_finiteness_audit_20261115/lean/LineEvaluation.lean",
+    "FiniteFractionField": "research/function_divisor_finiteness_audit_20261115/lean/FiniteFractionField.lean",
+    "ChartAlgebra": "research/function_divisor_finiteness_audit_20261115/lean/ChartAlgebra.lean",
+    "RationalControls": "research/function_divisor_finiteness_audit_20261115/lean/RationalControls.lean",
+    "LocalOrderAlgebra": "research/function_divisor_finiteness_audit_20261115/lean/LocalOrderAlgebra.lean",
+    "AllMiller": "research/function_divisor_finiteness_audit_20261115/lean/AllMiller.lean",
+    "FiniteValuation": "research/function_divisor_finiteness_audit_20261115/lean/FiniteValuation.lean",
+    "LocalComparison": "research/function_divisor_finiteness_audit_20261115/lean/LocalComparison.lean",
+    "MillerFunctions": "research/function_divisor_finiteness_audit_20261115/lean/MillerFunctions.lean",
+    "OriginEvaluation": "research/function_divisor_finiteness_audit_20261115/lean/OriginEvaluation.lean",
+    "InfinityMonic": "research/function_divisor_finiteness_audit_20261115/lean/InfinityMonic.lean",
+    "DVRIdentification": "research/function_divisor_finiteness_audit_20261115/lean/DVRIdentification.lean",
+    "PointLocalization": "research/function_divisor_finiteness_audit_20261115/lean/PointLocalization.lean",
+    "Normalization": "research/function_divisor_finiteness_audit_20261115/lean/Normalization.lean",
+    "RecursionCertificate": "research/function_divisor_finiteness_audit_20261115/lean/RecursionCertificate.lean",
+    "ValuationCertificate": "research/function_divisor_finiteness_audit_20261115/lean/ValuationCertificate.lean",
+    "FunctionDivisor": "research/function_divisor_finiteness_audit_20261115/lean/FunctionDivisor.lean",
+    "MillerStep": "research/function_divisor_finiteness_audit_20261115/lean/MillerStep.lean",
+    "FiniteZeros": "research/function_divisor_finiteness_audit_20261115/lean/FiniteZeros.lean",
+    "ChartCertificate": "research/function_divisor_finiteness_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/function_divisor_finiteness_audit_20261115/lean/ChartFractionField.lean",
+    "ChartAdicValuation": "research/function_divisor_finiteness_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartLocalization": "research/function_divisor_finiteness_audit_20261115/lean/ChartLocalization.lean",
+    "FinitePointCertificate": "research/function_divisor_finiteness_audit_20261115/lean/FinitePointCertificate.lean",
+    "LineIdeals": "research/function_divisor_finiteness_audit_20261115/lean/LineIdeals.lean",
+    "LocalOriginEvaluation": "research/function_divisor_finiteness_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "FiniteDVR": "research/function_divisor_finiteness_audit_20261115/lean/FiniteDVR.lean",
+    "NormEvaluation": "research/function_divisor_finiteness_audit_20261115/lean/NormEvaluation.lean",
+    "NormDegree": "research/function_divisor_finiteness_audit_20261115/lean/NormDegree.lean",
+    "PointDivisor": "research/function_divisor_finiteness_audit_20261115/lean/PointDivisor.lean",
+    "DiscreteValuation": "research/function_divisor_finiteness_audit_20261115/lean/DiscreteValuation.lean",
+    "GuardControls": "research/function_divisor_finiteness_audit_20261115/lean/GuardControls.lean",
+    "FiniteControls": "research/function_divisor_finiteness_audit_20261115/lean/FiniteControls.lean",
+    "RecursionControls": "research/function_divisor_finiteness_audit_20261115/lean/RecursionControls.lean",
+    "ResidueNormalization": "research/function_divisor_finiteness_audit_20261115/lean/ResidueNormalization.lean",
+    "LineMultiplicity": "research/function_divisor_finiteness_audit_20261115/lean/LineMultiplicity.lean",
+    "FunctionDivisorCertificate": "research/function_divisor_finiteness_audit_20261115/lean/FunctionDivisorCertificate.lean",
+    "PolynomialValues": "research/function_divisor_finiteness_audit_20261115/lean/PolynomialValues.lean"
+  },
+  "claims": [
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.zero_eval_norm_root",
+      "conclusion": "Actual evaluation zero implies actual algebra norm polynomial root."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.zero_pairs_finite",
+      "conclusion": "Actual nonzero coordinate function has finite affine zero pairs."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.affine_zero_set_finite",
+      "conclusion": "Actual finite affine point zero set, not abstract supplied finiteness."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.coordinate_nonvanishing_value",
+      "conclusion": "Actual nonvanishing evaluation gives local unit and official adic value1."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.function_order_support_finite",
+      "conclusion": "Every actual nonzero rational function has finite nonzero point orders."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.function_divisor_mul",
+      "conclusion": "General actual principal point divisor respects product."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.function_divisor_div",
+      "conclusion": "General actual principal point divisor respects quotient."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.function_divisor_mem_principal",
+      "conclusion": "Actual divisor lies in actual function-unit-group homomorphism range."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.function_divisor_miller",
+      "conclusion": "General divisor agrees with actual all-n Miller divisor."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.polynomial_function_value",
+      "conclusion": "Actual polynomial-function valuation equals twice its degree."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.rational_function_nonconstant",
+      "conclusion": "Actual F3 ratio nonconstant by polynomial injection/coefficient proof."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.rational_point_divisor_zero",
+      "conclusion": "Actual nonconstant F3 function has zero rational-only point divisor."
+    },
+    {
+      "declaration": "FunctionDivisorFinitenessAudit.rational_function_monic",
+      "conclusion": "Same actual nonconstant zero-rational-divisor function is normalized at infinity."
+    }
+  ],
+  "actual_homomorphism": "FunctionDivisorFinitenessAudit.principalDivisorHom",
+  "prior_reused_claims": [
+    "PCC-20261115-529612",
+    "PCC-20261115-bb5771",
+    "PCC-20261115-6a306d",
+    "PCC-20261115-c0e6db",
+    "PCC-20261115-357b60"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 334,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 33,
+    "new_modules": 6,
+    "actual_every_nonzero_function_finiteness": true,
+    "actual_divisor_homomorphism_and_principal_subgroup": true,
+    "actual_miller_compatibility": true,
+    "actual_nonconstant_normalized_F3_zero_rational_point_divisor_counter": true,
+    "arbitrary_field_scope": "ActualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints. F3counterdeliberatelyrational-only.",
+    "geometric_degree_zero_or_constant_kernel": false,
+    "chosen_function_uniqueness_or_binary_refinement": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "algebraic_closure_basechange_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

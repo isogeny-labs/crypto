@@ -1,0 +1,70 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-16-03
+experiment_id: BLINDSPOT-16
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/16-size-gated-equivariant/raw/receipt-card-03.json
+binds:
+  - {path: examples/blindspots_16_size_gated_oracle.rs, sha256: d6a15aa23eb805edde518d12ab19e5b44653e44e60de3b46e69b542a4acd4b99}
+  - {path: src/binary_ecc/f2m.rs, sha256: cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548}
+  - {path: src/cryptanalysis/algebra_cache.rs, sha256: a51224a8704d0bda373e834548a044c447c62a5230e891e8a74df4004a1a8e1f}
+  - {path: src/cryptanalysis/fx_hash.rs, sha256: 2257031df14bddbba2bc25a7b18b645589a893cb7977095c2ee335ff4b53c344}
+  - {path: src/cryptanalysis/gf2_elim.rs, sha256: 3560f41eed022dd0ada53ec2aa3c43b92701dd7ee3f4a8987b1f9660a19f02f9}
+  - {path: src/cryptanalysis/inherited_f4.rs, sha256: a9b4ad2acece6fd32fd61059457abd608b8c18a62a9ba34e7bd21044226e5499}
+  - {path: src/cryptanalysis/koblitz_groebner.rs, sha256: 4c98cd2fdbb008c677eb5e3cd164fc3e9479f833832ca5acece1ae1eabc76ad6}
+  - {path: src/cryptanalysis/matrix_f5_f2.rs, sha256: 40230728a72fcca3cde029177762012efe37a95219a278af6fa9f7012b1c5044}
+  - {path: src/cryptanalysis/pq_groebner_f2.rs, sha256: 6a92b00092fc90c80e2210f605f05a7ff8ff6be23d1ecbd4eeca22c36bb2e8b5}
+  - {path: src/cryptanalysis/sparse_macaulay.rs, sha256: 6a33da72961108e86bc1abb1a886b466c7bc78e45f668068afa3d3209daf3c83}
+  - {path: target/release/deps/libnum_bigint-72cf526ce00d5673.rlib, sha256: 4f57fa673bf4a00de5c0e516773cf68060e908876e637a7cec6590f2aad61971}
+  - {path: target/release/deps/libserde-07a9da4f5e2becdf.rlib, sha256: 29fc05538217c765be7ead752e9d52295e3a7a96780606829d81f1a03445c2af}
+  - {path: target/release/deps/librayon-46e094ef886c2480.rlib, sha256: 85cc22ff9b49c84deda2e644fa8088c4cee3abe81f526638655d58b9f0f2420b}
+  - {path: target/release/deps/libserde_json-15598c5810c24e49.rlib, sha256: 9f13d9c9ddb3092c8ee2fd87826bf6f868816818024eb7a2f76718255ef939ad}
+  - {path: target/release/deps/librand-995139fa871833e1.rlib, sha256: e57fabd4135f3e1be0ba1bed13f97b6a4ddef434b6abaccc70c01981db0a1acf}
+  - {path: target/release/deps/libblake3-eba32cb34a677f3d.rlib, sha256: ccc49e78f7865fee38ee4166acce89f42f926021142816ff7a44614960ac04dc}
+  - {path: target/release/deps/liblibc-d205a25cfc73043f.rlib, sha256: d13120d85e5ddbc404ec7ec3ce4ceee1c4072f32ffecbf203c87b9310c78db04}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-16/card-03]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -L, dependency=target/release/deps, --extern, num_bigint=target/release/deps/libnum_bigint-72cf526ce00d5673.rlib, --extern, serde=target/release/deps/libserde-07a9da4f5e2becdf.rlib, --extern, rayon=target/release/deps/librayon-46e094ef886c2480.rlib, --extern, serde_json=target/release/deps/libserde_json-15598c5810c24e49.rlib, --extern, rand=target/release/deps/librand-995139fa871833e1.rlib, --extern, blake3=target/release/deps/libblake3-eba32cb34a677f3d.rlib, --extern, libc=target/release/deps/liblibc-d205a25cfc73043f.rlib, -o, target/blindspots-16/card-03/b16, examples/blindspots_16_size_gated_oracle.rs]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/16-size-gated-equivariant/raw/card-03-build.stdout.log
+    stderr: research/blindspots_20261018/16-size-gated-equivariant/raw/card-03-build.stderr.log
+  - id: held-n5-n7-n11
+    argv: [prlimit, --as=4294967296, target/blindspots-16/card-03/b16, --mode, oracle, --n, "5,7,11", --targets, "8", --first, "12"]
+    timeout_seconds: 420
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/16-size-gated-equivariant/raw/held-n5-7-11.jsonl
+    stderr: research/blindspots_20261018/16-size-gated-equivariant/raw/held-n5-7-11.log
+  - id: held-n13-t12-19
+    argv: [prlimit, --as=4294967296, target/blindspots-16/card-03/b16, --mode, oracle, --n, "13", --targets, "8", --first, "12"]
+    timeout_seconds: 420
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/16-size-gated-equivariant/raw/held-n13-t12-19.jsonl
+    stderr: research/blindspots_20261018/16-size-gated-equivariant/raw/held-n13-t12-19.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-16/card-03/b16]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-16/card-03]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-16
+background: false
+write_scope:
+  - research/blindspots_20261018/16-size-gated-equivariant/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

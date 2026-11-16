@@ -1,0 +1,2716 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "groebner-source-systems-20261113-export",
+  "created": "2026-11-13T01:43:44Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "787b3fdd68e377e35974c358067bc2faa3f8481ea5cf3ea1dcb231490969db3e",
+    "protocol_id": "groebner-source-systems-20261113",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "Codex",
+    "session": "fourteen-target-20261113",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "8be3fae3f16f5d766a5751caf855599c9b8e7a3f",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "evidence/build-provenance.json",
+    "sha256": "d25ce37a40ad1fe6bf46bcb3ce7f0dae72e60711fa4b0c1f62c258a79ba073c0",
+    "class_id": "same-local-groebner-source-host",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "controls",
+      "role": "control_positive",
+      "binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+      "commit": "3b23168414f8f5a94767c75820da309072ebe306"
+    },
+    {
+      "id": "negative",
+      "role": "control_negative",
+      "binary_sha256": "4421041e6740b9852e5fa3d65379b01f6299c721dd48734755b1e722afd6b5d1",
+      "commit": "3b23168414f8f5a94767c75820da309072ebe306"
+    },
+    {
+      "id": "control",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "control-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-affine",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-affine-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-top",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-top-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-homogeneous",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "edwards-homogeneous-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-empty-affine",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-empty-affine-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-empty-homogeneous",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-empty-homogeneous-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-split-affine",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-split-affine-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-split-homogeneous",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "jv-split-homogeneous-aa",
+      "role": "control_aa",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "controls",
+      "arm": "controls",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/controls.argv.nul",
+          "sha256": "3572e64f010d9659fe0e9706d39ff86412bdce1e7c08d5dff62073e0440e4b34",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/controls.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/controls.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/controls.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/controls.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/controls.stdout",
+          "sha256": "abeb7d02f4fafec395ef252983539b33699f200763040f7615e7c46b46bae40b",
+          "bytes": 97,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/controls"
+    },
+    {
+      "run_id": "negative",
+      "arm": "negative",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/negative.argv.nul",
+          "sha256": "956fae190488dea6419131356e63c391ce01ba25b3d7237dfe1d15569dacb0a1",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/negative.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/negative.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/negative.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/negative.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/negative.stdout",
+          "sha256": "6aed3b50d2a8283dac3b000e116ef7a5942507cd14f3e5c7964281f6ff122161",
+          "bytes": 97,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/negative"
+    },
+    {
+      "run_id": "control",
+      "arm": "control",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 4,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 2,
+          "msolve_selected_pair_degree": -1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/control.argv.nul",
+          "sha256": "a35a4acb1bef8c00bddc969fdf127895b04f7242cc0438623b36f7db57e533eb",
+          "bytes": 120,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.out",
+          "sha256": "4f39fd766e4741933f6b41c5c50ada8e5d1deef93593c848dd7c9c55a0c682f6",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.stderr",
+          "sha256": "8262a9a50050c0984bedfbb313b06f18d21fd486c907b12b2a7b6158f1294e8b",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control.stdout",
+          "sha256": "7eb7e4d67389b412cfe49fd1c74c9fe7c013403e407c2225ee4fe34de187bece",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/control"
+    },
+    {
+      "run_id": "control-aa",
+      "arm": "control-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 4,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 2,
+          "msolve_selected_pair_degree": -1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/control-aa.argv.nul",
+          "sha256": "39848f89ad12fe240da8e8dfea1d785c70c30f276dfd0197caa56a967eb79b3c",
+          "bytes": 123,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.out",
+          "sha256": "4f39fd766e4741933f6b41c5c50ada8e5d1deef93593c848dd7c9c55a0c682f6",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.stderr",
+          "sha256": "8262a9a50050c0984bedfbb313b06f18d21fd486c907b12b2a7b6158f1294e8b",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/control-aa.stdout",
+          "sha256": "3c47470c0795f033e1d26bd27b0d385af3c8e4a549dc6f13520da2a09514da1a",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/control-aa"
+    },
+    {
+      "run_id": "edwards-affine",
+      "arm": "edwards-affine",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 2,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 3,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-affine.argv.nul",
+          "sha256": "1407d34ac67b7823ad21052dfc384bf4e2f298f66ff5d15e82a58b6d910c0d79",
+          "bytes": 134,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.out",
+          "sha256": "9b5b29f537089d7e6c5f7417100eaa710dd4ad167e5c7ff8c6f8da860fd0f48a",
+          "bytes": 237,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.stderr",
+          "sha256": "b339d645eeff36a4feb39782fd35be90bfda3298538d7fb9bd0766575c2f9a61",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine.stdout",
+          "sha256": "817bb5784b6855b64605dd4af7cc3963b0f7de2b375089441e8eea456ce7108c",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-affine"
+    },
+    {
+      "run_id": "edwards-affine-aa",
+      "arm": "edwards-affine-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 2,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 3,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-affine-aa.argv.nul",
+          "sha256": "5869f11d21803899278e88fc71e627b06cecb3c8076c1952759f3586acde926c",
+          "bytes": 137,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.out",
+          "sha256": "9b5b29f537089d7e6c5f7417100eaa710dd4ad167e5c7ff8c6f8da860fd0f48a",
+          "bytes": 237,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.stderr",
+          "sha256": "b339d645eeff36a4feb39782fd35be90bfda3298538d7fb9bd0766575c2f9a61",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-affine-aa.stdout",
+          "sha256": "368c14aa0a72ae870b75822b6aa6286f3d2531684626b758e8be9ea1ceabb6d3",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-affine-aa"
+    },
+    {
+      "run_id": "edwards-top",
+      "arm": "edwards-top",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 1,
+          "basis_degree": 2,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 9,
+          "reference_buchberger_peak": 2,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-top.argv.nul",
+          "sha256": "bf250318a1891c7315a414783d0314a8793f2bc4d3b73a3d0c4a61ccabbae9e7",
+          "bytes": 128,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.out",
+          "sha256": "9ad9044c6fa8cc4849bbf62078ca0518e6878af35036c6f3eacbaa29edf494b6",
+          "bytes": 194,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.stderr",
+          "sha256": "3a1a3635f5e834182820d775d551b839bbd8efe5c0f21fceabe09ffc0ed16733",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top.stdout",
+          "sha256": "a435cc7331298f4513f7e0939f98680a8c0ac0a201bbf66d9a56bb83645a40ed",
+          "bytes": 2065,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-top"
+    },
+    {
+      "run_id": "edwards-top-aa",
+      "arm": "edwards-top-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 5,
+          "variables": 2,
+          "basis_size": 1,
+          "basis_degree": 2,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 9,
+          "reference_buchberger_peak": 2,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-top-aa.argv.nul",
+          "sha256": "f61d0993543bd8fc216d1dad17ebec69e6e33ccc897390c55d832035795eee06",
+          "bytes": 131,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.out",
+          "sha256": "9ad9044c6fa8cc4849bbf62078ca0518e6878af35036c6f3eacbaa29edf494b6",
+          "bytes": 194,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.stderr",
+          "sha256": "3a1a3635f5e834182820d775d551b839bbd8efe5c0f21fceabe09ffc0ed16733",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-top-aa.stdout",
+          "sha256": "d3869aa27eb931010709a5fed32ab05692dd0179d65dbfb2fee5f75acd31e426",
+          "bytes": 2065,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-top-aa"
+    },
+    {
+      "run_id": "edwards-homogeneous",
+      "arm": "edwards-homogeneous",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 5,
+          "variables": 3,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 13,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-homogeneous.argv.nul",
+          "sha256": "8c8fcf3b35bc28813fc84c7ec3c3d0536e26d5af650fb3c73d8740be8cae70cc",
+          "bytes": 144,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.out",
+          "sha256": "04e52a9b058fc224c5dba2b65600950941c7ffec92dfbfdc8b6e72390f5c5b63",
+          "bytes": 260,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.stderr",
+          "sha256": "070122ebfea69f95351b87bad8a1b95c359a56cfc8ff501ba71c5c68952fc2bb",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous.stdout",
+          "sha256": "9078cfb869320645f5f35c110097e6d4ad7e19de16fbd5408fd609220fa393d8",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-homogeneous"
+    },
+    {
+      "run_id": "edwards-homogeneous-aa",
+      "arm": "edwards-homogeneous-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 5,
+          "variables": 3,
+          "basis_size": 2,
+          "basis_degree": 2,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 13,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/edwards-homogeneous-aa.argv.nul",
+          "sha256": "fa2c30f142bc0d3eac2ecc05555ae2ecf3ec9e76bef65306a8fa9c456fa130dc",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.out",
+          "sha256": "04e52a9b058fc224c5dba2b65600950941c7ffec92dfbfdc8b6e72390f5c5b63",
+          "bytes": 260,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.stderr",
+          "sha256": "070122ebfea69f95351b87bad8a1b95c359a56cfc8ff501ba71c5c68952fc2bb",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/edwards-homogeneous-aa.stdout",
+          "sha256": "7e2b5455fe3796d93dce6f381cfa828cc70313f6a48ad5a06807c0654b39275f",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/edwards-homogeneous-aa"
+    },
+    {
+      "run_id": "jv-empty-affine",
+      "arm": "jv-empty-affine",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 101,
+          "variables": 2,
+          "basis_size": 1,
+          "basis_degree": 0,
+          "initial_krull_dimension": -1,
+          "affine_length_if_finite": 0,
+          "rational_zeros": 0,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-empty-affine.argv.nul",
+          "sha256": "1343e563164cddfb7e22d9740de64a1fc047d4fb54504054359b6042ba572f2d",
+          "bytes": 136,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.out",
+          "sha256": "3f102d9edc4ebadee05080463b01feae9628a9c854db6c2e5b5de787416814db",
+          "bytes": 186,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.stderr",
+          "sha256": "9346a7725dda06bece90820b2e24cc27962af02ac2e472660e57558e7285fb59",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine.stdout",
+          "sha256": "9444b8520e47d30f0b54d5910cf01079343cce753268c36c6e6296f6566ac066",
+          "bytes": 2282,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-empty-affine"
+    },
+    {
+      "run_id": "jv-empty-affine-aa",
+      "arm": "jv-empty-affine-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 101,
+          "variables": 2,
+          "basis_size": 1,
+          "basis_degree": 0,
+          "initial_krull_dimension": -1,
+          "affine_length_if_finite": 0,
+          "rational_zeros": 0,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-empty-affine-aa.argv.nul",
+          "sha256": "133a5bf9d9d316b6740b4980bc7d50c4161a6c80e6581e8d01ac380d8780110a",
+          "bytes": 139,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.out",
+          "sha256": "3f102d9edc4ebadee05080463b01feae9628a9c854db6c2e5b5de787416814db",
+          "bytes": 186,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.stderr",
+          "sha256": "9346a7725dda06bece90820b2e24cc27962af02ac2e472660e57558e7285fb59",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-affine-aa.stdout",
+          "sha256": "99a944d226755213e0bbabe186cf696db2dce079afdaa7656290cf57e6deb992",
+          "bytes": 2282,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-empty-affine-aa"
+    },
+    {
+      "run_id": "jv-empty-homogeneous",
+      "arm": "jv-empty-homogeneous",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 101,
+          "variables": 3,
+          "basis_size": 6,
+          "basis_degree": 4,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 8,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 6,
+          "msolve_selected_pair_degree": 5
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-empty-homogeneous.argv.nul",
+          "sha256": "a82d4ec053dcba8bf76bfe4baf91789e80ed0b94cbe1f1579231d3e8d0585ea3",
+          "bytes": 146,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.out",
+          "sha256": "b5cbfbbc8efec92987851d5dd526c06f529a04c23a2af52b95ead85e47e6733f",
+          "bytes": 380,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.stderr",
+          "sha256": "53eb4fbd5766ee9fb025fe6f710e3d0ef11043bb00e719b0fbb73c0e403ce8b5",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous.stdout",
+          "sha256": "8b3f15640e01f473ffdcb10345df565331e89b8678c68bfe8eadc4b16bffe843",
+          "bytes": 2338,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-empty-homogeneous"
+    },
+    {
+      "run_id": "jv-empty-homogeneous-aa",
+      "arm": "jv-empty-homogeneous-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 101,
+          "variables": 3,
+          "basis_size": 6,
+          "basis_degree": 4,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 8,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 6,
+          "msolve_selected_pair_degree": 5
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.argv.nul",
+          "sha256": "8d50490ef1732dd6644019dd4fcadf74fb7daf5e86404b0832cf6911847c1d93",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.out",
+          "sha256": "b5cbfbbc8efec92987851d5dd526c06f529a04c23a2af52b95ead85e47e6733f",
+          "bytes": 380,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.stderr",
+          "sha256": "53eb4fbd5766ee9fb025fe6f710e3d0ef11043bb00e719b0fbb73c0e403ce8b5",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-empty-homogeneous-aa.stdout",
+          "sha256": "f2c22c1a532848043d5fb82884e5d634f757c93b8e39537e2a1919cf8b0a4916",
+          "bytes": 2338,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-empty-homogeneous-aa"
+    },
+    {
+      "run_id": "jv-split-affine",
+      "arm": "jv-split-affine",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 101,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 1,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 1,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-split-affine.argv.nul",
+          "sha256": "2cb3f9d219567c120b65d8d4bd92f6460134a9dfebcb72b83d8a35931687d780",
+          "bytes": 136,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.out",
+          "sha256": "e1e520601813b1b127388bc07dc76e8f34dc2ef958735de896db44b5c2541e9b",
+          "bytes": 243,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.stderr",
+          "sha256": "88ed2a8427a122e4803ae9acfbe3380215f9d633a51dbed39eca02efdf5aefbc",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine.stdout",
+          "sha256": "d33bb7ed9a5a9224d16e10c4f8775801223d3120bd699510e38045a19ed192fc",
+          "bytes": 2235,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-split-affine"
+    },
+    {
+      "run_id": "jv-split-affine-aa",
+      "arm": "jv-split-affine-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 101,
+          "variables": 2,
+          "basis_size": 2,
+          "basis_degree": 1,
+          "initial_krull_dimension": 0,
+          "affine_length_if_finite": 1,
+          "rational_zeros": 1,
+          "reference_buchberger_peak": 4,
+          "msolve_selected_pair_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-split-affine-aa.argv.nul",
+          "sha256": "889f5bd5ef0b579b46055cfdff879c11d7ac6706e8104c0eaf2b0fdc3f49482c",
+          "bytes": 139,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.out",
+          "sha256": "e1e520601813b1b127388bc07dc76e8f34dc2ef958735de896db44b5c2541e9b",
+          "bytes": 243,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.stderr",
+          "sha256": "88ed2a8427a122e4803ae9acfbe3380215f9d633a51dbed39eca02efdf5aefbc",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-affine-aa.stdout",
+          "sha256": "db1eea56f85b441099f1f280e70ecf0e2cb9214396e519bbf5e8f1e3a0114fd7",
+          "bytes": 2235,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-split-affine-aa"
+    },
+    {
+      "run_id": "jv-split-homogeneous",
+      "arm": "jv-split-homogeneous",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 0,
+          "p": 101,
+          "variables": 3,
+          "basis_size": 5,
+          "basis_degree": 3,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 101,
+          "reference_buchberger_peak": 6,
+          "msolve_selected_pair_degree": 4
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-split-homogeneous.argv.nul",
+          "sha256": "7c7a3bc350506291f486a407ac69cc79bed53cf7b6a4adb2dd9711d35a603336",
+          "bytes": 146,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.out",
+          "sha256": "c09626c555d249d1e5dcb5d5382ea8d06865828bff173e8b1983e850215e3a9c",
+          "bytes": 367,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.stderr",
+          "sha256": "4c776c753b79932120a22cfa7439092ab345066c63aaa6dc82c4ffeec3b3ab0d",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous.stdout",
+          "sha256": "075408f86e797d1bfc7bc9fba65b3a4450d79ec17c5411098ee5c08242e54dd1",
+          "bytes": 2235,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-split-homogeneous"
+    },
+    {
+      "run_id": "jv-split-homogeneous-aa",
+      "arm": "jv-split-homogeneous-aa",
+      "instance_id": "groebner-source-fixed-batch",
+      "seed": "No randomness; fixed source/control fixture",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "call_complete": 1,
+          "replicate": 1,
+          "p": 101,
+          "variables": 3,
+          "basis_size": 5,
+          "basis_degree": 3,
+          "initial_krull_dimension": 1,
+          "affine_length_if_finite": -1,
+          "rational_zeros": 101,
+          "reference_buchberger_peak": 6,
+          "msolve_selected_pair_degree": 4
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact outputs only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native independent Buchberger/source checks; unsigned same-host evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.argv.nul",
+          "sha256": "5f1b2449e417bb4b40ea45b3387b604e8708bb6e68ceec32b9134ca5e57e834e",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.end",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.out",
+          "sha256": "c09626c555d249d1e5dcb5d5382ea8d06865828bff173e8b1983e850215e3a9c",
+          "bytes": 367,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.start",
+          "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.stderr",
+          "sha256": "4c776c753b79932120a22cfa7439092ab345066c63aaa6dc82c4ffeec3b3ab0d",
+          "bytes": 856,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/main/jv-split-homogeneous-aa.stdout",
+          "sha256": "29842c32fe162d4118bc588f527eb8d15e42cbc9f9829f7f78ccfdd1b715594d",
+          "bytes": 2235,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T01:43:40Z",
+      "finished_at": "2026-11-13T01:43:40Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/main/jv-split-homogeneous-aa"
+    }
+  ],
+  "flow": {
+    "planned": 18,
+    "attempted": 18,
+    "completed": 18,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "runs/main/analysis.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.argv.nul",
+      "sha256": "39848f89ad12fe240da8e8dfea1d785c70c30f276dfd0197caa56a967eb79b3c",
+      "bytes": 123,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.out",
+      "sha256": "4f39fd766e4741933f6b41c5c50ada8e5d1deef93593c848dd7c9c55a0c682f6",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.stderr",
+      "sha256": "8262a9a50050c0984bedfbb313b06f18d21fd486c907b12b2a7b6158f1294e8b",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control-aa.stdout",
+      "sha256": "3c47470c0795f033e1d26bd27b0d385af3c8e4a549dc6f13520da2a09514da1a",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.argv.nul",
+      "sha256": "a35a4acb1bef8c00bddc969fdf127895b04f7242cc0438623b36f7db57e533eb",
+      "bytes": 120,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.out",
+      "sha256": "4f39fd766e4741933f6b41c5c50ada8e5d1deef93593c848dd7c9c55a0c682f6",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.stderr",
+      "sha256": "8262a9a50050c0984bedfbb313b06f18d21fd486c907b12b2a7b6158f1294e8b",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/control.stdout",
+      "sha256": "7eb7e4d67389b412cfe49fd1c74c9fe7c013403e407c2225ee4fe34de187bece",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.argv.nul",
+      "sha256": "3572e64f010d9659fe0e9706d39ff86412bdce1e7c08d5dff62073e0440e4b34",
+      "bytes": 125,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/controls.stdout",
+      "sha256": "abeb7d02f4fafec395ef252983539b33699f200763040f7615e7c46b46bae40b",
+      "bytes": 97,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.argv.nul",
+      "sha256": "5869f11d21803899278e88fc71e627b06cecb3c8076c1952759f3586acde926c",
+      "bytes": 137,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.out",
+      "sha256": "9b5b29f537089d7e6c5f7417100eaa710dd4ad167e5c7ff8c6f8da860fd0f48a",
+      "bytes": 237,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.stderr",
+      "sha256": "b339d645eeff36a4feb39782fd35be90bfda3298538d7fb9bd0766575c2f9a61",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine-aa.stdout",
+      "sha256": "368c14aa0a72ae870b75822b6aa6286f3d2531684626b758e8be9ea1ceabb6d3",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.argv.nul",
+      "sha256": "1407d34ac67b7823ad21052dfc384bf4e2f298f66ff5d15e82a58b6d910c0d79",
+      "bytes": 134,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.out",
+      "sha256": "9b5b29f537089d7e6c5f7417100eaa710dd4ad167e5c7ff8c6f8da860fd0f48a",
+      "bytes": 237,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.stderr",
+      "sha256": "b339d645eeff36a4feb39782fd35be90bfda3298538d7fb9bd0766575c2f9a61",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-affine.stdout",
+      "sha256": "817bb5784b6855b64605dd4af7cc3963b0f7de2b375089441e8eea456ce7108c",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.argv.nul",
+      "sha256": "fa2c30f142bc0d3eac2ecc05555ae2ecf3ec9e76bef65306a8fa9c456fa130dc",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.out",
+      "sha256": "04e52a9b058fc224c5dba2b65600950941c7ffec92dfbfdc8b6e72390f5c5b63",
+      "bytes": 260,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.stderr",
+      "sha256": "070122ebfea69f95351b87bad8a1b95c359a56cfc8ff501ba71c5c68952fc2bb",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous-aa.stdout",
+      "sha256": "7e2b5455fe3796d93dce6f381cfa828cc70313f6a48ad5a06807c0654b39275f",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.argv.nul",
+      "sha256": "8c8fcf3b35bc28813fc84c7ec3c3d0536e26d5af650fb3c73d8740be8cae70cc",
+      "bytes": 144,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.out",
+      "sha256": "04e52a9b058fc224c5dba2b65600950941c7ffec92dfbfdc8b6e72390f5c5b63",
+      "bytes": 260,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.stderr",
+      "sha256": "070122ebfea69f95351b87bad8a1b95c359a56cfc8ff501ba71c5c68952fc2bb",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-homogeneous.stdout",
+      "sha256": "9078cfb869320645f5f35c110097e6d4ad7e19de16fbd5408fd609220fa393d8",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.argv.nul",
+      "sha256": "f61d0993543bd8fc216d1dad17ebec69e6e33ccc897390c55d832035795eee06",
+      "bytes": 131,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.out",
+      "sha256": "9ad9044c6fa8cc4849bbf62078ca0518e6878af35036c6f3eacbaa29edf494b6",
+      "bytes": 194,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.stderr",
+      "sha256": "3a1a3635f5e834182820d775d551b839bbd8efe5c0f21fceabe09ffc0ed16733",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top-aa.stdout",
+      "sha256": "d3869aa27eb931010709a5fed32ab05692dd0179d65dbfb2fee5f75acd31e426",
+      "bytes": 2065,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.argv.nul",
+      "sha256": "bf250318a1891c7315a414783d0314a8793f2bc4d3b73a3d0c4a61ccabbae9e7",
+      "bytes": 128,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.out",
+      "sha256": "9ad9044c6fa8cc4849bbf62078ca0518e6878af35036c6f3eacbaa29edf494b6",
+      "bytes": 194,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.stderr",
+      "sha256": "3a1a3635f5e834182820d775d551b839bbd8efe5c0f21fceabe09ffc0ed16733",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/edwards-top.stdout",
+      "sha256": "a435cc7331298f4513f7e0939f98680a8c0ac0a201bbf66d9a56bb83645a40ed",
+      "bytes": 2065,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.argv.nul",
+      "sha256": "133a5bf9d9d316b6740b4980bc7d50c4161a6c80e6581e8d01ac380d8780110a",
+      "bytes": 139,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.out",
+      "sha256": "3f102d9edc4ebadee05080463b01feae9628a9c854db6c2e5b5de787416814db",
+      "bytes": 186,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.stderr",
+      "sha256": "9346a7725dda06bece90820b2e24cc27962af02ac2e472660e57558e7285fb59",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine-aa.stdout",
+      "sha256": "99a944d226755213e0bbabe186cf696db2dce079afdaa7656290cf57e6deb992",
+      "bytes": 2282,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.argv.nul",
+      "sha256": "1343e563164cddfb7e22d9740de64a1fc047d4fb54504054359b6042ba572f2d",
+      "bytes": 136,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.out",
+      "sha256": "3f102d9edc4ebadee05080463b01feae9628a9c854db6c2e5b5de787416814db",
+      "bytes": 186,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.stderr",
+      "sha256": "9346a7725dda06bece90820b2e24cc27962af02ac2e472660e57558e7285fb59",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-affine.stdout",
+      "sha256": "9444b8520e47d30f0b54d5910cf01079343cce753268c36c6e6296f6566ac066",
+      "bytes": 2282,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.argv.nul",
+      "sha256": "8d50490ef1732dd6644019dd4fcadf74fb7daf5e86404b0832cf6911847c1d93",
+      "bytes": 149,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.out",
+      "sha256": "b5cbfbbc8efec92987851d5dd526c06f529a04c23a2af52b95ead85e47e6733f",
+      "bytes": 380,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.stderr",
+      "sha256": "53eb4fbd5766ee9fb025fe6f710e3d0ef11043bb00e719b0fbb73c0e403ce8b5",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous-aa.stdout",
+      "sha256": "f2c22c1a532848043d5fb82884e5d634f757c93b8e39537e2a1919cf8b0a4916",
+      "bytes": 2338,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.argv.nul",
+      "sha256": "a82d4ec053dcba8bf76bfe4baf91789e80ed0b94cbe1f1579231d3e8d0585ea3",
+      "bytes": 146,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.out",
+      "sha256": "b5cbfbbc8efec92987851d5dd526c06f529a04c23a2af52b95ead85e47e6733f",
+      "bytes": 380,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.stderr",
+      "sha256": "53eb4fbd5766ee9fb025fe6f710e3d0ef11043bb00e719b0fbb73c0e403ce8b5",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-empty-homogeneous.stdout",
+      "sha256": "8b3f15640e01f473ffdcb10345df565331e89b8678c68bfe8eadc4b16bffe843",
+      "bytes": 2338,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.argv.nul",
+      "sha256": "889f5bd5ef0b579b46055cfdff879c11d7ac6706e8104c0eaf2b0fdc3f49482c",
+      "bytes": 139,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.out",
+      "sha256": "e1e520601813b1b127388bc07dc76e8f34dc2ef958735de896db44b5c2541e9b",
+      "bytes": 243,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.stderr",
+      "sha256": "88ed2a8427a122e4803ae9acfbe3380215f9d633a51dbed39eca02efdf5aefbc",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine-aa.stdout",
+      "sha256": "db1eea56f85b441099f1f280e70ecf0e2cb9214396e519bbf5e8f1e3a0114fd7",
+      "bytes": 2235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.argv.nul",
+      "sha256": "2cb3f9d219567c120b65d8d4bd92f6460134a9dfebcb72b83d8a35931687d780",
+      "bytes": 136,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.out",
+      "sha256": "e1e520601813b1b127388bc07dc76e8f34dc2ef958735de896db44b5c2541e9b",
+      "bytes": 243,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.stderr",
+      "sha256": "88ed2a8427a122e4803ae9acfbe3380215f9d633a51dbed39eca02efdf5aefbc",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-affine.stdout",
+      "sha256": "d33bb7ed9a5a9224d16e10c4f8775801223d3120bd699510e38045a19ed192fc",
+      "bytes": 2235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.argv.nul",
+      "sha256": "5f1b2449e417bb4b40ea45b3387b604e8708bb6e68ceec32b9134ca5e57e834e",
+      "bytes": 149,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.out",
+      "sha256": "c09626c555d249d1e5dcb5d5382ea8d06865828bff173e8b1983e850215e3a9c",
+      "bytes": 367,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.stderr",
+      "sha256": "4c776c753b79932120a22cfa7439092ab345066c63aaa6dc82c4ffeec3b3ab0d",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous-aa.stdout",
+      "sha256": "29842c32fe162d4118bc588f527eb8d15e42cbc9f9829f7f78ccfdd1b715594d",
+      "bytes": 2235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.argv.nul",
+      "sha256": "7c7a3bc350506291f486a407ac69cc79bed53cf7b6a4adb2dd9711d35a603336",
+      "bytes": 146,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.out",
+      "sha256": "c09626c555d249d1e5dcb5d5382ea8d06865828bff173e8b1983e850215e3a9c",
+      "bytes": 367,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.stderr",
+      "sha256": "4c776c753b79932120a22cfa7439092ab345066c63aaa6dc82c4ffeec3b3ab0d",
+      "bytes": 856,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/jv-split-homogeneous.stdout",
+      "sha256": "075408f86e797d1bfc7bc9fba65b3a4450d79ec17c5411098ee5c08242e54dd1",
+      "bytes": 2235,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.argv.nul",
+      "sha256": "956fae190488dea6419131356e63c391ce01ba25b3d7237dfe1d15569dacb0a1",
+      "bytes": 125,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.end",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.start",
+      "sha256": "f47960b7cd5a140b7222544fa72aa4f9d2b08e1ddc2c447edc31b48d20a2d3cf",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/main/negative.stdout",
+      "sha256": "6aed3b50d2a8283dac3b000e116ef7a5942507cd14f3e5c7964281f6ff122161",
+      "bytes": 97,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/analysis.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/analysis.jsonl",
+      "sha256": "39abb7800b6a50898aa23f4af1b8d2bf2a3850395ab3fba40e0f468a8fe2df51",
+      "bytes": 4829,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/analysis.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs.sha256",
+      "sha256": "4d972e7c708438c2b5883c298d46219fb175c47a02f3a85c8db0c0096c271f10",
+      "bytes": 2786,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/build-provenance.json",
+      "sha256": "d25ce37a40ad1fe6bf46bcb3ce7f0dae72e60711fa4b0c1f62c258a79ba073c0",
+      "bytes": 5915,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "53cd29a80b7b501b7419f9fa20e313a03938a760e17141d57c2006147c5d1f65",
+      "bytes": 16551,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "14dfa18d7c0deb9356d9f9b5e59516da80a4254c7256cef07382951879dfbfa9",
+      "bytes": 1741,
+      "kind": "raw"
+    },
+    {
+      "path": "analyze.sh",
+      "sha256": "848d60fce2d7cb5759a3b75a5525441b47b5c1acae6e9309b0cada414aa55372",
+      "bytes": 345,
+      "kind": "raw"
+    },
+    {
+      "path": "metadata.py",
+      "sha256": "a62acda439f4a92cde725cadf17328261377f7d07de9f9c2998964b04b8b6257",
+      "bytes": 17356,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "analyze.sh",
+      "sha256": "848d60fce2d7cb5759a3b75a5525441b47b5c1acae6e9309b0cada414aa55372",
+      "bytes": 345,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "analysis/analysis.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/analysis.jsonl",
+        "sha256": "39abb7800b6a50898aa23f4af1b8d2bf2a3850395ab3fba40e0f468a8fe2df51",
+        "bytes": 4829,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/analysis.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Known in-sample fixtures; no random/general or performance inference. Source inputs and homogenization are checked. Returned basis degree/F4 selected pair degree are not a full internal-degree certificate."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

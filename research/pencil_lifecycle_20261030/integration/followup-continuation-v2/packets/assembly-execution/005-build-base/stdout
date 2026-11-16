@@ -1,0 +1,49 @@
+Sending build context to Docker daemon  81.06MB
+Step 1/14 : FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39
+ ---> f88bac941108
+Step 2/14 : ARG SOURCE_REVISION
+ ---> Running in 875d34106b94
+ ---> Removed intermediate container 875d34106b94
+ ---> 21a310698cbc
+Step 3/14 : LABEL org.opencontainers.image.source="https://github.com/aburan28/crypto"       org.opencontainers.image.revision="${SOURCE_REVISION}"
+ ---> Running in bed18f7979fc
+ ---> Removed intermediate container bed18f7979fc
+ ---> eaf9e54bbf7d
+Step 4/14 : COPY ecbench /usr/local/bin/ecbench
+ ---> 2c080c3d0f53
+Step 5/14 : COPY isolab-fresh-owner /usr/local/bin/isolab-fresh-owner
+ ---> 1177998fc04d
+Step 6/14 : COPY smoke-prime.json /opt/isolab/specs/smoke-prime.json
+ ---> 14639e39b1c7
+Step 7/14 : COPY build-info.json /opt/isolab/build-info.json
+ ---> fac79e379edd
+Step 8/14 : ENV HOME=/work
+ ---> Running in 04409b860fa8
+ ---> Removed intermediate container 04409b860fa8
+ ---> f39975434b47
+Step 9/14 : WORKDIR /work
+ ---> Running in 405bebe32840
+ ---> Removed intermediate container 405bebe32840
+ ---> bc4db395d7b0
+Step 10/14 : USER 1000:1000
+ ---> Running in 370ea31dc763
+ ---> Removed intermediate container 370ea31dc763
+ ---> f400e75a27ad
+Step 11/14 : ENTRYPOINT []
+ ---> Running in 2b0339f7ba3a
+ ---> Removed intermediate container 2b0339f7ba3a
+ ---> 087f51dd7861
+Step 12/14 : CMD ["/usr/local/bin/ecbench", "--help"]
+ ---> Running in 7eefa9f367df
+ ---> Removed intermediate container 7eefa9f367df
+ ---> d9b47b608d6e
+Step 13/14 : LABEL isolab.local-assembly.owner=467e8502-46d8-4ab9-a13b-8d2375dd2ca2
+ ---> Running in 3eaa8f5ed888
+ ---> Removed intermediate container 3eaa8f5ed888
+ ---> b5b3ef81f27b
+Step 14/14 : LABEL isolab.local-assembly.phase=base
+ ---> Running in 9dd369489922
+ ---> Removed intermediate container 9dd369489922
+ ---> 347667d6ecc9
+Successfully built 347667d6ecc9
+Successfully tagged pencil-local-base:467e8502-46d8-4ab9-a13b-8d2375dd2ca2

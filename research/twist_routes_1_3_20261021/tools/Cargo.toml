@@ -1,0 +1,13 @@
+[package]
+name = "twist-route-preflight"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Independent small verifier: do not build the complete cryptanalysis library.
+[workspace]
+
+[dependencies]
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.145"
+hex = "=0.4.3"

@@ -1,0 +1,47 @@
+{
+  "schema": "software.independent-runtime-admission-review/v1",
+  "decision": "approve",
+  "scope": "one-private-runtime-qualification",
+  "independent": true,
+  "reviewer": "/root/assembler_independent_review_v2",
+  "execution_allowance_approved": true,
+  "inputs_sha256": "f432cfeea4cadf7c42917b9772bcdd1348ec6eabaa8c3baadc3594ce01bb617f",
+  "reservation_sha256": "4539d4e1c6e955755fa30bede53ead80f8d0b0626af454ae52b1ca928c0990bd",
+  "qualification_binding_sha256": "8f58834253bfb9f397f2d772e82b44dd07e572632885483dc32ef68832c172c5",
+  "qualifier_binding_sha256": "e20751122b78bbeb26b50dcbb179b15a5703d7d09aed61f9d58107251b71ace7",
+  "source_sha256": "c8d1dc9342bcb483e2b1f2aaf4592bdd1eaf29111793cf9c1ce587e75ca0eb4e",
+  "source_commit": "abe17a6c4490931063238b3bb95b6285a7cd4d44",
+  "derived_predecessor_sha256": "d57eacf6a0b9b87ab858adc5f7006f1c431d110db41d913fdab83e2602dbdd07",
+  "technical_review_sha256": "d81e35162a91a14f6af5db761814bff7b1dd99f14775d3355f87969ef1fb1b4d",
+  "closure_receipt_sha256": "6e88277949e0319d12ae0b13018d6dc99f92e9138cf3ace664a4a797b4493de6",
+  "scope_limits": {
+    "attempts": 1,
+    "wall_seconds": 300,
+    "cpu_seconds_ceiling": 600,
+    "memory_bytes": 2147483648,
+    "retained_disk_bytes": 4294967296,
+    "conservative_worker_debit_seconds": 600,
+    "campaign_remaining_seconds": 23400,
+    "attempt_usd": "1.00",
+    "shared_and_attempt_reservations_usd": "57.00",
+    "estimated_unreserved_usd": "11.87",
+    "deadline": "2026-11-04T06:00:00Z"
+  },
+  "findings": [
+    "All11 tools, four qualifier sources,33 fixture manifest members and exact file set, runtime member manifest, curl, gate/control/review hashes freshly verified.",
+    "Staged gate mode0555; fixture mount directory0555 and24files0444.",
+    "Final inner binding admits only qualification and binds prior technical review without circular final-input digest.",
+    "Original failed launcher preserved; derived predecessor binds completed assembly worker and independently accepted read-only stopped disposition; no disk rehash performed by reviewer.",
+    "Worker rehashes retained disk before mounting; no build is included in qualification branch.",
+    "Reservation arithmetic and scoped cost estimate retain earlier assembly charge and55USDshared estimate; estimated headroom is not guaranteed current funds."
+  ],
+  "conditions": [
+    "Publish exact final inputs/source/review/launch command and retain revision receipt before dispatch.",
+    "Root operator launches only this one qualification attempt; no scientific cohort, extra paid launch or automatic retry.",
+    "Reconcile any newly known competing commitment, owner-state change or input change before dispatch.",
+    "Preserve failures/uncertain cleanup; require stopped unit/cgroup and detached loop readback to report completion.",
+    "Storage remains allocated only through absolute deadline; later use/disposition requires separate reviewed accounting."
+  ],
+  "runtime_executed_by_reviewer": false,
+  "advisory_familiarity": "Reviewer supplied prior source findings, did not author supervisor/qualifier implementation."
+}

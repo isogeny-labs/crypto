@@ -15,28 +15,31 @@
 //!   (`If-None-Match: *`) with a SHA-256 that S3 itself checks.
 
 use std::fs;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 
 use base64::Engine;
 
 use super::index::validate_sha256;
+use crate::hash::sha256::Sha256;
 
 /// What the remote reports about an object without downloading it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Meta {
     pub bytes: u64,
     /// The object's SHA-256 when the backend knows it: S3's stored checksum,
-    /// the digest recorded in a multipart object's metadata, or the key of a
-    /// [`DirBackend`] object.
+    /// the digest recorded in a multipart object's metadata, or the hash of a
+    /// [`DirBackend`] object's bytes.
     pub sha256: Option<String>,
 }
 
 pub trait Backend {
     fn describe(&self) -> String;
     fn head(&self, key: &str) -> Result<Option<Meta>, String>;
-    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<(), String>;
+    /// Returns true when this call created the object, false when a
+    /// concurrent writer created verified identical bytes first.
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String>;
     fn get(&self, key: &str, dest: &Path) -> Result<(), String>;
     /// Keys under a prefix, with sizes.
     fn list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String>;
@@ -154,18 +157,61 @@ impl Backend for DirBackend {
     fn head(&self, key: &str) -> Result<Option<Meta>, String> {
         let path = self.path(key)?;
         match fs::metadata(&path) {
-            Ok(m) if m.is_file() => Ok(Some(Meta {
-                bytes: m.len(),
-                sha256: key.rsplit('/').next().map(str::to_string),
-            })),
+            Ok(m) if m.is_file() => {
+                let (sha256, bytes) = super::hash_file(&path)?;
+                Ok(Some(Meta {
+                    bytes,
+                    sha256: Some(sha256),
+                }))
+            }
             Ok(_) => Err(format!("{} is not a file", path.display())),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
             Err(e) => Err(format!("{}: {e}", path.display())),
         }
     }
 
-    fn put(&self, key: &str, src: &Path, _sha256: &str) -> Result<(), String> {
-        copy_into(src, &self.path(key)?)
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String> {
+        let dest = self.path(key)?;
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
+        }
+        let tmp = dest.with_extension(format!(
+            "upload-{}-{}",
+            std::process::id(),
+            rand::random::<u64>()
+        ));
+        let result = (|| {
+            let mut input = fs::File::open(src).map_err(|e| format!("{}: {e}", src.display()))?;
+            let mut output = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&tmp)
+                .map_err(|e| format!("{}: {e}", tmp.display()))?;
+            std::io::copy(&mut input, &mut output).map_err(|e| format!("copy: {e}"))?;
+            output
+                .sync_all()
+                .map_err(|e| format!("{}: {e}", tmp.display()))?;
+            let (actual, bytes) = super::hash_file(&tmp)?;
+            if actual != sha256 {
+                return Err("source file changed during artifact upload".into());
+            }
+            match fs::hard_link(&tmp, &dest) {
+                Ok(()) => Ok(true),
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                    let (present, present_bytes) = super::hash_file(&dest)?;
+                    if present == sha256 && present_bytes == bytes {
+                        Ok(false)
+                    } else {
+                        Err(format!(
+                            "{key}: another object holds this content-addressed key"
+                        ))
+                    }
+                }
+                Err(e) => Err(format!("{}: {e}", dest.display())),
+            }
+        })();
+        let _ = fs::remove_file(&tmp);
+        result
     }
 
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
@@ -212,6 +258,10 @@ impl Backend for DirBackend {
 
 /// Largest object sent as one `put-object` (S3 allows 5 GiB; stay under it).
 pub const SINGLE_PUT_MAX: u64 = 4 << 30;
+const MIN_MULTIPART_PART: u64 = 5 << 20;
+const DEFAULT_MULTIPART_PART: u64 = 64 << 20;
+const MAX_MULTIPART_PART: u64 = 5 << 30;
+const MAX_MULTIPART_PARTS: u64 = 10_000;
 
 pub fn hex_to_b64(hex_digest: &str) -> Result<String, String> {
     validate_sha256(hex_digest)?;
@@ -311,22 +361,222 @@ impl S3Backend {
         Ok(a)
     }
 
-    /// A multipart upload for objects past the single-PUT limit. S3 cannot
-    /// check a whole-object SHA-256 across parts, so the digest travels as
-    /// user metadata and the download is hashed.
-    pub fn put_multipart_args(&self, key: &str, src: &Path, sha256_hex: &str) -> Vec<String> {
+    /// Initiate an upload whose parts are checked by S3. The full-file digest
+    /// is also carried in metadata for later HEAD and download checks.
+    pub fn create_multipart_args(&self, key: &str, sha256_hex: &str) -> Vec<String> {
         let mut a: Vec<String> = vec![
-            "s3".into(),
-            "cp".into(),
-            src.display().to_string(),
-            self.uri(key),
+            "s3api".into(),
+            "create-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
             "--metadata".into(),
             format!("sha256={sha256_hex}"),
-            "--no-progress".into(),
-            "--only-show-errors".into(),
+            "--checksum-algorithm".into(),
+            "SHA256".into(),
+            "--checksum-type".into(),
+            "COMPOSITE".into(),
+            "--output".into(),
+            "json".into(),
         ];
         a.extend(self.endpoint_args());
         a
+    }
+
+    pub fn upload_part_args(
+        &self,
+        key: &str,
+        upload_id: &str,
+        number: u64,
+        src: &Path,
+        checksum: &str,
+    ) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "upload-part".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+            "--part-number".into(),
+            number.to_string(),
+            "--body".into(),
+            src.display().to_string(),
+            "--checksum-sha256".into(),
+            checksum.into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    pub fn complete_multipart_args(
+        &self,
+        key: &str,
+        upload_id: &str,
+        parts: &serde_json::Value,
+    ) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "complete-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+            "--multipart-upload".into(),
+            parts.to_string(),
+            "--if-none-match".into(),
+            "*".into(),
+            "--checksum-type".into(),
+            "COMPOSITE".into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    pub fn abort_multipart_args(&self, key: &str, upload_id: &str) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "abort-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    fn put_multipart(
+        &self,
+        key: &str,
+        src: &Path,
+        sha256: &str,
+        len: u64,
+        part_size: u64,
+    ) -> Result<bool, String> {
+        if !(MIN_MULTIPART_PART..=MAX_MULTIPART_PART).contains(&part_size)
+            || len.div_ceil(part_size) > MAX_MULTIPART_PARTS
+        {
+            return Err("invalid multipart part size or too many parts".into());
+        }
+        let created = self.run(&self.create_multipart_args(key, sha256))?;
+        if !created.status.success() {
+            return Err(self.failure("create-multipart-upload", &created));
+        }
+        let create_json: serde_json::Value = serde_json::from_slice(&created.stdout)
+            .map_err(|e| format!("create-multipart-upload output: {e}"))?;
+        let upload_id = create_json
+            .get("UploadId")
+            .and_then(|v| v.as_str())
+            .ok_or("create-multipart-upload returned no UploadId")?;
+        let outcome = (|| {
+            let mut source = fs::File::open(src).map_err(|e| format!("{}: {e}", src.display()))?;
+            let mut full_hash = Sha256::new();
+            let mut uploaded = 0u64;
+            let mut parts = Vec::new();
+            let mut buffer = vec![0u8; 1 << 20];
+            while uploaded < len {
+                let number = parts.len() as u64 + 1;
+                let part_path = std::env::temp_dir().join(format!(
+                    "crypto-store-multipart-{}-{}",
+                    std::process::id(),
+                    rand::random::<u64>()
+                ));
+                let mut part = fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&part_path)
+                    .map_err(|e| format!("{}: {e}", part_path.display()))?;
+                let mut part_hash = Sha256::new();
+                let mut remaining = part_size.min(len - uploaded);
+                let write_result = (|| -> Result<(), String> {
+                    while remaining > 0 {
+                        let chunk_len = remaining.min(buffer.len() as u64) as usize;
+                        let n = source
+                            .read(&mut buffer[..chunk_len])
+                            .map_err(|e| format!("{}: {e}", src.display()))?;
+                        if n == 0 {
+                            return Err("source file shortened during multipart upload".into());
+                        }
+                        part.write_all(&buffer[..n])
+                            .map_err(|e| format!("{}: {e}", part_path.display()))?;
+                        full_hash.update(&buffer[..n]);
+                        part_hash.update(&buffer[..n]);
+                        uploaded += n as u64;
+                        remaining -= n as u64;
+                    }
+                    Ok(())
+                })();
+                drop(part);
+                if let Err(e) = write_result {
+                    let _ = fs::remove_file(&part_path);
+                    return Err(e);
+                }
+                let checksum =
+                    base64::engine::general_purpose::STANDARD.encode(part_hash.finalize());
+                let response =
+                    self.run(&self.upload_part_args(key, upload_id, number, &part_path, &checksum));
+                let _ = fs::remove_file(&part_path);
+                let response = response?;
+                if !response.status.success() {
+                    return Err(self.failure("upload-part", &response));
+                }
+                let reply: serde_json::Value = serde_json::from_slice(&response.stdout)
+                    .map_err(|e| format!("upload-part output: {e}"))?;
+                let etag = reply
+                    .get("ETag")
+                    .and_then(|v| v.as_str())
+                    .ok_or("upload-part returned no ETag")?;
+                if reply.get("ChecksumSHA256").and_then(|v| v.as_str()) != Some(&checksum) {
+                    return Err(format!(
+                        "upload-part {number} returned a different SHA-256 checksum"
+                    ));
+                }
+                parts.push(serde_json::json!({
+                    "PartNumber": number, "ETag": etag, "ChecksumSHA256": checksum
+                }));
+            }
+            if source.read(&mut buffer[..1]).map_err(|e| e.to_string())? != 0
+                || hex::encode(full_hash.finalize()) != sha256
+            {
+                return Err("source file changed during multipart upload".into());
+            }
+            let manifest = serde_json::json!({"Parts": parts});
+            let completed = self.run(&self.complete_multipart_args(key, upload_id, &manifest))?;
+            if !completed.status.success() {
+                let stderr = String::from_utf8_lossy(&completed.stderr);
+                if stderr.contains("PreconditionFailed")
+                    || stderr.contains("ConditionalRequestConflict")
+                {
+                    let _ = self.run(&self.abort_multipart_args(key, upload_id));
+                    return match self.head(key)? {
+                        Some(m) if m.bytes == len && m.sha256.as_deref() == Some(sha256) => {
+                            Ok(false)
+                        }
+                        _ => Err(format!(
+                            "{key}: another object holds this content-addressed key"
+                        )),
+                    };
+                }
+                return Err(self.failure("complete-multipart-upload", &completed));
+            }
+            Ok(true)
+        })();
+        if outcome.is_err() {
+            let _ = self.run(&self.abort_multipart_args(key, upload_id));
+        }
+        outcome
     }
 
     pub fn get_args(&self, key: &str, dest: &Path) -> Vec<String> {
@@ -426,15 +676,32 @@ pub fn parse_head(stdout: &[u8]) -> Result<Meta, String> {
         .get("ContentLength")
         .and_then(|n| n.as_u64())
         .ok_or("head-object output has no ContentLength")?;
-    // A single-PUT object carries S3's own SHA-256; a multipart one carries
-    // the digest we put in its metadata.
-    let sha256 = match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
-        Some(b64) => Some(b64_to_hex(b64)?),
-        None => v
-            .get("Metadata")
-            .and_then(|m| m.get("sha256"))
-            .and_then(|s| s.as_str())
-            .map(str::to_string),
+    // A multipart SHA-256 checksum may be composite rather than the digest
+    // of the object's bytes. Our multipart path records that full digest in
+    // user metadata. A single PUT uses S3's direct checksum.
+    let metadata_sha256 = v
+        .get("Metadata")
+        .and_then(|m| m.get("sha256"))
+        .and_then(|s| s.as_str())
+        .map(str::to_string);
+    let sha256 = if v.get("ChecksumType").and_then(|s| s.as_str()) == Some("COMPOSITE") {
+        metadata_sha256
+    } else {
+        match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
+            Some(b64) => {
+                let direct = b64_to_hex(b64)?;
+                if metadata_sha256
+                    .as_ref()
+                    .is_some_and(|stored| stored != &direct)
+                {
+                    return Err(
+                        "head-object direct checksum disagrees with SHA-256 metadata".into(),
+                    );
+                }
+                Some(direct)
+            }
+            None => metadata_sha256,
+        }
     };
     Ok(Meta { bytes, sha256 })
 }
@@ -539,17 +806,45 @@ impl Backend for S3Backend {
         Err(msg)
     }
 
-    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<(), String> {
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String> {
         let len = fs::metadata(src)
             .map_err(|e| format!("{}: {e}", src.display()))?
             .len();
-        if len > SINGLE_PUT_MAX {
-            let out = self.run(&self.put_multipart_args(key, src, sha256))?;
-            return if out.status.success() {
-                Ok(())
-            } else {
-                Err(self.failure("s3 cp (multipart upload)", &out))
+        let threshold = match std::env::var("CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES") {
+            Ok(v) => {
+                let parsed = v
+                    .parse::<u64>()
+                    .map_err(|_| "invalid CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES")?;
+                if !(MIN_MULTIPART_PART..=SINGLE_PUT_MAX).contains(&parsed) {
+                    return Err(
+                        "CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES must be between 5 MiB and 4 GiB"
+                            .into(),
+                    );
+                }
+                parsed
+            }
+            Err(std::env::VarError::NotPresent) => SINGLE_PUT_MAX,
+            Err(e) => return Err(format!("CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES: {e}")),
+        };
+        if len > threshold {
+            let minimum_part_size = DEFAULT_MULTIPART_PART.max(len.div_ceil(MAX_MULTIPART_PARTS));
+            let part_size = match std::env::var("CRYPTO_STORE_MULTIPART_PART_BYTES") {
+                Ok(v) => {
+                    let parsed = v
+                        .parse::<u64>()
+                        .map_err(|_| "invalid CRYPTO_STORE_MULTIPART_PART_BYTES")?;
+                    if !(MIN_MULTIPART_PART..=MAX_MULTIPART_PART).contains(&parsed) {
+                        return Err(
+                            "CRYPTO_STORE_MULTIPART_PART_BYTES must be between 5 MiB and 5 GiB"
+                                .into(),
+                        );
+                    }
+                    parsed
+                }
+                Err(std::env::VarError::NotPresent) => minimum_part_size,
+                Err(e) => return Err(format!("CRYPTO_STORE_MULTIPART_PART_BYTES: {e}")),
             };
+            return self.put_multipart(key, src, sha256, len, part_size);
         }
         let out = self.run(&self.put_object_args(key, src, sha256)?)?;
         if !out.status.success() {
@@ -558,11 +853,7 @@ impl Backend for S3Backend {
                 // Someone stored this key first. Content addressing makes
                 // that fine only if what is there is what we meant to store.
                 return match self.head(key)? {
-                    Some(m)
-                        if m.bytes == len && m.sha256.as_deref().is_none_or(|s| s == sha256) =>
-                    {
-                        Ok(())
-                    }
+                    Some(m) if m.bytes == len && m.sha256.as_deref() == Some(sha256) => Ok(false),
                     _ => Err(format!(
                         "{key}: an object with a different size or digest already holds this key"
                     )),
@@ -579,7 +870,7 @@ impl Backend for S3Backend {
                 reply.get("ChecksumSHA256")
             ));
         }
-        Ok(())
+        Ok(true)
     }
 
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
@@ -715,20 +1006,38 @@ mod tests {
                 "http://localhost:9000"
             ]
         );
+        let create = b.create_multipart_args(&key, D);
         assert_eq!(
-            b.put_multipart_args(&key, Path::new("/tmp/f"), D),
+            &create[..6],
             [
-                "s3",
-                "cp",
-                "/tmp/f",
-                &format!("s3://bkt/{full}"),
-                "--metadata",
-                &format!("sha256={D}"),
-                "--no-progress",
-                "--only-show-errors",
-                "--endpoint-url",
-                "http://localhost:9000"
+                "s3api",
+                "create-multipart-upload",
+                "--bucket",
+                "bkt",
+                "--key",
+                &full
             ]
+        );
+        assert!(create
+            .windows(2)
+            .any(|w| w == ["--metadata", &format!("sha256={D}")]));
+        assert!(create
+            .windows(2)
+            .any(|w| w == ["--checksum-type", "COMPOSITE"]));
+        let part = b.upload_part_args(&key, "upload-1", 2, Path::new("/tmp/f"), "checksum");
+        assert!(part.windows(2).any(|w| w == ["--part-number", "2"]));
+        assert!(part
+            .windows(2)
+            .any(|w| w == ["--checksum-sha256", "checksum"]));
+        let complete =
+            b.complete_multipart_args(&key, "upload-1", &serde_json::json!({"Parts": []}));
+        assert!(complete.windows(2).any(|w| w == ["--if-none-match", "*"]));
+        assert!(complete
+            .windows(2)
+            .any(|w| w == ["--checksum-type", "COMPOSITE"]));
+        assert_eq!(
+            b.abort_multipart_args(&key, "upload-1")[1],
+            "abort-multipart-upload"
         );
         assert_eq!(
             b.get_args(&key, Path::new("/tmp/g"))[2],
@@ -765,6 +1074,24 @@ mod tests {
         .unwrap();
         assert_eq!(c.sha256.as_deref(), Some(D));
         assert!(parse_head(br#"{"ContentLength": 9, "ChecksumSHA256": "AAAA"}"#).is_err());
+        let composite = parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "COMPOSITE", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{D}"}}}}"#,
+                hex_to_b64(&"00".repeat(32)).unwrap()
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+        assert_eq!(composite.sha256.as_deref(), Some(D));
+        assert!(parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "FULL_OBJECT", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{}"}}}}"#,
+                hex_to_b64(D).unwrap(),
+                "00".repeat(32)
+            )
+            .as_bytes()
+        )
+        .is_err());
 
         let l = parse_list(
             br#"{"Contents":[{"Key":"p/sha256/ab/x","Size":3},{"Key":"p/sha256/aa/y","Size":5}]}"#,
@@ -810,10 +1137,15 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         fs::write(&src, b"hello").unwrap();
         let b = DirBackend::new(root.join("remote"));
-        let key = object_key(D).unwrap();
+        let digest = hex::encode(crate::hash::sha256::sha256(b"hello"));
+        let key = object_key(&digest).unwrap();
         assert_eq!(b.head(&key).unwrap(), None);
-        b.put(&key, &src, D).unwrap();
+        assert!(b.put(&key, &src, &digest).unwrap());
+        assert!(!b.put(&key, &src, &digest).unwrap());
         assert_eq!(b.head(&key).unwrap().unwrap().bytes, 5);
+        fs::write(&src, b"other").unwrap();
+        assert!(b.put(&key, &src, &digest).is_err());
+        assert_eq!(fs::read(b.path(&key).unwrap()).unwrap(), b"hello");
         let dest = root.join("out/dest.bin");
         b.get(&key, &dest).unwrap();
         assert_eq!(fs::read(&dest).unwrap(), b"hello");

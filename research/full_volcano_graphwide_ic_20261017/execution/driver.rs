@@ -251,6 +251,8 @@ fn replay_exhausted(session: &Path, out: &Path) -> Result<bool> {
             continue;
         }
         let input = ChildInput {
+            diagnostics: None,
+            diagnostic_lifecycle: None,
             schema: CHILD_INPUT_SCHEMA.into(),
             curve: r.workload.curve_spec.clone(),
             target_seed: r.workload.target_seed,

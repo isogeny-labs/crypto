@@ -1,0 +1,3 @@
+# Read-only publication custody audit
+
+Scope: followup-continuation-v2 and canonical integration/lean/same-support in the named pencil worktree only. Root may append packets concurrently. Snapshot included custody maps and their hashes at audit start; report later additions as pending rather than absent failures. Verify every included mapped path's exact bytes/hash, account for explicit artifactstore pointer representations, compare canonical Lean against reviewed producer copies, inspect README/index link targets and pending-test wording. List oversized publication files without altering/storing them. No root edits, builds, cloud or broad repository scans.

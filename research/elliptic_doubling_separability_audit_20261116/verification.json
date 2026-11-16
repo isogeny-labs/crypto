@@ -1,0 +1,109 @@
+{
+  "schema": "doubling-separability-verification/v1",
+  "source_commit": "1eecf47e2010f9fde617f95b51b30f59dd54a187",
+  "claim_id": "PCC-20261116-378474",
+  "declaration_sha256": "46ef1ebeb0b158a4824b639bf9fefbfad41b64d9133ca854497b33de5c145a0d",
+  "all_source_and_artifact_pins_match": true,
+  "preservation_entries": 7237,
+  "initial_plans": 55,
+  "formal_source_files": 282,
+  "artifact_pins": 19,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-378474",
+    "claim_sha256": "32dc234fce1f5fda3a0030b7705567ccee03f2ea9b1cadf21836cfeeb6711a55",
+    "commit": "1eecf47e2010f9fde617f95b51b30f59dd54a187",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/elliptic_doubling_separability_audit_20261116/lean (DoublingSeparableCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T18:36:58Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-378474",
+    "claim_sha256": "32dc234fce1f5fda3a0030b7705567ccee03f2ea9b1cadf21836cfeeb6711a55",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "known_source_theorem": true,
+  "Scheme_isogeny_API_comparison": false,
+  "corrected_general_factorization_proved": false,
+  "assurance": {
+    "schema": "doubling-separability-preflight/v1",
+    "build_snapshots": 5,
+    "failed_states": [
+      "01",
+      "02",
+      "03"
+    ],
+    "successful_states": [
+      "04",
+      "05"
+    ],
+    "published_preservation_entries": 7191,
+    "additional_dependency_entries": 46,
+    "all_checked_entries": 7237,
+    "frozen_plans": 55,
+    "manifest_packages": 28,
+    "copied_import_modules": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "registered_roots_from01": true,
+    "actual_minpoly_degree_divides_full_degree": true,
+    "actual_irreducible_expand_alternative": true,
+    "generic_characteristic_not_dividing_degree_separability": true,
+    "actual_doubling_all_fields_two_nonzero_separable": true,
+    "actual_binary_coordinates_x_four_y_four_plus_one": true,
+    "actual_binary_doubling_Frobenius_square_negation_identity": true,
+    "actual_binary_fourth_power_preimages": true,
+    "actual_binary_image_purely_inseparable": true,
+    "actual_binary_image_nonseparable": true,
+    "explicit_wrong_unconditional_separability_reading_negation": true,
+    "actual_ternary_and_rational_separable_controls": true,
+    "actual_identity_image_separable": true,
+    "actual_binary_degree_four_geometric_kernel_one": true,
+    "all_general_characteristic_two_models_classified": false,
+    "general_n_degree_n_squared_proved": false,
+    "general_multiplication_separability_proved": false,
+    "corrected_general_factorization_proved": false,
+    "general_Weil_nondegeneracy_proved": false,
+    "Scheme_isogeny_API_comparison": false,
+    "geometric_kernels_not_scheme_kernels": true,
+    "novelty_claim": false,
+    "primary_current_complete_page179_read_before_protocol": true,
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "native_experiments": 0,
+    "gate_declarations": 22,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_source_modules": 222,
+    "actually_imported_custom_modules": 204,
+    "actually_imported_frozen_modules": 198,
+    "additional_frozen_pinned_modules": 18,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "new_source_warnings": 0
+  }
+}

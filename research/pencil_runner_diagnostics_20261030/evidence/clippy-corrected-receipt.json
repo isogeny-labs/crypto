@@ -1,0 +1,13 @@
+{
+  "schema": "software-lint-receipt/v1",
+  "task": "T-933",
+  "recorded_at": "2026-10-30T16:10:35.953807+00:00",
+  "command": "cargo clippy --offline --lib -- -D warnings",
+  "exit_code": 0,
+  "diagnostics_source_sha256": "fdb4cc2f301d2daac004891de07f7a78d2ef3847decb4bc872b53c7fab9877ca",
+  "logs_sha256": {
+    "root-clippy-corrected.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "root-clippy-corrected.stderr": "bc3f88792e2cb7157c5c9115c7f0a9a1052df3c322f566eaf5ad16755a7904c3"
+  },
+  "subsequent_change": "only numeric JSON seed rejection assertion in existing cfg(test) fixture; root final merged-tree tests pending"
+}

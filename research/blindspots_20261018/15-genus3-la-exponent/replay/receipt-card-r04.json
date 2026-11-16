@@ -1,0 +1,500 @@
+{
+  "card_id": "CARD-BLINDSPOT-15-R04",
+  "card_path": "research/blindspots_20261018/15-genus3-la-exponent/replay/card-r04.yaml",
+  "card_sha256": "990ae874232cb3311dc3aef25ad02c3c9a73fb8b05978d37cbb13cceb3603dd9",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "research/blindspots_20261018/instruments/blindspots_15_genus3_la.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 15.571,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 15.571,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "--bits",
+        "19",
+        "--curve",
+        "0",
+        "--kappa",
+        "1.4348",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8,lpsgebw2!1@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 124.77,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b19-c0-r2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl": "0314f3abd0e47a2bdd4500465d83a8e1eb1926c6a27cb71f74c7b4a72f8982f3"
+      },
+      "seconds": 124.77,
+      "stderr_sha256": "bf1513293c20589065c15c75e5e8e9dd6cf3db9d35770670fb2823e0f899c96d",
+      "stderr_tail": [
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"r2:lpsgebw2@8\",\"correct\":true,\"cost\":5468927027,\"rel_cost\":3322398200,\"la_cost\":2146528827,\"cols\":8609,\"nnz\":131486,\"checks\":1,\"la_wall\":13.4,\"wall\":124.7}",
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"r2:lpsgebw2*\",\"correct\":true,\"cost\":5431881405,\"rel_cost\":3322398200,\"la_cost\":2109483205,\"cols\":7909,\"nnz\":145834,\"checks\":1,\"la_wall\":24.1,\"wall\":124.7}",
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"r2:lpsgebw4x4@8\",\"correct\":true,\"cost\":6493992475,\"rel_cost\":3322398200,\"la_cost\":3171594275,\"cols\":8609,\"nnz\":131486,\"checks\":1,\"la_wall\":19.9,\"wall\":124.7}",
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"r2:lpsgebl4@8\",\"correct\":true,\"cost\":7144375881,\"rel_cost\":3322398200,\"la_cost\":3821977681,\"cols\":8609,\"nnz\":131486,\"checks\":1,\"la_wall\":21.8,\"wall\":124.7}",
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"r2:lpsgebw2!1@8\",\"correct\":true,\"cost\":5468927027,\"rel_cost\":3322398200,\"la_cost\":2146528827,\"cols\":8609,\"nnz\":131486,\"checks\":1,\"la_wall\":15.3,\"wall\":124.7}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "--bits",
+        "19",
+        "--curve",
+        "0",
+        "--kappa",
+        "1.4348",
+        "--cx",
+        "8",
+        "--streams",
+        "aa",
+        "--las",
+        "lpsgebw2@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_aa.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 42.804,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b19-c0-aa",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_aa.jsonl": "a9d673a20a1cdcf7b4919e5d47cb6acc57b2c676bfa576468443d6258bc8fde1"
+      },
+      "seconds": 42.804,
+      "stderr_sha256": "675b02cc30fc40804161c3d1c9cfdcee7908a796825a99e4c753100f4ed01af5",
+      "stderr_tail": [
+        "{\"bits\":19,\"curve\":0,\"kappa\":1.4348,\"arm\":\"aa:lpsgebw2@8\",\"correct\":true,\"cost\":5475039104,\"rel_cost\":3320509791,\"la_cost\":2154529313,\"cols\":8719,\"nnz\":129566,\"checks\":1,\"la_wall\":13.1,\"wall\":42.7}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "r2:lpsgebw2@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-w2at",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2at.txt": "8b81be226ddcf7c93cc94abc76e7a6dc0d965319f9ae172340dbe29fcede22bc"
+      },
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8b81be226ddcf7c93cc94abc76e7a6dc0d965319f9ae172340dbe29fcede22bc",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=r2:lpsgebw2@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "r2:lpsgebw2*",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-w2star",
+      "index": 6,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2star.txt": "87cd0db9bd45749b3a0044d4d89a6b46e11e7361f549b83d37a786b6decfac51"
+      },
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "87cd0db9bd45749b3a0044d4d89a6b46e11e7361f549b83d37a786b6decfac51",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=r2:lpsgebw2*",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "r2:lpsgebw4x4@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-w4x4at",
+      "index": 7,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w4x4at.txt": "27eea225caaa908270d0a1f4a23516dcb531681e366a388c29c11f183838ebb7"
+      },
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "27eea225caaa908270d0a1f4a23516dcb531681e366a388c29c11f183838ebb7",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=r2:lpsgebw4x4@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "r2:lpsgebl4@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-l4at",
+      "index": 8,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-l4at.txt": "f615bea1825cdc859ee89265df79aed5db745a9a38fd22d3f37df69c87bc4955"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f615bea1825cdc859ee89265df79aed5db745a9a38fd22d3f37df69c87bc4955",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=r2:lpsgebl4@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "r2:lpsgebw2!1@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-w2bang1",
+      "index": 9,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2bang1.txt": "44ad013eeedeffa3525fece1b91680d903f0caae01045bf32e7bcfa602a6a062"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "44ad013eeedeffa3525fece1b91680d903f0caae01045bf32e7bcfa602a6a062",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=r2:lpsgebw2!1@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15",
+        "gate",
+        "aa:lpsgebw2@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_aa.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_aa.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-r04-aa",
+      "index": 10,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-aa.txt": "e2708d3d88d1d16498d85b02339ba843f72cf11cd83580b71cfbaa9af20852ae"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e2708d3d88d1d16498d85b02339ba843f72cf11cd83580b71cfbaa9af20852ae",
+      "stdout_tail": [
+        "GATE MATCH bits=19 curve=0 arm=aa:lpsgebw2@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04/b15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 12,
+  "commit": "658e4a102539ac245150c5e771ae7fc9cfc5125a",
+  "dirty_after": [
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c0_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c0_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c1_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c1_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c2_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c2_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b18_c3_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/b19_c0_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r03/b15",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r02.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r02.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r03.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r03.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r04.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r04.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-aa.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-l1at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-l4at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-l4star.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-w2at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-w2bang1.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-w2star.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-w4x4at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r02-w4x4star.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-aa.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-l4at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2bang1.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w2star.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/gate-r04-w4x4at.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r02-b18_c0_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r02-b18_c0_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r02-b18_c1_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r02-b18_c1_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r03-b18_c2_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r03-b18_c2_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r03-b18_c3_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r04-b19_c0_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/r04-b19_c0_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/receipt-card-r02.json"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r02/b15",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/bin-r03/b15.blindspots_15_genus3_la.eeb60fe1643f8f40-cgu.0.rcgu.o",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r02.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/replay/build-r02.stdout.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

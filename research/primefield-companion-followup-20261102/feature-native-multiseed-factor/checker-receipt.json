@@ -1,0 +1,45 @@
+{
+  "recorded_at": "2026-11-05T19:54:04.196496+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-multiseed-factor/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-multiseed-factor-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-multiseed-factor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-multiseed-factor/characters.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "packet_sha256": "6c6daecaee2791543e81cceedda2d580d8bf3a706df55c355a5249a05ae439de"
+    },
+    {
+      "step": "negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-multiseed-factor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-multiseed-factor/negative-characters.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "688004c40031eeb4912af6a0c092736fa5ca0e2faa78b6823aeab2b2a31f60a5"
+    }
+  ],
+  "binary_sha256": "970729595906bdaea3af30fb35481081fd1784ff09cf8bf61d954c2ff20f281a",
+  "source_sha256": "bd6711d96644a9405fdddc70d86a4cd2c94ba1d5cc20de61b954921e13764b92",
+  "transport_imports": 0,
+  "frozen_scalar_source_import": true,
+  "negative_control": "changed one finite numerator; expected raw-ratio rejection"
+}
