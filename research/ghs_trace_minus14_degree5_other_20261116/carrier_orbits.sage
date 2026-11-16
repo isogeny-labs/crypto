@@ -25,7 +25,7 @@ for mask,wanted in expected.items():
         transformed=sum(f[i]*(aa*x+bb)^i*(cc*x+dd)^(12-i)
                         for i in range(12))
         if transformed.degree()!=11 or transformed[11]!=1:continue
-        target=sum(int(transformed[i])*3^i for i in range(11))
+        target=int(sum(int(transformed[i])*3^i for i in range(11)))
         assert transformed==x^11+sum(F3((target//(3^i))%3)*x^i
                                       for i in range(11))
         maps.setdefault(target,list(key))
