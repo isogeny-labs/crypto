@@ -32,10 +32,10 @@ engines with the same seed, target source, max trials, factor base and matrix;
 check both recovered scalars and full group verification, and record trial,
 target-bearing relation and phase counters. If the initial targets or table
 keys differ, classify the comparison invalid. Any failed control blocks a
-performance interpretation.
+performance interpretation. [pcc:unverified]
 
 No local wall ratio, relation-count difference, or isolated subroutine gain is
-an end-to-end speed claim. A quantitative speed claim requires a separate
+an end-to-end speed claim. [pcc:unverified] A quantitative speed claim requires a separate
 same-host frozen comparison, strongest available rho control, complete phase
 costs, independent validation and a passing `claims/*.json` PCC record.
 
