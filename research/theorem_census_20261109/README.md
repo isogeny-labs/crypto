@@ -391,6 +391,178 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual elliptic tame-symbol proof](../elliptic_tame_symbol_audit_20261115/README.md)
+now constructs the classical signed local symbol using the actual general
+Weierstrass function field/local orders/regular-ring unit character. Actual
+balanced local orders cancel; both multiplicative laws/skew/diagonal/local
+Steinberg hold in every characteristic. Actual translation constructs order1
+parameters at every actual point of every nonsingular model over every field;
+formula/independence for every actual order1 parameter is proved. Finite
+multiplicative support is derived before finprod. Actual disjoint principal
+supports give exact proper f(div g)/g(div f), with both actual guards; product1
+iff equality of the two evaluations is proved as an equivalence, not asserted
+for arbitrary functions. Exact coefficient-field constant/diagonal degree
+formulas and geometric degreezero product1 are derived.
+
+On credited actual F5 y²=x³+1, parameter/constant2 distinguish classical and
+corrected Milnor inverse conventions; actual simple poles f+g=1 have signed1
+but unsigned−1≠1. Actual x−1 has no rational finite zero/divisor−2O, giving
+actual rational-point-only product4≠1 with constant2. Same actual scalar-
+extended curve/functions have geometric product1. Actual nonsingular F2
+simple poles have signed/unsigned1. Author-hosted Gille–Szamuely first-edition
+errata p6 already corrects p187line4 inverse error; credit authors, no novelty
+or qualified-source refutation. Full general norm projection/ramification/P1
+reduction/global reciprocity/arbitrary divisor representatives/multiplication-
+isogeny comparison/general geometric descent/canonical Tate/general MOV-FR
+and remaining fourteen-item obligations remain open.
+
+Exact local **PCC-20261115-2d7887 PASS at 2026-11-16T00:02:27Z**, signedunverified. Wholegate71/0failures/
+0trusted-native/10newmodules (9concrete/1officialimportbridge);232formal17artifact
+249pins/187pinnedcustom/169actuallyimported (159credited frozen+10new).
+All238Auxiliarypins beforeafter14states and gate;9failed/5successes retained,
+including actual default recursion failure08 symmetric simp, fixed by directed
+congruence without raised limits. Exact current roots from01/0copies0hydration/
+23packages/no lakeupdate. Final14newwarnings0/39frozen inherited per build/one
+auditor deprecation. Full2194header SHA3880274ed056ca85c3f6fc2fac3f727c73fac24b4fc5e1f4e9b9103702625efb,
+native1complete0prefix0unresolved/empty suffix after actual completed gate.
+Lossless306files107objects56608B XZ/roundtrip and actualrestoreequal/fivegate
+files. Firstvalidonepage47201B PDF/all4644textcharsread/individualfullpagevisual/
+inbounds/no reportdraft. Fresh bounded complete primary local proof/stated
+norm-reduction proof/author erratum and official/prior APIs read; earlier norm
+map dependencies not allread.5correctKBcalls/Conductor127/boundedfallback/no
+absence claim; expandedpublicationConductor127beforemaps/outsidepins.
+Same prover/host/procedural binding, no independent compiler/parser/physical-
+host assurance. Standardfoundations/defaultlimits/no holes/customaxioms/native
+proofeval/newflags/waivers/frozenedits/cryptoPython/spend/uploads. [pcc:unverified]
+
+
+The [actual auxiliary Weil proof](../weil_auxiliary_ratio_audit_20261115/README.md)
+now constructs the exact Galbraith26.1 divisor-formula pairing at three and
+proves it equals the inverse of the credited explicit tangent pairing for
+every geometric three-torsion pair. Actual zero, equal, opposite and distinct-x
+branches are all proved. The actual source representatives have derived
+degreezero/disjointness and both required principal-divisor equations; their
+class correction is the actual divisor of1/stepFunction. Both proper evaluation
+domains are derived. Every auxiliary choice and every valid full geometric
+function choice agrees, with no normalization premise.
+
+The underlying actual all-n chosen Miller auxiliary quotient is a nonzero
+coefficient scalar, from actual translation/negation divisor cancellation and
+the credited geometric constant-kernel theorem. Actual local-unit evaluations
+agree and actual admissible points exist, including simultaneous translated
+domains, from quadratic fibers/finite actual divisor support. No reciprocity,
+constancy, auxiliary independence, alternation or point-avoidance premise.
+The actual infinity quotient of a negated y-monic line and another line has
+residue−1; actual square/cube products give diagonal1, same-divisor cancellation
+gives opposite1 and zero-point functions give1. The actual curve equation
+classifies equal-x ordinates. All statements use every algebraically closed
+coefficient field/every nonsingular general model/every characteristic.
+
+The constructed divisor-formula pairing is alternating and has cube1. Both
+bilinear/zero-radical laws have explicit nonzero3 guard. The credited actual
+BinaryClosureF2 curve y²+y=x³+1 has Char2/nonzero3/nonsingular/nontrivialcube
+and source inverse different from tangent/sourcevalue not1: omission of
+inversion is false. The concrete actual AlgebraicClosureF3 ordinary curve
+y²+xy+y=x³ has nonzero discriminant/nonzero radical when coprimality is
+deleted. Actual restriction to a nonzero cyclic torsion line is degenerate.
+Known methods/curves credited; no new population, qualified-source refutation
+or novelty. Multiplication-isogeny definition26.2.2 comparison, arbitrary
+divisor representatives beyond the translated family, general reciprocity,
+general geometric divisor/Picard/Galois descent/canonical Tate/general MOV-FR
+and full14 remain open. The all-n result is auxiliary independence, not a
+complete all-n pairing construction/nondegeneracy theorem.
+
+Exact local **PCC-20261115-004f3b PASS at 2026-11-15T23:22:08Z**, signed standing unverified.
+Final wholetracked/transitive gate101/17newconcrete/0failures/0trusted-native;
+160frozenmodules0copies0hydration/199oldformal/all233oldpins match before-after
+38states/bothgates/22packages/no lakeupdate.219formal19artifact238pins/177custom
+imports; full2925-character headerSHA
+ac22919aa0acb5570a8c11ac17484c04af34ab74b4c4a5f36b45716c783f18dd,
+native1complete0prefix0unresolved/empty suffix after completed finalgate02.
+Lossless935files226objects80192B logicalXZ/two bounded parts64000/16192B/
+roundtrip and actual restore equal/five finalgate files. Firstvalidonepage47591B
+PDF/all5324characters read/individual fullpagevisual/inbounds/no draft.
+24failed states14successes/default200000heartbeat failures retained; exact
+current roots every state from01. Firstgate101PASS had5unused header-name
+warnings; preflight aborted initializer but shell without errexit continued
+staging/gate. Actualeffects recovered before formaledit. Final38 prefixes only
+those names, samehypotheses/proof; newsourcewarnings0/39frozen inherited per
+build/one auditor deprecation. New preparation wrappers use errexit.
+Fresh Galbraithch26PDF1–4/16 printed573–576 fulltext/every individualvisual,
+reciprocity sketch/definition/exact26.1/inversion footnote; referenced complete
+external reciprocity/isogeny equivalence proofs notread/no wholechapter/book.
+Five correct KB calls/Conductor127 before respective routes/code, expanded
+publicationConductor127beforemaps/outsidepins; bounded fallback/noabsence.
+Copyright local/excluded; no regenerablePNG archive. Same host/prover/procedural
+header check, no independent parser/compiler/physical-host assurance. Standard
+foundations/defaultlimits/no holes/customaxioms/nativeproofeval/newglobalflags/
+waivers/frozenedits/cryptoPython/newnativecryptoexperiment/spend/upload.
+[pcc:unverified]
+
+
+The [actual every-field translation proof](../general_translation_audit_20261115/README.md)
+removes the algebraically closed coefficient restriction from the actual
+function-field action and all-point local translation interfaces. For every
+field, every nonsingular general Weierstrass model and every characteristic
+including two and three, actual translated generic x is transcendental,
+coordinate substitution injective, and the actual fraction-field map is a
+coefficient-fixing RingEquiv with composition, identity, explicit negative-point
+inverse and faithfulness. Actual local values/orders/regular-ring isomorphisms
+and residues commute at every point, including infinity. No transcendence,
+injection, inverse, local invariance or ramification premise is supplied.
+
+The actual infinity valuation is trivial on coefficient functions. Exact
+translated x-difference values exp(−1)/exp(−2), with the second derivative
+branch using actual nonsingularity, let the official
+Valuation.transcendental_of_ne_one prove transcendence over the original field.
+Credited norm-product injection and fraction generation derive the action.
+Actual coordinate formulas prove the arbitrary coefficient-field extension
+square. Actual point-evaluation/localization/full-field/residue diagrams,
+chosen-uniformizer preservation and actual unit/DVR factorization prove
+normalized finite-point basechange. Credited infinity basechange completes
+every-point image normalization. Actual AC comparison in the proof gives
+every-field local translation, with no AC assumption on the conclusion.
+Actual coefficient-extension regular-ring injection and residue diagram are
+also derived. These extension statements concern images of actual K-rational
+points, not all closed places or geometric divisor descent.
+
+Actual K-rational point divisors satisfy D(φ_Qf)=pushforward(−Q)D(f), with
+support-disjointness iff and guarded evaluation transport. Actual nonsingular
+F2 y²+y=x³ and credited F3 y²=x³+x+1 have constructed nonzero points and
+nonidentity function-field translations. The credited source formula
+x↦1/x,y↦−y/x² now holds over every valid coefficient field; actual F5 affine
+coordinate-ring preservation fails. The credited F3 numerator x²+1 has actual
+rational-only divisor degree −4, preserved under every translation. Thus
+rational-point transport does not imply geometric degree zero. Known methods
+and controls credited; no new population, qualified-source refutation or novelty.
+
+Exact local **PCC-20261115-833af1 PASS at 2026-11-15T22:06:27Z**, signed standing unverified.
+Whole tracked/transitive gate92/twelve concrete modules/zero failures or
+trusted-native exemptions.105 frozen imports/zero copies/117 old formal files/
+all134 predecessor pins match before-after11states and gate.132formal17artifact
+149pins/117customimports; full3968-character header SHA
+1b948fe2fb1c6a1af59ef94db55340d8d15f3080d15f149ee4d80771b2161168,
+native1complete/0prefix/0unresolved/empty suffix after completed gate.
+Lossless259files/91objects/40432B XZ/roundtrip equal/five gate files.
+First valid onepage47541B PDF/all5013characters read/individual full-page
+visual/inbounds. Four failed01/03/06/07/seven successful states retained;
+exact source/root coverage asserted every state from01; final/source warnings0,
+one frozen auditor deprecation. Fresh Galbraithch7PDF6–9 printed128–131 and
+ch9PDF3–4 printed167–168 fulltext/each page visual. Lemma7.3.6 is an exercise,
+its proof not read/no whole chapter or Scheme-proof claim. Official valuation,
+actual norm/Point.map/local DVR proofs read/reused; relative algebraic closure
+reviewed alternative not selected. Copyright files local/excluded. Five correct
+KB calls/Conductor127 before code; expanded publication Conductor127 before
+maps/outside pins, bounded fallback/no absence claim. Same host/prover/procedural
+written-header check, no independent parser/compiler/physical-host assurance.
+No holes/custom axioms/native proof evaluation/raised limits/new global flags/
+waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload.
+
+Separate Scheme/line-bundle comparison, general geometric divisor/Picard/Galois
+descent, reciprocity, isogeny/Lang/Jacobian and canonical Weil–Tate/MOV–FR remain
+open. The fourteen-item request remains active. [pcc:unverified]
+
+
 The [actual local translation proof](../local_translation_audit_20261115/README.md)
 closes the all-local compatibility gap left by the actual function-field
 translation construction. For every nonsingular general Weierstrass model
