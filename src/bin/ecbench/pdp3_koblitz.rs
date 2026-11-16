@@ -498,17 +498,17 @@ fn verified_collision_rows(
         if g.is_identity(&current) || g.is_identity(&first) || current.x != first.x {
             return Err("pair-table collision has unequal or infinite sums".into());
         }
-        let indices = if current == first {
-            [i, j, fb.neg_index[fi], fb.neg_index[fj]]
+        let (indices, check_rhs) = if current == first {
+            ([i, j, fb.neg_index[fi], fb.neg_index[fj]], g.neg(first))
         } else if current == g.neg(first) {
-            [i, j, fi, fj]
+            ([i, j, fi, fj], first)
         } else {
             return Err("pair-table collision has unresolved sum sign".into());
         };
-        let mut check = fb.points[indices[0]];
-        for &index in &indices[1..] {
-            check = g.add(ops, check, fb.points[index]);
-        }
+        // Both pair sums were independently recomputed above. Reuse them for
+        // the complete four-point identity rather than re-adding the same
+        // four base points from scratch.
+        let check = g.add(ops, current, check_rhs);
         if !g.is_identity(&check) {
             return Err("pair-table collision failed full group verification".into());
         }
@@ -1532,9 +1532,10 @@ mod engine_names {
             let mut ops = GroupOps::default();
             let (rows, zero) =
                 verified_collision_rows(&group, &fb, inst.r, &collisions, &mut ops).unwrap();
+            assert_eq!(ops.adds, 3 * collisions.len() as u64);
             assert_eq!(zero, 0);
             assert_eq!(rows.len(), expected_candidates);
-            assert_eq!(ops.adds, 5 * expected_candidates as u64);
+            assert_eq!(ops.adds, 3 * expected_candidates as u64);
             let mut matrix = IncrementalGauss::new(fb.columns + 1, inst.r);
             for mut row in rows {
                 row.push(0);
@@ -1621,6 +1622,10 @@ mod engine_names {
         );
         assert_eq!(new.decomposition.setup.get("collision_candidates"), 27);
         assert_eq!(new.linear_algebra.cost.get("setup_seed_independent"), 5);
+        assert_eq!(
+            new.decomposition.setup.group_ops.adds,
+            old.decomposition.setup.group_ops.adds + 3 * 27
+        );
         assert!(new.decomposition.targets_tried <= old.decomposition.targets_tried);
         eprintln!(
             "old trials={} target_rows={} rank={} setup_adds={} total_gae={}; harvest trials={} target_rows={} rank={} setup_adds={} total_gae={} seed_rank={}",
