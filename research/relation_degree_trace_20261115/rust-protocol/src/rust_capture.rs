@@ -30,6 +30,12 @@ pub(super) struct Paths {
     root_both: PathBuf,
     #[serde(default)]
     m31: Option<PathBuf>,
+    #[serde(default)]
+    export_both: Option<PathBuf>,
+    #[serde(default)]
+    export_final: Option<PathBuf>,
+    #[serde(default)]
+    export_rust_only: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -85,6 +91,15 @@ fn selected_for(cases: &[Value], routes: &[&str]) -> Value {
             continue;
         };
         let candidate = &samples[routes.len() - 1];
+        if routes.last() == Some(&"root-export-rust-only")
+            && [16, 17, 18].into_iter().zip([2, 1, 0]).any(|(i, count)| {
+                samples[i]["answer"]["completion_exports"] != count
+                    || samples[i]["answer"]["root_api"] != true
+                    || samples[i]["answer"]["native_product_criterion"] != true
+            })
+        {
+            continue;
+        }
         if candidate["used_recovery"] != false
             || candidate["answer"]["constructor"]["subset_succeeded"] != true
             || candidate["answer"]["root_api"] != true
@@ -109,22 +124,45 @@ fn selected_for(cases: &[Value], routes: &[&str]) -> Value {
     chosen
 }
 pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
-    run_impl(prepared, out, config, false)
+    run_impl(prepared, out, config, 0)
 }
 pub(super) fn run_m31(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
-    run_impl(prepared, out, config, true)
+    run_impl(prepared, out, config, 1)
 }
-fn run_impl(prepared: &Path, out: &Path, config: &Path, m31: bool) -> Result<()> {
+pub(super) fn run_export(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, 2)
+}
+fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
-    if m31 != paths.m31.is_some() {
-        return Err("M31 path must appear only in the new sixteen-workflow mode".into());
+    let m31 = mode >= 1;
+    let exports = mode == 2;
+    if m31 != paths.m31.is_some()
+        || [
+            &paths.export_both,
+            &paths.export_final,
+            &paths.export_rust_only,
+        ]
+        .into_iter()
+        .any(|p| p.is_some() != exports)
+    {
+        return Err("exact optional paths required for15/16/19-workflow modes".into());
     }
     let mut routes = ROUTES.to_vec();
     let mut replay_routes = paths.replay_routes().to_vec();
     if let Some(exe) = &paths.m31 {
         routes.push("root-sparse-m31");
         replay_routes.push((exe.as_path(), "compact-sparse"));
+    }
+    for (name, exe) in [
+        ("root-export-both", &paths.export_both),
+        ("root-export-final", &paths.export_final),
+        ("root-export-rust-only", &paths.export_rust_only),
+    ] {
+        if let Some(exe) = exe {
+            routes.push(name);
+            replay_routes.push((exe.as_path(), "compact-sparse"));
+        }
     }
     let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
     let qualification = manifest["mode"] == "qualification";
@@ -160,11 +198,20 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, m31: bool) -> Result<()>
     if let Some(path) = &paths.m31 {
         identities.insert("m31".into(), json!({"path":path,"sha256":file_hash(path)?}));
     }
+    for (name, path) in [
+        ("export_both", &paths.export_both),
+        ("export_final", &paths.export_final),
+        ("export_rust_only", &paths.export_rust_only),
+    ] {
+        if let Some(path) = path {
+            identities.insert(name.into(), json!({"path":path,"sha256":file_hash(path)?}));
+        }
+    }
     fs::create_dir(out)?;
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -317,7 +364,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, m31: bool) -> Result<()>
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -362,6 +409,46 @@ mod tests {
         assert!(selected_for(&[json!({"id":"under15","samples":bad})], &routes).is_null());
         assert!(comparisons_for(&rows[..15], &routes).is_none());
         assert!(comparisons_for(&rows, &ROUTES).is_none());
+    }
+    #[test]
+    fn export_admission_keeps_m31_and_requires_all_three_actual_modes() {
+        let mut routes = ROUTES.to_vec();
+        routes.extend([
+            "root-sparse-m31",
+            "root-export-both",
+            "root-export-final",
+            "root-export-rust-only",
+        ]);
+        let mut rows = complete();
+        rows[14]["paid_wall_ns"] = json!(20);
+        for (i, name) in routes.iter().enumerate().skip(15) {
+            let mut row = rows[14].clone();
+            row["pipeline"] = json!(name);
+            row["paid_wall_ns"] = json!(if i == 18 { 1 } else { 20 });
+            if i >= 16 {
+                row["answer"]["completion_exports"] = json!(18 - i);
+            }
+            rows.push(row);
+        }
+        assert_eq!(comparisons_for(&rows, &routes).unwrap().len(), 18);
+        assert_eq!(
+            selected_for(&[json!({"id":"export","samples":rows})], &routes),
+            json!("export")
+        );
+        for (index, key) in [
+            (16, "completion_exports"),
+            (17, "completion_exports"),
+            (18, "completion_exports"),
+            (18, "root_api"),
+        ] {
+            let mut bad = rows.clone();
+            bad[index]["answer"][key] = Value::Null;
+            assert!(selected_for(&[json!({"id":"wrong-mode","samples":bad})], &routes).is_null());
+        }
+        let mut bad = rows.clone();
+        bad[15]["paid_wall_ns"] = json!(1);
+        assert!(selected_for(&[json!({"id":"tie-m31","samples":bad})], &routes).is_null());
+        assert!(comparisons_for(&rows[..18], &routes).is_none());
     }
     fn complete() -> Vec<Value> {
         ROUTES.iter().enumerate().map(|(i,p)|json!({"pipeline":p,"status":"complete","paid_wall_ns":if i==14{1}else{20},"basis_sha256":"a".repeat(64),"used_recovery":false,"answer":{"root_api":true,"native_product_criterion":true,"consumer":{"kind":"separate-rust-arithmetic"},"constructor":{"subset_succeeded":true}}})).collect()
@@ -411,6 +498,9 @@ mod tests {
             root_native: "01".into(),
             root_both: "11".into(),
             m31: None,
+            export_both: None,
+            export_final: None,
+            export_rust_only: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),

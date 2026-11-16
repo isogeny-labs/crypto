@@ -48,7 +48,7 @@ repeat its unchanged entire corpus in place of qualifying the new composition.
 Correctness clocks provide no speed result.
 
 A new prospective paid roster must preserve all16 prior controls and append
-single-export ablation plus Rust-only candidate, with old M31 as a measured
+a matched newly compiled two-export worker, single-export ablation and Rust-only candidate, with old M31 as a measured
 control. Same complete answers, preparation, exact checking, paid failures and
 caps. Freeze/publish complete source/protocol/qualification before any call.
 Only separately registered paired tests can confirm a screen; no fresh seeds

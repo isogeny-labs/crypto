@@ -124,6 +124,59 @@ pub struct NativeWitness {
 /// Opt-in native pair-verification optimization, keeping witness completion and
 /// its validation unchanged. The external consumer is a separate caller choice.
 pub fn produce_native_product(system: &System, kind: &str) -> Result<NativeWitness, String> {
+    native_product_impl(system, kind, CompletionExports::Both)
+}
+/// Native-owned rows only: omit the preliminary discarded text export, retaining
+/// the final structural export. Constructor and consumer obligations are unchanged.
+pub fn produce_native_single_export(system: &System, kind: &str) -> Result<NativeWitness, String> {
+    native_product_impl(system, kind, CompletionExports::Final)
+}
+/// Unaccepted serialized evidence. This type contains no checked basis and must
+/// pass a complete arithmetic consumer before any answer is exposed.
+#[must_use = "An unverified native wire requires complete arithmetic replay"]
+pub struct UnverifiedNativeWire {
+    wire: Vec<u8>,
+    constructor: serde_json::Value,
+}
+impl UnverifiedNativeWire {
+    /// Transfer proof bytes and diagnostic metadata, never an accepted basis.
+    pub fn into_parts(self) -> (Vec<u8>, serde_json::Value) {
+        (self.wire, self.constructor)
+    }
+}
+/// Complete native-owned, constructor-verified rows without rendering unused CAS
+/// text. The p31 Rust consumer must validate the entire serialized proof; this
+/// function does not accept imported rows or perform that final acceptance.
+pub fn produce_native_for_rust(
+    system: &System,
+    kind: &str,
+) -> Result<UnverifiedNativeWire, String> {
+    if system.prime != 2147483647 {
+        return Err("native Rust wire: consumer requires p2147483647".into());
+    }
+    let produced = native_product_impl(system, kind, CompletionExports::RustConsumer)?;
+    let wire = serde_json::to_vec(&produced.witness).map_err(|e| e.to_string())?;
+    if wire.len() > 16 * 1024 * 1024 {
+        return Err("native Rust wire: serialized proof byte cap".into());
+    }
+    Ok(UnverifiedNativeWire {
+        wire,
+        constructor: produced.constructor,
+    })
+}
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum CompletionExports {
+    Both,
+    Final,
+    RustConsumer,
+}
+// Only this private native factory may select Final/RustConsumer. Every branch
+// obtains its rows from a constructor with its complete native checks intact.
+fn native_product_impl(
+    system: &System,
+    kind: &str,
+    exports: CompletionExports,
+) -> Result<NativeWitness, String> {
     let input = system.decode()?;
     let n = system.variables.len();
     let p = system.prime;
@@ -151,10 +204,12 @@ pub fn produce_native_product(system: &System, kind: &str) -> Result<NativeWitne
         }
         _ => return Err("native product constructor kind".into()),
     };
-    let witness = complete_product(
+    let witness = complete_impl(
         system,
         certificate.definitions.iter().map(member).collect(),
         certificate.basis.iter().map(member).collect(),
+        true,
+        exports,
     )?;
     Ok(NativeWitness {
         witness,
@@ -178,6 +233,7 @@ fn produce_impl(system: &System, compact: bool, product: bool) -> Result<Witness
         certificate.definitions.iter().map(member).collect(),
         certificate.basis.iter().map(member).collect(),
         product,
+        CompletionExports::Both,
     )
 }
 /// Complete witnesses for independently produced membership rows. No supplied
@@ -187,7 +243,7 @@ pub fn complete(
     definitions: Vec<Member>,
     basis: Vec<Member>,
 ) -> Result<Witness, String> {
-    complete_impl(system, definitions, basis, false)
+    complete_impl(system, definitions, basis, false, CompletionExports::Both)
 }
 /// Opt-in completion for mature producers; product-criterion acceptance is
 /// checked by the same consumer used for locally constructed witnesses.
@@ -196,13 +252,14 @@ pub fn complete_product(
     definitions: Vec<Member>,
     basis: Vec<Member>,
 ) -> Result<Witness, String> {
-    complete_impl(system, definitions, basis, true)
+    complete_impl(system, definitions, basis, true, CompletionExports::Both)
 }
 fn complete_impl(
     system: &System,
     definitions: Vec<Member>,
     basis: Vec<Member>,
     product: bool,
+    exports: CompletionExports,
 ) -> Result<Witness, String> {
     let n = system.variables.len();
     let p = system.prime;
@@ -234,7 +291,9 @@ fn complete_impl(
     };
     // Validate untrusted imported rows before division. Empty placeholders are
     // not acceptance witnesses and this intermediate script is never executed.
-    singular_script(system, &witness)?;
+    if exports == CompletionExports::Both {
+        singular_script(system, &witness)?;
+    }
     let polynomials = witness
         .basis
         .iter()
@@ -258,7 +317,9 @@ fn complete_impl(
         let target = s_polynomial(&reducers[row.left], &reducers[row.right], p).poly;
         row.proof = quotient_witness(target, &reducers, p)?;
     }
-    singular_script(system, &witness)?;
+    if exports != CompletionExports::RustConsumer {
+        singular_script(system, &witness)?;
+    }
     Ok(witness)
 }
 fn checked_monomial(m: &Mono, n: usize) -> Option<usize> {
@@ -517,6 +578,39 @@ pub fn singular_script(system: &System, witness: &Witness) -> Result<String, Str
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn native_completion_variants_preserve_exact_wire_bytes() {
+        for n in [3, quotient::MAX_VARIABLES] {
+            let edges: Vec<_> = (1..n).map(|i| (0, i)).collect();
+            #[cfg(feature = "scale-screen")]
+            let system = workload::generate_scale_graph(2147483647, n, 7, &edges)
+                .unwrap()
+                .system;
+            #[cfg(not(feature = "scale-screen"))]
+            let system = workload::generate_graph(2147483647, n, 7, &edges)
+                .unwrap()
+                .system;
+            for kind in ["compact", "expanded", "compact-sparse"] {
+                let old = produce_native_product(&system, kind).unwrap();
+                let single = produce_native_single_export(&system, kind).unwrap();
+                let (wire, metadata) = produce_native_for_rust(&system, kind).unwrap().into_parts();
+                let expected = serde_json::to_vec(&old.witness).unwrap();
+                assert_eq!(serde_json::to_vec(&single.witness).unwrap(), expected);
+                assert_eq!(wire, expected);
+                assert_eq!(metadata, old.constructor);
+                assert_eq!(single.constructor, old.constructor);
+            }
+        }
+    }
+    #[test]
+    fn unverified_native_wire_rejects_unsupported_consumer_scope() {
+        let wide = workload::generate(9007199254740881, 3, 7).unwrap().system;
+        assert!(produce_native_for_rust(&wide, "compact").is_err());
+        let small = workload::generate(2147483647, 2, 7).unwrap().system;
+        assert!(produce_native_for_rust(&small, "compact").is_err());
+        let system = workload::generate(2147483647, 3, 7).unwrap().system;
+        assert!(produce_native_for_rust(&system, "imported").is_err());
+    }
     #[test]
     fn opt_in_native_product_verification_keeps_complete_original_ideals() {
         for n in [3, 6] {

@@ -28,6 +28,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     run(true, true)
 }
 pub(crate) fn run(native_product: bool, rust_consumer: bool) -> Result<(), Box<dyn Error>> {
+    run_with_exports(native_product, rust_consumer, 2)
+}
+#[allow(dead_code)] // Called by the two explicit variant wrapper binaries.
+pub(crate) fn run_completion_variant(exports: usize) -> Result<(), Box<dyn Error>> {
+    run_with_exports(true, true, exports)
+}
+fn run_with_exports(
+    native_product: bool,
+    rust_consumer: bool,
+    exports: usize,
+) -> Result<(), Box<dyn Error>> {
+    if exports > 2 || (exports < 2 && (!native_product || !rust_consumer)) {
+        return Err("completion variants require native product and full Rust consumer".into());
+    }
     let a: Vec<_> = std::env::args().collect();
     if a.len() == 4 && a[1] == "verify" {
         let checked = verify_replay_certificate_json(
@@ -44,33 +58,47 @@ pub(crate) fn run(native_product: bool, rust_consumer: bool) -> Result<(), Box<d
     let system: System = serde_json::from_slice(&original)?;
     let out = Path::new(&a[5]);
     fs::create_dir(out)?;
-    let (witness, constructor) = if native_product {
-        let produced = replay::produce_native_product(&system, &a[2])?;
-        (produced.witness, produced.constructor)
-    } else if a[2] == "compact-sparse" {
-        let produced = replay::produce_sparse(&system)?;
-        (
-            produced.witness,
-            json!({"info":produced.constructor,"subset_succeeded":produced.subset_succeeded,"subset_error":produced.subset_error}),
-        )
-    } else if a[2] == "compact" || a[2] == "expanded" {
-        (
-            replay::produce_product(&system, a[2] == "compact")?,
-            serde_json::Value::Null,
-        )
+    let (wire, constructor, witness) = if exports == 0 {
+        // Opaque pending evidence, not an accepted basis. Retain bytes and invoke
+        // the actual root checker below before any basis reaches the answer.
+        let (wire, constructor) = replay::produce_native_for_rust(&system, &a[2])?.into_parts();
+        (wire, constructor, None)
     } else {
-        return Err("unknown native constructor".into());
+        let (witness, constructor) = if native_product {
+            let produced = if exports == 1 {
+                replay::produce_native_single_export(&system, &a[2])?
+            } else {
+                replay::produce_native_product(&system, &a[2])?
+            };
+            (produced.witness, produced.constructor)
+        } else if a[2] == "compact-sparse" {
+            let produced = replay::produce_sparse(&system)?;
+            (
+                produced.witness,
+                json!({"info":produced.constructor,"subset_succeeded":produced.subset_succeeded,"subset_error":produced.subset_error}),
+            )
+        } else if a[2] == "compact" || a[2] == "expanded" {
+            (
+                replay::produce_product(&system, a[2] == "compact")?,
+                serde_json::Value::Null,
+            )
+        } else {
+            return Err("unknown native constructor".into());
+        };
+        (serde_json::to_vec(&witness)?, constructor, Some(witness))
     };
-    let wire = serde_json::to_vec(&witness)?;
     save(&out.join("witness.json"), &wire)?;
     let (basis, stats) = if rust_consumer {
         let checked = verify_replay_certificate_json(&original, &wire)?;
         (checked.basis, serde_json::to_value(checked.stats)?)
     } else {
+        let witness = witness
+            .as_ref()
+            .ok_or("CAS checker requires exported witness")?;
         let script = out.join("check.sing");
         save(
             &script,
-            replay::singular_script(&system, &witness)?.as_bytes(),
+            replay::singular_script(&system, witness)?.as_bytes(),
         )?;
         let stdout = out.join("check.stdout");
         let stderr = out.join("check.stderr");
@@ -116,7 +144,7 @@ pub(crate) fn run(native_product: bool, rust_consumer: bool) -> Result<(), Box<d
             serde_json::Value::Null,
         )
     };
-    let answer = json!({"basis":basis,"constructor":constructor,"consumer":{"kind":if rust_consumer{"separate-rust-arithmetic"}else{"singular-identity"},"stats":stats},"native_product_criterion":native_product,"root_api":rust_consumer,"validation":"native root adapter, exact consumer selected; unsigned"});
+    let answer = json!({"basis":basis,"constructor":constructor,"consumer":{"kind":if rust_consumer{"separate-rust-arithmetic"}else{"singular-identity"},"stats":stats},"native_product_criterion":native_product,"root_api":rust_consumer,"completion_exports":exports,"validation":"native root adapter, exact consumer selected; unsigned"});
     save(&out.join("answer.json"), &serde_json::to_vec(&answer)?)?;
     println!("{}", serde_json::to_string(&answer)?);
     Ok(())

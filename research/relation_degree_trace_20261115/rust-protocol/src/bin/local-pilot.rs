@@ -772,6 +772,7 @@ fn main() -> Result<()> {
     Some("phase-render")if a.len()==4=>phase_capture::render(Path::new(&a[2]),Path::new(&a[3])),
     Some("rust-screen")if a.len()==5=>rust_capture::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("m31-screen")if a.len()==5=>rust_capture::run_m31(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("export-screen")if a.len()==5=>rust_capture::run_export(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("root-paired")if a.len()==5=>root_paired::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }

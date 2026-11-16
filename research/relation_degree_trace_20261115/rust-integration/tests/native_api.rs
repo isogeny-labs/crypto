@@ -2,6 +2,36 @@
 use certified_relations as algebra;
 use crypto_lib::cryptanalysis::f4_fp::{self, certified::*, normalise, F4Options, Ordering, Poly};
 #[test]
+fn pending_native_wire_needs_complete_root_replay_and_rejects_changed_proof() {
+    let system = algebra::workload::generate(2147483647, 3, 7)
+        .unwrap()
+        .system;
+    let input = serde_json::to_vec(&system).unwrap();
+    for kind in ["compact", "expanded", "compact-sparse"] {
+        let full = algebra::replay::produce_native_product(&system, kind).unwrap();
+        let single = algebra::replay::produce_native_single_export(&system, kind).unwrap();
+        let (pending, _) = algebra::replay::produce_native_for_rust(&system, kind)
+            .unwrap()
+            .into_parts();
+        let expected = serde_json::to_vec(&full.witness).unwrap();
+        assert_eq!(pending, expected);
+        assert_eq!(serde_json::to_vec(&single.witness).unwrap(), expected);
+        let accepted = verify_replay_certificate_json(&input, &pending).unwrap();
+        let reference = verify_replay_certificate_json(&input, &expected).unwrap();
+        assert_eq!(accepted.basis, reference.basis);
+        let mut changed: serde_json::Value = serde_json::from_slice(&pending).unwrap();
+        changed["basis"][0]["proof"] = serde_json::json!([]);
+        assert!(
+            verify_replay_certificate_json(&input, &serde_json::to_vec(&changed).unwrap()).is_err()
+        );
+        let mut changed: serde_json::Value = serde_json::from_slice(&pending).unwrap();
+        changed["pair_reductions"].as_array_mut().unwrap().pop();
+        assert!(
+            verify_replay_certificate_json(&input, &serde_json::to_vec(&changed).unwrap()).is_err()
+        );
+    }
+}
+#[test]
 fn separate_replay_public_api_checks_complete_basis_and_changed_identity() {
     let system = algebra::workload::generate(2147483647, 3, 7)
         .unwrap()
