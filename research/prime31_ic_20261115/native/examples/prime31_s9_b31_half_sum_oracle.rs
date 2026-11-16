@@ -152,7 +152,8 @@ impl FourSet {
     // A negative is certified by an exhaustive sweep over distinct 4A.
     fn recover(&self, ar: &mut Arithmetic, pts: &[Point], q: Point) -> (Option<Word8>, usize) {
         for (i, &left) in self.ordered.iter().enumerate() {
-            let missing = ar.add(PRIME31, q, ar.neg(PRIME31, left));
+            let opposite_left = ar.neg(PRIME31, left);
+            let missing = ar.add(PRIME31, q, opposite_left);
             if let Some(&right) = self.index.get(&missing) {
                 let w = self.index.get(&left).expect("index/list invariant");
                 let witness = [
