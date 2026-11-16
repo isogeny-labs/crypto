@@ -1,3 +1,54 @@
+# Resume: crypto @ claude/fastest-grobner-base-algorithm-u74ipw (Gröbner solver shootout, 2026-11-16)
+
+## Goal
+User (2026-11-16, via workflow): controlled comparison of Gröbner/algebraic solvers on Weil-descended
+Semaev decomposition systems over GF(2^n), m = 3 and m = 4: msolve F4, Magma F4 (UNAVAILABLE unless a
+licensed binary is reachable; never faked), CryptoMiniSat with native XOR, fixed-schedule F4 replay
+(learn once, apply). Per system: degree reached, largest matrix, wall, peak RSS; cost per relation vs
+matched Pollard rho in the AGENTS.md §5a band (0 / 0.1 / 1 GAE).
+
+## Lead / hypothesis
+No directional hypothesis is decisive. Prior lab work is all [pcc:unverified] (m4gb ladder, gb_cas_comparison,
+sat_pdp_pricing_band, prime-field trace F4). Trace/learn_apply has never been measured on binary m = 3/4.
+
+## Spec
+research/groebner_solver_shootout_20261116/PROTOCOL.md + protocol.json (experiment.protocol/v1,
+GB-SOLVER-SHOOTOUT-20261116, frozen 2026-11-16T16:55:09Z, protocol_sha256
+116b33f754becbd9d7e76cbd80bfff8e323cb79ab0ee0c57481c0616d3d9bfee). grid.tsv (15 cell-variants),
+analyze.py (sha256 0b0eee39...7929, frozen before data). Seeds derive from the protocol hash.
+Instruments: msolve 0.6.5-1build2 (sha256 c2722288...59fa), cryptominisat5 5.11.15 (00db7e59...7207),
+groebner_compare/{semaev,external_worker,semaev_verifier,runner,certificate}.py (hashes in
+protocol.json execution.placement.harness_files_sha256_at_freeze).
+
+## State
+- groebner_compare Semaev generator, msolve/CMS/Magma adapters, verifier, 21 unit tests: written, UNCOMMITTED.
+- Protocol frozen; NOT launched. No main-run data. Preflight (one planted seed-1 instance per cell,
+  shared container, development only): preflight/timings.tsv.
+- Arms UNAVAILABLE at freeze: magma-f4 (no binary/licence), trace-f4 and julia-f4-warm (no Julia; proxy
+  403 on julialang-s3; per-target supports differ).
+
+## Next steps
+1. Commit and push study + groebner_compare changes (record source revision; freeze.commit 66d8635 is the parent).
+2. Implement prerequisites P1-P6 (PROTOCOL.md "Prerequisites") without changing the design; pin hashes.
+3. Fix run gates (P7): valid AWS identity, CHECKPOINT_UPLOAD_TOKEN, gh token, benchrec gate (2 pre-existing failing
+   records), Conductor; owner approval of USD 15 ceiling.
+4. experiment-director writes the isolab-eks command-Job card; executor-mechanical runs it; director assesses.
+5. analyze.py phase 1 blind, then phase 2 with key; research-visuals report; bench.record/v1.
+
+## Runs in flight
+None.
+
+## Stop and success conditions
+Fixed N (15 cells x (1 warm-up + 5 planted + 40 natural) x available arms); 300 CPU-s / 8 GiB per call;
+USD 15, 24 vCPU concurrent. Success = all rows certified and reported per the frozen decision rule,
+including UNAVAILABLE and censored arms; every rho gap reported as distance remaining. Clocks from command
+Jobs are diagnostic tier only (no L2 admission).
+
+## Open questions
+- Whether an L2-admitted path for external solvers (ecbench method) should be a v2 protocol.
+- Whether to provision Julia (network policy) or build a native fixed-schedule replay for trace-f4 (amendment).
+
+# Preserved previous resume (historical task state)
 # Current chord proof task - source only
 ## Goal
 Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
