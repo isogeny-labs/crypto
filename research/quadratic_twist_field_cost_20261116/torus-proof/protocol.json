@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-torus-coordinate-proof-20261116",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-15",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/torus-proof",
@@ -520,7 +520,7 @@
     {
       "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
       "provenance": "retrieved",
-      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+      "claim": "Primary author torus compression/operations and exceptional\u00b11 section read; SNARK inverse cost not native CPU price"
     },
     {
       "ref": "https://doi.org/10.1007/11535218_5",
@@ -530,11 +530,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "f608d728005f2722599b26f7f3a9d0bb888abae3f6dee40c0000c8e7af92a28f",
-    "commit": "30a26ff2d46324796aeb3ea8b707a7469ca30020",
-    "frozen_at": "2026-11-16T03:40:11Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   },
   "extensions": {
     "checkpoint": "Existing authorized samebranch GitHub source/protocol transport; clean source plus fresh connected ref before proof, no S3/skip/raw upload",
@@ -546,13 +546,21 @@
       "membership"
     ],
     "source_sha256": "235cea5f44d2513bb824b96241be6f08377f4f0501b00d1d8168a29b92fd80d1",
-    "environment_inventory_sha256": "ea34f2a336b1ddbe7b2e1d2df3b1fdafb59b907a1cbf7be23cd31784ab5b3ba7",
+    "environment_inventory_sha256": "895f576428ba7b0e4a882dc8ee7d38962e248098172ebdcf44e06218cd92fc8e",
     "controls_manifest": "CONTROL_SOURCES.json",
     "new_proof_execution_before_freeze": false,
     "window": "03:15-04:15UTC,600s stage/max2LOCALworkers",
     "canonical_skill_status": "Encrypted/unreadable, not claimed read; exact-proof-only scope, current available canonical validator pinned outside repository",
     "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
     "prior_result_export_denial_respected": true,
-    "no_performance_or_solver_claim": true
+    "no_performance_or_solver_claim": true,
+    "cache_preflight_attempt": {
+      "source_checkpoint": "9a797849ad27702575c4d8c34f724285d732d5ad",
+      "status": "input-binding-failure-before-Lean",
+      "changed_files": 1,
+      "proof_library_files_unchanged": 40077,
+      "cause": "13to16bytezero-paddingofLakecachetag, allactualproofartifactsbyte-identical",
+      "old_cache_modified": false
+    }
   }
 }

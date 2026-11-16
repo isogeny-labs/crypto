@@ -20,7 +20,7 @@ protocol=json.loads((root/base/'protocol.json').read_text());assert protocol['fr
 subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(root/base/'protocol.json')],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 for p,z in pins['repository_files'].items():assert h(root/p)==z,p
 for p,z in pins['gate_files'].items():assert h(Path(gate)/p)==z,p
-summary=json.loads((root/base/'ENVIRONMENT.json').read_text());assert h(env/'lean-4.34.1-linux/bin/lean')==summary['lean_binary_sha256'];assert h(env/'environment-inventory.json')==summary['inventory_sha256'];inventory=json.loads((env/'environment-inventory.json').read_text())
+summary=json.loads((root/base/'ENVIRONMENT.json').read_text());assert h(env/'lean-4.34.1-linux/bin/lean')==summary['lean_binary_sha256'];assert h(Path(summary['inventory_path']))==summary['inventory_sha256'];inventory=json.loads(Path(summary['inventory_path']).read_text())
 for p,v in inventory['compiled_libraries'].items():assert h(env/'mathlib'/p)==v['sha256'],p
 assert subprocess.check_output(['git','-C',str(env/'mathlib'),'rev-parse','HEAD'],text=True).strip()==summary['mathlib_commit']
 for package in summary['packages']:assert subprocess.check_output(['git','-C',str(env/'mathlib/.lake/packages'/package['name']),'rev-parse','HEAD'],text=True).strip()==package['commit']
