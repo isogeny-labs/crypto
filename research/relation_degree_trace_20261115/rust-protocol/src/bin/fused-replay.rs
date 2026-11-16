@@ -9,6 +9,7 @@ use std::{
     io::Write,
     path::Path,
     process::{Command, Stdio},
+    time::Instant,
 };
 #[path = "../external_certificate.rs"]
 mod external_certificate;
@@ -59,6 +60,12 @@ fn process(exe: &str, args: &[String], out: &Path, label: &str) -> Result<Vec<u8
     Ok(bytes)
 }
 fn main() -> Result<()> {
+    run(false)
+}
+fn elapsed(start: Option<Instant>) -> u64 {
+    start.map_or(0, |s| s.elapsed().as_nanos().min(u64::MAX as u128) as u64)
+}
+pub(crate) fn run(profile: bool) -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     if args.len() != 6 {
         return Err("usage: fused-replay INPUT compact|expanded|compact-sparse|std|slimgb|msolve-lift SINGULAR MSOLVE NEW_OUTPUT".into());
@@ -68,6 +75,7 @@ fn main() -> Result<()> {
     fs::create_dir(out)?;
     let kind = args[2].as_str();
     let mut constructor = serde_json::Value::Null;
+    let produce_start = profile.then(Instant::now);
     let witness = match kind {
         "compact" | "expanded" => replay::produce_product(&system, kind == "compact")?,
         "compact-sparse" => {
@@ -128,12 +136,18 @@ fn main() -> Result<()> {
         }
         _ => return Err("unknown fused producer".into()),
     };
+    let produce_ns = elapsed(produce_start);
+    let wire_start = profile.then(Instant::now);
     save(&out.join("witness.json"), &serde_json::to_vec(&witness)?)?;
+    let wire_ns = elapsed(wire_start);
+    let script_start = profile.then(Instant::now);
     let script = out.join("check.sing");
     save(
         &script,
         replay::singular_script(&system, &witness)?.as_bytes(),
     )?;
+    let script_ns = elapsed(script_start);
+    let check_start = profile.then(Instant::now);
     let checked = process(
         &args[3],
         &["-q".into(), script.display().to_string()],
@@ -143,6 +157,7 @@ fn main() -> Result<()> {
     if std::str::from_utf8(&checked)?.trim() != "CERTIFICATE_REPLAY_OK" {
         return Err("fused replay marker missing/polluted".into());
     }
+    let check_ns = elapsed(check_start);
     let basis: Vec<Vec<_>> = witness
         .basis
         .iter()
@@ -165,7 +180,10 @@ fn main() -> Result<()> {
             .iter()
             .map(|r| r.proof.len())
             .sum::<usize>();
-    let answer = json!({"basis":basis,"constructor":constructor,"explicit_cofactor_terms":terms,"coprime_pairs":witness.pair_reductions.iter().filter(|r|r.product_criterion).count(),"total_pairs":witness.pair_reductions.len(),"validation":"complete exact replay, checked product criterion; unsigned"});
+    let mut answer = json!({"basis":basis,"constructor":constructor,"explicit_cofactor_terms":terms,"coprime_pairs":witness.pair_reductions.iter().filter(|r|r.product_criterion).count(),"total_pairs":witness.pair_reductions.len(),"validation":"complete exact replay, checked product criterion; unsigned"});
+    if profile {
+        answer["profile_ns"] = json!({"construction_and_completion":produce_ns,"wire_write":wire_ns,"script_export_write":script_ns,"checker_process_consumption":check_ns});
+    }
     save(&out.join("answer.json"), &serde_json::to_vec(&answer)?)?;
     println!("{}", serde_json::to_string(&answer)?);
     Ok(())
