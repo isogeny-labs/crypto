@@ -11,11 +11,6 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Binary genus-two CI and security review](binary-genus2-ci-and-security-review.md) | open | merging the maintained full-subgroup publication | complete dependency checkout, repaired shared base CI, actual current-head passing checks and human disposition of alert 456 |
-| [a=0 native genus-two full-solve compute](binary-genus2-a0-full-solve-compute.md) | investigating | completed full-order native-Jacobian timings at r=2417851639230796216685689; a=1 native panel 8/8 verified, a=0 still censored | retained checkpoints, sufficient durable compute or a verified new method, and actual full-target recoveries |
-| [ecbench binary genus-two full-subgroup adapter](ecbench-binary-genus2-full-subgroup-adapter.md) | open | sealed cross-representation n=83 comparison and qualified speed ratio; 24 external resumable completions do not satisfy it | explicit wide subgroup selection, registered Mumford-image adapter, common costs and independent replay |
-| [Binary genus-two geometric formalization](binary-genus2-cover-geometric-formalization.md) | open | full Lean theorem for the explicit cover and Picard injection; native construction is verified | actual projective/function-field and divisor-class definitions, genus/degree and pullback bridge proofs |
-| [JV F4 minimum completed cases](jv-f4-minimum-completed-cases.md) | open | unqualified green whole-library gate on the pinned base | explain omitted cases and pass the full original suite without lowering its thresholds |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
@@ -82,8 +77,6 @@ Keep resolved and superseded records in the index.
 | [Primary N83 prebuilt-base quality for two to four summands](n83-prebuilt-base-quality-m2-m4.md) | open | measured selection of a signed-Frobenius or structured base at m=2, 3 or 4 on the 81-bit subgroup; K=16,627 object and full m=4 model fit under 4 GiB; constructed controls replayed, one unpinned natural query `UNKNOWN_budget` at 1,790 s without OOM | direct-subgroup structured-base census and export, durable natural progress and relation/rank comparison, matched prebuilt versus on-demand and complete cost |
 | [Generalized GPU rho workers for nine Certicom binary challenges](certicom-binary-gpu-rho-integration.md) | open | persistent, independently replayable GPU rho and qualified fastest-arithmetic choices for all nine exact challenges | exact CPU bindings, per-curve GPU replay and durable DP/collision path, then matched device performance gates |
 | [Genus-3 IC-2LP study 04 missing](ic-improve-04-genus3-2lp-study-missing.md) | investigating (04 has since landed on `main`) | pairing 04b's arms against the original IC-2LP arm (same instances, seeds, unit); 04b pairs against a rebuilt baseline instead | the original 04 tool and records at a pinned revision, then a matched baseline comparison |
-| [Conductor-gap Callgrind phase-dump volume](conductor-gap-callgrind-phase-dump-volume.md) | resolved for v2 census | complete instruction census on the archived prime-field pairs | all 100 profiles verified with one solve part; broader hardness remains open |
-| [Prime-field conductor-gap algebraic oracle](prime-field-conductor-gap-algebraic-oracle.md) | open | F4/SAT comparison on the archived large-gap prime-field pairs | native prime-field encoding/oracle, exact witness controls, complete counters and matched audited solves |
 | [p61 selected-class census and adjacency completion](p61-full-isogeny-class-census.md) | investigating | complete selected-class graph and its use as an admitted large-field corpus | exact 358,094,304-vertex ledger, verified selected-degree adjacency, and adequate durable storage |
 | [p61 registered-root terminal closure mismatch](p61-registered-root-terminal-closure.md) | resolved | terminal segment admitted; complete census unblocked | continue external uniqueness and full adjacency accounting |
 | [Full large-volcano class storage and execution](full-volcano-class-storage-and-execution.md) | open | complete fixed five-class datasets and graph-wide multi-method ECDLP/IC measurements | durable full-run storage, complete generation/map replay, and matched ecbench workloads with all requested targets and statistics |
@@ -99,7 +92,9 @@ Keep resolved and superseded records in the index.
 | [Prime-cover projected relation cost](prime-cover-projected-relation-cost-missing.md) | open | reusable rank, blind-target descent, and sub-rho total-work assessment for high-genus prime-field `C_d` covers | independently replayed higher-degree prime pushforward and a complete matched one-target cover/direct-norm/rho cost record |
 | [Catalog-general binary-cover arbitrary-class norm](binary-cover-arbitrary-jacobian-norm-missing.md) | open | pushforward and recovery from arbitrary classes for 160 binary cover maps and their 134 EC1 representations; the separate exact fixed-`GF(8)` fixture is implemented | generalize the checked norm to catalog fields and add independent divisor-map homomorphism/composition controls |
 | [Catalog cover-subgroup certificates](catalog-cover-subgroup-certificates-incomplete.md) | open | proof-grade exact-order, image-order, kernel, and recovery claims for 663 EC1/map bindings beyond the one order-29 certificate | exact source-order proofs and map-bound image/kernel/recovery certificates for every named EC1 representation |
-| [N83 eight-target rho workload contract](n83-eight-target-rho-contract.md) | open | matched8-target batch IC/rho ratio in PR1899 | corrected and frozen worker contract, prospective complete measured and audited cohorts |
+| [Ten-question baseline archive CI gate](ecbench-ten-question-baseline-ci.md) | open | merger of PR1853 while the unchanged m10 file-set assertion is red; reconfirmed on a80, with two separate incoming format failures | version the archive scope contract, verify both archived runs and pass current-head CI/review |
+| [Ten-question original resolution gates](ecbench-ten-question-resolution-gates.md) | open | scalable families/proofs, solving-degree growth, successful exact N83 recovery and full-cost crossover; shape correction and bounded wide execution implemented | discharge each original question's resolution and retain matched, held-out, independent evidence |
+| [Ten-question campaign runner access](ecbench-ten-question-runner-access.md) | open | Conductor reservation, independent L2+ replay and GPU gates for all ten questions | connect the existing authorized tools and runner; retain original specs and fidelity gates |
 | [Catalog cover-subgroup certificates](catalog-cover-subgroup-certificates-incomplete.md) | open | proof-grade exact-order, image-order, kernel and recovery gaps; 4,801 live-catalog maps and 15 EC1 additions lie outside the dated 15,791-map assessment | identity-bound source/order and transfer receipts; explicit new-cohort assessment with unchanged historical scopes |
 | [Root-finding pipeline complete-cost calibration](rootfinding-complete-cost-calibration.md) | open; 2026-10-19 conditional pair-cell evidence added | qualified full-cost or wall-time comparison for the assessed root-finding IC pipeline; 4/8/16-lane, B train/holdout and coverage panels are verified and replayed; a fresh-target equal-prefix component control exists, while native field counts are absent from sealed records and wall data are L0 | serialize and price native work; repeat matched public targets under L2 isolation and on an independent host |
 | [N83 cloud online A/A noise](n83-online-aa-noise.md) | investigating | selecting the exact-root factor-base finalist for the five sealed Tier 1 points after two K2543/root22 controls exceeded 10% | frozen mirrored K3072/K2543 adjacent A/A screen with exact base, relation and scalar replay, then an exact IC1 selection record |
@@ -158,6 +153,28 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
+
+
+
+| [Binary genus-two CI and security review](binary-genus2-ci-and-security-review.md) | open | merging the maintained full-subgroup publication | complete dependency checkout, repaired shared base CI, actual current-head passing checks and human disposition of alert 456 |
+| [a=0 native genus-two full-solve compute](binary-genus2-a0-full-solve-compute.md) | investigating | completed full-order native-Jacobian timings at r=2417851639230796216685689; a=1 native panel 8/8 verified, a=0 still censored | retained checkpoints, sufficient durable compute or a verified new method, and actual full-target recoveries |
+| [ecbench binary genus-two full-subgroup adapter](ecbench-binary-genus2-full-subgroup-adapter.md) | open | sealed cross-representation n=83 comparison and qualified speed ratio; 24 external resumable completions do not satisfy it | explicit wide subgroup selection, registered Mumford-image adapter, common costs and independent replay |
+| [Binary genus-two geometric formalization](binary-genus2-cover-geometric-formalization.md) | open | full Lean theorem for the explicit cover and Picard injection; native construction is verified | actual projective/function-field and divisor-class definitions, genus/degree and pullback bridge proofs |
+| [JV F4 minimum completed cases](jv-f4-minimum-completed-cases.md) | open | unqualified green whole-library gate on the pinned base | explain omitted cases and pass the full original suite without lowering its thresholds |
+
+| [Conductor-gap Callgrind phase-dump volume](conductor-gap-callgrind-phase-dump-volume.md) | resolved for v2 census | complete instruction census on the archived prime-field pairs | all 100 profiles verified with one solve part; broader hardness remains open |
+| [Prime-field conductor-gap algebraic oracle](prime-field-conductor-gap-algebraic-oracle.md) | open | F4/SAT comparison on the archived large-gap prime-field pairs | native prime-field encoding/oracle, exact witness controls, complete counters and matched audited solves |
+| [N83 eight-target rho workload contract](n83-eight-target-rho-contract.md) | open | matched8-target batch IC/rho ratio in PR1899 | corrected and frozen worker contract, prospective complete measured and audited cohorts |
+
+
+
+
+
+
+
+
+
 
 
 
