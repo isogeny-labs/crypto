@@ -204,6 +204,29 @@ fn main() {
         js_small.push(o);
     }
     writeln!(md, "\nA/A band, per-target wall ratio `merged-b` / `merged`:\n\n| l | median | min | max |\n|---|---|---|---|\n{aa_lines}").unwrap();
+    // ADDED AFTER THE MEASURED RUN (deviation 1 in README.md): two counts, no existing number changes.
+    {
+        let mut eq: BTreeMap<String, (u64, u64)> = BTreeMap::new();
+        let mut mc: BTreeMap<(u64, u64), f64> = BTreeMap::new();
+        for r in small.lines().filter(|r| raw(r, "arm").as_deref() == Some("merged")) {
+            mc.insert((num(r, "l").unwrap() as u64, num(r, "x_r").unwrap() as u64), num(r, "conflicts").unwrap());
+        }
+        for r in small.lines() {
+            let arm = raw(r, "arm").unwrap();
+            if !["mw", "del", "leaf", "delleaf", "merged-b"].contains(&arm.as_str()) {
+                continue;
+            }
+            let e = eq.entry(arm).or_default();
+            e.1 += 1;
+            e.0 += (mc.get(&(num(r, "l").unwrap() as u64, num(r, "x_r").unwrap() as u64)) == num(r, "conflicts").as_ref()) as u64;
+        }
+        let s: Vec<String> = eq.iter().map(|(a, (e, t))| format!("{a} {e} of {t}")).collect();
+        writeln!(md, "Conflict count equal to `merged` on ALL targets (decomposable ones included), per arm: {}.\n", s.join("; ")).unwrap();
+        let ku: Vec<&str> = k130.lines().filter(|r| raw(r, "kind").as_deref() == Some("uniform") && raw(r, "arm").map(|a| a.starts_with("solver")) == Some(true)).collect();
+        let learnt = ku.iter().filter(|r| num(r, "learnt_clauses").unwrap_or(0.0) > 0.0).count();
+        let cps = ku.iter().filter_map(|r| num(r, "clause_prop_share")).fold(0.0f64, f64::max);
+        writeln!(md, "ECC2K-130 solver rows on uniform targets: {} rows, {learnt} with a learnt clause; largest clause-propagation share {:.2} %.\n", ku.len(), 100.0 * cps).unwrap();
+    }
     // slopes and decision
     writeln!(md, "## Slopes of log2(solver wall / reference wall) per unit of l (least squares on cell medians)\n").unwrap();
     writeln!(md, "| arm | vs fastleaf, l = 9, 11, 13 | ratio at l = 13 (fastleaf) | vs scan, l = 9..13 | ratio at l = 13 (scan) |\n|---|---|---|---|---|").unwrap();
