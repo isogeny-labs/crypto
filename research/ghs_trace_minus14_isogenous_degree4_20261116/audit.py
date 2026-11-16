@@ -60,7 +60,9 @@ sources = {
 }
 source_hashes = {rep: hashlib.sha256(path.read_bytes()).hexdigest()
                  for rep, path in sources.items()}
+replay_hash = hashlib.sha256((HERE / 'direct_linear_replay.sage').read_bytes()).hexdigest()
 rows = []
+replay_consistent_at_most_four = 0
 for rep in REPS:
     for carrier in CARRIER_MASKS:
         if rep == 11:
@@ -85,6 +87,16 @@ for rep in REPS:
             assert c['assignments'] == count
             assert all(c[k] == 0 for k in ('degree_four_crt', 'coprime_crt',
                                          'polynomial_quotient', 'square_quotient'))
+        linear = json.loads((HERE / f'linear_{rep}_{carrier}.json').read_text())
+        assert linear['schema'] == 'ghs.trace-minus14.degree4-direct-linear-replay/v1'
+        assert linear['source_sha256'] == replay_hash
+        assert (linear['bmask'], linear['fmask']) == (rep, carrier)
+        assert linear['solutions'] == []
+        assert set(linear['counts']) == set(EXPECTED_COUNTS)
+        for kind, count in EXPECTED_COUNTS.items():
+            assert linear['counts'][kind]['assignments'] == count
+            assert linear['counts'][kind]['degree_exactly_four'] == 0
+            replay_consistent_at_most_four += linear['counts'][kind]['consistent_degree_at_most_four']
         rows.append({'bmask': rep, 'fmask': carrier, 'cpu_seconds': r['cpu_seconds']})
 assert len(rows) == 48
 
@@ -97,10 +109,13 @@ assert iso['subgroup_image_order'] == 43 and iso['Q_scalar'] == 7
 
 out = {'schema': 'ghs.trace-minus14.all-source-degree4-audit/v1',
        'carrier_masks': list(CARRIER_MASKS), 'source_orbits': orbits,
-       'source_hashes': source_hashes, 'representative_cells': len(rows),
+       'source_hashes': source_hashes, 'direct_linear_replay_sha256': replay_hash,
+       'representative_cells': len(rows),
        'representative_assignments': len(rows) * 59697,
        'frobenius_extended_pairs': len(CARRIER_MASKS) * 20,
        'degree_four_numerator_candidates': 0, 'exact_hits': 0,
+       'direct_linear_degree_at_most_four': replay_consistent_at_most_four,
+       'direct_linear_degree_four': 0,
        'cpu_seconds_sum': sum(r['cpu_seconds'] for r in rows),
        'two_isogeny_subgroup_image_order': iso['subgroup_image_order']}
 (HERE / 'AUDIT.json').write_text(json.dumps(out, indent=2, sort_keys=True) + '\n')
