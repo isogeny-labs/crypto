@@ -1,5 +1,21 @@
 # Native Vieta / smooth-coset decomposition
 
+The [half-GCD/rational-tower continuation](next-20261116/RESULTS.md) implements
+recursive GCD batching, general homogeneous rational maps, full-fiber certification
+and normalized Vélu maps. Its240-call main panel replayed completely. Half-GCD
+reduces word62/m16384 multiplication counts by a paired factor1.4437 against
+Newton/Euclid, but regresses P224/m2048 and all measured rational cases. See the
+[new report](next-20261116/report.pdf) and separate [degree audit](next-20261116/DEGREE_AUDIT.md).
+Data/theory standing remains unverified [pcc:unverified].
+
+The [16 November continuation](continuation-20261116/RESULTS.md) adds opt-in
+Karatsuba/Newton backends and a matched panel through m16384. The conditioned
+word62/m16384 multiplication-count ratio is2.1469 against schoolbook; Newton
+division did not engage in the successful study queries. See the
+[report](continuation-20261116/report.pdf) and the conditional hand extension
+to [split rational towers](continuation-20261116/SPLIT_TOWER_BOUND.md).
+All observations and hand arguments remain [pcc:unverified].
+
 The Rust port merged in [PR 4340](https://github.com/isogeny-labs/crypto/pull/4340).
 The authorized local scale matrix is complete: see [RESULTS.md](RESULTS.md), the
 [scale report](reports/local-scale/report.pdf), and the proposed

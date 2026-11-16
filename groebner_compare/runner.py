@@ -14,7 +14,13 @@ import subprocess
 import sys
 import time
 
-from .certificate import Rank, certify, terms, vanishes
+from .certificate import Rank, basis_roots, certify, terms, vanishes
+
+# Above this bound the exhaustive zeros-and-staircase certificate is not run;
+# a manifest must opt into "witness-replay" (roots replayed on the inputs).
+EXHAUSTIVE_MAX_VARS = 12
+WITNESS_MAX_VARS = 128
+SOLVER_OPERATIONS = ("solve", "learn", "apply", "fallback")
 
 
 def encoded(value):
@@ -30,11 +36,16 @@ def validate(manifest):
         raise ValueError("expected manifest schema 1")
     ring = manifest["ring"]
     n = ring["nvars"]
-    if (type(n) is not int or not 1 <= n <= 12 or ring.get("field") != "GF(2)"
+    mode = manifest.get("certificate", "exhaustive")
+    if mode not in ("exhaustive", "witness-replay"):
+        raise ValueError("certificate must be exhaustive or witness-replay")
+    bound = EXHAUSTIVE_MAX_VARS if mode == "exhaustive" else WITNESS_MAX_VARS
+    if (type(n) is not int or not 1 <= n <= bound or ring.get("field") != "GF(2)"
             or ring.get("order") != "degrevlex"
             or ring.get("quotient") != "x_i^2+x_i"
             or ring.get("variables") != [f"x{i}" for i in range(n)]):
-        raise ValueError("requires frozen Boolean ring, 1..12 variables, x0 > x1 > ...")
+        raise ValueError("requires frozen Boolean ring, 1..12 variables (1..128 with "
+                         "witness-replay certificates), x0 > x1 > ...")
     if not isinstance(manifest.get("encoding"), str) or not manifest["encoding"]:
         raise ValueError("encoding identity required")
     if type(manifest.get("threads", 1)) is not int or not 1 <= manifest.get("threads", 1) <= 64:
@@ -72,6 +83,15 @@ def validate(manifest):
                 or any(not isinstance(x, str) or not x for x in relation["command"])
                 or not relation.get("provenance")):
             raise ValueError("independent verifier command and provenance required")
+    planted = manifest.get("planted_answers")
+    if planted is not None:
+        ids = {item["id"] for item in instances}
+        if (not isinstance(planted, dict) or set(planted) - ids
+                or any(type(v) is not int or not 0 <= v < (1 << n) for v in planted.values())):
+            raise ValueError("planted_answers must map instance ids to assignment masks")
+        for instance in instances:
+            if "planted" in instance or "planted" in (instance.get("semaev") or {}):
+                raise ValueError("planted answers must not be sent to workers")
     curve = manifest.get("witness_verifier")
     if curve is not None and (not isinstance(curve.get("command"), list)
             or not curve["command"] or any(not isinstance(x, str) or not x
@@ -188,6 +208,7 @@ def run_backend(manifest, backend, directory):
     results = []
     relation = manifest.get("relation_verifier")
     curve = manifest.get("witness_verifier")
+    planted = manifest.get("planted_answers")
     rank = Rank(relation["modulus"], relation["width"]) if relation else None
     relation_complete = True
     certified_applies = 0
@@ -241,7 +262,24 @@ def run_backend(manifest, backend, directory):
         begin = time.perf_counter()
         try:
             n = manifest["ring"]["nvars"]
-            if "basis_terms" in response:
+            if "basis_terms" in response and n > EXHAUSTIVE_MAX_VARS:
+                # Witness-replay mode: enumerate the basis zeros, then keep
+                # only those that satisfy the ORIGINAL equations.
+                roots, info = basis_roots(n, response["basis_terms"],
+                                          limit=manifest.get("root_extraction_limit", 4096))
+                original = terms(instance["equations"], n)
+                valid = [a for a in roots if vanishes(original, a)]
+                certificate = {"verified": bool(valid),
+                               "method": "basis-root-extraction+direct-input-equation-replay",
+                               "complete": False, "root_count": None,
+                               "basis_zero_count": len(roots),
+                               "basis_zeros_failing_inputs": len(roots) - len(valid),
+                               "extraction_nodes": info["nodes"],
+                               "solutions": valid or None}
+                if not valid:
+                    certificate["reason"] = ("no basis zero satisfies the inputs; UNSAT is "
+                                             "not certified above the exhaustive bound")
+            elif "basis_terms" in response:
                 certificate = certify(n, instance["equations"], response["basis_terms"],
                                       blocks=response.get("basis_blocks"))
                 if response.get("basis_blocks") not in (None, instance.get("blocks")):
@@ -257,7 +295,7 @@ def run_backend(manifest, backend, directory):
                 certificate = {"verified": valid, "method": "direct-input-equation-replay",
                                "complete": False, "root_count": None,
                                "solutions": solutions if valid else None}
-        except (KeyError, TypeError, ValueError) as error:
+        except (KeyError, TypeError, ValueError, TimeoutError) as error:
             certificate = {"verified": False, "error": str(error)}
         duration = time.perf_counter() - begin
         phases["basis_verification"] = phases.get("basis_verification", 0) + duration
@@ -294,6 +332,10 @@ def run_backend(manifest, backend, directory):
                                  else "verified_witness" if certificate else "unknown"),
                       "root_count": certificate["root_count"] if certificate else None,
                       "relation_rank_increment": None}
+            if planted is not None and instance["id"] in planted:
+                result["planted_in_certified_solutions"] = (
+                    planted[instance["id"]] in certificate["solutions"]
+                    if certificate and certificate.get("solutions") is not None else None)
             if curve is not None:
                 result["curve_witness"] = "unknown"
                 if certificate and certificate["solutions"] is not None:
@@ -360,6 +402,13 @@ def run_backend(manifest, backend, directory):
         values = [m[name] for m in metrics if type(m.get(name)) is int and m[name] >= 0]
         return max(values) if values else None
 
+    solver_events = [e for e in events if e["operation"] in SOLVER_OPERATIONS]
+    unavailable = [e for e in solver_events if e["status"] == "unavailable"]
+    reasons = sorted({str(e["response"].get("reason") or e["response"].get("error"))
+                      for e in unavailable})
+    external_seconds = [m["solver_wall_seconds"] for m in metrics
+                        if type(m.get("solver_wall_seconds")) in (int, float)]
+
     summary = {"schema": 1, "scope": "bounded-Boolean-solver-stage",
                "manifest_sha256": digest(manifest), "backend": backend,
                "candidate_id": None, "full_dlp_speedup": None,
@@ -386,6 +435,16 @@ def run_backend(manifest, backend, directory):
                "backend_reported_highest_degree": maximum("highest_degree"),
                "backend_reported_largest_matrix_rows": maximum("largest_matrix_rows"),
                "backend_reported_largest_matrix_columns": maximum("largest_matrix_columns"),
+               "certificate_mode": manifest.get("certificate", "exhaustive"),
+               "availability": ("UNAVAILABLE" if solver_events
+                                and len(unavailable) == len(solver_events) else "available"),
+               "unavailable_reasons": reasons,
+               "backend_reported_solver_peak_rss_bytes": maximum("solver_peak_rss_bytes"),
+               "backend_reported_solver_wall_seconds": (sum(external_seconds)
+                                                        if external_seconds else None),
+               "planted_recovered_instances": (
+                   sum(row.get("planted_in_certified_solutions") is True for row in results)
+                   if planted is not None else None),
                "results": results}
     (directory / "summary.json").write_text(encoded(summary) + "\n")
     return summary
@@ -416,7 +475,8 @@ def main():
     args = parser.parse_args()
     for result in run(json.loads(args.manifest.read_text()), args.output):
         print(encoded({k: result[k] for k in ("backend", "verified_instances",
-            "attempted_instances", "total_wall_seconds", "verified_rank_per_total_second")}))
+            "attempted_instances", "verified_witness_instances", "availability",
+            "total_wall_seconds", "verified_rank_per_total_second")}))
 
 
 if __name__ == "__main__":
