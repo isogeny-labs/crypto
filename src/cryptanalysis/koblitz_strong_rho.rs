@@ -32,8 +32,10 @@
 //!
 //! **Widths.** The walk is written once over a field word `E` (`u64` for
 //! `n ≤ 63`, `u128` for the wide fields up to `n = 127` that the m = 83
-//! gate needs) and a scalar `S` (`u64`, or `u128` for a subgroup order past
-//! `2^64`).  [`StrongRho`] and the other unsuffixed names are the one-word
+//! gate needs, three limbs for `n ≤ 191` in
+//! [`koblitz_big`](crate::cryptanalysis::koblitz_big)) and a scalar `S`
+//! (`u64`, or `u128` for a subgroup order past `2^64`, or three limbs past
+//! `2^128`).  [`StrongRho`] and the other unsuffixed names are the one-word
 //! instantiation every committed reference run used; the generic code is
 //! that code with the word made a parameter, and the committed sessions'
 //! replays pin that it walks identically.  The hash mixers fold a word to
@@ -56,7 +58,9 @@ use std::ops::{BitAnd, BitOr, BitXor, Shl, Shr, Sub};
 /// Number of precomputed jumps (`r`-adding walk).
 pub const JUMPS: usize = 32;
 
-/// A field element word: `u64` or `u128`, bit `i` the coefficient of `z^i`.
+/// A field element word: `u64`, `u128` or
+/// [`W192`](crate::cryptanalysis::koblitz_big::W192), bit `i` the
+/// coefficient of `z^i`.
 pub trait FieldWord:
     Copy
     + Eq
@@ -186,7 +190,8 @@ impl RhoField for WideGf2 {
 }
 
 /// A scalar modulo the subgroup order: `u64`, or `u128` for an order past
-/// `2^64` (below `2^127`).
+/// `2^64` (below `2^127`), or [`U192`](crate::cryptanalysis::koblitz_big::U192)
+/// for an order past `2^128` (below `2^192`).
 pub trait RhoScalar:
     Copy + Eq + Ord + Hash + Debug + Send + Sync + SampleUniform + std::fmt::Display
 {
@@ -197,6 +202,8 @@ pub trait RhoScalar:
     fn from_biguint(v: &BigUint) -> Option<Self>;
     fn to_f64(self) -> f64;
     fn to_u128(self) -> u128;
+    /// The value exactly, at any width.
+    fn to_biguint(self) -> BigUint;
     /// Bits in the binary expansion (`0` for zero).
     fn bit_len(self) -> u32;
     fn bit(self, i: u32) -> bool;
@@ -236,6 +243,9 @@ impl RhoScalar for u64 {
     }
     fn to_u128(self) -> u128 {
         u128::from(self)
+    }
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self)
     }
     fn bit_len(self) -> u32 {
         64 - self.leading_zeros()
@@ -361,6 +371,9 @@ impl RhoScalar for u128 {
     }
     fn to_u128(self) -> u128 {
         self
+    }
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self)
     }
     fn bit_len(self) -> u32 {
         128 - self.leading_zeros()

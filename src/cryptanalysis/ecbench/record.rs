@@ -572,7 +572,7 @@ pub fn child_main(input: &str) -> ChildOutput {
                 (true, Instance::Prime(i), Some(k)) => {
                     Some(crate::cryptanalysis::ecbench::oracle::PlantedStaticDh::new(
                         &i.curve,
-                        u64::try_from(k).map_err(|_| "planted scalar past one word".to_string())?,
+                        k.checked_u64().ok_or_else(|| "planted scalar past one word".to_string())?,
                     ))
                 }
                 _ => None,
@@ -1530,9 +1530,9 @@ mod diagnostic_child_v2_tests {
                 construction: "not-built".into(),
                 field_degree: None,
                 field_bits: None,
-                group_order: 0,
-                r: 0,
-                cofactor: 0,
+                group_order: 0u64.into(),
+                r: 0u64.into(),
+                cofactor: 0u64.into(),
                 generator: ["0".into(), "0".into()],
                 automorphisms_available: 0,
                 registered: false,

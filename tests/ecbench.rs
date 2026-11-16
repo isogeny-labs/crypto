@@ -3384,7 +3384,7 @@ fn a_current_record_undercharged_by_its_class_setup_fails_replay() {
                 .expect("current records carry it");
             assert!(setup > 0.0);
             let total = rec.cost.total_gae.unwrap() - setup;
-            let r = rec.workload.curve.r as f64;
+            let r = rec.workload.curve.r.to_f64();
             let floor = rec.cost.s.unwrap() / rec.boundaries.ratio_to_floor.unwrap();
             rec.cost.total_gae = Some(total);
             rec.cost.s = Some(total / r.sqrt());

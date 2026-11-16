@@ -39,6 +39,15 @@ impl ExactScalar {
             .find(|(_, limb)| **limb != 0)
             .map_or(0, |(i, limb)| 64 * i as u32 + 64 - limb.leading_zeros())
     }
+    /// The nearest `f64`: exactly `v as f64` for a value `v` that fits a
+    /// `u128`, so a figure computed from a `u128` order is unchanged.
+    pub fn to_f64(self) -> f64 {
+        match self.checked_u128() {
+            Some(v) => v as f64,
+            None => num_traits::ToPrimitive::to_f64(&self.to_biguint())
+                .expect("a 256-bit value is finite"),
+        }
+    }
     pub fn bit(self, index: u32) -> bool {
         index < 256 && ((self.0[(index / 64) as usize] >> (index % 64)) & 1) != 0
     }

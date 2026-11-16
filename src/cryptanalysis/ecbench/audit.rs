@@ -1677,7 +1677,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // Every derived figure must follow from the record's own counts:
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
-        let sqrt_r = (w.curve.r as f64).sqrt();
+        let sqrt_r = (w.curve.r.to_f64()).sqrt();
         // The floor's `A` follows the rule the record names (none: the first
         // rule), so a record written before `j = 0` and `j = 1728` curves got
         // their own count still recomputes to the floor it was written with.
@@ -1712,7 +1712,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         let rec: Option<super::exact_scalar::ExactScalar> =
             r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
         let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
+        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
             record_problems.push(format!("{tag}: verification does not reproduce"));
         }

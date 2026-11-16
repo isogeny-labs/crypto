@@ -265,6 +265,7 @@ pub mod jv_rho_strong;
 pub mod jv_sieve;
 pub mod klein_v4;
 pub mod koblitz_bench;
+pub mod koblitz_big;
 pub mod koblitz_factor_base_search;
 pub mod koblitz_fast;
 pub mod koblitz_fast_arith;

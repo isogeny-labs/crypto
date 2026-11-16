@@ -38,10 +38,12 @@ use std::collections::{BTreeMap, HashMap};
 
 use num_traits::ToPrimitive;
 
-use crate::cryptanalysis::ecbench::canonical::{derive_u128, derive_u64};
-use crate::cryptanalysis::ecbench::workload::WideInstance;
+use crate::cryptanalysis::ecbench::canonical::{derive_biguint, derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
+use crate::cryptanalysis::ecbench::workload::{BigInstance, WideInstance};
 use crate::cryptanalysis::ic_boundary::{BinaryGroup, BinaryInstance, CountedGroup, GroupOps};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
+use crate::cryptanalysis::koblitz_big::{BigStrongRho, W192};
 use crate::cryptanalysis::koblitz_fast::{FastPoint, FrobeniusCanon, FrobeniusPowers};
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, RhoScalar, WideStrongRho};
 
@@ -60,12 +62,14 @@ pub struct ClawShape {
 }
 
 impl ClawShape {
-    pub fn seeds(&self, r: u128, n: u32) -> u64 {
-        let s = self.base_scale * (r as f64).powf(0.25) * (n as f64).powf(-0.75);
+    /// `r` is the subgroup order as the nearest `f64` (for a `u128` order,
+    /// `r as f64`, what these rules always read).
+    pub fn seeds(&self, r: f64, n: u32) -> u64 {
+        let s = self.base_scale * r.powf(0.25) * (n as f64).powf(-0.75);
         (s.ceil() as u64).max(2)
     }
-    pub fn table(&self, r: u128, n: u32) -> u64 {
-        let m = self.table_scale * (r as f64 / n as f64).sqrt();
+    pub fn table(&self, r: f64, n: u32) -> u64 {
+        let m = self.table_scale * (r / n as f64).sqrt();
         (m.ceil() as u64).max(1)
     }
 }
@@ -73,7 +77,7 @@ impl ClawShape {
 /// What one claw solve did, phase by phase.
 #[derive(Clone, Debug, Default)]
 pub struct ClawOutcome {
-    pub recovered: Option<u128>,
+    pub recovered: Option<ExactScalar>,
     pub base: GroupOps,
     pub table: GroupOps,
     pub search: GroupOps,
@@ -122,11 +126,16 @@ impl Schedule {
 
 /// What the claw needs of a Koblitz curve: counted group operations, the
 /// signed-Frobenius class of a point, and the Frobenius map.  The one-word
-/// curve ([`NarrowClaw`]) and the wide one ([`WideClaw`]) implement it; the
-/// claw is written once, so the wide claw is the one-word claw.
+/// curve ([`NarrowClaw`]), the wide one ([`WideClaw`]) and the three-word
+/// one ([`BigClaw`]) implement it; the claw is written once, so the wide and
+/// big claws are the one-word claw.
 pub trait ClawGroup {
     type P: Copy + PartialEq;
     type S: RhoScalar;
+    /// The table key: a class name.  `u128` for the one-word and wide
+    /// curves (as the committed claw keyed its table), a three-word word
+    /// for the big curves, whose class names do not fit a `u128`.
+    type K: Copy + Eq + std::hash::Hash;
     fn n(&self) -> u32;
     fn r(&self) -> Self::S;
     fn lambda(&self) -> Self::S;
@@ -140,7 +149,7 @@ pub trait ClawGroup {
     fn identity(&self) -> Self::P;
     /// The `{±φ^u}` class name of a finite point (never 0) and the shift
     /// `u` that carries its abscissa to the class's least rotation.
-    fn class(&self, p: &Self::P) -> (u128, u32);
+    fn class(&self, p: &Self::P) -> (Self::K, u32);
     fn frob(&self, t: u32, p: Self::P) -> Self::P;
     /// Seed scalar `i` in `[1, r − 1]` under `seed`.
     fn seed_scalar(&self, seed: u64, i: u64) -> Self::S;
@@ -191,6 +200,7 @@ impl<'a> NarrowClaw<'a> {
 impl ClawGroup for NarrowClaw<'_> {
     type P = FastPoint;
     type S = u64;
+    type K = u128;
     fn n(&self) -> u32 {
         self.inst.n
     }
@@ -258,6 +268,7 @@ impl<'a> WideClaw<'a> {
 impl ClawGroup for WideClaw<'_> {
     type P = RawPointG<u128>;
     type S = u128;
+    type K = u128;
     fn n(&self) -> u32 {
         self.rho.degree()
     }
@@ -306,6 +317,88 @@ impl ClawGroup for WideClaw<'_> {
     }
 }
 
+/// A Koblitz curve on the three-word arithmetic and normal basis of
+/// [`BigStrongRho`]: a big curve (`128 ≤ n ≤ 191`, subgroup order past
+/// `2^128`) in ecbench.  Seed scalars come from the whole 256-bit digest of
+/// decimal-string parts (`ecbench.claw.seed.big`), reduced mod `r − 1`; the
+/// class name is the least normal-basis rotation plus one, as a three-word
+/// word.
+pub struct BigClaw<'a> {
+    rho: &'a BigStrongRho,
+    r: crate::cryptanalysis::koblitz_big::U192,
+    lambda: crate::cryptanalysis::koblitz_big::U192,
+}
+
+impl<'a> BigClaw<'a> {
+    pub fn new(bi: &'a BigInstance) -> Self {
+        Self::from_parts(&bi.rho, bi.kc.r192(), bi.kc.lambda192())
+    }
+
+    pub fn from_parts(
+        rho: &'a BigStrongRho,
+        r: crate::cryptanalysis::koblitz_big::U192,
+        lambda: crate::cryptanalysis::koblitz_big::U192,
+    ) -> Self {
+        Self { rho, r, lambda }
+    }
+}
+
+impl ClawGroup for BigClaw<'_> {
+    type P = RawPointG<W192>;
+    type S = crate::cryptanalysis::koblitz_big::U192;
+    type K = W192;
+    fn n(&self) -> u32 {
+        self.rho.degree()
+    }
+    fn r(&self) -> Self::S {
+        self.r
+    }
+    fn lambda(&self) -> Self::S {
+        self.lambda
+    }
+    fn generator(&self) -> Self::P {
+        self.rho.generator()
+    }
+    fn add(&self, ops: &mut GroupOps, a: Self::P, b: Self::P) -> Self::P {
+        ops.adds += 1;
+        self.rho.add(a, b)
+    }
+    fn double(&self, ops: &mut GroupOps, a: Self::P) -> Self::P {
+        ops.doubles += 1;
+        self.rho.add(a, a)
+    }
+    fn neg(&self, a: Self::P) -> Self::P {
+        match a {
+            RawPointG::Affine { x, y } => RawPointG::Affine { x, y: y ^ x },
+            inf => inf,
+        }
+    }
+    fn is_identity(&self, a: &Self::P) -> bool {
+        *a == RawPointG::Infinity
+    }
+    fn identity(&self) -> Self::P {
+        RawPointG::Infinity
+    }
+    fn class(&self, p: &Self::P) -> (W192, u32) {
+        let RawPointG::Affine { x, .. } = *p else {
+            return (W192::ZERO, 0);
+        };
+        let (key, t) = self.rho.x_orbit(x);
+        // A least rotation is below 2^191, so the offset cannot wrap.
+        (key.plus_one(), t)
+    }
+    fn frob(&self, t: u32, p: Self::P) -> Self::P {
+        self.rho.frobenius(t, p)
+    }
+    fn seed_scalar(&self, seed: u64, i: u64) -> Self::S {
+        let r = self.r.to_big();
+        let k = derive_biguint("ecbench.claw.seed.big", &[seed.to_string(), i.to_string()])
+            % (&r - 1u8)
+            + 1u8;
+        <Self::S as RhoScalar>::from_biguint(&k).expect("k < r")
+    }
+}
+
 /// Run the claw on a one-word Koblitz instance.  `None` for any other
 /// curve.
 pub fn pair_claw(
@@ -326,6 +419,17 @@ pub fn pair_claw_wide(
     shape: ClawShape,
 ) -> ClawOutcome {
     pair_claw_on(&WideClaw::new(wi), target, seed, shape)
+}
+
+/// Run the claw on a big (three-word) Koblitz instance.
+pub fn pair_claw_big(
+    bi: &BigInstance,
+    target: RawPointG<W192>,
+    seed: u64,
+    shape: ClawShape,
+    v2: bool,
+) -> ClawOutcome {
+    pair_claw_with(&BigClaw::new(bi), target, seed, shape, v2)
 }
 
 /// [`pair_claw`] under the `_v2` accounting ([`pair_claw_with`]).
@@ -381,8 +485,8 @@ pub fn pair_claw_with<G: ClawGroup>(
     let negmod = |a: Sc<G>| Sc::<G>::sub_mod(Sc::<G>::zero(), a, r);
 
     let mut out = ClawOutcome::default();
-    let s = shape.seeds(r.to_u128(), n);
-    let m = shape.table(r.to_u128(), n);
+    let s = shape.seeds(r.to_f64(), n);
+    let m = shape.table(r.to_f64(), n);
     out.count("seed_orbits", s);
     out.count("table_target", m);
 
@@ -419,7 +523,7 @@ pub fn pair_claw_with<G: ClawGroup>(
     // The `_v2` final check: one scalar multiplication of the candidate.
     let verify = |o: &mut ClawOutcome| {
         if let (true, Some(d)) = (v2, o.recovered) {
-            let d = <G::S as RhoScalar>::from_biguint(&num_bigint::BigUint::from(d))
+            let d = <G::S as RhoScalar>::from_biguint(&d.to_biguint())
                 .expect("a candidate is below the subgroup order");
             o.count("verification_checks", 1);
             let mut ops = GroupOps::default();
@@ -437,7 +541,7 @@ pub fn pair_claw_with<G: ClawGroup>(
     // Reserve at most 2^24 slots up front: the table grows as it fills, and
     // a wide curve's target M (2^37 at n = 83) would otherwise be reserved
     // before the step budget can stop it.  Capacity changes no count.
-    let mut table: HashMap<u128, u64> = HashMap::with_capacity(m.min(1 << 24) as usize);
+    let mut table: HashMap<G::K, u64> = HashMap::with_capacity(m.min(1 << 24) as usize);
     let mut visited = 0u64;
     while (table.len() as u64) < m && visited < d_table {
         let d = sched.at(visited);
@@ -499,7 +603,7 @@ pub fn pair_claw_with<G: ClawGroup>(
         if g.is_identity(&y) {
             out.count("queries_visited", qi);
             out.count("direct_pair_hits", 1);
-            out.recovered = Some(pair_log.to_u128());
+            out.recovered = ExactScalar::from_biguint(&pair_log.to_biguint());
             verify(&mut out);
             measurement::end_online();
             return out;
@@ -537,7 +641,7 @@ pub fn pair_claw_with<G: ClawGroup>(
         }
         out.count("queries_visited", qi);
         out.count("relations", 1);
-        out.recovered = Some(addmod(pair_log, y_log).to_u128());
+        out.recovered = ExactScalar::from_biguint(&addmod(pair_log, y_log).to_biguint());
         verify(&mut out);
         measurement::end_online();
         return out;
@@ -577,7 +681,7 @@ mod tests {
                     }
                     assert_eq!(
                         o.recovered,
-                        Some(u128::from(k)),
+                        Some(ExactScalar::from(k)),
                         "n={n} k={k} {sh:?} {:?}",
                         o.counters
                     );
@@ -619,7 +723,145 @@ mod tests {
                 for sh in [shape(4.0, 1.0), shape(1.06, 1.0 / 32.0)] {
                     let o = pair_claw_on(&g, q, 3 + j as u64, sh);
                     assert!(!o.exhausted, "n={n} k={k} {sh:?} {:?}", o.counters);
-                    assert_eq!(o.recovered, Some(k), "n={n} k={k} {sh:?} {:?}", o.counters);
+                    assert_eq!(
+                        o.recovered,
+                        Some(ExactScalar::from(k)),
+                        "n={n} k={k} {sh:?} {:?}",
+                        o.counters
+                    );
+                }
+            }
+        }
+    }
+
+    /// The three-word claw ([`BigClaw`]: `Gf2W`, `U192`, three-word class
+    /// keys) on curves cheap enough to solve.  With the wide seed rule it is
+    /// the wide claw draw for draw: the same recovered logarithm, every
+    /// counter and every phase's operations.  With its own seed rule
+    /// (`ecbench.claw.seed.big`) it recovers the planted logarithms.
+    #[test]
+    fn big_claw_is_the_wide_claw_and_recovers_planted_logs() {
+        use crate::cryptanalysis::certicom131_symlp::gf2w::Gf2W;
+        use crate::cryptanalysis::koblitz_big::{BigStrongRho, U192};
+        use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
+        use crate::cryptanalysis::koblitz_strong_rho::{RawPoint, StrongRho, StrongRhoG};
+        use crate::cryptanalysis::wide_gf2m::WideGf2;
+
+        /// [`BigClaw`] with [`WideClaw`]'s seed rule.
+        struct WideSeeded<'a>(BigClaw<'a>, u128);
+        impl ClawGroup for WideSeeded<'_> {
+            type P = RawPointG<W192>;
+            type S = U192;
+            type K = W192;
+            fn n(&self) -> u32 {
+                self.0.n()
+            }
+            fn r(&self) -> U192 {
+                self.0.r()
+            }
+            fn lambda(&self) -> U192 {
+                self.0.lambda()
+            }
+            fn generator(&self) -> Self::P {
+                self.0.generator()
+            }
+            fn add(&self, ops: &mut GroupOps, a: Self::P, b: Self::P) -> Self::P {
+                self.0.add(ops, a, b)
+            }
+            fn double(&self, ops: &mut GroupOps, a: Self::P) -> Self::P {
+                self.0.double(ops, a)
+            }
+            fn neg(&self, a: Self::P) -> Self::P {
+                self.0.neg(a)
+            }
+            fn is_identity(&self, a: &Self::P) -> bool {
+                self.0.is_identity(a)
+            }
+            fn identity(&self) -> Self::P {
+                self.0.identity()
+            }
+            fn class(&self, p: &Self::P) -> (W192, u32) {
+                self.0.class(p)
+            }
+            fn frob(&self, t: u32, p: Self::P) -> Self::P {
+                self.0.frob(t, p)
+            }
+            fn seed_scalar(&self, seed: u64, i: u64) -> U192 {
+                let k =
+                    1 + derive_u128("ecbench.claw.seed.wide", &[seed.to_string(), i.to_string()])
+                        % (self.1 - 1);
+                U192::from_u128(k)
+            }
+        }
+
+        for (a, n) in [(0u8, 41u32), (1, 47)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let narrow = StrongRho::new(&kc);
+            let RawPoint::Affine { x, y } = narrow.generator() else {
+                unreachable!()
+            };
+            let (r, lambda) = (u128::from(narrow.modulus()), u128::from(narrow.lambda()));
+            let wide: WideStrongRho = StrongRhoG::from_parts(
+                WideGf2::new(&kc.curve.irreducible),
+                u128::from(a),
+                r,
+                lambda,
+                RawPointG::Affine {
+                    x: x as u128,
+                    y: y as u128,
+                },
+            );
+            let big: BigStrongRho = StrongRhoG::from_parts(
+                Gf2W::new(&kc.curve.irreducible),
+                W192::from(u64::from(a)),
+                U192::from_u128(r),
+                U192::from_u128(lambda),
+                RawPointG::Affine {
+                    x: W192::from(x),
+                    y: W192::from(y),
+                },
+            );
+            let gw = WideClaw::from_parts(&wide, r, lambda);
+            let gb = BigClaw::from_parts(&big, U192::from_u128(r), U192::from_u128(lambda));
+            let seeded = WideSeeded(
+                BigClaw::from_parts(&big, U192::from_u128(r), U192::from_u128(lambda)),
+                r,
+            );
+            for (j, k) in [5u128, r - 3, r / 7 + 2].into_iter().enumerate() {
+                let qw = wide.scalar_mul(wide.generator(), k);
+                let qb = big.scalar_mul(big.generator(), U192::from_u128(k));
+                for sh in [shape(4.0, 1.0), shape(1.06, 1.0 / 32.0)] {
+                    for v2 in [false, true] {
+                        let ow = pair_claw_with(&gw, qw, 3 + j as u64, sh, v2);
+                        let os = pair_claw_with(&seeded, qb, 3 + j as u64, sh, v2);
+                        assert_eq!(ow.recovered, Some(ExactScalar::from(k)));
+                        assert_eq!(
+                            (
+                                &ow.recovered,
+                                ow.exhausted,
+                                &ow.counters,
+                                ow.base,
+                                ow.table,
+                                ow.search,
+                                ow.recover,
+                                ow.verification
+                            ),
+                            (
+                                &os.recovered,
+                                os.exhausted,
+                                &os.counters,
+                                os.base,
+                                os.table,
+                                os.search,
+                                os.recover,
+                                os.verification
+                            ),
+                            "n={n} k={k} {sh:?} v2={v2}"
+                        );
+                        let ob = pair_claw_with(&gb, qb, 3 + j as u64, sh, v2);
+                        assert!(!ob.exhausted, "n={n} k={k} {sh:?} {:?}", ob.counters);
+                        assert_eq!(ob.recovered, Some(ExactScalar::from(k)), "n={n} k={k}");
+                    }
                 }
             }
         }
