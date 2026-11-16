@@ -10,7 +10,7 @@ fn plus(a:Expr,b:Expr)->Expr {Expr::plus(a,b)}
 fn prod(xs:Vec<Expr>)->Expr {Expr::product(xs)}
 fn pow(x:Expr,n:usize)->Expr {prod(vec![x;n])}
 fn main() {
-    let name=std::env::args().nth(1).expect("choose e2 or e24");
+    let name=std::env::args().nth(1).expect("choose e2, e24 or q2");
     let x=Expr::var("x");
     let xm1=plus(x.clone(),c(-1));
     let xm2=plus(x.clone(),c(-2));
@@ -30,6 +30,22 @@ fn main() {
             lhs:prod(vec![x.clone(),pow(xm1,9),pow(two_minus_x,9)]),
             rhs:prod(vec![x.clone(),pow(xm2,9),pow(one_minus_x,9)])},
             0x2026_1116_0000_0024)
+    }else if name=="q2" {
+        let x2=pow(x.clone(),2);
+        let u=plus(x2.clone(),c(2));
+        let numerator=plus(prod(vec![x2.clone(),pow(xm1.clone(),2)]),pow(xm2.clone(),2));
+        let denominator=prod(vec![x.clone(),xm1.clone(),xm2.clone()]);
+        let left=prod(vec![numerator,x.clone(),plus(u.clone(),
+            Expr::minus(prod(vec![c(3),x.clone()]))) ]);
+        let bracket=Expr::sum(vec![pow(u.clone(),2),
+            Expr::minus(prod(vec![c(2),x.clone(),u])),prod(vec![c(3),x2])]);
+        let right=prod(vec![denominator,bracket]);
+        let correction=prod(vec![c(5),pow(x.clone(),3),xm1,xm2]);
+        (IdentityStatement{name:"F5 cyclic11 trace-2 quotient rational identity correction".into(),
+            source:"research/ghs_cyclic11_four_branch_cm_20261116/RESULT.md".into(),
+            variables:vec!["x".into()],degree_bound:7,
+            lhs:right,rhs:plus(left,correction)},
+            0x2026_1116_0000_0202)
     }else {panic!("unknown candidate")};
     let cert=issue(statement,seed,32,
         "issued by standalone Rust using repository identity_certificate module; checker replay uses 32 independent extra points",None)
