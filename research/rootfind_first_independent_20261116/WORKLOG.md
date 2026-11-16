@@ -60,3 +60,40 @@
 ### Errors
 
 - None in the source step.
+
+## 2026-11-16, compile-only check
+
+### What was done
+
+- Added the library-only harness manifest and generated its Cargo lockfile.
+- The first compile-only command `cargo +1.99.1` exited 101 because the
+  Homebrew Cargo does not accept rustup's toolchain selector. A second
+  compile-only command invoked Rustup Cargo but resolved Homebrew rustc
+  1.93.1, which refused dependencies requiring 1.94.1. Both failures
+  preceded the corrected build. [pcc:unverified]
+- With the Rust 1.99.1 Cargo and rustc paths both explicit, `cargo test
+  --release --no-run` exited 0 and produced a test executable. This was
+  compilation only; the scientific test did not execute. The compiler
+  printed pre-existing library warnings and a nonfatal `rust-objcopy`
+  missing-`libLLVM.dylib` warning. [pcc:unverified]
+
+### Decisions made
+
+- Pin the harness manifest and lockfile before repeating the compile-only
+  check with `--locked`. Preserve the compile result separately from any
+  future experimental result.
+- The branch's `.resume/RESUME.md` describes other work and contains merge
+  markers; T-6342 holds `dir:.resume`. Do not run the experiment or write
+  around that reservation. [pcc:unverified]
+
+### Open threads
+
+- Commit the harness manifest/lock, rerun compile-only with `--locked`,
+  publish its exact build status, and update the stacked PR.
+- When T-6342 releases `.resume`, write this branch's complete resume,
+  push and pass its gate, then execute the frozen screen.
+
+### Errors
+
+- Toolchain selection needed explicit Cargo and rustc paths. The active
+  resume-file reservation prevents a branch-specific checkpoint.
