@@ -30,6 +30,24 @@ theorem scalingPreservesEquation {R : Type} [Lean.Grind.CommRing R]
     (u ^ 3 * y) ^ 2 = (u ^ 2 * x) ^ 3 + u ^ 6 * b := by
   grind
 
+/-- Denominator-cleared equation of the existing degree-three rational map.
+This ring identity is not the finite-group equality phi = psi_u o [m]. -/
+theorem degreeThreeCleared {R : Type} [Lean.Grind.CommRing R] (x b : R) :
+    (x ^ 3 + b) * (x ^ 3 - 8 * b) ^ 2 =
+      (x ^ 3 + 4 * b) ^ 3 - 27 * b * x ^ 6 := by
+  grind
+
+/-- Substitution of the source curve equation, before division by x^6.
+Constructing a projective curve map or group homomorphism is separate. -/
+theorem degreeThreeCurveEquationCleared {R : Type} [Lean.Grind.CommRing R]
+    (x y b : R) (onCurve : y ^ 2 = x ^ 3 + b) :
+    y ^ 2 * (x ^ 3 - 8 * b) ^ 2 =
+      (x ^ 3 + 4 * b) ^ 3 - 27 * b * x ^ 6 := by
+  rw [onCurve]
+  exact degreeThreeCleared x b
+
+#print axioms CubicAutomorphism.degreeThreeCleared
+#print axioms CubicAutomorphism.degreeThreeCurveEquationCleared
 #print axioms CubicAutomorphism.zeta13
 #print axioms CubicAutomorphism.zeta199
 #print axioms CubicAutomorphism.scaling13

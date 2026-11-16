@@ -1,5 +1,20 @@
 # Complete DLP cost after non-rational-kernel isogeny transfer
 
+**2026-10-19 paired-round review:** the historical paired runner drew a sign
+even for unliftable abscissae, violating its frozen target-stream protocol.
+The [versioned correction](../research/isogeny_torsion_fibers_20261012/paired_round/REVIEW-20261019.md)
+preserves all historical records. Source correction is not replacement
+evidence. Before admitting this paired comparison, complete a separately
+versioned native ecbench protocol/session with controls and verified answers,
+and supply the required paired IDC1 identity certificate and faithful proof
+bridge. Other torsion-study certificates are not substitutes. These are
+implementation/evidence gaps, not proved mathematical obstructions.
+Next step: register the corrected stream and exact two-curve workload in the
+native harness before execution; retain all failed/capped rows and require
+native audit and independent replay. A mismatch blocks comparison; success
+would validate only this bounded workload, leaving general cost/scaling open.
+No replacement campaign or new timing is recorded by this review.
+
 - **Status:** open
 - **Kind:** implementation and measurement gap; no mathematical
   nonexistence claim
@@ -16,18 +31,9 @@
   [public-only direct-root repeat](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/reports/run-20261015T1851Z/REPORT.md),
   [different-j relation and fiber controls](../research/isogeny_torsion_fibers_20261012/different_j_20261015/reports/run-20261015T1713Z/REPORT.md),
   [different-j full-image factor-base gate](../research/isogeny_torsion_fibers_20261012/different_j_full_image_20261015/RESULTS.md),
-  [different-j 60-target reuse and whole-process result](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md),
-  [bounded larger-order different-j pair screen](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md),
-  [selected order-229 full rational-fiber audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md),
-  [order-229 64-target cold comparison](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md),
-  [four-order counted-cost and full-fiber panel](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/RESULTS_V2.md),
-  [native missing-price sensitivity](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/sensitivity/RESULTS.md),
-  [selected order-1,201 complete-solve addendum](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/order1000/RESULTS.md),
-  [independent order-1,201 Linux replay](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/reports/run-20261016T0550Z-linux-order1201/REPORT.md),
-  [direct inverse-Vélu result and next gates](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/RESULTS.md),
   and [three-arm pairing batch cost report](../research/isogeny_torsion_fibers_20261012/pairing_batch_20261015/reports/run-20261015T1740Z/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-16
+- **Last updated:** 2026-10-15
 
 ## Problem
 
@@ -41,10 +47,6 @@ verification. It has same-host exact replay and an independent relation
 checker. A portable counted-unit price, L2 isolation, and independent-host
 replay are still missing. The earlier pairs have orders 19 and 211;
 extrapolation from them is not an acceptance criterion.
-The different-`j` extension-field panel now reaches order 1,201 with
-verified complete solves and exact rational fibers. Its cold full-image
-group-count cost remains above same-target direct rho and BSGS; this
-componentwise observation does not provide a complete portable price.
 Both curves admit a rational order-three automorphism. A fixed six-class
 rho control has now been executed and independently checked, but its
 small-order restarts do not calibrate the best available reference.
@@ -191,48 +193,10 @@ cannot map to their fixed non-isomorphic destinations.
   52 sums and had four unique sums each. The three-round paired
   full-image/rho local CPU ratio median was 70.281, with a 98.532%
   median full-image setup share. The custom timer omits common parsing,
-  model construction and process startup; portable counted-`S` remains
-  open. The follow-on distinct-target reuse gate is now executed below.
-  The checked Lean finite-support
+  model construction and process startup; portable counted-`S` and
+  target-count setup reuse remain open. The checked Lean finite-support
   proof uses frozen scalar-coordinate lists; a faithful curve-level
   point-to-scalar and Vélu bridge remains open.
-- **Observed over every distinct target in the frozen subgroup:** the
-  [V3/V4 reuse study](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md)
-  solved all 60 nonidentity order-61 public targets in seven arms and
-  three rounds per version. Each independent native replay checked
-  1,260/1,260 scalars and 10,960 relation witnesses. At `N=60`, the
-  V3 full-image cold native timer median was 11,049.667 µs against
-  643.208 µs for reusable source BSGS; V4 whole-child CPU medians were
-  15,351 and 6,148 µs. The paired V4 full-image/BSGS ratio median was
-  2.483. V3 prefix timing omits startup and final stdout; V4 includes
-  those costs for the full batch only. Shared-host L0 timing and this
-  one group do not establish a portable or growing-size crossover.
-- **Observed in the bounded larger-order screen:** the
-  [native 20-prime census](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md)
-  found three different-j pairs with multiplicity-one prime subgroup
-  order at least 211. The preregistered first pair has `p=211`,
-  `r=229`, `j=77` and `160`, and both curves have 44,655 points over
-  `F_(211²)` by a direct independent field census. The separate Rust
-  checker replayed 192/192 sampled map witnesses across all three
-  accepted pairs. A separately frozen
-  [full selected-pair audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md)
-  then enumerated all 44,655 source points, 14,885 image points with
-  exactly three rational preimages each, and all 52,441 order-229
-  subgroup-pair homomorphism checks. The independent Rust checker
-  reproduced the counts and both full-map hashes. The 64-target
-  relation/BSGS/rho comparison is now executed below.
-- **Observed in the order-229 distinct-target comparison:** the
-  [frozen run](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
-  launched 84 fresh child processes over prefixes 1, 4, 16 and 64.
-  The independent checker verified 1,785/1,785 scalars and 13,141
-  relation witnesses. At `N=64`, full-image, reusable source BSGS and
-  source negation rho median whole-child CPU values were 72,774,
-  6,383 and 7,653 µs; paired full/BSGS and full/rho median ratios
-  were 11.139 and 9.509. The full-image destination support covered
-  98 point keys versus 90 direct, with 40 shared. This is a finite
-  support change and a complete L0 CPU comparison, while portable
-  counted `S`, isolated timing and independent-host performance
-  replay remain open.
 - **Observed in the pairing batch:** the
   [V6 three-arm run](../research/isogeny_torsion_fibers_20261012/pairing_batch_20261015/reports/run-20261015T1740Z/REPORT.md)
   replayed 594/594 scalar outputs on 66 distinct order-67 `F_401`
@@ -311,34 +275,12 @@ cannot map to their fixed non-isomorphic destinations.
   different-j pair. The [V2 report](../research/isogeny_torsion_fibers_20261012/different_j_full_image_20261015/RESULTS.md)
   records exact support membership, 18/18 independently replayed scalar
   rows and a charged local timer interval over three paired rounds.
-- [x] Price that full-image construction over all 60 distinct reusable
-  targets against direct source BSGS and rho in native CPU. V4 includes
-  input/model validation, process startup, relation recovery, final
-  verification and output; memory is recorded separately as peak RSS.
-  The [V3/V4 result](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md)
-  preserves exact receipts and independent scalar replay. A portable
-  counted-unit price, larger-order pair, isolation and second-host
-  performance replay remain open; the native CPU result does not
-  discharge those separate acceptance conditions.
-- [x] Execute the frozen `p<=271`, `r>=211` different-j family screen
-  and independent accepted-pair point census. The
-  [result](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md)
-  selects `p=211`, `r=229` for the next panel; this is construction
-  evidence and does not price a DLP solve.
-- [x] On the selected order-229 pair, check every rational map fiber,
-  exact kernel, image subgroup and 52,441 ordered subgroup pairs with
-  an independent native checker. See the
-  [full audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md).
-- [x] On that selected order-229 pair, solve 64 distinct public targets
-  through projected and full-image relation arms plus direct source
-  BSGS/rho controls, replay every scalar and relation, and record
-  complete cold process cost at every prefix. The
-  [batch result](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
-  provides 84 whole-child meters and 1,785 independent scalar replays.
-- [ ] Convert every native primitive in that order-229 batch into a
-  portable counted unit, then repeat with isolation and independent-host
-  performance replay. The local CPU-to-addition calibration does not
-  discharge that portable accounting obligation.
+- [ ] Price that full-image construction over distinct reusable targets
+  against direct source BSGS and rho in one counted unit, with input/model
+  construction, setup, relation recovery, verification and memory charged.
+  The [60-target gate](../research/isogeny_torsion_fibers_20261012/different_j_full_image_20261015/NEXT_GATE.md)
+  specifies the next fixed panel; isolation and second-host replay remain
+  additional acceptance conditions.
 - [x] Construct and cold-price an exact pairing transfer on the first two
   frozen quadratic-extension targets, with a certified evaluation field,
   selected torsion input, separated H search/Miller/final exponent/field-DLP
@@ -427,14 +369,6 @@ It would not prove a general exponent change or a result for another curve.
   `N=64`; a later cold direct source-BSGS arm was faster still in V7.
   Portable counted pricing, isolation and larger-size scaling remain the
   next cost gates.
-- **Order-229 rational-image control:** the
-  [64-target run](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
-  found 98 full-image versus 90 destination-direct two-sum support keys
-  (40 shared), while full-image complete L0 child CPU exceeded both
-  reusable source BSGS and negation rho in every round and prefix.
-  Next discriminate whether a direct χ-coordinate resultant can
-  produce a cheaper verified relation oracle; retain portable pricing
-  and larger-order panels as separate obligations.
 - **Inputs and controls:** exact ICV1/EC1 pairs, executable isogeny,
   same source target transported to destination, source relation baseline,
   matched negation rho, six-class automorphism-aware rho where rationally
@@ -546,6 +480,116 @@ local timer interval had a paired rho ratio median of 70.281, dominated
 by construction. Reusing that construction over distinct targets,
 portable counted pricing and the direct χ-coordinate resultant remain
 open obligations.
+
+  [different-j 60-target reuse and whole-process result](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md),
+  [bounded larger-order different-j pair screen](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md),
+  [selected order-229 full rational-fiber audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md),
+  [order-229 64-target cold comparison](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md),
+  [four-order counted-cost and full-fiber panel](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/RESULTS_V2.md),
+  [native missing-price sensitivity](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/sensitivity/RESULTS.md),
+  [selected order-1,201 complete-solve addendum](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/order1000/RESULTS.md),
+  [independent order-1,201 Linux replay](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/reports/run-20261016T0550Z-linux-order1201/REPORT.md),
+  [direct inverse-Vélu result and next gates](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/RESULTS.md),
+- **Last updated:** 2026-10-16
+
+
+The different-`j` extension-field panel now reaches order 1,201 with
+verified complete solves and exact rational fibers. Its cold full-image
+group-count cost remains above same-target direct rho and BSGS; this
+componentwise observation does not provide a complete portable price.
+
+
+  model construction and process startup; portable counted-`S` remains
+  open. The follow-on distinct-target reuse gate is now executed below.
+  The checked Lean finite-support
+- **Observed over every distinct target in the frozen subgroup:** the
+  [V3/V4 reuse study](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md)
+  solved all 60 nonidentity order-61 public targets in seven arms and
+  three rounds per version. Each independent native replay checked
+  1,260/1,260 scalars and 10,960 relation witnesses. At `N=60`, the
+  V3 full-image cold native timer median was 11,049.667 µs against
+  643.208 µs for reusable source BSGS; V4 whole-child CPU medians were
+  15,351 and 6,148 µs. The paired V4 full-image/BSGS ratio median was
+  2.483. V3 prefix timing omits startup and final stdout; V4 includes
+  those costs for the full batch only. Shared-host L0 timing and this
+  one group do not establish a portable or growing-size crossover.
+- **Observed in the bounded larger-order screen:** the
+  [native 20-prime census](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md)
+  found three different-j pairs with multiplicity-one prime subgroup
+  order at least 211. The preregistered first pair has `p=211`,
+  `r=229`, `j=77` and `160`, and both curves have 44,655 points over
+  `F_(211²)` by a direct independent field census. The separate Rust
+  checker replayed 192/192 sampled map witnesses across all three
+  accepted pairs. A separately frozen
+  [full selected-pair audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md)
+  then enumerated all 44,655 source points, 14,885 image points with
+  exactly three rational preimages each, and all 52,441 order-229
+  subgroup-pair homomorphism checks. The independent Rust checker
+  reproduced the counts and both full-map hashes. The 64-target
+  relation/BSGS/rho comparison is now executed below.
+- **Observed in the order-229 distinct-target comparison:** the
+  [frozen run](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
+  launched 84 fresh child processes over prefixes 1, 4, 16 and 64.
+  The independent checker verified 1,785/1,785 scalars and 13,141
+  relation witnesses. At `N=64`, full-image, reusable source BSGS and
+  source negation rho median whole-child CPU values were 72,774,
+  6,383 and 7,653 µs; paired full/BSGS and full/rho median ratios
+  were 11.139 and 9.509. The full-image destination support covered
+  98 point keys versus 90 direct, with 40 shared. This is a finite
+  support change and a complete L0 CPU comparison, while portable
+  counted `S`, isolated timing and independent-host performance
+  replay remain open.
+
+
+- [x] Price that full-image construction over all 60 distinct reusable
+  targets against direct source BSGS and rho in native CPU. V4 includes
+  input/model validation, process startup, relation recovery, final
+  verification and output; memory is recorded separately as peak RSS.
+  The [V3/V4 result](../research/isogeny_torsion_fibers_20261012/different_j_reuse_20261015/RESULTS.md)
+  preserves exact receipts and independent scalar replay. A portable
+  counted-unit price, larger-order pair, isolation and second-host
+  performance replay remain open; the native CPU result does not
+  discharge those separate acceptance conditions.
+- [x] Execute the frozen `p<=271`, `r>=211` different-j family screen
+  and independent accepted-pair point census. The
+  [result](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/RESULTS.md)
+  selects `p=211`, `r=229` for the next panel; this is construction
+  evidence and does not price a DLP solve.
+- [x] On the selected order-229 pair, check every rational map fiber,
+  exact kernel, image subgroup and 52,441 ordered subgroup pairs with
+  an independent native checker. See the
+  [full audit](../research/isogeny_torsion_fibers_20261012/different_j_order_screen_20261015/FIBER_REPORT.md).
+- [x] On that selected order-229 pair, solve 64 distinct public targets
+  through projected and full-image relation arms plus direct source
+  BSGS/rho controls, replay every scalar and relation, and record
+  complete cold process cost at every prefix. The
+  [batch result](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
+  provides 84 whole-child meters and 1,785 independent scalar replays.
+- [ ] Convert every native primitive in that order-229 batch into a
+  portable counted unit, then repeat with isolation and independent-host
+  performance replay. The local CPU-to-addition calibration does not
+  discharge that portable accounting obligation.
+
+
+
+- **Order-229 rational-image control:** the
+  [64-target run](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md)
+  found 98 full-image versus 90 destination-direct two-sum support keys
+  (40 shared), while full-image complete L0 child CPU exceeded both
+  reusable source BSGS and negation rho in every round and prefix.
+  Next discriminate whether a direct χ-coordinate resultant can
+  produce a cheaper verified relation oracle; retain portable pricing
+  and larger-order panels as separate obligations.
+
+
+
+
+
+
+
+
+
+
 
 2026-10-15 larger-order screen and full fiber: the preregistered
 20-prime screen selected a different-j quadratic-extension pair at

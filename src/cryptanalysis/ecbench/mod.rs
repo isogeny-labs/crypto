@@ -91,6 +91,7 @@ pub mod koblitz_descent;
 pub mod legacy;
 pub mod measurement;
 pub mod methods;
+pub mod orbit_ic;
 pub mod negation_strong;
 pub mod optimization;
 pub mod oracle;
