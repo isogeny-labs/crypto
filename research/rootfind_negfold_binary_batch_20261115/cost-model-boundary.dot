@@ -1,0 +1,17 @@
+digraph cost_model_boundary {
+  graph [rankdir=LR, bgcolor="white", pad="0.22", nodesep="0.34", ranksep="0.55", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#56718f", fontname="Helvetica", fontsize=12, margin="0.16,0.12"];
+  edge [color="#56718f", arrowsize=0.7];
+  scalar [label="Scalar rootfinding\nordered table + scan"];
+  batch [label="Batched rootfinding\nshared inverse + lazy x"];
+  scalar_ops [label="Recorded GroupOps\nordinary additions"];
+  batch_ops [label="Recorded GroupOps\nsame table adds; scan may add 0–7"];
+  price [label="bitop/v1 model\nfixed affine group_add weight", fillcolor="#fff1d6", color="#aa7935"];
+  physical [label="Physical field work\ninversions and products differ", fillcolor="#dff4e8", color="#478365"];
+  wall [label="L2 cold process wall\npaired m=3 + A/A", fillcolor="#dff4e8", color="#478365"];
+  scalar -> scalar_ops -> price;
+  batch -> batch_ops -> price;
+  scalar -> physical [style=dashed];
+  batch -> physical [style=dashed];
+  physical -> wall;
+}
