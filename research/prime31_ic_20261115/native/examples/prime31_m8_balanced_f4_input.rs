@@ -186,6 +186,39 @@ fn minimal_s4_input(poly:&Polynomial,start:usize,free:usize,
     Ok(ring.from_raw(&raw))
 }
 
+
+// EXP-R31-SPLIT: only three active Dickson fibres and TWO free x coordinates
+// (outer sum u and internal pair sum h). This is a projected S4 presentation,
+// not an extra target-dependent relation oracle.
+fn split_s4_ring(terminal:u64)->TowerRing {
+    let mut rules=Vec::with_capacity(3*DEPTH);
+    for block in 0..3 {
+        for level in 0..DEPTH {
+            let last=level+1==DEPTH;
+            rules.push(SquareRule{
+                next:(!last).then_some((block*DEPTH+level+1) as u8),
+                a:0,b:u64::from(!last),c:0,
+                d:if last {(terminal+2)%P} else {2},
+            });
+        }
+    }
+    TowerRing{p:P,rules,n_free:2}
+}
+fn split_s4_input(poly:&Polynomial,ring:&TowerRing)->Result<RPoly,String>{
+    let mut raw=Vec::new();
+    for (m,&coeff) in &poly.0 {
+        if m.iter().enumerate().any(|(i,&exp)| exp!=0 && i>=3 && i!=8 && i!=9) {
+            return Err("split S4 constraint references a nonlocal leaf/free coordinate".into());
+        }
+        let mut exps=vec![0u32;3*DEPTH+2];
+        for i in 0..3 {exps[i*DEPTH]=u32::from(m[i]);}
+        exps[3*DEPTH]=u32::from(m[8]); // triple sum u
+        exps[3*DEPTH+1]=u32::from(m[9]); // pair sum h
+        raw.push((exps,coeff));
+    }
+    Ok(ring.from_raw(&raw))
+}
+
 fn four(code:u64)->[(usize,i8);4] {
     std::array::from_fn(|j| (
         ((code>>(6*j))&63) as usize,
@@ -266,13 +299,15 @@ fn main()->Result<(),String>{
     let args:Vec<_>=std::env::args().skip(1).collect();
     if args.len()>1 || (!args.is_empty()
         && args[0]!="--probe-f4" && args[0]!="--panel-f4"
-        && args[0]!="--ablate-f4" && args[0]!="--preeliminate-w-f4") {
-        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4]".into());
+        && args[0]!="--ablate-f4" && args[0]!="--preeliminate-w-f4"
+        && args[0]!="--split-s4-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4|--split-s4-f4]".into());
     }
     let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
     let panel_f4=args.first().is_some_and(|v|v=="--panel-f4");
     let ablate_f4=args.first().is_some_and(|v|v=="--ablate-f4");
     let preeliminate_w=args.first().is_some_and(|v|v=="--preeliminate-w-f4");
+    let split_s4_f4=args.first().is_some_and(|v|v=="--split-s4-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -292,6 +327,80 @@ fn main()->Result<(),String>{
     let polys:Vec<_>=fixed.iter().map(|p|ring.from_raw(&p.raw_tower())).collect();
     let nf_terms:Vec<_>=polys.iter().map(|p|p.len()).collect();
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
+
+    if split_s4_f4 {
+        // Matched, bounded presentation ablation on an *already witnessed*
+        // ordinary prime31 point triple. No known scalar enters either F4.
+        // Projecting the chained S3 ideal eliminates the added h variable
+        // and recovers the S4 condition only on the regular affine branch.
+        // An oversize/censored result is NOT a refutation or a relation.
+        let first=*transcript.witnesses.first().ok_or("missing fixed m8 witness")?;
+        let pts=witness_points(first[2],first[3],&fb,&ar)?;
+        let triple=ar.add(e,ar.add(e,Some(pts[0]),Some(pts[1])),
+            Some(pts[2])).ok_or("left three-sum is identity")?;
+        let base_r=minimal_s4_ring(fb.terminal);
+        let split_r=split_s4_ring(fb.terminal);
+        base_r.check();
+        split_r.check();
+        let old=minimal_s4_input(&fixed[0],0,8,&base_r)?;
+        let mut old_assignment=vec![0u64;3*DEPTH+1];
+        for i in 0..3 {
+            old_assignment[i*DEPTH]=pts[i].0;
+            for j in 1..DEPTH {
+                let t=old_assignment[i*DEPTH+j-1];
+                old_assignment[i*DEPTH+j]=sub(mul(t,t),2);
+            }
+        }
+        old_assignment[3*DEPTH]=triple.0;
+        if base_r.eval(&old,&old_assignment)!=0 {
+            return Err("original S4 lost the inherited positive witness".into());
+        }
+        let baseline=capped_f4(&[old.clone()],&base_r,Some(&old_assignment))?;
+        let h=Polynomial::variable(9);
+        let choices=[(0usize,1usize,2usize),(0,2,1),(1,2,0)];
+        let mut presentations=Vec::with_capacity(choices.len());
+        for (i,j,k) in choices {
+            let pair=ar.add(e,Some(pts[i]),Some(pts[j]))
+                .ok_or("pair-sum identity: regular-branch experiment not admissible")?;
+            let check=ar.add(e,Some(pair),Some(pts[k]))
+                .ok_or("triple-sum identity")?;
+            if check!=triple {return Err("S3 chaining changed the triple sum".into());}
+            let first_s3=split_s4_input(&s3(&leaf[i],&leaf[j],&h),&split_r)?;
+            let second_s3=split_s4_input(&s3(&h,&leaf[k],&u),&split_r)?;
+            let mut assignment=vec![0u64;3*DEPTH+2];
+            assignment[..3*DEPTH].copy_from_slice(&old_assignment[..3*DEPTH]);
+            assignment[3*DEPTH]=triple.0;
+            assignment[3*DEPTH+1]=pair.0;
+            if split_r.eval(&first_s3,&assignment)!=0
+                || split_r.eval(&second_s3,&assignment)!=0 {
+                return Err("chained S3 does not retain regular-branch witness".into());
+            }
+            let term_counts=[first_s3.len(),second_s3.len()];
+            let result=capped_f4(&[first_s3,second_s3],&split_r,Some(&assignment))?;
+            presentations.push(json!({
+                "pair_indices":[i,j],"remaining_index":k,
+                "pair_sum_x_witness_validator_only":pair.0,
+                "normal_form_terms":term_counts,
+                "f4":result
+            }));
+        }
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "curve":"ordinary cofactor-one prime31",
+            "p":P,"n":e.n,"B":fb.points.len(),
+            "scope":"fixed three-point S4 presentation comparison, not m8 or any complete ECDLP",
+            "original_s4":{"free_variables":1,"tower_blocks":3,
+                "normal_form_terms":old.len(),"f4":baseline},
+            "chained_s3":{"free_variables":2,"tower_blocks":3,
+                "presentations":presentations},
+            "all_regular_witnesses_checked":true,
+            "root_extraction":"not implemented",
+            "cold_solver_timing":"not measured",
+            "frontier":"compare partial algebraic work only; censor all capped arms"
+        }));
+        return Ok(());
+    }
+
     if preeliminate_w {
         // Frozen selection: one previously documented positive control and
         // seven deterministic first roots (one per first-collision arm).
