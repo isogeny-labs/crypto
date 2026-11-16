@@ -42,6 +42,15 @@ spec has no m=2 A/A arm. The [cost-model review](COST_MODEL_REVIEW_20261115.md)
 records the derivation. A new publication receipt must bind this amendment
 before a study job is admitted.
 
+**Fourth before-data amendment:** [`AMENDMENT-4.md`](AMENDMENT-4.md)
+deduplicates adjacent signed-pair denominators in the candidate's `m=3`
+lazy scan. The block still pays one field inversion, while an ordinary
+full K13 eight-point block has five denominator entries instead of eight
+in the batch product chain on the portable path. Its SIMD path retains
+the existing kernel. The source-level arithmetic count, correctness
+checks and unchanged wall decision are recorded there. A new pushed-source
+receipt including Amendment 4 is required before execution.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)

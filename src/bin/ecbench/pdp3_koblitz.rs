@@ -688,7 +688,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                     .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
                 self.scan_sums.clear();
                 self.scan_lambdas.clear();
-                g.0.add_many_lazy(
+                g.0.add_many_lazy_paired_x(
                     point,
                     &self.scan_addends,
                     &mut self.scan_sums,
@@ -1319,6 +1319,12 @@ mod engine_names {
             .expect("standard subspace");
         let fb = koblitz_factor_base(&inst, &frob, ColumnFold::Abscissa, "d5".into())
             .expect("signed base");
+        assert_eq!(fb.points.len(), 33);
+        assert_eq!(fb.neg_index[0], 0, "the first K13 point is self-negative");
+        for k in (1..fb.points.len()).step_by(2) {
+            assert_eq!(fb.neg_index[k], k + 1, "K13 signed pair at {k}");
+            assert_eq!(fb.points[k].x, fb.points[k + 1].x);
+        }
         let group = BinaryGroup(&inst.fast);
         let table = PairTable::build_negation_folded_binary_batch(&group, &fb);
         let ctx = InstanceCtx {

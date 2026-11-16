@@ -330,6 +330,78 @@ impl FastCurve {
         group_op_count::count_adds(sums as u64);
     }
 
+    /// Lazy sums with adjacent addends sharing an abscissa. The two signs
+    /// above one binary-field abscissa have the same denominator `x_P + x_Q`,
+    /// so only one copy of each adjacent equal denominator enters the batch
+    /// product chain. The batch still uses one field inversion in total.
+    /// Singles at either end of a scan block retain their own denominator.
+    ///
+    /// The existing eight-lane SIMD path remains in use where available.
+    /// Infinity falls back to the ordinary batch path. Equal-abscissa
+    /// exceptional sums stay complete, with the same `LAZY_DONE` marker as
+    /// [`Self::add_many_lazy`].
+    pub fn add_many_lazy_paired_x(
+        &self,
+        p: FastPoint,
+        qs: &[FastPoint],
+        out: &mut Vec<FastPoint>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+    ) {
+        #[cfg(target_arch = "x86_64")]
+        if self.simd.is_some() {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        if p.infinity
+            || qs.iter().any(|q| q.infinity)
+            || !qs.windows(2).any(|pair| pair[0].x == pair[1].x)
+        {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        let first = lambdas.len();
+        scratch.dens.clear();
+        let mut at = 0;
+        while at < qs.len() {
+            let x = qs[at].x;
+            scratch.dens.push(if x == p.x { 0 } else { p.x ^ x });
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+        }
+        self.field.batch_inv(&mut scratch.dens, &mut scratch.acc);
+        out.reserve(qs.len());
+        lambdas.reserve(qs.len());
+        let mut at = 0;
+        for &inv in &scratch.dens {
+            let x = qs[at].x;
+            let from = at;
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+            for &q in &qs[from..at] {
+                if inv == 0 {
+                    out.push(self.add(p, q));
+                    lambdas.push(Self::LAZY_DONE);
+                } else {
+                    let lambda = self.field.mul(p.y ^ q.y, inv);
+                    let x3 = self.field.sqr(lambda) ^ lambda ^ p.x ^ q.x ^ self.a;
+                    out.push(FastPoint::affine(x3, 0));
+                    lambdas.push(lambda);
+                }
+            }
+        }
+        group_op_count::count_adds(
+            lambdas[first..]
+                .iter()
+                .filter(|&&lambda| lambda != Self::LAZY_DONE)
+                .count() as u64,
+        );
+    }
+
     fn add_many_lazy_dispatch(
         &self,
         p: FastPoint,
@@ -3446,6 +3518,58 @@ mod tests {
                 assert_eq!((l.x, l.infinity), (e.x, e.infinity));
                 assert_eq!(fc.finish_lazy(p, l, lambda), e);
             }
+        }
+    }
+
+    #[test]
+    fn paired_abscissa_lazy_additions_match_order_and_exceptional_sums() {
+        for (a, n) in [(0u8, 13u32), (1, 19)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let points: Vec<FastPoint> = random_points(&kc, 12, 20261115)
+                .iter()
+                .map(|p| fc.lift(p))
+                .collect();
+            let mut qs = Vec::new();
+            for &q in points.iter().take(4) {
+                qs.extend([q, fc.neg(q)]);
+            }
+            qs.push(points[4]); // the last scan block can have one point
+            let mut targets = points.clone();
+            targets.push(fc.neg(points[0]));
+            targets.push(FastPoint::INFINITY);
+            for p in targets {
+                for scan in [&qs[..], &qs[1..]] {
+                    let (mut want, mut want_l) = (Vec::new(), Vec::new());
+                    let (mut got, mut got_l) = (Vec::new(), Vec::new());
+                    let mut scratch = BatchScratch::default();
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy(p, scan, &mut want, &mut want_l, &mut scratch);
+                    let ordinary_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy_paired_x(p, scan, &mut got, &mut got_l, &mut scratch);
+                    let paired_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    assert_eq!(got, want, "n={n}, p={p:?}: sums");
+                    assert_eq!(got_l, want_l, "n={n}, p={p:?}: slopes");
+                    assert_eq!(
+                        paired_adds, ordinary_adds,
+                        "n={n}, p={p:?}: addition ledger"
+                    );
+                    for ((&sum, &lambda), &q) in got.iter().zip(&got_l).zip(scan) {
+                        assert_eq!(fc.finish_lazy(p, sum, lambda), fc.add(p, q));
+                    }
+                }
+            }
+            let mut nonpaired = qs.clone();
+            nonpaired[0] = FastPoint::INFINITY;
+            let (mut want, mut want_l) = (Vec::new(), Vec::new());
+            let (mut got, mut got_l) = (Vec::new(), Vec::new());
+            let mut scratch = BatchScratch::default();
+            fc.add_many_lazy(points[5], &nonpaired, &mut want, &mut want_l, &mut scratch);
+            fc.add_many_lazy_paired_x(points[5], &nonpaired, &mut got, &mut got_l, &mut scratch);
+            assert_eq!((got, got_l), (want, want_l), "n={n}: fallback");
         }
     }
 
