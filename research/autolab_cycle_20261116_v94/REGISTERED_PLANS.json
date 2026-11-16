@@ -1,0 +1,128 @@
+[
+  {
+    "id": "degree-block-oracles-20261116-v94",
+    "hypothesis": "General degree-block preprocessing may dissolve apparent conditional hardness; independently check complete original root certificates before native residual solve.",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.degree_block_20261116_v94.oracles",
+      "degree-block-oracles-20261116-v94",
+      "oracles_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance_gate.py",
+      "performance/GATE.md",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/disjoint_separator_20261116_v92/kernel.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/source_guards_20261116_v93/kernel.py",
+      "research/symmetric_pair_20261116_v93b/kernel.py",
+      "research/degree_block_20261116_v94/PROOF_AND_REVIEW.md",
+      "research/degree_block_20261116_v94/cold.py",
+      "research/degree_block_20261116_v94/child.py",
+      "research/degree_block_20261116_v94/oracles.py",
+      "research/degree_block_20261116_v94/verifier.py",
+      "research/degree_block_20261116_v94/kernel.py",
+      "research/degree_block_20261116_v94/common.py"
+    ],
+    "input_paths": [
+      "research/degree_block_20261116_v94/DATA.json"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/source_guards_20261116_v93/kernel.py": "d0b80165f7fc734a3d4f9e20bef81203d990c34f25e077a3ae7cf341ce90829c",
+      "research/symmetric_pair_20261116_v93b/kernel.py": "7cda1a93a40c6bce29135ba24b9af48d5db5c7c556b550af04b8380c83332aac",
+      "research/degree_block_20261116_v94/PROOF_AND_REVIEW.md": "79bf668cc781419c23f69aefd8db851cefbf53712fe0787fb2a0d144da47b3be",
+      "research/degree_block_20261116_v94/cold.py": "768e88de180291ecf1f90a0c5cdc23ae66df30c97042a095fb902aaeb959528d",
+      "research/degree_block_20261116_v94/child.py": "24845b82ecc3f01dead3fe5682b13f8d5ac8f38b19cb8d1041bd37fc352de90a",
+      "research/degree_block_20261116_v94/oracles.py": "dbde2e88bba0f3adbf4775f40fa33e9d74d14564a75fc5f1712ed8e9c49b2f43",
+      "research/degree_block_20261116_v94/verifier.py": "a1103fc244a6cfaf3866e46af41a1173b3f51aecf33750faa203f8440de360e5",
+      "research/degree_block_20261116_v94/kernel.py": "571d971b605dad87862e005718c0aa57155e5693fae1262eddc8b5937bfa14a1",
+      "research/degree_block_20261116_v94/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/degree_block_20261116_v94/DATA.json": "d896884158b089ec47f77bef6618df2622d97d4a421c4f343ecc7b4180678ff1"
+    },
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "artifact_paths": [
+      "research/degree_block_20261116_v94/oracles_raw.json"
+    ]
+  },
+  {
+    "id": "degree-block-cold-20261116-v94",
+    "hypothesis": "General degree-block preprocessing may dissolve apparent conditional hardness; independently check complete original root certificates before native residual solve.",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.degree_block_20261116_v94.cold",
+      "degree-block-cold-20261116-v94",
+      "cold_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance_gate.py",
+      "performance/GATE.md",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/disjoint_separator_20261116_v92/kernel.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/source_guards_20261116_v93/kernel.py",
+      "research/symmetric_pair_20261116_v93b/kernel.py",
+      "research/degree_block_20261116_v94/PROOF_AND_REVIEW.md",
+      "research/degree_block_20261116_v94/cold.py",
+      "research/degree_block_20261116_v94/child.py",
+      "research/degree_block_20261116_v94/oracles.py",
+      "research/degree_block_20261116_v94/verifier.py",
+      "research/degree_block_20261116_v94/kernel.py",
+      "research/degree_block_20261116_v94/common.py",
+      "vendor/chain_native_v90/main.rs",
+      "vendor/chain_native_v90/chain-native-baseline"
+    ],
+    "input_paths": [
+      "research/degree_block_20261116_v94/DATA.json"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/source_guards_20261116_v93/kernel.py": "d0b80165f7fc734a3d4f9e20bef81203d990c34f25e077a3ae7cf341ce90829c",
+      "research/symmetric_pair_20261116_v93b/kernel.py": "7cda1a93a40c6bce29135ba24b9af48d5db5c7c556b550af04b8380c83332aac",
+      "research/degree_block_20261116_v94/PROOF_AND_REVIEW.md": "79bf668cc781419c23f69aefd8db851cefbf53712fe0787fb2a0d144da47b3be",
+      "research/degree_block_20261116_v94/cold.py": "768e88de180291ecf1f90a0c5cdc23ae66df30c97042a095fb902aaeb959528d",
+      "research/degree_block_20261116_v94/child.py": "24845b82ecc3f01dead3fe5682b13f8d5ac8f38b19cb8d1041bd37fc352de90a",
+      "research/degree_block_20261116_v94/oracles.py": "dbde2e88bba0f3adbf4775f40fa33e9d74d14564a75fc5f1712ed8e9c49b2f43",
+      "research/degree_block_20261116_v94/verifier.py": "a1103fc244a6cfaf3866e46af41a1173b3f51aecf33750faa203f8440de360e5",
+      "research/degree_block_20261116_v94/kernel.py": "571d971b605dad87862e005718c0aa57155e5693fae1262eddc8b5937bfa14a1",
+      "research/degree_block_20261116_v94/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "vendor/chain_native_v90/main.rs": "635c288e48e66def6effa550b59a57172756bb2cf8c5543245833f5b297db007",
+      "vendor/chain_native_v90/chain-native-baseline": "9eaa4b09d120e1f51b6bb5ccb542d04963dc57d218ddbb7e9be9412e00b31725",
+      "research/degree_block_20261116_v94/DATA.json": "d896884158b089ec47f77bef6618df2622d97d4a421c4f343ecc7b4180678ff1"
+    },
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "degree-block-oracles-20261116-v94"
+    ],
+    "artifact_paths": [
+      "research/degree_block_20261116_v94/cold_raw.json"
+    ]
+  }
+]

@@ -1,0 +1,168 @@
+{
+  "scope": "readelf metadata inspection only, no tested binary/compiler invocation",
+  "roots": 6,
+  "objects": [
+    {
+      "path": "/usr/bin/c++",
+      "resolved": "/usr/bin/c++",
+      "needed": [
+        "libm.so.6",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/bin/as",
+      "resolved": "/usr/bin/as",
+      "needed": [
+        "libbfd-2.41-50.amzn2023.0.5.so",
+        "libz.so.1",
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/bin/ld",
+      "resolved": "/usr/bin/ld.bfd",
+      "needed": [
+        "libbfd-2.41-50.amzn2023.0.5.so",
+        "libctf.so.0",
+        "libjansson.so.4",
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/libexec/gcc/x86_64-amazon-linux/11/cc1plus",
+      "resolved": "/usr/libexec/gcc/x86_64-amazon-linux/11/cc1plus",
+      "needed": [
+        "libmpc.so.3",
+        "libmpfr.so.6",
+        "libgmp.so.10",
+        "libz.so.1",
+        "libzstd.so.1",
+        "libm.so.6",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/libexec/gcc/x86_64-amazon-linux/11/collect2",
+      "resolved": "/usr/libexec/gcc/x86_64-amazon-linux/11/collect2",
+      "needed": [
+        "libm.so.6",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+      "resolved": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+      "needed": [
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libm.so.6",
+      "resolved": "/usr/lib64/libm.so.6",
+      "needed": [
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libc.so.6",
+      "resolved": "/usr/lib64/libc.so.6",
+      "needed": [
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/lib64/ld-linux-x86-64.so.2",
+      "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+      "needed": []
+    },
+    {
+      "path": "/usr/lib64/libbfd-2.41-50.amzn2023.0.5.so",
+      "resolved": "/usr/lib64/libbfd-2.41-50.amzn2023.0.5.so",
+      "needed": [
+        "libz.so.1",
+        "libsframe.so.1",
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libz.so.1",
+      "resolved": "/usr/lib64/libz.so.1.2.11",
+      "needed": [
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libctf.so.0",
+      "resolved": "/usr/lib64/libctf.so.0.0.0",
+      "needed": [
+        "libbfd-2.41-50.amzn2023.0.5.so",
+        "libsframe.so.1",
+        "libz.so.1",
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libjansson.so.4",
+      "resolved": "/usr/lib64/libjansson.so.4.14.0",
+      "needed": [
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libmpc.so.3",
+      "resolved": "/usr/lib64/libmpc.so.3.2.1",
+      "needed": [
+        "libmpfr.so.6",
+        "libgmp.so.10",
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libmpfr.so.6",
+      "resolved": "/usr/lib64/libmpfr.so.6.1.0",
+      "needed": [
+        "libgmp.so.10",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libgmp.so.10",
+      "resolved": "/usr/lib64/libgmp.so.10.4.1",
+      "needed": [
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libzstd.so.1",
+      "resolved": "/usr/lib64/libzstd.so.1.5.5",
+      "needed": [
+        "libc.so.6"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libgcc_s.so.1",
+      "resolved": "/usr/lib64/libgcc_s-14-20250110.so.1",
+      "needed": [
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "path": "/usr/lib64/libsframe.so.1",
+      "resolved": "/usr/lib64/libsframe.so.1.0.0",
+      "needed": [
+        "libc.so.6"
+      ]
+    }
+  ],
+  "unresolved": []
+}

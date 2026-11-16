@@ -2497,6 +2497,8 @@ mod tests {
             r: 13_043_059,
             cofactor: 1,
             generator: (0, 6_024_490),
+
+            representation: None,
         }
     }
 
@@ -3257,6 +3259,8 @@ mod tests {
                     r: n,
                     cofactor: 1,
                     generator: (x, y),
+
+                    representation: None,
                 };
             }
         }
@@ -3367,6 +3371,8 @@ mod tests {
             r: 131_203,
             cofactor: 8,
             generator: (349_837, 122),
+
+            representation: None,
         }
     }
 
@@ -3633,6 +3639,8 @@ mod tests {
             r: n as u64,
             cofactor: 1,
             generator: gen.unwrap(),
+
+            representation: None,
         };
         (inst, mulm(am, third, p))
     }
@@ -4117,6 +4125,8 @@ mod tests {
                     r,
                     cofactor: h,
                     generator: (gen.x, gen.y),
+
+                    representation: None,
                 };
                 return (inst, torsion);
             }

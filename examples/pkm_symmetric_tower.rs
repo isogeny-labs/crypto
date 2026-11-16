@@ -44,15 +44,132 @@ use std::time::Duration;
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
 
+// ------------------------------------------------------ counters ----
+//
+// Counted unit for the pre-F4 stages (2026-11-15 pricing study,
+// `research/pkm_priced_20261115/`).  Every field operation executed by this
+// file's own arithmetic (`mulm`, `addm`, `subm`, `invm`) is booked to the
+// current *stage* of the current thread.  Kinds:
+//   0  mulmod outside inversions      1  add / sub
+//   2  inversion calls                3  mulmods inside Fermat inversions
+// The mulmod total of a stage is kind 0 + kind 3.  The counters never change a
+// value; the existing arms' rows are unchanged.  The F4 stage keeps its own
+// counter (`F4Report::field_ops`, row multiply-subtracts) and is not booked here.
+mod cnt {
+    use std::cell::Cell;
+
+    pub const NST: usize = 11;
+    pub const STAGES: [&str; NST] = [
+        "other",
+        "s4_eval",
+        "s3_eval",
+        "sylvester_det",
+        "vandermonde_inv",
+        "grid_interp",
+        "subst_gw",
+        "to_elementary",
+        "param_xr_interp",
+        "param_eval",
+        "planted_check",
+    ];
+    pub const OTHER: usize = 0;
+    pub const S4_EVAL: usize = 1;
+    pub const S3_EVAL: usize = 2;
+    pub const DET: usize = 3;
+    pub const VINV: usize = 4;
+    pub const GRID_INTERP: usize = 5;
+    pub const SUBST: usize = 6;
+    pub const ELEM: usize = 7;
+    pub const PARAM_INTERP: usize = 8;
+    pub const PARAM_EVAL: usize = 9;
+    pub const CHECK: usize = 10;
+    /// Stages that make up one as-built (grid) S5 build.
+    pub const GRID_BUILD: [usize; 7] = [S4_EVAL, S3_EVAL, DET, VINV, GRID_INTERP, SUBST, ELEM];
+
+    pub type Snap = [[u64; 4]; NST];
+
+    thread_local! {
+        static STAGE: Cell<usize> = const { Cell::new(0) };
+        static C: [[Cell<u64>; 4]; NST] =
+            const { [const { [const { Cell::new(0) }; 4] }; NST] };
+    }
+
+    #[inline]
+    pub fn bump(kind: usize) {
+        add(kind, 1);
+    }
+    #[inline]
+    pub fn add(kind: usize, n: u64) {
+        let s = STAGE.with(|s| s.get());
+        C.with(|c| c[s][kind].set(c[s][kind].get() + n));
+    }
+    #[inline]
+    pub fn sub(kind: usize, n: u64) {
+        let s = STAGE.with(|s| s.get());
+        C.with(|c| c[s][kind].set(c[s][kind].get() - n));
+    }
+    #[inline]
+    pub fn get(kind: usize) -> u64 {
+        let s = STAGE.with(|s| s.get());
+        C.with(|c| c[s][kind].get())
+    }
+    pub fn snapshot() -> Snap {
+        let mut out = [[0u64; 4]; NST];
+        C.with(|c| {
+            for (s, row) in c.iter().enumerate() {
+                for (k, v) in row.iter().enumerate() {
+                    out[s][k] = v.get();
+                }
+            }
+        });
+        out
+    }
+    pub fn diff(a: &Snap, b: &Snap) -> Snap {
+        let mut out = [[0u64; 4]; NST];
+        for s in 0..NST {
+            for k in 0..4 {
+                out[s][k] = a[s][k] - b[s][k];
+            }
+        }
+        out
+    }
+    /// Mulmods (kind 0 + kind 3) summed over the listed stages.
+    pub fn mulmods(d: &Snap, stages: &[usize]) -> u64 {
+        stages.iter().map(|&s| d[s][0] + d[s][3]).sum()
+    }
+    pub fn addsubs(d: &Snap, stages: &[usize]) -> u64 {
+        stages.iter().map(|&s| d[s][1]).sum()
+    }
+    pub fn invs(d: &Snap, stages: &[usize]) -> u64 {
+        stages.iter().map(|&s| d[s][2]).sum()
+    }
+
+    /// RAII stage marker: books everything inside its scope to `stage`.
+    pub struct Guard(usize);
+    impl Guard {
+        pub fn enter(stage: usize) -> Guard {
+            Guard(STAGE.with(|s| s.replace(stage)))
+        }
+    }
+    impl Drop for Guard {
+        fn drop(&mut self) {
+            STAGE.with(|s| s.set(self.0));
+        }
+    }
+}
+
 // ------------------------------------------------------------ field ----
 
 fn mulm(a: u64, b: u64, p: u64) -> u64 {
+    cnt::bump(0);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 fn addm(a: u64, b: u64, p: u64) -> u64 {
+    cnt::bump(1);
     (a + b) % p
 }
 fn subm(a: u64, b: u64, p: u64) -> u64 {
+    cnt::bump(1);
     (a + p - b) % p
 }
 fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
@@ -66,8 +183,16 @@ fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
     }
     r
 }
+/// Fermat inversion.  Its multiplications are booked under kind 3
+/// ("inside inversions"), not kind 0, and the call under kind 2.
 fn invm(a: u64, p: u64) -> u64 {
-    powm(a, p - 2, p)
+    let before = cnt::get(0);
+    let r = powm(a, p - 2, p);
+    let used = cnt::get(0) - before;
+    cnt::sub(0, used);
+    cnt::add(3, used);
+    cnt::bump(2);
+    r
 }
 /// Tonelli–Shanks; `None` for a non-residue.
 fn sqrtm(a: u64, p: u64) -> Option<u64> {
@@ -405,26 +530,11 @@ fn sylvester(f: &[u64], df: usize, g: &[u64], dg: usize, p: u64) -> u64 {
     det_mod(m, p)
 }
 
-/// `S_5(x1, x2, x3, x4, x_R)` with `x_R` fixed, in four variables:
-/// `Res_u(S_4(x1, x2, x3, u), S_3(u, x4, x_R))`, degree ≤ 8 in each variable,
-/// recovered exactly by evaluation on a 9⁴ grid and tensor Lagrange
-/// interpolation.
-fn summation_poly_5(x_r: u64, a: u64, b: u64, p: u64) -> Pol {
-    const K: usize = 9;
-    let nodes: Vec<u64> = (0..K as u64).collect();
-    let mut vals = vec![0u64; K * K * K * K];
-    for i1 in 0..K {
-        for i2 in 0..K {
-            for i3 in 0..K {
-                let s4 = s4_in_u(nodes[i1], nodes[i2], nodes[i3], a, b, p);
-                for i4 in 0..K {
-                    let g = s3_in_u(nodes[i4], x_r, a, b, p);
-                    vals[((i1 * K + i2) * K + i3) * K + i4] = sylvester(&s4, 4, &g, 2, p);
-                }
-            }
-        }
-    }
-    // Inverse Vandermonde on the nodes: coefficient vector = V^{-1} · values.
+/// Inverse of the Vandermonde matrix on `nodes` (Gauss-Jordan, mod `p`):
+/// coefficient vector = `V^{-1}` times the values.
+fn vandermonde_inverse(nodes: &[u64], p: u64) -> Vec<Vec<u64>> {
+    #[allow(non_snake_case)]
+    let K = nodes.len();
     let mut v: Vec<Vec<u64>> = (0..K)
         .map(|i| (0..K).map(|j| powm(nodes[i], j as u64, p)).collect())
         .collect();
@@ -452,6 +562,40 @@ fn summation_poly_5(x_r: u64, a: u64, b: u64, p: u64) -> Pol {
             }
         }
     }
+    inv
+}
+
+/// `S_5(x1, x2, x3, x4, x_R)` with `x_R` fixed, in four variables:
+/// `Res_u(S_4(x1, x2, x3, u), S_3(u, x4, x_R))`, degree ≤ 8 in each variable,
+/// recovered exactly by evaluation on a 9⁴ grid and tensor Lagrange
+/// interpolation.
+fn summation_poly_5(x_r: u64, a: u64, b: u64, p: u64) -> Pol {
+    const K: usize = 9;
+    let nodes: Vec<u64> = (0..K as u64).collect();
+    let mut vals = vec![0u64; K * K * K * K];
+    for i1 in 0..K {
+        for i2 in 0..K {
+            for i3 in 0..K {
+                let s4 = {
+                    let _g = cnt::Guard::enter(cnt::S4_EVAL);
+                    s4_in_u(nodes[i1], nodes[i2], nodes[i3], a, b, p)
+                };
+                for i4 in 0..K {
+                    let g = {
+                        let _g = cnt::Guard::enter(cnt::S3_EVAL);
+                        s3_in_u(nodes[i4], x_r, a, b, p)
+                    };
+                    let _g = cnt::Guard::enter(cnt::DET);
+                    vals[((i1 * K + i2) * K + i3) * K + i4] = sylvester(&s4, 4, &g, 2, p);
+                }
+            }
+        }
+    }
+    let inv = {
+        let _g = cnt::Guard::enter(cnt::VINV);
+        vandermonde_inverse(&nodes, p)
+    };
+    let _g = cnt::Guard::enter(cnt::GRID_INTERP);
     // Apply V^{-1} along each axis.
     let idx = |a: [usize; 4]| ((a[0] * K + a[1]) * K + a[2]) * K + a[3];
     for axis in 0..4 {
@@ -604,6 +748,29 @@ fn plain_system(inst: &Instance, m: usize, x_r: u64, chain: bool) -> (Vec<Pol>, 
 /// Symmetric tower: `e_1..e_m` at `0..m`, `R_j` coefficients (constant
 /// term first) at `m·j .. m·j + m` for `j = 1..t−1`.
 fn symmetric_system(inst: &Instance, m: usize, x_r: u64) -> (Vec<Pol>, usize) {
+    let se = s_in_e_grid(inst, m, x_r);
+    symmetric_system_from(inst, m, &se)
+}
+
+/// `S_{m+1}(g w_1..g w_m, x_R)` written in `e_k(w)`, as built by the
+/// original instrument: grid evaluation + interpolation (m = 4), then the
+/// substitution `x_i = g w_i` and the elementary-symmetric rewrite.
+fn s_in_e_grid(inst: &Instance, m: usize, x_r: u64) -> Pol {
+    let p = inst.p;
+    let s = summation_poly(m, x_r, inst.a, inst.b, p);
+    let mut sw = s.clone();
+    {
+        let _g = cnt::Guard::enter(cnt::SUBST);
+        for i in 0..m {
+            sw = sw.subst(i, &Pol::var(m, i).scale(inst.g, p), p);
+        }
+    }
+    let _g = cnt::Guard::enter(cnt::ELEM);
+    to_elementary(&sw, m, p)
+}
+
+/// The symmetric tower system around a given `S_{m+1}(e)` polynomial `se`.
+fn symmetric_system_from(inst: &Instance, m: usize, se: &Pol) -> (Vec<Pol>, usize) {
     let (p, t) = (inst.p, inst.t);
     let n = m * t;
     let e = |k: usize| Pol::var(n, k - 1);
@@ -668,13 +835,7 @@ fn symmetric_system(inst: &Instance, m: usize, x_r: u64) -> (Vec<Pol>, usize) {
         };
         eqs.push(c.sub(&target, p));
     }
-    // S_{m+1}(g w_1..g w_m, x_R) in e_k(w): substitute x_i = g w_i first.
-    let s = summation_poly(m, x_r, inst.a, inst.b, p);
-    let mut sw = s.clone();
-    for i in 0..m {
-        sw = sw.subst(i, &Pol::var(m, i).scale(inst.g, p), p);
-    }
-    let se = to_elementary(&sw, m, p);
+    // S_{m+1}(g w_1..g w_m, x_R) in e_k(w), supplied by the caller.
     eqs.insert(0, se.remap(n, &(0..m).collect::<Vec<_>>()));
     (eqs, n)
 }
@@ -767,6 +928,655 @@ fn measure(eqs: &[Pol], n: usize, p: u64, budget: Duration) -> f4_fp::F4Report {
     f4_fp::f4(&input, n, p, &opts)
 }
 
+// ============================================ pricing study (2026-11-15) ====
+//
+// `research/pkm_priced_20261115/`: the per-target S5 build, counted
+// (`cnt`), and a per-curve parametric alternative.  `S_{m+1}` has degree
+// <= 2^{m-1} in `x_R`, so for m = 4 the polynomial `S_5(e; x_R)` is, per
+// monomial in the `e_k`, a polynomial of degree <= 8 in `x_R`.  The
+// parametric build computes it at 9 nodes `x_R = 0..8` ONCE per curve (the
+// grid build, substitution and `e` rewrite included), interpolates each
+// monomial coefficient in `x_R`, and then per target only evaluates those
+// degree-8 coefficient polynomials (Horner).  Both builds must agree
+// coefficient by coefficient; the check is exact, mod p.
+
+const XR_NODES: usize = 9; // 2^{m-1} + 1 for m = 4
+
+/// `S_5(e; x_R)` as `monomial -> coefficients in x_R` (constant term first).
+struct ParamS5 {
+    p: u64,
+    terms: Vec<(Vec<u32>, [u64; XR_NODES])>,
+}
+
+impl ParamS5 {
+    /// `node_builder(x_R)` must return the e-form `S_5` at that `x_R`
+    /// (the grid build in production, a synthetic family in unit tests).
+    fn build(p: u64, mut node_builder: impl FnMut(u64) -> Pol) -> ParamS5 {
+        let nodes: Vec<u64> = (0..XR_NODES as u64).collect();
+        let at_nodes: Vec<Pol> = nodes.iter().map(|&x| node_builder(x)).collect();
+        let _g = cnt::Guard::enter(cnt::PARAM_INTERP);
+        let inv = vandermonde_inverse(&nodes, p);
+        let mut keys: Vec<Vec<u32>> = at_nodes
+            .iter()
+            .flat_map(|f| f.t.keys().cloned())
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect();
+        keys.sort();
+        let terms = keys
+            .into_iter()
+            .map(|e| {
+                let mut c = [0u64; XR_NODES];
+                for (j, cj) in c.iter_mut().enumerate() {
+                    let mut acc = 0u64;
+                    for (k, f) in at_nodes.iter().enumerate() {
+                        let v = f.t.get(&e).copied().unwrap_or(0);
+                        acc = addm(acc, mulm(inv[j][k], v, p), p);
+                    }
+                    *cj = acc;
+                }
+                (e, c)
+            })
+            .collect();
+        ParamS5 { p, terms }
+    }
+
+    /// Per-target substitution: Horner in `x_R` for every monomial.
+    fn eval(&self, x_r: u64) -> Pol {
+        let _g = cnt::Guard::enter(cnt::PARAM_EVAL);
+        let p = self.p;
+        let n = self.terms.first().map(|(e, _)| e.len()).unwrap_or(0);
+        let mut f = Pol::zero(n);
+        for (e, c) in &self.terms {
+            let mut acc = c[XR_NODES - 1];
+            for j in (0..XR_NODES - 1).rev() {
+                acc = addm(mulm(acc, x_r, p), c[j], p);
+            }
+            if acc != 0 {
+                f.t.insert(e.clone(), acc);
+            }
+        }
+        f
+    }
+}
+
+/// Coefficient-by-coefficient equality of two polynomials (exact, mod p).
+/// Returns `(number of coefficients compared, number of mismatches)` over the
+/// union of supports (an absent term compares as 0).
+fn compare_coeffs(a: &Pol, b: &Pol) -> (usize, usize) {
+    let keys: std::collections::BTreeSet<&Vec<u32>> = a.t.keys().chain(b.t.keys()).collect();
+    let bad = keys
+        .iter()
+        .filter(|e| a.t.get(**e).copied().unwrap_or(0) != b.t.get(**e).copied().unwrap_or(0))
+        .count();
+    (keys.len(), bad)
+}
+
+fn stage_json(d: &cnt::Snap) -> serde_json::Value {
+    let mut m = serde_json::Map::new();
+    for (s, name) in cnt::STAGES.iter().enumerate() {
+        if d[s].iter().any(|&v| v != 0) {
+            m.insert(
+                name.to_string(),
+                serde_json::json!({"mulmod": d[s][0] + d[s][3], "mul_outside_inv": d[s][0],
+                    "addsub": d[s][1], "inv_calls": d[s][2], "mul_inside_inv": d[s][3]}),
+            );
+        }
+    }
+    serde_json::Value::Object(m)
+}
+
+/// Deterministic `x_R` of target `i`: independent of shard layout.
+fn target_xr(seed: u64, t: usize, i: u64, p: u64) -> u64 {
+    let mut r = Rng(seed ^ ((t as u64) << 48) ^ i.wrapping_mul(0xD1B5_4A32_D192_ED03));
+    r.next();
+    r.below(p)
+}
+
+/// The instrument's own instance for `(p, m, t)`: the same draws, in the same
+/// order, as the legacy `main` (same prime, curve, `g`, `zeta` as the
+/// committed rows).  Returns the generator state after the draws.
+fn legacy_instance(p: u64, m: usize, t: usize) -> (Instance, Rng) {
+    let mut rng = Rng(0x504B_4D53 ^ ((m as u64) << 32) ^ t as u64);
+    assert!((p - 1).is_multiple_of(1u64 << t), "2^t must divide p - 1");
+    let zeta = loop {
+        let h = 2 + rng.below(p - 2);
+        if powm(h, (p - 1) / 2, p) == p - 1 {
+            break powm(h, (p - 1) >> t, p);
+        }
+    };
+    let inst = Instance {
+        p,
+        a: rng.below(p),
+        b: 1 + rng.below(p - 1),
+        g: 2 + rng.below(p - 2),
+        zeta,
+        t,
+    };
+    (inst, rng)
+}
+
+/// A planted decomposition (distinct summands of `V`, chained `x_R`), or `None`.
+fn find_planted(inst: &Instance, m: usize, rng: &mut Rng) -> Option<(Vec<u64>, Vec<u64>, u64)> {
+    let (p, base) = (inst.p, inst.base());
+    if base.len() < m {
+        return None;
+    }
+    for _ in 0..200_000u32 {
+        let mut idx: Vec<usize> = Vec::new();
+        while idx.len() < m {
+            let k = rng.below(base.len() as u64) as usize;
+            if !idx.contains(&k) {
+                idx.push(k);
+            }
+        }
+        let xs: Vec<u64> = idx.iter().map(|&k| base[k]).collect();
+        let w: Vec<u64> = idx.iter().map(|&k| powm(inst.zeta, k as u64, p)).collect();
+        let mut chain = Vec::new();
+        let mut acc = s3_root(xs[0], xs[1], inst.a, inst.b, p);
+        for &x in &xs[2..] {
+            let Some(u) = acc else { break };
+            chain.push(u);
+            acc = s3_root(u, x, inst.a, inst.b, p);
+        }
+        if let Some(xr) = acc {
+            if chain.len() == m - 2 {
+                return Some((w, chain, xr));
+            }
+        }
+    }
+    None
+}
+
+// ------------------------------------------------ the curve, its order ----
+
+type Pt = Option<(u64, u64)>;
+
+fn ec_add(p1: Pt, p2: Pt, a: u64, p: u64) -> Pt {
+    let ((x1, y1), (x2, y2)) = match (p1, p2) {
+        (None, q) | (q, None) => return q,
+        (Some(u), Some(v)) => (u, v),
+    };
+    let lam = if x1 == x2 {
+        if addm(y1, y2, p) == 0 {
+            return None;
+        }
+        mulm(
+            addm(mulm(3, mulm(x1, x1, p), p), a, p),
+            invm(mulm(2, y1, p), p),
+            p,
+        )
+    } else {
+        mulm(subm(y2, y1, p), invm(subm(x2, x1, p), p), p)
+    };
+    let x3 = subm(subm(mulm(lam, lam, p), x1, p), x2, p);
+    let y3 = subm(mulm(lam, subm(x1, x3, p), p), y1, p);
+    Some((x3, y3))
+}
+
+fn ec_mul(mut k: u64, mut q: Pt, a: u64, p: u64) -> Pt {
+    let mut r = None;
+    while k > 0 {
+        if k & 1 == 1 {
+            r = ec_add(r, q, a, p);
+        }
+        q = ec_add(q, q, a, p);
+        k >>= 1;
+    }
+    r
+}
+
+/// `#E(F_p)` by a square table (O(p)).
+fn curve_order(a: u64, b: u64, p: u64) -> u64 {
+    let mut roots = vec![0u8; p as usize];
+    for y in 0..p {
+        let v = mulm(y, y, p) as usize;
+        roots[v] = roots[v].saturating_add(1);
+    }
+    let mut n = 1u64;
+    for x in 0..p {
+        let rhs = addm(addm(mulm(mulm(x, x, p), x, p), mulm(a, x, p), p), b, p);
+        n += roots[rhs as usize] as u64;
+    }
+    n
+}
+
+fn prime_factors(mut n: u64) -> Vec<u64> {
+    let mut f = Vec::new();
+    let mut d = 2;
+    while d * d <= n {
+        while n.is_multiple_of(d) {
+            f.push(d);
+            n /= d;
+        }
+        d += 1;
+    }
+    if n > 1 {
+        f.push(n);
+    }
+    f
+}
+
+// ------------------------------------------------------------- modes ----
+
+fn argv(args: &[String], k: &str, d: &str) -> String {
+    args.iter()
+        .position(|a| a == k)
+        .map(|i| args[i + 1].clone())
+        .unwrap_or_else(|| d.to_string())
+}
+
+/// `--mode curve`: the curve's order, subgroup, a generator, the liftable part
+/// of `V`, the derived relation yield, and (with `--spec-out`) the ecbench spec
+/// of the matched rho-neg arm on the same curve.
+fn run_curve(args: &[String]) {
+    let p: u64 = argv(args, "--p", "786433").parse().unwrap();
+    let t: usize = argv(args, "--t", "3").parse().unwrap();
+    let (inst, _) = legacy_instance(p, 4, t);
+    let n = curve_order(inst.a, inst.b, p);
+    let fs = prime_factors(n);
+    let r = *fs.iter().max().unwrap();
+    let h = n / r;
+    let mut gen = None;
+    for x in 1..p {
+        let rhs = addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+            inst.b,
+            p,
+        );
+        if let Some(y) = sqrtm(rhs, p) {
+            if y == 0 {
+                continue;
+            }
+            let g = ec_mul(h, Some((x, y)), inst.a, p);
+            if g.is_some() && ec_mul(r, g, inst.a, p).is_none() {
+                gen = g;
+                break;
+            }
+        }
+    }
+    let (gx, gy) = gen.expect("generator of order r");
+    let base = inst.base();
+    let on_curve = |x: u64| {
+        let rhs = addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+            inst.b,
+            p,
+        );
+        sqrtm(rhs, p).is_some()
+    };
+    let liftable = base.iter().filter(|&&x| on_curve(x)).count();
+    let c4 = |l: usize| {
+        if l < 4 {
+            0.0
+        } else {
+            (l * (l - 1) * (l - 2) * (l - 3)) as f64 / 24.0
+        }
+    };
+    // Signed sums: 16 sign patterns over an unordered 4-subset, +-R giving one
+    // x value, so 8 x values per subset; a random point hits one with
+    // probability (8 C(L,4)) / ((#E - 1)/2) = 16 C(L,4) / #E.
+    let yield_derived = 16.0 * c4(liftable) / n as f64;
+    let spec = serde_json::json!({
+        "schema": "ecbench.spec/v1",
+        "label": format!("pkm_priced_20261115 matched rho-neg, p={p} t={t}"),
+        "description": "Matched negation-map rho on the pkm_symmetric_lead1 curve (PROTOCOL.md). Public synthetic curve and targets; no security claim.",
+        "workloads": {"curves": [{"kind": "prime_explicit", "p": p, "a": inst.a, "b": inst.b,
+            "group_order": n, "r": r, "gx": gx, "gy": gy}],
+            "targets_per_curve": 200, "target_seed": 2026111531u64 + t as u64, "target_kind": "public"},
+        "arms": [
+            {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+            {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}],
+        "measurement": {"rounds": 3, "warmup": 1, "order": "alternate", "seed": 2026111541u64 + t as u64,
+            "isolation_required": "L0", "timeout_seconds": 1800}
+    });
+    if let Some(i) = args.iter().position(|a| a == "--spec-out") {
+        std::fs::write(&args[i + 1], serde_json::to_string_pretty(&spec).unwrap()).unwrap();
+    }
+    println!(
+        "{}",
+        serde_json::json!({"kind": "curve", "p": p, "t": t, "N": 4 * t, "a": inst.a, "b": inst.b, "g": inst.g,
+            "zeta": inst.zeta, "order": n, "factors": fs, "r": r, "cofactor": h, "gx": gx, "gy": gy,
+            "v_size": base.len(), "v_liftable_x": liftable, "unordered_4subsets_of_liftable": c4(liftable),
+            "relations_needed_derived": liftable + 1, "yield_per_target_derived": yield_derived,
+            "yield_lead_formula_8C(|V|,4)/r": 8.0 * c4(base.len()) / n as f64,
+            "label": "derived; [pcc:unverified]"})
+    );
+}
+
+/// `--mode calibrate`: best-of-N wall-clock cost of one mulmod relative to one
+/// affine group addition (Fermat inversion) on the curve (AGENTS.md 5a `w_cal`).
+/// Best-of-N timing, not an isolated host: labelled as such.
+fn run_calibrate(args: &[String]) {
+    use std::hint::black_box;
+    use std::time::Instant;
+    let p: u64 = argv(args, "--p", "786433").parse().unwrap();
+    let t: usize = argv(args, "--t", "3").parse().unwrap();
+    let (inst, _) = legacy_instance(p, 4, t);
+    let (mut best_mul, mut best_add) = (f64::MAX, f64::MAX);
+    for _ in 0..7 {
+        let n = 20_000_000u64;
+        let mut x = black_box(12345u64);
+        let s = Instant::now();
+        for _ in 0..n {
+            x = mulm(x, black_box(x | 1), p);
+        }
+        black_box(x);
+        best_mul = best_mul.min(s.elapsed().as_nanos() as f64 / n as f64);
+        let (mut q, g) = {
+            let mut x = 1;
+            loop {
+                let rhs = addm(
+                    addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+                    inst.b,
+                    p,
+                );
+                if let Some(y) = sqrtm(rhs, p) {
+                    if y != 0 {
+                        break (Some((x, y)), Some((x, y)));
+                    }
+                }
+                x += 1;
+            }
+        };
+        let n = 200_000u64;
+        let s = Instant::now();
+        for _ in 0..n {
+            q = ec_add(black_box(q), g, inst.a, p);
+        }
+        black_box(q);
+        best_add = best_add.min(s.elapsed().as_nanos() as f64 / n as f64);
+    }
+    println!(
+        "{}",
+        serde_json::json!({"kind": "calibration", "p": p, "t": t, "ns_per_mulmod": best_mul,
+            "ns_per_group_add": best_add, "w_cal": best_mul / best_add,
+            "method": "best of 7 loops; group add = affine add with Fermat inversion, this file's arithmetic (cnt-counted code path, not the production mulmod); not an isolated host",
+            "label": "measured on the executing host; [pcc:unverified]"})
+    );
+}
+
+/// `--mode stage0`: per target, the counted grid build, the counted parametric
+/// evaluation, the exact coefficient comparison, and (first `--f4-targets`
+/// targets) the F4 stage on the system built from the grid polynomial.
+fn run_stage0(args: &[String]) {
+    let p: u64 = argv(args, "--p", "786433").parse().unwrap();
+    let t: usize = argv(args, "--t", "3").parse().unwrap();
+    let targets: u64 = argv(args, "--targets", "24").parse().unwrap();
+    let lo: u64 = argv(args, "--target-lo", "0").parse().unwrap();
+    let f4_targets: u64 = argv(args, "--f4-targets", "8").parse().unwrap();
+    let seed: u64 = argv(args, "--seed", "2026111501").parse().unwrap();
+    let budget = Duration::from_secs(argv(args, "--budget", "600").parse().unwrap());
+    let skip_param = argv(args, "--param", "1") == "0";
+    let m = 4usize;
+    let (inst, mut rng) = legacy_instance(p, m, t);
+    let base = inst.base();
+    let row = |v: serde_json::Value| println!("{v}");
+    row(
+        serde_json::json!({"kind": "config", "p": p, "m": m, "t": t, "N": m * t, "a": inst.a, "b": inst.b,
+        "g": inst.g, "zeta": inst.zeta, "seed": seed, "targets": targets, "target_lo": lo,
+        "f4_targets": f4_targets, "xr_nodes": XR_NODES, "counted_unit":
+        "mulmod = kind0 + kind3 (every executed field multiplication, inversions' included); f4 = f4_fp field_ops (row multiply-subtracts)"}),
+    );
+
+    // Parametric precompute, once per curve, its own snapshot.
+    let mut mismatches_total = 0usize;
+    let mut compared_total = 0usize;
+    let pre0 = cnt::snapshot();
+    let t0 = std::time::Instant::now();
+    let param = if skip_param {
+        None
+    } else {
+        Some(ParamS5::build(p, |x| s_in_e_grid(&inst, m, x)))
+    };
+    let pre_ms = t0.elapsed().as_secs_f64() * 1e3;
+    let pre = cnt::diff(&cnt::snapshot(), &pre0);
+    if let Some(ps) = &param {
+        row(
+            serde_json::json!({"kind": "param_precompute", "xr_nodes": XR_NODES,
+            "e_monomials": ps.terms.len(),
+            "mulmod": cnt::mulmods(&pre, &(0..cnt::NST).collect::<Vec<_>>()),
+            "addsub": cnt::addsubs(&pre, &(0..cnt::NST).collect::<Vec<_>>()),
+            "grid_builds_inside": XR_NODES, "stages": stage_json(&pre), "ms": pre_ms}),
+        );
+    }
+
+    // Tower assembly (x_R independent): counted once, outside both builds.
+    let a0 = cnt::snapshot();
+    let dummy = Pol::zero(m);
+    let _ = symmetric_system_from(&inst, m, &dummy);
+    let asm = cnt::diff(&cnt::snapshot(), &a0);
+    row(serde_json::json!({"kind": "tower_assembly",
+        "mulmod": cnt::mulmods(&asm, &[cnt::OTHER]), "addsub": cnt::addsubs(&asm, &[cnt::OTHER]),
+        "note": "x_R-independent, per curve; reported, not added to either build"}));
+
+    // Planted target: both builds must reproduce the planted decomposition.
+    match find_planted(&inst, m, &mut rng) {
+        None => row(
+            serde_json::json!({"kind": "planted", "status": "skipped: no planted decomposition"}),
+        ),
+        Some((w, _partial, xr)) => {
+            let _g = cnt::Guard::enter(cnt::CHECK);
+            let se = s_in_e_grid(&inst, m, xr);
+            let sol = symmetric_solution(&inst, m, &w);
+            let (eqs, _) = symmetric_system_from(&inst, m, &se);
+            let ok_grid = eqs.iter().all(|e| e.eval(&sol, p) == 0);
+            let (ok_param, cmp) = match &param {
+                Some(ps) => {
+                    let sp = ps.eval(xr);
+                    let (eqs, _) = symmetric_system_from(&inst, m, &sp);
+                    (
+                        eqs.iter().all(|e| e.eval(&sol, p) == 0),
+                        compare_coeffs(&se, &sp),
+                    )
+                }
+                None => (true, (0, 0)),
+            };
+            compared_total += cmp.0;
+            mismatches_total += cmp.1;
+            row(
+                serde_json::json!({"kind": "planted", "x_r": xr, "grid_vanishes_at_planted": ok_grid,
+                "param_vanishes_at_planted": ok_param, "coeffs_compared": cmp.0, "mismatches": cmp.1}),
+            );
+            assert!(ok_grid && ok_param, "planted check failed");
+        }
+    }
+
+    // Targets.
+    let mut excluded = 0u64;
+    for i in lo..lo + targets {
+        let xr = target_xr(seed, t, i, p);
+        if base.contains(&xr) {
+            excluded += 1;
+            row(
+                serde_json::json!({"kind": "excluded", "target": i, "x_r": xr, "reason": "x_R in V"}),
+            );
+            continue;
+        }
+        let s0 = cnt::snapshot();
+        let tm = std::time::Instant::now();
+        let se = s_in_e_grid(&inst, m, xr);
+        let grid_ms = tm.elapsed().as_secs_f64() * 1e3;
+        let g = cnt::diff(&cnt::snapshot(), &s0);
+        let mut rec = serde_json::json!({"kind": "target", "target": i, "x_r": xr,
+            "e_monomials": se.t.len(),
+            "grid": {"mulmod": cnt::mulmods(&g, &cnt::GRID_BUILD), "addsub": cnt::addsubs(&g, &cnt::GRID_BUILD),
+                "inv_calls": cnt::invs(&g, &cnt::GRID_BUILD), "ms": grid_ms, "stages": stage_json(&g)}});
+        if let Some(ps) = &param {
+            let s1 = cnt::snapshot();
+            let tm = std::time::Instant::now();
+            let sp = ps.eval(xr);
+            let par_ms = tm.elapsed().as_secs_f64() * 1e3;
+            let d = cnt::diff(&cnt::snapshot(), &s1);
+            let (cmp, bad) = compare_coeffs(&se, &sp);
+            compared_total += cmp;
+            mismatches_total += bad;
+            rec["param"] = serde_json::json!({"mulmod": cnt::mulmods(&d, &[cnt::PARAM_EVAL]),
+                "addsub": cnt::addsubs(&d, &[cnt::PARAM_EVAL]), "ms": par_ms,
+                "coeffs_compared": cmp, "mismatches": bad});
+        }
+        if i - lo < f4_targets {
+            let (eqs, n) = symmetric_system_from(&inst, m, &se);
+            let rep = measure(&eqs, n, p, budget);
+            rec["f4"] = serde_json::json!({"field_ops": rep.field_ops, "D": rep.solving_degree_max,
+                "last_productive": rep.solving_degree, "max_cols": rep.max_cols,
+                "inconsistent": rep.inconsistent, "timed_out": rep.timed_out, "ms": rep.ms});
+            if let Some(gm) = rec["grid"]["mulmod"].as_u64() {
+                rec["build_over_f4"] = serde_json::json!(gm as f64 / rep.field_ops.max(1) as f64);
+            }
+        }
+        row(rec);
+    }
+    row(
+        serde_json::json!({"kind": "stage0_verdict", "coeffs_compared": compared_total,
+        "mismatches": mismatches_total, "targets_run": targets - excluded, "excluded_x_r_in_V": excluded,
+        "param_checked": !skip_param, "coefficient_check_passed": !skip_param && mismatches_total == 0}),
+    );
+    if mismatches_total != 0 {
+        std::process::exit(3);
+    }
+}
+
+fn read_jsonl(path: &str) -> Vec<serde_json::Value> {
+    std::fs::read_to_string(path)
+        .unwrap_or_default()
+        .lines()
+        .filter_map(|l| serde_json::from_str(l).ok())
+        .collect()
+}
+
+/// `--mode summary --stage0 a.jsonl[,b.jsonl] --curve c.json --band band.json
+///  --calib k.json [--amortise 100]`: the end-to-end priced S of each build
+/// mode against the matched rho-neg, at w = 0, 0.1, 1, `w_cal`, 10 `w_cal`
+/// and the leaderboard's 1/13 convention.  Mixes derived and measured inputs
+/// and says which is which.
+fn run_summary(args: &[String]) {
+    let rows: Vec<serde_json::Value> = argv(args, "--stage0", "")
+        .split(',')
+        .filter(|s| !s.is_empty())
+        .flat_map(read_jsonl)
+        .collect();
+    let curve = read_jsonl(&argv(args, "--curve", "curve.json"))
+        .pop()
+        .unwrap_or_default();
+    let calib = read_jsonl(&argv(args, "--calib", "calib.json"))
+        .pop()
+        .unwrap_or_default();
+    let band: serde_json::Value = std::fs::read_to_string(argv(args, "--band", "band.json"))
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_default();
+    let amort: f64 = argv(args, "--amortise", "100").parse().unwrap();
+    let mean = |key: &dyn Fn(&serde_json::Value) -> Option<f64>| -> Option<f64> {
+        let v: Vec<f64> = rows
+            .iter()
+            .filter(|r| r["kind"] == "target")
+            .filter_map(key)
+            .collect();
+        (!v.is_empty()).then(|| v.iter().sum::<f64>() / v.len() as f64)
+    };
+    let grid = mean(&|r| r["grid"]["mulmod"].as_f64());
+    let par = mean(&|r| r["param"]["mulmod"].as_f64());
+    let f4 = mean(&|r| r["f4"]["field_ops"].as_f64());
+    let inv_share = mean(&|r| {
+        let st = r["grid"]["stages"].as_object()?;
+        let inv: f64 = st
+            .values()
+            .filter_map(|v| v["mul_inside_inv"].as_f64())
+            .sum();
+        let all: f64 = st.values().filter_map(|v| v["mulmod"].as_f64()).sum();
+        Some(inv / all)
+    });
+    let pre = rows
+        .iter()
+        .find(|r| r["kind"] == "param_precompute")
+        .and_then(|r| r["mulmod"].as_f64());
+    let (n_order, r_sub) = (
+        curve["order"].as_f64().unwrap_or(f64::NAN),
+        curve["r"].as_f64().unwrap_or(f64::NAN),
+    );
+    let y = curve["yield_per_target_derived"]
+        .as_f64()
+        .unwrap_or(f64::NAN);
+    let need = curve["relations_needed_derived"]
+        .as_f64()
+        .unwrap_or(f64::NAN);
+    let targets_per_solve = need / y;
+    // rho-neg S(w) = s0 + w u is linear in w: fit from the band's weights.
+    let ws: Vec<f64> = band["weights"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|x| x.as_f64()).collect())
+        .unwrap_or_default();
+    let rho = band["rows"]
+        .as_array()
+        .and_then(|rs| rs.iter().find(|r| r["arm"] == "rho-neg"))
+        .cloned()
+        .unwrap_or_default();
+    let ms: Vec<f64> = rho["mean_s"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|x| x.as_f64()).collect())
+        .unwrap_or_default();
+    let (rho_s0, rho_u, rho_lin_resid) = if ws.len() == 3 && ms.len() == 3 {
+        let u = (ms[2] - ms[0]) / (ws[2] - ws[0]);
+        (
+            ms[0],
+            u,
+            (ms[1] - (ms[0] + u * ws[1])).abs() / ms[1].abs().max(1e-300),
+        )
+    } else {
+        (f64::NAN, f64::NAN, f64::NAN)
+    };
+    let w_cal = calib["w_cal"].as_f64().unwrap_or(f64::NAN);
+    let weights = [
+        ("w0", 0.0),
+        ("w0.1", 0.1),
+        ("w1", 1.0),
+        ("w_cal", w_cal),
+        ("10w_cal", 10.0 * w_cal),
+        ("legacy_1/13", 1.0 / 13.0),
+    ];
+    let sqrt_r = r_sub.sqrt();
+    let arm = |name: &str, per_target_ops: Option<f64>, setup_ops: f64| -> serde_json::Value {
+        let mut out = serde_json::Map::new();
+        for (label, w) in weights {
+            let s_alg = per_target_ops.map(|c| (targets_per_solve * c + setup_ops) * w / sqrt_r);
+            let s_rho = rho_s0 + rho_u * w;
+            out.insert(label.into(), serde_json::json!({"w": w, "S": s_alg, "S_rho_neg": s_rho,
+                "S_over_rho_neg": if w == 0.0 { None } else { s_alg.map(|s| s / s_rho) },
+                "note": if w == 0.0 { "undefined at w = 0: the algebraic arm has no counted group work" } else { "" }}));
+        }
+        serde_json::json!({"arm": name, "per_target_ops": per_target_ops, "setup_ops": setup_ops, "by_weight": out})
+    };
+    let tot = |b: Option<f64>| match (b, f4) {
+        (Some(b), Some(f)) => Some(b + f),
+        _ => None,
+    };
+    let summary = serde_json::json!({
+        "kind": "priced_summary",
+        "inputs": {"mean_grid_build_mulmod": grid, "mean_param_eval_mulmod": par, "mean_f4_field_ops": f4,
+            "param_precompute_mulmod": pre, "targets_per_solve_derived": targets_per_solve,
+            "relations_needed_derived": need, "yield_per_target_derived": y, "order": n_order, "r": r_sub,
+            "w_cal": w_cal, "rho_neg_S_fit": {"s0": rho_s0, "u_per_w": rho_u, "linearity_residual_at_w0.1": rho_lin_resid}},
+        "ratios_measured": {"grid_inversion_mulmod_share": inv_share,
+            "grid_build_over_f4": grid.zip(f4).map(|(a, b)| a / b),
+            "param_eval_over_f4": par.zip(f4).map(|(a, b)| a / b),
+            "grid_over_param_per_target": grid.zip(par).map(|(a, b)| a / b),
+            "precompute_over_grid_build": pre.zip(grid).map(|(a, b)| a / b),
+            "breakeven_targets": pre.zip(grid.zip(par)).map(|(s, (g, q))| s / (g - q)),
+            "param_eval_plus_amortised_precompute_over_grid_at_horizon": pre.zip(grid.zip(par)).map(|(s, (g, q))| (q + s / amort) / g),
+            "amortisation_horizon": amort},
+        "arms": [
+            arm("f4_only (as quoted, unpriced build)", f4, 0.0),
+            arm("symmetric_grid_build (as built)", tot(grid), 0.0),
+            arm("symmetric_parametric_build", tot(par), pre.unwrap_or(f64::NAN)),
+        ],
+        "not_priced_lower_bound": ["root recovery of relations", "linear algebra over the relation matrix",
+            "verification [d]G = Q", "x_R lift / point decoding", "tower assembly (per curve, reported separately)"],
+        "labels": "ratios_measured: measured; yield, relations_needed, targets_per_solve: derived; S and S/rho: derived from the two; all [pcc:unverified]",
+    });
+    println!("{summary}");
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let get = |k: &str, d: &str| -> String {
@@ -787,6 +1597,14 @@ fn main() {
     let randoms: usize = get("--random", "2").parse().unwrap();
     let budget = Duration::from_secs(get("--budget", "600").parse().unwrap());
     let arms_filter = get("--arms", "plain-chain,plain-smp1,symmetric");
+    match get("--mode", "legacy").as_str() {
+        "legacy" => {}
+        "stage0" => return run_stage0(&args),
+        "curve" => return run_curve(&args),
+        "calibrate" => return run_calibrate(&args),
+        "summary" => return run_summary(&args),
+        other => panic!("unknown --mode {other}"),
+    }
     for &m in &ms {
         let tmax = match m {
             2 => tmax2,
@@ -915,6 +1733,137 @@ fn main() {
                     );
                 }
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const P: u64 = 12289; // 3 * 2^12 + 1
+
+    #[test]
+    fn counters_book_to_the_current_stage() {
+        let s0 = cnt::snapshot();
+        {
+            let _g = cnt::Guard::enter(cnt::S3_EVAL);
+            let _ = mulm(3, 5, P);
+            let _ = addm(3, 5, P);
+            let _ = subm(3, 5, P);
+        }
+        let _ = mulm(3, 5, P);
+        let d = cnt::diff(&cnt::snapshot(), &s0);
+        assert_eq!(d[cnt::S3_EVAL][0], 1);
+        assert_eq!(d[cnt::S3_EVAL][1], 2);
+        assert_eq!(d[cnt::OTHER][0], 1);
+    }
+
+    #[test]
+    fn inversion_muls_are_booked_apart() {
+        let s0 = cnt::snapshot();
+        let r = invm(7, P);
+        assert_eq!(mulm(r, 7, P), 1);
+        let d = cnt::diff(&cnt::snapshot(), &s0);
+        assert_eq!(d[cnt::OTHER][2], 1);
+        assert!(
+            d[cnt::OTHER][3] >= 14,
+            "Fermat inversion is about 2 log p mulmods"
+        );
+        assert_eq!(
+            d[cnt::OTHER][0],
+            1,
+            "only the explicit mulm is outside the inversion"
+        );
+    }
+
+    #[test]
+    fn counting_does_not_change_values() {
+        let (inst, _) = legacy_instance(P, 4, 3);
+        let a = s4_in_u(1, 2, 3, inst.a, inst.b, P);
+        let _g = cnt::Guard::enter(cnt::S4_EVAL);
+        assert_eq!(a, s4_in_u(1, 2, 3, inst.a, inst.b, P));
+    }
+
+    /// A synthetic e-form family of exact degree 8 in `x_R`: the parametric
+    /// machinery must reproduce it at points that are not nodes.
+    #[test]
+    fn param_is_exact_on_a_degree_8_family() {
+        let fam = |x: u64| {
+            let mut f = Pol::zero(4);
+            for (k, e) in [[1, 0, 0, 0], [0, 1, 0, 0], [2, 1, 0, 1], [0, 0, 0, 0]]
+                .iter()
+                .enumerate()
+            {
+                let mut c = 0;
+                for j in 0..=8u64 {
+                    c = addm(c, mulm(1000 + 37 * j + 11 * k as u64, powm(x, j, P), P), P);
+                }
+                f.t.insert(e.to_vec(), c);
+            }
+            f
+        };
+        let ps = ParamS5::build(P, fam);
+        for x in [9u64, 100, 4321, P - 1] {
+            let (n, bad) = compare_coeffs(&fam(x), &ps.eval(x));
+            assert_eq!((n, bad), (4, 0), "x_R = {x}");
+        }
+    }
+
+    #[test]
+    fn param_detects_a_degree_9_family() {
+        let fam = |x: u64| {
+            let mut f = Pol::zero(1);
+            f.t.insert(vec![1], powm(x, 9, P));
+            f
+        };
+        let ps = ParamS5::build(P, fam);
+        let (_, bad) = compare_coeffs(&fam(5000), &ps.eval(5000));
+        assert!(bad > 0, "degree 9 in x_R must not be reproduced by 9 nodes");
+    }
+
+    #[test]
+    fn compare_coeffs_reports_a_mismatch() {
+        let mut a = Pol::zero(2);
+        a.t.insert(vec![1, 0], 5);
+        let mut b = a.clone();
+        assert_eq!(compare_coeffs(&a, &b), (1, 0));
+        b.t.insert(vec![0, 1], 3);
+        assert_eq!(compare_coeffs(&a, &b), (2, 1));
+    }
+
+    #[test]
+    fn curve_order_matches_group_law() {
+        let (inst, _) = legacy_instance(P, 4, 3);
+        let n = curve_order(inst.a, inst.b, P);
+        let mut x = 1;
+        let pt = loop {
+            let rhs = addm(
+                addm(mulm(mulm(x, x, P), x, P), mulm(inst.a, x, P), P),
+                inst.b,
+                P,
+            );
+            if let Some(y) = sqrtm(rhs, P) {
+                if y != 0 {
+                    break Some((x, y));
+                }
+            }
+            x += 1;
+        };
+        assert!(ec_mul(n, pt, inst.a, P).is_none());
+    }
+
+    /// The real thing at the smallest toy size (slow in debug:
+    /// `cargo test --release --example pkm_symmetric_tower -- --ignored`).
+    #[test]
+    #[ignore]
+    fn parametric_s5_equals_grid_s5_on_toy_curve() {
+        let (inst, _) = legacy_instance(P, 4, 3);
+        let ps = ParamS5::build(P, |x| s_in_e_grid(&inst, 4, x));
+        for i in 0..3 {
+            let xr = target_xr(7, 3, i, P);
+            let (_, bad) = compare_coeffs(&s_in_e_grid(&inst, 4, xr), &ps.eval(xr));
+            assert_eq!(bad, 0, "target {i}");
         }
     }
 }

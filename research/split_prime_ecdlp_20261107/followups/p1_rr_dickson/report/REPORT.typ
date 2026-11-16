@@ -47,3 +47,20 @@ Control met exactly (T on the Kummer curve at m3 t5: D 6, widest 23,720, round 7
 
 = Round 2, card B: the first m = 5 cell with a tower
 Card `CARD-p1-r2-b`, T24 m5 t4, seed 2, 13 GiB and 10,800 s, alone on the host. RR timed out after 10,800 s at degree ≥ 6 (working in degree 7), widest ≥ 146,277; T hit the 13 GiB cap after 2,619 s at degree ≥ 9, widest ≥ 662,876. *Rule 3: undecided under the frozen text* (RR did not complete) [pcc:unverified]. Descriptively RR was at a lower degree with 4.5 times narrower matrices when stopped, limited by time not memory. Deciding it needs RR run to completion on a larger host with about a day's time limit.
+
+= Round 3: T24 m5 t4 on Iso Lab EKS, 56–60 GiB and 24 h (PROTOCOL-R3)
+
+Same instrument, instance (seed 2; each pod re-emitted the system and its sha256 matched round 2's) and frozen rule 3; only the limits and the host changed (RR `ulimit -v` 60 GiB, T 56 GiB, `timeout` 86,400 s, one msolve process per Spot pod). Analysis `analysis/p1r3analyze` → `analysis/derived_r3/decision_r3.json`.
+
+#table(columns: 5, align: (left, left, left, right, right),
+  [*attempt*], [*host*], [*outcome*], [*D*], [*widest*],
+  [T a1], [m7i.4xlarge Spot], [lost: Spot interruption after 1 h 30 min], [—], [—],
+  [*T a2*], [m7i.4xlarge Spot], [*cap at 56 GiB after 21,267 s*, degree-9 step], [*≥ 9*], [*≥ 1,305,345*],
+  [RR a1], [r7a.4xlarge Spot], [lost: Spot interruption after 15 min], [—], [—],
+  [RR a2], [r7a.4xlarge Spot], [lost: Spot interruption after 2 h 33 min (after 10 h Pending)], [—], [—],
+  [RR a3], [r6a.4xlarge Spot, pinned], [lost: Spot interruption after 52 min], [—], [—],
+)
+
+Bounds after rounds 2 and 3: RR D ≥ 6, widest ≥ 146,277 (R2b); T D ≥ 9, widest ≥ 1,305,345 (R3). *Rule 3: still undecided* — no RR attempt completed, and the frozen reading decides only for a completed RR. Every loss is a CloudTrail `BidEvictedEvent`; partial records are kept and supply no bound. Descriptively, all RR attempts stopped inside the same degree-7 step (matrix 464,562 × 390,983, never finished); T's degree-8 step completed at 262,201 columns. The obstacle is the Spot pool, not the computation: four interruptions in five pods. Cheapest next step: RR alone on a host that is not reclaimed (On-Demand or a qualified resumable route).
+
+#figure(image("../figures/p1_r3_m5t4.svg", width: 100%), caption: [T24 m5 t4, seed 2, rounds 2b and 3: every bar is a lower bound (hatched); T's widest bound doubled at 56 GiB, RR never got past its degree-7 step on Spot.])

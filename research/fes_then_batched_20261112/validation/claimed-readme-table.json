@@ -1,0 +1,24 @@
+{
+  "what": "The claimed side, transcribed verbatim by the validator from the producer's README (table at lines 53-58, distance bullet at lines 77-78). Printed strings are kept so the rounding precision is explicit; thousands separators removed.",
+  "source": {"path": "README.md", "sha256": "aefc37f4815019ba26507090af06ce14340bb03baad3cc88ebf07e105249eebc", "lines": "53-58, 65, 77-78"},
+  "columns": ["rho", "pair-table", "inherited-f4", "fes-then-inherited", "fes-then-batched", "ftb_over_if4"],
+  "table": [
+    {"name": "koblitz-n13", "unknowns": 14, "printed": ["2.89", "197.8", "137.9", "101.9", "101.9", "0.739"]},
+    {"name": "char2-n15", "unknowns": 16, "printed": ["2.28", "473.7", "326.0", "326.0", "277.5", "0.851"]},
+    {"name": "koblitz-n17", "unknowns": 18, "printed": ["1.73", "493.2", "304.5", "304.5", "249.7", "0.820"]},
+    {"name": "koblitz-n19", "unknowns": 20, "printed": ["1.35", "1063.3", "465.5", "465.5", "413.6", "0.889"]},
+    {"name": "char2-n21", "unknowns": 22, "printed": ["1.24", "1975.9", "4411.6", "4411.6", "3726.1", "0.845"]},
+    {"name": "koblitz-n23", "unknowns": 24, "printed": ["0.88", "3986.3", "2051.2", "2051.2", "1674.3", "0.816"]}
+  ],
+  "secondary": {
+    "ftb_over_if4_range_printed": ["0.74", "0.89"],
+    "distance_to_rho_ftb_printed": {
+      "koblitz-n13": "35.3", "koblitz-n17": "144", "koblitz-n19": "306", "koblitz-n23": "1903",
+      "char2-n15": "122", "char2-n21": "3005"
+    },
+    "lowest_ic_row_claimed": {
+      "koblitz-n13": true, "char2-n15": true, "koblitz-n17": true, "koblitz-n19": true,
+      "char2-n21": false, "koblitz-n23": true
+    }
+  }
+}

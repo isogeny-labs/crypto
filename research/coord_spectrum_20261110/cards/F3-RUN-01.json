@@ -1,0 +1,301 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-coord-spectrum-20261110-F3-RUN-01",
+  "experiment_id": "coord_spectrum_20261110",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "7de7236cf320e9f1d76260f2ca0d558d3ed5b865",
+  "receipt": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.receipt.json",
+  "binds": [
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/PROTOCOL.md",
+      "sha256": "4bfd872a04d0e7b671446c6016a541f2e7384fdecc411e1c4d05a0810be2ec7f"
+    },
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/FREEZE.sha256",
+      "sha256": "4891d5aa563392fe32dd9c3035c2d65c43bd749af8efca329853facb8775bf7a"
+    },
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.toml",
+      "sha256": "a3f4cf8b04cd89c2b071ba0c27f113cd7f5c54559d064dc5fda807239c76f52a"
+    },
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.lock",
+      "sha256": "3cc4284b70d5c7155750195fc11e5a1c8b66d4fcb25cd9886682c0adc3cfd203"
+    },
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/tool/src/main.rs",
+      "sha256": "ecb877ef619ea88e80fbe096059cd43bfb4022f67ecc1e5b2f3fc73c208289a6"
+    },
+    {
+      "path": "/home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum",
+      "sha256": "7e08c12ec3865247299923e9f71398260dfe605b261ce66c5a78226496fe1c4e"
+    }
+  ],
+  "must_not_exist": [
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.receipt.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run",
+    "research/coord_spectrum_20261110/results/run.json",
+    "research/coord_spectrum_20261110/results/run.stdout.txt",
+    "research/coord_spectrum_20261110/results/run.stderr.txt",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-table.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-table.stderr"
+  ],
+  "commands": [
+    {
+      "id": "verify-freeze",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "cwd": "research/coord_spectrum_20261110",
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stdout"
+      ]
+    },
+    {
+      "id": "git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stdout"
+      ]
+    },
+    {
+      "id": "rustc-version",
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stdout"
+      ]
+    },
+    {
+      "id": "cargo-version",
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stdout"
+      ]
+    },
+    {
+      "id": "nproc",
+      "argv": [
+        "nproc"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stdout"
+      ]
+    },
+    {
+      "id": "uname",
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stdout"
+      ]
+    },
+    {
+      "id": "cpu-model",
+      "argv": [
+        "lscpu"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stdout"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stdout"
+      ]
+    },
+    {
+      "id": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stdout"
+      ]
+    },
+    {
+      "id": "binary-sha256",
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stdout"
+      ]
+    },
+    {
+      "id": "run-full",
+      "argv": [
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum",
+        "--protocol",
+        "/home/user/crypto/research/coord_spectrum_20261110/PROTOCOL.md",
+        "--sets",
+        "R16,R20,ANOM",
+        "--out",
+        "research/coord_spectrum_20261110/results/run.json"
+      ],
+      "timeout_seconds": 28800,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/results/run.stdout.txt",
+      "stderr": "research/coord_spectrum_20261110/results/run.stderr.txt",
+      "outputs": [
+        "research/coord_spectrum_20261110/results/run.json",
+        "research/coord_spectrum_20261110/results/run.stdout.txt"
+      ]
+    },
+    {
+      "id": "result-sha256",
+      "argv": [
+        "sha256sum",
+        "research/coord_spectrum_20261110/results/run.json"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-sha256.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-sha256.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-sha256.stdout"
+      ]
+    },
+    {
+      "id": "result-table",
+      "argv": [
+        "cat",
+        "research/coord_spectrum_20261110/results/run.stdout.txt"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-table.stdout",
+      "stderr": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-table.stderr",
+      "outputs": [
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.result-table.stdout"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-coord-spectrum",
+  "background": true,
+  "write_scope": [
+    "research/coord_spectrum_20261110/"
+  ],
+  "stop_when": [
+    "Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing.",
+    "The verify-freeze command prints any line not ending in OK, or the test command prints no line containing test result: ok. 7 passed; 0 failed; report the printed text verbatim.",
+    "The run-full command exits with a nonzero status; report the printed text verbatim."
+  ],
+  "notes": "Frozen full run of study coord_spectrum_20261110 (PROTOCOL.md sections 2, 5, 6; FREEZE.sha256). Exact counts; eta and energies are deterministic f64 reductions with recorded error bounds; no timing is a result. Execution route: local host. The isolab-eks route is unavailable from this session (no aws CLI) and the GitHub route takes only ecbench specs, so this is local evidence; the section 9a confirmatory EKS run is open. The host is shared with three other running studies. The tool has no --threads flag (it uses std::thread::available_parallelism, nproc is printed by the nproc step) and no null-count flag (its full-run null count is the constant 20 per class and 8 curves, --quick selects 2 curves and 5 nulls and is not used), so neither the requested --threads 2 nor an explicit null count is in the card; see specification_errors. --sets R16,R20,ANOM is the tool's own flag and default. The run-full command has an 8-hour limit, so it runs detached: run the card, then run wait until the receipt status is no longer detached. The cpu-model step runs lscpu. The binary bound in binds is the build already on disk before this card; the binary-sha256 step records the digest of the binary this card builds. The result-table step prints results/run.stdout.txt."
+}

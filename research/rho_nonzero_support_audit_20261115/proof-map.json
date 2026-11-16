@@ -1,0 +1,141 @@
+{
+  "main": "RhoNonzeroSupportAudit.nonzero_support_certificate",
+  "binding": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+  "custom_imports": {
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "CollisionCertificate": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+    "CollisionTails": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "PathAgreement": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+    "PostCollisionControl": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+    "Survival": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+    "BalancedPaths": "research/rho_twochoice_collision_audit_20261115/lean/BalancedPaths.lean",
+    "BinaryEnsemble": "research/rho_twochoice_collision_audit_20261115/lean/BinaryEnsemble.lean",
+    "BinaryMaximal": "research/rho_twochoice_collision_audit_20261115/lean/BinaryMaximal.lean",
+    "BinaryUnbounded": "research/rho_twochoice_collision_audit_20261115/lean/BinaryUnbounded.lean",
+    "SupportCounting": "research/rho_twochoice_collision_audit_20261115/lean/SupportCounting.lean",
+    "TwoChoiceCertificate": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceCertificate.lean",
+    "TwoChoiceImports": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceImports.lean",
+    "ConditionedMean": "research/rho_nonzero_support_audit_20261115/lean/ConditionedMean.lean",
+    "NonzeroBounds": "research/rho_nonzero_support_audit_20261115/lean/NonzeroBounds.lean",
+    "NonzeroCertificate": "research/rho_nonzero_support_audit_20261115/lean/NonzeroCertificate.lean",
+    "NonzeroLaw": "research/rho_nonzero_support_audit_20261115/lean/NonzeroLaw.lean"
+  },
+  "claims": [
+    {
+      "declaration": "RhoNonzeroSupportAudit.masked_mean_le_conditional",
+      "conclusion": "Derived finite nonnegative masked mean bound by actual subtype conditional mean."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.mean_le_conditioned_add_discard",
+      "conclusion": "Generic bounded-statistic conditional comparison."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.discarded_mass",
+      "conclusion": "Exact actual zero-containing support mass2/p."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.tableMean_le",
+      "conclusion": "Actual static hash first-repeat tablemean≤p."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.all_mean_le_nonzero_add_two",
+      "conclusion": "Actual Eall≤Enonzero+2."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzeroEquiv",
+      "conclusion": "Actual coordinate↔nonzeroembedding bijection."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzeroWitness",
+      "conclusion": "Actual nonempty support witness for primep>2."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzeroMean_actual_law",
+      "conclusion": "Actual uniform nonzero-support PMF×static vertex-label PMF mean."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.small_population_controls",
+      "conclusion": "Actualp2empty/p3two-support kernelchecked controls."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzero_mean_lower",
+      "conclusion": "Actual nonzero mean≥m²/2−2 at cubic threshold."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzero_mean_quarter",
+      "conclusion": "Actual nonzero mean≥m²/4 form≥3."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzero_ratio_unbounded",
+      "conclusion": "EverynaturalCsomeprimep>2hasactualnonzeroE²>Cp."
+    },
+    {
+      "declaration": "RhoNonzeroSupportAudit.nonzero_no_uniform_sqrt_bound",
+      "conclusion": "No realnonnegativeuniformsqrtconstant in nonzero model."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "packet": "rho_twochoice_collision_audit_20261115",
+      "claim": "PCC-20261115-db512a",
+      "scope": "Actual zeroallowed uniformdistinctsupport/staticfairhash Eall≥m²/2 atcubicthreshold/unbounded/no sqrt; actualmaximal/path/shortrelation/deferreddecisions machinery reused unchanged, notnewproofwork."
+    },
+    {
+      "packet": "sidon_rho_counterfamily_audit_20261114",
+      "scope": "Fixed20 nonzero sourcegeneric support family; supporttable notaveraged."
+    },
+    {
+      "packet": "static_hash_collision_audit_20261114",
+      "scope": "Actual leastrepeat≤p, deferreddecisions/selfavoidance, postcollisionwordfalse, credited."
+    },
+    {
+      "packet": "random_support_average_audit_20261114",
+      "scope": "Qualified expected uniformdistinctsupport Hildebrandmixing, not collisionconstant."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 20,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_both_nonzero_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "exact_discarded_mass_and_conditioned_mean_comparison": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "p2_not_normalized_as_PMF": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

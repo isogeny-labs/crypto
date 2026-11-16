@@ -1,0 +1,181 @@
+{
+  "schema": "rootfinding_research_cycle_v1",
+  "hypothesis": "Regular double-source elimination leaves one shared k, then exact coefficient constraints and incidence components may reduce conditional search cost.",
+  "results": {
+    "two-candidate-repair-controls-20261115-v2": {
+      "status": "passed",
+      "summary": "Complete conditional 4+1 norm candidates by quadratic inversion; no original-global-root or genuine baseline gain claim.",
+      "evidence": {
+        "complete_conditional_norm": true,
+        "complete_global_root_search": false,
+        "error": null,
+        "known_affine_rank_one_overlap": true,
+        "legacy_predicates": 57409,
+        "new_source_coverage_claim": false,
+        "novelty_claim": false,
+        "original_auxiliary_roots_recovered": false,
+        "original_root_count_exact": null,
+        "peak_process_rss_kib": 94168,
+        "predicates": 1444,
+        "qualified_speedup": null,
+        "raw_bytes": 2845,
+        "raw_sha256": "09703da371733688e8a566991e76122bac174b7394665da5e9c48c1a4c3b9f29",
+        "release_gate_claim": false
+      },
+      "details": {
+        "changed_assumption": "GF8 usesA1/B1 becauseGF8A0B1hasnopointoutsideprefixdomain; originalfailedvariantpreserved",
+        "positive_cells": 5,
+        "quadratic_rhs_checks": 28,
+        "raw_parameter_states": 52352,
+        "uniform_kzero_cells": 20
+      },
+      "process": {
+        "wall_seconds": 1.8825007850000475,
+        "peak_process_rss_kib": 94168,
+        "user_seconds": 1.8728989999999999,
+        "system_seconds": 0.003901
+      }
+    },
+    "regular-block-controls-20261115-v2": {
+      "status": "passed",
+      "summary": "Regular doubled-source free-k affine fiber and exact incidence-component probe; no global original-root or speedup claim.",
+      "evidence": {
+        "complete_conditional_component": true,
+        "complete_global_root_search": false,
+        "error": null,
+        "novelty_claim": false,
+        "original_root_count_exact": null,
+        "peak_process_rss_kib": 108824,
+        "predicates": 18303,
+        "qualified_speedup": null,
+        "raw_bytes": 566,
+        "raw_sha256": "a6d422a7fccdaff4eb00f16f6d0941a6b4182ffa9f85ac6b1c4984874b9de3dd",
+        "release_gate_claim": false
+      },
+      "details": {
+        "common_factor_branch": "unknown",
+        "norm_cells": 12,
+        "positive_regular_norm_parameters": 4,
+        "raw_r_s_k_states": 17344,
+        "scope": "fixed h,a,ya regular norm branch only",
+        "zero_a_branch": "unknown"
+      },
+      "process": {
+        "wall_seconds": 0.8270908130002681,
+        "peak_process_rss_kib": 108824,
+        "user_seconds": 0.8082699999999999,
+        "system_seconds": 0.012792
+      }
+    },
+    "regular-block-profile-20261115-v2": {
+      "status": "passed",
+      "summary": "Regular doubled-source free-k affine fiber and exact incidence-component probe; no global original-root or speedup claim.",
+      "evidence": {
+        "complete_conditional_component": true,
+        "complete_global_root_search": false,
+        "error": null,
+        "novelty_claim": false,
+        "original_root_count_exact": null,
+        "peak_process_rss_kib": 154460,
+        "predicates": 1497,
+        "qualified_speedup": null,
+        "raw_bytes": 6692,
+        "raw_sha256": "e98420402585b5a00b35fbc938bb47d1669169db82c0d38ed40dbc43d47e122d",
+        "release_gate_claim": false
+      },
+      "details": {
+        "a": 1,
+        "excluded_common_factor_k": 4989239479274253888111616,
+        "field_degree": 83,
+        "global_original_complete": false,
+        "h": 4989239479274253888111616,
+        "median_seconds": 0.1379683949999162,
+        "original_root_count_exact": null,
+        "repetitions": "same process, not cold; field irreducibility cache may be warm",
+        "ya": 0
+      },
+      "process": {
+        "wall_seconds": 0.7743475239999498,
+        "peak_process_rss_kib": 154460,
+        "user_seconds": 0.693955,
+        "system_seconds": 0.074145
+      },
+      "repetitions": [
+        {
+          "seconds": 0.13131439200014938,
+          "rank": 79,
+          "nullity": 4,
+          "regular_candidates": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true,
+          "structure": {
+            "active_row_density": 0.48558792130547507,
+            "columns": 83,
+            "component_sizes": [
+              83
+            ],
+            "density": 0.23109304688634055,
+            "general_btf_tested": false,
+            "nonzero_rows": 79,
+            "nonzeros": 3184,
+            "rows": 166
+          }
+        },
+        {
+          "seconds": 0.1407420809996438,
+          "rank": 79,
+          "nullity": 4,
+          "regular_candidates": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true,
+          "structure": {
+            "active_row_density": 0.48558792130547507,
+            "columns": 83,
+            "component_sizes": [
+              83
+            ],
+            "density": 0.23109304688634055,
+            "general_btf_tested": false,
+            "nonzero_rows": 79,
+            "nonzeros": 3184,
+            "rows": 166
+          }
+        },
+        {
+          "seconds": 0.1379683949999162,
+          "rank": 79,
+          "nullity": 4,
+          "regular_candidates": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true,
+          "structure": {
+            "active_row_density": 0.48558792130547507,
+            "columns": 83,
+            "component_sizes": [
+              83
+            ],
+            "density": 0.23109304688634055,
+            "general_btf_tested": false,
+            "nonzero_rows": 79,
+            "nonzeros": 3184,
+            "rows": 166
+          }
+        }
+      ]
+    }
+  },
+  "decisions": [
+    "Repaired4+1controls passed with real positive odd/even norm cases; preserve original impossible-target failure.",
+    "Regular free-k chart passed independent tiny exhaustive norm/source-product oracles. Actual selected branch rank79/nullity4,16regular candidates all rejected exact support; selected regular norm fiber empty.",
+    "Actual exact incidence has one83column connected component and active density0.48558792130547507. Disconnected-block optimization unavailable on this fixture; finer SCC/BTF not tested.",
+    "Retain two-term field Frobenius representation and test structured elimination in a fresh variant.",
+    "No original auxiliary/ghost/torsion closure, global root set, novel algorithm certification or qualified speedup established."
+  ],
+  "scientific_goal_complete": false,
+  "requested_speed_target": 8,
+  "release_floor_unchanged": 2,
+  "qualified_speedup": null,
+  "scope": "Binary conditional norm components; generic block-composition proof is field independent but is not odd-characteristic chart implementation evidence.",
+  "publication": "Standing authorization for public readable-source checkpoint PR3763; raw archive retained locally.",
+  "actual_support_audit_limitation": "Linear certificates and16 k assignments independently replayed; individual rejected Q and R^4 residues were not retained, so16 support rejections worker-reported only. Next variant must record/replay them."
+}

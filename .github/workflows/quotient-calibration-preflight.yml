@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   source-preflight:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

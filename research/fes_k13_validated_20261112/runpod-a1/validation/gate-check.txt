@@ -1,0 +1,12 @@
+# validator gate checks, 2026-11-15T01:16:06Z, HEAD 4812e1b245e1518b38f9c197444a1307ccfa0436
+$ python3 tools/validate_validation_json.py research/fes_k13_validated_20261112/runpod-a1/VALIDATION.json
+research/fes_k13_validated_20261112/runpod-a1/VALIDATION.json: schema is 'validation-gate/v1', not 'validation/v1'
+validation/v1: 1 problem(s)
+exit=1
+$ python3 tools/validate_validation_json.py --legacy-ok research/fes_k13_validated_20261112/runpod-a1/VALIDATION.json
+research/fes_k13_validated_20261112/runpod-a1/VALIDATION.json: skipped legacy schema 'validation-gate/v1'
+validation/v1: OK (0 record(s))
+exit=0
+$ python3 scripts/validation_gate.py evidence research/fes_k13_validated_20261112/runpod-a1
+valid
+exit=0

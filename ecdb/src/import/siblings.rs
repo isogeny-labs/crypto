@@ -13,27 +13,30 @@
 //!   line, any number of measurements each: rho and rho-offset costs
 //!   `tier1_rho`, `n4_rho_offset`, F_p costs `n5_fp_costs`, binary-field
 //!   costs `n7_binary_costs`). A v1 prime row becomes a dataset curve like any
-//!   other; a v1 binary row is kept as a `dataset_curve_binary` record and its
-//!   measurements with no slug, because no tested function derives an ICV1
-//!   slug for a binary curve from (m, modulus, a, b, #E) outside the generated
-//!   importer's own verification. Rows whose values are not finite are
-//!   problems and are not inserted.
+//!   other, through [`prime_icv1`]; a v1 binary row (`m`, `modulus`, `a`, `b`,
+//!   `N`) does too, through [`binary_icv1`], the one tested function that derives
+//!   a binary curve's ICV1 slug (the generated importer calls it as well), and
+//!   keeps the record kind `dataset_curve_binary`, so the record still names its
+//!   field family; the link is the slug. A binary row that fails validation
+//!   (modulus degree or irreducibility, b = 0, the Hasse bound) is reported by
+//!   `invalid` and stays unlinked, record and measurements kept. Rows whose
+//!   values are not finite are problems and are not inserted.
 //!
 //! Records are kept verbatim in `external_curve_record` and linked to an
 //! ecdb curve only by an exact identifier, in this order: EC1 alias,
 //! curve_uid, ICV1 slug (a model match: the representation may differ),
 //! a unique standard name. Prime-field dataset curves given as (p, a, b, #E)
-//! become ecdb curves under the ICV1 rule (model JSON, its hash, the slug);
-//! their measurements go to `measurement` in their producers' units.
+//! become ecdb curves under the ICV1 rule (model JSON, its hash, the slug), as
+//! do binary ones given as (m, modulus, a, b, #E); their measurements go to `measurement` in their producers' units.
 
 use super::registry::{
-    class_row, invariant_row, prime_field, ALIAS_SQL, CLASS_SQL, CURVE_SQL, FIELD_SQL, INVARIANT_SQL, LINK_CLASS_SQL,
-    ZETA_SQL,
+    binary_field, class_row, invariant_row, prime_field, FieldSpec, ALIAS_SQL, CLASS_SQL, CURVE_SQL, FIELD_SQL,
+    INVARIANT_SQL, LINK_CLASS_SQL, ZETA_SQL,
 };
 use super::{bulk, bulk1, read_bytes, Ctx, Report};
-use crate::math::{hasse_ok, sha256_hex};
+use crate::math::{gf2_is_irreducible, hasse_ok, icv1_binary_field, sha256_hex};
 use anyhow::{bail, Context, Result};
-use num_bigint::BigInt;
+use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
@@ -160,6 +163,64 @@ pub fn prime_icv1(p: &BigInt, a: &BigInt, b: &BigInt, order: &BigInt) -> Result<
     Ok((slug, model_json, sha, t))
 }
 
+/// Canonical text of a binary-field hex value, ecdb's convention: `0x`, lower
+/// case, no leading zeros (`0x0` for zero). Accepts `0X`, upper case, leading
+/// zeros and a missing prefix, so one value has one spelling in the model JSON.
+pub fn canon_hex(raw: &str) -> Result<(String, BigUint)> {
+    let t = raw.trim();
+    let digits = t.strip_prefix("0x").or_else(|| t.strip_prefix("0X")).unwrap_or(t);
+    if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_hexdigit()) {
+        bail!("not a hex value: {raw:?}");
+    }
+    let v = BigUint::parse_bytes(digits.as_bytes(), 16).with_context(|| format!("not a hex value: {raw:?}"))?;
+    Ok((format!("0x{}", v.to_str_radix(16)), v))
+}
+
+/// ICV1 for y^2 + xy = x^3 + a x^2 + b over GF(2^m) = GF(2)[x]/(modulus) with #E = order:
+/// (slug, model JSON, its SHA-256, trace), docs/curves/ICV1.md "The model JSON" (binary).
+/// `modulus` (degree exactly m, irreducible), `a` and `b` (reduced, polynomial basis) are
+/// hex; any case, prefix or leading zeros, normalised by [`canon_hex`] so the same curve
+/// always gets the same slug. Refused: b = 0 (singular), and an order outside the Hasse
+/// interval |q + 1 - N| <= 2 sqrt(q). The slug is icv1-f2m<m>-t<trace>-<first 8 hex of the
+/// model hash>, a negative trace written tm<|t|>. The trace is q + 1 - N.
+pub fn binary_icv1(
+    m: u64,
+    modulus: &str,
+    a: &str,
+    b: &str,
+    order: &BigInt,
+) -> Result<(String, String, String, BigInt)> {
+    let (modulus, poly) = canon_hex(modulus).context("modulus")?;
+    let degree = poly.bits().saturating_sub(1);
+    if m == 0 || degree != m {
+        bail!("modulus {modulus} has degree {degree}, not m = {m}");
+    }
+    if !gf2_is_irreducible(&poly) {
+        bail!("modulus {modulus} is not irreducible over GF(2)");
+    }
+    let fid = icv1_binary_field(m, &modulus);
+    let spec = binary_field(&fid, &modulus)?;
+    let canon = |what: &str, raw: &str| -> Result<String> {
+        let (c, _) = canon_hex(raw).with_context(|| what.to_string())?;
+        Ok(spec.fq.format(&spec.fq.parse(&c).with_context(|| what.to_string())?))
+    };
+    let (a, b) = (canon("a", a)?, canon("b", b)?);
+    if spec.fq.is_zero(&spec.fq.parse(&b)?) {
+        bail!("singular: b = 0, y^2 + xy = x^3 + a*x^2 is not a smooth curve");
+    }
+    let t = &spec.q + BigInt::one() - order;
+    if !hasse_ok(&t, &spec.q) {
+        bail!("order {order} violates the Hasse bound for q = 2^{m}");
+    }
+    let model_json = format!(
+        "{{\"a\":\"{a}\",\"b\":\"{b}\",\"field\":\"{fid}\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"{modulus}\",\"v\":\"1\"}}"
+    );
+    let sha = sha256_hex(&model_json);
+    let tr = if t.is_negative() { format!("m{}", t.abs()) } else { t.to_string() };
+    let slug = format!("icv1-f2m{m}-t{tr}-{}", &sha[..8]);
+    Ok((slug, model_json, sha, t))
+}
+
 fn big(v: &Value) -> Option<BigInt> {
     match v {
         Value::Number(n) => n.to_string().parse().ok(),
@@ -194,6 +255,14 @@ struct Curves {
     aliases: Vec<Value>,
 }
 
+/// The model-specific part of a dataset curve row.
+struct Model<'a> {
+    model: &'static str,
+    form: &'static str,
+    equation: String,
+    family: &'a str,
+}
+
 impl Curves {
     /// Add y^2 = x^3 + a x + b over F_p with #E = order; returns its slug.
     fn add(&mut self, p: &BigInt, a: &BigInt, b: &BigInt, order: &BigInt, family: &str) -> Result<String> {
@@ -207,17 +276,56 @@ impl Curves {
         let mut coeff = Map::new();
         coeff.insert("a".into(), json!(modp(a)));
         coeff.insert("b".into(), json!(modp(b)));
-        let mut inv = invariant_row(&slug, &spec.fq, "short_weierstrass", &coeff, None)?;
+        let equation = format!("y^2 = x^3 + {}*x + {}", modp(a), modp(b));
+        let curve = Model { model: "short_weierstrass", form: "y^2=x^3+a*x+b", equation, family };
+        self.register(&field, &spec, curve, coeff, (slug.clone(), model_json, sha), &t, order)?;
+        Ok(slug)
+    }
+
+    /// Add y^2 + xy = x^3 + a x^2 + b over GF(2^m) = GF(2)[x]/(modulus) with #E = order
+    /// (hex coefficients in the polynomial basis); returns its slug. The field row, the
+    /// invariant row and the isogeny-class row are those of the generated importer.
+    fn add_binary(&mut self, m: u64, modulus: &str, a: &str, b: &str, order: &BigInt, family: &str) -> Result<String> {
+        let (slug, model_json, sha, t) = binary_icv1(m, modulus, a, b, order)?;
+        if self.curves.contains_key(&slug) {
+            return Ok(slug);
+        }
+        let (modulus, _) = canon_hex(modulus)?;
+        let field = icv1_binary_field(m, &modulus);
+        let spec = binary_field(&field, &modulus)?;
+        let canon = |raw: &str| -> Result<String> { Ok(spec.fq.format(&spec.fq.parse(&canon_hex(raw)?.0)?)) };
+        let (a, b) = (canon(a)?, canon(b)?);
+        let equation = format!("y^2 + x*y = x^3 + ({a})*x^2 + ({b})");
+        let mut coeff = Map::new();
+        coeff.insert("a".into(), json!(a));
+        coeff.insert("b".into(), json!(b));
+        let curve = Model { model: "binary_weierstrass", form: "y^2+xy=x^3+a*x^2+b", equation, family };
+        self.register(&field, &spec, curve, coeff, (slug.clone(), model_json, sha), &t, order)?;
+        Ok(slug)
+    }
+
+    /// The rows every dataset curve gets: field, curve, invariants, class, Jacobian link, zeta, alias.
+    #[allow(clippy::too_many_arguments)]
+    fn register(
+        &mut self,
+        field: &str,
+        spec: &FieldSpec,
+        m: Model<'_>,
+        coeff: Map<String, Value>,
+        (slug, model_json, sha): (String, String, String),
+        t: &BigInt,
+        order: &BigInt,
+    ) -> Result<()> {
+        let mut inv = invariant_row(&slug, &spec.fq, m.model, &coeff, None)?;
         inv["status"] = json!("proved");
-        let (label, class) = class_row(&spec, &t)?;
+        let (label, class) = class_row(spec, t)?;
         self.classes.entry(label.clone()).or_insert(class);
-        self.fields.entry(field.clone()).or_insert_with(|| spec.row.clone());
+        self.fields.entry(field.to_string()).or_insert_with(|| spec.row.clone());
         self.curves.insert(
             slug.clone(),
             json!({
-                "field": field, "model": "short_weierstrass", "form": "y^2=x^3+a*x+b", "coefficients": coeff,
-                "equation": format!("y^2 = x^3 + {}*x + {}", modp(a), modp(b)), "family": family,
-                "model_json": model_json, "model_sha256": sha, "icv1": null, "slug": slug,
+                "field": field, "model": m.model, "form": m.form, "coefficients": coeff, "equation": m.equation,
+                "family": m.family, "model_json": model_json, "model_sha256": sha, "icv1": null, "slug": slug,
                 "is_smooth": true, "smoothness_status": "proved",
             }),
         );
@@ -225,7 +333,7 @@ impl Curves {
         self.links.push(json!({ "key": slug, "label": label }));
         self.zeta.push(json!({ "key": slug, "point_counts": [order.to_string()] }));
         self.aliases.push(json!({ "key": slug, "namespace": "icv1_slug", "alias": slug, "retired": false }));
-        Ok(slug)
+        Ok(())
     }
 
     async fn insert(self, ctx: &Ctx<'_>, prov: i64, report: &mut Report) -> Result<()> {
@@ -366,8 +474,14 @@ fn v1_row(
             if !seen.insert(key.to_string()) {
                 bail!("{key}: record_key repeated in the file");
             }
-            // No tested ICV1 slug function exists for binary curves: not linked, no curve registered.
-            ("dataset_curve_binary", None)
+            let (m, modulus, a, b) =
+                (r["m"].as_u64().unwrap_or_default(), r["modulus"].as_str(), r["a"].as_str(), r["b"].as_str());
+            let (modulus, a, b) = (modulus.unwrap_or_default(), a.unwrap_or_default(), b.unwrap_or_default());
+            let slug = curves
+                .add_binary(m, modulus, a, b, &bigf("N")?, "dataset")
+                .map_err(|e| invalid(report, path, key, e))
+                .ok();
+            ("dataset_curve_binary", slug)
         }
         other => bail!("{key}: unknown field {other:?}"),
     };
@@ -764,14 +878,15 @@ mod tests {
         let (records, ms) = out;
         assert_eq!(records.len(), 3);
         assert_eq!(ms.len(), 4);
-        assert_eq!(curves.curves.len(), 1);
+        assert_eq!(curves.curves.len(), 2);
         assert!(curves.curves.contains_key("icv1-fp10-t5-192cb216"));
+        assert!(curves.curves.contains_key("icv1-f2m7-t1-0ce5ade9"));
 
         assert_eq!(records[0]["kind"], "dataset_curve");
         assert_eq!(records[0]["record_key"], "c1");
         assert_eq!(records[0]["slug"], "icv1-fp10-t5-192cb216");
         assert_eq!(records[1]["kind"], "dataset_curve_binary");
-        assert!(records[1]["slug"].is_null());
+        assert_eq!(records[1]["slug"], "icv1-f2m7-t1-0ce5ade9");
 
         let m = &ms[0];
         assert_eq!(m["dataset"], "data/ecdb/tier1_rho.jsonl");
@@ -783,14 +898,171 @@ mod tests {
         assert_eq!(m["status"], "measured");
         assert_eq!(ms[1]["method"], "rho.automorphism_classes");
         assert!(ms[1]["sem"].is_null() && ms[1]["n"].is_null());
-        // binary: unlinked
+        // binary: linked to the curve ICV1 names (y^2 + xy = x^3 + x^2 + 0x2 over GF(2)[x]/(x^7 + x + 1))
         assert_eq!(ms[2]["record_key"], "b1");
-        assert!(ms[2]["slug"].is_null());
+        assert_eq!(ms[2]["slug"], "icv1-f2m7-t1-0ce5ade9");
         // legacy row: unchanged behaviour (key p:a:b, kind dataset_curve, producers' unit)
         assert_eq!(records[2]["record_key"], "827:1:15");
         assert_eq!(ms[3]["method"], "rho.plain");
         assert_eq!(ms[3]["slug"], "icv1-fp10-t5-192cb216");
         assert_eq!(ms[3]["n"].as_i64(), Some(10));
+    }
+
+    fn n(s: &str) -> BigInt {
+        s.parse().unwrap()
+    }
+
+    #[test]
+    fn binary_icv1_reproduces_slugs_the_deployed_ecdb_holds() {
+        // docs/curves/registry.json (family koblitz): K_0 over GF(2^7) and GF(2^41), also in docs/curves/ICV1.md
+        let (slug, mj, sha, t) = binary_icv1(7, "0x83", "0x0", "0x1", &n("116")).unwrap();
+        assert_eq!((slug.as_str(), t), ("icv1-f2m7-t13-616700dd", n("13")));
+        assert_eq!(
+            mj,
+            r#"{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"}"#
+        );
+        let (slug, _, sha41, t) = binary_icv1(41, "0x20000000009", "0x0", "0x1", &n("2199025563772")).unwrap();
+        assert_eq!((slug.as_str(), t), ("icv1-f2m41-tm2308219-7f48b14a", n("-2308219")));
+        assert!(sha41.starts_with("7f48b14a43b8")); // model12 of ICV1:f2m-41-39c74c32:-2308219:...:7f48b14a43b8
+        assert!(sha.starts_with("616700ddc6fe"));
+        // registry family binary over GF(2^17), the two curves ecdb/tests/api.rs queries by slug
+        let (slug, _, _, _) = binary_icv1(17, "0x20009", "0x0", "0x11a8e", &n("130864")).unwrap();
+        assert_eq!(slug, "icv1-f2m17-t209-0eba1a1e");
+        let (slug, _, _, _) = binary_icv1(17, "0x20009", "0x0", "0x1fc36", &n("130864")).unwrap();
+        assert_eq!(slug, "icv1-f2m17-t209-e5c8e740");
+    }
+
+    #[test]
+    fn binary_icv1_is_canonical_and_validating() {
+        let slug = |m, f: &str, a: &str, b: &str, order: &str| binary_icv1(m, f, a, b, &n(order)).map(|r| r.0);
+        let want = "icv1-f2m17-t209-0eba1a1e";
+        // case, prefix and leading zeros do not change the curve
+        for (f, a, b) in [
+            ("0x20009", "0x0", "0x11a8e"),
+            ("0X20009", "0X0", "0X11A8E"),
+            ("0x020009", "0x000", "0x0011a8E"),
+            ("20009", "0", "11a8e"),
+            (" 0x20009", "0x00", "0x11A8E "),
+        ] {
+            assert_eq!(slug(17, f, a, b, "130864").unwrap(), want, "{f} {a} {b}");
+        }
+        // the model JSON carries the canonical spelling
+        let (_, mj, _, _) = binary_icv1(17, "0X020009", "0x00", "0X11A8E", &n("130864")).unwrap();
+        assert!(mj.contains(r#""a":"0x0","b":"0x11a8e""#) && mj.contains(r#""modulus":"0x20009""#));
+        // another a, another b or another modulus is another curve
+        assert_ne!(slug(17, "0x20009", "0x1", "0x11a8e", "130864").unwrap(), want);
+        assert_ne!(slug(17, "0x20009", "0x0", "0x1fc36", "130864").unwrap(), want);
+        // b = 0 is singular; the message keeps the "singular" prefix that `invalid` counts as a control
+        let e = slug(17, "0x20009", "0x1", "0x0", "131072").unwrap_err().to_string();
+        assert!(e.starts_with("singular"), "{e}");
+        // the modulus has degree m and is irreducible: x^17 + x^3 + 1 is the degree-17 trinomial 0x20009 only
+        assert!(slug(16, "0x20009", "0x0", "0x1", "65000").unwrap_err().to_string().contains("degree 17, not m = 16"));
+        assert!(slug(0, "0x1", "0x0", "0x1", "1").is_err());
+        assert!(slug(4, "0x15", "0x0", "0x1", "16").unwrap_err().to_string().contains("not irreducible"));
+        assert!(slug(4, "0x12", "0x0", "0x1", "16").unwrap_err().to_string().contains("not irreducible"));
+        // coefficients are reduced field elements, in hex
+        assert!(slug(4, "0x13", "0x0", "0x10", "16").is_err());
+        assert!(slug(4, "0x13", "0xg", "0x1", "16").is_err());
+        assert!(slug(4, "0x13", "", "0x1", "16").is_err());
+        // Hasse: |q + 1 - N| <= 2 sqrt(q); q = 16, so 9 <= N <= 25
+        assert!(slug(4, "0x13", "0x0", "0x1", "9").is_ok() && slug(4, "0x13", "0x0", "0x1", "25").is_ok());
+        assert!(slug(4, "0x13", "0x0", "0x1", "8").unwrap_err().to_string().contains("Hasse"));
+        assert!(slug(4, "0x13", "0x0", "0x1", "26").unwrap_err().to_string().contains("Hasse"));
+    }
+
+    #[test]
+    fn gf2_irreducibility_agrees_with_brute_force() {
+        // every polynomial of degree 1..=10 against trial division by every polynomial of lower degree
+        let rem = |mut a: u32, b: u32| {
+            let db = 31 - b.leading_zeros();
+            while a != 0 && 31 - a.leading_zeros() >= db {
+                a ^= b << (31 - a.leading_zeros() - db);
+            }
+            a
+        };
+        for f in 2u32..1 << 11 {
+            let deg = 31 - f.leading_zeros();
+            let brute = (2..f).take_while(|g| 31 - g.leading_zeros() <= deg / 2).all(|g| rem(f, g) != 0);
+            assert_eq!(crate::math::gf2_is_irreducible(&BigUint::from(f)), brute, "f = {f:#x}");
+        }
+    }
+
+    #[test]
+    fn binary_curves_get_field_invariant_and_class_rows() {
+        let mut c = Curves::default();
+        let slug = c.add_binary(7, "0x83", "0x0", "0x1", &n("116"), "dataset").unwrap();
+        assert_eq!(slug, "icv1-f2m7-t13-616700dd");
+        // the same curve under another spelling is the same row
+        assert_eq!(c.add_binary(7, "0X83", "0", "0X01", &n("116"), "dataset").unwrap(), slug);
+        assert_eq!((c.curves.len(), c.invariants.len(), c.links.len(), c.zeta.len(), c.aliases.len()), (1, 1, 1, 1, 1));
+        let row = &c.curves[&slug];
+        assert_eq!(row["field"], "f2m-7-e1a6f45a");
+        assert_eq!((row["model"].as_str(), row["family"].as_str()), (Some("binary_weierstrass"), Some("dataset")));
+        assert_eq!(row["coefficients"], json!({"a": "0x0", "b": "0x1"}));
+        assert_eq!(row["equation"], "y^2 + x*y = x^3 + (0x0)*x^2 + (0x1)");
+        assert_eq!(c.fields["f2m-7-e1a6f45a"]["kind"], "binary");
+        assert_eq!(c.fields["f2m-7-e1a6f45a"]["modulus_hex"], "0x83");
+        assert_eq!(c.invariants[0]["j_invariant"], "0x1"); // j = 1/b
+        assert_eq!(c.classes.len(), 1);
+        assert_eq!(c.classes.values().next().unwrap()["order_value"], "116");
+        assert_eq!(c.links[0]["key"], slug.as_str());
+        // a refused curve leaves no partial rows
+        assert!(c.add_binary(7, "0x83", "0x1", "0x0", &n("128"), "dataset").is_err());
+        assert!(c.add_binary(7, "0x83", "0x1", "0x2", &n("500"), "dataset").is_err());
+        assert_eq!((c.curves.len(), c.invariants.len(), c.fields.len(), c.classes.len()), (1, 1, 1, 1));
+    }
+
+    #[test]
+    fn n7_binary_rows_link() {
+        // three rows copied verbatim from ml-cryptanalysis data/ecdb/n7_binary_costs.jsonl: a Koblitz curve
+        // over GF(2^17) (a = b = 1), a random curve over GF(2^21), and the Koblitz K_0 over GF(2^34), m > 32
+        let text = include_str!("testdata/n7_binary_costs_3rows.jsonl");
+        assert_eq!(text.lines().count(), 3);
+        let ((records, ms), curves, report) = run("data/ecdb/n7_binary_costs.jsonl", text);
+        assert!(report.problems.is_empty(), "{:?}", report.problems);
+        assert_eq!(records.len(), 3);
+        assert_eq!(curves.curves.len(), 3);
+        let keys: Vec<_> = records.iter().map(|r| r["record_key"].as_str().unwrap()).collect();
+        assert_eq!(keys, ["f2m:17:0x20009:0x1:0x1", "f2m:21:0x200005:0x0:0x11584c", "f2m:34:0x400000081:0x0:0x1"]);
+        for r in &records {
+            assert_eq!(r["kind"], "dataset_curve_binary");
+            let slug = r["slug"].as_str().unwrap_or_else(|| panic!("{} not linked", r["record_key"]));
+            assert!(curves.curves.contains_key(slug), "{slug}");
+            assert!(slug.starts_with("icv1-f2m"), "{slug}");
+        }
+        let slugs: Vec<_> = records.iter().map(|r| r["slug"].as_str().unwrap()).collect();
+        assert!(slugs[0].starts_with("icv1-f2m17-") && slugs[1].starts_with("icv1-f2m21-"));
+        assert!(slugs[2].starts_with("icv1-f2m34-"));
+        assert_eq!(ms.len(), 40);
+        for m in &ms {
+            let rec = records.iter().find(|r| r["record_key"] == m["record_key"]).unwrap();
+            assert_eq!(m["slug"], rec["slug"]);
+        }
+    }
+
+    #[test]
+    fn invalid_binary_rows_stay_unlinked() {
+        let row = |curve: &str| {
+            format!(
+                r#"{{"format":"csd.ecdb-measurements/v1","dataset":"t","record_key":"k","field":"binary",{curve},"status":"ok","measurements":[{M1}],"provenance":{{}}}}"#
+            )
+        };
+        // b = 0: a negative control, counted and not a problem; Hasse violation and reducible modulus: problems
+        let (out, curves, report) = run("x.jsonl", &row(r#""m":7,"modulus":"0x83","a":"0x1","b":"0x0","N":"128""#));
+        assert!(report.problems.is_empty() && curves.curves.is_empty());
+        assert_eq!(report.counts["dataset_rows_singular_controls"], 1);
+        assert!(out.0[0]["slug"].is_null() && out.1[0]["slug"].is_null());
+        for (curve, why) in [
+            (r#""m":7,"modulus":"0x83","a":"0x1","b":"0x2","N":"500""#, "Hasse"),
+            (r#""m":4,"modulus":"0x15","a":"0x1","b":"0x2","N":"16""#, "not irreducible"),
+            (r#""m":8,"modulus":"0x83","a":"0x1","b":"0x2","N":"128""#, "degree 7, not m = 8"),
+        ] {
+            let (out, curves, report) = run("x.jsonl", &row(curve));
+            assert!(curves.curves.is_empty());
+            assert!(report.problems.iter().any(|p| p.contains(why)), "{why}: {:?}", report.problems);
+            assert_eq!(out.0.len(), 1, "the record and its measurements are still kept");
+            assert!(out.0[0]["slug"].is_null() && out.1[0]["slug"].is_null());
+        }
     }
 
     #[test]

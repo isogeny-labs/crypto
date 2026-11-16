@@ -35,7 +35,7 @@ use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4,
 use crate::cryptanalysis::ic_boundary::{
     find_prime_order_curve, koblitz_instance, random_binary_instance, roster_prime_instance,
     BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
-    PrimePoint, QuarticClasses,
+    PrimePoint, PrimeRepresentation, QuarticClasses,
 };
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
@@ -95,6 +95,18 @@ pub enum CurveSpec {
         r: u64,
         gx: u64,
         gy: u64,
+    },
+    /// An EFD model/chart: the engine builds the short-Weierstrass curve
+    /// through the EFD bridge and decodes the generator in `chart`.
+    Efd {
+        model: String,
+        chart: String,
+        p: u64,
+        params: std::collections::BTreeMap<String, u64>,
+        r: u64,
+        cofactor: u64,
+        generator: Vec<u64>,
+        lift: u32,
     },
     /// An externally supplied public point with no logarithm in the fixture,
     /// retained verbatim in measured child inputs. Restricted to certified
@@ -291,6 +303,7 @@ impl CurveSpec {
     pub fn build(&self) -> Result<Instance, String> {
         match *self {
             CurveSpec::ThreeLeads {
+                p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
                 p,
                 n,
                 modulus,
@@ -309,6 +322,7 @@ impl CurveSpec {
                 let f = crate::cryptanalysis::three_leads::Field::new(p, n as usize, modulus);
                 let c = if p == 2 { [b, 0, a, 1] } else { [b, a, 0, 1] };
                 let i = crate::cryptanalysis::three_leads::StudyInstance {
+                    curve: crate::cryptanalysis::three_leads::Elliptic { f, c, binary: p == 2 },
                     curve: crate::cryptanalysis::three_leads::Elliptic {
                         f,
                         c,
@@ -442,6 +456,8 @@ impl CurveSpec {
                         word("generator x", &params.gx)?,
                         word("generator y", &params.gy)?,
                     ),
+
+                    representation: None,
                 };
                 instance.name = instance.curve_id().slug;
                 Ok(Instance::Prime(instance))
@@ -487,6 +503,17 @@ impl CurveSpec {
                 }
                 .map(Instance::Prime)
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ref params,
+                r,
+                cofactor,
+                ref generator,
+                lift,
+            } => PrimeInstance::from_efd(model, chart, p, params, r, cofactor, generator, lift)
+                .map(Instance::Prime),
             CurveSpec::PrimeExplicit {
                 p,
                 a,
@@ -518,6 +545,8 @@ impl CurveSpec {
                     r,
                     cofactor: group_order / r,
                     generator: (gx, gy),
+
+                    representation: None,
                 };
                 inst.name = inst.curve_id().slug;
                 Ok(Instance::Prime(inst))
@@ -698,6 +727,8 @@ impl CurveSpec {
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
+            | Instance::Ext(_)
+            | Instance::ThreeLeads(_) => None,
             | Instance::ThreeLeads(_)
             | Instance::Ext(_) => None,
             // The thread rule and the order's point counts are the slow
@@ -724,6 +755,12 @@ impl CurveSpec {
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ..
+            } => format!("PrimeInstance::from_efd({model}, {chart}, {p}, ...)"),
             CurveSpec::PrimeOrbitShape {
                 ref shape,
                 bits,
@@ -775,6 +812,9 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::ThreeLeads { p, n, a, b, ref family, parameter, .. } => format!(
+                "three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"
+            ),
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -1312,7 +1352,8 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1498,7 +1539,8 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1594,6 +1636,7 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
+                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
                 Instance::Wide(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
@@ -1819,6 +1862,11 @@ pub struct Workload {
     /// The hash counter that landed a public target in the subgroup.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_counter: Option<u64>,
+    /// EFD model/chart used for input and output, when one was selected.
+    /// This does not change the group or the priced workload; it is kept so
+    /// a record names the representation its generator and target came from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
 }
 
 impl Workload {
@@ -1912,6 +1960,10 @@ impl Workload {
             "W",
             &Self::identity_view(&curve, law, target_seed, index, &target),
         )?;
+        let representation = match inst {
+            Instance::Prime(prime) => prime.representation.clone(),
+            _ => None,
+        };
         Ok(Workload {
             workload_id,
             workload_sha256,
@@ -1923,6 +1975,7 @@ impl Workload {
             target,
             planted,
             target_counter: counter,
+            representation,
         })
     }
 
@@ -2506,5 +2559,34 @@ mod merged_variant_tests {
                 spec
             );
         }
+    }
+
+    #[test]
+    fn efd_spec_builds_and_records_the_representation() {
+        let spec = CurveSpec::Efd {
+            model: "montgom".into(),
+            chart: "xz".into(),
+            p: 1019,
+            params: std::collections::BTreeMap::from([
+                ("a".to_string(), 131u64),
+                ("b".to_string(), 1u64),
+            ]),
+            r: 269,
+            cofactor: 4,
+            generator: vec![604, 1],
+            lift: 0,
+        };
+        let instance = spec.build().unwrap();
+        let facts = instance.facts(&spec);
+        assert_eq!(facts.family, "prime");
+        assert_eq!(facts.r, 269);
+        let (workload, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
+        let representation = workload.representation.expect("EFD representation");
+        assert_eq!(representation.model, "montgom");
+        assert_eq!(representation.chart, "montgom/xz");
+        assert_eq!(
+            serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+            spec
+        );
     }
 }
