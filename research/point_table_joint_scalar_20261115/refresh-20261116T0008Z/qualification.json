@@ -1,0 +1,133 @@
+{
+  "schema": "native-point-tables.merge-refresh/v2",
+  "at": "2026-11-16T00:23:34.178817+00:00",
+  "merge": {
+    "first_parent": "e5c52eb5e0751262e8090206cff19fa19ede1970",
+    "second_parent": "aac194f7010c79f575f388da47552a6526ec6163",
+    "conflicts": [
+      "docs/session-logs/2026-11-15.md"
+    ],
+    "ledger_equals_incoming_parent": true,
+    "previous_head_is_complete_byte_prefix": true
+  },
+  "native_source_manifest": {
+    "path": "native-source.sha256",
+    "sha256": "d0cf7aa3e05aca802231ae299db23b9777e518054d5c563e593985c9ec57c188",
+    "entries": 68,
+    "scope": "Every native Rust source/test/example, JSON fixture, native manifest/lock and API document. Adds coverage of the already-tracked Rust hash-preparation example."
+  },
+  "main_native_changes": [
+    "src/admission.rs",
+    "src/admission/dimensions.rs",
+    "src/contraction/recursive.rs",
+    "src/contraction/dimension_controls.rs"
+  ],
+  "feature_algorithm_byte_identical_to_previous_head": true,
+  "main_audit_files_byte_identical_to_incoming_main": true,
+  "all_target_passing_cases": 174,
+  "checks": [
+    {
+      "check": "tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-16T00:20:12.152274+00:00",
+      "exit_code": 0,
+      "stdout": "joint.tests.stdout.log",
+      "stdout_sha256": "0525dc392a6630efab2fedf8455923a721da6f4806bccc799e65eabd569335af",
+      "stderr": "joint.tests.stderr.log",
+      "stderr_sha256": "3c3b4e5cbff0f2f4e2ea2dddbd626a6717c7ceeb175165386e4bdc09f064cbdc",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-16T00:20:12.480336+00:00",
+      "exit_code": 0,
+      "stdout": "joint.fmt.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.fmt.stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-16T00:20:15.134897+00:00",
+      "exit_code": 0,
+      "stdout": "joint.clippy.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.clippy.stderr.log",
+      "stderr_sha256": "45ab18932c6f882f9553f5de25f3a160cb05758dcab59c64109cc42fe0495108",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "msrv",
+      "argv": [
+        "cargo",
+        "+1.78.0",
+        "check",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-16T00:20:17.629638+00:00",
+      "exit_code": 0,
+      "stdout": "joint.msrv.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.msrv.stderr.log",
+      "stderr_sha256": "d74d13e298b15623e635c221e1457fac49ec16f7ee6ac4e25c63de0821ae53e7",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    }
+  ],
+  "archive": {
+    "path": "development.tar.xz",
+    "sha256": "d73190b0af328d0b4b111dbc076aeccac52db463dc602998719b012cf4df0bc6",
+    "bytes": 9652,
+    "check": "Extract to fresh directory; cd development; sha256sum -c SHA256SUMS"
+  },
+  "standing": "Producer development/source/retention observations only, not signed execution, performance or general audit",
+  "scientific_runs": 0,
+  "hosted_new_head_checks": "Pending upload/current-head inspection; old hosted statuses are historical observations",
+  "merge_dependency": "Existing unrelated open genus-ladder record; auto-merge remains off under all applicable checks/review"
+}

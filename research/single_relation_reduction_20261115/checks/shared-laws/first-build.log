@@ -1,0 +1,24 @@
+✖ [1046/1046] Building CryptoLean.Group.SingleRelation (3.1s)
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.SetTheory.Cardinal.Finite` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Data.Nat.Choose.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SingleRelation.lean: imports `Mathlib.Tactic.LinearCombination` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/scratch/crypto-lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/scratch/crypto-lean/CryptoLean/Group/SingleRelation.lean -o /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SingleRelation.olean -i /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SingleRelation.ilean -c /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SingleRelation.c --setup /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SingleRelation.setup.json --json
+error: CryptoLean/Group/SingleRelation.lean:15:58: unknown tactic
+error: CryptoLean/Group/SingleRelation.lean:15:54: unsolved goals
+R : Type u_1
+I : Type u_2
+inst✝ : CommRing R
+k : R
+u b : I → R
+i : I
+⊢ (fun i => u i - k * b i, b).1 i + k * (fun i => u i - k * b i, b).2 i = u i
+error: CryptoLean/Group/SingleRelation.lean:44:35: Unknown constant `Finset.mul_sum`
+error: CryptoLean/Group/SingleRelation.lean:44:4: Type mismatch: After simplification, term
+  h
+ has type
+  ∑ x ∈ s, c x * a x + ∑ x ∈ s, k * (c x * b x) = 0
+but is expected to have type
+  ∑ i ∈ s, c i * a i + k * ∑ i ∈ s, c i * b i = 0
+Some required targets logged failures:
+- CryptoLean.Group.SingleRelation
+error: build failed

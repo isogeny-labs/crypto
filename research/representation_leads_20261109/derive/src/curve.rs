@@ -2,7 +2,7 @@
 
 use crate::gf::{Gf, Rng};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Pt {
     Inf,
     A(u64, u64),

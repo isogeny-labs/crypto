@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R73-DEGREE-FIVE-FIBER-RESIDUES",
+  "version":2,
+  "goal":"compute the complete reduced residue algebra and branch degrees at the degree-five omitted fiber of the normal rank32 order",
+  "claims":[{"id":"degree_five_residues73","class":"exact_computation","statement":"Full F32-linear fifth Frobenius on the degree-five fiber determines its reduced algebra and all relative residue degrees"}],
+  "arms":{"reference":"R52 full multiplication table, R61 source unit, R70 affine normality","candidate":"all 32 semilinear square columns, F^5 matrix, stable image and gcd-degree inversion","positive":["degree-five F32 relation and a^32=a","all 32 source square slots","source unit fixed by absolute and relative Frobenius","S M^[2]=M S","F^5(a e_j)=a M e_j for all columns","stable image invariant","all 32 fixed dimensions reconstructed"],"negative":[],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"complete deterministic fiber"}},
+  "variables":{"fixed":["full rank32 F32 fiber, 160 F2 dimensions","complete R52 table","1200sec/4GiB","one Singular/FLINT thread","one math job"],"measured":["relative Frobenius rank","stable image dimension","relative residue degrees","exit/errors/UTC/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"complete degree-five fiber","seeds":[73]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["32x32 relative Frobenius","stable image rank","all relative residue degrees","fixed-dimension reconstruction"],
+  "execution":{"launcher":"REPLAY_CAS.sh degree-five73-02 DEGREE_FIVE73.sing DEGREE_FIVE73_ALL_CHECKS_PASS","backend":"original manually authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":73,"CPU_affinity":"not pinned","queue":"one math job at a time; R72 terminal and published","source_gate":"copied source/protocol/driver bytes match Git; all donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping":{"accept":"exit0/exact marker/no whitespace-question-mark errors and every assertion","failure":"retain raw attempt; freeze repair before fresh ID"},
+  "analysis":{"method":"exact relative Frobenius ranks and integer gcd-degree inversion","scope":"entire fC fiber reduced algebra and branch degrees; ramification and valuations separate"}
+}

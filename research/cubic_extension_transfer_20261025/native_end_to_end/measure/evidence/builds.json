@@ -1,0 +1,28 @@
+{
+  "schema": "cubic.native_measurement_development_builds/v1",
+  "source_base": "180d8ea25b00083894ba794f1c593c0850da4c9b",
+  "worktree_dirty": true,
+  "source_public": {
+    "command": "bash build_source.sh",
+    "exit_code": 0,
+    "sha256": "54f9e1ceb5087478d3e39c6e919d7b26dbcce918615d19b811acf905ffdadc13"
+  },
+  "transfer_test": {
+    "command": "bash build_map.sh transfer_test",
+    "exit_code": 0,
+    "sha256": "d9f54ce7b82562601f4ebcbee8f4fb9f65bc327e9147dadcfcb2e6a0af8f104a",
+    "environment": "existing cached native development container; current source staged in a separate tmp directory; old source mount untouched"
+  },
+  "runner": {
+    "command": "cargo test --release --locked --offline",
+    "sha256": "910d0ab8e618abbe095b1b05cf3af45723bc424d180149a15a6011744ab1aee5"
+  },
+  "observer": {
+    "sha256": "aa91aa57171cc23dab9a1f9b44da09b863762f7aba9357a68a343855251174a9"
+  },
+  "root_library_suite_passed": false,
+  "clippy_available": false,
+  "scientific_benchmark_executions": 0,
+  "source_bound_qualified_image": false,
+  "independent_execution_evidence": false
+}

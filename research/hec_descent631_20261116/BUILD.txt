@@ -1,0 +1,24 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-descent631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_descent631_20261116)
+warning: fields `qf`, `tangent`, `residual`, and `controls` are never read
+  --> ../hec_calibration631_20261115/field_config.rs:6:9
+   |
+ 5 | pub struct Config {
+   |            ------ fields in this struct
+ 6 |     pub qf: [u64; 15],
+   |         ^^
+...
+ 9 |     pub tangent: [u64; 2],
+   |         ^^^^^^^
+10 |     pub residual: [u64; 3],
+   |         ^^^^^^^^
+11 |     pub canonical: [[u64; 3]; 4],
+12 |     pub controls: [[u64; 3]; 4],
+   |         ^^^^^^^^
+   |
+   = note: `Config` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-descent631` (bin "descent631") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 2.53s

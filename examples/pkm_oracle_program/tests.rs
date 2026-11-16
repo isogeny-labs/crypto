@@ -21,6 +21,24 @@ pub(super) fn fixture() -> Request {
 }
 
 #[test]
+fn native_window_metadata_binds_attempt_state_and_keeps_legacy_records_readable() {
+    let mut request = fixture();
+    request.limits.solver_millis = 0;
+    let mut record = serde_json::to_value(run(&request).unwrap()).unwrap();
+    assert_eq!(record["ledger"]["f4_native_work"]["attempted"], false);
+    assert!(replay(&request, &record).is_ok());
+    let mut bad = record.clone();
+    bad["ledger"]["f4_native_work"]["attempted"] = serde_json::json!(true);
+    bad["ledger"]["f4_native_work"]["result_state"] = serde_json::json!("returned");
+    assert!(replay(&request, &bad).is_err());
+    record["ledger"]
+        .as_object_mut()
+        .unwrap()
+        .remove("f4_native_work");
+    assert!(replay(&request, &record).is_ok());
+}
+
+#[test]
 fn validation_counts_survive_acceptance_refusal_and_serialization() {
     let mut r = fixture();
     let mut counts = reference::Counts::default();

@@ -1,0 +1,84 @@
+{
+  "schema": "known-composite-tate-preflight/v1",
+  "build_snapshots": 8,
+  "failed_build_states": [
+    "composite-tate-build01.exit",
+    "composite-tate-build03.exit",
+    "composite-tate-build04.exit",
+    "composite-tate-build05.exit",
+    "composite-tate-build06.exit",
+    "composite-tate-build07.exit"
+  ],
+  "successful_builds": [
+    "02",
+    "08"
+  ],
+  "final_build": "08, full log no advisories/errors",
+  "gate": {
+    "archive": "research/composite_tate_domain_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_composite_tate_domain_audit_20261115_lean/audit.log",
+        "bytes": 5264,
+        "sha256": "cf07e5dda7cb562526680789ba1503c7f6ee18ce275a08a6c3c49658afc9b7cb"
+      },
+      {
+        "member": "research_composite_tate_domain_audit_20261115_lean/build.log",
+        "bytes": 2195,
+        "sha256": "7a6af4e499cbc0fa02ac3a95efd109307ba46c3e03952b0349f66f677eafec33"
+      },
+      {
+        "member": "research_composite_tate_domain_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_composite_tate_domain_audit_20261115_lean/source-build.log",
+        "bytes": 2195,
+        "sha256": "770389685fd7b0ebdcfb85253c142bc2f577f0207faa02ae50d678312a36b7f5"
+      },
+      {
+        "member": "research_composite_tate_domain_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 53,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/composite_tate_domain_audit_20261115/evidence/attempts.tar.xz",
+    "files": 109,
+    "unique_objects": 46,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "known_negative_control": true,
+  "prior_claim": "PCC-20261110-5e63e9",
+  "new_source_coverage": false,
+  "new_all14_gap_closure": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "actual_domains_and_target_counts": [
+    6,
+    6,
+    2
+  ],
+  "both_actual_radicals_proved": true,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

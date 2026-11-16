@@ -1,0 +1,254 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-max-order-census-20261027-v1",
+  "created": "2026-10-27T08:05:08Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "18feca459aa82923d4b3a89ad81ca4f019d53a0f112fd6288ae7c22beb32c404",
+    "protocol_id": "twist-maximal-order-census-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-max-order-census-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "f98f2935d5b7ccc41b10c4da5a7839b9225910a0",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "376307efd9528c6ab9c670c10a652801a6a9769044b9ca336391d9d84df2aa25",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "1323d7156bf8427c948e5f7009579706db13ad404a8756ede25f48a651a7c862",
+      "commit": "f98f2935d5b7ccc41b10c4da5a7839b9225910a0"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "f98f2935d5b7ccc41b10c4da5a7839b9225910a0"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "generator-native-000",
+      "arm": "native",
+      "instance_id": "original-ten-fixtures-two-seeds-all-bases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "base_cases": 120
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "legacy_bases_equal": 60,
+          "zero_shift_cases": 40
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact construction/count experiment only; no performance claim."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native field/group arithmetic and independent PARI seed/order/complete-base replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "d4f6b99b131b0e9c82646b0aff3ff014b5bd2cde22e51ebc761d621c918039d0",
+          "bytes": 7364,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "521565fd55ed337663ccc3b3a168fbeb2e290d1f466ceb702edf01e46a39e7d5",
+          "bytes": 892,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "a330f9b502b72ab749100501a92b37297eca31a25101a95479c1888f78d3b0d9",
+          "bytes": 11696,
+          "kind": "receipt"
+        },
+        {
+          "path": "pari-replay-v1/RECEIPT.json",
+          "sha256": "336f701a261dfa654b198214957d486524e6aa3b6d164fd485afa220ba472cf5",
+          "bytes": 1049,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T08:00:15.509Z",
+      "finished_at": "2026-10-27T08:00:15.727Z",
+      "worker": "1323d7156bf8427c948e5f7009579706db13ad404a8756ede25f48a651a7c862",
+      "backend_ref": "runs/generator-v1"
+    },
+    {
+      "run_id": "generator-pari-000",
+      "arm": "pari",
+      "instance_id": "original-ten-fixtures-two-seeds-all-bases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "base_cases": 120
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "legacy_bases_equal": 60,
+          "zero_shift_cases": 40
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact construction/count experiment only; no performance claim."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native field/group arithmetic and independent PARI seed/order/complete-base replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "d4f6b99b131b0e9c82646b0aff3ff014b5bd2cde22e51ebc761d621c918039d0",
+          "bytes": 7364,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "521565fd55ed337663ccc3b3a168fbeb2e290d1f466ceb702edf01e46a39e7d5",
+          "bytes": 892,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "a330f9b502b72ab749100501a92b37297eca31a25101a95479c1888f78d3b0d9",
+          "bytes": 11696,
+          "kind": "receipt"
+        },
+        {
+          "path": "pari-replay-v1/RECEIPT.json",
+          "sha256": "336f701a261dfa654b198214957d486524e6aa3b6d164fd485afa220ba472cf5",
+          "bytes": 1049,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "pari-replay-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "b25db6161ff8edf11aae0fd4ec5d38f3507ff6e140cf337d270327cf722ac0e9",
+      "bytes": 1584,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "d8964c185c5e460e35929d6cd5cdf4ce76592245891a22a94272bc3685e26ace",
+      "bytes": 11884,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/bin/twist-max-order-census.rs",
+      "sha256": "f925e6c6d713f82c090ee6c436d719b47f88f6b5efe8d0bb2e1dd208b354c5c7",
+      "bytes": 17903,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "a330f9b502b72ab749100501a92b37297eca31a25101a95479c1888f78d3b0d9",
+        "bytes": 11696,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Two actual whole-panel native/CAS executions check the same cases; do not pool them as independent targets. Different generators produce different bases. Discovery occurs in the actual producer and its trial/order-test counts are retained, but total primitive cost, decomposition and scalar recovery are unmeasured. GP epoch timestamps remain in its actual receipt, not reconstructed here.",
+      "by": "native exporter"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

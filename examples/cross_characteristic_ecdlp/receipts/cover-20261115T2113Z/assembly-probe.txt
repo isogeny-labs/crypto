@@ -1,0 +1,106 @@
+import CrossCharacteristicLarger
+import Mathlib.Algebra.Field.Subfield.Basic
+import Mathlib.Data.Finset.Card
+import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Data.Set.Card
+
+noncomputable section
+namespace CoverFieldProbe
+open CrossCharacteristicLarger (Fbig omega omega_ne_zero omega_ne_one omega_sq omega_inv)
+open WeierstrassCurve.Affine
+
+def fourField : Subfield Fbig where
+  carrier := {0, 1, omega, omega + 1}
+  zero_mem' := by simp
+  one_mem' := by simp
+  add_mem' := by
+    intro x y hx hy
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy ⊢
+    rcases hx with rfl | rfl | rfl | rfl <;>
+      rcases hy with rfl | rfl | rfl | rfl <;>
+      simp [CharTwo.add_self_eq_zero, CharTwo.add_cancel_left,
+        add_comm, add_left_comm]
+  neg_mem' := by
+    intro x hx
+    simpa only [CharTwo.neg_eq] using hx
+  mul_mem' := by
+    intro x y hx hy
+    have hsquare : (omega + 1) ^ 2 = omega := by
+      rw [CharTwo.add_sq, omega_sq, one_pow, add_assoc,
+        CharTwo.add_self_eq_zero, add_zero]
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy ⊢
+    rcases hx with rfl | rfl | rfl | rfl <;>
+      rcases hy with rfl | rfl | rfl | rfl <;>
+      simp [mul_add, add_mul, ← pow_two, hsquare, omega_sq,
+        CharTwo.add_self_eq_zero, CharTwo.add_cancel_left, add_comm]
+  inv_mem' := by
+    intro x hx
+    have h : (omega + 1)⁻¹ = omega := by rw [← omega_inv, inv_inv]
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx ⊢
+    rcases hx with rfl | rfl | rfl | rfl <;> simp [omega_inv, h]
+
+abbrev Small := fourField
+
+instance : CharP Small 2 := fourField.subtype.charP fourField.subtype_injective 2
+
+theorem small_card : Nat.card Small = 4 := by
+  let s : Finset Fbig := {0, 1, omega, omega + 1}
+  have heq : (fourField : Set Fbig) = (s : Set Fbig) := by ext x; simp [fourField, s]
+  have h0 : omega + 1 ≠ 0 := CharTwo.add_eq_zero.not.mpr omega_ne_one
+  calc
+    Nat.card Small = Nat.card (s : Set Fbig) := Nat.card_congr (Equiv.setCongr heq)
+    _ = s.card := by rw [Nat.card_coe_set_eq, Set.ncard_coe_finset]
+    _ = 4 := by simp [s, Ne.symm h0, omega_ne_zero,
+      Ne.symm omega_ne_zero, Ne.symm omega_ne_one]
+
+def w : Small := ⟨omega, by simp [fourField]⟩
+
+theorem w_ne_zero : w ≠ 0 := by
+  intro h
+  exact omega_ne_zero (congrArg Subtype.val h)
+
+def curve : WeierstrassCurve Small := ⟨0, w, w, 0, 0⟩
+
+theorem mapped_curve : curve.map fourField.subtype = CrossCharacteristicLarger.targetCurve := rfl
+
+instance : curve.IsElliptic where
+  isUnit := by
+    apply isUnit_iff_ne_zero.mpr
+    intro h
+    have hbig : CrossCharacteristicLarger.targetCurve.Δ = 0 := by
+      rw [← mapped_curve, WeierstrassCurve.map_Δ, h, map_zero]
+    exact (isUnit_iff_ne_zero.mp CrossCharacteristicLarger.targetCurve.isUnit_Δ) hbig
+
+def R : curve.toAffine.Point :=
+  .some (x := 0) (y := 0) (by
+    rw [← equation_iff_nonsingular, equation_iff]
+    norm_num [curve])
+
+def includePoints : curve.toAffine.Point →+
+    CrossCharacteristicLarger.targetCurve.toAffine.Point :=
+  Point.baseChange (W' := curve) Small Fbig
+
+theorem include_injective : Function.Injective includePoints :=
+  Point.map_injective (Algebra.ofId Small Fbig)
+
+theorem include_R : includePoints R = CrossCharacteristicLarger.R := rfl
+
+theorem R_order : addOrderOf R = 7 := by
+  have h := addOrderOf_injective includePoints include_injective R
+  rw [include_R, CrossCharacteristicLarger.R_order] at h
+  exact h.symm
+
+abbrev sourceCoordinate := CrossCharacteristicLarger.sourceCurve.toAffine.CoordinateRing
+
+def sourceX : sourceCoordinate :=
+  CoordinateRing.mk _ (Polynomial.C Polynomial.X)
+
+def sourceCubic : Polynomial sourceCoordinate := Polynomial.X ^ 3 - Polynomial.C sourceX
+
+abbrev sourceCoverAlgebra := AdjoinRoot sourceCubic
+
+def sourceCoverBasis : Module.Basis (Fin 3) sourceCoordinate sourceCoverAlgebra :=
+  (AdjoinRoot.powerBasisAux' (Polynomial.monic_X_pow_sub_C sourceX (by decide))).reindex
+    (finCongr (show sourceCubic.natDegree = 3 from Polynomial.natDegree_X_pow_sub_C))
+
+end CoverFieldProbe
