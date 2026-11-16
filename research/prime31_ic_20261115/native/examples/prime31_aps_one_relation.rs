@@ -2566,7 +2566,282 @@ fn joint_jump_batch_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-RHO-COLD: prospectively registered optimized generic control.
+// This is deliberately in the existing APS Rust example, to REUSE exactly
+// its Mersenne-field arithmetic, joint-Jacobian public source, mixed additions,
+// batch normalization, scalar arithmetic and original complete APS incumbent.
+// Rho uses canonical {P,-P}, r-adding walks, multiple lanes and a distinguished
+// point table. It is a comparator, not an index-calculus advance.
+#[derive(Clone,Copy)]
+struct NegRhoLane{
+    point:Labelled,
+    prior_x:Option<u64>,
+}
+fn neg_rho_fold(mut v:Labelled)->Labelled{
+    if v.pt.1>P/2{
+        v.pt.1=subp(0,v.pt.1);
+        v.a=subn(0,v.a);
+        v.b=subn(0,v.b);
+    }
+    v
+}
+fn neg_rho_hash(mut x:u64)->u64{
+    x^=x>>16;
+    x=x.wrapping_mul(0x7feb_352d);
+    x^=x>>15;
+    x=x.wrapping_mul(0x846c_a68b);
+    x^(x>>16)
+}
+fn neg_rho_restart(q:(u64,u64),gq:Option<(u64,u64)>,
+    rng:&mut u64)->Result<Labelled,String>{
+    loop{
+        let a=prng(rng)%N;
+        let b=prng(rng)%N;
+        if a==0 && b==0{continue;}
+        let pt=joint_public_jac(a,b,q,gq);
+        if pt.z==0{continue;}
+        let labels=normalize_jac_batch(&[(pt,a,b)])?;
+        return Ok(neg_rho_fold(labels[0]));
+    }
+}
+// All setup, group operations, normalizations, DP hashing, modular inverses,
+// retries and independent scalar replay are included in cold_wall_ns.
+// The frozen cap applies to total mixed-Jacobian walk steps; a cap reached
+// without a collision is explicitly censored, never counted as a solved log.
+fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
+    step_cap:u64)->Result<serde_json::Value,String>{
+    if lanes==0 || lanes>128 || dp_bits==0 || dp_bits>=20 ||
+        step_cap<(lanes as u64){
+        return Err("negation rho comparator admission".into());
+    }
+    let cold=Instant::now();
+    let mut arithmetic=Arithmetic::default();
+    check_curve(PRIME31,&mut arithmetic)?;
+    if !arithmetic.on_curve(PRIME31,Some(q)) ||
+        q==PRIME31.g{return Err("invalid rho public Q".into());}
+    const JUMPS:usize=16;
+    let gq=arithmetic.add(PRIME31,Some(PRIME31.g),Some(q));
+    let mut rng=seed^0x4e45_475f_5248_4f31;
+    let mut jump_projective=Vec::with_capacity(JUMPS);
+    while jump_projective.len()<JUMPS{
+        let a=prng(&mut rng)%N;
+        let b=prng(&mut rng)%N;
+        if a==0 && b==0{continue;}
+        let j=joint_public_jac(a,b,q,gq);
+        if j.z!=0{jump_projective.push((j,a,b));}
+    }
+    let jumps=normalize_jac_batch(&jump_projective)?;
+    let mut first=Vec::with_capacity(lanes);
+    while first.len()<lanes{
+        let a=prng(&mut rng)%N;
+        let b=prng(&mut rng)%N;
+        if a==0 && b==0{continue;}
+        let p=joint_public_jac(a,b,q,gq);
+        if p.z!=0{first.push((p,a,b));}
+    }
+    let mut states:Vec<NegRhoLane>=normalize_jac_batch(&first)?
+        .into_iter().map(|v|NegRhoLane{
+            point:neg_rho_fold(v),prior_x:None
+        }).collect();
+    let mut distinguished:HashMap<u64,(u64,u64)>=HashMap::new();
+    let mask=(1u64<<dp_bits)-1;
+    let mut steps=0u64;
+    let mut short_cycles=0u64;
+    let mut rejected_identity=0u64;
+    let mut restarts=0u64;
+    let mut useful_collisions=0u64;
+    let mut useless_collisions=0u64;
+    let mut maximum_table=0usize;
+    while steps+(lanes as u64)<=step_cap{
+        let mut next_block=Vec::with_capacity(lanes);
+        for lane in &states{
+            let idx=(neg_rho_hash(lane.point.pt.0) as usize)&(JUMPS-1);
+            let j=jumps[idx];
+            let mut new_point=jac_mixed(jac_affine(lane.point.pt),j.pt);
+            let mut a=addn(lane.point.a,j.a);
+            let mut b=addn(lane.point.b,j.b);
+            if new_point.z==0{
+                // In the rare inverse-point case, double instead; a=2a,b=2b.
+                rejected_identity+=1;
+                new_point=jac_double(jac_affine(lane.point.pt));
+                a=addn(lane.point.a,lane.point.a);
+                b=addn(lane.point.b,lane.point.b);
+                if new_point.z==0{
+                    return Err("unexpected rho double of prime-order nonzero point".into());
+                }
+            }
+            next_block.push((new_point,a,b));
+        }
+        let normalized=normalize_jac_batch(&next_block)?;
+        steps+=lanes as u64;
+        for (i,v) in normalized.into_iter().enumerate(){
+            let v=neg_rho_fold(v);
+            let old=states[i];
+            if v.pt.0==old.point.pt.0 || Some(v.pt.0)==old.prior_x{
+                short_cycles+=1;
+                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].prior_x=None;
+                restarts+=1;
+                continue;
+            }
+            states[i].prior_x=Some(old.point.pt.0);
+            states[i].point=v;
+            if v.pt.0&mask!=0{continue;}
+            if let Some(&(a0,b0))=distinguished.get(&v.pt.0){
+                let db=subn(v.b,b0);
+                if db!=0{
+                    // aG+bQ=a0G+b0Q gives k=(a0-a)/(b-b0) mod n.
+                    let k=muln(subn(a0,v.a),pown(db,N-2,N));
+                    if arithmetic.scalar(PRIME31,k,Some(PRIME31.g))==Some(q){
+                        useful_collisions+=1;
+                        return Ok(json!({
+                            "method":"optimized negation r-adding rho, batched Jacobian and distinguished points",
+                            "standing":"[pcc:unverified]","p":P,"n":N,
+                            "public_Q":q,"seed":format!("{seed:016x}"),
+                            "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
+                            "step_cap":step_cap,"walk_steps":steps,
+                            "short_cycles":short_cycles,"rejected_identity":rejected_identity,
+                            "restarts":restarts,"useful_collisions":useful_collisions,
+                            "unusable_collisions":useless_collisions,
+                            "distinguished_records":distinguished.len(),
+                            "max_distinguished_records":maximum_table,
+                            "complete_target_scalar_recovered":true,"log":k,
+                            "cold_wall_ns":cold.elapsed().as_nanos(),
+                            "known_answer_in_solver":false
+                        }));
+                    }
+                }
+                useless_collisions+=1;
+                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].prior_x=None;
+                restarts+=1;
+            }else{
+                distinguished.insert(v.pt.0,(v.a,v.b));
+                maximum_table=maximum_table.max(distinguished.len());
+            }
+        }
+    }
+    Ok(json!({
+        "method":"optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "standing":"[pcc:unverified]","p":P,"n":N,
+        "public_Q":q,"seed":format!("{seed:016x}"),
+        "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
+        "step_cap":step_cap,"walk_steps":steps,
+        "short_cycles":short_cycles,"rejected_identity":rejected_identity,
+        "restarts":restarts,"useful_collisions":useful_collisions,
+        "unusable_collisions":useless_collisions,
+        "distinguished_records":distinguished.len(),
+        "max_distinguished_records":maximum_table,
+        "complete_target_scalar_recovered":false,
+        "status":"bounded_censoring",
+        "cold_wall_ns":cold.elapsed().as_nanos(),
+        "known_answer_in_solver":false
+    }))
+}
+fn rho_cold_match_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const TARGET_SEED:u64=0x5248_4f5f_4e45_5731;
+    const RHO_SEED:u64=0x5248_4f5f_4352_3031;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;4];
+    let mut all_complete=[0u64;4];
+    let mut pair_wins=[0u64;2];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let chronological:[usize;4]=match i%4{
+            0=>[0,1,2,3],1=>[1,2,3,0],
+            2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for index in chronological{
+            let res=match index{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,[384,384,16_384],6,false,true,true)?,
+                1|3=>neg_rho_cold(q,rho_seed,32,4,STEP_CAP)?,
+                2=>neg_rho_cold(q,rho_seed^0x3634_5f44_5035,64,5,STEP_CAP)?,
+                _=>return Err("invalid rho panel arm".into())
+            };
+            let complete=res["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if complete{
+                let answer=if index==0{
+                    res["attempts"].as_array()
+                        .and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{res["log"].as_u64()};
+                if answer!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("invalid complete scalar i={i}, arm={index}"));
+                }
+                all_complete[index]+=1;
+            }
+            total_ns[index]+=res["cold_wall_ns"].as_u64()
+                .ok_or("missing fully cold ns")? as u128;
+            arms[index]=res;
+        }
+        if arms[0]["complete_target_scalar_recovered"].as_bool()==Some(true){
+            for (j,idx) in [1usize,2].into_iter().enumerate(){
+                if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+                    arms[0]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                    pair_wins[j]+=1;
+                }
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,
+            "caller_known_scalar_verifier_only":known,
+            "chronological_order":chronological,
+            "incumbent_joint_APS":arms[0],
+            "rho32_dp4":arms[1],
+            "rho64_dp5":arms[2],
+            "rho32_dp4_AA":arms[3]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_VS_OPTIMIZED_NEG_RHO_PROTOCOL_20261116.md",
+        "curve":"ordinary prime-order prime31",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["incumbent_joint_APS","rho32_dp4","rho64_dp5","rho32_dp4_AA"],
+        "successful_complete_calls":all_complete,
+        "fully_cold_ns":total_ns.map(|x|x.to_string()),
+        "paired_APS_wins_vs_rho32_rho64":pair_wins,
+        "all_96_complete":all_complete.iter().all(|&c|c==CASES as u64),
+        "ratios_APS_over_rho32_rho64":[
+            total_ns[0] as f64/total_ns[1] as f64,
+            total_ns[0] as f64/total_ns[2] as f64
+        ],
+        "rho32_AA_drift":(total_ns[1] as f64/total_ns[3] as f64-1.0).abs(),
+        "classification":"published APS explicit S3 pair MITM vs optimized generic negation rho; not asymptotic IC",
+        "scope":"source-specific unisolated development CI; external fastest rho and independent PCC untested",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
+    let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--rho-cold-match" {
+        let result=rho_cold_match_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
+    // Existing CLI follows unchanged.
+
     let args:Vec<String>=std::env::args().skip(1).collect();
     if args.len()==1 && args[0]=="--joint-jumps-confirm" {
         let result=joint_jump_batch_confirmation()?;
