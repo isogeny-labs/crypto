@@ -1915,8 +1915,178 @@ fn factorized_s3_fresh_confirmation()->Result<serde_json::Value,String>{
     Ok(report)
 }
 
+
+// Complete generic BSGS comparator: a fresh table for *each* public target.
+// It shares the tested Rust Mersenne/Jacobian arithmetic with the APS source,
+// but neither its table nor its giant walk is used for algebraic discovery.
+fn cold_batched_bsgs(q:(u64,u64))->Result<serde_json::Value,String>{
+    let cold=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar)?;
+    if !ar.on_curve(PRIME31,Some(q)){
+        return Err("BSGS comparator: invalid public Q".into());
+    }
+    let mut m=1u64;
+    while m*m<N {m+=1;}
+    if (m-1)*(m-1)>=N || m*m<N{
+        return Err("BSGS comparator: wrong ceil sqrt(n)".into());
+    }
+    const BATCH:usize=256;
+    let mut baby=HashMap::with_capacity(m as usize);
+    let mut cur=jac_affine(PRIME31.g);
+    let mut block=Vec::with_capacity(BATCH);
+    let mut baby_batches=0u64;
+    for j in 1..m{
+        block.push((cur,j,0u64));
+        if block.len()==BATCH || j+1==m {
+            for item in normalize_jac_batch(&block)?{
+                if baby.insert(item.pt,item.a).is_some(){
+                    return Err("BSGS comparator: baby collision before group order".into());
+                }
+            }
+            baby_batches+=1;
+            block.clear();
+        }
+        if j+1<m {cur=jac_mixed(cur,PRIME31.g);}
+    }
+    if baby.len() as u64 !=m-1{
+        return Err("BSGS comparator: incomplete baby table".into());
+    }
+    let build_ns=cold.elapsed().as_nanos();
+    let step=ar.scalar(PRIME31,m,Some(PRIME31.g))
+        .ok_or("BSGS comparator: [m]G identity")?;
+    let neg_step=ar.neg(PRIME31,Some(step))
+        .ok_or("BSGS comparator: negative giant step identity")?;
+    let giant_begin=Instant::now();
+    let mut giant=jac_affine(q);
+    let mut giant_count=0u64;
+    let mut giant_batches=0u64;
+    let mut recovered=None;
+    let mut giant_block=Vec::with_capacity(BATCH);
+    for i in 0..=m{
+        giant_count+=1;
+        if giant.z==0{
+            recovered=Some((i*m)%N);
+            break;
+        }
+        giant_block.push((giant,i,0u64));
+        if giant_block.len()==BATCH || i==m{
+            for item in normalize_jac_batch(&giant_block)?{
+                if let Some(&j)=baby.get(&item.pt){
+                    recovered=Some((item.a*m+j)%N);
+                    break;
+                }
+            }
+            giant_batches+=1;
+            giant_block.clear();
+            if recovered.is_some(){break;}
+        }
+        if i<m {giant=jac_mixed(giant,neg_step);}
+    }
+    let k=recovered.ok_or("BSGS comparator: no collision in full search")?;
+    // This check is internal to BSGS and does not use the known-answer k.
+    if ar.scalar(PRIME31,k,Some(PRIME31.g))!=Some(q){
+        return Err("BSGS comparator: reconstructed scalar replay mismatch".into());
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "method":"classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "p":P,"n":N,"cofactor":1,"public_Q":q,
+        "complete_target_scalar_recovered":true,"known_answer_in_solver":false,
+        "log":k,"ceil_sqrt_n":m,"baby_count":baby.len(),
+        "baby_normalization_batches":baby_batches,
+        "giant_steps_visited":giant_count,
+        "giant_normalization_batches":giant_batches,
+        "cold_baby_setup_ns":build_ns,
+        "cold_giant_search_and_replay_ns":giant_begin.elapsed().as_nanos(),
+        "cold_wall_ns":cold.elapsed().as_nanos()
+    }))
+}
+
+// Matched complete cold costs, not a win-only or postselected comparison.
+// The verifier-only answers never enter either algorithm.
+fn compare_factorized_aps_bsgs_cold()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const SEED_TARGET:u64=0x4247_5353_434f_4c44;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    let mut rng=SEED_TARGET;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;3];
+    let mut wins=[0usize;2];
+    let mut results=Vec::with_capacity(CASES);
+    for c in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(point)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,point);
+            }
+        };
+        let order: [usize;3]=match c%3{
+            0=>[0,1,2],1=>[1,2,0],_=>[2,0,1]
+        };
+        let mut arms:[serde_json::Value;3]=std::array::from_fn(|_|json!(null));
+        for idx in order{
+            let value=match idx{
+                0=>execute_factorized_unequal(q,PROFILE,6)?,
+                1|2=>cold_batched_bsgs(q)?,
+                _=>return Err("invalid APS/BSGS arm".into())
+            };
+            if value["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("APS/BSGS incomplete solve at case {c}, arm {idx}"));
+            }
+            let found=if idx==0{
+                value["attempts"].as_array()
+                    .and_then(|a|a.last())
+                    .and_then(|a|a["solution"]["log"].as_u64())
+                    .ok_or("APS complete but missing result log")?
+            }else{
+                value["log"].as_u64().ok_or("BSGS missing result log")?
+            };
+            if found!=known || verifier.scalar(PRIME31,found,Some(PRIME31.g))!=Some(q){
+                return Err(format!("APS/BSGS wrong scalar at case {c} arm {idx}"));
+            }
+            totals[idx]+=value["cold_wall_ns"].as_u64()
+                .ok_or("cold ns not u64")? as u128;
+            arms[idx]=value;
+        }
+        if arms[0]["cold_wall_ns"].as_u64()<arms[1]["cold_wall_ns"].as_u64(){
+            wins[0]+=1;
+        }else{
+            wins[1]+=1;
+        }
+        results.push(json!({
+            "case":c,"Q":q,"caller_known_scalar_verifier_only":known,
+            "rotated_arm_order":order,
+            "aps_s3_factorized_full_receipt":arms[0],
+            "bsgs_full_cold":arms[1],
+            "bsgs_full_cold_repeat":arms[2]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_VS_BSGS_COLD_PROTOCOL_20261116.md",
+        "target_seed":format!("{SEED_TARGET:016x}"),
+        "p":P,"n":N,"cofactor":1,"profile":PROFILE,
+        "case_count":CASES,"total_verified_logs":CASES*3,
+        "method_order":["factorized_APS_IC","batched_BSGS","batched_BSGS_AA"],
+        "aggregate_fully_cold_ns":totals,
+        "aps_per_target_wins":wins[0],
+        "bsgs_per_target_wins":wins[1],
+        "interpretation":"matched source-specific developer costs; BSGS generic, APS finite S3 pair MITM-equivalent; independent PCC/rho/CAS not assessed",
+        "cases":results
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--aps-vs-bsgs-cold" {
+        let result=compare_factorized_aps_bsgs_cold()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--factorized-s3-fresh" {
         let result=factorized_s3_fresh_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -2299,5 +2469,24 @@ mod factorized_coordinate_tests {
         assert_eq!(old.as_ref().map(|s|s.indices),new.as_ref().map(|s|s.indices));
         assert_eq!(old.as_ref().map(|s|s.signs),new.as_ref().map(|s|s.signs));
         assert_eq!(old_stats.pair_s3,new_stats.pair_s3);
+    }
+}
+
+
+#[cfg(test)]
+mod bsgs_cold_comparator_tests{
+    use super::*;
+    #[test]
+    fn complete_bsgs_recoveries_and_baby_zero_giant_zero(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let mut m=1u64;
+        while m*m<N{m+=1;}
+        for &k in &[1u64,2u64,m,m+3,N-1]{
+            let q=ar.scalar(PRIME31,k,Some(PRIME31.g)).unwrap();
+            let res=cold_batched_bsgs(q).unwrap();
+            assert_eq!(res["complete_target_scalar_recovered"].as_bool(),Some(true));
+            assert_eq!(res["log"].as_u64(),Some(k));
+        }
     }
 }
