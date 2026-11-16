@@ -1,0 +1,157 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T06:12:48+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/sparse-driver-33e8f2914-04",
+        "prepare",
+        "/workspace/sparse-paid-inputs-33e8f2914-01",
+        "sparse-screen"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:05:55+00:00",
+      "wall_s": 0.009
+    },
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/sparse-driver-33e8f2914-04",
+        "sparse-screen",
+        "/workspace/sparse-paid-inputs-33e8f2914-01",
+        "/workspace/sparse-paid-results-33e8f2914-01",
+        "/workspace/relation-native-qualifiers/scale-worker-8d0ba116c-01",
+        "/workspace/relation-native-qualifiers/replay-cli-ba3b691e4-04",
+        "/workspace/relation-native-qualifiers/sparse-fused-207e9a409-03",
+        "/workspace/relation-native-qualifiers/pilot-singular-e069707f6-01",
+        "/workspace/relation-native-qualifiers/pilot-msolve-e069707f6-01",
+        "0"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:05:56+00:00",
+      "wall_s": 24.801
+    }
+  ],
+  "commit": "1b90e1c568e16b1043acdafd3b8c83cd00ae550e",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T06:05:45+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0605Z-sparse-paid-screen-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": null,
+      "name": "complete_outputs",
+      "note": "Rust-rendered complete matching outer answers; no confirmation. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 66.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "paid_recovery_workflows",
+      "note": "Rust checks every failed-attempt plus recovery paid sum; inner failures retained. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 4.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 10536,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/05ddf5bd2a3798720240eeb8ecc73b1d9a3ecc05951c253947946227e2ed4546",
+      "sha256": "05ddf5bd2a3798720240eeb8ecc73b1d9a3ecc05951c253947946227e2ed4546",
+      "uploaded": false
+    },
+    {
+      "bytes": 1454296,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-first-n10-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/1329d5ec2efe22bd4f9548fc257d56b956bfa7fbb57c1067c6f458ad4e289133",
+      "sha256": "1329d5ec2efe22bd4f9548fc257d56b956bfa7fbb57c1067c6f458ad4e289133",
+      "uploaded": false
+    },
+    {
+      "bytes": 781964,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-first-n12-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2de54adced6f86c466679b574ffc50c20e3e08bd20bfd038c6bfff8074060b7a",
+      "sha256": "2de54adced6f86c466679b574ffc50c20e3e08bd20bfd038c6bfff8074060b7a",
+      "uploaded": false
+    },
+    {
+      "bytes": 1699148,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-first-n16-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fef3ab4644e81fa9dbd9e89247d110ce3d9eefd1c66f447c58d8c0afa9d2aa70",
+      "sha256": "fef3ab4644e81fa9dbd9e89247d110ce3d9eefd1c66f447c58d8c0afa9d2aa70",
+      "uploaded": false
+    },
+    {
+      "bytes": 961088,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-last-n10-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f723a693f691cd774886666a127caf73d40d3c07306a02767a0fd68d17f40ce",
+      "sha256": "3f723a693f691cd774886666a127caf73d40d3c07306a02767a0fd68d17f40ce",
+      "uploaded": false
+    },
+    {
+      "bytes": 894504,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-last-n12-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/23/233d6519996d525e843959a04b9e75d30d165c4d21bb5a7edaa2cb99d6f15d6b",
+      "sha256": "233d6519996d525e843959a04b9e75d30d165c4d21bb5a7edaa2cb99d6f15d6b",
+      "uploaded": false
+    },
+    {
+      "bytes": 1177156,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/raw-star-last-n16-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/84a384c5f694aaa5d74a5fab1433ba56b772ca44c4a2ca1b15210208767e79be",
+      "sha256": "84a384c5f694aaa5d74a5fab1433ba56b772ca44c4a2ca1b15210208767e79be",
+      "uploaded": false
+    },
+    {
+      "bytes": 266804,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/reporter-executable-01.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3fb1d28877f0bcefde8471dace76803b2a9eb766675e57459bd0f5499c1435e5",
+      "sha256": "3fb1d28877f0bcefde8471dace76803b2a9eb766675e57459bd0f5499c1435e5",
+      "uploaded": false
+    },
+    {
+      "bytes": 3922,
+      "path": "research/relation_degree_trace_20261115/sparse-pipeline-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/ae63ac5d9909af47e8aaadda15b9d80a7bb48f28bcf6faae71ae72ccadff01d3",
+      "sha256": "ae63ac5d9909af47e8aaadda15b9d80a7bb48f28bcf6faae71ae72ccadff01d3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/sparse-pipeline-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/sparse-pipeline-01/report-01/costs.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/sparse-pipeline-01/report-01/costs.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "sparse-paid-screen-20261116",
+  "status": "measured",
+  "summary": "Complete sparse screen, no follow-up:66 matching outer outputs,four charged recoveries. No case meets both primary10x gates; no15x confirmation. PCCf8e097/437abb, unsigned L0. [pcc:unverified]",
+  "validation": null
+}

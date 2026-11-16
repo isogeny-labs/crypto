@@ -1,0 +1,13 @@
+2026-11-15: 400 incoming blocks retained in original order; 38 own post-base records audited, 38 inserted; block bytes unchanged excluding separating newlines
+2026-11-16: 9 incoming blocks retained in original order; 13 own post-base records audited, 13 inserted; block bytes unchanged excluding separating newlines
+Active resume and incoming resume both retained byte-exact; merged ledger equals incoming main byte-exact; producer made no ledger edits
+Incoming resume: 3 existing marker lines escaped for literal archive; reversible reconstruction equals incoming bytes; active handoff unchanged
+Five pre-existing branch-only journal marker lines escaped; removing added indentation reconstructs the audited union byte-exact. All journal facts and both marker sides retained.
+
+Hygiene is relative to incoming main; raw validation log final blank lines are retained byte-exact. Source/journal/resume changes otherwise pass the standard checks.
+3bcf2c9b7088c85270715e37517b6300b485f7a63463716ae1858216e57e2212  /tmp/ic-main-reconcile/base.sha
+5e77f9e27a4f49a1d03303c6438b4a38789a1271ffe38fb13d049e7c51641c82  /tmp/ic-main-reconcile/incoming.sha
+7a417ae8e04b42aa89a41cf425b183a6a8f505d88a492a3b1f4ed71d13ec56e2  /tmp/ic-main-reconcile/ours.sha
+1500375cf6da6f442c4e761613e204468638e88b0c1666c44889134ff1213a15  /tmp/ic-main-reconcile/ledger.theirs
+7a125f9476b67a519698f3d51891af9de6a09f8ac42955caf660229435c92b33  /tmp/ic-main-reconcile/resume.theirs
+6b8e72d6f8e078d82a45b7b85777ad433ba7618b0f32746919378b579fcec520  /tmp/ic-main-reconcile/journal-before-marker-escape

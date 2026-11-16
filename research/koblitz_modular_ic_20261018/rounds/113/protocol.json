@@ -1,0 +1,12 @@
+{
+ "id":"marked23-r113-x0-y1-second-blowup-v1", "claim_class":"exact_computation",
+ "inputs_sha256":{
+  "donor51":"7a92cf0f1665b80bef5a38c57ca45136e530bfcf8cd13a430942af75684b7409",
+  "parser105":"4306bbc6a7c5de1b21716a5fc5a1fd1a8030ff1340409c814c39d6217292a3e4",
+  "result112":"0ca85dd551bb1e288aea9f3d2175061750a19b58e9f94d1dbc58f4eb61171fab"
+ },
+ "substitution":"y=1+x+x^2(1+v); divide f by x^6",
+ "decision_rule":"Report exact transformed support and edge data; certify branches only after simple residual and complete degree accounting",
+ "controls":["R112 predicted v^2+v^3 fiber","fresh replay","changed donor","independent R112 composition"],
+ "backend":"local exact F2 arithmetic","cloud_cost_usd":0
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:26:25Z",
+ "id": "PCC-20261116-86e888",
+ "kind": "statement",
+ "producer": {
+  "commit": "cb8353183add070b98fb5319072a112d9dc2941c",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-04"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/publication-round04-01/post-ci-reproduction-01.json",
+    "sha256": "331a10d1842ecdf1bc691cfb6e45688e0ea42e85eefa443e780faa53d096c346"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/publication-round04-01/workflow-wiring-01.json",
+    "sha256": "5523d5f5476f0d282488fdec22b36393b9f7811683edbf0179af56ed2edd7e27"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/publication-round04-01/draft-tier-study-01.log",
+    "sha256": "192d20a5c3a7cc34872fd1e52ec2fe0869333144b777a494fa650948d65260b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/publication-round04-01/historical-idc-source-metadata.json",
+    "sha256": "a4580dd18ed64b46dcb56b0885e8a43b2528a740b3d715a3a88a397980c0282e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Round04 publication wrapper and metadata only; not remote CI or independent execution proof",
+ "statement": "The added study CI shell wrapper reproduces all five qualifier04 JSONL outputs, the final generated Lean source and all four IDC1 records byte for byte in a separate local correctness execution. Focused study workflow wiring is idempotent, draft-tier acceptance and size check pass. The canonical ledger artifact diagnostic remains unresolved. An inherited round03 IDC statement.source prefix mismatch is disclosed in supplemental metadata; original records and separate theorem bindings are unchanged."
+}

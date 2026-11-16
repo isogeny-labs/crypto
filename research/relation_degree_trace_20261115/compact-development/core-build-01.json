@@ -1,0 +1,13 @@
+{
+  "schema": "compact-core-build/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "class": "development release correctness qualification",
+  "executable": {
+    "path": "/workspace/relation-native-qualifiers/compact-core-96f0c814d-01",
+    "sha256": "b922dd4b0e94a527c4c3097ca85b029d73f9a60553fd0d6b858f31cb2ba59960",
+    "bytes": 2524248
+  },
+  "transform": "separate copy, strip debug, read-only before hash",
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "command": "cargo test --release --locked --lib --no-run --manifest-path crates/certified-relations/Cargo.toml --message-format=json"
+}

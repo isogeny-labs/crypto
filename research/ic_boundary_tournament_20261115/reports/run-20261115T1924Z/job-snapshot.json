@@ -1,0 +1,243 @@
+{
+    "apiVersion": "batch/v1",
+    "kind": "Job",
+    "metadata": {
+        "annotations": {
+            "experiment.cost_ceiling_usd": "20",
+            "experiment.launch_config_revision": "d9aa2c7416278cfb2ed50aba229a9f71b6cb9e14",
+            "experiment.original_deadline_utc": "2026-11-16T08:11:12.640103+00:00",
+            "experiment.retry_allowance": "0",
+            "experiment.source_revision": "a10cb7b4f8e48f094efe70c31d9a24b6d72aee4a"
+        },
+        "creationTimestamp": "2026-11-15T19:24:05Z",
+        "generation": 1,
+        "labels": {
+            "isolab.dev/job": "true"
+        },
+        "name": "ic-boundary-single-20261115-1912",
+        "namespace": "isolab",
+        "resourceVersion": "14686882",
+        "uid": "751ec9e0-1e39-4c6e-a592-cc76c66a59a9"
+    },
+    "spec": {
+        "activeDeadlineSeconds": 46028,
+        "backoffLimit": 0,
+        "completionMode": "NonIndexed",
+        "completions": 1,
+        "manualSelector": false,
+        "parallelism": 1,
+        "podFailurePolicy": {
+            "rules": [
+                {
+                    "action": "FailJob",
+                    "onPodConditions": [
+                        {
+                            "status": "True",
+                            "type": "DisruptionTarget"
+                        }
+                    ]
+                },
+                {
+                    "action": "FailJob",
+                    "onExitCodes": {
+                        "containerName": "task",
+                        "operator": "NotIn",
+                        "values": [
+                            0
+                        ]
+                    }
+                }
+            ]
+        },
+        "podReplacementPolicy": "Failed",
+        "selector": {
+            "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "751ec9e0-1e39-4c6e-a592-cc76c66a59a9"
+            }
+        },
+        "suspend": false,
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "karpenter.sh/do-not-disrupt": "true"
+                },
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "751ec9e0-1e39-4c6e-a592-cc76c66a59a9",
+                    "batch.kubernetes.io/job-name": "ic-boundary-single-20261115-1912",
+                    "controller-uid": "751ec9e0-1e39-4c6e-a592-cc76c66a59a9",
+                    "isolab.dev/job": "true",
+                    "job-name": "ic-boundary-single-20261115-1912"
+                }
+            },
+            "spec": {
+                "affinity": {
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "isolab.dev/job": "true"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "/opt/tournament/run.sh"
+                        ],
+                        "env": [
+                            {
+                                "name": "HOME",
+                                "value": "/work"
+                            },
+                            {
+                                "name": "AWS_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "AWS_DEFAULT_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "POD_UID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.uid"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "ISOLAB_JOB_ID",
+                                "value": "ic-boundary-single-20261115-1912"
+                            },
+                            {
+                                "name": "ISOLAB_OUTPUT_DIR",
+                                "value": "/work/results"
+                            },
+                            {
+                                "name": "ISOLAB_RESULTS_URI",
+                                "value": "s3://isolab-results-104186811093-us-east-2/runs/ic-boundary-single-20261115-1912/$(POD_UID)/"
+                            },
+                            {
+                                "name": "RAYON_NUM_THREADS",
+                                "value": "4"
+                            },
+                            {
+                                "name": "OMP_NUM_THREADS",
+                                "value": "4"
+                            }
+                        ],
+                        "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:35af97d51319db07a1092ff8b8101b9c57c696720489fd88f623e1c71e111f13",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "task",
+                        "resources": {
+                            "limits": {
+                                "cpu": "4",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "24Gi"
+                            },
+                            "requests": {
+                                "cpu": "4",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "24Gi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/work",
+                                "name": "work"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ],
+                        "workingDir": "/work"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                    "isolab.dev/cpu-isolation": "v6",
+                    "isolab.dev/pool": "cpu-l2-spot",
+                    "node.kubernetes.io/instance-type": "m8a.2xlarge"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "runner",
+                "serviceAccountName": "runner",
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/workload",
+                        "operator": "Equal",
+                        "value": "cpu"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/measurement",
+                        "operator": "Equal",
+                        "value": "l2"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "8Gi"
+                        },
+                        "name": "work"
+                    },
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        },
+        "ttlSecondsAfterFinished": 86400
+    },
+    "status": {
+        "active": 1,
+        "ready": 0,
+        "startTime": "2026-11-15T19:24:05Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+    }
+}

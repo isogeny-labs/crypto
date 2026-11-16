@@ -1,0 +1,20 @@
+[package]
+name = "p256-minimal-transport"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+publish = false
+
+[workspace]
+
+[dependencies]
+p256-genus-check = { path = "../../native" }
+p256-transfer-search = { path = "../../transfer_search" }
+p256-folded-walk = { path = "../../folded_walk" }
+num-bigint = "0.4"
+num-integer = "0.1"
+num-traits = "0.2"
+serde_json = "1"
+
+[profile.release]
+overflow-checks = true

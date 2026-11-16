@@ -1,0 +1,42 @@
+{
+  "schema": "native-point-hash.budget-exception/v1",
+  "recorded_at": "2026-11-08T17:31:25.998447+00:00",
+  "authority": "Explicit user budget override on 2026-11-08 in the ongoing point-hashing experiment task.",
+  "scope": "First 32-context, 2368-attempt native point-table pilot; no blanket account or lab-policy change.",
+  "budget_headroom_gate": "overridden for this bounded pilot; unknown or exhausted account/lane headroom alone does not stop it",
+  "currency": "USD",
+  "maximum_total_cloud_cost": 10,
+  "ceiling_provenance": {
+    "path": "research/hashed_ecdl_ecbench_20261030/resume-20261104/launch-plan.json",
+    "sha256": "4fa5468f477fe16b4cb3f279a13e0d3add788f09f13743d5c022f0536d5aa517",
+    "note": "Use the existing USD 10 native-work ceiling conservatively for this pilot; it is not an unlimited allocation."
+  },
+  "maximum_build_invocations": 2,
+  "maximum_measurement_attempts": 1,
+  "pod_cpu": 4,
+  "pod_memory_gib": 4,
+  "disk_gib": 10,
+  "concurrency": 1,
+  "original_measurement_deadline_seconds": 1800,
+  "automatic_retries": 0,
+  "automatic_restores": 0,
+  "cost_accounting": "Retain all known charged/reserved costs and count builds, whole-worker default vCPUs, queue/idle, failures, storage and transfer against USD 10. Never reset the cost ledger on retries.",
+  "unmodified_requirements": [
+    "Authenticated caller and actual service permission",
+    "Published exact code/protocol/input identities",
+    "Fresh exact-source S3 upload and readback",
+    "Exact native image/binary binding",
+    "Native L2/host/resource, replay and A/A qualifications",
+    "Complete preregistration, metric inventory, analysis and independent audit requirements",
+    "Protection, required checks, blocking reviews and head-guarded MERGE policy",
+    "Shared AWS Budget/NodePool/quota/IAM settings and protected ledger/journal"
+  ],
+  "current_headroom_values": {
+    "account": null,
+    "lane": null,
+    "note": "Not asserted or fabricated; readback is no longer a blocking gate for this exception."
+  },
+  "new_cloud_jobs_submitted": 0,
+  "production_oracle_batches_run": 0,
+  "standing": "User policy exception, not a signed execution or measurement verdict."
+}

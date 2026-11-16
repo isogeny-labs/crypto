@@ -16,8 +16,8 @@ use std::time::Instant;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use crate::cryptanalysis::ic_boundary::{
-    addmod, mulmod, CountedGroup, FactorBase, GroupOps, KSumTable, PairTable, KSUM_INDEX_BITS,
-    KSUM_MAX_K,
+    addmod, ksum_index_bits, mulmod, CountedGroup, FactorBase, GroupOps, KSumTable, PairTable,
+    KSUM_MAX_ENTRIES, KSUM_MAX_K,
 };
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 
@@ -149,12 +149,22 @@ pub fn plan_check(r: u64, params: &Parameters, ksum: Option<u32>) -> Result<(), 
                 ));
             }
             if !(3..=KSUM_MAX_K).contains(&k) {
-                return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
-            }
-            if 2 * size >= 1 << KSUM_INDEX_BITS {
                 return Err(format!(
-                    "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
+                    "a k-sum table needs k = 3 to {KSUM_MAX_K}, not {k}"
+                ));
+            }
+            let bits = ksum_index_bits(k);
+            if 2 * size >= 1 << bits {
+                return Err(format!(
+                    "a k-sum table with k = {k} packs base indices in {bits} bits; the base has {} points",
                     2 * size
+                ));
+            }
+            // k <= 5 is planned as it always was (a table too large to build is
+            // refused only when it is built); k >= 6 is new and refused up front.
+            if k > 5 && sums > KSUM_MAX_ENTRIES {
+                return Err(format!(
+                    "a {k}-sum table over {size} abscissae would hold about {sums} sums, above the limit {KSUM_MAX_ENTRIES}"
                 ));
             }
         }
@@ -230,7 +240,7 @@ pub fn prepare<G: CountedGroup>(
 }
 
 /// [`prepare`] with a table of every signed `k`-sum of the base
-/// (`k = 3, 4, 5`, [`KSumTable`]) in place of the pair table: the same
+/// (`k = 3` to `9`, [`KSumTable`]) in place of the pair table: the same
 /// seeded target-blind base, so a hit's logarithm is the sum of `k` known
 /// logarithms.
 pub fn prepare_ksum<G: CountedGroup>(
@@ -481,7 +491,7 @@ mod tests {
     fn ksum_tables_recover_every_nonzero_prime_log() {
         let i = roster_prime_instance(10).unwrap();
         let g = &i.curve;
-        for k in [3u32, 4, 5] {
+        for k in [3u32, 4, 5, 6, 7] {
             let params = Parameters {
                 size: 7,
                 max_pair_work: 1 << 20,
@@ -580,7 +590,7 @@ mod tests {
                     let plan = plan_check(i.r, &params, None).is_ok();
                     let run = prepare(g, i.generator_point(), i.r, params).is_ok();
                     assert_eq!(plan, run, "pair {params:?}");
-                    for k in [0u32, 2, 3, 4, 5, 6] {
+                    for k in [0u32, 2, 3, 4, 5, 6, 7] {
                         let plan = plan_check(i.r, &params, Some(k)).is_ok();
                         let run = prepare_ksum(g, i.generator_point(), i.r, params, k).is_ok();
                         assert_eq!(plan, run, "ksum k = {k} {params:?}");
