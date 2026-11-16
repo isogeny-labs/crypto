@@ -1,6 +1,6 @@
 # N83 K600 H2 arm admission, frozen before execution on 2026-11-16 UTC
 
-**Status: no arm search authorized by this packet.** This is one source and input admission attempt: materialize tracked sparse paths, build the host-native arm supervisor, and perform one read-only K600 S3 staging call. A later separate freeze and controller amendment must pass before a constructed or natural solver arm. This packet makes an absolute gate claim, not a comparative runtime or factor-base claim; an A/A arm, matched rho and sampling power are not applicable to the gate itself. The [successful zero-trial preflight](../../reports/run-20261116-k600-preflight/attempt-6-zero-trial-pass/REPORT.md) is the predecessor.
+**Status: no arm search authorized by this packet.** This is one source and input admission attempt: materialize tracked sparse paths, build the host-native arm supervisor, and perform one read-only K600 S3 staging call. A later separate freeze and controller amendment must pass before a constructed or natural solver arm. This packet makes an absolute gate claim, not a comparative runtime or factor-base claim; an A/A arm, matched rho and sampling power are not applicable to the gate itself. The [successful zero-trial preflight](../../reports/run-20261116-k600-preflight/attempt-6-zero-trial-pass/REPORT.md) is the predecessor. [The prelaunch check amendment](PRELAUNCH_CHECK_AMENDMENT.md) was filed before this packet's first execution.
 
 ## Frozen identity and hypothesis
 

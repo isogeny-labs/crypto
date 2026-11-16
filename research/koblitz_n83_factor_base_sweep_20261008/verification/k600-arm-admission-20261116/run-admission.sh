@@ -9,6 +9,8 @@ lock="$h2/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-pref
 source_c=ba620214684e41def8bc6caddf2e782f43920218
 source_h2=a30e67492f821bc6f58ff97c508be9cfe144d7ab
 object_sha=3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf
+image=sha256:b84bd73914a2c76a7c8635ee4d40564d974f0fc7188b9e71f315726050bae2b3
+socket=unix:///Volumes/SSD990-2/tmp/n83-colima-home/n83-arm64/docker.sock
 
 test ! -e "$root"
 test ! -e "$stage"
@@ -18,6 +20,7 @@ test -z "$(git -C "$h2" status --porcelain)"
 test "$(git -C "$h2" diff --name-only HEAD^ HEAD)" = research/koblitz_n83_factor_base_sweep_20261008/verification/k600-preflight-source-lock-20261116/LOCK.json
 test "$(shasum -a 256 "$lock" | awk '{print $1}')" = b97fd192c5ab2af87bd368062014b2c4bef643e791cf6a0ab335a1197c986cae
 test "$(shasum -a 256 "$index" | awk '{print $1}')" = 298b5c1396b58a1b4025813be092934be6f65e34544856d92f1edadabeabd28b
+test "$(DOCKER_HOST="$socket" docker image inspect "$image" --format '{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$image linux/arm64 $source_c"
 test "$(df -Pk /Volumes/SSD990-2 | awk 'NR==2 {print $4}')" -ge $((20*1024*1024))
 test "$(df -Pk / | awk 'NR==2 {print $4}')" -ge $((5*1024*1024))
 
@@ -94,6 +97,8 @@ run_bounded build 2700 env RUSTC="$rustc_path" CARGO_TARGET_DIR="$root/target" \
 binary="$root/target/release/examples/n83_k600_m6_native_arms"
 test -f "$binary"
 file "$binary" > "$root/binary.file"
+rg -q 'Mach-O 64-bit executable arm64' "$root/binary.file"
+strings "$binary" | rg -F "$h2" > /dev/null
 shasum -a 256 "$binary" > "$root/binary.sha256"
 wc -c < "$binary" > "$root/binary.bytes"
 
