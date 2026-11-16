@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1650Z-genus4-rho-refs",
+  "latest_record": "20261116T1756Z-genus4-scale",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 208,
-    "open": 1
+    "measured": 209,
+    "open": 2
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -32344,6 +32344,162 @@
           ],
           "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
           "value": 1.367
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.212,
+      "latest": 0.212,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w01_p16411_p0f",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.142,
+            0.413
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 0.212
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.115,
+      "latest": 0.115,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p16411_frozen",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.077,
+            0.225
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 0.115
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.153,
+      "latest": 1.153,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p16411_p0f",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.772,
+            2.252
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 1.153
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.149,
+      "latest": 0.149,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p8209new_frozen",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.115,
+            0.218
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 0.149
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.05,
+      "latest": 1.05,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p8209new_p0f",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.683,
+            2.006
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 1.05
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.049,
+      "latest": 1.049,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1_p8209pool_p0f",
+      "points": [
+        {
+          "commit": "540259a31624",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T1756Z-genus4-scale",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.785,
+            1.513
+          ],
+          "summary": "Genus 4, p=8209 (3 new curves) and p=16411 (3 curves): under the frozen rho references arm w is below rho at w=0,0.1,1 in Q3 (0.149, 0.115 at w=1), but against window-free plain rho (P0f) w=1 is at parity (1.05 [0.68,2.01], 1.15 [0.77,2.25]); below at w<=0.1. Negation rho needs 1.42x theory steps at p=16411 (P4 failed). Measurement launchers search.sh/resume.sh ran outside benchrec (deviation); the recorded command is the analysis. [pcc:unverified]",
+          "value": 1.049
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
