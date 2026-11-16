@@ -1,6 +1,31 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (05:03Z, 16 November)
+## Current checkpoint (05:11Z, 16 November)
+
+STAGE19COMPLETE,NEGATIVE. Source1de7ddec033ba24e158c9aa3ee6893897deec4abpublished
+before solelocalcall. Exit0in29.356s,864starts/completions,144warm720measure,
+36fixtures/6912coordinates. Canonicaloutputsallmatchdensequalifier,global[],
+allcoldlearning/edgeintegerpartition/source/family/order/semanticchecksPASS.
+34eligibleALL34lose,means1.2207646428–2.3837251276,lowerintervalsallabove1.
+AArejections:p67s193b2,p67s197b2. Largest12allcontrolledlose1.797290–2.208839,
+eachfirstmeasuredpool7accepted:91product+665chain+196direct=952obligations,
+7336witnesschecks,0resource-refusal. Largestgains0,fullICfollowupfalse,none
+launched. No jobsactive. No retries. Full47262-byte originalRustsummaryretained.
+
+All4finalPDFpagesvisuallyinspected; exactbenchPDF/SVG/150dpiPNGcopies/hashesdone,
+originalPNGsalsolocal19. Allraw/source/binary/preposthasheschecked. Frozen56file
+manifeststays1de7bytes; renderedlocalreportfixesTypstcomparisonspacing,boolean
+formatandproseonly, hashesinlocal-evidence. RootstudyREADMEpostdatachangesare
+historicalmanifestdifference; DONOTrewritefrozenmanifest. Finishedpacketneed
+commit/pushandPRbodyupdate(currentbodysays19starting). Stage18publishedalready.
+
+Latestvalidation49cubic+10pool+5S4example+22analysischecks,actualreleasebuilds+
+allClippyPASS. Two independentreviewpointers(COVER_SIEVE_REVIEW.md and
+BORDER_CERTIFICATE_REVIEW.md)haveprimary/KBfallbackreceipts; no newmethod/trial
+chosenafter19. Finishpublishingbeforedecision. GoalACTIVE; no overallparity.
+CI/reviewlast04:23,next05:13absentevent;nogate/size/artifactsconfirmed. Localworks.
+
+## Prior source checkpoint (05:03Z, superseded pending states)
 
 STAGE19SOURCE/VALIDATIONDONE, NOTTIMED. All49cubicreleasechecks +10genericpool/
 paircertificatechecks+5S4examplechecks+22analysischecks PASS. Actual3example
@@ -14,7 +39,8 @@ BEFOREsinglewrappercalllocal-pair-certificate-20261116-19. No compiler/jobactive
 
 Newread-onlyBORDER_CERTIFICATE_REVIEW.md: primaryKehrein–KreuzerDefinitions1/15,
 Proposition16read, SHA8c928f34f99e94670ff62c0553cc9dae5129bcde808d77e31eb11a2d097be1b5
-inputevaluation+bothidealinclusionswouldberequiredforfuturecertificate.
+Exactcommutingcompletebordergraphs+originalinputevaluation+bothidealinclusions
+wouldberequiredforfuturecertificate.
 Readoldnegativeborderlazyelimination11.12–11.14, correctedceiling1.002x;
 no ceilingtransfer or performanceclaim for a different replaycertificate.
 KBtwoborderqueriesunavailable, receipts /tmp/ic-border-certificate-kb-*.log.

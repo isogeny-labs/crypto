@@ -278,8 +278,11 @@ no standard lab admission or canonical export validation is asserted.
   explicit `f4-trace-pair-graph` mode. Product/chain witnesses discharge pair
   obligations through prior certified edges; all original-input reductions
   and complete root/group checks remain. The exhaustive mode stays available.
-  [Frozen fresh comparison](pair-certificate-plan.json) is not timed yet.
-  [pcc:unverified]
+  The [864-batch fresh comparison](local-pair-certificate-20261116-19/report.pdf)
+  completes correctly in29.356seconds. All34controlled cases lose at
+  1.221–2.384times freshF4; two timing rejections remain. Largest-field pools
+  accept seven replays and prune pair obligations, but produce zero gains;
+  the frozen full-IC condition fails. [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;
