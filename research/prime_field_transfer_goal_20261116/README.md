@@ -1,10 +1,21 @@
-# Prime-field transfer goal: component targets, round one
+# Prime-field transfer goal: component targets and input-selected examples
 
-Latest component: [round03 result](round-03/RESULT.md) and
-[two-page report](reports/round-03.pdf), covering compact CM models and
+Latest component: [round04 source-selected Weber roots](round-04/RESULT.md)
+and [two-page report](reports/round-04.pdf). Coordinate-input rational Padé
+recognition accepts all18 order19 inputs from F79 to anomalous F19 at the
+tested8/16/32 digits and3/4 declared public order61 inputs from F1531 to
+F61 at32 digits. The remaining public case and all earlier failures stay
+recorded. Nine named Lean endpoints cover literal global-root, quotient
+and residue certificates; the CM/specialization/native bridge remains a
+written argument. Claims fb2ab0/be69df carry the PCC-20261116 prefix and
+are unsigned. [pcc:unverified]
+
+The [round03 result](round-03/RESULT.md) and
+[two-page report](reports/round-03.pdf) cover compact CM models and
 smaller anomalous targets on six generated fixtures. The native target-only
-Smart solver is implemented; the arbitrary-source-point evaluator remains
-open. Claims are unsigned. [pcc:unverified]
+Smart solver supplies the target component used by the new small examples.
+The efficient arbitrary-curve evaluator remains open. Claims are unsigned.
+[pcc:unverified]
 
 The earlier [round02 local lift](round-02/RESULT.md) and its frozen receipts
 remain unchanged.
