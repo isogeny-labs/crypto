@@ -14,7 +14,7 @@ For every prime $p$ with $p mod 11 in {3,4,5,9}$, every smooth geometric cyclic 
 
 After algebraic closure, move the three branch points to $0,1,infinity$ and write $y^11=x^a(x-1)^b$, with $c=-a-b mod 11$ and all $a,b,c$ nonzero. Riemann–Hurwitz gives genus five. Lemma 2.1 of Ozman–Pries–Weir gives the signature `s_i = -1 + sum_{e in {a,b,c}} <-i*e/11>`, where brackets mean fractional part. [pcc:unverified]
 
-Order five modulo 11 partitions the ten nontrivial characters into $R={1,3,4,5,9}$ and $N={2,6,7,8,10}$. Bouw's p-rank upper bound, restated as Theorem 2.3 by Ozman–Pries–Weir, is $f_p(C) <= 5 min_(i in R) s_i + 5 min_(i in N) s_i$. `OrbitBound.lean` checks all 90 valid exponent pairs: in every row, each orbit has a zero signature entry. Thus the upper bound is zero for every such geometric cover. The finite Lean declarations compile axiom-free; the normalization, signature formula and p-rank theorem remain cited external inputs. [pcc:unverified]
+Order five modulo 11 partitions the ten nontrivial characters into $R={1,3,4,5,9}$ and $N={2,6,7,8,10}$. Bouw's p-rank upper bound, restated as Theorem 2.3 by Ozman–Pries–Weir, is $f_p(C) <= 5 min_(i in R) s_i + 5 min_(i in N) s_i$. `OrbitBound.lean` checks all 90 valid exponent pairs: in every row, each orbit has a zero signature entry. Its conditional endpoint `zero_rank_if_bouw_bound` uses that finite certificate and a supplied upper-bound hypothesis to conclude zero. The finite declarations are axiom-free; the endpoint uses standard `propext` and `Quot.sound`. The normalization, signature formula and p-rank theorem remain cited external inputs. [pcc:unverified]
 
 #image("orbit.svg", width: 100%)
 

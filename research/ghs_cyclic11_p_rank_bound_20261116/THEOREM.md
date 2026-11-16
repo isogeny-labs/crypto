@@ -36,9 +36,14 @@ The source-bound `orbit_bound.py` checks all 90 valid `(a,b)` rows:
 each orbit contains an `s_i=0`, so both minima and the right side are
 zero. There are 20 distinct signature patterns. `OrbitBound.lean`
 checks the same 90-row modular condition and five-dimensional
-signature sum without axioms. The external geometric normalization,
+signature sum without axioms. Its `all_rows_orbit_bound_zero` is the
+finite bound certificate, and `zero_rank_if_bouw_bound` concludes `f=0`
+from a row-membership hypothesis and the supplied numerical inequality
+`f <= orbitBound a b`. The latter uses only Lean's standard `propext`
+and `Quot.sound` foundations. The external geometric normalization,
 signature formula, and p-rank theorem are cited mathematical inputs;
-Lean does not formalize them.
+Lean does not formalize them. The six-field inheritance map is in
+`PROOF_MAP.md`.
 
 The final transfer exclusion follows from p-rank under isogeny.
 An ordinary `E/K` gives an ordinary Weil restriction after base change
