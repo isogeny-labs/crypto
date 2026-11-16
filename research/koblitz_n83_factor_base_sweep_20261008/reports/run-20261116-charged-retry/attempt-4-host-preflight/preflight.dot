@@ -1,0 +1,10 @@
+digraph preflight_reject {
+  graph [rankdir=LR, bgcolor="white", pad="0.16", nodesep="0.26", ranksep="0.43"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, penwidth=1.3];
+  edge [color="#8b98a8", penwidth=1.2];
+  admit [label="No-work admission\nPASS", color="#398c62", fillcolor="#eaf7ef"];
+  names [label="Old log path exists\nattempt-2", color="#a56e33", fillcolor="#fff1df"];
+  stop [label="Host exit 102\nbefore Docker", color="#a56e33", fillcolor="#fff1df"];
+  output [label="Fresh output absent\nno build stage", color="#398c62", fillcolor="#eaf7ef"];
+  admit -> names -> stop -> output;
+}
