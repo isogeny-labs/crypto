@@ -1,0 +1,42 @@
+{
+  "schema": "torus.affine-source-qualification/v1",
+  "standing": "producer unsigned/unverified",
+  "inputs": 64,
+  "base_inputs": 55,
+  "new_inputs": 9,
+  "source_archives": [
+    {
+      "path": "research/curve25519_torus_native_20261115/target-circuit-v2/source-v2-post-checks.tar.xz",
+      "bytes": 55368,
+      "sha256": "8c69c14ac4723a1609b8a35202be08e711b28172ec70231543bb2bafd372feb9"
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/source-v1-delta.tar.xz",
+      "bytes": 34384,
+      "sha256": "c19bcfc224c111f8c3b14ab99f2575aac8c94e36467906ce30a191542e457eff"
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/source-v1-delta.tar.xz",
+      "bytes": 12952,
+      "sha256": "f75bac5d5ec48202ee39a00cbdf0b7442a1c4b268cd78da2f28e33ea8333fb3a"
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/affine-closure-v1/source-v1-delta.tar.xz",
+      "bytes": 53152,
+      "sha256": "41d9bda83e9ea5adbd42ec3fc85375ffb09658cbaff4b489d740a9bfa852d7ab"
+    }
+  ],
+  "binary": {
+    "path": "/workspace/curve25519-native-binaries/affine-closure-control-v1",
+    "bytes": 2710656,
+    "sha256": "54ad26145290b1228e4f45c6669176ae4b79ca17c7f187441bc9b6c2b7d1de7d"
+  },
+  "compiled_source_pins": 9,
+  "compiled_sources_match": true,
+  "archive_round_trips_match": true,
+  "all_55_previous_working_inputs_unchanged": true,
+  "pre_call_qualifier_sha256": "daaad933364f4675d9aa61a51e6c73dcf7ab6c72bc3ef2aef3111ba3cd2c4f34",
+  "native_archive": "research/curve25519_torus_native_20261115/affine-closure-v1/native-v1.tar.xz",
+  "rust": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "scope": "fixed source/certificate correctness and partial solver diagnostics; no full actual solve/timing/cold-cost/live-memory/exponent claim"
+}
