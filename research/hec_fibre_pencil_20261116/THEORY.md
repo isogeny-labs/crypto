@@ -57,3 +57,13 @@ where c,delta are the full-graph quantities above. Proof: admissible coefficient
 A constructive basis requires no modular elimination on all m columns. For each off-graph ungrounded component form w_j=sum_{i in C_j} B_i restricted to anchors. If some s_r!=0 modulo ell, emit w_j-(s_j/s_r)w_r for every j!=r. If every s_j=0, emit all w_j. This spans every anchor-supported difference relation; dependencies of dimension c-delta may remain and can be eliminated in the small anchor space. Columns on grounded components force their coefficient to zero. The formula holds with branch columns omitted and any odd coefficient prime, including component sizes divisible by that prime.
 
 Work includes enumerating every fibre, graph construction and component reduction, and writing the anchor rows. It does not make the catalogue scan free or guarantee k-delta_O positive. If k=0 then no anchor relation survives at all. This directly supplies the structural test the successor needs; it has NOT been independently exercised by the frozen curve gate, which predates this post-control derivation. A new frozen gate must compare its outputs to full/off Gaussian ranks before using it in a supplied-target solver or drawing a performance conclusion.
+
+## Post-anchor-control affine consequence (not a homogeneous rank claim)
+
+For each off-anchor ungrounded component C, sum the original fibre equations and apply an odd-prime cyclic projection pi (which kills omitted branch-place 2-torsion). This gives
+
+    |C| pi([D]) + sum_anchor w_C(P) pi([P-infinity]) = 0.
+
+Thus, under a valid odd-prime cyclic projection with ell not dividing |C|, a SINGLE such component gives a decomposition of D over anchors. It need not give a nonzero homogeneous relation; the zero-sum restriction is unnecessary when D itself is retained as an unknown column. Two size-normalized component equations can be differenced to recover the homogeneous construction. Accordingly zero anchor-intersection rank alone does not rule out target descent. This is an exact consequence of the original divisor identity; no complete DLP solve, cost advantage, or original-group division without a projection/order hypothesis is inferred. Curve diagnostics already record k, the count of off-anchor ungrounded components. Since their counts are below the algebra-control prime1000003, k>0 indicates an available component equation for that control field; it is not a verified subgroup scalar solve.
+
+The unprojected component sum may additionally contain a branch-supported 2-torsion term. The displayed affine equation is in the projected group; dropping that term in the original Jacobian without applying pi would be invalid.

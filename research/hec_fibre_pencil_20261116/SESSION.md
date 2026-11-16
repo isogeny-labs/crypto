@@ -39,3 +39,17 @@ General closed-component and characteristic-divisibility cases, and constructive
 
 ### Errors
 PR evidence-tag correction passes local lint-prose with zero findings. Historical open-record CI issue remains separate. No new scientific failure.
+
+## Anchor construction gate completed
+
+### What was done
+Frozen5e05b98b844e and checkpoint20261116T064255Z precede both once-only binaries. All179424exhaustive graph configurations pass full/off-rank, off-column cancellation and row-containment assertions, including11742closed-component cases and5432characteristic-divisible-size cases. All690curve anchor policies pass and original stdout reproduces CONTROL.tsv byte-for-byte. Native reducer records all cases and summarizes rank/component availability. Two-page report and graph rendered and inspected.
+
+### Decisions made
+No rank or component equation survives H8 in the panel. H16 yields some component equations despite zero homogeneous rank, so zero rank alone is not a descent rejection. Derived affine consequence after the frozen homogeneous control: component sums yield projected target decompositions when component size is invertible. Explicitly retained odd-prime projection: omitted branch 2-torsion cannot be dropped in the original Jacobian. This is not scalar recovery or a timing result. Next construction requires actual subgroup projection, target-seeded anchors, failed-pencil charging and comparison with existing point-add descent/Compact. Tenfold goal remains active.
+
+### Open threads
+No complete tenfold cost premise yet. Affine component witnesses are not independently replayed as actual supplied-target subgroup decompositions. Current PR CI and historical open-record issue tracked separately; PR remains unmerged. Shared daily log stays reserved and untouched.
+
+### Errors
+No scientific failures; both binaries exit0. Diagnostics intentionally written to curve stderr. Post-run review clarified the projected affine identity to retain the branch-torsion distinction. Original frozen source/outputs unchanged; original THEORY freeze bytes remain preserved separately. Unrelated .resume/RESUME.md excluded.
