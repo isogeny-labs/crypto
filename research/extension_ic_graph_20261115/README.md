@@ -1,5 +1,15 @@
 # Extension-field algebraic IC with graph elimination
 
+The [Runpod quadratic-remainder component40](runpod-extension-remainders-20261116-40/README.md)
+retains verified irreducible quadratic classes over Fp² as signed graph vertices.
+It reaches actual homogeneous rank491 at251904B rather than452608B for full
+smooth;10277partial sources produce206checked cancellation rows. Observed
+incomplete primitive bitops3398555767878→2289343806734, with every original
+Cantor identity, principal binding, witness and rank/product prefix checked.
+The inspected report and exact custody are retained; the owned runner is
+deleted. This component supports full-pipeline integration next, without a
+new scalar or pipeline-speed claim. PCC-c26441 remains unverified. [pcc:unverified]
+
 This integration reuses the existing `gaudry_cubic` algebraic relation finders
 and `pencil-symbolic-graph` forest. It changes the auxiliary-variable eliminator,
 with a protected target logarithm and protected constant coordinate. [pcc:unverified]

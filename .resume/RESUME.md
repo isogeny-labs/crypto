@@ -1,3 +1,41 @@
+# Current checkpoint:40COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet then integrate
+
+GoalACTIVE, Rust graph IC+cheap extension-field relation finder toward rho parity.
+ALL measurements Runpod; Rust science; no subagents/stop_goal. Every ownpod32–40DELETED.
+40source538919f948c4b162bba52b1ef3a0802fcfedafed/solePOST20221:03:37Z.
+Bothworkers/copiedqualifier0; actualfullbase492/rank491 in452608Bfullsmooth versus
+251904Bquadraticremaindergraph. Candidate10277partial/10071vertices/206collisionrows+
+285full rows yields491independentrows. Baseline492fullrows. Candidate10581hits,
+19refusals,0duplicates;246exactcohortprefixes/fullsourceidentity. Allsource/norm/
+Cantor/witness/projection/everyrank+productprefix/phases/prices/sampling/endpointsPASS.
+ObservedINCOMPLETEtotal3398555767878→2289343806734bitops;Relations2830056314080→
+1665824481400;LA567245453290→622265324826. MoreLA,lowerrecordedRelations+total.
+Completecosts/bands/ratiosnull, no newscalar orfullpipelinegainclaim.1coldround0warm/
+retry/excluded;115.112swholepracticality. Inner37.159/21.990s endsbeforeJSON,process
+39.831/75.234s includesoutput,candidatesystem51.454s preserved/no wall-speedclaim.
+PCCc26441UNVERIFIED, sourcefa3defUNVERIFIED; no signed/canonicaladmission.
+328publishedsourceblobs/portablecustodyhashPASS, privatepatternscanPASS.
+LOCAL/workspace/ic-runpod-runs/runpod-extension-remainders-20261116-40/returned/task/run
+raw952844/17538263B,export23756493B;2181BsummaryGit. Packetstudy/runpod-extension-
+remainders-20261116-40,bench20261116-runpod-extension-remainders. FinalonepagePDFVIEWED,
+exactfigurehashPASS;initialbadbarlabelrender/figuresLOCALhashbound,notdeleted.
+Ownzx071ey7jqvmdlDELETE204+independentGET40421:07Z/guardmarked;actualCPU11/4vCPU/
+8GiBcpu3c/.12h/pinnedRustimage/1800slifetime. Statuskeyexit_code0, earliercode:null
+wasmissingprojectedkey,notfailure. No active compiler/scientificjob/ownedpaidpod.
+
+NEXTpublish40packet/lesson/PCC/journal/resume/studyREADME, PRactual40AFTERproselint0.
+Then41productionintegration: inspectpublic/private six-pointdescent and protected
+projection interfaces, reuse verifiedquadraticconstructor+signedclass graph in
+actualscalarrecovery. Need meaningfulnativecontrols/source freeze/build/sourcepublish
+BEFORE freshRunpodcall. Candidatecomponentviabilityjustifies integration; do not
+repriceoldcohorts/claimcompletecost/parity. No41protocol/callselectedyet.
+Private auth /tmp/ic-runpod-auth-location; neverprintkey/header/token/envresponses.
+Task40 receipts retained;allownpodsdeleted. SourcePCCproof/oldleadpinnedunchanged.
+Canonical siblingprotocolsourceVLT1encrypted/unavailable;don'tprintit again.
+Avoid silent speculative loops; concrete tools/commentary<=60seconds.
+
+--- Previous checkpoint retained verbatim ---
+
 # Current checkpoint:40READY; publish source before sole Runpod call
 
 Goal ACTIVE: Rust graph IC/extension-field relation finding toward rho parity.
