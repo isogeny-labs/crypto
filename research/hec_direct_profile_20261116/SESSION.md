@@ -31,3 +31,17 @@ The PR remains unmerged. A successor requires a concrete complete-cost premise a
 
 ### Errors
 The MCP Conductor client attempted HTTPS against the HTTP endpoint; explicit HTTP CLI checks and claims succeeded (T-6614, T-6623, T-6624). Whole historical benchmark gate exits 1 with 2,206 issues across 230 records in this sparse checkout; the current closed record passes separately. Historical issues were not changed. Preexisting unrelated .resume/RESUME.md is preserved and excluded from staging.
+
+## PR delivery receipt
+
+### What was done
+Pushed evidence commit 57ea236f522016e88888ec1e211056f46470cdfe and updated PR #4357 title/body with exact integration, all charged observations and failed gates. Synced artifact-store maintenance commit e195514c5d939a44c7a1a36ef68152522e01b5ce with a fast-forward. Restored ignored local preview/raw copies from identical original bytes, then repeated closed-record remote validation: zero errors.
+
+### Decisions made
+PR remains open and ready for review, unmerged. No scientific result is upgraded by bookkeeping success. No benchmark-index row is added without independent validation.
+
+### Open threads
+Current-head CI is running; no green-CI claim. The next research premise must address complete cost relative to Compact. Mathematical tenfold objective remains open.
+
+### Errors
+No new record or scientific errors. The unrelated resume edit remains the only tracked change outside this handoff.
