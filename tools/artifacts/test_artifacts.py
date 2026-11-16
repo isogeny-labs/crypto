@@ -77,6 +77,24 @@ class RoundTrip(unittest.TestCase):
         self.art("pull", "research/r1/runs/a.jsonl")
         self.assertFalse(path.exists())
 
+    def test_manifest_cannot_replace_linked_worktree_control_files(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        self.git("commit", "-qm", "store fixture")
+        linked = Path(self.tmp.name) / "linked"
+        self.git("worktree", "add", "-b", "linked-control", str(linked), "HEAD")
+        original = (linked / ".git").read_bytes()
+        for name in (".git", ".GIT", ".git ", ".git.", ".git::$DATA",
+                     ".artifacts.json", ".gitignore", ".gitattributes"):
+            with self.subTest(name=name):
+                manifest = {"schema": artifacts.MANIFEST_SCHEMA, "files": {
+                    name: {"sha256": hashlib.sha256(self.big).hexdigest(), "bytes": len(self.big)}}}
+                (linked / ".artifacts.json").write_text(json.dumps(manifest))
+                sh(linked, "git", "add", ".artifacts.json", env=self.env)
+                result = self.art("pull", cwd=linked, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("invalid manifest entry", result.stderr)
+                self.assertEqual((linked / ".git").read_bytes(), original)
+
     def test_manifest_paths_cannot_escape_their_directory(self):
         self.art("push", "research/r1/runs/a.jsonl")
         target = Path(self.tmp.name) / "escaped.jsonl"

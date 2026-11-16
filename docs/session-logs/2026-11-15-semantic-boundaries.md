@@ -149,3 +149,14 @@ The catalog generator now batches sparse size queries, reuses resolved object ID
 
 ### Measurement boundary
 Private profiling identified subprocess overhead; its exploratory times are not a registered performance result. Freeze the checked source/input hashes and the baseline/candidate/candidate/baseline protocol in the code commit before opening all four benchmark records. Raw JSON and the standard progress report follow the existing benchmark-record and CI S3-custody flow. These are unisolated local software controls with no elliptic-curve price or rho claim.
+
+## Registered replay results and checkout-control guard (2026-11-16)
+
+### Results
+All four records were opened from clean code commit 6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6 before execution. The declared A-B-B-A order completed with zero failed arms and the same independent semantic digest. Generator main times are 183.13312383300217, 20.012492750000092, 19.01348345799488 and 162.9898612919933 seconds. The derived ratio of the two means is 8.869041053073971; the derived mean reduction is 88.72482386747545 percent. These are two observations per variant on an unisolated local host, scoped to the fixed catalog software workload. [pcc:unverified]
+
+### Custody
+The close command correctly required a report PDF. Created and visually inspected the versioned PDF and SVG, then closed all four records without changing measured raw values. Local benchmark gate passes with 223 records and the rolling report is current. The existing CI upload and S3 check remain required before an archive-custody claim. [pcc:unverified]
+
+### Additional reproduced finding
+Before the final artifact-tool publication, a disposable linked worktree and file remote reproduced a .git manifest entry overwriting the worktree's Git control file with a 300,000-byte payload and exit zero. Reject checkout control filenames and common filesystem spellings before hydration; apply the same rule to migration policy. A real linked-worktree regression checks eight names. All 47 artifact controls pass; all 8,228 entries in 3,791 current manifests satisfy the new parser, with zero existing manifest edits. Owner source SHA256 is now 5cad5ee04286bcd157cae3f2d6ae5ededf787645cfe3a471ed5584bc25c97c49. [pcc:unverified]

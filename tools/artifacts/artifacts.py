@@ -144,10 +144,16 @@ def suffix(path: str) -> str:
     return os.path.splitext(name)[1]
 
 
+def control_filename(name: str) -> bool:
+    """Checkout metadata is never data, including common filesystem aliases."""
+    canonical = name.split(":", 1)[0].rstrip(" .").casefold()
+    return canonical in {".git", MANIFEST, ".gitignore", ".gitattributes"}
+
+
 def belongs_in_store(path: str, size: int, policy: dict) -> bool:
     """The policy: does a tracked file of this path and size belong in the store?"""
     name = path.rsplit("/", 1)[-1]
-    if name in (MANIFEST, ".gitignore", ".gitattributes") or path.startswith(".artifacts/"):
+    if control_filename(name) or path.startswith(".artifacts/"):
         return False
     if any(fnmatch.fnmatchcase(path, pat) for pat in policy.get("keep", [])):
         return False
@@ -207,6 +213,7 @@ def read_manifest(d: Path) -> dict[str, dict]:
     for name, entry in files.items():
         if (not isinstance(name, str) or name in ("", ".", "..") or Path(name).name != name
                 or any(c in name for c in ("/", "\\", "\0"))
+                or control_filename(name)
                 or not isinstance(entry, dict)
                 or not isinstance(entry.get("sha256"), str)
                 or len(entry["sha256"]) != 64
