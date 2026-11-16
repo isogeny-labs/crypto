@@ -1,5 +1,15 @@
 # Extension-field algebraic IC with graph elimination
 
+The [fresh scalar-recovery comparison41](runpod-extension-pipeline-20261116-41/README.md)
+integrates the checked quadratic-remainder graph into the Rust IC library.
+All seven public-input IC/rho workers recover242624768583643540; every
+source/Cantor/witness/kernel/descent/affine/target/counter check passes.
+The paired graph reaches homogeneous rank508at223232B versus363520B,
+with observed incomplete subtotals5645040401736versus6415031980400.
+OriginalIC4525556132414is lower on this sample; all complete costs/bands/
+ratios remain null. Exact records/report/custody are retained and the owned
+runner is deleted. ResultPCC-7d4d7e remains unverified. [pcc:unverified]
+
 The [Runpod quadratic-remainder component40](runpod-extension-remainders-20261116-40/README.md)
 retains verified irreducible quadratic classes over Fp² as signed graph vertices.
 It reaches actual homogeneous rank491 at251904B rather than452608B for full

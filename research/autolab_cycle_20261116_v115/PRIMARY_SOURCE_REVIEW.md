@@ -1,0 +1,7 @@
+# Primary-source review and boundary
+
+[Neiger, Rosenkilde and Schost, Fast Computation of the Roots of Polynomials Over the Ring of Power Series,2017](https://arxiv.org/abs/1705.10658), DOI10.1145/3087604.3087642. The author abstract describes all roots modulo a power-series precision over an exact field, including multiple roots, using divide-and-conquer and root-preserving smaller-degree factors. This establishes important prior art for future lifting/factorization work. Its input polynomial is given; our coefficient family still contains unknown parameters. Its complexity claim is not transferred to solving that family.
+
+[Roth and Ruckenstein, Efficient Decoding of Reed-Solomon Codes Beyond Half the Minimum Distance,2000](https://cris.technion.ac.il/en/publications/efficient-decoding-of-reed-solomon-codes-beyond-half-the-minimum-/), DOI10.1109/18.817522. The institution-hosted abstract connects list-decoding reconstruction to polynomial root finding. This is relevant prior art, not evidence that C115has implemented their decoder or solved our systems.
+
+Only these primary abstracts were reviewed this cycle. Translation, weighted degree bounds, Hensel lifting and known root-prefix methods are not novelty certifications. C115's contribution here is a proved/measured application to a pinned affine norm family with explicit quotient-lift semantics and preserved branches. Full novelty review and qualified performance remain separate.
