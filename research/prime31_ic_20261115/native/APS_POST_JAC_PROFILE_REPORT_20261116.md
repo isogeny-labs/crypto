@@ -52,3 +52,20 @@ The highest-value unresolved scientific experiment is **target-conditioned, orig
 4. Pair **completed equal-output** algebraic relation oracles against the best available PKM/APS, native F4 and mature CAS controls on a shared runner. Only after full non-generic solver completion compare against optimized negation-map rho. Independent PCC and ordinary-curve replication required for any security/comparative frontier assertion.
 
 This run establishes a useful negative benchmark and rejects a misleading raw pair-work proxy; it does **not** establish a genuinely non-generic or faster-than-rho algorithm.
+
+
+## Exact-source automatic replay on separate CI run — same negative disposition
+
+After publishing the first raw receipt and report, the unchanged Rust source was run again by the same focused workflow on the documentation/evidence head: [Actions run **43859993988**](https://github.com/isogeny-labs/crypto/actions/runs/43859993988), job `133273990689`, **PASS**. All 160/160 fresh-panel public scalars were again recovered and independently checked. Same 32 Q, same five program arms and same recorded S3 pair counts — **not** 32 new held-out targets and **not** independent verifier/PCC. [All replay records](APS_POST_JAC_PROFILE_REPLAY_CI_20261116.json) are frozen separately, preserving both timing observations.
+
+| Complete 32-Q cold Rust duration | First source-exact run, ms | Later repeat on same source, ms |
+| --- | ---: | ---: |
+| A [256,256,32768] | 306.802452 | 258.882749 |
+| B [320,320,24576] | 252.978062 | 236.378185 |
+| **C [384,384,16384]** | **226.238457** | **220.701207** |
+| D [512,512,8192] | 287.947830 | 279.037128 |
+| C repeat A/A | 234.468467 | 220.349463 |
+
+On this second run, the best challenger B is **1.07189× the C/C′ mean** (7.19% more cold time), with **14/32** direct wins versus C; A/C′ drift is **0.159%**. All 160 complete solves passed and the preregistered candidate improvement gate failed again. Pair queries are identically `557568/725760/1088256/2416128/1088256` across the five arms in both executions.
+
+**Decision unchanged:** retain C; no challenger confirmation or speedup/leaderboard promotion. A repeat on the same Q/source helps falsify a fragile one-off timing winner but does not replace a fresh independent signed PCC campaign.
