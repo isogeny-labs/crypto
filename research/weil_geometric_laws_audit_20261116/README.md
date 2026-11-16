@@ -75,3 +75,5 @@ General multiplication-isogeny comparison, full general nondegeneracy,
 descent, nonclosed residue fields, canonical Tate, general MOV/Frey–Rück
 and backend runtime remain open. All fourteen targets remain active.
 [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `a5f0be2119a662666340ced9bb184e02e84e70c7` and local receipt `5ef5b65a2f80fde771d35a27a10a0593400de065` share tree `8438704a4e6d42de7442dc01dc35dfe4aa5333b8`. Anonymous fetch completed before exact fresh head/title/body/ready confirmation. All45 pinsets/5772 entries match. New-head CI, review and signing remain pending; next scheduled owner07:30UTC. [pcc:unverified]
