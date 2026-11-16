@@ -78,6 +78,12 @@ fn net_replay(ar: &mut Arithmetic, pts: &[Point], d: &Sig) -> Point {
     q
 }
 
+fn binomial(n: usize, k: usize) -> u128 {
+    if k > n { return 0; }
+    let k = k.min(n - k);
+    (1..=k).fold(1_u128, |v, i| v * (n - k + i) as u128 / i as u128)
+}
+
 fn integer_signature_count(b: usize, arity: usize) -> u128 {
     let mut poly = vec![0_u128; arity + 1];
     poly[0] = 1;
@@ -235,6 +241,19 @@ fn panel(ar: &mut Arithmetic, base: Vec<(u64, u64)>, label: &str,
     }
     let zero = measure(ar, &h, &pts, None, "identity_cancellation", 0, None);
     assert!(zero["positive"].as_bool().unwrap());
+    // The exact group-theoretic zero-fibre theorem: D4 injectivity forces
+    // every D8 sum to identity to be a cancellation net d=0. There are
+    // C(B+3,4) distinct x-only cancellation polynomials for that ONE d.
+    let four_sum_injective = h.extra_group_collisions == 0;
+    let identity_unique_net_zero = zero["distinct_eight_net_signatures"].as_u64() == Some(1)
+        && zero["all_net_signatures"].as_array()
+            .is_some_and(|roots| roots.len() == 1 && roots[0] == json!(vec![0_i8; B]));
+    if four_sum_injective {
+        assert!(identity_unique_net_zero,
+            "D4 group-point injectivity must imply only net zero at eight leaves");
+    }
+    let identity_x_polynomial_cancellation_count = binomial(B + 3, 4);
+    assert_eq!(identity_x_polynomial_cancellation_count, 46_376);
     rows.push(zero);
     // Retrospective controls from independently recorded earlier two-base CI.
     // These two Q are NOT part of the prospective 32-target sample.
@@ -260,6 +279,9 @@ fn panel(ar: &mut Arithmetic, base: Vec<(u64, u64)>, label: &str,
         "four_sum_integer_signatures":h.integer_half_signatures,
         "four_sum_distinct_group_points":h.ordered_points.len(),
         "four_sum_group_collisions":h.extra_group_collisions,
+        "identity_four_sum_injective":four_sum_injective,
+        "identity_unique_net_zero":identity_unique_net_zero,
+        "identity_x_polynomial_cancellation_count":identity_x_polynomial_cancellation_count,
         "unordered_four_token_words":h.word_multisets,
         "four_sum_setup_ns_diagnostic_only":h.setup_ns.to_string(),
         "four_sum_setup_group_additions":h.additions,
@@ -355,6 +377,10 @@ mod tests {
         let q = ar.add(PRIME31, pts[0], pts[1]);
         assert!(!h.all_net_roots(&mut ar, &pts, q).0.is_empty());
         let zero = h.all_net_roots(&mut ar, &pts, None);
-        assert!(zero.0.contains(&[0_i8; 31]));
+        assert_eq!(zero.0.len(), 1, "injective four-leaf image gives only the zero eight-net");
+        assert_eq!(zero.0[0], [0_i8; 31]);
+        assert_eq!(binomial(4 + 3, 4), 35,
+            "B4 has exactly 35 x-only cancellation polynomials");
+        assert_eq!(binomial(31 + 3, 4), 46_376);
     }
 }
