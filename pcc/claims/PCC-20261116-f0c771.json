@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:28:11Z",
+ "id": "PCC-20261116-f0c771",
+ "kind": "execution",
+ "producer": {
+  "commit": "913acc4625ab55772ee8a346331996ee20c7a4dc",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/ablation-development/test-47.stdout",
+    "sha256": "01aac815f18bbff2b1806197a792c0ea0c2c9bc7fd922bb44b7108aa3014e7d7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/ablation-development/lib-47.stdout",
+    "sha256": "34126943f782e5c4d6dadad8f681c51447166a7dbf7719f4f1bb2e00a88b5114"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/ablation-development/lint-47.stderr",
+    "sha256": "fc23ddc3bbbb9b5c2419a07696a556d460bed14a8fbffc04c65eb3a7c372a2a8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/ablation-development/build-47.stderr",
+    "sha256": "0bd36730b5e558e17492797a07351d2697f37f2c44cc8229b3ec74799dff9c41"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Standalone fixed relation-ablation collector and raw reporter:42 scoped release local-pilot tests, scoped release library tests, strict clippy and release build47 pass. New guards cover point/scalar identity, projection partition and exact identities, duplicate certificate keys, n3 duplicate geometric arms. Root F4 and certified-relations production source unchanged. Prior test46 had an unused-import warning, removed before strict lint47."
+}
