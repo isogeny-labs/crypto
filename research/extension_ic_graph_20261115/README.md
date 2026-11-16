@@ -220,7 +220,28 @@ projected relation stream with BLAKE3. Both backends hash the same byte encoding
 the report carries the digest and input-byte count. This hashing remains in the
 unpriced native-work scope; it is not a free relation oracle. [pcc:unverified]
 
-## Frozen measurement commands
+## Current local continuation (16 November)
+
+The user authorized local or Runpod execution. Frozen native local plans and
+the thin capture wrapper supersede the EKS launch dependency below for this
+route. Source/binaries/checkpoints/raw remain in local custody with hashes;
+no standard lab admission or canonical export validation is asserted.
+
+- [Complete small-field F4 IC trials](local-s4-f4-ic-small-20261115-09/report.pdf):
+  360 completed executions, 12 correct/control-passing strata.
+- [Censored larger-field trials](local-s4-f4-ic-scale-20261115-10/report.pdf):
+  timeout124 at900s, 181 completed execution records of240 planned; two
+  incomplete and two complete A/A-rejected strata are retained.
+- [Sparse FGLM continuation](AMENDMENT_8_SPARSE_FGLM.md): weighted quotient-graph
+  moments, exact recurrence/Hankel checks and charged dense fallback; new
+  component timing is pending source validation/publication.
+
+Native summaries, every local stratum, flow and raw custody hashes accompany
+each PDF. The local scalar and timing checks are producer observations;
+independent replay/recompute and strongest references are still absent.
+[pcc:unverified]
+
+## Original frozen measurement commands
 
 Only launch after publishing the exact source, checkpointing, and admitting the
 prescribed EKS run. The driver refuses to overwrite raw data, retains failed
