@@ -31,3 +31,30 @@ untouched until its reservation clears. [pcc:unverified]
 
 - A Conductor conflict blocked the canonical session log; this worklog
   preserves the task facts without taking that reserved path.
+
+## 2026-11-16T10:45Z — Actual-curve parity test implemented
+
+### What was done (commands, files, features)
+
+- Wrote `tests/rootfind_paged_curve_parity.rs` against the public Koblitz
+  constructor and production torsion builder. It reconstructs the ordered
+  pair-sum stream with the group law, computes the census-compatible base
+  digest, compares each insertion to a standard hash map, checks every
+  collision's full group equation, and compares the full collision vector
+  and counters with production. Rustfmt adjusted three assertion layouts.
+  No parity run has been made yet. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Commit the test source before the fixed release run, so any observed output
+  binds to a source commit. Keep timed measurements out of this gate.
+
+### Open threads (unfinished, pick up next time)
+
+- Run the source-pinned test, retain exact stdout/stderr, derive the per-cell
+  page occupancy and report the result at its checked scope.
+
+### Errors (what went wrong, how it was handled)
+
+- The first rustfmt check requested formatting only; it was applied before
+  source pinning.
