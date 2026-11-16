@@ -1,5 +1,22 @@
 # Vieta Rust port: continuation receipt
 
+## Final local publication checks — 16 November, 20:42 UTC
+
+Main672067a75a is now merged normally asbd24461be9, after reconciliation697964fedd.
+No conflicts or study/PCC/journal/progress changes in that advance. The merge
+commit/index trees matched; broad post-commit diffstat lazy fetching was stopped
+and merge bookkeeping cleared with merge --quit. Reports pruned by sparse merge
+were restored exactly from HEAD. See next-20261116/evidence/final-publication-check.json.
+
+Scoped closed1938 record validates with95 matching raw hashes,6 metrics and6
+new progress series; artifact policy passes against current main. Global records
+checking fails before completion on unchanged main record
+20261105T0828Z-icb-large-prime-n53-s1-archive command1 lacking an integer success
+exit. Do not close/edit another study's historical record. PCC's125 inherited
+claim-type errors remain unchanged. No global record/PCC pass is claimed.
+Publish this metadata with the completed results; final remote head/CI receipt
+and bounded automation carry the remaining publication status.
+
 ## Publication reconciliation — 16 November, 20:39 UTC
 
 The normal mainb02431b26e merge preserves453 main journal blocks and all53 local
