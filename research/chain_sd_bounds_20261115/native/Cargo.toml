@@ -1,0 +1,17 @@
+[package]
+name = "chainsd"
+version = "0.1.0"
+edition = "2021"
+description = "Exact degree-bounded closure (last fall degree) engine for normalized two-summand Kummer chain systems over F_p"
+
+[[bin]]
+name = "chainsd"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+codegen-units = 1
