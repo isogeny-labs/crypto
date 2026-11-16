@@ -1,1 +1,0 @@
-Read-only existing Iso Lab connector observations. Preserve original requests and deadlines. No submit/cancel/run operation, permission change or alternate-role assumption. A job listing is not EC2 owner closure or a worker-time ledger. Preserve failures and observation timestamps.

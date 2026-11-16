@@ -1,1 +1,0 @@
-T-2044 source-only preparation. Reviewed mathematical derivation is the input. Original branch/geometry files and failure receipts remain unchanged. Exact main statement text equality checked, and18 distinct readback names enumerated. No compiler, experiment, payload or runtime test executed. Candidate source and controls require independent review.

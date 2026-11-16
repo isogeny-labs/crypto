@@ -1,5 +1,0 @@
-import LocalTorsionBoundary
-#print axioms LocalTorsionBoundary.model19_degree
-#print axioms LocalTorsionBoundary.model83_degree
-#print axioms LocalTorsionBoundary.no_binary_residue17
-#print axioms LocalTorsionBoundary.no_binary_residue257

@@ -1,9 +1,0 @@
-    pub fn node(&mut self) -> usize {
-        let i = self.parent.len();
-        self.parent.push(i);
-        self.size.push(1);
-        self.pot.push(Potential::ID);
-        self.fixed.push(None);
-        i
-    }
-    fn find(&mut self, x: usize) -> (usize, Potential) {
