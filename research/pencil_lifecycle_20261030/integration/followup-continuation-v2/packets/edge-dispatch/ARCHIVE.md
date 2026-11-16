@@ -1,1 +1,0 @@
-Original .lean source bytes are retained as .lean.txt; restore suffixes and exact dependency paths for replay. Compiled caches and TeX aux files omitted; logs encoded reversibly with original hashes. One-page PDF inspected. Independent source-fidelity review pending.

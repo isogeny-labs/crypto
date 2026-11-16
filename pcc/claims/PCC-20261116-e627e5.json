@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:09:26Z",
+ "id": "PCC-20261116-e627e5",
+ "kind": "statement",
+ "producer": {
+  "commit": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
+  "model": "",
+  "session": "codex-20261116-nist-three"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-check/cover-replay.txt",
+    "sha256": "01fcf8d2acd14756a88390010cc3043e8eed1dd764b5a1bb19d55c39f25578a7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-check/controls.txt",
+    "sha256": "016ddfed6d92c26929df8f95a56229930b76b9dbdda2e27caf666c0082d0a592"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/cover_replay.cpp",
+    "sha256": "8611876d683627f71cf49ad836b00c71279e6961b64a7502c57299a4ada37160"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-check/pre-call-manifest.sha256",
+    "sha256": "d4d72648f88ff57097e591990bb643b441f57857751f631b939ef3b3d023a909"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native P-192 d7 cover development tests accept the monic degree7 model, source/image order-r screens,33 pull/norm/scalar cases,169 pullback addition pairs, two quadratic-extension ramified fibers, eight additional rational cover-point norms and64 degree2 plus64 degree3 norm-additivity fixtures. Eight malicious/incomplete input controls reject. This is an unsigned producer correctness replay, not a quotient construction, complete domain proof, DLP solve or speed measurement."
+}
