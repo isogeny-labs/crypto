@@ -21,7 +21,7 @@ fn native_kernel_bits() -> u8 {
     NATIVE_KERNELS.with(|v| v.get())
 }
 fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
-    assert!(bits <= 15);
+    assert!(bits <= 31);
     struct Restore(u8);
     impl Drop for Restore {
         fn drop(&mut self) {
@@ -174,6 +174,28 @@ fn cmp(a: &Mono, b: &Mono) -> Ordering {
         .then_with(|| b.iter().rev().cmp(a.iter().rev()))
 }
 fn lead(f: &Poly) -> &Mono {
+    if native_kernel_bits() & 16 != 0 {
+        lead_with_cached_degrees(f)
+    } else {
+        lead_legacy(f)
+    }
+}
+fn lead_with_cached_degrees(f: &Poly) -> &Mono {
+    // max_by never compares a singleton: preserve that behavior even for an
+    // intentionally extreme key whose degree would overflow in a debug build.
+    if f.len() <= 1 {
+        return f.keys().next().expect("nonzero polynomial");
+    }
+    f.keys()
+        .map(|m| (m.iter().sum::<usize>(), m))
+        .max_by(|a, b| {
+            a.0.cmp(&b.0)
+                .then_with(|| b.1.iter().rev().cmp(a.1.iter().rev()))
+        })
+        .expect("nonzero polynomial")
+        .1
+}
+fn lead_legacy(f: &Poly) -> &Mono {
     f.keys()
         .max_by(|a, b| cmp(a, b))
         .expect("nonzero polynomial")
@@ -1640,6 +1662,29 @@ mod tests {
                 }
             }}}
         }
+    }
+
+    #[test]
+    fn cached_degree_lead_preserves_sparse_maps_ties_empty_and_singleton() {
+        for n in 1..=16 {
+            for degree in 0..=3 {
+                for exact in [false,true] {
+                    let keys=monomials_legacy(n,degree,exact);
+                    for stride in 1..=5 {for offset in 0..stride {
+                        let poly:Poly=keys.iter().enumerate().filter(|(i,_)|i%stride==offset).map(|(i,m)|(m.clone(),i as u64%31)).collect();
+                        if !poly.is_empty() {
+                            assert_eq!(lead_legacy(&poly),lead_with_cached_degrees(&poly));
+                            assert_eq!(lead_legacy(&poly),with_native_kernel_bits(23,||lead(&poly)));
+                        }
+                    }}
+                }
+            }
+        }
+        let singleton=Poly::from([(vec![usize::MAX,1],1)]);
+        assert_eq!(lead_legacy(&singleton),lead_with_cached_degrees(&singleton));
+        assert!(std::panic::catch_unwind(|| {let _=lead_legacy(&Poly::new());}).is_err());
+        assert!(std::panic::catch_unwind(|| {let _=lead_with_cached_degrees(&Poly::new());}).is_err());
+        assert_eq!(native_kernel_bits(),0);
     }
 
 }
