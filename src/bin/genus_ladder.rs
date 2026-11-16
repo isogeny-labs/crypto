@@ -30,9 +30,11 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::genus_ladder as gl;
 use crypto_lib::cryptanalysis::genus_ladder::{Arm, IcParams};
+use crypto_lib::cryptanalysis::ic_boundary::RhoWalk;
 use crypto_lib::cryptanalysis::quartic_ladder as ql;
 use crypto_lib::cryptanalysis::smith_prop24 as smith;
 use serde_json::{json, Value};
+use std::hint::black_box;
 
 struct Cfg {
     primes: Vec<u64>,
@@ -50,6 +52,10 @@ struct Cfg {
     /// the hyperelliptic cells of `p` (to re-run admitted instances of an
     /// earlier study without its seed search).  Same admission path.
     curve_seeds: std::collections::HashMap<u64, Vec<u64>>,
+    /// Targets per admitted curve (`--targets`, default 1: the frozen grid).
+    targets: u64,
+    /// Emit a timing calibration per instance (`--calibrate`).
+    calibrate: bool,
     max_trials: u64,
     restart_sqrt: bool,
     smith: bool,
@@ -79,6 +85,8 @@ fn parse() -> Result<Cfg, String> {
         rho_cap: 3.0e7,
         seed_search: 600,
         curve_seeds: Default::default(),
+        targets: 1,
+        calibrate: false,
         max_trials: 50_000_000,
         restart_sqrt: false,
         smith: false,
@@ -105,6 +113,11 @@ fn parse() -> Result<Cfg, String> {
             i += 1;
             continue;
         }
+        if flag == "--calibrate" {
+            c.calibrate = true;
+            i += 1;
+            continue;
+        }
         let v = a
             .get(i + 1)
             .cloned()
@@ -124,6 +137,7 @@ fn parse() -> Result<Cfg, String> {
                     .collect::<Result<_, _>>()?
             }
             "--curves" => c.curves = num(&v)? as usize,
+            "--targets" => c.targets = num(&v)? as u64,
             "--seeds" => c.seeds = num(&v)? as u64,
             "--arms" => c.arms = v,
             "--cc" => c.cc = num(&v)?,
@@ -176,6 +190,9 @@ enum Spec {
         p: u64,
         g: u32,
         curve_seed: u64,
+        /// The target's seed: the curve seed for the first target (the
+        /// frozen instrument), then `curve_seed + k · 1_000_003` (`--targets`).
+        target_seed: u64,
         order: u64,
         h: u64,
         r: u64,
@@ -291,14 +308,17 @@ fn main() -> ExitCode {
                         rec["smith"] = smith_record(&inst.curve.f_coeffs(), p, cs);
                     }
                     emit(rec);
-                    specs.lock().unwrap().push(Spec::Hyper {
-                        p,
-                        g,
-                        curve_seed: cs,
-                        order: inst.order,
-                        h: inst.h,
-                        r: inst.r,
-                    });
+                    for k in 0..cfg.targets.max(1) {
+                        specs.lock().unwrap().push(Spec::Hyper {
+                            p,
+                            g,
+                            curve_seed: cs,
+                            target_seed: cs + k * 1_000_003,
+                            order: inst.order,
+                            h: inst.h,
+                            r: inst.r,
+                        });
+                    }
                 }
                 Err(e) => *reasons.entry(reason_class(&e)).or_default() += 1,
             }
@@ -348,6 +368,7 @@ fn main() -> ExitCode {
             p,
             g,
             curve_seed,
+            target_seed,
             order,
             h,
             r,
@@ -355,9 +376,12 @@ fn main() -> ExitCode {
             let curve = gl::JCurve::new(*p, *g, &gl::random_f(*p, *g, *curve_seed))
                 .expect("admitted curve");
             let inst =
-                gl::instance_from(curve, *order, *h, *r, *curve_seed).expect("admitted instance");
+                gl::instance_from(curve, *order, *h, *r, *target_seed).expect("admitted instance");
             let head = json!({"family": "hyperelliptic", "p": p, "g": g, "curve_seed": curve_seed,
-                "seed": seed, "r": r, "h": h});
+                "target_seed": target_seed, "seed": seed, "r": r, "h": h});
+            if cfg.calibrate && *target_seed == *curve_seed && *seed == 1 {
+                emit(calibrate(&inst, *p, *g, *curve_seed));
+            }
             for ch in cfg.arms.chars() {
                 // v: c + coordinate Wiedemann on a square row subset;
                 // w: v + the capped unit-T walk (gl::IcExt).
@@ -383,16 +407,25 @@ fn main() -> ExitCode {
                             unit_t: true,
                         },
                     ),
-                    'R' => {
-                        let expect = (std::f64::consts::PI * *r as f64 / 4.0).sqrt();
+                    'R' | 'P' => {
+                        // R: negation-map rho; P: plain rho (walk on points).
+                        let plain = ch == 'P';
+                        let expect = (std::f64::consts::PI * *r as f64
+                            / if plain { 2.0 } else { 4.0 })
+                        .sqrt();
                         let mut rec = head.clone();
-                        rec["arm"] = json!("R_rho_neg");
+                        rec["arm"] = json!(if plain { "R_rho_plain" } else { "R_rho_neg" });
                         if expect > cfg.rho_cap {
                             rec["kind"] = json!("skip");
                             rec["reason"] = json!("rho_cap");
                             rec["expected_steps"] = json!(expect);
                         } else {
-                            let o = gl::run_rho(&inst, *seed);
+                            let walk = if plain {
+                                RhoWalk::plain()
+                            } else {
+                                RhoWalk::negation()
+                            };
+                            let o = gl::run_rho_walk(&inst, *seed, walk);
                             rec["kind"] = json!("run");
                             rec["certified"] = json!(o.certified);
                             rec["ok"] = json!(o.recovered == Some(inst.t_secret));
@@ -402,6 +435,11 @@ fn main() -> ExitCode {
                             rec["cantor_inv"] = json!(o.cantor_inv);
                             rec["native"] = json!(o.native);
                             rec["steps"] = json!(o.steps);
+                            // Per-step work the walk does not emit, in closed
+                            // form: one partition hash and two coefficient
+                            // additions modulo r per step (symmetric pricing).
+                            rec["hash_uncharged"] = json!(o.steps);
+                            rec["coef_adds_uncharged"] = json!(2 * o.steps);
                             rec["wall_ns"] = json!(o.wall_ns);
                         }
                         emit(rec);
@@ -606,4 +644,74 @@ fn smith_record(f: &[u64], p: u64, seed: u64) -> Value {
             "full_success_twist": o.full_success(true),
         }),
     }
+}
+
+/// Informational timing (never part of a verdict): ns per Cantor addition,
+/// per multiplication and addition modulo p, and per multiplication modulo r
+/// (u128 reduction, as the linear algebra uses for r >= 2^50), best of 5.
+fn calibrate(inst: &gl::Instance, p: u64, g: u32, curve_seed: u64) -> serde_json::Value {
+    use std::time::Instant;
+    let best = |f: &mut dyn FnMut() -> u64, n: u64| -> f64 {
+        let mut b = f64::MAX;
+        for _ in 0..5 {
+            let t = Instant::now();
+            black_box(f());
+            b = b.min(t.elapsed().as_nanos() as f64 / n as f64);
+        }
+        b
+    };
+    let mut st = curve_seed ^ 0x5eed;
+    let (d1, d2) = (
+        inst.curve.random_divisor(&mut st),
+        inst.curve.random_divisor(&mut st),
+    );
+    let n_add = 20_000u64;
+    let ns_cantor = best(
+        &mut || {
+            let mut a = d1;
+            for _ in 0..n_add {
+                a = inst.curve.cantor(a, d2);
+            }
+            a.deg as u64
+        },
+        n_add,
+    );
+    let n = 20_000_000u64;
+    let ns_mul_p = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                a = black_box(a * (i | 1) % p);
+            }
+            a
+        },
+        n,
+    );
+    let ns_add_p = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                let s = a + (i % p);
+                a = black_box(if s >= p { s - p } else { s });
+            }
+            a
+        },
+        n,
+    );
+    let r = inst.r;
+    let ns_mul_r = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                a = black_box(((a as u128 * (i | 1) as u128) % r as u128) as u64);
+            }
+            a
+        },
+        n,
+    );
+    json!({"kind": "calibration", "p": p, "g": g, "curve_seed": curve_seed, "r": r,
+        "ns_cantor_add": ns_cantor, "ns_mulmod_p": ns_mul_p, "ns_addmod_p": ns_add_p,
+        "ns_mulmod_r": ns_mul_r,
+        "w_cal_mul_p": ns_mul_p / ns_cantor, "w_cal_add_p": ns_add_p / ns_cantor,
+        "w_cal_mul_r": ns_mul_r / ns_cantor})
 }

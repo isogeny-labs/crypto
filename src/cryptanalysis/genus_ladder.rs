@@ -1992,6 +1992,13 @@ impl RhoOut {
 /// Negation-map rho on the order-`r` subgroup (`rho_reference_walk`,
 /// `RhoWalk::negation()`), certified by an independent `[k]G`.
 pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
+    run_rho_walk(inst, seed, RhoWalk::negation())
+}
+
+/// [`run_rho`] with the walk chosen (`RhoWalk::plain()` for the walk on
+/// points).  `native` is the walk's canonicalisations, floored at one per
+/// step, as in [`run_rho`].
+pub fn run_rho_walk(inst: &Instance, seed: u64, walk: RhoWalk) -> RhoOut {
     let (fm0, fi0) = (inst.curve.fmul(), inst.curve.finv());
     let max_steps = (60.0 * (inst.r as f64).sqrt()) as u64 + 10_000;
     let rr = rho_reference_walk(
@@ -2001,7 +2008,7 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
         inst.r,
         seed,
         max_steps,
-        RhoWalk::negation(),
+        walk,
     );
     let (cm, ci) = (inst.curve.fmul() - fm0, inst.curve.finv() - fi0);
     let certified = rr
