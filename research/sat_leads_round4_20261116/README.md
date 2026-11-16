@@ -103,3 +103,58 @@ per cell.
 - Native reruns of the Python-provenance pilots that anyone intends to cite (the ECC2K-130 rails
   effect at d = 8 first).
 - No PDF report for this round (no PDF engine in the container; figures are SVG from Rust).
+
+## Follow-ups (same day)
+
+Two further Rust pilots on the open items above; protocols committed before measured rows
+(8fce46bd83, and the pairing protocol in `research/scan_pm_pairing_20261116/`). Same standing:
+pilots, every number `[pcc:unverified]`.
+
+| Lead | Decision per its rule | After skeptic | Files |
+|---|---|---|---|
+| Native solver: deletion, learning-free leaf, n = 131 | small fields inconclusive (slope flat, ratio above 60); n = 131 runs | counts supported; comparisons need rewording | [study](../sat_native_lin21_n131_20261116/README.md), [review](../sat_native_lin21_n131_20261116/SKEPTIC.md) |
+| ±P pairing inside the repository's `lin21-ht` | fails | not reviewed | [study](../scan_pm_pairing_20261116/README.md) |
+
+### Native solver at n = 131
+
+- Changes in a copy of the solver: multi-word field blocks, learnt-clause deletion, a learning-free
+  leaf. Producer differential test: 2,800 instances, no verdict mismatch; skeptic: 8,400 fresh
+  instances across nine arms with learning forced, no mismatch. In the producer's runs the
+  combined arm never actually deleted a clause.
+- Small fields (n = 3l+2): conflicts identical across arms; wall ratio to the fast scan leaf
+  118 to 128 with deletion or the learning-free leaf, slope about +0.01 per l against +0.097
+  before (the slope rests on l = 9, 11, 13 because the fast leaf needs odd n).
+- Curve y^2 + xy = x^3 + 1 over F_2^131, polynomial-basis subspace, d = 6..14, 8 non-decomposable
+  + 2 planted targets per d (one uniform target at d = 14). Conflicts per non-decomposable target
+  are 2^d + A, i.e. 2.88 to 3.05 x A (1.5 per scanned x1, no pruning). Wall per target at
+  d = 8 / 12 / 14: solver 78.7 / 1,268 / 5,779 ms; fast scan 0.335 / 6.45 / 30.4 ms; point-pair
+  enumeration 11.6 / 2,430 / 41,889 ms. The solver is 187 to 271x slower than the fast scan at
+  every d.
+- **Modulus caveat (skeptic).** The field polynomial used is z^131 + z^8 + z^3 + z^2 + 1, the
+  sparse basis of `ecc2k130/benchmarks/sparse-basis-compound/PROTOCOL.md` that the repository's
+  SAT panel uses, not the challenge's x^131 + x^13 + x^2 + x + 1
+  (`src/cryptanalysis/ecc2k130_guard.rs:852`). The curve constants a = 0, b = 1 are right. With
+  the challenge basis the factor-base sizes differ.
+- The pair-enumeration arm costs about 300 ns per pair against about 100 ns of arithmetic, so the
+  "0.52x at d = 12" figure against it is flattered; the fast scan is the baseline that matters.
+  The panel's 36.7x figure is in a different unit and is not directly comparable.
+- The base includes the 2-torsion point while A does not; no measured row is affected.
+- n = 131 with d <= 14 is heavily over-determined; nothing here transfers to the balanced
+  d of about 43 that index calculus on this curve would need.
+
+### ±P pairing in the repository scan
+
+Built against the library at 8d039abd94 (not a port). In `lin21-ht` the t stage is 2.4 to 3.5% of
+wall at n = 47..59, a ceiling of about 1.03. Counted field operations fall 1.05 to 1.06x; whole-leaf
+wall is inside the A/A band at the three largest n (1.013, 1.000, 0.997). The library already has
+denominator-sharing additions (`add_many_lazy_paired_x`, `add_many_lazy_soa_paired`) used by other
+scans. Identical decomposition sets on 632 targets.
+
+### Reading after the follow-ups
+
+- The native solver is a correct decider that walks the 2+1 scan at 1.5 conflicts per x1 and a
+  wall cost about 120 to 270x the fast scan leaf, with the ratio no longer growing. It does not
+  prune and gives no gain over the scan.
+- No scan-floor proposal reduces the scan's wall cost.
+- Dropped by counting: proposal A (torsion target) supplies only about 2^(3l-n)/6 relations, so
+  it would need l >= n/2 to supply the 2^l relations index calculus needs.
