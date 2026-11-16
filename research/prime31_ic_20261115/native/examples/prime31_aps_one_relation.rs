@@ -2611,6 +2611,10 @@ fn neg_rho_restart(q:(u64,u64),gq:Option<(u64,u64)>,
 // without a collision is explicitly censored, never counted as a solved log.
 fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     step_cap:u64)->Result<serde_json::Value,String>{
+    neg_rho_cold_watchdog(q,seed,lanes,dp_bits,step_cap,0)
+}
+fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
+    step_cap:u64,watchdog_limit:usize)->Result<serde_json::Value,String>{
     if lanes==0 || lanes>128 || dp_bits==0 || dp_bits>=20 ||
         step_cap<(lanes as u64){
         return Err("negation rho comparator admission".into());
@@ -2644,6 +2648,8 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
         .into_iter().map(|v|NegRhoLane{
             point:neg_rho_fold(v),prior_x:None
         }).collect();
+    let mut no_new_dp=vec![0usize;lanes];
+    let mut watchdog_restarts=0u64;
     let mut distinguished:HashMap<u64,(u64,u64)>=HashMap::new();
     let mask=(1u64<<dp_bits)-1;
     let mut steps=0u64;
@@ -2682,11 +2688,23 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                 short_cycles+=1;
                 states[i].point=neg_rho_restart(q,gq,&mut rng)?;
                 states[i].prior_x=None;
+                no_new_dp[i]=0;
                 restarts+=1;
                 continue;
             }
             states[i].prior_x=Some(old.point.pt.0);
             states[i].point=v;
+            no_new_dp[i]+=1;
+            if watchdog_limit>0 && no_new_dp[i]>=watchdog_limit{
+                // Long fruitless cycles without a NEW DP silently consumed
+                // the frozen 2m-step pilot cap; charge a fresh public start.
+                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].prior_x=None;
+                no_new_dp[i]=0;
+                watchdog_restarts+=1;
+                restarts+=1;
+                continue;
+            }
             if v.pt.0&mask!=0{continue;}
             if let Some(&(a0,b0))=distinguished.get(&v.pt.0){
                 let db=subn(v.b,b0);
@@ -2701,7 +2719,9 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                             "public_Q":q,"seed":format!("{seed:016x}"),
                             "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
                             "step_cap":step_cap,"walk_steps":steps,
-                            "short_cycles":short_cycles,"rejected_identity":rejected_identity,
+                            "short_cycles":short_cycles,"watchdog_restarts":watchdog_restarts,
+                            "watchdog_limit":watchdog_limit,
+                            "rejected_identity":rejected_identity,
                             "restarts":restarts,"useful_collisions":useful_collisions,
                             "unusable_collisions":useless_collisions,
                             "distinguished_records":distinguished.len(),
@@ -2715,10 +2735,12 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                 useless_collisions+=1;
                 states[i].point=neg_rho_restart(q,gq,&mut rng)?;
                 states[i].prior_x=None;
+                no_new_dp[i]=0;
                 restarts+=1;
             }else{
                 distinguished.insert(v.pt.0,(v.a,v.b));
                 maximum_table=maximum_table.max(distinguished.len());
+                no_new_dp[i]=0;
             }
         }
     }
@@ -2728,7 +2750,9 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
         "public_Q":q,"seed":format!("{seed:016x}"),
         "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
         "step_cap":step_cap,"walk_steps":steps,
-        "short_cycles":short_cycles,"rejected_identity":rejected_identity,
+        "short_cycles":short_cycles,"watchdog_restarts":watchdog_restarts,
+                            "watchdog_limit":watchdog_limit,
+                            "rejected_identity":rejected_identity,
         "restarts":restarts,"useful_collisions":useful_collisions,
         "unusable_collisions":useless_collisions,
         "distinguished_records":distinguished.len(),
@@ -2833,8 +2857,109 @@ fn rho_cold_match_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+// Fresh, separately preregistered watchdog follow-up. The original pilot
+// remains available byte-for-byte at --rho-cold-match (watchdog_limit=0).
+fn rho_watchdog_match_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const TARGET_SEED:u64=0x5248_4f5f_4e45_5732;
+    const RHO_SEED:u64=0x5248_4f5f_4352_3031;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;4];
+    let mut all_complete=[0u64;4];
+    let mut pair_wins=[0u64;2];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let chronological:[usize;4]=match i%4{
+            0=>[0,1,2,3],1=>[1,2,3,0],
+            2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for index in chronological{
+            let res=match index{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,[384,384,16_384],6,false,true,true)?,
+                1|3=>neg_rho_cold_watchdog(q,rho_seed,32,4,STEP_CAP,512)?,
+                2=>neg_rho_cold_watchdog(q,rho_seed^0x3634_5f44_5035,64,5,STEP_CAP,512)?,
+                _=>return Err("invalid rho panel arm".into())
+            };
+            let complete=res["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if complete{
+                let answer=if index==0{
+                    res["attempts"].as_array()
+                        .and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{res["log"].as_u64()};
+                if answer!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("invalid complete scalar i={i}, arm={index}"));
+                }
+                all_complete[index]+=1;
+            }
+            total_ns[index]+=res["cold_wall_ns"].as_u64()
+                .ok_or("missing fully cold ns")? as u128;
+            arms[index]=res;
+        }
+        if arms[0]["complete_target_scalar_recovered"].as_bool()==Some(true){
+            for (j,idx) in [1usize,2].into_iter().enumerate(){
+                if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+                    arms[0]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                    pair_wins[j]+=1;
+                }
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,
+            "caller_known_scalar_verifier_only":known,
+            "chronological_order":chronological,
+            "incumbent_joint_APS":arms[0],
+            "rho32_dp4":arms[1],
+            "rho64_dp5":arms[2],
+            "rho32_dp4_AA":arms[3]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_VS_NEG_RHO_WATCHDOG_PROTOCOL_20261116.md",
+        "curve":"ordinary prime-order prime31",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["incumbent_joint_APS","rho32_dp4","rho64_dp5","rho32_dp4_AA"],
+        "successful_complete_calls":all_complete,
+        "fully_cold_ns":total_ns.map(|x|x.to_string()),
+        "paired_APS_wins_vs_rho32_rho64":pair_wins,
+        "all_96_complete":all_complete.iter().all(|&c|c==CASES as u64),
+        "ratios_APS_over_rho32_rho64":[
+            total_ns[0] as f64/total_ns[1] as f64,
+            total_ns[0] as f64/total_ns[2] as f64
+        ],
+        "rho32_AA_drift":(total_ns[1] as f64/total_ns[3] as f64-1.0).abs(),
+        "classification":"published APS explicit S3 pair MITM vs optimized generic negation rho; not asymptotic IC",
+        "scope":"source-specific unisolated development CI; external fastest rho and independent PCC untested",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--rho-watchdog-match" {
+        let result=rho_watchdog_match_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--rho-cold-match" {
         let result=rho_cold_match_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
