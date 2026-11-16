@@ -50,6 +50,8 @@ Before data:
   kernel vector, and the filter test covers clique removal to a target excess.
 - One smoke run of each new configuration at q = 16001, seed 1 solved, passed every check, and
   `dlpf:0.5` w2 reproduced its `v4` counted fields. The smoke is not used in any analysis.
+  The predictions below were written before the smoke output was read and were not changed after.
+  The smoke binary predates the `summarize-solver` subcommand; the `attack` code is identical.
 
 ## Metrics
 
