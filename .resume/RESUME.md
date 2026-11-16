@@ -1,3 +1,58 @@
+# Current checkpoint:35COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE:Rust graphIC/extension-field algebraic relationfinder work and Runpod
+measurements towardrho parity. UserrequiresRust/noPython science,Runpodbackend.
+No subagents. All OWN paidpodsDELETED; no compiler/scientificjobactive.
+Privateauthpointer/tmp/ic-runpod-auth-location, NEVERprintkey/headers/tokens/env.
+Authorizationpersists; don'taskprofile/credential. No stopgoal(no blocker).
+
+35sourcec79c11d6c59a7dbbb60c08892ad6587511b115d7PUSHEDbeforeonePOST20217:32:54Z.
+p1009seed347/L263807419822068817,bothactualscalar61513282845831007.2workers+
+copiedRustqualifierexit0,61.186swholepracticalityonly,1round0warm/retry.
+Gateavoids1of2fullcheckswithsameoriginals/descents/endpoint/sourcestrideschedule.
+Prefix386sourcesLP-rank126upper260<target385skip;515sourcesLP-rank127upper388
+permitactualrankcheck.515originals/2descents2007resids/390affinecerts/targetrank387,
+zero fallback/fill.6171knownaddedwordeventscharged. ObservedINCOMPLETEbitops:
+LA903928056050→661359105264;whole6349082215578→6106513264792. OtherphasesEXACTLYequal.
+Removedcheckpoint5,813,150modrM/5,710,857modrA/687modrInvplusfield/wordevents.
+NativeDSU/othergapsremain,allunrankable,total/band/ratiosnull,noT0bestIC/T1rho.
+IndepBFS+denseLPrankallprefixes/permittedfullcheckpoint equality/cert/target/
+allphaseconservationPASS. PCC-20261116-7e4f97UNVERIFIED,lessonO-b0a0e7894c9c.
+
+ExactLOCAL /workspace/ic-runpod-runs/runpod-structural-rank-gate-20261116-35/returned/task/run.
+684527Bbaseline/571735Bcandidate/1271442BexportLOCALuntruncated/hashbound;
+20965BsummaryandmetadataGitpacket. Sealedbundle/source/binaries/returnedarchive
+alsoLOCAL. All280committedsourceblobs(postcallreconstructed)+portablepre/preworker/
+post/qualifiedhashPASS;nocredentialsinbundleorreturnedrun. Ownpod0e3b53r1g9y4qr
+CPU4vCPU8GiBcpu3c0.12USDh/actualCPU63:officialv2DELETE204+GET40417:36:06Zafter
+collection;privatepod-ID.deletedmarker,guardianinert. Old32/33/34ownpodsdeleted too.
+Final35onepagePDFVIEWED/exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS.
+Packetresearch/.../runpod-structural-rank-gate-20261116-35,benchmark
+benchmarks/20261116-runpod-structural-rank-gate. No originalraw/checker/summaryedited.
+
+Currentc79+DIRTY35packet/PCC/lesson/journal/resume/mainstudyREADME. Needcommit/push
+finishedpacketandPRactual35afterPCCproselint0. Source280manifesthistoricalc79;
+mainstudyREADMEchangedPOSTCALLandisnotexpectedtomatcholdmanifestoncurrentworktree.
+Don'trerun/reprice35. Nativeexportself-described/noncanonicalasbefore.
+
+NEXTafterpublication: readactualremainingtargetsolver/denseRREFsource and its
+operationcounts/KBpriorworkbeforeselectingsparsezero-elisionoravoidedrepeated
+elimination. No36protocol/callselectedornewimplementationyet. Considerimmutable
+recorded-matrixRunpodcomponentreplaybeforeanotherlengthyrootbuild. Keepcurrent
+strongactualscalar/cert/targetchecksandoriginalstreams;don'tsilentlyrelaxcriterion
+orcomposecrosscohortcosts. Avoidlongspeculation: chooseoneconcretecode/datastep,
+logdecision, nativecontrols,source/specpublishedBEFOREnewmeasurement.
+
+34matchedoriginalIC/graph/fourrhooptionspublished3cc53e0d1/PRupdatedandfully
+preserved; observedincompletevaluesbelowareNOTcomposablewith35. Completeparity
+needsfullaccounting/publicunknown-logcohorts/controls/strongestreferences,stillopen.
+PR4288regular/automerge/no manualmerge;3ccCIread17:14workflow/statusEMPTY.
+Newpublicationeventmayberead;artifactbotifPNGmigrationinspect/FF/restoreexact
+ignoredPNGfromLOCAL/hash,neverreaddignoredPNG. Alltests/sourcechecksforc79passed:
+strictlib/exampleClippy,30sievepass2oldignored,3examplepass,19qualifierpass,4pure
+helpercontrols,2armtransport/oldcollision/captureauth-oncecontrols,productionbuild.
+Maintaincommentary<=60sec/concreteactionloops;nosourcecodeneedlesslyrebuild.
+
 # Current checkpoint:35SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
 
 GoalACTIVE/RustgraphICintegrationandRunpodmeasurementsuntilrho parity; no subagents.

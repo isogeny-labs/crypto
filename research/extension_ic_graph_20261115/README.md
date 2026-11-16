@@ -70,6 +70,14 @@ checked before owned pod termination through the official GraphQL fallback.
 The [failed33capture](runpod-ic-graph-rho-portfolio-20261116-33/report.pdf)
 and its native transport controls remain preserved. [pcc:unverified]
 
+The [structural graph gate](runpod-structural-rank-gate-20261116-35/report.pdf)
+defers one of two full rank checks on a fresh matched fixture, retaining
+the same original relations, descents, endpoint, schedule and scalar.
+Independent prefix graph/dense-rank and all-phase conservation checks pass.
+Observed LA primitive bitops fall903928056050to661359105264, including6171
+known gate events; other phases match. Native bookkeeping remains incomplete,
+with no full-cost ratio or parity assertion. [pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |
