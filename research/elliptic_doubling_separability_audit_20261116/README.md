@@ -58,3 +58,15 @@ bounded ranges/175–176 visuals credited separately, no fullchapter/full
 external Silverman/newvisual read claimed. Actual binary identity derived
 from official formulas, not supplied from an unavailable source. No novelty,
 native experiment, agents or paidspend. All14 remain active. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+Local proof receipt `28e9fab6d963b0053f954477c80639330f2e27a9` and remote proof
+`6d63cbc73a8339bb1da7d8bfe2da16e348b4f4e5` share tree
+`94837e889eb48fadb7decfaff5c64252b7810485`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending. Local replay PASS does not establish signed standing. The author
+correction is acknowledged; general corrected factorization/Weil nondegeneracy
+and Scheme API comparison remain open. All14 targets stay active. [pcc:unverified]
