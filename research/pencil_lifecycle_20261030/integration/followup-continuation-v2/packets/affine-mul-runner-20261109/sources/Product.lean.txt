@@ -1,0 +1,63 @@
+import ProductRow
+import Canon
+set_option autoImplicit false
+namespace ProductPolynomial
+open Polynomial ScaleTrim MonicRemainder CoefficientTraversal TraversalPolynomial RemainderPolynomial
+
+def rows {n : Nat} (p : UInt64) (j : Nat) (as bs : List UInt64)
+ (h : j+as.length+bs.length≤n+1) (xs : State n) : State n :=
+ match as with
+ | []=>xs
+ | a::as=>rows p (j+1) as bs (by simp only [List.length_cons] at h; omega)
+   (ProductWord.run p a (events j bs (by simp only [List.length_cons] at h; omega)) xs)
+
+theorem rows_correct {n : Nat} (p : UInt64) [Fact p.toNat.Prime] (j : Nat) (as bs : List UInt64)
+ (h : j+as.length+bs.length≤n+1) (xs : State n) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (ha : Canon p as) (hbs : Canon p bs) (hx : Good p xs) :
+ Good p (rows p j as bs h xs) ∧
+ decodedPoly p (rows p j as bs h xs)=decodedPoly p xs+X^j*wordsPoly p as*wordsPoly p bs := by
+ induction as generalizing j xs with
+ | nil => exact ⟨hx,by simp [rows,wordsPoly,listPoly]⟩
+ | cons a as ih =>
+   have hac:=ha a (by simp)
+   have hat : Canon p as := by intro x hx; exact ha x (by simp [hx])
+   have hrow : j+bs.length≤n := by simp only [List.length_cons] at h; omega
+   have hg:=(ProductWord.run_correct p a (events j bs hrow) xs hp hb hac hx (events_good p j bs hrow hbs)).1
+   have hs:=generated_polynomial_step p a j bs hrow xs hp hb hac hx hbs
+   have ht:=ih (j+1) (by simp only [List.length_cons] at h; omega) _ hat hg
+   refine ⟨ht.1,?_⟩
+   change decodedPoly p (rows p (j+1) as bs _ _)=_
+   rw [ht.2,hs]
+   simp only [wordsPoly,List.map_cons,listPoly,pow_succ]
+   ring
+
+def zeros (n : Nat) : State n := ⟨Array.replicate n 0,by simp⟩
+
+theorem zeros_good (p : UInt64) (n : Nat) (hp : 0<p.toNat) : Good p (zeros n) := by
+ intro i
+ simpa [zeros,CoefficientTraversal.read] using hp
+
+theorem zeros_polynomial (p : UInt64) [Fact p.toNat.Prime] (n : Nat) : decodedPoly p (zeros n)=0 := by
+ rw [← wordsPoly_array]
+ simp [zeros,wordsPoly,List.map_replicate,listPoly_zeros]
+
+def product (p : UInt64) (as bs : List UInt64) : List UInt64 :=
+ if ha : as=[] then [] else if hb : bs=[] then [] else
+ let n:=as.length+bs.length-1
+ let out:=(rows p 0 as bs (by have := List.length_pos_iff.mpr ha; dsimp [n]; omega) (zeros n)).val.toList
+ trimFuel out.length out
+
+theorem product_correct (p : UInt64) [Fact p.toNat.Prime] (as bs : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (ha : Canon p as) (hbs : Canon p bs) :
+ Canon p (product p as bs) ∧ wordsPoly p (product p as bs)=wordsPoly p as*wordsPoly p bs := by
+ unfold product
+ split_ifs with hea heb
+ · subst as; simp [Canon,wordsPoly,listPoly]
+ · subst bs; simp [Canon,wordsPoly,listPoly]
+ · have hs:=rows_correct p 0 as bs (by have := List.length_pos_iff.mpr hea; omega)
+     (zeros (as.length+bs.length-1)) hp hb ha hbs (zeros_good p _ hp)
+   constructor
+   · exact trim_good p _ _ (list_good p _ hs.1)
+   · rw [trim_preserves,wordsPoly_array,hs.2,zeros_polynomial]
+     simp
+end ProductPolynomial

@@ -1,0 +1,42 @@
+--- prior/launch.py
++++ successor/launch.py
+@@ -3,7 +3,7 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-control-successor-20261111')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1794398400
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+@@ -151,7 +151,7 @@
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-pivot-operational-v2-20261111-'+phase
++  unit='pencil-pivot-control-successor-20261111-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',
+--- prior/replay.py
++++ successor/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-control-successor-20261111')
+ ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+--- prior/Controls.lean.txt
++++ successor/Controls.lean.txt
+@@ -13,7 +13,7 @@
+ theorem swapped_pivot : swapRows M 1 2 1 1 = 2 := by decide
+ theorem rhs_moves_with_row : swapRows M 1 2 1 4 = 6 := by decide
+ theorem zero_prefix : swapRows M 1 2 1 0 = 0 := by decide
+-theorem earlier_row_unchanged : swapRows M 1 2 0 = M 0 := by decide
++theorem earlier_row_unchanged : swapRows M 1 2 0 = M 0 := by rfl
+ theorem exhausted_search : nativePivot (fun _ _ => 0) 2 = none := by decide
+ theorem zero_prefix_is_not_automatic :
+   swapRows (fun _ _ => 1) 1 2 1 0 ≠ 0 := by decide
