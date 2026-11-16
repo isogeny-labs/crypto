@@ -14,8 +14,25 @@ struct Config {
     qualification_baseline: PathBuf,
     cpu: String,
     runtime_files: Vec<PathBuf>,
+    #[serde(default)]
+    expected_kernel: Option<String>,
+}
+fn fixed_scope(qualification: bool, last: bool) -> (&'static str, &'static str, usize) {
+    if qualification { ("n3-s7", "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa", 3) }
+    else if last { ("star-last-n16-s7", "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3", 16) }
+    else { ("star-first-n16-s7", "63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d", 16) }
+}
+fn kernel_matches(expected: Option<&str>, answer: &Value, last: bool) -> bool {
+    if last && !expected.is_some_and(|s| ["both_updates", "both_updates_fused"].contains(&s)) { return false; }
+    expected.is_none_or(|s| answer["kernel_mode"] == s)
+}
+pub(super) fn run_fused(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, true)
 }
 pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, false)
+}
+fn run_impl(prepared: &Path, out: &Path, config: &Path, last: bool) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let c: Config = serde_json::from_slice(&config_bytes)?;
     let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
@@ -23,11 +40,7 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     if !qualification && manifest["mode"] != "rust-consumer-screen" {
         return Err("known profile manifest required".into());
     }
-    let id = if qualification {
-        "n3-s7"
-    } else {
-        "star-first-n16-s7"
-    };
+    let (id, expected, variables) = fixed_scope(qualification, last);
     let item = manifest["cases"]
         .as_array()
         .ok_or("cases")?
@@ -37,15 +50,10 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     let input = prepared.join(id).join("system.json");
     let bytes = fs::read(&input)?;
     let s: System = serde_json::from_slice(&bytes)?;
-    let expected = if qualification {
-        "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa"
-    } else {
-        "63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d"
-    };
     if hash(&bytes) != expected
         || item["input_sha256"] != expected
         || s.prime != 2147483647
-        || s.variables.len() != if qualification { 3 } else { 16 }
+        || s.variables.len() != variables
     {
         return Err("profile input outside fixed scope".into());
     }
@@ -79,7 +87,7 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     }
     save(
         &out.join("pre-call.json"),
-        &json!({"pins":pins,"qualification":qualification,"input_sha256":expected,"scope":"instruction diagnosis; generation excluded, no speed comparison"}),
+        &json!({"pins":pins,"qualification":qualification,"fixed_last_entry":last,"expected_kernel":c.expected_kernel,"input_sha256":expected,"scope":"instruction diagnosis; generation excluded, no speed comparison"}),
     )?;
     let r = Runner {
         worker: c.candidate.clone(),
@@ -119,6 +127,7 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
             return Err("instrumented invocation failed/child diagnostics".into());
         }
         let answer: Value = serde_json::from_slice(&stdout)?;
+        if !kernel_matches(c.expected_kernel.as_deref(), &answer, last) { return Err("profile kernel differs from fixed protocol".into()); }
         let prior: Value = serde_json::from_slice(&fs::read(baseline)?)?;
         let basis = native_basis(&answer["basis"], s.variables.len())?;
         if basis != native_basis(&prior["basis"], s.variables.len())?
@@ -158,10 +167,33 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":"native-callgrind-profile/v1","qualification":qualification,"identities_unchanged":unchanged,"input_sha256":expected,"result":value,"failure":failure,"scope":"single descriptive instrumented profile; no speedup or admission"}),
+        &json!({"schema":"native-callgrind-profile/v1","qualification":qualification,"fixed_last_entry":last,"expected_kernel":c.expected_kernel,"identities_unchanged":unchanged,"input_sha256":expected,"result":value,"failure":failure,"scope":"single descriptive instrumented profile; no speedup or admission"}),
     )?;
     if failed || !unchanged {
         return Err("profile incomplete/changed pins; raw retained".into());
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn fixed_last_profile_keeps_old_first_and_n3_scope() {
+        assert_eq!(fixed_scope(false,true), ("star-last-n16-s7","e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3",16));
+        assert_eq!(fixed_scope(false,false).0,"star-first-n16-s7");
+        assert_eq!(fixed_scope(true,true),fixed_scope(true,false));
+        assert_eq!(fixed_scope(true,true).2,3);
+    }
+    #[test]
+    fn matched_profile_requires_exact_known_mode() {
+        for mode in ["both_updates","both_updates_fused"] {
+            assert!(kernel_matches(Some(mode),&json!({"kernel_mode":mode}),true));
+            assert!(!kernel_matches(Some(mode),&json!({"kernel_mode":"other"}),true));
+            assert!(!kernel_matches(Some(mode),&json!({}),true));
+        }
+        assert!(!kernel_matches(None,&json!({}),true));
+        assert!(!kernel_matches(Some("other"),&json!({"kernel_mode":"other"}),true));
+        assert!(kernel_matches(None,&json!({}),false));
+    }
 }

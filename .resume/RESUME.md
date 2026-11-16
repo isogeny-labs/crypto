@@ -1,3 +1,15 @@
+# Latest:1232 streamed paid30 CLOSED/NULL; matched profile QUALIFIED, pub26 pending
+
+Paid30 all180match/4recoveries/0contention/pinsunchanged. Fixedlast F4primary16.993/expanded12.750, matchedbaseline1.370/oldlead0.858; no admission/no pair/retry. PCC747182/589c8f, fused-screen-01/report-01 all174ratios/recoverysums computedRust, PDFA3/plot/tablechecked, raw7archives, closed1232/scopedintegrity/progresspass.
+
+Nextdiagnose matchedbaseline/direct instructions beforeanotherkernel. Newprofileentrysourcecb2817388 strictLASThashe4d22ea9/expectedkernel both_updates or both_updates_fused; oldFIRST/n3entry/parser/reporter/runtime unchanged.29capturetests/lint/build38 PCC20de46. Botholdn3profilecalibrations exactmodes/bases/native symbols/pins/rawself-summary-totals-Collected reconcile PCC941c40; fullraw+newdriver2archives-profile38 done. FUSED_PROFILE_PROTOCOL PCC0b992e andFUSED_PROFILE_QUALIFICATION authoritative. No n16profileyet.
+
+Publish26 BEFOREcleanregistration. Priorplan25 tree78fdf761da57463aebbee5980eee82963347abdb, ctx/tmp/fused26-remote.json heada3661efe6fa645ca244022f0971bbbe3a999f320 artifact-only2metadata/2removed mirrored. Bundle26 excludes priorlocal994abeb2444ffd4e46f9bad2a3baee9fea968e23; envelopesfused-screen-01/archive-envelope7raw +fused-development/archives-profile-38.json2raw. Finalcommit/bundle/sourceplan26/uploadneeded. PRbodyupdatedlinted, no jobsrunning.
+
+Afterpub26 registerone matchedinstructionrecord; reserveCPU0default; sequential /workspace/relation-native-qualifiers/fused-profile-driver-cb2817388-38 fused-profile oldpaidinputs new /workspace/fused-profile-results-cb2817388-01-{baseline,direct} configs fused-development/profile-config-{baseline,direct}-38.json. SameLASTfixture, one perbinary, no retry/capraise. Oldreporter /workspace/relation-native-qualifiers/callgrind-report-6bd05b0e5-17 RAW NEW_REPORT RESULTPCC. ReconcilesRustrawselftotals/log; fullfunctions retained. UseA3 PDF width65% forself.svg toavoidheightwarning; checkPDF/fig BEFOREclose; rawprofilecounts areNOTnativegain. Interpretremainingwork onlyafteractualresults, theninformedsuccessor. Goal15ACTIVE/no15confirmed/L0/checkpointwaived/zero$/noagents/Rustallmath/Pythonmetadataonly/no freshseeds/no gateweakening. All oldrejectionsretained.
+
+Historical follows:
+
 # Latest: streamed reducer fully QUALIFIED; publication25 pending, paid30 NOT RUN
 
 Corecfb9e82a0 shared57/58/59/lint36 PCCc4783c, root9API/3worker/lint36 DONE PCCf4f8b4. Native30 through16 oldinput/wire/basis/consumercounters/freshSingular andn3all30 match/no recovery/nullselection/pinsunchanged PCCfcfab0. Capture33ecd0d47 27tests+3guards/lints/build37 PCC3f9be4, old108/latest45reportsexact/wrongmode rejectPCCf0f7bf. FUSED_QUALIFICATION_REPORT authoritative. archives37 two payloads raw1081088/exes4907588 done; frozenroot-fused-{baseline,direct}-cfb9e82a0-36 +fivefused-tools33ecd37. No jobsrunning.
