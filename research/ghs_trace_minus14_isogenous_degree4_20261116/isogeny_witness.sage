@@ -36,6 +36,6 @@ out={'schema':'ghs.trace-minus14.two-isogeny-witness/v1',
      'Q_scalar':7,'subgroup_image_order':int(P2.order())}
 path=Path(__file__).resolve().parent/'ISOGENY.json'
 assert not path.exists(), 'refusing to overwrite receipt'
-path.write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+path.write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
 print(json.dumps({'degree':out['degree'],'subgroup_image_order':out['subgroup_image_order'],
                   'source_order':out['source_order']},sort_keys=True))
