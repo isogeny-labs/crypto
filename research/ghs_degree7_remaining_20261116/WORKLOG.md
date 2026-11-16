@@ -411,3 +411,32 @@ Rerun the corrected orbit certificate; then second-carrier searches.
 ### Errors
 
 Earlier worklog headings were ahead of local time.
+
+## 2026-11-15 23:27 America/Los_Angeles
+
+### What was done
+
+Committed corrected orbit source at `cb26c558000c`, reran the certificate,
+and ran ten second-carrier cells at source `ecd9cbd26c16`. All five arms for
+both source masks completed with zero exact hits; cubic cells had zero
+censoring. The prior quadratic-square census covers the same representative.
+`audit_second_carrier.py` checked source hashes and counters for all twelve
+second-carrier receipts and independently recomputed twelve PGL2(F3)
+coordinate substitutions using pure-Python polynomial arithmetic. Wrote
+the twelve-carrier bounded result.
+
+### Decisions made
+
+The finite census's twelve carrier equations and ten source equations have
+no degree-seven map in the normalized class. Do not extend this to every
+genus-five carrier or call it a vulnerability. Next inspect degree eight,
+whose odd denominator degree forces the rational branch pole.
+
+### Open threads
+
+Commit these receipts and audits; then freeze the degree-eight lead after
+checking its direct-cover prior work.
+
+### Errors
+
+None in the counted second-carrier runs or independent coordinate replay.
