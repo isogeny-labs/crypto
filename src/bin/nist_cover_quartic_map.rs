@@ -64,6 +64,9 @@ fn generator(e: &nc::Ecc, r: u128) -> Option<nc::EPt> {
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("wide") {
+        return run_wide(&args[1..]);
+    }
     let mut primes: Vec<u64> = vec![];
     let mut gamma_max = 500u64;
     let mut k_plant = 0u128; // 0 => choose r/3 + 1
@@ -193,6 +196,178 @@ fn main() -> ExitCode {
         );
     }
 
+    if all_ok {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(1)
+    }
+}
+
+/// `nist_cover_quartic_map wide [--bits 56] [--gamma-max G] [--seed S] --out F.json`
+///
+/// The ladder curve `find_a3_curve(bits, 3)` (largest `p = 3 mod 4` below
+/// `2^bits`, `a = -3`, smallest `b` of prime order). Search `gamma` for a
+/// Smith-positive cover; check `phi^*` on a planted pair; build the trigonal
+/// map; fit the canonical quartic `C` from sampled points, verify it on a
+/// held-out set, and certify `C` smooth by resultants. No point enumeration;
+/// `Psi` into `Pic^0(C)` is not available at this size.
+fn run_wide(args: &[String]) -> ExitCode {
+    use crypto_lib::cryptanalysis::nist_cover_quartic::wide;
+    use crypto_lib::cryptanalysis::prime_fast::find_a3_curve;
+    use crypto_lib::cryptanalysis::smith_canonical as sc;
+
+    let mut bits = 56u32;
+    let mut gamma_max = 400u64;
+    let mut seed = 0x5eed_5656u64;
+    let mut out = String::new();
+    let mut i = 0;
+    while i < args.len() {
+        let v = args.get(i + 1).cloned().unwrap_or_default();
+        match args[i].as_str() {
+            "--bits" => bits = v.parse().unwrap(),
+            "--gamma-max" => gamma_max = v.parse().unwrap(),
+            "--seed" => seed = v.parse().unwrap(),
+            "--out" => out = v,
+            f => {
+                eprintln!("unknown flag {f}");
+                return ExitCode::from(3);
+            }
+        }
+        i += 2;
+    }
+    if out.is_empty() {
+        eprintln!("--out required");
+        return ExitCode::from(3);
+    }
+    let t0 = std::time::Instant::now();
+    let (curve, g) = find_a3_curve(bits, 3).expect("ladder curve");
+    let p = curve.f.p;
+    let a = curve.f.from_mont(curve.a);
+    let b = curve.f.from_mont(curve.b);
+    let n = curve.n;
+    let (gx, gy) = curve.canonical(g);
+    println!("E: p = {p} (2^{bits} - {}), a = -3, b = {b}, n = {n} (prime), G = ({gx}, {gy})", (1u128 << bits) - p as u128);
+
+    // Independent E arithmetic: nc::Ecc (u128 affine) against prime_fast.
+    let e = nc::Ecc::new(p, a, b);
+    let gp: nc::EPt = Some((gx, gy));
+    let mut rng = sp::SplitMix64(seed);
+    let k = 1 + rng.below(n - 1);
+    let q = e.mul(&gp, k as u128);
+    let q_fast = curve.mul(Some(g), k).map(|pt| curve.canonical(pt));
+    let e_cross = q == q_fast;
+    let e_order_ok = e.mul(&gp, n as u128).is_none() && gp.is_some();
+    println!("planted k = {k}; [k]G agrees across two implementations: {e_cross}; [n]G = O: {e_order_ok}");
+
+    // gamma search.
+    let mut log = Vec::new();
+    let mut found = None;
+    for gamma in 1..=gamma_max {
+        let f = nc::cover_f(p, a, b, gamma);
+        match wide::trigonal(&f, p, seed ^ gamma) {
+            Ok(w) => {
+                log.push(json!({"gamma": gamma, "outcome": "smith_positive"}));
+                found = Some((gamma, f, w));
+                break;
+            }
+            Err(e) => log.push(json!({"gamma": gamma, "outcome": e})),
+        }
+    }
+    let Some((gamma, f, w)) = found else {
+        eprintln!("no Smith-positive gamma in [1, {gamma_max}]");
+        let rec = json!({"p": p, "b": b, "n": n, "status": "no_smith_positive_gamma", "gamma_log": log});
+        std::fs::write(&out, serde_json::to_string_pretty(&rec).unwrap()).ok();
+        return ExitCode::from(1);
+    };
+    let tried = log.len();
+    println!("gamma = {gamma} (first Smith-positive of {tried} tried); f = {f:?}");
+    println!("trigonal map: n1 = {}, n0 = {}, d1 = {}, d0 = {}", w.tr.n1, w.tr.n0, w.tr.d1, w.tr.d0);
+
+    // phi^* checks in J_H at this prime.
+    let jac = sc::HJac::new(&f, p).expect("deg 7");
+    let pg = nc::pullback(&jac, gamma, &gp).expect("pullback G");
+    let pq = nc::pullback(&jac, gamma, &q).expect("pullback Q");
+    let r_pt = e.add(&gp, &q);
+    let pr = nc::pullback(&jac, gamma, &r_pt).expect("pullback G+Q");
+    let pull_nonzero = !jac.is_zero(&pg);
+    let pull_order_n = jac.is_zero(&jac.mul(&pg, n as u128));
+    let pull_hom_k = jac.is_zero(&jac.sub(&jac.mul(&pg, k as u128), &pq));
+    let pull_additive = jac.is_zero(&jac.sub(&jac.add(&pg, &pq), &pr));
+    // negative control: a wrong scalar must not match
+    let pull_wrong_k = jac.is_zero(&jac.sub(&jac.mul(&pg, (k + 1) as u128), &pq));
+    println!("phi*: G nonzero {pull_nonzero}; [n]phi*G = 0 {pull_order_n}; phi*([k]G) = [k]phi*G {pull_hom_k}; additive {pull_additive}; wrong-k control matches (must be false) {pull_wrong_k}");
+
+    // Canonical quartic C from sampled points; held-out verification.
+    let (fit_pts, fit_draws) = match wide::sample_images(&w, 40, &mut rng) {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("sampling failed: {e}");
+            return ExitCode::from(1);
+        }
+    };
+    let (quartic, used) = match sc::fit_quartic_u64(p, &fit_pts) {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("fit failed: {e}");
+            return ExitCode::from(1);
+        }
+    };
+    let (hold_pts, hold_draws) = wide::sample_images(&w, 120, &mut rng).expect("held-out sample");
+    let k2 = crypto_lib::cryptanalysis::smith_trigonal::F2::new(p);
+    let hold_on = hold_pts
+        .iter()
+        .filter(|h| k2.is_zero(wide::quartic_eval_fp2(&quartic, **h, p)))
+        .count();
+    let hold_rational = hold_pts.iter().filter(|h| h.iter().all(|z| z.b == 0)).count();
+    // negative control: perturb one coefficient
+    let mut bad = quartic;
+    bad[1] = (bad[1] + 1) % p;
+    let hold_on_bad = hold_pts
+        .iter()
+        .filter(|h| k2.is_zero(wide::quartic_eval_fp2(&bad, **h, p)))
+        .count();
+    println!("C fitted from {used} points ({fit_draws} draws): {quartic:?}");
+    println!("held-out: {hold_on}/{} on C ({hold_rational} rational); perturbed-C control: {hold_on_bad}/{}", hold_pts.len(), hold_pts.len());
+
+    let (smooth, smooth_msg) = match wide::smooth_certificate(&quartic, p, seed ^ 0xC0FFEE) {
+        Ok(x) => x,
+        Err(e) => (false, format!("certificate error: {e}")),
+    };
+    println!("smoothness certificate: {smooth} ({smooth_msg})");
+
+    let all_ok = e_cross
+        && e_order_ok
+        && pull_nonzero
+        && pull_order_n
+        && pull_hom_k
+        && pull_additive
+        && !pull_wrong_k
+        && hold_on == hold_pts.len()
+        && hold_on_bad == 0
+        && smooth;
+    let rec = json!({
+        "bits": bits, "p": p, "two_pow_bits_minus_p": ((1u128 << bits) - p as u128) as u64,
+        "a": "-3", "a_mod_p": a, "b": b, "n": n, "generator_G": [gx, gy],
+        "seed": seed, "planted_k": k, "target_Q": q,
+        "e_scalar_mult_two_implementations_agree": e_cross, "e_order_n_ok": e_order_ok,
+        "gamma": gamma, "gamma_tried": tried, "gamma_log": log,
+        "cover_f_ascending": f,
+        "trigonal_map": {"n1": w.tr.n1, "n0": w.tr.n0, "d1": w.tr.d1, "d0": w.tr.d0},
+        "pullback": {"nonzero": pull_nonzero, "order_divides_n_prime": pull_order_n,
+                      "homomorphism_planted_k": pull_hom_k, "additive": pull_additive,
+                      "wrong_k_control_matches": pull_wrong_k},
+        "quartic_C_mons_deg4": quartic.to_vec(),
+        "fit_points_used": used, "fit_draws": fit_draws,
+        "heldout_points": hold_pts.len(), "heldout_on_C": hold_on, "heldout_rational": hold_rational,
+        "heldout_draws": hold_draws, "perturbed_C_control_on": hold_on_bad,
+        "smooth_certified": smooth, "smooth_certificate": smooth_msg,
+        "psi_pic0_transfer": "not_run: plane_quartic_pic is u32 (p < 2^31); port required",
+        "wall_seconds": t0.elapsed().as_secs_f64(),
+        "all_checks_ok": all_ok,
+        "status": "ok"
+    });
+    std::fs::write(&out, serde_json::to_string_pretty(&rec).unwrap()).ok();
+    println!("=> {}", if all_ok { "OK" } else { "FAIL" });
     if all_ok {
         ExitCode::SUCCESS
     } else {

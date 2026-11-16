@@ -387,6 +387,384 @@ pub fn bsgs_quartic(
     None
 }
 
+// ---------------------------------------------------------------------------
+// Wide primes (`p < 2^62`, e.g. the 56-bit ladder curve): the stages whose
+// cost is polynomial in `log p`. Nothing here enumerates the ~`p` points of a
+// curve; `Pic^0(C)` arithmetic (and hence `Psi`) is not available at this size.
+
+pub mod wide {
+    use crate::cryptanalysis::plane_quartic_pic::mons_of_degree;
+    use crate::cryptanalysis::smith_canonical as sc;
+    use crate::cryptanalysis::smith_prop24 as sp;
+    use crate::cryptanalysis::smith_trigonal::{Fp2, Trigonal, F2};
+
+    #[inline]
+    fn mm(a: u64, b: u64, p: u64) -> u64 {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
+    #[inline]
+    fn ad(a: u64, b: u64, p: u64) -> u64 {
+        ((a as u128 + b as u128) % p as u128) as u64
+    }
+    #[inline]
+    fn sb(a: u64, b: u64, p: u64) -> u64 {
+        ad(a, p - b % p, p)
+    }
+
+    /// Dense ternary form, `c[i][j][k]` the coefficient of `x^i y^j z^k`.
+    pub type Tern = [[[u64; 5]; 5]; 5];
+
+    pub fn tern_from_mons(q: &[u64; 15]) -> Tern {
+        let mut t = [[[0u64; 5]; 5]; 5];
+        for (&(i, j, k), &c) in mons_of_degree(4).iter().zip(q) {
+            t[i as usize][j as usize][k as usize] = c;
+        }
+        t
+    }
+
+    fn tmul(a: &Tern, b: &Tern, p: u64) -> Tern {
+        let mut r = [[[0u64; 5]; 5]; 5];
+        for i in 0..5 {
+            for j in 0..5 - i {
+                for k in 0..5 - i - j {
+                    if a[i][j][k] == 0 {
+                        continue;
+                    }
+                    for u in 0..5 - i - j - k {
+                        for v in 0..5 - i - j - k - u {
+                            for w in 0..5 - i - j - k - u - v {
+                                if b[u][v][w] != 0 {
+                                    let c = &mut r[i + u][j + v][k + w];
+                                    *c = ad(*c, mm(a[i][j][k], b[u][v][w], p), p);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        r
+    }
+
+    /// `F(A (x, y, z)^T)`: the form in the coordinates `X = A x`.
+    pub fn tern_compose(f: &Tern, a: &[[u64; 3]; 3], p: u64) -> Tern {
+        let lin = |row: &[u64; 3]| {
+            let mut l = [[[0u64; 5]; 5]; 5];
+            l[1][0][0] = row[0] % p;
+            l[0][1][0] = row[1] % p;
+            l[0][0][1] = row[2] % p;
+            l
+        };
+        let (lx, ly, lz) = (lin(&a[0]), lin(&a[1]), lin(&a[2]));
+        let mut one = [[[0u64; 5]; 5]; 5];
+        one[0][0][0] = 1;
+        let powers = |l: &Tern| {
+            let mut v = vec![one];
+            for e in 1..5 {
+                v.push(tmul(&v[e - 1], l, p));
+            }
+            v
+        };
+        let (px, py, pz) = (powers(&lx), powers(&ly), powers(&lz));
+        let mut out = [[[0u64; 5]; 5]; 5];
+        for i in 0..5 {
+            for j in 0..5 - i {
+                let k = 4 - i - j;
+                let c = f[i][j][k];
+                if c == 0 {
+                    continue;
+                }
+                let m = tmul(&tmul(&px[i], &py[j], p), &pz[k], p);
+                for (u, mu) in m.iter().enumerate() {
+                    for (v, mv) in mu.iter().enumerate() {
+                        for (w, &x) in mv.iter().enumerate() {
+                            if x != 0 {
+                                out[u][v][w] = ad(out[u][v][w], mm(c, x, p), p);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        out
+    }
+
+    /// `F` at a point of `P^2(F_{p^2})`.
+    pub fn quartic_eval_fp2(q: &[u64; 15], h: [Fp2; 3], p: u64) -> Fp2 {
+        let k = F2::new(p);
+        let mut acc = Fp2::default();
+        for (&(i, j, l), &c) in mons_of_degree(4).iter().zip(q) {
+            if c == 0 {
+                continue;
+            }
+            let mut m = k.c(c);
+            for _ in 0..i {
+                m = k.mul(m, h[0]);
+            }
+            for _ in 0..j {
+                m = k.mul(m, h[1]);
+            }
+            for _ in 0..l {
+                m = k.mul(m, h[2]);
+            }
+            acc = k.add(acc, m);
+        }
+        acc
+    }
+
+    fn det(mut m: Vec<Vec<u64>>, p: u64) -> u64 {
+        let n = m.len();
+        let mut d = 1u64;
+        for c in 0..n {
+            let Some(r) = (c..n).find(|&r| m[r][c] != 0) else {
+                return 0;
+            };
+            if r != c {
+                m.swap(r, c);
+                d = sb(0, d, p);
+            }
+            d = mm(d, m[c][c], p);
+            let iv = sp::inv_mod(m[c][c], p);
+            for r in c + 1..n {
+                if m[r][c] == 0 {
+                    continue;
+                }
+                let f = mm(m[r][c], iv, p);
+                for cc in c..n {
+                    let t = mm(f, m[c][cc], p);
+                    m[r][cc] = sb(m[r][cc], t, p);
+                }
+            }
+        }
+        d
+    }
+
+    /// Sylvester determinant of `a` (formal degree `a.len()-1`) and `b`
+    /// (formal degree `b.len()-1`), coefficients ascending; leading zeros
+    /// are kept, so this is the specialization of the generic resultant.
+    fn sylvester(a: &[u64], b: &[u64], p: u64) -> u64 {
+        let (m, n) = (a.len() - 1, b.len() - 1);
+        let s = m + n;
+        let mut mat = vec![vec![0u64; s]; s];
+        for r in 0..n {
+            for (i, &c) in a.iter().rev().enumerate() {
+                mat[r][r + i] = c % p;
+            }
+        }
+        for r in 0..m {
+            for (i, &c) in b.iter().rev().enumerate() {
+                mat[n + r][r + i] = c % p;
+            }
+        }
+        det(mat, p)
+    }
+
+    fn pdeg(a: &[u64]) -> isize {
+        a.iter().rposition(|&c| c != 0).map_or(-1, |d| d as isize)
+    }
+
+    fn pgcd(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        let mut a = a.to_vec();
+        let mut b = b.to_vec();
+        while pdeg(&b) >= 0 {
+            let db = pdeg(&b) as usize;
+            let ib = sp::inv_mod(b[db], p);
+            while pdeg(&a) >= db as isize {
+                let da = pdeg(&a) as usize;
+                let f = mm(a[da], ib, p);
+                for i in 0..=db {
+                    a[da - db + i] = sb(a[da - db + i], mm(f, b[i], p), p);
+                }
+            }
+            std::mem::swap(&mut a, &mut b);
+        }
+        a.truncate((pdeg(&a) + 1).max(0) as usize);
+        a
+    }
+
+    /// Coefficients (ascending, length `n`) of the polynomial of degree `< n`
+    /// through `(x_i, y_i)`, by Newton's divided differences.
+    fn interpolate(xs: &[u64], ys: &[u64], p: u64) -> Vec<u64> {
+        let n = xs.len();
+        let mut c = ys.to_vec();
+        for j in 1..n {
+            for i in (j..n).rev() {
+                let num = sb(c[i], c[i - 1], p);
+                let den = sb(xs[i], xs[i - j], p);
+                c[i] = mm(num, sp::inv_mod(den, p), p);
+            }
+        }
+        let mut poly = vec![0u64; n];
+        for i in (0..n).rev() {
+            // poly = poly * (x - xs[i]) + c[i]
+            let mut next = vec![0u64; n];
+            for k in 0..n {
+                if poly[k] == 0 {
+                    continue;
+                }
+                if k + 1 < n {
+                    next[k + 1] = ad(next[k + 1], poly[k], p);
+                }
+                next[k] = sb(next[k], mm(poly[k], xs[i], p), p);
+            }
+            next[0] = ad(next[0], c[i], p);
+            poly = next;
+        }
+        poly
+    }
+
+    /// One affine chart's certificate. `g[i][j]` is the coefficient of
+    /// `u^i v^j` of the dehomogenized form; `v` is eliminated. Returns
+    /// `(deg R_a, deg R_b, deg gcd)`, or an error if a resultant vanishes
+    /// identically or exceeds the Bezout bound 12.
+    fn chart_certificate(g: &[[u64; 5]; 5], p: u64) -> Result<(isize, isize, isize), String> {
+        // d/du and d/dv
+        let mut gu = [[0u64; 5]; 5];
+        let mut gv = [[0u64; 5]; 5];
+        for i in 0..5 {
+            for j in 0..5 {
+                if i > 0 {
+                    gu[i - 1][j] = ad(gu[i - 1][j], mm(i as u64, g[i][j], p), p);
+                }
+                if j > 0 {
+                    gv[i][j - 1] = ad(gv[i][j - 1], mm(j as u64, g[i][j], p), p);
+                }
+            }
+        }
+        let at = |h: &[[u64; 5]; 5], u0: u64, dv: usize| -> Vec<u64> {
+            (0..=dv)
+                .map(|j| {
+                    let mut s = 0u64;
+                    let mut up = 1u64;
+                    for row in h.iter() {
+                        s = ad(s, mm(row[j], up, p), p);
+                        up = mm(up, u0, p);
+                    }
+                    s
+                })
+                .collect()
+        };
+        const NPTS: u64 = 30;
+        let xs: Vec<u64> = (1..=NPTS).collect();
+        let ra: Vec<u64> = xs.iter().map(|&u0| sylvester(&at(g, u0, 4), &at(&gu, u0, 3), p)).collect();
+        let rb: Vec<u64> = xs.iter().map(|&u0| sylvester(&at(g, u0, 4), &at(&gv, u0, 3), p)).collect();
+        let pa = interpolate(&xs, &ra, p);
+        let pb = interpolate(&xs, &rb, p);
+        let (da, db) = (pdeg(&pa), pdeg(&pb));
+        if da < 0 || db < 0 {
+            return Err("a resultant vanishes identically (F has a repeated component)".into());
+        }
+        if da > 12 || db > 12 {
+            return Err(format!("resultant degree {da}/{db} exceeds the Bezout bound 12"));
+        }
+        Ok((da, db, pdeg(&pgcd(&pa, &pb, p))))
+    }
+
+    /// Smoothness certificate for the plane quartic `q` (`mons_of_degree(4)`
+    /// order) over `F_p`, `p > 3`. `Ok(true)`: certified smooth (charts
+    /// `z = 1`, `y = 1` and the point `(1:0:0)`); `Ok(false)`: a chart's gcd is
+    /// nontrivial (singular, or not certified); `Err`: degenerate input.
+    pub fn smooth_certificate(q: &[u64; 15], p: u64, seed: u64) -> Result<(bool, String), String> {
+        let f = tern_from_mons(q);
+        let mut rng = sp::SplitMix64(seed);
+        for _attempt in 0..64 {
+            let a: [[u64; 3]; 3] =
+                std::array::from_fn(|_| std::array::from_fn(|_| rng.below(p)));
+            let am: Vec<Vec<u64>> = a.iter().map(|r| r.to_vec()).collect();
+            if det(am, p) == 0 {
+                continue;
+            }
+            let g = tern_compose(&f, &a, p);
+            // y^4 and z^4 coefficients nonzero: the eliminated variable has
+            // full degree in each chart.
+            if g[0][4][0] == 0 || g[0][0][4] == 0 {
+                continue;
+            }
+            // Chart z = 1, variables (u, v) = (x, y), eliminate y.
+            let mut c1 = [[0u64; 5]; 5];
+            // Chart y = 1, variables (u, v) = (x, z), eliminate z.
+            let mut c2 = [[0u64; 5]; 5];
+            for i in 0..5 {
+                for j in 0..5 - i {
+                    let k = 4 - i - j;
+                    c1[i][j] = g[i][j][k];
+                    c2[i][k] = g[i][j][k];
+                }
+            }
+            let (a1, b1, g1) = chart_certificate(&c1, p)?;
+            let (a2, b2, g2) = chart_certificate(&c2, p)?;
+            // (1:0:0): F = x^4 coefficient; dF/dx = 4 x^3 coefficient,
+            // dF/dy = coefficient of x^3 y, dF/dz = coefficient of x^3 z.
+            let pt_ok = g[4][0][0] != 0 || g[3][1][0] != 0 || g[3][0][1] != 0;
+            let msg = format!(
+                "chart z=1: deg R_a {a1}, deg R_b {b1}, deg gcd {g1}; chart y=1: deg R_a {a2}, deg R_b {b2}, deg gcd {g2}; (1:0:0) nonsingular: {pt_ok}"
+            );
+            return Ok((g1 == 0 && g2 == 0 && pt_ok, msg));
+        }
+        Err("no admissible coordinate change in 64 tries".into())
+    }
+
+    /// One explicit instance at a wide prime.
+    pub struct WideChain {
+        pub tr: Trigonal,
+        pub cm: sc::CanonicalMap,
+    }
+
+    /// Build Smith's trigonal map and the canonical map of a Smith-positive
+    /// `f`, without the point enumeration of `CanonicalMap::new`.
+    pub fn trigonal(f: &[u64], p: u64, seed: u64) -> Result<WideChain, String> {
+        let tr = sc::find_trigonal(f, p, seed)?;
+        let tmat = sc::psi_matrix(&tr);
+        let cm = sc::CanonicalMap {
+            tr: tr.clone(),
+            tmat,
+            quartic: [0; 15],
+            fit_points: 0,
+        };
+        Ok(WideChain { tr, cm })
+    }
+
+    /// Images under `psi` of the points of `X` over random affine points of
+    /// `H` (sampled, not enumerated): `n` distinct normalized points.
+    pub fn sample_images(
+        w: &WideChain,
+        n: usize,
+        rng: &mut sp::SplitMix64,
+    ) -> Result<(Vec<[Fp2; 3]>, u64), String> {
+        let p = w.tr.p;
+        let k = F2::new(p);
+        let mut out: Vec<[Fp2; 3]> = Vec::new();
+        let mut draws = 0u64;
+        while out.len() < n {
+            draws += 1;
+            if draws > 200_000 {
+                return Err(format!("only {} images after {draws} draws", out.len()));
+            }
+            let x = rng.below(p);
+            let fx = {
+                let mut acc = 0u64;
+                for &c in w.tr.f.iter().rev() {
+                    acc = ad(mm(acc, x, p), c, p);
+                }
+                acc
+            };
+            let Some(y) = sp::sqrt_mod(fx, p) else { continue };
+            let Ok(ip) = w.tr.image_points(x, y) else { continue };
+            for xp in &ip.points {
+                if let Ok(h) = w.cm.psi_xpoint(xp) {
+                    if let Some(hn) = sc::normalize_fp2(&k, h) {
+                        if !out.contains(&hn) {
+                            out.push(hn);
+                        }
+                    }
+                }
+            }
+        }
+        out.truncate(n);
+        Ok((out, draws))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -534,6 +912,73 @@ mod tests {
         assert!(!c.is_zero(&psi_g), "image generator nonzero on C");
         let kk = bsgs_quartic(c, &psi_g, &psi_q, r).expect("log on C");
         assert_eq!(kk % r, k % r, "BSGS on C recovers the planted log");
+    }
+
+    // --- Wide primes: controls for the smoothness certificate ------------
+
+    /// `mons_of_degree(4)` index of `x^i y^j z^k`.
+    fn mon_index(i: u8, j: u8, k: u8) -> usize {
+        crate::cryptanalysis::plane_quartic_pic::mons_of_degree(4)
+            .iter()
+            .position(|&m| m == (i, j, k))
+            .unwrap()
+    }
+
+    /// The 56-bit ladder prime (largest p = 3 mod 4 below 2^56).
+    const P56: u64 = 72_057_594_037_927_931;
+
+    #[test]
+    fn wide_certificate_fermat_quartic_is_smooth() {
+        // x^4 + y^4 + z^4 is smooth for p > 2.
+        for p in [1009u64, P56] {
+            let mut q = [0u64; 15];
+            q[mon_index(4, 0, 0)] = 1;
+            q[mon_index(0, 4, 0)] = 1;
+            q[mon_index(0, 0, 4)] = 1;
+            let (ok, msg) = wide::smooth_certificate(&q, p, 7).unwrap();
+            assert!(ok, "Fermat quartic must certify smooth at p={p}: {msg}");
+        }
+    }
+
+    #[test]
+    fn wide_certificate_rejects_a_nodal_quartic() {
+        // F = x^2 z^2 - y^2 z^2 + x^3 z + y^4: a node at (0:0:1).
+        for p in [1009u64, P56] {
+            let mut q = [0u64; 15];
+            q[mon_index(2, 0, 2)] = 1;
+            q[mon_index(0, 2, 2)] = p - 1;
+            q[mon_index(3, 0, 1)] = 1;
+            q[mon_index(0, 4, 0)] = 1;
+            match wide::smooth_certificate(&q, p, 7) {
+                Ok((ok, msg)) => assert!(!ok, "nodal quartic must not certify at p={p}: {msg}"),
+                Err(_) => {} // degenerate is also a non-certification
+            }
+        }
+    }
+
+    #[test]
+    fn wide_compose_preserves_values() {
+        // F(A x) evaluated at x equals F evaluated at A x.
+        let p = P56;
+        let mut rng = super::sp::SplitMix64(11);
+        let q: [u64; 15] = std::array::from_fn(|_| rng.below(p));
+        let a: [[u64; 3]; 3] = std::array::from_fn(|_| std::array::from_fn(|_| rng.below(p)));
+        let g = wide::tern_compose(&wide::tern_from_mons(&q), &a, p);
+        let mons = crate::cryptanalysis::plane_quartic_pic::mons_of_degree(4);
+        let gq: [u64; 15] = std::array::from_fn(|i| {
+            let (x, y, z) = mons[i];
+            g[x as usize][y as usize][z as usize]
+        });
+        let k = crate::cryptanalysis::smith_trigonal::F2::new(p);
+        for _ in 0..20 {
+            let x: [u64; 3] = std::array::from_fn(|_| rng.below(p));
+            let ax: [u64; 3] = std::array::from_fn(|r| {
+                (0..3).fold(0u128, |s, c| (s + a[r][c] as u128 * x[c] as u128) % p as u128) as u64
+            });
+            let lhs = wide::quartic_eval_fp2(&gq, x.map(|v| k.c(v)), p);
+            let rhs = wide::quartic_eval_fp2(&q, ax.map(|v| k.c(v)), p);
+            assert_eq!(lhs, rhs);
+        }
     }
 
     #[test]
