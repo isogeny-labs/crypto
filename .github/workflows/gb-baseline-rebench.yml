@@ -3,39 +3,13 @@ name: Gröbner baseline re-benchmark
 # the in-house F4 / Gröbner engine code changes, compares against the
 # committed baseline, and regenerates the figures, REPORT.md and REPORT.pdf.
 #
-# - pull_request: measure, compare, publish the comparison as the job summary
-#   and an artifact (fails only if a cell's *answer* changed). Nothing is
-#   committed.
+# Research panel execution follows merge or explicit dispatch (AGENTS.md).
 # - push to main / manual dispatch: measure, regenerate the report, promote
 #   the new rows to the baseline, and open a refresh PR
 #   (`gb-baseline/refresh-<sha>`) with the images, report, PDF and baseline.
 #
 # The paths below mirror `python3 tools/gb_baseline.py paths`.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - 'src/cryptanalysis/groebner_f4.rs'
-      - 'src/cryptanalysis/groebner_cache.rs'
-      - 'src/cryptanalysis/f4_*.rs'
-      - 'src/cryptanalysis/inherited_f4.rs'
-      - 'src/cryptanalysis/inherited_f4/**'
-      - 'src/cryptanalysis/pq_f4_f2.rs'
-      - 'src/cryptanalysis/pq_groebner_f2.rs'
-      - 'src/cryptanalysis/matrix_f5_f2.rs'
-      - 'src/cryptanalysis/sig_fp_tower*.rs'
-      - 'src/cryptanalysis/koblitz_groebner.rs'
-      - 'src/cryptanalysis/koblitz_groebner/**'
-      - 'src/cryptanalysis/wide_groebner.rs'
-      - 'src/cryptanalysis/gf2_elim.rs'
-      - 'src/cryptanalysis/fp_backend*.rs'
-      - 'src/cryptanalysis/semaev_*.rs'
-      - 'src/cryptanalysis/binary_semaev*.rs'
-      - 'examples/groebner_stage_bench.rs'
-      - 'examples/pkm_tower_pilot.rs'
-      - 'benchmarks/gb-baseline/panel.json'
-      - 'tools/gb_baseline.py'
-      - '.github/workflows/gb-baseline-rebench.yml'
   push:
     branches: [main]
     paths:
@@ -82,13 +56,10 @@ concurrency:
 
 jobs:
   rebench:
-    if: ${{ !github.event.pull_request.draft }}
     # Same runner routing as the other benchmark workflows: the EKS pool when
     # this workflow is listed in CRYPTO_EKS(_HIGHMEM)_WORKFLOWS, else hosted.
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-highmem' || (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    # Routine PR validation follows the lab's 25-minute ceiling. Main and
-    # explicit dispatch retain the existing full-panel allowance.
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 300 }}
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -119,9 +90,7 @@ jobs:
   refresh:
     # Only main (or a manual run) rewrites the committed report and baseline.
     needs: rebench
-    if: >-
-      !github.event.pull_request.draft &&
-      (github.event_name != 'pull_request')
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

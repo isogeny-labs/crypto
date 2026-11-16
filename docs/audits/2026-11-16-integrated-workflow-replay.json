@@ -1,7 +1,13 @@
 {
   "schema": "integrated-workflow-replay/v1",
   "base": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
-  "allowed_changes": "Generated artifact pulls and established draft-tier transformation only. Each parsed non-generated document equals upstream or helper expected(document). PCC-base workflow reviewed separately.",
+  "ordinary_changes": "generated artifact pulls and established draft-tier transformation; all other parsed structure equals main",
+  "manual_exceptions": {
+    "pcc-gate.yml": "immutable merge parent for ledger, trust keyring and advisory diff; separate actual-race controls",
+    "gb-baseline-rebench.yml": "remove pull_request trigger under AGENTS.md merge policy; retain all other parsed structure including push/manual and300-minute budget",
+    "validation-gate.yml": "add seven numeric-fidelity controls after hydration"
+  },
+  "structured_expected_equality": true,
   "workflows": [
     ".github/workflows/agent-learning.yml",
     ".github/workflows/chained-crosschar-torsion-toy.yml",
@@ -91,16 +97,7 @@
     ".github/workflows/prime31-oriented-pair-f4.yml",
     ".github/workflows/prime31-s4-split-20261116.yml",
     ".github/workflows/rust-all-targets.yml",
+    ".github/workflows/validation-gate.yml",
     ".github/workflows/weak-curve-database.yml"
-  ],
-  "structured_equality_all": true,
-  "budget_override": {
-    "workflow": ".github/workflows/gb-baseline-rebench.yml",
-    "job": "rebench",
-    "before": 300,
-    "pull_request": 25,
-    "push": 300,
-    "workflow_dispatch": 300,
-    "commands_or_panel_inputs_changed": false
-  }
+  ]
 }

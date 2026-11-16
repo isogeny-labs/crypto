@@ -113,3 +113,21 @@ Current-head hosted checks and owner artifact-tool consumer copy after landing.
 
 ### Errors
 A later checker step was masked by the initial draft-tier failures. Repair the actual reported budget rather than widening the checker. [pcc:unverified]
+
+## 2026-11-16T06:28Z - current registry, exact custody and retained plan
+
+### What was done
+The records job identified an empty open plan and a stale progress report. Preserve the exact open-plan bytes under benchmarks/records/plans-retained/ instead of fabricating a launcher or closing it as an execution. All219 execution records pass; the regenerated rolling progress outputs equal the committed bytes.
+
+The three ecbench failures and sealed factor-base replay failure follow the registry rollback. Restore the exact22,300-entry registry from730e036d50^1, SHA256c0e1027ac8023409e7ce072428b4a978cd4d81cbcf7101dc7e728b7abb8f0134. All606 local ecbench tests pass, including the three previously failing cases (6 ignored); all5 sealed panels replay, and the independent observations/coverage/guard coverage are byte-identical. No F4 or new measurement was run.
+
+A prospective aimed-gather custody binding preserves the complete original target and all211 other raw pins (210 actual local byte hashes,1 manifest-only isolation file). Its Rust checker reuses the existing logic with date/predecessor updates and exact serde_json numeric features. An independent Decimal check rejected the default-parser successor's1-ULP changes; exact serialization and all7 positive/adversarial fidelity controls pass. The original report, prior bindings and previous manifest bytes remain retained. The171195-byte new report is pending trusted artifact-autofix upload/replay; its locator is not an upload receipt. Validation CI runs the numeric controls after hydration.
+
+### Decisions made
+Follow the existing push/manual-only research policy for gb-baseline-rebench: remove its routine PR trigger and restore the full300-minute allowance for its existing non-PR modes. Do not shorten a full scientific panel just to fit a routine check. Preserve the canceled25-minute arm as incomplete; no comparison or measurement is claimed from it. The actual routine budget checker passes without an exemption.
+
+### Open threads
+Trusted artifact publication, current-head hosted CI, then canonical source copies to both consumers.
+
+### Errors
+The first local Cargo command selected Homebrew rustc1.93 despite the newer Cargo. Invoke the installed1.99.1 Cargo and rustc by exact path; no dependency downgrade or global toolchain change. The first successor used default JSON floating parsing, which altered scientific values; rejected it before updating the manifest, then enabled arbitrary precision/round-trip parsing and checked exact Decimal equality. An early negative-control invocation lacked its fixture and was discarded; the completed mutated-target control fails specifically at the complete-record assertion. [pcc:unverified]
