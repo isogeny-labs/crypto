@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0755Z-actual-root-paired-confirmation-20261116",
+  "latest_record": "20261116T0819Z-m31-complete-paid-screen-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 202,
+    "measured": 203,
     "open": 1
   },
   "repo": "crypto",
@@ -13767,7 +13767,7 @@
     {
       "better": "neutral",
       "first": 45.0,
-      "latest": 45.0,
+      "latest": 96.0,
       "latest_derived": {},
       "metric": "complete_matching_answers",
       "points": [
@@ -13782,6 +13782,18 @@
           "spread": null,
           "summary": "Frozen A/A rejection retained:45 complete matching answers, both regeneration paid intervals exclude1; main0, no speed comparison or fresh generation. PCCc272fa/0adb1a unsigned L0.",
           "value": 45.0
+        },
+        {
+          "commit": "c9d27bcd7977",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0819Z-m31-complete-paid-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Six known fixtures,96 complete matching outputs,4 paid recoveries,0 monitor contention; first-star-n16 selected only. Primary26.978/17.578 vs oldroot1.027, no paired confirmation; regressions retained. PCC5449c2/68f7f0 unsigned L0.",
+          "value": 96.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -13871,6 +13883,52 @@
           "spread": null,
           "summary": "Frozen A/A rejection retained:45 complete matching answers, both regeneration paid intervals exclude1; main0, no speed comparison or fresh generation. PCCc272fa/0adb1a unsigned L0.",
           "value": 0.0
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "monitor_contended_samples",
+      "points": [
+        {
+          "commit": "c9d27bcd7977",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0819Z-m31-complete-paid-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Six known fixtures,96 complete matching outputs,4 paid recoveries,0 monitor contention; first-star-n16 selected only. Primary26.978/17.578 vs oldroot1.027, no paired confirmation; regressions retained. PCC5449c2/68f7f0 unsigned L0.",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 4.0,
+      "latest": 4.0,
+      "latest_derived": {},
+      "metric": "paid_recoveries",
+      "points": [
+        {
+          "commit": "c9d27bcd7977",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0819Z-m31-complete-paid-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Six known fixtures,96 complete matching outputs,4 paid recoveries,0 monitor contention; first-star-n16 selected only. Primary26.978/17.578 vs oldroot1.027, no paired confirmation; regressions retained. PCC5449c2/68f7f0 unsigned L0.",
+          "value": 4.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
