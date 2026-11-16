@@ -219,6 +219,43 @@ fn split_s4_input(poly:&Polynomial,ring:&TowerRing)->Result<RPoly,String>{
     Ok(ring.from_raw(&raw))
 }
 
+
+ // EXP-R31-SPLIT: fixed-pair w is specialized, so the remaining six
+ // Dickson leaves plus u,v and two internal S3 pair abscissae need only
+ // 36 tower variables and four ordinary free variables (the engine limit).
+fn six_chain_ring(terminal:u64)->TowerRing {
+    let mut rules=Vec::with_capacity(6*DEPTH);
+    for block in 0..6 {
+        for level in 0..DEPTH {
+            let last=level+1==DEPTH;
+            rules.push(SquareRule{
+                next:(!last).then_some((block*DEPTH+level+1) as u8),
+                a:0,b:u64::from(!last),c:0,
+                d:if last {(terminal+2)%P} else {2},
+            });
+        }
+    }
+    TowerRing{p:P,rules,n_free:4}
+}
+fn six_chain_input(poly:&Polynomial,ring:&TowerRing)->Result<RPoly,String>{
+    let mut raw=Vec::new();
+    for (m,&coeff) in &poly.0 {
+        if m[10]!=0 {
+            return Err("six-chain input retained eliminated fixed-pair w".into());
+        }
+        // Reuse former x6,x7 polynomial slots for auxiliary hL,hR;
+        // they are NOT point leaves after certified fixed-pair projection.
+        let mut exps=vec![0u32;6*DEPTH+4];
+        for i in 0..6 {exps[i*DEPTH]=u32::from(m[i]);}
+        exps[6*DEPTH]=u32::from(m[8]);   // u
+        exps[6*DEPTH+1]=u32::from(m[9]); // v
+        exps[6*DEPTH+2]=u32::from(m[6]); // hL
+        exps[6*DEPTH+3]=u32::from(m[7]); // hR
+        raw.push((exps,coeff));
+    }
+    Ok(ring.from_raw(&raw))
+}
+
 fn four(code:u64)->[(usize,i8);4] {
     std::array::from_fn(|j| (
         ((code>>(6*j))&63) as usize,
@@ -300,14 +337,15 @@ fn main()->Result<(),String>{
     if args.len()>1 || (!args.is_empty()
         && args[0]!="--probe-f4" && args[0]!="--panel-f4"
         && args[0]!="--ablate-f4" && args[0]!="--preeliminate-w-f4"
-        && args[0]!="--split-s4-f4") {
-        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4|--split-s4-f4]".into());
+        && args[0]!="--split-s4-f4" && args[0]!="--m8-s3chain-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4|--split-s4-f4|--m8-s3chain-f4]".into());
     }
     let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
     let panel_f4=args.first().is_some_and(|v|v=="--panel-f4");
     let ablate_f4=args.first().is_some_and(|v|v=="--ablate-f4");
     let preeliminate_w=args.first().is_some_and(|v|v=="--preeliminate-w-f4");
     let split_s4_f4=args.first().is_some_and(|v|v=="--split-s4-f4");
+    let m8_s3chain_f4=args.first().is_some_and(|v|v=="--m8-s3chain-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -398,6 +436,120 @@ fn main()->Result<(),String>{
             "root_extraction":"not implemented",
             "cold_solver_timing":"not measured",
             "frontier":"compare partial algebraic work only; censor all capped arms"
+        }));
+        return Ok(());
+    }
+
+
+    if m8_s3chain_f4 {
+        // A genuinely target-dependent polynomial SYSTEM, not algebraic root
+        // extraction or complete ECDLP: first choose a certified rational
+        // fixed-pair w, then replace both triple S4s by chained S3 equations.
+        // No known target logarithm or generic pair-sum table enters F4.
+        let r6=six_chain_ring(fb.terminal);
+        r6.check();
+        let known=*transcript.witnesses.first().ok_or("missing m8 positive control")?;
+        let pts=witness_points(known[2],known[3],&fb,&ar)?;
+        let left_pair=summands(&mut ar,&pts,0,2).ok_or("left pair is identity")?;
+        let left_triple=summands(&mut ar,&pts,0,3).ok_or("left triple is identity")?;
+        let right_pair=summands(&mut ar,&pts,3,5).ok_or("right pair is identity")?;
+        let right_triple=summands(&mut ar,&pts,3,6).ok_or("right triple is identity")?;
+        let fixed_pair=summands(&mut ar,&pts,6,8).ok_or("fixed pair is identity")?;
+        let known_left_right=ar.add(e,Some(left_triple),Some(right_triple));
+        let known_sum=ar.add(e,known_left_right,Some(fixed_pair));
+        let ag=ar.scalar(e,known[0],Some(e.g));
+        let bq=ar.scalar(e,known[1],Q);
+        let known_public=ar.add(e,ag,bq).ok_or("public positive target is identity")?;
+        if known_sum!=Some(known_public) {
+            return Err("test-only known natural positive is inconsistent".into());
+        }
+        let leaf_left_pair=Polynomial::variable(6);  // hL, NOT former x6
+        let leaf_right_pair=Polynomial::variable(7); // hR, NOT former x7
+        let constraints=[
+            s3(&leaf[0],&leaf[1],&leaf_left_pair),
+            s3(&leaf_left_pair,&leaf[2],&u),
+            s3(&leaf[3],&leaf[4],&leaf_right_pair),
+            s3(&leaf_right_pair,&leaf[5],&v),
+        ];
+        let fixed_input:Vec<_>=constraints.iter()
+            .map(|p|six_chain_input(p,&r6)).collect::<Result<_,_>>()?;
+        let terms:Vec<_>=fixed_input.iter().map(|q|q.len()).collect();
+        let mut root=vec![0u64;6*DEPTH+4];
+        for i in 0..6 {
+            root[i*DEPTH]=pts[i].0;
+            for j in 1..DEPTH {
+                let prior=root[i*DEPTH+j-1];
+                root[i*DEPTH+j]=sub(mul(prior,prior),2);
+            }
+        }
+        root[6*DEPTH]=left_triple.0;
+        root[6*DEPTH+1]=right_triple.0;
+        root[6*DEPTH+2]=left_pair.0;
+        root[6*DEPTH+3]=right_pair.0;
+        if fixed_input.iter().any(|poly|r6.eval(poly,&root)!=0) {
+            return Err("chained S3 lost the verified natural positive assignment".into());
+        }
+        let cases=[
+            ("known_natural_positive_validator_only",fixed_pair.0,known_public.0,true),
+            ("public_Q_branch_0",2_438_837,Q.unwrap().0,false),
+            ("public_Q_branch_1",60_956_599,Q.unwrap().0,false),
+            ("public_Q_branch_2",10_280_552,Q.unwrap().0,false),
+            ("public_Q_branch_3",7_087_371,Q.unwrap().0,false),
+            ("public_Q_branch_4",9_730_781,Q.unwrap().0,false),
+            ("public_Q_branch_5",2_344_949,Q.unwrap().0,false),
+            ("public_Q_diagonal",19_657_426,Q.unwrap().0,false),
+        ];
+        let mut records=Vec::new();
+        for (name,wx,rx,positive) in cases {
+            let final_eq=s4(&u,&v,&Polynomial::constant(wx),
+                &Polynomial::constant(rx));
+            let last=six_chain_input(&final_eq,&r6)?;
+            let mut system=fixed_input.clone();
+            system.push(last);
+            let witness=positive.then_some(root.as_slice());
+            if let Some(wit)=witness {
+                if system.iter().any(|p|r6.eval(p,wit)!=0) {
+                    return Err("positive target S4 not satisfied by chained witness".into());
+                }
+            }
+            let report=capped_f4(&system,&r6,witness)?;
+            records.push(json!({"arm":name,"w":wx,"target_x":rx,
+                "known_witness_is_validator_only":positive,"f4":report}));
+        }
+        // Same-host old S4 control for the positive frozen branch.
+        let old_r=six_ring(fb.terminal);
+        old_r.check();
+        let old_fixed=[six_input(&fixed[0],&old_r)?,
+            six_input(&fixed[1],&old_r)?,
+            six_input(&s4(&u,&v,&Polynomial::constant(fixed_pair.0),
+                &Polynomial::constant(known_public.0)),&old_r)?];
+        let mut old_root=vec![0u64;6*DEPTH+2];
+        old_root[..6*DEPTH].copy_from_slice(&root[..6*DEPTH]);
+        old_root[6*DEPTH]=left_triple.0;
+        old_root[6*DEPTH+1]=right_triple.0;
+        if old_fixed.iter().any(|poly|old_r.eval(poly,&old_root)!=0) {
+            return Err("old six-block S4 witness lost".into());
+        }
+        let old_report=capped_f4(&old_fixed,&old_r,Some(&old_root))?;
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "curve":"ordinary prime31, full prime-order cofactor one",
+            "p":P,"n":e.n,"factor_base":fb.points.len(),
+            "scope":"bounded target-dependent m8 S3-chain F4 feasibility; not a complete oracle",
+            "construction":"after fixed pair S3 is eliminated; 6 Dickson blocks, 4 free abscissae",
+            "original_same_host_positive_control":{
+                "three_S4_constraints":true,"tower_blocks":6,"free_variables":2,
+                "f4":old_report},
+            "chained_S3_constraints":4,
+            "target_S4_constraints":1,
+            "fixed_input_normal_form_terms":terms,
+            "regular_positive_witness_checked":true,
+            "certified_w_branch_catalogue_total":961,
+            "w_branches_tested":8,
+            "all_961_branches_tested":false,
+            "actual_root_extraction":false,
+            "outcomes":records,
+            "classification":"All censored calls are undetermined; no full cold solver cost"
         }));
         return Ok(());
     }
