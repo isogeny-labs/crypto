@@ -186,7 +186,7 @@ mod tests {
     use std::collections::HashMap;
 
     #[test]
-    fn promotion_keeps_first_witness_and_all_sixteen_slots() {
+    fn promotion_keeps_first_witness_across_page_boundary() {
         let mut index = InlinePagePairIndex::new(13, 1).unwrap();
         for key in 1..=15u32 {
             assert_eq!(index.insert(key, key - 1, 511), Ok(Insert::New));
@@ -206,6 +206,30 @@ mod tests {
         }
         assert_eq!(index.get(16), Some((511, 0)));
         assert_eq!(index.entries(), 16);
+    }
+
+    #[test]
+    fn every_valid_slot_in_one_page_survives_promotion() {
+        let mut index = InlinePagePairIndex::new(13, 1).unwrap();
+        for key in 16..32u32 {
+            assert_eq!(index.insert(key, key - 16, 511), Ok(Insert::New));
+        }
+        assert_eq!(index.occupied_pages(), 1);
+        assert_eq!(index.spill_pages(), 1);
+        assert_eq!(index.singleton_pages(), 0);
+        assert_eq!(index.entries(), 16);
+        for key in 16..32u32 {
+            assert_eq!(index.get(key), Some((key - 16, 511)));
+            assert_eq!(
+                index.insert(key, 500, 500),
+                Ok(Insert::Existing {
+                    first_i: key - 16,
+                    first_j: 511
+                })
+            );
+        }
+        assert_eq!(index.get(15), None);
+        assert_eq!(index.get(32), None);
     }
 
     #[test]

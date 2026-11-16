@@ -117,3 +117,36 @@ held file. [pcc:unverified]
 ### Errors (what went wrong, how it was handled)
 
 - No parity assertions executed in the refused launch.
+
+## 2026-11-16T11:20Z — First actual-curve parity result
+
+### What was done (commands, files, features)
+
+- The corrected source-bound Cargo harness at `4589d65ea6` exited zero:
+  eight tests passed, including complete K13/K19/K23 insertion, collision
+  and full-group parity. Raw output is in `curve-locked.stdout`,
+  `curve-locked.stderr` and `curve-locked.meta`. The library release build
+  took 2m58s; this is compilation, not a collector timing.
+- K13/K19/K23 had 161/4,159/18,158 singleton pages and 43/314/340 spill
+  pages. The candidate requested 11,332/163,844/2,129,924 bytes of
+  directory plus reserved spill backing; the prior 16-word paged index
+  requested 39,172/758,404/4,534,916 bytes. These are storage requests,
+  not allocator RSS or speed measurements. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Add a distinct synthetic control that fills all 16 valid slots of one
+  page. The existing control inserted keys 1..15 into the first page and
+  key 16 into the next, so its name overstated that coverage. Preserve
+  this passing first run, source-pin the additional control, then rerun.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the additive control, rerun both test binaries, derive a bounded
+  result record, and create the required visual report.
+
+### Errors (what went wrong, how it was handled)
+
+- The original synthetic test checked 15 rather than 16 occupied slots
+  in one page. Actual-curve parity was unaffected; the control is being
+  strengthened before the final source-bound result.
