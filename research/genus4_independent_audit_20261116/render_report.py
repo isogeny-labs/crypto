@@ -6,6 +6,7 @@ import json
 import re
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"] = "none"  # text as text: keeps the SVG under the artifact store threshold
 import matplotlib.pyplot as plt
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -42,6 +43,8 @@ fig.text(.02,.018,"Rust-derived ratios and paired bootstrap intervals. Orange ro
 fig.subplots_adjust(left=.37,right=.98,top=.89,bottom=.17,hspace=.7)
 fig.savefig(root/"pricing.svg")
 fig.savefig(root/"pricing.png",dpi=150)
+from PIL import Image as _PIL  # 256-colour palette: keeps the PNG under the artifact store threshold
+_PIL.open(root/"pricing.png").convert("RGB").quantize(256).save(root/"pricing.png", optimize=True)
 plt.close(fig)
 
 fontdir=Path("/usr/share/fonts/truetype/dejavu")
