@@ -1505,8 +1505,130 @@ fn jacobian_batch_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-APS-POST-JAC: prospective *full-cold* source-pinned profile screen.
+// Source generator, field arithmetic and target recovery reuse the verified
+// exact-source Jacobian+x-fibre Rust implementation. This is not a new
+// cryptanalytic complexity class, and no cost is derived from censored F4.
+const POST_JAC_PROFILES:[[usize;3];5]=[
+    [256,256,32_768],[320,320,24_576],[384,384,16_384],
+    [512,512,8_192],[384,384,16_384],
+];
+const POST_JAC_NAMES:[&str;5]=[
+    "A_256_256_32768","B_320_320_24576","C_384_384_16384",
+    "D_512_512_8192","C_repeat",
+];
+fn post_jacobian_partition_screen()->Result<serde_json::Value,String>{
+    const CASES:usize=32;
+    let mut rng=0x5052_4f46_5f4a_3332u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;5];
+    let mut setup_costs=[0u128;5];
+    let mut queries=[0u64;5];
+    let mut correct=[0usize;5];
+    let mut successful=[0usize;5];
+    let mut paired_wins=[0usize;5];
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES{
+        let known=loop{
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k){break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("post-Jac panel public Q is identity")?;
+        let order:[usize;5]=std::array::from_fn(|j|(j+case%5)%5);
+        let mut times=[0u64;5];
+        let mut recovered=[false;5];
+        let mut arms=Vec::with_capacity(5);
+        for (position,&arm) in order.iter().enumerate(){
+            let run=execute_unequal_profile_source(q,POST_JAC_PROFILES[arm],6,true,true)?;
+            let attempts=run["attempts"].as_array()
+                .ok_or("post-Jac profile attempt array missing")?;
+            let completed=run["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let log=attempts.last().and_then(|a|a.pointer("/solution/log"))
+                .and_then(|v|v.as_u64());
+            if completed {
+                let scalar=log.ok_or("post-Jac completed but scalar missing")?;
+                if scalar!=known ||
+                    verifier.scalar(PRIME31,scalar,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("post-Jac incorrect log on Q {case}, arm {arm}"));
+                }
+                correct[arm]+=1;
+                successful[arm]+=1;
+            }else if log.is_some(){
+                return Err(format!("post-Jac contradictory missed Q {case}, arm {arm}"));
+            }
+            recovered[arm]=completed;
+            let ns=run["cold_wall_ns"].as_u64()
+                .ok_or("post-Jac solver cold wall missing")?;
+            let source_ns=attempts.iter().map(|a|
+                a["source_setup_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            let pair_queries=attempts.iter().map(|a|
+                a["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            times[arm]=ns;
+            totals[arm]+=u128::from(ns);
+            setup_costs[arm]+=source_ns;
+            queries[arm]+=pair_queries;
+            arms.push(json!({
+                "arm_index":arm,"arm":POST_JAC_NAMES[arm],"profile":POST_JAC_PROFILES[arm],
+                "position":position,"complete":completed,"recovered_log":log,
+                "full_cold_ns":ns,"source_total_ns":source_ns.to_string(),
+                "s3_pair_queries":pair_queries,"all_paid_rounds":attempts
+            }));
+        }
+        for arm in [0usize,1,3]{
+            if recovered[arm] && recovered[2] && times[arm]<times[2]{
+                paired_wins[arm]+=1;
+            }
+        }
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_scalar_caller_verifier_only":known,
+            "chronological_arms":arms
+        }));
+    }
+    let baseline_median=(totals[2]+totals[4]) as f64/2.0;
+    let candidate=[0usize,1,3].into_iter().min_by_key(|&i|totals[i])
+        .ok_or("post-Jac candidate set empty")?;
+    let ratio=totals[candidate] as f64/baseline_median;
+    let aa_drift=(totals[4] as f64/totals[2] as f64-1.0).abs();
+    let all_complete=successful.iter().all(|&s|s==CASES);
+    let admissible=all_complete && aa_drift<=0.05 &&
+        ratio<=0.90 && paired_wins[candidate]>=24;
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experiment":"prospective post-Jacobian full-cold unequal APS profile screen",
+        "classification":"published APS one-relation IC, explicit S3 pair search generic-MITM equivalent",
+        "field_prime":P,"group_order":N,"cofactor":1,"cases":CASES,
+        "public_target_seed":"0x50524f465f4a3332","round_cap":6,
+        "full_cold_per_target":true,"all_failed_rounds_charged":true,
+        "source_mode":"Jacobian mixed add and batch normalization",
+        "relation_mode":"Mersenne S3 x-fibre roots, signed replay",
+        "profiles":POST_JAC_PROFILES,"arm_names":POST_JAC_NAMES,
+        "verified_logs_per_arm":correct,"completed_solves_per_arm":successful,
+        "all_complete":all_complete,
+        "cold_total_ns":totals.map(|n|n.to_string()),
+        "source_total_ns":setup_costs.map(|n|n.to_string()),
+        "s3_pair_quadratics":queries,
+        "paired_wins_against_incumbent":paired_wins,
+        "best_candidate_arm":POST_JAC_NAMES[candidate],
+        "best_candidate_ratio_to_aa_mean":ratio,
+        "incumbent_aa_drift":aa_drift,
+        "passes_preregistered_exploratory_gate":admissible,
+        "not_an_independent_PCC_or_external_IC_comparison":true,
+        "cases_detail":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--post-jac-profile" {
+        let result=post_jacobian_partition_screen()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--jacbatch-confirm" {
         let result=jacobian_batch_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -1592,6 +1714,19 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn post_jac_profile_admission_and_rotation() {
+        for profile in POST_JAC_PROFILES {
+            assert!(profile.iter().all(|&n|n>=16 && n<=32_768));
+            assert!(profile.iter().sum::<usize>()<=40_000);
+        }
+        assert_eq!(POST_JAC_PROFILES[2],POST_JAC_PROFILES[4]);
+        for case in 0..5usize {
+            let mut order:[usize;5]=std::array::from_fn(|j|(j+case%5)%5);
+            order.sort_unstable();
+            assert_eq!(order,[0,1,2,3,4]);
+        }
+    }
     #[test]
     fn jacobian_mixed_and_batch_normalizer_match_affine() {
         let mut ar=Arithmetic::default();
