@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0751Z-ic-positive-control-unit-t",
+  "latest_record": "20261116T1001Z-ic-positive-control-capped",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 205,
+    "measured": 206,
     "open": 1
   },
   "repo": "crypto",
@@ -27066,6 +27066,58 @@
     },
     {
       "better": "lower",
+      "first": 0.895,
+      "latest": 0.895,
+      "latest_derived": {},
+      "metric": "total_w_over_s_w01_p32771",
+      "points": [
+        {
+          "commit": "fcc5fc5e8786",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T1001Z-ic-positive-control-capped",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.89,
+            0.901
+          ],
+          "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+          "value": 0.895
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.821,
+      "latest": 0.821,
+      "latest_derived": {},
+      "metric": "total_w_over_s_w01_p65537",
+      "points": [
+        {
+          "commit": "fcc5fc5e8786",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1001Z-ic-positive-control-capped",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.815,
+            0.827
+          ],
+          "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+          "value": 0.821
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 19418.658333333333,
       "latest": 19418.658333333333,
       "latest_derived": {
@@ -32195,6 +32247,84 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.78,
+      "latest": 1.78,
+      "latest_derived": {},
+      "metric": "w_over_rho_w01_p131101",
+      "points": [
+        {
+          "commit": "fcc5fc5e8786",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1001Z-ic-positive-control-capped",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.15,
+            4.53
+          ],
+          "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+          "value": 1.78
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.72,
+      "latest": 1.72,
+      "latest_derived": {},
+      "metric": "w_over_rho_w01_p32771",
+      "points": [
+        {
+          "commit": "fcc5fc5e8786",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T1001Z-ic-positive-control-capped",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.95,
+            3.32
+          ],
+          "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+          "value": 1.72
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 8.75,
+      "latest": 8.75,
+      "latest_derived": {},
+      "metric": "w_over_rho_w1_p32771",
+      "points": [
+        {
+          "commit": "fcc5fc5e8786",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T1001Z-ic-positive-control-capped",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.82,
+            16.94
+          ],
+          "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+          "value": 8.75
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
