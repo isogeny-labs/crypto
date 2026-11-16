@@ -11,3 +11,10 @@ admission** because the binary's runtime git commit came from another
 worktree. The raw records and exact discrepancy remain in the study. This
 directory is outside the admitted results table in `benchmarks/README.md`;
 it carries no `VALIDATION.json` and changes no leaderboard.
+
+The [custody-corrected repeat PDF](custody-rerun-REPORT.pdf) and
+[SVG](custody-rerun-paired-ratios.svg) document the same frozen spec under a
+worktree-local binary path. Its 200 answers and 160 measured replays passed,
+and it records a local L0 complete cold process-wall comparison. The repeat
+uses the same seen targets, has no independent host replay, and remains
+outside the admitted results table. The two epochs are never pooled.

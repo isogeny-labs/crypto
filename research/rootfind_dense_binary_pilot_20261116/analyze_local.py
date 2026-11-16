@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Descriptive, fixed-session K13 local diagnostic; no claim admission."""
 
+import argparse
 import hashlib
 import json
 import statistics
@@ -31,7 +32,7 @@ def main():
     records_path = SESSION / "records.jsonl"
     records = read_jsonl(records_path)
     work = read_jsonl(WORK)
-    assert session["session_id"] == "ECBS1h3cf526729f36"
+    assert session["session_id"] in {"ECBS1h3cf526729f36", "ECBS1h08f6d5475be8"}
     assert session["spec_id"] == "ECS1hb376719703c9"
     assert session["status"] == "complete" and len(records) == 200
     assert audit["ok"] and audit["session_id"] == session["session_id"]
@@ -137,7 +138,7 @@ def draw_svg(result, workloads):
         '<svg xmlns="http://www.w3.org/2000/svg" width="850" height="430" viewBox="0 0 850 430">',
         '<rect width="850" height="430" fill="white"/>',
         '<text x="88" y="24" font-family="sans-serif" font-size="17" font-weight="bold">K13 fresh targets: batch / reference complete cold process wall</text>',
-        f'<text x="88" y="44" font-family="sans-serif" font-size="12">ECBS1h3cf526729f36 · L0 local · 4 matched rounds per target · ratio below 1 favors batch</text>',
+        f'<text x="88" y="44" font-family="sans-serif" font-size="12">{result["session_id"]} · L0 local · 4 matched rounds per target · ratio below 1 favors batch</text>',
     ]
     for tick in (0, 0.25, 0.5, 0.75, 1.0, 1.25):
         yy = y(tick)
@@ -166,4 +167,13 @@ def draw_svg(result, workloads):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--epoch", choices=("first", "rerun"), default="first")
+    args = parser.parse_args()
+    if args.epoch == "rerun":
+        SESSION = ROOT / "sessions/local-custody-rerun-202611160401"
+        WORK = ROOT / "reports/custody-rerun/work-records.jsonl"
+        AUDIT = ROOT / "audits/custody-rerun/replay-all.json"
+        OUT = ROOT / "reports/custody-rerun/analysis.json"
+        SVG = ROOT / "reports/custody-rerun/paired-ratios.svg"
     main()
