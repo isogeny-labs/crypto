@@ -1,0 +1,14 @@
+{
+  "action": "record it with benchrec add-raw so the records job uploads it, or keep it out of git (.gitignore); the artifact migrator head-checks the store for every moved data file and fails with 403 on an object that was never uploaded",
+  "created": "2026-11-16T20:31:58Z",
+  "evidence": [
+    "research/hecdlp_sge_coord_20261116/.gitignore"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "controlled-experiment"
+  ],
+  "trigger": "committing a raw data file (jsonl/json) produced by a smoke run that has no bench record",
+  "why": ""
+}
