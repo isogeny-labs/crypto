@@ -391,6 +391,7 @@ pub mod signature_corpus;
 pub mod six_class_rho;
 pub mod smith_canonical;
 pub mod smith_elliptic_walk;
+pub mod smith_isogeny;
 pub mod smith_kernel_coverage;
 pub mod smith_prop24;
 pub mod smith_trigonal;
