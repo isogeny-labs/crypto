@@ -19,3 +19,6 @@ Sources checked(KB): no loadedKBtools; officialwrapper127, Conductor127, scopedl
 Competing hypotheses: smaller field-polynomial degree/dimension reduces coldwork; fewer admissible sums require more shifts/identity recoveries and can lose. No favorable subset/no free log/oracle or source capability withheld. Degree reduction alone is not a speed result. [pcc:unverified]
 
 Pre-data completeness amendment: generic quadratic extraction receives a coefficient-only finite fixture with split/repeated/zero roots over all61base scalars and the32-element extension image-plus-zero alphabet. Native C++/Rust direct arithmetic independently checks every unordered pair with replacement; this is a primitive engineering check, NOT extra DLP targets or input to candidate stopping. No prior newbuild/proof/data had run at the amendment. Whole scope now334expectedstages; same19:45harddeadline. [pcc:unverified]
+
+## Pre-data dependency amendment v3
+Build01 compiled the C++ and Rust study instruments but the official identity caller failed because its manifest omitted hex. Exact failed source/logs retained locally. No Lean, identity or recovery data ran. Add only pinned hex0.4.3, refresh dependency inventory, and use fresh build/output directories. No arithmetic/proof/analysis/population change; the SAME19:45UTC deadline remains. [pcc:unverified]

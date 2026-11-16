@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-two-base-degree-two-full-source-20261116",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-16",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/projective/two-base",
@@ -7393,21 +7393,31 @@
       "claim": "Pinned existingcleartext normative fallback; currentcanonicalSKILLisVLT1encrypted/unreadable; KB/coordinationunavailable"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "dependency-build-correction",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "Build01 failed missing canonical caller hex dependency before proof/native data.",
+      "changes": [
+        "Add pinned hex0.4.3 and lock; refresh exact dependency inventory; fresh build/output paths. Algorithms/population/19:45deadline unchanged."
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "4f088866bd9a2c42b407c2ac284dc660a8494933b6c3c15ab88bd5e7b7f97b90",
-    "commit": "07beb6544db2955a87498fe79aa3d1bf4ba6da8d",
-    "frozen_at": "2026-11-16T18:58:01Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "commit": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "filed_before_affected_data": false
   },
   "extensions": {
-    "pins_sha256": "b8667a207d7aa069305c973c86ca3282d60a6a719536ef828afc571ca0519466",
+    "pins_sha256": "98503d194cc1f1f2d28bf61f5558b552be0e3b64abc4b1e718bf5c0c59211d56",
     "start_at": "2026-11-16T18:45:00Z",
     "deadline": "2026-11-16T19:45:00Z",
     "source_checkpoint": "Samebranch GitHub source/protocol beforeaffectedlaunch, sourceonlyapproval; no asset/credential/paidresourcepermission",
     "degree": "Univariate ORIGINALmembership/witness2 vs3; scalarfieldprimitives charged but notpolynomialdegree bounded; IDCtotaldegree4includescoeffvariables; originalcurvepullback/regularityunknown",
-    "population": "ALL B3two methods455×3 plus B2method105×3, BOTHstreams/freshcalls; independentB2math315profiles/9450recoveries/9765diagnostics eachC/A/B; SAME30nonidentitypointsrepeat",
+    "population": "ALL B3two methods455\u00d73 plus B2method105\u00d73, BOTHstreams/freshcalls; independentB2math315profiles/9450recoveries/9765diagnostics eachC/A/B; SAME30nonidentitypointsrepeat",
     "falsepayloads": "16math+7cost+2qualifier,2falseproofs,3forgedIDC and falseissuer; genuine rehashed/no receipt",
     "baseline_math": "Exactfirst-row0a181f004 andsetup-rank86449333f receipts; nativecounterfreshbothmethods, no imported timing",
     "identity": "Officialunchangedcanonicalnative module snapshots; evaluatedMersennefield64points andpinnedLeanpointer distinctfromactualkernelruns/signedverdict",
