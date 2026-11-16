@@ -125,12 +125,14 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Fourier, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Auto, true, meter)?.0)
 }
 
 /// The same language with the integer multiplication gadget chosen explicitly
-/// (`Multiplier::Fourier` reproduces `decomposition_network`). Only the Boolean
-/// graph changes: the accepted assignments, counts and witnesses do not.
+/// (`Fourier` is Theorem 3's gadget throughout). Only the Boolean graph
+/// changes: the accepted assignments, counts and witnesses do not. Free points
+/// keep the plain `(x, y)` input layout here; `decomposition_network` (Auto
+/// multiplier) enumerates prime-order free points as `(x, parity of y)`.
 pub fn decomposition_network_with_multiplier(
     curve: &Curve,
     bases: &[FactorBase],
@@ -138,7 +140,7 @@ pub fn decomposition_network_with_multiplier(
     multiplier: Multiplier,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, false, meter)?.0)
 }
 
 /// Build the same decomposition language with semantic slot regions and return
@@ -154,7 +156,15 @@ pub fn decomposition_network_with_semantic_cut(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
-    decomposition_network_impl(curve, bases, target, true, Multiplier::Fourier, meter)
+    decomposition_network_impl(
+        curve,
+        bases,
+        target,
+        true,
+        Multiplier::Fourier,
+        false,
+        meter,
+    )
 }
 
 /// The same language as the general construction, with the last slot computed
@@ -170,6 +180,7 @@ fn derived_last_slot_network(
     bases: &[FactorBase],
     target: &Point,
     multiplier: Multiplier,
+    compressed: bool,
     meter: &mut Meter,
 ) -> Result<Network> {
     let (last, free) = bases
@@ -177,9 +188,16 @@ fn derived_last_slot_network(
         .ok_or_else(|| invalid("decomposition target or arity"))?;
     let mut encoder = Encoder::new();
     encoder.set_multiplier(multiplier);
-    let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
+    let mut sum: Option<PointWords> = None;
     for base in free {
-        let point = encoder.input_point(curve, false, meter)?;
+        let point = if compressed {
+            encoder.input_point_compressed_unchecked(curve, meter)?
+        } else {
+            encoder.input_point(curve, false, meter)?
+        };
+        // The hash reads only x and the low ordinate bit, both free when
+        // compressed, so it runs before the costlier curve equation; the
+        // constraints are a conjunction, so the order changes no language.
         encoder.hash_member(
             curve,
             &point,
@@ -189,20 +207,17 @@ fn derived_last_slot_network(
             &base.threshold,
             meter,
         )?;
+        encoder.assert_valid_point(curve, &point, meter)?;
         encoder.mark_point_interface(&point, meter)?;
-        sum = encoder.point_add(curve, &sum, &point, meter)?;
+        // O + A_1 = A_1: the first free point starts the sum directly instead
+        // of passing through a whole addition network with a constant identity.
+        sum = Some(match sum {
+            None => point,
+            Some(sum) => encoder.point_add(curve, &sum, &point, meter)?,
+        });
     }
-    let width = curve.modulus().bits() as usize;
-    let negated = PointWords {
-        infinity: sum.infinity.clone(),
-        x: sum.x.clone(),
-        y: encoder.modular_subtract(
-            &Encoder::constant(width, &BigUint::zero())?,
-            &sum.y,
-            curve.modulus(),
-            meter,
-        )?,
-    };
+    let sum = sum.ok_or_else(|| invalid("decomposition target or arity"))?;
+    let negated = encoder.negate_point(curve, &sum, meter)?;
     let point = encoder.point_add(
         curve,
         &Encoder::constant_point(curve, target)?,
@@ -228,6 +243,7 @@ fn decomposition_network_impl(
     target: &Point,
     semantic_cut: bool,
     multiplier: Multiplier,
+    compressed: bool,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
@@ -235,7 +251,7 @@ fn decomposition_network_impl(
     }
     if !semantic_cut && curve.cofactor().is_one() {
         return Ok((
-            derived_last_slot_network(curve, bases, target, multiplier, meter)?,
+            derived_last_slot_network(curve, bases, target, multiplier, compressed, meter)?,
             Vec::new(),
         ));
     }
