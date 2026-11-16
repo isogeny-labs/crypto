@@ -67,3 +67,29 @@ jobs:
           for identity in parameter-norm parameter-factor; do
             cmp "/tmp/cm-idc1/$identity.json" "$study/receipts/round-03/identities/$identity.json"
           done
+      - name: Reproduce input-selected CM cover examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-04/v4/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-recognizer
+          timeout 60s /tmp/weber-recognizer qualify "$study/receipts/round-04/models/u3-v3.model" -1 > /tmp/weber-u3.jsonl
+          cmp /tmp/weber-u3.jsonl "$study/receipts/round-04/qualify-04-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/weber-recognizer qualify "$study/receipts/round-04/models/u5-v3.model" "$point" > "/tmp/weber-u5-$point.jsonl"
+            cmp "/tmp/weber-u5-$point.jsonl" "$study/receipts/round-04/qualify-04-u5-public-$point.jsonl"
+          done
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-04/root_certificates_v3.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-root-certificates
+          weber_study_root="$PWD/$study"
+          weber_root_replay=$(mktemp -d)
+          mkdir -p "$weber_root_replay/$study/lean"
+          (
+            cd "$weber_root_replay"
+            /tmp/weber-root-certificates "$weber_study_root/receipts/round-04/models/u3.model" "$weber_study_root/receipts/round-04/root-input-01.txt" root-idc "$study/lean/WeberRootBoundaryV3.lean"
+          )
+          cmp "$weber_root_replay/$study/lean/WeberRootBoundaryV3.lean" "$study/lean/WeberRootBoundaryV3.lean"
+          for root in two four; do
+            for part in real imag; do
+              cmp "$weber_root_replay/root-idc/beta-$root-$part.json" "$study/receipts/round-04/root-certificates-03/beta-$root-$part.json"
+            done
+          done
