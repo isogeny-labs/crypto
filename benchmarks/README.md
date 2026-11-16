@@ -45,6 +45,20 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [16 November N83 K600 host-native supervisor build](20261116-n83-k600-mac-supervisor-build/)
+([run PDF](20261116-n83-k600-mac-supervisor-build/run-report.pdf),
+[results PDF](20261116-n83-k600-mac-supervisor-build/results-report.pdf),
+[SVG](20261116-n83-k600-mac-supervisor-build/build-intervals.svg),
+[150 dpi PNG](20261116-n83-k600-mac-supervisor-build/build-intervals.png))
+records one shared macOS ARM64 setup build with Rust 1.99.1 and one Cargo
+job. The complete wrapper interval was 1,531 s by UTC endpoints; Cargo
+reported 1,530 s. The executable digest, 51 disk samples and terminal exit
+are in the [source-linked study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-3-mac-supervisor-build/REPORT.md).
+There is one sample per interval and no comparative ratio. This is a
+documentary setup measurement outside the admitted results table; it does
+not report relation yield, rank, descent, matched rho or cold one-target IC
+cost.
+
 The [16 November N83 K600 source-matched charged build](20261116-n83-k600-charged-build/)
 ([PDF](20261116-n83-k600-charged-build/run-report.pdf),
 [SVG](20261116-n83-k600-charged-build/build-cost.svg),
