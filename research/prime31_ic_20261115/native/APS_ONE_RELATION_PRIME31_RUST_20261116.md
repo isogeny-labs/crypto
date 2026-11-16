@@ -58,3 +58,26 @@ This is a **measured experiment protocol and executable Rust method**, not a cla
 **Strict interpretation:** this is the first source-bound completed cold Rust scalar recovery by the APS-style **one-relation** route for this registered prime31 Q, with no factor-base-log matrix. It is **not** a new non-generic complexity result. It is **one** source-specific developer run, no A/A isolation or PCC, not comparable via a precise wall ratio to the previous 46.2s index/LA from a different host and source. The `--compare` code path is a same-input generic group-support control and must execute before any *matched* comparative verdict; it is not hidden fallback. Do not compare the 327ms development observation to partial/censored F4 engines and call it IC-frontier superiority.
 
 **Next registered holdout:** `--holdouts` constructs 12 independent deterministic public Q=[k]G with k retained only in the *caller-side verifier*, not in the solver. It executes the same bounded 3-round labelled-list search, independently checks `k` after each algebraic solve, and prints all successes, misses, query counts and cold walls. The existing Rust CI now invokes `--compare` and `--holdouts`; their **actual source-specific execution receipts are pending**, not assumed to pass.
+
+
+## Same-source complete Rust experiment and 12 held-outs, 2026-11-16 01:35 UTC
+
+**[Actual source-specific completed GitHub Actions #43787167910](https://github.com/isogeny-labs/crypto/actions/runs/43787167910), job 133037288540, source-report head `6b2c38de`: PASS.** This CI executed the Rust `--one`, `--compare` and new `--holdouts` flags on the **same development runner**, in release mode. All 40 reused Rust library tests and two example tests passed. Full raw program outputs, target labels and individual cold durations are frozen in [APS_ONE_RELATION_PRIME31_MATCHED_CI_20261116.json](APS_ONE_RELATION_PRIME31_MATCHED_CI_20261116.json). Still **[pcc:unverified]**, not an isolated performance trial or signed scientific result.
+
+| Full one-public-Q Rust development program / same source | Observed |
+|---|---:|
+| Algebraic `--one` complete unknown log `1038579171` | **267.922 ms** in-process cold wall |
+| Algebraic `--compare` complete unknown log `1038579171` | **268.610 ms** in-process cold-to-verified-scalar wall |
+| `--compare` source/labelled base construction | 98.874 ms |
+| `--compare` S3 finite-field root query + signed verification | 169.421 ms |
+| **Separate** generic signed group-addition join on the same labelled sources | 325.897 ms for join alone |
+| Source construction + generic join, same code/runner | **424.771 ms**, excludes generic arm's separate process startup |
+| Generic join actual EC additions | 1,345,017 |
+| Algebraic side pair S3 quadratics actually visited | 672,768 |
+| Equivalent recovered scalar with both modes | Yes |
+
+The same-seed, same-point-set complete in-process **algebraic vs generic** cost ratio is **424.771/268.610 ≈ 1.581x**, but this is **one sequential development run** without A/A randomization, external mature implementations or signed PCC; it is only a relative engineering data point. It **does not** constitute a novel non-generic algorithm: the source searches the finite pair support, equivalent in reachability to a generic group meet-in-the-middle join, even if modular arithmetic happens to be faster than this particular affine group implementation.
+
+**Twelve public held-out unknown logs:** `--holdouts` recovered **12/12** independently constructed `Q_i=[k_i]G`, checking `[k_i]G=Q_i` and exact recovered k only in the caller-side verifier after search. Every test succeeded in its **first** bounded round. Total of the **12 separate charged in-process cold solver walls** was **2,271.161215 ms**; 4,368,384 field S3 quadratic trials in total. Minimum per-target 101.793 ms, maximum 504.566 ms, all status/output cases retained verbatim in the JSON above. The 12-point study does **not** use one target's relation as a precomputed oracle for another; each trial reconstructs its own 4608 labelled points and source masks. Generated Q scalars appear in the output solely for independent known-answer verification.
+
+**Decision:** This confirms correctness and removes conventional multi-relation factor-base LA for the published APS labelled one-relation method on the fixed ordinary prime31 curve, and supplies a measured Rust **complete solver control** for future non-generic m8 experiments. It does **not** establish a cheaper-than-frontier genuinely nonenumerative IC solver or asymptotic improvement. The next actual scientific advance requires a certified target-conditioned m8 rational-root mechanism that avoids enumerating finite S3 pair support. Charge all certificate/quotient work, exceptional branches, all missed natural targets and independent useful rank; compare completed equal-output calls with PKM/APS and a matched external CAS. Keep rho/BSGS separate as security/final full-cold controls.
