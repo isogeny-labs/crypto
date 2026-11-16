@@ -95,8 +95,11 @@ fn includes_one(s: &Statistics) -> bool {
 }
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
-    if a.len() != 5 {
-        return Err("usage: paired-result-report RAW CONDITIONS NEW_REPORT RESULT_PCC".into());
+    if a.len() != 5 && a.len() != 6 {
+        return Err(
+            "usage: paired-result-report RAW CONDITIONS NEW_REPORT RESULT_PCC [EXPECTED_EXPORTS]"
+                .into(),
+        );
     }
     let raw = Path::new(&a[1]);
     let out = Path::new(&a[3]);
@@ -127,6 +130,21 @@ fn main() -> Result<()> {
         .as_array()
         .filter(|b| b.len() == 21)
         .ok_or("21 blocks")?;
+    let expected_exports = a.get(5).map(|s| s.parse::<u64>()).transpose()?;
+    if let Some(expected) = expected_exports {
+        for panel in std::iter::once(&s["warmup"])
+            .chain(
+                pairs
+                    .iter()
+                    .flat_map(|p| p.as_array().into_iter().flatten()),
+            )
+            .chain(blocks)
+        {
+            if panel["samples"][2]["answer"]["completion_exports"] != expected {
+                return Err("candidate completion variant does not match protocol".into());
+            }
+        }
+    }
     read_panel(&s["warmup"])?;
     let mut aa = Vec::new();
     for (arm, name) in NAMES.iter().enumerate() {
@@ -215,7 +233,7 @@ fn main() -> Result<()> {
     fs::write(
         out.join("audit.json"),
         serde_json::to_vec_pretty(
-            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"standing":"unsigned producer recomputation"}),
+            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"expected_completion_exports":expected_exports,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"standing":"unsigned producer recomputation"}),
         )?,
     )?;
     let path = out.join("ratios.svg");
