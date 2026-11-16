@@ -10,7 +10,7 @@
 //! cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_evaluation
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::{json, Value};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::time::Instant;
 
 const P: u64 = 2_147_483_647;
@@ -97,6 +97,52 @@ fn relation_determinant(leaves: &[Point; 8], residual: Point) -> Result<u64, Str
     let mut a = [[0u64; 9]; 9];
     for (i, &q) in leaves.iter().enumerate() { a[i] = evaluation_row(q)?; }
     a[8] = evaluation_row(neg(residual))?;
+    Ok(determinant(a))
+}
+
+/// Order-one jet along the elliptic curve in local parameter x-x(P).
+/// Valid at affine P with y != 0: dy/dx = (3x^2+a)/(2y).
+fn evaluation_tangent_jet(q: Point) -> Result<[u64; 9], String> {
+    let (x, y) = q.ok_or("infinity has no finite local x parameter")?;
+    if x >= P || y >= P || y == 0 {
+        return Err("noncanonical point or local x not uniformizer at y=0".into());
+    }
+    let x2 = fp_mul(x, x);
+    let x3 = fp_mul(x2, x);
+    let dy = fp_mul(
+        fp_add(fp_mul(3, x2), PRIME31.a),
+        fp_pow(fp_mul(2, y), P - 2),
+    );
+    Ok([
+        0, 1, dy,
+        fp_mul(2, x),
+        fp_add(y, fp_mul(x, dy)),
+        fp_mul(3, x2),
+        fp_add(fp_mul(fp_mul(2, x), y), fp_mul(x2, dy)),
+        fp_mul(4, x3),
+        fp_add(fp_mul(fp_mul(3, x2), y), fp_mul(x3, dy)),
+    ])
+}
+
+/// Confluent evaluation matrix for at most two occurrences of each signed
+/// point. Each pair yields value row followed by first tangent jet.
+fn relation_determinant_hermite(
+    leaves: &[Point; 8], residual: Point,
+) -> Result<u64, String> {
+    let mut a = [[0u64; 9]; 9];
+    let mut seen: HashMap<Point, u8> = HashMap::new();
+    for (i, q) in leaves.iter().copied()
+        .chain(std::iter::once(neg(residual))).enumerate()
+    {
+        if q.is_none() { return Err("effective divisor includes infinity".into()); }
+        let entry = seen.entry(q).or_insert(0);
+        *entry += 1;
+        a[i] = match *entry {
+            1 => evaluation_row(q)?,
+            2 => evaluation_tangent_jet(q)?,
+            _ => return Err("third occurrence: higher elliptic Hermite jet required".into()),
+        };
+    }
     Ok(determinant(a))
 }
 
@@ -199,7 +245,15 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     let false_zero = determinant(naive);
     assert_eq!(false_zero, 0, "duplicate matrix rows must cause a false zero");
     assert!(relation_determinant(&repeated, wrong_target).is_err(),
-        "safe oracle must reject repeated signed points");
+        "safe squarefree oracle must reject repeated signed points");
+    // Repair the diagonal failure via the TRUE elliptic tangent jet rather
+    // than ignoring the duplicated point or admitting the false positive.
+    let hermite_true = relation_determinant_hermite(&repeated, repeated_sum)
+        .expect("double divisor positive with x-local uniformizer");
+    let hermite_false = relation_determinant_hermite(&repeated, wrong_target)
+        .expect("double divisor negative with x-local uniformizer");
+    assert_eq!(hermite_true, 0, "confluent RR9 misses a true repeated-leaf sum");
+    assert_ne!(hermite_false, 0, "confluent RR9 admits a false repeated-leaf sum");
 
     json!({
         "base":label, "factor_base":base, "seed":format!("{SEED:#x}"),
@@ -209,6 +263,9 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         "source_group_additions_outside_determinant":ar.counts.group_additions-base_additions_before,
         "naive_repeated_row_false_zero":false_zero==0,
         "safe_repeated_row_rejected":true,
+        "confluent_hermite_repeated_true_det":hermite_true,
+        "confluent_hermite_repeated_false_det":hermite_false,
+        "confluent_hermite_double_control":true,
         "no_unknown_ecdlp_solved":true, "cases":records
     })
 }
@@ -258,6 +315,9 @@ mod tests {
             assert_eq!(panel["accepted_negative"], 32);
             assert_eq!(panel["naive_repeated_row_false_zero"], true);
             assert_eq!(panel["safe_repeated_row_rejected"], true);
+            assert_eq!(panel["confluent_hermite_repeated_true_det"], 0);
+            assert_ne!(panel["confluent_hermite_repeated_false_det"], 0);
+            assert_eq!(panel["confluent_hermite_double_control"], true);
         }
     }
 }
