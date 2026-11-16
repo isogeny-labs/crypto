@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+  "latest_record": "20261116T0636Z-ic-positive-control-la",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 203,
-    "open": 0
+    "measured": 204,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -24393,6 +24393,58 @@
     },
     {
       "better": "lower",
+      "first": 0.667,
+      "latest": 0.667,
+      "latest_derived": {},
+      "metric": "la_mul_n_over_m_p32771",
+      "points": [
+        {
+          "commit": "caae5eca9f20",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0636Z-ic-positive-control-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.662,
+            0.673
+          ],
+          "summary": "Genus-3 positive control LA: coordinate Wiedemann on a square row subset cuts LA multiplications to 0.33x (paired); distance to matched rho at p=32771 w=0.1 3.69->1.92, w=1 19.6->9.85; 5a unresolved. [pcc:unverified]",
+          "value": 0.667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.328,
+      "latest": 0.328,
+      "latest_derived": {},
+      "metric": "la_mul_s_over_m_p32771",
+      "points": [
+        {
+          "commit": "caae5eca9f20",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0636Z-ic-positive-control-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.325,
+            0.331
+          ],
+          "summary": "Genus-3 positive control LA: coordinate Wiedemann on a square row subset cuts LA multiplications to 0.33x (paired); distance to matched rho at p=32771 w=0.1 3.69->1.92, w=1 19.6->9.85; 5a unresolved. [pcc:unverified]",
+          "value": 0.328
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 3.69,
       "latest": 3.69,
       "latest_derived": {},
@@ -25788,6 +25840,58 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.92,
+      "latest": 1.92,
+      "latest_derived": {},
+      "metric": "s_over_rho_w01_p32771",
+      "points": [
+        {
+          "commit": "caae5eca9f20",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0636Z-ic-positive-control-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.08,
+            3.71
+          ],
+          "summary": "Genus-3 positive control LA: coordinate Wiedemann on a square row subset cuts LA multiplications to 0.33x (paired); distance to matched rho at p=32771 w=0.1 3.69->1.92, w=1 19.6->9.85; 5a unresolved. [pcc:unverified]",
+          "value": 1.92
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 9.85,
+      "latest": 9.85,
+      "latest_derived": {},
+      "metric": "s_over_rho_w1_p32771",
+      "points": [
+        {
+          "commit": "caae5eca9f20",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0636Z-ic-positive-control-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            5.55,
+            19.04
+          ],
+          "summary": "Genus-3 positive control LA: coordinate Wiedemann on a square row subset cuts LA multiplications to 0.33x (paired); distance to matched rho at p=32771 w=0.1 3.69->1.92, w=1 19.6->9.85; 5a unresolved. [pcc:unverified]",
+          "value": 9.85
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
     },
     {
       "better": "lower",
