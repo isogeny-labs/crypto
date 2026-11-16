@@ -123,7 +123,7 @@ fn ols2(rows: &[(f64, f64, f64)]) -> Option<[f64; 3]> {
 
 impl Comparison {
     /// Rule v8's read-out against `control` (rule v8c).
-    pub fn matched(&self, control: &Comparison) -> Result<J, String> {
+    pub fn matched(&self, control: &Comparison, title: &str) -> Result<J, String> {
         let mut data: Vec<SizeData> = Vec::new();
         for (a, n) in SIZES {
             let (r1m, _, badm) = self.load_rows(a, n)?;
@@ -373,14 +373,7 @@ impl Comparison {
         }
         seed += 1;
         Ok(J::Obj(vec![
-            (
-                "what_this_is".into(),
-                J::Str(
-                    "Rule v8: the matched rho (batched canonicalisation) against its same-binary \
-                     control (KIC_RHO_CANON=scalar, rho as at rule v7), rows paired by target"
-                        .into(),
-                ),
-            ),
+            ("what_this_is".into(), J::Str(title.into())),
             (
                 "bootstrap".into(),
                 J::Obj(vec![

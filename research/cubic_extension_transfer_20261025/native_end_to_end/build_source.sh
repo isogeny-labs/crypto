@@ -11,5 +11,5 @@ sed -e 's/^fn main() {/fn reference_main() {/' \
 sed -n '/^fn signed_terms(/,/^fn fixed_instance(/{ /^fn fixed_instance(/!p; }' ../native_followup/quartic_adapter.rs >> build/source_native.rs
 sed -n '/^#\[derive(Clone,Copy,Debug,PartialEq,Eq)\]/,/^fn source_fixture(/{ /^fn source_fixture(/!p; }' ../native_followup/quartic_adapter.rs >> build/source_native.rs
 sed -n '/^fn source_rho(/,/^fn main(/{ /^fn main(/!p; }' ../native_followup/quartic_adapter.rs | sed 's/HashMap::new()/HashMap::default()/g' >> build/source_native.rs
-cat source_adapter.rs >> build/source_native.rs
+cat measurement_hook.rs source_adapter.rs >> build/source_native.rs
 "${RUSTC:-rustc}" --edition 2021 -O build/source_native.rs -o build/source_public

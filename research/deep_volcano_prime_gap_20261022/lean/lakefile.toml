@@ -1,0 +1,13 @@
+name = "deep_gap"
+version = "0.1.0"
+defaultTargets = ["DeepGap"]
+
+# TransferBound (`transfer`, `within_isogeny_cost`) from the 2026-10-10
+# conductor-gap study, by path, so the two files share one definition.
+[[require]]
+name = "generic_invariance"
+path = "../../conductor_gap_cm_pairs_20261010/lean"
+
+[[lean_lib]]
+name = "DeepGap"
+roots = ["DeepGap"]

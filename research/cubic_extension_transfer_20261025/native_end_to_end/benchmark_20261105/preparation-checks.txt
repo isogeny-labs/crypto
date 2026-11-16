@@ -1,0 +1,8 @@
++ bash -n research/cubic_extension_transfer_20261025/native_end_to_end/benchmark_20261105/capture-access.sh
++ jq -e '(.planned_panel.targets_per_curve * (.baseline.curve_primes | length) * .planned_panel.measured_rounds * (.planned_panel.arms | length)) == .planned_panel.measured_executions and (.planned_panel.targets_per_curve * (.baseline.curve_primes | length) * .planned_panel.warmups_per_target_arm * (.planned_panel.arms | length)) == .planned_panel.warmup_executions and .proposed_resources.launch_allowed == false and .protocol_frozen == false' research/cubic_extension_transfer_20261025/native_end_to_end/benchmark_20261105/launch-plan.json
+true
++ python3 tools/pcc/pcc.py lint-prose research/cubic_extension_transfer_20261025/native_end_to_end/benchmark_20261105/README.md research/cubic_extension_transfer_20261025/native_end_to_end/benchmark_20261105/HANDOFF.md /tmp/cubic-benchmark-session-entry.md
+lint-prose: 0 finding(s)
++ python3 tools/pcc/pcc.py ledger verify --base origin/main
+ledger: 96 entries, chain ok
++ git diff --check

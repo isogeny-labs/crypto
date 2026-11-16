@@ -15,6 +15,9 @@ pub enum Phase {
     Benchmark,
     Succeeded,
     Failed,
+    /// Command mode terminal: outputs uploaded, exit code recorded (any value),
+    /// no native replay and no fresh benchmark epoch.
+    CommandCompleted,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -81,6 +84,9 @@ pub struct State {
     pub benchmark_uid: Option<String>,
     pub benchmark_manifest: Option<serde_json::Value>,
     pub benchmark_create_attempted: bool,
+    /// Command mode only; omitted from every ecbench state.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub command_exit_code: Option<i32>,
 }
 
 impl State {
@@ -109,10 +115,14 @@ impl State {
             benchmark_uid: None,
             benchmark_manifest: None,
             benchmark_create_attempted: false,
+            command_exit_code: None,
         })
     }
     pub fn terminal(&self) -> bool {
-        matches!(self.phase, Phase::Succeeded | Phase::Failed)
+        matches!(
+            self.phase,
+            Phase::Succeeded | Phase::Failed | Phase::CommandCompleted
+        )
     }
     pub fn bind_request(&self, req: &Request) -> Result<(), String> {
         if self.schema != "isolab.eks.recovery-state/v1"
@@ -236,13 +246,45 @@ impl State {
         self.phase = Phase::Restoring;
         Ok(())
     }
+    /// Command mode only: the generation whose commit permits PVC-local
+    /// pruning, with its committed manifest hash. `n` must be the newest
+    /// committed generation and nothing newer may be pending. Committed numbers
+    /// are contiguous (commit requires number == next_generation), so keeping
+    /// n-1 and n keeps exactly the two most recent committed generations.
+    pub fn prune_target(&self, n: u64) -> Option<(u64, String)> {
+        if !self.request.is_command() {
+            return None;
+        }
+        let newest = self.generations.iter().max_by_key(|g| g.number)?;
+        if newest.number != n
+            || n.checked_add(1) != Some(self.next_generation)
+            || !newest.eligible(&self.request_sha256)
+        {
+            return None;
+        }
+        Some((n, newest.manifest_sha256.clone()))
+    }
     pub fn begin_benchmark(&mut self, native_replay_ok: bool) -> Result<(), String> {
         if self.phase != Phase::VerifyingComputation || !native_replay_ok {
             return Err("native computation verification is required".into());
         }
+        if self.request.is_command() {
+            return Err("command mode never starts a fresh benchmark epoch".into());
+        }
         // One deterministic epoch, never another name following an A/A failure.
         self.benchmark_job = Some(format!("{}-epoch-1", self.request.run_name));
         self.phase = Phase::Benchmark;
+        Ok(())
+    }
+    /// Command mode replaces native replay and the fresh epoch with one verified
+    /// output upload. Any exit code is terminal and recorded; nothing is retried.
+    pub fn complete_command(&mut self, exit_code: i32, now: u64) -> Result<(), String> {
+        if !self.request.is_command() || self.phase != Phase::VerifyingComputation {
+            return Err("command completion requires a command run verifying its outputs".into());
+        }
+        self.enforce_deadline(now)?;
+        self.command_exit_code = Some(exit_code);
+        self.phase = Phase::CommandCompleted;
         Ok(())
     }
 }
@@ -404,5 +446,107 @@ mod tests {
         s.fail("A/A not admitted");
         assert!(s.begin_benchmark(true).is_err());
         assert_eq!(s.benchmark_job, name);
+    }
+    #[test]
+    fn recorded_ecbench_state_round_trips_without_command_fields() {
+        let raw = include_bytes!("../../validation/20261022-periodic/attempt-b/final-state.json");
+        let state: State = serde_json::from_slice(raw).unwrap();
+        assert_eq!(state.request_sha256, state.request.hash());
+        assert!(state.command_exit_code.is_none());
+        assert_eq!(
+            serde_json::to_value(&state).unwrap(),
+            serde_json::from_slice::<serde_json::Value>(raw).unwrap()
+        );
+        assert!(state.bind_request(&state.request).is_ok());
+    }
+    #[test]
+    fn command_completion_is_terminal_records_any_exit_and_skips_benchmark() {
+        let mut s =
+            State::new(crate::contract::command_fixture(), "project:a".into(), 1000).unwrap();
+        assert!(s.complete_command(0, 1100).is_err(), "not verifying yet");
+        s.phase = Phase::VerifyingComputation;
+        assert!(s.begin_benchmark(true).is_err());
+        assert!(s.benchmark_job.is_none());
+        s.complete_command(3, 1100).unwrap();
+        assert_eq!(s.phase, Phase::CommandCompleted);
+        assert_eq!(s.command_exit_code, Some(3));
+        assert!(s.terminal());
+        let v = serde_json::to_value(&s).unwrap();
+        assert_eq!(v["phase"], "command_completed");
+        assert_eq!(v["command_exit_code"], 3);
+        let back: State = serde_json::from_value(v).unwrap();
+        assert!(back.bind_request(&s.request).is_ok());
+        // Deadline still applies to the completion transition.
+        let mut late =
+            State::new(crate::contract::command_fixture(), "project:a".into(), 1000).unwrap();
+        late.phase = Phase::VerifyingComputation;
+        assert!(late.complete_command(0, 5000).is_err());
+        assert_eq!(late.phase, Phase::Failed);
+        // An ecbench run can never take the command terminal.
+        let mut e = state();
+        e.phase = Phase::VerifyingComputation;
+        assert!(e.complete_command(0, 1100).is_err());
+        assert!(serde_json::to_value(&e)
+            .unwrap()
+            .get("command_exit_code")
+            .is_none());
+    }
+    #[test]
+    fn command_mode_admits_many_restores_within_its_budget() {
+        let mut s =
+            State::new(crate::contract::command_fixture(), "project:a".into(), 1000).unwrap();
+        assert_eq!(s.request.max_restores, 40);
+        s.restores = 39;
+        s.attempt = 39;
+        s.current_instance = Some("i-old".into());
+        s.current_pod_uid = Some("pod-old".into());
+        s.phase = Phase::Running;
+        s.begin_checkpoint().unwrap();
+        s.commit(generation(&s)).unwrap();
+        s.phase = Phase::Fencing;
+        s.confirm_terminated("i-old", Some("terminated")).unwrap();
+        s.begin_restore(1, 1200).unwrap();
+        assert_eq!(s.restores, 40);
+        assert!(s.bind_request(&s.request).is_ok());
+        s.phase = Phase::Fencing;
+        s.current_instance = Some("i-next".into());
+        s.confirm_terminated("i-next", Some("terminated")).unwrap();
+        assert!(s.begin_restore(1, 1300).is_err(), "budget exhausted");
+    }
+    #[test]
+    fn prune_targets_only_the_newest_committed_command_generation() {
+        let mut s = State::new(crate::contract::command_fixture(), "p".into(), 1000).unwrap();
+        s.current_instance = Some("i-old".into());
+        s.current_pod_uid = Some("pod-old".into());
+        s.phase = Phase::Running;
+        assert!(s.prune_target(1).is_none(), "nothing committed");
+        s.begin_checkpoint().unwrap();
+        assert!(s.prune_target(1).is_none(), "intent is not a commit");
+        s.commit(generation(&s)).unwrap();
+        assert_eq!(s.prune_target(1), Some((1, "d".repeat(64))));
+        s.finish_checkpoint();
+        s.phase = Phase::Running;
+        s.begin_checkpoint().unwrap();
+        // Generation 2 is pending: generation 1 is no longer the right target,
+        // and generation 2 is not committed.
+        assert_eq!(s.next_generation, 2);
+        assert!(s.prune_target(2).is_none());
+        s.commit(generation(&s)).unwrap();
+        assert_eq!(s.prune_target(2).map(|t| t.0), Some(2));
+        assert!(
+            s.prune_target(1).is_none(),
+            "an older generation is not newest"
+        );
+        let mut bad = s.clone();
+        bad.generations.last_mut().unwrap().readback_verified = false;
+        assert!(bad.prune_target(2).is_none());
+        // ecbench requests never prune, even with identical committed state.
+        let mut e = s.clone();
+        e.request = crate::contract::fixture();
+        e.request_sha256 = e.request.hash();
+        for g in &mut e.generations {
+            g.request_sha256 = e.request_sha256.clone();
+        }
+        assert!(e.prune_target(2).is_none());
     }
 }

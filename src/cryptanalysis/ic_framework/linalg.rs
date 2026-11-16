@@ -9,6 +9,7 @@
 //! | `incremental-gauss` | dense reduced row echelon, maintained as rows arrive | `rank × |F|` entries | leftmost non-zero | `row_ops` |
 //! | `incremental-gauss-full-rank` | same dense matrix, continue after target pin until every column is independent | `rank × |F|` entries | leftmost non-zero | `row_ops` |
 //! | `incremental-gauss-full-rank-checked` | same full-rank matrix, then point-check one representative per factor-base column | `rank × |F|` entries | leftmost non-zero | `row_ops` |
+//! | `incremental-gauss-echelon` | sparse row echelon (forward elimination only), pivot rows stored as non-zero lists | the non-zeros right of each pivot | leftmost non-zero | `row_ops` |
 //! | `structured-gauss` | sparse reduced row echelon, maintained as rows arrive | the non-zeros | lightest column (Markowitz) | `row_ops` |
 //! | `sparse-cado` | batch: CADO-style filter (clique purge, Markowitz/spanning-tree merge) then block Wiedemann, re-run as relations arrive | the non-zeros | — | `row_ops` |
 //! | `filter+wiedemann` | the same configuration as `sparse-cado`, under the explicit core-solver name | the non-zeros | — | `row_ops` |
@@ -57,25 +58,44 @@ use std::cell::RefCell;
 use num_bigint::BigUint;
 
 use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+use crate::cryptanalysis::prime_fast::MulModN;
 
 use crate::cryptanalysis::ic_boundary::{
     pivot_inversion_steps, IncrementalGauss, RelationSolver, RowStatus,
 };
 use crate::cryptanalysis::koblitz_sparse_la::{
-    FilterOptions, SparseCoreSolver, SparseRows, SparseSolveOptions, SparseSolveOutcome,
+    FilterOptions, FixedMul, SparseCoreSolver, SparseRows, SparseSolveOptions, SparseSolveOutcome,
 };
 
 #[cfg(test)]
 fn addmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 + b as u128) % m as u128) as u64
 }
+/// `(a + m − b) mod m` on 128-bit integers, exactly; reduced operands
+/// (every stored entry and right-hand side once reduced) take one
+/// compare-and-subtract instead of the 128-bit remainder.
+#[inline]
 fn submod(a: u64, b: u64, m: u64) -> u64 {
-    ((a as u128 + m as u128 - b as u128) % m as u128) as u64
+    if a < m && b < m {
+        // A select, not a branch: on field data the comparison is a coin
+        // flip a branch predictor cannot learn.
+        let (d, borrow) = a.overflowing_sub(b);
+        std::hint::select_unpredictable(borrow, d.wrapping_add(m), d)
+    } else {
+        ((a as u128 + m as u128 - b as u128) % m as u128) as u64
+    }
 }
+#[cfg(test)]
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
 }
+/// `a⁻¹ mod m`: `ic_boundary::invmod` (word-division Euclid) and, only
+/// when it finds no inverse, the `i128` Euclid it replaced.  Both are
+/// exact and the inverse is unique, so the value is unchanged.
 fn invmod(a: u64, m: u64) -> Option<u64> {
+    crate::cryptanalysis::ic_boundary::invmod(a, m).or_else(|| invmod_i128(a, m))
+}
+fn invmod_i128(a: u64, m: u64) -> Option<u64> {
     // Extended Euclid over i128; `m` is prime, so any non-zero `a` inverts.
     let (mut r0, mut r1) = (m as i128, (a % m) as i128);
     let (mut t0, mut t1) = (0i128, 1i128);
@@ -95,22 +115,28 @@ type Sparse = Vec<(usize, u64)>;
 
 /// `a − f·b`, both sparse and sorted, counting one `row_op` per
 /// non-zero touched and, in `steps`, one merge step (a column compare
-/// and a push) per entry of either input.
-fn sparse_sub_scaled(
-    a: &Sparse,
+/// and a push) per entry of either input.  The result is written into
+/// `out` (cleared first), so callers reuse one buffer instead of
+/// allocating a row per reduction; products go through `mm`
+/// ([`MulModN`], the value of the `u128` remainder).
+fn sparse_sub_scaled_into(
+    a: &[(usize, u64)],
     f: u64,
-    b: &Sparse,
-    m: u64,
+    b: &[(usize, u64)],
+    mm: &MulModN,
     ops: &mut u64,
     steps: &mut u64,
-) -> Sparse {
-    let mut out = Vec::with_capacity(a.len() + b.len());
+    out: &mut Sparse,
+) {
+    let m = mm.m;
+    out.clear();
+    out.reserve(a.len() + b.len());
     let (mut i, mut j) = (0, 0);
     while i < a.len() || j < b.len() {
         *steps += 1;
         match (a.get(i), b.get(j)) {
             (Some(&(ca, va)), Some(&(cb, vb))) if ca == cb => {
-                let v = submod(va, mulmod(f, vb, m), m);
+                let v = submod(va, mm.mul(f, vb), m);
                 *ops += 1;
                 if v != 0 {
                     out.push((ca, v));
@@ -127,7 +153,7 @@ fn sparse_sub_scaled(
                 i += 1;
             }
             (_, Some(&(cb, vb))) => {
-                let v = submod(0, mulmod(f, vb, m), m);
+                let v = submod(0, mm.mul(f, vb), m);
                 *ops += 1;
                 if v != 0 {
                     out.push((cb, v));
@@ -137,7 +163,6 @@ fn sparse_sub_scaled(
             (None, None) => break,
         }
     }
-    out
 }
 
 /// Sparse incremental elimination, pivoting on the lightest column.
@@ -174,6 +199,10 @@ pub struct StructuredGauss {
     pub entries_scanned: u64,
     /// Pivot normalisations, one modular inversion each.
     pub pivot_inversions: u64,
+    /// `a·b mod modulus` (the value of the `u128` remainder).
+    mm: MulModN,
+    /// The reduction buffer reused by `add_row` (no counted meaning).
+    scratch: Sparse,
 }
 
 impl StructuredGauss {
@@ -193,21 +222,26 @@ impl StructuredGauss {
             peak_nonzeros: 0,
             entries_scanned: 0,
             pivot_inversions: 0,
+            mm: MulModN::new(modulus),
+            scratch: Vec::new(),
         }
     }
+}
 
-    fn note_weight(&mut self, row: &Sparse, delta: i32) {
-        self.entries_scanned += row.len() as u64;
-        for &(c, _) in row {
-            let w = &mut self.weight[c];
-            *w = (*w as i32 + delta).max(0) as u32;
-        }
+/// Column-weight bookkeeping of [`StructuredGauss`], on the two fields it
+/// touches, so that it can run while a stored row is borrowed.
+fn note_weight(weight: &mut [u32], entries_scanned: &mut u64, row: &[(usize, u64)], delta: i32) {
+    *entries_scanned += row.len() as u64;
+    for &(c, _) in row {
+        let w = &mut weight[c];
+        *w = (*w as i32 + delta).max(0) as u32;
     }
 }
 
 impl RelationSolver for StructuredGauss {
     fn add_row(&mut self, dense: Vec<u64>, mut rhs: u64) -> RowStatus {
         let m = self.modulus;
+        let mm = self.mm;
         debug_assert_eq!(dense.len(), self.cols);
         let mut row: Sparse = dense
             .iter()
@@ -216,6 +250,13 @@ impl RelationSolver for StructuredGauss {
             .map(|(c, &v)| (c, v % m))
             .collect();
         self.entries_scanned += self.cols as u64;
+        // One reusable buffer for every reduction below (assessment
+        // 2026-11-10, R2): each `sparse_sub_scaled_into` writes into it
+        // and the result is swapped in, so no row is cloned or allocated
+        // per step.  The `2 × len` clone charges to `entries_scanned` are
+        // kept exactly as before: they are now modelled work, the copy the
+        // counted algorithm makes, so `bitop/v1` records do not change.
+        let mut scratch = std::mem::take(&mut self.scratch);
         // Reduce against every pivot the new row touches.  A sparse row
         // touches few, and the reduction adds only the pivot row's
         // non-zeros, so this is the step the structure pays for.
@@ -227,20 +268,23 @@ impl RelationSolver for StructuredGauss {
             });
             self.entries_scanned += looked;
             let Some((i, f)) = hit else { break };
-            let pivot_row = self.rows[i].clone();
-            self.entries_scanned += 2 * pivot_row.len() as u64;
-            row = sparse_sub_scaled(
+            // Modelled clone of the pivot row (see above).
+            self.entries_scanned += 2 * self.rows[i].len() as u64;
+            sparse_sub_scaled_into(
                 &row,
                 f,
-                &pivot_row,
-                m,
+                &self.rows[i],
+                &mm,
                 &mut self.row_ops,
                 &mut self.entries_scanned,
+                &mut scratch,
             );
-            rhs = submod(rhs, mulmod(f, self.rhs[i], m), m);
+            std::mem::swap(&mut row, &mut scratch);
+            rhs = submod(rhs, mm.mul(f, self.rhs[i]), m);
             self.row_ops += 1;
         }
         if row.is_empty() {
+            self.scratch = scratch;
             if rhs == 0 {
                 self.dependent += 1;
                 return RowStatus::Dependent;
@@ -258,10 +302,10 @@ impl RelationSolver for StructuredGauss {
         self.pivot_inversions += 1;
         let inv = invmod(pv, m).expect("prime modulus");
         for (_, v) in row.iter_mut() {
-            *v = mulmod(*v, inv, m);
+            *v = mm.mul(*v, inv);
             self.row_ops += 1;
         }
-        rhs = mulmod(rhs, inv, m);
+        rhs = mm.mul(rhs, inv);
         self.row_ops += 1;
         // Eliminate the new pivot column from every stored row that
         // holds it; only those rows are touched.
@@ -272,27 +316,34 @@ impl RelationSolver for StructuredGauss {
                 Ok(k) => self.rows[i][k].1,
                 Err(_) => continue,
             };
-            let before = self.rows[i].clone();
-            self.entries_scanned += 2 * before.len() as u64;
-            let after = sparse_sub_scaled(
-                &before,
+            // Modelled clone of the reduced row (see above).
+            self.entries_scanned += 2 * self.rows[i].len() as u64;
+            sparse_sub_scaled_into(
+                &self.rows[i],
                 f,
                 &row,
-                m,
+                &mm,
                 &mut self.row_ops,
                 &mut self.entries_scanned,
+                &mut scratch,
             );
-            self.rhs[i] = submod(self.rhs[i], mulmod(f, rhs, m), m);
+            // `scratch` now holds the row after, `rows[i]` the row before;
+            // swap so that `rows[i]` is the new row and `scratch` the old.
+            std::mem::swap(&mut self.rows[i], &mut scratch);
+            let (before, after) = (&scratch, &self.rows[i]);
+            self.rhs[i] = submod(self.rhs[i], mm.mul(f, rhs), m);
             self.row_ops += 1;
             self.nonzeros = self.nonzeros - before.len() as u64 + after.len() as u64;
-            self.note_weight(&before, -1);
-            self.note_weight(&after, 1);
-            self.rows[i] = after;
+            // Same order as before: the old row's weights out, then the
+            // new row's in.
+            note_weight(&mut self.weight, &mut self.entries_scanned, before, -1);
+            note_weight(&mut self.weight, &mut self.entries_scanned, after, 1);
         }
+        self.scratch = scratch;
         self.row_of_pivot[pc] = Some(self.rows.len());
         self.pivot_of_row.push(pc);
         self.nonzeros += row.len() as u64;
-        self.note_weight(&row, 1);
+        note_weight(&mut self.weight, &mut self.entries_scanned, &row, 1);
         self.peak_nonzeros = self.peak_nonzeros.max(self.nonzeros);
         self.rows.push(row);
         self.rhs.push(rhs);
@@ -568,9 +619,13 @@ impl<S: RhoScalar> Wiedemann<S> {
                     .expect("below the modulus")
             })
             .collect();
-        // y = Rᵀ D (R x)
-        let apply = |x: &[S], ops: &mut u64| -> Vec<S> {
-            let mut y = vec![S::zero(); n];
+        // y = Rᵀ D (R x), into a caller-owned buffer: the products of the
+        // Krylov run reuse two vectors instead of allocating one per
+        // matvec (assessment 2026-11-10, R10).  The loop order, every
+        // value and every `ops` charge are as before.
+        let apply = |x: &[S], y: &mut Vec<S>, ops: &mut u64| {
+            y.clear();
+            y.resize(n, S::zero());
             for (row, &di) in r.iter().zip(&d) {
                 let mut t = S::zero();
                 for &(j, v) in row {
@@ -587,7 +642,6 @@ impl<S: RhoScalar> Wiedemann<S> {
                 }
                 *ops += row.len() as u64;
             }
-            y
         };
         let dot = |x: &[S], y: &[S], ops: &mut u64| -> S {
             *ops += n as u64;
@@ -606,12 +660,13 @@ impl<S: RhoScalar> Wiedemann<S> {
         // s_0 .. s_{2n-1} from w_0 .. w_n.
         let mut seq = Vec::with_capacity(2 * n);
         let mut w = b.clone();
+        let mut next = Vec::with_capacity(n);
         for _ in 0..n {
-            let next = apply(&w, &mut ops);
+            apply(&w, &mut next, &mut ops);
             st.matvecs += 1;
             seq.push(dot(&w, &w, &mut ops));
             seq.push(dot(&w, &next, &mut ops));
-            w = next;
+            std::mem::swap(&mut w, &mut next);
         }
         let c = berlekamp_massey(&seq, m, &mut ops);
         let l = c.len() - 1;
@@ -623,6 +678,7 @@ impl<S: RhoScalar> Wiedemann<S> {
             let f0_inv = S::inverse_mod(c[l], m)?;
             let mut z = vec![S::zero(); n];
             let mut w = b.clone();
+            let mut tmp = next;
             for j in 1..=l {
                 let fj = c[l - j];
                 if fj != S::zero() {
@@ -632,7 +688,8 @@ impl<S: RhoScalar> Wiedemann<S> {
                     ops += n as u64;
                 }
                 if j < l {
-                    w = apply(&w, &mut ops);
+                    apply(&w, &mut tmp, &mut ops);
+                    std::mem::swap(&mut w, &mut tmp);
                     st.matvecs += 1;
                 }
             }
@@ -708,364 +765,6 @@ fn berlekamp_massey<S: RhoScalar>(s: &[S], m: S, ops: &mut u64) -> Vec<S> {
     c
 }
 
-/// Singleton peeling for [`PinWiedemann`]: the rows and columns that can
-/// matter to the unit vector of column `keep`.
-///
-/// A non-`keep` column that exactly one stored row touches forces that
-/// row's coefficient to zero in any combination of rows that equals the
-/// unit vector, so the row is dropped, and dropping it can leave further
-/// columns with one row; the loop repeats.  Columns no row touches drop
-/// out with weight 0.  Returns the kept row indices and kept columns, in
-/// increasing order.
-fn peel_core(rows: &[Vec<(u32, u64)>], weight: &[u32], keep: usize) -> (Vec<usize>, Vec<usize>) {
-    let cols = weight.len();
-    let mut weight = weight.to_vec();
-    let mut row_alive = vec![true; rows.len()];
-    let mut rows_of: Vec<Vec<usize>> = vec![Vec::new(); cols];
-    for (i, row) in rows.iter().enumerate() {
-        for &(c, _) in row {
-            rows_of[c as usize].push(i);
-        }
-    }
-    let mut queue: Vec<usize> = (0..cols).filter(|&c| c != keep && weight[c] == 1).collect();
-    while let Some(c) = queue.pop() {
-        if weight[c] != 1 {
-            continue;
-        }
-        let Some(&i) = rows_of[c].iter().find(|&&i| row_alive[i]) else {
-            continue;
-        };
-        row_alive[i] = false;
-        for &(c2, _) in &rows[i] {
-            let c2 = c2 as usize;
-            weight[c2] -= 1;
-            if c2 != keep && weight[c2] == 1 {
-                queue.push(c2);
-            }
-        }
-    }
-    let kept_rows = (0..rows.len()).filter(|&i| row_alive[i]).collect();
-    let kept_cols = (0..cols).filter(|&c| weight[c] > 0).collect();
-    (kept_rows, kept_cols)
-}
-
-/// Target-pinned sparse solve by Wiedemann's method: the sparse
-/// counterpart of the target-pinned default, which stops as soon as the
-/// target column is determined, long before the rows reach full column
-/// rank.
-///
-/// The target column `t` is determined by the stored rows `R x = a`
-/// exactly when the unit vector `e_t` lies in the row space of `R`.  With
-/// `A = Rᵀ D R` (`D` a random non-zero diagonal) the row space and the
-/// range of `A` coincide except with probability about `n/r`, so one
-/// attempt solves `A z = e_t` by the Krylov method:
-///
-/// 1. **Peel** the singleton columns ([`peel_core`]); this is exact.
-/// 2. **Sequence.** `s_i = e_tᵀ Aⁱ e_t` for `i < 2n`, by `n` products,
-///    in doubling chunks: Berlekamp–Massey runs when the chunk ends and
-///    the attempt stops as soon as the recurrence length `ℓ` satisfies
-///    `2ℓ + 2 ≤` the terms so far, so a small Krylov space costs a small
-///    number of products.
-/// 3. **Solve.** If `f(0) ≠ 0` for the minimal polynomial `f`, set
-///    `z = −f(0)⁻¹ Σ_{j≥1} f_j A^{j−1} e_t` and check `A z = e_t`
-///    exactly.  `f(0) = 0` means `e_t` has a component in the kernel of
-///    `A`: not pinned yet.
-/// 4. **Value.** For any solution `x` of `R x = a`,
-///    `x_t = e_tᵀ x = (A z)ᵀ x = (D R z)ᵀ (R x) = zᵀ Rᵀ D a`, so the
-///    value is a dot product with `b' = Rᵀ D a`.  The pin is therefore
-///    certified by the exact check of step 3 alone: no second seed, no
-///    rank claim.  The relation loop's `[d]G = Q` check still runs.
-///
-/// A failed attempt (not yet pinned, or an unlucky `D`) only delays the
-/// answer.  The next attempt waits `⌈ops / relation_ops⌉` more rows, `ops`
-/// being what the failed attempt cost, so the work spent on attempts stays
-/// proportional to the work of collecting the rows that come between them;
-/// `relation_ops = 0` attempts after every row, which reads the exact pin
-/// row of the echelon methods.
-///
-/// Work is counted in the dense matrices' unit, one `row_op` per
-/// multiplication modulo `r`: the products, the dot products,
-/// Berlekamp–Massey, the back-substitution, the check and the value, failed
-/// attempts included, plus one per non-zero for converting each arriving
-/// row.
-pub struct PinWiedemann {
-    modulus: u64,
-    cols: usize,
-    rows: Vec<Vec<(u32, u64)>>,
-    rhs: Vec<u64>,
-    weight: Vec<u32>,
-    relation_ops: u64,
-    state: RefCell<PinState>,
-}
-
-#[derive(Default)]
-struct PinState {
-    row_ops: u64,
-    attempts: u64,
-    failed_attempts: u64,
-    products: u64,
-    next_attempt_rows: usize,
-    cached: Option<(usize, u64, usize)>,
-    core_rows: usize,
-    core_cols: usize,
-}
-
-impl PinWiedemann {
-    pub fn new(cols: usize, modulus: u64, relation_ops: u64) -> Self {
-        Self {
-            modulus,
-            cols,
-            rows: Vec::new(),
-            rhs: Vec::new(),
-            weight: vec![0; cols],
-            relation_ops,
-            state: RefCell::new(PinState::default()),
-        }
-    }
-
-    /// `(attempts, failed attempts, products, core rows, core columns)`.
-    pub fn stats(&self) -> (u64, u64, usize, usize, u64) {
-        let s = self.state.borrow();
-        (
-            s.attempts,
-            s.failed_attempts,
-            s.core_rows,
-            s.core_cols,
-            s.products,
-        )
-    }
-
-    fn gap_after(&self, ops: u64) -> usize {
-        if self.relation_ops == 0 {
-            1
-        } else {
-            (ops.div_ceil(self.relation_ops)).max(1) as usize
-        }
-    }
-
-    /// The value of `col` once the stored rows determine it.
-    pub fn pin_value(&self, col: usize) -> Option<u64> {
-        let mut st = self.state.borrow_mut();
-        if let Some((c, v, at)) = st.cached {
-            if c == col && at == self.rows.len() {
-                return Some(v);
-            }
-        }
-        if self.weight[col] == 0 || self.rows.len() < st.next_attempt_rows {
-            return None;
-        }
-        let before = st.row_ops;
-        match self.attempt(col, &mut st) {
-            Some(v) => {
-                st.cached = Some((col, v, self.rows.len()));
-                Some(v)
-            }
-            None => {
-                st.failed_attempts += 1;
-                let spent = st.row_ops - before;
-                st.next_attempt_rows = self.rows.len() + self.gap_after(spent);
-                None
-            }
-        }
-    }
-
-    fn attempt(&self, target: usize, st: &mut PinState) -> Option<u64> {
-        let m = self.modulus;
-        let (rows, cols) = peel_core(&self.rows, &self.weight, target);
-        st.core_rows = rows.len();
-        st.core_cols = cols.len();
-        let n = cols.len();
-        let ti = cols.iter().position(|&c| c == target)?;
-        st.attempts += 1;
-        let mut ops = 0u64;
-        let mut index = vec![usize::MAX; self.cols];
-        for (j, &c) in cols.iter().enumerate() {
-            index[c] = j;
-        }
-        let r: Vec<Vec<(usize, u64)>> = rows
-            .iter()
-            .map(|&i| {
-                self.rows[i]
-                    .iter()
-                    .map(|&(c, v)| (index[c as usize], v))
-                    .collect()
-            })
-            .collect();
-        let a: Vec<u64> = rows.iter().map(|&i| self.rhs[i]).collect();
-        // Deterministic randomness: replays must reproduce every count.
-        let mut seed = 0x9e37_79b9_7f4a_7c15u64 ^ st.attempts.wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        let mut next = || {
-            seed ^= seed << 13;
-            seed ^= seed >> 7;
-            seed ^= seed << 17;
-            seed
-        };
-        let d: Vec<u64> = (0..r.len()).map(|_| 1 + next() % (m - 1)).collect();
-        let mul = |x: u64, y: u64| mulmod(x, y, m);
-        let add = |x: u64, y: u64| {
-            let s = x as u128 + y as u128;
-            (if s >= m as u128 { s - m as u128 } else { s }) as u64
-        };
-        // y = Rᵀ D (R x)
-        let apply = |x: &[u64], ops: &mut u64, products: &mut u64| -> Vec<u64> {
-            *products += 1;
-            let mut y = vec![0u64; n];
-            for (row, &di) in r.iter().zip(&d) {
-                let mut t = 0u64;
-                for &(j, v) in row {
-                    t = add(t, mul(v, x[j]));
-                }
-                *ops += row.len() as u64;
-                if t == 0 {
-                    continue;
-                }
-                let t = mul(t, di);
-                *ops += 1;
-                for &(j, v) in row {
-                    y[j] = add(y[j], mul(v, t));
-                }
-                *ops += row.len() as u64;
-            }
-            y
-        };
-        let dot = |x: &[u64], y: &[u64], ops: &mut u64| -> u64 {
-            *ops += n as u64;
-            x.iter()
-                .zip(y)
-                .fold(0u64, |acc, (&p, &q)| add(acc, mul(p, q)))
-        };
-        let mut products = 0u64;
-        let mut e = vec![0u64; n];
-        e[ti] = 1;
-        let mut seq: Vec<u64> = Vec::with_capacity(2 * n);
-        let mut w = e.clone();
-        let mut check_at = 1usize;
-        let mut j = 0usize;
-        let conn = loop {
-            let nxt = apply(&w, &mut ops, &mut products);
-            seq.push(dot(&w, &w, &mut ops));
-            seq.push(dot(&w, &nxt, &mut ops));
-            w = nxt;
-            j += 1;
-            if j == check_at || j == n {
-                let c = berlekamp_massey::<u64>(&seq, m, &mut ops);
-                let l = c.len() - 1;
-                if 2 * l + 2 <= seq.len() || j == n {
-                    break c;
-                }
-                check_at = (check_at * 2).min(n);
-            }
-        };
-        let l = conn.len() - 1;
-        let outcome = (|| {
-            if l == 0 || conn[l] == 0 {
-                return None;
-            }
-            let f0_inv = fermat_inv(conn[l], m)?;
-            let mut z = vec![0u64; n];
-            let mut w = e.clone();
-            for jj in 1..=l {
-                let fj = conn[l - jj];
-                if fj != 0 {
-                    for (zi, &wi) in z.iter_mut().zip(&w) {
-                        *zi = add(*zi, mul(fj, wi));
-                    }
-                    ops += n as u64;
-                }
-                if jj < l {
-                    w = apply(&w, &mut ops, &mut products);
-                }
-            }
-            let scale = submod(0, f0_inv, m);
-            for zi in z.iter_mut() {
-                *zi = mul(*zi, scale);
-            }
-            ops += n as u64;
-            // The exact check A z = e_t: the certificate of the pin.
-            let az = apply(&z, &mut ops, &mut products);
-            if az != e {
-                return None;
-            }
-            // x_t = zᵀ Rᵀ D a.
-            let mut value = 0u64;
-            for ((row, &di), &ai) in r.iter().zip(&d).zip(&a) {
-                let t = mul(di, ai);
-                let mut rz = 0u64;
-                for &(jx, v) in row {
-                    rz = add(rz, mul(v, z[jx]));
-                }
-                value = add(value, mul(rz, t));
-                ops += row.len() as u64 + 2;
-            }
-            Some(value)
-        })();
-        st.row_ops += ops;
-        st.products += products;
-        outcome
-    }
-}
-
-/// `v⁻¹ mod m` for a prime `m`, by Fermat's little theorem.
-fn fermat_inv(v: u64, m: u64) -> Option<u64> {
-    if v.is_multiple_of(m) {
-        return None;
-    }
-    let (mut base, mut e, mut acc) = (v % m, m - 2, 1u64);
-    while e > 0 {
-        if e & 1 == 1 {
-            acc = mulmod(acc, base, m);
-        }
-        base = mulmod(base, base, m);
-        e >>= 1;
-    }
-    Some(acc)
-}
-
-impl RelationSolver for PinWiedemann {
-    fn add_row(&mut self, dense: Vec<u64>, rhs: u64) -> RowStatus {
-        let m = self.modulus;
-        debug_assert_eq!(dense.len(), self.cols);
-        let entries: Vec<(u32, u64)> = dense
-            .iter()
-            .enumerate()
-            .filter(|(_, &v)| !v.is_multiple_of(m))
-            .map(|(c, &v)| (c as u32, v % m))
-            .collect();
-        self.state.get_mut().row_ops += entries.len() as u64;
-        if entries.is_empty() {
-            return if rhs.is_multiple_of(m) {
-                RowStatus::Dependent
-            } else {
-                RowStatus::Inconsistent
-            };
-        }
-        for &(c, _) in &entries {
-            self.weight[c as usize] += 1;
-        }
-        self.rows.push(entries);
-        self.rhs.push(rhs % m);
-        RowStatus::Independent
-    }
-
-    fn pinned(&self, col: usize) -> Option<u64> {
-        self.pin_value(col)
-    }
-
-    /// A placeholder, as for the other deferred solvers: the method tracks
-    /// no rank.
-    fn rank(&self) -> usize {
-        self.rows.len().min(self.cols.saturating_sub(1))
-    }
-
-    fn dependent(&self) -> u64 {
-        0
-    }
-
-    fn work(&self) -> (u64, &'static str) {
-        (self.state.borrow().row_ops, "row_ops")
-    }
-}
-
 /// The large-matrix pipeline of `koblitz_sparse_la` behind the
 /// incremental contract: CADO-NFS-style filtering
 /// ([`FilterOptions::cado`]: duplicates, singletons, clique purge,
@@ -1099,9 +798,6 @@ pub struct SparseCado {
     cols: usize,
     filter: FilterOptions,
     core: SparseCoreSolver,
-    /// Charge the `block × block` arithmetic of the Krylov core too (the
-    /// `+counted` names); off, `row_ops` is what recorded sessions hold.
-    count_block: bool,
     state: RefCell<SparseCadoState>,
 }
 
@@ -1146,7 +842,6 @@ impl SparseCado {
             cols,
             filter,
             core,
-            count_block: false,
             state: RefCell::new(SparseCadoState {
                 rows: SparseRows::for_modulus(&BigUint::from(modulus))
                     .expect("a prime modulus of at most 256 bits"),
@@ -1160,13 +855,6 @@ impl SparseCado {
                 attempts: 0,
             }),
         }
-    }
-
-    /// The same solver, charging the Krylov core's `block × block`
-    /// multiplications as well ([`SparseSolveOptions::count_block_arithmetic`]).
-    pub fn counted(mut self) -> Self {
-        self.count_block = true;
-        self
     }
 
     /// Solves tried so far.
@@ -1185,7 +873,6 @@ impl SparseCado {
                 filter: self.filter,
                 solver: self.core,
                 seed,
-                count_block_arithmetic: self.count_block,
                 ..SparseSolveOptions::default()
             };
             st.attempts += 1;
@@ -1290,6 +977,169 @@ impl RelationSolver for SparseCado {
     }
 }
 
+/// Sentinel for "no pivot at this column" in [`IncrementalEchelon`].
+const NO_ROW: u32 = u32::MAX;
+
+/// One pivot row of [`IncrementalEchelon`]: the pivot is 1 and every
+/// column left of it is 0, so only the non-zeros to its right are kept.
+struct EchelonRow {
+    cols: Vec<u32>,
+    vals: Vec<u64>,
+    rhs: u64,
+}
+
+/// **`incremental-gauss-echelon`**: forward elimination only.
+///
+/// A new row is reduced against the pivots in increasing column order
+/// (a pivot's entries lie right of its column, so one left-to-right
+/// scan of the new row visits every column a reduction can fill); the
+/// first non-zero at a column with no pivot becomes the new pivot, which
+/// is the column `IncrementalGauss` picks too (the leftmost non-zero of
+/// the fully reduced row: the two reduced rows differ by a row of the
+/// span whose leading column is a pivot, hence not the leading column of
+/// either).  Nothing is eliminated from existing rows.
+///
+/// The target column `d` is the last one, so no pivot row has an entry
+/// right of `d`.  A pivot at `d` is therefore a row `c·e_d`, and `e_d`
+/// is in the row space exactly when `d` is a pivot column (any vector
+/// of the span with leading column `d` is `c·e_d`, and the leading
+/// columns of the span are the pivot columns whatever echelon form is
+/// kept).  So `pinned(d)` is the O(1) test "pivot at `d`" and the
+/// logarithm is its right-hand side, the same pins, rank, dependents,
+/// inconsistencies and answer as `IncrementalGauss` row for row.
+///
+/// `x − f·y mod m` uses Shoup's precomputed multiplier (`FixedMul`),
+/// set up once per pivot row applied (one division, amortised over its
+/// non-zeros).  `row_ops` counts, as `IncrementalGauss` does, one per
+/// non-zero entry of each pivot row applied (its pivot entry included,
+/// though this kernel cancels it structurally, a conservative
+/// over-count of at most one per application), plus one for the
+/// right-hand side, and the same for the normalisation of a new pivot.
+pub struct IncrementalEchelon {
+    modulus: u64,
+    cols: usize,
+    rows: Vec<EchelonRow>,
+    row_of_pivot: Vec<u32>,
+    pub row_ops: u64,
+    pub dependent: u64,
+    pub inconsistent: u64,
+    /// Entries of the arriving row read outside a multiply-subtract.
+    pub entries_scanned: u64,
+    pub pivot_inversions: u64,
+}
+
+impl IncrementalEchelon {
+    pub fn new(cols: usize, modulus: u64) -> Self {
+        assert!(cols < NO_ROW as usize);
+        Self {
+            modulus,
+            cols,
+            rows: Vec::new(),
+            row_of_pivot: vec![NO_ROW; cols],
+            row_ops: 0,
+            dependent: 0,
+            inconsistent: 0,
+            entries_scanned: 0,
+            pivot_inversions: 0,
+        }
+    }
+}
+
+impl RelationSolver for IncrementalEchelon {
+    fn add_row(&mut self, mut row: Vec<u64>, mut rhs: u64) -> RowStatus {
+        let m = self.modulus;
+        debug_assert_eq!(row.len(), self.cols);
+        let mut new_pivot = None;
+        for j in 0..self.cols {
+            self.entries_scanned += 1;
+            let f = row[j];
+            if f == 0 {
+                continue;
+            }
+            let i = self.row_of_pivot[j];
+            if i == NO_ROW {
+                new_pivot = Some(j);
+                break;
+            }
+            let p = &self.rows[i as usize];
+            let fm = FixedMul::new(f, m);
+            row[j] = 0;
+            for (&c, &v) in p.cols.iter().zip(&p.vals) {
+                let c = c as usize;
+                row[c] = fm.sub_from(row[c], v, m);
+            }
+            rhs = fm.sub_from(rhs, p.rhs, m);
+            self.row_ops += p.cols.len() as u64 + 2;
+        }
+        let Some(pc) = new_pivot else {
+            if rhs == 0 {
+                self.dependent += 1;
+                return RowStatus::Dependent;
+            }
+            self.inconsistent += 1;
+            return RowStatus::Inconsistent;
+        };
+        self.entries_scanned += (self.cols - pc - 1) as u64;
+        self.pivot_inversions += 1;
+        let inv = FixedMul::new(invmod(row[pc], m).expect("prime modulus"), m);
+        let mut cols = Vec::new();
+        let mut vals = Vec::new();
+        for (c, &v) in row.iter().enumerate().skip(pc + 1) {
+            if v != 0 {
+                cols.push(c as u32);
+                vals.push(inv.mul(v, m));
+            }
+        }
+        self.row_ops += cols.len() as u64 + 2;
+        rhs = inv.mul(rhs, m);
+        self.row_of_pivot[pc] = self.rows.len() as u32;
+        self.rows.push(EchelonRow { cols, vals, rhs });
+        RowStatus::Independent
+    }
+
+    /// The value of `col` when its pivot row has no entry right of the
+    /// pivot (always so for the last column).  Sufficient, not necessary
+    /// for other columns: only the target column is asked in a run.
+    fn pinned(&self, col: usize) -> Option<u64> {
+        let i = self.row_of_pivot[col];
+        if i == NO_ROW {
+            return None;
+        }
+        let p = &self.rows[i as usize];
+        p.cols.is_empty().then_some(p.rhs)
+    }
+
+    fn rank(&self) -> usize {
+        self.rows.len()
+    }
+
+    fn dependent(&self) -> u64 {
+        self.dependent
+    }
+
+    fn work(&self) -> (u64, &'static str) {
+        (self.row_ops, "row_ops")
+    }
+
+    fn work_counters(&self) -> std::collections::BTreeMap<String, u64> {
+        let mut out = std::collections::BTreeMap::new();
+        out.insert(
+            "counted:gauss_column_scans_and_pivot_inversions".to_string(),
+            1,
+        );
+        if self.entries_scanned > 0 {
+            out.insert("gauss_entries_scanned".to_string(), self.entries_scanned);
+        }
+        if self.pivot_inversions > 0 {
+            out.insert(
+                "pivot_inversion_steps".to_string(),
+                self.pivot_inversions * pivot_inversion_steps(self.modulus),
+            );
+        }
+        out
+    }
+}
+
 /// The matrices the framework knows, by name.
 pub const MATRIX_NAMES: &[(&str, &str)] = &[
     (
@@ -1305,36 +1155,12 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
         "same full-rank matrix, then charge a full-point logarithm check for one representative of every factor-base column",
     ),
     (
+        "incremental-gauss-echelon",
+        "sparse row echelon, forward elimination only (no back-substitution into stored rows), O(1) target pin by pivot column, Shoup fixed-multiplier inner loop; same pins, rank and log as incremental-gauss, one row_op per non-zero multiply-subtract",
+    ),
+    (
         "structured-gauss",
         "sparse reduced row echelon maintained as rows arrive, pivot on the lightest column; one row_op per non-zero multiply-subtract, so the two are comparable",
-    ),
-    (
-        "sparse-cado+counted",
-        "sparse-cado with the block x block multiplications of the Krylov core charged as well (projection, approximant basis, Z f products); the same relations and answer, a larger row_ops; an accounting change",
-    ),
-    (
-        "filter+wiedemann+counted",
-        "filter+wiedemann with the block x block multiplications charged (accounting change; same as sparse-cado+counted)",
-    ),
-    (
-        "filter+lanczos+counted",
-        "filter+lanczos with the Lanczos recurrences charged (Gram products, lanes x lanes inverse and products, block updates, diagonal scaling); accounting change",
-    ),
-    (
-        "wiedemann+counted",
-        "wiedemann (no filter) with the block x block multiplications charged; accounting change",
-    ),
-    (
-        "lanczos+counted",
-        "lanczos (no filter) with the Lanczos recurrences charged; accounting change",
-    ),
-    (
-        "pin-wiedemann",
-        "sparse target-pinned solve: singleton peeling, then Wiedemann on A = RᵀDR to test whether the target's unit vector is in the row space (A z = e_t, exact check); attempts spaced by the work of the last failed one (one relation ~ 16384 row_ops); stops when the target is pinned, like the echelon methods; one row_op per modular multiplication, Berlekamp-Massey and failed attempts included",
-    ),
-    (
-        "pin-wiedemann-every",
-        "pin-wiedemann with an attempt after every row: reads the exact pin row of the echelon methods; a diagnostic for the relation count, not for the work",
     ),
     (
         "sparse-cado",
@@ -1362,7 +1188,7 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
 /// pipeline runs them under the full-rank completion rule.
 pub fn is_deferred_sparse(name: &str) -> bool {
     matches!(
-        name.strip_suffix("+counted").unwrap_or(name),
+        name,
         "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
     )
 }
@@ -1379,9 +1205,8 @@ pub fn matrix_by_name(
         | "incremental-gauss-full-rank-checked" => {
             Ok(Box::new(IncrementalGauss::new(cols, modulus)))
         }
+        "incremental-gauss-echelon" => Ok(Box::new(IncrementalEchelon::new(cols, modulus))),
         "structured-gauss" => Ok(Box::new(StructuredGauss::new(cols, modulus))),
-        "pin-wiedemann" => Ok(Box::new(PinWiedemann::new(cols, modulus, 16_384))),
-        "pin-wiedemann-every" => Ok(Box::new(PinWiedemann::new(cols, modulus, 0))),
         "sparse-cado" | "filter+wiedemann" => Ok(Box::new(SparseCado::new(cols, modulus))),
         "filter+lanczos" => Ok(Box::new(SparseCado::with_core(
             cols,
@@ -1401,18 +1226,6 @@ pub fn matrix_by_name(
             SparseCoreSolver::BlockLanczos,
             false,
         ))),
-        "sparse-cado+counted" | "filter+wiedemann+counted" => {
-            Ok(Box::new(SparseCado::new(cols, modulus).counted()))
-        }
-        "filter+lanczos+counted" => Ok(Box::new(
-            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true).counted(),
-        )),
-        "wiedemann+counted" => Ok(Box::new(
-            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockWiedemann, false).counted(),
-        )),
-        "lanczos+counted" => Ok(Box::new(
-            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false).counted(),
-        )),
         other => Err(format!(
             "unknown relation matrix `{other}`; known: {}",
             MATRIX_NAMES
@@ -1721,143 +1534,62 @@ mod tests {
         }
     }
 
-    /// Random sparse rows of a planted system, `weight` non-zeros each.
-    fn planted_rows_weight(
-        rng: &mut StdRng,
-        cols: usize,
-        count: usize,
-        weight: usize,
-        modulus: u64,
-        x: &[u64],
-    ) -> Vec<(Vec<u64>, u64)> {
-        (0..count)
-            .map(|_| {
+    /// `incremental-gauss-echelon` is statuswise identical to
+    /// `incremental-gauss`: row by row the same `RowStatus`, the same pin
+    /// of the last column (at the same row, with the same value), the
+    /// same rank and dependent count, over 1200 random sparse systems
+    /// (2-3 non-zeros among the factor-base columns plus a target-column
+    /// entry; some with a corrupted right-hand side to force
+    /// inconsistencies), several sizes and moduli.
+    #[test]
+    fn echelon_matches_incremental_gauss_row_for_row() {
+        let moduli = [101u64, 1_000_003, 4_294_967_291, (1u64 << 61) - 1];
+        let mut systems = 0;
+        let mut pinned_systems = 0;
+        for seed in 0..1200u64 {
+            let mut rng = StdRng::seed_from_u64(0xec4e1011 ^ seed);
+            let modulus = moduli[(seed % 4) as usize];
+            let fb = [3usize, 6, 12, 25, 40][(seed / 4 % 5) as usize];
+            let cols = fb + 1;
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+            let mut a = IncrementalGauss::new(cols, modulus);
+            let mut b = IncrementalEchelon::new(cols, modulus);
+            for step in 0..6 * cols {
                 let mut row = vec![0u64; cols];
-                for _ in 0..weight {
-                    row[rng.gen_range(0..cols)] = rng.gen_range(1..modulus);
+                for _ in 0..rng.gen_range(2..=3) {
+                    row[rng.gen_range(0..fb)] = rng.gen_range(1..modulus);
                 }
-                let rhs = row.iter().zip(x).fold(0u64, |acc, (&a, &b)| {
-                    addmod(acc, mulmod(a, b, modulus), modulus)
+                row[fb] = rng.gen_range(1..modulus);
+                let mut rhs = row.iter().zip(&x).fold(0u64, |acc, (&p, &q)| {
+                    addmod(acc, mulmod(p, q, modulus), modulus)
                 });
-                (row, rhs)
-            })
-            .collect()
-    }
-
-    /// The target-pinned sparse solve pins the target at exactly the row the
-    /// echelon method does when it attempts after every row, never earlier
-    /// when its attempts are spaced, and with the planted value; the pin is
-    /// certified by the exact check `A z = e_t`, not by a rank claim.
-    #[test]
-    fn pin_wiedemann_pins_at_the_echelon_row() {
-        for (k, &modulus) in [4_294_967_291u64, (1u64 << 61) - 1].iter().enumerate() {
-            for &(cols, weight) in &[(40usize, 2usize), (60, 3), (90, 4), (150, 3)] {
-                let mut rng = StdRng::seed_from_u64(20261104 + k as u64 * 977 + cols as u64);
-                let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
-                let rows = planted_rows_weight(&mut rng, cols, 4 * cols, weight, modulus, &x);
-                let target = cols - 1;
-                let first_pin = |name: &str| -> (usize, u64, u64) {
-                    let mut m = matrix_by_name(name, cols, modulus).unwrap();
-                    for (i, (row, rhs)) in rows.iter().enumerate() {
-                        assert!(!matches!(
-                            m.add_row(row.clone(), *rhs),
-                            RowStatus::Inconsistent
-                        ));
-                        if let Some(v) = m.pinned(target) {
-                            return (i + 1, v, m.work().0);
-                        }
-                    }
-                    panic!("{name}: never pinned cols={cols} weight={weight} p={modulus}");
-                };
-                let (ref_rows, ref_val, _) = first_pin("structured-gauss");
-                assert_eq!(ref_val, x[target], "reference value");
-                let (every_rows, every_val, every_ops) = first_pin("pin-wiedemann-every");
-                assert_eq!(
-                    every_rows, ref_rows,
-                    "every-row attempts pin at the echelon row (cols={cols} weight={weight} p={modulus})"
-                );
-                assert_eq!(every_val, x[target]);
-                assert!(every_ops > 0);
-                let (spaced_rows, spaced_val, _) = first_pin("pin-wiedemann");
-                assert!(spaced_rows >= ref_rows, "spaced attempts cannot pin early");
-                assert_eq!(spaced_val, x[target]);
-            }
-        }
-    }
-
-    /// Negative control for the pin test: when no stored row touches the
-    /// target column, or the rows touching it only ever combine to a
-    /// multiple of the unit vector plus another column, the target is not
-    /// determined and neither `pin-wiedemann` variant may claim a pin.
-    #[test]
-    fn pin_wiedemann_never_pins_an_undetermined_target() {
-        let modulus = 4_294_967_291u64;
-        let cols = 40usize;
-        let mut rng = StdRng::seed_from_u64(77);
-        let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
-        let target = cols - 1;
-        for name in ["pin-wiedemann", "pin-wiedemann-every"] {
-            // Rows that never touch the target.
-            let mut m = matrix_by_name(name, cols, modulus).unwrap();
-            for (row, rhs) in
-                planted_rows_weight(&mut rng, cols - 1, 200, 3, modulus, &x[..cols - 1])
-            {
-                let mut full = row;
-                full.push(0);
-                m.add_row(full, rhs);
-                assert_eq!(m.pinned(target), None, "{name}: untouched target");
-            }
-            // Every row carries the target and one shared base column, so
-            // the base part never cancels: rank-deficient in the target.
-            let mut m = matrix_by_name(name, cols, modulus).unwrap();
-            let mut row = vec![0u64; cols];
-            row[0] = rng.gen_range(1..modulus);
-            row[target] = rng.gen_range(1..modulus);
-            let rhs = addmod(
-                mulmod(row[0], x[0], modulus),
-                mulmod(row[target], x[target], modulus),
-                modulus,
-            );
-            // Two rows over the same two columns do determine both, so
-            // stop feeding before that can happen: one row only.
-            m.add_row(row, rhs);
-            assert_eq!(m.pinned(target), None, "{name}: one row over two columns");
-        }
-    }
-
-    /// The `+counted` names run the same solver on the same rows and return
-    /// the same solution; they differ only in charging the Krylov core's
-    /// `block x block` multiplications, so their `row_ops` is larger.
-    #[test]
-    fn counted_variants_charge_more_for_the_same_answer() {
-        let modulus = 4_294_967_291u64;
-        let cols = 90usize;
-        let mut rng = StdRng::seed_from_u64(20261104);
-        let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
-        let rows = planted_rows(&mut rng, cols, 3 * cols, modulus, &x);
-        for name in DEFERRED {
-            let run = |name: &str| {
-                let mut m = matrix_by_name(name, cols, modulus).unwrap();
-                let mut fed = 0usize;
-                while m.pinned(cols - 1).is_none() {
-                    let (row, rhs) = &rows[fed];
-                    m.add_row(row.clone(), *rhs);
-                    fed += 1;
+                if seed % 7 == 0 && step % 11 == 5 {
+                    rhs = addmod(rhs, 1, modulus);
                 }
-                let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
-                (sol, m.work().0, fed)
-            };
-            let counted = format!("{name}+counted");
-            assert!(is_deferred_sparse(&counted));
-            let (sol, ops, fed) = run(name);
-            let (sol_c, ops_c, fed_c) = run(&counted);
-            assert_eq!(
-                (sol_c, fed_c),
-                (sol, fed),
-                "{counted}: same answer, same rows"
-            );
-            assert!(ops_c > ops, "{counted}: {ops_c} must exceed {ops}");
+                let sa = RelationSolver::add_row(&mut a, row.clone(), rhs);
+                let sb = RelationSolver::add_row(&mut b, row, rhs);
+                assert_eq!(sa, sb, "seed {seed} step {step}: status");
+                assert_eq!(
+                    RelationSolver::pinned(&a, fb),
+                    RelationSolver::pinned(&b, fb),
+                    "seed {seed} step {step}: pin"
+                );
+                assert_eq!(RelationSolver::rank(&a), RelationSolver::rank(&b));
+                if sa == RowStatus::Inconsistent {
+                    break;
+                }
+            }
+            assert_eq!(RelationSolver::dependent(&a), RelationSolver::dependent(&b));
+            if let Some(v) = RelationSolver::pinned(&b, fb) {
+                pinned_systems += 1;
+                if seed % 7 != 0 {
+                    assert_eq!(v, x[fb], "seed {seed}: planted log");
+                }
+            }
+            systems += 1;
         }
+        assert_eq!(systems, 1200);
+        assert!(pinned_systems > 400, "{pinned_systems} pinned");
     }
 
     #[test]
@@ -1870,7 +1602,7 @@ mod tests {
             assert_eq!(
                 is_deferred_sparse(name),
                 matches!(
-                    name.strip_suffix("+counted").unwrap_or(name),
+                    *name,
                     "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
                 )
             );

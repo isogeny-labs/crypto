@@ -340,14 +340,14 @@ pub struct FixedMul {
 
 impl FixedMul {
     #[inline]
-    fn new(w: u64, m: u64) -> Self {
+    pub(crate) fn new(w: u64, m: u64) -> Self {
         debug_assert!(w < m, "a fixed multiplier must be reduced");
         let ws = (m >> U64_MODULUS_BITS == 0).then(|| (((w as u128) << 64) / m as u128) as u64);
         Self { w, ws }
     }
 
     #[inline]
-    fn mul(self, t: u64, m: u64) -> u64 {
+    pub(crate) fn mul(self, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => mulmod_shoup(self.w, ws, t, m),
             None => mulmod(self.w, t, m),
@@ -358,7 +358,7 @@ impl FixedMul {
     /// with the subtraction as a conditional move too
     /// (`a − p + m ∈ [1, 2m)` for residues `a`, `p`).
     #[inline]
-    fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
+    pub(crate) fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => fold_once(
                 a.wrapping_sub(mulmod_shoup(self.w, ws, t, m))
@@ -1048,13 +1048,25 @@ impl<'r, W: ModWord, const N: usize> LazyLanes<'r, W, N> {
     }
 
     /// Lane `l` gains `Σ_k vals[k] · x[cols[k]·n + l]`.
+    ///
+    /// # Safety
+    /// `cols.len() == vals.len()`, `N ≤ n`, and `cols[k]·n + N ≤ x.len()`
+    /// for every `k`: the gathers are unchecked (the bounds checks were a
+    /// quarter of the one-lane inner loop).
     #[inline(always)]
-    fn add_sparse(&mut self, cols: &[u32], vals: &[W], x: &[W], n: usize) {
+    unsafe fn add_sparse(&mut self, cols: &[u32], vals: &[W], x: &[W], n: usize) {
+        debug_assert_eq!(cols.len(), vals.len());
         let (mut cols, mut vals) = (cols, vals);
         loop {
             let take = vals.len().min(self.room);
-            for (&c, &a) in cols[..take].iter().zip(&vals[..take]) {
-                self.mac(a, &x[c as usize * n..]);
+            for k in 0..take {
+                // SAFETY: `k < take ≤ vals.len() = cols.len()`, and the
+                // caller bounds every gather.
+                let (c, a) = unsafe { (*cols.get_unchecked(k), *vals.get_unchecked(k)) };
+                let at = c as usize * n;
+                debug_assert!(at + N <= x.len());
+                let src = unsafe { x.get_unchecked(at..at + N) };
+                self.mac(a, src);
             }
             self.room -= take;
             (cols, vals) = (&cols[take..], &vals[take..]);
@@ -2203,6 +2215,9 @@ pub struct CsrMatrix<W: ModWord = u64> {
     /// no lazy path for the modulus (`u64` outside `[2, 2⁶³)`).
     lazy: Option<W::Lazy>,
     spmv: SpmvOptions,
+    /// `Aᵀ` in the same lazy form, built on the first transpose product
+    /// (`None` inside when the width has no lazy path).
+    transposed: std::sync::OnceLock<Option<Box<CsrMatrix<W>>>>,
 }
 
 /// Sparse matrix-times-block execution backend.  `Worker` uses the stable
@@ -2250,7 +2265,7 @@ impl<W: ModWord> CsrMatrix<W> {
         row_ptr.push(0);
         for row in rows {
             for &(c, v) in &row.entries {
-                debug_assert!((c as usize) < n_cols);
+                assert!((c as usize) < n_cols, "column index out of range");
                 col_idx.push(c);
                 vals.push(v);
             }
@@ -2277,7 +2292,49 @@ impl<W: ModWord> CsrMatrix<W> {
             modulus,
             lazy,
             spmv: SpmvOptions::default(),
+            transposed: std::sync::OnceLock::new(),
         }
+    }
+
+    /// `Aᵀ` as a CSR matrix over the stored (lazy-form) coefficients, for
+    /// the division-free row products; `None` without a lazy path.  A
+    /// stable counting sort by column, so each row of `Aᵀ` lists its
+    /// entries by increasing row of `A`.
+    fn transposed(&self) -> Option<&CsrMatrix<W>> {
+        self.transposed
+            .get_or_init(|| {
+                self.lazy.as_ref()?;
+                let mut row_ptr = vec![0usize; self.n_cols + 1];
+                for &c in &self.col_idx {
+                    row_ptr[c as usize + 1] += 1;
+                }
+                for c in 0..self.n_cols {
+                    row_ptr[c + 1] += row_ptr[c];
+                }
+                let mut next = row_ptr.clone();
+                let mut col_idx = vec![0u32; self.col_idx.len()];
+                let mut vals = vec![W::zero(); self.vals.len()];
+                for row in 0..self.n_rows {
+                    for k in self.row_ptr[row]..self.row_ptr[row + 1] {
+                        let slot = &mut next[self.col_idx[k] as usize];
+                        col_idx[*slot] = row as u32;
+                        vals[*slot] = self.vals[k];
+                        *slot += 1;
+                    }
+                }
+                Some(Box::new(CsrMatrix {
+                    n_rows: self.n_cols,
+                    n_cols: self.n_rows,
+                    row_ptr,
+                    col_idx,
+                    vals,
+                    modulus: self.modulus,
+                    lazy: self.lazy,
+                    spmv: SpmvOptions::default(),
+                    transposed: std::sync::OnceLock::new(),
+                }))
+            })
+            .as_deref()
     }
 
     pub fn with_spmv(mut self, options: SpmvOptions) -> Self {
@@ -2331,6 +2388,7 @@ impl<W: ModWord> CsrMatrix<W> {
     fn row_lazy(&self, i: usize, x: &[W], n: usize, extra: W, lazy: &W::Lazy, out: &mut [W]) {
         let span = self.row_ptr[i]..self.row_ptr[i + 1];
         let row = (&self.col_idx[span.clone()], &self.vals[span]);
+        assert!(x.len() >= self.n_cols * n && out.len() >= n);
         let extra = (self.n_cols * n, extra);
         let mut j = 0;
         while j + 4 <= n {
@@ -2538,6 +2596,12 @@ impl<W: ModWord> CsrMatrix<W> {
     pub fn mul_block_transpose(&self, x: &[W], n: usize, y: &mut [W]) {
         debug_assert_eq!(x.len(), self.n_rows * n);
         debug_assert_eq!(y.len(), self.n_cols * n);
+        if let Some(t) = self.transposed() {
+            // The same sums, exact and reduced once per lane, in the
+            // forward kernel's division-free form.
+            t.mul_block(x, n, y);
+            return;
+        }
         y.fill(W::zero());
         let modulus = &self.modulus;
         for row in 0..self.n_rows {
@@ -2565,7 +2629,11 @@ fn csr_lanes<W: ModWord, const N: usize>(
     extra: (usize, W),
     out: &mut [W],
 ) {
-    acc.add_sparse(cols, vals, x, n);
+    // SAFETY: `from_rows` checks every column index is below `n_cols`,
+    // `row_lazy` checks `x.len() ≥ n_cols·n` and calls with `N` lanes
+    // starting at lane `j` with `j + N ≤ n`, so `x` (already offset by
+    // `j`) holds `cols[k]·n + N` entries; `cols` and `vals` are one span.
+    unsafe { acc.add_sparse(cols, vals, x, n) };
     if !extra.1.is_zero() {
         acc.add(extra.1, &x[extra.0..]);
     }
@@ -2698,20 +2766,14 @@ pub struct BlockWiedemannReport {
     pub extra_steps: usize,
     /// Matrix–block products performed in total.
     pub products: usize,
-    /// Multiplications of the `block × block` arithmetic that
-    /// [`SparseSolveReport::row_ops`] leaves out: the projection `X Mᵗ Y`,
-    /// the approximant basis and the `Z f` products.  Never serialised, so
-    /// recorded reports keep their exact JSON; added to `row_ops` only under
-    /// [`SparseSolveOptions::count_block_arithmetic`].
-    #[serde(skip)]
-    pub block_ops: u64,
 }
 
 /// One column of the approximant basis: `f` (coefficients over the `n`
 /// right vectors), the residual `[a | I] · [f; g] mod λ^L` (column-major
 /// `m`-vectors per order), and the shifted degree bound `δ`.
 struct BasisColumn<W: ModWord> {
-    f: Vec<Vec<W>>,
+    /// `f_0, f_1, …` back to back (`n` entries per power of `λ`).
+    f: Vec<W>,
     residual: Vec<W>,
     delta: usize,
 }
@@ -2720,27 +2782,11 @@ struct BasisColumn<W: ModWord> {
 /// with shift `(0ⁿ, 1ᵐ)`: every column `[f; g]` satisfies
 /// `a·f + g ≡ 0 (mod λ^L)` with `deg f ≤ δ`, `deg g ≤ δ − 1`, hence the
 /// block recurrence `Σ_{k≤δ} S_{s−k} f_k = 0` for `δ ≤ s < L`.
-// Kept as the reference implementation for the shifted approximant basis;
-// callers currently use the incremental path.
-#[allow(dead_code)]
 fn minimal_approximant_basis<W: ModWord>(
     seq: &[Vec<W>],
     m: usize,
     n: usize,
     modulus: W::Modulus,
-) -> Vec<BasisColumn<W>> {
-    minimal_approximant_basis_counted(seq, m, n, modulus, &mut 0)
-}
-
-/// [`minimal_approximant_basis`], adding to `ops` one per multiplication
-/// (or multiply-subtract) of a residue: the column reductions, the pivot
-/// inversions (one each) and the pivot normalisations.
-fn minimal_approximant_basis_counted<W: ModWord>(
-    seq: &[Vec<W>],
-    m: usize,
-    n: usize,
-    modulus: W::Modulus,
-    ops: &mut u64,
 ) -> Vec<BasisColumn<W>> {
     let md = &modulus;
     let big_l = seq.len();
@@ -2755,7 +2801,7 @@ fn minimal_approximant_basis_counted<W: ModWord>(
             }
         }
         cols.push(BasisColumn {
-            f: vec![e],
+            f: e,
             residual,
             delta: 0,
         });
@@ -2764,7 +2810,7 @@ fn minimal_approximant_basis_counted<W: ModWord>(
         let mut residual = vec![W::zero(); big_l * m];
         residual[i] = W::one();
         cols.push(BasisColumn {
-            f: vec![vec![W::zero(); n]],
+            f: vec![W::zero(); n],
             residual,
             delta: 1,
         });
@@ -2790,20 +2836,17 @@ fn minimal_approximant_basis_counted<W: ModWord>(
                 };
                 let width = pp.f.len();
                 if pj.f.len() < width {
-                    pj.f.resize(width, vec![W::zero(); n]);
+                    pj.f.resize(width, W::zero());
                 }
                 // `c` scales a whole column: one fixed-multiplier set-up,
                 // then a few multiplications per element instead of a
                 // division (and no test for a zero entry, which the
                 // product leaves be).
                 let c = W::fixed(c, md);
-                for (fj, fp) in pj.f.iter_mut().zip(&pp.f) {
-                    for (a, &b) in fj.iter_mut().zip(fp) {
-                        *a = W::fixed_sub_from(&c, *a, b, md);
-                    }
+                for (a, &b) in pj.f.iter_mut().zip(&pp.f) {
+                    *a = W::fixed_sub_from(&c, *a, b, md);
                 }
                 let span = t * m..big_l * m;
-                *ops += (pp.f.len() * n + span.len()) as u64;
                 for (a, &b) in pj.residual[span.clone()].iter_mut().zip(&pp.residual[span]) {
                     *a = W::fixed_sub_from(&c, *a, b, md);
                 }
@@ -2813,15 +2856,11 @@ fn minimal_approximant_basis_counted<W: ModWord>(
                 let inv = cols[j].residual[t * m + row]
                     .inv(md)
                     .expect("prime modulus");
-                *ops += 1;
                 if inv != W::one() {
                     let inv = W::fixed(inv, md);
                     let col = &mut cols[j];
-                    *ops += (col.f.len() * n + (big_l - t) * m) as u64;
-                    for fk in col.f.iter_mut() {
-                        for a in fk.iter_mut() {
-                            *a = W::fixed_mul(&inv, *a, md);
-                        }
+                    for a in col.f.iter_mut() {
+                        *a = W::fixed_mul(&inv, *a, md);
                     }
                     for a in &mut col.residual[t * m..big_l * m] {
                         *a = W::fixed_mul(&inv, *a, md);
@@ -2832,7 +2871,11 @@ fn minimal_approximant_basis_counted<W: ModWord>(
         }
         for &(p, _) in &pivots {
             let col = &mut cols[p];
-            col.f.insert(0, vec![W::zero(); n]);
+            // `f ← λ·f`: shift every power up one slot.
+            let len = col.f.len();
+            col.f.resize(len + n, W::zero());
+            col.f.copy_within(0..len, n);
+            col.f[..n].fill(W::zero());
             col.residual
                 .copy_within(t * m..(big_l - 1) * m, (t + 1) * m);
             col.residual[t * m..(t + 1) * m]
@@ -2931,7 +2974,6 @@ pub fn block_wiedemann_kernel<W: ModWord>(
             }
         }
         seq.push(s);
-        report.block_ops += (m * big_n * n) as u64;
         if t + 1 < big_l {
             op.apply(&v, n, &mut w);
             report.products += 1;
@@ -2939,9 +2981,7 @@ pub fn block_wiedemann_kernel<W: ModWord>(
         }
     }
 
-    let mut basis_ops = 0u64;
-    let basis = minimal_approximant_basis_counted(&seq, m, n, modulus, &mut basis_ops);
-    report.block_ops += basis_ops;
+    let basis = minimal_approximant_basis(&seq, m, n, modulus);
     let mut order: Vec<usize> = (0..basis.len()).collect();
     order.sort_by_key(|&j| basis[j].delta);
     drop(y);
@@ -2969,20 +3009,22 @@ pub fn block_wiedemann_kernel<W: ModWord>(
     };
     for &j in &order {
         let col = &basis[j];
-        let Some(e) = col.f.iter().rposition(|fk| fk.iter().any(|a| !a.is_zero())) else {
+        let Some(e) = col
+            .f
+            .chunks(n)
+            .rposition(|fk| fk.iter().any(|a| !a.is_zero()))
+        else {
             continue;
         };
         // Horner from the top power: u = Σ_{k≤e} M^{e−k} Z f_k, so f_0
         // multiplies Mᵉ and f_e multiplies the identity.  The recurrence
         // gives M^{δ−e+1} u = 0, so some Mⁱu below that is in the kernel.
         let mut u = vec![W::zero(); big_n];
-        z_times(&col.f[0], &mut u);
-        report.block_ops += (big_n * n) as u64;
-        for fk in &col.f[1..=e] {
+        z_times(&col.f[..n], &mut u);
+        for fk in col.f.chunks(n).skip(1).take(e) {
             op.apply(&u, 1, &mut buf);
             report.products += 1;
             z_times(fk, &mut u);
-            report.block_ops += (big_n * n) as u64;
             for (a, &b) in u.iter_mut().zip(&buf) {
                 *a = a.add(b, md);
             }
@@ -3037,13 +3079,6 @@ pub struct BlockLanczosReport {
     pub iterations: usize,
     /// Applications of the original sparse matrix or its transpose.
     pub sparse_products: usize,
-    /// Multiplications of the block recurrences that
-    /// [`SparseSolveReport::row_ops`] leaves out (Gram products, the
-    /// `lanes × lanes` inverse and products, the block updates and the
-    /// diagonal scaling).  Never serialised; see
-    /// [`BlockWiedemannReport::block_ops`].
-    #[serde(skip)]
-    pub block_ops: u64,
 }
 
 /// The symmetric, nonsingular (when `A` is nonsingular) congruence
@@ -3136,13 +3171,25 @@ fn block_gram<W: ModWord>(
 ) -> Vec<W> {
     let mut out = vec![W::zero(); lanes * lanes];
     if let Some(lazy) = W::lazy(modulus, W::max_residue(modulus)) {
+        // One pass over the rows per `i`, four `j` lanes at a time (then
+        // singly): the same exact sums, one reduction each.
         for i in 0..lanes {
-            for j in 0..lanes {
+            let mut j = 0;
+            while j + 4 <= lanes {
+                let mut acc = LazyLanes::<W, 4>::plain(&lazy);
+                for row in 0..rows {
+                    acc.add(left[row * lanes + i], &right[row * lanes + j..]);
+                }
+                acc.finish(&mut out[i * lanes + j..i * lanes + j + 4]);
+                j += 4;
+            }
+            while j < lanes {
                 let mut acc = LazyLanes::<W, 1>::plain(&lazy);
                 for row in 0..rows {
                     acc.add(left[row * lanes + i], &right[row * lanes + j..]);
                 }
                 acc.finish(&mut out[i * lanes + j..i * lanes + j + 1]);
+                j += 1;
             }
         }
         return out;
@@ -3188,6 +3235,43 @@ fn block_axpy_small<W: ModWord>(
     subtract: bool,
     modulus: &W::Modulus,
 ) {
+    if let Some(lazy) = W::lazy(modulus, W::max_residue(modulus)) {
+        // `value_j = Σ_k small[k][j] · block[k]` as one exact sum per
+        // lane (four lanes at a time), reduced once: the chain of
+        // per-product reductions and modular adds gives the same residue.
+        let mut value = vec![W::zero(); lanes];
+        for row in 0..rows {
+            let b = &block[row * lanes..(row + 1) * lanes];
+            let mut j = 0;
+            while j + 4 <= lanes {
+                let mut acc = LazyLanes::<W, 4>::plain(&lazy);
+                for (k, &bk) in b.iter().enumerate() {
+                    acc.add(bk, &small[k * lanes + j..]);
+                }
+                acc.finish(&mut value[j..j + 4]);
+                j += 4;
+            }
+            while j < lanes {
+                let mut acc = LazyLanes::<W, 1>::plain(&lazy);
+                for (k, &bk) in b.iter().enumerate() {
+                    acc.add(bk, &small[k * lanes + j..]);
+                }
+                acc.finish(&mut value[j..j + 1]);
+                j += 1;
+            }
+            for (slot, &v) in target[row * lanes..(row + 1) * lanes]
+                .iter_mut()
+                .zip(&value)
+            {
+                *slot = if subtract {
+                    slot.sub(v, modulus)
+                } else {
+                    slot.add(v, modulus)
+                };
+            }
+        }
+        return;
+    }
     let fixed: Vec<W::Fixed> = small.iter().map(|&s| W::fixed(s, modulus)).collect();
     for row in 0..rows {
         for j in 0..lanes {
@@ -3248,11 +3332,6 @@ pub fn block_lanczos_solve<W: ModWord>(
     }
     let mut residual = vec![W::zero(); dimension * lanes];
     normal.rhs(&right, lanes, &mut residual);
-    let (nl, l2, l3) = (
-        (dimension * lanes) as u64,
-        (dimension * lanes * lanes) as u64,
-        (lanes * lanes * lanes) as u64,
-    );
     let mut direction = residual.clone();
     let mut solution = vec![W::zero(); dimension * lanes];
     let mut image = vec![W::zero(); dimension * lanes];
@@ -3261,17 +3340,12 @@ pub fn block_lanczos_solve<W: ModWord>(
         dimension,
         block_size: lanes,
         sparse_products: 1,
-        block_ops: nl,
         ..BlockLanczosReport::default()
     };
     let limit = dimension.div_ceil(lanes) + options.margin.max(2);
     for iteration in 0..limit {
         normal.apply(&direction, lanes, &mut image, &mut scratch);
         report.sparse_products += 2;
-        // The diagonal scaling of the normal operator, the two Gram
-        // products, the `lanes × lanes` inverse (an elimination on
-        // `lanes × 2·lanes`), the product and the two block updates.
-        report.block_ops += nl + 2 * l2 + 2 * l3 + l3 + 2 * l2;
         let h = block_gram(&direction, &image, dimension, lanes, modulus);
         let h_inverse = small_inverse(&h, lanes, modulus)?;
         let projected = block_gram(&direction, &residual, dimension, lanes, modulus);
@@ -3310,7 +3384,6 @@ pub fn block_lanczos_solve<W: ModWord>(
         }
         // P_new = R_new - P H^{-1} (A P)^T R_new. This makes the new
         // block A-conjugate to the previous direction block.
-        report.block_ops += l2 + l3 + l2;
         let cross = block_gram(&image, &residual, dimension, lanes, modulus);
         let beta = small_product(&h_inverse, &cross, lanes, modulus);
         let mut next_direction = residual.clone();
@@ -3361,11 +3434,6 @@ pub struct SparseSolveOptions {
     /// Independent `(fold, X, Y)` draws before giving up.
     pub attempts: usize,
     pub seed: u64,
-    /// Add the `block × block` multiplications of the Krylov core (see
-    /// [`BlockWiedemannReport::block_ops`]) to [`SparseSolveReport::row_ops`].
-    /// Off by default, so recorded counts replay unchanged.
-    #[serde(skip_serializing_if = "is_default")]
-    pub count_block_arithmetic: bool,
 }
 
 impl Default for SparseSolveOptions {
@@ -3379,7 +3447,6 @@ impl Default for SparseSolveOptions {
             fold: 3,
             attempts: 3,
             seed: 0x5350_4152_5345_4c41,
-            count_block_arithmetic: false,
         }
     }
 }
@@ -3537,9 +3604,6 @@ pub fn solve_sparse_system<W: ModWord>(
                     };
                     report.row_ops +=
                         (wr.products * wr.block_n) as u64 * (square_nonzeros + square.len() as u64);
-                    if opts.count_block_arithmetic {
-                        report.row_ops += wr.block_ops;
-                    }
                     report.wiedemann = Some(wr);
                     let t = z[core_cols];
                     let Some(inv) = (!t.is_zero()).then(|| t.inv(m)).flatten() else {
@@ -3553,9 +3617,6 @@ pub fn solve_sparse_system<W: ModWord>(
                         continue;
                     };
                     report.row_ops += (lr.sparse_products * lr.block_size) as u64 * square_nonzeros;
-                    if opts.count_block_arithmetic {
-                        report.row_ops += lr.block_ops;
-                    }
                     report.lanczos = Some(lr);
                     x
                 }
@@ -4390,15 +4451,15 @@ mod tests {
         // f(λ) = f_0 + f_1 λ + … with Σ_k s_{t−k} f_k = 0 for t ≥ 5.
         for t in 5..40 {
             let mut acc = 0;
-            for (k, fk) in best.f.iter().enumerate() {
+            for (k, fk) in best.f.chunks(1).enumerate() {
                 acc = addmod(acc, mulmod(s[t - k], fk[0], modulus), modulus);
             }
             assert_eq!(acc, 0, "recurrence at t = {t}");
         }
         // And it is the true connection polynomial up to scaling.
-        let scale = invmod(best.f[0][0], modulus).unwrap();
+        let scale = invmod(best.f[0], modulus).unwrap();
         for (k, &c) in coeffs.iter().enumerate() {
-            assert_eq!(mulmod(best.f[k + 1][0], scale, modulus), negmod(c, modulus));
+            assert_eq!(mulmod(best.f[k + 1], scale, modulus), negmod(c, modulus));
         }
     }
 
@@ -4451,7 +4512,7 @@ mod tests {
             for col in &basis {
                 for t in col.delta..big_l {
                     let mut acc = vec![0u64; m];
-                    for (k, fk) in col.f.iter().enumerate() {
+                    for (k, fk) in col.f.chunks(n).enumerate() {
                         if k > t {
                             break;
                         }

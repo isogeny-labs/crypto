@@ -1,0 +1,123 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T06:06:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "HEC_GATE=1 HEC_SEEDS=5 /Users/adamburan/pq-work/hec-followup-target/release/examples/anchor_relations > research/hec_anchor_relations_20261114/run/gates.txt"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T05:44:25+00:00",
+      "wall_s": 15.133
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "HEC_SEEDS=5 /Users/adamburan/pq-work/hec-followup-target/release/examples/anchor_relations > research/hec_anchor_relations_20261114/run/paired.txt"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T05:44:41+00:00",
+      "wall_s": 7.71
+    }
+  ],
+  "commit": "61457c05a726500455fb6148b61f2054aa0dd127",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T05:43:50+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-hec-anchor-forest"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "L0",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261115T0543Z-hec-anchor-forest",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": null,
+      "name": "recorded_observations",
+      "note": "Harness observations, not independent replay [pcc:unverified].",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 110.0
+    }
+  ],
+  "problem": "hec:g234-math10x",
+  "raw": [
+    {
+      "bytes": 23070,
+      "path": "research/hec_anchor_relations_20261114/run/orbit-paired.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c796b43a7e9300d4091a16f94cf89558683509a39facba5880208cd41b08c1f4",
+      "sha256": "c796b43a7e9300d4091a16f94cf89558683509a39facba5880208cd41b08c1f4",
+      "uploaded": false
+    },
+    {
+      "bytes": 4472,
+      "path": "research/hec_anchor_relations_20261114/run/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e38298ddec9993ff2fb839223589aaed302ba274cf15547451870209cc960367",
+      "sha256": "e38298ddec9993ff2fb839223589aaed302ba274cf15547451870209cc960367",
+      "uploaded": false
+    },
+    {
+      "bytes": 21857,
+      "path": "research/hec_anchor_relations_20261114/run/gates.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/01/0131372e774ccc66cfe72111495105a2406c4a735eb5707d9c53b3b051c95dc4",
+      "sha256": "0131372e774ccc66cfe72111495105a2406c4a735eb5707d9c53b3b051c95dc4",
+      "uploaded": false
+    },
+    {
+      "bytes": 3060,
+      "path": "research/hec_anchor_relations_20261114/run/orbit-summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e9/e9ebe12d27ceed57580f6a12e510f236bc1643365ce0efd382b52bd3bf295ae8",
+      "sha256": "e9ebe12d27ceed57580f6a12e510f236bc1643365ce0efd382b52bd3bf295ae8",
+      "uploaded": false
+    },
+    {
+      "bytes": 145,
+      "path": "research/hec_anchor_relations_20261114/run/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a6/a65acdf3ffd54e15e2f6c8670088237700f4af89caa0ee43a40df0bab51f0750",
+      "sha256": "a65acdf3ffd54e15e2f6c8670088237700f4af89caa0ee43a40df0bab51f0750",
+      "uploaded": false
+    },
+    {
+      "bytes": 21481,
+      "path": "research/hec_anchor_relations_20261114/run/paired.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/28a34bb56564bb73665d674670d12c445859f72fa900dae1ebe5cf320274a3b5",
+      "sha256": "28a34bb56564bb73665d674670d12c445859f72fa900dae1ebe5cf320274a3b5",
+      "uploaded": false
+    },
+    {
+      "bytes": 16863,
+      "path": "research/hec_anchor_relations_20261114/run/orbit-gates.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2cbcf29ba80b9ad7a2cd17eae8100d7d0af6eb4046ab6925a1c8108f3cef8da3",
+      "sha256": "2cbcf29ba80b9ad7a2cd17eae8100d7d0af6eb4046ab6925a1c8108f3cef8da3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-hec-anchor-forest/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261114-hec-anchor-forest/pilots.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-anchor-forest",
+  "status": "measured",
+  "summary": "Exploratory pilot; producer assertions [pcc:unverified]. Separate experiments; shared report preserves losses, controls, known-answer checks and scope. Independent replay and external comparison pending.",
+  "validation": null
+}

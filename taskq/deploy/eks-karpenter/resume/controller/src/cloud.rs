@@ -682,20 +682,24 @@ fn computation_owner_matches(observed: &Value, intended: &Value) -> Result<(), S
 fn provision(s: &State) -> Result<Value, String> {
     let reservation = campaign_admit(s, crate::campaign::Epoch::Computation)?;
     let req = &s.request;
-    let name = basename(s);
     ensure(
         NAMESPACE,
         &json!({"apiVersion":"v1","kind":"ConfigMap","metadata":metadata(&format!("{}-request",req.run_name),req),"immutable":true,"data":{"request.json":serde_json::to_string(req).map_err(error)?}}),
         req,
     )?;
-    let mut pvc = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&name,req),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":"8Gi"}}}});
-    if let Some(number) = s.selected_generation {
-        let g = s
-            .generations
-            .iter()
-            .find(|g| g.number == number)
-            .ok_or("missing selected generation")?;
-        pvc["spec"]["dataSource"] = json!({"name":g.snapshot_name,"kind":"VolumeSnapshot","apiGroup":"snapshot.storage.k8s.io"});
+    let pvc = computation_pvc(s)?;
+    if req.is_command() {
+        if let Some(source) = pvc["spec"]["dataSource"]["name"].as_str() {
+            // The clone uses the same immutable request size as its source PVC.
+            // Refuse only a parseable snapshot restoreSize that does not fit.
+            let snapshot = get(NAMESPACE, "volumesnapshot", source)?
+                .ok_or("selected command-mode VolumeSnapshot missing")?;
+            if let Some(size) = snapshot["status"]["restoreSize"].as_str() {
+                if restore_size_fits(size, req.pvc_gib()) == Some(false) {
+                    return Err("command PVC is smaller than its checkpoint snapshot".into());
+                }
+            }
+        }
     }
     ensure(NAMESPACE, &pvc, req)?;
     let remaining = req
@@ -716,6 +720,35 @@ fn provision(s: &State) -> Result<Value, String> {
         computation_owner_matches(&observed, &manifest)?;
     }
     Ok(observed)
+}
+/// Computation PVC for this attempt. ecbench keeps the fixed 8Gi manifest;
+/// command mode uses command.pvc_gib for the first and every cloned PVC.
+fn computation_pvc(s: &State) -> Result<Value, String> {
+    let req = &s.request;
+    let storage = format!("{}Gi", req.pvc_gib());
+    let mut pvc = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&basename(s),req),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":storage}}}});
+    if let Some(number) = s.selected_generation {
+        let g = s
+            .generations
+            .iter()
+            .find(|g| g.number == number)
+            .ok_or("missing selected generation")?;
+        pvc["spec"]["dataSource"] = json!({"name":g.snapshot_name,"kind":"VolumeSnapshot","apiGroup":"snapshot.storage.k8s.io"});
+    }
+    Ok(pvc)
+}
+/// Some(fits) for a Gi/Mi/Ki or plain-byte quantity; None when unparseable
+/// (Kubernetes then enforces the bound itself).
+fn restore_size_fits(quantity: &str, gib: u32) -> Option<bool> {
+    let units: [(&str, u64); 4] = [("Gi", 1 << 30), ("Mi", 1 << 20), ("Ki", 1 << 10), ("", 1)];
+    let (digits, scale) = units
+        .iter()
+        .find_map(|(suffix, scale)| quantity.strip_suffix(suffix).map(|d| (d, *scale)))?;
+    if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let bytes = digits.parse::<u64>().ok()?.checked_mul(scale)?;
+    Some(bytes <= u64::from(gib) << 30)
 }
 fn computation_pod(s: &State, remaining: u64) -> Value {
     let req = &s.request;
@@ -974,6 +1007,18 @@ fn checkpoint(stored: &mut Stored, st: &Status, dir: &Path) -> Result<(), String
     }
     if let Some(g) = s.generations.iter().find(|g| g.number == n) {
         rpc(s, "continue", n, Some(g.manifest_sha256.clone()))?;
+        // Command mode only: generation n is committed and saved, so PVC-local
+        // directories older than the two newest committed ones may go. S3
+        // archives and EBS snapshots are never touched.
+        if let Some((newest, manifest)) = s.prune_target(n) {
+            save(
+                &dir.join(format!("prune-request-g{newest}.json")),
+                &json!({"schema":"isolab.recovery.prune-request/v1","request_sha256":s.request_sha256,
+                    "attempt":s.attempt,"newest_committed":newest,"manifest_sha256":manifest,
+                    "keep":[newest.saturating_sub(1),newest],"at":now()}),
+            )?;
+            rpc(s, "prune", newest, Some(manifest))?;
+        }
         s.finish_checkpoint();
         stored.save()?;
         return Ok(());
@@ -1552,11 +1597,12 @@ fn tick(stored: &mut Stored, dir: &Path) -> Result<(), String> {
     save(&dir.join("supervisor-status.json"), &st)?;
     // Collect protected owner observations before either terminal branch. Missing
     // receipts remain explicit unknown evidence, never fabricated exit/closure.
-    let owner_collection = if ["failed", "completed", "verified"].contains(&st.phase.as_str()) {
-        collect_owner_exit(&stored.state, &pod, &st, dir)
-    } else {
-        Ok(())
-    };
+    let owner_collection =
+        if ["failed", "completed", "verified", "sealed"].contains(&st.phase.as_str()) {
+            collect_owner_exit(&stored.state, &pod, &st, dir)
+        } else {
+            Ok(())
+        };
     if st.phase == "failed" {
         let original = st
             .error
@@ -1628,10 +1674,12 @@ fn tick(stored: &mut Stored, dir: &Path) -> Result<(), String> {
             }
         }
         Phase::Checkpointing => checkpoint(stored, &st, dir)?,
-        Phase::VerifyingComputation => {
-            if st.phase == "completed" {
-                rpc(&stored.state, "verify", 0, None)?;
-            } else if st.phase == "verified" {
+        Phase::VerifyingComputation => match completion_step(&stored.state.request, &st.phase) {
+            CompletionStep::Seal => rpc(&stored.state, "seal", 0, None)?,
+            CompletionStep::UploadCommand => upload_command_outputs(stored, &st, dir)?,
+            CompletionStep::Verify => rpc(&stored.state, "verify", 0, None)?,
+            CompletionStep::Wait => {}
+            CompletionStep::ExportVerified => {
                 let archive = dir.join("computation.tar");
                 let result = kube(NAMESPACE)
                     .args([
@@ -1667,8 +1715,164 @@ fn tick(stored: &mut Stored, dir: &Path) -> Result<(), String> {
                 stored.state.begin_benchmark(true)?;
                 stored.save()?;
             }
-        }
+        },
         _ => {}
+    }
+    Ok(())
+}
+#[derive(Debug, PartialEq, Eq)]
+enum CompletionStep {
+    /// ecbench: native replay of the completed session.
+    Verify,
+    /// ecbench: archive the replayed computation, then one fresh L2 epoch.
+    ExportVerified,
+    /// command: freeze and hash outputs (no replay, no fresh epoch).
+    Seal,
+    /// command: upload sealed outputs, then the terminal command_completed.
+    UploadCommand,
+    Wait,
+}
+fn completion_step(req: &Request, supervisor_phase: &str) -> CompletionStep {
+    match (req.is_command(), supervisor_phase) {
+        (false, "completed") => CompletionStep::Verify,
+        (false, "verified") => CompletionStep::ExportVerified,
+        (true, "completed") => CompletionStep::Seal,
+        (true, "sealed") => CompletionStep::UploadCommand,
+        _ => CompletionStep::Wait,
+    }
+}
+fn command_key(req: &Request, path: &str) -> String {
+    format!("{}computation/{path}", prefix(req))
+}
+/// Accept only the supervisor's exact seal for this request, attempt and exit.
+fn check_command_seal(
+    seal: &[u8],
+    sums: &[u8],
+    request_sha256: &str,
+    attempt: u32,
+    exit_code: i32,
+) -> Result<crate::supervisor::CommandSeal, String> {
+    use crate::supervisor::{sealable_path, sha256sums, MAX_SEALED_FILES};
+    let seal: crate::supervisor::CommandSeal = serde_json::from_slice(seal).map_err(error)?;
+    if seal.schema != "isolab.recovery.command-seal/v1"
+        || seal.request_sha256 != request_sha256
+        || seal.attempt != attempt
+        || seal.exit_code != exit_code
+    {
+        return Err("command seal request/attempt/exit binding mismatch".into());
+    }
+    if seal.files.len() > MAX_SEALED_FILES
+        || !seal
+            .files
+            .iter()
+            .all(|f| sealable_path(&f.path) && hex(&f.sha256, 64))
+        || !seal.files.windows(2).all(|w| w[0].path < w[1].path)
+    {
+        return Err("command seal file list is not a sorted set of safe paths".into());
+    }
+    if sha256sums(&seal.files) != sums || digest(sums) != seal.sha256sums_sha256 {
+        return Err("command SHA256SUMS differs from its seal".into());
+    }
+    Ok(seal)
+}
+fn exec_to_file(s: &State, args: &[&str], path: &Path) -> Result<(), String> {
+    let result = kube(NAMESPACE)
+        .args(["exec", &basename(s), "--"])
+        .args(args)
+        .stdout(File::create(path).map_err(error)?)
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(error)?;
+    if !result.status.success() {
+        return Err(format!(
+            "command output export failed: {}",
+            String::from_utf8_lossy(&result.stderr)
+        ));
+    }
+    Ok(())
+}
+/// Command-mode completion: every sealed file is copied out, re-hashed against
+/// the seal, uploaded to a private versioned key and read back before the run
+/// becomes terminal. Timing is never admitted.
+fn upload_command_outputs(stored: &mut Stored, st: &Status, dir: &Path) -> Result<(), String> {
+    let s = &stored.state;
+    let exit_code = st.exit_code.ok_or("command exit code missing")?;
+    let export = dir.join(format!("command-export-attempt-{}", s.attempt));
+    if export.exists() {
+        fs::remove_dir_all(&export).map_err(error)?;
+    }
+    let files_dir = export.join("files");
+    fs::create_dir_all(&files_dir).map_err(error)?;
+    let control = format!("/work/control/attempt-{}/command", s.attempt);
+    let seal_path = export.join("seal.json");
+    let sums_path = export.join("SHA256SUMS");
+    exec_to_file(s, &["cat", &format!("{control}/seal.json")], &seal_path)?;
+    exec_to_file(s, &["cat", &format!("{control}/SHA256SUMS")], &sums_path)?;
+    let seal = check_command_seal(
+        &fs::read(&seal_path).map_err(error)?,
+        &fs::read(&sums_path).map_err(error)?,
+        &s.request_sha256,
+        s.attempt,
+        exit_code,
+    )?;
+    let mut uploaded = Vec::new();
+    for file in &seal.files {
+        let local = files_dir.join(&file.path);
+        fs::create_dir_all(local.parent().ok_or("sealed path parent")?).map_err(error)?;
+        exec_to_file(s, &["cat", &format!("/work/compute/{}", file.path)], &local)?;
+        if sha_file(&local)? != (file.sha256.clone(), file.bytes) {
+            return Err(format!(
+                "exported command output differs from seal: {}",
+                file.path
+            ));
+        }
+        let key = command_key(&s.request, &file.path);
+        let (version, sha256, bytes) = put_verified(&local, &key, &export)?;
+        uploaded.push(
+            json!({"path":file.path,"key":key,"version":version,"sha256":sha256,"bytes":bytes}),
+        );
+    }
+    let mut manifests = serde_json::Map::new();
+    for (name, path) in [("SHA256SUMS", &sums_path), ("seal.json", &seal_path)] {
+        let key = command_key(&s.request, name);
+        let (version, sha256, bytes) = put_verified(path, &key, &export)?;
+        manifests.insert(
+            name.into(),
+            json!({"key":key,"version":version,"sha256":sha256,"bytes":bytes}),
+        );
+    }
+    let result = json!({"schema":"isolab.eks.command-result/v1","run_name":s.request.run_name,
+        "request_sha256":s.request_sha256,"exit_code":exit_code,"argv":s.request.command.as_ref().map(|c| &c.argv),
+        "bucket":BUCKET,"prefix":command_key(&s.request, ""),"files":uploaded,"skipped":seal.skipped,
+        "manifests":manifests,"restores":s.restores,"committed_generations":s.next_generation - 1,
+        "timing_valid":false,"isolation":"L0","native_replay":false,"fresh_benchmark_epoch":false,
+        "supervisor":st});
+    save(&dir.join("command-result.json"), &result)?;
+    output(
+        aws()
+            .args(["s3", "cp"])
+            .arg(dir.join("command-result.json"))
+            .arg(format!(
+                "s3://{BUCKET}/{}command-result.json",
+                prefix(&s.request)
+            ))
+            .arg("--only-show-errors"),
+    )?;
+    stored.state.complete_command(exit_code, now())?;
+    stored.save()?;
+    // Terminal state is durable first; a failed delete only leaves the idle
+    // supervisor Pod until its original activeDeadlineSeconds.
+    if let Err(e) = output(kube(NAMESPACE).args([
+        "delete",
+        "pod",
+        &basename(&stored.state),
+        "--ignore-not-found",
+        "--wait=false",
+    ])) {
+        save(
+            &dir.join("command-pod-delete-error.json"),
+            &json!({"error":e,"at":now()}),
+        )?;
     }
     Ok(())
 }
@@ -1701,7 +1905,10 @@ pub fn run(req: Request, dir: &Path) -> Result<(), String> {
     loop {
         if stored.state.terminal() {
             publish(&stored, dir)?;
-            return if stored.state.phase == Phase::Succeeded {
+            return if matches!(
+                stored.state.phase,
+                Phase::Succeeded | Phase::CommandCompleted
+            ) {
                 Ok(())
             } else {
                 Err(stored
@@ -1830,6 +2037,19 @@ pub fn wait(req: Request, dir: &Path) -> Result<Value, String> {
                 )?;
                 let computation: Value = read(&path)?;
                 let result = json!({"schema":"isolab.eks.recovery-result/v1","state":status,"computation":computation,"benchmark":benchmark});
+                save(&dir.join("result.json"), &result)?;
+                return Ok(result);
+            }
+            Some("command_completed") => {
+                let key = format!("{}command-result.json", prefix(&req));
+                let path = dir.join("command-result.json");
+                output(
+                    aws()
+                        .args(["s3api", "get-object", "--bucket", BUCKET, "--key", &key])
+                        .arg(&path),
+                )?;
+                let command: Value = read(&path)?;
+                let result = json!({"schema":"isolab.eks.command-recovery-result/v1","state":status,"command":command});
                 save(&dir.join("result.json"), &result)?;
                 return Ok(result);
             }
@@ -2340,5 +2560,152 @@ mod fieldref_default_tests {
                 .get("fieldRef")
                 .is_none()
         );
+    }
+}
+
+#[cfg(test)]
+mod command_mode_tests {
+    use super::*;
+    #[test]
+    fn completion_selects_upload_only_for_command_mode() {
+        let ecbench = crate::contract::fixture();
+        let command = crate::contract::command_fixture();
+        assert_eq!(
+            completion_step(&ecbench, "completed"),
+            CompletionStep::Verify
+        );
+        assert_eq!(
+            completion_step(&ecbench, "verified"),
+            CompletionStep::ExportVerified
+        );
+        assert_eq!(completion_step(&ecbench, "sealed"), CompletionStep::Wait);
+        assert_eq!(completion_step(&command, "completed"), CompletionStep::Seal);
+        assert_eq!(
+            completion_step(&command, "sealed"),
+            CompletionStep::UploadCommand
+        );
+        for phase in ["verified", "running", "stopped", "waiting"] {
+            assert_eq!(completion_step(&command, phase), CompletionStep::Wait);
+        }
+        assert_eq!(
+            command_key(&command, "out/result.json"),
+            "recovery/runs/test-recovery/computation/out/result.json"
+        );
+        // The computation Pod is the same supervisor manifest in both modes.
+        let a = computation_pod(&State::new(ecbench, "t".into(), 1000).unwrap(), 60);
+        let b = computation_pod(&State::new(command, "t".into(), 1000).unwrap(), 60);
+        assert_eq!(
+            a["spec"]["containers"][0]["command"],
+            b["spec"]["containers"][0]["command"]
+        );
+        assert_eq!(a["spec"]["nodeSelector"], b["spec"]["nodeSelector"]);
+        assert_eq!(b["spec"]["automountServiceAccountToken"], false);
+    }
+    #[test]
+    fn command_seal_binding_rejects_mismatch_and_unsafe_lists() {
+        use crate::supervisor::{sha256sums, CommandSeal, SealedFile};
+        let files = vec![
+            SealedFile {
+                path: "out/a".into(),
+                sha256: digest(b"a"),
+                bytes: 1,
+            },
+            SealedFile {
+                path: "run.stdout".into(),
+                sha256: digest(b""),
+                bytes: 0,
+            },
+        ];
+        let sums = sha256sums(&files);
+        let seal = CommandSeal {
+            schema: "isolab.recovery.command-seal/v1".into(),
+            request_sha256: "r".repeat(64),
+            attempt: 3,
+            exit_code: 7,
+            outputs: "/work/compute/out".into(),
+            files,
+            skipped: vec![],
+            sha256sums_sha256: digest(&sums),
+        };
+        let bytes = serde_json::to_vec(&seal).unwrap();
+        let rr = "r".repeat(64);
+        assert_eq!(check_command_seal(&bytes, &sums, &rr, 3, 7).unwrap(), seal);
+        assert!(check_command_seal(&bytes, &sums, &rr, 2, 7).is_err());
+        assert!(check_command_seal(&bytes, &sums, &rr, 3, 0).is_err());
+        assert!(check_command_seal(&bytes, &sums, &"s".repeat(64), 3, 7).is_err());
+        let mut tampered = sums.clone();
+        tampered[0] ^= 1;
+        assert!(check_command_seal(&bytes, &tampered, &rr, 3, 7).is_err());
+        for bad in ["../control/x", "/etc/passwd", "out//a"] {
+            let mut s = seal.clone();
+            s.files[0].path = bad.into();
+            s.sha256sums_sha256 = digest(&sha256sums(&s.files));
+            let b = serde_json::to_vec(&s).unwrap();
+            assert!(
+                check_command_seal(&b, &sha256sums(&s.files), &rr, 3, 7).is_err(),
+                "{bad}"
+            );
+        }
+        let mut dup = seal.clone();
+        dup.files[1] = dup.files[0].clone();
+        dup.sha256sums_sha256 = digest(&sha256sums(&dup.files));
+        let b = serde_json::to_vec(&dup).unwrap();
+        assert!(check_command_seal(&b, &sha256sums(&dup.files), &rr, 3, 7).is_err());
+        let mut v = serde_json::to_value(&seal).unwrap();
+        v["extra"] = json!(1);
+        assert!(check_command_seal(&serde_json::to_vec(&v).unwrap(), &sums, &rr, 3, 7).is_err());
+    }
+    #[test]
+    fn computation_pvc_size_is_fixed_for_ecbench_and_bound_for_command_mode() {
+        fn with_clone(mut s: State) -> State {
+            s.selected_generation = Some(1);
+            s.generations = vec![crate::model::Generation {
+                number: 1,
+                request_sha256: s.request_sha256.clone(),
+                snapshot_name: format!("{}-g1", s.request.run_name),
+                snapshot_id: "snap-1".into(),
+                archive_key: "k".into(),
+                archive_version: "v".into(),
+                archive_sha256: "e".repeat(64),
+                manifest_sha256: "d".repeat(64),
+                archive_bytes: 1,
+                source_instance: "i-1".into(),
+                source_pod_uid: "p".into(),
+                committed_unix_seconds: 1,
+                snapshot_ready: true,
+                encrypted: true,
+                readback_verified: true,
+            }];
+            s
+        }
+        // ecbench: byte-identical to the former inline manifest.
+        let e = State::new(crate::contract::fixture(), "t".into(), 1000).unwrap();
+        let legacy = json!({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":metadata(&basename(&e),&e.request),"spec":{"accessModes":["ReadWriteOnce"],"storageClassName":"gp3","resources":{"requests":{"storage":"8Gi"}}}});
+        assert_eq!(
+            serde_json::to_vec(&computation_pvc(&e).unwrap()).unwrap(),
+            serde_json::to_vec(&legacy).unwrap()
+        );
+        let clone = computation_pvc(&with_clone(e)).unwrap();
+        assert_eq!(clone["spec"]["resources"]["requests"]["storage"], "8Gi");
+        assert_eq!(clone["spec"]["dataSource"]["name"], "test-recovery-g1");
+        // command: default 8 and explicit 32, first and cloned PVCs alike.
+        for (gib, storage) in [(8, "8Gi"), (32, "32Gi"), (64, "64Gi")] {
+            let mut req = crate::contract::command_fixture();
+            req.command.as_mut().unwrap().pvc_gib = gib;
+            let s = State::new(req, "t".into(), 1000).unwrap();
+            let first = computation_pvc(&s).unwrap();
+            assert_eq!(first["spec"]["resources"]["requests"]["storage"], storage);
+            assert!(first["spec"].get("dataSource").is_none());
+            let clone = computation_pvc(&with_clone(s)).unwrap();
+            assert_eq!(clone["spec"]["resources"]["requests"]["storage"], storage);
+            assert_eq!(clone["spec"]["dataSource"]["kind"], "VolumeSnapshot");
+        }
+        assert_eq!(restore_size_fits("32Gi", 32), Some(true));
+        assert_eq!(restore_size_fits("33Gi", 32), Some(false));
+        assert_eq!(restore_size_fits("8589934592", 8), Some(true));
+        assert_eq!(restore_size_fits("8589934593", 8), Some(false));
+        assert_eq!(restore_size_fits("8192Mi", 8), Some(true));
+        assert_eq!(restore_size_fits("8G", 8), None);
+        assert_eq!(restore_size_fits("Gi", 8), None);
     }
 }

@@ -70,6 +70,8 @@
         "O-E2E": {"status": "conditional", "basis": "explicit end-to-end bound exists only conditional on the pinned contraction result and uncompleted bridge audit"}
       },
       "evidence": [
+        "research/ic_weak_assumptions_20261102/FOLLOWUP.md",
+        "crates/hashed-ecdl-tensor/src/admission.rs",
         "research/prime_ic_lead_review_20261031/README.md",
         "research/hashed_ecdl_speed_20261029/README.md",
         "problems/hashed-ecdl-tensor-backend.md"
@@ -82,7 +84,7 @@
       "disposition": "open_unfrozen",
       "cost_model": {"kind": "fixed_arity", "m": 3, "setup_exponent_a": null, "query_exponent_e": null},
       "obligations": {
-        "O-SOLVE": {"status": "open", "basis": "no production propagator or natural-query exponent exists"},
+        "O-SOLVE": {"status": "open", "basis": "a checked affine-unit/conflict trail kernel now exists, but no production propagator or natural-query exponent exists"},
         "O-NONGENERIC": {"status": "conditional", "basis": "the intended Fp theory is coordinate-algebraic, but the production oracle is not implemented"},
         "O-YIELD": {"status": "conditional", "basis": "mean combinatorics and guarded rationality are available; natural solver success and variance are unmeasured"},
         "O-RANK": {"status": "open", "basis": "no fixed natural relation population exists"},
@@ -90,6 +92,8 @@
         "O-E2E": {"status": "open", "basis": "strict a<1.5 and e<0.5 gates have no measurements"}
       },
       "evidence": [
+        "research/prime_shared_coefficient_sat_20261031/native/src/trail.rs",
+        "research/ic_weak_assumptions_20261102/FOLLOWUP.md",
         "research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md",
         "research/prime_ic_lead_review_20261031/PROTOCOL.md"
       ]

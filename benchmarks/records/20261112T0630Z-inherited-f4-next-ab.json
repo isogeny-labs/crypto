@@ -1,0 +1,115 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T06:33:07+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/inherited_f4_next_20261112/run_ab.sh",
+        "research/inherited_f4_next_20261112/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T06:30:57+00:00",
+      "wall_s": 82.741
+    }
+  ],
+  "commit": "8ef2534964f834c7f323ad019b099ed318ed328e",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T06:30:52+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-inherited-f4-next"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0630Z-inherited-f4-next-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 13,
+      "name": "next_over_old_wall_ratio_median",
+      "note": "median over the 13 cells of the cell-median paired per-target ratio inherited-f4-next / inherited-f4; range 0.860-0.941",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.86,
+        0.941
+      ],
+      "unit": "ratio",
+      "value": 0.893
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 78,
+      "name": "ops_differences",
+      "note": "per-target ops (word XORs) equal between inherited-f4 and inherited-f4-next on every target and repeat",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 78,
+      "name": "disagreements_with_fes",
+      "note": "every decided answer of both inherited engines equals fes-f2",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "fes_over_old_wall_ratio_24_unknowns",
+      "note": "fes-f2 / inherited-f4 wall per call at 24 unknowns, K 0.69 and R 0.80; 0.08-0.11 at 14-18, 7.8 and 14.2 at 30 and 32",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.745
+    }
+  ],
+  "problem": "study:inherited_f4_next_20261112:descent-ab",
+  "raw": [
+    {
+      "bytes": 103150,
+      "path": "research/inherited_f4_next_20261112/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bd909ca09738481d27bdb625dfceff1551cfd1d93768d1818f9a5604520788f2",
+      "sha256": "bd909ca09738481d27bdb625dfceff1551cfd1d93768d1818f9a5604520788f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 11109,
+      "path": "research/inherited_f4_next_20261112/results_ab.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bec0875e5a162e9b72d4459df5e4d03a0b71c440e4e7842dfc44e555d984264c",
+      "sha256": "bec0875e5a162e9b72d4459df5e4d03a0b71c440e4e7842dfc44e555d984264c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/inherited_f4_next_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/inherited_f4_next_20261112/results_ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "inherited-f4-next-ab",
+  "status": "measured",
+  "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+  "validation": null
+}

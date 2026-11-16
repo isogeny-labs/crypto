@@ -1,0 +1,36 @@
+{
+  "schema": "native-geometric-principal-divisor-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "geometric-principal-divisor-certificate",
+      "expected_decl_sha256": "87af23f53b8644b39d35a8d39e7b83e65d5a5c4e15b785494cadc5bab49e10dd",
+      "full_characters": 1883,
+      "full_decl_sha256": "87af23f53b8644b39d35a8d39e7b83e65d5a5c4e15b785494cadc5bab49e10dd",
+      "full_normalized_signature": "theorem geometric_principal_divisor_certificate : (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), divisorDegree W (functionDivisor W f hf) = 0) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (_ : f ≠ 0), NoPoles W f ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf = 0 ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c * g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg → InfinityMonic W f → InfinityMonic W g → f = g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (P : W.Point) (i j : ℕ), millerFunction W P (i + j) = millerFunction W P i * millerFunction W P j * stepFunction W (i • P) (j • P)) ∧ divisorDegree rationalCurve (functionDivisor rationalCurve numeratorFunction numerator_function_nonzero) = -4 ∧ geometricControlCurve.Δ ≠ 0 ∧ divisorDegree geometricControlCurve (functionDivisor geometricControlCurve (verticalFunction geometricControlCurve 0) (vertical_nonzero geometricControlCurve 0)) = 0 ∧ rationalFunction ≠ (1 : rationalCurve.FunctionField) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = functionDivisor rationalCurve 1 one_ne_zero ∧ InfinityMonic rationalCurve rationalFunction ∧ InfinityMonic rationalCurve (1 : rationalCurve.FunctionField)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "geometric_principal_divisor_certificate",
+        "end_byte": 2525,
+        "file": "/workspace/scratch/geometric-binding-input01/GeometricCertificate.lean",
+        "qualified_decl_id": "GeometricPrincipalDivisorAudit.geometric_principal_divisor_certificate",
+        "signature": "theorem geometric_principal_divisor_certificate :\n    (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0)\n      (f : W.FunctionField) (hf : f ≠ 0), divisorDegree W (functionDivisor W f hf) = 0) ∧\n    (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0)\n      (f : W.FunctionField) (_ : f ≠ 0), NoPoles W f ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧\n    (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0)\n      (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf = 0 ↔\n        ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧\n    (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0)\n      (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0),\n      functionDivisor W f hf = functionDivisor W g hg ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c * g) ∧\n    (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0)\n      (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0),\n      functionDivisor W f hf = functionDivisor W g hg → InfinityMonic W f → InfinityMonic W g → f = g) ∧\n    (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K)\n      (_ : W.Δ ≠ 0) (P : W.Point) (i j : ℕ), millerFunction W P (i + j) =\n        millerFunction W P i * millerFunction W P j * stepFunction W (i • P) (j • P)) ∧\n    divisorDegree rationalCurve\n      (functionDivisor rationalCurve numeratorFunction numerator_function_nonzero) = -4 ∧\n    geometricControlCurve.Δ ≠ 0 ∧\n    divisorDegree geometricControlCurve (functionDivisor geometricControlCurve\n      (verticalFunction geometricControlCurve 0) (vertical_nonzero geometricControlCurve 0)) = 0 ∧\n    rationalFunction ≠ (1 : rationalCurve.FunctionField) ∧\n    functionDivisor rationalCurve rationalFunction rational_function_nonzero =\n      functionDivisor rationalCurve 1 one_ne_zero ∧\n    InfinityMonic rationalCurve rationalFunction ∧\n    InfinityMonic rationalCurve (1 : rationalCurve.FunctionField)",
+        "start_byte": 399
+      },
+      "recorded_statement": "theorem geometric_principal_divisor_certificate : (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), divisorDegree W (functionDivisor W f hf) = 0) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (_ : f ≠ 0), NoPoles W f ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf = 0 ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c * g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg → InfinityMonic W f → InfinityMonic W g → f = g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (P : W.Point) (i j : ℕ), millerFunction W P (i + j) = millerFunction W P i * millerFunction W P j * stepFunction W (i • P) (j • P)) ∧ divisorDegree rationalCurve (functionDivisor rationalCurve numeratorFunction numerator_function_nonzero) = -4 ∧ geometricControlCurve.Δ ≠ 0 ∧ divisorDegree geometricControlCurve (functionDivisor geometricControlCurve (verticalFunction geometricControlCurve 0) (vertical_nonzero geometricControlCurve 0)) = 0 ∧ rationalFunction ≠ (1 : rationalCurve.FunctionField) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = functionDivisor rationalCurve 1 one_ne_zero ∧ InfinityMonic rationalCurve rationalFunction ∧ InfinityMonic rationalCurve (1 : rationalCurve.FunctionField)",
+      "recorded_text_sha256": "87af23f53b8644b39d35a8d39e7b83e65d5a5c4e15b785494cadc5bab49e10dd",
+      "source_plan": "research/geometric_principal_divisor_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "GeometricPrincipalDivisorAudit.geometric_principal_divisor_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

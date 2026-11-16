@@ -1,5 +1,5 @@
 //! Bind one native stratum to the sealed source bundle and EC2 IMDSv2 identity.
-use super::Result;
+use super::{aws, Result};
 use flate2::read::GzDecoder;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -140,7 +140,7 @@ pub fn verify(root: &Path, stratum: usize, allocation_path: &Path, bundle: &Path
         || allocation["stratum"] != stratum
         || allocation["account_id"] != "590183823895"
         || allocation["region"] != "us-east-1"
-        || allocation["availability_zone"] != "us-east-1d"
+        || allocation["availability_zone"] != aws::ZONE
         || allocation["instance_type"] != "g5g.4xlarge"
         || allocation["market"] != "spot"
         || allocation["state"] != "running"
@@ -195,7 +195,7 @@ pub fn bind_allocation(template: &Path, output: &Path) -> Result<Value> {
     let mut allocation: Value = serde_json::from_slice(&fs::read(template)?)?;
     if allocation["schema"] != "n83.crossfamily-current-aws-allocation/v1"
         || allocation["region"] != "us-east-1"
-        || allocation["availability_zone"] != "us-east-1d"
+        || allocation["availability_zone"] != aws::ZONE
         || allocation["instance_type"] != "g5g.4xlarge"
         || allocation["market"] != "spot"
         || allocation["instance_id"].as_str().is_some()

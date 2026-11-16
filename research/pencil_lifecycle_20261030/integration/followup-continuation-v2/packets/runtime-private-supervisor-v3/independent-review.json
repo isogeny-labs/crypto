@@ -1,0 +1,36 @@
+{
+  "schema": "software.independent-source-review/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "decision": "accept_scoped_source_delta_and_supported_derivation",
+  "scope": "Supervisor v2-to-v3 loop readback correction; derived predecessor provenance; draft joins only",
+  "source_hashes": {
+    "supervise.py": "c8d1dc9342bcb483e2b1f2aaf4592bdd1eaf29111793cf9c1ce587e75ca0eb4e",
+    "test_supervise.py": "b9a444fdc4188159535a541f4c7e1217fd17cd531716bb6592a4eef2eed333e2",
+    "derive_bindings.py": "bf639f2ed5034c007bb559a83f714f9b1f3368e0bb82cd9596d1c788b4e103f9",
+    "derived-predecessor-receipt.json": "4ca216ca94a0493467c43b900b9e3b3295b4b71c69704c72ebaf507ab710e410",
+    "qualification-binding.draft.json": "cc83a66b27907839462dc2f585d06429fc1479eca8b4f3a452acffdde3cb5fc1",
+    "qualifier-binding.draft.json": "141fa547e89956ec4fddc679e9fa10c0d47690c0b120e484d877f147f7d024eb",
+    "gate-staging.json": "ece836d5e0a98dd68e903d87635811b6fd9e201aaa3e192ce36cab5cf22dbd07",
+    "binding-inputs.json": "3ccfd26a56b16eeb189e990a76dd10d52d8bd78d2a3d749978f50c897c2ca3bf"
+  },
+  "test_receipt_sha256": "e391f962a0823dd3f8fcca3bd6e541273bcd97955381e01bb77b5548668bb94a",
+  "tests_passed": 36,
+  "findings": [
+    "Only implementation delta is explicit losetup --list and strict sole-key loopdevices empty-list parser. Empty bytes, attached loops, duplicate keys, null, extra keys reject.",
+    "Derived predecessor copies original worker facts and adds observed stopped disposition, preserving original failed launcher receipt and disclosing no disk-content rehash.",
+    "Exact input manifest, source and qualifier joins verified; staged gate exact candidate bytes and mode0555 verified; draft admitted false and review fields null."
+  ],
+  "provenance_recommendation": "Bind the actual disposition postreview explicitly in derived receipt; current reconciliation_review_sha256 binds prospective helper review.",
+  "actual_disposition_postreview": {
+    "path": "/var/tmp/runtime-disposition-postreview-cszzu02d/review.json",
+    "sha256": "828b5cc7d5873c9d7f2ce90160263cbb00715c86965e57f0f9e968b63fa5dbd8"
+  },
+  "execution_allowance_approved": false,
+  "remaining": [
+    "Prospective qualification accounting and exact final input review/publication.",
+    "Dispatch custody recheck; fresh staged gate is user-owned, so exact bytes/mode must still be checked at use."
+  ],
+  "live_operations": false,
+  "advisory_familiarity": "Reviewer previously supplied design findings; did not author supervisor or derivation implementation."
+}

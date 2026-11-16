@@ -1,0 +1,136 @@
+{
+  "branch": null,
+  "closed_utc": "2026-11-05T08:28:06+00:00",
+  "commands": [
+    {
+      "argv": [
+        "flock",
+        "-s",
+        "/dev/shm/cpu.lock",
+        "/dev/shm/tgt-q/release/ecbench",
+        "run",
+        "--spec",
+        "specs/n61-s2.json",
+        "--out",
+        "sessions/n61-s2",
+        "--allow-busy",
+        "--wait"
+      ],
+      "cwd": "research/icb_large_prime_n53_n61_20261029",
+      "exit": null,
+      "provenance": "Documentary launcher command from frozen run_ladder.sh; this import did not execute it. Exact process start and exit code were not captured by that launcher record.",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "ecfaa38c10908eaadbb105f9c255e0010b6fb46b",
+  "commit_dirty": null,
+  "commit_role": "archival metadata/data snapshot, not the executed binary source commit",
+  "created_utc": "2026-11-05T08:28:06+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-icb-large-prime"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": null,
+    "isolation": "historical shared KVM guest; guest-local reservations recorded, not independently attested",
+    "platform": "linux x86_64 kernel 6.18.44-fc-v185",
+    "source": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/host.json"
+  },
+  "id": "20261105T0828Z-icb-large-prime-n61-s2-archive",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "reported_native_records_written",
+      "note": "Count copied from the original session.json, with records.jsonl hash pinned; no mathematical correctness, timing or complete-cost assertion. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 60
+    }
+  ],
+  "problem": "archive:icb-large-prime-n61-s2-20261029",
+  "provenance": {
+    "archive_commit": "ecfaa38c10908eaadbb105f9c255e0010b6fb46b",
+    "executed_binary_commit": null,
+    "executed_binary_dirty": null,
+    "executed_binary_sha256": "e0b8ac52a95e12d61d4b937938901f1666abcec73f023ca0c51637d08d1faddd",
+    "kind": "retrospective_metadata_index",
+    "measurement_finished_unix_ms": 1793269302059,
+    "measurement_started_unix_ms": 1793266167989,
+    "notes": [
+      "The required commit field pins the archival inputs. The binary build did not record its source Git commit or dirty state; no executed-source attribution is inferred.",
+      "This index quotes session-output counts only; the original component-cost numbers, ratios, limitations and receipts remain in their frozen files.",
+      "No new benchmark, native replay, timing claim or signed scientific standing is produced.",
+      "S3 addresses are derived locations, not an assertion of upload or remote HEAD by this session."
+    ],
+    "recorded_executions_planned": 60,
+    "recorded_status": "complete",
+    "recorded_status_counts": {
+      "verified": 60
+    },
+    "session_id": "ECBS1h73249a282e37",
+    "source_host": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/host.json",
+    "source_report": "research/icb_large_prime_n53_n61_20261029/README.md",
+    "source_results": "research/icb_large_prime_n53_n61_20261029/results.json",
+    "source_results_sha256": "3fceb74e897ac184c3fa2e2b9fe157ae8e1c88b463b94df0cd82aa2c30d8cd5b",
+    "source_session": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/session.json",
+    "standing": "unverified"
+  },
+  "raw": [
+    {
+      "bytes": 625850,
+      "path": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fe1129514bb4408c776df2353f4296fcc06fdacacb927bbdc9fc2bd003cdeb56",
+      "sha256": "fe1129514bb4408c776df2353f4296fcc06fdacacb927bbdc9fc2bd003cdeb56",
+      "uploaded": false
+    },
+    {
+      "bytes": 3326,
+      "path": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2b/2bb4901f1f8313c3acccfec65f1fa412be35a1973c87810d3f611e6e9add4b79",
+      "sha256": "2bb4901f1f8313c3acccfec65f1fa412be35a1973c87810d3f611e6e9add4b79",
+      "uploaded": false
+    },
+    {
+      "bytes": 3542,
+      "path": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2b/2bda6814868c75c7ed15b14506f11805287c5f53e230db460c7309b9ce26be52",
+      "sha256": "2bda6814868c75c7ed15b14506f11805287c5f53e230db460c7309b9ce26be52",
+      "uploaded": false
+    },
+    {
+      "bytes": 3724,
+      "path": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/51/517de1a87f837d16cef1daafe48136ebcf329f06bf7c5e3e2b1d79dd832fa166",
+      "sha256": "517de1a87f837d16cef1daafe48136ebcf329f06bf7c5e3e2b1d79dd832fa166",
+      "uploaded": false
+    },
+    {
+      "bytes": 19476,
+      "path": "research/icb_large_prime_n53_n61_20261029/sessions/n61-s2/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f4bb7538b10f2050637c999ca065db88351646928a798d1f43a55dd4f16a5a5",
+      "sha256": "1f4bb7538b10f2050637c999ca065db88351646928a798d1f43a55dd4f16a5a5",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-icb-large-prime/REPORT.pdf",
+    "png": [
+      "benchmarks/20261029-icb-large-prime/large-prime-s.png"
+    ],
+    "svg": [
+      "benchmarks/20261029-icb-large-prime/large-prime-s.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "slug": "icb-large-prime-n61-s2-archive",
+  "status": "measured",
+  "summary": "Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverified]"
+}
