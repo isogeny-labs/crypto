@@ -1,0 +1,319 @@
+{
+  "schema": "rho-twochoice-source-plan/v1",
+  "created": "2026-11-15T16:03:22.585126+00:00",
+  "formal": {
+    "project": "research/rho_twochoice_collision_audit_20261115/lean",
+    "theorem": "RhoTwoChoiceCollisionAudit.twochoice_collision_certificate",
+    "statement": "theorem twochoice_collision_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p = ∑ f : Fin 2 ↪ ZMod p, (uniformLaw (Fin 2 ↪ ZMod p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + f (h x)) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 0 < m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 2 ≤ ensembleMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, (C : ℝ) * p < (@ensembleMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, @ensembleMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ W n : ℕ, ∀ s : ℤ, (W : ℝ)^2 * hitMass W n s ≤ (s : ℝ)^2 + n) ∧ (hitMass 1 1 0 = 1 ∧ hitMass 2 1 0 = 0) ∧ ((∀ i : Fin 2, 0 < fair i) ∧ (∑ i : Fin 2, fair i) = 1 ∧ (∑ i : Fin 2, (fair i)^2) = 1 / 2) ∧ (∀ (p : ℕ) [Fact p.Prime] (d : ℕ), 0 < d → d < p → ∀ k : ZMod p, finiteMean (fun z : TwoSupport p => if (d : ZMod p) * z.1 + k * z.2.val = 0 then (1 : ℝ) else 0) = 1 / p) ∧ (¬∀ w : Fin 3 → Fin 2, expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) = weight controlWeights w)",
+    "decl_sha256": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+    "scope": "Actual uniform ordered distinct two-increment support on each prime Z/p, individual zero increments allowed/equal increments excluded; independent actual fair static binary vertex hash, actual least repeat from0. Genuine finite uniform-support PMF and vertex-product PMF meanE defined and identified, firstpoint/nonzero difference bijection derived. Actual iid-word prefix stopped-square bound W²hitMass≤s²+n; goodword mass≥3/4 at time m²,boundary2m. Actual chronological integer/Zp paths and balanced collision relation derived; at most m²(4m+1) shortrelations. Each actual distinct-support relation0<d<p has mass1/p, d0/k0 guardmass1. Actual static-hash/iid selfavoidance bridge credited and reused only for survival, not unrestricted postcollision words. Ensemble survival≥1/2 and E≥m²/2 whenever p≥4m²(4m+1). Bertrand yields for every naturalC a primep with E²>Cp, and no realnonnegative K bounds E≤Ksqrtp for allprimes. Actual one-step hit controls1/0, fairpositive normalized/I2=1/2, credited actual primeZ3 postcollision word static0vs iid1/8. This is r2 negativecalibration of unqualified square-root extension, not refutation of qualified nS≥8/20 large-partition source conjectures. Existing qualified Hildebrand random-support mixing/fixed20Sidon/staticfirstcollision methods credited; established maximal/unioncount/Bertrand/deferred-decisions methods/no novelty. Firstrepeat not Floydoperations/cyclealone/scalarrecovery/practicalhashruntime. Sevennewmodules6concrete1adapter/10frozen localmodules0copies/22oldformalconfigs/36oldformal-artifactpins checked every13states/twogates. Full written header explicitly gives primeFact arguments after first frozen parser prefix diagnostic; verifier unchanged. Foundations/defaults only/noholes/customaxioms/nativeproofeval/raisedlimits/globalflags/waivers/frozenedits/cryptoPython/newsolverbenchmark/spend/upload/newhost/compilerrefinement/canonicalpromotion/full14claim. Larger-partition collision penalty/constants and other14 obligations remainopen.",
+    "sources": [
+      {
+        "path": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+        "bytes": 2000,
+        "sha256": "6f513a6bc498e01f7bdf60c156dd7778b9e301101c5ed90ca26648ca8bc0f1f3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+        "bytes": 2485,
+        "sha256": "9ec402373f13e2004e58a185dc7824b6bf7ef1e88ca0ec0819eb1088f190abfa"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+        "bytes": 3005,
+        "sha256": "a816e5f511d2f438e6fcd7c29d6d3730281ceb757a4dafae35f6a2cfbe530a3e"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+        "bytes": 2810,
+        "sha256": "85231289c6ddd9d038f9f8acccd3e75faf322fd4a735a4fdff885596c14bb434"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+        "bytes": 3898,
+        "sha256": "04a6e61e1c4e95724a1bb14f34f9344924185fb9216ef650f640a451a26d4a61"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+        "bytes": 2104,
+        "sha256": "28e88e300b31a25978d0b8e13f4ee7119666e27366d3f039a9445121d147df3f"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+        "bytes": 3510,
+        "sha256": "b4660c08256c6336341194cb5e1a188f1a528908cc4a35af414190eca1c5a0ad"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "0a701461970071d742dd15e11f48fec7b44c17ef90c1cd95c3d563472c9d06b3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3948,
+        "sha256": "64c5efc80667aa6d01a85d66546171cf484ea733ed60bc78b8ede4f2321e410d"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lakefile.toml",
+        "bytes": 280,
+        "sha256": "ef3c7bbfa8df48c11cc80121f45e386731f323f54651aab17488579dae39e438"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4069,
+        "sha256": "90f185ef835962877da491e4397eb6f9a17786f3a3c66494e96461bf513a66e9"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lakefile.toml",
+        "bytes": 258,
+        "sha256": "50c2e8bd80c059c5bf813cc5645abc046e6f41be2f06025bb8423282bb3ad82b"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BalancedPaths.lean",
+        "bytes": 5602,
+        "sha256": "f9ff0990f63d8f172a302a4a7e88f1a10bbfe2f23974fa93b49264e965d0e314"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryEnsemble.lean",
+        "bytes": 5403,
+        "sha256": "7fafd0ad5987accc8ff84445fcd352dc4fc5cba7caa5d59fc9849c04b7a689f7"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryMaximal.lean",
+        "bytes": 6064,
+        "sha256": "2b636dcb84006e6b692e16bfeeaa21b21897dd382ea4fa422e19eacdd26350b8"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/BinaryUnbounded.lean",
+        "bytes": 3040,
+        "sha256": "4ac80aa3ff742a9303848c382a5692837de99ce234824393de8603e05afef3c7"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/SupportCounting.lean",
+        "bytes": 7595,
+        "sha256": "d7945a2015647ef7673128c88173ac562e5109970a829f326dd4554156f936e1"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceCertificate.lean",
+        "bytes": 2164,
+        "sha256": "9c6028f460c5059e4de510db8bfd4f778c3e366c2f1f947af0554d30a669c01e"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceImports.lean",
+        "bytes": 52,
+        "sha256": "ef4210912f68e4dbc1e2a1d4534f45c59c50bc0b32d01b6ddb099c9123d87341"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4641,
+        "sha256": "218e3c5bc0c5752342e9e18261429f42dbf15c190c2db499cbc9b29965bce6c0"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lakefile.toml",
+        "bytes": 405,
+        "sha256": "3128201f765ae8d6fdcfdfa3c108242beca62c70f91079de9b2f4322d2886a28"
+      },
+      {
+        "path": "research/rho_twochoice_collision_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BalancedPaths",
+    "BinaryEnsemble",
+    "BinaryMaximal",
+    "BinaryUnbounded",
+    "CollisionCertificate",
+    "CollisionTails",
+    "Cylinder",
+    "FirstCollision",
+    "PathAgreement",
+    "PostCollisionControl",
+    "SupportCounting",
+    "Survival",
+    "TwoChoiceCertificate",
+    "TwoChoiceImports",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral"
+  ],
+  "artifacts": [
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 29268,
+      "sha256": "5d1b9599242a2c5ff95e3f5e2fa24fd734793db292b1aeca10e65b5434534a10"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "1c6c1bce1d141200d2702ba50e33b0c991aa1e73ac8ee5e6a073805bdfcbbb65"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/attempts.json",
+      "bytes": 233,
+      "sha256": "66f00eb750b4c89b902426a2159cbbc9a065682db83f76b5180b5704509d2c65"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 2217,
+      "sha256": "d7ad374622ef8fd32603d1f4b276c9e562f9aa70c78a3fa63bda0b700b8d3639"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/gate.json",
+      "bytes": 4147,
+      "sha256": "1e86ab50c0113d238f66de3dc52de93810fa23c8590b4752a3a17456e4bb159c"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/source-review.json",
+      "bytes": 4141,
+      "sha256": "8065a5889e0df705a1adcd60c8d3a6ad432dabf819e48377e0e7bd1f7795d0a2"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/binding-check.json",
+      "bytes": 5639,
+      "sha256": "aeb4b26e7093e72be1544b9ad8493217dc6743d3432858a115a1a5316e427a9a"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/proof-map.json",
+      "bytes": 6490,
+      "sha256": "1a79c0df84f08c7271b1ef8684337338a2f655aaac543f1513b56217e6f91ec6"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/render_report.py",
+      "bytes": 7830,
+      "sha256": "b71ca2ca86b80356b1bd13da041488cd0d7de4c90a8ccd8542eebc2abb11989b"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/export_binding_input.py",
+      "bytes": 1752,
+      "sha256": "2b042bad46f0c4b7c62af3cfdc7552dee274e8d8a450cf31e49139e52690fa91"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/PROTOCOL.md",
+      "bytes": 7282,
+      "sha256": "4a25f13e95b4c95e2cd601680e3f6099402337d70e559ec9b7816614344bf8fb"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/preflight.json",
+      "bytes": 5480,
+      "sha256": "ec8f91fd270ffa3d00ce641a6033196a067791b7db6d84ed6f5309554f5dbeb4"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/reports/layout.json",
+      "bytes": 320,
+      "sha256": "b418148b0f9f7fa82c6ca6368ddbd3e4246bca119b13d96179323eb81f5725bb"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/reports/report.pdf",
+      "bytes": 48131,
+      "sha256": "a4c536192bfe552e77a42a4be112910beb620ae22ba49c63a8f13991467b0750"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/reports/twochoice.svg",
+      "bytes": 1440,
+      "sha256": "e7d5a8f124f47a1c36080ae7ddb81c0fdcfa98100e4b7414a0342dbba729f938"
+    },
+    {
+      "path": "research/static_hash_collision_audit_20261114/sources.json",
+      "bytes": 12200,
+      "sha256": "04ebe24a337d5a9e06fbc6ec8866a2831e27820c0de55634acbdf00f5c2a7019"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/report-drafts.tar.xz",
+      "bytes": 48140,
+      "sha256": "36c22bb8ce851c244d30a17a323221e43eac322cdb2ede7367c4895a674c78d4"
+    },
+    {
+      "path": "research/rho_twochoice_collision_audit_20261115/evidence/report-drafts.json",
+      "bytes": 2247,
+      "sha256": "f6915a3543ff37c6a6bea932110b693a3d3a5e001aeee947249c0eb3972ce7da"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 70,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

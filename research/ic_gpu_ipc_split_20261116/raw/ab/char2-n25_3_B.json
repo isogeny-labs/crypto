@@ -1,0 +1,520 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 231.62718,
+    "ns_per_as_solve": 26.535255,
+    "ns_per_canon": null,
+    "ns_per_double": 231.936215,
+    "ns_per_frobenius": 8.29433,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 1.9291513671875,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.4400772705078125,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_as_solve",
+      "ns_per_word_xor",
+      "ns_per_frobenius"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 2,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 9.425996875,
+  "instance": "icv1-f2m25-tm5661-0c0ce376",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-f2m25-tm5661-0c0ce376 | binary-subspace[dimension=13] + mitm[m=2] + — + walk | 8158 | 4079 | 2.0 | 0.640 | 1193 | 763 | 763 | — | — | 14073.663 | 11519.15× | yes |\n| icv1-f2m25-tm5661-0c0ce376 | binary-subspace[dimension=13] + descent-algebraic[m=2] + fes-f2-gpu + walk | 8158 | 4079 | 2.0 | 0.637 | 2338 | 1489 | 1489 | — | 6 | 252100.940 | 206342.04× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "char2",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 1.6426879222475925,
+    "mean_s": 1.221762355555835,
+    "mean_s_walk": 1.036140734483327,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 0.8008367888640773,
+    "per_run": [
+      {
+        "planted": 3481070,
+        "s": 0.8008367888640773,
+        "s_walk": 0.6317054712581476,
+        "seed": 1400727545,
+        "steps": 1449,
+        "steps_over_expected": 0.7128032935079469,
+        "verified": true
+      },
+      {
+        "planted": 3481070,
+        "s": 1.6426879222475925,
+        "s_walk": 1.4405759977085064,
+        "seed": 1400727544,
+        "steps": 3280,
+        "steps_over_expected": 1.625515944432112,
+        "verified": true
+      }
+    ],
+    "runs": 2
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 4.19910778786122,
+    "mean_s": 2.958106744927711,
+    "mean_s_walk": 2.2528291505109843,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 1.7171057019942015,
+    "per_run": [
+      {
+        "planted": 3481070,
+        "s": 4.19910778786122,
+        "s_walk": 3.403344938525321,
+        "seed": 1400727545,
+        "steps": 8049,
+        "steps_over_expected": 2.7154763815359306,
+        "verified": true
+      },
+      {
+        "planted": 3481070,
+        "s": 1.7171057019942015,
+        "s_walk": 1.102313362496647,
+        "seed": 1400727544,
+        "steps": 2607,
+        "steps_over_expected": 0.879518813102767,
+        "verified": true
+      }
+    ],
+    "runs": 2
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 3000.0,
+          "group_ops": {
+            "adds": 2312,
+            "doubles": 688,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 1193,
+            "relations": 763,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 1193,
+            "trials": 1193,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 1192
+          },
+          "wall_ns": 1252276,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 1192,
+            "walk_modr_adds": 2384
+          }
+        },
+        "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+        "gae_before_solver": 3000.0,
+        "hit_rate": 0.6395641240569991,
+        "name": "mitm",
+        "relations_found": 763,
+        "setup": {
+          "gae": 33280561.0,
+          "group_ops": {
+            "adds": 33280561,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 8347024367,
+          "work_native": {
+            "counted:table_insert_attempts": 1,
+            "table_insert_attempts": 33276482
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 1193
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 4079,
+        "columns": 4079,
+        "cost": {
+          "gae": 938.3625604948435,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 8191,
+            "as_solves": 8191
+          },
+          "wall_ns": 3966275,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 12237,
+            "index_sort_word_ops": 53027
+          }
+        },
+        "description": "points whose abscissa lies in the 13-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 8158
+      },
+      "group_order": 33560094,
+      "instance": "icv1-f2m25-tm5661-0c0ce376",
+      "label": "binary-subspace[dimension=13] + mitm[m=2] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 47.823347632996374,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 4080,
+            "pinned_by_repeated_row": 0,
+            "rank": 763,
+            "repeated_column_rows": 0,
+            "row_ops": 5742,
+            "rows": 763,
+            "single_column_rows": 0,
+            "two_column_rows": 763
+          },
+          "wall_ns": 43060207,
+          "work_native": {
+            "column_part_inserts": 763,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 8500195,
+            "pivot_inversion_steps": 35098,
+            "row_build_modr_adds": 2289,
+            "row_build_modr_muls": 1526,
+            "row_build_words": 9337594,
+            "row_key_mixes": 1526
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 763,
+        "rows": 763,
+        "work": 5742,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 22.415280920184205,
+      "r": 5593349,
+      "recovered": 3481070,
+      "rho_s": 1.221762355555835,
+      "s": 14073.662679835452,
+      "s_over_rho": 11519.149052053339,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "13"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 20000000,
+        "oracle": "mitm",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261113,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 33284581.185908128,
+      "verified": true,
+      "verify": {
+        "gae": 34.0,
+        "group_ops": {
+          "adds": 13,
+          "doubles": 21,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 8023
+      },
+      "wall_seconds": 8.395488869
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 596224244.7448504,
+          "group_ops": {
+            "adds": 10140,
+            "doubles": 688,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 3,
+            "lookups": 0,
+            "relations": 1489,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 2338,
+            "solver_ops": 313806782703,
+            "sqrt_solves": 0,
+            "target_guard_probes": 2338,
+            "trials": 2338,
+            "unliftable_systems": 1,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 2337
+          },
+          "wall_ns": 901432908,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 2337,
+            "walk_modr_adds": 4674
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-f2-gpu",
+        "gae_before_solver": 10828.0,
+        "hit_rate": 0.636869118905047,
+        "name": "descent-algebraic",
+        "relations_found": 1489,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 104119,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 2338,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 2552452,
+            "bitop_field_muls": 851396,
+            "bitop_field_sqrs": 458444,
+            "bitop_hash_probes": 3485754,
+            "bitop_word_ops": 745778248953,
+            "gpu_capped": 0,
+            "gpu_fallback": 0,
+            "gpu_round_trip_ns": 670241345,
+            "gpu_worker": 2338,
+            "points": 156900524032,
+            "slot_hit_rotation_0": 1489,
+            "slot_hits": 1489,
+            "slot_systems": 2338,
+            "verification_tests": 11361698
+          },
+          "gae": 596213416.7448504,
+          "name": "fes-f2-gpu",
+          "ns_per_op": 0.4400772705078125,
+          "op_unit": "word XORs (Gray-code steps)",
+          "ops": 313806782703,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": 6,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 701688568
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 25,
+          "n_vars": 26,
+          "semi_regular_degree": 6
+        },
+        "targets_tried": 2338
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 4079,
+        "columns": 4079,
+        "cost": {
+          "gae": 938.3625604948435,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 8191,
+            "as_solves": 8191
+          },
+          "wall_ns": 3735447,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 12237,
+            "index_sort_word_ops": 53027
+          }
+        },
+        "description": "points whose abscissa lies in the 13-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 8158
+      },
+      "group_order": 33560094,
+      "instance": "icv1-f2m25-tm5661-0c0ce376",
+      "label": "binary-subspace[dimension=13] + descent-algebraic[m=2] + fes-f2-gpu + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 114.41956631523931,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 4080,
+            "pinned_by_repeated_row": 0,
+            "rank": 1489,
+            "repeated_column_rows": 0,
+            "row_ops": 13738,
+            "rows": 1489,
+            "single_column_rows": 0,
+            "two_column_rows": 1489
+          },
+          "wall_ns": 117473046,
+          "work_native": {
+            "column_part_inserts": 1489,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 19113018,
+            "pivot_inversion_steps": 68494,
+            "row_build_modr_adds": 4467,
+            "row_build_modr_muls": 2978,
+            "row_build_words": 18222382,
+            "row_key_mixes": 2978
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 1489,
+        "rows": 1489,
+        "work": 13738,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 22.415280920184205,
+      "r": 5593349,
+      "recovered": 3481070,
+      "rho_s": 1.221762355555835,
+      "s": 252100.93977797483,
+      "s_over_rho": 206342.04240421427,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "13"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 20000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261113,
+        "solver": "fes-f2-gpu",
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 596225331.5269772,
+      "verified": true,
+      "verify": {
+        "gae": 34.0,
+        "group_ops": {
+          "adds": 13,
+          "doubles": 21,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 8481
+      },
+      "wall_seconds": 1.022808917
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "x86_64",
+    "binary_blake3": "42758c2434333cba27dd69f5a545effd076c8b64fac3a64344c784ead1f2110f",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "linux",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

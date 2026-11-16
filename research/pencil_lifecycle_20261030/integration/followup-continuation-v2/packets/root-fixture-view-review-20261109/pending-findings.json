@@ -1,0 +1,24 @@
+{
+  "status": "awaiting_producer_revision",
+  "execution": false,
+  "findings": [
+    {
+      "scope": "toolchain custody",
+      "finding": "Rehashing listed files does not detect added header-tree members.",
+      "requested": "Exact membership for four inventoried roots at suite pre/post."
+    },
+    {
+      "scope": "full-suite acceptance",
+      "finding": "Current regex permits zero passing tests and does not bind6179 inventory.",
+      "requested": "Exactly one summary;passed+ignored6179,failed0,measured0,filtered0."
+    }
+  ],
+  "checked": [
+    "135 base Git blob path hashes and sizes",
+    "unchanged20c362a4 cached binary binding",
+    "two independent120/1800 attempts and no automatic continuation",
+    "read-only bind at original compiled manifest path",
+    "root-v4 ownership/permit/cleanup adaptation",
+    "guarded input coverage explicitly changes, original18failure rows remain"
+  ]
+}

@@ -1,0 +1,106 @@
+TorsionBoundaries.lean:16:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'Nat.card', which is 'noncomputable'
+TorsionBoundaries.lean:24:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'orderOf', which is 'noncomputable'
+TorsionBoundaries.lean:30:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype (Option { xy // SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2 })
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TorsionBoundaries.lean:31:2: error: Expected type must not contain metavariables
+  Fintype.card (Option { xy // SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2 }) = 6
+TorsionBoundaries.lean:55:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:101:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype (Option { xy // bkCurve.Nonsingular xy.1 xy.2 })
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TorsionBoundaries.lean:102:2: error: Expected type must not contain metavariables
+  Fintype.card (Option { xy // bkCurve.Nonsingular xy.1 xy.2 }) = 9
+TorsionBoundaries.lean:111:29: error: unsolved goals
+case coeff_ne_zero
+g : K[X] := map (algebraMap F K) cubic
+⊢ 1 ≠ 0
+
+case deg_eq_deg
+g : K[X] := map (algebraMap F K) cubic
+⊢ (X ^ 3 + C ((algebraMap F K) 5) * X ^ 2 + C ((algebraMap F K) 3) * X).natDegree = 3
+TorsionBoundaries.lean:140:10: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  P + P
+in the target expression
+  WeierstrassCurve.Affine.Point.some x v huv = P ∨ WeierstrassCurve.Affine.Point.some x v huv = -P
+
+case some
+L : Type u_1
+inst✝¹ : Field L
+inst✝ : DecidableEq L
+E : WeierstrassCurve.Affine L
+ha1 : E.a₁ = 0
+ha2 : E.a₂ = 0
+ha3 : E.a₃ = 0
+h2 : 2 ≠ 0
+x y : L
+h : E.Nonsingular x y
+hs : S3 E.a₄ E.a₆ x x x = 0
+P : E.Point := WeierstrassCurve.Affine.Point.some x y h
+v : L
+huv : E.Nonsingular x v
+hx : pointX (WeierstrassCurve.Affine.Point.some x v huv) = some x
+he : P + P = WeierstrassCurve.Affine.Point.some x v huv
+⊢ WeierstrassCurve.Affine.Point.some x v huv = P ∨ WeierstrassCurve.Affine.Point.some x v huv = -P
+TorsionBoundaries.lean:143:21: error(lean.unknownIdentifier): Unknown identifier `add_left_eq_self.mp`
+TorsionBoundaries.lean:144:4: error: Dependent elimination failed: Failed to solve equation
+  0 = P
+TorsionBoundaries.lean:150:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HSMul ℕ (bkCurve.baseChange K).Point ?m.14
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TorsionBoundaries.lean:151:21: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  DecidableEq K
+
+Hint: Adding the command `deriving instance DecidableEq for TorsionBoundaryAudit.K` may allow Lean to derive the missing instance.
+TorsionBoundaries.lean:175:4: error: ring failed, ring expressions not equal
+α : K
+hα : α ^ 3 + 5 * α ^ 2 + 3 * α + 2 = 0
+hnot : ¬∃ a, (algebraMap F K) a = α
+y : K
+hy : y ^ 2 = α ^ 3 + 3 * α + 2
+E : WeierstrassCurve.Affine K := ⋯
+hΔ : WeierstrassCurve.Δ E ≠ 0
+heq : E.Equation α y
+hn : E.Nonsingular α y
+P : E.Point := ⋯
+h2 : 2 ≠ 0
+hc : 7 = 0
+⊢ -14 - α * 119 - α ^ 2 * 140 - α ^ 3 * 14 = 0
+TorsionBoundaries.lean:180:2: error: Tactic `cases` failed: major premise type is not an inductive type
+  ?m.41 P
+
+Explanation: the `cases` tactic is for constructor-based reasoning as well as for applying custom cases principles with a 'using' clause or a registered '@[cases_eliminator]' theorem. The above type neither is an inductive type nor has a registered theorem.
+
+α : K
+hα : α ^ 3 + 5 * α ^ 2 + 3 * α + 2 = 0
+hnot : ¬∃ a, (algebraMap F K) a = α
+y : K
+hy : y ^ 2 = α ^ 3 + 3 * α + 2
+E : WeierstrassCurve.Affine K := bkCurve.baseChange K
+hΔ : WeierstrassCurve.Δ E ≠ 0
+heq : E.Equation α y
+hn : E.Nonsingular α y
+P : E.Point := WeierstrassCurve.Affine.Point.some α y hn
+h2 : 2 ≠ 0
+hs : S3 E.a₄ E.a₆ α α α = 0
+Q : ?m.41 P
+hQ : sorry Q = P
+⊢ False
+TorsionBoundaries.lean:192:8: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HSMul ℕ (bkCurve.baseChange K).Point ?m.49
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+TorsionBoundaries.lean:193:23: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  DecidableEq K
+
+Hint: Adding the command `deriving instance DecidableEq for TorsionBoundaryAudit.K` may allow Lean to derive the missing instance.

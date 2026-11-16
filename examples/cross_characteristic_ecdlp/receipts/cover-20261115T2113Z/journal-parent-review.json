@@ -1,0 +1,117 @@
+{
+  "schema": "producer.full-journal-parent-review/v1",
+  "normalization": "Full ## blocks with CRLF normalized and trimEnd only. Differences need human review; headings are not treated as unique keys.",
+  "merges": [
+    {
+      "ref": "5dddc7d7d3693aac81a83376d4e573cf760e1b0a",
+      "parents": [
+        "5668d68ccd8f1f1758db7f1e8c1cc1b865ce7a02",
+        "30e066b0928150bcefa6c09bfe948830b175bba7"
+      ],
+      "journal": [
+        {
+          "parent": "5668d68ccd8f1f1758db7f1e8c1cc1b865ce7a02",
+          "missingOrModifiedFullBlockMultiplicities": [
+            {
+              "heading": "## 2026-11-15T19:25Z — Assessment repairs, item 2: validation gate (Claude, session 01TCbLH9)",
+              "sha256": "98b35044b998a8cd5653b0a6ad5fb056e3992e37599039264e568f1d95b32012",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:44Z — Orientation review branch synchronization (Codex)",
+              "sha256": "863c2372dfa4e2345a17bf134ec83a196f6273d837ef1978452b89ef1d3b5f53",
+              "count": 1,
+              "present": 0
+            }
+          ]
+        },
+        {
+          "parent": "30e066b0928150bcefa6c09bfe948830b175bba7",
+          "missingOrModifiedFullBlockMultiplicities": [
+            {
+              "heading": "## 2026-11-15T19:25Z — Assessment repairs, item 2: validation gate (Claude, session 01TCbLH9)",
+              "sha256": "98b35044b998a8cd5653b0a6ad5fb056e3992e37599039264e568f1d95b32012",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:44Z — Orientation review branch synchronization (Codex)",
+              "sha256": "bc17d9d235af9e687290eea5fb4adf18ba206b6ceae7a31ebe1a8a358074a444",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:50Z — Assessment repairs: PR 4321 merged; Serpent (Claude, session 01TCbLH9)",
+              "sha256": "36d8e64b1392b7be550df662f4e12333e6bfd0f29928a771a3058c1509f64bf6",
+              "count": 1,
+              "present": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "c40b39826f0b8378d939b624e78a68ae870208a1",
+      "parents": [
+        "5dddc7d7d3693aac81a83376d4e573cf760e1b0a",
+        "b05c8a03af1034fdc6c92c1bb061a9258ad0b555"
+      ],
+      "journal": [
+        {
+          "parent": "5dddc7d7d3693aac81a83376d4e573cf760e1b0a",
+          "missingOrModifiedFullBlockMultiplicities": [
+            {
+              "heading": "## 2026-11-15T19:25Z — Assessment repairs, item 2: validation gate (Claude, session 01TCbLH9)",
+              "sha256": "402d1bb7fd815861e6e69d84a8de10cf43cfd8b6315448fbc910f04a2ce44fd3",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 19:55Z — Growth-law engine fix and rerun launched (Claude, branch claude/hky-progress-growth-law-20261115)",
+              "sha256": "4c8c274b9bb701e1d5abc677c4972eceaa5fbcfd05342378c62d0106bcaafc63",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:50Z — Assessment repairs: PR 4321 merged; Serpent (Claude, session 01TCbLH9)",
+              "sha256": "b561a8c3357b5b99cdd4023ec3defd5e9a28400503d4d389f4811d8a30b3f465",
+              "count": 1,
+              "present": 0
+            }
+          ]
+        },
+        {
+          "parent": "b05c8a03af1034fdc6c92c1bb061a9258ad0b555",
+          "missingOrModifiedFullBlockMultiplicities": [
+            {
+              "heading": "## 2026-11-15T19:25Z — Assessment repairs, item 2: validation gate (Claude, session 01TCbLH9)",
+              "sha256": "ab4cca374fdb1014b73714a21690eb9594f8078a4858e06d93ef226210eea5ab",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:44Z — Orientation review branch synchronization (Codex)",
+              "sha256": "bc17d9d235af9e687290eea5fb4adf18ba206b6ceae7a31ebe1a8a358074a444",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 2026-11-15T19:50Z — Assessment repairs: PR 4321 merged; Serpent (Claude, session 01TCbLH9)",
+              "sha256": "36d8e64b1392b7be550df662f4e12333e6bfd0f29928a771a3058c1509f64bf6",
+              "count": 1,
+              "present": 0
+            },
+            {
+              "heading": "## 20:20Z — IFMA native sweep measured",
+              "sha256": "d683c0168e647b6f07582d9d3ddd1b7ecd2e65716fc1e3125129c639214b5366",
+              "count": 1,
+              "present": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "decision": "No journal rewrite in this addition; all prior deferred entries remain in their existing receipts. Frozen ledger differences remain unresolved."
+}

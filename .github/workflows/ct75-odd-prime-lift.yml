@@ -1,6 +1,7 @@
 name: CT75 odd-prime input-uniform torsion lifts
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct75/**'
       - '.github/workflows/ct75-odd-prime-lift.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct75-local-odd-torsion:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T12:32:54Z",
+ "id": "PCC-20261112-5dc179",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4e94d77251455793687ff954931f06620e8929cd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d4e1040db2b97aa69fe524ffd885abef303706c31485cca39c9cb52a7833d33c",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+   "theorem": "TwoPrimaryQuotient.frobenius_twelve_mod_sixteen"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful halving polynomial/quotientlift independence/16torsion lifts/Frobenius12mod16/crossdegree4divisibility/integerclearedmapzero consequences. Actual geometricquotient/Picard/Homcancellation/degree/kernelrestrictiondivisibility/classification remain written. Nativewrongdoubling control isnot theliteralclearednormpull map;V2explicit.",
+ "statement": "theorem frobenius_twelve_mod_sixteen {R : Type} [CommRing R] (x : R) (h16 : (16 : R)=0) (hx : x^2+7*x+101=0 \u2228 x^2+11*x+101=0) : x^12=1"
+}

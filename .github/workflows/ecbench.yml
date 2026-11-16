@@ -99,7 +99,9 @@ defaults:
     shell: bash
 jobs:
   scope:
-    if: ${{ !github.event.pull_request.draft }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -144,7 +146,9 @@ jobs:
   factor-base-sweep:
     name: factor-base sweep CLI
     needs: scope
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -220,7 +224,9 @@ jobs:
           cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
 
   harness:
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false'))
     needs: scope
     runs-on: ubuntu-24.04
     # Keep the exhaustive scientific audit's existing 300-minute budget in
@@ -615,8 +621,12 @@ jobs:
             "isolation_levels.ic L0 is below required L2",
             "isolation_levels.rho L0 is below required L2",
             "record_class must be verified_answer_controlled_wall for a primary wall claim"]' "$RUNNER_TEMP/check-native.json" > /dev/null
-          for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
-          test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*), min(check_status) from claims')" = "1|FAIL"
+          db="$RUNNER_TEMP/ecbench.db"
+          for _ in 1 2; do
+            ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" |
+              python3 -c 'import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); c.executescript(sys.stdin.read()); c.commit(); c.close()' "$db"
+          done
+          test "$(python3 -c 'import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); r = c.execute("select count(*), min(check_status) from claims").fetchone(); print(f"{r[0]}|{r[1]}")' "$db")" = "1|FAIL"
           jq -r '.verdict' "$RUNNER_TEMP/claim.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
@@ -645,7 +655,9 @@ jobs:
   # and a week costs ~28 runner-hours at 1.0x and ~39 at 1.4x.  quarter=all
   # (180 h) uses 48 shards: heaviest 5.0 h at 1.4x, ~148 runner-hours.
   replay_plan:
-    if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -718,7 +730,9 @@ jobs:
           if-no-files-found: error
 
   exhaustive_replay:
-    if: ${{ always() && !cancelled() && needs.replay_plan.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && needs.replay_plan.result == 'success')
     needs: [replay_plan, harness]
     runs-on: ubuntu-24.04
     # replay_plan only succeeds on workflow_dispatch and schedule, so this lane
@@ -790,7 +804,9 @@ jobs:
   # They are replayed only on request: workflow_dispatch with long=true.  Set
   # long_runner to a self-hosted runner label for them.
   long_replay:
-    if: ${{ always() && !cancelled() && github.event_name == 'workflow_dispatch' && inputs.long && needs.harness.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && github.event_name == 'workflow_dispatch' && inputs.long && needs.harness.result == 'success')
     needs: [harness]
     runs-on: ${{ inputs.long_runner || 'ubuntu-24.04' }}
     timeout-minutes: 2880
@@ -860,7 +876,9 @@ jobs:
           bash .github/scripts/ecbench-replay-sessions.sh "$RUNNER_TEMP/long.txt"
 
   evidence_audit_pr:
-    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
@@ -953,7 +971,9 @@ jobs:
   # method id of a committed session has no sentinel, so a new method gets one
   # in the PR that adds its first session.
   replay_sentinels_pr:
-    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     # Routine PR and merge-group runs get the 25-minute cap; push to main keeps 30.

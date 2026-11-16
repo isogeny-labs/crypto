@@ -31,7 +31,7 @@ image=$(jq -r .image_uri "$here/../image.json")
 source_revision=$(printf 'a%.0s' {1..40})
 binary=$(printf 'b%.0s' {1..64})
 jq -n --arg image "$image" --arg source "$source_revision" --arg binary "$binary" '
-  {schema:"isolab.eks.request/v1",job:{job_name:"gh-123-1",seconds:1,
+  {schema:"isolab.eks.request/v1",job:{job_name:"gh-123-1",seconds:4800,
     build:{image_uri:$image,source_revision:$source,ecbench_sha256:$binary}},
     provenance:{source_revision:$source}}
 ' > "$tmp/request.json"
@@ -56,7 +56,7 @@ run_sha=$(sha256sum "$here/run-request" | cut -d ' ' -f1)
 buildspec_sha=$(sha256sum "$here/current-run-request-buildspec.yml" | cut -d ' ' -f1)
 jq -e --arg run_sha "$run_sha" --arg buildspec \
   "arn:aws:s3:::fixture-bucket/inputs/requests/$buildspec_sha.buildspec.yml" '
-  .projectName=="isolab-experiment-launcher" and .timeoutInMinutesOverride==100
+  .projectName=="isolab-experiment-launcher" and .timeoutInMinutesOverride==130
   and .buildspecOverride==$buildspec and (.idempotencyToken|test("^[a-f0-9]{64}$"))
   and any(.environmentVariablesOverride[];
     .name=="ISOLAB_RUN_REQUEST_SHA256" and .value==$run_sha)
@@ -67,4 +67,4 @@ jq -e --arg run_sha "$run_sha" --arg buildspec \
 # or isolab-eks-mcp is not found and every launch fails with exit 127.
 grep -Fq 'export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"' "$here/run-request" \
   || { echo 'run-request does not put the launcher bin/ on PATH' >&2; exit 1; }
-printf 'Portable launch pins the reviewed run-request and 100-minute terminal bound\n'
+printf 'Portable launch pins the reviewed run-request and 130-minute terminal bound\n'

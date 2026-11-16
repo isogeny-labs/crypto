@@ -1,5 +1,59 @@
 # p1tool: the native instrument for P1 (IDEA-20261107-RR-DICKSON-TORUS)
 
+## Opt-in preprocessing continuation (2026-11-10)
+
+`emit --system rr --reduce affine|quadratic` enables constant-pivot elimination.
+It accepts a substitution only if every remaining equation stays within the
+original maximum input degree (at most two). Without `--reduce`, historical
+emission is unchanged. This bounds input degree, **not F4 solving degree**.
+The `.plant.json` carries original/reduced input digests, original equations
+and a reverse-order reconstruction map. `lift --map FILE.ms.plant.json
+--values coordinates.json` reconstructs arbitrary reduced solutions and checks
+every original equation; coordinates are a JSON array in emitted variable order.
+It does not read the stored planted values. These are producer checks, not signed
+PCC verification. It does not provide rational root enumeration or point extraction.
+
+Implementation and the pending equal-output experiment are tracked in
+[`rr_dickson_matrix_reduction_20261110`](../../../../rr_dickson_matrix_reduction_20261110/README.md).
+No new F4 measurement is asserted by this continuation.
+
+### Common-chart extraction (2026-11-12)
+
+`extract --metadata C.ms.plant.json --system-file C.ms --values values.json`
+checks a supplied rational assignment (JSON array in the emitted variable order)
+against the exact input digest and all emitted equations, reconstructs reduced
+RR variables if needed, and returns canonical signed point triples summing to R.
+The extraction path does not read stored planted coordinates. It regenerates
+the full declared tower root set from public metadata, checks cubic splitting,
+curve points and group sums, and normalizes F's x-only sign choices to R.
+
+Scope: m3, 2 <= t <= 10, distinct support abscissae, nonzero support y and C,
+support disjoint from x_R, and a monic degree-two A in the RR norm identity.
+Unsupported charts produce an error; they are not silently counted as empty
+answers. F assignments with no signed E(F_p) output on this chart return an
+empty list. This command processes one supplied assignment. It does not enumerate
+all rational solutions of a Groebner basis or certify solver completeness.
+See the continuation's dated extraction report for bounded development checks;
+no F4 degree, width or timing result is implied. [pcc:unverified]
+
+### Supplied-basis collection (2026-11-12)
+
+`collect --metadata C.ms.plant.json --system-file C.ms --gb C.gb` collects
+rational assignments when the supplied basis reduces by affine pivots and
+univariate quadratics. It checks the basis field/variable header, records the
+input/basis digests, validates each assignment through `extract`, and unions
+the normalized outputs. Contradictions produce an empty supplied-basis set;
+unsupported/free/capped residuals produce `status:unknown`, null assignments
+and exit 3. Normalization exclusions also cause exit 3 and remain explicit.
+
+Success has status `enumerated_supplied_basis`, not an original-input UNSAT
+or completeness claim. `binding.input_completeness` always states that input
+completeness is not certified: trusted basis provenance and independent input
+qualification are still required. Exit 0 alone is not that qualification.
+The collector supports RR/F only, up to 10,000 recursion nodes, 4,096 points
+and 100,000 terms per polynomial; other cases remain unknown. See
+[`COLLECTION-20261112.md`](../../../../rr_dickson_matrix_reduction_20261110/COLLECTION-20261112.md).
+
 2026-11-07. This is the instrument for proposal P1
 ([`../../../ideas/idea-generator.md`](../../../ideas/idea-generator.md), lines 41–135).
 It is a standalone Rust crate. It writes msolve 0.6.5 input files for six

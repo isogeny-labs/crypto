@@ -1,0 +1,82 @@
+{
+  "admission": "refused_budget_exhausted",
+  "budgets": {
+    "isolab-daily-cost-100": {
+      "BudgetLimit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "BudgetName": "isolab-daily-cost-100",
+      "BudgetType": "COST",
+      "CalculatedSpend": {
+        "ActualSpend": {
+          "Amount": "216.868",
+          "Unit": "USD"
+        }
+      },
+      "CostTypes": {
+        "IncludeCredit": true,
+        "IncludeDiscount": true,
+        "IncludeOtherSubscription": true,
+        "IncludeRecurring": true,
+        "IncludeRefund": true,
+        "IncludeSubscription": true,
+        "IncludeSupport": true,
+        "IncludeTax": true,
+        "IncludeUpfront": true,
+        "UseAmortized": false,
+        "UseBlended": false
+      },
+      "LastUpdatedTime": "2026-11-15T21:10:30.672000-08:00",
+      "TimePeriod": {
+        "End": "2087-06-14T17:00:00-07:00",
+        "Start": "2026-10-22T17:00:00-07:00"
+      },
+      "TimeUnit": "DAILY"
+    },
+    "isolab-monthly-account-cost": {
+      "BudgetLimit": {
+        "Amount": "1300.0",
+        "Unit": "USD"
+      },
+      "BudgetName": "isolab-monthly-account-cost",
+      "BudgetType": "COST",
+      "CalculatedSpend": {
+        "ActualSpend": {
+          "Amount": "2094.914",
+          "Unit": "USD"
+        }
+      },
+      "CostTypes": {
+        "IncludeCredit": true,
+        "IncludeDiscount": true,
+        "IncludeOtherSubscription": true,
+        "IncludeRecurring": true,
+        "IncludeRefund": true,
+        "IncludeSubscription": true,
+        "IncludeSupport": true,
+        "IncludeTax": true,
+        "IncludeUpfront": true,
+        "UseAmortized": false,
+        "UseBlended": false
+      },
+      "LastUpdatedTime": "2026-11-15T21:15:49.938000-08:00",
+      "TimePeriod": {
+        "End": "2087-06-14T17:00:00-07:00",
+        "Start": "2026-09-30T17:00:00-07:00"
+      },
+      "TimeUnit": "MONTHLY"
+    }
+  },
+  "commands": [
+    "aws sts get-caller-identity --profile ecc-challenges-new --query Account --output text",
+    "aws budgets describe-budget --profile ecc-challenges-new --account-id 104186811093 --budget-name isolab-monthly-account-cost --query Budget --output json",
+    "aws budgets describe-budget --profile ecc-challenges-new --account-id 104186811093 --budget-name isolab-daily-cost-100 --query Budget --output json"
+  ],
+  "new_job_ceiling_usd": 5,
+  "observed_at_utc": "2026-11-16T08:38:30.088484+00:00",
+  "profile_name": "ecc-challenges-new",
+  "reason": "Both account monthly and daily actual spend exceed their current budget limits; no build or job submitted.",
+  "schema": "isolab.budget-admission-readback/v1",
+  "sts_account": "104186811093"
+}
