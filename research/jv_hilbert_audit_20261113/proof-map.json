@@ -1,0 +1,52 @@
+{
+  "namespace": "JVHilbertAudit",
+  "proofs": [
+    {
+      "claim": "all-multiplier source annihilation by actual linear map",
+      "file": "CubicDual.lean",
+      "declarations": [
+        "cubicDual",
+        "cubicDual_annihilates_source_multiples"
+      ]
+    },
+    {
+      "claim": "actual ideal annihilator, h^3 nonmembership and sharp monomial cutoff",
+      "file": "SharpCutoff.lean",
+      "declarations": [
+        "sourceIdeal_le_dualAnnihilator",
+        "source_hcube_not_mem",
+        "literal_jv_sharp_monomial_cutoff"
+      ]
+    },
+    {
+      "claim": "all64dual pairings and actual quotient independence",
+      "file": "DualBasis.lean",
+      "declarations": [
+        "dualEvaluation_basis",
+        "basisVector_linearIndependent"
+      ]
+    },
+    {
+      "claim": "all24actual coordinate products, spanning and actual basis",
+      "file": "QuotientBasis.lean",
+      "declarations": [
+        "actual_coordinate_multiplication",
+        "basisSpan_eq_top",
+        "actualBasis"
+      ]
+    },
+    {
+      "claim": "actual dimension8, scalar-field length8, geometric support1 and combined closed certificate",
+      "file": "QuotientBasis.lean",
+      "declarations": [
+        "actual_coordinate_algebra_dimension",
+        "actual_scalar_module_length",
+        "actual_geometric_zero_iff",
+        "literal_jv_exact_algebra_certificate"
+      ]
+    }
+  ],
+  "hypotheses": "Actual literal source ideal over F101; no assumed GB/regularity/native value. Scalar-field length explicitly distinguished from length over the quotient algebra.",
+  "local_gate": "51/0failures/0trusted",
+  "signed_standing": "not established"
+}

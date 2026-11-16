@@ -1,0 +1,9 @@
+# Parent retention for the dynamic profile
+
+The parent recognizes the versioned dynamic strategy for canonical artifact retention and suppresses solver completion after an outer persistence failure. Ordinary dynamic artifacts use the existing bounded borrowed capture path. The exact dedicated PDP witness path/role/JSON identity is skipped because publication and final confirmation already committed it; generic capture must not republish that witness. This does not register the solver in DatasetPlan or activate runtime dispatch.
+
+The real Bound producer/restore control now moves the admitted final artifact owners to SolverData and flushes them through the parent twice. It retains the independent replay and exactly-one witness publication checks, verifies owner pointers remain unchanged, and simulates a later outer retention failure after closing the sink: completion becomes false, while local witness mathematics and the dedicated acknowledgement remain intact. Pointer checks do not prove absence of transient allocations or measure RSS.
+
+Sources checked: solvers.rs solve_with_context, retains_canonical_artifacts, record_prime_chain_persistence_error and flush_prime_chain_payloads; capture.rs payload_borrowed; prime_f4_wide_dynamic.rs take_step4_artifacts and the real Bound restore test; CAPTURE_BRIDGE.md, READONLY_PREFIX.md, CONFIRMATION_WORK.md and OUTER_CLAIMS.md in this directory. This is integration of existing custody contracts, with no new algebraic or performance claim.
+
+Implementation is isolated from the ongoing full-library validation of predecessor3adc85e597558c71042bee745882f7c39e6fb05e. Patch formatting and applicability checks passed before this commit; compiled validation is pending. Original profile admission, runtime construction, early failure/censored outcomes and central original-input replay remain unfinished. Native432 coverage still has108 failures. No new scientific cloud jobs or larger budget are implied.

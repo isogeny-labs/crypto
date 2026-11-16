@@ -5,6 +5,7 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct102/**'
       - '.github/workflows/ct102-global-eleven-field.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct102/**'
       - '.github/workflows/ct102-global-eleven-field.yml'
@@ -12,6 +13,7 @@ on:
 
 jobs:
   ct102:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

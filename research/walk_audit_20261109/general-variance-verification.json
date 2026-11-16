@@ -1,0 +1,76 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T01:38:50.952Z",
+  "source_commit": "6f963444100c059d974e42d3e30b01e502c7b8ca",
+  "source_plan_sha256": "a293b8bd9e386f9db045bc4563d1e87b7525d7d31ec1f6b7f664fd34d05509d8",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/walk_audit_20261109/lean",
+    "theorem": "WalkWeightedGeneralAudit.general_variance_audit_certificate",
+    "statement": "theorem general_variance_audit_certificate : (∀ (A : Type*) (B : Type*) [AddCommGroup A] [Fintype A] [Fintype B] [DecidableEq A] [DecidableEq B] (p : B → ℝ) (hp0 : ∀ i,0≤p i) (hp : ∑ i,p i=1) (increments : B → A), Function.Injective increments → ∀ target : A, (∑ h : Hash A B,(hashLaw p hp0 hp h).toReal*inDegree increments h target)=1 ∧ (∑ h : Hash A B,(hashLaw p hp0 hp h).toReal* (inDegree increments h target-1)^2)=1-∑ i : B,(p i)^2) ∧ (¬ ∀ increments : Fin 2 → ZMod 3, (∀ i,increments i≠0) → (∑ h : Hash (ZMod 3) (Fin 2),(uniformTwoLabelLaw h).toReal* (inDegree increments h 0-1)^2)=1-∑ _i : Fin 2,(1/2:ℝ)^2)",
+    "decl_sha256": "dab72e540963ac90a31df1b3731120dc8ad7cd8bfca3e0e9b65b158b680c2720",
+    "sources": [
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      }
+    ],
+    "gate": {
+      "path": "evidence/general-variance-gate.log",
+      "declarations": 70,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every finite abelian group, every finite distinct increment table, all nonnegative normalized real label laws, actual product PMF and actual in-degree cardinality at every target. Exact mean1/variance1-sum(p_i²). Direct nonzero-only universal disproof by duplicate+1steps onZ3, variance0versus1/2. No collision-time/mixing asymptotic claim."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-4e62d0",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-4e62d0",
+      "claim_sha256": "9d210b92b4eace2471ccf0ef4d97e691306233608f815170b4bb52d19a8c53aa",
+      "commit": "6f963444100c059d974e42d3e30b01e502c7b8ca",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/walk_audit_20261109/lean (WalkWeightedGeneral.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T01:29:41Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-4e62d0",
+      "claim_sha256": "9d210b92b4eace2471ccf0ef4d97e691306233608f815170b4bb52d19a8c53aa",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-general-variance/report.pdf",
+    "bytes": 58370,
+    "sha256": "1d011a5865eee318fa3b9eb9ca1f59d5684b2a0512cc4ae0e15536fa361c6599",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "graph_inspected": true
+  },
+  "scope": "Every finite abelian group, every finite distinct increment table, all nonnegative normalized real label laws, actual product PMF and actual in-degree cardinality at every target. Exact mean1/variance1-sum(p_i²). Direct nonzero-only universal disproof by duplicate+1steps onZ3, variance0versus1/2. No collision-time/mixing asymptotic claim.",
+  "paid_compute": 0
+}

@@ -1,0 +1,894 @@
+{
+  "schema": "koblitz.interim-raw-snapshot/v1",
+  "round": 50,
+  "round_sealed": false,
+  "source_revision": "d924e5d359f7b9b862bee32176c6dab3192b8f80",
+  "attempts": [
+    {
+      "attempt": "boundary50-01",
+      "source_revision": "6777e47e46eb01248ae8d9a677dba1a3d1e6d97f",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "BOUNDARY50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "BOUNDARY50_RESULT conjugate_pairs=2 refined_geometric_points=4 plane_closed_points=1 refined_closed_points=2 source_bound_fiber_separation=true"
+      ],
+      "exports": {
+        "boundary-certificate50.sing": {
+          "sha256": "c0b146d5a61486dbad955a1db434be3d6c8d14f56fd7a5dcaad0f8dc69ba7ff4",
+          "bytes": 243
+        }
+      }
+    },
+    {
+      "attempt": "candidate50-01",
+      "source_revision": "47ac238cf8b1958d433dab8fea9ae493223c7144",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CANDIDATE50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "CANDIDATE50_RESULT norm_degree=32 scale_u_power=4 monic_integral_candidate=true rational_arrays_exported=true model_binding_verified=false normalization_performed=false"
+      ],
+      "exports": {
+        "integral-candidate50.sing": {
+          "sha256": "76dfc62d8586e1dde2dbc6fbb3a3adcfdf8df508cd99c19772c5694db237f7da",
+          "bytes": 1608
+        },
+        "rational-candidate50.sing": {
+          "sha256": "563d2b4f3f1bb0f6bc11ea7cc9839570f0a7c446576a015610271cdf46f2b343",
+          "bytes": 14462
+        }
+      }
+    },
+    {
+      "attempt": "chart50-01",
+      "source_revision": "a267c8d59370d443c78db77409fabe7ed24a5468",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHART50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "CHART50_RESULT monic_charts=2 polynomial_degree=32 weighted_degree=128 overlap_products=8 unit_maps=2 inverse_transition_verified=true"
+      ],
+      "exports": {
+        "infinity-candidate50.sing": {
+          "sha256": "42086c6b5a159172ee5e8dae9d0b21b3c5fa6bb5071bd55fa686af23f51b72cd",
+          "bytes": 1565
+        },
+        "overlap-certificate50.sing": {
+          "sha256": "f48b1a2de5b8abdaac6a47387381ccf4576ef5ce028c72ad48740fdf17c91dc8",
+          "bytes": 391124
+        }
+      }
+    },
+    {
+      "attempt": "defect50-01",
+      "source_revision": "214feb878aca3c166c41f02c11b3fa258ad23943",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DEFECT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "DEFECT50_RESULT finite_F2_length=898 infinity_local_F2_length=94 global_F2_length=992 plane_arithmetic_genus=1953 refined_arithmetic_genus=961"
+      ],
+      "exports": {
+        "defect-lengths50.sing": {
+          "sha256": "48c20d51f8bd41207204ae1c6512607ade3a65d62547c7eb01ce7c36995161e1",
+          "bytes": 12505
+        }
+      }
+    },
+    {
+      "attempt": "denominator50-01",
+      "source_revision": "c7e237dc2c7933ac86ace2e95f06753b45b57978",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DENOM50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? not univariate",
+        "   ? error occurred in or before input.sing line 19: `list controlBez50=extgcd(controlA50,controlB50);`",
+        "   ? `controlBez50` is not defined",
+        "   ? error occurred in or before input.sing line 21: `print(\"DENOM50_STAGE extgcd_control_pass=true actual_Bezout_begin=true\");`",
+        "   ? not univariate",
+        "   ? error occurred in or before input.sing line 22: `list bez50=extgcd(a50,b50);`",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 24: `number gcdValue50=leadcoef(bez50[1]);`",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 25: `poly x50=bez50[2]/gcdValue50;poly y50=bez50[3]/gcdValue50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 25: `poly x50=bez50[2]/gcdValue50;poly y50=bez50[3]/gcdValue50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `x50` is not defined",
+        "   ? error occurred in or before input.sing line 28: `poly inverseB50=x50^2*a50+(y50^2+(u^3+u)*x50^2)*b50;`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? `inverseB50` is not defined",
+        "   ? error occurred in or before input.sing line 31: `link bezOut50=\"ASCII:w denominator-certificate50.sing\";open(bezOut50);`",
+        "   ? `bezOut50` is not defined",
+        "   ? error occurred in or before input.sing line 31: `link bezOut50=\"ASCII:w denominator-certificate50.sing\";open(bezOut50);`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 32: `y50=\"+string(y50)+\";poly inverseB50=\"+string(inverseB50)+\";\");close(bezOut50);`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `bezOut50` is not defined",
+        "   ? error occurred in or before input.sing line 32: `y50=\"+string(y50)+\";poly inverseB50=\"+string(inverseB50)+\";\");close(bezOut50);`",
+        "   ? `candidateIdeal50` is not defined",
+        "   ? error occurred in or before input.sing line 44: `ue integral_scaling_bound=true original_four_forward_equations_pending=true\");`"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {}
+    },
+    {
+      "attempt": "denominator50-02",
+      "source_revision": "3dad6ed3c30d6d8903ec344b06f30fc37b0556ec",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DENOM50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "DENOM50_RESULT actual_Bezout_checked=true denominator_unit_certificate=true inverse_corruption_rejected=true norm_source_membership=true reverse_coordinates=true integral_scaling_bound=true original_four_forward_equations_pending=true"
+      ],
+      "exports": {
+        "denominator-certificate50.sing": {
+          "sha256": "c605f130798bce376e61c0a2ba90873860c95ee7dbbc9dd08bed8ac125fa92a0",
+          "bytes": 351687
+        }
+      }
+    },
+    {
+      "attempt": "fiber50-01",
+      "source_revision": "640e0b14d528a8c1e6dc945a87992d2a04d52cc5",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIBER50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "FIBER50_RESULT plane_fiber_exponent=16 refined_fiber_exponent=8 content_power=8 full_source_product=true witness_separated=1"
+      ],
+      "exports": {
+        "parameter-saturation50.sing": {
+          "sha256": "9ff42350ceeed51182ddcb7560d035de1a71439f1293fcc04b85bc30022cbf73",
+          "bytes": 2293
+        }
+      }
+    },
+    {
+      "attempt": "forward50-01",
+      "source_revision": "9494c9f241ba0b8f771e9e1ac9f47597e0b96f81",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FORWARD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? conversion error: denominator!= 1",
+        "   ? error occurred in or before input.sing line 56: ` poly quotient50=image50/monic50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `actualSource50` is not defined",
+        "   ? error occurred in or before input.sing line 82: `products=4 corrupted_equations_rejected=4 rational_source_map_verified=true\");`"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {
+        "forward-certificate50.sing": {
+          "sha256": "60b0154ede0c3444a0dcbde00f01239d934d7d7e2fc19c978387e351aa477985",
+          "bytes": 1607
+        }
+      }
+    },
+    {
+      "attempt": "forward50-02",
+      "source_revision": "b077db435daf50dfb2f338d26ddd412b2f4732de",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FORWARD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "FORWARD50_RESULT original_generators=4 complete_denominator_cleared_products=4 corrupted_equations_rejected=4 rational_source_map_verified=true"
+      ],
+      "exports": {
+        "forward-certificate50.sing": {
+          "sha256": "11d4c32ef358042c430ca16328937eccbc98b6d8939866a1fffa0d7241e404da",
+          "bytes": 760143
+        }
+      }
+    },
+    {
+      "attempt": "lean50-01",
+      "source_revision": "a267c8d59370d443c78db77409fabe7ed24a5468",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Rational50.bezout_norm_inverse",
+        "Rational50.field_map_bijective_of_equal_finrank",
+        "Rational50.linear_coordinate_numerator",
+        "Rational50.overlap_coordinate_roundtrip",
+        "Rational50.quadratic_norm_zero_iff",
+        "Rational50.zero_denominator_counterexample"
+      ]
+    },
+    {
+      "attempt": "local-lean50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Local50.bezout_intersection_reconstruction",
+        "Local50.exact_eighth_power_nilpotency",
+        "Local50.scaled_quadratic_identity"
+      ]
+    },
+    {
+      "attempt": "local50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "LOCAL50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "LOCAL50_RESULT monic_integral_witness=true source_module_presentation=true plane_determinant_product=true CRT_comaximal_product=true block_F2_dimension=128 exact_parameter_exponent=8"
+      ],
+      "exports": {
+        "local-block50.sing": {
+          "sha256": "b285bbf5b643fa705e522bc572c9cfe7b7462695051e0298a1b834dbd6bb24b0",
+          "bytes": 5390
+        }
+      }
+    },
+    {
+      "attempt": "marked-lean50-01",
+      "source_revision": "0a959c557d19394e5bd088395a77e08e6c40351a",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "marked23-50-01",
+      "source_revision": "1631d9529647e30f790f309767bdfbcb7c5bb970",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MARK23_50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? error occurred in or before ::add23 line 4: `oly xxx=right[2];poly yyy=right[3];poly slope;poly intercept;poly denominator;`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? last reserved name was `denominator`",
+        "   ? leaving ::add23 (2)",
+        "   ? leaving ::add23 (2)",
+        "   ? `def` == `int` failed",
+        "   ? expected `int` == `int`",
+        "   ? expected `ring` == `int`",
+        "   ? expected `intvec` == `int`",
+        "   ? error occurred in or before ::pointResidual23 line 3: ` poly xx=pt[2];poly yy=pt[3];`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? leaving ::pointResidual23 (0)",
+        "   ? leaving ::add23 (2)",
+        "   ? `def` <> `int` failed",
+        "   ? expected `int` <> `int`",
+        "   ? error occurred in or before input.sing line 128: `link pointOut23=\"ASCII:w marked23-points50.sing\";open(pointOut23);`",
+        "   ? `pointOut23` is not defined",
+        "   ? error occurred in or before input.sing line 128: `link pointOut23=\"ASCII:w marked23-points50.sing\";open(pointOut23);`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 129: `write(pointOut23,\"list prefixPoints23;\");`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 135: `)+\",poly(\"+string(accumulator23[2])+\"),poly(\"+string(accumulator23[3])+\"));\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `pointOut23` is not defined",
+        "   ? error occurred in or before input.sing line 145: `close(pointOut23);close(inverseOut23);`",
+        "   ? MARK23_ORDER_NOT_23"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [
+        "MARK23_50_RESULT prime_generic_degree=7 inverse_coordinates=true nonsingular_Tate_curve=true point_exact_order=23 checked_prefixes=5 QR7_extension_not_yet_computed=true"
+      ],
+      "exports": {
+        "marked23-field50.sing": {
+          "sha256": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+          "bytes": 2701
+        },
+        "marked23-inverses50.sing": {
+          "sha256": "259be8a9e07c11107b9d450200efa325ae1db62e42ddfd299cbf6c2c07ecf945",
+          "bytes": 3490
+        }
+      }
+    },
+    {
+      "attempt": "marked23-50-02",
+      "source_revision": "d7b5805cf5ccb3e5ece468d84f6357e63765bb07",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MARK23_50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "MARK23_50_RESULT prime_generic_degree=7 inverse_coordinates=true nonsingular_Tate_curve=true point_exact_order=23 checked_prefixes=5 QR7_extension_not_yet_computed=true"
+      ],
+      "exports": {
+        "marked23-field50.sing": {
+          "sha256": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+          "bytes": 2701
+        },
+        "marked23-inverses50.sing": {
+          "sha256": "30e45a25c78270ce8b1532bdc185af26dee17c050b0aab5438d0d429284ba267",
+          "bytes": 17536
+        },
+        "marked23-points50.sing": {
+          "sha256": "10876a9d5fa019c9c0439982bcf1e3e3b77f5e762f2c909722503813074319c1",
+          "bytes": 2491
+        }
+      }
+    },
+    {
+      "attempt": "normal-finite50-01",
+      "source_revision": "84740530e53b90fd197e2f3d9c3d6114bb3ea5c0",
+      "kind": "Singular",
+      "native_exit": 124,
+      "marker": "NORMAL50_PRODUCER_PASS",
+      "marker_present": false,
+      "native_errors": [],
+      "timeout": true,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {
+        "prime-components50.sing": {
+          "sha256": "9be50cbddab1ad3e1e26bf90afb248d0754c171d626dad14c80ea47748dca020",
+          "bytes": 2548
+        },
+        "selected-prime50.sing": {
+          "sha256": "f7f6acad368cdc565ff925b6cd05709e0aba526d6d9c9870874eb4668ab1eb07",
+          "bytes": 5037
+        }
+      }
+    },
+    {
+      "attempt": "normal-relative-finite50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "NORMAL_RELATIVE50_PRODUCER_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? NORMAL_RELATIVE50_COEFFICIENT_DESCENT"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [
+        "NORMAL_RELATIVE50_RESULT normalization_output_computed=true delta=818 output_variables=22 serialization_checked=true independent_verification_required=true"
+      ],
+      "exports": {
+        "fractional-module50.sing": {
+          "sha256": "45c13706d22b8b85bf61b441bc642311337aa2f3e3535505818c52a516d153c9",
+          "bytes": 66337
+        },
+        "normalization50.sing": {
+          "sha256": "951025a6faa9cbbc9f1844156db471c9e0fd638ed62c15ef81baacf8c780ed82",
+          "bytes": 2699742
+        },
+        "prime-components50.sing": {
+          "sha256": "1e5188aea2adbaaa6acbbd20923ee35b92bd2779799ccf329728fe1159b40e4b",
+          "bytes": 1195
+        },
+        "selected-prime50.sing": {
+          "sha256": "da78bc60419c0c862dbf9f19f8467fe5d5fc4145cbf3d34dc62239252687047a",
+          "bytes": 2331
+        }
+      }
+    },
+    {
+      "attempt": "normal-relative-infinity50-01",
+      "source_revision": "d7b5805cf5ccb3e5ece468d84f6357e63765bb07",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "NORMAL_RELATIVE50_PRODUCER_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "NORMAL_RELATIVE50_COEFFICIENT_FIELD charstr=ZZ/2 characteristic=2 parameters=0",
+        "NORMAL_RELATIVE50_RESULT normalization_output_computed=true delta=376 output_variables=14 serialization_checked=true independent_verification_required=true"
+      ],
+      "exports": {
+        "fractional-module50.sing": {
+          "sha256": "e71ad173db5fa6cdbfd516d333e0e56fbb9a30b87df0e57e4e3466e42f1ee627",
+          "bytes": 16915
+        },
+        "normalization50.sing": {
+          "sha256": "4583cbf1dfa80caa16e98eb194e0a17fbea95811017fe87bde4328934ac8b02f",
+          "bytes": 458173
+        },
+        "prime-components50.sing": {
+          "sha256": "660cc8b8d7a5c480d5c6620f3e158d854303f5aa436655afe1d5e3ff95109394",
+          "bytes": 1212
+        },
+        "selected-prime50.sing": {
+          "sha256": "43eac9d7f5a80fe91daaaa7310bbd24844a58899518aae16eaa0d6df4c88fcb7",
+          "bytes": 2365
+        }
+      }
+    },
+    {
+      "attempt": "quotient50-01",
+      "source_revision": "889be41f73e0ba429e657b858017490dce91290a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "QUOTIENT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "QUOTIENT50_RESULT proper_quotient_charts=2 quotient_rank=16 coupled_source_rank=32 overlap_full_products=5 arithmetic_genus=449 normalization_not_computed=true"
+      ],
+      "exports": {
+        "coupled-quotient-finite50.sing": {
+          "sha256": "c5ab8e59b503feffe450ffdb93cf960b824f9939a8b144acb886932b82f262ac",
+          "bytes": 8861
+        },
+        "coupled-quotient-infinity50.sing": {
+          "sha256": "a7615bc45542eb0eacb3d0b75596a2bde726af40d0009a98d74094eacbab96b9",
+          "bytes": 9174
+        },
+        "quotient-finite50.sing": {
+          "sha256": "7c3729c61e518e7d09caa6ea5c8fe87011b13e83b46fe6a0c56934822cac98ca",
+          "bytes": 1053
+        },
+        "quotient-infinity50.sing": {
+          "sha256": "730e7ae08c3ea7dc79f89a1b9367ad6b7f5972f9a7a46b5d424fbb5e2134701c",
+          "bytes": 1060
+        },
+        "quotient-overlap50.sing": {
+          "sha256": "4f180c7e7495ae92df17bb1f9439a21d2ee3d7aa01adb774e3c8ae7733b75192",
+          "bytes": 45055
+        }
+      }
+    },
+    {
+      "attempt": "relative50-01",
+      "source_revision": "ff6a9988e4fd5f7ed81bde8e8036ba4c8ad0d802",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RELATIVE50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RELATIVE50_RESULT charts=2 quadratic_base_degree=2 relative_monic_degree=16 generic_degree=32 plane_norm_products=2 overlap_products=12 unit_maps=2 integral_v_adjoined=true"
+      ],
+      "exports": {
+        "relative-finite50.sing": {
+          "sha256": "46cd94628834eddf57756574265ac4b1f4be2a44c76ba7a81e92a290a75c5605",
+          "bytes": 1189
+        },
+        "relative-infinity50.sing": {
+          "sha256": "d5a0a0ef9ab7e8e2a4f2571441bebd5eb4a92e0327b321cc7191a55fa334a782",
+          "bytes": 905
+        },
+        "relative-overlap50.sing": {
+          "sha256": "004414eba5cc1b7426697a9f0c689ebda924841a8daf605fd4f767733d7cab81",
+          "bytes": 100778
+        }
+      }
+    },
+    {
+      "attempt": "rr-field50-01",
+      "source_revision": "889be41f73e0ba429e657b858017490dce91290a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_FIELD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RR_FIELD50_RESULT source_degree=32 descended_sections=68 complete_space_products=196 columns=196 rows=32 coefficient_field=F2(u) module_normalization_not_yet_computed=true"
+      ],
+      "exports": {
+        "rr-field50.sing": {
+          "sha256": "430662a07f0436caa2ce38c82a28c84c9041d200d78d7eb27589adc7816f72e0",
+          "bytes": 1780872
+        }
+      }
+    },
+    {
+      "attempt": "separation50-01",
+      "source_revision": "6777e47e46eb01248ae8d9a677dba1a3d1e6d97f",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "separation50-02",
+      "source_revision": "ec189014410bcfb440608b6b47d292130dfada25",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "separation50-03",
+      "source_revision": "640e0b14d528a8c1e6dc945a87992d2a04d52cc5",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Separation50.evaluations_exclude_image"
+      ]
+    },
+    {
+      "attempt": "verify-relative-finite50-01",
+      "source_revision": "214feb878aca3c166c41f02c11b3fa258ad23943",
+      "kind": "Singular",
+      "native_exit": 124,
+      "marker": "VERIFY_RELATIVE50_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "native_errors": [],
+      "timeout": true,
+      "status": "rejected",
+      "result_lines": [
+        "VERIFY_RELATIVE50_COEFFICIENT_FIELD charstr=ZZ/2 characteristic=2 parameters=0"
+      ],
+      "exports": {}
+    }
+  ],
+  "status_counts": {
+    "accepted": 16,
+    "rejected": 9
+  },
+  "archive_sha256": "d46a49cb903b2892d42d020f75f76b597abd18f896c715d9654c5d56c5f70aa3",
+  "archive_bytes": 578892,
+  "members": {
+    "runs/boundary50-01/boundary-certificate50.sing": "c0b146d5a61486dbad955a1db434be3d6c8d14f56fd7a5dcaad0f8dc69ba7ff4",
+    "runs/boundary50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/boundary50-01/finished-utc.txt": "5ef454dfc5dd4fc0a59f2710121fbc9866b24db5143811275dd831e8306678d9",
+    "runs/boundary50-01/gate.log": "abc1c6f159a1a32b64c3b0b08a37cacf461e030d4b7af06443112fd8b58e074f",
+    "runs/boundary50-01/input.sing": "89e27b437c68d3c1955b90486e584a317e80b871e4e9feffcd0262641aa4642b",
+    "runs/boundary50-01/native.log": "fed09c006b69541068c02ec15a672741c8728883bf6f896a091f3403469ae5aa",
+    "runs/boundary50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/boundary50-01/source-revision.txt": "77688b3e3c04a381a3302bce1fc7618cdaf6c294e0c278c870af1da751f593c0",
+    "runs/boundary50-01/source.sha256": "9cf14276b46fefaa95a1af76f914edbc2001d96492b3501317eb8118d84de54e",
+    "runs/boundary50-01/started-utc.txt": "9dc5a37a208980582ff2ce3db23cc9d866dc5aeca5f3896ede9492165742b85f",
+    "runs/candidate50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/candidate50-01/finished-utc.txt": "643f6c240eb692e729054c8a94fcd0cabcf1261c85931406f49447dd6951e35b",
+    "runs/candidate50-01/gate.log": "9b491b5b2cb62941f27e338d4bc32a45a583d023ce78b9c0cb107c122221b02d",
+    "runs/candidate50-01/input.sing": "1ad461dba720867ebdf75a3a71801f0b43d9857f4d64c40f60f3e7b0b6369dd6",
+    "runs/candidate50-01/integral-candidate50.sing": "76dfc62d8586e1dde2dbc6fbb3a3adcfdf8df508cd99c19772c5694db237f7da",
+    "runs/candidate50-01/native.log": "89878adf511258a0f7264f45703f6f55e85ad24c2289f88468a4f1c538391fda",
+    "runs/candidate50-01/rational-candidate50.sing": "563d2b4f3f1bb0f6bc11ea7cc9839570f0a7c446576a015610271cdf46f2b343",
+    "runs/candidate50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/candidate50-01/source-revision.txt": "e5aa8f9604787a5410c919b013f133ab661229b798d4930275b9e54e7610a7c1",
+    "runs/candidate50-01/source.sha256": "34a86fce467fe681a518fbe531f41374ff0135c569bbd633a4d0a59437ae1dc2",
+    "runs/candidate50-01/started-utc.txt": "8da6bf86f385e21c540f02a2a189223f4611f568915c2a035b8b0c03a844888c",
+    "runs/chart50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/chart50-01/finished-utc.txt": "9f4647d4bbacb91a5fb89ee3a65c61d1b24740430a47e893feb8c189bc01172e",
+    "runs/chart50-01/gate.log": "10517ab745c884d88de6137ccdc389b58c5c5c7c34cfe231dad4e5b1f335e4e3",
+    "runs/chart50-01/infinity-candidate50.sing": "42086c6b5a159172ee5e8dae9d0b21b3c5fa6bb5071bd55fa686af23f51b72cd",
+    "runs/chart50-01/input.sing": "e47371c19a539785a38371c0cfab8f077371fd4ec28d954887d496da9f8dc27f",
+    "runs/chart50-01/native.log": "ff29c91556478acaf0aa9d63636c3eec8fc8d921619cff4f33ce3b6e50cdd8ce",
+    "runs/chart50-01/overlap-certificate50.sing": "f48b1a2de5b8abdaac6a47387381ccf4576ef5ce028c72ad48740fdf17c91dc8",
+    "runs/chart50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/chart50-01/source-revision.txt": "00cbdc77f97812fe35ff3bc1eda24f5de8ff2b5272fd18f3def4dfe51d3918b9",
+    "runs/chart50-01/source.sha256": "0363497def2ff0d89b1c14d87b11d0f87d5ab24e4947b29d8c2836d036e4c414",
+    "runs/chart50-01/started-utc.txt": "9f4647d4bbacb91a5fb89ee3a65c61d1b24740430a47e893feb8c189bc01172e",
+    "runs/defect50-01/defect-lengths50.sing": "48c20d51f8bd41207204ae1c6512607ade3a65d62547c7eb01ce7c36995161e1",
+    "runs/defect50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/defect50-01/finished-utc.txt": "bea7c5a3d1a10e90326f9ee2b3f416fca8ca64fef683c9886c18e58e169af71c",
+    "runs/defect50-01/gate.log": "b0e058c6c4ac7d4a8dfea685be7c9fd7558cb1c99f2d0568c128c81d625ef5b7",
+    "runs/defect50-01/input.sing": "e6f36686667cb4516778ee7898311d1f6a62a2eae3ee8c74ae4909ae7889d12c",
+    "runs/defect50-01/native.log": "5d7682429290df39e562a005b18386520c3e48aa72bd6dcf84350d89ad642b3c",
+    "runs/defect50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/defect50-01/source-revision.txt": "91b0510b0d4b54bf65760bdf282effcc6aee20cd49cc52224d611d5b4748db8e",
+    "runs/defect50-01/source.sha256": "af8af9f8a737e3f241bea1657b37d280a3c057a5f7ebe9380d87af29d98c648f",
+    "runs/defect50-01/started-utc.txt": "bea7c5a3d1a10e90326f9ee2b3f416fca8ca64fef683c9886c18e58e169af71c",
+    "runs/denominator50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/denominator50-01/finished-utc.txt": "31f1d8f21888889a6ed7aa9a5b4e227ebad3e3310fd44f0b6f686c7d01c3c79d",
+    "runs/denominator50-01/gate.log": "cc48719dfef81f75fdc696eaa340cd33b10dcf8d99155cd0887cba0d66fe6ae6",
+    "runs/denominator50-01/input.sing": "d5fd7b0241acfc1046890dbf3256b73e81fd4e931beed6c7321238adf9a3a2de",
+    "runs/denominator50-01/native.log": "9f94e16782d72be45d2bb1185f72b17a8b89e53a9a79feb66fb20be10a6470cd",
+    "runs/denominator50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/denominator50-01/source-revision.txt": "ba2811409df5638dc662c4e0641e0b971a1f5dc118c7cad7fb8df5bd95824337",
+    "runs/denominator50-01/source.sha256": "ac83267a98479753ab54f08bfe442145692503bc48b4caa2667d53657fe8629a",
+    "runs/denominator50-01/started-utc.txt": "31f1d8f21888889a6ed7aa9a5b4e227ebad3e3310fd44f0b6f686c7d01c3c79d",
+    "runs/denominator50-02/denominator-certificate50.sing": "c605f130798bce376e61c0a2ba90873860c95ee7dbbc9dd08bed8ac125fa92a0",
+    "runs/denominator50-02/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/denominator50-02/finished-utc.txt": "c3e5ba7719bcf7f0c2f8c21b6a981b4d100620a4693834e3fec2f6923e90e10e",
+    "runs/denominator50-02/gate.log": "a3492dc37eb9a344cdb73fd40e1d4965c4c0f66526e407669402c7b13d86d5e3",
+    "runs/denominator50-02/input.sing": "15f2a70a5a924f93acbd523ab136ea3146017a652002ae2669a61c29826effcc",
+    "runs/denominator50-02/native.log": "9cfdf377130482ad656a87bd484c65dcd88ea11b8d2fbbf28cbc72fc4f98e231",
+    "runs/denominator50-02/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/denominator50-02/source-revision.txt": "a17189e459593d92410b1deb4bd6ac13bab0267398fcbeb872e8326f12630e88",
+    "runs/denominator50-02/source.sha256": "baef1974ba9faad4512336c8ca382813734d55d16eb02e8e46491716cc3f37e3",
+    "runs/denominator50-02/started-utc.txt": "fbab06192b18b651360d1adfa7ae5fcced780868a26a812c736ed61e48e1bf0e",
+    "runs/fiber50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/fiber50-01/finished-utc.txt": "f0d67fbd063995606722afed6ef881baaa27e263821233d7e77c268d6b3b389a",
+    "runs/fiber50-01/gate.log": "99ebbe4a3befb5d1874447431787b86ead90ec1f902681c3bac149448575158e",
+    "runs/fiber50-01/input.sing": "980646c08b6e37d00d7775867009035e02b16d2915ab125a15a6f55a8fb3fc9e",
+    "runs/fiber50-01/native.log": "65b5c0282102bf5a005917fb0e6183abbd1d8067f9defb23902fe54101732665",
+    "runs/fiber50-01/parameter-saturation50.sing": "9ff42350ceeed51182ddcb7560d035de1a71439f1293fcc04b85bc30022cbf73",
+    "runs/fiber50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/fiber50-01/source-revision.txt": "9b57c5724ee81fd36cd37ef0027d811631b0a34f60ee48787668fc06f72fd519",
+    "runs/fiber50-01/source.sha256": "c586bbab176fdf92d8530b516782c6e08604072393214e4c12aa299b0e7ff8b4",
+    "runs/fiber50-01/started-utc.txt": "f0d67fbd063995606722afed6ef881baaa27e263821233d7e77c268d6b3b389a",
+    "runs/forward50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/forward50-01/finished-utc.txt": "90e51e94b5c0f9523c6b11def1d97d9ebab325bb1ea8cdd14b849fa4e8fcc527",
+    "runs/forward50-01/forward-certificate50.sing": "60b0154ede0c3444a0dcbde00f01239d934d7d7e2fc19c978387e351aa477985",
+    "runs/forward50-01/gate.log": "5f514267c835fb1d216780f211eb446df29989056821c8c4e927b706945fb835",
+    "runs/forward50-01/input.sing": "e141ba4816beb9128fece48e9b606962ecab64d46f4843560c1553bca373c602",
+    "runs/forward50-01/native.log": "9d9b30fc3a9d8872f0990810e956b534ecdc0c6abb8da17cf7839109a7637f5f",
+    "runs/forward50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/forward50-01/source-revision.txt": "929adb1c341e4a482590c4716703f849fa76776543a57177bf240c8cef662c4a",
+    "runs/forward50-01/source.sha256": "763626fa1000a3a3e1f2e46554a1616ee360a89f8ea854faca76ff23c56bb800",
+    "runs/forward50-01/started-utc.txt": "5740b06038761d39bf1b8508536cb28e485812401aecd716d655fb348ff883c0",
+    "runs/forward50-02/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/forward50-02/finished-utc.txt": "5c3743d9a43a6074232ba085e8cc369183f8063085a0d145f5dca864bcf62a4f",
+    "runs/forward50-02/forward-certificate50.sing": "11d4c32ef358042c430ca16328937eccbc98b6d8939866a1fffa0d7241e404da",
+    "runs/forward50-02/gate.log": "7f911a033a055dc121bd3a86efa4aa82f0eaea730f46fb1dbce93ab398cb6e1d",
+    "runs/forward50-02/input.sing": "2b244b64353cc2c8856c823e49cad63695228f9fc8ab80b59a92d52e9b2f3a74",
+    "runs/forward50-02/native.log": "a0ef3cee935767d8b3bfe669d7fcc85a25c1fb4228be7beb40bc2e2acac1b932",
+    "runs/forward50-02/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/forward50-02/source-revision.txt": "2aed61d2fb0a8f600bde0462e7bf97cdd6057612dc8d138a78b109d468dc9193",
+    "runs/forward50-02/source.sha256": "2070b7cc0506c69a7a75cdd3324e6621a4c5ee369d69c10c856a9ba5e7a97e3d",
+    "runs/forward50-02/started-utc.txt": "27b692f351168f4cefb009c9e66af8b794b26f259652ccae7520612ed86c4246",
+    "runs/lean50-01/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/lean50-01/Rational50.lean": "dd36cedd9b0d849a6f97fa4e75d0093746b1d83f7b445265f13bbb4cd9529c24",
+    "runs/lean50-01/audit.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/lean50-01/audit.log": "9e710f45195e5ae1d52f475f0ebc86fe2ada92f3af3bff1bdc2f29dd24632e86",
+    "runs/lean50-01/compile.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/lean50-01/compile.log": "bf1b0a83e86e420a0988b75c6a7be789dc70eccc25a24dea69bb0f8de04c67f2",
+    "runs/lean50-01/gate.log": "b9faf03ba6f9c9581bcfc03d4c60b05d0b8f2c5ad26d1c708c7ddc4f2206ae34",
+    "runs/lean50-01/runner.sh": "bd252b9f61b743bfd9268294d362ca8633530a663be7bb47b579f57da9299558",
+    "runs/lean50-01/source-revision.txt": "00cbdc77f97812fe35ff3bc1eda24f5de8ff2b5272fd18f3def4dfe51d3918b9",
+    "runs/lean50-01/source.sha256": "c8b67fee446661084fcf8079c3e875ad4203fbf58f056d0c94b68259da0fa7b8",
+    "runs/lean50-01/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/local-lean50-01/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/local-lean50-01/Local50.lean": "70f0ca48d511e42438095e0949834df39dee6e2a9912a1ac28f6b2545bab647d",
+    "runs/local-lean50-01/audit.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/local-lean50-01/audit.log": "128a1752eb2829e8e2363bcc226375361cc3a588af01b6a022dd2c807e2b5992",
+    "runs/local-lean50-01/compile.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/local-lean50-01/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/local-lean50-01/gate.log": "6383b45857d178065c47fa33a2b3cec604a32cf502b64a6f65c643a444af1329",
+    "runs/local-lean50-01/runner.sh": "7cf49cd5ce1b4fa3823a7548f1d8321d8c828f4591091ae7ac66ce83741d47d3",
+    "runs/local-lean50-01/source-revision.txt": "22ebbc72f91e82c580577b2e1fb3fb9ca1915d0975c64c7fa89cedce33284692",
+    "runs/local-lean50-01/source.sha256": "652e696c0a79477a2d6205cca55fbcbc153d956e4b1482626fa75bc8a37bff91",
+    "runs/local-lean50-01/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/local50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/local50-01/finished-utc.txt": "8a8f8d98da7648d6e1c369b0cb6416186b55c2aa10b1942262f8a6d4fb0f46bb",
+    "runs/local50-01/gate.log": "4a91bbd639f02b55b3d4047f167c069a0efd63e1452d5714b9fc7ad9a834d649",
+    "runs/local50-01/input.sing": "d316dcb5202099ca5a5204f33ab8e26fe3db92b1694381b836a6f496ec7dbe5f",
+    "runs/local50-01/local-block50.sing": "b285bbf5b643fa705e522bc572c9cfe7b7462695051e0298a1b834dbd6bb24b0",
+    "runs/local50-01/native.log": "862f8e5e4f9bf3d30f672330f1e0ad34ba52a62b6128608f3865514499eb7a60",
+    "runs/local50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/local50-01/source-revision.txt": "22ebbc72f91e82c580577b2e1fb3fb9ca1915d0975c64c7fa89cedce33284692",
+    "runs/local50-01/source.sha256": "c8e5e2c9836aef4ba901ac4cba60dd9807f8d39895574d7dd79f9a29429ea183",
+    "runs/local50-01/started-utc.txt": "8a8f8d98da7648d6e1c369b0cb6416186b55c2aa10b1942262f8a6d4fb0f46bb",
+    "runs/marked-lean50-01/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/marked-lean50-01/Marked23_50.lean": "70dec78db81f377259011e90c193b57129a61679ad0b5aa3ad51360361872094",
+    "runs/marked-lean50-01/compile.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "runs/marked-lean50-01/compile.log": "e239d08110ef9b08731e670606e2c607fb0f0349e5f1c82383543e2173eee04b",
+    "runs/marked-lean50-01/gate.log": "7f9deff439966a91e939b8853f1a8258c69b3475d6ed2b5c7ad38f813ae93cb4",
+    "runs/marked-lean50-01/runner.sh": "abbce6cf96c58ae19b173104279463c0890dcf04e8c774df49f81b7924b7ef10",
+    "runs/marked-lean50-01/source-revision.txt": "b440f280aa5abd4907626f285f586447f40761cc51ba11fe9bc601207022e4da",
+    "runs/marked-lean50-01/source.sha256": "06cd94adf64e27c57f2e52b5978edc80e7e35bc23568b23b573235c6a1742aa3",
+    "runs/marked-lean50-01/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/marked23-50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/marked23-50-01/finished-utc.txt": "b7707ae808ba5ec99526b649571e950d99ce8991810a8f1c680cf492c138a60c",
+    "runs/marked23-50-01/gate.log": "215ee136b1454236a36bad2982287117470c8ff151e192469d9eb13332608dc5",
+    "runs/marked23-50-01/input.sing": "8f421da63e74b309a387b2625c1b5ab56693e91dd0c0350979abb9b41da14247",
+    "runs/marked23-50-01/marked23-field50.sing": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+    "runs/marked23-50-01/marked23-inverses50.sing": "259be8a9e07c11107b9d450200efa325ae1db62e42ddfd299cbf6c2c07ecf945",
+    "runs/marked23-50-01/native.log": "49005d45ae7bb4000e7ce4fd05346cf0fdebb98cb17d55b37d081c950b458daf",
+    "runs/marked23-50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/marked23-50-01/source-revision.txt": "4152da9271e0fe706f6d05080fc083d11f7763c5662aa12cea62ac22f29598a0",
+    "runs/marked23-50-01/source.sha256": "8388495bfc75624d72fee9d4a1d3e0779f723f9f4710bce08fe085c84b5ab6b4",
+    "runs/marked23-50-01/started-utc.txt": "1be51601c35ca749297a16ad2a0d4a00100353dbb1be2bcd6c06cb0637eadde9",
+    "runs/marked23-50-02/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/marked23-50-02/finished-utc.txt": "e3eff3b4aa8ac3402913efd7d59f8f2993f8593624a90d0c33f095c73f2805fd",
+    "runs/marked23-50-02/gate.log": "3f5255420317895f167c33b0eab02cd4515419e9d2ca2eaa6d7dfb2a01f2d78a",
+    "runs/marked23-50-02/input.sing": "5d216a6db806fdfd9711fed2fa16d9366a4aea68780a4f80725960249f0f8a6a",
+    "runs/marked23-50-02/marked23-field50.sing": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+    "runs/marked23-50-02/marked23-inverses50.sing": "30e45a25c78270ce8b1532bdc185af26dee17c050b0aab5438d0d429284ba267",
+    "runs/marked23-50-02/marked23-points50.sing": "10876a9d5fa019c9c0439982bcf1e3e3b77f5e762f2c909722503813074319c1",
+    "runs/marked23-50-02/native.log": "5698e58af37b6cca1713beb0a543a8a5ff36c836383cfbf389b840ca55a02dc7",
+    "runs/marked23-50-02/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/marked23-50-02/source-revision.txt": "00a38edc3da88b323af9c650eca76e8660bf4806caf42d30d977c8a28e315ea4",
+    "runs/marked23-50-02/source.sha256": "80af1d5fc341692a66fcc445777743ac1700449c9bfa09a75fe9a7380dd6baac",
+    "runs/marked23-50-02/started-utc.txt": "32208807d85c00e7ca7fdc527b5142c20364928032167dfa3a1fc0db851ed80a",
+    "runs/normal-finite50-01/exit.txt": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+    "runs/normal-finite50-01/finished-utc.txt": "e23822fe80a993b3ec182e68ab6e09f2134212d487b2ffbb92d8f67946d37246",
+    "runs/normal-finite50-01/gate.log": "ebe90ffa9ad0694f8a734bb6ba5ef384f70e0073768ecd161499c2cfadff91d0",
+    "runs/normal-finite50-01/input.sing": "8c694be23b1cf82ccf1f705602658536f6a23e624ef7e83c9f7ba738ac12763c",
+    "runs/normal-finite50-01/native.log": "d0949c26d3b4b6b19ce225533462a02a8e96ed9211e5d033cce03a0eb6a15d39",
+    "runs/normal-finite50-01/prime-components50.sing": "9be50cbddab1ad3e1e26bf90afb248d0754c171d626dad14c80ea47748dca020",
+    "runs/normal-finite50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/normal-finite50-01/selected-prime50.sing": "f7f6acad368cdc565ff925b6cd05709e0aba526d6d9c9870874eb4668ab1eb07",
+    "runs/normal-finite50-01/source-revision.txt": "dea059c8b5de7d6cacbadaa7695b89402935a46abaf23e4e75b4b5dfe40bdf8c",
+    "runs/normal-finite50-01/source.sha256": "8c7cc4ab46056cb4bc911e20ad7a7e418269254c6acfa7e79dfb71c4c7227f91",
+    "runs/normal-finite50-01/started-utc.txt": "44b18ba37776bed36f10a025a35e17f6750ac3c836d4df3c5d135566fbae5b7f",
+    "runs/normal-relative-finite50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/normal-relative-finite50-01/finished-utc.txt": "0b5e380fead1048008116a2944925b462de0141666a5f8bb6231758b72271587",
+    "runs/normal-relative-finite50-01/fractional-module50.sing": "45c13706d22b8b85bf61b441bc642311337aa2f3e3535505818c52a516d153c9",
+    "runs/normal-relative-finite50-01/gate.log": "6b18aeafef7911e3279391f92f6b7f601847927067b5a1a84f565a76a5b0be36",
+    "runs/normal-relative-finite50-01/input.sing": "f173d4a410f311d92f7c0aceaab09f057f81f069e554b2c86eaaa7b33643c508",
+    "runs/normal-relative-finite50-01/native.log": "a64ceab2752b0b1d74743d851196b8cf582e5899f680b8a10c60128dc8ab64e5",
+    "runs/normal-relative-finite50-01/normalization50.sing": "951025a6faa9cbbc9f1844156db471c9e0fd638ed62c15ef81baacf8c780ed82",
+    "runs/normal-relative-finite50-01/prime-components50.sing": "1e5188aea2adbaaa6acbbd20923ee35b92bd2779799ccf329728fe1159b40e4b",
+    "runs/normal-relative-finite50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/normal-relative-finite50-01/selected-prime50.sing": "da78bc60419c0c862dbf9f19f8467fe5d5fc4145cbf3d34dc62239252687047a",
+    "runs/normal-relative-finite50-01/source-revision.txt": "22ebbc72f91e82c580577b2e1fb3fb9ca1915d0975c64c7fa89cedce33284692",
+    "runs/normal-relative-finite50-01/source.sha256": "a2abdff3c4f1011742d79cde5bd66f8d05ba522b08457a2c691587e8d7d90865",
+    "runs/normal-relative-finite50-01/started-utc.txt": "2f689e49eb4f048df066090744a6af3ce10d8b3920d8d3a7629986c8937f8504",
+    "runs/normal-relative-infinity50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/normal-relative-infinity50-01/finished-utc.txt": "f3b890822f59ac67d00cac79d58ff9ad0bb642cdbb6192ba3e8f3b21fe622194",
+    "runs/normal-relative-infinity50-01/fractional-module50.sing": "e71ad173db5fa6cdbfd516d333e0e56fbb9a30b87df0e57e4e3466e42f1ee627",
+    "runs/normal-relative-infinity50-01/gate.log": "f69169072b115514bac99f2eaaefe26f0c6d9acc2434aaa459c5eb323e8ae1a2",
+    "runs/normal-relative-infinity50-01/input.sing": "8ed49029eb5ff2136bc2244376e76449d3c7db4aeca4558a9a155c3ddafc33fb",
+    "runs/normal-relative-infinity50-01/native.log": "9baac2ba13d9ef2d728695821c51ce1f648f0573de30eb48a2b3d7de5cb8f17a",
+    "runs/normal-relative-infinity50-01/normalization50.sing": "4583cbf1dfa80caa16e98eb194e0a17fbea95811017fe87bde4328934ac8b02f",
+    "runs/normal-relative-infinity50-01/prime-components50.sing": "660cc8b8d7a5c480d5c6620f3e158d854303f5aa436655afe1d5e3ff95109394",
+    "runs/normal-relative-infinity50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/normal-relative-infinity50-01/selected-prime50.sing": "43eac9d7f5a80fe91daaaa7310bbd24844a58899518aae16eaa0d6df4c88fcb7",
+    "runs/normal-relative-infinity50-01/source-revision.txt": "00a38edc3da88b323af9c650eca76e8660bf4806caf42d30d977c8a28e315ea4",
+    "runs/normal-relative-infinity50-01/source.sha256": "b33a9c0c294688f433d3c3ecca50657438fd984dabdf9471b8c62d75f2cf89a2",
+    "runs/normal-relative-infinity50-01/started-utc.txt": "fd64a8c537b1ccd0e7f8b7b7a7ffa8e78cfa63d771e53bfc14668f3ac942b81f",
+    "runs/quotient50-01/coupled-quotient-finite50.sing": "c5ab8e59b503feffe450ffdb93cf960b824f9939a8b144acb886932b82f262ac",
+    "runs/quotient50-01/coupled-quotient-infinity50.sing": "a7615bc45542eb0eacb3d0b75596a2bde726af40d0009a98d74094eacbab96b9",
+    "runs/quotient50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/quotient50-01/finished-utc.txt": "9cab11103770706935b1be31bedd8de0bc905d48e4d60537a2f72155ab998377",
+    "runs/quotient50-01/gate.log": "70c8c46e87cb165ce7baa143953c04cb4ea4978feaf2aecad42bb1b490c40685",
+    "runs/quotient50-01/input.sing": "a234d0cf47348d35acfbe5b1d2d7671f0949effdd1f049e710f87867aa6db2cc",
+    "runs/quotient50-01/native.log": "75877a88b6da7eae5a2f11555a3953c052af20f61c79fef207590cf68581c708",
+    "runs/quotient50-01/quotient-finite50.sing": "7c3729c61e518e7d09caa6ea5c8fe87011b13e83b46fe6a0c56934822cac98ca",
+    "runs/quotient50-01/quotient-infinity50.sing": "730e7ae08c3ea7dc79f89a1b9367ad6b7f5972f9a7a46b5d424fbb5e2134701c",
+    "runs/quotient50-01/quotient-overlap50.sing": "4f180c7e7495ae92df17bb1f9439a21d2ee3d7aa01adb774e3c8ae7733b75192",
+    "runs/quotient50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/quotient50-01/source-revision.txt": "1883b0f6b9763c2a36ddf4d786b9c174b7554fdd1ea6af40b048fcfeb5477ad1",
+    "runs/quotient50-01/source.sha256": "46c8a495d32a6529d8ed995d7f53418f4862abda5fc0ac051dcbbfed90455018",
+    "runs/quotient50-01/started-utc.txt": "9cab11103770706935b1be31bedd8de0bc905d48e4d60537a2f72155ab998377",
+    "runs/relative50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/relative50-01/finished-utc.txt": "d43f73df0566c5cf197c6d7b8092d030c769686fe5ccdebeefb5c5fb8dbe386f",
+    "runs/relative50-01/gate.log": "d1e89466bffd3fc8023c85756de72fe9368a4aacaa24c70ca5ce62daafef4235",
+    "runs/relative50-01/input.sing": "e29ebb9c52c4be5e6155d9252f068cab6273876a7b11c44f474342e4acec67ef",
+    "runs/relative50-01/native.log": "ce7ba00115f192e3be0d72105b3cfc770559cc874a36b0484238e52ef407e013",
+    "runs/relative50-01/relative-finite50.sing": "46cd94628834eddf57756574265ac4b1f4be2a44c76ba7a81e92a290a75c5605",
+    "runs/relative50-01/relative-infinity50.sing": "d5a0a0ef9ab7e8e2a4f2571441bebd5eb4a92e0327b321cc7191a55fa334a782",
+    "runs/relative50-01/relative-overlap50.sing": "004414eba5cc1b7426697a9f0c689ebda924841a8daf605fd4f767733d7cab81",
+    "runs/relative50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/relative50-01/source-revision.txt": "638678666ffd40f1adf57325245b9a3aa3a3aa12100f11dc2d8bee884c44e17d",
+    "runs/relative50-01/source.sha256": "013a768d5e7a1e3c7b0ef1dd131427e386fe75ca4ba0f2f30393ae54ce165a0e",
+    "runs/relative50-01/started-utc.txt": "5393a107a273f8a6445cb4829be3b66dacbfe85df6f929f2f97541d39a9495f1",
+    "runs/rr-field50-01/exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/rr-field50-01/finished-utc.txt": "5a559689af273bcf64aab9800556c5d088dd89338dc21a956eb70b9ef95dbcc8",
+    "runs/rr-field50-01/gate.log": "6fbd9b58a13a80197cb03cd5d37c1fb60360846f43ad4f9d96a634a2d8b5142f",
+    "runs/rr-field50-01/input.sing": "ec711e1f8561c7992ed2e5bd7026ea44a726fb1a2b6db36d9939b3202a803117",
+    "runs/rr-field50-01/native.log": "b59954a4982d83d5073242571c9156408fc22d80ecab698a9b3e8e2d51f49558",
+    "runs/rr-field50-01/rr-field50.sing": "430662a07f0436caa2ce38c82a28c84c9041d200d78d7eb27589adc7816f72e0",
+    "runs/rr-field50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/rr-field50-01/source-revision.txt": "1883b0f6b9763c2a36ddf4d786b9c174b7554fdd1ea6af40b048fcfeb5477ad1",
+    "runs/rr-field50-01/source.sha256": "5c81b025a86c0cd4c52d448c5a5da7ae5aa79bef93e93136c4fd1e90ee23cca8",
+    "runs/rr-field50-01/started-utc.txt": "2b057282ce161987546e5a7aec386dd07d1ca23ce7028b69cc1940adf56f3938",
+    "runs/separation50-01/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/separation50-01/Separation50.lean": "96766d23b25be8db8d409439eeb25efd9ad6b9517ceabb8901d03ed201f09ce7",
+    "runs/separation50-01/compile.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "runs/separation50-01/compile.log": "2b761fee19fbbcdbf6a9d9ec98f2206a92bb955257185f29458b40fdf60901a1",
+    "runs/separation50-01/gate.log": "87916ac4cbf9b2ca2d6490287765003e356da4887152668b29e244a22f28ebd7",
+    "runs/separation50-01/runner.sh": "fae15b37c6accd6f9feaed23351c839b3ed2b9b9c7d1c10797d5400f6d4ad1b2",
+    "runs/separation50-01/source-revision.txt": "77688b3e3c04a381a3302bce1fc7618cdaf6c294e0c278c870af1da751f593c0",
+    "runs/separation50-01/source.sha256": "b628f570a39354adf884c4cd872279ecb82a9d29c6651f70bab9a6fae283b414",
+    "runs/separation50-01/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/separation50-02/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/separation50-02/Separation50.lean": "ecaf1f5af3d24984e7d41ca7f9b5071c50be7a4da0ab23f9ff32f2d1d3a71ff9",
+    "runs/separation50-02/compile.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "runs/separation50-02/compile.log": "b27618757ffbe896df50ae22c7613a59528bbeec949e3b68f1ed49560929db1d",
+    "runs/separation50-02/gate.log": "440d316d6fb1e8f9482ab896d5107eaca017b7c8040bd1890ddf1bfae0276f91",
+    "runs/separation50-02/runner.sh": "fae15b37c6accd6f9feaed23351c839b3ed2b9b9c7d1c10797d5400f6d4ad1b2",
+    "runs/separation50-02/source-revision.txt": "a8ed4d79c27ec5f2cb4af7ff8fa5ad473e816e2966941479c2e636a8b68b2f57",
+    "runs/separation50-02/source.sha256": "e2d9637e72c1301946f46abe21f35349dcf8e4bbbd54565263bc2cb912d06eb5",
+    "runs/separation50-02/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/separation50-03/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "runs/separation50-03/Separation50.lean": "c4f1b1da75cc5b1c4f7f89a1a6f33f9743690caa2545b08987c2ce0fe67f267d",
+    "runs/separation50-03/audit.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/separation50-03/audit.log": "084fc760cc1bec2702a118098a53bc958098a3d3fdc2d131bd2f532d5d93a0e3",
+    "runs/separation50-03/compile.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/separation50-03/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/separation50-03/gate.log": "f5ea2bb69e1fd0b0d506cf085c6536c34c66636b4066d47d7e88f0a0bc688a9c",
+    "runs/separation50-03/runner.sh": "fae15b37c6accd6f9feaed23351c839b3ed2b9b9c7d1c10797d5400f6d4ad1b2",
+    "runs/separation50-03/source-revision.txt": "9b57c5724ee81fd36cd37ef0027d811631b0a34f60ee48787668fc06f72fd519",
+    "runs/separation50-03/source.sha256": "b7d6a2a61d889d6fef058a95ace7b723cf140449717e23150b0d90df909ea224",
+    "runs/separation50-03/version.txt": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+    "runs/verify-relative-finite50-01/exit.txt": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+    "runs/verify-relative-finite50-01/finished-utc.txt": "d7019ab2d2ac985c525c1a07833d6fa58326df4c811846e63f0affb3a5e9f0b7",
+    "runs/verify-relative-finite50-01/gate.log": "740d4cc18dbbaa63a55476541bab803c1eeb22e5ad8436d0824cf2e3a067c928",
+    "runs/verify-relative-finite50-01/input.sing": "c6abd5b1309813b56e072dfa6299b546f52aa9f9f4fb8e2ca74f4486813b2735",
+    "runs/verify-relative-finite50-01/native.log": "8445253b86c198a66904d15e0c77f1934705bcbf16bfa30992b55d018ca5a6a0",
+    "runs/verify-relative-finite50-01/runner.sh": "6660b9adf421b9a782ff92f980645b5597066fc22e9c916528f321ea00bf664c",
+    "runs/verify-relative-finite50-01/source-revision.txt": "91b0510b0d4b54bf65760bdf282effcc6aee20cd49cc52224d611d5b4748db8e",
+    "runs/verify-relative-finite50-01/source.sha256": "b140e2cfa7d431bbed7037c2cdd3d894a5b031d9744e053c47824e6876af6e8b",
+    "runs/verify-relative-finite50-01/started-utc.txt": "0db3dbcffb5a0e24fc98c8cf370ef8cefd6cfb5af5a5d6e65e3aca93246d2478",
+    "source-data/boundary-certificate50.sing": "c0b146d5a61486dbad955a1db434be3d6c8d14f56fd7a5dcaad0f8dc69ba7ff4",
+    "source-data/boundary-input50.sing": "89e27b437c68d3c1955b90486e584a317e80b871e4e9feffcd0262641aa4642b",
+    "source-data/candidate-input50.sing": "1ad461dba720867ebdf75a3a71801f0b43d9857f4d64c40f60f3e7b0b6369dd6",
+    "source-data/chart-input50.sing": "e47371c19a539785a38371c0cfab8f077371fd4ec28d954887d496da9f8dc27f",
+    "source-data/coupled-quotient-finite50.sing": "c5ab8e59b503feffe450ffdb93cf960b824f9939a8b144acb886932b82f262ac",
+    "source-data/coupled-quotient-infinity50.sing": "a7615bc45542eb0eacb3d0b75596a2bde726af40d0009a98d74094eacbab96b9",
+    "source-data/defect-input50.sing": "e6f36686667cb4516778ee7898311d1f6a62a2eae3ee8c74ae4909ae7889d12c",
+    "source-data/defect-lengths50.sing": "48c20d51f8bd41207204ae1c6512607ade3a65d62547c7eb01ce7c36995161e1",
+    "source-data/denominator-certificate50.sing": "c605f130798bce376e61c0a2ba90873860c95ee7dbbc9dd08bed8ac125fa92a0",
+    "source-data/denominator-input50.sing": "15f2a70a5a924f93acbd523ab136ea3146017a652002ae2669a61c29826effcc",
+    "source-data/fiber-input50.sing": "980646c08b6e37d00d7775867009035e02b16d2915ab125a15a6f55a8fb3fc9e",
+    "source-data/forward-input50.sing": "2b244b64353cc2c8856c823e49cad63695228f9fc8ab80b59a92d52e9b2f3a74",
+    "source-data/generic-primes49.sing": "a69b2a7e6e248ed8bea23b0468053d9a1ec92457fa41ede6ab85e409e1431726",
+    "source-data/infinity-candidate50.sing": "42086c6b5a159172ee5e8dae9d0b21b3c5fa6bb5071bd55fa686af23f51b72cd",
+    "source-data/integral-candidate50.sing": "76dfc62d8586e1dde2dbc6fbb3a3adcfdf8df508cd99c19772c5694db237f7da",
+    "source-data/integral-input49.sing": "665628d4aa55cfee8f9783a3d3228e2a1c4ae40f518f8b5bd0bfb67ab3da71c6",
+    "source-data/local-block50.sing": "b285bbf5b643fa705e522bc572c9cfe7b7462695051e0298a1b834dbd6bb24b0",
+    "source-data/local-input50.sing": "d316dcb5202099ca5a5204f33ab8e26fe3db92b1694381b836a6f496ec7dbe5f",
+    "source-data/marked23-field50.sing": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+    "source-data/marked23-input50.sing": "5d216a6db806fdfd9711fed2fa16d9366a4aea68780a4f80725960249f0f8a6a",
+    "source-data/marked23-inverses50.sing": "30e45a25c78270ce8b1532bdc185af26dee17c050b0aab5438d0d429284ba267",
+    "source-data/marked23-points50.sing": "10876a9d5fa019c9c0439982bcf1e3e3b77f5e762f2c909722503813074319c1",
+    "source-data/normal-finite-input50.sing": "8c694be23b1cf82ccf1f705602658536f6a23e624ef7e83c9f7ba738ac12763c",
+    "source-data/normal-infinity-input50.sing": "a6e6596ab2a0c22d167133be5c9d8182e5d131309965985e56193479dbadbe72",
+    "source-data/normal-relative-finite-input50.sing": "f173d4a410f311d92f7c0aceaab09f057f81f069e554b2c86eaaa7b33643c508",
+    "source-data/normal-relative-infinity-input50.sing": "8ed49029eb5ff2136bc2244376e76449d3c7db4aeca4558a9a155c3ddafc33fb",
+    "source-data/parameter-saturation50.sing": "9ff42350ceeed51182ddcb7560d035de1a71439f1293fcc04b85bc30022cbf73",
+    "source-data/proof-cache-roots50.txt": "3989aa51b7282405159de67684f945bb972152f357971d562b6b250c8e6c7a77",
+    "source-data/quotient-finite50.sing": "7c3729c61e518e7d09caa6ea5c8fe87011b13e83b46fe6a0c56934822cac98ca",
+    "source-data/quotient-infinity50.sing": "730e7ae08c3ea7dc79f89a1b9367ad6b7f5972f9a7a46b5d424fbb5e2134701c",
+    "source-data/quotient-input50.sing": "a234d0cf47348d35acfbe5b1d2d7671f0949effdd1f049e710f87867aa6db2cc",
+    "source-data/quotient-overlap50.sing": "4f180c7e7495ae92df17bb1f9439a21d2ee3d7aa01adb774e3c8ae7733b75192",
+    "source-data/rational-candidate50.sing": "563d2b4f3f1bb0f6bc11ea7cc9839570f0a7c446576a015610271cdf46f2b343",
+    "source-data/relative-finite50.sing": "46cd94628834eddf57756574265ac4b1f4be2a44c76ba7a81e92a290a75c5605",
+    "source-data/relative-infinity50.sing": "d5a0a0ef9ab7e8e2a4f2571441bebd5eb4a92e0327b321cc7191a55fa334a782",
+    "source-data/relative-input50.sing": "e29ebb9c52c4be5e6155d9252f068cab6273876a7b11c44f474342e4acec67ef",
+    "source-data/rr-field-input50.sing": "ec711e1f8561c7992ed2e5bd7026ea44a726fb1a2b6db36d9939b3202a803117",
+    "source-data/rr-pid-input50.sing": "aa297f4fa1aa8718eb1df4bf049452c8ef6170e1e8a79c4dbb4e0be5215cfbdd",
+    "source-data/verify-relative-finite-input50.sing": "c6abd5b1309813b56e072dfa6299b546f52aa9f9f4fb8e2ca74f4486813b2735",
+    "source-data/verify-relative-infinity-input50.sing": "4e76fab5e1cf5c1bce4677df3d3d1caabaf50ecccdbd2fddeba11f4e005a9a19",
+    "source-data/x1opt23.txt": "00ddb521e07dc580ed844ee644b789d204c856d74d7c76385cf87042bc11d850"
+  },
+  "remote_key": "store/sha256/d4/d46a49cb903b2892d42d020f75f76b597abd18f896c715d9654c5d56c5f70aa3",
+  "fresh_download_verified": true,
+  "fresh_member_hashes_checked": 307
+}

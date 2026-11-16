@@ -1,0 +1,107 @@
+{
+  "schema": "development.weber-certificates/v1",
+  "scope": "Post-call output certificates only; never an input or lookup table to the recognizer",
+  "model": "models/u3.model",
+  "roots": [
+    {
+      "beta": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0"
+        ]
+      ],
+      "target_weber": "2",
+      "source_x": "42",
+      "source_y": "48",
+      "precision": 32
+    },
+    {
+      "beta": [
+        [
+          "16/9",
+          "44/9"
+        ],
+        [
+          "-175/9",
+          "-20/9"
+        ],
+        [
+          "5/18",
+          "-13/36"
+        ]
+      ],
+      "target_weber": "14",
+      "source_x": "33",
+      "source_y": "63",
+      "precision": 32
+    },
+    {
+      "beta": [
+        [
+          "308/9",
+          "172/9"
+        ],
+        [
+          "166/9",
+          "20/9"
+        ],
+        [
+          "-5/18",
+          "13/36"
+        ]
+      ],
+      "target_weber": "17",
+      "source_x": "15",
+      "source_y": "20",
+      "precision": 32
+    }
+  ],
+  "summaries": [
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 1,
+      "inputs": 18,
+      "accepted": 6
+    },
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 2,
+      "inputs": 18,
+      "accepted": 6
+    },
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 4,
+      "inputs": 18,
+      "accepted": 6
+    },
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 8,
+      "inputs": 18,
+      "accepted": 6
+    },
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 16,
+      "inputs": 18,
+      "accepted": 18
+    },
+    {
+      "kind": "precision_summary",
+      "u": 3,
+      "precision": 32,
+      "inputs": 18,
+      "accepted": 18
+    }
+  ]
+}

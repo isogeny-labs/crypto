@@ -1,0 +1,1 @@
+V2 reconstructs exact archived passed-oracle inputs in a fresh checkout before running the preserved original replay. It does not rerun or repair either failed timing attempt. Use python research/autolab_cycle_20261116_v107/REPLAY_PORTABLE_V2.py from repository root.

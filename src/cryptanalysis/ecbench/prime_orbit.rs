@@ -262,11 +262,7 @@ mod tests {
                 0x5eed,
             )
             .unwrap();
-            assert_eq!(
-                report.recovered,
-                workload.planted.map(ExactScalar::from),
-                "{coordinates}"
-            );
+            assert_eq!(report.recovered, workload.planted, "{coordinates}");
             assert!(!report.exhausted, "{coordinates}");
             assert_eq!(report.counters["rejected_relations"], 0, "{coordinates}");
             assert_eq!(report.counters["verified_descents"], 1, "{coordinates}");
