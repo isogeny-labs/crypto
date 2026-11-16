@@ -67,3 +67,17 @@ Freeze before once-only execution. Preserve candidate noncompletions and bounded
 
 ### Errors
 Native build outcome recorded in DESCENT-BUILD.*. Unrelated resume edit preserved.
+
+## Projected descent gate completed
+
+### What was done
+Frozen79f304759cf7 and checkpoint20261116T065252Z precede once-only execution. Source/import/binary check passes, exit0, empty stderr. All five emitted decompositions verify at actual subgroup orders after certified h=1/2/1; every admitted fibre passes independent norm and original group checks. Twenty-four fixed policies retain fifteen no-component and four squarefree-support precondition failures. Genus3 target1 u=(x+35)^2(x+37); it is already rational-split for unrestricted descent. Unrestricted reference completes24calls; restricted reference completes20and retains four2048-add caps. Native reducer writes exact summaries and figure. Two-page report rendered and visually inspected.
+
+### Decisions made
+Selected projected witnesses are all single fibres; multi-fibre projected cancellation remains uncovered. Only one of six inputs decomposes at the Compact size rule with prefix membership. No timing or speed ratio between field inversions and group additions. A conditional unchanged-seed fallback identity excludes a tenfold additive-work gain on failed pencils in that guard architecture. It is not a complete hybrid runtime measurement or a universal bound. Need a structural change producing useful constraints at target-seeded anchor scale; repeated-support generalization alone does not fix genus2/4 no-component cases. Goal stays active; PR unmerged.
+
+### Open threads
+Source descent/complete scalar recovery and multi-fibre projected witnesses are absent. Failed-pencil charging, actual Compact membership and complete same-target cost remain before a performance claim. Historical open-record CI remains separate from this correctness/count gate. Shared daily log reserved; own handoff used.
+
+### Errors
+One Typst rendering attempt treated multi-letter math subscripts as variables; quoted labels and rendered successfully. No scientific build/run error or rerun. Imported table module dead-code warning retained. Unrelated .resume/RESUME.md remains excluded.
