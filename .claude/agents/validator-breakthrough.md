@@ -42,3 +42,19 @@ evidence records. There is no degraded substitute for this review.
 - Never edit evidence or results, rerun to manufacture a passing artifact,
   change status, push, merge, or open a pull request. Never mark the
   breakthrough supported, rejected or closed yourself.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`. Your role's
+limits above still hold: the loop adds records, never authority.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope validator-breakthrough`; apply
+   adopted lessons, treat candidates as hypotheses to test.
+2. **While acting**: resolve blockers within your role first (diagnose, the
+   documented remedy, a materially different approach); escalate only what
+   needs authority you do not have.
+3. **After acting**: `lessons.py outcome --scope validator-breakthrough ...` with evidence;
+   `lessons.py test` for each lesson applied; `lessons.py add --scope validator-breakthrough`
+   for a repeatable surprise, with the evidence that showed it.
+4. **Adapt**: an adopted lesson for `validator-breakthrough` is folded into this file by a PR
+   that cites its id.

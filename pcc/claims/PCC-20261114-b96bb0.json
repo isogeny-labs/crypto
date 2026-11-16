@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:54:55Z",
+ "id": "PCC-20261114-b96bb0",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "model": "",
+  "session": "norm-growing-input-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "9f45472fdf480049749b388782a630211ebcbd27eac63e135b8feac0fee93208",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormInputBudget.leading_degree"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration context. Generic coefficient-support budget and actual Mathlib computed monic division over CommRing; actual growing chart over Field K, a=h+2 covers all a>=2. Literal multivariate variables have consecutive weights via explicit bijection. Actual norm/support/remainder, monicity/degrees, coefficient weightedTotalDegree <=2*degree(P)-2*j. Exact norm multiplication requires stated target-curve premise. Four-variable source binding is a polynomial-ring renaming equivalence, not finite-field value comparison. No degree29 normalized-row, full closure, public finder, coverage, extraction/retries or expected bit-cost claim. Unsigned; gate/fresh pending at creation.",
+ "statement": "Exact source-bound declaration NormInputBudget.leading_degree: theorem leading_degree (hP : Budget w k P D) (hp : P\u22600) : k*P.natDegree\u2264D"
+}

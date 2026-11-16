@@ -1,0 +1,111 @@
+{
+  "schema": "root-v4-permit-software-qualification/v1",
+  "passed": true,
+  "cases": [
+    {
+      "case": "fresh_single_read",
+      "passed": true
+    },
+    {
+      "case": "expired_then_fresh",
+      "passed": true
+    },
+    {
+      "case": "both_expired_fail",
+      "passed": true
+    },
+    {
+      "case": "identity_first_no_retry",
+      "passed": true
+    },
+    {
+      "case": "identity_second_fail",
+      "passed": true
+    },
+    {
+      "case": "parse_first_no_retry",
+      "passed": true
+    },
+    {
+      "case": "parse_second_fail",
+      "passed": true
+    },
+    {
+      "case": "oversize_no_retry",
+      "passed": true
+    },
+    {
+      "case": "nonfinite_expiry_no_retry",
+      "passed": true
+    },
+    {
+      "case": "boolean_expiry_no_retry",
+      "passed": true
+    },
+    {
+      "case": "reread_bound_exceeded",
+      "passed": true
+    },
+    {
+      "case": "reread_bound_edge",
+      "passed": true
+    },
+    {
+      "case": "signal_during_reread",
+      "passed": true
+    },
+    {
+      "case": "deadline_during_reread",
+      "passed": true
+    },
+    {
+      "case": "owner_check_then_permit_before_checkpoint_and_lease_margin",
+      "passed": true
+    },
+    {
+      "case": "cleaning_no_permit",
+      "passed": true
+    },
+    {
+      "case": "interrupted_no_permit",
+      "passed": true
+    },
+    {
+      "case": "terminal_no_permit",
+      "passed": true
+    },
+    {
+      "case": "changed_owner_no_permit",
+      "passed": true
+    },
+    {
+      "case": "missing_current_cgroup_no_permit",
+      "passed": true
+    },
+    {
+      "case": "changed_current_cgroup_no_permit",
+      "passed": true
+    },
+    {
+      "case": "prelaunch_existing_unit_no_permit",
+      "passed": true
+    },
+    {
+      "case": "fresh_read_crosses_wall_expiry",
+      "passed": true
+    },
+    {
+      "case": "heartbeat_defers_cumulative_checkpoint_source_check",
+      "passed": true
+    }
+  ],
+  "elapsed_seconds": 0.011666838021483272,
+  "python": "3.9.25 (main, Jul 15 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-5)]",
+  "source_pins": {
+    "durable-worker.py": "b3de879c3d030edc33441300cbdfb5558b17fcc423bd894feadf8968c0928e95",
+    "durable-launcher.py": "32d752703c87cbdf369bd0799c7183d5aa3f0d6af21cc23c2336733bc916238a"
+  },
+  "native_payload_started": false,
+  "network_used": false,
+  "real_conductor_used": false
+}

@@ -1,0 +1,12 @@
+// Native u means z=1/original_u; l=lambda,v=V.
+ring diamondIteratesCertificate51=(2,u),(l,v),dp;list images51;
+images51[1]=list(poly(1/(u^3+u^2)*l*v+1/(u^2)*l+(u^2+1)/(u^2)),poly(1/(u^3+u)*v),poly(1/(u^2+u)*v+1));
+images51[2]=list(poly((u^2+u+1)/(u+1)*l*v+(u^3+u+1)/(u+1)*l+(u)*v+(u^2+u)),poly((u)/(u^2+1)*v+(u)/(u^2+1)),poly(1/(u+1)*v+1/(u+1)));
+images51[3]=list(poly((u)/(u^4+1)*l*v+1/(u^2+1)*l+(u^2)/(u^3+u^2+u+1)*v+(u^2)/(u+1)),poly((u)/(u+1)*v+(u^2+1)),poly(1/(u+1)*v+(u+1)));
+images51[4]=list(poly((u^2+u+1)/(u^5+u)*l*v+(u^2)/(u^4+1)*l+(u)/(u^3+u^2+u+1)*v+(u)/(u^3+u^2+u+1)),poly(1/(u^2+u)*v+1/(u^2+u)),poly(1/(u^2+u)*v+1/(u+1)));
+images51[5]=list(poly(l+(u^2+u)*v+(u^4+u+1)),poly(v),poly((u)));
+images51[6]=list(poly(1/(u^3+u^2)*l*v+1/(u^2)*l+1/(u^3+u^2)*v+1/(u)),poly(1/(u^3+u)*v),poly(1/(u^2+u)*v+1));
+images51[7]=list(poly((u^2+u+1)/(u+1)*l*v+(u^3+u+1)/(u+1)*l+(u^3+u^2+1)/(u+1)*v+(u^4+u+1)/(u+1)),poly((u)/(u^2+1)*v+(u)/(u^2+1)),poly(1/(u+1)*v+1/(u+1)));
+images51[8]=list(poly((u)/(u^4+1)*l*v+1/(u^2+1)*l+(u^2)/(u^4+1)*v+(u^2+u+1)/(u^2+1)),poly((u)/(u+1)*v+(u^2+1)),poly(1/(u+1)*v+(u+1)));
+images51[9]=list(poly((u^2+u+1)/(u^5+u)*l*v+(u^2)/(u^4+1)*l+(u^3+u^2+1)/(u^5+u)*v+(u^4)/(u^4+1)),poly(1/(u^2+u)*v+1/(u^2+u)),poly(1/(u^2+u)*v+1/(u+1)));
+images51[10]=list(poly(l),poly(v),poly((u)));

@@ -23,7 +23,6 @@ ledger.json ──► propose ──► freeze ──► run train ──► sel
 (incumbents,    panel       PROTOCOL   sessions/     holdout    sessions/        RESULT     ledger      README.md
  trials,        .json       specs/     train-k*      specs      holdout-k*       .json      .json       round.svg
  exposures)                 MANIFEST   verify+band              verify+band                 ratchet.svg REPORT.pdf
-```
 
 | step | what it does | rule it enforces |
 |:--|:--|:--|
@@ -64,11 +63,9 @@ H=research/curve25519_autolab_20261104
 # one round, generic track, k = 20 and 24, local route (an explicitly requested development screen)
 ./target/release/ic_autolab --home $H loop --rounds 1 --track generic --sizes 20,24 --cpus none --allow-busy
 $H/scripts/render_pdf.sh $H/round-001
-```
 
 Step by step, or through the model-tier relay (the lab's default route):
 
-```bash
 ./target/release/ic_autolab --home $H propose --round 2 --track generic --sizes 20,24 --out /tmp/panel.json
 ./target/release/ic_autolab --home $H freeze  --round 2 --panel /tmp/panel.json --route eks --ecbench target/release/ecbench
 ./target/release/ic_autolab --home $H card    --round 2 --stage train        # -> round-002/cards/CARD-...yaml
@@ -76,7 +73,6 @@ python3 tools/task_card.py lint $H/round-002/cards/CARD-*.yaml                # 
 ./target/release/ic_autolab --home $H select  --round 2 --ecbench target/release/ecbench
 ./target/release/ic_autolab --home $H card    --round 2 --stage holdout --n 2
 ./target/release/ic_autolab --home $H assess  --round 2 && ./target/release/ic_autolab --home $H ratchet --round 2 && ./target/release/ic_autolab --home $H report --round 2
-```
 
 Before any run: `scripts/checkpoint.sh init` and fill `.resume/RESUME.md`
 (CLAUDE.md "Resume checkpoints"). The algebraic track's arms take minutes per
@@ -181,3 +177,31 @@ series; the `seed=run` rows are the expected cost.
 - Round 34's nulls were measured against the favourable fixed-table
   incumbent and were not re-run after the `seed=run` fix. They are not
   evidence that the challengers would fail against the expected cost.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| C = 1 boundary | — | 20, 24, 28, 32 | one-seed `wwalk` screen (20 arms) plus pre-registered confirmation on fresh curves: mean S / rho 1.40 / 1.60 / 1.74 / 1.69, against 1.79 / 1.88 / 1.86 / 2.04 for the C = 2 baseline; 1.3x not met at k = 20 or 24; labelled boundary result outside the ratchet [pcc:unverified] | [c1](c1/README.md), [PDF](c1/REPORT.pdf) |
+| BSGS-class boundary | — | 20, 24 | measured `bsgs.negation` / rho-neg: 0.61 / 0.63 / 0.70 at k = 20 (w = 0 / 0.1 / 1), 0.89 / 0.90 / 0.93 at k = 24; time-memory, outside the ratchet [pcc:unverified] | [bsgs](bsgs/README.md), [PDF](bsgs/REPORT.pdf) |
+| SNC panel | — | 20, 24, 28, 32 | lazy certification (`lazy=1`) and the two-seed chained target walk (`tw=2,cj=1`) vs the C = 2 incumbent, frozen protocol, five fresh curves: combined 0.936 / 0.883 / 0.899 / 0.919 of the incumbent at w = 0 with the order holding across the band; ratio to rho-neg 1.61 / 1.63 / 1.74 / 1.78 (from 1.72 / 1.84 / 1.94 / 1.93); classification of `tw=2` is the owner's call [pcc:unverified] | [snc-panel](snc-panel/README.md), [PDF](snc-panel/REPORT.pdf) |
+
+
+
+
+

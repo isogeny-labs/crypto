@@ -1,0 +1,1275 @@
+{
+ "what_this_is": "The rule's comparison at baseline v9, rho matched: \u00a723's figures, from the checked rows.",
+ "sizes": [
+  {
+   "curve": "icv1-f2m47-t22705043-f4e44623",
+   "a": 1,
+   "n": 47,
+   "r": 106781081677,
+   "log2_r": 36.64,
+   "curve_id": "EC1N47Ce1h9669b6d5105b",
+   "candidate_id": "IC1N47Ckb1fb5264PDP3pairtableRCaimedLAsparseTDwalkISO0ha9ee2d4f1cec",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:fdce2445551539bed1c669d31d21ff8c015a115fbb5a1fb8d8b744241241d9f7",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.77471473457912,
+      "rho_ns_per_step": 53.12601809954751
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.04375644994839,
+      "rho_ns_per_step": 52.89765057776869
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.71405740161151,
+      "rho_ns_per_step": 52.883505917159766
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.90055231759786,
+      "rho_ns_per_step": 53.10174072486546
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.70161897590363,
+      "rho_ns_per_step": 53.07079553748306
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.91240337179039,
+      "rho_ns_per_step": 52.77084550538353
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.22116477272728,
+      "rho_ns_per_step": 52.95191920873389
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.24455147236701,
+      "rho_ns_per_step": 53.314705966682915
+     }
+    ],
+    "strong_ns_per_step_median": 67.90647784469412,
+    "rho_ns_per_step_median": 53.011357373108474,
+    "rho_over_strong": 0.7806524363455926,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 17.10056552946762,
+    "ci95": [
+     13.643329614400747,
+     21.969236534466493
+    ],
+    "median_of_rows": 20.578324432812686,
+    "rows_above_one": 64
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 9.144037101347136,
+    "ci95": [
+     7.259732115728784,
+     11.72189114941827
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 4.07593714999039,
+    "ci95": [
+     3.762988825647084,
+     4.44035719854736
+    ]
+   },
+   "break_even_targets": {
+    "value": 5.836151885163301,
+    "ci95": [
+     5.216595084817737,
+     6.63490111387575
+    ]
+   },
+   "s_ic_online_mean": 0.043734252085892295,
+   "s_rho_online_mean": 0.7478804436770572,
+   "s_rho_model_mean": 0.39990762367306754,
+   "s_setup": 4.109504123485336,
+   "s_rho_setup": 0.2710848206869976,
+   "s_floor_steps": 0.12926948294637178,
+   "rho_steps_over_floor_mean": 1.0413241869608778,
+   "rho_units_per_step_median": 5.559277418346092,
+   "canonical_step_units": 2.9666512688268565,
+   "rho_step_over_model_median": 1.8732396294352802,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 17386.235531774644,
+    "s_bl_online": 0.05320572933284259,
+    "ic_online_over_bl": 0.8219838847110065
+   },
+   "ic_replay_ns_median": 1650.0,
+   "rho_replay_ns_median": 1730.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 1.0884548795568831,
+     "ic_online_R2_over_R1": 0.9143737248043583,
+     "rho_online_R2_over_R1": 0.995094144476587
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 0.9963928504726536,
+     "ic_online_R2_over_R1": 1.0066143677219217,
+     "rho_online_R2_over_R1": 1.0005707471688587
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.0034165755349191,
+     "ic_online_R2_over_R1": 0.995524966669385,
+     "rho_online_R2_over_R1": 0.9998948682998167
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 0.9938890202595073,
+     "ic_online_R2_over_R1": 1.0031755025045113,
+     "rho_online_R2_over_R1": 1.0035344159852024
+    }
+   ],
+   "isolation": {
+    "processes": 70,
+    "contended": 2,
+    "failed": 0,
+    "retries": 2
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.009292895880254162,
+     "target_descent": 0.0026855494886176825,
+     "target_pdp": 0.9493095659293529,
+     "target_query": 0.03358135369250055,
+     "target_relation_check": 0.004682337874826699
+    },
+    "curve_construction_units": 48712.779291928084,
+    "s_curve_construction": 0.14907188766194493,
+    "cold_ratio_without_curve_construction": 5.35401951175812,
+    "cold_ratio_rho_at_canonical_step": 6.1896946984734385,
+    "online_trials_mean": 4.3125,
+    "against_s22_batch_descent": {
+     "s22_files": 20,
+     "online_over_s22_per_target_descent": 0.6258688595167469,
+     "trials_ratio": 0.8141592920353983,
+     "units_per_trial_ratio": 0.7673070111261879
+    }
+   }
+  },
+  {
+   "curve": "icv1-f2m57-tm747311035-c1f545af",
+   "a": 0,
+   "n": 57,
+   "r": 275295876199,
+   "log2_r": 38.0,
+   "curve_id": "EC1N57Ce0hb5884395c7f2",
+   "candidate_id": "IC1N57Ckb0fb7296PDP3pairtableRCaimedLAsparseTDwalkISO0hd2bc9025b4af",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:660c0bd15db00ed61ad2d090746107e8970f76f6768d551f91792c70f0451ef2",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.94710677238832,
+      "rho_ns_per_step": 55.79600876125578
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.58737536141811,
+      "rho_ns_per_step": 55.377761564278416
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.11998859627242,
+      "rho_ns_per_step": 55.333149052075186
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.98589210069606,
+      "rho_ns_per_step": 55.29263451305009
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.02307692307693,
+      "rho_ns_per_step": 55.0831987525756
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.88787868621465,
+      "rho_ns_per_step": 55.32848863579096
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.4814713822158,
+      "rho_ns_per_step": 55.53206947890819
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.62052470128921,
+      "rho_ns_per_step": 55.13195835002002
+     }
+    ],
+    "strong_ns_per_step_median": 70.60395003135366,
+    "rho_ns_per_step_median": 55.33081884393307,
+    "rho_over_strong": 0.783678800114751,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 15.172850683145645,
+    "ci95": [
+     12.009395396170621,
+     19.51525006197861
+    ],
+    "median_of_rows": 19.590219592358125,
+    "rows_above_one": 63
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 8.743712292138655,
+    "ci95": [
+     6.921804973536191,
+     11.234841703700793
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 4.731180628132082,
+    "ci95": [
+     4.400045904822635,
+     5.130065615076324
+    ]
+   },
+   "break_even_targets": {
+    "value": 7.181511289786599,
+    "ci95": [
+     6.412514802413499,
+     8.15086640996754
+    ]
+   },
+   "s_ic_online_mean": 0.04261777587093874,
+   "s_rho_online_mean": 0.6466331497375208,
+   "s_rho_model_mean": 0.37263757074633724,
+   "s_setup": 4.337743226627533,
+   "s_rho_setup": 0.27921630450914225,
+   "s_floor_steps": 0.11738362384644484,
+   "rho_steps_over_floor_mean": 0.951218365452095,
+   "rho_units_per_step_median": 5.7960155130230735,
+   "canonical_step_units": 3.324154192577092,
+   "rho_step_over_model_median": 1.7389756940312704,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 27380.171352194135,
+    "s_bl_online": 0.05218387302432855,
+    "ic_online_over_bl": 0.8166847993645465
+   },
+   "ic_replay_ns_median": 1740.0,
+   "rho_replay_ns_median": 1850.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 0.977209211064154,
+     "ic_online_R2_over_R1": 1.0177693778087586,
+     "rho_online_R2_over_R1": 0.9955931277738619
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 1.0036952829068406,
+     "ic_online_R2_over_R1": 0.9945177035285145,
+     "rho_online_R2_over_R1": 0.9985077916445217
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.002165033440836,
+     "ic_online_R2_over_R1": 0.9975385777487438,
+     "rho_online_R2_over_R1": 0.9999913227987355
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 1.0000960377458046,
+     "ic_online_R2_over_R1": 0.9965098327705423,
+     "rho_online_R2_over_R1": 0.9945585758054215
+    }
+   ],
+   "isolation": {
+    "processes": 68,
+    "contended": 0,
+    "failed": 0,
+    "retries": 0
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.0062692108079323025,
+     "target_descent": 0.0015257231316780698,
+     "target_pdp": 0.3349467440485248,
+     "target_query": 0.6548329531366841,
+     "target_relation_check": 0.0016900637578652852
+    },
+    "curve_construction_units": 81809.23890445201,
+    "s_curve_construction": 0.1559202417067698,
+    "cold_ratio_without_curve_construction": 6.5329789580173445,
+    "cold_ratio_rho_at_canonical_step": 6.719851133479398,
+    "online_trials_mean": 11061.53125
+   }
+  },
+  {
+   "curve": "icv1-f2m41-tm2308219-7f48b14a",
+   "a": 0,
+   "n": 41,
+   "r": 549756390943,
+   "log2_r": 39.0,
+   "curve_id": "EC1N41Ce0he09550ab560a",
+   "candidate_id": "IC1N41Ckb0fb6560PDP3pairtableRCaimedLAsparseTDwalkISO0h5484ac7ad665",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:4001c15b56962dfe631e862286c5d4b61b48eb456dd57552317d4a1ce2431361",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 66.04744859550976,
+      "rho_ns_per_step": 45.50438813463054
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 65.33667647703136,
+      "rho_ns_per_step": 45.436158175486035
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 65.43476172926368,
+      "rho_ns_per_step": 45.41597203858491
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 66.6602203753852,
+      "rho_ns_per_step": 45.453183520599254
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 67.44393645363945,
+      "rho_ns_per_step": 45.42796868203567
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 65.492888057217,
+      "rho_ns_per_step": 45.38285433492509
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 66.13037560303239,
+      "rho_ns_per_step": 45.73773280539669
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 65.68678014604939,
+      "rho_ns_per_step": 45.388445978105665
+     }
+    ],
+    "strong_ns_per_step_median": 65.86711437077957,
+    "rho_ns_per_step_median": 45.432063428760856,
+    "rho_over_strong": 0.6897533596661666,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 9.810746610872787,
+    "ci95": [
+     7.765174675574439,
+     12.711220878625532
+    ],
+    "median_of_rows": 12.526255450201855,
+    "rows_above_one": 63
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 6.015541393141737,
+    "ci95": [
+     4.789736423240654,
+     7.729960376099851
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 6.142826875178378,
+    "ci95": [
+     5.562685744944119,
+     6.856023007647913
+    ]
+   },
+   "break_even_targets": {
+    "value": 7.643749420996083,
+    "ci95": [
+     6.7370832250060975,
+     8.819079994199141
+    ]
+   },
+   "s_ic_online_mean": 0.06552407268315083,
+   "s_rho_online_mean": 0.6428400740068042,
+   "s_rho_model_mean": 0.3941627714727216,
+   "s_setup": 4.4128588508494495,
+   "s_rho_setup": 0.0862025987777117,
+   "s_floor_steps": 0.13840539283493047,
+   "rho_steps_over_floor_mean": 0.9642090344191143,
+   "rho_units_per_step_median": 4.817734076739294,
+   "canonical_step_units": 2.945893629830263,
+   "rho_step_over_model_median": 1.6346196127940915,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 41526.760825816855,
+    "s_bl_online": 0.056007077731461685,
+    "ic_online_over_bl": 1.1699248619490645
+   },
+   "ic_replay_ns_median": 1730.0,
+   "rho_replay_ns_median": 1825.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 0.9933486195217273,
+     "ic_online_R2_over_R1": 1.0073607469915833,
+     "rho_online_R2_over_R1": 0.9975829605504416
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 0.9856420627068143,
+     "ic_online_R2_over_R1": 1.0212030196446074,
+     "rho_online_R2_over_R1": 1.0027485182312346
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.0000549516644368,
+     "ic_online_R2_over_R1": 1.0008472464565632,
+     "rho_online_R2_over_R1": 1.000914832451624
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 1.0055720714381364,
+     "ic_online_R2_over_R1": 0.9963052615283609,
+     "rho_online_R2_over_R1": 1.0016503273484607
+    }
+   ],
+   "isolation": {
+    "processes": 69,
+    "contended": 1,
+    "failed": 0,
+    "retries": 1
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.002865479640794178,
+     "target_descent": 0.0007918074767778575,
+     "target_pdp": 0.30680927302681393,
+     "target_query": 0.6884443606157942,
+     "target_relation_check": 0.0006293829672112923
+    },
+    "curve_construction_units": 31734.98168424944,
+    "s_curve_construction": 0.04280092043421037,
+    "cold_ratio_without_curve_construction": 6.899977432103029,
+    "cold_ratio_rho_at_canonical_step": 9.322867968600326,
+    "online_trials_mean": 28411.8125,
+    "against_s22_batch_descent": {
+     "s22_files": 20,
+     "online_over_s22_per_target_descent": 1.3639811499041234,
+     "trials_ratio": 1.2098430539296066,
+     "units_per_trial_ratio": 1.1365057896515185
+    }
+   }
+  },
+  {
+   "curve": "icv1-f2m53-tm56619371-dac20a85",
+   "a": 0,
+   "n": 53,
+   "r": 21044858204113,
+   "log2_r": 44.26,
+   "curve_id": "EC1N53Ce0hb097de99be9a",
+   "candidate_id": "IC1N53Ckb0fb27984PDP3pairtableRCaimedLAsparseTDwalkISO0haaf98f0c4871",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:cb6220cb6a2ab83de5a29b81ee9e5fb938f22e5b8ce22e176d109c41504cfcf3",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.39954081682318,
+      "rho_ns_per_step": 43.936403157244804
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.20422191801,
+      "rho_ns_per_step": 44.155022529207024
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.0280578180732,
+      "rho_ns_per_step": 44.19593229669993
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.3382491653067,
+      "rho_ns_per_step": 43.97662135336119
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.22029712809301,
+      "rho_ns_per_step": 44.26018228005686
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 68.51321666009801,
+      "rho_ns_per_step": 43.898912338959576
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.23942988891218,
+      "rho_ns_per_step": 44.12603172530428
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.29649290749283,
+      "rho_ns_per_step": 44.137248901007176
+     }
+    ],
+    "strong_ns_per_step_median": 68.7706372390856,
+    "rho_ns_per_step_median": 44.13164031315573,
+    "rho_over_strong": 0.6417221373088228,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 22.784219793534092,
+    "ci95": [
+     17.88919804136511,
+     29.323362486671165
+    ],
+    "median_of_rows": 29.255811540832024,
+    "rows_above_one": 64
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 15.228341206613633,
+    "ci95": [
+     11.99658754281975,
+     19.730808390019906
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 7.458472722152137,
+    "ci95": [
+     6.672217148446361,
+     8.394370939035488
+    ]
+   },
+   "break_even_targets": {
+    "value": 8.18703385317969,
+    "ci95": [
+     7.232320379894792,
+     9.359221621291507
+    ]
+   },
+   "s_ic_online_mean": 0.024654070420707858,
+   "s_rho_online_mean": 0.5617237592706754,
+   "s_rho_model_mean": 0.37544059649841977,
+   "s_setup": 4.397007724131367,
+   "s_rho_setup": 0.03111366995521143,
+   "s_floor_steps": 0.12173263026670363,
+   "rho_steps_over_floor_mean": 0.993697891893538,
+   "rho_units_per_step_median": 4.645103570789463,
+   "canonical_step_units": 3.092224196584989,
+   "rho_step_over_model_median": 1.5020518602554953,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 219783.2220232399,
+    "s_bl_online": 0.047909488468154494,
+    "ic_online_over_bl": 0.5145968201496339
+   },
+   "ic_replay_ns_median": 2225.0,
+   "rho_replay_ns_median": 2280.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 1.006825570764581,
+     "ic_online_R2_over_R1": 0.9900985213337219,
+     "rho_online_R2_over_R1": 1.0013873537906397
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 1.012509298019375,
+     "ic_online_R2_over_R1": 0.9870068882102448,
+     "rho_online_R2_over_R1": 1.0004321003779544
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.012718438593928,
+     "ic_online_R2_over_R1": 0.9879971417463296,
+     "rho_online_R2_over_R1": 1.0010714582340086
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 1.0081018724543775,
+     "ic_online_R2_over_R1": 1.004249676480835,
+     "rho_online_R2_over_R1": 1.0101679975917557
+    }
+   ],
+   "isolation": {
+    "processes": 69,
+    "contended": 1,
+    "failed": 0,
+    "retries": 1
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.0014511213141468666,
+     "target_descent": 0.0006456577518530673,
+     "target_pdp": 0.3631164250213738,
+     "target_query": 0.6341265257885184,
+     "target_relation_check": 0.00043836059039543073
+    },
+    "curve_construction_units": 83273.97967402829,
+    "s_curve_construction": 0.018152494681638293,
+    "cold_ratio_without_curve_construction": 7.839279053440459,
+    "cold_ratio_rho_at_canonical_step": 10.87594488460836,
+    "online_trials_mean": 56384.453125,
+    "against_s22_batch_descent": {
+     "s22_files": 20,
+     "online_over_s22_per_target_descent": 1.2914519128774404,
+     "trials_ratio": 1.1981370896557975,
+     "units_per_trial_ratio": 1.0817628786210782
+    }
+   }
+  },
+  {
+   "curve": "icv1-f2m59-tm943548413-98844ecc",
+   "a": 1,
+   "n": 59,
+   "r": 25179555920633,
+   "log2_r": 44.52,
+   "curve_id": "EC1N59Ce1h20858f64459b",
+   "candidate_id": "IC1N59Ckb1fb30208PDP3pairtableRCaimedLAsparseTDwalkISO0h7f91d6c0e188",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:a729f7aba6884dfe83aa38bfa96b6ddc3cf697c25aebc4a6a3b6a3f8c19292dd",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.01567281487476,
+      "rho_ns_per_step": 45.40113630530396
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 69.9346291568628,
+      "rho_ns_per_step": 45.3423702469543
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.66511335094334,
+      "rho_ns_per_step": 45.37482868835745
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.24316192501766,
+      "rho_ns_per_step": 45.39972030353944
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.17699674001629,
+      "rho_ns_per_step": 45.686493592767405
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.39627530364372,
+      "rho_ns_per_step": 45.69878375398475
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.66322441083024,
+      "rho_ns_per_step": 46.02703471204532
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.14337856952359,
+      "rho_ns_per_step": 46.19591972981464
+     }
+    ],
+    "strong_ns_per_step_median": 70.66416888088679,
+    "rho_ns_per_step_median": 45.54381494903568,
+    "rho_over_strong": 0.6445107282844494,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 26.784688144860727,
+    "ci95": [
+     20.80811590804832,
+     34.86151397205494
+    ],
+    "median_of_rows": 30.369607006976395,
+    "rows_above_one": 64
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 18.720114055936854,
+    "ci95": [
+     14.456154181576382,
+     24.426004245305297
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 6.827982501917706,
+    "ci95": [
+     6.03096187592835,
+     7.833958541475171
+    ]
+   },
+   "break_even_targets": {
+    "value": 7.5666266309791625,
+    "ci95": [
+     6.573395241298181,
+     8.876453988059932
+    ]
+   },
+   "s_ic_online_mean": 0.021603556470957658,
+   "s_rho_online_mean": 0.5786445228944889,
+   "s_rho_model_mean": 0.40442104115020006,
+   "s_setup": 4.214921011086661,
+   "s_rho_setup": 0.04182053634779076,
+   "s_floor_steps": 0.11537691830657834,
+   "rho_steps_over_floor_mean": 1.0533085590039784,
+   "rho_units_per_step_median": 4.764820828135761,
+   "canonical_step_units": 3.3189114925612535,
+   "rho_step_over_model_median": 1.437085575936771,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 259529.42642850403,
+    "s_bl_online": 0.0517204832109272,
+    "ic_online_over_bl": 0.41769827213047744
+   },
+   "ic_replay_ns_median": 2290.0,
+   "rho_replay_ns_median": 2350.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 1.0019788134045562,
+     "ic_online_R2_over_R1": 1.0054454720507897,
+     "rho_online_R2_over_R1": 1.0030830671728688
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 1.0416920348379095,
+     "ic_online_R2_over_R1": 0.9688194667305965,
+     "rho_online_R2_over_R1": 1.009320478661981
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.0084180436789694,
+     "ic_online_R2_over_R1": 0.9919639426609933,
+     "rho_online_R2_over_R1": 1.0016041422701656
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 1.0067566307107048,
+     "ic_online_R2_over_R1": 0.9937811119794501,
+     "rho_online_R2_over_R1": 0.9998695044070088
+    }
+   ],
+   "isolation": {
+    "processes": 68,
+    "contended": 0,
+    "failed": 0,
+    "retries": 0
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.0015201684685722668,
+     "target_descent": 0.0006825402971675775,
+     "target_pdp": 0.37066607245510774,
+     "target_query": 0.6264832745969308,
+     "target_relation_check": 0.0005098267614679368
+    },
+    "curve_construction_units": 135238.26666525344,
+    "s_curve_construction": 0.02695104211029429,
+    "cold_ratio_without_curve_construction": 7.274887014207349,
+    "cold_ratio_rho_at_canonical_step": 9.493791661707482,
+    "online_trials_mean": 51156.0
+   }
+  },
+  {
+   "curve": "icv1-f2m61-t158598901-ab42b6c5",
+   "a": 0,
+   "n": 61,
+   "r": 162888033982417,
+   "log2_r": 47.21,
+   "curve_id": "EC1N61Ce0hd8c15448081e",
+   "candidate_id": "IC1N61Ckb0fb39040PDP3pairtableRCaimedLAsparseTDwalkISO0heeea4513ee19",
+   "rho_reference_uid": "urn:ec-candidate:1:sha256:5862917d42405b70a782ac0bab85ad9db49243f0b8f0582c7161b7308248ebbc",
+   "rows": {
+    "R1": 64,
+    "R2": 4,
+    "not_passing": []
+   },
+   "all_rows_pass_the_check": true,
+   "logarithms_as_earlier": {
+    "rows": 68,
+    "equal": 68,
+    "differing": []
+   },
+   "reference_check": {
+    "what": "the comparison's rho against the strong walk (koblitz_rho_fixture strong), ns per step on the same public targets T01-T08; admissible when no slower",
+    "targets": [
+     {
+      "target": 1,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.85728315395899,
+      "rho_ns_per_step": 45.673159334918296
+     },
+     {
+      "target": 2,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.63793509486256,
+      "rho_ns_per_step": 45.58749909221931
+     },
+     {
+      "target": 3,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.389963874853,
+      "rho_ns_per_step": 45.589630090231736
+     },
+     {
+      "target": 4,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.04925659094786,
+      "rho_ns_per_step": 45.47690795294921
+     },
+     {
+      "target": 5,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.77566638249998,
+      "rho_ns_per_step": 45.46719490073978
+     },
+     {
+      "target": 6,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.52664302542729,
+      "rho_ns_per_step": 45.507339378096816
+     },
+     {
+      "target": 7,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 70.61050916985054,
+      "rho_ns_per_step": 45.72864011329844
+     },
+     {
+      "target": 8,
+      "measured": true,
+      "same_target": true,
+      "strong_ns_per_step": 71.77998493079328,
+      "rho_ns_per_step": 45.58655781531558
+     }
+    ],
+    "strong_ns_per_step_median": 71.28794980818758,
+    "rho_ns_per_step_median": 45.587028453767445,
+    "rho_over_strong": 0.639477339107481,
+    "admissible": true
+   },
+   "online_speedup": {
+    "mean_ratio": 13.901951137449663,
+    "ci95": [
+     10.680292317710082,
+     18.58217338753117
+    ],
+    "median_of_rows": 17.21542247995538,
+    "rows_above_one": 64
+   },
+   "online_speedup_rho_model": {
+    "mean_ratio": 9.728154262436373,
+    "ci95": [
+     7.546765166319351,
+     12.994281068317603
+    ]
+   },
+   "cold_ratio_ic_over_rho": {
+    "value": 11.132498522598462,
+    "ci95": [
+     9.917774504270705,
+     12.602296203195193
+    ]
+   },
+   "break_even_targets": {
+    "value": 12.25055855804954,
+    "ci95": [
+     10.773833499210983,
+     14.052891444208527
+    ]
+   },
+   "s_ic_online_mean": 0.03711524651104996,
+   "s_rho_online_mean": 0.5159743434510156,
+   "s_rho_model_mean": 0.3610628435478474,
+   "s_setup": 5.866291408117771,
+   "s_rho_setup": 0.014311525677570065,
+   "s_floor_steps": 0.11346973044749432,
+   "rho_steps_over_floor_mean": 0.953028955776286,
+   "rho_units_per_step_median": 4.771159485904684,
+   "canonical_step_units": 3.33279084768031,
+   "rho_step_over_model_median": 1.4319975783010697,
+   "precomputation_boundary_model": {
+    "what": "Bernstein-Lange: a generic walk given the index calculus's set-up as its budget, online ~ 1.93*1.21 r c^2 / (2n P) units; a model",
+    "bl_online_units": 462572.62381372513,
+    "s_bl_online": 0.03624393441221865,
+    "ic_online_over_bl": 1.0240402183968629
+   },
+   "ic_replay_ns_median": 2480.0,
+   "rho_replay_ns_median": 2470.0,
+   "aa": [
+    {
+     "target": 1,
+     "online_speedup_R2_over_R1": 1.0025346961094674,
+     "ic_online_R2_over_R1": 0.9972014839014313,
+     "rho_online_R2_over_R1": 0.9992589995780216
+    },
+    {
+     "target": 2,
+     "online_speedup_R2_over_R1": 0.9894890366959223,
+     "ic_online_R2_over_R1": 1.011983735591404,
+     "rho_online_R2_over_R1": 1.0017307567953857
+    },
+    {
+     "target": 3,
+     "online_speedup_R2_over_R1": 1.00269042376823,
+     "ic_online_R2_over_R1": 1.0030745521454685,
+     "rho_online_R2_over_R1": 1.0050180099430555
+    },
+    {
+     "target": 4,
+     "online_speedup_R2_over_R1": 1.000561607042652,
+     "ic_online_R2_over_R1": 0.9941729875423709,
+     "rho_online_R2_over_R1": 0.9967521372109424
+    }
+   ],
+   "isolation": {
+    "processes": 69,
+    "contended": 1,
+    "failed": 0,
+    "retries": 1
+   },
+   "diagnostics": {
+    "online_phase_shares": {
+     "recovery_check": 0.0003848259260191191,
+     "target_descent": 0.00018827890777047302,
+     "target_pdp": 0.38603278514758754,
+     "target_query": 0.6132816999970588,
+     "target_relation_check": 0.00012529699254589126
+    },
+    "curve_construction_units": 104282.3155386221,
+    "s_curve_construction": 0.008170828125483986,
+    "cold_ratio_without_curve_construction": 11.425443728604707,
+    "cold_ratio_rho_at_canonical_step": 15.726717481565036,
+    "online_trials_mean": 218823.828125,
+    "against_s22_batch_descent": {
+     "s22_files": 20,
+     "online_over_s22_per_target_descent": 0.9415509210557004,
+     "trials_ratio": 1.1197692486456663,
+     "units_per_trial_ratio": 0.8083290063226828
+    }
+   }
+  }
+ ],
+ "fits_ln_s_on_ln_r": {
+  "s_ic_online_mean": {
+   "slope": -0.0861101813345203,
+   "ci95": [
+    -0.2346002379778398,
+    0.062379875308799196
+   ],
+   "points": 6
+  },
+  "s_rho_online_mean": {
+   "slope": -0.04214476159114723,
+   "ci95": [
+    -0.059986921177545734,
+    -0.02430260200474873
+   ],
+   "points": 6
+  },
+  "s_setup": {
+   "slope": 0.029493648005589266,
+   "ci95": [
+    -0.015790115439116067,
+    0.0747774114502946
+   ],
+   "points": 6
+  },
+  "s_rho_model_mean": {
+   "slope": -0.006561323127343541,
+   "ci95": [
+    -0.025671029934350817,
+    0.012548383679663733
+   ],
+   "points": 6
+  },
+  "online_speedup": {
+   "slope": 0.04396541974337311,
+   "ci95": [
+    -0.11292907811994071,
+    0.20085991760668695
+   ],
+   "points": 6
+  },
+  "cold_ratio": {
+   "slope": 0.11261710054356035,
+   "ci95": [
+    0.05582390167828812,
+    0.16941029940883257
+   ],
+   "points": 6
+  }
+ },
+ "s23_then_v9": [
+  {
+   "curve": "icv1-f2m47-t22705043-f4e44623",
+   "online_speedup": [
+    9.765321645722155,
+    17.10056552946762
+   ],
+   "online_speedup_model": [
+    4.34101280853476,
+    9.144037101347136
+   ],
+   "cold_ratio": [
+    4.946769165949517,
+    4.07593714999039
+   ],
+   "ic_online_over_bl": [
+    2.420286907320609,
+    0.8219838847110065
+   ]
+  },
+  {
+   "curve": "icv1-f2m57-tm747311035-c1f545af",
+   "online_speedup": [
+    13.537727158347499,
+    15.172850683145645
+   ],
+   "online_speedup_model": [
+    5.965561658306264,
+    8.743712292138655
+   ],
+   "cold_ratio": [
+    1.9845626541276857,
+    4.731180628132082
+   ],
+   "ic_online_over_bl": [
+    3.2853141362363862,
+    0.8166847993645465
+   ]
+  },
+  {
+   "curve": "icv1-f2m41-tm2308219-7f48b14a",
+   "online_speedup": [
+    9.383847456632276,
+    9.810746610872787
+   ],
+   "online_speedup_model": [
+    4.573391331935683,
+    6.015541393141737
+   ],
+   "cold_ratio": [
+    8.044290213253069,
+    6.142826875178378
+   ],
+   "ic_online_over_bl": [
+    2.500894272351845,
+    1.1699248619490645
+   ]
+  },
+  {
+   "curve": "icv1-f2m53-tm56619371-dac20a85",
+   "online_speedup": [
+    17.489057559646973,
+    22.784219793534092
+   ],
+   "online_speedup_model": [
+    9.367317061316216,
+    15.228341206613633
+   ],
+   "cold_ratio": [
+    14.703867319407847,
+    7.458472722152137
+   ],
+   "ic_online_over_bl": [
+    2.0210143621729992,
+    0.5145968201496339
+   ]
+  },
+  {
+   "curve": "icv1-f2m59-tm943548413-98844ecc",
+   "online_speedup": [
+    16.87050545272324,
+    26.784688144860727
+   ],
+   "online_speedup_model": [
+    8.895399369043808,
+    18.720114055936854
+   ],
+   "cold_ratio": [
+    15.668163853624774,
+    6.827982501917706
+   ],
+   "ic_online_over_bl": [
+    2.772527754858401,
+    0.41769827213047744
+   ]
+  },
+  {
+   "curve": "icv1-f2m61-t158598901-ab42b6c5",
+   "online_speedup": [
+    8.83874129306946,
+    13.901951137449663
+   ],
+   "online_speedup_model": [
+    4.684228035877141,
+    9.728154262436373
+   ],
+   "cold_ratio": [
+    31.599405794913018,
+    11.132498522598462
+   ],
+   "ic_online_over_bl": [
+    8.042349147151148,
+    1.0240402183968629
+   ]
+  }
+ ]
+}
