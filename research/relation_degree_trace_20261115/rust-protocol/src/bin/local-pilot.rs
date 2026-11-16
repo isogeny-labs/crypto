@@ -13,10 +13,12 @@ use std::{
     time::{Duration, Instant},
 };
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
-type Basis = BTreeSet<Poly>;
+use compact_speed_analysis::cas_formats::{msolve_basis, singular_basis, Basis};
 const P: u64 = 2147483647;
 const ARMS: [Arm; 3] = [Arm::F4, Arm::Certified, Arm::Compact];
 const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
+#[path = "../replay_capture.rs"]
+mod replay_capture;
 fn arm_name(a: Arm) -> &'static str {
     match a {
         Arm::F4 => "f4",
@@ -61,109 +63,6 @@ fn expr(f: &Poly, names: &[String]) -> String {
 fn singular_code(s: &System, f: &[Poly], algorithm: &str) -> String {
     format!("ring r={},({}),dp;\noption(redSB);\nideal I={};\nideal G={algorithm}(I);\nint i;poly f;\nfor(i=1;i<=size(G);i++){{print(\"POLY\");f=G[i];while(f!=0){{print(\"TERM:\"+string(leadcoef(f))+\":\"+string(leadexp(f)));f=f-lead(f);}}print(\"ENDPOLY\");}}\nprint(\"DONE\");\nquit;\n",s.prime,s.variables.join(","),f.iter().map(|f|expr(f,&s.variables)).collect::<Vec<_>>().join(","))
 }
-fn singular_basis(text: &str, n: usize) -> Result<Basis> {
-    let mut basis = Basis::new();
-    let mut current = None;
-    let mut done = false;
-    for line in text.lines().map(str::trim).filter(|s| !s.is_empty()) {
-        if line == "POLY" {
-            if current.is_some() || done {
-                return Err("bad POLY order".into());
-            }
-            current = Some(Poly::new());
-        } else if let Some(term) = line.strip_prefix("TERM:") {
-            let (c, m) = term.split_once(':').ok_or("bad TERM")?;
-            let c = (c.parse::<i128>()?).rem_euclid(P as i128) as u64;
-            let m: Vec<usize> = m
-                .split(',')
-                .map(|x| x.trim().parse())
-                .collect::<std::result::Result<_, _>>()?;
-            if m.len() != n
-                || m.iter()
-                    .try_fold(0usize, |s, e| s.checked_add(*e))
-                    .is_none_or(|d| d > 64)
-                || c == 0
-            {
-                return Err("bad term shape/residue".into());
-            }
-            if current
-                .as_mut()
-                .ok_or("TERM outside POLY")?
-                .insert(m, c)
-                .is_some()
-            {
-                return Err("duplicate monomial".into());
-            }
-        } else if line == "ENDPOLY" {
-            let f = current.take().ok_or("END outside POLY")?;
-            if f.is_empty() || !basis.insert(f) {
-                return Err("empty/duplicate polynomial".into());
-            }
-        } else if line == "DONE" {
-            if done || current.is_some() {
-                return Err("bad completion".into());
-            }
-            done = true;
-        } else if !line.starts_with("//") {
-            return Err("unexpected Singular output".into());
-        }
-    }
-    if !done || current.is_some() || basis.is_empty() {
-        return Err("missing complete basis".into());
-    }
-    Ok(basis)
-}
-fn msolve_basis(text: &str, names: &[String]) -> Result<Basis> {
-    let text = text
-        .lines()
-        .filter(|s| !s.trim_start().starts_with('#'))
-        .collect::<String>();
-    let body = text
-        .trim()
-        .strip_prefix('[')
-        .and_then(|s| s.strip_suffix("]:"))
-        .ok_or("bad msolve framing")?;
-    let mut basis = Basis::new();
-    for polynomial in body.split(',') {
-        let mut f = Poly::new();
-        for term in polynomial.trim().split('+') {
-            let mut factors = term.trim().split('*');
-            let c = factors
-                .next()
-                .ok_or("missing coefficient")?
-                .trim()
-                .parse::<i128>()?
-                .rem_euclid(P as i128) as u64;
-            let mut m = vec![0; names.len()];
-            for factor in factors {
-                let (v, e) = factor.trim().split_once('^').ok_or("missing power")?;
-                let axis = names
-                    .iter()
-                    .position(|n| n == v.trim())
-                    .ok_or("unknown variable")?;
-                if m[axis] != 0 {
-                    return Err("repeated variable".into());
-                }
-                m[axis] = e.trim().parse()?;
-            }
-            if m.iter()
-                .try_fold(0usize, |s, e| s.checked_add(*e))
-                .is_none_or(|d| d > 64)
-                || c == 0
-                || f.insert(m, c).is_some()
-            {
-                return Err("malformed/duplicate msolve term".into());
-            }
-        }
-        if f.is_empty() || !basis.insert(f) {
-            return Err("empty/duplicate msolve polynomial".into());
-        }
-    }
-    if basis.is_empty() {
-        return Err("missing msolve basis".into());
-    }
-    Ok(basis)
-}
 fn native_basis(value: &Value, n: usize) -> Result<Basis> {
     let raw: Vec<Vec<(Vec<usize>, u64)>> = serde_json::from_value(value.clone())?;
     let mut out = Basis::new();
@@ -199,10 +98,13 @@ fn basis_hash(b: &Basis) -> String {
 }
 fn prepare(root: &Path, mode: &str) -> Result<()> {
     if mode == "graph-screen" {
-        return prepare_graphs(root, false);
+        return prepare_graphs(root, false, "graph-screen");
     }
     if mode == "scale-screen" {
-        return prepare_graphs(root, true);
+        return prepare_graphs(root, true, "scale-screen");
+    }
+    if mode == "replay-screen" {
+        return prepare_graphs(root, true, "replay-screen");
     }
     let roster: Vec<_> = match mode {
         "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
@@ -359,16 +261,11 @@ fn induced_width(n: usize, edges: &[(usize, usize)]) -> usize {
     }
     width
 }
-fn prepare_graphs(root: &Path, scale: bool) -> Result<()> {
+fn prepare_graphs(root: &Path, scale: bool, mode: &str) -> Result<()> {
     if scale && !cfg!(feature = "scale-screen") {
         return Err("scale-screen requires the explicit research feature".into());
     }
     let plan = if scale { scale_plan() } else { graph_plan()? };
-    let mode = if scale {
-        "scale-screen"
-    } else {
-        "graph-screen"
-    };
     fs::create_dir(root)?;
     let mut cases = Vec::new();
     for (n, (name, edges)) in plan {
@@ -390,6 +287,19 @@ fn prepare_graphs(root: &Path, scale: bool) -> Result<()> {
         fs::create_dir(&dir)?;
         let f = system.decode()?;
         let bytes = serde_json::to_vec(&system)?;
+        if mode == "replay-screen" {
+            let declared: Value =
+                serde_json::from_str(include_str!("../../../scale-screen-01/input-manifest.json"))?;
+            let expected = declared["cases"]
+                .as_array()
+                .ok_or("published roster")?
+                .iter()
+                .find(|c| c["id"] == id)
+                .ok_or("published case")?;
+            if expected["input_sha256"] != hash(&bytes) {
+                return Err("replay generation differs from declared public input".into());
+            }
+        }
         write_new(&dir.join("system.json"), &bytes)?;
         for algorithm in ["std", "slimgb"] {
             write_new(
@@ -467,6 +377,7 @@ impl Runner {
             .env("RAYON_NUM_THREADS", "1")
             .env("OMP_NUM_THREADS", "1")
             .env("OPENBLAS_NUM_THREADS", "1")
+            .env("SINGULARPATH", "/workspace/native-cas/share/singular/LIB")
             .env(
                 "LD_LIBRARY_PATH",
                 "/workspace/msolve-source/src/neogb/.libs:/workspace/native-cas/lib",
@@ -523,7 +434,7 @@ impl Runner {
                 )
             };
             let (status, bytes, _) = self.process(exe, &args, None, &prefix)?;
-            if !status.success() {
+            if !status.success() || !fs::read(prefix.with_extension("stderr"))?.is_empty() {
                 return Err(format!("reference {algorithm} failed: {status}").into());
             }
             let basis = if algorithm == "msolve" {
@@ -579,6 +490,7 @@ impl Runner {
         )?;
         let value: Value = serde_json::from_slice(&bytes)?;
         let complete = status.success()
+            && fs::read(out.with_extension("stderr"))?.is_empty()
             && value["status"] == "complete"
             && value["basis"].as_array().is_some_and(|a| !a.is_empty());
         let worker_wall_ns = ns(start);
@@ -837,6 +749,7 @@ fn main() -> Result<()> {
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
     Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
+    Some("replay-screen")if a.len()==9=>replay_capture::run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),PathBuf::from(&a[7]),a[8].clone()),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]

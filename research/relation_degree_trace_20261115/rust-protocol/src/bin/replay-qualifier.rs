@@ -1,10 +1,11 @@
 //! Bounded correctness/tamper checks; elapsed test clocks are not performance data.
 use certified_relations::{
     replay::{CanonicalTerm, CofactorTerm, Member, PairReduction, Witness},
-    workload, System, Term,
+    workload, Poly, System, Term,
 };
 use serde_json::{json, Value};
 use std::{
+    collections::BTreeSet,
     error::Error,
     fs,
     io::Write,
@@ -134,12 +135,13 @@ fn non_gb() -> (System, Witness) {
 }
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
-    if args.len() != 4 {
-        return Err("usage: replay-qualifier REPLAY_CLI SINGULAR NEW_OUTPUT".into());
+    if args.len() != 5 {
+        return Err("usage: replay-qualifier REPLAY_CLI SINGULAR MSOLVE NEW_OUTPUT".into());
     }
     let cli = PathBuf::from(&args[1]);
     let singular = PathBuf::from(&args[2]);
-    let out = Path::new(&args[3]);
+    let msolve = PathBuf::from(&args[3]);
+    let out = Path::new(&args[4]);
     fs::create_dir(out)?;
     let start = Instant::now();
     let system = workload::generate(2147483647, 3, 7)?.system;
@@ -167,24 +169,124 @@ fn main() -> Result<()> {
         let witness: Witness = serde_json::from_slice(&fs::read(wire)?)?;
         positive.push((mode.to_string(), system.clone(), witness));
     }
-    let a = serde_json::to_value(
-        positive[0]
-            .2
-            .basis
+    for method in ["std", "slimgb", "msolve-lift"] {
+        let script = out.join(format!("{method}-producer.sing"));
+        if method == "msolve-lift" {
+            let ms_input = out.join("input.ms");
+            let (code, _, stderr) = call(
+                &cli,
+                &[
+                    "program".into(),
+                    input.display().to_string(),
+                    "msolve".into(),
+                    ms_input.display().to_string(),
+                ],
+                out,
+                "msolve-input",
+                start,
+            )?;
+            if code != Some(0) || !stderr.is_empty() {
+                return Err("msolve input preparation failed".into());
+            }
+            let ms_basis = out.join("msolve-basis.txt");
+            let (code, _, stderr) = call(
+                &msolve,
+                &[
+                    "-g".into(),
+                    "2".into(),
+                    "-t".into(),
+                    "1".into(),
+                    "-f".into(),
+                    ms_input.display().to_string(),
+                    "-o".into(),
+                    ms_basis.display().to_string(),
+                ],
+                out,
+                "msolve",
+                start,
+            )?;
+            if code != Some(0) || !stderr.is_empty() {
+                return Err("msolve producer failed".into());
+            }
+            let (code, _, stderr) = call(
+                &cli,
+                &[
+                    "program-lift".into(),
+                    input.display().to_string(),
+                    ms_basis.display().to_string(),
+                    script.display().to_string(),
+                ],
+                out,
+                "msolve-lift-program",
+                start,
+            )?;
+            if code != Some(0) || !stderr.is_empty() {
+                return Err("msolve lifting program failed".into());
+            }
+        } else {
+            let (code, _, stderr) = call(
+                &cli,
+                &[
+                    "program".into(),
+                    input.display().to_string(),
+                    method.into(),
+                    script.display().to_string(),
+                ],
+                out,
+                &format!("{method}-program"),
+                start,
+            )?;
+            if code != Some(0) || !stderr.is_empty() {
+                return Err("liftstd program failed".into());
+            }
+        }
+        let label = format!("{method}-producer");
+        let (code, _, stderr) = call(
+            &singular,
+            &["-q".into(), script.display().to_string()],
+            out,
+            &label,
+            start,
+        )?;
+        if code != Some(0) || !stderr.is_empty() {
+            return Err(format!("{method} producer diagnostics").into());
+        }
+        let wire = out.join(format!("{method}.json"));
+        let (code, _, stderr) = call(
+            &cli,
+            &[
+                "import".into(),
+                input.display().to_string(),
+                out.join(format!("{label}.stdout")).display().to_string(),
+                wire.display().to_string(),
+            ],
+            out,
+            &format!("{method}-import"),
+            start,
+        )?;
+        if code != Some(0) || !stderr.is_empty() {
+            return Err(format!("{method} import failed").into());
+        }
+        positive.push((
+            method.into(),
+            system.clone(),
+            serde_json::from_slice(&fs::read(wire)?)?,
+        ));
+    }
+    let canonical = |w: &Witness| -> BTreeSet<Poly> {
+        w.basis
             .iter()
-            .map(|r| &r.polynomial)
-            .collect::<Vec<_>>(),
-    )?;
-    let b = serde_json::to_value(
-        positive[1]
-            .2
-            .basis
-            .iter()
-            .map(|r| &r.polynomial)
-            .collect::<Vec<_>>(),
-    )?;
-    if a != b {
-        return Err("constructor bases differ".into());
+            .map(|row| {
+                row.polynomial
+                    .iter()
+                    .map(|t| (t.exponents.clone(), t.coefficient))
+                    .collect()
+            })
+            .collect()
+    };
+    let reference = canonical(&positive[0].2);
+    if positive.iter().any(|(_, _, w)| canonical(w) != reference) {
+        return Err("producer bases differ".into());
     }
     let original = positive[0].2.clone();
     let mut cases: Vec<(String, System, Witness, &str)> = positive

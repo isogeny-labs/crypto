@@ -90,30 +90,63 @@ pub fn produce(system: &System, compact: bool) -> Result<Witness, String> {
             basis: quotient::solve(&input, n, p)?.0,
         }
     };
-    let polynomials: Vec<_> = certificate.basis.iter().map(|r| r.poly.clone()).collect();
-    let reducers = input_rows(&polynomials, n);
+    complete(
+        system,
+        certificate.definitions.iter().map(member).collect(),
+        certificate.basis.iter().map(member).collect(),
+    )
+}
+/// Complete witnesses for independently produced membership rows. No supplied
+/// identity is accepted arithmetically until the exported checker executes.
+pub fn complete(
+    system: &System,
+    definitions: Vec<Member>,
+    basis: Vec<Member>,
+) -> Result<Witness, String> {
+    let n = system.variables.len();
+    let p = system.prime;
+    if !(3..=quotient::MAX_VARIABLES).contains(&n)
+        || definitions.len() > n
+        || basis.is_empty()
+        || basis.len() > 256
+    {
+        return Err("replay: completion shape budget".into());
+    }
+    let input = system.decode()?;
     let mut pairs = Vec::new();
-    for right in 0..reducers.len() {
+    for right in 0..basis.len() {
         for left in 0..right {
-            let target = s_polynomial(&reducers[left], &reducers[right], p).poly;
             pairs.push(PairReduction {
                 left,
                 right,
-                proof: quotient_witness(target, &reducers, p)?,
+                proof: Vec::new(),
             });
         }
     }
-    let witness = Witness {
+    let mut witness = Witness {
         version: 1,
-        definitions: certificate.definitions.iter().map(member).collect(),
-        basis: certificate.basis.iter().map(member).collect(),
-        input_reductions: input
-            .into_iter()
-            .map(|f| quotient_witness(f, &reducers, p))
-            .collect::<Result<_, _>>()?,
+        definitions,
+        basis,
+        input_reductions: vec![Vec::new(); input.len()],
         pair_reductions: pairs,
     };
-    // The consumer's shape/coverage checks also bound serialized construction output.
+    // Validate untrusted imported rows before division. Empty placeholders are
+    // not acceptance witnesses and this intermediate script is never executed.
+    singular_script(system, &witness)?;
+    let polynomials = witness
+        .basis
+        .iter()
+        .map(|r| decode_poly(&r.polynomial, n, p))
+        .collect::<Result<Vec<_>, _>>()?;
+    let reducers = input_rows(&polynomials, n);
+    witness.input_reductions = input
+        .into_iter()
+        .map(|f| quotient_witness(f, &reducers, p))
+        .collect::<Result<_, _>>()?;
+    for row in &mut witness.pair_reductions {
+        let target = s_polynomial(&reducers[row.left], &reducers[row.right], p).poly;
+        row.proof = quotient_witness(target, &reducers, p)?;
+    }
     singular_script(system, &witness)?;
     Ok(witness)
 }
