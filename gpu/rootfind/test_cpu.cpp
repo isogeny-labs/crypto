@@ -499,6 +499,38 @@ static void test_lookup_primitives(std::mt19937_64 &rng) {
                 RF_PROBE_PAIR, checks);
 }
 
+/* rf_pair_run (the device pair-table build's batched runs) against rf_pair_x, cell by cell:
+ * rows not a multiple of RF_PAIR_CHUNK, a doubling on every diagonal, both signs, and a
+ * duplicated abscissa (zero denominator -> the per-cell fallback). */
+static void test_pair_runs(uint64_t p, std::mt19937_64 &rng) {
+    Fp64Ctx f = fp64_ctx_new(p);
+    const uint64_t a_m = fp64_to_mont(f, rng() % p);
+    for (uint32_t n : {1u, 15u, 16u, 17u, 37u, 50u}) {
+        std::vector<uint64_t> x(n), y(n);
+        for (uint32_t i = 0; i < n; i++) {
+            x[i] = fp64_to_mont(f, rng() % p);
+            uint64_t yc; do { yc = rng() % p; } while (yc == 0);
+            y[i] = fp64_to_mont(f, yc);
+        }
+        if (n > 5) x[5] = x[2];   /* duplicate abscissa */
+        std::vector<uint64_t> keys((size_t)n * (n + 1), 0);
+        for (uint32_t ai = 0; ai < n; ai++)
+            for (uint32_t b0 = ai; b0 < n; b0 += RF_PAIR_CHUNK) rf_pair_run(f, a_m, x.data(), y.data(), n, ai, b0, keys.data());
+        uint64_t b = 0, filled = 0;
+        for (uint32_t ai = 0; ai < n; ai++)
+            for (uint32_t bi = ai; bi < n; bi++)
+                for (int sg = 0; sg < 2; sg++, b++) {
+                    uint64_t xk = 0;
+                    const int ok = rf_pair_x(f, a_m, x.data(), y.data(), ai, bi, sg, &xk);
+                    const uint64_t want = ok ? xk : RF_PAIR_EMPTY;
+                    CHECK(keys[b] == want, "pair run p=%llu n=%u (%u,%u,%d)", (unsigned long long)p, n, ai, bi, sg);
+                    filled += keys[b] != RF_PAIR_EMPTY;
+                }
+        CHECK(b == keys.size(), "pair run index covers n(n+1)");
+        CHECK(n == 1 || filled > 0, "pair run filled keys");
+    }
+}
+
 int main() {
     std::mt19937_64 rng(0x5EED);
     /* primes: a 61-bit p = 3 mod 4, a 40-bit one, and a tiny one */
@@ -513,6 +545,8 @@ int main() {
     test_fp256(rng);
     std::printf("=== lookup primitives ===\n");
     test_lookup_primitives(rng);
+    std::printf("=== pair-table runs ===\n");
+    for (uint64_t p : {p61, p40, p20}) test_pair_runs(p, rng);
     std::printf("=== oracle (synthetic a=-3 curves) ===\n");
     for (uint64_t p : {p61, p40}) test_oracle(p, rng);
     std::printf("=== oracle (P-256 positive controls) ===\n");
