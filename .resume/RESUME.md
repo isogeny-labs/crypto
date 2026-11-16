@@ -1,4 +1,52 @@
-# Current checkpoint:31SOURCE READY, NOT RUN (16 November14:58Z)
+# Current checkpoint:31FINISHED; publish then native rho pricing (16 November15:06Z)
+
+Source564853c1e5d9708cbe462f5487b8198b63738298publishedBEFOREsole31call.
+Run/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31 exits0,
+194.973sec/fixture+3workers/3starts3complete. All3actualscalar146169426957327337,
+native+extraellreplay/heldout. CopiedRustqualifier fullrecovery/rank/prefixTRUE.
+Fixed2LP1018081B/643sources/521rowsrank371 vsrankstop798720B/497sources/376rows
+rank371. Both2descents/2087residuals/2086advances. Small370/full494.
+Checkpoint1B574464/369sources/247certs/rank247<369; checkpoint2B798720/
+497sources/374certs/rank369READY. All621checkpoint+376finalcertreplaysPASS,
+exactsourceprefix/common-descent-prefix/phasecountercontainmentPASS.
+Observedpartialsubtotal5086671014334IC/8264537803730fixed/7496753787480rankstop;
+relation5875912460348fixed->4608739628848rankstop;LA291342950896->790731766146.
+No completecost/speed/rho ranking, no crossruncomposition/retry/relaxedgate.
+
+All230source/precall/preworker/posthashPASS BEFOREpostcalldocedits. ICraw7398B/
+summary24073BexactGit+local/allprogressfit64KiB. Fullfixedraw505331B/rankraw621964B/
+nativeexport1151925B LOCALexact/hashbound, immutablecopiedbins/qualifier/wrapper/
+source/hostfactsretained. NativeexportNONCANONICALexplicit; encryptedschemaunreadable.
+PCC-20261116-6dce0fstandingunverified, lessonO-a1b447014ab6scopeoutcome.
+SinglefinalPDFpageviewed/exactPDF/SVG/150dpiPNGcopieshashPASS. Initialtableclipping
+andprosetypofixedpresentationonly; frozenoriginaltemplate/initialrenderLOCALhashbound.
+No compiler/scientificjob. Current564853+DIRTY31packet/resume/journal/mainREADME/PCC/lesson.
+
+NEXTcommit/pushpacket/updatePRactual31theninspectartifactbot/FF/restoreignoredPNG/hash,
+neverreaddignoredPNG. Afterpublication implementnativeRhopricingcontrols per
+STRONG_RHO_ACCOUNTING_FOLLOWUP.md: actualArith inversiondiffersfromharnessFq3Prims,
+TUNEDlegacycreditsnotcompletenativebitopprice; doNOTwholehooksnapshot+rho_tallydoublecount.
+No newrho numericprice/protocolselectedyet. KB/primary/source receiptsdoneforreview;
+logselection/newsourcecontrols/freezeprotocolbeforeanynewmeasure. GoalACTIVE/local
+authorized/no stopgoal/subagents/manualmerge. CI564853last14:58next>=15:48absent
+publicationevent. RegularPR4288automergeenabled/requiredgatesreviewunconfirmed.
+
+# Previous checkpoint:31RUNNING on published source (16 November14:59Z)
+
+Source564853c1e5d9708cbe462f5487b8198b63738298PUSHED/remoteconfirmed/cleanBEFORE
+sole31call. All230source+2binaryhashPASS. Session36216run
+/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31. Fixtureexit0,
+originalICstarted; inspectflow/status thenfixed2LP/rankstop. Nativequeuefinished,
+no compiler. Do notlaunchagain/retry/raisebounds. Existing900worker/2800whole/
+60fixture/CPU0/8GiB/1round0warm/noretry frozen. Poll<=50sec withcommentary<=60sec.
+Afterrun originalcopiedanalyzer RUN-DIR NEW-SUMMARYwritesraw-export.json too;
+pre/post/preworker/sourcehashchecks, preservefullraw/proofsLOCALif>64KiB andexact
+summary/flow/hashGit, report/viewallpages/exactbenchmarkcopies/publication.
+PRsourceupdated/PCCproselint0findings;CI56485314:58reviewSUCCESS/migrateINPROGRESS,
+othersEMPTY/requiredgatesunconfirmed;next>=15:48absentevent/newpublication.
+No31resultyet. GoalACTIVE/no stopgoal/subagents/manualmerge.
+
+# Previous checkpoint:31SOURCE READY, NOT RUN (16 November14:58Z)
 
 Nativequeue25349FINISHED:26sievepass/2existingignored, public-input1/1,
 productionexamplebuild andfinal library/examplestrictClippyPASS. Twofrozen

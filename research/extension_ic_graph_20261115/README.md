@@ -38,7 +38,15 @@ rows. This corrects counter coverage; the original29measurement is unchanged
 and no end-to-end price is reconstructed. The next opt-in collection lead
 checks certified homogeneous rank at B-batch boundaries before stopping
 collection; [Amendment26](AMENDMENT_26_RANK_STOP_COLLECTION.md) freezes its
-fresh matched validation. Native checks are in progress;31has not run.
+fresh matched validation. The [completed31trial](local-cover-two-lp-rank-stop-20261116-31/report.pdf)
+recovers146169426957327337in all three methods. Rank stopping uses798720
+rather than1018081Bvalues, with497rather than643original sources and
+376final affine certificate replays. Both independent checkpoint ranks
+and exact source/descent prefixes pass. Observed primitive subtotals are
+8264537803730fixed2LP,7496753787480rankstop and5086671014334originalIC;
+these are incomplete counts without a full-cost or speed ranking. Native
+26sieve(two existing ignored),1public-input and17qualifier checks pass,
+with release builds/strictClippy and byte-exact29summary replay.
 [pcc:unverified]
 
 ## Three graph representations in the Rust integration
