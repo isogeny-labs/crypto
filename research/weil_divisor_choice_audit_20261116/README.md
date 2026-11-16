@@ -69,3 +69,5 @@ Multiplication-isogeny comparison, full canonical nondegeneracy, descent,
 nonclosed residue fields, canonical Tate, general MOV/Frey–Rück and backend
 runtime remain open. All fourteen requested targets remain active.
 [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `256270fb73306a7e292cb0f9f3c3eec35bb36e20` and local receipt `b86740581c2c104c5318a92b78ba46f98671939c` share tree `6f08f3db619d6b28f9cac457caf4a4e3fe46c2ab`. Anonymous fetch completed before exact fresh head/title/body/ready confirmation.44 pinsets/5404 entries match. Scheduled06:30 check:2success/5running/1signskipped, no reviews or threads. Signed status remains unverified. [pcc:unverified]
