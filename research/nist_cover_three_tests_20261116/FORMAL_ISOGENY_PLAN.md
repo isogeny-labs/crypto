@@ -1,6 +1,6 @@
 # Proposed full-isogeny construction from a rational reference divisor
 
-Update:the fixed224-term formal construction and all six rational fits now pass their local controls;see [FORMAL_RECONSTRUCTION.md](FORMAL_RECONSTRUCTION.md),PCC-20261116-b97918. The global correspondence,kernel and dual obligations below remain open. The rest of this file preserves the original design notes. [pcc:unverified]
+Update:the fixed224-term formal construction and all six rational fits pass their local controls(PCC-20261116-b97918). Exact global pairing,quartic/characteristic identities and all3 differential traces pass(PCC-20261116-fe2b13). The full-source evaluator passes the G/Q bridge and generic negation/doubling/addition(PCC-20261116-b54698);see [FORMAL_RECONSTRUCTION.md](FORMAL_RECONSTRUCTION.md). Actual kernel,polarization/degree and dual obligations remain open. The rest of this file preserves the original design notes. [pcc:unverified]
 
 Design notes,2026-11-16. This is not an executed map or a proof of the generic isogeny. Sources: Tian arXiv:2007.03172 section4.3,especially its coefficient-by-coefficient differential reconstruction and Remark4.4 on changing the target divisor reference;existing exact candidate differential and the successful degree6 elliptic backmap. KB unavailable. Freeze an implementation/control protocol before affected data.
 

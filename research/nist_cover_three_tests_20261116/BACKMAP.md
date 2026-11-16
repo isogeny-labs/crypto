@@ -85,7 +85,7 @@ For target arithmetic,the implementation adds the same auxiliary rational degree
 
 The class spaces and scalar-multiple witness are retained in [public-classes-v2/result.json](evidence/public-classes-v2/result.json),PCC-20261116-8599e0. Scalar37 is used only by the known-answer checker;the public-fiber/class constructor consumes public coordinates. These tests do not recover a scalar by individual descent,and target multiplication by the full subgroup order was not executed. [pcc:unverified]
 
-The full isogeny from all of $J(H)$ with the recorded kernel remains separate. A [formal construction plan](FORMAL_ISOGENY_PLAN.md),based on Tian4.3 and a known rational target reference divisor,is proposed but unexecuted.
+The global source-curve correspondence and full-source evaluator now also pass their exact equation,differential and public bridge checks;see [the global construction report](FORMAL_RECONSTRUCTION.md),PCC-20261116-fe2b13 and PCC-20261116-b54698. Identifying its actual recorded kernel,polarization/degree and dual remains separate. [pcc:unverified]
 
 The retained first seven-variable inverse call used the exact Fp24 bridge and round-tripped762 distinct coefficients. It reached its predeclared60-second limit without a basis. This is a bounded execution result. The backmap construction proceeds independently of that root solve. Large program/stdout files and the earlier expanded coefficient result remain local with explicit pending-artifact manifests;the current uploader lacks the AWS CLI. No remote-byte verification is asserted. [pcc:unverified]
 

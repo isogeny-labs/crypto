@@ -8,7 +8,7 @@
 
 ## Problem
 
-The original P-192 speedup test remains open. Kernel3's explicit degree6 backmap now gives closed public fibers and actual target Jacobian classes. Zero,doubling,cancellation,the public G/Q known-answer relation and norm[6] pass(PCC-20261116-73bb6a,PCC-20261116-8599e0). Six source-bound setup rows have rank6 on225 projected points. See [BACKMAP.md](../research/nist_cover_three_tests_20261116/BACKMAP.md). The full source-Jacobian isogeny/dual and restricted-base individual descent remain open;no scalar is recovered by the known-answer test. Paid performance runs still require restored,live-confirmed headroom. [pcc:unverified]
+The original P-192 speedup test remains open. A global genus3 correspondence now passes exact quartic,characteristic-polynomial and differential identities(PCC-20261116-fe2b13). Its full-source class evaluator passes the actual G/Q bridge to the degree6 elliptic transfer and generic negation,doubling/addition(PCC-20261116-b54698). See [FORMAL_RECONSTRUCTION.md](../research/nist_cover_three_tests_20261116/FORMAL_RECONSTRUCTION.md). Six source-bound setup rows have rank6 on225 projected points. Actual recorded-kernel,polarization/degree,dual and restricted-base individual-descent checks remain;no scalar is recovered by the known-answer fixture. Paid performance runs still require restored,live-confirmed headroom. [pcc:unverified]
 
 ## Evidence and uncertainty
 

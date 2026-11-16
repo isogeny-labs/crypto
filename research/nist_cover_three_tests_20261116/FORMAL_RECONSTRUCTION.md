@@ -1,6 +1,6 @@
-# Reconstructing the full map from a known rational reference divisor
+# A global genus3 correspondence from a known rational reference divisor
 
-2026-11-16. The fixed kernel3 differential now produces six rational-function candidates on the actual P-192 genus3 source curve. Every candidate has a one-dimensional training kernel and passes32 unused series coefficients. The complete224-term computation also passes4032 native branch,quartic and trace checks. These are producer results;global pairing and the actual recorded-kernel identification remain acceptance obligations. [pcc:unverified]
+2026-11-16. The six reconstructed rational functions now give a global correspondence from the actual P-192 genus3 source curve to the kernel3 quartic. Exact quartic incidence,the y-characteristic polynomial,and all three candidate differential trace identities pass. Two arithmetic implementations produce identical normalized map coefficients. These results have unsigned producer standing;the actual recorded-kernel identification,polarization/degree and dual checks remain acceptance obligations. [pcc:unverified]
 
 The complete coefficients and local series are in [formal-series-v1/result.json](evidence/formal-series-v1/result.json),with unsigned PCC-20261116-b97918. This stage uses the same original prime field as P-192. It consumes neither a hidden discrete logarithm nor a seven-variable inverse solution.
 
@@ -52,8 +52,49 @@ There are107 linear unknowns. For each function,the first192 coefficients give r
 
 Structural certificate `IDC1h4ad7b19e8ec8a81c` checks the generic third Newton identity at32 derived points with an added-one corruption control in the mandated field $2^{61}-1$. PCC-20261116-3a64de is unsigned. This structural record does not verify P-192 coefficients or the isogeny.
 
+## Executed global pairing and differential checks
+
+Let $K=\mathbb F_p(X)[Y]/(Y^2-h(X))$. The fitted x-functions define a monic cubic $U(T)$ over $K$;the fitted y-functions define a monic cubic $Q(W)$. Compute the polynomial gcd of $F_C(T,W)$ and $Q(W)$ in $(K[T]/U)[W]$. Its monic linear result pairs the two coordinate multisets and supplies a quadratic $V(T)$. The explicit correspondence is
+
+$$U(T)=0,\qquad W=V(T).$$
+
+Every coefficient is retained as $(a(X)+b(X)Y)/c(X)$ in [global-correspondence-v2/result.json](evidence/global-correspondence-v2/result.json),unsigned PCC-20261116-fe2b13. The complete record is about41KiB. The native calculation checks the following exact identities. [pcc:unverified]
+
+$$F_C(T,V)=0,\qquad Q(V)=0\pmod U,$$
+
+as well as the full characteristic polynomial of multiplication by $V$. Differentiating in $K$,with $Y'=h'/(2Y)$,gives
+
+$$T'=-U_X/U_T,\qquad W'=V_X+V_TT'.$$
+
+The quartic derivative equation and each of the three identities
+
+$$\operatorname{Tr}\left((T,V,1)\frac{T'}{F_y(T,V)}\right)
+=D\frac{(1,X,X^2)^t}{2Y}$$
+
+pass exactly. The rational limits at source infinity recover the chosen reference divisor. Altering the paired y-coordinate rejects. Thus the calculation establishes global incidence and the declared differential beyond the heldout local-series tests. [pcc:unverified]
+
+The first implementation uses Euclidean cubic inverses;its generator inverse controls pass but it omitted per-call source-field inverse assertions. That limitation is retained in PCC-20261116-9d7084. The second uses adjugate multiplication matrices and checks every source-field/cubic inverse by multiplication,plus two fixed cubic-unit and zero-nonunit controls. Both produce byte-identical normalized $U,V$ and differential traces. This is same-producer agreement,not independent verification. The original successful result is preserved. [pcc:unverified]
+
+Structural records `IDC1hbeea2608f845f93f` and `IDC1h3718f832316891d6` check the generic adjugate-column annihilation formulas at32 derived points,with added-one rejection,in the same limited $2^{61}-1$ field. PCC-20261116-181d2a is unsigned. They do not verify the actual P-192 coefficient arithmetic or the global geometric identification.
+
+## Executed source-class evaluator and public bridge
+
+The evaluator now consumes an actual source Mumford divisor $(u,v)$ of degree $d\le3$. It evaluates the global coefficients in $\mathbb F_p[S]/u$,with $Y=v(S)$,and forms the rank3 algebra defined by $U(T)$. A full power basis in this $3d$-dimensional algebra gives a closed target divisor of degree $3d$. Every source denominator inverse,basis solve and target curve equation is checked. This also handles the nonreduced degree2 divisor in the doubling fixture. [pcc:unverified]
+
+The target class is the resulting effective divisor minus $dE_{\rm ref}$. Adding $(3-d)E_{\rm ref}$ and a common auxiliary degree3 divisor to the positive representative gives effective degree12;subtracting $3E_{\rm ref}$ plus that same auxiliary divisor recovers the desired class. The unchanged large-model KM backend evaluates these classes.
+
+| Executed source-class control | Outcome |
+|---|---|
+| Actual pullback of public $G$,including branch shift | Agrees with earlier $f^*G$ |
+| Actual pullback of public $Q$,including branch shift | Agrees with earlier $f^*Q$ |
+| Separate source point $P$ and $-P$ | Images cancel |
+| Source doubling $2P$ | Image equals twice image of $P$ |
+| Source addition $P+\pi^*G$ | Image equals the target sum |
+
+The six source divisors have degrees3,3,1,1,2,3;their closed images have degrees9,9,3,3,6,9. The test completes19 target addflips. Full source/target divisors and class coordinates are retained in [generic-bridge-v1/result.json](evidence/generic-bridge-v1/result.json),unsigned PCC-20261116-b54698. No hidden scalar is consumed by this evaluator. [pcc:unverified]
+
 ## Next acceptance step
 
-Recover the pairing of x- and y-support coordinates over $\mathbb F_p(H)$,rather than accepting two independent multisets. Require exact quartic incidence,characteristic-polynomial and differential identities. The frozen [global protocol](GLOBAL_CORRESPONDENCE_PROTOCOL.md) gives these checks. Afterwards the original requirements still include the actual recorded kernel,degree/polarization,dual composition and the bridge to the completed public subgroup transfer. Individual descent remains a separate solver component.
+Check that the global homomorphism kills the actual recorded27-element kernel,with a nonkernel torsion control;then establish its degree/polarization and dual composition. The [next kernel-check design](ACTUAL_KERNEL_PLAN.md) gives a small exact principal-divisor test over the recorded degree8 field. It is unexecuted. The differential and public subgroup bridge do not replace these checks. Individual descent remains a separate solver component.
 
-Reproduce into new output directories with [check-formal-series.sh](check-formal-series.sh),passing the completed kernel3 study and retained elliptic-backmap result. The [frozen protocol](FORMAL_SERIES_PROTOCOL.md),source snapshot,pre/post-call hashes and process exit0 are retained. No speed or scalar-recovery claim is made. KB was unavailable;the retained primary Tian text and native source/target receipts supplied the source review. Full formalization is absent;the structural identity is limited to its stated field and formula.
+Reproduce into new output directories with [check-formal-series.sh](check-formal-series.sh),passing the completed kernel3 study and retained elliptic-backmap result. Then use [check-global-correspondence-v2.sh](check-global-correspondence-v2.sh) with the fixed formal receipt. The [frozen formal protocol](FORMAL_SERIES_PROTOCOL.md),[global protocol](GLOBAL_CORRESPONDENCE_PROTOCOL.md),[adjugate control protocol](GLOBAL_ADJUGATE_PROTOCOL.md),source snapshots,pre/post-call hashes and process exits0 are retained. No speed or scalar-recovery claim is made. KB was unavailable;the retained primary Tian text and native source/target receipts supplied the source review. Lean and lake are unavailable,so no compiled formalization is supplied;the structural identity is limited to its stated field and formula.
