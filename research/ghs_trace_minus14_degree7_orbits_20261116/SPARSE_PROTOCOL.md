@@ -1,0 +1,7 @@
+# Frozen sparse branch-pole continuation
+
+16 November 2026. This is an additional degree-seven search under `PROTOCOL.md`, not a change to its original two-shape screen. Source `sparse.sage` SHA256: `50050f0425d85206cc86d4a0a1e46ab6a2c7446f4c209f3ea011325445fa9754`. The source models, carrier orbit representatives, exact field, and seven cells are the same as in `PROTOCOL.md`; E11/f9735 has an earlier complete degree-seven receipt.
+
+This script covers `B=1`, `B=Q_i`, `B=Q_i^3`, and `B=Q_iQ_j` after moving the image of the rational point at infinity to the elliptic origin. The numerator CRT constraints include the unique rational 2-torsion image of the carrier's rational branch point and all three choices at each unpoled quadratic branch pair. For `Q_iQ_j`, the CRT modulus has degree seven, leaving one free numerator coefficient; all 242 nonzero values are enumerated. Every final candidate must satisfy `deg A=7`, `gcd(A,B)=1`, and the full exact identity `f C²=B(A³+A²B+bB³)`. The four denominator assignment counts are 243,405,405,270 per cell, before the extra numerator coefficient loop.
+
+Run all seven cells with `sage sparse.sage <bmask> <fmask> > sparse_<bmask>_<fmask>.json 2> sparse_<bmask>_<fmask>.stderr`. Preserve source-bound output. Zero hits exclude these four shapes only. A hit triggers independent algebra-system replay and exact subgroup pullback/norm evaluation before attack-cost work.
