@@ -8,18 +8,19 @@
 
 ## Problem
 
-The comprehensive speedup test cannot yet execute because the eight actual P-192 d7 mixed kernels have no implemented quotient/dual map in this study, and the hypothesized restricted-base relation solver has no explicit algorithm. Paid EKS runs also require restored, live-confirmed budget headroom; the latest shared journal reports the monthly allowance exceeded. [pcc:unverified]
+The original P-192 speedup test remains open: all eight kernels now have an executable coset-image quotient/dual transfer, but no nonhyperelliptic target model or useful restricted-base P-192 algorithm has been constructed. A small full-base index-calculus control now completes scalar recovery on public F109/F1009 fixtures. Paid performance runs additionally require restored, live-confirmed budget headroom. [pcc:unverified]
 
 ## Evidence and uncertainty
 
-- **Observed:** native development replays, exact input witnesses, failures and corruption controls are in the report. Six actual genus3 torsion generators realize the eight abstract kernels after common-root alignment. These are producer assertions awaiting signed PCC verification. [pcc:unverified]
-- **Derived or proved:** the standard polarized-isogeny identities would give TF=[6] after construction of phi; this is conditional, not an executed quotient identity. Source pullback/norm has a separate executed fixture check.
+- **Observed:** native development replays, actual kernel witnesses, coset-image quotient/dual checks and OpenSSL elliptic endpoints are in the report. The two small controls recover all11/109 subgroup targets; their explicit bases contain all nonzero subgroup points and their quotient working fields are extensions6/9. These are producer assertions awaiting signed PCC verification. [pcc:unverified]
+- **Derived or proved:** the coset implementation executes TF=[6] and inverse6 source-point recovery. For transported source bases, projection scales the old norm by3; this does not test a new target-geometry base. No formal or signed independent proof is asserted. [pcc:unverified]
 - **Suspected explanation:** unknown whether the candidate quotients improve the projected relation equations. Kernel existence and point-field degree do not decide it.
-- **Missing capability:** native theta/Weil-set quotient, field-of-definition/descent and actual-kernel check, dual evaluation, restricted-base algebraic relation solver, independent replay and complete cost panel. No missing generic genus3 arithmetic is asserted for the tested monic cover.
+- **Missing capability:** native theta/Weil-set plane-quartic reconstruction and geometric descent, full target divisor/dual-coordinate arithmetic, a useful restricted-base P-192 solver, signed independent replay and complete admitted costs. The finite-image quotient/dual and small full-base recovery controls are implemented; do not list them as missing.
 - **Alternatives inspected:** existing Tian controls replay published maps but do not construct this quotient; the existing prime-cover collector lacks the proposed mixed-3 relation mechanism; Milio/Tian primary papers describe quotient methods but the inspected local native APIs do not implement this input path. The public Magma route previously reached its request limit; no new public-service campaign was started. No universal implementation-absence claim follows.
 
 ## What would unblock it
 
+- [x] Execute the coset-image quotient/dual and source-point recovery for all eight P-192 kernels, plus additional public small-curve IC recoveries. This is component coverage, not completion of the original advantage claim. [pcc:unverified]
 - [ ] Construct one quotient from an emitted actual kernel, identify smooth nonhyperelliptic Jacobian/product/hyperelliptic target and descent field; verify actual kernel and dual composition, including exceptional inputs.
 - [ ] Implement an explicit projected relation solver and independent checking on original elliptic points, merging duplicate projected base images before rank accounting.
 - [ ] Freeze public inputs, standard-panel controls and complete per-phase costs before a paid experiment; obtain current budget/capacity, source-image pin and S3 checkpoint admission.
@@ -31,4 +32,4 @@ Compute the theta/Weil-set quotient for kernel1 with the emitted six-generator w
 
 ## Resolution and history
 
-Unresolved. 2026-11-16: actual kernel realization and source cover maps added; quotient and candidate relation algorithm remain open. No scientific job is running.
+Unresolved for the original P-192 advantage. 2026-11-16: actual kernels, source maps and finite coset-image quotient/dual implemented; full small-curve principal-function IC recovery added. Nonhyperelliptic target geometry, scalable restricted base and full measurements remain open. Native correctness replays are distinguished from paid scientific jobs.

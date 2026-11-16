@@ -1,6 +1,6 @@
-# P-192 mixed 3-isogeny route: native construction checks
+# Mixed 3-torsion transfers and a working small-curve IC prototype
 
-2026-11-16. Follow-up to [PR4348](https://github.com/isogeny-labs/crypto/pull/4348). **Scope: native development tests and static archived-evidence replay; the complete proposed attack has not run.** All new assertions are producer-unverified under the repository PCC policy. [pcc:unverified]
+2026-11-16. Follow-up to [PR4348](https://github.com/isogeny-labs/crypto/pull/4348), delivered in [PR4403](https://github.com/isogeny-labs/crypto/pull/4403). **The public small-curve prototype now recovers scalars end to end. P-192 has transfer/quotient-image checks, with no DLP recovery or speed result.** These are native development correctness tests, not performance experiments. All new assertions remain producer-unverified under the repository PCC policy. [pcc:unverified]
 
 ## Findings
 
@@ -8,7 +8,36 @@ The P-192 d7 cover now has executable native pullback and norm, six explicit gen
 
 ![Eight kernel rationality checks](figures/kernels.svg)
 
-The next missing algorithm is an explicit quotient from one of those actual kernels, followed by its dual map and a restricted-base projected relation solver. Stable kernels alone do not supply those algorithms. Neither a DLP speedup nor a general obstruction is established. [pcc:unverified]
+All eight P-192 kernels now have executable kernel-coset quotient image arithmetic and a dual candidate, with TF=[6] and inverse6 source-point roundtrips. A distinct OpenSSL backend checks40 public elliptic endpoint receipts. These coset models do not reconstruct a plane quartic or cover every rational point of the algebraic quotient. Neither a P-192 DLP speedup nor a general obstruction is established. [pcc:unverified]
+
+## End-to-end scalar recovery on public controls
+
+The implemented solver constructs actual auxiliary torsion, transfers through a mixed kernel, generates principal-function relations, merges projected duplicates, solves a modular relation matrix, performs individual descent from a public quotient target, and verifies the recovered scalar on E. Both fixed correctness cases complete. [pcc:unverified]
+
+| Base field | Elliptic model | Source order | Prime subgroup r | Quotient working field | Distinct projected base | Relations / rank | Source-checked targets |
+|---|---|---:|---:|---|---:|---|---:|
+| F109 | y²=x³+8x+52 | 99 | 11 | F109^6 | 10 | 10 / 10 | 11 |
+| F1009 | y²=x³+145x+438 | 981 | 109 | F1009^9 | 108 | 144 / 108 | 109 |
+
+Each source cofactor is9. The recovered logarithms are in prime subgroups of orders11 and109; the auxiliary3-primary groups are used for construction. Unlike the NIST prime-order sources, these Hesse controls have rational elliptic3-torsion. They are functional controls, not matched NIST-family samples. The extension fields do not make these large-DLP tests. The complete projected bases contain every nonzero point of these tiny subgroups. This establishes functional recovery, not a useful P-192 complexity bound. [pcc:unverified]
+
+![Source-checked scalar recoveries](figures/recovery.svg)
+
+The source curves come from fixed Hesse parameter2: a=-864 mod p, b=-5616 mod p, with the same d7 cover construction generalized to that coefficient a. Source point counts and genus2 Fp/Fp² counts determine exact construction inputs. A native3-primary group constructor builds full Prym3-torsion in a declared extension; the mixed kernel is realized in the genus3 Jacobian. The toy quotient's working field is explicitly larger than the source field, unlike the Fp-stable P-192 kernels.
+
+For each cubic L, the collector seeks seven distinct rational roots of f_H(X)-L(X)². Their curve points define a principal divisor of Y-L(X), hence a genuine relation. Each accepted divisor is checked with genus3 arithmetic and its projected elliptic row is checked before linear algebra. The generator row fixes log(P)=1. Only after setup are the exhaustive public correctness targets formed and reordered; solve() receives a quotient target and no scalar-witness argument. The enclosing test retains witnesses for final checking. This is principal-function hyperelliptic index calculus carried through a quotient-group image, not Diem on a reconstructed nonhyperelliptic curve.
+
+For individual descent, the solver forms aF(P)+bF(Q), with b nonzero modulo r, and computes
+
+$$R=[6^{-1}]T\big(aF(P)+bF(Q)\big).$$
+
+When R equals a base point B_i whose logarithm l_i was obtained from the relation matrix, it returns $k=(l_i-a)b^{-1}\pmod r$. It verifies $[k]F(P)=F(Q)$ and the enclosing test verifies $[k]P=Q$. Thus scalar recovery uses solved relation data; applying the transfer inverse alone only recovers a point. [pcc:unverified]
+
+The [F109 witness](evidence/toy-v3-109/public-witness.json) and [F1009 witness](evidence/toy-v3-1009/public-witness.json) contain exact source parameters, field modulus, kernel coordinates, base points/logs, all accepted functions/support/rows and recovered target answers. The separate OpenSSL checker recomputes source counts, base logarithms, principal support and projected coefficients, matrix rank and every answer. Its [F109 output](evidence/toy-v3-109/openssl-check.txt) and [F1009 output](evidence/toy-v3-1009/openssl-check.txt) pass; changed-row canaries reject. It does not independently check the auxiliary Jacobian/kernel construction or provide signed PCC verification. [pcc:unverified]
+
+The implementation now uses the exact identity $T(\phi(D))=[3]\pi_*(D)$ to build the projected base without enumerating a coset for every point; eight explicit quotient evaluations audit that identity in each toy case. The relation scan precomputes curve values and evaluates cubics by finite differences, with Horner cross-checks. Results and complete public witnesses are byte-identical to retained v2 outputs. No runtime ratio was measured. [pcc:unverified]
+
+The active solver is `toy_ic_v4.cpp`; the pinned `toy_ic.cpp` retains v3. V4 checks target order and requires the actual zero coset before returning zero for a zero projection. A nonzero auxiliary3-coset with zero projection is a separate rejection case. Both v4 cases pass with four rejection controls each, and their complete public witnesses remain byte-identical to v3. This closes an out-of-domain shortcut in the earlier toy interface; it does not change the valid-target problem. [pcc:unverified]
 
 ## Request-to-evidence status
 
@@ -20,10 +49,10 @@ The next missing algorithm is an explicit quotient from one of those actual kern
 | Actual mixed3 kernels on the genus3 Jacobian | Six generators span729 distinct classes. Eight subgroups of27 elements are explicitly realized and Frobenius-stable. Pairing transport uses aligned roots and the standard polarized degree2 pullback identities. |
 | Boundary inputs | Origin, second branch class, and both ramified fibers at elliptic x=1 over a quadratic extension. The latter tests execute pullback fiber/additivity; the norm backend is restricted to rational-coefficient divisors over the base prime field. |
 | Corruption controls | Nine rejected cases: count, Frobenius, form, missing modules, duplicate module, torsion point, cube-root/pairing witness, curve coefficient and non-isotropic kernel. |
-| Explicit quotient, nonhyperelliptic target and descent | Not implemented for these eight kernels. |
-| Executed dual composition TF=[6] | Not implemented; depends on the quotient/dual. Source-cover norm composition [2] is separately fixture-tested. |
-| Candidate projected relation solver | No explicit restricted-base solver has been derived or implemented. |
-| Complete cost / rho / scaling panel | Not attempted. Both quotient/solver implementation and cloud admission remain open. No scientific job is running. |
+| Explicit quotient, nonhyperelliptic target and descent | Exact finite kernel-coset image representation implemented; plane-quartic/Jacobian coordinates and full rational-point coverage remain unconstructed. |
+| Executed dual composition TF=[6] | Executed for all8 P-192 kernels with source-point recovery and separate OpenSSL endpoint checks; not a target-curve-coordinate implementation. |
+| Candidate projected relation solver | A working full-base small-curve principal-function IC control is implemented. A useful restricted-base P-192 solver remains open. |
+| Complete cost / rho / scaling panel | Not attempted. Small correctness fixtures are not performance trials. No P-192 advantage or scientific measurement is claimed. |
 
 All executed rows above have unsigned producer standing; see the linked raw outputs and PCC records. [pcc:unverified]
 
@@ -83,33 +112,51 @@ Every kernel has full point-field degree8, trivial intersection with the ellipti
 
 The two nonzero rational Prym 3-torsion classes were lifted into J(H), checked fixed by Frobenius and checked to have zero elliptic norm. Their translations therefore do not create distinct projected elliptic factor-base elements. This is a checked constraint on that mechanism, not a rejection of all torsion-assisted coordinate methods. [pcc:unverified]
 
+## Executed quotient/dual on the P-192 image
+
+For each actual $K$, represent a point by the coset $D+K$, with its least full Mumford encoding as a deterministic label. Addition and negation act on representatives. The map $\psi([D])=[3]D$ is independent of representative because $3K=0$. On this implemented image, $\psi(\phi(D))=[3]D$ and $\phi(\psi(A))=[3]A$. The source transfer $F=\phi\circ\pi^*$ and projection $T=\pi_*\circ\psi$ consequently admit an executed $T\circ F=[6]$ check.
+
+The native [quotient replay](evidence/quotient-v1/rows.jsonl) partitions the729 source3-torsion classes into27 cosets of27 for each kernel, checks135 representative choices and five source scalar fixtures per kernel (including a hash-derived full-width known-answer scalar), and checks inverse6 source-point recovery. [OpenSSL](evidence/quotient-openssl-v1/checker.txt) verifies all40 recorded elliptic endpoints and rejects a corrupted recovery point. No logarithm is recovered by applying inverse6: it recovers the original source point. [pcc:unverified]
+
+This models the image of $J(H)(\mathbf F_{p^8})$ in its quotient, not all $A(\mathbf F_{p^8})$ or $A(\mathbf F_p)$. In particular the 27 cosets from source 3-torsion are not the full geometric $A[3]$, which still has 729 points. The cryptographic order-$r$ subgroup is preserved. A nonhyperelliptic target curve, rational descent of its geometric model and full target divisor arithmetic remain distinct obligations.
+
+For a transported source base $D_i$, the projected row identity is exactly
+
+$$T\left(\sum_i n_i\phi(D_i)\right)=[3]\pi_*\left(\sum_i n_iD_i\right).$$
+
+Since3 is invertible modulo the source prime order, merely transporting that base scales its projected equations. The replay checks16 divisor differences per kernel. This constrains that base choice; it does not assess a new base arising from reconstructed target-curve geometry. [pcc:unverified]
+
 ![Construction and remaining quotient](figures/route.svg)
 
 ## Reproduce and audit
 
-Requirements: C++17 compiler, GMP C++/C libraries, OpenSSL libcrypto and POSIX shell. No Python arithmetic, curve search, solver or replay is used. The Python figure script only lays out recorded observations.
+Requirements: C++17 compiler, GMP C++/C libraries, OpenSSL libcrypto, ripgrep and POSIX shell. No Python arithmetic, curve search, solver or replay is used. The Python figure script only lays out recorded observations.
 
 ```sh
-research/nist_cover_three_tests_20261116/check.sh /tmp/nist-three-new-output
+research/nist_cover_three_tests_20261116/check-e2e.sh /tmp/nist-three-new-output
 ```
 
-The output directory must not already exist. The harness compiles separate executables, records hashes before calls, sets executable files read-only and retains distinct post-call source hashes. Generated arithmetic headers are exact prefixes of the unchanged point and cover sources, with their CLI main functions removed. This reuses one implementation; it does not constitute an independent verifier.
+The output directory must not already exist. The active v4 combined command has completed. Its [completion receipt](evidence/e2e-v2/COMPLETE.txt), [payload manifest](evidence/e2e-v2/MANIFEST.sha256) and [complete raw archive](evidence/e2e-v2.tar.gz) retain every stage, including canaries. Extract with `tar -xzf evidence/e2e-v2.tar.gz -C /tmp`, then run `sha256sum -c MANIFEST.sha256` inside the extracted e2e-v2 directory. The previous [v3 combined run](evidence/e2e-v1.tar.gz) is retained. Individually named PCC/report evidence remains loose; combined-run records are archived together. [pcc:unverified]
+
+The harness compiles separate executables, records hashes before calls, sets executable files read-only and retains distinct post-call source hashes. Generated arithmetic headers remove CLI main functions from the unchanged source files. Toy builds make exactly one guarded source-derivative substitution and one guarded working-field Frobenius substitution; hashes pin the adapted headers. The P-192 builds do not use those substitutions. This reuses one Jacobian implementation; the OpenSSL checks cover the elliptic endpoints/relations and do not constitute a signed independent Jacobian verifier.
 
 Canonical development evidence is [final-kernel-check](evidence/final-kernel-check/): [module summary](evidence/final-kernel-check/module-summary.txt), [actual source torsion](evidence/final-kernel-check/point-replay.txt), [cover maps](evidence/final-kernel-check/cover-replay.txt), [kernel realization](evidence/final-kernel-check/actual-cover-torsion-summary.txt), [controls](evidence/final-kernel-check/controls.txt), hashes and raw module rows. Earlier pre-call manifests and failed normalization/global-initialization attempts remain under evidence/. No elapsed time or host-performance ratio is reported.
 
 Evaluated polynomial certificates: `IDC1h2fca4883893cfdf8` (cleared cover equation), `IDC1h27026700af8d9bbf` (normalized quadratic fiber). Each records32 deterministic evaluations modulo2^61-1 and rejects an added-one corruption. These are producer-issued evaluations, with no Lean proof or independent signature. [pcc:unverified]
 
-PCC statements: `PCC-20261116-b0b9e9` (finite modules), `PCC-20261116-4a86ed` (source points/pairings), `PCC-20261116-e627e5` (cover fixtures and original eight controls); `PCC-20261116-e4ac3b` records actual kernel realization and nine controls. All have unsigned producer standing. [pcc:unverified]
+PCC statements: `PCC-20261116-b0b9e9` (finite modules), `PCC-20261116-4a86ed` (source points/pairings), `PCC-20261116-e627e5` (cover fixtures and original eight controls), `PCC-20261116-e4ac3b` (actual kernels), `PCC-20261116-192f99` (coset quotient/dual), `PCC-20261116-68ee38` (OpenSSL P-192 endpoints), `PCC-20261116-5c37d1` (first full small recovery), `PCC-20261116-61549b` (both public recoveries and OpenSSL receipts), `PCC-20261116-0b194b` (optimized exact-output qualification), `PCC-20261116-f4dd12` (previous combined command), `PCC-20261116-ab0c8b` (active v4 and complete e2e-v2 command). All have unsigned producer standing. [pcc:unverified]
 
 ## Full test still required
 
-For a polarized3-isogeny phi with dual phi-dagger, the proposed maps are $F=\phi\pi^*$ and $T=\pi_*\phi^\dagger$. Standard identities imply TF=[6]; this remains conditional on the unconstructed quotient. The proposed relation problem is
+The coset-image implementation now checks the transfer and dual compositions. An explicit nonhyperelliptic quotient model, its target divisor arithmetic, and a useful P-192 restricted-base solver are still required for the original proposed attack. The relation problem is
 
 $$T\left(\sum n_iD_i\right)=aP+bQ,$$
 
-allowing a free residual in ker(T). A complete test needs an explicit solver for this equation, independent elliptic verification, duplicate-image merging and rank measurement, then all cold costs against direct elliptic equations and matched rho. Merely applying Diem's ambient genus3 solver does not provide the hypothesized elliptic-subgroup advantage.
+allowing a free residual in ker(T). The small full-base control now solves a version of this problem; it does not supply a scalable prime-field factor base or favourable cost bound. The original P-192 evaluation still needs the target-geometry construction, an appropriate solver, independent replay and all cold costs against direct elliptic equations and matched rho. Merely applying Diem's ambient genus3 solver does not provide the hypothesized elliptic-subgroup advantage. [pcc:unverified]
 
 The [named obstruction](../../problems/nist-mixed-three-quotient-and-relation-solver.md), [blocked backlog card](../../backlog/XP-20261116-nist-mixed-three-quotient/README.md) and [protocol](PROTOCOL.md) preserve the original requirements. The current main journal reports monthly lab spend USD1982.224 againstUSD1300; this executor has no live AWS readback. No paid experiment/build was submitted, and no alternative backend was used to bypass that admission limit. Restored budget alone would not supply the missing quotient and solver.
+
+The [Iso Lab skill](../../.agents/skills/isolab-eks/SKILL.md) requires: “Stop new launches when the budget is exhausted or its remaining balance is unknown.” That rule applies to the unperformed paid performance trials; the native runs above are functional development tests.
 
 ## Sources checked and novelty boundary
 
