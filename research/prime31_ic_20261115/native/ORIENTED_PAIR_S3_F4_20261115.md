@@ -74,3 +74,26 @@ The dedicated, ten-minute capped GitHub Actions development workflow compiles/te
 **Stop:** if the oriented presentation still oversizes (or is worse), or the exact-base membership polynomial dominates both models. Retain the negative numbers and switch to certified quotient #4228/#4349, sparse implicit factor bases or other leads rather than increasing caps indiscriminately.
 
 **Final gate:** full m8 natural-root extraction without generic pair support enumeration, independent signed relation rank, 12 independently verified unknown target logarithms, complete cold cost against PKM/APS IC frontier on the same p=2³¹−1 curve, and separately optimized negation-map rho as the ultimate ECDLP security metric. No requirement is already satisfied merely by a completed component.
+
+
+## Exact-head first 15k-cap Rust development result (2026-11-16 UTC)
+
+At source commit [134ba1a06ce0](https://github.com/isogeny-labs/crypto/commit/134ba1a06ce0ad74e3f58e116cc4c25363a033eb), [Actions run 43781126033](https://github.com/isogeny-labs/crypto/actions/runs/43781126033) job 133018316921 **passed**, including **2/2** new example tests. Its outputs are frozen verbatim as structured data in [ORIENTED_PAIR_F4_CI_15000_20261116.json](ORIENTED_PAIR_F4_CI_15000_20261116.json). All numbers below are single-run producer-development results **[pcc:unverified]**.
+
+- The Rust semantic test verified **4,805** equality evaluations of the exact S3 identity, all **961** rational finite S3 roots among **496** unordered Dickson B31 point pairs, with **961** signed affine lifts/replays, **31** tangent-diagonal cases and **961** unique x-sums. These are mathematical correctness controls only.
+- All four F4 calls **stopped oversize**; **zero** completed roots/refutations and no target-conditioned IC solve. Same host/input limits, F4 degree cap 12, 15k dense/NNZ, budget 5s.
+
+| Exact B31 member equations? | Presentation | Degree reached at stop | Max reducer B' entries | Max columns | Elimination multiply-adds already done | Verdict |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| No (Dickson64) | S3 x-only | 6 | 26,618 | 429 | 30,943 | oversize / undetermined |
+| No (Dickson64) | Oriented chord-tangent | 5 | 23,535 | 337 | 10,148 | oversize / undetermined |
+| **Yes (B31)** | **S3 x-only** | **6** | **32,599** | **495** | **30,943** | **oversize / undetermined** |
+| **Yes (B31)** | **Oriented chord-tangent** | **5** | **27,377** | **366** | **10,148** | **oversize / undetermined** |
+
+For the **domain-comparable B31 rows**, the partial observed reducer-block entry count is 16.0% lower, the max column count is 26.1% lower, and the operations incurred **before different early stops** are ~3.05× fewer in the oriented arm. This is *not* an admitted 3.05× speedup or a completed solver cost: the oriented arm stopped at a lower degree, and neither algorithm completed. The exact cap threshold **27,377** versus **32,599** motivates a cap ladder that can discriminate whether the oriented approach reaches further with identical resource caps. The untreated Dickson64 rows are not valid same-projection comparisons.
+
+## Preregistered next cap-ladder (before any result)
+
+On **only the two equivalent B31-restricted ideals**, run both methods at paired dense/NNZ caps **30,000** and **60,000**, preserving the same pinned ordinary curve, point set, exact membership constraints, degree cap 12, per-call 5s cooperative limit and original F4 engine. Record every capped/timeout/basis-only result, wall time, matrix size, steps, field multiply-adds, and emitted complete solution counts (which remain unavailable without root extraction). Do not silently change resource limits between arms or assert a solver speedup from two censored stages. If both still hit oversize or cost balloons, close this presentation as a negative F4-engine lead rather than raising caps indefinitely.
+
+This is a bounded development diagnostic on the ordinary p=2³¹−1 prime-order curve; no authenticated paid EKS benchmark, PCC signature, full m8 natural relation or PKM/APS completion is being claimed.
