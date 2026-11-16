@@ -1,0 +1,3696 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "independence_basis": "validator subagent that did not produce item 15, its matched-rho cards, runs or replay; every number recomputed by this stdlib script from the committed raw records (the binary's own gate, analyze and matched_rho outputs are compared against, never used as inputs to the recompute)",
+ "snapshot": {
+  "head": "1e351403e4a17565eacebf1786d7ddd384dbbd95",
+  "evidence_paths_clean": true,
+  "evidence_paths": [
+   "research/blindspots_20261018/15-genus3-la-exponent",
+   "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs",
+   "examples/ic_improve_04_genus3_2lp.rs",
+   "research/ic_improve_20261014/04-genus3-2lp/results/run-20261014"
+  ]
+ },
+ "raw_data": [
+  {
+   "path": "../../examples/ic_improve_04_genus3_2lp.rs",
+   "sha256": "9d57c4473cc7d497f50ca841e32af367d63d1bfa65023acd17eea01f42a5e747"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md",
+   "sha256": "c4119c5ebd4a0717b46a1d3921b329338377658f0ad07fa613886d8e1d8ab142"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m00.yaml",
+   "sha256": "f0e3b94f04dd98c142ecafc97ed1a9f7f951207784fd1d0299d7917f870ac8ea"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m01.yaml",
+   "sha256": "715b33fd4327a69621feda8b63c32f4061af1a802c445c74b31bbbb79a47904e"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m02.yaml",
+   "sha256": "7b2dca3e3de6cdc60957102ae2d9f49c4293a670661dd878981beee71f550857"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m03.yaml",
+   "sha256": "418bf2f8d4b01cedd3f366812a2ad727e5886767139d40b4009a7a9077d516df"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+   "sha256": "d31864a01ff8aff7f1ef6e0a2649e52fa9a25dabec8852f3a9e4c5e4e6ddf235"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/analysis.json",
+   "sha256": "d5a63240a73367f9e1d22f437cc20419ecd63eef1223307b33075deb6591d9d7"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c0_r2.jsonl",
+   "sha256": "7ee1517f9fa3bc0329e5dbe44719f0b4cfc2162ee2a55e9b4074eeb8c2690273"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c1_r2.jsonl",
+   "sha256": "c3d352e31004529f33fdf3f9866b2a729ab9105ea1c8064410c8939500eb2325"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c2_r2.jsonl",
+   "sha256": "0bc403b6d174b89b9d81bdef060b5757e9466535b10447ac57365f58f037ed7d"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c3_r2.jsonl",
+   "sha256": "9117738a659cc4eea9bfb19ef2e4304a5421356d6e4c450fda3353fef4c077ba"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c0_r2.jsonl",
+   "sha256": "20b3fe52f263331ff01b72d7941d67dadf0c27ccdf305c4fa2cc825ca06ed680"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c1_r2.jsonl",
+   "sha256": "bf11f9e9aea508fe421baf63ec5191138dea179c4552e637ddbbdd0555cecfb3"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c2_r2.jsonl",
+   "sha256": "dd52348bb59451e0522521878bf057029c9cb742960b390ebbfe5ce9f89c4769"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c3_r2.jsonl",
+   "sha256": "ea7fdcf3b8d2e6fa32891dcc27ea7a2719fd63a5302423120f0be7cd6e0d374e"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_r2.jsonl",
+   "sha256": "bf40f5949c613c2a1f1a42d36c41fc88142cc8257fd70f09aa54d66aefbb604f"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl",
+   "sha256": "39c8b0822d7379a116ee210bf97ff0bd893f89f29a08c4dc327e63e572d727f9"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_r2.jsonl",
+   "sha256": "468b35520734e85aa0f8f874ac8f69cf6f07c35d897eb43c489b1ca26681bc6e"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_r2.jsonl",
+   "sha256": "765babd50de9e2d39b9b87c5756b943db171a214b4190180b5cd884c6bcf05bd"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl",
+   "sha256": "6f49a147f771a3213cb6739b6b31209ef65586ba7b47460049faf1e47d2910c7"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c1_r2.jsonl",
+   "sha256": "83231358439ddbd2507e68ba3617e7ec09523a131c1f21f9dc3ed4148fd07cb1"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c2_r2.jsonl",
+   "sha256": "6485505ed0dab4fcafff34e5e858f524b0058f01fa4d89251dd6cae294734616"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c3_r2.jsonl",
+   "sha256": "ae01505f857fa5f7117b3ad7d85b3711c82efd198103134112e0a538ded19227"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c0_r2.jsonl",
+   "sha256": "ce00e5d9df908ed7747c4d15d52736d2b7caaf93fd735d803a88429e0bb7c138"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl",
+   "sha256": "5257584e2ec6e1079f6f3a5ec4c4c1a1cd3c75e5376683600e2e9e3ccf151bfc"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c2_r2.jsonl",
+   "sha256": "def811ee5c4a31e9c0ead7e0003f5ba090f9b6a39c53cb1cd7e0ece7983bd4d7"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl",
+   "sha256": "e1f396b7d47f7435c5cee3d10eeb2eb1fee9877d0735f7defd9c9ef372ef36ec"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c0_matched.jsonl",
+   "sha256": "c984823f449c6fb4714973aebd45f989935b20a46342ca38e6ee27124dcc4d36"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl",
+   "sha256": "29a264689b6e634b46a2cce692434128f0c209d3d222756603cdeeab84ad5f52"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c2_matched.jsonl",
+   "sha256": "489b0e6222f18e9a378cf06444c80fca6c8f248cbb5b57bc5db3520753a53755"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+   "sha256": "f74615af15eb0997c71492bfe4d19aae30a3182ef5db04a78544eaf40e130a8c"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c0.stderr.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c0.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stderr.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c2.stderr.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c2.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stderr.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-l4at8.txt",
+   "sha256": "136d06ecc26887cbf1ba4197ede3b2745a0df16b55af11d96eb618baf71548b5"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w2at8.txt",
+   "sha256": "02da910314644f50f593fd9fa2c820d4c6dee8df3bad41d44def1d549c9a23ce"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w2star.txt",
+   "sha256": "465b2c196b9a7674c70dd56eae3ee73c16eed96a31135988da5bb1f2852587ee"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w4x4at8.txt",
+   "sha256": "990e8943a83335e75bd167a899cec2dde4e9f8c68a947f37cd42668e42534a5e"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-l4at8.txt",
+   "sha256": "697b6c3c5422fdf43494380d9b9e6a49b0480b77b23a57e515683b6dfaf840af"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2at8.txt",
+   "sha256": "661008be8597c672db999b56605eae5318792d035a39f088ec35c7101a369a97"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2star.txt",
+   "sha256": "7e495c18c29f2c50c468624cb9544b37e2baa009cc65a0a44d988214bfd61971"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w4x4at8.txt",
+   "sha256": "dafb8ed3b36ed4902e143ce03f1a56aeae115643b21844b7b973a509393384b1"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-l4at8.txt",
+   "sha256": "2246becc5e21f92e925aa083ba5ff1e4c26592808a914df32d543ea29911925b"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w2at8.txt",
+   "sha256": "8211b3166bbe5c24e1d30cbe10f7423a70838a55e7c9740dc4753538456d5bd8"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w2star.txt",
+   "sha256": "c9169f07211cdbbcd755953901e594587eb937ae0ef74e47e12d68d2fe2df7f8"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w4x4at8.txt",
+   "sha256": "97f3028f9d740464fbdd5bf12fd7454b06a092604d7b2dd5b8dd4e32957e237f"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-l4at8.txt",
+   "sha256": "6c9d64a342cd08973e39861787a66432e5e0c941553480a68284aab58ae100e3"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2at8.txt",
+   "sha256": "83dcbd217564960abc09f3be8609e299fc31b27ac462d0ceb3b450898884ac2b"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2star.txt",
+   "sha256": "f9ea906d1fef86f9809f4b7a719dc3e58b316cf906ca081db58ac5abacd67ed5"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w4x4at8.txt",
+   "sha256": "6720c46f2960f95cab130363939de3ab1688e7924b8f368147133cc42d13863b"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m00.json",
+   "sha256": "44c765a47a5af65df53e233f570b242de2be78187b5697de251e865cf52cb1df"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m01.json",
+   "sha256": "685896b50e5e07549556e25ae0b15dfaa2346bfe602d28e9fb9049f902ff73e7"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m02.json",
+   "sha256": "8f9fe5e690b8f4cd41ccaf1ba4a80884380773b7fd6db70d0ef33b9e86ddcd96"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m03.json",
+   "sha256": "35f3808a0dcb3cc4d68ae51d76f481b1cc22add368a1661a7d73c34350ab10eb"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c0.stderr.log",
+   "sha256": "064bf16d50c7f635c3c1347ed3ff5154ea63dbd3e824b97bbea52fc58db51f9c"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c0.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stderr.log",
+   "sha256": "556caf9f2c17bf340828bf2639fc6c54a7d6e9ede22e8b175f8fd9e22a73ebc8"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c2.stderr.log",
+   "sha256": "6d84009039888db4b3fbff0bf1f7d20ffcc57afb45cac9e3f9fc881a9bcd15cc"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c2.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stderr.log",
+   "sha256": "671ceed011d5c98e9fe0c2c420a5b01b06dcf311dcdbdbcee361868d225ca1ae"
+  },
+  {
+   "path": "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stdout.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "../../research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs",
+   "sha256": "79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991"
+  },
+  {
+   "path": "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c0_rho.jsonl",
+   "sha256": "eea354abbbb2d1cdd2dad28e4be453e5300e9db33d4eeb91f3d19ec3d4b4df98"
+  },
+  {
+   "path": "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c1_rho.jsonl",
+   "sha256": "0faeb923233c42edba6a786d5c2feb72fce11716b60af83e7a079dbfc887cef4"
+  },
+  {
+   "path": "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c2_rho.jsonl",
+   "sha256": "5550ee7a395f139ef6c8b86a10e875cc771f08286fb45b93cc6b9fd70ac0707a"
+  }
+ ],
+ "headline": [
+  {
+   "name": "d_la_ratio_b20 (analysis.json)",
+   "claimed": 0.9862257259104769,
+   "recomputed": 0.9862257259104749,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].sections.la.ratio_top"
+  },
+  {
+   "name": "d_la_ratio_b20 (README, 4 d.p.)",
+   "claimed": 0.9862,
+   "recomputed": 0.9862257259104749,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "d_la_saving_b20_percent (README 'about 1.4 %')",
+   "claimed": 1.4,
+   "recomputed": 1.377427408952514,
+   "rel_tol": 0.05,
+   "source": "README 'Primitive: ... 1.4 % lower'"
+  },
+  {
+   "name": "d_whole_ratio_b20 (analysis.json)",
+   "claimed": 0.9949283304210372,
+   "recomputed": 0.9949283304210317,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].sections.whole.ratio_top"
+  },
+  {
+   "name": "d_whole_ratio_b20 (README, 4 d.p.)",
+   "claimed": 0.9949,
+   "recomputed": 0.9949283304210317,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "d_la_exponent (analysis.json)",
+   "claimed": 1.3787379789986,
+   "recomputed": 1.3787379789986005,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].sections.la.slope_role"
+  },
+  {
+   "name": "a_la_exponent (analysis.json)",
+   "claimed": 1.3846345801143318,
+   "recomputed": 1.3846345801143323,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].sections.la.slope_a"
+  },
+  {
+   "name": "d_minus_a_la_exponent (analysis.json)",
+   "claimed": -0.005896601115731759,
+   "recomputed": -0.005896601115731759,
+   "rel_tol": 1e-06,
+   "source": "raw/analysis.json roles[d].sections.la.delta"
+  },
+  {
+   "name": "d_la_exponent (README, 4 d.p.)",
+   "claimed": 1.3787,
+   "recomputed": 1.3787379789986005,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "a_la_exponent (README, 4 d.p.)",
+   "claimed": 1.3846,
+   "recomputed": 1.3846345801143323,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "d_minus_a_la_exponent (README, 4 d.p.)",
+   "claimed": -0.0059,
+   "recomputed": -0.005896601115731759,
+   "rel_tol": 0.01,
+   "source": "README table (-0.0059, rounding half-unit 0.00005)"
+  },
+  {
+   "name": "b_la_ratio_b20 (analysis.json)",
+   "claimed": 1.4758354452690041,
+   "recomputed": 1.4758354452690066,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[b]"
+  },
+  {
+   "name": "b_la_ratio_b20 (README, 4 d.p.)",
+   "claimed": 1.4758,
+   "recomputed": 1.4758354452690066,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "b_la_exponent (analysis.json)",
+   "claimed": 1.385022438079461,
+   "recomputed": 1.3850224380794613,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[b]"
+  },
+  {
+   "name": "b_la_exponent (README, 4 d.p.)",
+   "claimed": 1.385,
+   "recomputed": 1.3850224380794613,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "c_la_ratio_b20 (analysis.json)",
+   "claimed": 1.7833081634261396,
+   "recomputed": 1.7833081634261394,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[c]"
+  },
+  {
+   "name": "c_la_ratio_b20 (README, 4 d.p.)",
+   "claimed": 1.7833,
+   "recomputed": 1.7833081634261394,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "c_la_exponent (analysis.json)",
+   "claimed": 1.401929476859776,
+   "recomputed": 1.4019294768597765,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[c]"
+  },
+  {
+   "name": "c_la_exponent (README, 4 d.p.)",
+   "claimed": 1.4019,
+   "recomputed": 1.4019294768597765,
+   "rel_tol": 0.0001,
+   "source": "README table"
+  },
+  {
+   "name": "old_c_ell_view_d_cell0 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.45727543840241297,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_d_cell0.1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.48351634674583865,
+   "recomputed": 0.48351634674583904,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_d_cell1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.7196838973583054,
+   "recomputed": 0.719683897358306,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[d].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_d_cell0 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.4573,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_d_cell0.1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.4835,
+   "recomputed": 0.48351634674583904,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_d_cell1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.7197,
+   "recomputed": 0.719683897358306,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_b_cell0 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.45727543840241297,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[b].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_b_cell0.1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.4965650672911214,
+   "recomputed": 0.4965650672911218,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[b].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_b_cell1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.8501688404487656,
+   "recomputed": 0.8501688404487664,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[b].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_b_cell0 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.4573,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_b_cell0.1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.4966,
+   "recomputed": 0.4965650672911218,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_b_cell1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.8502,
+   "recomputed": 0.8501688404487664,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_c_cell0 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.45727543840241297,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[c].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_c_cell0.1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.504759776652,
+   "recomputed": 0.5047597766520004,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[c].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_c_cell1 (analysis.json rho_gap_top; lower-bound comparison)",
+   "claimed": 0.9321133339969917,
+   "recomputed": 0.9321133339969924,
+   "rel_tol": 1e-09,
+   "source": "raw/analysis.json roles[c].rho_gap_top"
+  },
+  {
+   "name": "old_c_ell_view_c_cell0 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.4573,
+   "recomputed": 0.45727543840241336,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_c_cell0.1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.5048,
+   "recomputed": 0.5047597766520004,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "old_c_ell_view_c_cell1 (README, 4 d.p.; lower-bound comparison)",
+   "claimed": 0.9321,
+   "recomputed": 0.9321133339969924,
+   "rel_tol": 0.0002,
+   "source": "README 'Distance to the matched rho' table"
+  },
+  {
+   "name": "rho_target0_cost_c0 (addendum control 2, round 4's record)",
+   "claimed": 18866263020,
+   "recomputed": 18866263020,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c0_matched.jsonl"
+  },
+  {
+   "name": "rho_target0_steps_c0 (addendum control 2, round 4's record)",
+   "claimed": 232712993,
+   "recomputed": 232712993,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c0_matched.jsonl"
+  },
+  {
+   "name": "rho_target0_cost_c1 (addendum control 2, round 4's record)",
+   "claimed": 23539588479,
+   "recomputed": 23539588479,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c1_matched.jsonl"
+  },
+  {
+   "name": "rho_target0_steps_c1 (addendum control 2, round 4's record)",
+   "claimed": 290359854,
+   "recomputed": 290359854,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c1_matched.jsonl"
+  },
+  {
+   "name": "rho_target0_cost_c2 (addendum control 2, round 4's record)",
+   "claimed": 17781900829,
+   "recomputed": 17781900829,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c2_matched.jsonl"
+  },
+  {
+   "name": "rho_target0_steps_c2 (addendum control 2, round 4's record)",
+   "claimed": 219336676,
+   "recomputed": 219336676,
+   "rel_tol": 1e-12,
+   "source": "PROTOCOL-ADDENDUM-matched-rho.md control 2; raw/matched/b20_c2_matched.jsonl"
+  },
+  {
+   "name": "matched_rho_c0_rho_S_gae_mean_w0 (binary)",
+   "claimed": 255158182.7060185,
+   "recomputed": 255158182.7060185,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c0_rho_S_gae_mean_w0.1 (binary)",
+   "claimed": 356822179.10601854,
+   "recomputed": 356822179.10601854,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c0_rho_S_gae_mean_w1 (binary)",
+   "claimed": 1271798146.7060184,
+   "recomputed": 1271798146.7060184,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c0_a_ratio_w0 (binary)",
+   "claimed": 0.4410987285194684,
+   "recomputed": 0.4410987285194684,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_a_ratio_w0.1 (binary)",
+   "claimed": 1.8342197903805237,
+   "recomputed": 1.8342197903805237,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_a_ratio_w1 (binary)",
+   "claimed": 4.349710282477473,
+   "recomputed": 4.349710282477473,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_d_ratio_w0 (binary)",
+   "claimed": 0.4410987285194684,
+   "recomputed": 0.4410987285194684,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_d_ratio_w0.1 (binary)",
+   "claimed": 1.8681381561904138,
+   "recomputed": 1.8681381561904138,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_d_ratio_w1 (binary)",
+   "claimed": 4.444873380736003,
+   "recomputed": 4.444873380736003,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_b_ratio_w0 (binary)",
+   "claimed": 0.4410987285194684,
+   "recomputed": 0.4410987285194684,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_b_ratio_w0.1 (binary)",
+   "claimed": 2.541555378746541,
+   "recomputed": 2.541555378746541,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_b_ratio_w1 (binary)",
+   "claimed": 6.334247110540188,
+   "recomputed": 6.334247110540188,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_c_ratio_w0 (binary)",
+   "claimed": 0.4410987285194684,
+   "recomputed": 0.4410987285194684,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_c_ratio_w0.1 (binary)",
+   "claimed": 2.9974719047528025,
+   "recomputed": 2.9974719047528025,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c0_c_ratio_w1 (binary)",
+   "claimed": 7.613389785196125,
+   "recomputed": 7.613389785196125,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c0_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_rho_S_gae_mean_w0 (binary)",
+   "claimed": 210820801.6234568,
+   "recomputed": 210820801.62345678,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c1_rho_S_gae_mean_w0.1 (binary)",
+   "claimed": 294818420.24845684,
+   "recomputed": 294818420.2484568,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c1_rho_S_gae_mean_w1 (binary)",
+   "claimed": 1050796987.8734568,
+   "recomputed": 1050796987.8734568,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c1_a_ratio_w0 (binary)",
+   "claimed": 0.5322785206358965,
+   "recomputed": 0.5322785206358966,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_a_ratio_w0.1 (binary)",
+   "claimed": 2.2246926879761015,
+   "recomputed": 2.224692687976102,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_a_ratio_w1 (binary)",
+   "claimed": 5.280625508488453,
+   "recomputed": 5.280625508488453,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_d_ratio_w0 (binary)",
+   "claimed": 0.5322785206358965,
+   "recomputed": 0.5322785206358966,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_d_ratio_w0.1 (binary)",
+   "claimed": 2.2559660534334904,
+   "recomputed": 2.255966053433491,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_d_ratio_w1 (binary)",
+   "claimed": 5.368368091560173,
+   "recomputed": 5.368368091560173,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_b_ratio_w0 (binary)",
+   "claimed": 0.5322785206358965,
+   "recomputed": 0.5322785206358966,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_b_ratio_w0.1 (binary)",
+   "claimed": 3.0873367791616873,
+   "recomputed": 3.0873367791616877,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_b_ratio_w1 (binary)",
+   "claimed": 7.700915737095647,
+   "recomputed": 7.700915737095647,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_c_ratio_w0 (binary)",
+   "claimed": 0.5322785206358965,
+   "recomputed": 0.5322785206358966,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_c_ratio_w0.1 (binary)",
+   "claimed": 3.650136942259259,
+   "recomputed": 3.6501369422592598,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c1_c_ratio_w1 (binary)",
+   "claimed": 9.279944387870401,
+   "recomputed": 9.279944387870401,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c1_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_rho_S_gae_mean_w0 (binary)",
+   "claimed": 210806500.62731478,
+   "recomputed": 210806500.6273148,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c2_rho_S_gae_mean_w0.1 (binary)",
+   "claimed": 294798428.38356483,
+   "recomputed": 294798428.38356483,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c2_rho_S_gae_mean_w1 (binary)",
+   "claimed": 1050725778.1898149,
+   "recomputed": 1050725778.1898148,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c2_a_ratio_w0 (binary)",
+   "claimed": 0.5336540327286688,
+   "recomputed": 0.5336540327286687,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_a_ratio_w0.1 (binary)",
+   "claimed": 2.2040027446815533,
+   "recomputed": 2.2040027446815533,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_a_ratio_w1 (binary)",
+   "claimed": 5.220092543683966,
+   "recomputed": 5.2200925436839665,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_d_ratio_w0 (binary)",
+   "claimed": 0.5336540327286688,
+   "recomputed": 0.5336540327286687,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_d_ratio_w0.1 (binary)",
+   "claimed": 2.24443278450691,
+   "recomputed": 2.24443278450691,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_d_ratio_w1 (binary)",
+   "claimed": 5.33352568149594,
+   "recomputed": 5.333525681495941,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_b_ratio_w0 (binary)",
+   "claimed": 0.5336540327286688,
+   "recomputed": 0.5336540327286687,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_b_ratio_w0.1 (binary)",
+   "claimed": 3.053039594953833,
+   "recomputed": 3.053039594953833,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_b_ratio_w1 (binary)",
+   "claimed": 7.602205310834369,
+   "recomputed": 7.6022053108343695,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_c_ratio_w0 (binary)",
+   "claimed": 0.5336540327286688,
+   "recomputed": 0.5336540327286687,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_c_ratio_w0.1 (binary)",
+   "claimed": 3.5990225626465238,
+   "recomputed": 3.5990225626465238,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c2_c_ratio_w1 (binary)",
+   "claimed": 9.134050480534993,
+   "recomputed": 9.134050480534995,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c2_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_rho_S_gae_mean_w0 (binary)",
+   "claimed": 510776780.4027778,
+   "recomputed": 510776780.4027778,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c3_rho_S_gae_mean_w0.1 (binary)",
+   "claimed": 714292579.0340279,
+   "recomputed": 714292579.0340278,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c3_rho_S_gae_mean_w1 (binary)",
+   "claimed": 2545934766.715278,
+   "recomputed": 2545934766.7152777,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.rho_S_gae_mean"
+  },
+  {
+   "name": "matched_rho_c3_a_ratio_w0 (binary)",
+   "claimed": 0.21956169745518062,
+   "recomputed": 0.21956169745518062,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_a_ratio_w0.1 (binary)",
+   "claimed": 0.9151000521521405,
+   "recomputed": 0.9151000521521407,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_a_ratio_w1 (binary)",
+   "claimed": 2.170978095427396,
+   "recomputed": 2.1709780954273965,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_d_ratio_w0 (binary)",
+   "claimed": 0.21956169745518062,
+   "recomputed": 0.21956169745518062,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_d_ratio_w0.1 (binary)",
+   "claimed": 0.9318493051209721,
+   "recomputed": 0.9318493051209722,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_d_ratio_w1 (binary)",
+   "claimed": 2.217970136450645,
+   "recomputed": 2.2179701364506452,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw2*].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_b_ratio_w0 (binary)",
+   "claimed": 0.21956169745518062,
+   "recomputed": 0.21956169745518062,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_b_ratio_w0.1 (binary)",
+   "claimed": 1.2680486043279708,
+   "recomputed": 1.268048604327971,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_b_ratio_w1 (binary)",
+   "claimed": 3.161217652606884,
+   "recomputed": 3.1612176526068847,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebw4x4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_c_ratio_w0 (binary)",
+   "claimed": 0.21956169745518062,
+   "recomputed": 0.21956169745518062,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_c_ratio_w0.1 (binary)",
+   "claimed": 1.4955853885121133,
+   "recomputed": 1.4955853885121135,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "matched_rho_c3_c_ratio_w1 (binary)",
+   "claimed": 3.7995994309809253,
+   "recomputed": 3.7995994309809262,
+   "rel_tol": 1e-09,
+   "source": "raw/matched/b20_c3_matched.jsonl matched_rho.arms[r2:lpsgebl4@8].ratio_ic_over_rho"
+  },
+  {
+   "name": "c_add_c0 (addendum: 81 at b = 20; code: 60 M_q + 1 I_q)",
+   "claimed": 81,
+   "recomputed": 81.0,
+   "rel_tol": 1e-12,
+   "source": "raw/matched/b20_c0_matched.jsonl c_add.mean"
+  },
+  {
+   "name": "c_add_c1 (addendum: 81 at b = 20; code: 60 M_q + 1 I_q)",
+   "claimed": 81,
+   "recomputed": 81.0,
+   "rel_tol": 1e-12,
+   "source": "raw/matched/b20_c1_matched.jsonl c_add.mean"
+  },
+  {
+   "name": "c_add_c2 (addendum: 81 at b = 20; code: 60 M_q + 1 I_q)",
+   "claimed": 81,
+   "recomputed": 81.0,
+   "rel_tol": 1e-12,
+   "source": "raw/matched/b20_c2_matched.jsonl c_add.mean"
+  },
+  {
+   "name": "c_add_c3 (addendum: 81 at b = 20; code: 60 M_q + 1 I_q)",
+   "claimed": 81,
+   "recomputed": 81.0,
+   "rel_tol": 1e-12,
+   "source": "raw/matched/b20_c3_matched.jsonl c_add.mean"
+  }
+ ],
+ "findings": {
+  "order_vs_matched_rho": {
+   "a": "unresolved: order changes inside the band",
+   "d": "unresolved: order changes inside the band",
+   "b": "unresolved: order changes inside the band",
+   "c": "unresolved: order changes inside the band"
+  },
+  "best_arm_under_band": "a (r2:lpsgebw2@8)",
+  "readme_ic_below_rho_at_every_price": "does not survive section 5a. The README's statement used c_ell pricing (M_ell at 0, 0.1, 1 F_q-mult) against one unpriced round-4 rho walk per curve (curves 0-2); those numbers recompute exactly and remain a lower-bound comparison. In that old unit the statement also holds against the matched rho mean over 4 curves x 16 walks (arm a 0.407 / 0.431 / 0.645). In GAE with every arm's native work priced (rho included), the frozen statistic puts every IC arm below rho at w = 0 and above rho at w = 0.1 and w = 1; the hierarchical bootstrap intervals exclude 1 at each w (the df-3 t intervals over curves at w = 0.1 cover 1 for arms a and d). The order changes inside the band (pooled crossover w about 0.022-0.044 GAE per native op), so the arms are unresolved against rho and no order between IC and rho is stated.",
+  "la_headline": "arm d's LA cost at b = 20 is 0.98623 of arm a's (1.38 % lower) on the four recorded curves, the analysis.json and README numbers recompute from raw/b{16..20}_c{0..3}_r2.jsonl; this is in the c_ell = 1 unit of the frozen PROTOCOL. Under the section 5a GAE band arm d is not cheaper than arm a at w > 0 (its 16 SGE candidates add native bookkeeping), which the LA verdict does not depend on."
+ },
+ "validation_report": {
+  "id": "VAL-20261022-15b7e3",
+  "task_id": "unassigned (dispatched by the main session for the validation gate; no TASK card)",
+  "run_ids": [
+   "CARD-BLINDSPOT-15-M00",
+   "CARD-BLINDSPOT-15-M01",
+   "CARD-BLINDSPOT-15-M02",
+   "CARD-BLINDSPOT-15-M03",
+   "item 15 cards 01-09 (raw/receipt-card-0*.json; LA headline records)"
+  ],
+  "artifact_checks": [
+   {
+    "check": "instrument sha256 equals the pin",
+    "ok": true,
+    "detail": "79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991"
+   },
+   {
+    "check": "instrument has exactly one commit (7555a42a6c, unchanged since)",
+    "ok": true,
+    "detail": [
+     "7555a42a6c5ad30e68a1e1a670da33262bf19f1b"
+    ]
+   },
+   {
+    "check": "addendum M has exactly one commit (7555a42a6c, unchanged since)",
+    "ok": true,
+    "detail": [
+     "7555a42a6c5ad30e68a1e1a670da33262bf19f1b"
+    ]
+   },
+   {
+    "check": "m00: receipt card_sha256 equals the card file",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: receipt status completed",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: dirty_before empty",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: card binds the instrument at the pinned sha256",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: bound file research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: bound file research/blindspots_20261018/15-genus3-la-exponent/orders.csv hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: bound file research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c0_r2.jsonl hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: instrument at the receipt commit equals the pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: addendum commit is an ancestor of the receipt commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: commands_total equals commands run",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: make-dirs exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: make-dirs argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: build exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: build argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: run-b20-c0-matched exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: run-b20-c0-matched argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: output b20_c0_matched.jsonl digest",
+    "ok": true,
+    "detail": "c984823f449c6fb4714973aebd45f989935b20a46342ca38e6ee27124dcc4d36"
+   },
+   {
+    "check": "m00: gate-w2at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate-w2at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: output gate-c0-w2at8.txt digest",
+    "ok": true,
+    "detail": "02da910314644f50f593fd9fa2c820d4c6dee8df3bad41d44def1d549c9a23ce"
+   },
+   {
+    "check": "m00: gate-w2star exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate-w2star argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: output gate-c0-w2star.txt digest",
+    "ok": true,
+    "detail": "465b2c196b9a7674c70dd56eae3ee73c16eed96a31135988da5bb1f2852587ee"
+   },
+   {
+    "check": "m00: gate-w4x4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate-w4x4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: output gate-c0-w4x4at8.txt digest",
+    "ok": true,
+    "detail": "990e8943a83335e75bd167a899cec2dde4e9f8c68a947f37cd42668e42534a5e"
+   },
+   {
+    "check": "m00: gate-l4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate-l4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: output gate-c0-l4at8.txt digest",
+    "ok": true,
+    "detail": "136d06ecc26887cbf1ba4197ede3b2745a0df16b55af11d96eb618baf71548b5"
+   },
+   {
+    "check": "m00: remove-bin exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: remove-bin argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: remove-bin-dir exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: remove-bin-dir argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: run stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: build stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: run stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: build stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate r2:lpsgebw2@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate r2:lpsgebw2@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=0 arm=r2:lpsgebw2@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m00: gate r2:lpsgebw2* stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate r2:lpsgebw2* prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=0 arm=r2:lpsgebw2*\nGATE OK cells=1"
+   },
+   {
+    "check": "m00: gate r2:lpsgebw4x4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate r2:lpsgebw4x4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=0 arm=r2:lpsgebw4x4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m00: gate r2:lpsgebl4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: gate r2:lpsgebl4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=0 arm=r2:lpsgebl4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m00: matched jsonl added in exactly one commit",
+    "ok": true,
+    "detail": [
+     "fa5a791a3cda779524f2262affd1ad5528b274ed"
+    ]
+   },
+   {
+    "check": "m00: addendum commit is an ancestor of the run commit fa5a791a3c",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m00: card commit edd8f77077 is an ancestor of the run commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: receipt card_sha256 equals the card file",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: receipt status completed",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: dirty_before empty",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: card binds the instrument at the pinned sha256",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: bound file research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: bound file research/blindspots_20261018/15-genus3-la-exponent/orders.csv hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: bound file research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: instrument at the receipt commit equals the pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: addendum commit is an ancestor of the receipt commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: commands_total equals commands run",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: make-dirs exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: make-dirs argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: build exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: build argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: run-b20-c1-matched exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: run-b20-c1-matched argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: output b20_c1_matched.jsonl digest",
+    "ok": true,
+    "detail": "29a264689b6e634b46a2cce692434128f0c209d3d222756603cdeeab84ad5f52"
+   },
+   {
+    "check": "m01: gate-w2at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate-w2at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: output gate-c1-w2at8.txt digest",
+    "ok": true,
+    "detail": "661008be8597c672db999b56605eae5318792d035a39f088ec35c7101a369a97"
+   },
+   {
+    "check": "m01: gate-w2star exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate-w2star argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: output gate-c1-w2star.txt digest",
+    "ok": true,
+    "detail": "7e495c18c29f2c50c468624cb9544b37e2baa009cc65a0a44d988214bfd61971"
+   },
+   {
+    "check": "m01: gate-w4x4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate-w4x4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: output gate-c1-w4x4at8.txt digest",
+    "ok": true,
+    "detail": "dafb8ed3b36ed4902e143ce03f1a56aeae115643b21844b7b973a509393384b1"
+   },
+   {
+    "check": "m01: gate-l4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate-l4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: output gate-c1-l4at8.txt digest",
+    "ok": true,
+    "detail": "697b6c3c5422fdf43494380d9b9e6a49b0480b77b23a57e515683b6dfaf840af"
+   },
+   {
+    "check": "m01: remove-bin exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: remove-bin argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: remove-bin-dir exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: remove-bin-dir argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: run stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: build stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: run stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: build stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate r2:lpsgebw2@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate r2:lpsgebw2@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=1 arm=r2:lpsgebw2@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m01: gate r2:lpsgebw2* stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate r2:lpsgebw2* prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=1 arm=r2:lpsgebw2*\nGATE OK cells=1"
+   },
+   {
+    "check": "m01: gate r2:lpsgebw4x4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate r2:lpsgebw4x4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=1 arm=r2:lpsgebw4x4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m01: gate r2:lpsgebl4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: gate r2:lpsgebl4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=1 arm=r2:lpsgebl4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m01: matched jsonl added in exactly one commit",
+    "ok": true,
+    "detail": [
+     "a099f3af60e30c8936f0f8bfedcb7d141e85b9e3"
+    ]
+   },
+   {
+    "check": "m01: addendum commit is an ancestor of the run commit a099f3af60",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m01: card commit edd8f77077 is an ancestor of the run commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: receipt card_sha256 equals the card file",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: receipt status completed",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: dirty_before empty",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: card binds the instrument at the pinned sha256",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: bound file research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: bound file research/blindspots_20261018/15-genus3-la-exponent/orders.csv hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: bound file research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c2_r2.jsonl hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: instrument at the receipt commit equals the pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: addendum commit is an ancestor of the receipt commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: commands_total equals commands run",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: make-dirs exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: make-dirs argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: build exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: build argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: run-b20-c2-matched exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: run-b20-c2-matched argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: output b20_c2_matched.jsonl digest",
+    "ok": true,
+    "detail": "489b0e6222f18e9a378cf06444c80fca6c8f248cbb5b57bc5db3520753a53755"
+   },
+   {
+    "check": "m02: gate-w2at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate-w2at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: output gate-c2-w2at8.txt digest",
+    "ok": true,
+    "detail": "8211b3166bbe5c24e1d30cbe10f7423a70838a55e7c9740dc4753538456d5bd8"
+   },
+   {
+    "check": "m02: gate-w2star exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate-w2star argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: output gate-c2-w2star.txt digest",
+    "ok": true,
+    "detail": "c9169f07211cdbbcd755953901e594587eb937ae0ef74e47e12d68d2fe2df7f8"
+   },
+   {
+    "check": "m02: gate-w4x4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate-w4x4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: output gate-c2-w4x4at8.txt digest",
+    "ok": true,
+    "detail": "97f3028f9d740464fbdd5bf12fd7454b06a092604d7b2dd5b8dd4e32957e237f"
+   },
+   {
+    "check": "m02: gate-l4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate-l4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: output gate-c2-l4at8.txt digest",
+    "ok": true,
+    "detail": "2246becc5e21f92e925aa083ba5ff1e4c26592808a914df32d543ea29911925b"
+   },
+   {
+    "check": "m02: remove-bin exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: remove-bin argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: remove-bin-dir exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: remove-bin-dir argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: run stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: build stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: run stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: build stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate r2:lpsgebw2@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate r2:lpsgebw2@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=2 arm=r2:lpsgebw2@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m02: gate r2:lpsgebw2* stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate r2:lpsgebw2* prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=2 arm=r2:lpsgebw2*\nGATE OK cells=1"
+   },
+   {
+    "check": "m02: gate r2:lpsgebw4x4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate r2:lpsgebw4x4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=2 arm=r2:lpsgebw4x4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m02: gate r2:lpsgebl4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: gate r2:lpsgebl4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=2 arm=r2:lpsgebl4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m02: matched jsonl added in exactly one commit",
+    "ok": true,
+    "detail": [
+     "a099f3af60e30c8936f0f8bfedcb7d141e85b9e3"
+    ]
+   },
+   {
+    "check": "m02: addendum commit is an ancestor of the run commit a099f3af60",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m02: card commit edd8f77077 is an ancestor of the run commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: receipt card_sha256 equals the card file",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: receipt status completed",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: dirty_before empty",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: card binds the instrument at the pinned sha256",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: bound file research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: bound file research/blindspots_20261018/15-genus3-la-exponent/orders.csv hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: bound file research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl hashes to its pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: instrument at the receipt commit equals the pin",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: addendum commit is an ancestor of the receipt commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: commands_total equals commands run",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: make-dirs exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: make-dirs argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: build exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: build argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: run-b20-c3-matched exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: run-b20-c3-matched argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: output b20_c3_matched.jsonl digest",
+    "ok": true,
+    "detail": "f74615af15eb0997c71492bfe4d19aae30a3182ef5db04a78544eaf40e130a8c"
+   },
+   {
+    "check": "m03: gate-w2at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate-w2at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: output gate-c3-w2at8.txt digest",
+    "ok": true,
+    "detail": "83dcbd217564960abc09f3be8609e299fc31b27ac462d0ceb3b450898884ac2b"
+   },
+   {
+    "check": "m03: gate-w2star exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate-w2star argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: output gate-c3-w2star.txt digest",
+    "ok": true,
+    "detail": "f9ea906d1fef86f9809f4b7a719dc3e58b316cf906ca081db58ac5abacd67ed5"
+   },
+   {
+    "check": "m03: gate-w4x4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate-w4x4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: output gate-c3-w4x4at8.txt digest",
+    "ok": true,
+    "detail": "6720c46f2960f95cab130363939de3ab1688e7924b8f368147133cc42d13863b"
+   },
+   {
+    "check": "m03: gate-l4at8 exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate-l4at8 argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: output gate-c3-l4at8.txt digest",
+    "ok": true,
+    "detail": "6c9d64a342cd08973e39861787a66432e5e0c941553480a68284aab58ae100e3"
+   },
+   {
+    "check": "m03: remove-bin exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: remove-bin argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: remove-bin-dir exit 0, succeeded, not timed out",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: remove-bin-dir argv equals the card",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: run stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: build stdout log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: run stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: build stderr log digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate r2:lpsgebw2@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate r2:lpsgebw2@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw2@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m03: gate r2:lpsgebw2* stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate r2:lpsgebw2* prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw2*\nGATE OK cells=1"
+   },
+   {
+    "check": "m03: gate r2:lpsgebw4x4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate r2:lpsgebw4x4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw4x4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m03: gate r2:lpsgebl4@8 stdout digest",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: gate r2:lpsgebl4@8 prints GATE OK",
+    "ok": true,
+    "detail": "GATE MATCH bits=20 curve=3 arm=r2:lpsgebl4@8\nGATE OK cells=1"
+   },
+   {
+    "check": "m03: matched jsonl added in exactly one commit",
+    "ok": true,
+    "detail": [
+     "7e2fab8cb1bea82dd9b45c0e076e251f6dddfa08"
+    ]
+   },
+   {
+    "check": "m03: addendum commit is an ancestor of the run commit 7e2fab8cb1",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "m03: card commit edd8f77077 is an ancestor of the run commit",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "raw/matched has no uncommitted change",
+    "ok": true,
+    "detail": ""
+   }
+  ],
+  "metric_recomputations": [
+   {
+    "check": "c0: instance fields equal (q, seed, N, ell, h, a, b, ...)",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "c0: r2:lpsgebw2@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c0: r2:lpsgebw2* matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c0: r2:lpsgebw4x4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c0: r2:lpsgebl4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c1: instance fields equal (q, seed, N, ell, h, a, b, ...)",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "c1: r2:lpsgebw2@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c1: r2:lpsgebw2* matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c1: r2:lpsgebw4x4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c1: r2:lpsgebl4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c2: instance fields equal (q, seed, N, ell, h, a, b, ...)",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "c2: r2:lpsgebw2@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c2: r2:lpsgebw2* matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c2: r2:lpsgebw4x4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c2: r2:lpsgebl4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c3: instance fields equal (q, seed, N, ell, h, a, b, ...)",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "c3: r2:lpsgebw2@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c3: r2:lpsgebw2* matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c3: r2:lpsgebw4x4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "c3: r2:lpsgebl4@8 matched record equals recorded r2 on every non-wall field",
+    "ok": true,
+    "detail": {
+     "fields_compared": 50,
+     "mismatched": []
+    }
+   },
+   {
+    "check": "canon: 15b text minus `nat(` lines equals round 4's text",
+    "ok": true,
+    "detail": {
+     "lines_15b_after_drop": 10,
+     "lines_round4": 10
+    }
+   },
+   {
+    "check": "rho_neg: 15b text minus `nat(` lines equals round 4's text",
+    "ok": true,
+    "detail": {
+     "lines_15b_after_drop": 151,
+     "lines_round4": 151
+    }
+   },
+   {
+    "check": "c0: 16 rho walks, targets 0..15",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: every rho walk returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: every IC arm returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: rho target 0 k equals the IC k_true of every arm",
+    "ok": true,
+    "detail": {
+     "rho_t0_k": 27107377909561436,
+     "ic_k_true": [
+      27107377909561436
+     ]
+    }
+   },
+   {
+    "check": "c0: rho counted CNT has no mod-ell products or inversions",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: rho native counters 0-5 positive, IC counters 6-12 zero",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: rho cost recomputes from counters (c_ell = 1, unit M_q + ceil(log2 q) I_q)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: rho additions counted (CNT[4]) >= steps",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: fruitless-cycle escapes occur and are counted",
+    "ok": true,
+    "detail": 24818636
+   },
+   {
+    "check": "c0: rho target 0 reproduces round 4 (cost, steps, k)",
+    "ok": true,
+    "detail": {
+     "matched": [
+      18866263020,
+      232712993
+     ],
+     "round4": [
+      18866263020,
+      232712993
+     ]
+    }
+   },
+   {
+    "check": "c0: c_add = 60 M_q + 1 I_q = 81 at ceil(log2 q) = 21",
+    "ok": true,
+    "detail": {
+     "unit": "M_q + ceil(log2 q) I_q per generic E0(F_q^3) affine addition (1 GAE)",
+     "mean": 81,
+     "min": 81,
+     "max": 81,
+     "additions": 64,
+     "c_dbl_mean": 92
+    }
+   },
+   {
+    "check": "c0: j(E0) recomputed from orders.csv equals the recorded j",
+    "ok": true,
+    "detail": {
+     "orders_rows": 1,
+     "recomputed": [
+      1010728,
+      487071,
+      141473
+     ],
+     "recorded": [
+      1010728,
+      487071,
+      141473
+     ]
+    }
+   },
+   {
+    "check": "c0: j not in F_q, not Frobenius-fixed, not 0, not 1728 (negation is the strongest symmetry)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: N = c * ell, ell prime",
+    "ok": true,
+    "detail": {
+     "N": 1152944594058570216,
+     "c": 24,
+     "ell": 48039358085773759
+    }
+   },
+   {
+    "check": "c1: 16 rho walks, targets 0..15",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: every rho walk returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: every IC arm returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: rho target 0 k equals the IC k_true of every arm",
+    "ok": true,
+    "detail": {
+     "rho_t0_k": 28998230088219452,
+     "ic_k_true": [
+      28998230088219452
+     ]
+    }
+   },
+   {
+    "check": "c1: rho counted CNT has no mod-ell products or inversions",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: rho native counters 0-5 positive, IC counters 6-12 zero",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: rho cost recomputes from counters (c_ell = 1, unit M_q + ceil(log2 q) I_q)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: rho additions counted (CNT[4]) >= steps",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: fruitless-cycle escapes occur and are counted",
+    "ok": true,
+    "detail": 20506117
+   },
+   {
+    "check": "c1: rho target 0 reproduces round 4 (cost, steps, k)",
+    "ok": true,
+    "detail": {
+     "matched": [
+      23539588479,
+      290359854
+     ],
+     "round4": [
+      23539588479,
+      290359854
+     ]
+    }
+   },
+   {
+    "check": "c1: c_add = 60 M_q + 1 I_q = 81 at ceil(log2 q) = 21",
+    "ok": true,
+    "detail": {
+     "unit": "M_q + ceil(log2 q) I_q per generic E0(F_q^3) affine addition (1 GAE)",
+     "mean": 81,
+     "min": 81,
+     "max": 81,
+     "additions": 64,
+     "c_dbl_mean": 92
+    }
+   },
+   {
+    "check": "c1: j(E0) recomputed from orders.csv equals the recorded j",
+    "ok": true,
+    "detail": {
+     "orders_rows": 1,
+     "recomputed": [
+      995242,
+      541662,
+      1026254
+     ],
+     "recorded": [
+      995242,
+      541662,
+      1026254
+     ]
+    }
+   },
+   {
+    "check": "c1: j not in F_q, not Frobenius-fixed, not 0, not 1728 (negation is the strongest symmetry)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: N = c * ell, ell prime",
+    "ok": true,
+    "detail": {
+     "N": 1152944593130529336,
+     "c": 24,
+     "ell": 48039358047105389
+    }
+   },
+   {
+    "check": "c2: 16 rho walks, targets 0..15",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: every rho walk returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: every IC arm returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: rho target 0 k equals the IC k_true of every arm",
+    "ok": true,
+    "detail": {
+     "rho_t0_k": 6882642624567781,
+     "ic_k_true": [
+      6882642624567781
+     ]
+    }
+   },
+   {
+    "check": "c2: rho counted CNT has no mod-ell products or inversions",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: rho native counters 0-5 positive, IC counters 6-12 zero",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: rho cost recomputes from counters (c_ell = 1, unit M_q + ceil(log2 q) I_q)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: rho additions counted (CNT[4]) >= steps",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: fruitless-cycle escapes occur and are counted",
+    "ok": true,
+    "detail": 20508095
+   },
+   {
+    "check": "c2: rho target 0 reproduces round 4 (cost, steps, k)",
+    "ok": true,
+    "detail": {
+     "matched": [
+      17781900829,
+      219336676
+     ],
+     "round4": [
+      17781900829,
+      219336676
+     ]
+    }
+   },
+   {
+    "check": "c2: c_add = 60 M_q + 1 I_q = 81 at ceil(log2 q) = 21",
+    "ok": true,
+    "detail": {
+     "unit": "M_q + ceil(log2 q) I_q per generic E0(F_q^3) affine addition (1 GAE)",
+     "mean": 81,
+     "min": 81,
+     "max": 81,
+     "additions": 64,
+     "c_dbl_mean": 92
+    }
+   },
+   {
+    "check": "c2: j(E0) recomputed from orders.csv equals the recorded j",
+    "ok": true,
+    "detail": {
+     "orders_rows": 1,
+     "recomputed": [
+      349275,
+      449140,
+      938498
+     ],
+     "recorded": [
+      349275,
+      449140,
+      938498
+     ]
+    }
+   },
+   {
+    "check": "c2: j not in F_q, not Frobenius-fixed, not 0, not 1728 (negation is the strongest symmetry)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: N = c * ell, ell prime",
+    "ok": true,
+    "detail": {
+     "N": 1152944592810723880,
+     "c": 40,
+     "ell": 28823614820268097
+    }
+   },
+   {
+    "check": "c3: 16 rho walks, targets 0..15",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: every rho walk returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: every IC arm returns the planted k",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: rho target 0 k equals the IC k_true of every arm",
+    "ok": true,
+    "detail": {
+     "rho_t0_k": 83761481830508921,
+     "ic_k_true": [
+      83761481830508921
+     ]
+    }
+   },
+   {
+    "check": "c3: rho counted CNT has no mod-ell products or inversions",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: rho native counters 0-5 positive, IC counters 6-12 zero",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: rho cost recomputes from counters (c_ell = 1, unit M_q + ceil(log2 q) I_q)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: rho additions counted (CNT[4]) >= steps",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: fruitless-cycle escapes occur and are counted",
+    "ok": true,
+    "detail": 49699413
+   },
+   {
+    "check": "c3: c_add = 60 M_q + 1 I_q = 81 at ceil(log2 q) = 21",
+    "ok": true,
+    "detail": {
+     "unit": "M_q + ceil(log2 q) I_q per generic E0(F_q^3) affine addition (1 GAE)",
+     "mean": 81,
+     "min": 81,
+     "max": 81,
+     "additions": 64,
+     "c_dbl_mean": 92
+    }
+   },
+   {
+    "check": "c3: j(E0) recomputed from orders.csv equals the recorded j",
+    "ok": true,
+    "detail": {
+     "orders_rows": 1,
+     "recomputed": [
+      424491,
+      527286,
+      817193
+     ],
+     "recorded": [
+      424491,
+      527286,
+      817193
+     ]
+    }
+   },
+   {
+    "check": "c3: j not in F_q, not Frobenius-fixed, not 0, not 1728 (negation is the strongest symmetry)",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: N = c * ell, ell prime",
+    "ok": true,
+    "detail": {
+     "N": 1152944592751250296,
+     "c": 8,
+     "ell": 144118074093906287
+    }
+   },
+   {
+    "check": "c0 rho t0: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t1: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t2: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t3: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t4: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t5: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t6: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t7: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t9: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t10: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t11: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t12: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t13: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t14: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 rho t15: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2*: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2*: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw4x4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw4x4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebl4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebl4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: binary rho_S_gae_mean recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw2*: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebw4x4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0 r2:lpsgebl4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c0: at least 12 correct rho walks (addendum usability rule)",
+    "ok": true,
+    "detail": 16
+   },
+   {
+    "check": "c1 rho t0: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t1: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t2: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t3: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t4: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t5: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t6: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t7: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t9: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t10: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t11: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t12: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t13: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t14: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 rho t15: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2*: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2*: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw4x4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw4x4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebl4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebl4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: binary rho_S_gae_mean recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw2*: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebw4x4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1 r2:lpsgebl4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c1: at least 12 correct rho walks (addendum usability rule)",
+    "ok": true,
+    "detail": 16
+   },
+   {
+    "check": "c2 rho t0: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t1: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t2: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t3: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t4: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t5: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t6: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t7: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t9: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t10: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t11: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t12: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t13: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t14: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 rho t15: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2*: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2*: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw4x4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw4x4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebl4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebl4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: binary rho_S_gae_mean recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw2*: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebw4x4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2 r2:lpsgebl4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c2: at least 12 correct rho walks (addendum usability rule)",
+    "ok": true,
+    "detail": 16
+   },
+   {
+    "check": "c3 rho t0: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t1: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t2: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t3: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t4: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t5: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t6: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t7: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t9: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t10: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t11: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t12: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t13: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t14: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 rho t15: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2*: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2*: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw4x4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw4x4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebl4@8: counted_fq = cost(c_ell=1) - m_ell = rel_cost + LA M_q/I_q",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebl4@8: binary gae fields recompute",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: binary rho_S_gae_mean recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw2*: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebw4x4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3 r2:lpsgebl4@8: binary ratio_ic_over_rho recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "c3: at least 12 correct rho walks (addendum usability rule)",
+    "ok": true,
+    "detail": 16
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view d: analysis.json rho_gap_top recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2* c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2* c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2* c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2* c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2* c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2* c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2* c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2* c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw2* c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw2* c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw2* c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw2* c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view b: analysis.json rho_gap_top recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw4x4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw4x4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw4x4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw4x4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw4x4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw4x4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw4x4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw4x4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebw4x4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebw4x4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebw4x4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebw4x4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view c: analysis.json rho_gap_top recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebl4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebl4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebl4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebl4@8 c_ell=0.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebl4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebl4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebl4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebl4@8 c_ell=0.1: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c0 r2:lpsgebl4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c1 r2:lpsgebl4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c2 r2:lpsgebl4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "old view vs matched rho c3 r2:lpsgebl4@8 c_ell=1.0: binary descriptive ratio recomputes",
+    "ok": true,
+    "detail": ""
+   },
+   {
+    "check": "LA headline: every arm a, b, c, d correct on every (b, curve), b = 16..20",
+    "ok": true,
+    "detail": ""
+   }
+  ],
+  "control_checks": {
+   "continuity_ic_rows": {
+    "c0": {
+     "r2:lpsgebw2@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw2*": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw4x4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebl4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     }
+    },
+    "c1": {
+     "r2:lpsgebw2@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw2*": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw4x4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebl4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     }
+    },
+    "c2": {
+     "r2:lpsgebw2@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw2*": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw4x4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebl4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     }
+    },
+    "c3": {
+     "r2:lpsgebw2@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw2*": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebw4x4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     },
+     "r2:lpsgebl4@8": {
+      "fields_compared": 50,
+      "mismatched": []
+     }
+    }
+   },
+   "rho_target0_vs_round4": "curves 0-2 reproduce cost and steps exactly (see headline)",
+   "planted_k": "all 64 rho walks and all 16 IC arm solves return the planted k",
+   "symmetry": "negation on every cell (j recomputed independently)"
+  },
+  "heuristic_validation_checks": [
+   "rho model sqrt(pi ell / 4) * cost_per_step shown as a secondary column only: measured mean / model mean = 1.3555 over 64 walks; not used to rank"
+  ],
+  "cost_model_checks": [
+   "unit declared (GAE = 81 F_q-mult-eq, measured per process)",
+   "every arm's native work listed and priced at w in {0, 0.1, 1} GAE, rho included (section 5a)",
+   "IC m_ell and i_ell classified as native per the frozen PROTOCOL (unchanged by addendum M)",
+   "memory: vmhwm_kb about 0.6 GB per process (descriptive)",
+   "each rho walk is run to success; no success-probability scaling is needed (every walk correct)"
+  ],
+  "proof_architecture_checks": [],
+  "verdict": "passed",
+  "limitations": [
+   "Toy scale: q = 2^20 + 7, group order about 2^60, b = 20 only (b = 16..19 not in addendum M).",
+   "One IC solve per curve (no IC walk-to-walk variation); intervals are over 4 curves and 16 rho walks per curve.",
+   "At w = 0 the LA phase is free (all of it is mod-ell products, priced as native by the frozen classification), so w = 0 is the most IC-favourable point of the band.",
+   "Rho's coefficient bookkeeping (two mod-ell additions per step, a negation on a canonical flip) is not in its native counters, while IC's mod-ell additions are; charging 3 native ops per step to rho (sensitivity field) only raises rho and does not change any order.",
+   "The matched rho is round 4's walk as frozen, not a tuned one: its mean steps are about 1.33x the sqrt(pi ell / 4) negation-map model over 64 walks (t95 excludes 1), consistent with fruitless 2-cycles being detected only every L = 64 steps (one escape per ~164 steps). This inflates rho and favours IC; a model-efficient rho raises IC/rho at every w (sensitivity field) and leaves the order verdict unchanged.",
+   "The order flip is a statement about the price of a mod-ell product: m_ell is about 98 % of each IC arm's native ops. Under the frozen classification (M_ell native, priced at w GAE = 0, 8.1, 81 F_q-mult-eq) the order changes near w = 0.02-0.04. Under the PROTOCOL's primary unit (M_ell counted at c_ell = 1 F_q-mult-eq; I_ell and NAT counters at w GAE; sensitivity B) every arm's point ratio is below 1 at every w, with bootstrap upper ends below 1 for arms a and d at every w, while the w = 0 intervals of arms b and c cross 1. The break-even price of one mod-ell product is about 1.6-2.9 F_q-mult-eq at w = 0 (field break_even_fq_mult_per_m_ell). Which classification governs is an owner decision (addendum M, 'Pricing'); this report applies the frozen one.",
+   "Clique removal is not instrumented; it is used only by arm e, which is not in this comparison.",
+   "Single-threaded counted operations on a shared host; no wall-time claim.",
+   "LA headline intervals are paired bootstraps over 4 curves on identical matrices; they do not include walk-to-walk variation (the aa null spread is about 1 %, the size of arm d's gain).",
+   "The README's rho distance table is a pre-section-5a lower-bound comparison and must be cited as such."
+  ],
+  "artifact_paths": [
+   "../../examples/ic_improve_04_genus3_2lp.rs",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m00.yaml",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m01.yaml",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m02.yaml",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m03.yaml",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/analysis.json",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c0_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c1_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c2_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b16_c3_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c0_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c1_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c2_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b17_c3_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c0_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c1_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c2_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b19_c3_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c0_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c1_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c2_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c0_matched.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c1_matched.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c2_matched.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c0.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c0.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c1.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c2.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c2.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-l4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w2at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w2star.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c0-w4x4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-l4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w2star.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c1-w4x4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-l4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w2at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w2star.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c2-w4x4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-l4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2star.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w4x4at8.txt",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m00.json",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m01.json",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m02.json",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/receipt-card-m03.json",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c0.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c0.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c1.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c2.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c2.stdout.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stderr.log",
+   "../../research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stdout.log",
+   "../../research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs",
+   "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c0_rho.jsonl",
+   "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c1_rho.jsonl",
+   "../../research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/b20_c2_rho.jsonl",
+   "rho-reference.json",
+   "validate_item15_matched_rho.py"
+  ]
+ },
+ "validator_script": {
+  "path": "validate_item15_matched_rho.py",
+  "sha256": "1b70c87b6a17e3aff98c55fbecb17c366570876d9bf74d91dfd78cf0f8527e1d"
+ }
+}

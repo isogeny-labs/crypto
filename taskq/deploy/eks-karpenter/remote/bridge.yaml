@@ -124,7 +124,7 @@ Resources:
       Description: Submit audited L2 Kubernetes jobs; measured work runs on EKS
       ServiceRole: !GetAtt LauncherRole.Arn
       ConcurrentBuildLimit: 2
-      TimeoutInMinutes: 70
+      TimeoutInMinutes: 100
       QueuedTimeoutInMinutes: 10
       Artifacts: {Type: NO_ARTIFACTS}
       Source:
@@ -180,6 +180,22 @@ Resources:
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/launcher/*
+              # Failure diagnosis may read only hash manifests and sanitized
+              # gate/identity receipts. Raw records, stdout and stderr remain
+              # outside the GitHub role's object-read boundary.
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/SHA256SUMS
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/job-exit.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/build-info.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/binary.sha256
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/input-spec.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/l2-gate.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/audit.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/control-comparison.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/owner-run-check.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/owner-replay-check.json
               - Effect: Allow
                 Action: ecr:GetAuthorizationToken
                 Resource: '*'

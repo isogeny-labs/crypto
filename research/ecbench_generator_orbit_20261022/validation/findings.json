@@ -1,0 +1,82 @@
+{
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "info",
+      "title": "Every headline reproduces",
+      "text": "All 84 band means (7 sessions x 4 named arms x w = 0, 0.1, 1), recomputed from raw records.jsonl with validation/band_recompute.jq, equal the unrounded mean_s of tables/band-<session>.json (max relative difference 0.0, i.e. the same doubles) and round to the 3-decimal figures of the brief in all 84 cases. H1: 960 lazy/layout (workload_id, round, warmup) pairs, every lazy record has exactly one layout partner and vice versa, keys unique, all 960 equal on trials, relations, rank, recovered and pair_table_entries (phase indices 1/2/3 confirmed to be oracle_setup/relations/linear_algebra). a1-n29 ic-gen-layout-c1 mean phases[2].native.trials over its 192 non-warm-up records = 34.96875 (ic-layout-c1: 53.3698).",
+      "evidence": ["validation/recompute-summary.json", "validation/recompute-<session>.json", "validation/h1-<session>.json"]
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "title": "The band subtracts C at pinned-calibration ratios from a G priced at full_prices.json ratios",
+      "text": "For the *_full IC records, total_gae is rebuilt by full_price.rs: G = sum(adds + doubles) + sum over native counters of count x the full_prices.json unit ratio (re-derived here on all 4320 measured records to <= 5e-16 relative, validation/alike-<session>.json max_g_rel_err). The calibration pricing the base method applied (detail.framework_total_gae_before_solver_removal) is discarded, but detail.calibration_pinned_units is kept, so band.rs subtracts C = count x pinned ratio although G holds count x full ratio for the same counters (e.g. lookup 0.0736 full vs 0.00942 pinned at n29). G - C therefore still contains (C_full - C) at every w, and n_C is then added at w on top. Mean residual per record ranges 0 (n19) to 1114.9 GAE (a0-n37 ic-lazy-c8). Subtracting what G actually holds (S_alt in recompute-<session>.json) lowers the IC means by 1.2-12.3 % at every weight on the six calibrated curves. No band order among the reported arms changes, and the error charges the IC arms more, not less. I reproduce band.rs as specified; this is a defect of the rule as applied to *_full records, not a recompute disagreement.",
+      "evidence": ["src/cryptanalysis/ecbench/band.rs (calibrated_native)", "src/cryptanalysis/ecbench/full_price.rs (reprice)", "validation/recompute-<session>.json mean_c, mean_c_full, mean_s_alt"]
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "title": "The ecbench band is not applied alike to every arm; under an alike sweep n29 and n19 IC-vs-rho become unresolved",
+      "text": "All 5760 records have cost.unpriced = [] (U = 0). Rho records carry no pinned units, so C = n_C = 0 and their native work (canonicalisations, distinguished-point lookups; mean 161.7 operations per record at n29) stays at full_prices.json ratios at every w: the rho row of every band is a single point. On IC records only PRICED_NATIVE counters with a pinned unit are swept; hash probes, inserts, pair-table entries, curve-equation checks, field squarings, negations and the byte floor stay at full_prices.json at every w. AGENTS.md 5a asks for the weights to be 'applied the same way to every arm'. Diagnostic (validation/alike_band.jq, my construction, not the protocol's): S_alike(w) = (group-operation GAE + w x native unit-operations)/sqrt(r), with operation multiplicities from the full_price.rs rule table. All IC-vs-IC orders (gen-layout < layout < lazy) hold at every weight on every curve. IC-vs-rho verdicts are unchanged at n13 (unresolved), n17, n23, n31 and n37 (rho ahead), but: a1-n29 ic-gen-layout-c1 0.413 / 0.887 / 5.145 vs rho-frob 1.503 / 1.582 / 2.288, so unresolved (the band tool reports 'ic-gen-layout-c1 < rho-frob'); a1-n29 ic-layout-c1 1.426 / 2.043 / 7.590 vs rho-frob, unresolved (the band tool has rho-frob ahead); a0-n19 ic-gen-layout-c2 0.801 / 1.303 / 5.818 vs rho-frob 0.890 / 0.936 / 1.359, so unresolved (the band tool reports 'rho-frob < ic-gen-layout-c2'). The n29 alike pattern is what PROTOCOL.md 5 H5 predicted ('below rho at w = 0 and 0.1 and above it at w = 1, so unresolved'). Consequence for the gate: a VALIDATION.json rho_reference.gae_band / order_holds_across_band for n29 (or n19) should not be filled from tables/band-*.json without deciding this. That is the Coordinator's call, not part of this headline check.",
+      "evidence": ["validation/alike_band.jq", "validation/alike-<session>.json", "tables/band-a1-n29.json ranks", "tables/band-a0-n19.json ranks"]
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "title": "a0-n19: no pinned calibration, so the band collapses to one host-microbenchmark point",
+      "text": "At a0-n19 the IC records carry detail.calibration_pinned_units = [] because docs/ic/calibration.json has no koblitz/K_0 / GF(2^19) row: it has K_0 at n = 13, 15, 23, 31, 37, 39, 41 and K_1 at n = 11, 17, 19, 23, 29, and K_1 / GF(2^19) is another curve. The base ic.pipeline therefore priced no native work: detail.framework_total_gae_before_solver_removal equals sum(adds + doubles), e.g. 281 GAE. The *_full repricing then charged every native counter (lookups, canonicalisations, Frobenius maps, row ops, inversions, hash probes, field squarings and the rest) at the icv1-f2m19-t797-b6cf2467 row of src/cryptanalysis/ecbench/full_prices.json, one host's `ecbench price-units` microbenchmark (lookup 0.1019, canon 0.1005, frobenius 0.0425, row_op 0.0256, field_inv 0.8233 GAE). With U = 0 and C = n_C = 0, priced_gae(w) = G at every w, so the n19 band is 1.081 / 1.081 / 1.081 (gen-layout), 1.739 (layout), 1.856 (lazy), 0.937 (rho-frob): one point, not a band. Native work priced from that table and never swept is 25.9 % of the mean S of ic-gen-layout-c2, 19.2 % of ic-layout-c2, 19.0 % of ic-lazy-c2 and 5.0 % of rho-frob. Per AGENTS.md 5a, a calibration 'may be added as a further point, but never replaces the band'. At n19 it replaced the band. The band tool's n19 verdicts are single-point orders. IC-vs-IC (gen < layout < lazy) holds both with all native work at 0 and at the full-price point. IC-vs-rho does not: with every arm's native work at 0, ic-gen-layout-c2 (0.801) is below rho-frob (0.890), and at the full-price point it is above (1.081 vs 0.937), so unresolved inside any alike band (F3). n19 is also priced on a different basis from its neighbours: n17 and n23 sweep their pinned PRICED_NATIVE counters, n19 sweeps nothing. A growing-n reading across n17 -> n19 -> n23 mixes bases.",
+      "evidence": ["docs/ic/calibration.json", "src/cryptanalysis/ecbench/full_price.rs (module comment names icv1-f2m19-t797-b6cf2467)", "validation/recompute-a0-n19.json mean_s_point, mean_s_group", "validation/alike-a0-n19.json"]
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "title": "The A/A control cannot fail",
+      "text": "On every (workload, round, warmup) key in all seven sessions (960 pairs), the rho-frob-aa record equals the rho-frob record in algorithm_seed, total_gae and recovered. The PROTOCOL.md 5 rule 'rho-frob-aa / rho-frob must contain 1' therefore holds by construction. The control detects nondeterminism or order effects only, not sampling variation. Counted costs are deterministic, so the receipts are not wrong, but the control has no power.",
+      "evidence": ["sessions/<session>/records.jsonl"]
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "title": "The binary is bound to its source by run-time records, not by a rebuild",
+      "text": "target/release/ecbench sha256 f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191 equals binary_sha256 in all 5760 records and all 7 session.json files (git_commit de57ca373f, git_dirty false). The binary embeds no commit string. It was built 08:42:40Z, after d2b3a56c32 (08:37:49Z, the last commit touching src/). de57ca373f changed only PROTOCOL.md, run.sh and cards/attempt-1. There was no mismatch, so nothing was rebuilt, and a cargo rebuild in another directory is not expected to be bit-identical.",
+      "evidence": ["validation/replay-certificate.json binary"]
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "title": "Replay scope",
+      "text": "4320 of 4320 replays reproduced identically. verify --replay-all re-executes measured deterministic runs only, so the 1440 warm-ups were not replayed. All 5760 scalars, warm-ups included, were checked twice: by the ecbench audit, and by validator-written Python GF(2^n) code that derives each field modulus itself (moduli 0x201b, 0x80027, 0x800021, 0x80000009, 0x2000000053, 0x20009, 0x20000005), puts G on the curve with [r]G = O, and checks [recovered]G = target and [r]target = O for every record. Same binary, same host class (env ECBENV2hebd6c1d47154, hardware ECBHW1h71df94523395). Not a cross-host replay.",
+      "evidence": ["validation/replay-certificate.json", "validation/scalar-check.json", "validation/verify_scalars.py"]
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "title": "Frozen contract binding",
+      "text": "The study is committed at HEAD 45a11de2eb with a clean tree. The PROTOCOL.md freeze is d2b3a56c32 (08:37:49Z) and Amendment 1 is de57ca373f (08:46:33Z, run.sh band --json fix only). All seven sessions started 08:47:25Z-08:54:16Z on de57ca373f. sessions/<s>/spec.json is byte-identical to docs/ecbench/specs/claim-koblitz-generator-orbit-<s>.json, unchanged since d2b3a56c32. session.json spec_sha256 is ecbench's canonical digest and was not independently recomputed; the ecbench audit spec_id check is true. Target seeds are 202610221001/03/05/07/09/11/13, one per curve, matching PROTOCOL.md 3. Targets x rounds: 32 x (3 + 1 warm-up), 64 x 4 at n29, 16 x 4 at n37. All records verified, matches_target true, lower_bound false, no solver block. rho-frob, rho-strong and the IC arms use all 2n automorphisms on every curve.",
+      "evidence": ["PROTOCOL.md", "sessions/<session>/session.json", "docs/ecbench/specs/"]
+    },
+    {
+      "id": "F9",
+      "severity": "info",
+      "title": "H1 claimed count corrected before the report",
+      "text": "The validation brief first gave 1088 lazy/layout pairs. The Coordinator corrected it to 960 (128 each at n13, n17, n19, n23, n31; 64 at n37; 256 at n29, warm-ups included) before this report was written. 960 is the `claimed` value here, and the recompute independently gives 960.",
+      "evidence": ["validation/claimed-3dec.json"]
+    },
+    {
+      "id": "F10",
+      "severity": "info",
+      "title": "Scale and mechanism scope",
+      "text": "r ranges from 2003 (a0-n13) to 230603167 (a0-n37), log2 r 11.0-27.8. At c = 1 (a0-n13, a1-n17, a1-n29) the generator-orbit arm is, per PROTOCOL.md 2, a Frobenius-folded baby-step giant-step, so a band result against rho there is a small-r effect of a generic mechanism. Nothing here transfers to ECC2K-130 or deployed curves (PROTOCOL.md 6). The H2-H5 paired bootstrap ratios (tables/compare-*.txt, sessions/*/comparisons/) were not recomputed and are outside this report's headlines.",
+      "evidence": ["PROTOCOL.md"]
+    }
+  ],
+  "limitations": [
+    "Replay ran on the same host class with the same binary; the cross-host replay the gate envisages was not available in this container.",
+    "The H2-H5 cluster-bootstrap ratios and their confidence intervals were not recomputed; only the band means, H1 and the n29 trials mean were.",
+    "The alike-band diagnostic (F3) is the validator's construction: operation multiplicities come from the full_price.rs rule table (e.g. a curve-equation check counts as 4 operations, the factor-base byte floor as 1/8 operation per byte). Other readings of 'native operation' would move its w > 0 points.",
+    "PRICED_NATIVE and the full_price.rs rule table were transcribed from source at 45a11de2eb into the validator scripts; the recompute is independent code but not independent of those definitions.",
+    "Prices are one host's microbenchmark ratios (src/cryptanalysis/ecbench/full_prices.json, sha256 3838bb9174e4c6f908db61484aa08ebb65442c9df362e72159702f39d179b5e1); the unit is ecbench.gae (group-addition equivalents); memory is recorded per record as time.max_rss_kib but is not part of S.",
+    "raw_data paths are relative to research/ecbench_generator_orbit_20261022/ (each entry also carries its repository path); a VALIDATION.json in another directory needs those paths re-based, which changes nothing measured."
+  ]
+}

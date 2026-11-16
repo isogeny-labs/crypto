@@ -1,0 +1,349 @@
+{
+  "card_id": "CARD-BLINDSPOT-15-M03",
+  "card_path": "research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-m03.yaml",
+  "card_sha256": "418bf2f8d4b01cedd3f366812a2ad727e5886767139d40b4009a7a9077d516df",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 17.721,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 17.721,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "--bits",
+        "20",
+        "--curve",
+        "3",
+        "--kappa",
+        "1.3059",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--arms",
+        "ic2lp,rho",
+        "--rho-targets",
+        "16",
+        "--rho-r",
+        "64",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3684.583,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b20-c3-matched",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl": "f74615af15eb0997c71492bfe4d19aae30a3182ef5db04a78544eaf40e130a8c"
+      },
+      "seconds": 3684.583,
+      "stderr_sha256": "671ceed011d5c98e9fe0c2c420a5b01b06dcf311dcdbdbcee361868d225ca1ae",
+      "stderr_tail": [
+        "{\"bits\":20,\"curve\":3,\"kappa\":1.3059,\"arm\":\"r2:lpsgebw2@8\",\"correct\":true,\"cost\":14389276017,\"rel_cost\":9083908371,\"la_cost\":5305367646,\"cols\":13544,\"nnz\":206672,\"checks\":1,\"la_wall\":33.6,\"wall\":281.1}",
+        "{\"bits\":20,\"curve\":3,\"kappa\":1.3059,\"arm\":\"r2:lpsgebw2*\",\"correct\":true,\"cost\":14322359760,\"rel_cost\":9083908371,\"la_cost\":5238451389,\"cols\":12723,\"nnz\":223264,\"checks\":1,\"la_wall\":55.1,\"wall\":281.1}",
+        "{\"bits\":20,\"curve\":3,\"kappa\":1.3059,\"arm\":\"r2:lpsgebw4x4@8\",\"correct\":true,\"cost\":16910374834,\"rel_cost\":9083908371,\"la_cost\":7826466463,\"cols\":13544,\"nnz\":206672,\"checks\":1,\"la_wall\":50.4,\"wall\":281.1}",
+        "{\"bits\":20,\"curve\":3,\"kappa\":1.3059,\"arm\":\"r2:lpsgebl4@8\",\"correct\":true,\"cost\":18535653282,\"rel_cost\":9083908371,\"la_cost\":9451744911,\"cols\":13544,\"nnz\":206672,\"checks\":1,\"la_wall\":51.1,\"wall\":281.1}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":0,\"correct\":true,\"cost\":74312580692,\"steps\":916668665,\"steps_over_model\":2.725,\"wall\":388.5}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":1,\"correct\":true,\"cost\":36137482723,\"steps\":445761422,\"steps_over_model\":1.325,\"wall\":183.4}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":2,\"correct\":true,\"cost\":41792934066,\"steps\":515523377,\"steps_over_model\":1.532,\"wall\":218.0}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":3,\"correct\":true,\"cost\":37760158737,\"steps\":465777430,\"steps_over_model\":1.384,\"wall\":193.3}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":4,\"correct\":true,\"cost\":63487975357,\"steps\":783141622,\"steps_over_model\":2.328,\"wall\":327.6}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":5,\"correct\":true,\"cost\":33373797125,\"steps\":411669605,\"steps_over_model\":1.224,\"wall\":168.4}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":6,\"correct\":true,\"cost\":59901409589,\"steps\":738900313,\"steps_over_model\":2.196,\"wall\":303.3}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":7,\"correct\":true,\"cost\":55466476989,\"steps\":684193372,\"steps_over_model\":2.034,\"wall\":287.7}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":8,\"correct\":true,\"cost\":36823979074,\"steps\":454229326,\"steps_over_model\":1.350,\"wall\":193.1}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":9,\"correct\":true,\"cost\":21866905796,\"steps\":269726894,\"steps_over_model\":0.802,\"wall\":112.6}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":10,\"correct\":true,\"cost\":14373800434,\"steps\":177295851,\"steps_over_model\":0.527,\"wall\":72.9}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":11,\"correct\":true,\"cost\":29654155186,\"steps\":365785755,\"steps_over_model\":1.087,\"wall\":150.4}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":12,\"correct\":true,\"cost\":74346113760,\"steps\":917082477,\"steps_over_model\":2.726,\"wall\":374.2}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":13,\"correct\":true,\"cost\":16034045949,\"steps\":197775718,\"steps_over_model\":0.588,\"wall\":79.6}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":14,\"correct\":true,\"cost\":51240169776,\"steps\":632059701,\"steps_over_model\":1.879,\"wall\":270.6}",
+        "{\"bits\":20,\"curve\":3,\"arm\":\"rho\",\"target\":15,\"correct\":true,\"cost\":15394722149,\"steps\":189889308,\"steps_over_model\":0.564,\"wall\":78.9}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "gate",
+        "r2:lpsgebw2@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-w2at8",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2at8.txt": "83dcbd217564960abc09f3be8609e299fc31b27ac462d0ceb3b450898884ac2b"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "83dcbd217564960abc09f3be8609e299fc31b27ac462d0ceb3b450898884ac2b",
+      "stdout_tail": [
+        "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw2@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "gate",
+        "r2:lpsgebw2*",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-w2star",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2star.txt": "f9ea906d1fef86f9809f4b7a719dc3e58b316cf906ca081db58ac5abacd67ed5"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f9ea906d1fef86f9809f4b7a719dc3e58b316cf906ca081db58ac5abacd67ed5",
+      "stdout_tail": [
+        "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw2*",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "gate",
+        "r2:lpsgebw4x4@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-w4x4at8",
+      "index": 6,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w4x4at8.txt": "6720c46f2960f95cab130363939de3ab1688e7924b8f368147133cc42d13863b"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6720c46f2960f95cab130363939de3ab1688e7924b8f368147133cc42d13863b",
+      "stdout_tail": [
+        "GATE MATCH bits=20 curve=3 arm=r2:lpsgebw4x4@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b",
+        "gate",
+        "r2:lpsgebl4@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b20_c3_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate-l4at8",
+      "index": 7,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-l4at8.txt": "6c9d64a342cd08973e39861787a66432e5e0c941553480a68284aab58ae100e3"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6c9d64a342cd08973e39861787a66432e5e0c941553480a68284aab58ae100e3",
+      "stdout_tail": [
+        "GATE MATCH bits=20 curve=3 arm=r2:lpsgebl4@8",
+        "GATE OK cells=1"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3/b15b"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.011,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.011,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/bin-c3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "edd8f77077e632539f7759986490b883cd030186",
+  "dirty_after": [
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/b20_c3_matched.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/build-c3.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-l4at8.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2at8.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w2star.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/gate-c3-w4x4at8.txt",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched/run-c3.stdout.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,559 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "HASHED-ECDL-CPU-SPARSE-RECIPROCAL-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_cpu_20261030/round6",
+  "authors": [
+    "Codex"
+  ],
+  "links": {},
+  "question": "Which complete CPU costs remain after sparse pivot tails and reciprocal arithmetic relative to the fixed optimized baseline?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Both pinned implementations recover identical full certificates on all three fixed fixtures.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Sparse pivot tails and bounded reciprocal arithmetic preserve complete certificates and checks; setup remains charged.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "L0 timings do not establish certified speedup, external-tool or rho advantage, asymptotic improvement, unknown-scalar challenge performance or largest feasible scale.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "description": "Pinned optimized CPU baseline batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "flags": {
+          "arm": "v"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      }
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "description": "Sparse-pivot/reciprocal candidate batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9930a229ba35a5feae61fb877673505543faa6b2",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "6d4d724d809b572dae72c1c6fe56253797e31ebb996f0b93c78a922161ce533b",
+        "flags": {
+          "arm": "v"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Sparse-pivot/reciprocal candidate batch64"
+      }
+    },
+    {
+      "id": "w",
+      "role": "reference",
+      "description": "Sparse-pivot/reciprocal candidate batch1 ablation",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "9930a229ba35a5feae61fb877673505543faa6b2",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "6d4d724d809b572dae72c1c6fe56253797e31ebb996f0b93c78a922161ce533b",
+        "flags": {
+          "arm": "w"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Sparse-pivot/reciprocal candidate batch1 ablation"
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Pinned optimized CPU baseline batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "flags": {
+          "arm": "v"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      },
+      "same_instrument_as": "u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each fixed public target is constructed from a known scalar before solver invocation; solver sees only P,Q. Exact recovery and independent replay must pass every execution."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Every execution corrupts the recovered scalar after timing and requires rejection. All-target unit tests also compare exhaustive positive and negative relation answers; no random-population claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "pinned-optimized-baseline",
+          "arithmetic-candidate-batch64",
+          "arithmetic-candidate-batch1"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "Two pinned source revisions built with identical locked dependencies, compiler and release flags.",
+        "how": "Baseline2bd4588fba60 versus candidate981cf39a9827; bundled implementation comparison, no attribution to individual changes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "case0 p211,a0,b7,r199,P3:33,k42,m3,tau40; case1 p65521,a65518,b3,r65563,P0:64894,k45678,m3,tau80; case2 same curve,k54321,m4,tau64",
+        "how": "Public software fixtures; seeds111,222,333; max_trials16,max_work1000000,one target per execution."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same EKS job, CPU2,memory4Gi; one software thread per cell; shared VM L0. Capture CPUinfo, affinity, kernel, cgroups. No certified clocks."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process per cell; cap1000000 retained tuple rows. Record retained sum-table bytes, not RSS. No reuse between complete recoveries."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Latin four-arm rotation with alternating reversal by round and case."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analyzer reads neutral labels and exact full certificate bytes; labels decoded in report."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-native",
+        "arms": [
+          "u",
+          "v"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-batch",
+        "arms": [
+          "w",
+          "v"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "seed=111*(case+1), fixed across arms and rounds. Target scalar construction is solely a public known-answer fixture and excluded from solver inputs."
+    },
+    "instance_sampling": {
+      "rule": "Three fixed complete-recovery software fixtures, covering 8/16-bit fields and 3/4 slots; no population or scale extrapolation.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Standalone frozen analyzer receives neutral u/v/w/x labels and cert files only; producer knows key. Numerical signatures may reveal variants.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 9,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact source-level counts and deterministic equality need no sampling power. Nine repeats characterize descriptive ranges only; no timed significance test or equivalence claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 300,
+      "measured_on": "Unmeasured conservative allocation, not evidence. Round0 is fixed per-arm/case warmup/preflight. No timing data existed at freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "preparations",
+        "name": "Reusable table preparations",
+        "unit": "preparations",
+        "kind": "exact",
+        "definition": "Cumulative successful MITM preparations, including discarded trials; all arms use cached MITM.",
+        "source": "rows.csv preparations",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "query_inversions",
+        "name": "Residual batch inversions",
+        "unit": "inversions",
+        "kind": "exact",
+        "definition": "Cumulative residual inversions; excludes other arithmetic and is not total work. All arms are instrumented.",
+        "source": "rows.csv query_inversions",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "complete_ms",
+        "name": "complete_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Fresh-process algorithm interval: curve construction and known-target construction, solve including all base/table setup, discarded trials, target queries, reduction and internal verification, second independent replay, certificate serialization. Excludes process launch, archive I/O and negative control. Not the primary IC-online interval.",
+        "source": "rows.csv complete_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "oracle_ms",
+        "name": "oracle_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "All oracle queries, including cold table preparation, discarded trials and witness checks.",
+        "source": "rows.csv oracle_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "bases_ms",
+        "name": "bases_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "All base enumeration across all trials.",
+        "source": "rows.csv bases_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "reduction_other_ms",
+        "name": "reduction_other_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Solve remainder excluding bases and oracle: target generation, elimination, scalar recovery and internal replay; not a pure linear-algebra timer.",
+        "source": "rows.csv reduction_other_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "curve_ms",
+        "name": "curve_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Curve validation and known-target construction.",
+        "source": "rows.csv curve_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "replay_ms",
+        "name": "replay_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Second complete independent certificate verification.",
+        "source": "rows.csv replay_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "oracle_calls",
+      "preparations",
+      "built_rows",
+      "probed_rows",
+      "query_inversions",
+      "table_bytes",
+      "digest"
+    ],
+    "record": [
+      "CPUinfo, kernel, process affinity and cgroups",
+      "rustc and executable/source hashes",
+      "every complete certificate",
+      "all stage durations and cumulative structural counters"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab CPU Spot",
+    "placement": {
+      "cpu": 2,
+      "memory": "4Gi",
+      "threads": 1,
+      "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "runtime_source": "cb2ec6873f30 (crypto main ancestor)",
+      "binary_source": {
+        "baseline": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "candidate": "9930a229ba35a5feae61fb877673505543faa6b2"
+      }
+    },
+    "measurement_class": "throughput",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "4arms x3instances x(1warmup+9rounds)=120 rows; no extra repeats after viewing results.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any incorrect output, timeout or missing cell invalidates panel; preserve failures. Per-cell60s, whole job300s, one attempt, no automatic reruns.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any full certificate mismatch, missing/duplicate cell, failed known scalar or negative replay, source/hash mismatch or deadline invalidates the panel."
+  ],
+  "decision_rule": {
+    "text": "All120cells must complete with full certificate equality and negative controls. L0 durations only guide optimization; they cannot complete the further10x performance goal.",
+    "comparison_ids": [
+      "C-native",
+      "C-batch"
+    ],
+    "threshold": "All fixed cells complete with identical certificates; expected batching and reuse counters are consistent.",
+    "statistic": "exact certificate equality and structural counters; descriptive stage median/min/max",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Structural query counts and descriptive stage times only. Matched rho and fastest external comparisons not run; their gaps remain unknown.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "3815e06c3e9c77210fa8b5d4d1fe072d7a08162ecf167b146ae94293ad5196b9"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.csv",
+      "latency.svg",
+      "analysis.log"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-arm complete CPU recovery diagnostic median and full observed range"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Certified speedup from L0 clocks",
+    "Calling retained table capacity total peak memory",
+    "Ignoring preparation or discarded trials",
+    "Calling cached MITM tensor contraction or algebraic progress",
+    "Claiming largest feasible scale or rho/external advantage without matched measurements"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.hyperelliptic.org/EFD/precomp.pdf",
+      "provenance": "retrieved",
+      "claim": "Bernstein and Lange describe standard affine arithmetic and precomputation/batch inversion tradeoffs; this code applies known methods, no novelty claim.",
+      "verified_by": "Primary paper read before implementation,2026-10-30 UTC"
+    },
+    {
+      "ref": "src/cryptanalysis/hashed_ecdl.rs",
+      "provenance": "retrieved",
+      "claim": "Existing reduction, checked group operations, lexicographic exhaustive oracle and independent verifier define exact output semantics.",
+      "verified_by": "Baseline2bd4588fba60 and candidate981cf39a9827; full archived-certificate, exhaustive root and all-target tuple controls pass."
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap2.pdf",
+      "provenance": "retrieved",
+      "claim": "Algorithms2.107 and2.142 give extended Euclid and modular inversion.",
+      "verified_by": "Primary source read before candidate implementation2026-10-30."
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap3.pdf",
+      "provenance": "retrieved",
+      "claim": "Algorithms3.34/3.36 describe prime-field square-root methods; retain field-dependent work and check the final square.",
+      "verified_by": "Primary source read before candidate implementation2026-10-30."
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap14.pdf",
+      "provenance": "retrieved",
+      "claim": "Section14.3.3 motivates amortized reciprocal reduction. The ceiling variant has a separate bound documented in reciprocal-candidate.md.",
+      "verified_by": "Primary source read before implementation 2026-10-30;26 tests pass."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "10e83377864c5ccd1303a61081c7bd815a316fd136d4c393b8ba715c0b345df7",
+    "commit": "9930a229ba35a5feae61fb877673505543faa6b2",
+    "frozen_at": "2026-10-30T06:06:19Z",
+    "filed_before_affected_data": true
+  }
+}

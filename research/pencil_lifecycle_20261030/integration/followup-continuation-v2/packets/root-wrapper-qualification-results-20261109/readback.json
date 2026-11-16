@@ -1,0 +1,165 @@
+{
+  "scope": "Retained JSON and filesystem readback; no test rerun",
+  "cases": 26,
+  "stdout_equal_result": true,
+  "admission_fixtures": [
+    {
+      "fixture": "bad-active_worker_seconds_ceiling",
+      "admission_sha256": "425b39de942b3624e595a7bdd0158e9e619585475ef0c24309ed5e3e63a960b2",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-approved",
+      "admission_sha256": "fafdb70dcbff8c8340caf8d5be6f5e12a19f2eeff6f81cc4df7a8492a85c433e",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-control",
+      "admission_sha256": "3873802bce4bc42436b5fdfa81cf5fc9527eb266c5b68ac5f0c336d1f90a56ad",
+      "admitted": true,
+      "exact_tests": 3,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-deadline",
+      "admission_sha256": "342369c614de82fe47c1e206de86dac94f470698b112ff0356086011dfe3e3ee",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-fence",
+      "admission_sha256": "bf5af0d7a7c21ac83a08e7a0e62546497aa03fba8a177e7b97c4bdaf418091ce",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 0,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-hash",
+      "admission_sha256": "913e320a6a441af945672c79b28c3a476f33fa8c7b6a732788a14e00d1c4396c",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-one_attempt_limit",
+      "admission_sha256": "c9bffa57677924910943d37029838ee5294ed1f4cfa1ba9f42059b2863482ab1",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-preserve_resource_and_ownership_checks",
+      "admission_sha256": "53964895ab7a0af46088403dc3456e18296f0a1d51b90b386152218878851720",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-pub",
+      "admission_sha256": "529833c69344233f207f1d323f88a993633d43720a5862fda858e7d23bdf1def",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-resource",
+      "admission_sha256": "aef7a950db20cd1da17517b8ee683884d5459df61a7ddfb4e07237c3d86149ae",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-scope",
+      "admission_sha256": "fac5f6ac72f818a706db4c536efe8995bc79078cb143f437eac1fe28488fb4b1",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "bad-validation_attempt_seconds",
+      "admission_sha256": "1fd69c9f39f0b20f0388f4eaf525641cebba2d802faa25b7e18aca1d857e3a41",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    },
+    {
+      "fixture": "nonnull",
+      "admission_sha256": "b1fe98c12303254d8e890b9e36d7eb9130a8933799c14ab263248421f5bb7296",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "1"
+    },
+    {
+      "fixture": "ordinary-boolean",
+      "admission_sha256": "cf454d9380c838262dd237e6bff41db192d3cc73548aedd4d6c0917265f8ed71",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": null,
+      "ceiling": "True"
+    },
+    {
+      "fixture": "ordinary-infinite",
+      "admission_sha256": "9eab08f1a0713da8032d58191826ed681a9a341d8288a40fd73039d6dc3416f1",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": null,
+      "ceiling": "inf"
+    },
+    {
+      "fixture": "ordinary-valid",
+      "admission_sha256": "6b850690b67fbb2fbe3a9d033662ba555dd73858938ecd26ad07041376e4f5d1",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": null,
+      "ceiling": "4"
+    },
+    {
+      "fixture": "waiver-valid",
+      "admission_sha256": "03bbaf13128d09f2c70874a89a55139a156ee5a964da48be2d7f7d515f7f414a",
+      "admitted": true,
+      "exact_tests": 4,
+      "fence": 1,
+      "dollar_mode": "owner-waived-dollar-facts/v1",
+      "ceiling": "None"
+    }
+  ],
+  "fixed_prefix_verified": true,
+  "old_atomic_value_preserved": true,
+  "terminal_manifest_absent": true,
+  "heartbeat_exception_receipts": "not separately recorded; case assertions only",
+  "memory_cpu_telemetry": "not recorded"
+}

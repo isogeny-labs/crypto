@@ -1,0 +1,24 @@
+{
+  "card_id": "CARD-native-allocation-profile-k4096-p21",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "stopped",
+  "classification": "infrastructure_lock_contention_refusal_not_search",
+  "stopped_at_step": "k4096-p21",
+  "recommendation": "rerun_after_infrastructure_fix",
+  "reasons": [
+    "Native runner-v21 card-check exited 0: record_digests_verified=true, relay_verbatim=true, status=stopped at command 1. Exact stdout/stderr/status saved beside assessment.",
+    "Actual relay and original receipt are byte-identical with SHA256 b16eb3b1f2e2a9c47d50cf4e3fe067507fc40ba18806af785380fa04dc317097. Card unchanged; one exact specified argv attempt, exit 1, timed_out=false, seconds=10.985894322.",
+    "Original stderr: another benchmark holds /tmp/crypto-bench.lock; pass --wait to queue behind it. This is live lock contention, not the earlier protected-open permission failure. No holder identity or predicted release time is established by this assessment.",
+    "Reservation acquires the lock with wait=false before CPU planning, thread eviction or isolation preflight. Output directory exists and is empty; all fourteen declared outputs are absent. No container, worker/query/SAT start or measurement admission is established; terminal fields remain missing, not zero.",
+    "No cleanup record exists because the refusal preceded resource reservation/container setup; do not label missing cleanup evidence as completed worker cleanup.",
+    "Frozen HEAD 674d2075958c5cb388cbfcb271e8ebcd6dea646c verified; receipt dirty_before/dirty_after empty; independent git status output zero bytes.",
+    "Recommendation requires resolving host contention and separately authorizing a fresh card/attempt. Do not remove or bypass the shared lock, add --wait to this frozen card, or automatically retry. Director performed no retry, tracked edit or HEAD move."
+  ],
+  "admitted_as_search_result": false,
+  "interpretation": "not_assessed",
+  "commit": "674d2075958c5cb388cbfcb271e8ebcd6dea646c",
+  "relay_sha256": "b16eb3b1f2e2a9c47d50cf4e3fe067507fc40ba18806af785380fa04dc317097",
+  "receipt_sha256": "b16eb3b1f2e2a9c47d50cf4e3fe067507fc40ba18806af785380fa04dc317097",
+  "card_check_exit_code": 0
+}

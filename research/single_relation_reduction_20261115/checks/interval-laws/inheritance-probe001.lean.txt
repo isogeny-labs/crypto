@@ -1,0 +1,27 @@
+import Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality
+import Mathlib.Combinatorics.Additive.Convolution
+import Mathlib.Tactic
+set_option autoImplicit false
+open scoped BigOperators ComplexConjugate
+
+example {G : Type*} [AddCommGroup G] [Fintype G] [DecidableEq G] (a : G) :
+    ∑ ψ : AddChar G ℂ, ψ a = if a = 0 then (Fintype.card G : ℂ) else 0 :=
+  AddChar.sum_apply_eq_ite a
+
+example {G : Type*} [AddCommGroup G] [Fintype G] :
+    Fintype.card (AddChar G ℂ) = Fintype.card G := AddChar.card_eq
+
+example {G : Type*} [AddCommGroup G] [Fintype G] (ψ : AddChar G ℂ) (a : G) :
+    ‖ψ a‖ = 1 := ψ.norm_apply a
+
+example {ι : Type*} (s : Finset ι) (f : ι → ℂ) :
+    ‖∑ i ∈ s, f i‖ ≤ ∑ i ∈ s, ‖f i‖ := norm_sum_le s f
+
+#check Complex.mul_conj
+#check Complex.mul_conj'
+#check Complex.normSq_eq_norm_sq
+#check AddChar.inv_apply_eq_conj
+#check AddChar.map_neg_eq_inv
+#check Finset.sum_ite_eq'
+#check Finset.sum_boole
+#check Finset.addConvolution

@@ -1,0 +1,159 @@
+{
+  "schema": "qualification.raw-readback/v1",
+  "checks": "Raw JSON, prefix bytes/hash/newline count, stdout equality; no fixture rerun. Archivist authored harness; not independent scientific verification.",
+  "observations": [
+    {
+      "case": "normal_intermediate_and_final",
+      "reported_status": "passed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 2,
+      "declared_record_count": 2,
+      "tail_bytes": 0
+    },
+    {
+      "case": "interrupted_unacknowledged_tail",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 11
+    },
+    {
+      "case": "first_file_fsync_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": false
+    },
+    {
+      "case": "first_directory_fsync_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": false
+    },
+    {
+      "case": "append_fsync_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 39
+    },
+    {
+      "case": "append_write_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 0
+    },
+    {
+      "case": "append_short_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 3
+    },
+    {
+      "case": "append_flush_failure",
+      "reported_status": "failed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 39
+    },
+    {
+      "case": "checkpoint_replace_failure",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 39
+    },
+    {
+      "case": "acknowledged_prefix_corruption_rejected",
+      "reported_status": "passed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": false,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 0
+    },
+    {
+      "case": "normal_repeat_control",
+      "reported_status": "passed",
+      "storage": "inline-final-and-journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 2,
+      "declared_record_count": 2,
+      "tail_bytes": 0
+    },
+    {
+      "case": "before_first_append_interruption",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": false,
+      "pointer_present": false
+    },
+    {
+      "case": "durable_append_before_checkpoint",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 1,
+      "tail_bytes": 39
+    },
+    {
+      "case": "checkpoint_directory_fsync_failure",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 2,
+      "declared_record_count": 2,
+      "tail_bytes": 0
+    },
+    {
+      "case": "pointer_count_mismatch_rejected",
+      "reported_status": "failed",
+      "storage": "journal-prefix/v1",
+      "journal_present": true,
+      "pointer_present": true,
+      "prefix_sha_matches": true,
+      "prefix_record_count": 1,
+      "declared_record_count": 2,
+      "tail_bytes": 0
+    }
+  ]
+}

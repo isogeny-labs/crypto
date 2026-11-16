@@ -1,0 +1,7 @@
+# Original-weight row equivalence verification amendment
+
+Freeze after targeted63familygate9dabb35afe93 completes. Keep SCREEN.txt/EXIT unchanged. Clone main.rs asrow_verify.rs, identicalseeds/profiles/caps/constructors/ranks/counters. Extendfirst64functionspereachpartition(3694checks)with original-weightCantorreduction, independent ofprimitive-keptweights. Compare old/newresidualsplitstatus; ifsplit, compare exactINTEGRALmergedsignedvectorsincludingbranchcolumns. No droppedcolumns,normalizationorbest-samplefilter. Existingkept-residualcheckstays. AtendaddonlyROW_EQUIVALENCEfooteranddirectedfixtureline; all originaloutputlinesmustreplaybyte-identicallyafterfilteringnewlines. Separatebinaryhash/sourcecommit/checkpoint/gatebeforeonce-onlyexecution, hard180s watchdog.
+
+DirectedcommonbranchfactorfixtureoverF101: A=x^3+x^2+x+60; B=(x^2-1)(x^2-4)(x^2-9); f=A^2-B (degree5,squarefreeverifiedbyCurve::new), f(0)=0, f'(0)=19. Sixnonbranchinputs x=+/-1,+/-2,+/-3,y=A(x),multiplicity1,d2. Explicit paira=x*A,b=x satisfiesdegreeboundsandconditions,commongcdxatabranchpointexternaltotheinput. PrimitiveA,1hasnormB,residualconstant1. Verify groupinputsumzeroandrowequivalence. Gaussian/CRTprimitivepairmustagreewithA,1;requirecommondegree>=1forcanonicalGaussianpair(freeb1chosen1,b0free0). Thischecksnormverticalcancellationwithoutfalselyequatingoriginalandprimitive residuals in general.
+
+Thisis a correctness/equivalencereplay, not a new profile arm or timing comparison. No production-kernelreplacementor10xclaimuntilcostsarecomparedatcompleteboundary.

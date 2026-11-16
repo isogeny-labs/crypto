@@ -1,0 +1,36 @@
+{
+  "schema": "native-static-hash-collision-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "static-hash-collision",
+      "expected_decl_sha256": "be9c6e9f61b3fd7984f70666f38565d4b55df432cbeecdc75723d02c47859a1f",
+      "full_characters": 1421,
+      "full_decl_sha256": "be9c6e9f61b3fd7984f70666f38565d4b55df432cbeecdc75723d02c47859a1f",
+      "full_normalized_signature": "theorem static_hash_collision_certificate : (∀ (G I : Type*) [Fintype G] [Fintype I] [DecidableEq G] [DecidableEq I] (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1) (U : G → I → G) (x : G) (t : ℕ), (∑ h : Hash G I, (hashLaw q hq0 hq h).toReal * (if StaticSurvives U h x t then (1 : ℝ) else 0)) = (∑ w : Fin t → I, (hashLaw q hq0 hq w).toReal * (if SelfAvoiding U x w then (1 : ℝ) else 0))) ∧ (∀ (p : ℕ) [NeZero p] (I : Type*) [Fintype I] [DecidableEq I] (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1) (U : ZMod p → I → ZMod p) (x : ZMod p), (∀ t : ℕ, (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal * (if t < firstCollision p (staticStep U h) x then (1 : ℝ) else 0)) = iidSurvival q U x t) ∧ (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal * (firstCollision p (staticStep U h) x : ℝ)) = ∑ t : Fin p, iidSurvival q U x t.val) ∧ (Nat.Prime 3 ∧ Function.Injective controlIncrements ∧ (∀ i : Fin 2, controlIncrements i ≠ 0) ∧ (∀ i : Fin 2, 0 < controlWeights i) ∧ (∑ i : Fin 2, controlWeights i) = 1 ∧ expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = forbiddenWord then (1 : ℝ) else 0) = 0 ∧ weight controlWeights forbiddenWord = 1 / 8 ∧ ¬SelfAvoiding controlUpdate 0 forbiddenWord ∧ (¬∀ w : Fin 3 → Fin 2, expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) = weight controlWeights w))",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "static_hash_collision_certificate",
+        "end_byte": 1906,
+        "file": "/workspace/scratch/static-hash-input01/CollisionCertificate.lean",
+        "qualified_decl_id": "StaticHashCollisionAudit.static_hash_collision_certificate",
+        "signature": "theorem static_hash_collision_certificate :\n    (∀ (G I : Type*) [Fintype G] [Fintype I] [DecidableEq G] [DecidableEq I]\n      (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1)\n      (U : G → I → G) (x : G) (t : ℕ),\n      (∑ h : Hash G I, (hashLaw q hq0 hq h).toReal *\n        (if StaticSurvives U h x t then (1 : ℝ) else 0)) =\n      (∑ w : Fin t → I, (hashLaw q hq0 hq w).toReal *\n        (if SelfAvoiding U x w then (1 : ℝ) else 0))) ∧\n    (∀ (p : ℕ) [NeZero p] (I : Type*) [Fintype I] [DecidableEq I]\n      (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1)\n      (U : ZMod p → I → ZMod p) (x : ZMod p),\n      (∀ t : ℕ,\n        (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal *\n          (if t < firstCollision p (staticStep U h) x then (1 : ℝ) else 0)) =\n            iidSurvival q U x t) ∧\n      (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal *\n        (firstCollision p (staticStep U h) x : ℝ)) =\n          ∑ t : Fin p, iidSurvival q U x t.val) ∧\n    (Nat.Prime 3 ∧ Function.Injective controlIncrements ∧\n      (∀ i : Fin 2, controlIncrements i ≠ 0) ∧\n      (∀ i : Fin 2, 0 < controlWeights i) ∧ (∑ i : Fin 2, controlWeights i) = 1 ∧\n      expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) =>\n        if observations controlUpdate h 0 3 = forbiddenWord then (1 : ℝ) else 0) = 0 ∧\n      weight controlWeights forbiddenWord = 1 / 8 ∧\n      ¬SelfAvoiding controlUpdate 0 forbiddenWord ∧\n      (¬∀ w : Fin 3 → Fin 2,\n        expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) =>\n          if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) =\n            weight controlWeights w))",
+        "start_byte": 187
+      },
+      "recorded_statement": "theorem static_hash_collision_certificate : (∀ (G I : Type*) [Fintype G] [Fintype I] [DecidableEq G] [DecidableEq I] (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1) (U : G → I → G) (x : G) (t : ℕ), (∑ h : Hash G I, (hashLaw q hq0 hq h).toReal * (if StaticSurvives U h x t then (1 : ℝ) else 0)) = (∑ w : Fin t → I, (hashLaw q hq0 hq w).toReal * (if SelfAvoiding U x w then (1 : ℝ) else 0))) ∧ (∀ (p : ℕ) [NeZero p] (I : Type*) [Fintype I] [DecidableEq I] (q : I → ℝ) (hq0 : ∀ i, 0 ≤ q i) (hq : ∑ i, q i = 1) (U : ZMod p → I → ZMod p) (x : ZMod p), (∀ t : ℕ, (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal * (if t < firstCollision p (staticStep U h) x then (1 : ℝ) else 0)) = iidSurvival q U x t) ∧ (∑ h : Hash (ZMod p) I, (hashLaw q hq0 hq h).toReal * (firstCollision p (staticStep U h) x : ℝ)) = ∑ t : Fin p, iidSurvival q U x t.val) ∧ (Nat.Prime 3 ∧ Function.Injective controlIncrements ∧ (∀ i : Fin 2, controlIncrements i ≠ 0) ∧ (∀ i : Fin 2, 0 < controlWeights i) ∧ (∑ i : Fin 2, controlWeights i) = 1 ∧ expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = forbiddenWord then (1 : ℝ) else 0) = 0 ∧ weight controlWeights forbiddenWord = 1 / 8 ∧ ¬SelfAvoiding controlUpdate 0 forbiddenWord ∧ (¬∀ w : Fin 3 → Fin 2, expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) = weight controlWeights w))",
+      "recorded_text_sha256": "be9c6e9f61b3fd7984f70666f38565d4b55df432cbeecdc75723d02c47859a1f",
+      "source_plan": "research/static_hash_collision_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "StaticHashCollisionAudit.static_hash_collision_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source-processing check; entire actual survival/PMF/leastrepeat tails/finiteexpectation/primeZ3postcollision counter certificate. Not proved by mathematical certificate."
+}

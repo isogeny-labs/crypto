@@ -1,0 +1,53 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/T20Whole.lean:19:36: error: `grind` failed
+case grind
+M : Type
+inst : IntModule M
+x : M
+order : 12317 • x = 0
+h : -(2 • x) = 2 • x
+h_1 : ¬4 • x = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 12317 • x = 0
+    [prop] -(2 • x) = 2 • x
+    [prop] ¬4 • x = 0
+  [eqc] False propositions
+    [prop] 4 • x = 0
+  [eqc] Equivalence classes
+    [eqc] {-(2 • x), 2 • x}
+    [eqc] {0, 12317 • x}
+  [linarith] Linarith assignment for `M`
+    [assign] x := 0
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/T20Whole.lean:24:4: error: `grind` failed
+case grind
+M : Type
+inst : IntModule M
+x : M
+order : 12317 • x = 0
+h : -(2 • x) = 2 • x
+h4 : 4 • x = 0
+hm : 12316 • x = 0
+h_1 : ¬x = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 12317 • x = 0
+    [prop] -(2 • x) = 2 • x
+    [prop] 4 • x = 0
+    [prop] 12316 • x = 0
+    [prop] ¬x = 0
+  [eqc] False propositions
+    [prop] x = 0
+  [eqc] Equivalence classes
+    [eqc] {-(2 • x), 2 • x}
+    [eqc] {0, 4 • x, 12316 • x, 12317 • x}
+  [linarith] Linarith assignment for `M`
+    [assign] x := 0
+'T20Whole.rational_half_recovery' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T20Whole.wrong_transpose_only_identity' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'T20Whole.recovery_and_chain_constants' does not depend on any axioms
+'T20Whole.branch_permutation_cubes' does not depend on any axioms
+'T20Whole.actual_target_fixed_pairs' does not depend on any axioms
+'T20Whole.fixed_two_torsion_counts' does not depend on any axioms
+toolchain pin: leanprover/lean4:v4.35.0

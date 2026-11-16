@@ -1,0 +1,50 @@
+// source lines 195-200
+        self.count(|c| c.m += 1);
+        (a * b) % self.p
+    }
+    fn bs(&self, a: u64) -> u64 {
+        self.count(|c| c.s += 1);
+        (a * a) % self.p
+
+// source lines 307-332
+    pub fn inv(&self, a: u64) -> u64 {
+        assert_ne!(a, 0);
+        if let Some(t) = &self.tables {
+            return t.0[((self.size() - 1 - t.1[a as usize]) % (self.size() - 1)) as usize];
+        }
+        if self.p == 2 {
+            self.count(|c| c.i += 1);
+            let mut x = a;
+            let mut e = self.size() - 2;
+            let mut r = 1;
+            while e > 0 {
+                if e & 1 != 0 {
+                    r = binary_mul(r, x, self.modulus, self.n);
+                }
+                e >>= 1;
+                if e > 0 {
+                    x = binary_mul(x, x, self.modulus, self.n);
+                }
+            }
+            return r;
+        }
+        if self.n == 1 {
+            return self.bi(a);
+        }
+        if self.n == 2 {
+            let (x, y) = (a % self.p, a / self.p);
+
+// source lines 588-600
+pub fn modpow(mut a: u64, mut e: u64, p: u64) -> u64 {
+    let mut r = 1;
+    while e != 0 {
+        if e & 1 != 0 {
+            r = (r as u128 * a as u128 % p as u128) as u64;
+        }
+        e >>= 1;
+        if e != 0 {
+            a = (a as u128 * a as u128 % p as u128) as u64;
+        }
+    }
+    r
+}

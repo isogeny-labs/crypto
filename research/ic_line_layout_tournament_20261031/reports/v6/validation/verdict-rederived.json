@@ -1,0 +1,153 @@
+{
+ "combined_verdict": "invalid_measurement",
+ "host_epoch": {
+  "h1_node": "ip-10-84-67-216.us-east-2.compute.internal",
+  "h1_same_node_s1_s2": true,
+  "h2_condition_holds": true,
+  "h2_node": "ip-10-84-75-83.us-east-2.compute.internal"
+ },
+ "producer_crosscheck": {
+  "s1": {
+   "gate_disagreements": [],
+   "gates_agree": true,
+   "producer_gates": {
+    "aa_inside_0_9_1_1": false,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "producer_verdict": "invalid_measurement",
+   "verdict_agrees": true
+  },
+  "s2": {
+   "gate_disagreements": [],
+   "gates_agree": true,
+   "producer_gates": {
+    "aa_inside_0_9_1_1": true,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "producer_verdict": "inconclusive",
+   "verdict_agrees": true
+  },
+  "s3": {
+   "gate_disagreements": [],
+   "gates_agree": true,
+   "producer_gates": {
+    "aa_inside_0_9_1_1": true,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "producer_verdict": "inconclusive",
+   "verdict_agrees": true
+  }
+ },
+ "producer_overall_fields": {
+  "note": "neither overall field is the verdict (amendment 2.4)",
+  "run_i": "invalid_measurement",
+  "run_ii": "invalid_measurement"
+ },
+ "s1_determinism": {
+  "byte_equal": true,
+  "run_i": "{\"gates\":{\"aa_inside_0_9_1_1\":false,\"admission\":true,\"counted_parity_ops\":true,\"counted_parity_records\":true,\"outside_noise\":true,\"positive_control_detected\":true,\"replay_and_audit\":true,\"total_and_corrected_ci_below_1\":false},\"verdict\":\"invalid_measurement\",\"verify_exit\":0}",
+  "run_ii": "{\"gates\":{\"aa_inside_0_9_1_1\":false,\"admission\":true,\"counted_parity_ops\":true,\"counted_parity_records\":true,\"outside_noise\":true,\"positive_control_detected\":true,\"replay_and_audit\":true,\"total_and_corrected_ci_below_1\":false},\"verdict\":\"invalid_measurement\",\"verify_exit\":0}"
+ },
+ "schema": "validator.verdict/v1",
+ "sessions": {
+  "s1": {
+   "gates": {
+    "_outside_noise_readings": {
+     "candidate_ci_disjoint_from_aa_ci": true,
+     "corrected_ci_excludes_1": true
+    },
+    "aa_inside_0_9_1_1": false,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "job_exit": {
+    "exit_code": 0,
+    "job_name": "ic-line-v6-s1-20261106",
+    "node_name": "ip-10-84-67-216.us-east-2.compute.internal",
+    "pod_uid": "c4934aa4-5562-44e2-8789-4a6a26a43e4e"
+   },
+   "verdict": "invalid_measurement",
+   "verdict_under_each_outside_noise_reading": {
+    "candidate_ci_disjoint_from_aa_ci": "invalid_measurement",
+    "corrected_ci_excludes_1": "invalid_measurement"
+   }
+  },
+  "s2": {
+   "gates": {
+    "_outside_noise_readings": {
+     "candidate_ci_disjoint_from_aa_ci": true,
+     "corrected_ci_excludes_1": true
+    },
+    "aa_inside_0_9_1_1": true,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "job_exit": {
+    "exit_code": 0,
+    "job_name": "ic-line-v6-s2-20261106",
+    "node_name": "ip-10-84-67-216.us-east-2.compute.internal",
+    "pod_uid": "9c36a122-d184-4105-9e42-94df3241d815"
+   },
+   "verdict": "inconclusive",
+   "verdict_under_each_outside_noise_reading": {
+    "candidate_ci_disjoint_from_aa_ci": "inconclusive",
+    "corrected_ci_excludes_1": "inconclusive"
+   }
+  },
+  "s3": {
+   "gates": {
+    "_outside_noise_readings": {
+     "candidate_ci_disjoint_from_aa_ci": true,
+     "corrected_ci_excludes_1": true
+    },
+    "aa_inside_0_9_1_1": true,
+    "admission": true,
+    "counted_parity_ops": true,
+    "counted_parity_records": true,
+    "outside_noise": true,
+    "positive_control_detected": true,
+    "replay_and_audit": true,
+    "total_and_corrected_ci_below_1": false
+   },
+   "job_exit": {
+    "exit_code": 0,
+    "job_name": "ic-line-v6-s3-20261106",
+    "node_name": "ip-10-84-75-83.us-east-2.compute.internal",
+    "pod_uid": "1e4e7241-8955-46ad-9b09-242962804cf2"
+   },
+   "verdict": "inconclusive",
+   "verdict_under_each_outside_noise_reading": {
+    "candidate_ci_disjoint_from_aa_ci": "inconclusive",
+    "corrected_ci_excludes_1": "inconclusive"
+   }
+  }
+ }
+}

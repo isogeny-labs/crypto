@@ -1,0 +1,45 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{pdftitle={Jet completion: finite control and proposed next search},pdfauthor={Research follow-up for PR 2969}}
+\title{Jet completion: finite control and proposed next search}
+\author{Research follow-up for PR 2969}
+\date{2026-11-01}
+\begin{document}
+\maketitle
+\section*{Evidence scope}
+The existing native exact-rational control at $L=4,8,16,32$ checks the original cardinal-polynomial kernel against its ordinary first-jet flattening control. Its recorded first-coefficient valuations differ by two at each size, while both normalized residue ranks stay 2. The four rows contain 5,440 nodal value/first-derivative checks in total. These are finite exact observations, not a runtime comparison or a uniform theorem.
+\section*{Recorded finite observations}
+\begin{center}
+\begin{tabular}{rrrrr}\toprule
+$L$ & Nodal checks & Original $v_2$ & Flattened $v_2$ & Both residue ranks\\\midrule
+4 & 64 & 3 & 5 & 2\\
+8 & 256 & 4 & 6 & 2\\
+16 & 1,024 & 5 & 7 & 2\\
+32 & 4,096 & 6 & 8 & 2\\\bottomrule
+\end{tabular}
+\end{center}
+The values are copied from \texttt{native/expected.txt} and match \texttt{native/replay.log}. The prospective protocol identifies the coefficients: the original is linear in the scaled chart and the flattened control is quadratic. Flattening roughly doubles polynomial degree and adds two valuation bits in these cases; the data do not establish that this trade is beneficial after degree and precision are priced.
+\begin{center}
+\includegraphics[width=0.96\linewidth]{valuation.pdf}
+\end{center}
+\noindent\textbf{Figure 1.} Exact recorded $v_2$ by $L$ from the native control. Each point is one size, not a timing sample. Normalized residue rank is 2 for both series at every size. The source SVG is \texttt{valuation.svg}.
+\section*{Proposals, separately}
+The study proposes (1) replacing the scalar origin channel with a nonscalar matrix $R(T)$ whose off-node values vanish and whose crossing jets have low weighted rank, and (2) allowing free jets through $W_{new}(T)=W_{base}(T)+C(T)H(T)$. Neither construction has a supplied integral factorization certificate or a measured cost here. The finite flattening control is not evidence that either proposal works.
+
+The next discriminating step is a bounded search that returns the candidate polynomial and entry-by-entry integral $U,V$ witnesses at every retained node and stipulated precision. Its candidate domain is $\deg H\leq 2L-1$; initial sizes are $L=4,8$, precisions $8,12,16$, and controls are $H=0$, the recorded flattening construction, and rejection of an invalid even-denominator inverse. Before searching, freeze rational coefficient and denominator budgets and price polynomial degree and precision. A successful small case would still need a uniform construction and a complete recursive proof.
+
+The linked backlog card \texttt{XP-20261101-rank-directed-jet-completion} is draft, unfunded, and not scheduled. The runner, frozen protocol, resource estimate, and authorization to execute do not exist yet.
+\section*{Sources and limits}
+\begin{itemize}
+\item Study README: proposals, control interpretation, formal scope, and deferred search inputs.
+\item \texttt{native/PROTOCOL.txt}: four-size exact-rational control protocol; no timing run.
+\item \texttt{native/expected.txt} and \texttt{native/replay.log}: recorded values and replay.
+\item \texttt{lean/PROOF\_MAP.md}: formalized own-node value and first-derivative identities and their limits.
+\end{itemize}
+No new experiment, Lean build, ECDLP instance, or solver execution was performed for this report.
+\end{document}

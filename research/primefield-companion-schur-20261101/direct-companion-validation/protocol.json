@@ -1,0 +1,375 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "DIRECT-COMPANION-VALIDATION-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "other",
+  "study_dir": "direct-companion-validation",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "source": "check.py"
+  },
+  "question": "Does the direct prime-field companion generator satisfy the complete boundary/companion and primal/dual transport identities with exact constructor accounting?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "All162cases,27contexts,66normalizedwitnesses,1038corruptions,324invalidgamma rejections andexactAA pass.",
+      "class": "exact_computation",
+      "decided_by": [
+        "correctness"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Public companion generator; AA uses tuple weights instead of list",
+      "instrument": {
+        "repo": "primefield-ecdlp-research",
+        "commit": "bbf1e3c29de11aee1562e820c3b3b8ca941a1126",
+        "build": null,
+        "binary_sha256": "efd8688d7a788a7852c1c77b6e920dceab0bf90fab3738451b813957e5b9a525",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "exact prime field",
+          "timing": "none"
+        }
+      },
+      "parameters": {
+        "contract": "CONTRACT.md"
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Public companion generator; AA uses tuple weights instead of list",
+      "instrument": {
+        "repo": "primefield-ecdlp-research",
+        "commit": "bbf1e3c29de11aee1562e820c3b3b8ca941a1126",
+        "build": null,
+        "binary_sha256": "efd8688d7a788a7852c1c77b6e920dceab0bf90fab3738451b813957e5b9a525",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "exact prime field",
+          "timing": "none"
+        }
+      },
+      "parameters": {
+        "contract": "CONTRACT.md"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa-check",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "not_applicable_reason": "Embedded66normalized public null witnesses, plus complete constructive primal transports.",
+      "arm": null,
+      "expected_detection": null
+    },
+    "negative": {
+      "present": false,
+      "not_applicable_reason": "Embedded1038generator/wrap/scaling/RHS/count/normalized-witness mutations and324invalidgamma rejections.",
+      "arm": null,
+      "null_population": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "A/A changes weight container list to tuple; all math, seeds and traversal identical."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "Source and imported files locked; one Python runtime; exact counted arithmetic"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record platform and CPU count; no clock claims"
+      },
+      {
+        "name": "memory_environment",
+        "treatment": "fixed",
+        "how": "Single-threaded Python; no performance inference from allocation or shared host"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "No blinding; fixed acceptance checks, all fixtures retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "correctness",
+        "arms": [
+          "candidate"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All entrywise identities, transport, old-boundary equality, count formulas, controls and AA pass."
+      },
+      {
+        "id": "aa-check",
+        "arms": [
+          "candidate",
+          "aa"
+        ],
+        "differs_in": [
+          "order"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20961701,
+        20961702,
+        20961703,
+        21562301,
+        21562302,
+        21562303,
+        22162601,
+        22162602,
+        22162603,
+        24562601,
+        24562602,
+        24562603,
+        27562601,
+        27562602,
+        27562603,
+        55162601,
+        55162602,
+        55162603,
+        56162401,
+        56162402,
+        56162403,
+        56162501,
+        56162502,
+        56162503,
+        56162601,
+        56162602,
+        56162603,
+        68162601,
+        68162602,
+        68162603,
+        68162701,
+        68162702,
+        68162703,
+        68162801,
+        68162802,
+        68162803,
+        88562701,
+        88562702,
+        88562703,
+        88562801,
+        88562802,
+        88562803,
+        88562901,
+        88562902,
+        88562903,
+        20961201,
+        20961202,
+        20961203,
+        21561201,
+        21561202,
+        21561203,
+        22161201,
+        22161202,
+        22161203,
+        24561201,
+        24561202,
+        24561203,
+        27561201,
+        27561202,
+        27561203,
+        55161201,
+        55161202,
+        55161203,
+        56161201,
+        56161202,
+        56161203,
+        68161201,
+        68161202,
+        68161203,
+        88561201,
+        88561202,
+        88561203,
+        20961401,
+        20961402,
+        20961403,
+        21561501,
+        21561502,
+        21561503,
+        22161501,
+        22161502,
+        22161503
+      ],
+      "note": "Weight seeds listed in context-major/gamma-index order. Gamma choices2,r-1,and Random(20261101+100r+q).randrange(2,r), duplicates retained."
+    },
+    "instance_sampling": {
+      "rule": "All27declared contexts with3gammachoices inbotharms.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unblinded exact source checks; target scalar labels belong to checker only, never passed to source."
+    },
+    "arm_order_reason": "Exact deterministic candidate then tuple-weight AA; no clock comparison."
+  },
+  "sample_size": {
+    "instances": 81,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact fixed compiler checks; no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "No affected execution before freeze; deterministic counts only; shared-host estimate, not a measurement"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "checked_cases",
+        "name": "Exact component cases",
+        "unit": "cases",
+        "kind": "counted",
+        "definition": "One source-arm/preconditioner dual certificate context independently checked; no performance metric",
+        "source": "runs/export.json runs.measurements.counted.checked_cases",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "checked_cases",
+      "feature_exclusion",
+      "feature_rank",
+      "mutations_rejected"
+    ],
+    "record": [
+      "All dual vectors, feature projections, target pairings, rank and source identities"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All162records or900secondcap; no restart.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "All162cases,66normalizedwitnesses,1038mutations,324invalidgamma rejections andexactAA; no partial panel decides completion.",
+    "comparison_ids": [
+      "correctness"
+    ],
+    "statistic": "Exact matrix identities and schedule equality",
+    "interval": "None: exact fixed panel",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Separate arithmetic vectors; no mixed score",
+    "verdict_vocabulary": [
+      "verified",
+      "exhausted",
+      "incomplete",
+      "out_of_scope"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.py",
+      "sha256": "cdeb92edb2874be73eeb4b0fdf06ba41adb3ad70da8882bae888a6e7dc7ce3af"
+    },
+    "inputs": [
+      "runs/cases.jsonl",
+      "runs/summary.json",
+      "runs/host.json"
+    ],
+    "outputs": [
+      "runs/export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No excluded ECDLP techniques or extension-field source substitution.",
+    "No target scalar labels in production compiler or source; no saved decoder.",
+    "No wall-clock/asymptotic claim from counts.",
+    "Do not drop unsuccessful feature spans or failed recovery."
+  ],
+  "literature": [
+    {
+      "ref": "../direct-cyclic-companion/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Derived direct companion identity and transport; constructor not yet numerically validated.",
+      "verified_by": "Codex"
+    },
+    {
+      "ref": "https://cs.uwaterloo.ca/~eschost/publications/BoJeMoSc17.pdf",
+      "provenance": "retrieved",
+      "claim": "Companion displacement setting; no structured solver or randomized success bound is evaluated here.",
+      "verified_by": "Codex"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a60f8d67c16a3aa439b226797824f3f87dd9e3717dd1aa21638a7489e038d1e7",
+    "commit": "bbf1e3c29de11aee1562e820c3b3b8ca941a1126",
+    "frozen_at": "2026-11-01T19:45:50Z",
+    "filed_before_affected_data": true
+  }
+}

@@ -1,0 +1,13 @@
+card_id: CARD-isogeny-ic-yield-p3-b-badapt-20261102-1
+relay_verbatim: not_checked   # detached queue launch (LAUNCH_NOTE.md); no executor report file was supplied, check-relay needs one
+outcome: stopped
+stopped_at_step: measure
+recommendation: respecify
+reasons:
+  - "Receipt cards/CARD-isogeny-ic-yield-p3-b-badapt-20261102-1.receipt.json (sha256 ca74b8e298f7a2413c58188c7783f5f22b56e0cd4ddcdfa4a253143e9d89444e): status 'stopped at command 1', commands_total 1, attempts 1, exit_code null, timed_out true, seconds 1872.104 against timeout_seconds 1872. Only the card's argv ran; stdout and stderr are empty (sha256 e3b0c442...)."
+  - "The stop is a card fault, not a data or host fault: the A1 timeout (4 x 468 = 1872) was derived from the section 7 estimate, which sums the timed fields and omits the untimed solution count (harness/src/main.rs lines 452-475). Partial rows: timed 226.5 s of 1872.1 s wall. Derivation and re-sized timeouts: TIMEOUT_NOTE.md."
+  - "Partial output moved aside so must_not_exist passes: p3_ecc2k130/full/_failed/CARD-isogeny-ic-yield-p3-b-badapt-20261102-1-attempt1/p3b_badapt.jsonl, 1713 lines, 832845 bytes, sha256 eaf22cc4a5202ea5e1fc6b3078b5a6909d943a12f44f93ed73feb31d32a16ebc equal to the receipt's output digest. No p3b_badapt.jsonl remains in full/. The partial is incomplete (k=6 attempt 0: 129 of 264 rows, attempt 1 absent) and is not pooled, analysed or cited."
+  - "Card unchanged: python3 tools/task_card.py lint prints CARD OK after the move (card sha256 eac35c24244e8ffd5cc71153801bfc542a91d4c22dc65752f0c9fd7b2ea0564d, same as the receipt's card_sha256 and as the main checkout copy). No p3h badapt process is running."
+  - "Write scope: git status --porcelain in /home/user/crypto-p3run shows only untracked files under research/isogeny_class_ic_yield_20261102/ plus the tracked .resume/RESUME.md, which a session hook changed and the card did not write."
+  - "Rerun route: CARD-isogeny-ic-yield-p3-b-badapt-20261102-2, same argv, env and binary, only timeout_seconds changed (1872 to 21280); position A9, followed by A10 b-bsparse -2 and A11 b-main-k5-s1 -1."
+interpretation: not_assessed

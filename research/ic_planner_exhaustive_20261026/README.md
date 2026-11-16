@@ -312,3 +312,25 @@ Engineering and measurement, as the protocol said.
     `scripts/lean_certificates.sh`
     (`cargo run --release --example ic_planner_exhaustive_lean_certs`);
   - the figures, laid out by `scripts/plots.py`.
+
+## Note, 2026-11-01: byte counters are no longer priced as operations
+
+This README and its `analysis/band-*` files are frozen as measured. The band
+priced `residual_table_bytes_uncharged`, a byte count, at `w` GAE per byte:
+83-99% of the `res*` arms' S at w = 1. The owner decided (option B, 2026-11-01)
+that the band prices operations only (`band.rs` `NON_OPERATION_COUNTERS`); the
+counter stays listed. [`analysis/exbytes/`](analysis/exbytes/) holds the bands
+and the 136 weighted comparisons re-run under that rule (same arms, weights and
+bootstrap seeds; `sessions/` untouched). What changes:
+
+- The w = 1 distances to `rho.negation` in the 36-bit table above are the byte
+  price: res2 / rho is 2.6x at p36 and 2.7x at p37 (not 23.3x and 24.3x), res4 is
+  3.2x and 3.6x (not 41.9x and 47.3x). They are flat in w.
+- Of the 136 weighted comparisons, 36 go from "unresolved inside the band" to
+  resolved (residual arm cheaper at every weight), 12 stay unresolved, and 88
+  were resolved and keep their direction. Rows that name no byte counter (`plan`,
+  `rho`, the `B-*` sessions) are identical. The `K-*` `pipeline` arms name the
+  small `factor_base_vec_bytes_floor_uncharged` counter and move by at most 12%
+  at w = 1; no `K-*` verdict changes direction.
+- The leaderboard row (2.59x) is the w = 0 value and is unchanged.
+Audit and rationale: [`research/ic_byte_counter_pricing_20261101`](../ic_byte_counter_pricing_20261101/README.md).

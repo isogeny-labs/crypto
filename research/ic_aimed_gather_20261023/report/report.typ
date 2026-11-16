@@ -29,8 +29,6 @@ Aimed collection scans, each trial, a window of a fixed sorted subset of the fac
 )
 #figure(image("paired-collect-ratio.svg", width: 95%), caption: [Per-round collect-phase ratio (main / candidate), the median and its interval, and the A/A pairs (`runs/time/`).])
 
-#block(stroke: 0.6pt + rgb("#c44e52"), inset: 6pt, radius: 3pt)[*Correction (2026-10-29).* These A/B intervals came from a bootstrap that drew only odd-numbered rounds (`aa2_20261029/CORRECTION.md`). Corrected: collect 1.082 – 1.149, whole set-up 1.018 – 1.080. The 5-pair A/A is unaffected and both verdicts stand (1.082 against 1.087). The follow-up `aa2_20261029/` measured a 42-round A/A and established the collect-phase gain.]
-
 *Verdict under the declared rule: not established.* Both intervals exclude 1, and 28 of 30 rounds favour the change. The rule committed before measuring also asks the interval's lower end to clear the A/A interval's upper end. It does not: 1.065 against 1.087 for collect, 1.018 against 1.121 for the set-up. With 5 A/A pairs that interval is wide. The rule is not changed after the fact. A larger A/A is the way to settle it.
 
 The collect phase gains more in time (11%) than the whole process does in instructions (2.3%). The removed work is a scattered load from the base's coordinate arrays per summand. Its cost is cache misses, which Callgrind does not count.

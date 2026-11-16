@@ -1,0 +1,388 @@
+{
+  "card_id": "CARD-p2-lift-linear-complexity-20261110-F2-RUN-01",
+  "card_path": "research/p2_lift_linear_complexity_20261110/cards/F2-RUN-01.json",
+  "card_sha256": "b6aae73cce57e8ec91ae6d1c0248569dad32eb8919bc7db12e8108a6a735a213",
+  "commands": [
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/p2_lift_linear_complexity_20261110",
+      "exit_code": 0,
+      "id": "verify-freeze",
+      "index": 1,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec",
+      "stdout_tail": [
+        "PROTOCOL.md: OK",
+        "tool/src/main.rs: OK",
+        "tool/Cargo.toml: OK",
+        "tool/Cargo.lock: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 2,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout": "b8ac0bdfc2d7b5e9968784ee6adb3b985e3edb5bd949d11c0f342af3894c1cc1"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b8ac0bdfc2d7b5e9968784ee6adb3b985e3edb5bd949d11c0f342af3894c1cc1",
+      "stdout_tail": [
+        "6930d073e258b4e62ed0b06e7e9993eae1facf77"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.059,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rustc-version",
+      "index": 3,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+      },
+      "seconds": 0.059,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "stdout_tail": [
+        "rustc 1.97.0 (2d8144b78 2026-07-07)",
+        "binary: rustc",
+        "commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3",
+        "commit-date: 2026-07-07",
+        "host: x86_64-unknown-linux-gnu",
+        "release: 1.97.0",
+        "LLVM version: 22.1.6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.04,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cargo-version",
+      "index": 4,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52"
+      },
+      "seconds": 0.04,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52",
+      "stdout_tail": [
+        "cargo 1.97.0 (c980f4866 2026-06-30)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "nproc"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.001,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "nproc",
+      "index": 5,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+      },
+      "seconds": 0.001,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "stdout_tail": [
+        "4"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "uname",
+      "index": 6,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676",
+      "stdout_tail": [
+        "Linux vm 6.18.44-fc-v338 #1 SMP @0 x86_64 x86_64 x86_64 GNU/Linux"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cpu-model",
+      "index": 7,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Not affected",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Not affected",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Not affected",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Not affected",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.065,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "build",
+      "index": 8,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "pid_file": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.pid.json",
+      "seconds": 0.065,
+      "stderr_sha256": "6bfa9e18ffdef821c711a542cfebd7db0982665615563e5a191285e489609c6f",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.01s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.818,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "test",
+      "index": 9,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout": "05dbcbd5a5c5ab176230095f840f8c5c11cf65f77b23180cb4b69ca9463b16d8"
+      },
+      "pid_file": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.pid.json",
+      "seconds": 0.818,
+      "stderr_sha256": "d2e8cc648b86f9daf7235b0a7dcd8c8b9c3cf73d89cee5102d2739dde00d6495",
+      "stderr_tail": [
+        "   Compiling p2_lift_linear_complexity v0.1.0 (/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool)",
+        "    Finished `release` profile [optimized] target(s) in 0.72s",
+        "     Running unittests src/main.rs (research/p2_lift_linear_complexity_20261110/tool/target/release/deps/p2_lift_linear_complexity-ecc457ada7c56f08)"
+      ],
+      "stdout_sha256": "05dbcbd5a5c5ab176230095f840f8c5c11cf65f77b23180cb4b69ca9463b16d8",
+      "stdout_tail": [
+        "",
+        "running 7 tests",
+        "test tests::bm_known_lfsr ... ok",
+        "test tests::hensel_lift_on_lifted_curve ... ok",
+        "test tests::sha256_known ... ok",
+        "test tests::trace_sequence_has_linear_complexity_two ... ok",
+        "test tests::tau0_matches_h110_reference ... ok",
+        "test tests::aa_invariance_e101 ... ok",
+        "test tests::bm_fast_matches_naive ... ok",
+        "",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 10,
+      "outputs": {
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout": "ec353d6b9d0b96cfe8b2b1aeb95792a36b84525ca03699903e8c217134a4736f"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ec353d6b9d0b96cfe8b2b1aeb95792a36b84525ca03699903e8c217134a4736f",
+      "stdout_tail": [
+        "172f1f4dc2db4e0a0d263ad0de4f4439d6d750fa2dce08e0dfe82ebad2ea19d2  /home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity",
+        "--protocol",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/PROTOCOL.md",
+        "--null",
+        "200",
+        "--out",
+        "research/p2_lift_linear_complexity_20261110/results/run.json"
+      ],
+      "cwd": ".",
+      "id": "run-full",
+      "index": 11,
+      "pid": 4981,
+      "pid_file": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.pid.json",
+      "started_at": "2026-11-10T18:05:27Z",
+      "status": "detached",
+      "stderr": "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+      "stdout": "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt"
+    }
+  ],
+  "commands_total": 13,
+  "commit": "6930d073e258b4e62ed0b06e7e9993eae1facf77",
+  "detached": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.pid.json",
+  "dirty_before": [
+    "research/p2_lift_linear_complexity_20261110/cards/F2-RUN-01.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "detached"
+}

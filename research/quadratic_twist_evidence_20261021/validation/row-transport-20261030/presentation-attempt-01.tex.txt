@@ -1,0 +1,82 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref,microtype}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+{\LARGE Actual twist relation yield and main-source recovery}\par
+2026-10-30\quad PR2381\quad 20 named theorems /24 audited declarations
+
+\textbf{Actual objects.} Curve field $\mathbf F_{13}$:
+$E:y^2=x^3+x+4$, $T:y^2=x^3+4x+6$,the actual monic $d=2$ twist.
+$P=(0,2)\mapsto U=(8,11)$,order7. The prior checked coordinate maps are
+$\Phi$ and $I=[4]D$; $I\Phi Q=Q$ on $E[7]$. These are Mathlib nonsingular
+points and coordinate functions,not target-log lookup tables.
+
+\textbf{Complete matched relation theorem.} For any finite integer coefficient
+universe $V$,bases $B_i\in E[7]$ and unknown $Q\in E[7]$,
+\[
+ \sum_i v_i\Phi(B_i)=\Phi(Q)\quad\Longleftrightarrow\quad\sum_i v_iB_i=Q.
+\]
+Complete matched row sets/cardinalities coincide. Reduce coefficients modulo7:
+the relation-field $\mathbf F_7$ spans and incremental ranks
+$\dim(L+\langle R\rangle)-\dim L$ agree for every coefficient state$L$.
+A supplied adaptive query rule must stay in$E[7]$;complete matched collection
+steps,their finite iterates and rank progress are then equal.
+
+\begin{center}\includegraphics[width=0.78\linewidth,height=3.1in,keepaspectratio]{bridge.pdf}\end{center}
+
+\textbf{Domain control.} Global injectivity is false:actual $K=(10,0)\ne0$,
+$\Phi K=0$,and$7K\ne0$,all kernel checked. The seven-torsion hypotheses are
+material. Aggregate inverse recovery does not assert individual summands vanish.
+
+\newpage
+{\LARGE From an admitted relation to the original scalar}\par
+For explicit \emph{public setup logs} $A_i=\ell_iU$ and an accepted actual relation
+\[
+ \sum_i v_iA_i=\Phi(Q)+sU,\qquad Q\in E[7],
+\]
+Lean proves for signed integers
+\[
+ Q=\Bigl(\sum_i v_i\ell_i-s\Bigr)P
+  =\Bigl(\bigl(\sum_i v_i\ell_i-s\bigr)\bmod7\Bigr)P.
+\]
+Unknown$Q$ is an actual arbitrary source point in the stated domain.
+Setup logs must be legitimately derived;no target scalar is supplied to a solver.
+This gives an actual main-DLP bridge for admitted relations,not a measurement
+of relation finding or free setup/linear algebra.
+
+\textbf{Degree qualification is a separate obligation.} The new module allows
+abstract numerical profiles$d_E(v),d_T(v)$ and caps. An explicit compression
+hypothesis ensures source-admitted rows meet the target cap;only then is source
+qualified span contained in target qualified span. No claim identifies those
+profiles with the native solver,degree of regularity or runtime. Complete row
+equality alone supplies no admitted-subset or cost equality. A higher qualified
+yield/lower relevant degree still needs actual solver evidence and full references.
+
+\textbf{What was run.} The unmodified scoped repository gate passes24declarations,
+20named plus4generated,zero failing/extra trusted/native axioms. Only
+\texttt{propext,Classical.choice,Quot.sound}. Lean4.34.1/Mathlibd13f23b7.
+Six builds:three failed,three successful progressive stages. Failed sources/logs
+remain;same statements corrected for action/coercion and variable-scalar sum
+lemmas. Explicit finite-set induction closes the final signed recovery proof.
+Historical imported receipts are not a fresh global audit. All18old polynomial
+certificates remain unchanged;no field IDC is substituted for group proofs.
+
+\textbf{What has not run.} The separate all16F13arm bounded-solver study
+(original/reduced,caps0--8,all6targets,blocked setups,strongest-source/matched/
+direct-enumeration controls) is \emph{unimplemented and unexecuted}.
+It is a validated draft card,not a ready/funded/Cairn task. No new native census,
+scalar recoveries,degree/yield/speed measurement or external checker is claimed.
+This proof does not close generic PairRank independence,native iid stopping-time
+semantics,absorption/integrability,broader geometry or calibrated complete work.
+
+\textbf{Open gates.} Latest root5140-case suite remains incomplete600s/124;
+1921study registrations,naming,required exact-head CI/review/integration and
+Conductor127/no lease remain held. No registry/catalog/benchmark/leaderboard or
+old frozen record changed. Keep PR open/non-draft and auto-mergeoff. Proof caps
+600sec,iteration03:08--04:08UTC,two localworkers,no paidcompute/broaderassetupload.
+
+\small Source and raw restoration links are in the adjacent README. Literature:
+prior CM8/dual,PhaseRecovery and conditional RelationCost modules;lead-atlas
+isogeny-transported/decomposition/degree leads. No invention or universal
+no-advantage,hardness,GHS,practical-speedup or invalid-curve claim.
+\end{document}

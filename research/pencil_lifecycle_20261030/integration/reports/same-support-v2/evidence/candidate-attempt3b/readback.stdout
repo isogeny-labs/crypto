@@ -1,0 +1,8 @@
+@SameSupportCandidate.validity_coefficients : ∀ {K : Type u_1} [inst : Field K] (f : Polynomial K)
+  (q r s1 t1 s2 t2 : K),
+  Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s1 * Polynomial.X + Polynomial.C t1) ^ 2 →
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+        f - (Polynomial.C s2 * Polynomial.X + Polynomial.C t2) ^ 2 →
+      s1 = s2 → (t2 - t1) * (s1 + s2) = 0 ∧ (t2 - t1) * (t2 + t1) = 0
+'SameSupportCandidate.validity_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
