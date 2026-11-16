@@ -2622,6 +2622,11 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
 // and adjust collision labels when two points have equal x but opposite y.
 fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     step_cap:u64,watchdog_limit:usize,fold:bool)->Result<serde_json::Value,String>{
+    neg_rho_cold_policy_jumps(q,seed,lanes,dp_bits,step_cap,watchdog_limit,fold,16)
+}
+fn neg_rho_cold_policy_jumps(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
+    step_cap:u64,watchdog_limit:usize,fold:bool,jump_count:usize)->Result<serde_json::Value,String>{
+    if !matches!(jump_count,16|32|64){return Err("rho jump width: expected 16, 32, 64".into());}
     if lanes==0 || lanes>128 || dp_bits==0 || dp_bits>=20 ||
         step_cap<(lanes as u64){
         return Err("negation rho comparator admission".into());
@@ -2631,11 +2636,10 @@ fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     check_curve(PRIME31,&mut arithmetic)?;
     if !arithmetic.on_curve(PRIME31,Some(q)) ||
         q==PRIME31.g{return Err("invalid rho public Q".into());}
-    const JUMPS:usize=16;
     let gq=arithmetic.add(PRIME31,Some(PRIME31.g),Some(q));
     let mut rng=seed^0x4e45_475f_5248_4f31;
-    let mut jump_projective=Vec::with_capacity(JUMPS);
-    while jump_projective.len()<JUMPS{
+    let mut jump_projective=Vec::with_capacity(jump_count);
+    while jump_projective.len()<jump_count{
         let a=prng(&mut rng)%N;
         let b=prng(&mut rng)%N;
         if a==0 && b==0{continue;}
@@ -2669,7 +2673,7 @@ fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     while steps+(lanes as u64)<=step_cap{
         let mut next_block=Vec::with_capacity(lanes);
         for lane in &states{
-            let idx=(neg_rho_hash(lane.point.pt.0) as usize)&(JUMPS-1);
+            let idx=(neg_rho_hash(lane.point.pt.0) as usize)&(jump_count-1);
             let j=jumps[idx];
             let mut new_point=jac_mixed(jac_affine(lane.point.pt),j.pt);
             let mut a=addn(lane.point.a,j.a);
@@ -2736,7 +2740,7 @@ fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                             "fold_negation":fold,"automorphism_classes":if fold{2}else{1},
                             "standing":"[pcc:unverified]","p":P,"n":N,
                             "public_Q":q,"seed":format!("{seed:016x}"),
-                            "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
+                            "lanes":lanes,"dp_bits":dp_bits,"jump_count":jump_count,
                             "step_cap":step_cap,"walk_steps":steps,
                             "short_cycles":short_cycles,"watchdog_restarts":watchdog_restarts,
                             "watchdog_limit":watchdog_limit,
@@ -2768,7 +2772,7 @@ fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                             "fold_negation":fold,"automorphism_classes":if fold{2}else{1},
         "standing":"[pcc:unverified]","p":P,"n":N,
         "public_Q":q,"seed":format!("{seed:016x}"),
-        "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
+        "lanes":lanes,"dp_bits":dp_bits,"jump_count":jump_count,
         "step_cap":step_cap,"walk_steps":steps,
         "short_cycles":short_cycles,"watchdog_restarts":watchdog_restarts,
                             "watchdog_limit":watchdog_limit,
@@ -3172,8 +3176,113 @@ fn rho_fold_sensitivity_48q_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+// Preregistered 24-Q generic control; width-only variant of existing native Rust rho.
+fn rho_jump_width_24q_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const TARGET_SEED:u64=0x4a55_4d50_5332_3431;
+    const RHO_SEED:u64=0x4a55_4d50_5352_5231;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;5];
+    let mut all_complete=[0u64;5];
+    let mut pair_wins=[0u64;3];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let chronological:[usize;5]=match i%5{
+            0=>[0,1,2,3,4],1=>[1,2,3,4,0],2=>[2,3,4,0,1],
+            3=>[3,4,0,1,2],_=>[4,0,1,2,3]
+        };
+        let mut arms:[serde_json::Value;5]=std::array::from_fn(|_|json!(null));
+        for index in chronological{
+            let res=match index{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,[384,384,16_384],6,false,true,true)?,
+                1=>neg_rho_cold_policy_jumps(q,rho_seed,32,4,STEP_CAP,512,false,16)?,
+                2|4=>neg_rho_cold_policy_jumps(q,rho_seed,32,4,STEP_CAP,512,false,32)?,
+                3=>neg_rho_cold_policy_jumps(q,rho_seed,32,4,STEP_CAP,512,false,64)?,
+                _=>return Err("invalid rho jump sweep arm".into())
+            };
+            let complete=res["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if complete{
+                let answer=if index==0{
+                    res["attempts"].as_array()
+                        .and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{res["log"].as_u64()};
+                if answer!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("invalid complete scalar i={i}, arm={index}"));
+                }
+                all_complete[index]+=1;
+            }
+            total_ns[index]+=res["cold_wall_ns"].as_u64()
+                .ok_or("missing fully cold ns")? as u128;
+            arms[index]=res;
+        }
+        if arms[0]["complete_target_scalar_recovered"].as_bool()==Some(true){
+            for (j,idx) in [1usize,2,3].into_iter().enumerate(){
+                if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+                    arms[0]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                    pair_wins[j]+=1;
+                }
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,
+            "caller_known_scalar_verifier_only":known,
+            "chronological_order":chronological,
+            "incumbent_joint_APS":arms[0],
+            "rho16_jumps":arms[1],
+            "rho32_jumps":arms[2],
+            "rho64_jumps":arms[3],
+            "rho32_jumps_AA":arms[4]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"RHO_JUMP_WIDTH_PROTOCOL_20261116.md",
+        "curve":"ordinary prime-order prime31",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["incumbent_joint_APS","rho16_jumps",
+            "rho32_jumps","rho64_jumps","rho32_jumps_AA"],
+        "successful_complete_calls":all_complete,
+        "fully_cold_ns":total_ns.map(|x|x.to_string()),
+        "paired_APS_wins_vs_rho16_rho32_rho64":pair_wins,
+        "all_120_complete":all_complete.iter().all(|&k|k==CASES as u64),
+        "ratios_APS_over_rho16_rho32_rho64":[
+            total_ns[0] as f64/total_ns[1] as f64,
+            total_ns[0] as f64/total_ns[2] as f64,
+            total_ns[0] as f64/total_ns[3] as f64
+        ],
+        "ratio_rho16_over_rho32":total_ns[1] as f64/total_ns[2] as f64,
+        "rho32_jumps_AA_drift":(total_ns[2] as f64/total_ns[4] as f64-1.0).abs(),
+        "classification":"published APS S3 pair MITM vs generic unfolded r-adding rho with 16/32/64 jump widths",
+        "scope":"source-specific unisolated development CI; tuned WZ rho and independent PCC untested",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--rho-jump-width-24q" {
+        let result=rho_jump_width_24q_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--rho-fold-sensitivity-48q" {
         let result=rho_fold_sensitivity_48q_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -3735,6 +3844,30 @@ mod unfolded_rho_collision_tests {
             assert_eq!(unfolded["complete_target_scalar_recovered"].as_bool(),Some(true));
             assert_eq!(unfolded["log"].as_u64(),Some(k));
             assert_eq!(unfolded["fold_negation"].as_bool(),Some(false));
+        }
+    }
+}
+
+#[cfg(test)]
+mod rho_jump_width_controls {
+    use super::*;
+    #[test]
+    fn original_sixteen_jump_trajectory_and_wider_log_replay() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let k=37u64;
+        let q=ar.scalar(PRIME31,k,Some(PRIME31.g)).unwrap();
+        let seed=0x5248_4f5f_5431_3634;
+        let original=neg_rho_cold_policy(q,seed,32,4,2_000_000,512,false).unwrap();
+        let named16=neg_rho_cold_policy_jumps(q,seed,32,4,2_000_000,512,false,16).unwrap();
+        assert_eq!(original["log"],named16["log"]);
+        assert_eq!(original["walk_steps"],named16["walk_steps"]);
+        assert_eq!(original["complete_target_scalar_recovered"],named16["complete_target_scalar_recovered"]);
+        for width in [32usize,64] {
+            let result=neg_rho_cold_policy_jumps(q,seed,32,4,2_000_000,512,false,width).unwrap();
+            assert_eq!(result["complete_target_scalar_recovered"].as_bool(),Some(true));
+            assert_eq!(result["log"].as_u64(),Some(k));
+            assert_eq!(result["jump_count"].as_u64(),Some(width as u64));
         }
     }
 }

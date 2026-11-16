@@ -40,6 +40,10 @@ jobs:
         timeout-minutes: 6
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-unfolded-match
 
+      - name: Preregistered 24 Q APS versus 16/32/64 jump unfolded rho
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-jump-width-24q
+
       - name: Prospective 48 Q same-host APS versus folded and unfolded rho
         timeout-minutes: 6
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-fold-sensitivity-48q
