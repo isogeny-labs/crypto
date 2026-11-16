@@ -1554,12 +1554,46 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
 
 // ── The method end to end ────────────────────────────────────────────────
 
+/// Capture only the solver invocation. Its answer check remains in the
+/// existing verification phase; no projection/replay work is folded in here.
+fn observed_solve(
+    rows: &[SparseRel],
+    columns: usize,
+    modulus: u64,
+    rng: &mut StdRng,
+    ops: &mut u64,
+    kind: &str,
+    attempt: u64,
+    work: &mut Option<Vec<serde_json::Value>>,
+) -> Option<Vec<u64>> {
+    let before = work.as_ref().map(|_| super::jv_bitops::snapshot());
+    let answer = wiedemann_u64(rows, columns, modulus, rng, ops);
+    if let (Some(before), Some(work)) = (before, work) {
+        let primitives = super::jv_bitops::snapshot().since(&before).total();
+        work.push(serde_json::json!({
+            "schema":"cover.sieve.solve-work/v1", "complete":false,
+            "marker":"counted:cover_solve_subtotals", "kind":kind,
+            "attempt":attempt,
+            "rows":rows.len(), "columns":columns,
+            "nonzeros":rows.iter().map(|r|r.cols.len()).sum::<usize>(),
+            "returned_solution":answer.is_some(),
+            "primitives":super::jv_bitops::prims_json(&primitives),
+            "known_uncounted":"solver native bookkeeping remains incomplete"
+        }));
+    }
+    answer
+}
+
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SieveDlpReport {
     /// Opt-in graph projection; absent under the historical default.
     /// Its modular/native costs are in cold wall, not legacy multiplication totals.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub graph_filter: Option<SieveGraphStats>,
+    /// Observed solver-call primitives, only when operation hooks are enabled.
+    /// Native bookkeeping remains incomplete; these are not complete totals.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub work_native: Option<Vec<serde_json::Value>>,
     /// Factor-base line search (`JV_FB_LINE=n`, `JV_FB_LINE_MODE`); its
     /// multiplications are inside `setup_muls`, its additions and lookups in
     /// `total_plus`.  Absent when off, so the default record is unchanged.
@@ -1960,6 +1994,7 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
         .unwrap_or(0);
     let mut rep = SieveDlpReport {
         graph_filter: graph_options.map(|_| SieveGraphStats::new()),
+        work_native: super::jv_bitops::enabled().then(Vec::new),
         fb_line,
         p,
         seed,
@@ -2321,8 +2356,17 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
         let mut dd = None;
         if let Some((projected, target)) = &projection {
             dd = verified_scalar(
-                wiedemann_u64(projected, projected.len(), l, &mut rng, &mut la_ops)
-                    .map(|x| x[*target]),
+                observed_solve(
+                    projected,
+                    projected.len(),
+                    l,
+                    &mut rng,
+                    &mut la_ops,
+                    "projected",
+                    rep.la_attempts,
+                    &mut rep.work_native,
+                )
+                .map(|x| x[*target]),
             );
         }
         if dd.is_none() {
@@ -2330,7 +2374,17 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
                 stats.fallback_solves += 1;
             }
             dd = verified_scalar(
-                wiedemann_u64(&sel, sel.len(), l, &mut rng, &mut la_ops).map(|x| x[k]),
+                observed_solve(
+                    &sel,
+                    sel.len(),
+                    l,
+                    &mut rng,
+                    &mut la_ops,
+                    "original",
+                    rep.la_attempts,
+                    &mut rep.work_native,
+                )
+                .map(|x| x[k]),
             );
         }
         if dd.is_some() {
@@ -2410,6 +2464,45 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn observed_solver_call_matches_its_hooked_subtotal() {
+        use super::super::jv_bitops::{self, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, 101);
+        let rows = vec![
+            SparseRel {
+                cols: vec![(0, 1), (1, 2)],
+                rhs: 8,
+            },
+            SparseRel {
+                cols: vec![(0, 3), (1, 4)],
+                rhs: 18,
+            },
+        ];
+        let mut work = Some(Vec::new());
+        let mut rng = StdRng::seed_from_u64(17);
+        let mut ops = 0;
+        let before = jv_bitops::snapshot();
+        let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+        assert_eq!(
+            observed_solve(&rows, 2, 101, &mut rng, &mut ops, "original", 1, &mut work),
+            Some(vec![2, 3])
+        );
+        let actual = jv_bitops::prims_json(&jv_bitops::snapshot().since(&before).total());
+        let call = &work.unwrap()[0];
+        assert_eq!(call["primitives"], actual);
+        assert_eq!(call["complete"], false);
+        assert_eq!(call["rows"], 2);
+        assert_eq!(call["nonzeros"], 4);
+        assert_eq!(call["returned_solution"], true);
+        assert!(call["primitives"]["modr_mul"].as_u64().unwrap() > 0);
+        assert!(serde_json::to_value(SieveDlpReport::default())
+            .unwrap()
+            .get("work_native")
+            .is_none());
+    }
     use crate::cryptanalysis::jv_cover::Hyp;
 
     fn ring_and_rng(p: u64) -> (FpRing, StdRng) {

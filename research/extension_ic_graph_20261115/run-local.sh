@@ -70,7 +70,8 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/jv_rho_strong.rs src/cryptanalysis/jv_isogeny_walk.rs \
   src/cryptanalysis/large_prime_filter.rs \
   src/cryptanalysis/large_prime_filter_mst.rs \
-  src/cryptanalysis/bitops.rs src/prime_hyperelliptic/ops.rs docs/units/BITOPS.md \
+  src/cryptanalysis/bitops.rs src/cryptanalysis/ic_measurement.rs \
+  src/prime_hyperelliptic/ops.rs docs/units/BITOPS.md \
   docs/units/bitop-v1.vectors.json docs/units/bitop-v2.vectors.json \
   research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \

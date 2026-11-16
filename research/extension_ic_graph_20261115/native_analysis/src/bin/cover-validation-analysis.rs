@@ -21,6 +21,7 @@ fn key(v: &Value) -> Result<Key, String> {
 }
 fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, String> {
     let counted = plan["operation_accounting"] == true;
+    let detail = plan["operation_accounting_detail"] == "projection_and_solve";
     let source = plan["source_revision"]
         .as_str()
         .filter(|s| s.len() == 40 && s.bytes().all(|c| c.is_ascii_hexdigit()))
@@ -37,6 +38,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
         || plan
             .get("operation_accounting")
             .is_some_and(|v| !v.is_boolean())
+        || plan
+            .get("operation_accounting_detail")
+            .is_some_and(|v| !counted || v != "projection_and_solve")
     {
         return Err("invalid frozen validation plan".into());
     }
@@ -155,6 +159,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
         let fixture = fixtures.get(&(*p, *seed));
         let mut valid = false;
         let mut exercised = false;
+        let mut component_accounting = None;
         if let (Some(r), Some(f)) = (row, fixture) {
             let w = &r["worker"];
             let work = &w["work"];
@@ -200,11 +205,19 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             } else {
                 valid &= work["graph_filter"].is_null();
             }
+            if detail {
+                component_accounting = accounting::details(work, &w["work_native"], &f["family"]);
+                valid &= component_accounting.is_some();
+            }
         }
         outcomes.push(json!({"p":p,"seed":seed,"arm":arm,"completed":row.is_some(),"endpoint_valid":valid,"nontrivial_graph_without_fallback":exercised,"child_exit":row.map(|r|r["child_exit"].clone()),"recorded_outer_wall_ns":row.map(|r|r["cold_process_wall_ns"].clone()),"recovered_scalar":row.map(|r|r["worker"]["recovered_scalar"].clone()),"work":row.map(|r|r["worker"]["work"].clone()),"progress_path":row.map(|r|r["progress_path"].clone())}));
         if counted {
             outcomes.last_mut().expect("just pushed")["work_native"] =
                 row.map_or(Value::Null, |r| r["worker"]["work_native"].clone());
+        }
+        if detail {
+            outcomes.last_mut().expect("just pushed")["component_accounting"] =
+                component_accounting.unwrap_or(Value::Null);
         }
     }
     let valid = problems.is_empty()
@@ -216,6 +229,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
     if counted {
         result["accounting_diagnostic_only"] = json!(true);
         result["allows_new_frozen_comparison"] = json!(false);
+    }
+    if detail {
+        result["projection_and_solve_accounting_checked"] = json!(true);
     }
     Ok(result)
 }
@@ -287,8 +303,7 @@ mod tests {
         }
         (p, rows)
     }
-    #[test]
-    fn accounting_diagnostic_reprices_and_never_allows_comparison() {
+    fn counting_fixture() -> (Value, Vec<Value>) {
         let (mut p, mut rows) = fixture();
         p["operation_accounting"] = json!(true);
         let names = [
@@ -337,6 +352,12 @@ mod tests {
             row["worker"]["work_native"] = native.clone();
             row["worker"]["signature"]["work_native"] = native;
         }
+        (p, rows)
+    }
+
+    #[test]
+    fn accounting_diagnostic_reprices_and_never_allows_comparison() {
+        let (mut p, rows) = counting_fixture();
         let s = analyze(&p, rows.clone(), 0).unwrap();
         assert_eq!(s["full_recovery_validation_passed"], true);
         assert_eq!(s["allows_new_frozen_comparison"], false);
@@ -385,6 +406,58 @@ mod tests {
         assert_eq!(
             analyze(&p, rows, 0).unwrap()["full_recovery_validation_passed"],
             false
+        );
+    }
+
+    #[test]
+    fn detailed_counts_bind_the_native_report_and_outer_phase() {
+        let (mut p, mut rows) = counting_fixture();
+        p["operation_accounting_detail"] = json!("projection_and_solve");
+        assert_eq!(
+            analyze(&p, rows.clone(), 0).unwrap()["full_recovery_validation_passed"],
+            false
+        );
+        for r in rows.iter_mut().filter(|r| r["record_type"] == "execution") {
+            let worker = &mut r["worker"];
+            let graph = worker["method"] == "graph";
+            let native = &mut worker["work_native"];
+            let one = native["observed_primitives"].clone();
+            let zero = native["phases"][7]["primitives"].clone();
+            native["phases"][0]["primitives"] = zero.clone();
+            native["phases"][0]["diagnostic_priced_bitops"] = json!("0");
+            native["phases"][7]["primitives"] = one.clone();
+            native["phases"][7]["diagnostic_priced_bitops"] = json!("64");
+            if graph {
+                let mut three = one.clone();
+                three["word_op"] = json!(3);
+                native["observed_primitives"] = three.clone();
+                native["diagnostic_priced_bitops"] = json!("192");
+                native["phases"][7]["primitives"] = three;
+                native["phases"][7]["diagnostic_priced_bitops"] = json!("192");
+            }
+            let native = native.clone();
+            let work = &mut worker["work"];
+            work["la_attempts"] = json!(1);
+            work["work_native"] = json!([{"schema":"cover.sieve.solve-work/v1","complete":false,"marker":"counted:cover_solve_subtotals","attempt":1,"kind":if graph {"projected"} else {"original"},"rows":if graph {4} else {5},"columns":if graph {4} else {5},"nonzeros":if graph {4} else {5},"returned_solution":true,"primitives":one}]);
+            if graph {
+                let stages: Vec<_> = ["mapping", "filter", "replay", "output"]
+                    .into_iter()
+                    .map(|name| json!({"stage":name,"primitives":if ["filter","replay"].contains(&name) {&one} else {&zero}}))
+                    .collect();
+                work["graph_filter"]["work_native"] = json!([{"schema":"cover.graph.projection-work/v1","complete":false,"marker":"counted:graph_projection_subtotals","call_index":1,"input_rows":5,"input_nonzeros":5,"candidate_rows":4,"candidate_nonzeros":4,"accepted":true,"stages":stages}]);
+            }
+            let mut semantic = work.clone();
+            clean(&mut semantic);
+            worker["signature"]["work"] = semantic;
+            worker["signature"]["work_native"] = native;
+        }
+        let s = analyze(&p, rows, 0).unwrap();
+        assert_eq!(s["full_recovery_validation_passed"], true);
+        assert_eq!(s["allows_new_frozen_comparison"], false);
+        assert_eq!(s["projection_and_solve_accounting_checked"], true);
+        assert_eq!(
+            s["outcomes"][0]["component_accounting"]["diagnostic_component_bitops"],
+            "64"
         );
     }
 

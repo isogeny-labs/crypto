@@ -1,4 +1,45 @@
-# Current checkpoint:24finished, publish packet then coverage (16 November10:06Z)
+# Current checkpoint:25SOURCE READY,25NOTRUN (16 November10:33Z)
+
+Native final subcount checks ALLPASS:19sieve/graph(twoexistingignored),1executed
+publicworker;actualproduction/analyzerbuilds,library/example/analyzerstrictClippy;
+26analyzertests. Newanalyzerreplays21/23/24summaries BYTEEXACT. SourcechangesONLY
+optional graph work_native mapping/filter/replay/output counts+matrixnnz and
+separateWiedemann call counts withattempt identity. Olddefaults/API/optionskept.
+Analyzerchecksflow/shapes/positivefilter+replay/counts<=LA,remainder,overflow/tamper.
+No completecost/rankingpromotion. Rootcodefrozensincefinalchecks.
+
+ProspectiveAmendment20/cover-subcounts-validation-plan.json: p1009fresh271,
+oneICthenoriginalPivotgraph,1validation0warm/noRho/AA/ratios/CI;900worker1900whole,
+CPU0/8GiB/noretry/incidence+sharedboth. Requireactualfullrecovery+nontrivialaccepted
+graphnofallback+zeroOTHER/foreign+exactdetailedcounts/positivefilter+replay/validsum.
+96filesvalidation/cover-subcounts-source.sha256 PASS,distinctbuildreceipt.
+MUSTcommit/publishcleanSOURCE/SPECbeforeSOLEwrappercall to
+/workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25.
+25NOdata/job yet. AfterexitORIGINALcopiedanalyzer/fullflow/hash/report/publish.
+
+24PUBLISHEDa02eb15a4f136d0ec1f079a057cc662efaec6bb1, actualscalarbothcorrect,
+graph519->389nofallback,diagnosticpassbutcompletefalse/no comparativeverdict.
+Artifactbot1068e8556 FF integrated;exactignoredPNGrestored/hashPASS.NeverreaddPNG.
+CurrentHEAD1068e8556 plusDIRTY25prep. No livecompiler orscientificjob.
+Preparationrootcheckwasstoppedafterattemptfieldsfinalized; logsretained as
+*-preparation* and finalchecks rerun/pass. Initialanalyzeremptyunitlintretained/fixed.
+
+Valgrind3.28.0 NOWINSTALLED /workspace/ic-local-tools/valgrind-install,
+officialsource/hash+setupreceiptsvalidation/valgrind-local-*. /bin/trueCallgrind
+smokePASS; NOcrypto instructionaudit run. Neitherthatnorallunitchecksclosesnative
+coverage. COUNTING_COVERAGE.md namesstillmissinggraph/scalar/RNG/nativework and
+strongestRhoprices. GoalACTIVE/localworks/no stopgoal/subagents.
+
+FutureLITERATUREPOINTER only: JVprimary§3.3 adapted2LP usesSMALLSUBSET ofFp
+abscissae;remainingdegree2factor mustSPLIT overFp. NOTirreducquadFp²variant.
+Paper§6usesdegree8manysurplusrelations; currentm9capacity/u64boundsneedrespect.
+No newfinderselected/implemented/trial fromthispointer. After25useobservedsubcosts
+beforeoptimization. Prior23MSTrefusal/22censorunchanged. AllclaimsPCCunverified.
+CIlastb16110:01requiredgatesunconfirmed;NEXT>=10:51absentnewsourceevent.
+PR4288same/regular/automerge/no manualmerge. origin/mainadvancedtod2f6c9e3f;
+donotmergeunrelatedmainmidtrial,preserveallsharedjournal/ledgerbyteswhenintegrating.
+
+# Previous checkpoint:24finished, publish packet then coverage (16 November10:06Z)
 
 Sourceb161085c8a85b6891681c40b3ac8f1840f300d36 published beforeSOLE24call.
 Run /workspace/ic-local-runs/local-cover-accounting-validation-20261116-24

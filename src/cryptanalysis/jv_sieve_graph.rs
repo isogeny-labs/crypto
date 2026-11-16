@@ -3,6 +3,7 @@
 //! selected input rows before it reaches Wiedemann. Unsupported projections
 //! return None so the caller can charge the original solve as fallback.
 use super::*;
+use crate::cryptanalysis::jv_bitops;
 use crate::cryptanalysis::large_prime_filter::{
     filter_large_primes, replay_complete_relation, CompleteRelation, LargePrimeFilterOptions,
     LargePrimeFilterReport, PartialRelation,
@@ -43,7 +44,59 @@ pub struct SieveGraphStats {
     /// Refused MST output whose dimension * nonzeros exceeds the input.
     #[serde(default, skip_serializing_if = "is_zero")]
     pub cost_guard_refusals: u64,
+    /// Observed primitive subtotals per graph call, present only with hooks on.
+    /// These do not assert complete native-bookkeeping coverage.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub work_native: Option<Vec<serde_json::Value>>,
     pub counter_scope: &'static str,
+}
+
+struct ProjectionMeter {
+    before: jv_bitops::JvTally,
+    phase: &'static str,
+    stages: Vec<serde_json::Value>,
+    input_rows: usize,
+    input_nonzeros: usize,
+    candidate: Option<(usize, usize)>,
+    call_index: u64,
+}
+impl ProjectionMeter {
+    fn new(rows: &[SparseRel], call_index: u64) -> Option<Self> {
+        jv_bitops::enabled().then(|| Self {
+            before: jv_bitops::snapshot(),
+            phase: "mapping",
+            stages: Vec::new(),
+            input_rows: rows.len(),
+            input_nonzeros: rows.iter().map(|r| r.cols.len()).sum(),
+            candidate: None,
+            call_index,
+        })
+    }
+    fn advance(&mut self, next: &'static str) {
+        let after = jv_bitops::snapshot();
+        self.stages.push(serde_json::json!({
+            "stage":self.phase,
+            "primitives":jv_bitops::prims_json(&after.since(&self.before).total())
+        }));
+        self.before = after;
+        self.phase = next;
+    }
+    fn candidate(&mut self, rows: &[CompleteRelation]) {
+        self.candidate = Some((rows.len(), rows.iter().map(|r| r.small.len()).sum()));
+    }
+    fn finish(mut self, accepted: bool) -> serde_json::Value {
+        self.advance("finished");
+        serde_json::json!({
+            "schema":"cover.graph.projection-work/v1", "complete":false,
+            "marker":"counted:graph_projection_subtotals",
+            "call_index":self.call_index,
+            "input_rows":self.input_rows, "input_nonzeros":self.input_nonzeros,
+            "candidate_rows":self.candidate.map(|c|c.0),
+            "candidate_nonzeros":self.candidate.map(|c|c.1),
+            "accepted":accepted, "stages":self.stages,
+            "known_uncounted":"graph native bookkeeping remains incomplete"
+        })
+    }
 }
 fn is_zero(v: &u64) -> bool {
     *v == 0
@@ -87,6 +140,7 @@ fn project_mode(
     mst: bool,
 ) -> Option<(Vec<SparseRel>, usize)> {
     let started = Instant::now();
+    let mut meter = ProjectionMeter::new(rows, stats.calls + 1);
     if mst {
         stats.counter_scope = "complete wall includes MST planning/normalization/filter/cost guard/replay/drop; legacy la_ops/la_muls/total_muls omit graph modular and native work";
     }
@@ -148,6 +202,9 @@ fn project_mode(
             max_small_weight: options.max_small_weight,
             max_sources: options.max_sources,
         };
+        if let Some(meter) = &mut meter {
+            meter.advance("filter");
+        }
         let complete = if mst {
             let attempt =
                 filter_large_primes_mst(inputs.clone(), &filter_options, &MstLimits::default())
@@ -155,6 +212,9 @@ fn project_mode(
             stats.last_report = Some(attempt.report);
             stats.mst = Some(attempt.stats);
             let projected = attempt.relations?;
+            if let Some(meter) = &mut meter {
+                meter.candidate(&projected);
+            }
             let input_work =
                 width as u128 * rows.iter().map(|r| r.cols.len() as u128).sum::<u128>();
             let projected_work = projected.len() as u128
@@ -170,10 +230,19 @@ fn project_mode(
         } else {
             let (rows, report) = filter_large_primes(inputs.clone(), &filter_options).ok()?;
             stats.last_report = Some(report);
+            if let Some(meter) = &mut meter {
+                meter.candidate(&rows);
+            }
             rows
         };
+        if let Some(meter) = &mut meter {
+            meter.advance("replay");
+        }
         if complete.len() != keep + 1 || !replays_match(&complete, &inputs, n) {
             return None;
+        }
+        if let Some(meter) = &mut meter {
+            meter.advance("output");
         }
         stats.replayed_rows += complete.len() as u64;
         stats.output_rows += complete.len() as u64;
@@ -188,6 +257,12 @@ fn project_mode(
             keep,
         ))
     })();
+    if let Some(meter) = meter {
+        stats
+            .work_native
+            .get_or_insert_with(Vec::new)
+            .push(meter.finish(result.is_some()));
+    }
     stats.filter_call_wall_ns += started.elapsed().as_nanos();
     if result.is_some() {
         stats.projected += 1;
@@ -200,6 +275,65 @@ fn project_mode(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn projection_subtotals_cover_the_call_and_refusals() {
+        use jv_bitops::Phase;
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, 101);
+        let rows = vec![
+            SparseRel {
+                cols: vec![(0, 1), (2, 2)],
+                rhs: 12,
+            },
+            SparseRel {
+                cols: vec![(1, 1), (2, 3)],
+                rhs: 18,
+            },
+            SparseRel {
+                cols: vec![(2, 7)],
+                rhs: 35,
+            },
+            SparseRel {
+                cols: vec![(3, 1)],
+                rhs: 7,
+            },
+        ];
+        let before = jv_bitops::snapshot();
+        let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+        let mut stats = SieveGraphStats::new();
+        assert!(project(&rows, 101, &SieveGraphOptions::default(), &mut stats).is_some());
+        let expected = jv_bitops::prims_json(&jv_bitops::snapshot().since(&before).total());
+        let call = &stats.work_native.as_ref().unwrap()[0];
+        assert_eq!(call["complete"], false);
+        assert_eq!(call["input_nonzeros"], 6);
+        assert_eq!(call["candidate_rows"], 3);
+        assert_eq!(call["candidate_nonzeros"], 3);
+        let stages = call["stages"].as_array().unwrap();
+        assert_eq!(
+            stages
+                .iter()
+                .map(|s| s["stage"].as_str().unwrap())
+                .collect::<Vec<_>>(),
+            ["mapping", "filter", "replay", "output"]
+        );
+        for (k, value) in expected.as_object().unwrap() {
+            let actual: u64 = stages
+                .iter()
+                .map(|s| s["primitives"][k].as_u64().unwrap())
+                .sum();
+            assert_eq!(actual, value.as_u64().unwrap(), "{k}");
+        }
+        assert!(stages[1]["primitives"]["modr_mul"].as_u64().unwrap() > 0);
+        assert!(stages[2]["primitives"]["modr_mul"].as_u64().unwrap() > 0);
+        assert!(project(&[], 101, &SieveGraphOptions::default(), &mut stats).is_none());
+        let rejected = &stats.work_native.as_ref().unwrap()[1];
+        assert_eq!(rejected["accepted"], false);
+        assert!(rejected["candidate_rows"].is_null());
+        assert_eq!(rejected["stages"].as_array().unwrap().len(), 1);
+        assert_eq!(rejected["stages"][0]["stage"], "mapping");
+    }
 
     #[test]
     fn mst_projects_a_weighted_system_and_keeps_the_target() {
@@ -248,6 +382,7 @@ mod tests {
         let value = serde_json::to_value(SieveGraphStats::new()).unwrap();
         assert!(value.get("mst").is_none());
         assert!(value.get("cost_guard_refusals").is_none());
+        assert!(value.get("work_native").is_none());
     }
 
     #[test]

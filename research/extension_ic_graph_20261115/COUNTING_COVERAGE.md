@@ -30,3 +30,22 @@ recovery only. Its analyzer checks primitive schemas, exact repricing,
 phase sums, declared gaps, zero foreign/other hooks and false comparative
 eligibility. It cannot discharge this inventory by passing an endpoint.
 [pcc:unverified]
+
+After diagnostic24, the projection adapter adds optional observed subtotals
+for mapping/filter/replay/output and input/candidate matrix nonzeros. The
+solver has separate original/projected call subtotals and attempt identities.
+These measure the existing hooked work; native coverage remains incomplete.
+The analyzer checks the sequence, shapes, sums and remainder within LA.
+Source tests/build and any later actual endpoint are separate obligations.
+[pcc:unverified]
+
+Local instruction-tool setup subsequently builds Valgrind3.28.0 from the
+[official release](https://valgrind.org/downloads/current.html), source
+SHA2569f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c.
+The release page's published SHA1 matches; no GPG signature check is asserted.
+Read the [Callgrind manual](https://valgrind.org/docs/manual/cl-manual.html)
+on Ir events and dump/collection control. Installed under
+`/workspace/ic-local-tools/valgrind-install`; /bin/true smoke test succeeds.
+Receipts are validation/valgrind-local-*. No cryptographic instruction audit
+has run yet, and a future audit remains diagnostic, not proof of complete
+instrumentation or physical gate costs. [pcc:unverified]
