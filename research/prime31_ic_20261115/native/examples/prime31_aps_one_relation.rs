@@ -895,6 +895,87 @@ fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
         "cold_wall_ns":cold.elapsed().as_nanos(),"attempts":attempts
     }))
 }
+// Pre-registered fresh public holdout replication of the 384-384-16384 arm.
+// No shared source precomputation across targets or arms, no scalar oracle.
+fn unequal_384_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    let profiles=[[1536,1536,1536],[384,384,16384],[384,384,16384]];
+    let names=["equal1536","unequal384","unequal384_repeat"];
+    let mut rng=0x434f_4e46_5f33_3834_u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut totals=[0u128;3];
+    let mut successes=[0usize;3];
+    let mut queries=[0u64;3];
+    let mut source_groups=[0u64;3];
+    let mut cases=Vec::with_capacity(CASES);
+    let mut paired_wins=0usize;
+    for case in 0..CASES {
+        let k=loop {
+            let x=prng(&mut rng)%N;
+            if x>1 && used.insert(x) {break x;}
+        };
+        let q=verifier.scalar(PRIME31,k,Some(PRIME31.g))
+            .ok_or("confirmation produced identity public Q")?;
+        let order: [usize;3]=if case%2==0 {[0,1,2]} else {[1,2,0]};
+        let mut arms=Vec::new();
+        let mut times=[0u64;3];
+        for (position,&arm) in order.iter().enumerate(){
+            let result=execute_unequal_profile(q,profiles[arm],6)?;
+            let done=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let attempts=result["attempts"].as_array().ok_or("missing confirmation attempts")?;
+            let log=attempts.last().and_then(|a|a.pointer("/solution/log"))
+                .and_then(|v|v.as_u64());
+            if done && (log!=Some(k) ||
+                verifier.scalar(PRIME31,log.unwrap(),Some(PRIME31.g))!=Some(q)){
+                return Err(format!("confirm arm {} returned invalid log on case {case}",names[arm]));
+            }
+            let ns=result["cold_wall_ns"].as_u64().ok_or("missing confirmation wall")?;
+            let n_queries=attempts.iter().map(|a|
+                a["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            let n_groups=attempts.iter().map(|a|
+                a["source_group_additions"].as_u64().unwrap_or(0)).sum::<u64>();
+            times[arm]=ns;totals[arm]+=u128::from(ns);queries[arm]+=n_queries;
+            source_groups[arm]+=n_groups;
+            if done {successes[arm]+=1;}
+            arms.push(json!({
+                "arm":names[arm],"order":position,"profile":profiles[arm],
+                "complete_target_scalar_recovered":done,"recovered_log":log,
+                "rounds":attempts.len(),"cold_wall_ns":ns,
+                "s3_pair_queries":n_queries,"source_group_additions":n_groups,
+                "bounded_failure":!done,"attempts":attempts
+            }));
+        }
+        if times[1]<times[0]{paired_wins+=1;}
+        cases.push(json!({
+            "case":case,"public_Q":q,"known_answer_caller_verifier_only":k,
+            "arms":arms
+        }));
+    }
+    let all_complete=successes.iter().all(|&n|n==CASES);
+    // Integer-only admissions avoid floating/rounding ambiguity.
+    let ratio_gate=totals[1]*5<=totals[0]*4;
+    let aa_gate=totals[1].abs_diff(totals[2])*20<=totals[1];
+    let paired_gate=paired_wins>=18;
+    Ok(json!({
+        "standing":"[pcc:unverified]","experiment":"EXP-R31-APS-UNEQUAL-384-CONFIRM",
+        "classification":"published APS one-relation index calculus; generic MITM-equivalent",
+        "field_prime":P,"group_order":N,"cofactor":1,
+        "public_holdouts":CASES,"round_cap":6,
+        "names":names,"profiles":profiles,
+        "successes":successes,"all_complete":all_complete,
+        "cold_total_ns":totals.map(|v|v.to_string()),
+        "s3_pair_queries":queries,"source_group_additions":source_groups,
+        "candidate_paired_wins":paired_wins,
+        "candidate_at_least_20_percent_cheaper":ratio_gate,
+        "candidate_aa_within_5_percent":aa_gate,
+        "candidate_at_least_18_of_24_paired_wins":paired_gate,
+        "passes_preregistered_development_gate":all_complete&&ratio_gate&&aa_gate&&paired_gate,
+        "scientific_limit":"not independently signed/isolated; no PKM/APS external IC frontier claim",
+        "cases_detail":cases
+    }))
+}
+
 fn unequal_profile_confirmation()->Result<serde_json::Value,String>{
     // Caller-side deterministic holdouts are distinct from historical
     // APS panels; known k never enters execute_unequal_profile.
@@ -1021,6 +1102,14 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--unequal-384-confirm" {
+        let result=unequal_384_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        if result["passes_preregistered_development_gate"].as_bool()!=Some(true){
+            return Err("fresh unequal-384 APS confirmation gate not met".into());
+        }
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--unequal-confirm" {
         let result=unequal_profile_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e| e.to_string())?);
