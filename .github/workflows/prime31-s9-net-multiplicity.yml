@@ -41,7 +41,10 @@ jobs:
               assert p["four_sum_integer_signatures"]==618885
               assert p["unordered_four_token_words"]==677040
               assert p["four_sum_distinct_group_points"] + p["four_sum_group_collisions"]==618885
-              assert len(p["cases"])==45
+              assert len(p["cases"])==47
+              regressions=[r for r in p["cases"] if r["type"]=="retrospective_cross_base_regression"]
+              assert len(regressions)==2
+              assert all((not r["positive"]) for r in regressions) if p["base_kind"].startswith("dickson") else all(r["positive"] for r in regressions)
               natural=[r for r in p["cases"] if r["type"]=="natural_verifier_only_k"]
               planted=[r for r in p["cases"] if r["type"]=="blinded_constructed_positive"]
               assert len(natural)==32 and len(planted)==12
