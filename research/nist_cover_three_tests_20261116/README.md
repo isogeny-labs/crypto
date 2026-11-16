@@ -16,6 +16,8 @@ Starting from the emitted actual kernel1, native code constructs normalized leve
 
 The candidate's Jacobian still needs identification with the polarized quotient over Fp, including a possible Serre quadratic twist, and an executable divisor-class map. A fixed coordinate-window factor base contains234 points and five principal vertical-line relations of coefficient rank5. Native target Jacobian arithmetic now checks rational point classes, addition, cancellation and one principal relation using85 evaluations. These have no source-image binding or base logarithms; see PCC-20261116-d2bdb3 and PCC-20261116-94a153. [pcc:unverified]
 
+The target Weil functions now pass exact conic/divisor and heldout normalization checks. A new exact differential comparison matches four quadratic forms with one original-field scalar whose quadratic character is-1. Under the frozen normalization argument this points to a nontrivial Serre twist for kernel1; the result is conditional and producer-unverified, with no executable source divisor map. The next same-field input is recorded kernel2, reconstructing every kernel-dependent predecessor. See PCC-20261116-06f27b, PCC-20261116-08b9be and the detailed geometric report. [pcc:unverified]
+
 ## End-to-end scalar recovery on public controls
 
 The implemented solver constructs actual auxiliary torsion, transfers through a mixed kernel, generates principal-function relations, merges projected duplicates, solves a modular relation matrix, performs individual descent from a public quotient target, and verifies the recovered scalar on E. Both fixed correctness cases complete. [pcc:unverified]

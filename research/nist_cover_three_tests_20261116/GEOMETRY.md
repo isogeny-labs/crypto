@@ -1,6 +1,6 @@
 # Actual P-192 cover: quotient functions and a base-field quartic candidate
 
-2026-11-16. Same P-192 d7 genus3 cover and actual mixed3 kernel1 as the preceding native replay. **The construction now emits a smooth plane-quartic candidate over the original P-192 prime field.** The polarized quotient/Jacobian identification, possible Serre twist and executable divisor-class isogeny remain open. These are native functional development results with unsigned producer standing, not an ECDLP recovery or performance trial. [pcc:unverified]
+2026-11-16. Same P-192 d7 genus3 cover and actual mixed3 kernel1 as the preceding native replay. **The construction emits a smooth plane-quartic candidate over the original P-192 prime field. A conditional exact differential comparison now finds a nonsquare twist scalar for kernel1.** The executable divisor-class isogeny and independent justification of that marked-ppav comparison remain open. These are native functional development results with unsigned producer standing, not an ECDLP recovery or performance trial. [pcc:unverified]
 
 ## Executed construction
 
@@ -15,6 +15,8 @@
 | Candidate curve descent | 28 labelled bitangents/Frobenius correspondences; nonsingular Hilbert90 matrix; all coefficients in Fp | PCC-20261116-901321 |
 | Destination geometry | Fixed x-window contains234 points, six split fibers and five principal relations of coefficient rank5 | PCC-20261116-d2bdb3 |
 | Target Jacobian arithmetic | 85 evaluations; dimensions10/22/34/46; point addition/direct-divisor comparison, cancellation and principal relation | PCC-20261116-94a153 |
+| Target Weil functions | Eight contact divisors;22 exact conic intersections; eight diagonal/heldout normalization checks; sanitizers | PCC-20261116-06f27b |
+| Conditional differential comparison | 384 source normalization equations;12 source/12 target derivative checks; four common quadratic forms; nonsquare scalar | PCC-20261116-08b9be |
 | Fresh dependency chain | All seven stage result files match separate runs byte for byte | PCC-20261116-98512d |
 
 All rows are producer-unverified assertions, with exact sources and receipts linked below. [pcc:unverified]
@@ -43,7 +45,7 @@ The first quartic equation has extension-field coefficients. Squared Jacobi deri
 
 An exact norm preimage normalizes the24-step scalar cocycle. Constructive matrix Hilbert90 produces a nonsingular change of coordinates B, with M B^p=B. After this change, every normalized coefficient lies in Fp and the smoothness rank is again36. The [complete descent receipt](evidence/descent-v1/result.json) retains M, B and every labelled line. The [standalone model](evidence/p192-d7-kernel1-plane-quartic.json) records the resulting15 terms; their exact coefficients follow in this report. [pcc:unverified]
 
-This establishes candidate-curve descent. It does not settle whether the polarized quotient is this curve's Jacobian over Fp or its quadratic twist. A divisor-class lift and compatible Frobenius action must settle that ambiguity before a same-field source DLP transfer is claimed.
+This establishes candidate-curve descent. The differential comparison below addresses the Jacobian's Serre sign separately. Its conditional nonsquare result points to the opposite quadratic sign for kernel1; independent normalization justification and an executable divisor map remain required before a source DLP transfer is claimed. [pcc:unverified]
 
 ## Relations on this actual curve
 
@@ -59,6 +61,20 @@ Exact fiber factorizations check the supports. Their coefficient rank modulo the
 The active native target backend is quartic_km_v3.cpp. It uses Khuri-Makdisi's evaluation-space model on this actual base-field quartic, with D0 three times the first split fiber and85 evaluation points away from the poles. All relevant products have pole degree at most84, so evaluation at85 distinct points is injective. The ambient dimensions are10,22,34,46. Native checks compare point addition with a separately constructed effective divisor, check cancellation, and check one vertical principal relation both as a zero class and by explicit function membership. This validates the declared rational-support fixture; conversion of a general isogeny image into target divisor classes is still required. [pcc:unverified]
 
 The initial version rejected its point/zero screen. An intersection shortcut did not apply to representatives sharing the base-divisor support. V3 uses the general equality preimage test from Khuri-Makdisi Theorem4.1; it retains the same point/addition/principal acceptance checks. The failed source and receipts remain available under PCC-20261116-21b046. The successful target-arithmetic record is PCC-20261116-94a153, unsigned. [pcc:unverified]
+
+## Target functions and the conditional twist result
+
+The target function layer represents degree3 effective divisors by exact cubic ideals, without splitting their supports into points. Translation by a bitangent difference uses two residual conics; every intersection is checked by exact factorization and both curve/conic equations. Riemann--Roch conic bases then give determinant Weil functions. On the fixed four odd labels63,38,41,13, normalization at even2-torsion61 agrees with the quotient theta data, the diagonal cocycle, and separate heldout even classes. The successful address/undefined sanitizer execution retains eight contact divisors,22 exact intersections, eight normalization checks and two rejected controls. Earlier compile/lifetime failures remain preserved. PCC-20261116-06f27b is unsigned. [pcc:unverified]
+
+The new differential implementation uses exact dual numbers. At an odd theta zero, a Weil function is a square times a nonzero factor, so its quadratic leading form follows from the first derivative of the underlying section or determinant. Hamiltonian flows on H and C supply tangent directions; trace matrices convert them to canonical Abel coordinates. The target differential basis change includes the determinant and equation-scaling factor of the existing descent matrix.
+
+For the fixed four labels, the producer obtains an original-field projective matrix M0 and one nonzero scalar s satisfying
+
+$$Q_A=s\,M_0^t Q_C M_0.$$
+
+All four full quadratic forms agree, and s lies in Fp with quadratic character-1. The execution also checks384 source normalization equations,12 source and12 target derivatives and the declared discriminator/corruption controls. Exact forms, source representative, matrices and scalar are in evidence/differential-twist-v2/result.json. The run exits0 and post-call source hashes match. PCC-20261116-08b9be is unsigned. [pcc:unverified]
+
+Under TWIST_PROTOCOL's marked-ppav normalization argument, s nonsquare means the differential identification requires the quadratic extension, pointing to a nontrivial Serre obstruction for kernel1. This is a conditional producer result. The general argument and implemented normalizations still need independent review; no executable divisor-class isogeny is supplied by a differential matrix. The next same-field construction input is recorded kernel2, using fresh kernel-dependent predecessors under KERNEL_CONTINUATION_PROTOCOL.
 
 ## Evidence and reproduction
 
@@ -76,7 +92,7 @@ Source review: Tian arXiv:2007.03172 sections2--5; Dalla Piazza--Fiorentino--Sal
 
 ## Next executable acceptance test
 
-Let A=J(H)/K. The present kernel has order27, giving a (3,3,3) quotient; this differs from Smith's original (2,2,2) construction. First identify A with J(C) over Fp, including the possible Serre quadratic obstruction. An Fp equation for C alone does not settle this: the polarized quotient may instead be the quadratic twist of J(C), and a nonhyperelliptic curve cannot absorb that sign by the usual hyperelliptic curve-twist construction. If the obstruction is nontrivial, test another recorded kernel for the same-field route, or explicitly account for an extension-field destination.
+Let A=J(H)/K. The present kernel has order27, giving a (3,3,3) quotient; this differs from Smith's original (2,2,2) construction. The conditional kernel1 comparison points to a nontrivial Serre sign. Continue through the remaining recorded kernels in order to seek a same-field Jacobian, preserving kernel1's result and every intermediate. An extension-field route requires explicit field accounting; a nonhyperelliptic curve cannot absorb the opposite Jacobian sign by the usual hyperelliptic curve-twist construction. [pcc:unverified]
 
 Next implement the quotient map $\phi$ on divisor classes, lifting its Kummer coordinates to actual J(C) classes and checking exceptional inputs. Acceptance requires $\phi(D+k)=\phi(D)$ for every k in the actual kernel, compatibility with Frobenius and addition, and a dual $\psi$ satisfying $\psi(\phi(D))=[3]D$ on the tested domain. Combine it with the existing cover pullback and norm: $F=\phi\circ\pi^*$ and $T=\pi_*\circ\psi$ must satisfy $T(F(P))=[6]P$. The current coset implementation checks this identity; the new test must execute it in target divisor coordinates. [pcc:unverified]
 

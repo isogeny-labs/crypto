@@ -61,7 +61,7 @@ stage(10.1,3.1,3.2,1.2,'Candidate C / Fp\nsmooth plane quartic\nexplicit curve d
 for start,end,label in [(2.05,2.9,'degree 2'),(5.1,6.0,'degree 27'),(8.4,10.0,'Riemann + descent')]:
     ax.annotate('',xy=(end,3.7),xytext=(start,3.7),arrowprops={'arrowstyle':'->','color':'#207143'})
     ax.text((start+end)/2,4.05,label,ha='center',fontsize=8)
-stage(9.7,.85,3.6,1.2,'Jac(C) identification\nSerre twist + divisor map\nstill open','#fff0d4')
+stage(9.7,.85,3.6,1.2,'Kernel1 differential test\nconditional twist sign -1\nsource divisor map still open','#fff0d4')
 ax.annotate('',xy=(11.5,2.15),xytext=(11.5,3.0),arrowprops={'arrowstyle':'->','linestyle':'--','color':'#a56b12'})
 stage(1.0,.85,5.2,1.2,'Additional fixed small-curve IC controls\nr = 11 and 109: every scalar recovered\ncomplete nonzero factor bases','#e4f1e8')
 ax.text(7.0,5.35,'Actual genus-3 quotient geometry and the remaining isogeny lift',ha='center',fontsize=13)

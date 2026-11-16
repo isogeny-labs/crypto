@@ -1,3 +1,5 @@
+\newpage
+
 # Exact base-field candidate equation
 
 The equation is the homogeneous sum of the following terms, set equal to zero, modulo the prime below. This is a curve model; the isogeny/twist identification remains open. [pcc:unverified]
