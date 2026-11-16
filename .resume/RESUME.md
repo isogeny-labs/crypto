@@ -1,4 +1,35 @@
-# Current checkpoint: accounting source ready,24NOTRUN (16 November10:00Z)
+# Current checkpoint:24finished, publish packet then coverage (16 November10:06Z)
+
+Sourceb161085c8a85b6891681c40b3ac8f1840f300d36 published beforeSOLE24call.
+Run /workspace/ic-local-runs/local-cover-accounting-validation-20261116-24
+exit0/60.313s/2starts2complete. Bothactualscalar220308746551549747/native+outer
+groupreplay. Pivotgraph519->389/389witnessreplays/0fallback. Bothforeign0/OTHER0;
+ORIGINALcopiedanalyzer global[]/endpoint+accountingcriterionTRUE, butcomparative
+eligibilityFALSE/followupFALSE/completeFALSE/totalNULL exactlyasfrozen.
+NativeIC/graph observedpricedsubtotals3474643743588/3760737383246;
+LA356048989504/642142629162, otherphasecostsMATCH. Incomplete/no ratio/ranking;
+DO NOTattributeextraLAcostspecificallytofilter,replayorWiedemannwithoutsubcounts.
+
+Exactraw48253B/summary22227B/progress/runtime/flow/custodyinGit+local.
+Final1pagePDFvisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS.
+Study local-cover-accounting-validation-20261116-24, bench20261116-cover-accounting-diagnostic.
+Originaltemplatebooleanstr()error retainedlocalreport-initial.typ/build-initial.log;
+reportcopyrepr(bool)fix only, frozen sourcetemplate/summaryunchanged.
+Source88/preposthashesPASS. No activejobs/compiler. NEXTpublishpacket/updatePR,
+thenconcretesubcomponentaccounting/sourceaudit+instructiontoolsetup.
+No nextscientificcomparisonselected. GoalACTIVE/localworks/no stopgoal/subagents.
+
+Valgrind3.28.0 officialsourceDOWNLOADEDONLY/workspace/ic-local-tools,
+SHA2569f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c,
+publishedSHA1matches; Callgrindmanualread,/tmp/ic-{valgrind-current,callgrind-manual}.html.
+Neitherperf/Valgrindinstalledyet, no auditrun. COUNTING_COVERAGE.md namesgraph
+maps/normalization/scheduling/replaybookkeeping,2inline scalaradds/residual+4initial
+RNGdraws, native/RNGcoverage,strongestRho pricing. Need distinguishprojection,
+replayandWiedemann observedcost before optimizing; all stillwithinoriginalgoal.
+CIcurrentb161read10:01listsEMPTY/requiredgatesreviewUNCONFIRMED;
+NEXT>=10:51absentnewpublicationevent. PR4288same/regular/automerge/no manualmerge.
+
+# Previous checkpoint: accounting source ready,24NOTRUN (16 November10:00Z)
 
 All native checks PASS:12 generic/MSTfilter (768map-oracle merges + exact
 3mul/2add/1inv/23word kernel),17sieve/graph(twoignored),1executed public-worker
