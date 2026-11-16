@@ -1984,7 +1984,6 @@ research for extension work. Recheck access before any new experiment.
 ## CT20b (2026-11-11) — conditional global degree-seven factor lemma
 
 **State: written geometric argument plus 15-class symbolic negative-control test, unsigned; actual Jacobian map unimplemented.** See `CT20B_GLOBAL_FACTOR_CERTIFICATE.md`, `ct20_two_torsion_graph.py`, and `ct20b_torsion_graph.svg` in stacked CT20b review PR (on CT20 #3920). Assuming the *actual* source and target HLP product pull/norm maps have the matching kernel graphs, branch-pair norms yield N0(J0[2]) subset G0; A=P1 alpha N0 factors through geometric [2] to degree49 Phi, with dual[7] identities. Producer script enumerates all15 nonzero branch pairs (3 zero,4 each graph element); incorrect rotated matching fails12/15. This is **not** an independently certified correspondence or cost result. Next independently establish the target quotient correspondences and run full12,317-class balanced divisor maps/dual checks and64 elliptic4-torsion lifts. Preserve root PCC ledger/archive gates. [pcc:unverified]
-<<<<<<< HEAD
 
 
 ## CT21 — rational Richelot frontier after degree-seven gluing (2026-11-11)
@@ -2031,6 +2030,18 @@ divisor isogeny. Next: match six target branch points to actual
 product four-torsion cosets for both nonsplit Richelot labels,
 then execute full 12,317-class Phi and dual[7] tests.
 
+<<<<<<< HEAD
+
+## CT23 — exact rational-product acceptance / cross-factor vanishing (2026-11-11)
+
+**[pcc:unverified]** Independent stdlib Python product-coordinate control on F101 E109 x E113 for both B+A/B+B degree-seven elliptic maps; 12,317/12,317 distinct target product images, full 109/113 component dual[7] checks, 109/109 public order-109 scalar recoveries, CRT idempotents and deliberately wrong E113 target negative check. Coprime rational factor orders imply any cross-factor rational *group* homomorphism vanishes, regardless of geometric Hom over extensions. On rational points, conditional HLP formula Phi_rat(D)=P1 alpha [6159]N0(D) follows from N0P0=[2], but neither P1/N0 nor Phi were constructed as actual genus-2 balanced-divisor maps. Cold BSGS counts across 109 known answers: 1685 EC additions direct and 1685 transported plus 109 rational degree7 map evaluations, excluding field ops/gluing/cost of Phi; **not** a matched complete solver cost. Local python3 -S/py_compile self-check passed; exact-head CI and independent signed PCC remain pending. See CT23_RATIONAL_PRODUCT_CONTROL.md and ct23_rational_product_transport.py on a stacked regular review PR after #3926. Continue actual geometric correspondence and full-class Jacobian replay, then admitted matched costs. No paid work or root frozen-ledger edits.
+
+## CT24 — closed-divisor elliptic-to-Jacobian leg (2026-11-11)
+
+**[pcc:unverified]** See `CT24_CLOSED_FIBER_TRANSFER.md`. On both CT20 supported F101 charts, CT24 evaluates the *actual reciprocal elliptic quotient pullback* after the fixed E109 degree-seven Kohel map for all 109 source scalars: generic genus-two closed support `u=t²-b/U, v=(V/U)t` with base `D0=(0,+sqrt(b))+(0,-sqrt(b))`, plus **two ramified infinity** exceptions `U=0,V=±b` per chart. No fake infinity-as-base normalization. Both local stdlib oracles pass: separate F101² pointwise replay, 58 split+48 nonsplit+2 ramified nonidentity fibers, norm[2] and 109/109 end-to-end public scalar recovery by elliptic BSGS after decoding divisor support. BSGS 1685 additions, transport costs not included. Next: exact-head CI/signed PCC; **not** full CT20 `J0->J1` balanced-divisor Phi or a speedup. Parent ledger/archive and S3 budget gates unchanged.
+
+---
+
 ---
 
 =======
@@ -2060,4 +2071,4 @@ Full fresh diagnosticCI, full scientific custodyNEW28 using resource-aware regul
 
 ## Errors
 Prior allocation134/driver1 and wrong61-count false rejection1/driver1 remain complete frozen attempts. This success uses the original62-record schema and unchanged2GiBVM120s criterion. The original audit101 is the expected control rejection. No new fresh solver CI has run. Conductor command/tool unavailable in this runtime; existing reserved project/evidence/log/problem scopes retained. [pcc:unverified]
->>>>>>> origin/research/ct20-f101-degree7-gluing-inventory-20261111
+>>>>>>> origin/research/ct21-f101-richelot-next-frontier-20261111
