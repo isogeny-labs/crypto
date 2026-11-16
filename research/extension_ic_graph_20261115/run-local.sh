@@ -27,6 +27,10 @@ case "$driver_kind" in
     driver_binary=target/release/examples/gaudry_cubic_s4_f4_probe
     analyzer_binary=$here/native_analysis/target/release/s4-component-analysis
     ;;
+  s4-trace-component)
+    driver_binary=target/release/examples/gaudry_cubic_s4_trace_compare
+    analyzer_binary=$here/native_analysis/target/release/s4-trace-analysis
+    ;;
   *) echo 'Unknown frozen driver kind.' >&2; exit 2;;
 esac
 # Pin the documented native defaults rather than inherit another study's
@@ -52,6 +56,7 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
   src/cryptanalysis/f4_fp.rs src/cryptanalysis/f4_fp src/cryptanalysis/groebner_f4.rs src/cryptanalysis/fx_hash.rs \
   examples/gaudry_cubic_graph_compare.rs examples/gaudry_cubic_s4_f4_probe.rs \
+  examples/gaudry_cubic_s4_trace_compare.rs \
   research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
   research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \

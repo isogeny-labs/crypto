@@ -12,6 +12,72 @@ enum Extraction {
     DelayedKrylov,
 }
 
+#[derive(Clone, PartialEq, Eq, Serialize)]
+struct TraceFamily {
+    p: u64,
+    c: u64,
+    modulus: Option<[u64; 3]>,
+    a: E3,
+    b: E3,
+    generator: Pt3,
+    target: Pt3,
+    subgroup_order: u64,
+}
+
+impl TraceFamily {
+    fn new(inst: &Instance3) -> Self {
+        Self {
+            p: inst.curve.field.p,
+            c: inst.curve.field.c,
+            modulus: inst.curve.field.modulus,
+            a: inst.curve.a,
+            b: inst.curve.b,
+            generator: inst.curve.g,
+            target: inst.q,
+            subgroup_order: inst.curve.n,
+        }
+    }
+}
+
+/// A cold, bounded trace pool for one original DLP instance and S4 encoding.
+/// Sampled residuals vary within this family; the original target is bound.
+pub struct S4TraceState {
+    family: TraceFamily,
+    pool: f4::TracePool,
+    family_rejections: u64,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct S4TraceStats {
+    pub family_rejections: u64,
+    pub pool: f4::TraceStats,
+}
+
+impl S4TraceState {
+    pub fn new(inst: &Instance3) -> Self {
+        let family = TraceFamily::new(inst);
+        let bytes = serde_json::to_vec(&family).expect("integer trace-family serialization");
+        let label = format!("cubic-s4:{}", blake3::hash(&bytes).to_hex());
+        Self {
+            family,
+            pool: f4::TracePool::new(&label, 4, 1_000_000)
+                .expect("fixed bounded trace-pool parameters"),
+            family_rejections: 0,
+        }
+    }
+
+    pub fn family(&self) -> &str {
+        self.pool.family()
+    }
+
+    pub fn stats(&self) -> S4TraceStats {
+        S4TraceStats {
+            family_rejections: self.family_rejections,
+            pool: self.pool.stats(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct S4F4Stats {
     pub calls: u64,
@@ -25,6 +91,8 @@ pub struct S4F4Stats {
     pub max_basis_columns: usize,
     pub counter_scope: &'static str,
     pub krylov: KrylovStats,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace: Option<S4TraceStats>,
 }
 
 fn packed_basis(basis: &[f4::Poly]) -> Option<Vec<Vec<([u8; 3], u64)>>> {
@@ -164,6 +232,30 @@ pub fn solve_s4_f4_krylov_delayed(
     solve_with(inst, pre, x_r, rng, stats, work, Extraction::DelayedKrylov)
 }
 
+/// Complete coordinate recovery with certified trace reuse and delayed sparse
+/// extraction. Learning, rejected replay and certification work are charged.
+/// A changed original curve/field/target returns None, never empty roots.
+pub fn solve_s4_f4_trace_delayed(
+    inst: &Instance3,
+    pre: &SymmetrisedS4,
+    x_r: &E3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+    trace: &mut S4TraceState,
+) -> Option<Vec<[u64; 3]>> {
+    solve_with_trace(
+        inst,
+        pre,
+        x_r,
+        rng,
+        stats,
+        work,
+        Extraction::DelayedKrylov,
+        Some(trace),
+    )
+}
+
 fn solve_with(
     inst: &Instance3,
     pre: &SymmetrisedS4,
@@ -173,12 +265,47 @@ fn solve_with(
     work: &mut S4F4Stats,
     mode: Extraction,
 ) -> Option<Vec<[u64; 3]>> {
+    solve_with_trace(inst, pre, x_r, rng, stats, work, mode, None)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_with_trace(
+    inst: &Instance3,
+    pre: &SymmetrisedS4,
+    x_r: &E3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+    mode: Extraction,
+    mut trace: Option<&mut S4TraceState>,
+) -> Option<Vec<[u64; 3]>> {
     work.calls += 1;
     work.counter_scope="native F4 row counter plus counted restriction/border/root work; polynomial scalar housekeeping unpriced; serial costing required";
     stats.solves += 1;
     let mut muls = 0;
     let mut trial_rng = rng.clone();
-    let result = solve_inner(inst, pre, x_r, &mut trial_rng, stats, work, &mut muls, mode);
+    let result = if trace
+        .as_ref()
+        .is_some_and(|s| s.family != TraceFamily::new(inst))
+    {
+        trace.as_mut().unwrap().family_rejections += 1;
+        None
+    } else {
+        solve_inner(
+            inst,
+            pre,
+            x_r,
+            &mut trial_rng,
+            stats,
+            work,
+            &mut muls,
+            mode,
+            trace.as_deref_mut(),
+        )
+    };
+    if let Some(trace) = trace {
+        work.trace = Some(trace.stats());
+    }
     stats.fp_muls += muls;
     if result.is_some() {
         work.completed += 1;
@@ -199,6 +326,7 @@ fn solve_inner(
     work: &mut S4F4Stats,
     muls: &mut u64,
     mode: Extraction,
+    trace: Option<&mut S4TraceState>,
 ) -> Option<Vec<[u64; 3]>> {
     let f = &inst.curve.field;
     let before = f.muls();
@@ -214,12 +342,12 @@ fn solve_inner(
         *muls += terms.len() as u64;
         f4::normalise(&terms, f.p, f4::Ordering::Grevlex)
     });
-    let report = f4::f4(
-        &input,
-        3,
-        f.p,
-        &f4::F4Options::new(f4::Ordering::Grevlex, 24),
-    );
+    let opts = f4::F4Options::new(f4::Ordering::Grevlex, 24);
+    let report = if let Some(trace) = trace {
+        trace.pool.run(&input, 3, f.p, &opts, &[None; 3])
+    } else {
+        f4::f4(&input, 3, f.p, &opts)
+    };
     *muls += report.field_ops;
     work.basis_row_muls += report.field_ops;
     work.max_basis_columns = work.max_basis_columns.max(report.max_cols);
@@ -381,6 +509,32 @@ pub(super) fn triple_oracle_krylov_delayed(
 }
 
 #[allow(clippy::too_many_arguments)]
+pub(super) fn triple_oracle_trace_delayed(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    pre: &SymmetrisedS4,
+    r: &Pt3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+    trace: &mut S4TraceState,
+) -> Vec<Vec<(usize, i64)>> {
+    if r.inf {
+        return Vec::new();
+    }
+    if let Some(triples) = solve_s4_f4_trace_delayed(inst, pre, &r.x, rng, stats, work, trace) {
+        let found = base
+            .lookup(&inst.curve.field, r)
+            .map(|(i, s)| vec![vec![(i, s)]])
+            .unwrap_or_default();
+        settle_triple_signs(inst, base, r, triples, found)
+    } else {
+        work.fallback_calls += 1;
+        subspace_triple_oracle_groebner(inst, base, pre, r, rng, stats)
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn triple_with(
     inst: &Instance3,
     base: &SubspaceBase,
@@ -409,6 +563,111 @@ fn triple_with(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn certified_trace_preserves_distinct_residual_coordinates_and_charges_checks() {
+        let inst = generate_instance3(67, 3);
+        let pre = SymmetrisedS4::precompute(&inst.curve);
+        let mut trace = S4TraceState::new(&inst);
+        let mut work = S4F4Stats::default();
+        let mut stats = SolveStats::default();
+        for d in 1..=8 {
+            let r = inst.curve.mul(&inst.curve.g, d);
+            let expected = solve_s4_f4_krylov_delayed(
+                &inst,
+                &pre,
+                &r.x,
+                &mut StdRng::seed_from_u64(101 + d),
+                &mut SolveStats::default(),
+                &mut S4F4Stats::default(),
+            );
+            let got = solve_s4_f4_trace_delayed(
+                &inst,
+                &pre,
+                &r.x,
+                &mut StdRng::seed_from_u64(101 + d),
+                &mut stats,
+                &mut work,
+                &mut trace,
+            );
+            assert_eq!(got, expected, "distinct residual d={d}");
+        }
+        let trace_work = trace.stats();
+        assert_eq!(work.calls, 8);
+        assert!(stats.fp_muls > 0);
+        assert!(trace_work.pool.learned > 0);
+        assert!(trace_work.pool.accepted > 0);
+        assert!(trace_work.pool.certification_pairs > 0);
+        assert!(trace_work.pool.certification_multiplications > 0);
+        assert!(trace_work.pool.retained_words <= 1_000_000);
+        assert_eq!(trace_work.family_rejections, 0);
+    }
+
+    #[test]
+    fn changed_trace_family_is_unsupported_without_consuming_root_randomness() {
+        let inst = generate_instance3(7, 3);
+        let mut other = generate_instance3(7, 3);
+        other.q = other.curve.add(&other.q, &other.curve.g);
+        let pre = SymmetrisedS4::precompute(&other.curve);
+        let mut state = S4TraceState::new(&inst);
+        let mut rng = StdRng::seed_from_u64(107);
+        let mut before = rng.clone();
+        let mut work = S4F4Stats::default();
+        assert!(solve_s4_f4_trace_delayed(
+            &other,
+            &pre,
+            &other.curve.g.x,
+            &mut rng,
+            &mut SolveStats::default(),
+            &mut work,
+            &mut state
+        )
+        .is_none());
+        assert_eq!(rng.gen::<u64>(), before.gen::<u64>());
+        assert_eq!(state.stats().family_rejections, 1);
+        assert_eq!(state.stats().pool.learned, 0);
+        assert_eq!(work.unsupported_quotients, 1);
+    }
+
+    #[test]
+    fn certified_trace_graph_and_pivot_keep_the_full_relation_stream() {
+        let inst = generate_instance3(7, 3);
+        let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(3));
+        let mut opts = GaudryOptions {
+            solver: Solver::F4KrylovDelayed,
+            small_base: 1,
+            max_large_primes: 2,
+            max_residuals: 10000,
+            ..GaudryOptions::default()
+        };
+        let expected = run_gaudry_with_sampler(
+            &inst,
+            &base,
+            5,
+            &opts,
+            LargePrimeBackend::SymbolicGraph,
+            ResidualSampler3::RAddingLong,
+        );
+        assert_eq!(expected.correct, Some(true));
+        opts.solver = Solver::F4TraceDelayed;
+        for backend in [LargePrimeBackend::SymbolicGraph, LargePrimeBackend::Pivot] {
+            let got = run_gaudry_with_sampler(
+                &inst,
+                &base,
+                5,
+                &opts,
+                backend,
+                ResidualSampler3::RAddingLong,
+            );
+            assert_eq!(got.correct, Some(true));
+            assert_eq!(got.lp_input_digest, expected.lp_input_digest);
+            assert_eq!(got.residuals, expected.residuals);
+            assert_eq!(got.recovered_scalar, expected.recovered_scalar);
+            assert_eq!(got.group_ops, expected.group_ops);
+            assert!(got.s4_f4_stats.unwrap().trace.unwrap().pool.learned > 0);
+        }
+    }
+
     fn brute(inst: &Instance3, base: &SubspaceBase, r: &Pt3) -> Vec<Vec<(usize, i64)>> {
         let c = &inst.curve;
         let mut pairs = HashMap::<Pt3, Vec<Vec<(usize, i64)>>>::new();

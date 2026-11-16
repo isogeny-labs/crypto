@@ -253,6 +253,11 @@ no standard lab admission or canonical export validation is asserted.
   controlled combined comparisons improve over prepared S3; the isolated
   convolution ablation has two gains and six inconclusive cases. One delayed
   timing rejection remains visible. [pcc:unverified]
+- [Certified S4 trace reuse](AMENDMENT_13_CERTIFIED_TRACE.md) is integrated as
+  explicit `f4-trace-delayed`, preserving all basis/root/group checks. A cold
+  distinct-residual coordinate-batch comparison is frozen in
+  [this plan](certified-trace-plan.json); validation passes, timing unstarted.
+  [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;

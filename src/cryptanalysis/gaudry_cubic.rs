@@ -70,7 +70,10 @@ pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
 mod prepared;
 #[path = "gaudry_cubic_s4_f4.rs"]
 mod s4_f4;
-pub use s4_f4::{solve_s4_f4, solve_s4_f4_krylov, solve_s4_f4_krylov_delayed, S4F4Stats};
+pub use s4_f4::{
+    solve_s4_f4, solve_s4_f4_krylov, solve_s4_f4_krylov_delayed, solve_s4_f4_trace_delayed,
+    S4F4Stats, S4TraceState, S4TraceStats,
+};
 #[path = "gaudry_cubic_krylov.rs"]
 mod krylov;
 pub use krylov::KrylovStats;
@@ -3730,6 +3733,8 @@ pub enum Solver {
     F4Krylov,
     /// Same checked graph recurrence with bounded delayed dot products.
     F4KrylovDelayed,
+    /// Certified bounded trace reuse with the same delayed sparse extraction.
+    F4TraceDelayed,
     /// **Joux–Vitse**: look for decompositions into `k − 1 = 2` base
     /// points instead of `k = 3`, with one Weil-restricted `S₃` pair
     /// test on the residual itself.
@@ -3911,7 +3916,11 @@ fn run_gaudry_impl(
     };
     let pre = if matches!(
         solver,
-        Solver::Groebner | Solver::F4Groebner | Solver::F4Krylov | Solver::F4KrylovDelayed
+        Solver::Groebner
+            | Solver::F4Groebner
+            | Solver::F4Krylov
+            | Solver::F4KrylovDelayed
+            | Solver::F4TraceDelayed
     ) || cross_check
     {
         Some(SymmetrisedS4::precompute(curve))
@@ -3926,6 +3935,7 @@ fn run_gaudry_impl(
         }
         _ => None,
     };
+    let mut trace_state = (solver == Solver::F4TraceDelayed).then(|| S4TraceState::new(inst));
     let precompute_muls = curve.field.muls();
     curve.reset();
     let mut walk_sampler = match sampler {
@@ -4108,6 +4118,22 @@ fn run_gaudry_impl(
                 rep.oracle_fp_muls += stats.fp_muls - before;
                 decs
             }
+            Solver::F4TraceDelayed => {
+                let before = stats.fp_muls;
+                let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
+                let decs = s4_f4::triple_oracle_trace_delayed(
+                    inst,
+                    base,
+                    pre.as_ref().unwrap(),
+                    &r,
+                    &mut rng,
+                    &mut stats,
+                    work,
+                    trace_state.as_mut().unwrap(),
+                );
+                rep.oracle_fp_muls += stats.fp_muls - before;
+                decs
+            }
             Solver::F4Groebner | Solver::F4Krylov | Solver::F4KrylovDelayed => {
                 let before = stats.fp_muls;
                 let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
@@ -4187,6 +4213,7 @@ fn run_gaudry_impl(
                 | Solver::F4Groebner
                 | Solver::F4Krylov
                 | Solver::F4KrylovDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::F4TraceDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
                 Solver::SymmetricPairOnly
                 | Solver::PreparedSymmetricPairOnly
                 | Solver::PseudoRemainderPairOnly

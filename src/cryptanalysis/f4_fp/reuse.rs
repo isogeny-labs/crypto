@@ -75,7 +75,7 @@ impl TracePool {
         self.stats.clone()
     }
 
-    pub(super) fn run(
+    pub(crate) fn run(
         &mut self,
         input: &[Poly],
         vars: usize,

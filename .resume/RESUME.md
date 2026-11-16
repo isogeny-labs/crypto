@@ -1,6 +1,53 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (03:31Z, 16 November)
+## Current checkpoint (04:15Z, 16 November)
+
+STAGE18SOURCEIMPLEMENTED/VALIDATED,NOTTIMED. CertifiednativeF4TracePoolwired
+throughS4TraceStateboundtocurve/field/generator/subgroup/originaltarget; varying
+residualsinsidefamily. Everyinput/Buchbergercheckkept, crate-onlyrunvisibility.
+Oldbasiscubic/groupchecksandchargedfallbackpreserved. ExplicitF4TraceDelayed,
+CLIf4-trace-delayed; olddefaultsunchanged. NewcompletecoordinateAPIandfullIC
+graph/pivotprefixunitcasesPASS. StatecoldperICarm/percomponentbatch,capacity4,
+total1mwords; learning/reject/cert/extraction/destructionchargedinsidebatch.
+
+ValidationALLDONE49targetedcubicrelease+5genericpooltests+5S4exampletests+
+21native-analysis tests(9main+3oldcomponent+9newtrace),actual3examples/analyzers
+releasebuilds,library/examples/analyzerClippy-DwarningsPASS. No jobsactive.
+Logscapturedvalidation/certified-trace-*. Mainplotlabelnewmodeonlyaddedafter
+tests, actualanalyzersrebuilt/linted; no numericalcodechanged. Wrapperbashsyntax
+passes;driverhelp/optionsverified. Needcreatefinalsourcemanifest,commit/push
+SOURCE/SPECBEFOREwrapper. Sourceuncommitted,NO18DATA.
+
+FrozenAMENDMENT_13_CERTIFIED_TRACE.md+certified-trace-plan.json:p67/127/1039,
+seeds173/179/181,32publicscalarresiduals1..32perinstance,4groups*8DISTINCTXs,
+fresh_a/trace_a/fresh_b/trace_b,1warm5round,864batchstarts/executionsplanned
+(144warm720measure),6912coordinatesolves,CPU0/8GiB/900s/no-retries.
+Densequalification/symbolic/inputfixtureoutsidephaseREPORTED;notfullICorρ.
+Newexamplegaudry_cubic_s4_trace_compare+nativebin s4-trace-analysis+wrapperkind
+s4-trace-component. Strongmetadata/order/A/A/coldlearning/outputchecks, None
+neverempty; exactcensorstarts+noincompleteCI. Analysisreadsadjacentexit-code.txt;
+missing/nonzeroexitcannotauthorizefullICevenallrowsflushed. Positive6caseand
+negative/tampertestsPASS. Followuprequiresalloutputsvalid/no censor/atleast6
+of12largestfieldcontrolledgainswithacceptedcertifiedreplay. Newfullicplanonly
+AFTERoutcome;nevercomposephaseratiosintopipelinegains.
+
+PrimaryreviewDONE:Joux–VitseauthorPDFsection4p15–17andapplicability,
+URLhttps://www-fourier.ujf-grenoble.fr/~viva/research/articles/DLFq5.pdf,
+SHA6f3268a0ef8c50b51a79f8b64deff0c60374228a827bea73d4e590284cb68377,
+local/tmp/ic-joux-vitse-f4-remake.{pdf,txt}. Web403/timeoutsbutcurlSUCCEEDED.
+No paperfactor/failureprobabilitytransfertoourcubic(square)systems. Nativepool
+contracts/caps/damaged/coefficienttestsreviewed;KBstatus+2queriesunavailable,
+Conductorunavailable; receiptsinAmendment13. No noveltyclaim.
+
+PR4288currentpublished7cbdbd078(autofast-forwardonly17overviewPNGartifactmove
+afterabe2d908fstage17reports). Currenttree18source/docsareUNCOMMITTED. Old16/17
+evidenceandbodypublished;fullgoalACTIVE,noparity. LastCI03:16on9db2appchecks
+migrate/reviewsuccess;gate/size/artifactspending,nextallowed04:06(NOWallowed,
+deferuntilnewsourcepublished). Lastformalreviews03:30empty,next04:20absentevent.
+No merge/bypass. Mainadvancing,fetchbeforejournalappend;normalintegrationlater
+preserveALLsharedrecords+append-onlyledger. Localworks,noauthquestionneeded.
+
+## Previous checkpoint (03:31Z, superseded pending states)
 
 STAGE17FINISHED onpublished73efa9eb5beforecall. Authorizedlocaldir
 /workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17exit0,19.901s,
