@@ -15,12 +15,22 @@ For a nonsingular short-Weierstrass elliptic curve over F_p (5 ≤ p ≤ 499), e
 
 Induced pullback and norm maps are structural divisor-class maps; this tool does not compute Jacobian coordinates. Their composition on E is multiplication by the covering degree. They are not isogenies from E onto higher-dimensional Jacobians.
 
-This is not an exhaustive classification of maps, covers, correspondences or cohomological transfers. Nonconstant maps of smooth curves run from these higher-genus covers down to E. Export buttons provide a machine-readable JSON graph and a standalone SVG.
+This is not an exhaustive classification of maps, covers, correspondences or cohomological transfers. Nonconstant maps of smooth curves run from these higher-genus covers down to E. Export buttons provide a machine-readable JSON graph, a PNG image, and an SVG diagram.
+
+Use **PNG ↓** for a raster image, or **SVG ↓** for a scalable diagram. Both
+include the full graph, current curve parameters and a legend, independent of
+the interactive zoom. PNG images use twice the SVG dimensions (2000 pixels
+wide). Encoding failures display a message and keep the SVG option available.
 
 ## Files
 
 - `dist/math.mjs`: reusable pure computation module (`build`, `points`, and finite-field helpers).
 - `dist/app.mjs`: interactive graph, inspector, controls and exports.
+- `dist/export.mjs`: standalone SVG serialization and canvas PNG encoding.
 - `checks.mjs`: mathematical validation.
+- `export-checks.mjs`: optional Playwright browser download checks; requires
+  Playwright and Chromium. Set `CHROMIUM_PATH` for a system Chromium binary and
+  `CURVE_ATLAS_EXPORT_DIR` to retain images. Tests serve the bundled and modular
+  pages locally over HTTP.
 
 No build step or package install is required. Fonts have local fallbacks if Google Fonts is unavailable.

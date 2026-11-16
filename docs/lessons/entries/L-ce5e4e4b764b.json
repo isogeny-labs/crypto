@@ -1,0 +1,14 @@
+{
+  "action": "git archive the manifest, src, path dependencies, test fixtures and files src includes, instead of a full worktree",
+  "created": "2026-11-15T21:47:18Z",
+  "evidence": [
+    "research/ic_native_ifma_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a scratch build of the crate on a small disk",
+  "why": "the full tree is 12 GB; the archive subset builds lib tests in 10-15 min and about 1 GB"
+}
