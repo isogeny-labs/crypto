@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T23:40:00Z",
+ "id": "PCC-20261116-99ecee",
+ "kind": "statement",
+ "producer": {
+  "commit": "3eaf2d5733a98c2cb51e8103fdb6be5e0c8084a7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/native-richelot-chart-boundary-10/evidence/pr4455-scheduled-observation-03/ACTUAL_PR4455_MERGE_OBSERVATION.json",
+    "sha256": "51cc7dc495334776b0d169e33211067bc065325798041b7aa8726e0680c9929e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/native-richelot-chart-boundary-10/evidence/pr4455-scheduled-observation-03/ct625_actual_pr.json",
+    "sha256": "e1ad37c3391d5b4c269be388fa16ae08b96a77fd8ea948acdfe10e37df26e9ac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/native-richelot-chart-boundary-10/evidence/pr4455-scheduled-observation-03/ct625_own_runs.json",
+    "sha256": "014bd44c63e36791760c536f6416949def58cdab03a5ebd9e64f800d128e9293"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Scheduled PR4455 check at23:38 observes closed/merged23:17:13Z asdc2448150b0d7d3c77083a424322b5170ed2c97d, actualhead70141c8f71700b49cc098c3ea22db8fd23aa8fe9/base268f4bdc5b476b0f5a7763e5a9277def6f062b12 differing from original0729. Original0729 runs API54 completed workflows, including08/09 success and failures elsewhere, beyond30-check budget. Metadata observation only; full jobs/artifacts and actual-head custody/closure episode pending; no green/signed inference, never push closed lane."
+}

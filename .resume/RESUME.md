@@ -7622,3 +7622,21 @@ Compile/test exact new source and preserve every outcome; own0729CI23:35/eight w
 
 ## Errors
 No chart build/call has occurred. Sparse01/protection403/archive503/temporary cache/source-label/type/prose/whitespace failures remain preserved; original prototypes and sources unchanged. No benchmark, Jacobian/DLP, paid or signed promotion. [pcc:unverified]
+
+
+---
+
+2026-11-16T23:40:27.167057+00:00
+# First Richelot chart unit, report and scheduled PR4455 merge observation
+
+## What was done
+PCC-20261116-1422f5: frozen public3eaf/06fe86f1 source first native unit, four tests/eight phases0, all12 input/output point sets120 and complete5644 trace records. Whole110-file493468B source/compiler/qualifier/log archive retained. PCC-20261116-7557ce: separate two-page53282B report, both pages inspected, no producer rerun; original prospective report unchanged. PCC-20261116-99ecee: scheduled23:38 actual4455 merged23:17:13 asdc244815, finalhead70141c8f/base268f differsoriginal0729. Original0729 API54 workflows, including08/09 success and other failures, beyond30-check limit; detailed job/artifact audit pending. All unsigned. [pcc:unverified]
+
+## Decisions made
+Never push closed lane/chained-transfers. Freeze these outcomes as a normal child/source tag, then preserve both original0729 and final7014 CI/source changes and closure episode. Next substantive task is prospective independent Rust trace auditor11 with different arithmetic/transform/coverage backend and semantic mutations, without producer rerun. Fetch origin/main completed before this append, observed80a76623. Keep the original1216-prefix and failed/legacy ledgers; no side choosing or rechain. [pcc:unverified]
+
+## Open threads
+Full actual-head/source CI byte custody, original eight policy objects plus new whole unit archive awaiting original store/PCC, closure episode/lessons and fresh main-based successor PR with <=30 triggered checks. Independent trace audit then actual balanced divisor/Richelot composition/dual orientation. Original fullLP EKS population, field/library/compiler/general Jacobian and matched-cost/admission work remain unresolved; paid STOPe42949/locked autoresearcher8edec422 persist. [pcc:unverified]
+
+## Errors
+No native source modification/retry after original unit. Both b signs pass curve checks so orientation is not certified. Initial report layout issues corrected before7557ce; full initial rendered pages remain in scratch. Prior frozen source-label/type/sparse/transport/policy failures remain retained. PR4455 merge does not imply green CI, accepted complete artifacts or signed mathematical standing. Metadata-only timestamp labels in the new custody files are ingestion labels; raw API and files retain actual event times. [pcc:unverified]
