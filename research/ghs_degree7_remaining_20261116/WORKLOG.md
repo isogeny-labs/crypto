@@ -517,3 +517,29 @@ Run four cells, inspect any hits, and audit source/counter completeness.
 ### Errors
 
 None in source preparation.
+
+## 2026-11-15 23:37 America/Los_Angeles
+
+### What was done
+
+Committed degree-eight two-pole protocol/source at `e77997882dd9` and
+completed all four carrier/source cells. Each covered 3,858,261,660 logical
+candidates, 540 branch assignments, 10,800 bitset controls, and zero full
+identities. Point-filter survivors were 6,223 / 6,384 / 6,345 / 6,262 in
+carrier/source order (32280,68), (32280,84), (35349,68), (35349,84).
+CPU seconds were about 64 per cell. Wrote the bounded result note.
+
+### Decisions made
+
+These two branch-pole shapes are closed for the finite census, but degree
+eight still has nonbranch-square and three-quadratic-pole classes. Next
+screen linear nonbranch squares, where one-variable coefficient equations
+and necessary point filters keep the search bounded.
+
+### Open threads
+
+Commit receipts, freeze linear-square degree-eight screen, run and audit.
+
+### Errors
+
+None in the four counted runs.
