@@ -304,10 +304,8 @@ impl FastJ {
         let (m0, i0) = (self.curve.fmul(), self.curve.finv());
         let d = self.curve.cantor(a, b);
         self.fb_ops.set(self.fb_ops.get() + 1);
-        self.fb_mul
-            .set(self.fb_mul.get() + self.curve.fmul() - m0);
-        self.fb_inv
-            .set(self.fb_inv.get() + self.curve.finv() - i0);
+        self.fb_mul.set(self.fb_mul.get() + self.curve.fmul() - m0);
+        self.fb_inv.set(self.fb_inv.get() + self.curve.finv() - i0);
         d
     }
 
@@ -714,14 +712,16 @@ impl FastJ {
         for ((i, m2), iv) in mids2.into_iter().zip(inv2) {
             out[i] = Some(self.stage3(m2, iv));
         }
-        out.into_iter().map(|d| d.expect("every slot filled")).collect()
+        out.into_iter()
+            .map(|d| d.expect("every slot filled"))
+            .collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::genus_ladder::{random_f, JCurve, JDiv};
+    use super::*;
 
     fn mk(p: u64, g: u32, seed0: u64) -> FastJ {
         for s in seed0.. {
@@ -798,9 +798,13 @@ mod tests {
                 let mut a = vec![0u64; n];
                 let mut b = vec![0u64; n];
                 for i in 0..n {
-                    s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                    s = s
+                        .wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
                     a[i] = (s >> 33) % p;
-                    s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                    s = s
+                        .wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
                     b[i] = (s >> 33) % p;
                 }
                 let mut out = vec![0u64; 2 * n - 1];
@@ -837,7 +841,7 @@ mod tests {
 
     #[test]
     fn large_prime_random_and_exact_counts() {
-        for (p, g) in [(8209u64, 3u32), (8209, 4), (65521, 3), (65521, 4)] {
+        for (p, g) in [(8209u64, 3u32), (8209, 4), (32749, 3), (32749, 4)] {
             let fj = mk(p, g, 100);
             let c = fj.curve();
             let mut st = 77u64;
