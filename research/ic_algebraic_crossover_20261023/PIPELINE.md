@@ -32,11 +32,17 @@ The common band at 0, 0.1 and 1 GAE is a sensitivity scenario for recorded
 native work, not a calibration of the unmeasured construction and splitting.
 Neither a low S nor a solver-stage word reduction discharges those costs.
 
-**Framework pricing disclosure (2026-10-25).** The initial complete-DLP
-records showed that the legacy raw `S` includes a wall-priced solver term
-when `SolverCost.wall_ns` is present. Its `lower_bound` flag does not identify
-the construction and splitting omissions above. Raw `S` is an incomplete
-estimate and is not admitted as a counted comparison at L0. Use `ecbench
-band`, which reconstructs the recorded group/native-work scenarios, and
-keep their remaining omissions explicit. The registered v1 adapter and
-sealed sessions are retained unchanged for replay.
+**Pricing correction (2026-10-25).** The earlier disclosure in commit
+0e5356af incorrectly called the completed n=13/n=23 S wall-priced. Their
+solver charges use pinned word rates, 0.002304 and 0.001164 GAE per word
+respectively. The n=7 solver estimate is marked measured, but `ic_report`
+removes that wall term. A wall-time diagnostic in a record does not imply
+that the reported cost uses it. Native reconstruction from integer group
+counts, the named native counters and fixed rates reproduces the raw IC
+charges ([audit protocol](PRICING_AUDIT_PROTOCOL.md),
+[receipt](pipeline-receipts/pricing-audit-20261025/receipt.json)).
+Raw S is a fixed-price estimate of the counted parts; the `lower_bound`
+flag still does not identify our missing construction/splitting work.
+The numerical bands are unchanged. Earlier PDFs are retained and visibly
+superseded by corrected pricing reports. The registered v1 adapter and
+sealed sessions stay unchanged for replay.

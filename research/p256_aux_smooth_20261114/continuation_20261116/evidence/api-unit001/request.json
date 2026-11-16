@@ -1,0 +1,3 @@
+{
+  "code": "// Development API qualification, not a performance measurement.\nSetSeed(1);\nSetNthreads(1);\nSetColumns(256);\np := 115792089210356248762697446949407573530086143415290314195533631308867097853951;\nF := GF(p);\nassert #F eq p;\nR<x,y> := PolynomialRing(F,2,\"grevlex\");\nI := ideal<R | x^2-1,y-x>;\nG := GroebnerBasis(I);\nV := Variety(I);\nassert #V eq 2;\nfor v in V do\n    assert v[1]^2 eq 1 and v[2] eq v[1];\nend for;\nprintf \"P256_GB_PROBE_OK %o\\n\", #V;\nquit;\n"
+}

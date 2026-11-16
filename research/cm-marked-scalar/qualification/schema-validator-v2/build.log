@@ -1,0 +1,14 @@
+error[E0615]: attempted to take value of method `instance_path` on type `jsonschema::ValidationError<'_>`
+ --> research/cm-marked-scalar/protocol/validate.rs:9:78
+  |
+9 |     for error in validator.iter_errors(&instance) { eprintln!("{}: {}",error.instance_path,error); errors+=1; }
+  |                                                                              ^^^^^^^^^^^^^ method, not a field
+  |
+help: use parentheses to call the method
+  |
+9 |     for error in validator.iter_errors(&instance) { eprintln!("{}: {}",error.instance_path(),error); errors+=1; }
+  |                                                                                           ++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0615`.

@@ -1,0 +1,60 @@
+LIB "linalg.lib";
+proc require61(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump61(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require61(A[i,j]==1,"COHORT61_BINARY_CERTIFICATE");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../fix61-02/fixed-space61.sing"));
+require61(nrows(F61)==76 && ncols(F61)==38,"COHORT61_ACCEPTED_FIXED_DONOR");
+matrix fixed7661=F61;matrix profiles61=fixedProfiles61;
+intvec caps61=34,12,20,2;intvec original61=34,12,20,2;intvec offsets61=0,136,184,264;
+proc constraints61(intvec signed){
+ matrix C[136][38];int row=0;int p;int e;int col;int src;
+ for(p=1;p<=4;p++){
+  for(e=-caps61[p];e<2*signed[p];e++){
+   src=offsets61[p]+2*(e+original61[p])+1;
+   for(col=1;col<=38;col++){C[row+1,col]=profiles61[src,col];C[row+2,col]=profiles61[src+1,col];}
+   row=row+2;
+  }
+ }
+ require61(row==136,"COHORT61_ALL_LOCAL_ROWS");return(C);
+}
+intvec empty61=0,0,0,0;matrix control61=constraints61(empty61);
+matrix controlK61=matrix(syz(module(control61)));int controlDim61=mat_rk(controlK61);
+require61(controlDim61==1 && mat_rk(control61)==37,"COHORT61_REGULAR_CONTROL_DIMENSION");
+matrix fixedOne61=one38;require61(control61*fixedOne61==matrix(0,136,1),"COHORT61_REGULAR_ONE");
+link cert61="ASCII:w cohort-certificates61.sing";open(cert61);write(cert61,"ring cohortCertificate61=2,(w),dp;short=0;");
+dump61(cert61,"fixed7661",fixed7661);dump61(cert61,"control61",control61);dump61(cert61,"controlK61",controlK61);dump61(cert61,"fixedOne61",fixedOne61);
+link table61="ASCII:w cohort61.tsv";open(table61);write(table61,"id|e0|e1|e2|e3|degree|rank|kernel_dimension|status");
+int e061;int e161;int e261;int e361;int count61=0;int principal61=0;int excluded61=0;int dim61;int rank61;int ii61;int positive61;int degree61;intvec signed61;
+matrix C61[136][38];matrix K61[38][1];matrix R61[1][38];matrix H61[38][136];matrix bad61[38][136];
+list survivors61;list signs61;
+for(e161=-6;e161<=6;e161++){for(e261=-10;e261<=10;e261++){for(e361=-1;e361<=1;e361++){
+ e061=-e161-e261-e361;
+ if(e061!=0 || e161!=0 || e261!=0 || e361!=0){
+  require61(e061>=-17 && e061<=17,"COHORT61_COMPLETE_BALANCED_BOUND");count61++;signed61=e061,e161,e261,e361;
+  positive61=0;for(ii61=1;ii61<=4;ii61++){if(signed61[ii61]>0){positive61=positive61+signed61[ii61];}}
+  degree61=2*positive61;require61(degree61>0 && degree61<=34,"COHORT61_MAP_DEGREE_BOUND");
+  C61=constraints61(signed61);rank61=mat_rk(C61);dim61=38-rank61;
+  require61(dim61<=1,"COHORT61_GEOMETRY_KERNEL_MORE_THAN_ONE");
+  dump61(cert61,"Ccase"+string(count61),C61);
+  if(dim61==0){
+   H61=transpose(lift(module(transpose(C61)),module(unitmat(38))));require61(H61*C61==unitmat(38),"COHORT61_EXCLUSION_LEFT_INVERSE");excluded61++;
+   dump61(cert61,"Hcase"+string(count61),H61);
+  }else{
+   K61=matrix(syz(module(C61)));require61(ncols(K61)==1 && mat_rk(K61)==1 && C61*K61==matrix(0,136,1),"COHORT61_PRINCIPAL_KERNEL");
+   R61=transpose(lift(module(transpose(K61)),module(unitmat(1))));
+   H61=transpose(lift(module(transpose(C61)),module(transpose(unitmat(38)+K61*R61))));
+   require61(R61*K61==unitmat(1) && K61*R61+H61*C61==unitmat(38),"COHORT61_COMPLETE_PRINCIPAL_SPLITTING");
+   principal61++;survivors61[principal61]=K61;signs61[principal61]=signed61;
+   dump61(cert61,"Kcase"+string(count61),K61);dump61(cert61,"Rcase"+string(count61),R61);dump61(cert61,"Hcase"+string(count61),H61);
+  }
+  print("COHORT61_PATTERN id="+string(count61)+" e="+string(signed61)+" degree="+string(degree61)+" rank="+string(rank61)+" dimension="+string(dim61));
+  write(table61,string(count61)+"|"+string(e061)+"|"+string(e161)+"|"+string(e261)+"|"+string(e361)+"|"+string(degree61)+"|"+string(rank61)+"|"+string(dim61)+"|"+string(dim61));
+ }
+}}}
+require61(count61==818 && principal61+excluded61==818,"COHORT61_COMPLETE_COHORT_COUNT");
+// Check a deliberately corrupted left inverse on the regular control's nonzero kernel.
+bad61[1,1]=1;require61(bad61*control61!=unitmat(38),"COHORT61_BAD_RECOVERY_REJECTED");
+close(table61);close(cert61);
+link gen61="ASCII:w principal-generators61.sing";open(gen61);write(gen61,"ring principalSource61=2,(w),dp;short=0;");dump61(gen61,"fixed7661",fixed7661);
+for(ii61=1;ii61<=principal61;ii61++){dump61(gen61,"generator"+string(ii61),survivors61[ii61]);write(gen61,"intvec signs"+string(ii61)+"="+string(signs61[ii61])+";");}close(gen61);
+print("COHORT61_RESULT patterns="+string(count61)+" fixed_dimension=38 constraint_rows=136 principal_patterns="+string(principal61)+" excluded_patterns="+string(excluded61)+" complete_kernel_certificates=818 regular_control_dimension="+string(controlDim61)+" both_trace_parities=1");
+print("COHORT61_ALL_CHECKS_PASS");quit;
