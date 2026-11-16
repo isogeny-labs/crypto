@@ -1,0 +1,95 @@
+{
+  "recorded_utc": "2026-11-06T00:23:56.488442+00:00",
+  "head": "d55b2d9de7ee01f2a4be2f3ea3b7f2669ee7f58e",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "checks": {
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "d55b2d9de7ee01f2a4be2f3ea3b7f2669ee7f58e"
+      ],
+      "exit": 0,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_utf8": ""
+    },
+    "size": {
+      "command": [
+        "scripts/check-large-files.sh",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "d55b2d9de7ee01f2a4be2f3ea3b7f2669ee7f58e"
+      ],
+      "exit": 0,
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n"
+    },
+    "artifacts": {
+      "command": [
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "d55b2d9de7ee01f2a4be2f3ea3b7f2669ee7f58e"
+      ],
+      "exit": 0,
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "raw_utf8": "artifacts check: no data files committed\n"
+    },
+    "benchrec": {
+      "command": [
+        "python3",
+        "tools/benchrec.py",
+        "gate"
+      ],
+      "exit": 0,
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8",
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n"
+    },
+    "ledger-old-d30": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160"
+      ],
+      "exit": 0,
+      "bytes": 30,
+      "sha256": "325af3a7f521ecf5726897db78b24e14881fca2df0cb952c85476a7643e6fb2c",
+      "raw_utf8": "ledger: 142 entries, chain ok\n"
+    },
+    "body-lint": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "/workspace/pkm-helper-accounting-20261106/pr-body.md"
+      ],
+      "exit": 0,
+      "bytes": 25,
+      "sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb",
+      "raw_utf8": "lint-prose: 0 finding(s)\n"
+    }
+  },
+  "current_main_snapshot_prefix": {
+    "base": "c224878f19c01aa8954695c7bd20e42ad86379ef",
+    "exit": 1,
+    "raw_utf8": "ledger[95]: differs from the base branch (history rewritten)\nledger: 142 entries, BROKEN\n",
+    "scope": "unresolvedfrozenfork, notwaived"
+  },
+  "body": {
+    "sha256": "53a31730ecdf85cf77e09411dd6e4e1cbfa5c51d3dd4ed36a6b2e1770b2d6c3c",
+    "raw_utf8": "This continuation retains PKM replay work that was previously omitted: scalar row-space arithmetic, affine setup/witness/enumeration stages, and now constructor-helper and raw relation-encoding work. Selected helper scopes retain Result-error prefixes and mark underlying/aggregate overflow unavailable. The encoder has separate scalar-n and coordinate-p integer classes because it does not call the coordinate helpers. [pcc:unverified]\n\nProducer outputs add relation_encoding_work/v1. Replay compares it when present using the SHARED encoder and accepts older records without it. This is consistency checking, not independent counter completeness or execution proof. Missing old diagnostics are unknown for producer pricing, not zero. Producer and replay are TWO executed paths: equal counters do not make replay reusable/free. Within one execution, completed-oracle enumeration aliases attempted enumeration; inverse/sqrt diagnostics overlap expanded multiplication children. Current helper aggregates support the expanded-field view; atomic inverse/root pricing would require excluded-child attribution not yet emitted. [pcc:unverified]\n\nObserved validation on source `ab0df82d147f39252adde0a280a2b17f4b19f8b7`: **32 oracle tests pass**,0failed/ignored, including5new helper/encoder controls and27prior. New cases check disjoint-scope conservation/retained errors, helper and aggregate overflow without changed math, setup partition/invalid-root refusal, exact signed-encoder prefixes/overflow, diagnostic tampering and old-record readability. Formatting/CLIbuild0 and actual checkpoint-refusal MESSAGE+expectedexit1 pass before controlled nonexistent input/replay-envelope emission. PCC-20261106-59b811 is an unsigned producer observation. [pcc:unverified]\n\n**Overall validation remains FAIL101.** Final scoped Cargo lint and supervisor stop on the unchanged inherited library unused solve_one_with_trace and custody bool_comparison errors; final Cargo example strictlint remains unqualified. No suppression, test/assertion/ignore change or gate waiver. The fresh recipe guards22committed objects and alltrackedcleanliness beforeeveryphase; exact small captures/terminals and2freshbinaryhashes with preserved copies are committed. Eight unchanged binaries, oldraw and exact formal/gate/Mathlib objects are rechecked. No unchanged library/legacy/process/Lean test duplicates. [pcc:unverified]\n\nEarlier failed/capped receipts remain immutable and apply to ownsource: notably the6168-case library cap with2166pass/2clockfail/45ignored/1PKMunfinished/3954notreached,Cargoexitunknown/no fullpass, raw213453bytes NOT_UPLOADED. Initialb013 compilation101/zero tests, finalc93327controls/finallint101 and f86623controls/finallint101 are preserved separately. The earlier18declaration/0trusted formal audit and kernel replay against imports, not --fresh, retain only unchanged objects. No new theorem/Rust-cost bridge is claimed. [pcc:unverified]\n\nCoverage remains partial: synchronous current-thread helper calls only, raw encoder classes and selected affine/scalar reference paths. Other-thread work, primality/discriminant/raw guards, JSON/binding, uninstrumented constructor/container/logical/branch/counter/serialization, full F4/root/native work, whole-process memory/journal and qualified interruption/resume remain incomplete/unpriced. Old affine/producer overflow limitations remain. coverage_complete=false,priced_total=null,comparison_admissible=false. No timing/speedup or calibrated GAE result. [pcc:unverified]\n\nIntegration remains blocked by frozen PCC divergence after95common entries. Local original history is preserved; landed maintainer945/e2 re-chain operations were recorded, not copied/repeated or treated as a general contract. Report-only/no-edits request6664459966 asks for a sanctioned canonical provenance-preserving reconciliation contract. No ordinary main merge, ledger side-selection/rechain, frozen claim rewrite or shared verifier/keyring patch was attempted. PR3452/2949 are merged and their maintenance stopped. Auto-merge stays paused. Require exact-current-head gate,size,artifactsSUCCESS, applicable live reviews/resolvedthreads and expectedSHAguard after reviewed/validated resolution; absent/pending/old checks never qualify newsource. [pcc:unverified]\n\nOriginal G1-G6 acceptance unchanged: G1-G3/G6 partial,G4/G5 unrun,zero scientific panels,all cost/GAE/scaling metrics null. Full-panel historical card stays blocked/unfunded/unimplemented. No scientific panel,funding/lease/IAM/quota/pool/access change or checkpoint/protocol/runtime bypass. Next extend remaining native/F4/root/logical coverage and freeze calibrated nonoverlapping pricing, while retaining complete runtime/journal/G6 bridge requirements.\n\nStudy: `research/prime_ecdlp_three_leads_20261029/continuation-20261030/`. New `G2_HELPER_ACCOUNTING_20261106.md`, `validation/helper-accounting-20261106/{receipt.json,delivery-review.json}` and two-page `helper-accounting-20261106.pdf`/editable SVG carry the latest scope. Both final pages inspected; older reports/evidence preserved. Canonical scientific/curve/performance views are unchanged because no admitted metric/curveedge/phaseprice/reference changed. [pcc:unverified]\n",
+    "lint0actuallyobserved": true,
+    "initial1capture": "body-lint-attempts.json, no prematurepassclaim"
+  },
+  "limits": "localoldbasepolicies,NOTcurrentmainprefix/globalPCC/nativeaggregate/GitHubCI",
+  "pcc_standing": "unverified"
+}

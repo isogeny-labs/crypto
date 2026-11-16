@@ -18,6 +18,9 @@ mod band;
 #[path = "../../../src/cryptanalysis/ecbench/canonical.rs"]
 mod canonical;
 #[allow(dead_code)]
+#[path = "../../../src/cryptanalysis/ic_framework/solver_units.rs"]
+mod solver_units;
+#[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/ecbench/stats.rs"]
 mod stats;
 
@@ -44,6 +47,12 @@ mod cryptanalysis {
     }
     pub mod ic_boundary {
         pub use crate::evidence::pinned_calibration_ratios;
+        pub use crate::solver_units::PINNABLE_NATIVE;
+    }
+    pub mod ic_framework {
+        pub mod solvers {
+            pub use crate::solver_units::solver_unit_key;
+        }
     }
 }
 

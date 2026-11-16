@@ -40,7 +40,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly};
+use crate::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly, RunLog};
 
 // ── modular helpers (p < 2^32) ───────────────────────────────────────
 
@@ -435,6 +435,10 @@ pub enum Form {
     Sym,
     /// Chain variables only; `e_k` substituted by `sigma_k(x)`.
     Plain,
+    /// The generators of [`Form::Sym`] with the variables permuted so that
+    /// `e_1..e_m` come first (indices `0..m`) and the chain variables after
+    /// them (chain variable `i*l + j` at index `m + i*l + j`).
+    SymEFirst,
 }
 
 /// A system ready for [`f4_fp::f4`].
@@ -488,7 +492,7 @@ pub fn build_system(
     let l = base.levels();
     let chain = m * l;
     let n_vars = match form {
-        Form::Sym => chain + m,
+        Form::Sym | Form::SymEFirst => chain + m,
         Form::Plain => chain,
     };
     let unit = |idx: usize, k: u32| -> Vec<u32> {
@@ -550,7 +554,7 @@ pub fn build_system(
     let sym = symmetrise(m, xt, a, b, p, seed)?;
     let sym_terms = sym.len();
     match form {
-        Form::Sym => {
+        Form::Sym | Form::SymEFirst => {
             for k in 1..=m {
                 let mut f = sig[k].clone();
                 for c in f.values_mut() {
@@ -605,6 +609,9 @@ pub fn build_system(
             polys.push(to_poly(&s, p));
         }
     }
+    if form == Form::SymEFirst {
+        polys = polys.iter().map(|f| permute_e_first(f, chain, p)).collect();
+    }
     let input_terms = polys.iter().map(|f| f.len()).sum();
     let input_degree = polys
         .iter()
@@ -621,12 +628,43 @@ pub fn build_system(
     })
 }
 
+/// The variable permutation of [`Form::SymEFirst`] applied to a polynomial of
+/// the [`Form::Sym`] layout (`chain` chain variables, then `e_1..e_m`): the
+/// `e` block moves to the front, and the result is renormalised (Grevlex).
+pub fn permute_e_first(f: &Poly, chain: usize, p: u64) -> Poly {
+    let terms: Vec<(Vec<u32>, u64)> = f
+        .iter()
+        .map(|(e, c)| {
+            let mut ne = e[chain..].to_vec();
+            ne.extend_from_slice(&e[..chain]);
+            (ne, *c)
+        })
+        .collect();
+    f4_fp::normalise(&terms, p, Ordering::Grevlex)
+}
+
 /// Run F4 on a system with a wall-clock cap (a censoring rule only; the
 /// reported quantities are counts).
 pub fn solve_system(sys: &System, p: u64, cap_s: u64, max_degree: u32) -> F4Report {
     let mut opts = F4Options::new(Ordering::Grevlex, max_degree);
     opts = opts.with_budget(std::time::Duration::from_secs(cap_s));
     f4_fp::f4(&sys.polys, sys.n_vars, p, &opts)
+}
+
+/// [`solve_system`] with the per-step run log of [`f4_fp::take_run_log`]
+/// captured; the same options otherwise (the budget and the run log are
+/// compatible; only checkpointing excludes the run log).
+pub fn solve_system_logged(
+    sys: &System,
+    p: u64,
+    cap_s: u64,
+    max_degree: u32,
+) -> (F4Report, RunLog) {
+    let opts = F4Options::new(Ordering::Grevlex, max_degree)
+        .with_budget(std::time::Duration::from_secs(cap_s))
+        .capturing_run_log();
+    let rep = f4_fp::f4(&sys.polys, sys.n_vars, p, &opts);
+    (rep, f4_fp::take_run_log())
 }
 
 #[cfg(test)]
@@ -868,5 +906,63 @@ mod tests {
             let rep = solve_system(&sys, p, 120, 200);
             assert_eq!(!rep.inconsistent, want, "X = {xt}");
         }
+    }
+
+    /// `SymEFirst` is `Sym` up to the variable permutation that puts
+    /// `e_1..e_m` first: the generator sets agree after applying it, and the
+    /// permuted system is solved to the same consistency.
+    #[test]
+    fn sym_efirst_is_a_permutation_of_sym() {
+        let (p, a, b, d, m) = (211u64, 5u64, 9u64, 7u64, 2usize);
+        let base = Base::Subgroup {
+            factors: factor_ascending(d),
+            g: 1,
+            lo: 0,
+            zeta: primitive_root_of_unity(p, d).unwrap(),
+        };
+        let chain = m * base.levels();
+        for xt in [0u64, 3, 17, 100, 210] {
+            let sym = build_system(p, a, b, &base, m, xt, Form::Sym, 3).unwrap();
+            let ef = build_system(p, a, b, &base, m, xt, Form::SymEFirst, 3).unwrap();
+            assert_eq!(sym.n_vars, ef.n_vars);
+            assert_eq!(sym.sym_terms, ef.sym_terms);
+            assert_eq!(sym.input_terms, ef.input_terms);
+            assert_eq!(sym.input_degree, ef.input_degree);
+            let mut want: Vec<Poly> = sym
+                .polys
+                .iter()
+                .map(|f| permute_e_first(f, chain, p))
+                .collect();
+            let mut got = ef.polys.clone();
+            want.sort();
+            got.sort();
+            assert_eq!(want, got, "X = {xt}");
+            // the e block is at indices 0..m: the last generator is S~(e)
+            let s = ef.polys.last().unwrap();
+            assert!(s.iter().all(|(e, _)| e[m..].iter().all(|&v| v == 0)));
+            let r1 = solve_system(&sym, p, 120, 200);
+            let r2 = solve_system(&ef, p, 120, 200);
+            assert_eq!(r1.inconsistent, r2.inconsistent, "X = {xt}");
+        }
+    }
+
+    /// The logged solve is the same solve, with a non-empty step log.
+    #[test]
+    fn logged_solve_matches_and_records_steps() {
+        let (p, a, b) = (211u64, 5u64, 9u64);
+        let base = Base::Subgroup {
+            factors: factor_ascending(7),
+            g: 1,
+            lo: 0,
+            zeta: primitive_root_of_unity(p, 7).unwrap(),
+        };
+        let sys = build_system(p, a, b, &base, 2, 17, Form::Sym, 3).unwrap();
+        let r1 = solve_system(&sys, p, 120, 200);
+        let (r2, log) = solve_system_logged(&sys, p, 120, 200);
+        assert_eq!(r1.inconsistent, r2.inconsistent);
+        assert_eq!(r1.steps, r2.steps);
+        // (`field_ops` agree too, but the counter is process-wide unless
+        // `F4_FP_THREAD_OPS=1`, so parallel tests would pollute a comparison.)
+        assert!(!log.steps.is_empty());
     }
 }

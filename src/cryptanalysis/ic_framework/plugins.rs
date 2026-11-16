@@ -65,7 +65,7 @@ use crate::cryptanalysis::ic_boundary::{
     PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, WSumTable, WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
-use crate::cryptanalysis::koblitz_fast::FastPoint;
+use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
 use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
 use crate::cryptanalysis::koblitz_groebner::{f4_word_ops_thread, FieldStructure, SolverEngine};
 use crate::cryptanalysis::koblitz_index_calculus::build_frobenius_factor_base_from_divisor;
@@ -943,6 +943,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
     fn parameters(&self) -> &[(&str, &str)] {
         &[
             (
+                "halftrace_tables",
+                "0 (default) preserves legacy halftrace squarings; 1 builds a lazy byte-table cache in the charged factor-base phase, preserving ordered points",
+            ),
+            (
                 "divisor",
                 "`;`-separated indices into the factorisation of the Frobenius characteristic \
                  polynomial, e.g. `divisor=1;2` (a `,` would end the parameter on the command \
@@ -975,8 +979,15 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
             .as_ref()
             .ok_or("this instance is not a Koblitz curve, so it has no Frobenius to fold by")?;
         let idx = divisor_indices(params)?;
-        let frob = build_frobenius_factor_base_from_divisor(kc, &idx)
-            .ok_or_else(|| format!("no invariant subspace for divisor {idx:?} on this curve"))?;
+        let cached = match params.u64_or("halftrace_tables", 0)? {
+            0 => false,
+            1 => true,
+            _ => return Err("halftrace_tables must be 0 or 1".into()),
+        };
+        let frob = with_cached_point_lifts(cached, || {
+            build_frobenius_factor_base_from_divisor(kc, &idx)
+        })
+        .ok_or_else(|| format!("no invariant subspace for divisor {idx:?} on this curve"))?;
         let fold = if params.flag("no_fold") {
             ColumnFold::Abscissa
         } else if params.flag("projected") {
@@ -2348,7 +2359,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 3, 4 or 5"),
+            ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
         ]
     }
@@ -2606,6 +2617,9 @@ pub struct WWalkOracle<E> {
     free_checked: u64,
     free_emitted: u64,
     probe_hits: u64,
+    /// `lcheck=1` (with `tw=1|2`): both `[d]G = Q` checks read the target
+    /// walk's stored `[2^i]G` ladder.
+    lcheck: bool,
 }
 
 impl<E> WWalkOracle<E> {
@@ -2617,6 +2631,7 @@ impl<E> WWalkOracle<E> {
             free_checked: 0,
             free_emitted: 0,
             probe_hits: 0,
+            lcheck: false,
         }
     }
 
@@ -2628,6 +2643,22 @@ impl<E> WWalkOracle<E> {
     /// The `tw=1` walk of the last `prepare`, for reports and tests.
     pub fn target_walk(&self) -> Option<&TargetWalk<E>> {
         self.tw_table.as_ref()
+    }
+
+    /// With `lcheck=1`: the target walk's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`], already paid for in `prepare`), for the
+    /// pipeline's recovery check
+    /// ([`collect_and_solve_relations_touching_ladder`]); `None` otherwise.
+    ///
+    /// [`collect_and_solve_relations_touching_ladder`]: crate::cryptanalysis::ic_boundary::collect_and_solve_relations_touching_ladder
+    pub fn recovery_ladder(&self) -> Option<Vec<E>>
+    where
+        E: Copy + PartialEq,
+    {
+        self.tw_table
+            .as_ref()
+            .filter(|_| self.lcheck)
+            .map(TargetWalk::g_ladder)
     }
 }
 
@@ -2664,8 +2695,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("lcheck", "1 (needs tw=1 or tw=2): the [d]G = Q checks (the build's lazy final check, charged as tw_lazy_check_*, and the pipeline's recovery check, charged to the verification phase's group ops, where the pipeline reads the oracle's recovery ladder) compute [d]G from the [2^i]G ladder (i < bits(r)) that the target walk's set-up already doubled and paid for, one addition per set bit of d (the first free) instead of a double-and-add; the ladder is retained at no group operation; walk, stream, collisions, rows and entries are unchanged, only the check counts move (default 0)"),
             ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
             ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
+            ("aut", "3 (needs tw=1 or tw=2; j = 0 prime curves over p ≡ 1 mod 3 with 3 | r − 1): orbit-canonical keys under the order-3 automorphism ζ₃(x, y) = (ωx, y) = [κ](x, y) and negation (A = 6): each stored or probed point is keyed by min(x, ωx, ω²x), two field multiplications, listed as the unpriced counter aut_canonicalisations_uncharged exactly as rho.cubic lists its canonicalisations_uncharged (the §5a band charges it at w; bitop/v1 prices it as 2 field multiplications and 2 word compares); the rotation is stored with the entry, and a collision at rotation difference d is the row of E_t = ±[κ^d]E_s (the kept coefficients scaled by κ^d mod r), with lazy, cv=0, sib and the verified recomputation unchanged; the [κ]G = ζ₃(G) check is charged to the set-up (default off)"),
             ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 127 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery (default 1)"),
         ]
     }
@@ -2712,6 +2745,11 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if cj && tw == 0 {
             return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
         }
+        let lcheck = params.flag("lcheck");
+        if lcheck && tw == 0 {
+            return Err("wwalk: lcheck=1 needs tw=1 or tw=2".into());
+        }
+        self.lcheck = lcheck;
         if lazy && !opts.g_jumps {
             return Err("wwalk: lazy=1 needs g=1".into());
         }
@@ -2740,31 +2778,23 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                 ))
             }
         };
+        let aut = match params.get("aut") {
+            None | Some("0" | "1" | "off" | "no" | "false") => false,
+            Some("3") => true,
+            Some(v) => return Err(format!("wwalk: aut is 3 (or off), not `{v}`")),
+        };
+        if aut && tw == 0 {
+            return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
+        }
         if tw > 0 {
             if !opts.g_jumps || grow != 2 {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
-            let walk = if sib.is_some() {
-                if !cv {
-                    return Err("wwalk: sib with cv=0 is not supported".into());
-                }
-                TargetWalk::build_ext_sib(
-                    ctx.group,
-                    ctx.generator,
-                    ctx.target,
-                    fb,
-                    ctx.r,
-                    ctx.cofactor,
-                    x,
-                    jumps,
-                    seed,
-                    lazy,
-                    tw,
-                    cv,
-                    sib,
-                )?
-            } else {
-                TargetWalk::build_ext_cv(
+            if aut && sib.is_some() && !cv {
+                return Err("wwalk: sib with cv=0 is not supported".into());
+            }
+            let walk = if aut {
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2778,6 +2808,52 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     lazy,
                     tw,
                     cv,
+                    sib,
+                    true,
+                    lcheck,
+                )?
+            } else if sib.is_some() {
+                if !cv {
+                    return Err("wwalk: sib with cv=0 is not supported".into());
+                }
+                // `build_ext_sib` (chained jumps) with `lcheck`.
+                TargetWalk::build_lcheck(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    true,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    sib,
+                    false,
+                    lcheck,
+                )?
+            } else {
+                // `build_ext_cv` with `lcheck`.
+                TargetWalk::build_lcheck(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    cj,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    None,
+                    false,
+                    lcheck,
                 )?
             };
             self.free_pending = true;
@@ -2920,6 +2996,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             }
         }
         m
+    }
+
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        WWalkOracle::recovery_ladder(self)
     }
 }
 
@@ -3096,11 +3176,11 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 /// coordinates of its positive representative in Montgomery form, and the
 /// indices of `P` and `−P` in the run's base.
 #[derive(Clone, Copy, Debug)]
-struct SweepRep {
-    x: u64,
-    y: u64,
-    plus: usize,
-    minus: usize,
+pub(crate) struct SweepRep {
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) plus: usize,
+    pub(crate) minus: usize,
 }
 
 /// Direct-subtraction root finding on a prime curve: the decomposition
@@ -3142,6 +3222,11 @@ pub struct RootfindSubtractOracle<'i> {
     /// each is charged as.
     sweep_field_muls: u64,
     sweep_field_adds: u64,
+    /// `m = 3` with the pair table built elsewhere (`rootfind-subtract-gpu`,
+    /// `probe_build=pairs`): `prepare` builds no table, and the builder
+    /// charges the build and supplies its work counters here.
+    defer_table: bool,
+    deferred_table_work: BTreeMap<String, u64>,
 }
 
 impl<'i> RootfindSubtractOracle<'i> {
@@ -3158,7 +3243,20 @@ impl<'i> RootfindSubtractOracle<'i> {
             mismatches: 0,
             sweep_field_muls: 0,
             sweep_field_adds: 0,
+            defer_table: false,
+            deferred_table_work: BTreeMap::new(),
         }
+    }
+
+    /// Build no pair table in `prepare` (`m = 3`); the caller builds it,
+    /// charges it, and passes its [`PairTable::work_counters`] to
+    /// [`Self::set_deferred_table_work`].
+    pub(crate) fn defer_pair_table(&mut self) {
+        self.defer_table = true;
+    }
+
+    pub(crate) fn set_deferred_table_work(&mut self, work: BTreeMap<String, u64>) {
+        self.deferred_table_work = work;
     }
 }
 
@@ -3243,7 +3341,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         self.degenerate = vec![false; reps.len()];
         self.reps = reps;
         self.field = Some(f);
-        if self.m == 3 {
+        if self.m == 3 && !self.defer_table {
             let table = PairTable::build_negation_folded(ctx.group, fb);
             ops.merge(table.build_ops);
             self.table = Some(table);
@@ -3256,12 +3354,12 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
             .table
             .as_ref()
             .map(PairTable::work_counters)
-            .unwrap_or_default();
+            .unwrap_or_else(|| self.deferred_table_work.clone());
         // The sweep's `x_index` read per abscissa, and its two
         // conversions into Montgomery form.
         let k = self.reps.len() as u64;
         if k > 0 {
-            *out.entry("lookups".to_string()).or_insert(0) += k;
+            crate::cryptanalysis::ic_boundary::bump_counter(&mut out, "lookups", k);
             out.insert("montgomery_conversions".to_string(), 2 * k);
         }
         table_counted(out)
@@ -3349,9 +3447,42 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
 }
 
 impl RootfindSubtractOracle<'_> {
+    /// The prepared sweep: the field and one representative per abscissa,
+    /// in the order `decompose` walks them (`rootfind-subtract-gpu`).
+    pub(crate) fn sweep(&self) -> Option<(Fp64, &[SweepRep])> {
+        Some((self.field?, &self.reps))
+    }
+
+    /// The pair table's abscissae (`m = 3`), for the device probe set.
+    pub(crate) fn pair_abscissae(&self) -> Option<Vec<u64>> {
+        self.table.as_ref()?.map_abscissae()
+    }
+
+    /// What `decompose` charges for a target before its first candidate:
+    /// the two conversions into Montgomery form and the batched inversion
+    /// over the `k` abscissae.
+    pub(crate) fn charge_sweep_setup(&mut self, ops: &mut GroupOps, counters: &mut OracleCounters) {
+        let k = self.reps.len() as u64;
+        ops.field_ops.muls += 2;
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * k;
+        self.sweep_field_muls += 2 + 3 * k;
+        self.sweep_field_adds += k;
+    }
+
+    /// What `decompose` charges per non-degenerate candidate point, before
+    /// its lookup.
+    pub(crate) fn charge_candidate(ops: &mut GroupOps) {
+        ops.adds += 1;
+        ops.field_ops.muls += 4;
+        ops.field_ops.sqrs += 1;
+    }
+
     /// Is `t = R − F_summand` a base point (`m = 2`), or a pair sum
     /// (`m = 3`)?  A hit is re-added in the group before it is returned.
-    fn lookup(
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn lookup(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,
@@ -3843,8 +3974,11 @@ pub(crate) fn charge_system_build(
 ) {
     crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
     let terms: u64 = system.equations.iter().map(|p| p.terms.len() as u64).sum();
-    *extra.entry("bitop_word_ops".to_string()).or_insert(0) +=
-        terms + shape_calls * system.shape_word_ops(shape);
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_word_ops",
+        terms + shape_calls * system.shape_word_ops(shape),
+    );
 }
 
 /// The hash probes of one `lift_abscissae` call on `xs`: one per
@@ -3874,7 +4008,11 @@ pub(crate) fn charge_lift(
     lifted: bool,
 ) {
     crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
-    *extra.entry("bitop_hash_probes".to_string()).or_insert(0) += lift_probes(fb, xs, lifted);
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_hash_probes",
+        lift_probes(fb, xs, lifted),
+    );
 }
 
 impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
@@ -4001,7 +4139,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             // The descent, the copy, and two shape computations (here and
             // in the harness).
             charge_system_build(&mut self.totals.extra, &system, &shape, 2);
-            *self.totals.extra.entry("slot_systems".into()).or_insert(0) += 1;
+            crate::cryptanalysis::ic_boundary::bump_counter(
+                &mut self.totals.extra,
+                "slot_systems",
+                1,
+            );
             let SolverVerdict::Solved(solutions) = verdict else {
                 continue;
             };
@@ -4012,7 +4154,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
                 );
                 charge_lift(&mut self.totals.extra, fb, &xs, lifted.is_some());
                 if let Some(indices) = lifted {
-                    *self.totals.extra.entry("slot_hits".into()).or_insert(0) += 1;
+                    crate::cryptanalysis::ic_boundary::bump_counter(
+                        &mut self.totals.extra,
+                        "slot_hits",
+                        1,
+                    );
                     *self
                         .totals
                         .extra
@@ -4850,6 +4996,27 @@ mod tests {
             name: inst.name.clone(),
             field_degree: Some(inst.n),
         }
+    }
+
+    #[test]
+    fn cached_halftrace_factor_base_preserves_order_columns_and_coefficients() {
+        let inst = koblitz_instance(1, 9).unwrap();
+        let group = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &group);
+        let builder = KoblitzOrbitBase { instance: &inst };
+        let (_, baseline) = Params::parse_spec("koblitz-orbit:divisor=2").unwrap();
+        let (_, candidate) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=1").unwrap();
+        let mut ops = GroupOps::default();
+        let old = builder.build(&ctx, &baseline, &mut ops).unwrap();
+        let new = builder.build(&ctx, &candidate, &mut ops).unwrap();
+        assert_eq!(new.points, old.points);
+        assert_eq!(new.col_of, old.col_of);
+        assert_eq!(new.coef_of, old.coef_of);
+        assert_eq!(new.columns, old.columns);
+        let (_, invalid) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=2").unwrap();
+        assert!(builder.build(&ctx, &invalid, &mut ops).is_err());
     }
 
     /// Every relation the chained oracle returns re-sums to its target,
@@ -6032,6 +6199,105 @@ mod wwalk_pipeline_tests {
             crate::cryptanalysis::ic_boundary::TW_COEF_BITS
         )
         .is_ok());
+    }
+
+    /// `aut=3` on `j = 0`, `b = 7` prime-order curves: orbit-canonical keys
+    /// under `ζ₃` recover and verify the planted log with lazy, verified,
+    /// `cv=0`, sibling and one-seed walks; rotated collisions occur and are
+    /// solved; every canonicalisation charges two field multiplications;
+    /// curves without the structure and `tw=0` are refused.
+    #[test]
+    fn wwalk_aut3_recovers_on_j0_curves_and_refuses_elsewhere() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
+        let build = |shape: &str, bits: u32, seed: u64| {
+            let Instance::Prime(inst) = (CurveSpec::PrimeOrbitShape {
+                shape: shape.into(),
+                bits,
+                seed,
+            })
+            .build()
+            .unwrap() else {
+                panic!("a prime instance");
+            };
+            inst
+        };
+        let run = |inst: &PrimeInstance, arm: &str, size: u64, s: u64| {
+            let planted = (inst.r / 5 + 7919 * s) % inst.r;
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+            let base =
+                Params::parse_spec(&format!("prime-projected-abscissa:size={size},scan_cap=32"))
+                    .unwrap()
+                    .1;
+            let (name, oracle_params) = Params::parse_spec(&format!("{arm},seed={s}")).unwrap();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base,
+                oracle: name,
+                oracle_params,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let rep = run_pipeline(
+                &ctx(inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: inst },
+                &mut oracle,
+                planted,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            );
+            (rep, oracle, planted)
+        };
+        let pre2 = "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1";
+        let mut rotated = 0u64;
+        for (bits, cseed) in [(28u32, 3u64), (34, 5)] {
+            let inst = build("j0_b7", bits, cseed);
+            for (arm, size) in [
+                (format!("{pre2},lazy=1,aut=3"), 2u64),
+                (format!("{pre2},aut=3"), 2),
+                (format!("{pre2},cv=0,aut=3"), 2),
+                (format!("{pre2},lazy=1,sib=8,pool=256,aut=3"), 2),
+                (
+                    "wwalk:x=2.0,g=1,grow=2,tw=1,cj=1,lazy=1,aut=3".to_string(),
+                    1,
+                ),
+            ] {
+                for s in 0..4u64 {
+                    let (rep, oracle, planted) = run(&inst, &arm, size, s);
+                    let rep = rep.unwrap_or_else(|e| panic!("{arm} at {bits} bits: {e}"));
+                    assert!(
+                        rep.verified && rep.recovered == Some(planted),
+                        "{arm} at {bits} bits s={s}: planted log not recovered"
+                    );
+                    let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+                    assert!(
+                        ctr["aut_canonicalisations_uncharged"] > 0,
+                        "{arm}: no canonicalisation"
+                    );
+                    rotated += ctr["tw_aut_rotated_collisions"];
+                    let walk = oracle.target_walk().unwrap();
+                    assert!(walk.walk_ops.field_ops.muls >= 2 * walk.aut_canonicalisations);
+                }
+            }
+        }
+        // About two thirds of the collisions join different rotations.
+        assert!(rotated > 0, "no rotated collision was ever solved");
+        // Refusals: a curve without ζ₃, and the plain walk table.
+        let a3 = build("generic_a_minus_3", 28, 3);
+        let (rep, _, _) = run(&a3, &format!("{pre2},lazy=1,aut=3"), 2, 0);
+        assert!(rep.is_err(), "aut=3 on an a = -3 curve should be refused");
+        let j0 = build("j0_b7", 28, 3);
+        let (rep, _, _) = run(&j0, "wwalk:x=2.0,g=1,grow=2,aut=3", 2, 0);
+        assert!(rep.is_err(), "aut=3 without tw should be refused");
     }
 
     /// `tw=2` (size-2 `prime-projected-abscissa` base) and `lazy=1`, end to
