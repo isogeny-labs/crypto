@@ -1,0 +1,14 @@
+[package]
+name="hec-normalize631"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+num-bigint="0.4"
+[[bin]]
+name="normalize631"
+path="main.rs"
+[[bin]]
+name="local-admission631"
+path="local_admission.rs"

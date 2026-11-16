@@ -1,0 +1,83 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R83-DIRECT-CANDIDATE-FRACTIONS",
+  "version": 1,
+  "goal": "test positive ideal membership for all surviving T source fractions without a global standard basis",
+  "claims": [
+    {
+      "id": "direct_fraction_membership83",
+      "class": "exact_computation",
+      "statement": "19 complete denominator-cleared T(k) fraction polynomials reduce to zero against saved candidate generators"
+    }
+  ],
+  "arms": {
+    "reference": "R50 selected source, module and candidate presentation; R82 interrupted global approach",
+    "candidate": "direct positive reductions of 19 identities",
+    "positive": [
+      "literal source map and saved ring shape",
+      "all 19 zero remainders"
+    ],
+    "negative": [],
+    "baseline": {
+      "not_applicable_reason": "exact identity test, not comparison"
+    },
+    "A_A": {
+      "not_applicable_reason": "complete deterministic relation list"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "pinned R50 source/module/candidate bytes",
+      "R81 T-variable names",
+      "one thread",
+      "1200 seconds",
+      "4 GiB virtual"
+    ],
+    "measured": [
+      "19 remainder statuses",
+      "exit/errors/hashes"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete surviving coordinate set",
+    "seeds": [
+      83
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact algebra"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "number of zero-remainder positive memberships out of 19"
+  ],
+  "execution": {
+    "launchers": [
+      "REPLAY_CAS.sh candidate-direct83-01 DIRECT83.sing CANDIDATE_DIRECT83_ALL_CHECKS_PASS"
+    ],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 83,
+    "queue": "one math job",
+    "source_gate": "frozen Git bytes and donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit0, exact marker, zero native errors and all 19 zero remainders",
+    "failure": "retain raw; nonzero remainder is inconclusive, not false identity; freeze repair before new ID"
+  },
+  "analysis": {
+    "method": "sound positive membership via direct reduction against generators",
+    "scope": "rejected candidate only; nonzero remainder inconclusive; no normality or branch claim"
+  }
+}

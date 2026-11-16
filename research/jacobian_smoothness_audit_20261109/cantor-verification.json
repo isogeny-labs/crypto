@@ -1,0 +1,108 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "component": "Complete finite Cantor arithmetic and cyclic subgroup proportions",
+  "source_commit": "5ffeedb4560957ab9c4a7315d003da1826b69a7c",
+  "lean": "leanprover/lean4:v4.35.0",
+  "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "binding": "MumfordCantorGroupAudit.cantor_subgroup_audit_certificate",
+  "decl_sha256": "d679c6228528c41e37c2afa3267f6d36b9ab9631fdfbcd0f3ac54baff380d6ee",
+  "formal_sources": [
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean",
+      "sha256": "1ebb9df7ecd8c67df17b2a58e44afd95576ccf8f1c218e284260f8773d817bd7"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordCantor.lean",
+      "sha256": "898cbea8d29b6089b584b41093a50c8c874b40870324cd96a286cf228052e7b4"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordCantorGroup.lean",
+      "sha256": "87c9bf6250568be433375ad432667bd41af281844019ced0de12b2a49a8452e7"
+    }
+  ],
+  "gate": {
+    "path": "evidence/cantor-subgroup-gate.log",
+    "declarations": 170,
+    "failing": 0,
+    "trusted_native": 0,
+    "foundations": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "pcc": {
+    "claim_id": "PCC-20261109-4a0f82",
+    "full_local_check": "pass",
+    "checked_at": "2026-11-09T20:56:49Z",
+    "verifier_host": "762f5fc120c9",
+    "standing": "unverified",
+    "standing_command_exit": 2,
+    "signed_verdict": false
+  },
+  "identity": {
+    "id": "IDC1h95637a8da70e67cd",
+    "path": "cantor-identity-certificate.json",
+    "sha256": "b6cf9ca2f6b8d96ffb99e064d46995b55e883fac2a6f56799764c8dcbb70c71e",
+    "raw_bytes": 2081,
+    "variables": 5,
+    "total_degree": 6,
+    "points": 32,
+    "extra_points": 11,
+    "seed_hex": "0x202611092040",
+    "extra_seed_hex": "0x5e4ae096",
+    "modulus_decimal": "2305843009213693951",
+    "issue_and_extra_check": "accept; producer Rust process exit0",
+    "scope": "Scalar cancellation/quintic-factorization only; no gcd, all64group law, counts, geometry or independent host."
+  },
+  "exact_kernel_counts": {
+    "ambient": 8,
+    "smooth_including_identity": 7,
+    "cyclic_subgroup": 2,
+    "cyclic_smooth_including_identity": 2,
+    "ambient_nonzero_smooth": 6,
+    "cyclic_nonzero_smooth": 1,
+    "cantor_input_pairs": 64
+  },
+  "exact_kernel_fractions": {
+    "ambient": "7/8",
+    "cyclic": "1",
+    "difference_cyclic_minus_ambient": "1/8",
+    "ambient_nonzero_numerator_whole_denominator": "3/4",
+    "cyclic_nonzero_numerator_whole_denominator": "1/2"
+  },
+  "scope": "Complete actual reduced-Mumford pair/Cantor arithmetic model overF3; geometric Picard identification, large-prime/typical/asymptotic refutation, scaling family and new native multi-field population remain open.",
+  "new_native_curve_population": false,
+  "paid_spend": 0,
+  "frozen_prior_data_changed": false,
+  "source_freeze": "evidence/cantor-source-freeze-before-issue.json",
+  "sources": "cantor-sources.json",
+  "retained_failures": {
+    "arithmetic": [
+      "01",
+      "02",
+      "04",
+      "05",
+      "06"
+    ],
+    "group": [
+      "01",
+      "03",
+      "04"
+    ],
+    "raw04_archive": "evidence/mumford-cantor-build-04.log.gz"
+  },
+  "inherited_limitations": [
+    "root release tests blocked by sparse missing ecdl-tensor-ic",
+    "separate-host S3 manual dispatch returned404/nojob",
+    "divergent main/local immutable PCCledgers; no rewrite/forcepush"
+  ],
+  "report": {
+    "path": "reports/proof-20261109-cantor-subgroup/report.pdf",
+    "pages": 2,
+    "sha256": "0a5ba7e0f48852740319ed36464235769b1b0fbf22b3fbb383af098bfd243b2a",
+    "bytes": 64596,
+    "visually_inspected_at": "2026-11-09T21:01:17Z",
+    "diagram_visually_inspected": true
+  }
+}

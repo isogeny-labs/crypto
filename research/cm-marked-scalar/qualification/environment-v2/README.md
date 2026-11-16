@@ -1,0 +1,11 @@
+# Authorized submitter readback, 2026-11-08
+
+The documented host kubeconfig at /home/ec2-user/ops/eks-isolab/kubeconfig, context i-01f85a6c905181498@isolab.us-east-2.eksctl.io, authenticates the existing WorkerRole into isolab:submitters. The default kubeconfig instead attempts the denied remote-launcher role. Selecting the documented existing context changed no credential, IAM permission, Kubernetes binding or kubeconfig. Identity extra authentication metadata was omitted before publication; only username/groups are retained.
+
+Read-only actual NodePool get succeeded: cpu-spot has CPU16/memory128Gi/nodes1; cpu-l2-spot has CPU8/memory40Gi/nodes1. L2 memory40Gi exceeds the supplied32Gi policy. No cap was patched. Both ResourceQuota list and named get of isolab/jobs are forbidden. Nine retained Jobs were read, none active and one suspended; no job was submitted/restarted/cancelled. The NodePool snapshots are actual API objects, not MCP compiled-in defaults.
+
+AWS DescribeBudget succeeded. The MONTHLY COST budget, with no CostFilters, reports ActualSpend1044.578USD and a live BudgetLimit1100USD. The standing owner instruction supplied to this task retains a1000USD monthly ceiling; the higher object limit is not treated as authorization to exceed it. New cloud spending remains stopped under that instruction. The daily object reports limit200USD and ActualSpend229.599USD; its LastUpdatedTime is not a guaranteed billing-freshness timestamp, so no new-day balance is inferred from it.
+
+AWS defines CalculatedSpend.ActualSpend as the tracked amount used, and TimeUnit as the reset interval. Sources checked: https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_budgets_CalculatedSpend.html and https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_budgets_Budget.html . Budget alerts are not enforcement. No scope/filter/limit/billing setting was changed. The native count experiment's cloud ceiling remains zero.
+
+The approved migration receipt was read through sudo only for its schema/capture/original-disk metadata. No migrated credential was copied into the research tree. Conductor project secret-name listing was empty. No new agent/generator was launched, and the deadline-expired Diem state was preserved.

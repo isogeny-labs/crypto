@@ -1,0 +1,20 @@
+{
+  "schema": "source-fidelity-review/v1",
+  "status": "source_review_passed_scoped",
+  "source_packet": "affine-mul-runner-20261109",
+  "freeze_sha256": "7347919c56723f6680e2ea26ea58f3a82534d0df68dd1f1e093bad063bc1cdf8",
+  "execution_performed": false,
+  "checks": [
+    "Finding A1 is resolved by restoring original NatClassifier bytes and compiling exact Mathlib.Algebra.Field.ZMod source (1106 bytes, SHA5343882be47490c292c9da2f623221d3d0ea16e0ff252f0f944b4dffb07be5c3). The unsupported Basic-only replacement is preserved as an unexecuted initial proposal.",
+    "Verified every corrected frozen file hash and all137 ordered module imports against their actual source.133 prerequisites precede MulAcceptance, Controls, Readback and ExpectedFailure. The added instance module depends only on the two already bound external modules.",
+    "module_path validates module names and maps dots to nested paths consistently for staged source, compiler output, artifact receipt and final source check. Fresh workspace precedence permits importing the newly compiled Field.ZMod before NatClassifier; no historical proof body was changed.",
+    "One CPU,8GiB,no swap,10800-second total with900/9000/900 phases and120-second per-module limits remain unchanged. The additional call is charged inside the same shared compiler cap. No compile or timing prediction is asserted.",
+    "The26 target readbacks, noncanonical-storage False rejection, four final modules and serial cleanup remain unchanged. Publication and current ledger/lease release remain coordinator-bound."
+  ],
+  "findings": [],
+  "remaining": [
+    "Coordinator finalizes current ledger and published release for the reviewed137-call packet."
+  ],
+  "kb": "KB unavailable; retained closure, exact declarations and import maps used.",
+  "trust": "Source-only review; compiled acceptance remains pending."
+}

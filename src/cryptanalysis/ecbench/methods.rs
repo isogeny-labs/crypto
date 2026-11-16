@@ -31,7 +31,8 @@ use crate::cryptanalysis::cheon_counted::{
 };
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{
-    pair_claw, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome, ClawShape,
+    pair_claw, pair_claw_big, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome,
+    ClawShape,
 };
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
@@ -49,7 +50,9 @@ use crate::cryptanalysis::ecbench::koblitz_descent::{
 use crate::cryptanalysis::ecbench::negation_strong::NegStrongParams;
 use crate::cryptanalysis::ecbench::oracle::StaticDhOracle;
 use crate::cryptanalysis::ecbench::wordram_price;
-use crate::cryptanalysis::ecbench::workload::{CurveFacts, HashWork, Instance, WideInstance};
+use crate::cryptanalysis::ecbench::workload::{
+    BigInstance, CurveFacts, HashWork, Instance, WideInstance,
+};
 use crate::cryptanalysis::ecbench_large_prime::{
     self as large_prime, SolveConfig as LargePrimeConfig,
 };
@@ -512,6 +515,13 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: super::prime_orbit::ID,
             family: "ic",
@@ -1178,6 +1188,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_framework::run_pipeline + ecbench::ic_report(counted)",
             applies: Applies::Any,
             params: IC_COUNTED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
         },
         MethodDecl {
             id: "ic.tensor_contraction_v1",
@@ -2928,6 +2946,91 @@ fn solve_wide(
     }
 }
 
+/// The methods that have a three-word (`128 ≤ n ≤ 191`, subgroup order
+/// past `2^128`) implementation: the strong rho in all four registered
+/// forms (each is generic over the field word and scalar) and the pair
+/// claw in both accountings.  Any other method refuses a big curve rather
+/// than run on a truncation; [`applicable`] refuses it at plan time.
+pub const BIG_METHODS: [&str; 6] = [
+    "rho.signed_frobenius_strong",
+    "rho.signed_frobenius_strong_legacy",
+    "rho.signed_frobenius_strong_escape",
+    "rho.signed_frobenius_strong_v2",
+    "claw.pair_table",
+    "claw.pair_table_v2",
+];
+
+fn big_refusal(id: &str, n: u32) -> String {
+    format!(
+        "`{id}` has no three-word implementation; on a Koblitz curve with 128 ≤ n ≤ 191 (here n = {n}, a subgroup order past 2^128) only {} run",
+        BIG_METHODS.join(", ")
+    )
+}
+
+/// The most base points a claw on a big curve may build: `2^24` points (a
+/// few hundred megabytes with the table).  The cost-minimising base at
+/// `n = 131` is about `4·10^10` points, which no host holds; a run asks for
+/// a scaled-down base instead of aborting on the allocation.
+pub const BIG_CLAW_MAX_BASE: u64 = 1 << 24;
+
+/// The claw's shape on a big curve: [`ClawShape`] from the parameters,
+/// the step budget by the wide rule saturated at `u64::MAX` (the floor of a
+/// `2^129` subgroup times the cap multiple is past `2^64`), and a refusal
+/// when the base would exceed [`BIG_CLAW_MAX_BASE`] points.
+fn big_claw_shape(m: &ResolvedMethod, r: f64, n: u32) -> Result<ClawShape, String> {
+    let multiple = param_u64(m, "cap_multiple")? as f64;
+    let shape = ClawShape {
+        base_scale: param_f64(m, "base_scale")?,
+        table_scale: param_f64(m, "table_scale")?,
+        max_adds: ((crate::cryptanalysis::ic_boundary::generic_floor_ops(r, 1.0) * multiple)
+            as u64)
+            .saturating_add(4096),
+    };
+    let base = shape.seeds(r, n).saturating_mul(2 * u64::from(n));
+    if base > BIG_CLAW_MAX_BASE {
+        return Err(format!(
+            "`{}` with base_scale = {} builds {base} base points on n = {n}, past the {BIG_CLAW_MAX_BASE} a big-curve claw may hold; lower base_scale",
+            m.id, shape.base_scale
+        ));
+    }
+    Ok(shape)
+}
+
+/// The methods of [`BIG_METHODS`] on a big Koblitz curve.
+fn solve_big(
+    m: &ResolvedMethod,
+    bi: &BigInstance,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::koblitz_big::W192;
+    let parse = |s: &String| W192::parse_hex(s).ok_or_else(|| format!("bad hex `{s}`"));
+    let q = RawPointG::Affine {
+        x: parse(&target[0])?,
+        y: parse(&target[1])?,
+    };
+    let r = bi.kc.r192().to_f64();
+    match m.id.as_str() {
+        "rho.signed_frobenius_strong"
+        | "rho.signed_frobenius_strong_legacy"
+        | "rho.signed_frobenius_strong_escape"
+        | "rho.signed_frobenius_strong_v2" => {
+            let t = Instant::now();
+            let rho = bi.kc.strong_rho();
+            strong_run(m, &rho, q, r, bi.kc.n, seed, t)
+        }
+        "claw.pair_table" | "claw.pair_table_v2" => {
+            let shape = big_claw_shape(m, r, bi.kc.n)?;
+            let v2 = m.id == "claw.pair_table_v2";
+            let t = Instant::now();
+            let o = pair_claw_big(bi, q, seed, shape, v2);
+            let wall = t.elapsed().as_nanos() as u64;
+            Ok(claw_report(o, shape, r, bi.kc.n, wall, v2))
+        }
+        other => Err(big_refusal(other, bi.kc.n)),
+    }
+}
+
 fn parse_hex(s: &str) -> Result<u64, String> {
     u64::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|_| format!("bad hex `{s}`"))
 }
@@ -3012,6 +3115,15 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on subfield_fp3 / gls_fp2 curves only; {} is {}",
             curve.slug, curve.family
         )),
+        Instance::Big(bi) => {
+            if !BIG_METHODS.contains(&m.id.as_str()) {
+                return Err(big_refusal(&m.id, bi.kc.n));
+            }
+            if m.id.starts_with("claw.") {
+                big_claw_shape(m, bi.kc.r192().to_f64(), bi.kc.n)?;
+            }
+            Ok(())
+        }
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -3120,7 +3232,10 @@ fn known_log_applicable(
     if param_u64(m, "max_trials")? == 0 {
         return Err("known-log max_trials must be positive".into());
     }
-    let r = u64::try_from(curve.r).map_err(|_| "known-log needs an order below 2^64")?;
+    let r = curve
+        .r
+        .checked_u64()
+        .ok_or("known-log needs an order below 2^64")?;
     let params = super::known_log::Parameters {
         size: usize::try_from(param_u64(m, "size")?).map_err(|_| "base size exceeds usize")?,
         base_seed: param_u64(m, "base_seed")?,
@@ -3470,7 +3585,9 @@ pub fn solve_measured(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
-    let mut rep = if let Instance::Wide(wi) = inst {
+    let mut rep = if let Instance::Big(bi) = inst {
+        solve_big(m, bi, target, seed)?
+    } else if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
@@ -3709,6 +3826,9 @@ fn solve_inner(
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
+    if let Instance::Big(_) = inst {
+        return Err("a big instance goes through solve_big".into());
+    }
     if d.family == "cheon" {
         let Instance::Prime(i) = inst else {
             return Err(format!(
@@ -3755,6 +3875,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
@@ -4118,6 +4241,7 @@ fn solve_inner(
             solve_generic(m, &i.curve, i.generator, target, one_word(i.r)?, seed)
         }
         (Instance::Wide(_), _)
+        | (Instance::Big(_), _)
         | (Instance::Fp4(_), _)
         | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
@@ -5151,6 +5275,9 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+            unreachable!("returned above")
+        }
     }
 }
 
@@ -5628,7 +5755,7 @@ fn solve_claw(
     }
     .ok_or("not a Koblitz instance")?;
     let wall = t.elapsed().as_nanos() as u64;
-    Ok(claw_report(o, shape, u128::from(inst.r), inst.n, wall, v2))
+    Ok(claw_report(o, shape, inst.r as f64, inst.n, wall, v2))
 }
 
 /// The claw on a wide Koblitz curve; the step budget is [`rho_cap`]'s rule
@@ -5657,13 +5784,13 @@ fn solve_claw_wide(
         pair_claw_wide(wi, target, seed, shape)
     };
     let wall = t.elapsed().as_nanos() as u64;
-    Ok(claw_report(o, shape, wi.kc.r, wi.kc.n, wall, v2))
+    Ok(claw_report(o, shape, wi.kc.r as f64, wi.kc.n, wall, v2))
 }
 
 fn claw_report(
     o: ClawOutcome,
     shape: ClawShape,
-    r: u128,
+    r: f64,
     n: u32,
     wall: u64,
     v2: bool,
@@ -5689,7 +5816,7 @@ fn claw_report(
         detail["accounting"] = json!("v2");
     }
     SolveReport {
-        recovered: o.recovered.map(ExactScalar::from),
+        recovered: o.recovered,
         exhausted: o.exhausted,
         phases,
         total_gae: total,
@@ -5860,7 +5987,7 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
     let (recovered, c, walk_steps, walks, fruitless, capped, wasted, entries, automorphisms, lost) =
         match &outcome {
             Ok(o) => (
-                Some(o.scalar.to_u128()),
+                ExactScalar::from_biguint(&o.scalar.to_biguint()),
                 o.charges,
                 o.walk_steps,
                 o.walks,
@@ -5953,7 +6080,7 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
         "scalar_multiplication_charge": "1.5·log2(r) additions each for the two start multiplications and every candidate check (ic_boundary::signed_frobenius_rho's convention); the start multiples j·stride are charged as additions",
     });
     Ok(SolveReport {
-        recovered: recovered.map(ExactScalar::from),
+        recovered,
         exhausted: recovered.is_none(),
         phases,
         total_gae,
@@ -6080,7 +6207,7 @@ fn strong_run<F: RhoField, S: RhoScalar>(
         counters.insert("fruitless_escapes".to_string(), o.escapes);
     }
     Ok(SolveReport {
-        recovered: Some(ExactScalar::from(o.scalar.to_u128())),
+        recovered: ExactScalar::from_biguint(&o.scalar.to_biguint()),
         exhausted: false,
         total_gae: setup.gae + search.gae,
         phases: vec![setup, search],
@@ -6168,6 +6295,17 @@ fn ic_report(
     // (`audit::legacy_solver_rounding` reproduces those records).
     let mut total = rep.total_gae;
     if let Some(s) = &rep.decomposition.solver {
+        // New opt-in Boolean variants retain their exact Gray search work
+        // separately from calibrated Macaulay word XORs. A reduction in the
+        // latter must not silently price the tail enumeration at zero.
+        for name in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            if let Some(&count) = s.extra.get(name).filter(|&&count| count > 0) {
+                phases[2].native.insert(name.into(), count);
+            }
+        }
         // `counted` (field multiplications priced at the curve's own
         // multiplications per addition, `gaudry-d4`) is a count, like
         // `pinned`, and stays in the total.
@@ -8525,7 +8663,7 @@ pub fn dump_factor_base(
         _ => None,
     };
     let (name, params) = Params::parse_spec(fb_spec)?;
-    if let Instance::Wide(_) = &inst {
+    if let Instance::Wide(_) | Instance::Big(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
     if matches!(
@@ -8667,6 +8805,7 @@ pub fn dump_factor_base(
             })
         }
         Instance::Wide(_)
+        | Instance::Big(_)
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
@@ -8675,7 +8814,7 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) => unreachable!("returned above"),
+        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
     }
 }
 
@@ -8818,7 +8957,7 @@ mod tests {
                     Workload::build(&spec, 20261027, index, TargetKind::Planted).unwrap();
                 let a = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
                 let b = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
-                assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+                assert_eq!(a.recovered, w.planted);
                 assert_eq!(a.recovered, b.recovered);
                 assert_eq!(a.counters, b.counters);
                 assert_eq!(a.total_gae, b.total_gae);
@@ -8947,11 +9086,7 @@ mod tests {
             for index in 0..3 {
                 let (w, inst) = Workload::build(&spec, 11, index, TargetKind::Planted).unwrap();
                 let rep = solve(&m, &inst, &w.curve, &w.target, 40 + index).unwrap();
-                assert_eq!(
-                    rep.recovered,
-                    w.planted.map(ExactScalar::from),
-                    "record target"
-                );
+                assert_eq!(rep.recovered, w.planted, "record target");
                 assert_eq!(rep.automorphisms_used, 2);
                 let per = rep.detail["per_target"].as_array().unwrap();
                 assert_eq!(per.len(), batch.parse::<usize>().unwrap());
@@ -9736,7 +9871,10 @@ mod accounting_rules_tests {
             ],
         );
         let rep = run(&f4, &inst, &facts, 4242, 6);
-        assert_eq!(rep.recovered, Some(ExactScalar::from(4242 % facts.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(4242 % facts.r.checked_u128().unwrap()))
+        );
         let solver = rep.solver.as_ref().expect("solver block");
         let fc = solver
             .degree_of_regularity_forecast
@@ -9748,7 +9886,7 @@ mod accounting_rules_tests {
         assert!(fc.cost.columns > 0);
         assert_eq!(fc.cost.hope_ratio_band.len(), 3);
         let floor = fc.cost.rho_floor_group_additions.unwrap();
-        let expected = (std::f64::consts::PI * facts.r as f64 / (2.0 * 34.0)).sqrt();
+        let expected = (std::f64::consts::PI * facts.r.to_f64() / (2.0 * 34.0)).sqrt();
         assert!((floor - expected).abs() < 1e-6, "{floor} vs {expected}");
         assert_eq!(fc.semi_regular_degree, solver.semi_regular_degree);
         assert!(fc.certified_degree_of_regularity.is_none());
@@ -9990,9 +10128,12 @@ mod accounting_rules_tests {
         for i in 0..runs {
             let k = 12_345 + 40_503 * u128::from(i);
             let rep = run(&m, &inst, &facts, k, 100 + i);
-            assert_eq!(rep.recovered, Some(ExactScalar::from(k % facts.r)));
+            assert_eq!(
+                rep.recovered,
+                Some(ExactScalar::from(k % facts.r.checked_u128().unwrap()))
+            );
             assert!(rep.automorphisms_used <= facts.automorphisms_available);
-            s += rep.total_gae / (facts.r as f64).sqrt();
+            s += rep.total_gae / (facts.r.to_f64()).sqrt();
         }
         let ratio = s / runs as f64 / floor;
         assert!(ratio > 1.0, "mean S over the A = 6 floor is {ratio}");
@@ -10011,7 +10152,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4321u128 % facts.r;
+            let k = 4321u128 % facts.r.checked_u128().unwrap();
             let frozen = run(&method(old, &[]), &inst, &facts, k, 7);
             let v2 = run(&method(new, &[]), &inst, &facts, k, 7);
             assert_eq!(frozen.recovered, Some(ExactScalar::from(k)));
@@ -10122,7 +10263,7 @@ mod accounting_rules_tests {
                 curves.push(&prime);
             }
             for (inst, facts) in curves {
-                let r = facts.r;
+                let r = facts.r.checked_u128().unwrap();
                 for (j, k) in [3u128, r - 2, r / 3 + 5, r / 2 + 11]
                     .into_iter()
                     .enumerate()
@@ -10206,7 +10347,7 @@ mod accounting_rules_tests {
                 unreachable!()
             };
             let (g, gen) = (&p.curve, p.generator_point());
-            for k in 1..facts.r as u64 {
+            for k in 1..facts.r.checked_u64().unwrap() {
                 let mut scratch = GroupOps::default();
                 let q = g.mul(&mut scratch, gen, k);
                 for seed in 0..4u64 {
@@ -10495,13 +10636,16 @@ mod accounting_rules_tests {
                     k,
                     i,
                 );
-                assert_eq!(v.recovered, Some(ExactScalar::from(k % facts.r)));
+                assert_eq!(
+                    v.recovered,
+                    Some(ExactScalar::from(k % facts.r.checked_u128().unwrap()))
+                );
                 assert_phases_sum("strong_v2", &v);
                 old += o.total_gae;
                 new += v.total_gae;
             }
             assert!(new * 2.0 < old, "n={n}: v1 {old}, v2 {new}");
-            let floor_ops = ((facts.r as f64).sqrt()
+            let floor_ops = ((facts.r.to_f64()).sqrt()
                 * crate::cryptanalysis::ecbench::record::floor_s(facts.automorphisms_available))
                 * runs as f64;
             assert!(old / floor_ops > 2.0, "n={n}: frozen set-up dominates");
@@ -10842,7 +10986,7 @@ mod accounting_rules_tests {
             let rep = run(&method(id, params), inst, facts, 4242, 6);
             assert_eq!(
                 rep.recovered,
-                Some(ExactScalar::from(4242 % facts.r)),
+                Some(ExactScalar::from(4242 % facts.r.checked_u128().unwrap())),
                 "{id}"
             );
             assert_phases_sum(id, &rep);
@@ -10856,7 +11000,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4242 % facts.r;
+            let k = 4242 % facts.r.checked_u128().unwrap();
             let rep = run(&method(id, &[]), &inst, &facts, k, 6);
             assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
             assert_phases_sum(id, &rep);
@@ -11008,7 +11152,7 @@ mod accounting_tests {
             applicable(&v2, &inst, &w.curve).unwrap();
             let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 5).unwrap());
             let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 5).unwrap());
-            assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+            assert_eq!(a.recovered, w.planted);
             assert_eq!(b.recovered, a.recovered);
             // The frozen record keeps its three phases, its counters and its
             // `unpriced`, with no verification and no factor-base tally.
@@ -11085,7 +11229,7 @@ mod accounting_tests {
         applicable(&v2, &inst, &w.curve).unwrap();
         let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 7).unwrap());
         let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 7).unwrap());
-        assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+        assert_eq!(a.recovered, w.planted);
         assert_eq!(b.recovered, a.recovered);
         assert!(a.unpriced.is_empty(), "frozen: {:?}", a.unpriced);
         assert!(!a.counters.contains_key("root_search_field_muls_uncharged"));
@@ -11462,6 +11606,7 @@ mod accounting_tests {
     }
 }
 
+/// `rho.negation_strong` end to end through `solve`, on curves over F_(2^m)^4.
 #[cfg(test)]
 mod neg_strong_tests {
     use super::*;
@@ -11497,7 +11642,8 @@ mod neg_strong_tests {
             let (inst, facts) = f2m4(m, 1);
             applicable(&strong, &inst, &facts).unwrap();
             for seed in 0..4u64 {
-                let k = (17 + 1009 * u128::from(seed) + u128::from(m)) % facts.r;
+                let k = (17 + 1009 * u128::from(seed) + u128::from(m))
+                    % facts.r.checked_u128().unwrap();
                 let target = inst.mul_generator_hex(k).unwrap();
                 let a = solve(&strong, &inst, &facts, &target, seed).unwrap();
                 let b = solve(&plain, &inst, &facts, &target, seed).unwrap();
@@ -11540,9 +11686,9 @@ mod neg_strong_tests {
             &[("lanes", "8"), ("dp_bits", "6"), ("step_cap_factor", "0")],
         );
         let (inst, facts) = f2m4(17, 1);
-        assert!(u64::try_from(facts.r).is_err());
+        assert!(facts.r.checked_u64().is_none());
         applicable(&strong, &inst, &facts).unwrap();
-        let k = (u128::MAX / 5) % facts.r;
+        let k = (u128::MAX / 5) % facts.r.checked_u128().unwrap();
         let target = inst.mul_generator_hex(k).unwrap();
         let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
         assert!(rep.counters["walk_steps"] >= 1_000_000);
@@ -11752,7 +11898,7 @@ mod engine_items_tests {
         assert_ne!(base.method_id, cv0.method_id);
         let mut saved_total = 0.0;
         for seed in 0..12u64 {
-            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r.checked_u128().unwrap() - 1);
             let d = run(&base, &inst, &facts, k, seed);
             let e = run(&explicit, &inst, &facts, k, seed);
             let n = run(&cv0, &inst, &facts, k, seed);
@@ -11832,7 +11978,7 @@ mod engine_items_tests {
                 .expect("setup phase")
         };
         for seed in 0..16u64 {
-            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r.checked_u128().unwrap() - 1);
             let a = run(&plain, &inst, &facts, k, seed);
             let b = run(&chained, &inst, &facts, k, seed);
             assert_eq!(a.recovered, Some(ExactScalar::from(k)), "seed {seed}");
@@ -11976,7 +12122,7 @@ mod rho_lanes_tests {
         assert_ne!(one.method_id, many.method_id);
         let own = ["lanes", "lane_rounds", "montgomery_conversions_uncharged"];
         for seed in 0..8u64 {
-            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r.checked_u128().unwrap() - 1);
             let target = inst.mul_generator_hex(k).expect("a nonzero target");
             let a = solve(&serial, &inst, &facts, &target, seed).unwrap();
             let b = solve(&one, &inst, &facts, &target, seed).unwrap();
@@ -12013,5 +12159,213 @@ mod rho_lanes_tests {
             let m = method("rho.negation_lanes_v1", &[("lanes", bad)]);
             assert!(solve(&m, &inst, &facts, &target, 1).is_err(), "lanes={bad}");
         }
+    }
+}
+
+#[cfg(test)]
+mod big_koblitz_tests {
+    //! The three-word Koblitz class (`Instance::Big`, `128 ≤ n ≤ 191`) on
+    //! the method layer: plan-time refusals, the dispatch through
+    //! `solve_big` on a curve small enough to solve (built by the same
+    //! constructor at `n = 41`), and capped runs on ECC2K-130's field.
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+    use crate::cryptanalysis::koblitz_big::{BigKoblitz, W192};
+    use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
+    use crate::cryptanalysis::koblitz_wide::WideKoblitz;
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    fn strip_wall(mut r: SolveReport) -> SolveReport {
+        r.solve_wall_ns = 0;
+        for p in &mut r.phases {
+            p.wall_ns = None;
+        }
+        r
+    }
+
+    /// The three-word constructor's curve at `n = 41` as a big instance,
+    /// and the same curve, generator and λ as a wide instance.
+    fn toy(a: u8, n: u32) -> (BigInstance, WideInstance) {
+        let irr = KoblitzCurve::new(a, n).unwrap().curve.irreducible.clone();
+        let kc = BigKoblitz::for_any_degree(a, &irr).unwrap();
+        let rho = kc.strong_rho();
+        let narrow = |v: &num_bigint::BigUint| num_traits::ToPrimitive::to_u128(v).unwrap();
+        let wk = WideKoblitz {
+            a,
+            n,
+            irreducible: irr,
+            trace: kc.trace,
+            group_order: narrow(&kc.group_order),
+            r: narrow(&kc.r),
+            cofactor: u128::from(kc.cofactor),
+            lambda: narrow(&kc.lambda),
+            generator: (
+                kc.generator.0.checked_u128().unwrap(),
+                kc.generator.1.checked_u128().unwrap(),
+            ),
+            generator_seed_x: u128::from(kc.generator_seed_x),
+        };
+        let wrho = wk.strong_rho();
+        (BigInstance { kc, rho }, WideInstance { kc: wk, rho: wrho })
+    }
+
+    fn big131() -> (Instance, CurveFacts, CurveSpec) {
+        let spec = CurveSpec::Koblitz { a: 0, n: 131 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts, spec)
+    }
+
+    #[test]
+    fn plan_refuses_every_method_without_a_three_word_path() {
+        let (inst, facts, _) = big131();
+        for id in BIG_METHODS {
+            let params: &[(&str, &str)] = if id.starts_with("claw") {
+                &[("base_scale", "1"), ("table_scale", "1")]
+            } else if id.ends_with("_v2") {
+                &[("lanes", "auto"), ("dp_bits", "auto"), ("jumps", "auto")]
+            } else {
+                &[]
+            };
+            let m = method(id, params);
+            if id.starts_with("claw") {
+                // base_scale = 1 is about 4·10^10 base points on n = 131.
+                let err = applicable(&m, &inst, &facts).expect_err(id);
+                assert!(err.contains("lower base_scale"), "{err}");
+                let small = method(id, &[("base_scale", "0.000000001"), ("table_scale", "1")]);
+                assert!(applicable(&small, &inst, &facts).is_ok(), "{id}");
+            } else {
+                assert!(applicable(&m, &inst, &facts).is_ok(), "{id}");
+            }
+        }
+        for (id, params) in [
+            ("bsgs.textbook", &[][..]),
+            ("rho.plain", &[][..]),
+            ("rho.negation", &[][..]),
+            ("rho.signed_frobenius", &[][..]),
+            ("rho.signed_frobenius_strong_wordram", &[][..]),
+        ] {
+            let Ok(m) = resolve(&MethodSpec {
+                id: id.into(),
+                params: params
+                    .iter()
+                    .map(|(k, v): &(&str, &str)| (k.to_string(), v.to_string()))
+                    .collect(),
+            }) else {
+                continue;
+            };
+            let err = applicable(&m, &inst, &facts).expect_err(id);
+            assert!(err.contains("no three-word implementation"), "{id}: {err}");
+            assert!(err.contains("n = 131"), "{err}");
+        }
+    }
+
+    /// `solve_big` (the dispatch every big run takes) on a 39-bit subgroup:
+    /// the strong rho in all four ids reports exactly what `solve_wide`
+    /// reports on the same curve, seed and target — the recovered
+    /// logarithm, every phase, counter and the total — and the claw in both
+    /// ids recovers the planted logarithm with its own seed rule.
+    #[test]
+    fn solve_big_is_solve_wide_on_a_solvable_curve() {
+        let (bi, wi) = toy(0, 41);
+        let r = wi.kc.r;
+        for (k, seed) in [(12_345u128, 1u64), (r - 7, 2), (r / 3 + 1, 3)] {
+            let RawPointG::Affine { x, y } = wi.rho.scalar_mul(wi.rho.generator(), k) else {
+                unreachable!()
+            };
+            let target = [W192::from_u128(x).hex(), W192::from_u128(y).hex()];
+            assert_eq!(target, [format!("0x{x:x}"), format!("0x{y:x}")]);
+            for (id, params) in [
+                ("rho.signed_frobenius_strong", &[][..]),
+                ("rho.signed_frobenius_strong_legacy", &[][..]),
+                (
+                    "rho.signed_frobenius_strong_escape",
+                    &[("dp_bits", "6")][..],
+                ),
+                (
+                    "rho.signed_frobenius_strong_v2",
+                    &[("lanes", "auto"), ("dp_bits", "auto"), ("jumps", "auto")][..],
+                ),
+            ] {
+                let m = method(id, params);
+                let big = strip_wall(solve_big(&m, &bi, &target, seed).unwrap());
+                let wide = strip_wall(solve_wide(&m, &wi, x, y, seed).unwrap());
+                assert_eq!(big.recovered, Some(ExactScalar::from(k)), "{id}");
+                assert_eq!(
+                    serde_json::to_value(&big).unwrap(),
+                    serde_json::to_value(&wide).unwrap(),
+                    "{id} k={k}"
+                );
+            }
+            for id in ["claw.pair_table", "claw.pair_table_v2"] {
+                let m = method(id, &[("base_scale", "4"), ("table_scale", "1")]);
+                let rep = solve_big(&m, &bi, &target, seed).unwrap();
+                assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
+                assert!(!rep.exhausted);
+                if id.ends_with("_v2") {
+                    assert_eq!(rep.counters.get("verification_checks"), Some(&1));
+                    assert_eq!(rep.counters.get("failed_candidates"), None);
+                }
+                let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+                assert_eq!(total, rep.total_gae);
+            }
+        }
+    }
+
+    /// On ECC2K-130's field (a 2^129 subgroup) a capped run is an
+    /// instrument check: the `_v2` strong rho stops at its first million
+    /// steps and records the work it spent; the claw with a two-seed base
+    /// exhausts its query domain.  Both report `exhausted`, no candidate,
+    /// and phases that sum to the total.
+    #[test]
+    fn capped_runs_on_ecc2k130s_field_end_exhausted_with_their_work() {
+        let (inst, facts, spec) = big131();
+        let (w, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
+        assert_eq!(w.curve, facts);
+        let m = method(
+            "rho.signed_frobenius_strong_v2",
+            &[
+                ("lanes", "auto"),
+                ("dp_bits", "auto"),
+                ("jumps", "auto"),
+                ("step_cap_factor", "0"),
+            ],
+        );
+        applicable(&m, &inst, &facts).unwrap();
+        let rep = solve(&m, &inst, &facts, &w.target, 5).unwrap();
+        assert!(rep.exhausted && rep.recovered.is_none());
+        assert!(rep.counters["walk_steps"] >= 1_000_000);
+        assert_eq!(rep.automorphisms_used, 262);
+        let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(total, rep.total_gae);
+        let m = method(
+            "claw.pair_table_v2",
+            &[
+                ("base_scale", "0.000000001"),
+                ("table_scale", "0.00000000000000000001"),
+            ],
+        );
+        applicable(&m, &inst, &facts).unwrap();
+        let rep = solve(&m, &inst, &facts, &w.target, 5).unwrap();
+        assert!(rep.exhausted && rep.recovered.is_none());
+        assert_eq!(rep.counters["seed_orbits"], 2, "{:?}", rep.counters);
+        assert_eq!(
+            rep.counters.get("query_domain_exhausted"),
+            Some(&1),
+            "{:?}",
+            rep.counters
+        );
+        let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(total, rep.total_gae);
     }
 }
