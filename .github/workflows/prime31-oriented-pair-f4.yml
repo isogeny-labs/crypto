@@ -42,3 +42,6 @@ jobs:
       - name: Same-host capped Rust F4 four-arm comparison
         timeout-minutes: 3
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --f4
+      - name: Paired exact-B31 oriented versus S3 30k/60k F4 cap ladder
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --ladder
