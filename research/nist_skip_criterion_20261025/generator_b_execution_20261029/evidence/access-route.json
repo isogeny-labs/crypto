@@ -1,0 +1,44 @@
+{
+  "kind": "authorized-access-and-execution-route/v1",
+  "date_utc": "2026-10-29T04:36:30.869Z",
+  "prior_user_authorized_credentials_authenticate": true,
+  "expected_lab_account_verified": true,
+  "temporary_client_outside_git": true,
+  "credentials_in_requests_reports_or_artifacts": false,
+  "managed_runtime_injected_identity_still_absent": true,
+  "codebuild_project_inspection": {
+    "operation": "BatchGetProjects",
+    "project": "isolab-experiment-launcher",
+    "error_code": "AccessDeniedException",
+    "actual_denial_observed": true,
+    "start_build_attempted": false
+  },
+  "available_portable_contract": {
+    "source": "taskq/deploy/eks-karpenter/remote/validate-request",
+    "source_sha256": "dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426",
+    "arbitrary_argv_supported": false,
+    "ecbench_only": true
+  },
+  "eks_mcp_available": false,
+  "route": "explicitly reported local exact-parameter analysis; no performance clock",
+  "paid_job_submitted": false,
+  "new_identity_or_policy_created": false,
+  "earlier_missing_identity_block_superseded": true,
+  "preparation_attempts": [
+    {
+      "id": "001",
+      "status": 2,
+      "reason": "relative untracked directory was not resolved by artifact tool; retry used absolute payload path"
+    },
+    {
+      "id": "002",
+      "status": 1,
+      "reason": "default cache under read-only home; immutable object may already have uploaded before cache failure"
+    },
+    {
+      "id": "003",
+      "status": 0,
+      "reason": "explicit writable cache; existing immutable object reconciled and full GET checked"
+    }
+  ]
+}

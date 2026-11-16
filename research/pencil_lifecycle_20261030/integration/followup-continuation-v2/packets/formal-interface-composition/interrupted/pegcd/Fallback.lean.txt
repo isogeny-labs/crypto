@@ -1,0 +1,38 @@
+import Pegcd
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial
+variable {K : Type*} [Field K]
+theorem normalized_endpoint (a b : K[X]) (z : State K) (hv:Valid a b z)
+ (hz:z.r1=0) (c:K) (hc:c≠0) :
+ C c*z.r0=(C c*z.s0)*a+(C c*z.t0)*b ∧
+ (C c*z.r0)∣a ∧ (C c*z.r0)∣b ∧
+ ∀h, (h∣a ∧ h∣b) ↔ h∣(C c*z.r0) := by
+ obtain ⟨he,ha,hb,hd⟩ := endpoint a b z hv hz
+ have hu : IsUnit (C c) := isUnit_C.mpr (isUnit_iff_ne_zero.mpr hc)
+ have eqd : ∀x:K[X], (C c*z.r0)∣x ↔ z.r0∣x := fun x => by
+   simpa using (hu.mul_dvd_iff (a:=z.r0) (b:=x))
+ refine ⟨?_,(eqd a).mpr ha,(eqd b).mpr hb,?_⟩
+ · rw [he]; ring
+ · intro h
+   rw [hd h]
+   constructor
+   · exact fun hh => dvd_mul_of_dvd_right hh _
+   · intro hh
+     have hh' := dvd_mul_of_dvd_right hh (C c⁻¹)
+     simpa [←mul_assoc,←C_mul,hc] using hh'
+theorem fallback_divisibilities (ua ub va vb f d1 d c1 c2 e1 e2:K[X])
+ (h1:d1∣ua ∧ d1∣ub) (h2:d∣d1 ∧ d∣va+vb)
+ (hvalid:ua∣f-va*va) :
+ d*d∣ua*ub ∧
+ d∣(c1*e1*ua)*vb+(c1*e2*ub)*va+c2*(va*vb+f) := by
+ have ha:d∣ua := dvd_trans h2.1 h1.1
+ have hb:d∣ub := dvd_trans h2.1 h1.2
+ have hf:d∣f-va*va := dvd_trans ha hvalid
+ have hv:d∣va*(va+vb) := dvd_mul_of_dvd_right h2.2 va
+ have hsum:d∣va*vb+f := by
+   have hh := dvd_add hf hv
+   convert hh using 1 <;> ring
+ refine ⟨mul_dvd_mul ha hb,?_⟩
+ exact dvd_add (dvd_add (dvd_mul_of_dvd_left (dvd_mul_of_dvd_right ha _) _) (dvd_mul_of_dvd_left (dvd_mul_of_dvd_right hb _) _)) (dvd_mul_of_dvd_right hsum c2)
+end Pegcd

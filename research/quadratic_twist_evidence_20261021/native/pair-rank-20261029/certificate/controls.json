@@ -1,0 +1,220 @@
+{
+  "false_identity": {
+    "counterexample": {
+      "assignment": [
+        2088908650538709417
+      ],
+      "index": 0,
+      "lhs": 523239202704900850,
+      "rhs": 523239202704900851
+    },
+    "statement": {
+      "degree_bound": 2,
+      "lhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": 2,
+                    "op": "const"
+                  },
+                  {
+                    "args": "b",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": 2,
+                        "op": "const"
+                      },
+                      {
+                        "args": "b",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": 1,
+                    "op": "const"
+                  }
+                ],
+                "op": "add"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": {
+              "args": [
+                {
+                  "args": 2,
+                  "op": "const"
+                },
+                {
+                  "args": "b",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            "op": "neg"
+          }
+        ],
+        "op": "add"
+      },
+      "name": "signed-two-summand-cleared-count",
+      "rhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": 4,
+                "op": "const"
+              },
+              {
+                "args": [
+                  {
+                    "args": "b",
+                    "op": "var"
+                  },
+                  {
+                    "args": "b",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": 1,
+            "op": "const"
+          }
+        ],
+        "op": "add"
+      },
+      "source": "research/quadratic_twist_evidence_20261021/lean-pair-rank/PairRank.lean:PairRank.signed_pair_count_polynomial; polynomial only, not combinatorial/rank proof",
+      "variables": [
+        "b"
+      ]
+    }
+  },
+  "false_source": {
+    "certificate": {
+      "id": "IDC1h4f9c853b5a053557",
+      "independence": "Cleared counting polynomial only; no combinatorial count or rank/advantage certification",
+      "modulus": 2305843009213693951,
+      "points": 32,
+      "proof": {
+        "kind": "lean4",
+        "path": "research/quadratic_twist_evidence_20261021/lean-pair-rank/PairRank.lean",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "schema": "identity.certificate/v1",
+      "seed": 20261029,
+      "statement": {
+        "degree_bound": 2,
+        "lhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 2,
+                      "op": "const"
+                    },
+                    {
+                      "args": "b",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": 2,
+                          "op": "const"
+                        },
+                        {
+                          "args": "b",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": 1,
+                      "op": "const"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": 2,
+                    "op": "const"
+                  },
+                  {
+                    "args": "b",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        },
+        "name": "signed-two-summand-cleared-count",
+        "rhs": {
+          "args": [
+            {
+              "args": 4,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": "b",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        "source": "research/quadratic_twist_evidence_20261021/lean-pair-rank/PairRank.lean:PairRank.signed_pair_count_polynomial; polynomial only, not combinatorial/rank proof",
+        "variables": [
+          "b"
+        ]
+      },
+      "value_digest": "ee94b308b1d05fd5429b050de4573d3544eb21a8f44379968388dc26d2c0a90b"
+    },
+    "rejection": "Lean source SHA-256 mismatch"
+  }
+}

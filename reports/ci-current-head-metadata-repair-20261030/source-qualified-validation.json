@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-30T10:44:28.994271+00:00",
+  "source": "cbabd18809c4c6a6ac4353d4af6231778a10cfa3",
+  "published_head": "cced4c9283dc2233b37e4c6fe97e7bc9d5328e2c",
+  "source_equivalence": {
+    "default_library_manifest_path_crates": true,
+    "cli_and_proof_and_native_workflows": true,
+    "lean_source_and_admission_tools": true,
+    "complete_changed_paths": [
+      ".github/workflows/backend-leaderboard.yml",
+      "docs/session-logs/2026-10-30.md",
+      "reports/ci-repair-integration-20261029/.artifacts.json",
+      "reports/ci-repair-integration-20261029/.gitignore",
+      "reports/ci-repair-integration-20261029/root-backend-artifact-input-wiring.json",
+      "reports/ci-repair-integration-20261029/root-backend-artifact-wire-check.log.gz",
+      "reports/ci-repair-integration-20261029/root-backend-artifact28-controls.log.gz",
+      "reports/ci-repair-integration-20261029/root-post-cli-main-full-library.log.gz"
+    ]
+  },
+  "cli": {
+    "run_id": 41037568864,
+    "job_id": 124002093182,
+    "conclusion": "success",
+    "passed": 95,
+    "failed": 0,
+    "existing_ignored": 1,
+    "full_decoded_log": "cli-complete-job-log.json.gz"
+  },
+  "lean": {
+    "run_id": 41037575734,
+    "conclusion": "success",
+    "total_jobs": 133,
+    "success": 133,
+    "non_success": 0,
+    "all_paginated_job_metadata": "lean-all-job-pages.json",
+    "scope": "130 discovered target matrix jobs, discovery, and two selftest toolchains. Expected-failure controls are evidence of admission rejection, not admitted failed proofs."
+  },
+  "native_current_source": {
+    "run_id": 41037582856,
+    "status": "pending verification; not qualified by older replay"
+  }
+}

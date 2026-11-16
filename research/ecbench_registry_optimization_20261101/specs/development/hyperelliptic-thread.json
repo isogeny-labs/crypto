@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: hyperelliptic thread index calculus",
+  "description": "The thread's documented genus-3 fixture and baseline parameters. Development only.",
+  "workloads": {
+    "curves": [{"kind": "hyperelliptic_thread", "p": 23, "genus": 3}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010341,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {"name": "rho-plain-reference", "role": "reference", "method": {"id": "rho.plain"}},
+    {"name": "rho-plain-aa", "role": "control", "method": {"id": "rho.plain"}},
+    {"name": "hyper-ic-thread", "role": "candidate", "method": {"id": "ic.hyperelliptic_thread", "params": {"fb_size": "all", "large_primes": "0", "extra_relations": "8", "branches": "64", "d_step_in": "4", "max_trials": "200000"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010342, "isolation_required": "L2", "timeout_seconds": 180}
+}

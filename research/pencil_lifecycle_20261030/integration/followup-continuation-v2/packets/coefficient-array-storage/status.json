@@ -1,0 +1,153 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1163",
+  "main_declarations": 7,
+  "control_declarations": 8,
+  "readback": [
+    {
+      "name": "CoefficientStorage.put_size",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.put_slot",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.put_other",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.put_canonical",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.loop_index",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.update_canonical",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorage.update_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorageControls.first",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorageControls.middle",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorageControls.last",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorageControls.neighbour",
+      "axioms": []
+    },
+    {
+      "name": "CoefficientStorageControls.empty_size",
+      "axioms": []
+    },
+    {
+      "name": "CoefficientStorageControls.excluded_index",
+      "axioms": []
+    },
+    {
+      "name": "CoefficientStorageControls.zero_canonical",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "CoefficientStorageControls.generated_slot",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "attempts": {
+    "attempt1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "claims": [
+    {
+      "claim": "bounds-checked replacement preserves size and other slots",
+      "domain": "Array UInt64; in-bounds index"
+    },
+    {
+      "claim": "replacement preserves canonical entries",
+      "domain": "canonical array and canonical replacement"
+    },
+    {
+      "claim": "generated-inverse coefficient update decodes slotwise",
+      "domain": "prime p;1<p<2^31; canonical array and c,a,b,s; s nonzero; j<=k<=5; j<size"
+    }
+  ],
+  "independent_source_fidelity_review": "pending",
+  "full_nested_loop_composition": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

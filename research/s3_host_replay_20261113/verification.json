@@ -1,0 +1,59 @@
+{
+  "schema": "s3-hosted-continuation-verification/v1",
+  "source_commit": "977db035f827852dfb8825de1c9de0438097e6fc",
+  "claim_id": "PCC-20261113-9b23b3",
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-9b23b3",
+    "claim_sha256": "a834683ad5bba25808ca6f87bd7d41b0476070ad5f3460d952323920fe5548c2",
+    "commit": "977db035f827852dfb8825de1c9de0438097e6fc",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      }
+    ],
+    "reasons": [
+      "claim kind measurement is not covered: recompute; replay"
+    ],
+    "schema": "pcc.verdict/v1",
+    "verdict": "not_covered",
+    "verified_at": "2026-11-13T20:35:41Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-9b23b3",
+    "claim_sha256": "a834683ad5bba25808ca6f87bd7d41b0476070ad5f3460d952323920fe5548c2",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "native_artifacts": 79,
+  "all_pins_match": true,
+  "report": {
+    "path": "reports/run-20261113-host-continuation/report.pdf",
+    "bytes": 46489,
+    "sha256": "375468472ec9234505c332e12734c9ca5b0109f967ac21352971d7c8af540cf6",
+    "pages": 1,
+    "all_pages_visually_inspected": true
+  },
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "actual_public_run": 43501438026,
+  "actual_public_job": 132147937956,
+  "actual_separate_host_record": true,
+  "author_independent": false,
+  "formal_proof_of_native_execution": false,
+  "clock_valid": false,
+  "paid_spend": 0,
+  "agent_uploads": 0
+}

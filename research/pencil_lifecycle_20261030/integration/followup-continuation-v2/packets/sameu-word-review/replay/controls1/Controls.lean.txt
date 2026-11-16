@@ -1,0 +1,48 @@
+import WordSameU
+import FieldFixtures
+set_option autoImplicit false
+set_option maxHeartbeats 1600000
+open PencilWordRefinement MixedCancellation
+namespace SameUWordControls
+instance : Fact (Nat.Prime (5:UInt64).toNat) := ⟨by decide⟩
+def a : WeightedWord := ⟨0,4,0,1,2,3⟩
+def b : WeightedWord := ⟨0,4,4,0,3,2⟩
+theorem da : a.decodeTwo 5=SameUCompositionControls.a := by
+ unfold WeightedWord.decodeTwo a SameUCompositionControls.a
+ congr 1 <;> norm_num <;> decide
+theorem db : b.decodeTwo 5=SameUCompositionControls.b := by
+ unfold WeightedWord.decodeTwo b SameUCompositionControls.b
+ congr 1 <;> norm_num <;> decide
+@[simp] theorem four_neg_one : (4:ZMod 5)= -1 := by decide
+theorem va : a.normalizedValid 5 (WeightedDoubling.curve (1:ZMod 5) 4 0 0) := by
+ change validTwo _ (a.decodeTwo 5)
+ rw [da,four_neg_one];exact SameUCompositionControls.va
+theorem vb : b.normalizedValid 5 (WeightedDoubling.curve (1:ZMod 5) 4 0 0) := by
+ change validTwo _ (b.decodeTwo 5)
+ rw [db,four_neg_one];exact SameUCompositionControls.vb
+theorem hg : IsCoprime (WeightedDoubling.curve (1:ZMod 5) 4 0 0)
+ (WeightedDoubling.curve (1:ZMod 5) 4 0 0).derivative := by
+ rw [four_neg_one];exact SameUCompositionControls.hg
+-- Full original-input composition, including nonunit weights and global certificate.
+example : let d := (samePointWords 5 a b).point
+ let c := dblWordPayload 5 1 4 0 0 d
+ (samePointWords 5 a b).k≠0 ∧ d.canonical 5 ∧ d.y≠0 ∧
+ sameUWordDispatch 5 1 4 0 0 a b=some c ∧ c.canonical 5 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 5 (WeightedDoubling.curve (1:ZMod 5) 4 0 0) := by
+ exact same_u_word_preserves 5 (by decide) (by decide) 1 4 0 0 a b
+  (by decide) (by decide) (by decide) (by decide)
+  (by norm_num [WeightedWord.canonical,a]) (by norm_num [WeightedWord.canonical,b])
+  (by decide) (by decide) (by decide) (by decide)
+  va vb (by decide) (by decide) (by decide) (by decide) hg
+-- Explicit emitted words, independent of an abstract existence conclusion.
+example : (samePointWords 5 a b).k=4 ∧ (samePointWords 5 a b).point.x=1 ∧
+ (samePointWords 5 a b).point.y=2 ∧ (samePointWords 5 a b).point.z=4 ∧
+ (samePointWords 5 a b).point.w=3 := by decide
+example : let c := dblWordPayload 5 1 4 0 0 (samePointWords 5 a b).point
+ c.q=3 ∧ c.r=1 ∧ c.s=2 ∧ c.t=4 ∧ c.z=4 ∧ c.w=4 := by decide
+-- Restricted None is deliberate for earlier equal/inverse branches.
+example : sameUWordDispatch 5 1 4 0 0 a a=none := by decide
+example : sameUWordDispatch 5 1 4 0 0 a ⟨0,4,0,4,2,3⟩=none := by decide
+-- Inputs outside canonical range do not satisfy the theorem.
+example : ¬(WeightedWord.mk 5 4 0 1 2 3).canonical 5 := by norm_num [WeightedWord.canonical]
+end SameUWordControls

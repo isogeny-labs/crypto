@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Genus ladder follow-up 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}table{border-collapse:collapse;margin:8px 0;font-size:9.5pt}th,td{border:1px solid #d8d7d2;padding:3px 7px}th{background:#f1f0ec}img{max-width:100%}code{font-size:9pt;background:#f4f3ef;padding:0 2px}h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Genus ladder follow-up 1</h1>
+</header>
+<h1
+id="genus-ladder-follow-up-1-r-bound-to-p-genus-4-and-plane-quartics-to-p-8209-results-2026-11-15">Genus
+ladder, follow-up 1: <code>r</code> bound to <code>p</code>, genus 4 and
+plane quartics to p = 8209 — results (2026-11-15)</h1>
+<p>Status: <code>[pcc:unverified]</code>; independent replay by a
+validator agent on the same shared host is in
+<code>VALIDATION_REPORT.md</code> (see “Validation” below). No isolated
+host, so no row reaches the IC leaderboard or
+<code>benchmarks/README.md</code>. Protocol: <a
+href="PROTOCOL.md"><code>PROTOCOL.md</code></a> (frozen before data,
+<code>frozen.sha256</code>); binary <code>binary.sha256</code> (sha
+61ccabd2…, source commit <code>14ab74ec8b</code>); data
+<code>bound_r.jsonl</code>, <code>analysis.json</code>,
+<code>data.sha256</code>; tables <a
+href="tables.md"><code>tables.md</code></a>; bench record
+<code>benchmarks/records/20261115T0031Z-genus-ladder-bound-r.json</code>.</p>
+<h2 id="run">Run</h2>
+<p>Genus-4 hyperelliptic curves and smooth plane quartics over
+<code>p = 2053, 4099, 8209</code>, cofactor <code>h &lt;= 2</code> (so
+<code>ln r</code> is within <code>ln 2</code> of <code>ln #J</code>), 3
+curves per cell, 2 solver seeds, arms a (full base + prefilter), c
+(double large prime + prefilter), R (negation rho) and the three quartic
+arms. <strong>108 runs, all certified</strong>; no rho run hit the cap.
+Admission at genus 4 with <code>h &lt;= 2</code> took 109, 418 and 407
+seeds (1 in 36 to 1 in 139); the whole run was 4,246 s on four workers
+(the genus-4 instance search at 8209 alone was 3,744 s single-threaded;
+the solver runs were seconds each, rho at 8209 about 100 s).</p>
+<figure>
+<img src="fig_cost.png" alt="cost" />
+<figcaption aria-hidden="true">cost</figcaption>
+</figure>
+<figure>
+<img src="fig_ratio.png" alt="ratio" />
+<figcaption aria-hidden="true">ratio</figcaption>
+</figure>
+<h2 id="findings">Findings</h2>
+<p>Primary reading, <code>F_p</code>-multiplication equivalents
+(<code>cantor_mul + 10·inv + rel_mul + g²·la_mul</code>), means over 6
+runs with hierarchical bootstrap 95% intervals.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">genus-4 arm c</th>
+<th style="text-align: right;">genus-4 rho</th>
+<th style="text-align: right;">c / rho</th>
+<th style="text-align: right;">quartic 2LP</th>
+<th style="text-align: right;">quartic rho</th>
+<th style="text-align: right;">2LP / rho</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2053</td>
+<td style="text-align: right;">8.93e7</td>
+<td style="text-align: right;">1.81e9</td>
+<td style="text-align: right;">0.049 [0.041, 0.062]</td>
+<td style="text-align: right;">7.0e6</td>
+<td style="text-align: right;">7.9e8</td>
+<td style="text-align: right;">0.0089 [0.0056, 0.018]</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4099</td>
+<td style="text-align: right;">2.40e8</td>
+<td style="text-align: right;">6.42e9</td>
+<td style="text-align: right;">0.038 [0.022, 0.077]</td>
+<td style="text-align: right;">1.6e7</td>
+<td style="text-align: right;">1.8e9</td>
+<td style="text-align: right;">0.0086 [0.0042, 0.020]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8209</td>
+<td style="text-align: right;">6.74e8</td>
+<td style="text-align: right;">2.16e10</td>
+<td style="text-align: right;">0.031 [0.018, 0.062]</td>
+<td style="text-align: right;">6.1e7</td>
+<td style="text-align: right;">4.7e9</td>
+<td style="text-align: right;">0.013 [0.0064, 0.035]</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Genus 4: arm c is below rho across the whole FPM band at every
+prime, and its distance grows with <code>p</code>: exponent 1.458
+[1.449, 1.467] against rho’s 1.79 [1.20, 2.22] (theory 1.5 and 2; three
+primes give a wide rho interval). Under the GAE band the verdict stays
+unresolved at every prime: at <code>w = 1</code> the interval straddles
+1 (8209: [0.48, 1.64]); at <code>w = 0</code> and <code>w = 0.1</code>
+the arm is below (8209: [0.0022, 0.0074] and [0.089, 0.304]).</li>
+<li>Quartics: double-large-prime Diem is below rho across the FPM band
+at every prime, by a factor 75 to 115; under the GAE band it is below at
+<code>w = 0</code> and above at <code>w = 0.1</code> and
+<code>w = 1</code> (one line relation costs no group operation but
+hundreds of native multiplications, which that band prices against rho’s
+one step). Its FPM exponent is 1.56 [0.97, 1.96] on three primes,
+dominated by the conic evaluations of the decomposition rows
+(<code>rel_mul</code> is 70% to 80% of its FPM); the full-base Diem arm
+grows as 1.98 [1.90, 2.05] because of its dense-ish linear algebra.</li>
+<li>Binding <code>r</code> to <code>p</code> removed the cofactor
+scatter: <code>mean ln r</code> is 30.3, 33.0, 35.6 at genus 4
+(<code>ln #J</code> minus at most <code>ln 2</code>), and the rho
+exponent moved from 1.90 (first run, <code>h &lt;= 8</code>) to 1.79
+with a much wider interval, because only three primes and six runs per
+cell are behind it.</li>
+<li>Every admitted genus-4 curve has <code>f</code> with 1 or 2
+irreducible factors (9 of 9), as the rational 2-rank forces under
+<code>h &lt;= 2</code>.</li>
+</ul>
+<p>Scorecard (PROTOCOL.md section 3): B1 held (108/108); B2 held (1.79
+[1.20, 2.22] overlaps 2.0 ± 0.25; a weak test); B3 held (FPM band below
+at all three primes; GAE <code>w = 0</code> and <code>w = 0.1</code>
+below at 8209); B4 held; B5 held.</p>
+<h2 id="validation">Validation</h2>
+<p><code>VALIDATION_REPORT.md</code> is written by a separate validator
+agent that builds its own binary from the stated commit, replays cells
+of the protocol’s command and compares every counted field with
+<code>bound_r.jsonl</code>, and recomputes the cell means from the raw
+data. The host is this same shared 4-vCPU container: that replay is a
+reproducibility check of the counted units on one machine, not the
+isolated-host measurement the validation gate asks for. Standing after
+the replay: see the report’s verdict.</p>
+<h2 id="deviations">Deviations</h2>
+<ul>
+<li>The run was launched with <code>nohup</code>, not under
+<code>tools/benchrec.py run</code>; the command, start time, wall and
+exit code were added to the bench record afterwards from the driver’s
+own <code>config</code> and <code>done</code> lines, and the record says
+so.</li>
+<li>The analysis binary and <code>render.py</code> are the first
+study’s, unchanged.</li>
+</ul>
+<h2 id="limits">Limits</h2>
+<p>Three primes; 3 curves and 6 runs per cell; genus 4 only on the
+hyperelliptic side; generic Cantor group law; the quartic rho’s per-step
+cost (about 8,900 field multiplications per <code>Pic</code> addition)
+makes its IC/rho ratios small for a reason that is not the index
+calculus. Toy sizes: <code>#J</code> up to 2^51.</p>
+</body>
+</html>

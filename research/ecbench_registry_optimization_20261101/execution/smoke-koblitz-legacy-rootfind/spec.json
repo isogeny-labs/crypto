@@ -1,0 +1,24 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: Koblitz legacy, priced, and windowed root finding",
+  "description": "Count-first development panel covering historical rho, priced wrappers, the old claw, counted pipelines, and both previously missing windowed root-finding engines.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 13}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010201,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-strong-reference", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-strong-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-signed", "role": "baseline", "method": {"id": "rho.signed_frobenius"}},
+    {"name": "rho-strong-legacy", "role": "baseline", "method": {"id": "rho.signed_frobenius_strong_legacy"}},
+    {"name": "rho-signed-wordram", "role": "candidate", "method": {"id": "rho.signed_frobenius_wordram"}},
+    {"name": "rho-strong-wordram", "role": "candidate", "method": {"id": "rho.signed_frobenius_strong_wordram"}},
+    {"name": "claw-v1", "role": "candidate", "method": {"id": "claw.pair_table", "params": {"base_scale": "4.0", "table_scale": "1.0"}}},
+    {"name": "known-log-mitm2", "role": "candidate", "method": {"id": "ic.known_log_mitm2_v1", "params": {"size": "8", "base_seed": "17", "max_pair_work": "128", "max_trials": "8192"}}},
+    {"name": "pipeline-counted-window", "role": "baseline", "method": {"id": "ic.pipeline_counted", "params": {"factor_base": "koblitz-standard-subspace:dimension=5", "oracle": "pdp3-koblitz:m=3,engine=rootfind-window", "max_trials": "20000"}}},
+    {"name": "pipeline-wordram-window-negfold", "role": "candidate", "method": {"id": "ic.pipeline_wordram", "params": {"factor_base": "koblitz-standard-subspace:dimension=5", "oracle": "pdp3-koblitz:m=3,engine=rootfind-window-negfold", "max_trials": "20000"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010202, "isolation_required": "L2", "timeout_seconds": 90}
+}

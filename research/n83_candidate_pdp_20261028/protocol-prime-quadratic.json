@@ -1,0 +1,898 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-PRIME-QUADRATIC-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "PRIME_QUADRATIC_DESIGN.md",
+    "bounded_contract": "PRIME_QUADRATIC_BOUNDED.md"
+  },
+  "question": "Do complete degree-six quadratic multiplier maps and pair-covering projections exclude degree-six nontrivial syzygies on all42 retained higher-m prime sources?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "A complete projected map with full column rank, verified source normalization and pair coverage certifies FFD>=7. Deficiency or caps give no new bound.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No exact FFD,LFD,elite-base improvement or runtime comparison.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "description": "original retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "d29f1a531a7113fa198fd6eca27c7de337d5a0b6",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_quadratic"
+          ]
+        ],
+        "binary_sha256": "7fb9a669e1045f048b2aa350270d84d460670d323b9520fd95c3c65aec1b0e47",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "description": "baseline retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "d29f1a531a7113fa198fd6eca27c7de337d5a0b6",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_quadratic"
+          ]
+        ],
+        "binary_sha256": "7fb9a669e1045f048b2aa350270d84d460670d323b9520fd95c3c65aec1b0e47",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "description": "spike40 retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "d29f1a531a7113fa198fd6eca27c7de337d5a0b6",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_quadratic"
+          ]
+        ],
+        "binary_sha256": "7fb9a669e1045f048b2aa350270d84d460670d323b9520fd95c3c65aec1b0e47",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Native bounded/unbounded equality on deficient and injective small-prime maps; prior independent dense and quartic controls.26native test invocations=10new plus16duplicated donor invocations."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Four deterministic cap reasons retain replayable null-certificate records;truncated/extra journal rejected;two Python controls inject failure/timeout and prove later templates still attempted."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "dataset",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One Rust binary and source-bound Python controller;one child at a time"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "All42 original input/source/base hashes;no new targets"
+      },
+      {
+        "name": "dataset",
+        "treatment": "crossed",
+        "how": "Three arms,two target kinds,seven m values;seven shared maps,not42 independent computations"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Chosen backend and live resource/readability receipts retained;no clock claim"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "Per-template work caps,8GiB address space,300s producer/replay,5s grace,all7attempted,no retries"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Full rank gives lower7 under pair-cover proof;otherwise null,no negative inference"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original",
+          "baseline",
+          "spike40"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Full source/field/normalization/pair coverage and complete coefficient map injection with fresh replay;cap and failure retained without bounds"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Historical input seed only;this certificate stage makes no new draws."
+    },
+    "instance_sampling": {
+      "rule": "Entire pre-existing42case panel;no sampling or target changes;original and paired planted targets differ.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 14,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "All42 existing inputs;seven shared deterministic templates. Nulls retained;no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 4800,
+      "measured_on": "Development controls only;fixed cap,not runtime estimate"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "first_fall_lower_bound",
+        "name": "first_fall_lower_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "7 only after complete source-bound injection and fresh replay;otherwise omitted/null",
+        "source": "results/summary.json first_fall_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "projected_rank",
+        "name": "projected_rank",
+        "unit": "rows",
+        "kind": "counted",
+        "definition": "Exact rank only for a complete verified template;partial rank omitted",
+        "source": "results/summary.json projected_rank",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "projected_columns",
+        "name": "projected_columns",
+        "unit": "columns",
+        "kind": "counted",
+        "definition": "Complete quadratic normal-form multiplier domain dimension",
+        "source": "results/summary.json projected_columns",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "first_fall_lower_bound",
+      "projected_rank",
+      "projected_columns"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 4800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Attempt all7templates regardless of earlier failure;fresh replay only after producer success;assemble all42source identities with null new bounds for unverified templates"
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Per-template100000columns,5000000coefficient entries,50000000reduction updates,2000000basis entries;8GiB,300s producer and replay,+5s grace;two120sassemblies;4800souter;no retries"
+    }
+  ],
+  "invalidation_rules": [
+    "Source,field,normalization,coverage,journal or replay mismatch invalidates affected certificate",
+    "Partial matrix or deficient projection supplies no original-system bound",
+    "No LFD,exactFFD,timing or elite-base claim"
+  ],
+  "decision_rule": {
+    "text": "Record lower7 only for complete injective projected map plus pair-cover proof and both successful native processes;otherwise null with full outcome.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified_lower",
+      "inconclusive",
+      "capped",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/prime_quadratic.rs",
+      "sha256": "392a5b412ee6fcdeec35419cc3fc36649d2966f1d8f2a4514740c1b31cfc2fb8"
+    },
+    "inputs": [
+      "42 unchanged input.json/system.sing pairs"
+    ],
+    "outputs": [
+      "results/summary.json",
+      "results/KEY.json",
+      "templates/mM/attempt.json",
+      "templates/mM/native/journal.jsonl",
+      "templates/mM/native/result.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-m verified rank versus full domain;missing/capped values explicit;source-matched FFD bounds only"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definition1.3 distinguishes nontrivial highest-form syzygies;Section4 separates FFD fromLFD. Pair-cover argument is study-specific.",
+      "verified_by": "Primary definitions read;PRIME_QUADRATIC_DESIGN.md and PRIME_QUADRATIC_BOUNDED.md"
+    }
+  ],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-prime-m3-planted",
+        "arm": "original",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m3-planted",
+        "input_sha256": "a05b6f730ef96b3441edca028578f34dcba9fa91afc19ffa865aa8128dc2f82c",
+        "source_sha256": "27be4abb6ab8cef63b955e552a2d19d74032c4d15dfbd23f2915dfbfb0c08199",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m3-natural",
+        "arm": "original",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m3-natural",
+        "input_sha256": "33b2e31ed63e1b673272f9633bea30e2136ddd2528f58ac5e28bb9f7440f1f6b",
+        "source_sha256": "2f5f832a9c499a53b3120ecd37e2e1ea8bedbff9cddab71991f6cd970ad2b44e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m4-planted",
+        "arm": "original",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m4-planted",
+        "input_sha256": "8e3e4a1883c021c6f9e822595e95eaf8c59e246f01dd3db04d4c57046b1caf2b",
+        "source_sha256": "5500462b5949f7083e2eafdb8fb699107798600cefb7448beba031297e0abbe5",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m4-natural",
+        "arm": "original",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m4-natural",
+        "input_sha256": "c472d4468a3b09fadab51d5a6f632b749df24cfcd17dcdec1e19a8766d605b3a",
+        "source_sha256": "ec0367d23a91037fd0753bc35da44ebca812f6ddeda69fa1a891c4149f3157fe",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m5-planted",
+        "arm": "original",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m5-planted",
+        "input_sha256": "5b4fa54d80de9207a032ee24930c57e5271d98e87ae9dd41c53ba654fb320e76",
+        "source_sha256": "05de935a558cc3e36d4bf471d4763228839cb05297b38fea877c778769096274",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m5-natural",
+        "arm": "original",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m5-natural",
+        "input_sha256": "458098a7a0713f968e2bd425968833a61c98e7b528036eda3082e83421bbd346",
+        "source_sha256": "9c3097ce6e9a2b1276822a0301d4b9cc350c596a8c74d7479133ca5d9b912515",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m6-planted",
+        "arm": "original",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m6-planted",
+        "input_sha256": "3b4faef80d1b97a453fe88e29b75ba5b557724ae98522f5092b9db3c3fde6c20",
+        "source_sha256": "16ae1a490cac94d8d4536713ebd0a4c7ee5dca8703160ac1f2cfe378008aeb2a",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m6-natural",
+        "arm": "original",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m6-natural",
+        "input_sha256": "c5475b2fc46de01bb0b87295b0a67806b83a775c94ac75b9c5606b9c8a7bc9a4",
+        "source_sha256": "053953160626184642bf3371e4eb9f30ca719f29cc7f4c7b05c24f71df6b8ccc",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m7-planted",
+        "arm": "original",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m7-planted",
+        "input_sha256": "26aff5a053a2472c11cc6c86f81837df42842e92f6f5bca91ed86dbb5fa2ce0c",
+        "source_sha256": "dfd1c5e6773478bc4aa5ad6f5a791da6eb2d01a259689489d7d0826da3502dd5",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m7-natural",
+        "arm": "original",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m7-natural",
+        "input_sha256": "81d75b7979035f8527a22004a99ee9b2c8a673da8d097b2a8612e3ffb4da4aae",
+        "source_sha256": "e3a9c0185f144bfdf250e83f807c14926428aedcf8df2d14dbd568e72677de79",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m8-planted",
+        "arm": "original",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m8-planted",
+        "input_sha256": "f6aa5b143b79024593a8a888431c84a3bbcdd2c13a2148fd70fac464285d96e8",
+        "source_sha256": "c7a1c69bc6a0a08401e982d0d1ee2ceaf8c0a05c5dd8d90aef5958de57ef4175",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m8-natural",
+        "arm": "original",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m8-natural",
+        "input_sha256": "1dcd5c84aedc0d10cc8c70842af8b183f31ef6d2147daf829e3dab1d32649e69",
+        "source_sha256": "a3a9d628f1101a6eae9c61f01189d57ae87bb04ae5d6872415346b811bd2e043",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m9-planted",
+        "arm": "original",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m9-planted",
+        "input_sha256": "f511ae28b37f65a8ac0e62914b5e8a515eee5c13b648c071c4a0fbf53a321dd8",
+        "source_sha256": "5bdfda50136906cc01d253dfbd3c4f78f28c4b12b5525bded107caf26a423c39",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m9-natural",
+        "arm": "original",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m9-natural",
+        "input_sha256": "23b14a56ce0de393b66942088a1360a44fcfe325c9ea37da8b184e0eb4cf3d56",
+        "source_sha256": "58a9326de94939e0bbff8c20b1d2be59afbbbfb0cad26d1990582a7993611fff",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m3-planted",
+        "arm": "baseline",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m3-planted",
+        "input_sha256": "7d3bd9e64c9fe4a0ae1a625abf5469ecfbf6424796a25725caeac205e8a27898",
+        "source_sha256": "f40bd489ce13094d32580db240d45a94893fc7af699519613cdcd959ed8316ec",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m3-natural",
+        "arm": "baseline",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m3-natural",
+        "input_sha256": "1baf77204e5f15f8fb306c4b7b0cb5856ab6bf0b22ea56db7755d52332040772",
+        "source_sha256": "2f5f832a9c499a53b3120ecd37e2e1ea8bedbff9cddab71991f6cd970ad2b44e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m4-planted",
+        "arm": "baseline",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m4-planted",
+        "input_sha256": "e479bbfbd5f49ec47bb6a0e4b9877d6b87c80e92d5714fffeeb791d4335224c0",
+        "source_sha256": "8a1972dc6eb996b546cd5e4385515a63dbe5a03f382ea8bc28eb229363882a0e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m4-natural",
+        "arm": "baseline",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m4-natural",
+        "input_sha256": "88e52acbc38c9aa7384d13fce069eb8bfea861112bbaf58e92752abcbc9a2246",
+        "source_sha256": "ec0367d23a91037fd0753bc35da44ebca812f6ddeda69fa1a891c4149f3157fe",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m5-planted",
+        "arm": "baseline",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m5-planted",
+        "input_sha256": "a4275b5ae2076a6cca8a52a1bc5e2119e397c8af68d04844cd67981de0a36bb2",
+        "source_sha256": "9b38184b09d3f486cfbb3ccc8532280e268e1ae789a3ade5cc73f034243b616e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m5-natural",
+        "arm": "baseline",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m5-natural",
+        "input_sha256": "bf61ae4fb04e35ff8090b9db5871c58483f25c7218283f240f3deda1857d6660",
+        "source_sha256": "9c3097ce6e9a2b1276822a0301d4b9cc350c596a8c74d7479133ca5d9b912515",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m6-planted",
+        "arm": "baseline",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m6-planted",
+        "input_sha256": "74b6ca75593a113fa16806bcc1dd31a016e0a4eb76211400bb5aaa1d49cfd638",
+        "source_sha256": "1876ca30660a959f45fe70fb3a6d53e3f7e2dc4f3d4266b008433970bc717a62",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m6-natural",
+        "arm": "baseline",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m6-natural",
+        "input_sha256": "309169920500270134ffcdf99e40040c89909e1e3106c080c1e188358d9a767b",
+        "source_sha256": "053953160626184642bf3371e4eb9f30ca719f29cc7f4c7b05c24f71df6b8ccc",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m7-planted",
+        "arm": "baseline",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m7-planted",
+        "input_sha256": "f8fb23d5ce5ef65900fcc268924a383bafe619f89ccbefe71ae640d94fe0a064",
+        "source_sha256": "295b9c8eaab2ab5e189a5c6b70724fce9acd86ce2ddc3c9a64613fcda64b3b7f",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m7-natural",
+        "arm": "baseline",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m7-natural",
+        "input_sha256": "3d6f5fb6c82bff2bec71a198c6fdd856f6f25152d8ca390e0b23198b756b1112",
+        "source_sha256": "e3a9c0185f144bfdf250e83f807c14926428aedcf8df2d14dbd568e72677de79",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m8-planted",
+        "arm": "baseline",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m8-planted",
+        "input_sha256": "6daf18ad43a623e280ce75d0ec959196b280859ade5eab37c0b5f98dc47491c4",
+        "source_sha256": "e9568bcb1ba820900aceb8af64c77371783046342544474730abd05dbb6a5fc8",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m8-natural",
+        "arm": "baseline",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m8-natural",
+        "input_sha256": "6a9c0efd7fe599929a0b78f9f9f33fb7de9c69f0040008bc296a1935d54a7432",
+        "source_sha256": "a3a9d628f1101a6eae9c61f01189d57ae87bb04ae5d6872415346b811bd2e043",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m9-planted",
+        "arm": "baseline",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m9-planted",
+        "input_sha256": "eebc3b060f0fc40c2cf2dc807d16627d4ad1dc94c961df3bc3c9568409cf6fc4",
+        "source_sha256": "09fef5bb51f9b6bba459b1846d2c9d74eb69addb3f789985a074cc8a0df48883",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m9-natural",
+        "arm": "baseline",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m9-natural",
+        "input_sha256": "cd9e5eb98d3b492cdbcac5dcb96098e97c2baf37035526428b10ca4f14a68619",
+        "source_sha256": "58a9326de94939e0bbff8c20b1d2be59afbbbfb0cad26d1990582a7993611fff",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "spike40-prime-m3-planted",
+        "arm": "spike40",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m3-planted",
+        "input_sha256": "ae03c4d9eadffc315a12bd3cba92a62cdd731470a0249af86b01d0b92baf7fbe",
+        "source_sha256": "7db6024d72b131f756251ec1fbc7c25fef13cb2648d08b887c564effa6283e2e",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m3-natural",
+        "arm": "spike40",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m3-natural",
+        "input_sha256": "0197b69534e43697725fa11576f621b894552d885e9d8239d2b1a56dfe7bbbf8",
+        "source_sha256": "e91d47366e7040501721a9afb3e7662dd3256e4fa43172eb995d0361a66461f5",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m4-planted",
+        "arm": "spike40",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m4-planted",
+        "input_sha256": "6a33d4dbe5adc351150d9275e0b48a47dde714478e1e578d4cd0c5ea1825c879",
+        "source_sha256": "1901eef02091d5828e86194b05acea42c9b2048f9e26ccd402e3621802077071",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m4-natural",
+        "arm": "spike40",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m4-natural",
+        "input_sha256": "4e0e02813a7008ff894cfc9ec93112dfc464895f98d2293aa7e060b6fa07ac46",
+        "source_sha256": "a7c833a350622ed52f5b963aabdea44932f081f396e7c425ee1fc84cb5691b46",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m5-planted",
+        "arm": "spike40",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m5-planted",
+        "input_sha256": "196e7e8ceaa096712e6dc67027e4676188fc564e00a3430fc6f72a63326f10ae",
+        "source_sha256": "d199fc1ac23a1c8d08dd60c4132ef8747b25a4b95879e874ca04468b642dd8b2",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m5-natural",
+        "arm": "spike40",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m5-natural",
+        "input_sha256": "4238cf1381718eb93673bdd85cd820770c2c2e3186ee752e5580c5a5d888eeb6",
+        "source_sha256": "1adcfe8535fa4ed84dd84f28147c23ce60e2a7b245bfe76a90e949eb4df94ef7",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m6-planted",
+        "arm": "spike40",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m6-planted",
+        "input_sha256": "8d2157ec8345be752ec0c6c2573655c9336cc33b2c803fd57901f513baa105a0",
+        "source_sha256": "a8f4d166420b03e48cee37404c739d88016060f3dec3a2b7a78545ff7275ecd6",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m6-natural",
+        "arm": "spike40",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m6-natural",
+        "input_sha256": "69db76db57439a251082f2a9fde7929f68814a40c17c869666bd4e05e9d799a1",
+        "source_sha256": "42c618ae0e1bbf2ea70d4638a775f148d090b3cfc495ff05b46969007bce612a",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m7-planted",
+        "arm": "spike40",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m7-planted",
+        "input_sha256": "b253f8ad424b1bdc9aa6b94b210f25cab92629403ab185f223fd3be69d786d37",
+        "source_sha256": "e6b98cf44b80db169851b8055bc98a7503267f1b9a749a5416acfdff7508203b",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m7-natural",
+        "arm": "spike40",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m7-natural",
+        "input_sha256": "9b27f5391a1c9ebe1e5ae5f00ae947802aae0dff1bac96d0732ad01161489dcc",
+        "source_sha256": "3eb92539f0c842f72b9cf911f00a4703ffd43216ef02bb222b97fddbf744e2a5",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m8-planted",
+        "arm": "spike40",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m8-planted",
+        "input_sha256": "b7ead54714ec5e6d3211d1e3e0cbf94bff677a58664c81e95319d86e3db3cea4",
+        "source_sha256": "6f49e7b207679a77c8eb7f280865053c6fdf49a48cca049006325232dfb62743",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m8-natural",
+        "arm": "spike40",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m8-natural",
+        "input_sha256": "4c7017b7864936d2899b07204f6652530510018fae9847c910d1f32754a97c3c",
+        "source_sha256": "53e9f1bb77763e14456a184932c1ffefafc65effd3e9666842d8172da772cfd0",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m9-planted",
+        "arm": "spike40",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m9-planted",
+        "input_sha256": "a339c93e6c18589436ed1d034f7a75f657adecbca8a45faec34f952f14ecdcdd",
+        "source_sha256": "8cc97fa93c25c696a0961d018e3cfe57b7a91528335df5ae5a8b5d31ff6f59f7",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m9-natural",
+        "arm": "spike40",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m9-natural",
+        "input_sha256": "5a70656034d0f5f0b0be21046a30fd2553b47bf863e9a8af073a80bc857c44e7",
+        "source_sha256": "8e3cc429c7a9cd49f58d6a651bd69de0d2ffee3878cbf629311d7bc5f869e036",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      }
+    ],
+    "detailed_design": "PRIME_QUADRATIC_BOUNDED.md",
+    "file_layout": "PRIME_QUADRATIC_FORMAT.json",
+    "source_files": [
+      {
+        "path": "src/bin/prime_quadratic.rs",
+        "sha256": "392a5b412ee6fcdeec35419cc3fc36649d2966f1d8f2a4514740c1b31cfc2fb8"
+      },
+      {
+        "path": "src/prime_quadratic_bounded.rs",
+        "sha256": "50ad2ad80a2871ca77fcf6c871c7686f0ecb35fc7bcbdd44b52dd8559419340f"
+      },
+      {
+        "path": "src/prime_linear_source_donor.rs",
+        "sha256": "ce6042fcecc4e3d997acaa48b9af1426622a08e0a76c875673ccf1923d6a7b2f"
+      },
+      {
+        "path": "src/prime_first_fall_donor.rs",
+        "sha256": "f88e89504dfe6cdcff2691c4ad6bdd7fc2b046fdd776ed9f0757c0954848ae9d"
+      },
+      {
+        "path": "src/prime_terminal_math.rs",
+        "sha256": "b1dc368a8b4fb07aeeb04cc1d4e7467fb916141f5c6b791ba9c95fdae70dc691"
+      },
+      {
+        "path": "PRIME_QUADRATIC_DESIGN.md",
+        "sha256": "a15157da2c835d2a84982563e7f07e1267edcb3834b44a5840251cd92510e931"
+      },
+      {
+        "path": "PRIME_QUADRATIC_BOUNDED.md",
+        "sha256": "11c187a714846906f7781fc6f86c183d77997f51460384351667143838e83e3b"
+      },
+      {
+        "path": "PRIME_QUADRATIC_FORMAT.json",
+        "sha256": "3fc69845f028f40d233e79669f4b957cd5a5ed946056d1b813ba4aee4add9d88"
+      },
+      {
+        "path": "run-prime-quadratic.py",
+        "sha256": "72b5edfb01a07f99a846ffcf5a2b705c9be270ebed1a915e55a10ae860e9e031"
+      },
+      {
+        "path": "run-prime-quadratic.sh",
+        "sha256": "0463aa735ce577035384121f170d399304f57d5b54676257a1267bcc75a8c8d2"
+      },
+      {
+        "path": "test-prime-quadratic-runner.py",
+        "sha256": "cf7d0b845126fca0ee01cf18be98609e98dd578f3796a2a8fa2b361dd87b89cf"
+      },
+      {
+        "path": "prepare-prime-quadratic-protocol.py",
+        "sha256": "95afd1aa1fcdf69ab35811833b6bfd75253713a2fe3a7c1952a7669c322a10f8"
+      }
+    ],
+    "template_limits": {
+      "columns": 100000,
+      "coefficients": 5000000,
+      "reductions": 50000000,
+      "basis_entries": 2000000
+    },
+    "template_timeout_seconds": 300,
+    "address_space_bytes": 8589934592,
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-prime-quadratic-20261030-r1/local/",
+    "raw_upload_seconds": 30,
+    "retry_policy": "none",
+    "backend_reason": "Fresh EKS source-read probe n83-quadratic-s3-probe-20261030-r1 UID8bad8d9b-9fc6-4f65-8afc-08c1cb38d9b9 reached DeadlineExceeded with no retained Pod/log output;no current S3 access verdict. Prior terminalR2 source403 retained separately. Use established existing-host fallback without IAM/capacity changes.",
+    "proof_boundary": "Native exact arithmetic and written pair-cover/regular-sequence argument;independent review and full formalization pending",
+    "probe_job": "n83-quadratic-s3-probe-20261030-r1"
+  },
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "749f737e353b677411c437a433b8329378b26537777e20747339421a8f365031",
+    "commit": "d29f1a531a7113fa198fd6eca27c7de337d5a0b6",
+    "frozen_at": "2026-10-30T15:28:53Z",
+    "filed_before_affected_data": true
+  }
+}

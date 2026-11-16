@@ -1,0 +1,48 @@
+rows: 22000  (sha256 d4aba33321e915e2ffe2a413058086e9afa6ca8a6b264676b13234df7b570e26)
+
+== per (k, arm): attempts x curves, Dreg (mean, sd, distribution), solutions mean, time medians ==
+k=3     main  n=5180   dreg mean 2.000 sd 0.000 hist {2: 5180} sol_mean 0.0000 t_med 0.0000s
+k=3     null  n=320    dreg mean 2.000 sd 0.000 hist {2: 320} sol_mean 0.0000 t_med 0.0000s
+k=4     main  n=5180   dreg mean 2.000 sd 0.000 hist {2: 5180} sol_mean 0.0000 t_med 0.0001s
+k=4     null  n=320    dreg mean 2.000 sd 0.000 hist {2: 320} sol_mean 0.0000 t_med 0.0001s
+k=5     main  n=5180   dreg mean 2.000 sd 0.000 hist {2: 5180} sol_mean 0.0000 t_med 0.0002s
+k=5     null  n=320    dreg mean 2.000 sd 0.000 hist {2: 320} sol_mean 0.0000 t_med 0.0002s
+k=8     main  n=5180   dreg mean 2.674 sd 0.469 hist {2: 1687, 3: 3493} sol_mean 0.0000 t_med 0.0174s
+k=8     null  n=320    dreg mean 2.691 sd 0.463 hist {2: 99, 3: 221} sol_mean 0.0000 t_med 0.0174s
+
+isomorphic-model control (Frobenius conjugate instance): 0/0 identical (dreg, solutions, refuted)
+A/A repeat: 0/0 identical counts; time ratio repeat/first median NaN, sd NaN (noise floor for the time column)
+within-orbit Dreg spread (same V, x_R; curves of one orbit are Galois conjugates but V is NOT conjugated, so this is a between-presentation spread):
+  #distinct dreg values per (k, attempt, orbit): {1: 482, 2: 78}
+
+== main arm mean dreg by (k, orbit) ==
+k=3 orbit=O0 n=860 mean=2.000 sd=0.000
+k=3 orbit=O1 n=860 mean=2.000 sd=0.000
+k=3 orbit=O2 n=860 mean=2.000 sd=0.000
+k=3 orbit=O3 n=860 mean=2.000 sd=0.000
+k=3 orbit=O4 n=860 mean=2.000 sd=0.000
+k=3 orbit=O5 n=860 mean=2.000 sd=0.000
+k=3 orbit=crater n=20 mean=2.000 sd=0.000
+k=4 orbit=O0 n=860 mean=2.000 sd=0.000
+k=4 orbit=O1 n=860 mean=2.000 sd=0.000
+k=4 orbit=O2 n=860 mean=2.000 sd=0.000
+k=4 orbit=O3 n=860 mean=2.000 sd=0.000
+k=4 orbit=O4 n=860 mean=2.000 sd=0.000
+k=4 orbit=O5 n=860 mean=2.000 sd=0.000
+k=4 orbit=crater n=20 mean=2.000 sd=0.000
+k=5 orbit=O0 n=860 mean=2.000 sd=0.000
+k=5 orbit=O1 n=860 mean=2.000 sd=0.000
+k=5 orbit=O2 n=860 mean=2.000 sd=0.000
+k=5 orbit=O3 n=860 mean=2.000 sd=0.000
+k=5 orbit=O4 n=860 mean=2.000 sd=0.000
+k=5 orbit=O5 n=860 mean=2.000 sd=0.000
+k=5 orbit=crater n=20 mean=2.000 sd=0.000
+k=8 orbit=O0 n=860 mean=2.694 sd=0.461
+k=8 orbit=O1 n=860 mean=2.683 sd=0.466
+k=8 orbit=O2 n=860 mean=2.678 sd=0.468
+k=8 orbit=O3 n=860 mean=2.652 sd=0.477
+k=8 orbit=O4 n=860 mean=2.664 sd=0.473
+k=8 orbit=O5 n=860 mean=2.676 sd=0.468
+k=8 orbit=crater n=20 mean=2.650 sd=0.489
+
+Decision rule, null set and thresholds: PROTOCOL.md section 6.  Masked output hides arm names; rerun with --unmask only after the analysis is frozen.

@@ -1,0 +1,13 @@
+/var/tmp/graph-find-mutation-20261101/Find.lean:39:43: error: Function expected at
+  ih
+but this term has type
+  Forest t rank ∧
+    Represents t v k ∧
+      t.parent r = r ∧
+        v (s.parent x) = eval q (v r) k ∧
+          rank r ≤ rank (s.parent x) ∧
+            ∀ (y : Fin n), rank (s.parent x) < rank y → t.parent y = s.parent y ∧ t.pot y = s.pot y
+
+Note: Expected a function because this term is being applied to the argument
+  hf
+/var/tmp/graph-find-mutation-20261101/Find.lean:39:10: error: Tactic `rcases` failed: `x✝ : ?m.94` is not an inductive datatype

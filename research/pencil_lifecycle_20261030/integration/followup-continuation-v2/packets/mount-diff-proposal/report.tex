@@ -1,0 +1,17 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage{hyperref}
+\begin{document}\section*{Proposed exact mount-diff contract}
+\textbf{Pure parser checks passed; independent prospective review pending.}
+
+The retained v5 qualification failed its empty-diff assertion after Q0 passed and Q1 produced its expected output. The observed additions were \texttt{/fixtures}, \texttt{/qualification}, and \texttt{/qualification/exec-gate}. That failure remains unchanged.
+\subsection*{Proposed amendment}
+Accept exactly those three additions, in any order, after the existing identity and read-only mount checks. Reject all other filesystem changes. This changes the contract explicitly: it does not establish an empty writable layer or identify who caused a change. No supervisor integration or new qualification was executed.
+\subsection*{Fixed checks}
+All 27 predefined cases had their expected outcome: six permutations accepted and 21 negative cases rejected. Negatives cover empty, missing and duplicate entries; changed/deleted entries; an extra child; altered prefixes/suffixes; dot paths; whitespace and framing variations; non-ASCII, NUL and oversized input. The retained native diff also parses under the proposed contract.
+\subsection*{Scope and next review}
+The parser is pure Python with no socket, Docker, process-launch or cloud capability. Independent review must assess whether this amended filesystem contract is adequate, how it joins the existing identity/mount checks, and whether additional metadata observations are required. The scientific campaign remains expired; no worker-time admission or scientific result follows from these checks.
+
+Primary documentation: \url{https://docs.docker.com/reference/cli/docker/container/diff/}. Docker defines A, C and D as added, changed and deleted, and measures changes since container creation. That documentation does not assign writer attribution for this observation.
+
+The accompanying \texttt{checks.json} gives every fixed case and input hash. The original native receipt and diff are bound in \texttt{bindings.json}. The diagram is provided as editable SVG.
+\end{document}

@@ -1,0 +1,22 @@
+@SameSupportCandidate.cross_scale : ∀ {K : Type u_1} [inst : Field K] (x z1 z2 w1 w2 : K) (n : ℕ),
+  z1 ≠ 0 → w1 ≠ 0 → x * z2 ^ n * w2 = (z1 * z2) ^ n * (w1 * w2) * (x / (z1 ^ n * w1))
+'SameSupportCandidate.cross_scale' depends on axioms: [propext, Classical.choice, Quot.sound]
+@SameSupportCandidate.weighted_valid_inputs_exclude_same_support_error : ∀ {K : Type u_1} [inst : Field K]
+  [inst_1 : DecidableEq K] (f : Polynomial K) (q1 r1 s1 t1 z1 w1 q2 r2 s2 t2 z2 w2 : K),
+  z1 ≠ 0 →
+    z2 ≠ 0 →
+      w1 ≠ 0 →
+        w2 ≠ 0 →
+          2 ≠ 0 →
+            Polynomial.X ^ 2 + Polynomial.C (q1 / z1 ^ 2) * Polynomial.X + Polynomial.C (r1 / z1 ^ 4) ∣
+                f - (Polynomial.C (s1 / (z1 ^ 3 * w1)) * Polynomial.X + Polynomial.C (t1 / (z1 ^ 5 * w1))) ^ 2 →
+              Polynomial.X ^ 2 + Polynomial.C (q2 / z2 ^ 2) * Polynomial.X + Polynomial.C (r2 / z2 ^ 4) ∣
+                  f - (Polynomial.C (s2 / (z2 ^ 3 * w2)) * Polynomial.X + Polynomial.C (t2 / (z2 ^ 5 * w2))) ^ 2 →
+                q1 * z2 ^ 2 = q2 * z1 ^ 2 →
+                  r1 * z2 ^ 4 = r2 * z1 ^ 4 →
+                    ProjectiveLawRuntime.classifySameU22 (s1 * z2 ^ 3 * w2) (t1 * z2 ^ 5 * w2) (s2 * z1 ^ 3 * w1)
+                        (t2 * z1 ^ 5 * w1) ≠
+                      ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'SameSupportCandidate.weighted_valid_inputs_exclude_same_support_error' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

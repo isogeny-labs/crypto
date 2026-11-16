@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:41:51Z",
+ "id": "PCC-20261112-f4d41d",
+ "kind": "statement",
+ "producer": {
+  "commit": "9712627653dd163442dd20c03061c10b9bb7011e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/object-transport-failed-21.txt",
+    "sha256": "2f97f1374210aaf64e454eac7817b04222da0bfa70e08a424eb431a61423aec6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/object-transport-helper-21.py",
+    "sha256": "51754370a5ab1ff9bd42bdc789cced9728a85895035c0da2b0bf8a3a31e5d346"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned operational failure:exact root971 checkpoint object transport21 exits1 on GitHubHTTP503 during git/blobs upload. No branch move attempted;fresh connector PR3877 read still sees expected848 head. Full diagnostic/helper source retained. Retry same immutable commit/tree once;no SHA rewriting,credentials/policy changes or force update."
+}

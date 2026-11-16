@@ -1,0 +1,24 @@
+{
+  "schema": "software.additive-source-review/v1",
+  "status": "routing_clarification_resolved_prospectively",
+  "producer_manifest_sha256": "1b03d6fcd49676a40a7216632c8d5b4687a692f0da1158b0aa331b6b7c8f8a5c",
+  "checks": [
+    {
+      "path": "/var/tmp/pencil-local-image-routing-addendum-20261031-v1/ADDENDUM.md",
+      "sha256": "24056924c5e6ba43a6c9332914c9464ae2a11a2fb4b5bd86ca566cac1acc99b2"
+    },
+    {
+      "path": "/var/tmp/pencil-local-image-routing-addendum-20261031-v1/status.json",
+      "sha256": "1a3e2f3a0b2eb4e9bf989529552e46f9c134ed316e6ef64a18a5ed63cde8cc1e"
+    }
+  ],
+  "driver": "explicit local daemon legacy DOCKER_BUILDKIT=0",
+  "remaining_gates": [
+    "current client/server supports explicitly selected legacy route",
+    "affirmative parent resolution without registry access",
+    "second parent immutable image ID accepted by same builder",
+    "finalbinary/source bindings and reviewed supervisor"
+  ],
+  "docker_actions": 0,
+  "authorship": "Prior qualification and fixture author; not assembly/addendum producer."
+}

@@ -38,7 +38,8 @@
 #   CHECKPOINT_MAX_TOTAL_MB cap on the untracked tarball input (default 300)
 #
 # Layout: s3://$BUCKET/$PREFIX/<repo>/<branch>/<UTC stamp>-<sha>/
-#   checkpoint.tar.gz  (meta.json RESUME.md files/<spec and lead files>
+#   checkpoint.tar.gz  (meta.json RESUME.md relay/<HANDOFF.md handoff.json relay.jsonl>
+#                       files/<spec and lead files>
 #                       branch.bundle worktree.patch untracked.tar.gz
 #                       skipped-untracked.txt)
 #   RESUME.md  meta.json  (copies, for reading without unpacking)
@@ -75,9 +76,25 @@ aws_() {
 
 have_profile() { aws configure list-profiles 2>/dev/null | grep -qx "$PROFILE"; }
 
+token_expiry() { printf '%s' "$1" | python3 -c 'import base64,json,sys;print(json.loads(base64.b64decode(sys.stdin.read()))["expires"])' 2>/dev/null; }
+
+# $CHECKPOINT_UPLOAD_TOKEN wins, except when it has expired and the token file holds one that has not
+# (a session environment can carry a stale token after a fresh one was installed with presign-upload --install).
 upload_token() {
-  if [ -n "${CHECKPOINT_UPLOAD_TOKEN:-}" ]; then printf '%s' "$CHECKPOINT_UPLOAD_TOKEN"
-  elif [ -s "$TOKEN_FILE" ]; then tr -d '[:space:]' < "$TOKEN_FILE"
+  local env_tok="${CHECKPOINT_UPLOAD_TOKEN:-}" file_tok="" now exp
+  [ -s "$TOKEN_FILE" ] && file_tok="$(tr -d '[:space:]' < "$TOKEN_FILE")"
+  if [ -n "$env_tok" ] && [ -n "$file_tok" ] && [ "$env_tok" != "$file_tok" ]; then
+    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"; exp="$(token_expiry "$env_tok")"
+    if [ -n "$exp" ] && [[ "$exp" < "$now" ]]; then
+      exp="$(token_expiry "$file_tok")"
+      if [ -n "$exp" ] && ! [[ "$exp" < "$now" ]]; then
+        echo "checkpoint: \$CHECKPOINT_UPLOAD_TOKEN has expired; using $TOKEN_FILE" >&2
+        printf '%s' "$file_tok"; return
+      fi
+    fi
+  fi
+  if [ -n "$env_tok" ]; then printf '%s' "$env_tok"
+  elif [ -n "$file_tok" ]; then printf '%s' "$file_tok"
   fi
 }
 
@@ -269,6 +286,10 @@ cmd_push() {
   trap 'rm -rf -- "$stage"; trap - RETURN' RETURN
 
   [ -f .resume/RESUME.md ] && cp .resume/RESUME.md "$stage/RESUME.md"
+  # Runtime relay handoff (scripts/relay.py), so another runtime or host can take over.
+  mkdir -p "$stage/relay"
+  for f in HANDOFF.md handoff.json relay.jsonl; do [ -f ".resume/$f" ] && cp ".resume/$f" "$stage/relay/$f"; done
+  rmdir "$stage/relay" 2>/dev/null || true
 
   local f
   while IFS= read -r f; do
@@ -475,12 +496,16 @@ print(m["repo"], s[-2], s[-1])' "$dl/meta.json")
   [ -f "$dl/untracked.tar.gz" ] && tar -xzf "$dl/untracked.tar.gz" -C "$dest"
   mkdir -p "$dest/.resume"
   [ -f "$dl/RESUME.md" ] && cp "$dl/RESUME.md" "$dest/.resume/RESUME.md"
+  [ -d "$dl/relay" ] && cp "$dl/relay/"* "$dest/.resume/"
   cp "$dl/meta.json" "$dest/.resume/restored-from.json"
   [ -f "$dl/skipped-untracked.txt" ] && { echo "Not in the checkpoint (too large):"; cat "$dl/skipped-untracked.txt"; }
   rm -rf "$dl"
   echo "restored $src"
   echo "  worktree: $dest (branch $newb)"
   echo "  read:     $dest/.resume/RESUME.md"
+  if [ -f "$dest/.resume/HANDOFF.md" ]; then
+    echo "  handoff:  $dest/.resume/HANDOFF.md (python3 scripts/relay.py accept)"
+  fi
 }
 
 case "${1:-}" in

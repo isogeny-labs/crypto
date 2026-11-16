@@ -1,0 +1,51 @@
+{
+  "status": "failed",
+  "error": "AssertionError({'module': 'Normalization', 'command': ['/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean', '-j1', '-M3500', '-s16384', '-o', '/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Normalization.olean', '/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Normalization.lean'], 'expected_exit': 0, 'reaped': True, 'pid': 26316, 'exit': 1})",
+  "commands": [
+    {
+      "module": "Narrow",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Narrow.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Narrow.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 26240,
+      "exit": 0
+    },
+    {
+      "module": "Normalization",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Normalization.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt1/Normalization.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 26316,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 30.62227476600674,
+  "inputs": 28799,
+  "changed_inputs": [],
+  "scientific_runs": 0,
+  "pending_signal": null,
+  "limits": {
+    "outer_seconds": 95,
+    "address_space_bytes": 8589934592,
+    "lean_heap_MiB": 3500,
+    "hard_OS_stack_bytes": 10485760,
+    "lean_stack_KiB": 16384,
+    "workers": 1
+  }
+}

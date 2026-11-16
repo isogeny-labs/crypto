@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "7f6c72f1b66cedb1befc3679b9a197b2d93ea847372bb74f92b6838563b9c7ec"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "b9dcc6888df563580f20c2f541daf549a389ea08b30531dce97b945342e4c181"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/mt_timed_20261112/PROTOCOL.md: per configuration, the fastest (solve-phase wall time, median of 3 interleaved repeats) of 10 runs of this harness's multi-target rho (Kuhn-Struik retention rho rho2xks x 4 kappa, distinguished-point rho rhodpu x 6), x-only / negation-map classes",
+  "unit": "solve-phase wall time on one pinned CPU of the session VM (diagnostic); the gae_band below is the counted GAE per target (I = 10M, S = M, h on hash-table, solver and native operations) of the time-fastest keys",
+  "binary_or_process": "target/release/examples/mt_fieldops built from commit a992ed6c80 (bin_sha256 in every row of runs.jsonl), same binary for every arm",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 447.777,
+    "rho": 599.951
+   },
+   "0.1": {
+    "ic": 520.305,
+    "rho": 716.215
+   },
+   "1": {
+    "ic": 1173.062,
+    "rho": 1767.726
+   }
+  },
+  "order_holds_across_band": true,
+  "note": "Wall-time study; band shown for the counted cost of the time-fastest IC and rho keys at 32 b, T = 16384 (medians over 4 configurations). strongest_available = the strongest multi-target rho in this harness (validated in research/mt_fieldops_v5_20261112); not ecbench's rho.multitarget_pooled. Seconds are diagnostic (session VM, not an isolated L2 node). The counted band of these time-fastest keys favours the IC at every h, while their wall time favours rho at 2^32: the counted model with one h for hash and native work does not predict this host's timing (native work is nearly free, lookups are not)."
+ }
+}

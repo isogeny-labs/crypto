@@ -1,0 +1,65 @@
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:15:16: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:15:16: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:22:80: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:53:48: error: No goals to be solved
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:74:13: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.466 → ?m.466 → ?m.466[X]
+  
+  Polynomial.support : ?m.466[X] → Finset ℕ
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:74:2: error: `simp` made no progress
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:106:63: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 : K
+a : D2 K
+hz : a.z ≠ 0
+hw : a.w ≠ 0
+hs : a.s ≠ 0
+h2 : 2 ≠ 0
+hb : sourceB a = 0
+ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a
+hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (derivative (WeightedDoubling.curve a0 a1 a2 a3))
+hsn : ns a ≠ 0
+hb' : (nq a * ns a - nt a) * nt a - nr a * ns a ^ 2 = 0
+hpz : (point a).z ≠ 0
+hpw : (point a).w ≠ 0
+hpx : WeightedAdd11.nx (point a) = nt a / ns a - nq a
+hpy : WeightedAdd11.ny (point a) = 2 * nt a - nq a * ns a
+hn : 2 * nt a - nq a * ns a ≠ 0
+hraw : (point a).y ≠ 0
+hv : validPoint (WeightedDoubling.curve a0 a1 a2 a3) (point a)
+⊢ ?m.516 - WeightedAdd11.nx (point a) = 0
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/BZero.lean:90:85: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 : K
+a : D2 K
+hz : a.z ≠ 0
+hw : a.w ≠ 0
+hs : a.s ≠ 0
+h2 : 2 ≠ 0
+hb : sourceB a = 0
+ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a
+hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (derivative (WeightedDoubling.curve a0 a1 a2 a3))
+hsn : ns a ≠ 0
+hb' : (nq a * ns a - nt a) * nt a - nr a * ns a ^ 2 = 0
+hpz : (point a).z ≠ 0
+hpw : (point a).w ≠ 0
+hpx : WeightedAdd11.nx (point a) = nt a / ns a - nq a
+hpy : WeightedAdd11.ny (point a) = 2 * nt a - nq a * ns a
+hn : 2 * nt a - nq a * ns a ≠ 0
+hraw : (point a).y ≠ 0
+hv : validPoint (WeightedDoubling.curve a0 a1 a2 a3) (point a)
+⊢ let c := WeightedDoubling.output a0 a1 a2 a3 (point a).x (point a).y (point a).z (point a).w;
+  c.z ≠ 0 ∧
+    c.w ≠ 0 ∧
+      X ^ 2 + C (c.q / c.z ^ 2) * X + C (c.r / c.z ^ 4) ∣
+        WeightedDoubling.curve a0 a1 a2 a3 - (C (c.s / (c.z ^ 3 * c.w)) * X + C (c.t / (c.z ^ 5 * c.w))) ^ 2
