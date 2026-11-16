@@ -23,6 +23,8 @@ try:
   shutil.copyfile(Path(env['CARGO_TARGET_DIR'])/'release/twist-integrated-isolated-audit',out/'auditor');(out/'auditor').chmod(0o700)
   (out/'build.json').write_text(json.dumps(dict(checkpoint=checkpoint,inputs=pins['inputs'],binaries={n:hashlib.sha256((out/n).read_bytes()).hexdigest()for n in ['producer','auditor']},commands=stages.copy()),indent=2)+'\n');sys.exit(0)
  build=json.loads((out/'build.json').read_text());protocol=json.loads((root/scope/'timing-protocol.json').read_text());assert protocol['extensions']['binary_pins']==build['binaries']
+ assert protocol['freeze']['status']=='frozen' and protocol['freeze']['filed_before_affected_data'] is True
+ subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(root/scope/'timing-protocol.json')],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  for n,h in build['binaries'].items():assert hashlib.sha256((out/n).read_bytes()).hexdigest()==h
  (out/'precall.json').write_text(json.dumps(dict(started=started,checkpoint=checkpoint,build=build,protocol_sha256=hashlib.sha256((root/scope/'timing-protocol.json').read_bytes()).hexdigest()),indent=2)+'\n')
  for tag in ['A','B']:run('isolated'+tag,[sys.executable,str(helper),'run','--cpus','0','--out',str(out/('isolation-'+tag+'.jsonl')),'--label','twist-integrated-'+tag,'--',str(out/'producer'),'produce',str(out/('cases'+tag)),tag])

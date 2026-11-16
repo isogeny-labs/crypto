@@ -75,3 +75,6 @@ Within SAME02:09–03:09window prepare explicit post-data timing replication: un
 
 ### Errors
 Initial isolation helper import failed (missing result_switches); fetched same-official helper dependency unchanged, help succeeds. No scientific command ran in failed help. Earlier newRust omitted-import failure preserved. Current oldCargo manifest briefly prepared for a new binary, then restored byte-exact to frozen input before any new affected launch; timing binary uses its OWNmanifest/lock. [pcc:unverified]
+
+###02:40 timing protocol preflight failure and recovery
+Initial schema25boolean flag fields corrected tostrings; then canonical comparison still referenced removed producerA/B names. Shell metadata commands lacked fail-fast and mistakenly published UNFROZEN9f04f33a before correction, and started isolated timing attempt. Detected the actual producer process, terminated that specific current run via outer timeoutPID (exit143); partial freshcasesA/logs retained, NO timing result accepted. This was an actual orchestration defect, not an accepted frozen run. Added explicit frozen-status AND official canonical validation guards to runner; no arithmetic predicate changed. Fresh source checkpoint/build and corrected canonical freeze required before new isolated run02; prior failed sources/data untouched. [pcc:unverified]
