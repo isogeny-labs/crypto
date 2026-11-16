@@ -1,0 +1,59 @@
+import FallbackWordNormal
+set_option autoImplicit false
+namespace FallbackWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+def Divided (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (ch : Chain p ua ub va vb) (u v : List UInt64) : Prop :=
+ exactDiv p (ProductPolynomial.product p ua ub) (ProductPolynomial.product p ch.d ch.d)=some u ∧
+ exactDiv p (numerator p ua ub va vb f ch.c1 ch.c2 ch.e1 ch.e2) ch.d=some v ∧
+ Canon p u ∧ Canon p v ∧ Normal u ∧ Normal v ∧
+ wordsPoly p ua*wordsPoly p ub=wordsPoly p u*(wordsPoly p ch.d*wordsPoly p ch.d) ∧
+ wordsPoly p (numerator p ua ub va vb f ch.c1 ch.c2 ch.e1 ch.e2)=wordsPoly p v*wordsPoly p ch.d ∧
+ wordsPoly p u ≠ 0
+
+theorem chain_divisions (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (ch : Chain p ua ub va vb) (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hanz : wordsPoly p ua ≠ 0) (hbnz : wordsPoly p ub ≠ 0)
+ (hvalid : wordsPoly p ua ∣ wordsPoly p f-wordsPoly p va*wordsPoly p va) :
+ ∃ u v, Divided p ua ub va vb f ch u v := by
+ have hd1nz := result_nonzero p _ _ ch.d1 ch.e1 ch.e2 ch.first hanz
+ have hdnz := result_nonzero p _ _ ch.d ch.c1 ch.c2 ch.second hd1nz
+ rcases ch.first with ⟨hcd1,hce1,hce2,hnd1,_,_,_,hd1a,hd1b,_⟩
+ rcases ch.second with ⟨hcd,hcc1,hcc2,hnd,_,_,_,hdd1,hds,_⟩
+ have hsum := ResidualWord.add_correct p va vb (by omega) hb hva hvb
+ have hds' : wordsPoly p ch.d ∣ wordsPoly p va+wordsPoly p vb := by simpa [hsum.2] using hds
+ have halg := Pegcd.fallback_divisibilities (wordsPoly p ua) (wordsPoly p ub) (wordsPoly p va) (wordsPoly p vb) (wordsPoly p f)
+   (wordsPoly p ch.d1) (wordsPoly p ch.d) (wordsPoly p ch.c1) (wordsPoly p ch.c2) (wordsPoly p ch.e1) (wordsPoly p ch.e2)
+   ⟨hd1a,hd1b⟩ ⟨hdd1,hds'⟩ hvalid
+ have hprod := ProductPolynomial.product_correct p ua ub (by omega) hb hua hub
+ have hsq := ProductPolynomial.product_correct p ch.d ch.d (by omega) hb hcd hcd
+ have hnum := numerator_correct p ua ub va vb f ch.c1 ch.c2 ch.e1 ch.e2 (by omega) hb hua hub hva hvb hf hcc1 hcc2 hce1 hce2
+ have hsqnz : wordsPoly p (ProductPolynomial.product p ch.d ch.d) ≠ 0 := by
+   rw [hsq.2]; exact mul_ne_zero hdnz hdnz
+ have hdivu : wordsPoly p (ProductPolynomial.product p ch.d ch.d) ∣ wordsPoly p (ProductPolynomial.product p ua ub) := by
+   simpa [hsq.2,hprod.2] using halg.1
+ have hdivv : wordsPoly p ch.d ∣ wordsPoly p (numerator p ua ub va vb f ch.c1 ch.c2 ch.e1 ch.e2) := by
+   simpa [hnum.2] using halg.2
+ obtain ⟨u,heu,hcu,hnu,hdu⟩ := exact_total_normal p _ _ hp hb hprod.1 hsq.1 (product_normal p ch.d ch.d) hsqnz hdivu
+ obtain ⟨v,hev,hcv,hnv,hdv⟩ := exact_total_normal p _ _ hp hb hnum.1 hcd hnd hdnz hdivv
+ have hdu' : wordsPoly p ua*wordsPoly p ub=wordsPoly p u*(wordsPoly p ch.d*wordsPoly p ch.d) := by
+   simpa [hprod.2,hsq.2] using hdu
+ have hunz : wordsPoly p u ≠ 0 := by
+   intro hz
+   have hzero : wordsPoly p ua*wordsPoly p ub=0 := by simpa [hz] using hdu'
+   exact (mul_ne_zero hanz hbnz) hzero
+ exact ⟨u,v,heu,hev,hcu,hcv,hnu,hnv,hdu',hdv,hunz⟩
+
+theorem fallback_divisions_exist (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hna : Normal ua) (hnb : Normal ub)
+ (hanz : wordsPoly p ua ≠ 0) (hbnz : wordsPoly p ub ≠ 0)
+ (hvalid : wordsPoly p ua ∣ wordsPoly p f-wordsPoly p va*wordsPoly p va) :
+ ∃ ch : Chain p ua ub va vb, ∃ u v, Divided p ua ub va vb f ch u v := by
+ obtain ⟨ch⟩ := chain_exists p ua ub va vb hp hb hua hub hva hvb hna hnb hanz
+ obtain ⟨u,v,h⟩ := chain_divisions p ua ub va vb f ch hp hb hua hub hva hvb hf hanz hbnz hvalid
+ exact ⟨ch,u,v,h⟩
+end FallbackWord

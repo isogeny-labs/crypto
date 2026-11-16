@@ -1,0 +1,33 @@
+/workspace/scratch/CoverFieldProbe.lean:26:14: error: unsolved goals
+case inr.inr.inr.inr.inr.inr
+⊢ 1 + (omega + 1) = 0 ∨ omega + 1 = 0 ∨ 1 + (omega + 1) = omega
+/workspace/scratch/CoverFieldProbe.lean:51:13: error: unsolved goals
+s : Finset Fbig := {0, 1, omega, omega + 1}
+heq : ↑fourField = ↑s
+h0 : omega + 1 ≠ 0
+h1 : omega + 1 ≠ 1
+⊢ ¬0 = omega + 1
+/workspace/scratch/CoverFieldProbe.lean:51:52: warning: This simp argument is unused:
+  h0
+
+Hint: Omit it from the simp argument list.
+  simp [s, Finset.card_insert_eq_ite, h0̵,̵ ̵h̵1, omega_ne_zero, omega_ne_one,
+        Ne.symm omega_ne_zero, Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:51:56: warning: This simp argument is unused:
+  h1
+
+Hint: Omit it from the simp argument list.
+  simp [s, Finset.card_insert_eq_ite, h0, h̵1̵,̵ ̵omega_ne_zero, omega_ne_one,
+        Ne.symm omega_ne_zero, Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:51:75: warning: This simp argument is unused:
+  omega_ne_one
+
+Hint: Omit it from the simp argument list.
+  simp [s, Finset.card_insert_eq_ite, h0, h1, omega_ne_zero, o̵m̵e̵g̵a̵_̵n̵e̵_̵o̵n̵e̵,̵Ne.symm omega_ne_zero,
+  ̲  ̲ ̲ ̲ ̲ ̲Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

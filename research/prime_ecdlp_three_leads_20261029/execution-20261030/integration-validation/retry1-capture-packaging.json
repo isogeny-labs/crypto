@@ -1,0 +1,15 @@
+{
+  "schema": "pkm.stdout-capture-packaging/v1",
+  "recorded_utc": "2026-10-30T09:49:44.300286+00:00",
+  "original_receipt_commit": "2acf618dd960011237d6628d32edc1ea5e018785",
+  "original_receipt": "native-retry1-result.json",
+  "capture_file": "retry1-native-tests.log",
+  "captured_bytes": 2258,
+  "captured_sha256": "c51c58319b53f54829303966602d0b965e1382c0ec628f5780225f8e1305fc87",
+  "stored_bytes": 2432,
+  "stored_sha256": "acacbc85e3fbef0f8df7ef254ed23090dd39b551a975f7a5e941ff40cad97c53",
+  "representation": "exact captured stdout prefix plus explicit capture-note footer",
+  "raw_file_preserved": "/workspace/pr2949-integration-20261030/retry-20261030T0838Z/native-tests.log",
+  "reconstruct": "head -c 2258 retry1-native-tests.log",
+  "reason": "Captured stdout ends with a blank line. Initial whitespace check flagged it before commit; retain all raw bytes and add an explicit footer, rather than trimming or compressing output."
+}

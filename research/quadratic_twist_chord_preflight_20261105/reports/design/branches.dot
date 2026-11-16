@@ -1,0 +1,15 @@
+digraph chord {
+  graph [rankdir=TB, bgcolor="white", pad="0.18", nodesep="0.24", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3fa", color="#315b85", fontname="Helvetica", fontsize=11, margin="0.15,0.10"];
+  edge [color="#315b85", arrowsize=0.7];
+  input [label="Actual query point R and three base points\nPROPOSED: independent source/map binding"];
+  distinct [label="Distinct branch\ngcd(U, W); actual roots and point sum"];
+  diagonal [label="Tangent branch\nDelta = 0; F_B(s/2) = 0; actual doubling"];
+  identity [label="Identity branch\nR = O; ordered opposite point pairs"];
+  rows [label="Complete ordered signed rows\nExplicit columns; compare independent pair reference"];
+  later [label="LATER: public setup and original-scalar recovery\nThen charge fixed collector schedules", fillcolor="#fff2da"];
+  input -> distinct; input -> diagonal; input -> identity;
+  {rank=same; distinct; diagonal; identity;}
+  distinct -> rows; diagonal -> rows; identity -> rows;
+  rows -> later [style=dashed, label="only after coverage"];
+}

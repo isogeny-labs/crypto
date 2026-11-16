@@ -2,7 +2,7 @@
 //! queries that group curves by them or rank curves by likeness to one.
 //!
 //! ```text
-//! curve_traits build                       # registry + sources + hints → docs/curves/traits.json
+//! curve_traits build                       # catalog rows + sources + hints → docs/curves/traits.json
 //! curve_traits check                       # the committed file is current
 //! curve_traits unfactored                  # composites the budget left, for the hint script
 //! curve_traits show ECC2K-130              # one curve's record
@@ -23,6 +23,7 @@ use crypto_lib::cryptanalysis::curve_traits::{
 };
 
 const REGISTRY: &str = "docs/curves/registry.json";
+const CATALOG: &str = crypto_lib::cryptanalysis::cover_catalog::MANIFEST_PATH;
 const TRAITS: &str = "docs/curves/traits.json";
 const HINTS: &str = "docs/curves/factor-hints.txt";
 const SOURCES: &str = "docs/curves/trait-sources.json";
@@ -35,9 +36,9 @@ fn read(path: &str) -> Result<Input, String> {
     })
 }
 
-/// Build from the registry, the hints and every source the manifest
-/// names, each read from its repository-relative path.
-fn build(registry: &str, budget: u64) -> Result<(TraitFile, Factoring), String> {
+/// Build from the registry rows the catalog names, the hints and every
+/// source the manifest names, each read from its repository-relative path.
+fn build(registry: &str, catalog: &str, budget: u64) -> Result<(TraitFile, Factoring), String> {
     let manifest = read(SOURCES)?;
     let files = read_manifest(&manifest.text)?
         .iter()
@@ -45,6 +46,7 @@ fn build(registry: &str, budget: u64) -> Result<(TraitFile, Factoring), String> 
         .collect::<Result<Vec<_>, _>>()?;
     TraitFile::build_from(
         &read(registry)?,
+        &read(catalog)?,
         Some(&read(HINTS)?),
         Some(&read(CERTIFICATES)?),
         Some(&manifest),
@@ -64,10 +66,14 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Derive every curve's traits from the registry and write the file.
+    /// Derive the traits of every catalog curve (and every source curve)
+    /// and write the file.
     Build {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        /// The manifest naming the registry rows to derive.
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = TRAITS)]
         out: String,
         /// Pollard-rho iterations per composite.
@@ -78,11 +84,8 @@ enum Cmd {
     Check {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
-        #[arg(long, default_value = TRAITS)]
-        traits: String,
-    },
-    /// Re-encode an existing report without recomputing or changing its values.
-    Format {
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value = TRAITS)]
         traits: String,
     },
@@ -135,6 +138,8 @@ enum Cmd {
     Unfactored {
         #[arg(long, default_value = REGISTRY)]
         registry: String,
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         #[arg(long, default_value_t = DEFAULT_BUDGET)]
         budget: u64,
     },
@@ -295,35 +300,28 @@ fn show(c: &CurveTraits) {
     );
 }
 
-// The complete catalogue can exceed GitHub's 100 MiB blob limit when pretty
-// printed. Keep small reports readable and large ones compact, with the same
-// canonical encoding in build/check. This changes no derived trait or budget.
-fn catalogue_json(file: &TraitFile) -> String {
-    let pretty = file.to_json();
-    if pretty.len() <= 64 * 1024 * 1024 {
-        pretty
-    } else {
-        serde_json::to_string(file).expect("serialisable") + "\n"
-    }
-}
-
 fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
             registry,
+            catalog,
             out,
             budget,
         } => {
-            let (file, _) = build(&registry, budget)?;
-            std::fs::write(&out, catalogue_json(&file)).map_err(|e| format!("{out}: {e}"))?;
+            let (file, _) = build(&registry, &catalog, budget)?;
+            std::fs::write(&out, file.to_json()).map_err(|e| format!("{out}: {e}"))?;
             eprintln!("wrote {} curves to {out}", file.curves.len());
             Ok(true)
         }
-        Cmd::Check { registry, traits } => {
+        Cmd::Check {
+            registry,
+            catalog,
+            traits,
+        } => {
             let committed =
                 std::fs::read_to_string(&traits).map_err(|e| format!("{traits}: {e}"))?;
             let budget = load(&traits)?.factor_budget;
-            let fresh = catalogue_json(&build(&registry, budget)?.0);
+            let fresh = build(&registry, &catalog, budget)?.0.to_json();
             if fresh == committed {
                 eprintln!("{traits} is current");
                 return Ok(true);
@@ -332,26 +330,6 @@ fn run(cli: Cli) -> Result<bool, String> {
                 "{traits} is stale: run `cargo run --release --bin curve_traits -- build --budget {budget}`"
             );
             Ok(false)
-        }
-        Cmd::Format { traits } => {
-            let original =
-                std::fs::read_to_string(&traits).map_err(|e| format!("{traits}: {e}"))?;
-            let file: TraitFile = serde_json::from_str(&original).map_err(|e| e.to_string())?;
-            let encoded = catalogue_json(&file);
-            let before: serde_json::Value =
-                serde_json::from_str(&original).map_err(|e| e.to_string())?;
-            let after: serde_json::Value =
-                serde_json::from_str(&encoded).map_err(|e| e.to_string())?;
-            if before != after {
-                return Err("refusing a format change that changes JSON values".into());
-            }
-            std::fs::write(&traits, &encoded).map_err(|e| format!("{traits}: {e}"))?;
-            eprintln!(
-                "formatted {traits}: {} -> {} bytes; all values equal",
-                original.len(),
-                encoded.len()
-            );
-            Ok(true)
         }
         Cmd::Show { name, traits, json } => {
             let file = load(&traits)?;
@@ -474,8 +452,12 @@ fn run(cli: Cli) -> Result<bool, String> {
             }
             Ok(true)
         }
-        Cmd::Unfactored { registry, budget } => {
-            let (_, fx) = build(&registry, budget)?;
+        Cmd::Unfactored {
+            registry,
+            catalog,
+            budget,
+        } => {
+            let (_, fx) = build(&registry, &catalog, budget)?;
             for c in fx.leftovers() {
                 println!("{c}");
             }

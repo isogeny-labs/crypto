@@ -1,0 +1,110 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime medium rho CPC M1: 33-, 37- and 41-bit curves",
+  "description": "research/prime_medium_rho_cpc_20261109/PROTOCOL.md. Curves from research/prime_medium_tier_rho_20261107/curves.json; seeds from seeds.json.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 5557729739,
+        "a": 2036002406,
+        "b": 2773982840,
+        "group_order": 5557664551,
+        "r": 5557664551,
+        "gx": 3,
+        "gy": 898702012
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 7183145327,
+        "a": 4546663450,
+        "b": 440691422,
+        "group_order": 7183188797,
+        "r": 7183188797,
+        "gx": 3,
+        "gy": 6515878363
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 70093240733,
+        "a": 34866272438,
+        "b": 47397029180,
+        "group_order": 70093459687,
+        "r": 70093459687,
+        "gx": 9,
+        "gy": 33541631670
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 92849827471,
+        "a": 41216192137,
+        "b": 53376697970,
+        "group_order": 92849667067,
+        "r": 92849667067,
+        "gx": 2,
+        "gy": 43964737334
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 1495523448539,
+        "a": 640197488525,
+        "b": 566237084442,
+        "group_order": 1495523854093,
+        "r": 1495523854093,
+        "gx": 1,
+        "gy": 949085523714
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 1930433675293,
+        "a": 28146981299,
+        "b": 897732060440,
+        "group_order": 1930434562229,
+        "r": 1930434562229,
+        "gx": 1,
+        "gy": 969460461504
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 4704550062423,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "baseline",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 231691171589394,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

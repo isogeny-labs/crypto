@@ -1,0 +1,17 @@
+closed form vs numeric at c=2^40: (128.82518642910316, 59.16666666638675) (128.8251864783908, 59.166800000003924)
+kappa lo/mid/hi = 540 960.0 1800
+
+log2c  | T lo-conv | T mid | T hi-conv | rho lo | rho mid | rho hi
+ 32.0 |  125.5 |  126.2 |  127.3 |  168.3 |  169.0 |  170.2
+ 40.0 |  128.1 |  128.8 |  130.0 |  168.3 |  169.0 |  170.2
+ 44.0 |  129.5 |  130.2 |  131.3 |  168.3 |  169.0 |  170.2
+ 50.0 |  131.5 |  132.2 |  133.3 |  168.3 |  169.0 |  170.2
+ 54.0 |  132.8 |  133.5 |  134.6 |  168.3 |  169.0 |  170.2
+ 62.3 |  135.6 |  136.3 |  137.4 |  168.3 |  169.0 |  170.2
+
+2^128 crossing log2c: lo-conv 39.6  mid 37.5  hi-conv 34.1
+2^128 group ops in words (800/op) = 2^137.6 ; crossing log2c = 65.2
+kappa halved: crossing 39.5
+JV(n-1) full base break-even c~ (F_p ops, u=4): 2^34.7  [rho 500 words/op]
+JV(n-1) full base break-even c~ (F_p ops, u=4): 2^35.4  [rho 800 words/op]
+JV(n-1) full base break-even c~ (F_p ops, u=4): 2^36.6  [rho 1830 words/op]

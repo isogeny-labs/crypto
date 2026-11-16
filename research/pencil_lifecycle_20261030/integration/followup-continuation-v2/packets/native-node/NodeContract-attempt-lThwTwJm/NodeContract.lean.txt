@@ -1,0 +1,27 @@
+import NodeColumns
+set_option autoImplicit false
+namespace NativeNode
+open SignedWord
+variable {n : Nat}
+theorem insertion_contract (r : UInt64) [Fact r.toNat.Prime] (s : Columns n)
+ (hs : Bounded s) (hn : n+1<USize.size) (hp : 0<r.toNat)
+ (owner : Fin n → Fin n) (rank : Fin n → Nat) (v : Fin n → F r) (z k : F r)
+ (hg : Good r (toWord s hs).graph) (ha : FixedGood r (toWord s hs))
+ (hv : GraphUnion.Valid (unionDecode r (toWord s hs)) v k)
+ (hf : GraphFind.Forest (decode r (toWord s hs).graph) rank)
+ (ho : ComponentMap.Valid (decode r (toWord s hs).graph) owner)
+ (hz : ComponentMap.SizeValid owner s.size) :
+ let out := toWord (append s) (append_bounded s hs (by omega))
+ Good r out.graph ∧ FixedGood r out ∧
+ GraphUnion.Valid (unionDecode r out) (insertValues v z) k ∧
+ GraphFind.Forest (decode r out.graph) (ComponentMap.insertRank rank) ∧
+ ComponentMap.Valid (decode r out.graph) (ComponentMap.extendMap owner) ∧
+ ComponentMap.SizeValid (ComponentMap.extendMap owner) (append s).size := by
+ dsimp only
+ rw [append_refines]
+ obtain ⟨hgood,hanchor⟩ := insert_good r (toWord s hs) hp hg ha
+ refine ⟨hgood,hanchor,insert_valid r (toWord s hs) v z k hv,?_,?_,?_⟩
+ · rw [decoded_graph];exact ComponentMap.insert_forest _ rank hf
+ · rw [decoded_graph];exact ComponentMap.insert_valid _ owner ho
+ · rw [sizes_refine];exact ComponentMap.insert_sizes_valid owner s.size hz
+end NativeNode

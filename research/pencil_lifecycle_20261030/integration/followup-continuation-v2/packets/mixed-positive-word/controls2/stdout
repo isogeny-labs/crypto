@@ -1,0 +1,33 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:23:1: error: unsolved goals
+case hva
+h64 : 64 = 1
+h6 : 6 = -1
+⊢ -X + X ^ 5 = X * 6 + X ^ 5
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:32:58: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv (ZMod 7) (ZMod (UInt64.toNat 7)) (ZMod 7)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:32:48: error: unsolved goals
+h486 : 486 = 3
+h9 : 9 = 2
+⊢ 5 / 2 = -1
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/Controls.lean:28:1: error: unsolved goals
+case hvb
+h486 : 486 = 3
+h9 : 9 = 2
+hd : 5 / 2 = -1
+h6 : 6 = -1
+⊢ 1 + X * C 6 + X ^ 5 - C (486⁻¹ * 3) ^ 2 =
+    X * C (9⁻¹ * 5) + X ^ 2 + X ^ 2 * C (9⁻¹ * 5) + X ^ 3 + X ^ 3 * C (9⁻¹ * 5) + X ^ 4 + X ^ 4 * C (9⁻¹ * 5) + X ^ 5

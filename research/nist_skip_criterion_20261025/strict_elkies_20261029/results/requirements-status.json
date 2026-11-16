@@ -1,0 +1,42 @@
+{
+  "kind": "nist-selection-requirements-status/v1",
+  "date": "2026-10-29",
+  "requirements": [
+    {
+      "requirement": "Complete the four outstanding factorizations and update comparison",
+      "status": "verified_complete",
+      "evidence": "research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md; complete proved factors across all 84 records"
+    },
+    {
+      "requirement": "Find a criterion matching the recorded skipped curves",
+      "status": "verified_complete",
+      "evidence": "summary.json, at691.tsv, verification.json; strict splitting envelope reproduces all 11 omissions against all 8 paired publications, retaining both singleton published controls",
+      "limitation": "Reproduction of an externally reported empirical criterion; no independent historical holdout"
+    },
+    {
+      "requirement": "Establish the original historical selection mechanism",
+      "status": "blocked",
+      "gap": "No authenticated original caller, acceptance/visit trace, generation program or independently discriminating historical prediction; the user has no original logs"
+    },
+    {
+      "requirement": "Measure curve and generator/coefficient differences",
+      "status": "partial",
+      "evidence": "Declared complete-factor, inherited, point-trait, scalar-recipe and strict-character families are verified",
+      "gap": "The declared finite families do not enumerate all possible mathematical functions; historical omitted generators remain unknown"
+    },
+    {
+      "requirement": "Determine whether selected or skipped curves are weak",
+      "status": "unresolved",
+      "gap": "No applicable attack construction, transfer with solver advantage or measured DLP follows from the observed separation",
+      "dlp_requested_or_attempted": false
+    },
+    {
+      "requirement": "Provide PDF and update existing PR",
+      "status": "verified_complete",
+      "evidence": "Main REPORT.pdf and two supporting PDFs rendered, all six pages inspected, and existing regular PR 2666 title and description updated with the reproduced criterion. Commit delivery and current-head CI are recorded separately in the PR and session log."
+    }
+  ],
+  "historical_use_established": false,
+  "vulnerability_established": false,
+  "all_possible_functions_certified": false
+}

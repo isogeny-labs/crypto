@@ -1,0 +1,58 @@
+import QuotientStorage
+set_option autoImplicit false
+namespace QuotientStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder MonicTermination NativeDivision
+
+def wloop {n:Nat} (p:UInt64) (b:List UInt64) (fuel:Nat) (xs:State n) (r:List UInt64) :
+ Option (State n×List UInt64) :=
+ if hr:r=[] then some (xs,r) else
+ if hl:b.length≤r.length then
+  if hj:r.length-b.length<n then
+   match fuel with
+   | 0=>none
+   | k+1=>wloop p b k (put xs ⟨r.length-b.length,hj⟩ (r.getLast hr)) (selected p b r hr hl)
+  else none
+ else some (xs,r)
+termination_by structural fuel
+
+theorem loop_refines {n:Nat} (p:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (hm:b.getLast?=some 1)
+ (N fuel:Nat) (xs:State n) (r:List UInt64) (hc:Canon p r) (hr:r.length≤N) (hn:N-b.length<n) :
+ (wloop p b fuel xs r).map (fun z=>(decodedPoly p z.1,z.2))=
+ qloop p b fuel (decodedPoly p xs) r := by
+ induction fuel generalizing xs r with
+ | zero =>
+   rw [wloop,qloop]
+   split_ifs with he hl hj
+   · rfl
+   · rfl
+   · rfl
+   · rfl
+ | succ fuel ih =>
+   rw [wloop,qloop]
+   split_ifs with he hl hj
+   · rfl
+   · have hs:=selected_correct p b r he hl hp hb hbs hc
+     have hd:=selected_shorter p b r he hl hp hb hbs hc hm
+     rw [ih _ _ hs.1 (by omega),put_decode]
+   · exact False.elim (hj (current_index_bound N b.length r.length n hr hn))
+   · rfl
+
+theorem loop_good {n:Nat} (p:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b)
+ (fuel:Nat) (xs ys:State n) (r out:List UInt64) (hg:Good p xs) (hc:Canon p r)
+ (ho:wloop p b fuel xs r=some (ys,out)) : Good p ys ∧ Canon p out := by
+ induction fuel generalizing xs ys r out with
+ | zero =>
+   rw [wloop] at ho
+   split_ifs at ho with he hl hj
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+ | succ fuel ih =>
+   rw [wloop] at ho
+   split_ifs at ho with he hl hj
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+   · exact ih _ ys _ out (put_good p xs _ _ hg (hc _ (List.getLast_mem he)))
+       (selected_correct p b r he hl hp hb hbs hc).1 ho
+   · have h:=Option.some.inj ho; cases h; exact ⟨hg,hc⟩
+end QuotientStorage

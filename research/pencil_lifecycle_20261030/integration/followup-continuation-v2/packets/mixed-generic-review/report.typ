@@ -1,0 +1,22 @@
+#set page(paper:"a4",margin:18mm)
+#set text(size:10pt)
+#text(size:18pt,weight:"bold")[Independent generic mixed-degree field review]
+#image("diagram.svg",width:100%)
+
+#text("Independent review supports the generic weighted degree1+degree2 field-value preservation claim. Fresh isolated checks of the main module, producer controls and separate readback all exited0. A reviewer full characteristic2 fixture also passed after retained reviewer-only elaboration repairs. Ten named declarations have only standard propext, Classical.choice and Quot.sound axioms. Producer files were not changed.")
+
+#text("The theorem assumes an arbitrary field, monic quintic f=X5+a3X3+a2X2+a1X+a0, four nonzero representation weights, the literal genericK nonzero guard, and original normalized degree1/degree2 validity predicates. It concludes nonzero output weights and normalized output quadratic divisibility. Neither output identities nor output validity occur as premises.")
+
+#text("Independent algebra check: for u(T)=T²+qT+r, v(T)=sT+t and k=u(x) nonzero, set m=(y-v(x))/k and h=v+m*u. The explicit identity u-(T-x)(T+q+x)=k makes the two supports coprime. Original input validity and interpolation give (T-x)u dividing f-h². The proposed quotient is T²+qprime*T+rprime, with qprime=x-q-m² and rprime=a3+q²-r-m(2s+mq)+x*qprime.")
+
+#text("The producer derives the residual polynomial explicitly and bounds its degree by2. It remains divisible by the monic degree3 product (T-x)u, hence is zero, even when residual leading coefficients vanish. The output ordinate is -h reduced modulo the quadratic quotient; h+vprime=m*uprime gives the final output divisibility. No squarefreeness of the input or output quadratic, division by2, or odd-characteristic premise is introduced.")
+
+#text("Source inspection at add12_weighted_generic lines232-292 matches genericK and outputWith field formulas, signs and representation powers. Let D=Za^5 Zb^5 Wa Wb. Then outputZ=D*u(x), rawA=D*(y-v(x)), and rawA/outputZ=m. The normalized bb and cc terms give s+mq and t+mr. genericK_same relates the differently associated generic-source guard to the prior rawK identity. Nonzero outputZ follows directly from K,Za,Zb,Wb; outputW=1. The source uses curve[3], and the theorem explicitly requires the monic quintic with zero X4 coefficient.")
+
+#text("Controls construct original input divisibility witnesses. The full rational nonunit fixture normalizes to point(0,1), u=X²+1 and v=0, and output(-1,-1,-1,-2). A second control admits zero interpolation slope and repeated output support. ZeroK dispatch and invalid-input constant coefficient controls cover exclusions. Reviewer controls instantiate the full theorem over ZMod2 using unit weights and the same exact polynomial construction, and show a zero input weight can produce zero outputZ outside the premises. These are polynomial fixtures, not smooth-curve claims.")
+
+#text("All five failed reviewer-control versions remain with source and receipt: missing ZMod import, missing field-instance setup, and characteristic2 polynomial negation simplification. The final version adds the existing field import, checked prime2 instance and an explicit coefficientwise X=-X identity. Fixture values and asserted mathematical conclusion were unchanged. Producer failures and corrected scratch expansion remain preserved separately.")
+
+#text("This review validates field-value output preservation and the guarded Some return only. It does not prove the divisor-class sum, literal UInt64 computation, counter behavior, compiler/linkage semantics, zeroK completion, tripling or whole-walk closure. Characteristic2 is allowed by this polynomial theorem; that does not extend an implementation claim to binary-field source branches.")
+
+#text("Exact producer manifest/source hashes were checked. Fresh target modules used the existing pinned Lean toolchain and dependency union; dependency source/olean bindings were captured before replay and rechecked unchanged. Cached dependencies remain inside the normal Lean/toolchain trust boundary; no independent binary/kernel rechecker was used. The review plan was frozen before producer proof inspection; this is independent source-fidelity review, not a blind review of unknown statements. No native experiment, scientific trajectory or cost measurement occurred.")

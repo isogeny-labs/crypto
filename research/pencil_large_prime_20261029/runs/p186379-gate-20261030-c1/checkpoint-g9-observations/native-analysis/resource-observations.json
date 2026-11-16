@@ -1,0 +1,68 @@
+{
+  "schema": "pencil-interim-resource-observations/v1",
+  "observation_utc": "2026-10-30T06:51:07Z",
+  "scope": "Interim checkpoint9 data and separately timestamped live controller observation. Run remains active; this is not terminal allocation or total scientific cost accounting.",
+  "controller_status": "IN_PROGRESS",
+  "controller_phase": "BUILD",
+  "controller_end_utc": null,
+  "controller_build": "isolab-recovery-controller:592e9381-e505-48bc-a796-3d02c4d3a922",
+  "controller_invocations_observed": 2,
+  "controller_history": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/controller-takeover/lineage-observation.json",
+    "sha256": "79d3b325cea11f33135ff741846e02a725e4e520a9909de5f192461db53c24a6"
+  },
+  "controller_amendment": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/controller-continuation-v5.json",
+    "sha256": "d00be8a9e4b12fd4e6bb60d3d6c423b9213850de1859e22e248b52cddf70c956"
+  },
+  "controller_continuation_admission": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/controller-takeover/continuation-admission.json",
+    "sha256": "187f21544280fdef4835b52e1ea860a1ed8472e0f3b50b2a6b6fdfd5da215ca2"
+  },
+  "worker_termination_verified": false,
+  "worker_instance_terminated_verified": false,
+  "worker_instance_id": "i-04d58c2b309fb6549",
+  "worker_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+  "worker_elapsed_seconds": null,
+  "worker_active_seconds": null,
+  "worker_restores_observed": 0,
+  "worker_attempt_observed": 0,
+  "scientific_submission_count": 1,
+  "maximum_active_scientific_payloads": 1,
+  "request_G_unix": 1793347824,
+  "outer_D_unix": 1793359074,
+  "original_authorization_start_unix": 1793337474,
+  "cumulative_active_worker_seconds_limit": 21600,
+  "resource_authorization": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/resource_authorization.json",
+    "sha256": "5ea8e080af4b28572f3ff1d074e9e261ef8ad3c24a53a6e7d06d1b37b0316d25"
+  },
+  "prior_b1_resources": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/resource-observations-worker-terminal.json",
+    "sha256": "4880cc449b6d4b0065cd71d1be119cb748bb5f658d8574b87051454738b6f928"
+  },
+  "cost_conversion": null,
+  "allocated_dollars": null,
+  "scientific_total_cost": null,
+  "charged_categories": [
+    "candidate",
+    "rho",
+    "rho_AA",
+    "warmups",
+    "computation",
+    "fresh_epoch_if_any",
+    "independent_replay_if_any",
+    "recovery",
+    "failed_attempts"
+  ],
+  "allocation_and_algorithm_costs_distinct": true,
+  "failed_costs_retained": true,
+  "missing_costs_not_zero": true,
+  "accounting_notes": [
+    "Worker time continues across controller ownership changes; controller invocations are separately retained.",
+    "G9 includes a producer-recorded pencil warmup timeout; its raw rusage/status remain in the archived record, not converted to a complete algorithm cost.",
+    "No complete measured pair or independently replayed candidate exists in this snapshot.",
+    "No total active time or total spend is claimed while execution and terminal accounting remain incomplete.",
+    "Prior budgets and failed attempts remain separate, without refunds or pooled result rows."
+  ]
+}

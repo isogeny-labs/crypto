@@ -1,0 +1,1329 @@
+{
+  "cells": [
+    {
+      "curve": "icv1-f2m11-t67-05f5aa36",
+      "d_semireg_max": 8,
+      "d_semireg_min": 8,
+      "engines": [
+        {
+          "agrees_with_reference": true,
+          "d_learn_max": null,
+          "d_learn_mean": null,
+          "d_reach_max": 6,
+          "d_reach_mean": 6.0,
+          "decided": 6,
+          "declined": false,
+          "engine": "inherited-f4",
+          "ms_max": 23.685638,
+          "ms_mean": 22.206024666666664,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops_mean": 651261.1666666666,
+          "over_budget": 0,
+          "peak_kib_max": 0.0,
+          "wall_over_reference": 1.0,
+          "workload": "complete enumeration"
+        },
+        {
+          "agrees_with_reference": true,
+          "d_learn_max": null,
+          "d_learn_mean": null,
+          "d_reach_max": 7,
+          "d_reach_mean": 7.0,
+          "decided": 6,
+          "declined": false,
+          "engine": "m4gb-f2",
+          "ms_max": 6313.010619,
+          "ms_mean": 6218.385649833333,
+          "op_unit": "none (external process; wall time only)",
+          "ops_mean": 0.0,
+          "over_budget": 0,
+          "peak_kib_max": 253952.0,
+          "wall_over_reference": 280.0314663780283,
+          "workload": "complete enumeration"
+        },
+        {
+          "agrees_with_reference": true,
+          "d_learn_max": null,
+          "d_learn_mean": null,
+          "d_reach_max": null,
+          "d_reach_mean": null,
+          "decided": 6,
+          "declined": false,
+          "engine": "m4gb-f2-server",
+          "ms_max": 6839.911496,
+          "ms_mean": 6406.308231333333,
+          "op_unit": "none (external process; wall time only)",
+          "ops_mean": 0.0,
+          "over_budget": 0,
+          "peak_kib_max": 0.0,
+          "wall_over_reference": 288.49415091165804,
+          "workload": "complete enumeration"
+        }
+      ],
+      "equations": 11,
+      "family": "K",
+      "n": 11,
+      "n_prime": 4,
+      "n_vars": 12,
+      "per_target": [
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 567493,
+                  "bitop_word_ops": 4771627,
+                  "eliminated": 40,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 271,
+                  "reduction_cache_on": 0,
+                  "reductions": 432,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 540214,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 21796251
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 567424,
+                  "bitop_word_ops": 4769858,
+                  "eliminated": 40,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 271,
+                  "reduction_cache_on": 0,
+                  "reductions": 432,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 540214,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 24244654
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 567424,
+                  "bitop_word_ops": 4769858,
+                  "eliminated": 40,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 271,
+                  "reduction_cache_on": 0,
+                  "reductions": 432,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 540214,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 17284450
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6118480059
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6227484174
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6036018817
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6044960327
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6258816545
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6233272182
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "f04c945e81f3b48c5e7ec4c328d132ec5221ff17b87e2074c551f827da779959",
+          "terms": 5492,
+          "x_r": 1938
+        },
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 575331,
+                  "bitop_word_ops": 6141793,
+                  "eliminated": 41,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 215,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 298,
+                  "reduction_cache_on": 0,
+                  "reductions": 433,
+                  "splits": 229,
+                  "verification_tests": 30930
+                },
+                "ops": 972296,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 20643173
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 575331,
+                  "bitop_word_ops": 6141244,
+                  "eliminated": 41,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 215,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 298,
+                  "reduction_cache_on": 0,
+                  "reductions": 433,
+                  "splits": 229,
+                  "verification_tests": 30930
+                },
+                "ops": 972296,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 20675077
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 575331,
+                  "bitop_word_ops": 6141244,
+                  "eliminated": 41,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 215,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 298,
+                  "reduction_cache_on": 0,
+                  "reductions": 433,
+                  "splits": 229,
+                  "verification_tests": 30930
+                },
+                "ops": 972296,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 25386410
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 6108
+                },
+                "ops": 0,
+                "peak_bytes": 260046848,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6179658028
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 6209
+                },
+                "ops": 0,
+                "peak_bytes": 260046848,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6275905440
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 5953
+                },
+                "ops": 0,
+                "peak_bytes": 260046848,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6056294020
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6235967382
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 5929093422
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 31654,
+                  "m4gb_basis_len": 13,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  71,
+                  116,
+                  1031,
+                  1136,
+                  1796,
+                  1856
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6112550061
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "5b84bde260d2812bfb71048dd71bf278f43c3a1f404452f65917ca2ab14cceee",
+          "terms": 5155,
+          "x_r": 57
+        },
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 577080,
+                  "bitop_word_ops": 4874545,
+                  "eliminated": 43,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 240,
+                  "reduction_cache_on": 0,
+                  "reductions": 436,
+                  "splits": 231,
+                  "verification_tests": 0
+                },
+                "ops": 567138,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 25187834
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 577080,
+                  "bitop_word_ops": 4874136,
+                  "eliminated": 43,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 240,
+                  "reduction_cache_on": 0,
+                  "reductions": 436,
+                  "splits": 231,
+                  "verification_tests": 0
+                },
+                "ops": 567138,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 17169601
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 577080,
+                  "bitop_word_ops": 4874136,
+                  "eliminated": 43,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 232,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 240,
+                  "reduction_cache_on": 0,
+                  "reductions": 436,
+                  "splits": 231,
+                  "verification_tests": 0
+                },
+                "ops": 567138,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 22281702
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6234014271
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6426448388
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 5712484444
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6494664420
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6518340591
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6322421521
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "891c94028744492327342a57a2b17847d94dddcbebd9dd7ace2d300b11c949be",
+          "terms": 5991,
+          "x_r": 1375
+        },
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 584752,
+                  "bitop_word_ops": 4884430,
+                  "eliminated": 16,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 313,
+                  "reduction_cache_on": 0,
+                  "reductions": 441,
+                  "splits": 228,
+                  "verification_tests": 0
+                },
+                "ops": 555990,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 32821846
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 583512,
+                  "bitop_word_ops": 4883147,
+                  "eliminated": 16,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 313,
+                  "reduction_cache_on": 0,
+                  "reductions": 441,
+                  "splits": 228,
+                  "verification_tests": 0
+                },
+                "ops": 555990,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 22145144
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 583512,
+                  "bitop_word_ops": 4883147,
+                  "eliminated": 16,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 313,
+                  "reduction_cache_on": 0,
+                  "reductions": 441,
+                  "splits": 228,
+                  "verification_tests": 0
+                },
+                "ops": 555990,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 22608017
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6216130711
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6313010619
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6379322953
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6839911496
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6236060993
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 7199120541
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "4c9dacdf332bafd4048561dfb8baa9191d31cd4492865dd52abe2654ec3408d6",
+          "terms": 5638,
+          "x_r": 1726
+        },
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 604046,
+                  "bitop_word_ops": 5431770,
+                  "eliminated": 18,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 284,
+                  "reduction_cache_on": 0,
+                  "reductions": 448,
+                  "splits": 230,
+                  "verification_tests": 17751
+                },
+                "ops": 688780,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 25107094
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 604046,
+                  "bitop_word_ops": 5431504,
+                  "eliminated": 18,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 284,
+                  "reduction_cache_on": 0,
+                  "reductions": 448,
+                  "splits": 230,
+                  "verification_tests": 17751
+                },
+                "ops": 688780,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 19097788
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 604046,
+                  "bitop_word_ops": 5431504,
+                  "eliminated": 18,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 225,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 284,
+                  "reduction_cache_on": 0,
+                  "reductions": 448,
+                  "splits": 230,
+                  "verification_tests": 17751
+                },
+                "ops": 688780,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 23685638
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 5964
+                },
+                "ops": 0,
+                "peak_bytes": 252706816,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6031565949
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 6110
+                },
+                "ops": 0,
+                "peak_bytes": 252706816,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6184240859
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 6101
+                },
+                "ops": 0,
+                "peak_bytes": 252706816,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6168807869
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6397805929
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 6144134513
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 17923,
+                  "m4gb_basis_len": 11,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [
+                  1102,
+                  1252,
+                  3652
+                ],
+                "solving_degree": null,
+                "verdict": "solved",
+                "wall_ns": 5784855540
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "ffeb9f41f7439a977877360a5fc237bf334249444c3c5ef1704cbc1ce368bef5",
+          "terms": 5917,
+          "x_r": 709
+        },
+        {
+          "runs": {
+            "inherited-f4": [
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 586111,
+                  "bitop_word_ops": 4945888,
+                  "eliminated": 15,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 231,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 198,
+                  "reduction_cache_on": 0,
+                  "reductions": 456,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 583149,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 18149689
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 586111,
+                  "bitop_word_ops": 4945888,
+                  "eliminated": 15,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 231,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 198,
+                  "reduction_cache_on": 0,
+                  "reductions": 456,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 583149,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 22776476
+              },
+              {
+                "degree_reached": 6,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 586111,
+                  "bitop_word_ops": 4945888,
+                  "eliminated": 15,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 231,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 198,
+                  "reduction_cache_on": 0,
+                  "reductions": 456,
+                  "splits": 232,
+                  "verification_tests": 0
+                },
+                "ops": 583149,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 22189463
+              }
+            ],
+            "m4gb-f2": [
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6180353750
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6296343053
+              },
+              {
+                "degree_reached": 7,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6425011092
+              }
+            ],
+            "m4gb-f2-server": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6613316716
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6631781843
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "extraction_tests": 0,
+                  "m4gb_basis_len": 1,
+                  "m4gb_cpu_ms": 0
+                },
+                "ops": 0,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 6133812616
+              }
+            ]
+          },
+          "semi_regular_degree": 8,
+          "system_blake3": "3abc38659083ebad40a19908b61b125657cadc824d7c40104c9bfcd33967ebd9",
+          "terms": 5930,
+          "x_r": 878
+        }
+      ],
+      "reference_engine": "inherited-f4",
+      "repeats": 3,
+      "summands": 3,
+      "targets": 6,
+      "verdict_digest": "8adbfa99aaa5e77e181e5c930860498eab88e2ee74fcc495b6133fa2f7c26a63"
+    }
+  ],
+  "cells_measured": 1,
+  "cells_skipped": [],
+  "config": {
+    "budget_seconds_per_call": 60,
+    "cells": [
+      {
+        "m": 3,
+        "n": 11,
+        "n_prime": 4
+      }
+    ],
+    "engines": [
+      {
+        "describe": "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default)",
+        "engine": "inherited-f4",
+        "finds_every_solution": true,
+        "spec": "inherited-f4"
+      },
+      {
+        "describe": "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis",
+        "engine": "m4gb-f2",
+        "finds_every_solution": true,
+        "spec": "m4gb-f2"
+      },
+      {
+        "describe": "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis, one long-lived `--serve` process per binary (process start, field tables and thread pool paid once)",
+        "engine": "m4gb-f2-server",
+        "finds_every_solution": true,
+        "spec": "m4gb-f2-server"
+      }
+    ],
+    "families": [
+      "K"
+    ],
+    "repeats": 3,
+    "seed": 233164359,
+    "targets": 6,
+    "worker_threads": 1
+  },
+  "disagreements": [],
+  "elapsed_seconds": 226.001244613,
+  "markdown": "| E | n | n' | m | vars | engine | finds | decided | over budget | D_learn | D_reach | D_sr | ops | ms | wall / reference | agrees |\n|:--|--:|--:|--:|--:|:--|:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|\n| K | 11 | 4 | 3 | 12 | inherited-f4 | all | 6/6 | 0 | — | 6.0 | 8 | 6.513e5 wx | 22.2 | ref | yes |\n| K | 11 | 4 | 3 | 12 | m4gb-f2 | all | 6/6 | 0 | — | 7.0 | 8 | 0.000e0 ? | 6218.4 | 280.0× | yes |\n| K | 11 | 4 | 3 | 12 | m4gb-f2-server | all | 6/6 | 0 | — | — | 8 | 0.000e0 ? | 6406.3 | 288.5× | yes |\n",
+  "operation": "descent-engines",
+  "schema_version": 1,
+  "software": {
+    "arch": "x86_64",
+    "binary_blake3": "36e8b0bc2ac79e87c75ff84c314bcb54941bdf490e90309c17e02bee0e1c572e",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "linux",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "For each (curve family, n, n', m) cell: the Weil descent of the Semaev polynomial over the same seeded targets as the descent-degrees table, solved by every listed engine in every repetition, interleaved per target with the engine order rotated each repetition. Each engine's answers are checked against the reference engine's (fes-f2 where it applies, else exhaustive); each system carries a blake3 fingerprint and each cell a digest of the reference answers, so a rerun can prove it solved the same inputs and decided them the same way. The ms column is the mean over targets of the per-target median over repetitions.",
+  "what_this_is_not": [
+    "not a speed: this prices one decomposition oracle call on one target, which AGENTS.md section 2 calls a stage diagnostic and never a speed",
+    "not a common unit: each engine counts in its own unit (ops column, unit named per engine); only wall time is common, and it is a host-dependent practicality note",
+    "not a group relation: a boolean root is not yet a point decomposition until it is lifted and checked on the curve, which the whole-pipeline run does",
+    "not one leaderboard: a first-solution engine (sat-cdcl) and the complete-enumeration engines are different workloads and are listed apart"
+  ]
+}

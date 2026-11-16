@@ -1,0 +1,71 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-07-02
+experiment_id: BLINDSPOT-07
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-02.json
+binds:
+  - {path: examples/blindspots_07_blocked_closure.rs, sha256: 2d019d295a6e8e74ee814b7ca69ebfa17ddcdd3b7db17b00f0ee427b64c0cf2b}
+  - {path: research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv, sha256: 9bde3abe294c509b14825436f94f282eab6759012a99c1036333fd905d4c8d54}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-07/card-02]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=7516192768, rustc, --edition, "2021", -C, opt-level=3, -C, target-cpu=native, -o, target/blindspots-07/card-02/b07, examples/blindspots_07_blocked_closure.rs]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-build.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-build.stderr.log
+  - id: r-11-4-4-u1
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-02/b07, "closure", "--m", "4", "--n", "11", "--ell", "4", "--basis", "1452,1544,883,714", "--xr", "1068", "--from", "3", "--to", "4", "--label", "r-11-4-4-u1", "--time-limit", "300", "--expect-solutions", "0"]
+    timeout_seconds: 390
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u1.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u1.stderr.log
+  - id: r-11-4-4-u2
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-02/b07, "closure", "--m", "4", "--n", "11", "--ell", "4", "--basis", "1213,527,866,1984", "--xr", "1261", "--from", "3", "--to", "4", "--label", "r-11-4-4-u2", "--time-limit", "300", "--expect-solutions", "0"]
+    timeout_seconds: 390
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log
+  - id: r-11-4-4-u3
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-02/b07, "closure", "--m", "4", "--n", "11", "--ell", "4", "--basis", "652,1678,1128,975", "--xr", "698", "--from", "3", "--to", "4", "--label", "r-11-4-4-u3", "--time-limit", "300", "--expect-solutions", "0"]
+    timeout_seconds: 390
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log
+  - id: r-13-4-4-i06u0
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-02/b07, "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "3282,7995,4756,7689", "--xr", "444", "--from", "3", "--to", "4", "--label", "r-13-4-4-i06u0", "--time-limit", "300", "--expect-solutions", "0"]
+    timeout_seconds: 390
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log
+  - id: sat-13-4-4-d0
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-02/b07, "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "3283,4071,3917,7233", "--xr", "8005", "--from", "3", "--to", "4", "--label", "sat-13-4-4-d0", "--time-limit", "300", "--expect-solutions", "48", "--expect-no-refutation"]
+    timeout_seconds: 390
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-07/card-02/b07]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-07/card-02]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-07
+background: false
+write_scope:
+  - research/blindspots_20261018/07-blocked-f4-degree-cells/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

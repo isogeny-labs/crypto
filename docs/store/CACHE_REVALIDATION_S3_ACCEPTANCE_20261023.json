@@ -1,0 +1,67 @@
+{
+  "schema": "crypto.cache-revalidation-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T03:15:39.069426+00:00",
+  "source_commits": {
+    "crypto": "5559d97ec6ca32c4a715f6efbd5651279b5a891b",
+    "cryptanalysis": "bcd1014c9c26a4aa01dd507681013378f0bf44e0"
+  },
+  "binary_sha256": {
+    "crypto": "3a622b804b6cd3af63e10f4ceae2228506d309788bb672fbcc65cb1810b114f5",
+    "ecdlp-nist": "4f96cdc6d88cff8f1adbd879fccc69f6c0049d81e892c4a941c8effe73ba4a17",
+    "crax": "ef3240cff338bccf7fefa2d61fc9340629c905a2e44afd281b9659d9d186749d"
+  },
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "target": {
+    "curve": "P-256",
+    "schema_version": 1,
+    "expected_scalar": "12345",
+    "interval_bits": 16,
+    "sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a"
+  },
+  "store_bridge_run": {
+    "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T031353Z-5c908ff7",
+    "object_key": "ic/v1/acceptance/20261024T031353Z-5c908ff7/sha256/1f/1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "logical_name": "ecdlp-targets/p256/cache-check.json",
+    "sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "bytes": 1201,
+    "head_bytes_match": true,
+    "prefix_empty_after_exact_delete": true,
+    "remote_download_status": "bytes_ok",
+    "initial_pull_fetched": true,
+    "same_size_corruption_bytes": 1201,
+    "replacement_pull_fetched": true,
+    "recovered_cache_sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "subsequent_ecdlp_scalar": "12345",
+    "subsequent_ecdlp_verified": true,
+    "absent_remote_pull_exit_code": 1,
+    "absent_remote_pull_status": "error"
+  },
+  "consumer_run": {
+    "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T031503Z-7da38960",
+    "object_key": "ic/v1/acceptance/20261024T031503Z-7da38960/sha256/1f/1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "logical_name": "ecdlp-targets/p256/consumer-cache.json",
+    "sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "bytes": 1201,
+    "head_bytes_match": true,
+    "prefix_empty_after_exact_delete": true,
+    "same_size_corruption_bytes": 1201,
+    "ecdlp_refetched_damaged_cache": true,
+    "recovered_scalar": "12345",
+    "verified": true,
+    "resolved_input_sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+    "absent_remote_solve_exit_code": 1,
+    "absent_remote_solve_status": "error"
+  },
+  "commands": [
+    "crypto store push TARGET --name ecdlp-targets/p256/<run>.json --no-cache --json",
+    "crax --json store verify NAME --remote --download",
+    "crax --json store pull store:NAME",
+    "crax --json ecdlp-nist solve P-256 --point-file store:NAME --interval-bits 16",
+    "aws s3api head-object --bucket setec-astronomy-artifacts --key OBJECT_KEY --checksum-mode ENABLED",
+    "aws s3api delete-object --bucket setec-astronomy-artifacts --key OBJECT_KEY",
+    "aws s3api list-objects-v2 --bucket setec-astronomy-artifacts --prefix ACCEPTANCE_PREFIX/"
+  ],
+  "limitation": "These are public bounded P-256 targets; the check establishes cache integrity and S3 retrieval for the tested artifacts."
+}

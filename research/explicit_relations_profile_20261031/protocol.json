@@ -1,0 +1,480 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-PROFILE-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_profile_20261031",
+  "authors": [
+    "Codex"
+  ],
+  "links": {},
+  "question": "Which bracketed operations dominate instrumented GPU relation-query block cycles on the fixed large affine inputs?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "All 30 replay cells preserve the full protocol replies for the same eight-query prefix of each fixed 63-bit input.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Stage cycle shares, CUDA event durations and instrumentation overhead are descriptive L0 diagnostics; no production time partition or speedup claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "description": "Stock persistent affine kernel with event timing",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined",
+          "ER_QUERY_PROFILE": "defined"
+        },
+        "env": {
+          "ER_PROFILE_MODE": "stock"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "prefix_queries": 8,
+        "rounds": 5
+      }
+    },
+    {
+      "id": "s",
+      "role": "candidate",
+      "description": "Staged full-cache diagnostic kernel with block clocks and event timing",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined",
+          "ER_QUERY_PROFILE": "defined"
+        },
+        "env": {
+          "ER_PROFILE_MODE": "stages"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "prefix_queries": 8,
+        "rounds": 5
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Exact stock binary repeated",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined",
+          "ER_QUERY_PROFILE": "defined"
+        },
+        "env": {
+          "ER_PROFILE_MODE": "stock"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "prefix_queries": 8,
+        "rounds": 5
+      },
+      "same_instrument_as": "b"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Before data, exact planted hits, minimum IDs and independent CPU relation replay run through both stock and staged kernels. These validation fixtures are not timed study arms."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Before data, CPU-exhausted misses, tail coverage and empty/infinity cases must agree across kernels; memcheck/racecheck/synccheck must pass."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "instrumentation",
+        "levels": [
+          "stock",
+          "stages"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "One CUDA13.2 sm_89 -O3 -lineinfo binary for b/s/x; only runtime mode changes",
+        "how": "Capture uses a separate uninstrumented build of the same source; all responses compared bytewise."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "First8 actual queries from each prior63-bit seed101/202 input",
+        "how": "Transparent Rust proxy records real service requests and responses; no selection by timing or hit outcome."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "One RTX4090, source/binary hashes, GPU state, CPU identity; L0 shared host."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh-process ASLR; same full-cache/filter/index policy and original full table sizes."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Five rounds per seed: b/s/x on even rounds, x/s/b on odd. All process setup cold; clocks reported only for search kernel."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Strict frozen Rust analyzer retains all cells; no significance testing."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "b",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-instrumentation",
+        "arms": [
+          "b",
+          "s"
+        ],
+        "differs_in": [
+          "instrumentation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-complete",
+        "arms": [
+          "b",
+          "s",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All30 cells and8 queries each; exact protocol response equality."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Five b/s/x then x/s/b alternating rounds per seed; stock repeat brackets stages.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Exactly101/202, existing63-bit input files copied unchanged; driver RNG unchanged."
+    },
+    "instance_sampling": {
+      "rule": "Use both prior63-bit affine inputs and first8 queries from each; full tables unchanged. Prefix scope chosen before data.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive instrumentation, not inferential analysis; labels not masked.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 5,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Fixed8-query prefixes on2 inputs,5 rounds and stock repeat. No population inference or test of speedup; sample supports descriptive repeat range only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 4200,
+      "measured_on": "Prior queries averaged roughly0.09-0.17s; instrumentation and cold full-table preparation are unknown. Fixed4200s worker and4500s controller cap; <=0.90/hour one4090. No adaptive sample count."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "verified_queries",
+        "name": "Exact query outcomes",
+        "unit": "queries",
+        "kind": "exact",
+        "definition": "Eight iff the complete protocol response stream equals captured uninstrumented responses, exit0 and all eight profile/coverage records exist.",
+        "source": "native analyzer and per-cell stdout/stderr/exit",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "kernel_ms",
+        "name": "Search kernel event interval",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "CUDA events immediately before and after search kernel on default stream; no setup, resolution, copies or host launch time included.",
+        "source": "PROFILE kernel_ms",
+        "aggregation": "per_row",
+        "resolution": "CUDA event",
+        "uncertainty": "range"
+      },
+      {
+        "id": "block_cycles",
+        "name": "Stage block elapsed cycles",
+        "unit": "cycles",
+        "kind": "timed",
+        "definition": "Thread0 clock64 differences between fenced block barriers, summed over tiles and blocks. Includes scheduling and instrumentation; not wall time. Empty interval retained without subtraction.",
+        "source": "PROFILE load_convert/subtract/normalize/affine_out/lookup/empty",
+        "aggregation": "per_row",
+        "resolution": "SM cycle counter",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "verified_queries",
+      "visited_rows",
+      "visited_tiles"
+    ],
+    "record": [
+      "All command transcripts, replies, logs and profiler statuses",
+      "Source and binary hashes; ptxas registers/spills",
+      "GPU and CPU identity",
+      "Raw per-query stage clocks and kernel events; all30 cells, including failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX 4090",
+    "placement": {
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 4200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "2 fixed63-bit inputs x5 rounds x3 arms x8 prefix queries =30 cells/240 queries. Capture ends intentionally after8 replies. No retry, expansion or input changes.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Preflight failure stops before data. Per cell/capture600s, sanitizer180s, profiler600s,worker4200/controller4500. Preserve all partial records. Optional profiler failures retained, not invented; no counter permission bypass.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any reply mismatch, wrong minimum, coverage mismatch, sanitizer failure or missing planned cell invalidates complete panel. Optional hardware-profiler unsupported/timeout does not erase block-clock data; retain limitation."
+  ],
+  "decision_rule": {
+    "text": "Report exact reply equality; aggregate each stage cycle sum over40 staged queries per seed, divide by total including empty. Report cycles/tile, per-round stock repeat spread and staged/mean(stock,repeat) event-duration ratio. Instrumented fractions never applied to historical oracle seconds.",
+    "comparison_ids": [
+      "C-complete"
+    ],
+    "threshold": "30 complete verified cells",
+    "statistic": "Exact counts and descriptive ratios",
+    "interval": "Five per-round baseline relative spreads, not a confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Instrumented event time / mean of stock repeats; stage block cycle share including empty interval",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "931a8f617a9400bd7c83d637b6cac37c6799b93e17c6363ab0c4e36983a32189"
+    },
+    "inputs": [
+      "*.stdout",
+      "*.stderr",
+      "*.commands.answers",
+      "*.commands.complete"
+    ],
+    "outputs": [
+      "summary.txt",
+      "stages.csv",
+      "stages.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Instrumented block-cycle shares for both seeds, empty control included"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Calling prefix execution a complete recovery",
+    "Converting concurrent block-cycle totals or shares into production seconds",
+    "Treating instrumented kernel time as a throughput or speedup result",
+    "Changing samples after seeing costs",
+    "Silently skipping failed cells or counter permission failures"
+  ],
+  "literature": [
+    {
+      "ref": "research/explicit_relations_affine_20261030/RESULTS.md and gpu/explicit-relations/AFFINE-QUERY.md",
+      "provenance": "internal",
+      "claim": "Large affine runs are dominated by query oracle; arithmetic count omits conversion normalization and index memory costs.",
+      "verified_by": "Read before implementation2026-10-31"
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-support.html#clock-and-clock64",
+      "provenance": "retrieved",
+      "claim": "Per-SM cycle intervals include time slicing; they are not instruction execution cost.",
+      "verified_by": "Read primary guide clock section2026-10-31"
+    },
+    {
+      "ref": "https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html",
+      "provenance": "retrieved",
+      "claim": "Replay/cache controls and metric collection perturb kernels; source counters and occupancy can explain costs if supported.",
+      "verified_by": "Read primary guide and repo profile skill before implementation2026-10-31"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "8b77f5a916607e7f7a0d094d194515d55457823759b9114b97808f7c6416bb17",
+    "commit": "ffa0da3efaf222bdcc958d45013aa469d5fbecf7",
+    "frozen_at": "2026-10-31T07:21:59Z",
+    "filed_before_affected_data": true
+  }
+}

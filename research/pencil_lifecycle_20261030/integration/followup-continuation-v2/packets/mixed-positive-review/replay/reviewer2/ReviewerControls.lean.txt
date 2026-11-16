@@ -1,0 +1,36 @@
+import PositiveDistinct
+import WordMixed
+set_option autoImplicit false
+open Polynomial MixedCancellation MixedPositiveDistinct
+-- Independent finite-field invocation, using unit weights to isolate branch logic.
+example : let a : WeightedAdd11.Input (ZMod 5) := ⟨0,1,1,1⟩
+ let b : D2 (ZMod 5) := ⟨-1,0,0,1,1,1⟩
+ let d := doubled 1 (-1) 0 0 a
+ let c := MixedGeneric.output (other a b) d 0
+ classify a b = .positiveCoincidence ∧ (2:ZMod 5) ≠ 0 ∧ a.y ≠ 0 ∧
+ MixedGeneric.dispatch (other a b) d 0 = some c ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ validTwo (MixedGeneric.curve 1 (-1) 0 0) c := by
+ apply source_branch_preserves
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+   decide
+ · norm_num [other]
+-- Characteristic-two equality lies in cancellation, not the positive-only branch.
+example : classify (⟨0,1,1,1⟩:WeightedAdd11.Input (ZMod 2))
+ (⟨-1,0,0,1,1,1⟩:D2 (ZMod 2)) = .cancellation := by
+ norm_num [classify,rawK,rawW3,rawY3]
+-- Characteristic-two impossibility follows from the helper without a type exclusion premise.
+example (a : WeightedAdd11.Input (ZMod 2)) (b : D2 (ZMod 2))
+ (hc : a.y*rawW3 b ≠ -(rawY3 a b*a.w))
+ (hp : a.y*rawW3 b = rawY3 a b*a.w) : False := by
+ exact (positive_nonzero a b hc hp).1 (by decide)

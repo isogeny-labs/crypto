@@ -1,0 +1,662 @@
+{
+  "card_id": "CARD-coord-spectrum-20261110-F3-RUN-02",
+  "card_path": "research/coord_spectrum_20261110/cards/F3-RUN-02.json",
+  "card_sha256": "d09186447235f7da48e4e1e0d188c90141206dff54661cec1e733dc054c66f3a",
+  "commands": [
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/coord_spectrum_20261110",
+      "exit_code": 0,
+      "id": "verify-freeze",
+      "index": 1,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.verify-freeze.stdout": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec",
+      "stdout_tail": [
+        "PROTOCOL.md: OK",
+        "tool/src/main.rs: OK",
+        "tool/Cargo.toml: OK",
+        "tool/Cargo.lock: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 2,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.git-head.stdout": "0c684bcd9cc977984c21a7e837adce983cb477c306c0f0d996d05b50b7fd8845"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0c684bcd9cc977984c21a7e837adce983cb477c306c0f0d996d05b50b7fd8845",
+      "stdout_tail": [
+        "9465664dbe6ba5757b9cb011192215a00605e8d8"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.135,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rustc-version",
+      "index": 3,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.rustc-version.stdout": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+      },
+      "seconds": 0.135,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "stdout_tail": [
+        "rustc 1.97.0 (2d8144b78 2026-07-07)",
+        "binary: rustc",
+        "commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3",
+        "commit-date: 2026-07-07",
+        "host: x86_64-unknown-linux-gnu",
+        "release: 1.97.0",
+        "LLVM version: 22.1.6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.075,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cargo-version",
+      "index": 4,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cargo-version.stdout": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52"
+      },
+      "seconds": 0.075,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52",
+      "stdout_tail": [
+        "cargo 1.97.0 (c980f4866 2026-06-30)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "nproc"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "nproc",
+      "index": 5,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.nproc.stdout": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "stdout_tail": [
+        "4"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "uname",
+      "index": 6,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.uname.stdout": "8e9796b4ed8592afe87f55fec7aa27f4d3721d36fd79b479d8112c3c5a281008"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8e9796b4ed8592afe87f55fec7aa27f4d3721d36fd79b479d8112c3c5a281008",
+      "stdout_tail": [
+        "Linux vm 6.18.44-fc-v378 #1 SMP PREEMPT_DYNAMIC @0 x86_64 x86_64 x86_64 GNU/Linux"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cpu-model",
+      "index": 7,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cpu-model.stdout": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Not affected",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Not affected",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Not affected",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Not affected",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.57,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "build",
+      "index": 8,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "pid_file": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.pid.json",
+      "seconds": 0.571,
+      "stderr_sha256": "659733bce35848337a1e3e6cbdfee85dbb5c03b39d17b9c5e62299cc0b42e99c",
+      "stderr_tail": [
+        "    Blocking waiting for file lock on package cache",
+        "    Blocking waiting for file lock on package cache",
+        "    Blocking waiting for file lock on package cache",
+        "    Blocking waiting for file lock on shared package cache",
+        "    Finished `release` profile [optimized] target(s) in 0.49s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.418,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "test",
+      "index": 9,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.test.stdout": "4d07e2fd9434d23be28bde854fd7e4ed87ab89be111fb68989a5a21a0a2737ac"
+      },
+      "pid_file": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.pid.json",
+      "seconds": 0.418,
+      "stderr_sha256": "2b4cd9566b0551cbfaadff9184dba4b12720a993f212a2a4d6d14a7ef971561a",
+      "stderr_tail": [
+        "    Blocking waiting for file lock on package cache",
+        "    Blocking waiting for file lock on package cache",
+        "    Blocking waiting for file lock on package cache",
+        "    Finished `release` profile [optimized] target(s) in 0.21s",
+        "     Running unittests src/main.rs (research/coord_spectrum_20261110/tool/target/release/deps/coord_spectrum-aa4a50eb7541dded)"
+      ],
+      "stdout_sha256": "4d07e2fd9434d23be28bde854fd7e4ed87ab89be111fb68989a5a21a0a2737ac",
+      "stdout_tail": [
+        "",
+        "running 7 tests",
+        "test tests::energy_matches_bruteforce ... ok",
+        "test tests::plant_is_seen_and_null_is_not ... ok",
+        "test tests::pm_statistic_excludes_b0_and_sees_planted_frequency ... ok",
+        "test tests::symmetric_nulls_have_their_symmetry ... ok",
+        "test tests::anomalous_curve_has_p_points ... ok",
+        "test tests::bluestein_matches_naive ... ok",
+        "test tests::lambda_is_linear_on_anomalous_2_16 ... ok",
+        "",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 10,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.binary-sha256.stdout": "e32f9c35fc94076e4bb4b91881a38daddf0d74eebbc59b67fa41167db44de895"
+      },
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e32f9c35fc94076e4bb4b91881a38daddf0d74eebbc59b67fa41167db44de895",
+      "stdout_tail": [
+        "7e08c12ec3865247299923e9f71398260dfe605b261ce66c5a78226496fe1c4e  /home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/crypto/research/coord_spectrum_20261110/tool/target/release/coord_spectrum",
+        "--protocol",
+        "/home/user/crypto/research/coord_spectrum_20261110/PROTOCOL.md",
+        "--sets",
+        "R16,R20,ANOM",
+        "--out",
+        "research/coord_spectrum_20261110/results/run.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 15500.901,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "run-full",
+      "index": 11,
+      "outputs": {
+        "research/coord_spectrum_20261110/results/run-02.stdout.txt": "3c8c10b1a41cd03d5c37238fd9f9f99cfb9436e22645ad80c782fb5eb4356111",
+        "research/coord_spectrum_20261110/results/run.json": "642bf9cd48c7f11fabc73f29c7563e488c14742148c5aa4f948ea52daa8dc30a"
+      },
+      "pid_file": "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.pid.json",
+      "seconds": 15500.901,
+      "stderr_sha256": "ab8f9e0e3807eda526a91752786dddc7b330523643ac507f10c0ee6c91763c82",
+      "stderr_tail": [
+        "[3.7s] 18 curves built",
+        "[26.8s] R16_0 done",
+        "[86.8s] R16_1 done",
+        "[106.3s] R16_2 done",
+        "[146.8s] R16_3 done",
+        "[167.7s] R16_4 done",
+        "[189.9s] R16_5 done",
+        "[246.2s] R16_6 done",
+        "[269.5s] R16_7 done",
+        "[1223.3s] R20_0 done",
+        "[3531.7s] R20_1 done",
+        "[5754.2s] R20_2 done",
+        "[6727.6s] R20_3 done",
+        "[7620.5s] R20_4 done",
+        "[9611.7s] R20_5 done",
+        "[11624.8s] R20_6 done",
+        "[13370.1s] R20_7 done",
+        "[13405.8s] ANOM_16 done",
+        "[15500.9s] ANOM_20 done"
+      ],
+      "stdout_sha256": "3c8c10b1a41cd03d5c37238fd9f9f99cfb9436e22645ad80c782fb5eb4356111",
+      "stdout_tail": [
+        "  NULL odd_fp       n=20 median 5.57397e-3 min 5.21655e-3 max 6.64429e-3",
+        "  NULL even_pm1     n=20 median 4.72320e-3 min 4.48847e-3 max 4.92710e-3",
+        "  energy K=1030   E=3180546        null mean 3.17721e6 sd 3.126e3  ratio 1.00105 z +1.07 band(3sd/mean) 2.95e-3 in_band true",
+        "  energy K=10400  E=11243267840    null mean 1.12432e10 sd 3.206e5  ratio 1.00001 z +0.24 band(3sd/mean) 8.56e-5 in_band true",
+        "  lambda linearity violations: 0",
+        "",
+        "summary (numbers, not verdicts):",
+        "  P1_coordinate_functions_R16: {   \"curves\": 8,   \"pairs\": 48,   \"eta_over_null_median_min\": 4.5968749246628116e-1,   \"eta_over_null_median_max\": 1.060196599948265e0,   \"pairs_outside_0.8_1.25\": 40,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_R16: {   \"curve_K_pairs\": 16,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.947561178965965e-1,   \"energy_ratio_max\": 1.0072178245006844e0,   \"max_abs_z\": 2.942544493207049e0  }",
+        "  P1_coordinate_functions_R20: {   \"curves\": 8,   \"pairs\": 48,   \"eta_over_null_median_min\": 4.040048343673199e-1,   \"eta_over_null_median_max\": 1.1048936213795235e0,   \"pairs_outside_0.8_1.25\": 40,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_R20: {   \"curve_K_pairs\": 16,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.980426291680091e-1,   \"energy_ratio_max\": 1.0010057999069402e0,   \"max_abs_z\": 2.2143126599736997e0  }",
+        "  P4_anom_coordinates_ANOM: {   \"curves\": 2,   \"pairs\": 10,   \"eta_over_null_median_min\": 4.1128832744454824e-1,   \"eta_over_null_median_max\": 7.744092055274636e-1,   \"pairs_outside_0.8_1.25\": 10,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_ANOM: {   \"curve_K_pairs\": 4,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.999805518799264e-1,   \"energy_ratio_max\": 1.0046844423355137e0,   \"max_abs_z\": 1.2579179925218338e0  }",
+        "  P2_controls: {   \"lambda_eta_min\": 1.0000000000000002e0,   \"lambda_curves\": 2,   \"plant_eta_min\": 9.999999996168333e-1,   \"plant_curves\": 18,   \"lambda_linear_violations_total\": 0  }",
+        "  instrument: {   \"parseval_max_relative_deviation_from_r2\": 8.682964995996564e-16,   \"fft_vs_naive_max_abs_error_over_r\": 1.347539132337562e-15,   \"fft_error_bound_1e-6_r_holds\": true,   \"rule1_instrument_failure_flag\": false  }",
+        "",
+        "protocol_sha256   4bfd872a04d0e7b671446c6016a541f2e7384fdecc411e1c4d05a0810be2ec7f",
+        "tool_source_sha256 ecb877ef619ea88e80fbe096059cd43bfb4022f67ecc1e5b2f3fc73c208289a6",
+        "fft: parseval max rel dev 8.683e-16, fft-vs-naive max |dS|/r 1.348e-15, bound 1e-6 holds: true",
+        "wrote research/coord_spectrum_20261110/results/run.json (151455 bytes), 15500.9s on 4 threads"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "research/coord_spectrum_20261110/results/run.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "result-sha256",
+      "index": 12,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-sha256.stdout": "08c63c5761249b6e484bdb5595c270ba35308a73c614107a3db8192a7f2a5da2"
+      },
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "08c63c5761249b6e484bdb5595c270ba35308a73c614107a3db8192a7f2a5da2",
+      "stdout_tail": [
+        "642bf9cd48c7f11fabc73f29c7563e488c14742148c5aa4f948ea52daa8dc30a  research/coord_spectrum_20261110/results/run.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cat",
+        "research/coord_spectrum_20261110/results/run-02.stdout.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "result-table",
+      "index": 13,
+      "outputs": {
+        "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-table.stdout": "3c8c10b1a41cd03d5c37238fd9f9f99cfb9436e22645ad80c782fb5eb4356111"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3c8c10b1a41cd03d5c37238fd9f9f99cfb9436e22645ad80c782fb5eb4356111",
+      "stdout_tail": [
+        "  NULL odd_fp       n=20 median 5.57397e-3 min 5.21655e-3 max 6.64429e-3",
+        "  NULL even_pm1     n=20 median 4.72320e-3 min 4.48847e-3 max 4.92710e-3",
+        "  energy K=1030   E=3180546        null mean 3.17721e6 sd 3.126e3  ratio 1.00105 z +1.07 band(3sd/mean) 2.95e-3 in_band true",
+        "  energy K=10400  E=11243267840    null mean 1.12432e10 sd 3.206e5  ratio 1.00001 z +0.24 band(3sd/mean) 8.56e-5 in_band true",
+        "  lambda linearity violations: 0",
+        "",
+        "summary (numbers, not verdicts):",
+        "  P1_coordinate_functions_R16: {   \"curves\": 8,   \"pairs\": 48,   \"eta_over_null_median_min\": 4.5968749246628116e-1,   \"eta_over_null_median_max\": 1.060196599948265e0,   \"pairs_outside_0.8_1.25\": 40,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_R16: {   \"curve_K_pairs\": 16,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.947561178965965e-1,   \"energy_ratio_max\": 1.0072178245006844e0,   \"max_abs_z\": 2.942544493207049e0  }",
+        "  P1_coordinate_functions_R20: {   \"curves\": 8,   \"pairs\": 48,   \"eta_over_null_median_min\": 4.040048343673199e-1,   \"eta_over_null_median_max\": 1.1048936213795235e0,   \"pairs_outside_0.8_1.25\": 40,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_R20: {   \"curve_K_pairs\": 16,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.980426291680091e-1,   \"energy_ratio_max\": 1.0010057999069402e0,   \"max_abs_z\": 2.2143126599736997e0  }",
+        "  P4_anom_coordinates_ANOM: {   \"curves\": 2,   \"pairs\": 10,   \"eta_over_null_median_min\": 4.1128832744454824e-1,   \"eta_over_null_median_max\": 7.744092055274636e-1,   \"pairs_outside_0.8_1.25\": 10,   \"pairs_above_1.5\": 0,   \"curves_with_a_pair_above_1.5\": 0  }",
+        "  P3_energy_ANOM: {   \"curve_K_pairs\": 4,   \"outside_1_pm_3sd_over_mean\": 0,   \"energy_ratio_min\": 9.999805518799264e-1,   \"energy_ratio_max\": 1.0046844423355137e0,   \"max_abs_z\": 1.2579179925218338e0  }",
+        "  P2_controls: {   \"lambda_eta_min\": 1.0000000000000002e0,   \"lambda_curves\": 2,   \"plant_eta_min\": 9.999999996168333e-1,   \"plant_curves\": 18,   \"lambda_linear_violations_total\": 0  }",
+        "  instrument: {   \"parseval_max_relative_deviation_from_r2\": 8.682964995996564e-16,   \"fft_vs_naive_max_abs_error_over_r\": 1.347539132337562e-15,   \"fft_error_bound_1e-6_r_holds\": true,   \"rule1_instrument_failure_flag\": false  }",
+        "",
+        "protocol_sha256   4bfd872a04d0e7b671446c6016a541f2e7384fdecc411e1c4d05a0810be2ec7f",
+        "tool_source_sha256 ecb877ef619ea88e80fbe096059cd43bfb4022f67ecc1e5b2f3fc73c208289a6",
+        "fft: parseval max rel dev 8.683e-16, fft-vs-naive max |dS|/r 1.348e-15, bound 1e-6 holds: true",
+        "wrote research/coord_spectrum_20261110/results/run.json (151455 bytes), 15500.9s on 4 threads"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 13,
+  "commit": "9465664dbe6ba5757b9cb011192215a00605e8d8",
+  "dirty_after": [
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.binary-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.binary-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.build.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.build.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cargo-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cargo-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cpu-model.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.cpu-model.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.git-head.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.git-head.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.nproc.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.nproc.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.receipt.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-table.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.result-table.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/08-build.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/09-test.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.run/11-run-full.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.rustc-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.rustc-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.test.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.test.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.uname.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.uname.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.verify-freeze.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-02.verify-freeze.stdout",
+    "research/coord_spectrum_20261110/results/run-02.stderr.txt",
+    "research/coord_spectrum_20261110/results/run-02.stdout.txt",
+    "research/coord_spectrum_20261110/results/run.json",
+    "research/coord_spectrum_20261110/results/run.stderr.txt",
+    "research/coord_spectrum_20261110/results/run.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.binary-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.binary-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.build.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.build.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.cargo-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.cargo-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.cpu-model.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.cpu-model.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.git-head.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.git-head.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.nproc.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.nproc.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.receipt.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/08-build.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/08-build.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/08-build.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/08-build.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/08-build.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/09-test.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/09-test.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/09-test.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/09-test.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/09-test.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/11-run-full.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/11-run-full.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/11-run-full.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.run/11-run-full.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.rustc-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.rustc-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.test.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.test.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.uname.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.uname.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.verify-freeze.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-02.verify-freeze.stdout",
+    "research/p2_lift_linear_complexity_20261110/results/run-02.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run-02.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.binary-sha256.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.binary-sha256.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.build.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.build.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.cargo-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.cargo-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.cpu-model.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.cpu-model.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.git-head.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.git-head.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.nproc.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.nproc.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.receipt.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/08-build.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/08-build.exit.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/08-build.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/08-build.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/08-build.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/09-test.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/09-test.exit.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/09-test.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/09-test.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/09-test.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/11-run-batsat.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/11-run-batsat.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/11-run-batsat.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.run/11-run-batsat.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.rustc-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.rustc-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.test.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.test.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.uname.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.uname.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.verify-freeze.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-REP-01.verify-freeze.stdout",
+    "research/sat_ladder_scaling_20261110/results/rep-batsat.stderr.txt",
+    "research/sat_ladder_scaling_20261110/results/rep-batsat.stdout.txt",
+    "resume/RESUME.md"
+  ],
+  "dirty_before": [
+    "research/coord_spectrum_20261110/cards/F3-RUN-02.json",
+    "research/coord_spectrum_20261110/results/run.stderr.txt",
+    "research/coord_spectrum_20261110/results/run.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/cards/F2-RUN-02.json",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/sat_ladder_scaling_20261110/cards/F4-RUN-02.json",
+    "research/sat_ladder_scaling_20261110/results/run.stderr.txt",
+    "research/sat_ladder_scaling_20261110/results/run.stdout.txt",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

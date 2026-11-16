@@ -1,0 +1,152 @@
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:6:57: error: Tactic `decide` failed for proposition
+  padd 17 [16] [1, 2, 3] = [0, 2, 3]
+because its `Decidable` instance
+  instDecidableEqList (padd 17 [16] [1, 2, 3]) [0, 2, 3]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match padd 17 [16] [1, 2, 3] with
+  | [] =>
+    match [0, 2, 3] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [0, 2, 3] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:7:58: error: Tactic `decide` failed for proposition
+  padd 17 [1, 2, 3] [16] = [0, 2, 3]
+because its `Decidable` instance
+  instDecidableEqList (padd 17 [1, 2, 3] [16]) [0, 2, 3]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match padd 17 [1, 2, 3] [16] with
+  | [] =>
+    match [0, 2, 3] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [0, 2, 3] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:8:63: error: Tactic `decide` failed for proposition
+  psub 17 [1, 2, 0] [1, 2] = []
+because its `Decidable` instance
+  (psub 17 [1, 2, 0] [1, 2]).instDecidableEqNil
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `List.instDecidableEqNil`, reduction got stuck at the `Decidable` instance
+  match psub 17 [1, 2, 0] [1, 2] with
+  | [] => isTrue ⋯
+  | head :: tail => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:9:51: error: Tactic `decide` failed for proposition
+  padd 17 [] [0, 3, 0] = [0, 3]
+because its `Decidable` instance
+  instDecidableEqList (padd 17 [] [0, 3, 0]) [0, 3]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match padd 17 [] [0, 3, 0] with
+  | [] =>
+    match [0, 3] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [0, 3] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:11:65: error: Tactic `decide` failed for proposition
+  residual 17 [1, 0, 1] [1, 1] = [0, 15]
+because its `Decidable` instance
+  instDecidableEqList (residual 17 [1, 0, 1] [1, 1]) [0, 15]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match residual 17 [1, 0, 1] [1, 1] with
+  | [] =>
+    match [0, 15] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [0, 15] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:12:67: error: Tactic `decide` failed for proposition
+  residual 17 [1, 2, 1] [1, 1] = []
+because its `Decidable` instance
+  (residual 17 [1, 2, 1] [1, 1]).instDecidableEqNil
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `List.instDecidableEqNil`, reduction got stuck at the `Decidable` instance
+  match residual 17 [1, 2, 1] [1, 1] with
+  | [] => isTrue ⋯
+  | head :: tail => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:13:59: error: Tactic `decide` failed for proposition
+  residual 17 [1, 0, 0] [] = [1]
+because its `Decidable` instance
+  instDecidableEqList (residual 17 [1, 0, 0] []) [1]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match residual 17 [1, 0, 0] [] with
+  | [] =>
+    match [1] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [1] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-residual-construction-20261101-v1/ResidualControls.lean:14:65: error: Tactic `decide` failed for proposition
+  residual 17 [] [1, 1] = [16, 15, 16]
+because its `Decidable` instance
+  instDecidableEqList (residual 17 [] [1, 1]) [16, 15, 16]
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instance `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match residual 17 [] [1, 1] with
+  | [] =>
+    match [16, 15, 16] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [16, 15, 16] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯

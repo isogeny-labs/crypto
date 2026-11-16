@@ -1,0 +1,17 @@
+# Nonbranch Lean import preflight — 2026-11-11
+
+**Status:** source-only dependency and receipt reconciliation; no new compiler invocation, theorem verdict, experiment attempt, or scientific promotion. The source tree is pinned to crypto commit `4f8d8bf375348180cf1518ecf9d913a2ddca7ad2`. The five source files and their dependencies are unchanged at the later gate commit `cce79de90322deb6e598c28a63b0f3cb75e2fb02`.
+
+## Observations
+
+- The static import map in [imports.json](imports.json) starts from five archived pencil `.lean` files. Resolving import basenames against the pinned Git tree, preferring a source's own directory, reaches 41 tracked Lean sources and 53 internal import edges. Three edges cross from the pencil packet into `research/projective_law_followup_20261022/formal/`; 36 sources are there. This name-based check found no missing or ambiguous tracked module. It does not elaborate Lean imports or prove that the sources compile.
+- The 36 projective-law sources have a nearest `lean-toolchain` pin of `leanprover/lean4:v4.34.1`. None of the five archived pencil roots has a nearest pin. The retained native `commands.json` used the explicit Lean 4.34.1 binary. The projective-law `lake-manifest.json` is SHA-256 `ebc6643e694eaa4a60ab2b727c96253f3d88694e7ecb404f2176a548eedbe98d` and pins Mathlib revision `d13f23b723b8a846827a245b89c10fc7d3f11612`.
+- In the original native attempt, `Nonbranch` exited 0 and `IndependentControls` exited 1. Its `compiler-receipt.json` says `status: failed`, `machine_review_complete: false`, and `scientific_execution: false`. Separate pre and post receipts checked 16,736 dependency files and 3,111,892,318 bytes each; they do not convert the failed compiler phase into a completed proof review.
+- The later correction packet's `result.json` labels candidate SHA-256 `448d5ab601e955b93a9071d6b5f932b38850f5728c9cf2c3fc3eb5b3742bb35d` as `proposed_uncompiled`, with zero compiler invocations, three prior attempts against a ceiling of three, and `new_attempt_authorized: false`. The original source SHA-256 is `6dda751467447446311323393a0a985ae93f2440e700289914bcd0037e1476d7`.
+- Hosted proof-gate run [42773450127](https://github.com/isogeny-labs/crypto/actions/runs/42773450127) reported `FAIL_build` for these five standalone roots because each was compiled without its cross-directory imports. Those failures establish the repository-wide gate's current interface gap. They do not revise the original native compiler outcome or certify the proposed correction.
+
+## Reproduction and boundaries
+
+`imports.json` lists every source path, source SHA-256, nearest pin and internal edge. From the pinned commit, `git show <commit>:<path> | sha256sum` checks a source or pin entry. The exact five roots and 41-source closure are a static map; external Mathlib imports are counted but not replayed here. [flow.svg](flow.svg) is an editable view of the directory-level closure and recorded states. [report.pdf](report.pdf) renders the same preflight findings.
+
+No source, receipt, deadline, retry count, or historical measurement was changed. A prospective proof attempt needs a new authorized attempt envelope, an immutable source and dependency workspace at the recorded pins, an independent source-fidelity review, explicit compilation of the named modules, transitive axiom readback and negative controls. The uncompiled correction remains `not_verified` until those checks exist.

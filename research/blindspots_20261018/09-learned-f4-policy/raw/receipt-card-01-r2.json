@@ -1,0 +1,233 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-01-r2",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-01-r2.yaml",
+  "card_sha256": "b9b48893b8f16c5aa866b235e7dc4e1ef0e708e909788a5ee40a0b667482cabe",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-01-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-01-r2/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.793,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.793,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-01-r2/b09",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 81.893,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 81.893,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1163e4f90f03f22f99e5c99e08394cd87588ec10e5b265f8f7435903af34f0d9",
+      "stdout_tail": [
+        "PASS monomial-order mkey vs grevlex_greater on 20000 pairs",
+        "PASS cell-7-3-3 280 runs; sat 24 unsat 16; wrong 0; basis differs 0",
+        "PASS cell-8-3-3 280 runs; sat 16 unsat 24; wrong 0; basis differs 0",
+        "PASS cell-8-2-4 280 runs; sat 13 unsat 27; wrong 0; basis differs 0",
+        "SELFTEST OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-01-r2/b09",
+        "control",
+        "--table",
+        "research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv",
+        "--max-vars",
+        "34",
+        "--wall",
+        "20",
+        "--cap",
+        "3000000000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 24.021,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "control-p1",
+      "index": 4,
+      "outputs": {},
+      "seconds": 24.021,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ea89cb29bb491fd49ba0c4ab2a92a9f8285accbf12e64b7b6178dbb2a54583be",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-7-2-7.u1.jsonl#3\",\"m\":4,\"n\":7,\"ell\":2,\"nv\":22,\"outcome\":\"unsat\",\"degree_reached\":3,\"ref_closure\":3,\"ref_msolve\":3,\"touches\":66208,\"steps\":11}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-7-2-7.u2.jsonl#4\",\"m\":4,\"n\":7,\"ell\":2,\"nv\":22,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":31450766,\"steps\":15}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-7-2-7.u3.jsonl#5\",\"m\":4,\"n\":7,\"ell\":2,\"nv\":22,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":331196,\"steps\":17}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-8-2-7.u0.jsonl#0\",\"m\":4,\"n\":8,\"ell\":2,\"nv\":24,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":88418827,\"steps\":14}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-8-2-7.u1.jsonl#1\",\"m\":4,\"n\":8,\"ell\":2,\"nv\":24,\"outcome\":\"unsat\",\"degree_reached\":3,\"ref_closure\":3,\"ref_msolve\":3,\"touches\":186161,\"steps\":14}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-8-2-7.u2.jsonl#2\",\"m\":4,\"n\":8,\"ell\":2,\"nv\":24,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":81799162,\"steps\":13}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-8-2-7.u3.jsonl#3\",\"m\":4,\"n\":8,\"ell\":2,\"nv\":24,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":74665809,\"steps\":14}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-9-3-6.u0.jsonl#0\",\"m\":4,\"n\":9,\"ell\":3,\"nv\":30,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":1544009894,\"steps\":16}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-9-3-6.u1.jsonl#1\",\"m\":4,\"n\":9,\"ell\":3,\"nv\":30,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":1332926844,\"steps\":16}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-9-3-6.u2.jsonl#2\",\"m\":4,\"n\":9,\"ell\":3,\"nv\":30,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":1631942577,\"steps\":16}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_m4_chain_20261006/runs/cell-9-3-6.u3.jsonl#4\",\"m\":4,\"n\":9,\"ell\":3,\"nv\":30,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":4,\"touches\":896622830,\"steps\":17}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-7-4-7.jsonl#5\",\"m\":3,\"n\":7,\"ell\":4,\"nv\":19,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":87095588,\"steps\":9}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-7-4-7.jsonl#17\",\"m\":3,\"n\":7,\"ell\":4,\"nv\":19,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":32607571,\"steps\":10}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-7-4-7.jsonl#19\",\"m\":3,\"n\":7,\"ell\":4,\"nv\":19,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":5132462,\"steps\":7}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-7-4-7.jsonl#30\",\"m\":3,\"n\":7,\"ell\":4,\"nv\":19,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":101656505,\"steps\":11}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-8-4-7.jsonl#2\",\"m\":3,\"n\":8,\"ell\":4,\"nv\":20,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":13103247,\"steps\":6}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-8-4-7.jsonl#4\",\"m\":3,\"n\":8,\"ell\":4,\"nv\":20,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":55364148,\"steps\":9}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-8-4-7.jsonl#11\",\"m\":3,\"n\":8,\"ell\":4,\"nv\":20,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":11529744,\"steps\":6}",
+        "{\"tool\":\"b09\",\"mode\":\"control\",\"key\":\"research/dreg_surplus_control_20260925/runs/cell-8-4-7.jsonl#17\",\"m\":3,\"n\":8,\"ell\":4,\"nv\":20,\"outcome\":\"unsat\",\"degree_reached\":4,\"ref_closure\":4,\"ref_msolve\":-1,\"touches\":13047351,\"steps\":11}",
+        "control summary: 92 unsat draws; not refuted 5; degree equals committed closure degree 92/92; equals committed msolve degree 40/40"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-09/card-01-r2/b09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-09/card-01-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "e474190c1a19a50fed51e05e01c03231af9f7a76",
+  "dirty_after": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/control-p1-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/control-p1-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/selftest-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/selftest-r2.txt"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-t0.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-t0.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-12-r2.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,841 @@
+{
+  "schema": "ecbench.frontier-coverage/v1",
+  "date": "2026-10-31",
+  "source_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
+  "method_count": 74,
+  "solver_backend_count": 11,
+  "coverage_semantics": "Every live method receives a disposition. Fresh missing evidence is blocked/unranked, never interpreted as zero cost or a loss.",
+  "methods": [
+    {
+      "id": "ic.aps_v1",
+      "family": "ic",
+      "applies": "prime_only",
+      "entry": "ecbench::aps::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "prime",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads::pencil::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_choice2_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads_followup::solve_genus2_choice2",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_projective_chart_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads_followup::solve_genus2_projective",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_target_rank_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads_followup::solve_genus2_target_rank",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.three_leads_plain_v1",
+      "family": "rho",
+      "applies": "any",
+      "entry": "three_leads::solve_rho",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.three_leads_negation_v1",
+      "family": "rho",
+      "applies": "any",
+      "entry": "three_leads::solve_rho",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.three_leads_jacobian_v1",
+      "family": "rho",
+      "applies": "any",
+      "entry": "three_leads::solve_rho",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads::solve_genus2_v2",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_genus2_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads::solve_genus2",
+      "disposition": "legacy_control",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.three_leads_decomposition_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads::solve_subfield_or_pkm_v2",
+      "disposition": "specialized_domain",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.three_leads_decomposition_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "three_leads::solve_subfield_or_pkm",
+      "disposition": "legacy_control",
+      "campaign_cell": "three-leads/transfer",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.plus_model_v1",
+      "family": "rho",
+      "applies": "prime_only",
+      "entry": "ecbench::best2_model::solve(best2=false)",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "rho.best2_model_v1",
+      "family": "rho",
+      "applies": "prime_only",
+      "entry": "ecbench::best2_model::solve(best2=true)",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "rho.frozen_reference",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::rho_reference",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.plain",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::rho_walk_with(PointClasses, RhoWalk::plain())",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.negation",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.negation_strong",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ecbench::negation_strong::NegStrongRho::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.multitarget_pooled",
+      "family": "rho",
+      "applies": "prime_only",
+      "entry": "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "rho.preprocessing",
+      "family": "rho",
+      "applies": "prime_only",
+      "entry": "ic_boundary::PreprocessingRho::{build, solve}(NegationClasses, RhoWalk::negation())",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.k4_gaudry",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::fp4::solve_k4",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.cubic",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::CubicClasses with RhoWalk::negation()",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.quartic",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::QuarticClasses with RhoWalk::negation()",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.frobenius_orbit",
+      "family": "rho",
+      "applies": "any",
+      "entry": "endo_rho::EndomorphismClasses(FrobeniusType) with RhoWalk::negation()",
+      "disposition": "specialized_domain",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.gls",
+      "family": "rho",
+      "applies": "any",
+      "entry": "endo_rho::EndomorphismClasses(GlsEndomorphism) with RhoWalk::negation()",
+      "disposition": "specialized_domain",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.signed_frobenius",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned",
+      "disposition": "legacy_control",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.signed_frobenius_strong",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve",
+      "disposition": "legacy_control",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.signed_frobenius_strong_legacy",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve_legacy",
+      "disposition": "legacy_control",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "rho.signed_frobenius_strong_escape",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve (escape_fruitless)",
+      "disposition": "current_primary",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "bsgs.textbook",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_textbook",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "bsgs.interleaved",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_interleaved",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "bsgs.negation",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_negation",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "bsgs.negation_table",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_negation_table",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "kangaroo.vow",
+      "family": "kangaroo",
+      "applies": "any",
+      "entry": "ecbench::generic::kangaroo",
+      "disposition": "legacy_control",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "transfer.isogeny",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ecbench::isogeny::{find_isogeny, Isogeny::map}",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "transfer.quartic_cover",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ecbench::cover_quartic::{QuarticCover, transfer}",
+      "disposition": "legacy_control",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "transfer.quartic_cover_v2",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ecbench::cover_quartic::{QuarticCover, transfer}",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "transfer.ghs_cover",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ecbench::ghs_cover::transfer (jv_cover::Cover::transfer)",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.hyperelliptic",
+      "family": "ic",
+      "applies": "any",
+      "entry": "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+      "disposition": "legacy_control",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.hyperelliptic_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "hyperelliptic_index_calculus::hec_index_calculus_dlp + ecbench::hyper_ic::factor_base_scan_muls",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "claw.pair_table",
+      "family": "claw",
+      "applies": "koblitz_only",
+      "entry": "ecbench::claw::pair_claw",
+      "disposition": "legacy_control",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.cm_folded_native_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "legacy_control",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.cm_folded_recurrence_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "legacy_control",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.cm_folded_native_d43_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "legacy_control",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.cm_folded_native_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.cm_folded_recurrence_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.cm_folded_native_d43_v2",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::cm_folded::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "CM-folded",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.hyperelliptic_thread",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::hyper_ic::solve",
+      "disposition": "specialized_domain",
+      "campaign_cell": "transfer/Jacobian",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.pipeline",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ic_framework::run_pipeline",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "ic.pipeline_full",
+      "family": "ic",
+      "applies": "binary_only",
+      "entry": "ic_framework::run_pipeline + ecbench::full_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "rho.signed_frobenius_full",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned + ecbench::full_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "rho.signed_frobenius_strong_full",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve + ecbench::full_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "ic.pipeline_wordram",
+      "family": "ic",
+      "applies": "binary_only",
+      "entry": "ic_framework::run_pipeline + ecbench::wordram_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "rho.signed_frobenius_wordram",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned + ecbench::wordram_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "rho.signed_frobenius_strong_wordram",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve + ecbench::wordram_price::reprice",
+      "disposition": "pricing_sensitivity",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "rank only inside its full-price or word-RAM unit"
+    },
+    {
+      "id": "ic.pipeline_counted",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ic_framework::run_pipeline + ecbench::ic_report(counted)",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.tensor_contraction_v1",
+      "family": "ic",
+      "applies": "prime_only",
+      "entry": "ecdl_tensor_ic::Solver with SparseContractor",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.known_log_mitm2_v1",
+      "family": "ic",
+      "applies": "any",
+      "entry": "ecbench::known_log::{prepare,recover}",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.known_log_ksum_v1",
+      "family": "ic",
+      "applies": "prime_only",
+      "entry": "ecbench::known_log::{prepare_ksum,recover}",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "prime",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.large_prime",
+      "family": "ic",
+      "applies": "binary_only",
+      "entry": "ecbench_large_prime::solve",
+      "disposition": "legacy_control",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "retained for replay/accounting drift; not a current winner"
+    },
+    {
+      "id": "ic.trace_line_2lp",
+      "family": "ic",
+      "applies": "binary_only",
+      "entry": "ecbench_large_prime::trace_line + solve_candidate_with_basis",
+      "disposition": "specialized_domain",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "ic.shared_rank",
+      "family": "ic",
+      "applies": "koblitz_only",
+      "entry": "ic_framework::shared_rank::run_shared_rank_targets",
+      "disposition": "diagnostic_only",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "not_globally_rankable",
+      "note": "different advice, target multiplicity, known-log, or model scope"
+    },
+    {
+      "id": "ic.koblitz_descent",
+      "family": "ic",
+      "applies": "koblitz_only",
+      "entry": "ecbench::koblitz_descent::run",
+      "disposition": "specialized_domain",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "requires its own curve/object and matched reference cell"
+    },
+    {
+      "id": "rho.negation_v2",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::rho_walk_with_policy(NegationClasses, RhoWalk::negation(), WalkPolicy::v2())",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "rho.cubic_v2",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::CubicClasses with rho_walk_with_policy(WalkPolicy::v2())",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "rho.quartic_v2",
+      "family": "rho",
+      "applies": "any",
+      "entry": "ic_boundary::QuarticClasses with rho_walk_with_policy(WalkPolicy::v2())",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "rho.signed_frobenius_v2",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "ic_boundary::signed_frobenius_rho_tuned_policy(WalkPolicy::v2())",
+      "disposition": "current_primary",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "rho.signed_frobenius_strong_v2",
+      "family": "rho",
+      "applies": "koblitz_only",
+      "entry": "koblitz_strong_rho::StrongRho::solve_accounted (jumps_fixed_base)",
+      "disposition": "current_primary",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "bsgs.textbook_v2",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_textbook + verify_candidate",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "bsgs.interleaved_v2",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_interleaved + verify_candidate",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "bsgs.negation_v2",
+      "family": "bsgs",
+      "applies": "any",
+      "entry": "ecbench::generic::bsgs_negation + verify_candidate",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "kangaroo.vow_v2",
+      "family": "kangaroo",
+      "applies": "any",
+      "entry": "ecbench::generic::kangaroo_with(restarts_apart) + verify_candidate",
+      "disposition": "current_primary",
+      "campaign_cell": "prime + binary, split before ranking",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "claw.pair_table_v2",
+      "family": "claw",
+      "applies": "koblitz_only",
+      "entry": "ecbench::claw::pair_claw_with(v2)",
+      "disposition": "current_primary",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    },
+    {
+      "id": "ic.large_prime_v2",
+      "family": "ic",
+      "applies": "binary_only",
+      "entry": "ecbench_large_prime::solve_candidate_v2",
+      "disposition": "current_primary",
+      "campaign_cell": "binary/Koblitz",
+      "fresh_run": "blocked_checkpoint_gate",
+      "note": "eligible in an applicable same-object E2E cell"
+    }
+  ],
+  "solver_backends": [
+    {
+      "id": "f4-f2",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "word XORs for elimination; incomplete whole-engine count",
+      "global_rankable": false
+    },
+    {
+      "id": "buchberger-f2",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "polynomial reductions; backend-native unit",
+      "global_rankable": false
+    },
+    {
+      "id": "matrix-f4",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "partial word operations; matrix build excluded",
+      "global_rankable": false
+    },
+    {
+      "id": "matrix-f5",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "partial word operations; matrix build excluded",
+      "global_rankable": false
+    },
+    {
+      "id": "inherited-f4",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "partial word operations; child specialisation excluded",
+      "global_rankable": false
+    },
+    {
+      "id": "crossbred-f2",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "partial word operations",
+      "global_rankable": false
+    },
+    {
+      "id": "xl-f2",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "modelled monomial operations",
+      "global_rankable": false
+    },
+    {
+      "id": "sat-cdcl",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "conflicts; CNF or native-XOR encoding",
+      "global_rankable": false
+    },
+    {
+      "id": "fes-f2",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "Gray-code word XORs; quadratic systems",
+      "global_rankable": false
+    },
+    {
+      "id": "fes-f2-wide",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "AVX2/AVX-512 vector XORs; at most 32 equations",
+      "global_rankable": false
+    },
+    {
+      "id": "exhaustive",
+      "disposition": "nested_backend",
+      "campaign_cell": "algebraic-solver matched systems",
+      "fresh_run": "blocked_checkpoint_gate",
+      "native_unit": "short-circuited monomial tests",
+      "global_rankable": false
+    }
+  ]
+}

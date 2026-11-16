@@ -1,0 +1,96 @@
+name: Prime31 algebraic IC development tests
+
+on:
+  push:
+    branches: [main, research/norm-branch-rank-pilot-20261115]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - src/cryptanalysis/f4_fp_tower.rs
+      - src/cryptanalysis/sig_fp_tower.rs
+      - .github/workflows/prime31-algebraic-ic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  development:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install recorded development toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal --component clippy
+      - name: Test reused engines and adapter
+        run: cargo +1.100.0 test --locked --release --lib --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+      - name: Exact prime31 native two-sum coverage preflight
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_two_sum_gate
+      - name: Compile and test three-summand collision/rank IC example
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m3_collision_ic
+      - name: Unit-test Rust m8 natural-positive split control
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_split_ic
+      - name: Build balanced m8 algebraic S4 F4 input and validate 32 public witness certificates
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input
+      - name: Bounded existing Rust F4 pilot on positive and public-Q targets
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --probe-f4
+      - name: Diagnose fixed-versus-target Semaev F4 matrix cap
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --ablate-f4
+      - name: Freeze-test 16 natural prime31 masks with actual S4/S3 Rust F4
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --panel-f4
+      - name: Count balanced m8 ordered rational roots using reused Rust arithmetic
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_permutation_orbit_gate
+      - name: Rust-native exact split-m8 reachability prefix (100 left blocks)
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_exact_support
+      - name: Replay exact Dickson first-collision S3 branch partition on prime31
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_pair_branches
+      - name: Test all fixed-S3 algebraic quotient branches with reused Rust F4
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_pair_branches -- --f4
+      - name: Replay collapsed Dickson first-collision S3 quotient identities
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_collapsed_s3
+      - name: Measure all seven true collapsed-tower S3 F4 arms
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_collapsed_s3 -- --f4
+      - name: Probe target-dependent Rust S4 after algebraic fixed-pair elimination
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --preeliminate-w-f4
+      - name: Algebraically eliminate the fixed pair S3 using existing Rust prime31 arithmetic
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_pair_elimination_poly
+      - name: Run reused-Rust S4 triple-arm root extraction with batched inversion
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s4_triple_projection
+      - name: Audit exact S3 discriminant and signed-S4 generic-group equivalence
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_discriminant_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_discriminant_gate
+      - name: Exact target-dependent univariate S3 quotient/GCD oracle
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --compare
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --depth8
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-preview
+      - name: Scale target-dependent m4 signed relation extraction B4/B8/B16
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-scale
+      - name: Rust-only oriented x/y slope and rational y-fiber support gates
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_xy_slope_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_xy_slope_gate
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_y_lift_support_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_y_lift_support_gate
+      - name: Lint adapter and CLI
+        run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings

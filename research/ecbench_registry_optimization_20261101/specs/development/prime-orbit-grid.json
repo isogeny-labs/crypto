@@ -1,0 +1,187 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: prime-orbit coordinate and factor-base grid",
+  "description": "Count-first L0 development grid for the shipped prime-orbit relation collector. Local wall clocks are diagnostic only; this spec cannot promote a leaderboard row or substitute for the preregistered L2 affine/Jacobian study.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic_a_minus_3",
+        "bits": 14,
+        "seed": 202611019100
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611019101,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-reference",
+      "role": "reference",
+      "method": {"id": "rho.negation_v2"}
+    },
+    {
+      "name": "orbit-affine-o16-r1_5",
+      "role": "baseline",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "16",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "16",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-o8-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "8",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-o32-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "32",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-o16-r1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "16",
+          "relations_per_orbit": "1",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-o16-r2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "16",
+          "relations_per_orbit": "2",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-jacobian-o8-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "8",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-jacobian-o16-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "16",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-jacobian-o32-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "32",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-jacobian-o16-r1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "16",
+          "relations_per_orbit": "1",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-jacobian-o16-r2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "jacobian",
+          "orbits": "16",
+          "relations_per_orbit": "2",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611019102,
+    "isolation_required": "L2",
+    "timeout_seconds": 30
+  }
+}
