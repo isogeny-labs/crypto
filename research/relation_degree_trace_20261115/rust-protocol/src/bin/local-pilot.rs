@@ -303,37 +303,77 @@ fn select_screen_family(summaries: &[Value]) -> Value {
     }
     selected.unwrap_or(Value::Null)
 }
+fn graph_plan() -> Result<Vec<(usize, GraphDefinition)>> {
+    let mut plan = Vec::new();
+    for n in [6, 7, 8] {
+        for graph in graph_roster(n)? {
+            plan.push((n, graph));
+        }
+    }
+    for n in [6, 7, 8] {
+        let balanced = match n {
+            6 => vec![(5, 0), (5, 1), (0, 2), (0, 3), (1, 4)],
+            7 => vec![(6, 0), (6, 1), (0, 2), (0, 3), (1, 4), (1, 5)],
+            _ => vec![(7, 0), (7, 1), (0, 2), (0, 3), (1, 4), (2, 5), (4, 6)],
+        };
+        plan.push((n, ("star-first", (1..n).map(|i| (0, i)).collect())));
+        plan.push((n, ("balanced-first", balanced)));
+    }
+    Ok(plan)
+}
+/// Graph descriptor for x0-first elimination; not a grevlex solving degree.
+fn induced_width(n: usize, edges: &[(usize, usize)]) -> usize {
+    let mut neighbors = vec![BTreeSet::new(); n];
+    for &(a, b) in edges {
+        neighbors[a].insert(b);
+        neighbors[b].insert(a);
+    }
+    let mut width = 0;
+    for axis in 0..n {
+        let later: Vec<_> = neighbors[axis]
+            .iter()
+            .copied()
+            .filter(|v| *v > axis)
+            .collect();
+        width = width.max(later.len());
+        for (i, &a) in later.iter().enumerate() {
+            for &b in &later[i + 1..] {
+                neighbors[a].insert(b);
+                neighbors[b].insert(a);
+            }
+        }
+    }
+    width
+}
 fn prepare_graphs(root: &Path) -> Result<()> {
     fs::create_dir(root)?;
     let mut cases = Vec::new();
-    for n in [6, 7, 8] {
-        for (name, edges) in graph_roster(n)? {
-            let start = Instant::now();
-            let system = workload::generate_graph(P, n, 7, &edges)?.system;
-            let id = format!("{name}-n{n}-s7");
-            let dir = root.join(&id);
-            fs::create_dir(&dir)?;
-            let f = system.decode()?;
-            let bytes = serde_json::to_vec(&system)?;
-            write_new(&dir.join("system.json"), &bytes)?;
-            for algorithm in ["std", "slimgb"] {
-                write_new(
-                    &dir.join(format!("{algorithm}.sing")),
-                    singular_code(&system, &f, algorithm).as_bytes(),
-                )?;
-            }
-            let ms = format!(
-                "{}\n{}\n{}\n",
-                system.variables.join(","),
-                P,
-                f.iter()
-                    .map(|f| expr(f, &system.variables))
-                    .collect::<Vec<_>>()
-                    .join(",\n")
-            );
-            write_new(&dir.join("input.ms"), ms.as_bytes())?;
-            cases.push(json!({"id":id,"topology":name,"variables":n,"seed":7,"edges":edges,"input_sha256":hash(&bytes),"preparation_ns":ns(start)}));
+    for (n, (name, edges)) in graph_plan()? {
+        let start = Instant::now();
+        let system = workload::generate_graph(P, n, 7, &edges)?.system;
+        let id = format!("{name}-n{n}-s7");
+        let dir = root.join(&id);
+        fs::create_dir(&dir)?;
+        let f = system.decode()?;
+        let bytes = serde_json::to_vec(&system)?;
+        write_new(&dir.join("system.json"), &bytes)?;
+        for algorithm in ["std", "slimgb"] {
+            write_new(
+                &dir.join(format!("{algorithm}.sing")),
+                singular_code(&system, &f, algorithm).as_bytes(),
+            )?;
         }
+        let ms = format!(
+            "{}\n{}\n{}\n",
+            system.variables.join(","),
+            P,
+            f.iter()
+                .map(|f| expr(f, &system.variables))
+                .collect::<Vec<_>>()
+                .join(",\n")
+        );
+        write_new(&dir.join("input.ms"), ms.as_bytes())?;
+        cases.push(json!({"id":id,"topology":name,"variables":n,"seed":7,"edges":edges,"induced_width_x0_first":induced_width(n,&edges),"input_sha256":hash(&bytes),"preparation_ns":ns(start)}));
     }
     save(
         &root.join("manifest.json"),
@@ -638,6 +678,11 @@ fn run(
                         .iter()
                         .all(|r| r["full_cost_single_call_ratio"].as_f64().unwrap() >= 10.);
                 let screen = json!({"schema":"graph-screen-case/v1","id":id,"topology":item["topology"],"variables":n,"seed":7,"edges":item["edges"],"input_sha256":input_hash,"worker_sha256":runner.worker_hash,"reference_basis_sha256":basis_hash(&reference),"setup_wall_ns":setup,"calls":calls,"comparisons":comparisons,"eligible_for_preregistered_followup":eligible,"status":if complete{"screen_complete"}else{"screen_incomplete"},"standing":"one planned call per arm; no A/A, confidence interval, confirmed gain or family standing"});
+                let screen = {
+                    let mut value = screen;
+                    value["induced_width_x0_first"] = item["induced_width_x0_first"].clone();
+                    value
+                };
                 save(&dir.join("screen-transcript.json"), &screen)?;
                 return Ok(screen);
             }
@@ -846,6 +891,20 @@ mod tests {
         let s = singular_basis("POLY\nTERM:1:1,0\nTERM:-1:0,0\nENDPOLY\nDONE", 2).unwrap();
         let m = msolve_basis("[1*x1^1+2147483646]:", &["x1".into(), "x2".into()]).unwrap();
         assert_eq!(s, m);
+    }
+    #[test]
+    fn amended_plan_preserves_original_order_and_exercises_fill() {
+        let plan = graph_plan().unwrap();
+        assert_eq!(plan.len(), 18);
+        for (i, n) in [6, 7, 8].into_iter().enumerate() {
+            assert_eq!(plan[4 * i].0, n);
+            assert_eq!(plan[4 * i].1 .0, "path");
+            assert_eq!(plan[12 + 2 * i].0, n);
+            assert_eq!(plan[12 + 2 * i].1 .0, "star-first");
+            assert_eq!(induced_width(n, &plan[12 + 2 * i].1 .1), n - 1);
+            assert_eq!(induced_width(n, &plan[4 * i + 2].1 .1), 1);
+            assert_eq!(induced_width(n, &plan[13 + 2 * i].1 .1), 3);
+        }
     }
     #[test]
     fn incomplete_and_duplicate_cas_outputs_rejected() {
