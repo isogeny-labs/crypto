@@ -1,4 +1,64 @@
-# Current checkpoint:27FINISHED, publish packet (16 November12:13Z)
+# Current checkpoint:28SOURCE READY, NOTRUN (16 November12:45Z)
+
+ALLfinalnativechecksPASS:21sieve(twoignored),12generic/MSTfilter,1executedpublicworker,
+actualnewprobe/oldworkerbuilds,library/twoexamplesstrictClippy;qualifier12tests/build/
+strictClippy.Threebefore-test root hashesPASS. No livecompiler/scientificjob.
+Amendment23/plan/wrapper/report fixed; nextfreshsource/buildmanifest thencommit/PUSH
+cleansource/spec BEFOREsolecall to
+/workspace/ic-local-runs/local-cover-two-lp-component-20261116-28.
+Thenoriginalcopiedanalyzer/fullrawLOCALif>64KiB/exactsummary/flow/hash/report/viewallpages/
+exactbenchmarkcopies/publication. Requiredpositive2LP/nontrivialcycle/positiverank;
+cohortidentities/phaseprices/sourcebindings/certificates/exitflowzero mustpass.
+No completecost/fullDLP/rhorankingfromcomponent. Full2LPtargetdescentnextopenwork.
+LastcleanHEAD16f8275d9+DIRTYnewcode/sourceprep;ROOTsourcesfrozensince12:27.
+GoalACTIVE/localusable/no stopgoal/subagents. S3gateagainfailedmissingprofile/token;
+userlocalauthorizationpersists, receiptvalidation/two-lp-checkpoint-gate.log.
+
+# Previous checkpoint:2LPimplemented;28NOTRUN; native build active (16 November12:42Z)
+
+27packet2aca6d9deb9fe3e608b75015998807653d00941d PUBLISHED/PRactualresultupdated.
+Artifactbot16f8275d9FFintegrated;exactignored27PNGrestored/hashPASS,neverreadd.
+CURRENTHEAD16f8275d9 +DIRTY new2LPcode/docs/qualifier/protocol andO-998c1cf09f2a.
+GoalACTIVE/localusable/no stopgoal/subagents. No scientificjob28ornewrundir yet.
+
+SELECTED actualalgorithm: JV§3.3 adapted2LPsmallFpbase/splitquadratic. Implemented
+jv_sieve::two_large_prime public API: reducedprefixsetup,m-2threshold, peel small
+roots/remainingdegree<=2Fproots, Jacobianverifiedsources, protectedprivatepartial
+binding/modulus/cover checks, genericLPfilter+allcertificate replays ->SparseRel.
+Nativeprobe newexample jv_sieve_two_large_prime_probe has matched smooth/2LP modes,
+separate enum/extract RNGs, incidence/sharedfixedBcohort/linehash; outputsfullinput
+relations/certificates andpartialphasecounts. FullDLPdescent/targetNOTintegratedyet.
+
+Checks: final library/2examples strictClippy PASS. Nativejv_sieve21(twoignored),
+12generic/MSTfilter PASS. Originalpublicworker test/production probe build STILL
+compiles session83168 (normalrootlib rustc62559 started12:38). Do NOT edit root
+sources during compilation orrun timing. Three-file /tmp/ic-two-lp-root-source-before-tests.sha256
+PASS. Logs validation/two-lp-{sieve-tests,filter-tests,existing-worker-test,example-build}.log.
+IndependentRustqualifier two-lp-component-analysis:12tests/build/strictClippy PASS,
+including coefficient replay, exactrank/dependence/wideprime, source/identity/price
+tamper/cohort/refusedpromotion controls; checks allzeroexit +exact4event flow.
+No independentJacobianverdict; collector verifies actualsources, qualifiermodularonly.
+
+ProspectiveAmendment23/cover-two-lp-component-plan.json +run-two-lp-local.sh/report:
+p1009fresh293,m9,75%prefixbase,300000uniqueB, smooththen2LP,1validation0warm,
+900worker1900whole/CPU0/8GiB/noretry. Require samecohortdigest/linecount, actual2LP
+sources/nontrivialcycle/positiverank, binding/cert/price/conservation/zeroOTHERforeign.
+NoAA/ratios/ranking/fullDLP/rho;totalnull/completefalse. Wrapperthin/syntaxPASS.
+NEXTfinishnativebuild/root-hashcheck, freshsource/build manifests, commit/PUSH clean
+SOURCE/spec BEFORESOLEcall to /workspace/ic-local-runs/local-cover-two-lp-component-20261116-28.
+Thenoriginalcopiedanalyzer/fullrawLOCALif>64KiB/exactsummary/flow/hash/report/viewallpages/
+exactbenchmarkcopies/publication. No measured2LPdata existsyet.
+
+PrimaryJVauthorPDFhash7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38
+local/tmp/ic-cover-decomp-primary.{pdf,txt},§3.3/§6. NotirreducFp²LPs/noexponenttransfer.
+KBMCPabsent/wrapperstatus+3queriesfailed:/tmp/ic-adapted-2lp-kb-*.log.
+Conductorabsent:/tmp/ic-adapted-2lp-conductor.log;scopeannouncedbeforeedits.
+Initialunused-p/2needlessborrow/rangeloop lint failures retained, fixedfinalPASS.
+S3checkpointuploadunavailable;userexplicitlocalorRunpod overridesbackend, Git+localcustody
+usable;don'taskcredentials. PR4288regular/automerge;CIrequiredgatesunconfirmed,
+next>=12:58absentevent/newsourcepublication. No manualmerge/bypass.
+
+# Previous checkpoint:27FINISHED, publish packet (16 November12:13Z)
 
 Source15121ac779cef32bc173916e74ce26e2a3976f09 publishedbeforeSOLE27call.
 Run /workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27

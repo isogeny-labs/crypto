@@ -47,6 +47,10 @@ use super::residual_walk::inv_mod;
 mod graph_filter;
 pub use graph_filter::{SieveGraphOptions, SieveGraphStats};
 
+/// Adapted two-large-prime collection over a reduced Fp-abscissa base.
+#[path = "jv_sieve_two_large_prime.rs"]
+pub mod two_large_prime;
+
 /// The harness's price of one `F_p` inversion, as in `jv_cover`.
 const INV_COST: u64 = 16;
 
@@ -1259,8 +1263,20 @@ pub fn sieve_line(
     all_counts: Option<&mut Vec<u8>>,
     shared: Option<&SharedB>,
 ) -> (Vec<u64>, SieveCost) {
+    sieve_line_threshold(ring, setup, line, ctr, all_counts, shared, setup.m as u8)
+}
+
+fn sieve_line_threshold(
+    ring: &FpRing,
+    setup: &SieveSetup,
+    line: &Line,
+    ctr: &mut Counters,
+    all_counts: Option<&mut Vec<u8>>,
+    shared: Option<&SharedB>,
+    minimum: u8,
+) -> (Vec<u64>, SieveCost) {
     let p = setup.p;
-    let m = setup.m as u8;
+    let m = minimum;
     let mut cost = SieveCost::default();
     ctr.id = ctr.id.wrapping_add(1);
     if ctr.id == u32::MAX {
@@ -1430,7 +1446,6 @@ pub fn relation_from_hit(
     s: u64,
     rng: &mut StdRng,
 ) -> Option<SieveRel> {
-    let p = setup.p;
     let f = line_poly(ring, line, s);
     if fdeg(&f) != setup.m as isize {
         return None;
@@ -1439,6 +1454,20 @@ pub fn relation_from_hit(
     if roots.len() != setup.m {
         return None;
     }
+    relation_from_roots(ring, fq, setup, base, by_x, line, s, &roots)
+}
+
+fn relation_from_roots(
+    ring: &FpRing,
+    fq: &Fq,
+    setup: &SieveSetup,
+    base: &[BaseEl],
+    by_x: &HashMap<u64, usize>,
+    line: &Line,
+    s: u64,
+    roots: &[u64],
+) -> Option<SieveRel> {
+    let p = setup.p;
     // √s ∈ F_q: in F_p if s is a square, else t·√(s/ω)
     let sq = if setup.sqrt[s as usize] != u64::MAX {
         E2([setup.sqrt[s as usize], 0])
@@ -1451,7 +1480,7 @@ pub fn relation_from_hit(
         E2([0, r])
     };
     let mut terms = Vec::with_capacity(setup.m);
-    for &x in &roots {
+    for &x in roots {
         super::jv_bitops::probe(1);
         let &idx = by_x.get(&x)?;
         super::jv_bitops::words(4);
