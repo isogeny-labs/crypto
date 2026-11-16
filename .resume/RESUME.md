@@ -1,3 +1,54 @@
+# Current checkpoint:23published; nextaccountinglead (16 November ~09:10Z)
+
+STAGE23FINISHED/FAILEDPROJECTIONCRITERION, actualrecoveriesBOTHCORRECT.
+Sourcea457ec75b8657c211da69b4dc658c4e698a5888a, sole
+/workspace/ic-local-runs/local-cover-mst-validation-20261116-23 exit0/27.517s.
+Bothactualscalar66296859173437586/native+outergroupreplay. MST127trees/1703edges/
+19297evaluations/maxdegree51/0budgetrefusal. Candidate509rows4577nnz->382rows10904nnz;
+proxyguardREFUSES (1),0admitted/0replayedrows,originalsolvefallback1recoverstrue.
+Originalcopiedanalyzer9873Bsummary global[]/validationfalse/followupfalse/comparativefalse.
+No performanceverdictorwrong-scalar failure. Exactraw37296B/summary/progress/prepost
+hashes/reportonepageALLinGitandlocal; PDFvisuallyinspected, exactbenchPDF/SVG/150dpiPNG
+hasheschecked/originalsalsolocal. PublishedRESULTafd4c579f8a8a353cdbddf5ad45b3246b6057a5d,
+PR4288bodyactual23negative+22censor. DoNOTretryunchanged/rewritehistorical76sourcehashes.
+No activejobs/compilers. GoalACTIVE/localworks; no stopgoal/no subagents.
+
+NEXTSELECTEDLEAD: complete COUNTEDCOSTaccounting of ALREADYVALIDATED cover+Pivotgraph
+usingexistingbitop/v1 harness. Readprimarysource/kernelcoverage BEFOREcode; review
+examples/jv_cover_ic_vs_rho_bitops.rs +src/cryptanalysis/jv_bitops.rs +docs/units/BITOPS.md,
+jv_rho_strong::rho_tally/nativearithprices vsstrongestcredit. KB2queries unavailable
+/tmp/ic-graph-bitops-kb-search{1,2}.log. Countsprimary/wallpracticality perAGENTS2185.
+Currentgenericlarge_prime_filter helpers(add_mod/mul_mod/inverse_mod)BYPASShooks,
+Word/stdcontainercoverage incomplete. Don'tclaimprimaryparityfromlegacyorwallpartial.
+Review existing sparseAXPY kernels inresearch/pencil_large_prime_20261029/src/sparse.rs,
+genericWorkRow.axpy/normalise(BTreeMap); a sortedmerge/countedadaptermayreuseframework.
+Thisisaccountingimplementationworknotexternalblocker. No nextcode/trialyet. Adaptive
+MSTbest-prefix/variable-columnstopping is a SEPARATEfuturecandidate, notselected;
+fixed75%matrixfillnegativepreserved. DoNOTspendnewlongwall-onlycohortbeforeaccounting.
+
+NATIVECODEALLBUILT/CHECKED: newlarge_prime_filter_mst.rs637lines, additive
+jv_sieve::run_cover_sieve_dlp_on_with_mst_filter +--mst-graph+explicitstrategybinding,
+protectedtarget/witnessreplay/atomiccaps/proxyguard. Originaloptions/functions/default
+serializedfieldskept. Tests10filter+17sieve(2ignored)+19cover(1ignored)+1example;
+actualproduction/analyzerbuilds+strictClippyPASS. Nativeanalysis46executions36distinct
+10dupPASS; 20/21/22summaryreplayBYTEEXACT. Standaloneprototypealso10pass/buildClippy.
+Initialtuplealiaslint+analyzercollapsibleiflintfixed/logsretained,noassertweakening.
+Source/tests/review+Amend18/planpublisheda457BEFORE23call. RawmatrefusedBEFOREinput
+witnessreplay orcandidateWiedemann, so neverclaimcandidateitselfgroupvalidated.
+
+STAGE22published1abc/aaebotffintegrated/exactPNGsrestored/hashpass. Source23b,
+3600.002scensor124,36planned26starts25complete6warm19measure3correctrounds,
+inflightmeasurement3graph_b,10unattempted. All25completevalid/8graph516->387nofallback.
+Fullsummary13765B, raw350106BLOCALONLY/compactflow28058B inGit. AllCIsnull/ineligible/
+followupfalse/parityfalse. Partialoutergraph/IC1.01269,graph/rho.05724,IC/rho.05652
+AREDESCRIPTIVEONLY.No cross-runratiocomposition.Report2pagesallinspectedoriginalplotkept,
+separateRustpresentationaxesfix+dependencylock.No stop atcomponentorpartialcomparison.
+
+CIlast08:55ona457appsreview/migratesuccess;requiredgate/size/artifacts/reviewUNCONFIRMED.
+NEXT>=09:45absentevent. SamePR4288regular/automerge;no manualmerge/bypass. /usr/bin/git
+only;partial+sparseclone avoidgitarchive/broadsparseapply. Fetchmainbeforejournalappend,
+preserveallsharedentries+ledgers. AllclaimsPCCunverified/no signed independent/admittedrows.
+
 # Current checkpoint: STAGE23RUNNING (16 November ~08:55Z)
 
 Source/spec a457ec75b8657c211da69b4dc658c4e698a5888a PUBLISHED before solecall.
