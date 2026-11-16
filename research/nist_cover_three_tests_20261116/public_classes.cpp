@@ -1,0 +1,51 @@
+#include "closed_fibers_arithmetic.hpp"
+#include "quartic_km_v3_arithmetic.hpp"
+CFPoly pc_read_poly(const Json& row){std::vector<Z> c;for(auto& value:row.arr)c.emplace_back(mpz_class(value.scalar));return CFPoly(c);}
+EC pc_read_point(const Json& row){if(row.at("infinity").scalar=="true")return {};return EC(F(CFPoly{Z(mpz_class(row.at("x").scalar))}),F(CFPoly{Z(mpz_class(row.at("y").scalar))}));}
+CFPoly pc_power_mod(CFPoly a,int n,const CFPoly& u){CFPoly out{Z(1)};for(int i=0;i<n;++i)out=(out*a)%u;return out;}
+struct PublicClassAdapter {
+    QuarticKM& km;
+    std::vector<int> auxiliary,excluded;
+    explicit PublicClassAdapter(QuarticKM& k,const std::vector<ClosedFiber>& fibers):km(k){
+        std::set<int> evaluation(km.pool.begin(),km.pool.end());
+        for(int i=int(km.points.size())-1;i>=0&&auxiliary.size()<6;--i){
+            bool usable=!evaluation.count(i)&&km.points[i].x!=km.fibers[0].x;
+            for(auto& f:fibers){if(f.u.eval(Z(km.points[i].x))==Z(0))usable=false;}
+            if(usable)auxiliary.push_back(i);else excluded.push_back(i);
+        }
+        require(auxiliary.size()==6,"six fixed disjoint auxiliary rational points");
+    }
+    Class encode(const ClosedFiber& fiber)const{
+        require(km.mons.size()==34,"large-model degree9 section basis34");
+        Space constraints(6,Vector(km.mons.size(),Z(0)));CFPoly x{Z(0),Z(1)};
+        for(size_t j=0;j<km.mons.size();++j){auto e=km.mons[j];auto value=(pc_power_mod(x,e[0],fiber.u)*pc_power_mod(fiber.v,e[1],fiber.u))%fiber.u;for(int i=0;i<6;++i)constraints[i][j]=value.at(i);}
+        for(int index:auxiliary){const auto& p=km.points.at(size_t(index));Vector row;for(auto e:km.mons)row.push_back(zpow(Z(p.x),e[0])*zpow(p.y,e[1]));constraints.push_back(row);}
+        auto coefficients=nullspace(constraints,int(km.mons.size()));require(coefficients.size()==22,"closed-fiber effective12 RR coefficient dimension22");Space values;
+        for(auto& row:coefficients){values.push_back(linear_combination(row,km.v3));}
+        auto space=row_basis(values,evaluation_count);require(space.size()==22,"closed-fiber effective12 evaluation dimension22");return {space};
+    }
+};
+Class pc_times(QuarticKM& km,Class value,mpz_class n){Class out=km.identity;while(n>0){if(mpz_odd_p(n.get_mpz_t()))out=km.add(out,value);n>>=1;if(n>0)value=km.add(value,value);}return out;}
+void pc_emit_class(const Class& value){std::cout<<'[';for(size_t i=0;i<value.w.size();++i){if(i)std::cout<<',';std::cout<<'[';for(size_t j=0;j<value.w[i].size();++j)std::cout<<(j?",":"")<<'"'<<value.w[i][j].x<<'"';std::cout<<']';}std::cout<<']';}
+int main(int argc,char** argv){try{
+    require(argc==4,"usage: public_classes kernel3-study backmap.json closed-fibers.json");std::string root=argv[1];initialize_cover(read_json(root+"/inputs/p192-d7-prym.json"));Level2Input level;
+    auto model=read_json(root+"/evidence/p192-d7-kernel3-plane-quartic.json"),points=read_json(root+"/evidence/destination-relations-v2/result.json"),receipt=read_json(argv[3]);require(model.at("kernel").integer()==3&&receipt.at("distinct_public_fibers").integer()==4,"fixed kernel3 public-fiber input");BRMap map(model,read_json(argv[2]));ClosedFiberSolver checker(map);std::vector<ClosedFiber> fibers;
+    for(auto& row:receipt.at("fibers").arr){ClosedFiber f;f.u=pc_read_poly(row.at("U"));f.v=pc_read_poly(row.at("V"));f.source=pc_read_point(row.at("source_point"));auto actual=checker.validate(f);f.norm=times(actual,6);require(f.norm==pc_read_point(row.at("norm")),"public fiber norm receipt binding");fibers.push_back(f);}
+    require(fibers.size()==4&&receipt.at("public_targets").arr.size()==4,"four public fixtures");QuarticKM km(model,points);PublicClassAdapter adapter(km,fibers);std::vector<Class> encoded;
+    for(size_t i=0;i<fibers.size();++i){encoded.push_back(adapter.encode(fibers[i]));std::cerr<<"encoded effective12 public fiber "<<i<<" in22-dimensional RR space\n";}
+    auto negative_reference=km.negate(encoded[0]);std::vector<Class> images;std::vector<EC> source_points,norms;int compositions=0;
+    for(auto& row:receipt.at("public_targets").arr){int positive=row.at("positive_fiber_index").integer(),negative=row.at("negative_fiber_index").integer();require(negative==0&&positive>=0&&positive<4,"public divisor-pair binding");auto source=pc_read_point(row.at("point"));auto norm=fibers[size_t(positive)].norm.add(fibers[0].norm.neg());require(norm==times(source,6),"public class companion divisor norm composition6");images.push_back(km.add(encoded[size_t(positive)],negative_reference));source_points.push_back(source);norms.push_back(norm);++compositions;}
+    require(km.zero(images[0]),"closed-fiber public zero class");require(!km.zero(images[1])&&!km.zero(images[2])&&!km.zero(images[3]),"nonzero public transported classes");std::cerr<<"public zero/nonzero class checks passed\n";
+    auto doubled=km.add(images[1],images[1]);require(km.equal(doubled,images[2]),"public fiber pullback preserves doubling");auto cancelled=km.add(images[1],km.negate(images[1]));require(km.zero(cancelled),"public pullback cancellation");std::cerr<<"public doubling and cancellation passed\n";
+    require(times(source_points[1],37)==source_points[3],"external source known-answer fixture");auto scalar_multiple=pc_times(km,images[1],37);require(km.equal(scalar_multiple,images[3]),"public Q class equals37 times public G class");std::cerr<<"public G/Q scalar fixture passes in target Jacobian\n";
+    int Frobenius_checks=0;for(auto& image:images){for(auto& row:image.w){for(auto& z:row){mpz_class value;mpz_powm(value.get_mpz_t(),z.x.get_mpz_t(),prime.get_mpz_t(),prime.get_mpz_t());require(value==z.x,"target class-space coefficient prime Frobenius");++Frobenius_checks;}}}
+    auto ambient=row_basis(km.v3,evaluation_count);rejects([&]{auto bad=images[1].w[0];bad[0]=bad[0]+Z(1);require(all_zero(residual(bad,ambient)),"altered public class evaluation coordinate");},"altered public class evaluation coordinate");
+    std::cout<<"{\"scope\":\"P192-kernel3-public-Jacobian-class-transfer\",\"standing\":\"producer-unverified\",\"kernel\":3,\"public_classes\":4,\"effective_divisor_degree\":12,\"RR_class_dimension\":22,\"evaluation_points\":85,\"norm_composition_checks\":"<<compositions<<",\"zero_class_checked\":true,\"doubling_checked\":true,\"cancellation_checked\":true,\"public_scalar_fixture_checked\":true,\"Frobenius_coefficient_checks\":"<<Frobenius_checks<<",\"addflip_calls\":"<<km.flips<<",\"target_Jacobian_arithmetic_executed\":true,\"target_order_r_multiplication_executed\":false,\"DLP_scalar_recovered\":false,\"full_source_Jacobian_isogeny_constructed\":false,\"auxiliary_point_indices\":[";
+    for(size_t i=0;i<adapter.auxiliary.size();++i){std::cout<<(i?",":"")<<adapter.auxiliary[i];}
+    std::cout<<"],\"auxiliary_excluded_indices\":[";
+    for(size_t i=0;i<adapter.excluded.size();++i){std::cout<<(i?",":"")<<adapter.excluded[i];}
+    std::cout<<"],\"evaluation_point_indices\":[";
+    for(size_t i=0;i<km.pool.size();++i){std::cout<<(i?",":"")<<km.pool[i];}
+    std::cout<<"],\"public_class_spaces\":[";
+    for(size_t i=0;i<images.size();++i){if(i)std::cout<<',';std::cout<<"{\"source_point\":";br_emit_point(source_points[i]);std::cout<<",\"norm_from_closed_divisor_pair\":";br_emit_point(norms[i]);std::cout<<",\"class_space\":";pc_emit_class(images[i]);std::cout<<'}';}std::cout<<"],\"scalar_multiple_class_space\":";pc_emit_class(scalar_multiple);std::cout<<"}\n";
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}
