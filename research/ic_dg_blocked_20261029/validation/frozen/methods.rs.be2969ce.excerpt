@@ -1,0 +1,94 @@
+# be2969ce src/cryptanalysis/ecbench/methods.rs lines 3969-4010 and 4150-4200, blob 8237bc3f4916f00f23b75cd47dbdb49ec761a4ad
+fn factor_base_facts<E: Copy>(
+    slug: &str,
+    spec: &str,
+    params: &Params,
+    fb: &crate::cryptanalysis::ic_boundary::FactorBase<E>,
+    key: impl Fn(&E) -> u64,
+) -> Result<FactorBaseFacts, String> {
+    let mut keys: Vec<u64> = fb.points.iter().map(key).collect();
+    keys.sort_unstable();
+    let mut bytes = Vec::with_capacity(keys.len() * 8);
+    for k in &keys {
+        bytes.extend_from_slice(&k.to_be_bytes());
+    }
+    let points_sha256 = sha256_hex(&bytes);
+    let family = spec.split(':').next().unwrap_or(spec).to_string();
+    let (fb_id, fb_sha256) = short_id(
+        "FB1",
+        &json!({
+            "schema": "ecbench.factor_base/v1",
+            "curve": slug,
+            "family": family,
+            "params": params.0,
+            "columns": fb.columns,
+            "signed_points": fb.points.len(),
+            "points_sha256": points_sha256,
+        }),
+    )?;
+    Ok(FactorBaseFacts {
+        fb_id,
+        fb_sha256,
+        family,
+        params: params.0.clone(),
+        description: fb.description.clone(),
+        signed_points: fb.points.len() as u64,
+        abscissae: fb.abscissae as u64,
+        columns: fb.columns as u64,
+        dimension: fb.dimension,
+        points_sha256,
+    })
+}
+
+fn solve_known_log<G: CountedGroup>(
+        "prime-kummer" => &kummer,
+        "prime-isogeny" => &isogeny,
+        "cm-scalar-orbit" => &cm_orbit,
+        other => {
+            return Err(format!(
+                "factor base `{other}` does not run on a prime curve"
+            ))
+        }
+    };
+    let ms = spec.oracle_params.u64_or("m", 2)? as u32;
+    let mut subtract = SubtractOracle;
+    let mut mitm = MitmOracle::new(ms);
+    let mut ksum = KSumOracle::new(ms);
+    let mut prime_batch = PrimeBatchMitmOracle::new();
+    let mut prime_blocked = PrimeBatchMitmOracle::blocked();
+    let mut mitm_fiber = FiberMitmOracle::new(ms);
+    let mut rootfind_mitm = RootfindMitmOracle::new(ms);
+    let mut rootfind_pairs = RootfindPairsOracle::new(ms);
+    let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    // `pkm-semaev` writes its system on the base's own tower, so it reads
+    // the tower from the `prime-kummer` spec and runs on no other base.
+    let mut pkm = match or_name.as_str() {
+        "pkm-semaev" => {
+            if fb_name != "prime-kummer" {
+                return Err(format!(
+                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
+                ));
+            }
+            let t = spec.factor_base_params.u64("t")? as u32;
+            let g = spec.factor_base_params.u64_or("g", 1)?;
+            let budget = (spec.solver_budget_seconds > 0)
+                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
+            Some(
+                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
+                    .with_budget(budget),
+            )
+        }
+        _ => None,
+    };
+    let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
+        "pkm-semaev" => pkm.as_mut().expect("built above"),
+        "subtract" => &mut subtract,
+        "mitm" => &mut mitm,
+        "ksum" => &mut ksum,
+        "mitm-prime-batch" => &mut prime_batch,
+        "mitm-prime-blocked" => &mut prime_blocked,
+        "mitm-fiber" => &mut mitm_fiber,
+        "rootfind-mitm" => &mut rootfind_mitm,
+        "rootfind-pairs" => &mut rootfind_pairs,
+        "rootfind-subtract" => &mut rootfind,
+        other => return Err(format!("oracle `{other}` does not run on a prime curve")),

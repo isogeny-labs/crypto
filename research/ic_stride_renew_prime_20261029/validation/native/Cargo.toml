@@ -1,0 +1,20 @@
+[package]
+name = "srenew-validate"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Native validator for XP-20261029-stride-renew-prime: replaces validation/{recompute,mechanism,build_gate_files}.py"
+
+# Standalone: builds without linking ecbench or the crypto library, so the
+# [d]G = Q check and the statistics stay independent of the producer.
+[workspace]
+
+[[bin]]
+name = "srenew-validate"
+path = "src/main.rs"
+
+[dependencies]
+# preserve_order: Python dict insertion order; float_roundtrip: correctly
+# rounded float parsing, as Python's json module does.
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+sha2 = "0.10"

@@ -1,0 +1,252 @@
+validation_report:
+  id: VAL-20261029-e85dcc
+  task_id: null   # dispatched by the main session with no TASK card id; write_scope = this directory
+  experiment: XP-20261029-srenew-deferred-guard-v3
+  claim: >-
+    At 24 and 32 bits, dg-small (ic.pipeline, targets = stride-renew-deferred-guard, factor base N_b = 130 / 741)
+    has lower whole-pipeline S than the walk baseline (targets = walk, N = 162 / 1024) under v3 section 6:
+    instrument (6.1), completeness (6.2), the 95% cluster-bootstrap upper bound of sum S_dg-small / sum S_walk
+    below 1 at w = 0, 0.1 and 1 (6.3), and band --ranks dg-small < walk on every curve (6.4).
+    The producer reports that 28 bits is NOT an improvement.
+  validator: Validator subagent (claude-opus-5-5). It did not write the protocol, the runs, the analysis or the claim.
+  snapshot:
+    repository_branch: claude/ic-srenew-deferred-guard-run-20261029 (producer worktree wt-dg, read only)
+    head_at_validation: 727cd0436477976ce7bb64a2f39ec35544099075   # pushed 09:03:09Z, clean
+    evidence_commit: 868fca5568aa806aeda7a2ae8bf1eb24907a8b43       # ancestor of HEAD
+    protocol_freeze_commit: e277272384d683a4d4b9983a141b523bf28c9f4a # pushed 07:56:20Z
+    p32_trigger_commit: a767145ff66cfb5ffc341288db0a3917b681ba2e     # pushed 08:01:04Z
+    predictions_frozen_commit: bced9c05ab   # first-study section 7, 06:09:53Z; carried verbatim into v3 (v3 section 1)
+    working_tree_only_receipts_used: false
+  run_ids:
+    - {size: 24, job: ic-dg3-p24-20261029, pod: 839dfb99-d7e2-4de7-aa8e-c067afa1191e, session: ECBS1h6f22178e42b6, launcher: 205ec4ab-ac65-447b-808a-c7642fabfbde}
+    - {size: 28, job: ic-dg3-p28-20261029, pod: 44c7bbd0-4d75-4625-9996-ba992ec3dd98, session: ECBS1h9261b082b1f3, launcher: 3f4424c2-6e14-4edd-ac2e-e64ebdec34ed, scope: confirm not an improvement only}
+    - {size: 32, job: ic-dg3-p32-20261029, pod: bd38514c-48dc-49a0-82e0-9986502d8196, session: ECBS1h999ec5ed79e4, launcher: c24e65f7-8ae6-4f68-b453-5dc494cebfde}
+
+  verdict: passed
+  verdict_by_size:
+    "24": {verdict: pass, reason: "every section 6.1-6.4 condition recomputed and holds; the margin is clear at every weight"}
+    "32": {verdict: pass with caveats, reason: "every section 6.1-6.4 condition recomputed and holds; the w = 0 upper bound is 0.968, and the gain is smaller than the section 7 model (see caveats)"}
+    "28": {verdict: "agree: not an improvement", reason: "section 6.4 fails: band unresolved on icv1-fp28-tm7951-a51cdbf3; nothing else at 28 bits was validated for promotion"}
+
+  artifact_checks:
+    - check: worker files equal the S3 originals
+      result: 57/57 IDENTICAL (19 per size); one pod prefix per job, so no reruns (provenance.txt section 1)
+    - check: SHA256SUMS of each eks-results directory
+      result: OK at 24, 28 and 32 bits
+    - check: committed evidence equals the S3-verified copies
+      result: tracked blobs 79 / 79 / 82 and .artifacts.json entries 8 / 8 / 5 equal by sha256; 0 mismatches
+    - check: launcher requests
+      result: >-
+        request.json sha256 equals result.request_sha256 and original-request.json. job.spec is JSON-equal to the
+        frozen spec-P<b>.json (unchanged since e2772723), to input-spec.json and to session/spec.json.
+    - check: binary and source
+      result: >-
+        build-info.json, binary.sha256, session.json and the records all name ecbench
+        88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c, source be2969ce, image cf0dcc8b.
+        The local replay binary has the same hash.
+    - check: dirty tree, revision and seeds
+      result: >-
+        session git_commit / git_dirty are null (image build; the binding is build-info.json). The producer worktree
+        is clean at 727cd043. Curve seeds 202610299<b>3 and <b>4, target seed <b>6 and measurement seed <b>8 are
+        in the specs. Algorithm seeds pair across arms with 0 mismatches.
+    - check: timing of freeze, trigger and executions
+      result: >-
+        Freeze pushed 07:56:20Z, before the first job (08:01:04Z) and the first session (08:02:08Z). Trigger pushed
+        08:01:04Z, before the P32 job (08:05:53Z) and session (08:06:58Z). The predictions were frozen at 06:09:53Z,
+        before any execution of either study.
+    - check: environment and resources
+      result: >-
+        Measured on env ECBENV3hc1c5e5126853 (EKS c8a.2xlarge, 3600 s deadline). Records hold max_rss_kib; the mean
+        max RSS of walk vs dg-small is 47366 vs 47397 KiB at 24 bits and 102464 vs 60971 KiB at 32 bits.
+    - check: independent replay (validator, ecbench verify --replay-all on copies under /dev/shm/dg3val)
+      result: >-
+        P24 and P32 each: 2688 records, 2688 verified, 2304/2304 replays reproduced "identical", 0 problems, all 12
+        audit checks true. Replayer env ECBENV3h13e37662a118 and hardware ECBHW1he9e33daae9e7, against measuring
+        hardware ECBHW1hef96e8cddc74. Copy hashes are equal before and after, and equal to the evidence. The
+        validator receipts carry the same checks, replay list and files block as the worker receipts (which remain
+        untouched); only the auditor env, hardware and time differ.
+        Same binary on a different host: not a cross-binary or cross-implementation replay.
+  metric_recomputations:
+    - quantity: priced S(w) = (G + w U) / sqrt(r) per record
+      result: >-
+        C = n_C = 0, since no record carries pinned calibration units. U is summed from cost.unpriced as in band.rs.
+        Max relative deviation from the records' own S is 0.0.
+    - quantity: decision ratio sum S_dg-small / sum S_walk, 288 pairs, with ecbench's two-stage cluster bootstrap (4000, seed 20261002)
+      p24: {w0: "0.910514 [0.88245, 0.94023]", w0.1: "0.888392 [0.85938, 0.91891]", w1: "0.784809 [0.75188, 0.81969]"}
+      p32: {w0: "0.940564 [0.91436, 0.96813]", w0.1: "0.918698 [0.89184, 0.94684]", w1: "0.818879 [0.78974, 0.84962]"}
+      own_two_stage_upper_bounds_over_11_seeds: {p24: "w0 0.9389-0.9405, w0.1 0.9178-0.9196, w1 0.8185-0.8201", p32: "w0 0.9663-0.9686, w0.1 0.9450-0.9473, w1 0.8474-0.8497"}
+      own_one_stage_target_bootstrap: {p24_w0: "[0.888, 0.932]", p32_w0: "[0.921, 0.959]"}
+      per_curve: {icv1-fp24-tm241-91a7fdd0: "0.895 / 0.872 / 0.764", icv1-fp24-tm2519-cce74591: "0.926 / 0.905 / 0.806", icv1-fp32-tm103307-fa421912: "0.931 / 0.910 / 0.812", icv1-fp32-tm24839-2a7bda13: "0.950 / 0.928 / 0.826"}
+    - quantity: band --ranks (band.rs mean S per curve and arm)
+      result: >-
+        dg-small < walk at every weight on all four curves. The validator's re-run of ecbench band is byte-identical
+        to analysis/band.md at every size, and the stdlib means agree with it to 0.0.
+    - quantity: distance to rho (same-session rho.negation), w = 0 / 0.1 / 1
+      p24: {walk: "12.481 / 12.495 / 12.557", dg-small: "11.364 / 11.100 / 9.855"}
+      p32: {walk: "32.065 / 32.000 / 31.707", dg-small: "30.159 / 29.398 / 25.964"}
+      note: rho stays ahead at every size and weight; this is the distance remaining, not a gate
+    - quantity: analyst numbers, read only after the recompute (compare_analyst.py, validator-report.json headline)
+      result: >-
+        The 27 + 27 compare files at P24 / P32 (and 24 at P28) match on point ratios, ci95_bootstrap, per-curve
+        ratios and per-curve bootstraps with relative difference 0.0. The gate_v3.json counts match (672 / 14 waived
+        rho executions, 0 IC executions below L2, 2304 identical replays). All 626 headline entries pass rel_tol
+        1e-12. The README decision and rho-distance tables match to their printed decimals.
+    - quantity: "[d]G = Q, by the validator's own affine arithmetic"
+      result: >-
+        2304 measured + 384 warm-up records per size, all arms: 0 failures. Curves: a and b are derived from the
+        plan points; p and r are prime; [r]G = O; r is the only multiple of r in the Hasse interval, so #E = r;
+        j matches the ICV1 string and is not 0 or 1728.
+  control_checks:
+    - control: A/A (null object of identical shape)
+      result: >-
+        walk-aa/walk and rho-neg-aa/rho-neg give exactly 1.0 at every weight; all 288/288 pairs are identical at
+        24 and 32 bits.
+    - control: v3 section 6.1 instrument, recounted from records.jsonl
+      result: >-
+        All IC executions are L2. The rho executions at L1 are exactly those whose only L2 blocker is "solve too short
+        to admit wall time" (P24: 672, 84.7-996.3 us; P32: 14, 547.5-933.1 us). l2-gate below_l2 equals the
+        records' set. The exit-42 clause holds (single pod, exit 42, every below-L2 entry a waived rho execution).
+    - control: section 6.1 spec and arm identity
+      result: >-
+        The input, session and job specs are equal to the frozen spec. walk vs dg-small differ only in factor_base
+        (162 to 130; 1024 to 741) and targets (walk to stride-renew-deferred-guard).
+    - control: the deferred guard's confirming addition is in the counted ledger
+      result: >-
+        Source: ic_boundary.rs PairTable::probe adds into rel.group_ops, which is charged.
+        Records: dg minus srenew extra charged adds equal the decomposing repeats; lookups_dg = lookups_sr +
+        eager_skips on 288/288 pairs at both N. Doubles and scalar_mults are equal. This matches the unit test in
+        ic_framework/mod.rs.
+    - control: inverse direction (proves-too-much)
+      result: >-
+        The inverse comparison (walk over dg-small) fails the upper-bound test at every weight, as it must. Its
+        upper bound, the reciprocal of the forward lower bound, is 1.13 / 1.16 / 1.33 at 24 bits and 1.09 / 1.12 /
+        1.27 at 32 bits.
+    - control: negative case at 28 bits
+      result: >-
+        The same test pipeline rejects 28 bits. The pooled upper bounds are 0.9756 / 0.9625 / 0.9016, but on
+        icv1-fp28-tm7951-a51cdbf3 dg-small has S 20.844 against srenew 20.646 at w = 0, so the band is unresolved.
+        The validator agrees: 28 bits is not an improvement.
+  null_object_checks_inventor_protocol_s3:
+    - A/A arms are the same-shape null; their ratio is exactly 1 (above).
+    - >-
+      The quantity that should vanish does. The guard deferral changes only native, w-priced work, so dg/srenew must
+      be 1 at w = 0 apart from the confirming additions, and must fall as w grows. Measured (24 / 32 bits): 1.000002 / 1.000000 at
+      w = 0 (the w = 0 interval is degenerate, [1, 1]), 0.957 / 0.956 at w = 0.1, and 0.762 / 0.756 at w = 1.
+    - >-
+      The quantity that should scale does. The setup saving is exactly N_b (N_b + 1) / (N (N + 1)) = 0.6449 and 0.5238,
+      and the trial count follows T ~ 1/N. Model vs measured srenew-small/srenew trials: 1.246 vs 1.239
+      [1.173, 1.310] at 24 bits; 1.382 vs 1.414 [1.352, 1.477] at 32 bits.
+  validation_ladder_inventor_protocol_s6:
+    step1_assumptions_isolated: >-
+      The three assumptions are each measured by a control arm. Target source at fixed N: srenew/walk. Guard deferral
+      at fixed N: dg/srenew. Smaller N with the eager guard: srenew-small/srenew. The failure mode named in section 7
+      prediction 4 is trial counts not scaling as 1/N (rank deficiency); it is not seen.
+    step2_scaled_pipeline_measured_ratio: >-
+      The claim is made at the executed sizes (24 and 32 bits) as a measured paired ratio against the baseline in one
+      session, not as an extrapolation. The predicted negative cases were checked: guard alone at w = 0 is 1.000; N
+      alone is above 1 at w = 1 (1.074 / 1.176, the relabelling pattern); 28 bits fails.
+      No claim beyond 32 bits, or about exponent, is validated.
+    step3_cheats: none; the real pipeline ran at the claimed scale
+    step4_reproducibility: >-
+      Partly exercised. Every measured run was re-executed and every statistic rebuilt from the raw records; the
+      artifacts are listed in SHA256SUMS. The measuring binary was not rebuilt from be2969ce: it is bound by hash
+      only.
+  heuristic_validation_checks:
+    - check: pre-registered prediction
+      result: >-
+        The section 7 predictions were frozen at bced9c05 (06:09:53Z), before any execution of either study, and
+        are unchanged since; v3 carries them verbatim. The first study's results were seen before the v3 freeze, but
+        the predictions were not changed.
+    - check: predictions against data (24 / 32 bits)
+      result: >-
+        P1 holds. P2 holds in direction; at w = 1 it is outside the modelled 1.10-1.12 (1.074 / 1.176), and at
+        32 bits w = 0 it sits on the edge at 0.9505. P3 holds in direction but not in magnitude: dg-small/srenew is
+        0.927 / 0.900 / 0.779 at 24 bits (model 0.95 / 0.92 / 0.79) and 0.950 / 0.929 / 0.831 at 32 bits
+        (model 0.89 / 0.88 / 0.80). P4 (the model risk) did not occur.
+    - check: sample integrity
+      result: >-
+        2 fresh curves per size, 24 targets each, 1 warm-up and 6 measured rounds, alternate order; seeds are in the
+        specs. Completeness: 336 records per arm (48 warm-up, 288 measured), all verified, all matching their
+        target, 0 censored.
+    - check: scale binding
+      result: 24 and 32 bits only, prime-field prime-order curves with j not 0 or 1728. No transfer to other sizes or curve families is validated.
+    - check: correspondence validity
+      result: not applicable (direct sampling)
+  cost_model_checks:
+    - check: unit declared
+      result: >-
+        S = ecbench GAE / sqrt(r). Native operations are priced at w = 0, 0.1 and 1 GAE (section 5a band), and rho
+        is priced the same way. No wall-clock figure is admitted.
+    - check: GAE bookkeeping on 1728 IC records per size
+      result: >-
+        total_gae equals the sum of phase gae; phase gae equals adds + doubles; oracle_setup equals N (N + 1)
+        additions with 0 doubles; the factor-base abscissae equal N; eager guard probes equal trials; deferred
+        probes equal relations + repeats.
+    - check: mechanism (exact split of ratio - 1, mechanism.py)
+      p24: >-
+        At w = 0, -0.0895 = setup -0.1819 + trial steps +0.1267 (trials x1.283 [1.214, 1.358]) + other relations work
+        -0.0342 (scalar mults 60.6 to 6.0). At w = 1, -0.2152, with guard probes -0.2316 (23016 to 71 per run) and
+        lookups +0.0659.
+      p32: >-
+        At w = 0, -0.0594 = setup -0.2451 + steps +0.1869 + other -0.0013. At w = 1, -0.1811, with probes -0.2452
+        (986287 to 368) and lookups +0.0948.
+      reading: >-
+        The charged GAE itself falls at w = 0 (G ratio 0.910 / 0.941), so this is not an accounting shift from
+        charged to native work.
+    - check: memory reported with cost
+      result: max RSS is recorded per record, and dg-small does not raise memory (figures above)
+    - check: per-attempt x inverse success probability
+      result: not applicable; every run solves its instance (288/288 recovered and verified), and S is the measured cost to solve
+
+  caveats:
+    - >-
+      P32: the gain (0.941 / 0.919 / 0.819) is smaller than the section 7 model; the w = 0 upper bound is 0.968, and
+      on curve icv1-fp32-tm24839-2a7bda13 the per-curve interval at w = 0 reaches 0.988. Section 6.4 still holds on
+      both curves.
+    - >-
+      The candidate changes both targets and N against walk. The stride-renew stream alone (srenew/walk:
+      0.982 / 0.987 / 1.007 at 24 bits, 0.990 / 0.989 / 0.985 at 32) is not resolved at either size. The smaller N
+      carries the w = 0 gain and the deferred guard the w > 0 gain.
+    - >-
+      Rho executions under 1 ms are L1 under grading v3. v3 section 6.1 condition 5 admits only their counts, and
+      those are replay-certified.
+    - >-
+      Each size is decided at 95% on its own, as frozen. There is no multiplicity correction, and the intervals
+      cover target variation on these two curves.
+  discrepancies:
+    - "README predictions row 1: dg/srenew at w = 0.1 is quoted as 0.957-0.959. Measured 0.9573 / 0.9592 / 0.9563, so the range is 0.956-0.959. Presentation only."
+    - "README predictions row 2: srenew-small/srenew at 32 bits, w = 0, is quoted as 0.951. Measured 0.95047 (0.950). Presentation only."
+    - "No discrepancy in any decision number, interval, band mean, gate count or rho distance."
+  proof_architecture_checks: []   # not a proof claim
+  procedure_deviations:
+    - >-
+      There was no review_plan or TASK card. The validator owned every joint of the 24- and 32-bit receipts and
+      checked 28 bits only to confirm it is not an improvement.
+    - >-
+      The recompute replicates from the producer's raw artifacts, so it is not a blind re-derivation. The only
+      blind-from-parameters quantities are the setup N (N + 1) and the trial model 1/N.
+  limitations:
+    - Same IC implementation (ecbench 88070375) for measurement and replay; older binaries lack the target source.
+    - The validator did not rebuild the measuring binary from be2969ce.
+    - Counted unit only.
+    - >-
+      There is no sealed ECBND1 measured_bound record in the evidence. A ledger cost claim under AGENTS.md "Curve
+      identity and measured bounds" would need one; this report covers only admissibility to the crypto repo's
+      validation gate.
+    - >-
+      HEAD 727cd043 already adds deferred_guard_component() to scripts/build_ic_leaderboard.py. It renders 24, 28 and
+      32 bits in one section, with a section-level check_evidence_dir that has no row slug, so the 28-bit line
+      shares the "validated (24 and 32 bits)" string. The 28-bit row is not in this draft's rows; the gate checker
+      rejects it by slug. Its reading "dg-small becomes the 24/32-bit baseline" is a promotion decision for the
+      Coordinator.
+    - >-
+      This report says the receipts are admissible evidence. It does not support an ECDLP claim, does not show a
+      speedup over rho, and does not authorize promotion.
+  gate_check: >-
+    The draft was placed in a mock repository at /dev/shm/dg3gate with the raw files byte for byte, and passes
+    wt-pbo scripts/validation_gate.py check_evidence_dir with no slug and with each of the four row slugs (0
+    errors). The 28-bit slug is rejected ("not among its rows").
+  artifact_paths:
+    directory: /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/dg3/validation/
+    intended_repo_location: research/ic_srenew_deferred_guard_20261029/v3/validation/ (with VALIDATION.draft.json as research/ic_srenew_deferred_guard_20261029/VALIDATION.json)
+    files: see SHA256SUMS in the same directory
