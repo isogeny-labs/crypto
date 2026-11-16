@@ -53,6 +53,9 @@ jobs:
       - name: Same-source Rust APS algebraic versus independent direct group join
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compare
+      - name: Same twelve held-out prime31 Q across five Rust APS partition sizes
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-sweep
       - name: Twelve held-out complete prime31 Rust APS logarithms
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
