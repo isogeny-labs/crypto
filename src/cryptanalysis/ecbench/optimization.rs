@@ -116,6 +116,7 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v3", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
@@ -204,6 +205,18 @@ const POLICIES: &[PolicyDecl] = &[
         "rho.frozen_reference",
         ReplayControl,
         FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "rho.curve25519_bounded",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.curve25519_pair_v1",
+        NativeGrid,
+        SpecializedDomain,
         StandardBand
     ),
     policy!("rho.plain", ReplayControl, FrozenHistorical, StandardBand),
@@ -518,12 +531,24 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_descent",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_batched",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_descent_v2",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
     ),
     policy!(
-        "ic.koblitz_batched",
+        "ic.koblitz_batched_v2",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -707,12 +732,15 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         "attempts"
         | "budget_ms"
         | "cap_multiple"
+        | "growth_ceiling"
         | "matrix_coefficient_cap"
         | "max_pair_work"
         | "max_descent_ops"
         | "max_ops"
         | "max_restarts"
         | "max_states"
+        | "max_steps"
+        | "max_scan"
         | "max_sums"
         | "max_trials"
         | "max_u"
@@ -726,12 +754,15 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "step_cap_factor"
         | "target_max_attempts"
         | "trial_cap"
+        | "trace_entries"
+        | "trace_words"
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
         | "batch_trials"
         | "base"
         | "base_multiplier"
+        | "base_size"
         | "base_scale"
         | "beta"
         | "branches"
@@ -751,6 +782,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "factor_base"
         | "factor_base_points"
         | "fb_size"
+        | "growth"
+        | "guess"
         | "independent"
         | "inner"
         | "jumps"
@@ -777,9 +810,11 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver"
         | "stop"
         | "subset_size"
+        | "subset_profile"
         | "summands"
         | "table_scale"
         | "targets"
+        | "trace"
         | "unique_relations"
         | "walks" => Knob,
         _ => return None,
@@ -1279,7 +1314,7 @@ mod tests {
         let profiles = profiles().unwrap();
         let profile = profiles
             .iter()
-            .find(|profile| profile.id == "ic.koblitz_batched")
+            .find(|profile| profile.id == "ic.koblitz_batched_v2")
             .unwrap();
         assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
         assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);
@@ -1324,6 +1359,7 @@ mod tests {
     #[test]
     fn censoring_and_seeds_cannot_be_tuning_knobs() {
         for name in [
+            "max_steps",
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",

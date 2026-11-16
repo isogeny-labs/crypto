@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R103-MARKED23-DIRECT-LAMBDA-NORM",
+  "version":1,
+  "goal":"compute the direct norm of the actual G51 lambda derivative and match its sixteenth power to R99",
+  "claims":[{"id":"direct_norm103","class":"exact_computation","statement":"the actual derivative norm is nonzero and its sixteenth power equals the accepted R99 full lambda discriminant norm"}],
+  "arms":{"reference":"R51 source and R99 full resultant norm","candidate":"direct derivative coefficient norm","positive":["actual source degree checks","nonzero direct norm","sixteenth-power equality"],"negative":["changed norm equality rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R51 and R99 SHA-256 pins","F2(x)[n,l,y]","one Singular thread","120-second timeout","2 GiB cap"],"measured":["direct numerator/denominator","source identity","fresh replay"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation","seeds":[103]},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["direct norm exact rational value","sixteenth-power identity","replay identity"],
+  "execution":{"backend":"pinned local Singular","backend_reason":"default EKS image lacks pinned CAS","timeout_seconds_per_program":120,"virtual_KiB_native":2097152,"threads":1,"seed":103,"queue":"one serial exact computation","source_gate":"committed source/protocol and donor hashes","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"exit zero, exact marker, zero native errors, nonzero direct norm, equality and changed control, fresh replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"direct source-bound resultant of lambda derivative through f51","scope":"displayed monogenic-order norm identity; not normalized ramification"}
+}

@@ -8,9 +8,9 @@ import argparse,glob,json,os,subprocess,sys,tempfile
 HERE=os.path.dirname(os.path.abspath(__file__));ROOT=os.path.dirname(HERE)
 ap=argparse.ArgumentParser();ap.add_argument("--ic",required=True);ap.add_argument("--out",required=True)
 ap.add_argument("--bits",default="26,30,34");ap.add_argument("--fb",default="128,512");ap.add_argument("--per",type=int,default=3)
-ap.add_argument("--seed",default="e222m221-mid-v1");ap.add_argument("--skip-default-cofactor",action="store_true",help="run only the H1 configuration on E/M (the default arm costs hours above 36 bits)");ap.add_argument("--rho-runs",type=int,default=8);a=ap.parse_args()
+ap.add_argument("--seed",default="e222m221-mid-v1");ap.add_argument("--families",default="W,E,M",help="subset of W,E,M (run families in parallel processes)");ap.add_argument("--skip-default-cofactor",action="store_true",help="run only the H1 configuration on E/M (the default arm costs hours above 36 bits)");ap.add_argument("--rho-runs",type=int,default=8);a=ap.parse_args()
 tmp=tempfile.mkdtemp(prefix="mid-");inst=os.path.join(tmp,"inst")
-subprocess.run([sys.executable,"-I",os.path.join(ROOT,"gen_instances.py"),"--out",inst,"--families","W,E,M","--bits",a.bits,"--per",str(a.per),"--seed",a.seed],capture_output=True,check=True)
+subprocess.run([sys.executable,"-I",os.path.join(ROOT,"gen_instances.py"),"--out",inst,"--families",a.families,"--bits",a.bits,"--per",str(a.per),"--seed",a.seed],capture_output=True,check=True)
 bins=set();n=0
 for f in sorted(glob.glob(inst+"/*.json")):
     if f.endswith("MANIFEST.json"): continue

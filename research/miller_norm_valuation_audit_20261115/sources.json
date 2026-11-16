@@ -1,0 +1,178 @@
+{
+  "schema": "miller-norm-valuation-source-plan/v1",
+  "created": "2026-11-15T04:42:06.733144+00:00",
+  "formal": {
+    "project": "research/miller_norm_valuation_audit_20261115/lean",
+    "theorem": "MillerNormValuationAudit.miller_norm_valuation_certificate",
+    "statement": "theorem miller_norm_valuation_certificate : ∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), IsDiscreteValuationRing (valuationRing W) ∧ Valuation.IsUniformizer (functionValuation W) (parameter W) ∧ IsLocalRing.maximalIdeal (valuationRing W) = Ideal.span {integralParameter W} ∧ Function.Surjective (functionValuation W) ∧ functionValuation W (xFunction W) = WithZero.exp (2 : ℤ) ∧ functionValuation W (yFunction W) = WithZero.exp (3 : ℤ) ∧ functionValuation W (parameter W) = WithZero.exp (-1 : ℤ) ∧ (∀ x : K, functionValuation W (verticalFunction W x) = WithZero.exp (2 : ℤ) ∧ functionValuation W (parameter W ^ 2 * verticalFunction W x - 1) < 1 ∧ IsLocalRing.residue (valuationRing W) (normalizedVertical W x) = 1) ∧ (∀ x y slope : K, functionValuation W (lineFunction W x y slope) = WithZero.exp (3 : ℤ) ∧ functionValuation W (parameter W ^ 3 * lineFunction W x y slope - 1) < 1 ∧ IsLocalRing.residue (valuationRing W) (normalizedLine W x y slope) = 1 ∧ functionValuation W ((xFunction W)⁻¹ ^ 3 * lineFunction W x y slope - 1) = 1) ∧ ¬ Valuation.IsUniformizer (functionValuation W) (xFunction W)⁻¹",
+    "decl_sha256": "9e902bb2a63699a532e54ad1d475b5c8e1fb224ab597a92cc49f98ee0ca43dc9",
+    "scope": "Actual norm-degree valuation on every general Weierstrass coordinate ring over every field, with triangle derived from official max(2degp,2degq+3), multiplicativity from actual Algebra.norm and degree, and zero support proved. Extend to actual FunctionField. Actual coordinate values exp2/exp3, every vertical exp2/every nonvertical line exp3, actual t=X/Y exp(-1). Actual Weierstrass equation proves v(t^3*line-1)<1 and v(t^2*vertical-1)<1; actual valuation-ring residue maps send normalized elements to1. Derived surjective valuation, nontrivial value group, actual DVR, t is actual IsUniformizer and generates actual maximal ideal. Actual countercontrol: reciprocal X is not uniformizer and replacing t with reciprocal X makes normalized-line difference valuation1, failing residue-one criterion. No supplied valuation/DVR/coordinate-weight/normalization premises. Seven new Mathlib-backed modules, no earlier custom proof modules. Constructed norm-degree DVR and normalization only; canonical projective infinity local-ring equivalence/full canonical principal divisor/Weil-Tate/reciprocity/isogeny/Lang/Cartier/Jacobian/MOV-FR/all14 remain open. Same host/prover/Mathlib, no independent implementation/physical-host/parser/compiler refinement, canonical promotion/novelty/signed-standing claim.",
+    "sources": [
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/lakefile.toml",
+        "bytes": 435,
+        "sha256": "b9142c301ced18c570222135b5c1aa370caeafe5d02a9e7fc0cfb17c9945f19b"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "DiscreteValuation",
+    "FieldValuation",
+    "MillerFunctions",
+    "NormDegree",
+    "Normalization",
+    "ResidueNormalization",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 15848,
+      "sha256": "7a16a4c4acb5fc55dd2e08939d4b53b74cf71a16c0721f7f1e2571760bb9bd2f"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "c3e268d5146a3c83a4d86cf22ee622e327777e40d0d908dce0f22a148ba0fd71"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/attempts.json",
+      "bytes": 231,
+      "sha256": "6924191de1f5547092369030a431bccec506dab9605cc85e95277fa4135d7e53"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1476,
+      "sha256": "fae6a7213f78b6ac11228559fa330ad3f7b7cb4db49176c631c9f1afa9c4df87"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/gate.json",
+      "bytes": 1442,
+      "sha256": "18610a79e601dc2b0f86817ff95e1048977936862ae3585cd35b1bb5a4cade89"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/source-review.json",
+      "bytes": 3273,
+      "sha256": "cbc1448f7230adf44b937a8fc12aef56741f1c990c5896472ae35c83369f170b"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/evidence/binding-check.json",
+      "bytes": 5025,
+      "sha256": "7fcac53f50f50106ef5ef1cac6db214adcccd1920fa9e58da05c6e00ebc6ed4e"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/proof-map.json",
+      "bytes": 5413,
+      "sha256": "4988ac02828a8f19d89a13e1c879ec6b6f1f1f6863cf7dd83884e044632b4a55"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/render_report.py",
+      "bytes": 6912,
+      "sha256": "5c7cc80b3420b1e9264b6ac257f26e34c1abe15fc8b2df94b2185349f8ba7146"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/export_binding_input.py",
+      "bytes": 1758,
+      "sha256": "0bbae93e381edcc5d016bf301bc63c01a5eb2a72ffdc7de74d7c14d86de91c24"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/reports/layout.json",
+      "bytes": 248,
+      "sha256": "69643b354d2c36fd0445ad835b84f64d17f018868d8b6ccb88afdd1e081bd3c2"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/reports/report.pdf",
+      "bytes": 46894,
+      "sha256": "d42717835f458283f7d4dbc5f07301345c9df3477bb1842bf3cc3deaa393a8fd"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/reports/valuation-bridge.svg",
+      "bytes": 1424,
+      "sha256": "234f4bd80304cc022c8a77102b92c61008977d71fff6b7fb4f8d0ec6df8f10c0"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 57,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_norm_degree_valuation": true,
+    "actual_DVR_and_uniformizer_and_maximalIdeal": true,
+    "actual_residue_normalization": true,
+    "actual_wrong_parameter_countercontrol": true,
+    "canonical_projective_infinity_localRing_identification": false,
+    "canonical_principal_divisor_or_pairing_identification": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

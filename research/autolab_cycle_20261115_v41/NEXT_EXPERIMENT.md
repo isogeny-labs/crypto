@@ -1,0 +1,11 @@
+# Next queue: prime interval query and remaining original branches
+
+Register unchanged prime_reciprocal_prepared_20261115_v41/solver.py before firstexecution. Independent exhaustive positivepair maps for all t over smallproved primes (e.g.101/M2,1009/M3,10007/M7,65537/M15) must exercise signed Euclid, absent fractions, t0, repeatedpairs, discriminant/parity, unsupported4M³>=p and capdemotion. Then actualP192/P224/P256/P384/P521 fields with d38/44/51/76/104, M=2^d-1, planted(a,b)=(2^(d-1),2^(d-1)+1), diagonal and frozenqueries. The plantedfraction has qmax1, so certify the full interval pairset without scanning it. Treat these as auxiliary arithmeticcontrols, not hardcurve benchmarks.
+
+Copy existing nist_fields.py/rootfinder fields dependencies unchanged into RAM if absent, and explicitly supply the accessible exact FLINT library /workspace/generalized_roots/vendor/msolve-local/usr/lib/x86_64-linux-gnu/libflint.so.24.0.0. Freeze source/input and libraryidentity, charge provedprime p validation (not probableprime). The preparedprototype assumes provedprime caller. Both module copies are currently absent inRAM; nist_presets.json and the library are available.90seconds4GiBonecore, independent correctness before timings.
+
+Lowheight fractions may trigger q-workcap. Preserve such cases; a freshvariant can compare a-range reconstruction b=D a/(Na-D), or certified divisors, with explicit caps. Never turn an unresolved qrange into emptyrootset or extrapolate to allprimecurves. Odd-extension rational lifts need coefficient/unit/sign proofs of their own.
+
+Then close >=2zero/v0 k0norm branch through exact commonX cancellation to the cubic pole-four norm. Match any existing three-source certificate's modulus,targetsign,domain and rational/ghost scope before reuse. Keep distinctfive/otherk and originalchain U/source/order closure. The reciprocaltriple certificate already excludes all nozero repeatedsourcek0norms; do not rerun it unchanged. Distinctfive's directlift remains>=72bits.
+
+Finally preregister paid cold pair-query/curve integration panels with fastest matching competitors and fulloutput/memory accounting. No component-only gains substitute for the full genuineF4/F5/F6 releasegate.

@@ -26,10 +26,12 @@
 #define FES_HD __host__ __device__
 #define FES_HDM __host__ __device__
 #define FES_FI __host__ __device__ __forceinline__
+#define FES_UNROLL _Pragma("unroll")
 #else
 #define FES_HD static inline
 #define FES_HDM inline
 #define FES_FI inline
+#define FES_UNROLL
 #endif
 
 // Lower-triangular index for the unordered pair {i, j}.
@@ -298,11 +300,11 @@ FES_HD void fes_walk_block(uint64_t cst, const uint64_t *lin,
   uint64_t val = fes_eval(cst, lin, quad_tri, n, base);
   if (val == 0) emit(base);
   uint64_t dl[K], q[K][K], qc[K];
-#pragma unroll
+FES_UNROLL
   for (int i = 0; i < K; ++i) {
     dl[i] = df[i];
     qc[i] = 0;
-#pragma unroll
+FES_UNROLL
     for (int j = 0; j < K; ++j) q[i][j] = (i < j) ? qsym[i * n + j] : 0ULL;
   }
   const uint64_t nblocks = 1ULL << (low_bits - K);
@@ -315,7 +317,7 @@ FES_HD void fes_walk_block(uint64_t cst, const uint64_t *lin,
       if (rest) df[c] ^= qsym[c * n + K + fes_ctz(rest)];
       val ^= df[c];
       if (val == 0) emit(point);
-#pragma unroll
+FES_UNROLL
       for (int j = 0; j < K; ++j) qc[j] = qsym[j * n + c];
     }
     fes_block_steps<K, 1>(dl, q, qc, h != 0, val, point, emit);

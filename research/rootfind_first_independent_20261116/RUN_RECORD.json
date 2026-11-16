@@ -1,0 +1,65 @@
+{
+  "schema": "rootfind-first-independent-run/v1",
+  "run_id": "run-20261116T1342Z",
+  "status": "completed_harness_passed_unreviewed",
+  "requested_tests": 1,
+  "completed_tests": 1,
+  "exit_code": 0,
+  "start_utc": "2026-11-16T13:42:02Z",
+  "end_utc": "2026-11-16T13:42:02Z",
+  "command": "gtimeout -s TERM -k 10s 600s /usr/bin/time -l /Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_first_independent-0455cb05dd584dab --exact fixed_koblitz_first_independent_vs_controls --nocapture",
+  "workdir": "/Volumes/SSD990-2/crypto/wt/codex-rootfind-inline-page-index-20261116",
+  "branch": "codex/rootfind-multihit-relations-20261116",
+  "branch_head_at_run": "42671e8c465116fa9991b8964a5618905d56e4e9",
+  "source_commit": "83407456e0f052d4cf51d533b1fda824063b2287",
+  "protocol_commit": "0e413634e86a9358d431aaf2e0a3dc77ce5e9b40",
+  "harness_commit": "ea2fc503bfb431f1b2ad7f5a9ec24c1241fcba9f",
+  "tracked_tree_state_at_launch": "not separately captured at launch; branch was clean on prior turn and executable digest is pinned",
+  "environment": {
+    "operating_system": "Darwin 27.2.0",
+    "architecture": "arm64",
+    "macos_version": "27.2",
+    "hardware_model": "Mac16,7",
+    "logical_cpus": 14,
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "1.99.1 (5f94df478 2026-08-27)",
+    "cargo_lock_sha256": "8a3ad2005cd808e4b6ba38dc5ef45a3635d192925e3885c22d7e81fb5e297c36",
+    "isolation": "L0 shared host"
+  },
+  "parameters": {
+    "curve_degrees": [13, 19, 23],
+    "subgroup_orders": [2003, 130873, 2095853],
+    "sample_targets": [2003, 1024, 1024],
+    "public_target_scalar": 641,
+    "k13_coefficients": "(1000+3t) mod 2003, t=0..2002",
+    "k19_k23_coefficients": "105000+3t, t=0..1023",
+    "policies": ["first-hit", "first-independent", "all-hit"]
+  },
+  "checkpoint": {
+    "pre_run_s3_uri": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__rootfind-multihit-relations-20261116/20261116T134012Z-42671e8c4651/",
+    "resume_sha256": "7126716a0f0e57f5d3e83408fd823b412cbff5d96b94499d2ce36e543845cc8a",
+    "remote_resume_byte_comparison": "matched"
+  },
+  "sha256": {
+    "executable": "f58ad80e4402725f22ee51dfe14db1b8bb0af12a2c56f22cddbbf6de5b6c0247",
+    "run_meta": "19a927330301799f295b44a7fd8e174fa11619924db5e328ca97f47dab402076",
+    "run_stdout": "87abaa1f1aae3cea5002c9cb8ee19edc787d6507ce4a4619545a1ac2627c7db5",
+    "run_stderr": "273fc461a391e550f74acd55e81f989bc0b6eb55df3a163d46897171ed6095a2",
+    "results": "b8edbcd4e00f2a0a5ce0c2cca43032578ad5c5a8a66760d11c793207f97497c8"
+  },
+  "resource_observation": {
+    "process_real_seconds": 0.28,
+    "process_user_seconds": 0.11,
+    "maximum_resident_set_size_bytes": 10174464,
+    "instructions_retired": 1272972931,
+    "cycles_elapsed": 465913964,
+    "scope": "whole diagnostic harness, not per-policy timing"
+  },
+  "validity": {
+    "source_harness_assertions": "passed",
+    "independent_replay": false,
+    "group_equations": "harness re-add checks passed",
+    "full_rank_scalar": "harness asserted 641 for each full-rank arm",
+    "wrong_answer_or_inconsistent_row": false
+  }
+}

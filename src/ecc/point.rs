@@ -17,6 +17,7 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
+use super::mont_vt::{Jac as MontJac, Mont};
 use num_bigint::BigUint;
 
 #[cfg(test)]
@@ -389,6 +390,20 @@ impl Point {
             Point::Infinity => return Point::Infinity,
             Point::Affine { x, y } => (x, y),
         };
+        if let Some(r) = scalar_mul_fixed_width(x, y, k, a) {
+            return r;
+        }
+        self.scalar_mul_biguint(k, a)
+    }
+
+    /// [`scalar_mul`](Self::scalar_mul)'s ladder on `BigUint` field
+    /// elements: the general path, and the reference the fixed-width one
+    /// is tested against.
+    fn scalar_mul_biguint(&self, k: &BigUint, a: &FieldElement) -> Point {
+        let (x, y) = match self {
+            Point::Infinity => return Point::Infinity,
+            Point::Affine { x, y } => (x, y),
+        };
         let mut acc: Option<Jacobian> = None;
         for i in (0..k.bits()).rev() {
             if let Some(j) = &acc {
@@ -510,6 +525,83 @@ impl Point {
             Point::Infinity => None,
         }
     }
+}
+
+/// [`Point::scalar_mul`]'s ladder on fixed-width Montgomery words
+/// ([`mont_vt`](super::mont_vt)) instead of `BigUint` field elements: the
+/// same Jacobian formulas, branch for branch, and the same final Fermat
+/// inversion `Z^(p-2)`, so the point is the `BigUint` ladder's for every
+/// odd modulus `p >= 3` (prime or not).  `None`, leaving the `BigUint`
+/// path to run (and to panic where it panics), when the modulus is even,
+/// below 3 or wider than 576 bits, when a coordinate or `a` is not a
+/// reduced residue of that same modulus, or when the final `Z` is zero.
+fn scalar_mul_fixed_width(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+) -> Option<Point> {
+    let m = &x.modulus;
+    if y.modulus != *m || a.modulus != *m {
+        return None;
+    }
+    match m.bits() {
+        0..=64 => mont_ladder::<1>(x, y, k, a),
+        65..=128 => mont_ladder::<2>(x, y, k, a),
+        129..=256 => mont_ladder::<4>(x, y, k, a),
+        257..=576 => mont_ladder::<9>(x, y, k, a),
+        _ => None,
+    }
+}
+
+fn mont_ladder<const N: usize>(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+) -> Option<Point> {
+    let m = &x.modulus;
+    let ctx = Mont::<N>::new(m)?;
+    let (xm, ym, am) = (
+        ctx.enter(&x.value)?,
+        ctx.enter(&y.value)?,
+        ctx.enter(&a.value)?,
+    );
+    let mut acc: Option<MontJac<N>> = None;
+    for i in (0..k.bits()).rev() {
+        if let Some(j) = &acc {
+            acc = ctx.double(j, &am);
+        }
+        if k.bit(i) {
+            acc = match &acc {
+                None => Some(MontJac {
+                    x: xm,
+                    y: ym,
+                    z: ctx.one(),
+                }),
+                Some(j) => ctx.add_affine(j, &xm, &ym, &am),
+            };
+        }
+    }
+    let Some(j) = acc else {
+        return Some(Point::Infinity);
+    };
+    if j.z.iter().all(|&w| w == 0) {
+        return None;
+    }
+    let zi = ctx.pow(&j.z, &(m - BigUint::from(2u32)));
+    let zi2 = ctx.mul(&zi, &zi);
+    let zi3 = ctx.mul(&zi2, &zi);
+    Some(Point::Affine {
+        x: FieldElement {
+            value: ctx.leave(&ctx.mul(&j.x, &zi2)),
+            modulus: m.clone(),
+        },
+        y: FieldElement {
+            value: ctx.leave(&ctx.mul(&j.y, &zi3)),
+            modulus: m.clone(),
+        },
+    })
 }
 
 /// A finite point in Jacobian coordinates, `(X : Y : Z)` with `Z ≠ 0`
@@ -1561,6 +1653,200 @@ mod vartime_differential {
                     linear_dlog_reference(&g, &t, bound, &a),
                     "p={p} g={g:?} t={t:?} bound={bound}"
                 );
+            }
+        }
+    }
+}
+
+/// `scalar_mul`'s fixed-width Montgomery ladder against the `BigUint`
+/// ladder it replaces, over odd moduli of every width the dispatcher
+/// distinguishes (prime and composite), points that need not lie on a
+/// curve, edge scalars and edge coordinates; a panic of the reference
+/// must be a panic of `scalar_mul` too.
+#[cfg(test)]
+mod fixed_width_differential {
+    use super::*;
+    use num_bigint::RandBigInt;
+    use rand::{rngs::StdRng, SeedableRng};
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+
+    fn moduli() -> Vec<BigUint> {
+        let two = |e: u32| BigUint::from(1u8) << e;
+        vec![
+            BigUint::from(3u32),
+            BigUint::from(5u32),
+            BigUint::from(97u32),
+            BigUint::from(15u32),
+            BigUint::from(u64::MAX - 58),
+            BigUint::from(u64::MAX),
+            two(64) + 13u32,
+            two(127) - 1u32,
+            two(128) + 51u32,
+            two(192) - two(64) - 1u32,
+            two(255) - 19u32,
+            two(256) - 189u32,
+            two(256) - 1u32,
+            two(257) - 93u32,
+            two(384) - two(128) - two(96) + two(32) - 1u32,
+            two(521) - 1u32,
+            two(576) - 3u32,
+            two(577) - 5u32,
+            crate::ecc::curve::CurveParams::p256().p.clone(),
+            crate::ecc::curve::CurveParams::secp256k1().p.clone(),
+        ]
+    }
+
+    #[test]
+    fn matches_biguint_ladder() {
+        let mut rng = StdRng::seed_from_u64(0x6d6f_6e74);
+        for m in moduli() {
+            let fe = |v: BigUint| FieldElement::new(v, m.clone());
+            for round in 0..6 {
+                let draw = |rng: &mut StdRng| match round {
+                    0 => BigUint::from(0u8),
+                    1 => BigUint::from(1u8),
+                    2 => &m - 1u32,
+                    _ => rng.gen_biguint_below(&m),
+                };
+                let (x, y, a) = (draw(&mut rng), draw(&mut rng), draw(&mut rng));
+                let pt = Point::Affine { x: fe(x), y: fe(y) };
+                let a = fe(a);
+                let mut scalars = vec![
+                    BigUint::from(0u8),
+                    BigUint::from(1u8),
+                    BigUint::from(2u8),
+                    BigUint::from(3u8),
+                    &m - 1u32,
+                    m.clone(),
+                    &m + 1u32,
+                    BigUint::from(1u8) << 300,
+                ];
+                for _ in 0..4 {
+                    scalars.push(rng.gen_biguint(m.bits() + 3));
+                }
+                for k in &scalars {
+                    let fast = catch_unwind(AssertUnwindSafe(|| pt.scalar_mul(k, &a)));
+                    let slow = catch_unwind(AssertUnwindSafe(|| pt.scalar_mul_biguint(k, &a)));
+                    match (fast, slow) {
+                        (Ok(f), Ok(s)) => assert_eq!(f, s, "m={m} round={round} k={k}"),
+                        (Err(_), Err(_)) => {}
+                        (f, s) => panic!(
+                            "m={m} k={k}: fast panicked={} reference panicked={}",
+                            f.is_err(),
+                            s.is_err()
+                        ),
+                    }
+                }
+            }
+        }
+    }
+
+    /// Moduli and operands the fixed-width path must decline (even,
+    /// unreduced, mixed moduli) still give the `BigUint` ladder's answer.
+    #[test]
+    fn declines_what_it_cannot_do() {
+        let m = BigUint::from(1u8) << 130;
+        let fe = |v: u32, m: &BigUint| FieldElement::new(BigUint::from(v), m.clone());
+        let pt = Point::Affine {
+            x: fe(5, &m),
+            y: fe(7, &m),
+        };
+        let k = BigUint::from(77u32);
+        assert_eq!(
+            pt.scalar_mul(&k, &fe(1, &m)),
+            pt.scalar_mul_biguint(&k, &fe(1, &m))
+        );
+        let m = BigUint::from(1_000_003u32);
+        let unreduced = Point::Affine {
+            x: FieldElement {
+                value: BigUint::from(2_000_010u32),
+                modulus: m.clone(),
+            },
+            y: fe(7, &m),
+        };
+        let a = fe(2, &m);
+        assert_eq!(
+            unreduced.scalar_mul(&k, &a),
+            unreduced.scalar_mul_biguint(&k, &a)
+        );
+        let other = BigUint::from(1_000_033u32);
+        let a_other = fe(2, &other);
+        let pt = Point::Affine {
+            x: fe(5, &m),
+            y: fe(7, &m),
+        };
+        assert_eq!(
+            pt.scalar_mul(&k, &a_other),
+            pt.scalar_mul_biguint(&k, &a_other)
+        );
+    }
+}
+
+/// `FieldElement::pow`'s 256-bit Montgomery path against `mod_pow_ct`.
+#[cfg(test)]
+mod pow_256_differential {
+    use super::*;
+    use num_bigint::RandBigInt;
+    use rand::{rngs::StdRng, SeedableRng};
+
+    #[test]
+    fn pow_and_inv_match_mod_pow_ct() {
+        let mut rng = StdRng::seed_from_u64(0x706f_7732);
+        let mut mods = vec![
+            crate::ecc::curve::CurveParams::p256().p.clone(),
+            crate::ecc::curve::CurveParams::secp256k1().p.clone(),
+            (BigUint::from(1u8) << 256) - 1u32,
+            (BigUint::from(1u8) << 255) + 1u32,
+        ];
+        mods.push(BigUint::from(1u8) << 255); // even: declined
+        mods.push((BigUint::from(1u8) << 255) - 19u32); // 255 bits: declined
+        for m in mods {
+            let bits = m.bits() as usize;
+            let mut bases = vec![
+                BigUint::from(0u8),
+                BigUint::from(1u8),
+                &m - 1u32,
+                &m + 5u32,
+                &m * 3u32 + 2u32,
+            ];
+            for _ in 0..4 {
+                bases.push(rng.gen_biguint_below(&m));
+            }
+            let mut exps = vec![
+                BigUint::from(0u8),
+                BigUint::from(1u8),
+                BigUint::from(2u8),
+                &m - 2u32,
+                &m - 1u32,
+                BigUint::from(1u8) << 256,
+                (BigUint::from(1u8) << 300) + 12345u32,
+            ];
+            for _ in 0..3 {
+                exps.push(rng.gen_biguint(bits as u64));
+            }
+            for b in &bases {
+                let fe = FieldElement {
+                    value: b.clone(),
+                    modulus: m.clone(),
+                };
+                if (b % &m).bits() != 0 {
+                    assert_eq!(
+                        fe.inv().unwrap().value,
+                        crate::utils::mod_pow_ct(b, &(&m - 2u32), &m, bits),
+                        "inv m={m} b={b}"
+                    );
+                }
+                for e in &exps {
+                    let fe = FieldElement {
+                        value: b.clone(),
+                        modulus: m.clone(),
+                    };
+                    assert_eq!(
+                        fe.pow(e).value,
+                        crate::utils::mod_pow_ct(b, e, &m, bits),
+                        "m={m} b={b} e={e}"
+                    );
+                }
             }
         }
     }

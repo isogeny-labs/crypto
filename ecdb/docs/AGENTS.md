@@ -8,6 +8,10 @@ It holds:
   isogeny-walk outputs and the trait catalogue;
 - 20,815 genus-2 and genus-3 cover curves, their Jacobians and explicit
   covers;
+- 128 Ciani plane quartics (genus 3, non-hyperelliptic, family
+  `ciani-quartic`) over F_p, p < 64, with their three elliptic quotients
+  (`curve_morphism` kind `quotient`) and L(Jac C) = L(E_x) L(E_y) L(E_z)
+  verified by exhaustive counts (`ecdb import ciani-quartics`);
 - 478 kernel-certified isogenies;
 - 61,305 priced DLP transfer routes;
 - Frobenius data, End(E), volcano levels, embedding degrees, twists and
@@ -44,11 +48,27 @@ It holds:
   graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
   and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
   `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the rational ℓ-isogenies for ℓ = 7, 11, 13 of every curve over F_p, p < 2^10,
+  computed by ecdb (`ecdb import ell-isogenies`) and cross-checked against
+  Φ_ℓ. A curve's ℓ-neighbourhood is complete exactly when it has a
+  `curve_ell_torsion` row for that ℓ with a non-null `rational_isogenies`;
+  F_7, F_11 and F_13 are skipped at ℓ = p.
 - the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
   the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
   direction (horizontal, ascending, descending). End(E) is stored for 149,593
   census curves whose conductor is {2, 3, 5}-smooth; `ecdb import end-rings`
   computes it for every other ordinary census curve (Kohel's criterion).
+- Frobenius on E[ℓ] (ℓ ≤ 13) of every census curve: `curve_ell_torsion`
+  (action, rational ℓ-isogenies, torsion and isogeny field degrees, ψ_ℓ
+  factor degrees) and `frobenius_ell` (characteristic polynomial mod ℓ,
+  depth, splitting), from `ecdb import ell-torsion`.
+  `ecdb import levels57` certifies the ℓ = 5, 7 levels of every ordinary
+  census curve from rational isogenies it computes, replacing upper bounds
+  (`level_at_most`) with exact levels.
+- genus-2 curves glued from census-fp pairs with full rational 2-torsion
+  over F_p, p < 50 (`ecdb import gluings`, Howe–Leprévost–Poonen Prop. 4):
+  family `gluing`, the two degree-2 maps C -> E1, C -> E2 as `curve_morphism`
+  kind `gluing_2_2`, and L(Jac C) = L(E1) L(E2), verified by point counts.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).
@@ -158,6 +178,10 @@ repository's files matches the checkout.
     equal traces give `isomorphism` (same model) or `birational_model_change`
     (e.g. Montgomery or Edwards against Weierstrass).
   - Sextic and quartic twists at j = 0, 1728 are not recorded yet.
+  - `prym_complement` links the target E of a genus-2 cover H to E', the
+    other elliptic factor of Jac(H) ~ E x E'. Its `map` names H. E' is a
+    curve of family `prym-complement`, and `av_component` holds the
+    decomposition ([`SCHEMA.md`](SCHEMA.md), "Prym complements").
   - None of them transports a discrete logarithm. A walk needs an `isogeny`
     row with its kernel certificate, as the typed curve-link rules require.
 - **GLV.** An endomorphism of kind `glv` with a non-null `eigenvalue` was

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T16:19:11Z",
+ "id": "PCC-20261112-f99da7",
+ "kind": "theorem",
+ "producer": {
+  "commit": "fdfe8c832bf586403537677466e3a5815db63717",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "3d228184b32342d6d72165d5c6f322364473e92ca161837d7d7bfc166ee6298e",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+   "theorem": "PartialFrobenius.rational_bridge_agreement"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Finite symplectic4module/Frobenius orbit/publicCRT and IntModule rational normalization/directbridge comparison at exact hypotheses. Actualtorsionbases/Weilforms,AV/group-schemequotient/degree/descent and rationaldomainorder/fixedimage/clearedmap identification remain native/written bridges;not a full formalAVtheory or scientificsignature.",
+ "statement": "theorem rational_bridge_agreement {J E T : Type} [IntModule T] (n r : Int) (norm : J \u2192 E) (pull : E \u2192 T) (phi : E \u2192 E) (transfer : J \u2192 T) (fixed : \u2200 x, phi (norm x)=norm x) (cleared : \u2200 x, n \u2022 transfer x=pull (phi (norm x))) (inverse : \u2200 y : T, r \u2022 (n \u2022 y)=y) : \u2200 x, transfer x=r \u2022 pull (norm x)"
+}

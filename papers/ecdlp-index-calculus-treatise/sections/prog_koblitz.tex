@@ -320,7 +320,10 @@ In order:
   $4.662\cdot10^{-12}$ of the subgroup and no natural relation was found.
   On the 81-bit $a=0$ gate curve, SAT and XCNF decompositions succeed only
   with a known witness, and the prebuilt-base question is an open problem
-  record.
+  record. The 14 November gates on the D18 and K2048 bases solve
+  constructed controls but no public natural query within $10^6$ conflicts,
+  and on K2048 the solver misses a known model once the witness pins are
+  removed (\S\ref{sec:n83l-gates}).
 \item \emph{The $a=1$ point, 7--12 October.} The archived K600 point read
   $8.2\times$ online and was re-measured slower (above).
 \item \emph{Root-index capacity, 13--16 October} (25 directories). Root-index
@@ -519,6 +522,102 @@ operation $98$ and $14{,}389$ times the measured one
 (\art{research/logs_oversampling_20261111/full/break_even.json};
 \texttt{[pcc:unverified]}).
 
+\paragraph{Set-up components of the rule's pipeline, 12--15 November.}
+Table~A on \texttt{origin/main} (\texttt{ec3b88e2c4}) still reads rule v9;
+no Table~A row has changed since. Seven exploration records then
+measured set-up levers of the same Koblitz descent at \texttt{k0n53}
+($\log_2r=44.3$) and \texttt{k0n61} ($\log_2r=47.2$), on a 4-vCPU Xeon
+container with AVX-512, one thread (the build-pairing record names the
+host; the later records say ``this session's container''). A step probe of the folded pair-table
+build put it at $34.58$ and $35.48$\,ns per stored pair, of which pushing
+pairs into partition streams took $15.07$ and $13.85$ and the counting sort
+with the filter fill $11.63$ and $12.88$; forming the pairs (additions and
+keys) took about 7\,ns
+(\art{research/ic_tool_program/explorations/build-steps-20261113/README.md}).
+Table~\ref{tab:prog_koblitz-setupab} lists the A/B records that followed.
+Each was frozen before its first row, ran 41--44 rounds with a
+same-session A/A, and recorded zero identity mismatches between arms. They are component results on this host class: none has a
+validation file, a matched rho or a board row, so the distance remaining to
+rho is still Table~A's $4.08$--$11.13\times$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.2\linewidth}lll>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lever (date) & Stage & \texttt{k0n53} & \texttt{k0n61} & Outcome \\
+\midrule
+Twin pairing in the build (12--13 Nov) & build & $1.044$ $[1.028,1.064]$ & $1.036$ $[0.991,1.068]$ & not established; reverted \\
+Filter lookahead 64 for 32 (12--13 Nov) & collect & $0.997$ $[0.978,1.015]$ & $0.997$ $[0.966,1.055]$ & no effect; reverted \\
+Partition-local filter word, \texttt{Top} (13 Nov) & build & $1.104$ $[1.069,1.142]$ & $1.142$ $[1.098,1.164]$ & established; CPU default \\
+ & set-up & $1.033$ $[1.007,1.061]$ & $1.000$ $[0.983,1.034]$ & not established \\
+One packed stream a partition (14 Nov) & build & $1.244$ $[1.214,1.276]$ & $1.252$ $[1.223,1.266]$ & established; default \\
+ & set-up & $1.068$ $[1.051,1.080]$ & $1.038$ $[1.020,1.050]$ & established at \texttt{k0n53} only \\
+Split least-rotation min chains (14 Nov) & collect & $1.020$ $[1.006,1.034]$ & $1.019$ $[1.004,1.035]$ & not established; opt-in \\
+Block-filled filter tests (15 Nov) & collect & $1.086$ $[1.071,1.121]$ & $1.097$ $[1.076,1.115]$ & established; default \\
+ & set-up & $1.049$ $[1.027,1.074]$ & $1.086$ $[1.056,1.102]$ & established at \texttt{k0n61} only \\
+\bottomrule
+\end{tabularx}
+\caption[]{Set-up A/B records on the Table~A Koblitz descent, 12--15
+November: median ratio old/new with 95\% interval (above 1: the new arm
+is faster), as the sources state them; ``established'' is each frozen
+rule's verdict against its A/A. Measured on one 4-vCPU Xeon container;
+\texttt{[pcc:unverified]}, no validation file. A two-level presence filter
+was dropped at micro-benchmark, and a lagged run prefetch and a doubled
+filter were dropped after three exploratory rounds an arm. Sources: the
+\texttt{README.md} of \texttt{build-pairing-lookahead-20261112},
+\texttt{filter-layout-20261113}, \texttt{fold-pack-20261114},
+\texttt{key-chains-20261114}, \texttt{scan-vfilter-20261115} and
+\texttt{admitted-stage-20261115} under
+\art{research/ic_tool_program/explorations/}.}
+\label{tab:prog_koblitz-setupab}
+\end{table}
+
+The partition-local filter word cut the sort-and-fill step from $10.69$ to
+$7.86$\,ns per stored pair at \texttt{k0n53}
+(\art{research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json}),
+so the \texttt{Top} layout builds faster. The leaderboard's 14 November
+reconciliation printed the same $1.104$ and $1.142$ as ``Top/Low'' and called
+\texttt{Top} slower to build (\art{docs/ic/LEADERBOARD.md}); the source's
+ratios are old (\texttt{Low}) over new (\texttt{Top}), and the board was
+corrected on 15 November (PR~\#4262). The reconciliation
+keeps the old ecbench identifiers on \texttt{Low} and names \texttt{Top}
+only in explicit \texttt{\_v2} identifiers.
+
+\paragraph{K1 pair-table base sized for $n$, 14 November.} Outside
+Tables~A--C, the board gained a validated section on two K1 Koblitz curves
+in ecbench counted GAE, one target per process with every phase priced,
+against strong signed-Frobenius rho in the same session
+(Table~\ref{tab:prog_koblitz-k1lgrow}). The pair-table dimension was
+re-selected per $n$ (9 at $n=23$, 10 at $n=29$) in place of the fixed
+dimension 7. The validator (\texttt{VAL-20261114-d9190c}) admits both
+improvements over dimension 7 as measured and positive across the band;
+rho stays cheaper at every weight. This is a parameter re-selection at fixed
+$n$; the $n=29$ curve has a 15.37-bit subgroup (cofactor 12{,}646), so
+$n$ there is the field degree, not the problem size
+(\art{research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrlll@{}}
+\toprule
+$n$ & $\log_2r$ & Gap to rho, bits & Before (dim.~7) & Gain, bits \\
+\midrule
+23 & 22.00 & $5.59/5.66/5.95$ & $6.91/6.94/7.09$ & $1.32/1.28/1.14$ \\
+ & & $[5.54,5.65]$ at $w=0$ & & $[1.26,1.36]$ at $w=0$ \\
+29 & 15.37 & $9.47/9.52/9.86$ & $10.36/10.46/11.06$ & $0.89/0.94/1.20$ \\
+ & & $[9.38,9.54]$ at $w=0$ & & $[0.67,1.06]$ at $w=0$ \\
+\bottomrule
+\end{tabular}
+\caption[]{K1 Koblitz, one target, pair-table base of dimension 9 ($n=23$)
+and 10 ($n=29$). Gap $=\log_2(S_{\mathrm{IC}}/S_{\mathrm{rho}})$ at
+$w=0/0.1/1$ GAE per native operation: the distance remaining. Eight
+targets $\times$ five rounds per $n$, L0 counted cost (wall time not
+certified). Validated (\texttt{VAL-20261114-d9190c}). Source:
+\art{docs/ic/LEADERBOARD.md}, section ``K1 Koblitz, one target, ecbench
+counted GAE''.}
+\label{tab:prog_koblitz-k1lgrow}
+\end{table}
+
 \section{ECC2K-130}\label{sec:ecc2k130}
 
 ECC2K-130 is the $a=0$, $n=131$ member of the same family, with a 130-bit
@@ -623,6 +722,16 @@ that has been constructed or priced is at least about 5 bits above rho (the
 $m=4$ single-relation row, at $2^{70.79}$ bytes), most by tens of bits, and
 the one hypothetical route below rho needs a genus-130 curve that no known
 method can construct.
+
+On 14 November the owner listed seven items believed open for index
+calculus on curves of the ECC2K-130 type. A parallel sweep found items 1,
+6 and 7 and two of item 4's three baselines already built and measured in
+the repositories, measured items 2, 3 and 4(a) at toy scale with no
+improvement, and measured item 5's function-field Coppersmith gap up to
+$n=131$ (\S\ref{sec:bt-open7}; every claim \texttt{[pcc:unverified]}). Its
+consolidated table of 147 complete rows finds every prime-degree Koblitz
+arm moving away from rho as $r$ grows, by $+0.05$ to $+0.15$ in
+$\log_2(\text{IC}/\text{rho})$ per bit of $r$.
 
 \section{Factor bases closed under $\ZZ[\tau]$}
 

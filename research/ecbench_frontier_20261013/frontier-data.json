@@ -289,5 +289,21 @@
         }
       }
     ]
+  },
+  "precomputed_rho_control": {
+    "note": "Added 2026-10-20. Online wall-time ratio IC / precomputed (Bernstein-Lange) rho; above 1 means the precomputed rho is faster. Copied from stored ratio keys, not recomputed.",
+    "n61": {
+      "ic_K360_over_bl_level0_ratio_of_means": 53.10774659093966,
+      "ic_K256_over_bl_level0_ratio_of_means": 221.06874435803675,
+      "bl_table_bytes": 5711008,
+      "ic_K360_advice_bytes": 728186432,
+      "source": "research/ic_next10_20261014/09-equal-advice/results.json rungs.61"
+    },
+    "n83": {
+      "ic_over_bl_a_time_matched_median_of_paired_ratios": 16.25637777972311,
+      "ic_over_bl_b_memory_matched_median_of_paired_ratios": 42.71645985611259,
+      "index": "K3300 root11 (the control's index, not the K1798 dense index plotted online)",
+      "source": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k3300/analysis.json paired"
+    }
   }
 }

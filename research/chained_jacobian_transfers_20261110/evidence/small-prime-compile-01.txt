@@ -1,0 +1,13 @@
+error: unexpected closing delimiter: `}`
+   --> research/chained_jacobian_transfers_20261110/native/src/small_prime.rs:212:1
+    |
+ 97 |                     None=>{
+    |                           - the nearest open delimiter
+ 98 |                         let t=self.sqrt_base(self.mul(d,self.inv(self.e(self.0.nonresidue() as i64))))).ok_or("quadratic support di...
+    |                                                                                                       - missing open `(` for this delimiter
+...
+212 | }
+    | ^ unexpected closing delimiter
+
+error: aborting due to 1 previous error
+

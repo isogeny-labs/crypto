@@ -1,0 +1,252 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-relation-rank-20261027-v1",
+  "created": "2026-10-27T14:32:03Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "fdf1d7d301ad748eee6220c080f8bb15d118a361985496874075c757a85aaea1",
+    "protocol_id": "twist-relation-rank-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-relation-rank-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "a3da15bda17804c75b48bbe487e48cb4ae5cb560",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "3b9a00f6457bdb5a8f9c7c9289d9f8f4f83f35fafe4659a68e24468ade6c4eb8",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "50565f79ec340316d967f6e2b1e071daf8d0e61361fd886fa99ec9dbe5a4f774",
+      "commit": "a3da15bda17804c75b48bbe487e48cb4ae5cb560"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "a3da15bda17804c75b48bbe487e48cb4ae5cb560"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "rank-native-original-attempt",
+      "arm": "native",
+      "instance_id": "same-eighteen-archived-matrices",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "systems": 18
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native RREF/nullspace and independent GP matker/matinverseimage; strict stderr gate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "80052a20f9d52aa5bad20dc1f1295bd878f76b24c290f7bcee78310a96fdde34",
+          "bytes": 2712,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "51e300eaf55708159b9f79c3b434bf8dfecb3739fee5256eff68c71f57f45dba",
+          "bytes": 1831,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "e826aced5d694358af452c9f47370e995a31928949f34766ba5fb483a9822124",
+          "bytes": 1040,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v2/RECEIPT.json",
+          "sha256": "86cb98a66ee1221fed589841cf16d1a86faa2033b4e8d9d04646578c5e65c820",
+          "bytes": 1268,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T14:27:19.244Z",
+      "finished_at": "2026-10-27T14:27:19.259Z",
+      "worker": "50565f79ec340316d967f6e2b1e071daf8d0e61361fd886fa99ec9dbe5a4f774",
+      "backend_ref": "runs/rank-v1"
+    },
+    {
+      "run_id": "rank-pari-attempt-1",
+      "arm": "pari",
+      "instance_id": "same-eighteen-archived-matrices",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "native RREF/nullspace and independent GP matker/matinverseimage; strict stderr gate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "80052a20f9d52aa5bad20dc1f1295bd878f76b24c290f7bcee78310a96fdde34",
+          "bytes": 2712,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "51e300eaf55708159b9f79c3b434bf8dfecb3739fee5256eff68c71f57f45dba",
+          "bytes": 1831,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "e826aced5d694358af452c9f47370e995a31928949f34766ba5fb483a9822124",
+          "bytes": 1040,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v2/RECEIPT.json",
+          "sha256": "86cb98a66ee1221fed589841cf16d1a86faa2033b4e8d9d04646578c5e65c820",
+          "bytes": 1268,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "cd268cebd64c27571ccbbfddd09f9a06cea6ed288c55e9bcce9ac2e58375b440",
+      "bytes": 940,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "999c57cb162e58e9d411d51b954f10ec3642acb199d45595dba6b75ddf7288dd",
+      "bytes": 10273,
+      "kind": "protocol"
+    },
+    {
+      "path": "PARI_V2_FREEZE.json",
+      "sha256": "b9fcea1848b2cbace45bab36dbedbc0725ebad79dc6d4c41344d4f4b857ccf67",
+      "bytes": 635,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/bin/twist-relation-rank.rs",
+      "sha256": "1185f77e0006d2728aabe0f9e5e290abc595b34d219d9ba7a27abcb20fd1bfc4",
+      "bytes": 6892,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "8844b7e9fca6b4aa879fbfe001a8c7a4afb6b4ad65fe203b37e0820ba463fac3",
+        "bytes": 9072,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Original export retains failed GP verification despite process0/sentinel. Version2 uses the same actual native attempt plus a separately frozen reference preload replay; do not pool exports as independent runs. No matrix, expected rank, witness, target or scientific native output changed.",
+      "by": "native publication tool"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

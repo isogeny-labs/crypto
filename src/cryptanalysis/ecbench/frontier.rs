@@ -1570,7 +1570,7 @@ mod tests {
         SizeRow {
             slug: format!("c{}", sz.0),
             log2_r: sz.0,
-            r,
+            r: r.into(),
             field_bits: 20,
             automorphisms_available: 2,
             floor_s: floor,
@@ -1590,6 +1590,7 @@ mod tests {
             levels: BTreeMap::new(),
             axes,
             band: vec![point(0.0), point(0.1), point(1.0)],
+            calibrated: None,
         }
     }
 

@@ -4,7 +4,9 @@
 //! curve row (with its Jacobian) and a curve_morphism to E. Existence over the
 //! declared field only: no descent, subgroup-map or DLP-cost claim.
 //! The exact L-polynomial of each cover source's Jacobian is computed at the
-//! end of the import ([`super::cover_lpoly`]).
+//! end of the import ([`super::cover_lpoly`]), the Prym complement E' of
+//! each genus-2 source after it ([`super::cover_prym`]), then the Richelot
+//! (2,2)-isogenous curves over small prime fields ([`super::richelot`]).
 
 use super::{bulk, bulk1, Ctx, Report};
 use crate::field::Fq;
@@ -140,7 +142,7 @@ fn cover_map(k: &Fq, cert: &Value) -> Result<Value> {
     Ok(map)
 }
 
-fn poly_text(c: &[String], var: &str) -> String {
+pub fn poly_text(c: &[String], var: &str) -> String {
     let terms: Vec<String> = c
         .iter()
         .enumerate()
@@ -220,5 +222,9 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("field_status_updates", bulk1(client, FIELD_STATUS_SQL, &rows).await?);
     // The Frobenius data of every cover source, new or imported earlier.
     super::cover_lpoly::import(ctx, &mut report).await?;
+    // Then the Prym complement E' of every genus-2 source with an L-polynomial.
+    super::cover_prym::import(ctx, &mut report).await?;
+    // Richelot (2,2)-isogenous curves of the small-p sources, checked against those counts.
+    super::richelot::import(ctx, &mut report).await?;
     Ok(report)
 }

@@ -1,0 +1,1190 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-interval-width-costs-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-width-panel",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "DRAFT: production build pin, runtime preflight and execution admission remain. No production panel executed."
+  },
+  "question": "On the fixed20 stride/cap cases, how does initial width policy change separate interval-engine event counts before and after doubling?",
+  "claims": [
+    {
+      "id": "C-values",
+      "text": "All coefficients agree with the dense Rust (X-1)^((r-1)/2) reference for every arm and phase.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-deltas",
+      "text": "Report every per-case and per-phase planned/shared and separate/shared counter delta.",
+      "class": "comparative",
+      "decided_by": [
+        "planned-old",
+        "separate-old"
+      ],
+      "if_supported": "Preserve separate signed dimensions including regressions.",
+      "if_not_supported": "Reject incomplete or invalid panel; retain failure."
+    }
+  ],
+  "arms": [
+    {
+      "id": "old",
+      "role": "reference",
+      "description": "Shared original width",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-width-panel/main.rs",
+            "-o",
+            "panel"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "policy": "old"
+      }
+    },
+    {
+      "id": "planned",
+      "role": "candidate",
+      "description": "Shared width planned from2m before first use",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-width-panel/main.rs",
+            "-o",
+            "panel"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "policy": "planned"
+      },
+      "same_instrument_as": "old"
+    },
+    {
+      "id": "separate",
+      "role": "candidate",
+      "description": "Separate native-width engines",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-width-panel/main.rs",
+            "-o",
+            "panel"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "policy": "separate"
+      },
+      "same_instrument_as": "old"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Repeat original shared width",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-width-panel/main.rs",
+            "-o",
+            "panel"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "policy": "aa"
+      },
+      "same_instrument_as": "old"
+    },
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "Original shared width plus one scalar multiplication in each phase",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-width-panel/main.rs",
+            "-o",
+            "panel"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "policy": "positive"
+      },
+      "same_instrument_as": "old"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "Exactly +1 scalar_products in each phase, all other counters and coefficients unchanged.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Finite deterministic accounting comparison, no population-detection claim. Parser mutation tests reject malformed rows, counter failures and coefficient mismatches."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "policy",
+        "levels": [
+          "old",
+          "planned",
+          "separate"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Four (r,m) pairs and five caps",
+        "how": "Pinned native constants; dense oracle independent of arm"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One compiler/binary/flags; single thread",
+        "how": "Bind production closure and binary before freeze"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "Five arms rotated by case id; initial then doubled",
+        "how": "No timed metric; preserve phase boundary"
+      },
+      {
+        "name": "lifetime",
+        "treatment": "fixed",
+        "value": "Fresh context for each arm; shared cache survives between phases",
+        "how": "Interval scope excludes caller vectors and destruction outside products"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unblinded exact vector differences",
+        "how": "Pinned strict parser; no weighted total"
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 0,
+        "how": "No timed primary"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Admitted execution host",
+        "how": "Record kernel CPU and environment; allocator counts are build-dependent"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "planned-old",
+        "arms": [
+          "old",
+          "planned"
+        ],
+        "differs_in": [
+          "policy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "separate-old",
+        "arms": [
+          "old",
+          "separate"
+        ],
+        "differs_in": [
+          "policy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "repeat",
+        "arms": [
+          "old",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Fixed rotation by case index; each arm gets a fresh context. Deterministic counters only.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261107
+      ],
+      "nonce": null,
+      "note": "No randomness; seed is an identity label, all cases enumerated in source."
+    },
+    "instance_sampling": {
+      "rule": "(281,35),(1009,63),(2017,63),(2521,315) crossed with caps1,2,7,16,64; all five arms and both phases.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 20,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact fixed-fixture integer comparison; no population-power or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "initial.scalar_products",
+        "name": "initial.scalar_products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. scalar_products",
+        "source": "export.runs.measurements.counted.initial.scalar_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.polynomial_products",
+        "name": "initial.polynomial_products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. polynomial_products",
+        "source": "export.runs.measurements.counted.initial.polynomial_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.scalar_products",
+        "name": "doubled.scalar_products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. scalar_products",
+        "source": "export.runs.measurements.counted.doubled.scalar_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.polynomial_products",
+        "name": "doubled.polynomial_products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. polynomial_products",
+        "source": "export.runs.measurements.counted.doubled.polynomial_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "initial.eea_inverse_calls",
+        "name": "initial.eea_inverse_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. eea_inverse_calls",
+        "source": "export.runs.measurements.counted.initial.eea_inverse_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.pow_r_minus_2_calls",
+        "name": "initial.pow_r_minus_2_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. pow_r_minus_2_calls",
+        "source": "export.runs.measurements.counted.initial.pow_r_minus_2_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.alloc_calls",
+        "name": "initial.alloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. alloc_calls",
+        "source": "export.runs.measurements.counted.initial.alloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.zeroed_calls",
+        "name": "initial.zeroed_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. zeroed_calls",
+        "source": "export.runs.measurements.counted.initial.zeroed_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.realloc_calls",
+        "name": "initial.realloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. realloc_calls",
+        "source": "export.runs.measurements.counted.initial.realloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.requested_bytes",
+        "name": "initial.requested_bytes",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. requested_bytes",
+        "source": "export.runs.measurements.counted.initial.requested_bytes",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.allocation_failures",
+        "name": "initial.allocation_failures",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. allocation_failures",
+        "source": "export.runs.measurements.counted.initial.allocation_failures",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "initial.dealloc_calls",
+        "name": "initial.dealloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "initial incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. dealloc_calls",
+        "source": "export.runs.measurements.counted.initial.dealloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.eea_inverse_calls",
+        "name": "doubled.eea_inverse_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. eea_inverse_calls",
+        "source": "export.runs.measurements.counted.doubled.eea_inverse_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.pow_r_minus_2_calls",
+        "name": "doubled.pow_r_minus_2_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. pow_r_minus_2_calls",
+        "source": "export.runs.measurements.counted.doubled.pow_r_minus_2_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.alloc_calls",
+        "name": "doubled.alloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. alloc_calls",
+        "source": "export.runs.measurements.counted.doubled.alloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.zeroed_calls",
+        "name": "doubled.zeroed_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. zeroed_calls",
+        "source": "export.runs.measurements.counted.doubled.zeroed_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.realloc_calls",
+        "name": "doubled.realloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. realloc_calls",
+        "source": "export.runs.measurements.counted.doubled.realloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.requested_bytes",
+        "name": "doubled.requested_bytes",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. requested_bytes",
+        "source": "export.runs.measurements.counted.doubled.requested_bytes",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.allocation_failures",
+        "name": "doubled.allocation_failures",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. allocation_failures",
+        "source": "export.runs.measurements.counted.doubled.allocation_failures",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "doubled.dealloc_calls",
+        "name": "doubled.dealloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "doubled incremental phase. Separate interval-region event; definitions in predecessor README. Not total work or peak memory. dealloc_calls",
+        "source": "export.runs.measurements.counted.doubled.dealloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "initial.scalar_products",
+      "initial.polynomial_products",
+      "initial.eea_inverse_calls",
+      "initial.pow_r_minus_2_calls",
+      "initial.alloc_calls",
+      "initial.zeroed_calls",
+      "initial.realloc_calls",
+      "initial.requested_bytes",
+      "initial.allocation_failures",
+      "initial.dealloc_calls",
+      "doubled.scalar_products",
+      "doubled.polynomial_products",
+      "doubled.eea_inverse_calls",
+      "doubled.pow_r_minus_2_calls",
+      "doubled.alloc_calls",
+      "doubled.zeroed_calls",
+      "doubled.realloc_calls",
+      "doubled.requested_bytes",
+      "doubled.allocation_failures",
+      "doubled.dealloc_calls"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "source_commit",
+      "protocol_sha256",
+      "image_digest",
+      "job_uid",
+      "pod_uid",
+      "environment",
+      "memory_layout",
+      "admission_receipt",
+      "raw_sha256",
+      "external_exit_status"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 1024,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "PROPOSED ceiling including build, idle, failures, storage and transfer; no reserved funds, no submission authority",
+      "concurrency": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "20 cases x5 arms x2 phases =200 rows. One120s attempt, no retry/resume. Preserve partial failures.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing, extra, reordered or duplicate rows; malformed identities/counts; coefficient domain or length errors; overflow or allocation failure.",
+    "Dense native oracle or value agreement fails; AA differs; positive differs by anything other than +1 scalar product per phase.",
+    "Unfrozen protocol, unbound production binary/source, unsuccessful producer exit or missing execution admission."
+  ],
+  "decision_rule": {
+    "text": "Validate entire panel and controls, then report all per-case separate signed deltas. No weighted total or timing inference.",
+    "comparison_ids": [
+      "planned-old",
+      "separate-old"
+    ],
+    "threshold": "Exact signed deltas in named event dimensions",
+    "statistic": "Per-case and per-phase metric vector minus old shared width",
+    "interval": "Exact fixed-fixture values; no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Separate signed integers; no selective weighting",
+    "verdict_vocabulary": [
+      "valid_counted_deltas",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.py",
+      "sha256": "871999a2601d70dd81f71bb0acbba104ecf4e79b71e2cbe66d85275970857c96"
+    },
+    "inputs": [
+      "200 ordered rows plus source-bound successful native receipt"
+    ],
+    "outputs": [
+      "comparison.json with every separate signed delta",
+      "Canonical experiment.export/v1 with100 execution cells and two named incremental phases each"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-phase product and request-byte deltas; no summation across units"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Collecting panel before committed freeze, production binding and admission",
+    "Replacing original4563-case cohort or public-target panel with coefficient fixtures",
+    "Treating software fixture or synthetic parser tests as research rows",
+    "Summing inverse events and internal products or calling requested bytes peak memory",
+    "Using these component counts as end-to-end timing"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-work-accounting/README.md",
+      "provenance": "internal",
+      "claim": "Counter scope and software qualification",
+      "verified_by": "Source review"
+    },
+    {
+      "ref": "../feature-native-planned-width/width-plan-checks.rs",
+      "provenance": "internal",
+      "claim": "Fixed case panel and separate initial/doubled phases",
+      "verified_by": "Source review"
+    },
+    {
+      "ref": "../feature-native-resultant-protocol/authority/docs/experiment-protocol.md",
+      "provenance": "internal",
+      "claim": "Canonical freeze and export requirements",
+      "verified_by": "Source review"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "bindings": {
+      "main.rs": {
+        "path": "main.rs",
+        "sha256": "80926c6089b69ae1aba3ab883e802675f89f420395db44189049be730677748e"
+      },
+      "panel.rs": {
+        "path": "panel.rs",
+        "sha256": "f575d6ee92ea3d6a8207de41fa428b1766a4ea1bb29fe9aecc3faede67a8001b"
+      },
+      "analyze.py": {
+        "path": "analyze.py",
+        "sha256": "871999a2601d70dd81f71bb0acbba104ecf4e79b71e2cbe66d85275970857c96"
+      },
+      "generation.json": {
+        "path": "generation.json",
+        "sha256": "5e75b708812c126f88715b160c47e96ce16887e933484275bfdb357c2ecc3595"
+      },
+      "export.py": {
+        "path": "export.py",
+        "sha256": "e2632f536143b5f469b866263f892fd590f57f497f00095d0130035c6bf624d5"
+      },
+      "native:main.rs": {
+        "path": "main.rs",
+        "sha256": "80926c6089b69ae1aba3ab883e802675f89f420395db44189049be730677748e"
+      },
+      "native:../feature-native-work-accounting/metered-polynomial.rs": {
+        "path": "../feature-native-work-accounting/metered-polynomial.rs",
+        "sha256": "98a2a76377863064077262b2471db12fa2b1a1ccc9b27e3b7e5cdc71a43d1ae0"
+      },
+      "native:../feature-native-work-accounting/meter.rs": {
+        "path": "../feature-native-work-accounting/meter.rs",
+        "sha256": "533392c70d7ac314d24ba3c20b68a4239d21e25ba20e897b28c6ce4472ae449f"
+      },
+      "native:../feature-native-work-accounting/lib.rs": {
+        "path": "../feature-native-work-accounting/lib.rs",
+        "sha256": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de"
+      },
+      "native:../feature-native-work-accounting/geometry.rs": {
+        "path": "../feature-native-work-accounting/geometry.rs",
+        "sha256": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892"
+      },
+      "native:../feature-native-work-accounting/division.rs": {
+        "path": "../feature-native-work-accounting/division.rs",
+        "sha256": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc"
+      },
+      "native:../feature-native-work-accounting/polynomial.rs": {
+        "path": "../feature-native-work-accounting/polynomial.rs",
+        "sha256": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626"
+      },
+      "native:../feature-orbit-local-terms/local.rs": {
+        "path": "../feature-orbit-local-terms/local.rs",
+        "sha256": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+      },
+      "native:../feature-native-hgcd-roots/gcd.rs": {
+        "path": "../feature-native-hgcd-roots/gcd.rs",
+        "sha256": "9832817f5a0687ae8aa2b41a1970916f64e9b3beb531d74d536cd250e4b737b0"
+      },
+      "native:instrument-checks.rs": {
+        "path": "instrument-checks.rs",
+        "sha256": "a9185e324fc29eff2fb71b616414db73c0f574d7bf7fa7835976755a6731d0a2"
+      },
+      "native:../feature-native-work-accounting/schedule.rs": {
+        "path": "../feature-native-work-accounting/schedule.rs",
+        "sha256": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706"
+      },
+      "native:../feature-native-work-accounting/allocation.rs": {
+        "path": "../feature-native-work-accounting/allocation.rs",
+        "sha256": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b"
+      },
+      "native:../feature-native-work-accounting/class-source.rs": {
+        "path": "../feature-native-work-accounting/class-source.rs",
+        "sha256": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91"
+      },
+      "native:../feature-native-monomial-recovery/recovery.tsv": {
+        "path": "../feature-native-monomial-recovery/recovery.tsv",
+        "sha256": "1da82499ad1c6266b485283045d55337be74a4e95d1ef83f67c5c36bdb241d61"
+      },
+      "native:../feature-native-work-accounting/reference.rs": {
+        "path": "../feature-native-work-accounting/reference.rs",
+        "sha256": "6970b3421f864fe917eefee6bc81e934bc4a6ccbf1e8cd654bab45a3a57b3d50"
+      },
+      "native:../feature-native-work-accounting/orbit.rs": {
+        "path": "../feature-native-work-accounting/orbit.rs",
+        "sha256": "05865d37a397af1cf37e4b971c0c27735be66f7ec7e112ae19edcd5323c2ab30"
+      },
+      "native:../feature-native-work-accounting/adapter.rs": {
+        "path": "../feature-native-work-accounting/adapter.rs",
+        "sha256": "8161633791e51e56d48e1451d9bca308e17d76459e271bacb273e7240a56bf5b"
+      },
+      "native:../feature-native-work-accounting/envelope.rs": {
+        "path": "../feature-native-work-accounting/envelope.rs",
+        "sha256": "18d161fc1809dfabc4063f6b5ae29d7138d564836f1bd8b0834a94a78a6d67e0"
+      },
+      "native:../feature-native-work-accounting/dynamic.rs": {
+        "path": "../feature-native-work-accounting/dynamic.rs",
+        "sha256": "dd7d1b16a657c5dafb21adfd94b1e78c3b87acfea1b10b0984e8466e6bbdcd46"
+      },
+      "native:../feature-native-work-accounting/trace.rs": {
+        "path": "../feature-native-work-accounting/trace.rs",
+        "sha256": "73583ddc36db707e0edbee97bbb8cfb3eb86b744209db8e7e279e1dc9db25f53"
+      },
+      "native:../feature-native-fast-moment-roots/lib.rs": {
+        "path": "../feature-native-fast-moment-roots/lib.rs",
+        "sha256": "5d10ba60b3afadedbf6bdad213b1699642d1568459cf8a151d9a92a368b0e5c4"
+      },
+      "native:../feature-native-half-gcd/polynomial.rs": {
+        "path": "../feature-native-half-gcd/polynomial.rs",
+        "sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9"
+      },
+      "native:../feature-native-inert-seed/lib.rs": {
+        "path": "../feature-native-inert-seed/lib.rs",
+        "sha256": "1fe68a36296d850dd7232526184deb565049f3fe28146dac071b66f25c257841"
+      },
+      "native:../feature-native-triple-moments/lib.rs": {
+        "path": "../feature-native-triple-moments/lib.rs",
+        "sha256": "89c1c8f8eef2d8b36e29f4d6d460f918f8584f61cb1a8170c6272947c910dcdb"
+      },
+      "native:../feature-native-standalone-source/lib.rs": {
+        "path": "../feature-native-standalone-source/lib.rs",
+        "sha256": "52feace2e3a5e3c07e6f0d6ec28ac8655b2b615fb895ca79be82e66d660a9c23"
+      },
+      "native:../feature-native-joint-window/lib.rs": {
+        "path": "../feature-native-joint-window/lib.rs",
+        "sha256": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d"
+      },
+      "native:../feature-native-value-division/lib.rs": {
+        "path": "../feature-native-value-division/lib.rs",
+        "sha256": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93"
+      },
+      "native:../feature-native-half-gcd/residual.rs": {
+        "path": "../feature-native-half-gcd/residual.rs",
+        "sha256": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4"
+      },
+      "native:../feature-native-work-accounting/planner.rs": {
+        "path": "../feature-native-work-accounting/planner.rs",
+        "sha256": "f982c8cf5acc18512338b15fe0f5713e5af9de30d24c5de2aa46181620179dd9"
+      },
+      "native:../feature-native-work-accounting/planned.rs": {
+        "path": "../feature-native-work-accounting/planned.rs",
+        "sha256": "cf58a29979d9358a261f2cced3686e46f4436f3dbf450247af6b84dc2c953803"
+      },
+      "native:../feature-native-work-accounting/workspace-checks.rs": {
+        "path": "../feature-native-work-accounting/workspace-checks.rs",
+        "sha256": "971f9710ca26141367b28a1560cce26abb2e1512e0ec1644c332164c72ef3839"
+      },
+      "native:../feature-native-work-accounting/blocks.rs": {
+        "path": "../feature-native-work-accounting/blocks.rs",
+        "sha256": "cff852625d82dcb619397aaaa2b96e92381e9eb607debd6b1fada6357989f3fc"
+      },
+      "native:../feature-native-work-accounting/checks.rs": {
+        "path": "../feature-native-work-accounting/checks.rs",
+        "sha256": "7850a85408a3c01dde92fc7df887483665a36914a8776e0b285fc4fc1963981d"
+      },
+      "native:../feature-native-work-accounting/adaptive.rs": {
+        "path": "../feature-native-work-accounting/adaptive.rs",
+        "sha256": "345b514b68da30fd3be1250a3c60eeeb599fc1f5d66853a97f30d7bec8ce773a"
+      },
+      "native:../feature-native-inert-seed/roots.rs": {
+        "path": "../feature-native-inert-seed/roots.rs",
+        "sha256": "673f0b600d4b90d89c0f2ea3493e50513dcaf4cd5ef52e0ac3de3ee665c6f90e"
+      },
+      "native:../feature-native-fast-moment-roots/roots.rs": {
+        "path": "../feature-native-fast-moment-roots/roots.rs",
+        "sha256": "673f0b600d4b90d89c0f2ea3493e50513dcaf4cd5ef52e0ac3de3ee665c6f90e"
+      },
+      "native:../feature-native-fast-moment-roots/recovery.rs": {
+        "path": "../feature-native-fast-moment-roots/recovery.rs",
+        "sha256": "afe9cbb2527d0002ae376a85b468847feea7ad49c5ece366c7c5a02a1a999039"
+      },
+      "native:../feature-native-work-accounting/block-projection.rs": {
+        "path": "../feature-native-work-accounting/block-projection.rs",
+        "sha256": "81979b20cf5c10ed5f3eb7ee078b5f22479314b94bb44bd4003a00b2795299e7"
+      },
+      "native:../feature-native-work-accounting/blocked-image.rs": {
+        "path": "../feature-native-work-accounting/blocked-image.rs",
+        "sha256": "c72bd69d0c46621eef724f60c86e5e0d3dcb62fbf486fa306e78879a566d0837"
+      },
+      "native:../feature-native-work-accounting/history.rs": {
+        "path": "../feature-native-work-accounting/history.rs",
+        "sha256": "d912ed99cfaaf21f4d5ecc9263836c6a32d156b16c25e03bd5915227c0717221"
+      },
+      "native:../feature-native-work-accounting/trace-adapter.rs": {
+        "path": "../feature-native-work-accounting/trace-adapter.rs",
+        "sha256": "382dcf9691ef3bb90e747ab0e4673a5107f36f72e06bd390879ebe35d7fa4872"
+      },
+      "native:../feature-native-work-accounting/residue-constraints.rs": {
+        "path": "../feature-native-work-accounting/residue-constraints.rs",
+        "sha256": "bfb64443682fd88fcdc259ce9ea5547aa1a00104f2a52c15691e8e130092e09c"
+      },
+      "native:../feature-native-work-accounting/implicit.rs": {
+        "path": "../feature-native-work-accounting/implicit.rs",
+        "sha256": "94d9af1040967028e3f8ecbe526d743c1a84061ddeee4d3ef96a20d97d0c37c9"
+      },
+      "native:../feature-native-work-accounting/streamed.rs": {
+        "path": "../feature-native-work-accounting/streamed.rs",
+        "sha256": "ad433e1f5e6378cdf128caefd2ff24889279c92aed1562945a876f77ca4fa205"
+      },
+      "native:../feature-native-work-accounting/interval.rs": {
+        "path": "../feature-native-work-accounting/interval.rs",
+        "sha256": "fe7b68d6276cb96530a4ec936621a957ae5c0c1e510a1453b2c99f51bc3596a4"
+      },
+      "native:../feature-native-work-accounting/progression.rs": {
+        "path": "../feature-native-work-accounting/progression.rs",
+        "sha256": "d41d06482b5973d2afa8e4178d17476a0794ffa6ef74ad703ea8590e99a801e5"
+      },
+      "native:../feature-native-work-accounting/progression-checks.rs": {
+        "path": "../feature-native-work-accounting/progression-checks.rs",
+        "sha256": "f20f43a0e8d48c0abe2d049cd4e63786ddf493481a14ded84a836b25386ca86f"
+      },
+      "native:../feature-native-work-accounting/cached.rs": {
+        "path": "../feature-native-work-accounting/cached.rs",
+        "sha256": "641959ca0e1f4a3a9b0f30c032a534d6d82d6a71ce88594a25ac695518db3f00"
+      },
+      "native:../feature-native-work-accounting/packed-checks.rs": {
+        "path": "../feature-native-work-accounting/packed-checks.rs",
+        "sha256": "0cdbfd4d8bfa333eee842428445d3a313536886622cf6a3fb73520310079df2b"
+      },
+      "native:../feature-native-work-accounting/stream-checks.rs": {
+        "path": "../feature-native-work-accounting/stream-checks.rs",
+        "sha256": "e937c907fe9d63c4a973b3b2030141b98da0448e6db2454b50c043c1ba11ba51"
+      },
+      "native:../feature-native-work-accounting/context.rs": {
+        "path": "../feature-native-work-accounting/context.rs",
+        "sha256": "a3243aa0373751dd853296c7f1042c192ab2a0aa75022ded4e3f2bad970ee000"
+      },
+      "native:../feature-native-work-accounting/engine-storage.rs": {
+        "path": "../feature-native-work-accounting/engine-storage.rs",
+        "sha256": "d6756b0ea4660b92d1caaa8ddf3bdb8b915ed53ba143101332774912e4e0a348"
+      },
+      "native:../feature-native-work-accounting/context-checks.rs": {
+        "path": "../feature-native-work-accounting/context-checks.rs",
+        "sha256": "8248c8df8a7cf9271ca8751081b1728fc6c286436ea2f8770bcc28fb75292132"
+      },
+      "native:../feature-native-work-accounting/reciprocal.rs": {
+        "path": "../feature-native-work-accounting/reciprocal.rs",
+        "sha256": "2ec6f4939386bc3c7ec707499753df98d91e5d68f1514516b3800c9c92c00f76"
+      },
+      "native:../feature-native-work-accounting/reciprocal-checks.rs": {
+        "path": "../feature-native-work-accounting/reciprocal-checks.rs",
+        "sha256": "f85b1f9ccd217f3d0a916ca0db8f162c209cef1af6734b702bd7f7fd0f7ae45c"
+      },
+      "native:../feature-native-work-accounting/quadratic.rs": {
+        "path": "../feature-native-work-accounting/quadratic.rs",
+        "sha256": "9ce2ad08c34ab09e5b8559921566dbd99feadd50cd2f565efff67be4ac0de9df"
+      },
+      "native:../feature-native-work-accounting/reciprocal-control.rs": {
+        "path": "../feature-native-work-accounting/reciprocal-control.rs",
+        "sha256": "bbc8087a0d966128db0958483b3f13c5a89532452081af54effae4447755ad2c"
+      },
+      "native:../feature-native-work-accounting/quadratic-checks.rs": {
+        "path": "../feature-native-work-accounting/quadratic-checks.rs",
+        "sha256": "3f4693ec24740d8615b15f701efba1ce57c8fe08c84d966164c1220c730ccdd8"
+      },
+      "native:../feature-native-work-accounting/persistent.rs": {
+        "path": "../feature-native-work-accounting/persistent.rs",
+        "sha256": "d2a41fe726f303fc125ee126b27045f482825c381a8b69c0c0af53666d31d20e"
+      },
+      "native:../feature-native-work-accounting/persistent-adapter.rs": {
+        "path": "../feature-native-work-accounting/persistent-adapter.rs",
+        "sha256": "ddcb6d69f523347d789e152b0303f772aca6704bbc331e8da309873ad0dc5ca4"
+      },
+      "native:../feature-native-work-accounting/persistent-checks.rs": {
+        "path": "../feature-native-work-accounting/persistent-checks.rs",
+        "sha256": "874c562ef4e0b0e9d1ec5a1bce881c5babcc5d55e1b51f36bad2265b5ab7016d"
+      },
+      "native:../feature-native-work-accounting/canonical.rs": {
+        "path": "../feature-native-work-accounting/canonical.rs",
+        "sha256": "8696c18257fa480a0de3ed605b945f962ef3c940ce067efccdbd1f84a39394a6"
+      },
+      "native:../feature-native-work-accounting/canonical-image.rs": {
+        "path": "../feature-native-work-accounting/canonical-image.rs",
+        "sha256": "f4c3bb08ecabe57d636eb6f75cfbd0065c2500d0ec81610e0e5037d80d3d1833"
+      },
+      "native:../feature-native-work-accounting/canonical-adapter.rs": {
+        "path": "../feature-native-work-accounting/canonical-adapter.rs",
+        "sha256": "4492d96122d04107533b17e361dc722844d601acd2cee7282b6c1348d6db3ea6"
+      },
+      "native:../feature-native-work-accounting/canonical-checks.rs": {
+        "path": "../feature-native-work-accounting/canonical-checks.rs",
+        "sha256": "a844ee0affde4ca2b59f54495b05c6e3e7a396905ac273de4866863e78430b51"
+      },
+      "native:../feature-native-work-accounting/split.rs": {
+        "path": "../feature-native-work-accounting/split.rs",
+        "sha256": "094e564298b21e70c41d2f5fe1b3606d32dbd1f728809a1d4ce940aa63033f97"
+      },
+      "native:../feature-native-work-accounting/split-image.rs": {
+        "path": "../feature-native-work-accounting/split-image.rs",
+        "sha256": "4523194ccf01eb025e0af07075a03cd29020a56f89080ffe5d18b55b5902653d"
+      },
+      "native:../feature-native-work-accounting/split-adapter.rs": {
+        "path": "../feature-native-work-accounting/split-adapter.rs",
+        "sha256": "ff4af9d7d0f61d6de63fb3500cff492137420233fc90fc262779a4b3b7cab5ac"
+      },
+      "native:../feature-native-work-accounting/split-checks.rs": {
+        "path": "../feature-native-work-accounting/split-checks.rs",
+        "sha256": "b79174a4d12053e3e86101181ba67a3e88360cfe338a2b277a304f1fa19c23fe"
+      },
+      "native:../feature-native-work-accounting/reused.rs": {
+        "path": "../feature-native-work-accounting/reused.rs",
+        "sha256": "18a22610e13911ab5276ca532a730231be22ebd268a46228311064781fd7d29a"
+      },
+      "native:../feature-native-work-accounting/reused-image.rs": {
+        "path": "../feature-native-work-accounting/reused-image.rs",
+        "sha256": "f414c730955ba46398cd90c207e5f24f5d3cf88fa59a71d3acf285cfb11e1aca"
+      },
+      "native:../feature-native-work-accounting/reused-adapter.rs": {
+        "path": "../feature-native-work-accounting/reused-adapter.rs",
+        "sha256": "84284db420c3fbfc6029a4a9894cb336bbf4e031e9cfe74d795170b3fc0f08a5"
+      },
+      "native:../feature-native-work-accounting/reused-checks.rs": {
+        "path": "../feature-native-work-accounting/reused-checks.rs",
+        "sha256": "7ed8343ca0f9ee7b86a32aa3b46d104b09adea647e99f7ab6607506063324cf3"
+      },
+      "native:../feature-native-work-accounting/shared.rs": {
+        "path": "../feature-native-work-accounting/shared.rs",
+        "sha256": "b497304089e7721e320fee3d768c982ad1b94781deb15d546f1177a757063224"
+      },
+      "native:../feature-native-work-accounting/shared-image.rs": {
+        "path": "../feature-native-work-accounting/shared-image.rs",
+        "sha256": "7af9b39f88a91506b04d5a6e3750d793ab11305f941bac523cfaeaa2883b2171"
+      },
+      "native:../feature-native-work-accounting/shared-adapter.rs": {
+        "path": "../feature-native-work-accounting/shared-adapter.rs",
+        "sha256": "85fa983b0aa234e4fa8a8af1d2bf53d8d9caf59c295d3a09c397882c1bb584b8"
+      },
+      "native:../feature-native-work-accounting/shared-checks.rs": {
+        "path": "../feature-native-work-accounting/shared-checks.rs",
+        "sha256": "eb628f7a753d4aba5580f311e05d31ef97b53015f0500844d43f0f879b40cd93"
+      },
+      "native:../feature-native-work-accounting/neighbor.rs": {
+        "path": "../feature-native-work-accounting/neighbor.rs",
+        "sha256": "cc13e22e7f59906e0037c9b6dabc605d6cf9c55dfe0ad4e50f254f07157cc051"
+      },
+      "native:../feature-native-work-accounting/neighbor-image.rs": {
+        "path": "../feature-native-work-accounting/neighbor-image.rs",
+        "sha256": "6f131caa442a93f368f5359cf19e3f1d2240660602036f13485b224b68edb9a0"
+      },
+      "native:../feature-native-work-accounting/neighbor-adapter.rs": {
+        "path": "../feature-native-work-accounting/neighbor-adapter.rs",
+        "sha256": "864fe61980f81c355c9506cb9c5a9fa727f27a08a750457d17ec6906674a82a0"
+      },
+      "native:../feature-native-work-accounting/neighbor-checks.rs": {
+        "path": "../feature-native-work-accounting/neighbor-checks.rs",
+        "sha256": "11db07c9a822095dd3754e4a1fe5effe3e6b650642ece9638a18aa7c0700819e"
+      },
+      "native:../feature-native-work-accounting/fused.rs": {
+        "path": "../feature-native-work-accounting/fused.rs",
+        "sha256": "bf4d533562ffbb582297e480e582645da154f534ddb5bf5b45635a88252c48a5"
+      },
+      "native:../feature-native-work-accounting/fused-block.rs": {
+        "path": "../feature-native-work-accounting/fused-block.rs",
+        "sha256": "c59b8d7e8aea5be250e807d741289569f08ba882a85316d8f4d4944a08cfd4f2"
+      },
+      "native:../feature-native-work-accounting/fused-image.rs": {
+        "path": "../feature-native-work-accounting/fused-image.rs",
+        "sha256": "43a9b009dab4f223cedef7b23de727d1ff150765819a4405b5b250ddb7524ce7"
+      },
+      "native:../feature-native-work-accounting/fused-adapter.rs": {
+        "path": "../feature-native-work-accounting/fused-adapter.rs",
+        "sha256": "72d6608b62a872cdd0e399587ee4aa608e77cf9236aa6b1d716fbec17b6c1a4d"
+      },
+      "native:../feature-native-work-accounting/fused-checks.rs": {
+        "path": "../feature-native-work-accounting/fused-checks.rs",
+        "sha256": "8b06c592c1ca00e4f224c900ec6e3037a874154d4d359a23fbe8e373a915ca03"
+      },
+      "native:../feature-native-work-accounting/direct.rs": {
+        "path": "../feature-native-work-accounting/direct.rs",
+        "sha256": "452c7db59cfdf04199fb613b8ce807144afca251af2419173dc4ff2e52aadebd"
+      },
+      "native:../feature-native-work-accounting/direct-adapter.rs": {
+        "path": "../feature-native-work-accounting/direct-adapter.rs",
+        "sha256": "a2da435cf9419b55392a1f1218a7e72b5b0f96d513446096c1d55eaadcca141e"
+      },
+      "native:../feature-native-work-accounting/direct-checks.rs": {
+        "path": "../feature-native-work-accounting/direct-checks.rs",
+        "sha256": "e4296f03b50b67331f1b945ffe7e876590da5077b0eae1f2e90713b8ae980521"
+      },
+      "native:../feature-native-work-accounting/opposite.rs": {
+        "path": "../feature-native-work-accounting/opposite.rs",
+        "sha256": "82c5bc029b19f720bd37343238adb2272a3281e41c297ed942f3f4c6abd8b519"
+      },
+      "native:../feature-native-work-accounting/opposite-adapter.rs": {
+        "path": "../feature-native-work-accounting/opposite-adapter.rs",
+        "sha256": "146fde3b88fa02327e67096008fefa4f9d67c63e0b2fa073bf49371f7fcffc49"
+      },
+      "native:../feature-native-work-accounting/opposite-checks.rs": {
+        "path": "../feature-native-work-accounting/opposite-checks.rs",
+        "sha256": "c12b6209fcff785a2438250d2684249ca038287b088bda81eabbe0b513dd8308"
+      },
+      "native:../feature-native-work-accounting/doubled.rs": {
+        "path": "../feature-native-work-accounting/doubled.rs",
+        "sha256": "2191dff16aec53379596408c33947a93501d2bda718bd3e40ddf31cec64f6e12"
+      },
+      "native:../feature-native-work-accounting/doubled-adapter.rs": {
+        "path": "../feature-native-work-accounting/doubled-adapter.rs",
+        "sha256": "0a46226ab796c64d5f534516cf67808fce376954d972a94e630d01b8980e54ca"
+      },
+      "native:../feature-native-work-accounting/doubled-checks.rs": {
+        "path": "../feature-native-work-accounting/doubled-checks.rs",
+        "sha256": "41bffd8f3555350deb7f4c1b5d59ade238c736fac9662d2290e2feb3ef70e72f"
+      },
+      "native:../feature-native-work-accounting/shared-rescue.rs": {
+        "path": "../feature-native-work-accounting/shared-rescue.rs",
+        "sha256": "21d6bacc299b9ad7b2ddb5fdbf2cf23ebbc889806c7e13d8549fc1042fc33128"
+      },
+      "native:../feature-native-work-accounting/shared-rescue-phase.rs": {
+        "path": "../feature-native-work-accounting/shared-rescue-phase.rs",
+        "sha256": "ce1dba64a4f455d88e9754dcdd622873f8e940daf24b49c304b61dd13fe0107e"
+      },
+      "native:../feature-native-work-accounting/shared-rescue-adapter.rs": {
+        "path": "../feature-native-work-accounting/shared-rescue-adapter.rs",
+        "sha256": "99cf683635eeaa072f758d9278d5d2174e788c8531f5e74caafaf22015ca6326"
+      },
+      "native:../feature-native-work-accounting/shared-rescue-checks.rs": {
+        "path": "../feature-native-work-accounting/shared-rescue-checks.rs",
+        "sha256": "062724cdcbb2c9cf46c0b8725d0a629cbf33474d3dacba4e0a77b53d47f2bd67"
+      },
+      "native:../feature-native-work-accounting/borrowed-checks.rs": {
+        "path": "../feature-native-work-accounting/borrowed-checks.rs",
+        "sha256": "e92bffa11559a00b337767b797ec71fc9c0c79d75ea7bdffe3c985e9400045f2"
+      },
+      "native:../feature-native-work-accounting/width-plan.rs": {
+        "path": "../feature-native-work-accounting/width-plan.rs",
+        "sha256": "aefd2b20d1cd972c04b5e07c0a173b08928684f55be7fcea6f5f0ac2f40ae95d"
+      },
+      "native:../feature-native-work-accounting/width-plan-checks.rs": {
+        "path": "../feature-native-work-accounting/width-plan-checks.rs",
+        "sha256": "b8be414a96a049562306627f785dc70a781f1a6926667a5d141a6bab3e88b9cd"
+      },
+      "native:../feature-native-work-accounting/stream-adapter.rs": {
+        "path": "../feature-native-work-accounting/stream-adapter.rs",
+        "sha256": "431c4a1b14f1a54225e494f112d8ee13dc7f242268444c45f5d812f460c8d699"
+      },
+      "native:../feature-native-work-accounting/new-recovery.rs": {
+        "path": "../feature-native-work-accounting/new-recovery.rs",
+        "sha256": "ced4c44c78d9f2db356b3e09a902186f834142b2d5b85749a8c1caa5fcb564f9"
+      },
+      "native:panel.rs": {
+        "path": "panel.rs",
+        "sha256": "f575d6ee92ea3d6a8207de41fa428b1766a4ea1bb29fe9aecc3faede67a8001b"
+      },
+      "authority": {
+        "path": "../feature-native-resultant-protocol/authority.json",
+        "sha256": "aa66f939fe8d47a0e25f4dfeadaf8ed8ded1ed6dcaea775b418a7ad5a8756c0a"
+      }
+    },
+    "reserved_usd": 0,
+    "production_binary_status": "Unbound; software-test binary is not production admission",
+    "phase_rule": "Each doubled row is incremental; initial+doubled counters may be summed per dimension, never across dimensions",
+    "public_panel_status": "Warm m35 public recovery is a separate future protocol; this panel is coefficients only",
+    "export_layout": "200 raw phase rows become100 execution cells; phase is not an independent replicate."
+  }
+}

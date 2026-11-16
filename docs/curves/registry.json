@@ -476,6 +476,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round4-2026-09-21.json"
    ],
+   "panel_alias": "K0-13",
    "representations": [
     {
      "ec1": "EC1N13Ce0h1dfa32cdf623",
@@ -858,7 +859,8 @@
     "a": 1,
     "n": 17,
     "modulus": "0x20009",
-    "modulus_rule": "recorded in the run"
+    "modulus_rule": "recorded in the run",
+    "generator_call": "KoblitzCurve::new(1, 17)"
    },
    "model_json": "{\"a\":\"0x1\",\"b\":\"0x1\",\"field\":\"f2m-17-237ceae1\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x20009\",\"v\":\"1\"}",
    "trace": -101,
@@ -882,6 +884,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-17",
    "representations": [
     {
      "ec1": "EC1N17Ce1h381f66e2762a",
@@ -989,6 +992,7 @@
     "docs/curves/sources/generated.json",
     "prose, by the constructor rule: docs/curves/sources/generated.json"
    ],
+   "panel_alias": "K0-19",
    "representations": [
     {
      "ec1": "EC1N19Ce0h1e2a8f558313",
@@ -1038,7 +1042,8 @@
     "a": 1,
     "n": 19,
     "modulus": "0x80027",
-    "modulus_rule": "recorded in the run"
+    "modulus_rule": "recorded in the run",
+    "generator_call": "KoblitzCurve::new(1, 19)"
    },
    "model_json": "{\"a\":\"0x1\",\"b\":\"0x1\",\"field\":\"f2m-19-87f45376\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x80027\",\"v\":\"1\"}",
    "trace": -797,
@@ -1062,6 +1067,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-19",
    "representations": [
     {
      "ec1": "EC1N19Ce1h6186a62ebfaa",
@@ -1201,6 +1207,7 @@
     "docs/curves/sources/generated.json",
     "prose, by the constructor rule: docs/curves/sources/generated.json"
    ],
+   "panel_alias": "K0-23",
    "representations": [
     {
      "ec1": "EC1N23Ce0h27a979171a13",
@@ -1272,6 +1279,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-23",
    "representations": [
     {
      "ec1": "EC1N23Ce1heec6a3619e3f",
@@ -2056,6 +2064,7 @@
     "docs/ic/runs/ic-boundary-ledger-round2-holdout-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round2-unguarded-diagnostic-2026-09-21.json"
    ],
+   "panel_alias": "K0-41",
    "representations": [
     {
      "ec1": "EC1N41Ce0he09550ab560a",
@@ -2980,6 +2989,7 @@
    "sources": [
     "research/ic_single_target_20260930/curve_records.json"
    ],
+   "panel_alias": "K1-83",
    "representations": [
     {
      "ec1": "EC1N83Ce1h35c7ced6b497",
@@ -3249,6 +3259,7 @@
     "ECC2K-130 (src/cryptanalysis/ecc2k130_guard.rs)",
     "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
+   "panel_alias": "K0-131",
    "representations": [],
    "ec1_unresolved": "the challenge's normal-basis points are not imported (src/bin/ic/params.rs)"
   },
@@ -11739,116 +11750,6 @@
    ]
   },
   {
-   "slug": "icv1-fp3-t3-cec99b6b",
-   "icv1": "ICV1:fp-5:3:3:2:unk:unk:r:cec99b6bab3a",
-   "family": "prime",
-   "params": {
-    "p": "5",
-    "a": "4",
-    "b": "3"
-   },
-   "model_json": "{\"a\":\"4\",\"b\":\"3\",\"field\":\"fp-5\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5\",\"v\":\"1\"}",
-   "trace": 3,
-   "order": "3",
-   "j": "2",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp3-tm3-37e7e540",
-   "icv1": "ICV1:fp-5:-3:9:2:unk:unk:r:37e7e5403bd4",
-   "family": "prime",
-   "params": {
-    "p": "5",
-    "a": "1",
-    "b": "1"
-   },
-   "model_json": "{\"a\":\"1\",\"b\":\"1\",\"field\":\"fp-5\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5\",\"v\":\"1\"}",
-   "trace": -3,
-   "order": "9",
-   "j": "2",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp4-t0-097da6b6",
-   "icv1": "ICV1:fp-13:0:14:5:unk:unk:r:097da6b6babc",
-   "family": "prime",
-   "params": {
-    "p": "13",
-    "a": "4",
-    "b": "6"
-   },
-   "model_json": "{\"a\":\"4\",\"b\":\"6\",\"field\":\"fp-13\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13\",\"v\":\"1\"}",
-   "trace": 0,
-   "order": "14",
-   "j": "5",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp4-t0-6bee67e0",
-   "icv1": "ICV1:fp-13:0:14:5:unk:unk:r:6bee67e066ba",
-   "family": "prime",
-   "params": {
-    "p": "13",
-    "a": "1",
-    "b": "4"
-   },
-   "model_json": "{\"a\":\"1\",\"b\":\"4\",\"field\":\"fp-13\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13\",\"v\":\"1\"}",
-   "trace": 0,
-   "order": "14",
-   "j": "5",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp4-t0-bb514d71",
-   "icv1": "ICV1:fp-13:0:14:5:unk:unk:r:bb514d71cc7f",
-   "family": "prime",
-   "params": {
-    "p": "13",
-    "a": "4",
-    "b": "7"
-   },
-   "model_json": "{\"a\":\"4\",\"b\":\"7\",\"field\":\"fp-13\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13\",\"v\":\"1\"}",
-   "trace": 0,
-   "order": "14",
-   "j": "5",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp4-t3-f654de29",
    "icv1": "ICV1:fp-13:3:11:8:unk:unk:r:f654de29b55d",
    "family": "prime",
@@ -11947,50 +11848,6 @@
    ]
   },
   {
-   "slug": "icv1-fp6-t0-74779950",
-   "icv1": "ICV1:fp-43:0:44:8:unk:unk:r:74779950ae8b",
-   "family": "prime",
-   "params": {
-    "p": "43",
-    "a": "1",
-    "b": "0"
-   },
-   "model_json": "{\"a\":\"1\",\"b\":\"0\",\"field\":\"fp-43\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"43\",\"v\":\"1\"}",
-   "trace": 0,
-   "order": "44",
-   "j": "8",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp6-t0-c6a8a47c",
-   "icv1": "ICV1:fp-43:0:44:8:unk:unk:r:c6a8a47ccc8d",
-   "family": "prime",
-   "params": {
-    "p": "43",
-    "a": "4",
-    "b": "0"
-   },
-   "model_json": "{\"a\":\"4\",\"b\":\"0\",\"field\":\"fp-43\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"43\",\"v\":\"1\"}",
-   "trace": 0,
-   "order": "44",
-   "j": "8",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp6-tm7-fc20da94",
    "icv1": "ICV1:fp-59:-7:67:52:unk:unk:r:fc20da944826",
    "family": "prime",
@@ -12037,28 +11894,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp7-t5-de12415d",
-   "icv1": "ICV1:fp-83:5:79:60:unk:unk:r:de12415daa94",
-   "family": "prime",
-   "params": {
-    "p": "83",
-    "a": "59",
-    "b": "30"
-   },
-   "model_json": "{\"a\":\"59\",\"b\":\"30\",\"field\":\"fp-83\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"83\",\"v\":\"1\"}",
-   "trace": 5,
-   "order": "79",
-   "j": "60",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp7-t1-da77b880",
    "icv1": "ICV1:fp-101:1:101:99:unk:unk:r:da77b88029ba",
    "family": "prime",
@@ -12100,28 +11935,6 @@
    "sources": [
     "research/weak_curve_leaderboard_20261012/snapshot.json",
     "website/weakcurves/dist/snapshot.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp7-t5-b172aa85",
-   "icv1": "ICV1:fp-101:5:97:33:unk:unk:r:b172aa85b9b1",
-   "family": "prime",
-   "params": {
-    "p": "101",
-    "a": "3",
-    "b": "58"
-   },
-   "model_json": "{\"a\":\"3\",\"b\":\"58\",\"field\":\"fp-101\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"101\",\"v\":\"1\"}",
-   "trace": 5,
-   "order": "97",
-   "j": "33",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -12281,28 +12094,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp7-tm11-1cabae54",
-   "icv1": "ICV1:fp-127:-11:139:118:unk:unk:r:1cabae547d2e",
-   "family": "prime",
-   "params": {
-    "p": "127",
-    "a": "20",
-    "b": "61"
-   },
-   "model_json": "{\"a\":\"20\",\"b\":\"61\",\"field\":\"fp-127\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"127\",\"v\":\"1\"}",
-   "trace": -11,
-   "order": "139",
-   "j": "118",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp8-tm11-e7c21318",
    "icv1": "ICV1:fp-211:-11:223:46:unk:unk:r:e7c21318e16c",
    "family": "prime",
@@ -12380,29 +12171,6 @@
    "standard_names": [],
    "sources": [
     "research/full_volcano_classes_20261016/evidence/controls/control-3-root.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp8-tm9-5b1fe05b",
-   "icv1": "ICV1:fp-223:-9:233:197:unk:unk:r:5b1fe05bcffc",
-   "family": "prime",
-   "params": {
-    "p": "223",
-    "a": "138",
-    "b": "1"
-   },
-   "model_json": "{\"a\":\"138\",\"b\":\"1\",\"field\":\"fp-223\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"223\",\"v\":\"1\"}",
-   "trace": -9,
-   "order": "233",
-   "j": "197",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/A-schoolbook-8-16.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C-fourier-8-24.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -12634,7 +12402,8 @@
    "params": {
     "p": "827",
     "a": "1",
-    "b": "15"
+    "b": "15",
+    "generator_call": "roster_prime_instance(10)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"15\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
    "trace": 5,
@@ -12692,28 +12461,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp10-tm13-06cca796",
-   "icv1": "ICV1:fp-839:-13:853:104:unk:unk:r:06cca796e480",
-   "family": "prime",
-   "params": {
-    "p": "839",
-    "a": "159",
-    "b": "359"
-   },
-   "model_json": "{\"a\":\"159\",\"b\":\"359\",\"field\":\"fp-839\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"839\",\"v\":\"1\"}",
-   "trace": -13,
-   "order": "853",
-   "j": "104",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/A-schoolbook-8-16.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp10-tm3-e1039cbb",
@@ -12936,29 +12683,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp12-t91-e3e6f997",
-   "icv1": "ICV1:fp-2371:91:2281:142:unk:unk:r:e3e6f9973cda",
-   "family": "prime",
-   "params": {
-    "p": "2371",
-    "a": "194",
-    "b": "612"
-   },
-   "model_json": "{\"a\":\"194\",\"b\":\"612\",\"field\":\"fp-2371\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2371\",\"v\":\"1\"}",
-   "trace": 91,
-   "order": "2281",
-   "j": "142",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/A-schoolbook-8-16.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C-fourier-8-24.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp12-t17-938453d1",
    "icv1": "ICV1:fp-2393:17:2377:1953:unk:unk:r:938453d1c9a0",
    "family": "prime",
@@ -13094,7 +12818,8 @@
    "params": {
     "p": "3907",
     "a": "1",
-    "b": "3"
+    "b": "3",
+    "generator_call": "roster_prime_instance(12)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"3\",\"field\":\"fp-3907\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3907\",\"v\":\"1\"}",
    "trace": 19,
@@ -13152,28 +12877,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp12-t65-cc62419e",
-   "icv1": "ICV1:fp-4091:65:4027:3533:unk:unk:r:cc62419eb1ee",
-   "family": "prime",
-   "params": {
-    "p": "4091",
-    "a": "4088",
-    "b": "40"
-   },
-   "model_json": "{\"a\":\"4088\",\"b\":\"40\",\"field\":\"fp-4091\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4091\",\"v\":\"1\"}",
-   "trace": 65,
-   "order": "4027",
-   "j": "3533",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_qubo_annealing_20261110/results/run.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp13-tm110-9906da6a",
@@ -14688,28 +14391,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp14-tm119-34d9c218",
-   "icv1": "ICV1:fp-8419:-119:8539:2332:unk:unk:r:34d9c21830a8",
-   "family": "prime",
-   "params": {
-    "p": "8419",
-    "a": "1614",
-    "b": "1715"
-   },
-   "model_json": "{\"a\":\"1614\",\"b\":\"1715\",\"field\":\"fp-8419\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"8419\",\"v\":\"1\"}",
-   "trace": -119,
-   "order": "8539",
-   "j": "2332",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/A-schoolbook-8-16.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp14-t18-26848214",
    "icv1": "ICV1:fp-8429:18:8412:998:unk:unk:r:26848214588d",
    "family": "prime",
@@ -15712,7 +15393,8 @@
    "params": {
     "p": "16187",
     "a": "1",
-    "b": "12"
+    "b": "12",
+    "generator_call": "roster_prime_instance(14)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"12\",\"field\":\"fp-16187\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16187\",\"v\":\"1\"}",
    "trace": -43,
@@ -17030,29 +16712,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp16-tm109-acf88759",
-   "icv1": "ICV1:fp-40499:-109:40609:8691:unk:unk:r:acf887596e88",
-   "family": "prime",
-   "params": {
-    "p": "40499",
-    "a": "3669",
-    "b": "40312"
-   },
-   "model_json": "{\"a\":\"3669\",\"b\":\"40312\",\"field\":\"fp-40499\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"40499\",\"v\":\"1\"}",
-   "trace": -109,
-   "order": "40609",
-   "j": "8691",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/A-schoolbook-8-16.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C-fourier-8-24.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp16-tm119-f1da0584",
    "icv1": "ICV1:fp-40897:-119:41017:38161:unk:unk:r:f1da05849471",
    "family": "prime",
@@ -17559,7 +17218,8 @@
    "params": {
     "p": "65353",
     "a": "1",
-    "b": "16"
+    "b": "16",
+    "generator_call": "roster_prime_instance(16)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"16\",\"field\":\"fp-65353\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"65353\",\"v\":\"1\"}",
    "trace": 351,
@@ -17852,28 +17512,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp16-tm29-53b12ed7",
-   "icv1": "ICV1:fp-65521:-29:65551:9917:unk:unk:r:53b12ed7afda",
-   "family": "prime",
-   "params": {
-    "p": "65521",
-    "a": "32634",
-    "b": "6454"
-   },
-   "model_json": "{\"a\":\"32634\",\"b\":\"6454\",\"field\":\"fp-65521\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"65521\",\"v\":\"1\"}",
-   "trace": -29,
-   "order": "65551",
-   "j": "9917",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/compiled_advice_robdd_20261110/results/run.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp17-t121-95219f0d",
@@ -18248,7 +17886,8 @@
    "params": {
     "p": "261847",
     "a": "3",
-    "b": "2"
+    "b": "2",
+    "generator_call": "roster_prime_instance(18)"
    },
    "model_json": "{\"a\":\"3\",\"b\":\"2\",\"field\":\"fp-261847\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"261847\",\"v\":\"1\"}",
    "trace": 175,
@@ -18306,28 +17945,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp18-t163-11feb894",
-   "icv1": "ICV1:fp-262139:163:261977:159940:unk:unk:r:11feb894b20c",
-   "family": "prime",
-   "params": {
-    "p": "262139",
-    "a": "5257",
-    "b": "67894"
-   },
-   "model_json": "{\"a\":\"5257\",\"b\":\"67894\",\"field\":\"fp-262139\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"262139\",\"v\":\"1\"}",
-   "trace": 163,
-   "order": "261977",
-   "j": "159940",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/compiled_advice_robdd_20261110/results/run.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp18-tm443-965d79a1",
@@ -19500,30 +19117,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp20-t859-7d75ab45",
-   "icv1": "ICV1:fp-916999:859:916141:709516:unk:unk:r:7d75ab45509f",
-   "family": "prime",
-   "params": {
-    "p": "916999",
-    "a": "61160",
-    "b": "695385"
-   },
-   "model_json": "{\"a\":\"61160\",\"b\":\"695385\",\"field\":\"fp-916999\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"916999\",\"v\":\"1\"}",
-   "trace": 859,
-   "order": "916141",
-   "j": "709516",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B1-schoolbook-20-28.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C-fourier-8-24.json",
-    "research/semaev_tensor_treewidth_20261111/rows/E-eager-20-24.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp20-t1239-d852a683",
    "icv1": "ICV1:fp-921517:1239:920279:29553:unk:unk:r:d852a6839db7",
    "family": "prime",
@@ -20113,7 +19706,8 @@
    "params": {
     "p": "1048291",
     "a": "1",
-    "b": "11"
+    "b": "11",
+    "generator_call": "roster_prime_instance(20)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"11\",\"field\":\"fp-1048291\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1048291\",\"v\":\"1\"}",
    "trace": 1293,
@@ -20310,28 +19904,6 @@
     "research/curve25519_algebraic_ecbench_20261102/spec_g0.json",
     "research/curve25519_algebraic_ecbench_20261102/spec_g0_a1.json",
     "research/curve25519_algebraic_ladder_20261102/sessions/e2e-bits-t3-g2-k20/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp20-tm995-d6804e64",
-   "icv1": "ICV1:fp-1048573:-995:1049569:638114:unk:unk:r:d6804e643f78",
-   "family": "prime",
-   "params": {
-    "p": "1048573",
-    "a": "604772",
-    "b": "380143"
-   },
-   "model_json": "{\"a\":\"604772\",\"b\":\"380143\",\"field\":\"fp-1048573\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1048573\",\"v\":\"1\"}",
-   "trace": -995,
-   "order": "1049569",
-   "j": "638114",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/compiled_advice_robdd_20261110/results/run.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -23105,28 +22677,6 @@
     "research/bitop_ladder_20261019/sessions/train-P22-pair-ext1/spec.json",
     "research/bitop_ladder_20261019/sessions/train-P22/plan.json",
     "research/bitop_ladder_20261019/sessions/train-P22/spec.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp22-tm1317-cbf44512",
-   "icv1": "ICV1:fp-4194301:-1317:4195619:29295:unk:unk:r:cbf44512a9d7",
-   "family": "prime",
-   "params": {
-    "p": "4194301",
-    "a": "1347343",
-    "b": "3761177"
-   },
-   "model_json": "{\"a\":\"1347343\",\"b\":\"3761177\",\"field\":\"fp-4194301\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4194301\",\"v\":\"1\"}",
-   "trace": -1317,
-   "order": "4195619",
-   "j": "29295",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/compiled_advice_robdd_20261110/results/run.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -216022,30 +215572,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp24-t6499-fbdb96cf",
-   "icv1": "ICV1:fp-14655287:6499:14648789:518347:unk:unk:r:fbdb96cfa2e7",
-   "family": "prime",
-   "params": {
-    "p": "14655287",
-    "a": "5253983",
-    "b": "9082955"
-   },
-   "model_json": "{\"a\":\"5253983\",\"b\":\"9082955\",\"field\":\"fp-14655287\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"14655287\",\"v\":\"1\"}",
-   "trace": 6499,
-   "order": "14648789",
-   "j": "518347",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B1-schoolbook-20-28.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C-fourier-8-24.json",
-    "research/semaev_tensor_treewidth_20261111/rows/E-eager-20-24.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp24-t3943-008feb23",
    "icv1": "ICV1:fp-14793199:3943:14789257:2912819:unk:unk:r:008feb23b8e1",
    "family": "prime",
@@ -258868,6 +258394,7 @@
     "research/bitop_ladder_20261019/sessions/train-P24-pair-ext1/spec.json",
     "research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1/plan.json"
    ],
+   "panel_alias": "P24a",
    "representations": [
     {
      "ec1": "EC1P24Cfph095cb65c0da0",
@@ -258902,28 +258429,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp24-t1423-bf32cd91",
-   "icv1": "ICV1:fp-16777213:1423:16775791:11352064:unk:unk:r:bf32cd91f1bd",
-   "family": "prime",
-   "params": {
-    "p": "16777213",
-    "a": "15004033",
-    "b": "13878218"
-   },
-   "model_json": "{\"a\":\"15004033\",\"b\":\"13878218\",\"field\":\"fp-16777213\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16777213\",\"v\":\"1\"}",
-   "trace": 1423,
-   "order": "16775791",
-   "j": "11352064",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/compiled_advice_robdd_20261110/results/run.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp24-tm1578-e83ed1b2",
@@ -462220,29 +461725,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp28-t8037-cf0154e6",
-   "icv1": "ICV1:fp-135466519:8037:135458483:56738475:unk:unk:r:cf0154e61fe2",
-   "family": "prime",
-   "params": {
-    "p": "135466519",
-    "a": "132281804",
-    "b": "114814996"
-   },
-   "model_json": "{\"a\":\"132281804\",\"b\":\"114814996\",\"field\":\"fp-135466519\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"135466519\",\"v\":\"1\"}",
-   "trace": 8037,
-   "order": "135458483",
-   "j": "56738475",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B1-schoolbook-20-28.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C2-fourier-28-36.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp28-tm5475-0f58a032",
    "icv1": "ICV1:fp-146781643:-5475:146787119:79537464:unk:unk:r:0f58a032f26c",
    "family": "prime",
@@ -491866,28 +491348,6 @@
    ]
   },
   {
-   "slug": "icv1-fp32-t69479-5a41ef55",
-   "icv1": "ICV1:fp-4228167899:69479:4228098421:313337079:unk:unk:r:5a41ef55ba74",
-   "family": "prime",
-   "params": {
-    "p": "4228167899",
-    "a": "56727971",
-    "b": "4195668212"
-   },
-   "model_json": "{\"a\":\"56727971\",\"b\":\"4195668212\",\"field\":\"fp-4228167899\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4228167899\",\"v\":\"1\"}",
-   "trace": 69479,
-   "order": "4228098421",
-   "j": "313337079",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B2-schoolbook-32-36.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp32-tm5202-633eb5e4",
    "icv1": "ICV1:fp-4294965733:-5202:4294970936:68236157:unk:unk:r:633eb5e46b58",
    "family": "prime",
@@ -492207,6 +491667,7 @@
     "research/bitop_ladder_20261019/sessions/train-P32/plan.json",
     "research/bitop_ladder_20261019/sessions/train-P32/spec.json"
    ],
+   "panel_alias": "P32a",
    "representations": [
     {
      "ec1": "EC1P32Cfph06b9f59ff156",
@@ -492250,7 +491711,8 @@
    "params": {
     "p": "5557729739",
     "a": "2036002406",
-    "b": "2773982840"
+    "b": "2773982840",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 33, 201624291843241)"
    },
    "model_json": "{\"a\":\"2036002406\",\"b\":\"2773982840\",\"field\":\"fp-5557729739\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5557729739\",\"v\":\"1\"}",
    "trace": 65189,
@@ -492310,7 +491772,8 @@
    "params": {
     "p": "7183145327",
     "a": "4546663450",
-    "b": "440691422"
+    "b": "440691422",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 33, 24642267360510)"
    },
    "model_json": "{\"a\":\"4546663450\",\"b\":\"440691422\",\"field\":\"fp-7183145327\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"7183145327\",\"v\":\"1\"}",
    "trace": -43469,
@@ -492625,29 +492088,6 @@
    ]
   },
   {
-   "slug": "icv1-fp36-tm159071-27e57f6b",
-   "icv1": "ICV1:fp-47316548351:-159071:47316707423:35585159894:unk:unk:r:27e57f6bc1e7",
-   "family": "prime",
-   "params": {
-    "p": "47316548351",
-    "a": "2101710822",
-    "b": "36980591456"
-   },
-   "model_json": "{\"a\":\"2101710822\",\"b\":\"36980591456\",\"field\":\"fp-47316548351\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"47316548351\",\"v\":\"1\"}",
-   "trace": -159071,
-   "order": "47316707423",
-   "j": "35585159894",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B2-schoolbook-32-36.json",
-    "research/semaev_tensor_treewidth_20261111/rows/C2-fourier-28-36.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp36-t33869-2ec6c587",
    "icv1": "ICV1:fp-51539607599:33869:51539573731:17104780281:unk:unk:r:2ec6c58720eb",
    "family": "prime",
@@ -492933,6 +492373,7 @@
     "research/bitop_ladder_20261019/specs/holdout-P36.json",
     "research/bitop_ladder_20261019/specs/train-P36.json"
    ],
+   "panel_alias": "P36a",
    "representations": [
     {
      "ec1": "EC1P36Cfphfa97d84519ef",
@@ -492998,7 +492439,8 @@
    "params": {
     "p": "70093240733",
     "a": "34866272438",
-    "b": "47397029180"
+    "b": "47397029180",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 37, 18561872162765)"
    },
    "model_json": "{\"a\":\"34866272438\",\"b\":\"47397029180\",\"field\":\"fp-70093240733\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"70093240733\",\"v\":\"1\"}",
    "trace": -218953,
@@ -493158,7 +492600,8 @@
    "params": {
     "p": "92849827471",
     "a": "41216192137",
-    "b": "53376697970"
+    "b": "53376697970",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 37, 135799598603144)"
    },
    "model_json": "{\"a\":\"41216192137\",\"b\":\"53376697970\",\"field\":\"fp-92849827471\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"92849827471\",\"v\":\"1\"}",
    "trace": 160405,
@@ -493239,60 +492682,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp38-t197973-83084dae",
-   "icv1": "ICV1:fp-206158430209:197973:206158232237:112462469979:unk:unk:r:83084daeaf56",
-   "family": "prime",
-   "params": {
-    "p": "206158430209",
-    "a": "31640015536",
-    "b": "131579046511"
-   },
-   "model_json": "{\"a\":\"31640015536\",\"b\":\"131579046511\",\"field\":\"fp-206158430209\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"206158430209\",\"v\":\"1\"}",
-   "trace": 197973,
-   "order": "206158232237",
-   "j": "112462469979",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b38.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-b38/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp38-tm342119-54e6289f",
-   "icv1": "ICV1:fp-206158430209:-342119:206158772329:143393317457:unk:unk:r:54e6289f3d8c",
-   "family": "prime",
-   "params": {
-    "p": "206158430209",
-    "a": "17529164684",
-    "b": "64402007602"
-   },
-   "model_json": "{\"a\":\"17529164684\",\"b\":\"64402007602\",\"field\":\"fp-206158430209\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"206158430209\",\"v\":\"1\"}",
-   "trace": -342119,
-   "order": "206158772329",
-   "j": "143393317457",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b38.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-b38/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp38-t925069-ef71b7ab",
    "icv1": "ICV1:fp-274877906899:925069:274876981831:101493381000:unk:unk:r:ef71b7abe2b0",
    "family": "prime",
@@ -493342,28 +492731,6 @@
     "research/bitop_ladder_20261019/sessions/train-P39/spec.json",
     "research/bitop_ladder_20261019/specs/holdout-P39.json",
     "research/bitop_ladder_20261019/specs/train-P39.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp40-t1241413-652f9bf8",
-   "icv1": "ICV1:fp-597887375623:1241413:597886134211:208534569888:unk:unk:r:652f9bf80cee",
-   "family": "prime",
-   "params": {
-    "p": "597887375623",
-    "a": "414041159781",
-    "b": "6405283706"
-   },
-   "model_json": "{\"a\":\"414041159781\",\"b\":\"6405283706\",\"field\":\"fp-597887375623\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"597887375623\",\"v\":\"1\"}",
-   "trace": 1241413,
-   "order": "597886134211",
-   "j": "208534569888",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/semaev_tensor_treewidth_20261111/rows/B3-schoolbook-40.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -493904,6 +493271,7 @@
     "research/bitop_ladder_20261019/specs/holdout-P40.json",
     "research/bitop_ladder_20261019/specs/train-P40.json"
    ],
+   "panel_alias": "P40a",
    "representations": [
     {
      "ec1": "EC1P40Cfphd8c9e6e2886b",
@@ -494045,7 +493413,8 @@
    "params": {
     "p": "1495523448539",
     "a": "640197488525",
-    "b": "566237084442"
+    "b": "566237084442",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 41, 119518173357916)"
    },
    "model_json": "{\"a\":\"640197488525\",\"b\":\"566237084442\",\"field\":\"fp-1495523448539\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1495523448539\",\"v\":\"1\"}",
    "trace": -405553,
@@ -494158,7 +493527,8 @@
    "params": {
     "p": "1930433675293",
     "a": "28146981299",
-    "b": "897732060440"
+    "b": "897732060440",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 41, 181458334271012)"
    },
    "model_json": "{\"a\":\"28146981299\",\"b\":\"897732060440\",\"field\":\"fp-1930433675293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1930433675293\",\"v\":\"1\"}",
    "trace": -886935,
@@ -494311,60 +493681,6 @@
     "research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell2033609-rho/plan.json",
     "research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell2033609-rho/spec.json",
     "research/drastic_prime_conductor_gap_round2_20261012/specs/d3-ell2033609-cubic.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp42-tm2024069-82b51dd6",
-   "icv1": "ICV1:fp-3298534883417:-2024069:3298536907487:1565464249174:unk:unk:r:82b51dd65ee8",
-   "family": "prime",
-   "params": {
-    "p": "3298534883417",
-    "a": "3095835013652",
-    "b": "1681054115190"
-   },
-   "model_json": "{\"a\":\"3095835013652\",\"b\":\"1681054115190\",\"field\":\"fp-3298534883417\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3298534883417\",\"v\":\"1\"}",
-   "trace": -2024069,
-   "order": "3298536907487",
-   "j": "1565464249174",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b42.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-b42/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp42-tm470063-4e53badf",
-   "icv1": "ICV1:fp-3298534883417:-470063:3298535353481:2473944471754:unk:unk:r:4e53badfa69b",
-   "family": "prime",
-   "params": {
-    "p": "3298534883417",
-    "a": "62543284952",
-    "b": "1316274821483"
-   },
-   "model_json": "{\"a\":\"62543284952\",\"b\":\"1316274821483\",\"field\":\"fp-3298534883417\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3298534883417\",\"v\":\"1\"}",
-   "trace": -470063,
-   "order": "3298535353481",
-   "j": "2473944471754",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b42.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-b42/plan.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -494787,7 +494103,8 @@
    "params": {
     "p": "25361112161527",
     "a": "20787366627629",
-    "b": "12019143787601"
+    "b": "12019143787601",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 45, 196853410870112)"
    },
    "model_json": "{\"a\":\"20787366627629\",\"b\":\"12019143787601\",\"field\":\"fp-25361112161527\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"25361112161527\",\"v\":\"1\"}",
    "trace": 1999407,
@@ -494847,7 +494164,8 @@
    "params": {
     "p": "27611383581911",
     "a": "12878670601399",
-    "b": "4914515096856"
+    "b": "4914515096856",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 45, 185150999512726)"
    },
    "model_json": "{\"a\":\"12878670601399\",\"b\":\"4914515096856\",\"field\":\"fp-27611383581911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"27611383581911\",\"v\":\"1\"}",
    "trace": -6458695,
@@ -495330,60 +494648,6 @@
     "research/drastic_prime_conductor_gap_20261012/sessions/d43-ell2033609/plan.json",
     "research/drastic_prime_conductor_gap_20261012/sessions/d43-ell2033609/spec.json",
     "research/drastic_prime_conductor_gap_20261012/specs/d43-ell2033609.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp46-t1903477-624c39df",
-   "icv1": "ICV1:fp-52776558133303:1903477:52776556229827:41585914291008:unk:unk:r:624c39df9bd6",
-   "family": "prime",
-   "params": {
-    "p": "52776558133303",
-    "a": "20777813265038",
-    "b": "24598973769605"
-   },
-   "model_json": "{\"a\":\"20777813265038\",\"b\":\"24598973769605\",\"field\":\"fp-52776558133303\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"52776558133303\",\"v\":\"1\"}",
-   "trace": 1903477,
-   "order": "52776556229827",
-   "j": "41585914291008",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b46.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-b46/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp46-tm8487557-5b9dbadb",
-   "icv1": "ICV1:fp-52776558133303:-8487557:52776566620861:33290243028545:unk:unk:r:5b9dbadbddaf",
-   "family": "prime",
-   "params": {
-    "p": "52776558133303",
-    "a": "34594083178937",
-    "b": "2966526380693"
-   },
-   "model_json": "{\"a\":\"34594083178937\",\"b\":\"2966526380693\",\"field\":\"fp-52776558133303\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"52776558133303\",\"v\":\"1\"}",
-   "trace": -8487557,
-   "order": "52776566620861",
-   "j": "33290243028545",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b46.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-b46/plan.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -504979,7 +504243,8 @@
    "params": {
     "p": "365857381347911",
     "a": "265803930896159",
-    "b": "186608017781445"
+    "b": "186608017781445",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 49, 40016877808970)"
    },
    "model_json": "{\"a\":\"265803930896159\",\"b\":\"186608017781445\",\"field\":\"fp-365857381347911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"365857381347911\",\"v\":\"1\"}",
    "trace": -10234315,
@@ -505039,7 +504304,8 @@
    "params": {
     "p": "561006233595917",
     "a": "429062284978109",
-    "b": "409501054401560"
+    "b": "409501054401560",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 49, 203571419754608)"
    },
    "model_json": "{\"a\":\"429062284978109\",\"b\":\"409501054401560\",\"field\":\"fp-561006233595917\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"561006233595917\",\"v\":\"1\"}",
    "trace": -34125029,
@@ -505091,60 +504357,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp50-t11968379-49e5b5c3",
-   "icv1": "ICV1:fp-844424930132057:11968379:844424918163679:315619683170031:unk:unk:r:49e5b5c3eef9",
-   "family": "prime",
-   "params": {
-    "p": "844424930132057",
-    "a": "481377040093434",
-    "b": "188765857618864"
-   },
-   "model_json": "{\"a\":\"481377040093434\",\"b\":\"188765857618864\",\"field\":\"fp-844424930132057\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"844424930132057\",\"v\":\"1\"}",
-   "trace": 11968379,
-   "order": "844424918163679",
-   "j": "315619683170031",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b50.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-b50/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp50-t2599511-88b9da3c",
-   "icv1": "ICV1:fp-844424930132057:2599511:844424927532547:585950977590257:unk:unk:r:88b9da3c992a",
-   "family": "prime",
-   "params": {
-    "p": "844424930132057",
-    "a": "548432262590603",
-    "b": "517609737896812"
-   },
-   "model_json": "{\"a\":\"548432262590603\",\"b\":\"517609737896812\",\"field\":\"fp-844424930132057\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"844424930132057\",\"v\":\"1\"}",
-   "trace": 2599511,
-   "order": "844424927532547",
-   "j": "585950977590257",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b50.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-b50/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp52-t13351431-b09ac3d1",
@@ -525378,60 +524590,6 @@
    ]
   },
   {
-   "slug": "icv1-fp54-t31279651-8605fb61",
-   "icv1": "ICV1:fp-13510798882111519:31279651:13510798850831869:6301696161754857:unk:unk:r:8605fb6136b0",
-   "family": "prime",
-   "params": {
-    "p": "13510798882111519",
-    "a": "13233386480254195",
-    "b": "9590392405427686"
-   },
-   "model_json": "{\"a\":\"13233386480254195\",\"b\":\"9590392405427686\",\"field\":\"fp-13510798882111519\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13510798882111519\",\"v\":\"1\"}",
-   "trace": 31279651,
-   "order": "13510798850831869",
-   "j": "6301696161754857",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b54.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-b54/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp54-tm12351057-1a8453f9",
-   "icv1": "ICV1:fp-13510798882111519:-12351057:13510798894462577:680325624423367:unk:unk:r:1a8453f92ab1",
-   "family": "prime",
-   "params": {
-    "p": "13510798882111519",
-    "a": "9747439063640566",
-    "b": "11266668522726132"
-   },
-   "model_json": "{\"a\":\"9747439063640566\",\"b\":\"11266668522726132\",\"field\":\"fp-13510798882111519\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"13510798882111519\",\"v\":\"1\"}",
-   "trace": -12351057,
-   "order": "13510798894462577",
-   "j": "680325624423367",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b54.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-b54.interrupted-1/plan.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp56-tm300120038-865aea25",
    "icv1": "ICV1:fp-36028808184391849:-300120038:36028808484511888:27648379608073898:unk:unk:r:865aea25abec",
    "family": "prime",
@@ -529397,60 +528555,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp58-t139482667-7d4bc0d6",
-   "icv1": "ICV1:fp-216172782113783843:139482667:216172781974301177:197047022933411714:unk:unk:r:7d4bc0d6852f",
-   "family": "prime",
-   "params": {
-    "p": "216172782113783843",
-    "a": "77820819277036018",
-    "b": "22981726657118617"
-   },
-   "model_json": "{\"a\":\"77820819277036018\",\"b\":\"22981726657118617\",\"field\":\"fp-216172782113783843\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"216172782113783843\",\"v\":\"1\"}",
-   "trace": 139482667,
-   "order": "216172781974301177",
-   "j": "197047022933411714",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b58.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-minus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp58-tm415539635-ef096790",
-   "icv1": "ICV1:fp-216172782113783843:-415539635:216172782529323479:205615741274379457:unk:unk:r:ef09679077a3",
-   "family": "prime",
-   "params": {
-    "p": "216172782113783843",
-    "a": "112093403776573655",
-    "b": "64618624775954345"
-   },
-   "model_json": "{\"a\":\"112093403776573655\",\"b\":\"64618624775954345\",\"field\":\"fp-216172782113783843\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"216172782113783843\",\"v\":\"1\"}",
-   "trace": -415539635,
-   "order": "216172782529323479",
-   "j": "205615741274379457",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b58.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-plus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp59-t1073741954-0def9996",
    "icv1": "ICV1:fp-288230445959117953:1073741954:288230444885376000:223637982630395085:unk:unk:r:0def999619b3",
    "family": "prime",
@@ -530499,60 +529603,6 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
-   "slug": "icv1-fp60-t1555138629-2c81ccd7",
-   "icv1": "ICV1:fp-864691128455135281:1555138629:864691126899996653:233500472981764010:unk:unk:r:2c81ccd71ccf",
-   "family": "prime",
-   "params": {
-    "p": "864691128455135281",
-    "a": "266958886551088021",
-    "b": "361107338951082445"
-   },
-   "model_json": "{\"a\":\"266958886551088021\",\"b\":\"361107338951082445\",\"field\":\"fp-864691128455135281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"864691128455135281\",\"v\":\"1\"}",
-   "trace": 1555138629,
-   "order": "864691126899996653",
-   "j": "233500472981764010",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b60.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-minus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp60-tm590816469-2f97e8ad",
-   "icv1": "ICV1:fp-864691128455135281:-590816469:864691129045951751:826421397019880065:unk:unk:r:2f97e8ade54b",
-   "family": "prime",
-   "params": {
-    "p": "864691128455135281",
-    "a": "88849412390835425",
-    "b": "409199564115882755"
-   },
-   "model_json": "{\"a\":\"88849412390835425\",\"b\":\"409199564115882755\",\"field\":\"fp-864691128455135281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"864691128455135281\",\"v\":\"1\"}",
-   "trace": -590816469,
-   "order": "864691129045951751",
-   "j": "826421397019880065",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b60.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-plus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
    "slug": "icv1-fp61-t2-fefb1f9c",
    "icv1": "ICV1:fp-1637958981148213249:2:1637958981148213248:913494765004474322:unk:unk:r:fefb1f9ce2be",
    "family": "prime",
@@ -530990,60 +530040,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp62-t2116822531-282e2794",
-   "icv1": "ICV1:fp-3458764513820540933:2116822531:3458764511703718403:2667827367259566651:unk:unk:r:282e2794e985",
-   "family": "prime",
-   "params": {
-    "p": "3458764513820540933",
-    "a": "3216694079344826173",
-    "b": "502696299769690733"
-   },
-   "model_json": "{\"a\":\"3216694079344826173\",\"b\":\"502696299769690733\",\"field\":\"fp-3458764513820540933\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3458764513820540933\",\"v\":\"1\"}",
-   "trace": 2116822531,
-   "order": "3458764511703718403",
-   "j": "2667827367259566651",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-plus-b62.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/plus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-plus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
-  },
-  {
-   "slug": "icv1-fp62-tm169603703-4013f6ed",
-   "icv1": "ICV1:fp-3458764513820540933:-169603703:3458764513990144637:1830345912465987980:unk:unk:r:4013f6ed8e9f",
-   "family": "prime",
-   "params": {
-    "p": "3458764513820540933",
-    "a": "3420827111682484458",
-    "b": "3211882459968223436"
-   },
-   "model_json": "{\"a\":\"3420827111682484458\",\"b\":\"3211882459968223436\",\"field\":\"fp-3458764513820540933\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3458764513820540933\",\"v\":\"1\"}",
-   "trace": -169603703,
-   "order": "3458764513990144637",
-   "j": "1830345912465987980",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "research/cheon_ecbench_wide_20261106/chunks/spec-minus-b62.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261106/spec.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/plan.json",
-    "research/cheon_ecbench_wide_20261106/sessions/minus-20261107/spec.json",
-    "research/cheon_ecbench_wide_20261106/spec-minus.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp63-t1073763201-9fe803db",
@@ -532052,28 +531048,6 @@
      ]
     }
    ]
-  },
-  {
-   "slug": "icv1-fp131-t29529377007934231835-9681b699",
-   "icv1": "ICV1:fp-1550031797834347859248576414813139942411:29529377007934231835:1550031797834347859219047037805205710577:424712279079156405453899315082070930793:unk:unk:r:9681b699f2f5",
-   "family": "prime",
-   "params": {
-    "p": "1550031797834347859248576414813139942411",
-    "a": "1399267573763578815877905235971153316710",
-    "b": "1009296542191532464076260367525816293976"
-   },
-   "model_json": "{\"a\":\"1399267573763578815877905235971153316710\",\"b\":\"1009296542191532464076260367525816293976\",\"field\":\"fp-1550031797834347859248576414813139942411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1550031797834347859248576414813139942411\",\"v\":\"1\"}",
-   "trace": 29529377007934231835,
-   "order": "1550031797834347859219047037805205710577",
-   "j": "424712279079156405453899315082070930793",
-   "end": "unk",
-   "aliases": [],
-   "standard_names": [],
-   "sources": [
-    "docs/curves/sources/recovered-slugs-20261113.json"
-   ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp158-t454233058419889982668807-a7cee044",
@@ -534327,7 +533301,8 @@
    "params": {
     "p": "6277101735386680763835789423207666416083908700390324961279",
     "a": "6277101735386680763835789423207666416083908700390324961276",
-    "b": "2455155546008943817740293915197451784769108058161191238065"
+    "b": "2455155546008943817740293915197451784769108058161191238065",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"6277101735386680763835789423207666416083908700390324961276\",\"b\":\"2455155546008943817740293915197451784769108058161191238065\",\"field\":\"fp-6277101735386680763835789423207666416083908700390324961279\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"6277101735386680763835789423207666416083908700390324961279\",\"v\":\"1\"}",
    "trace": 31607402316713927207482677199,
@@ -541313,7 +540288,8 @@
    "params": {
     "p": "26959946667150639794667015087019630673557916260026308143510066298881",
     "a": "26959946667150639794667015087019630673557916260026308143510066298878",
-    "b": "18958286285566608000408668544493926415504680968679321075787234672564"
+    "b": "18958286285566608000408668544493926415504680968679321075787234672564",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"26959946667150639794667015087019630673557916260026308143510066298878\",\"b\":\"18958286285566608000408668544493926415504680968679321075787234672564\",\"field\":\"fp-26959946667150639794667015087019630673557916260026308143510066298881\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"26959946667150639794667015087019630673557916260026308143510066298881\",\"v\":\"1\"}",
    "trace": 4733100108545601916421827343930821,
@@ -544271,7 +543247,8 @@
    "params": {
     "p": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
     "a": "115792089210356248762697446949407573530086143415290314195533631308867097853948",
-    "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291"
+    "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"115792089210356248762697446949407573530086143415290314195533631308867097853948\",\"b\":\"41058363725152142129326129780047268409114441015993725554835256314039467401291\",\"field\":\"fp-115792089210356248762697446949407573530086143415290314195533631308867097853951\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"115792089210356248762697446949407573530086143415290314195533631308867097853951\",\"v\":\"1\"}",
    "trace": 89188191154553853111372247798585809583,
@@ -544532,7 +543509,8 @@
    "params": {
     "p": "115792089237316195423570985008687907853269984665640564039457584007908834671663",
     "a": "0",
-    "b": "7"
+    "b": "7",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"0\",\"b\":\"7\",\"field\":\"fp-115792089237316195423570985008687907853269984665640564039457584007908834671663\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"115792089237316195423570985008687907853269984665640564039457584007908834671663\",\"v\":\"1\"}",
    "trace": 432420386565659656852420866390673177327,
@@ -621946,6 +620924,3140 @@
    "trace": "80369948951667839190628429049567884210",
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp10-t5-44c1ec1d",
+   "icv1": "ICV1:fp-827:5:823:596:unk:unk:r:44c1ec1df33d",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "54",
+    "b": "121"
+   },
+   "model_json": "{\"a\":\"54\",\"b\":\"121\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "596",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-bdd22a81",
+   "icv1": "ICV1:fp-827:5:823:304:unk:unk:r:bdd22a81ae5e",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "211",
+    "b": "695"
+   },
+   "model_json": "{\"a\":\"211\",\"b\":\"695\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "304",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-aa4928b9",
+   "icv1": "ICV1:fp-827:5:823:7:unk:unk:r:aa4928b96b0a",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "27",
+    "b": "514"
+   },
+   "model_json": "{\"a\":\"27\",\"b\":\"514\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "7",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-3b71719e",
+   "icv1": "ICV1:fp-827:5:823:785:unk:unk:r:3b71719e4ef8",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "11",
+    "b": "543"
+   },
+   "model_json": "{\"a\":\"11\",\"b\":\"543\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "785",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-b4defb92",
+   "icv1": "ICV1:fp-827:5:823:56:unk:unk:r:b4defb92264c",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "229",
+    "b": "473"
+   },
+   "model_json": "{\"a\":\"229\",\"b\":\"473\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "56",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-abb926d8",
+   "icv1": "ICV1:fp-827:5:823:179:unk:unk:r:abb926d84a1f",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "17",
+    "b": "601"
+   },
+   "model_json": "{\"a\":\"17\",\"b\":\"601\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "179",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-6c3bd6f1",
+   "icv1": "ICV1:fp-827:5:823:349:unk:unk:r:6c3bd6f1035b",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "665",
+    "b": "221"
+   },
+   "model_json": "{\"a\":\"665\",\"b\":\"221\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "349",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-0f8036c6",
+   "icv1": "ICV1:fp-827:5:823:558:unk:unk:r:0f8036c6b1c3",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "367",
+    "b": "162"
+   },
+   "model_json": "{\"a\":\"367\",\"b\":\"162\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "558",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-751:21:731:93:unk:unk:r:53e512d5848c",
+   "j": "93",
+   "model_json": "{\"a\":\"724\",\"b\":\"573\",\"field\":\"fp-751\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"751\",\"v\":\"1\"}",
+   "order": "731",
+   "params": {
+    "a": "724",
+    "b": "573",
+    "p": "751"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-t21-53e512d5",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "21"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-647:47:601:246:unk:unk:r:852299b7f95a",
+   "j": "246",
+   "model_json": "{\"a\":\"644\",\"b\":\"378\",\"field\":\"fp-647\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"647\",\"v\":\"1\"}",
+   "order": "601",
+   "params": {
+    "a": "644",
+    "b": "378",
+    "p": "647"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-t47-852299b7",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "47"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-751:-21:773:93:unk:unk:r:b87c79a9b701",
+   "j": "93",
+   "model_json": "{\"a\":\"748\",\"b\":\"355\",\"field\":\"fp-751\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"751\",\"v\":\"1\"}",
+   "order": "773",
+   "params": {
+    "a": "748",
+    "b": "355",
+    "p": "751"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-tm21-b87c79a9",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-21"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-647:-47:695:246:unk:unk:r:7d0680d88387",
+   "j": "246",
+   "model_json": "{\"a\":\"572\",\"b\":\"19\",\"field\":\"fp-647\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"647\",\"v\":\"1\"}",
+   "order": "695",
+   "params": {
+    "a": "572",
+    "b": "19",
+    "p": "647"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-tm47-7d0680d8",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-47"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-827:-5:833:463:unk:unk:r:eb2925bf0717",
+   "j": "463",
+   "model_json": "{\"a\":\"4\",\"b\":\"120\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "order": "833",
+   "params": {
+    "a": "4",
+    "b": "120",
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-tm5-eb2925bf",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-647-2-8d90d7c6:915:417695:246,0:unk:unk:r:ec9c237121ea",
+   "j": "246,0",
+   "model_json": "{\"a\":[\"644\",\"0\"],\"b\":[\"378\",\"0\"],\"field\":\"fpk-647-2-8d90d7c6\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"642\",\"0\"],\"p\":\"647\",\"v\":\"1\"}",
+   "order": "417695",
+   "params": {
+    "a": [
+     "644",
+     "0"
+    ],
+    "b": [
+     "378",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "642",
+     "0"
+    ],
+    "p": "647"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k2-t915-ec9c2371",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "915"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-751-2-934d4122:-1061:565063:93,0:unk:unk:r:ed1193ddfcfb",
+   "j": "93,0",
+   "model_json": "{\"a\":[\"748\",\"0\"],\"b\":[\"355\",\"0\"],\"field\":\"fpk-751-2-934d4122\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"748\",\"0\"],\"p\":\"751\",\"v\":\"1\"}",
+   "order": "565063",
+   "params": {
+    "a": [
+     "748",
+     "0"
+    ],
+    "b": [
+     "355",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "748",
+     "0"
+    ],
+    "p": "751"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k2-tm1061-ed1193dd",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-1061"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-827-2-5c96f4a5:-1629:685559:463,0:unk:unk:r:b86295944f10",
+   "j": "463,0",
+   "model_json": "{\"a\":[\"1\",\"0\"],\"b\":[\"15\",\"0\"],\"field\":\"fpk-827-2-5c96f4a5\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"825\",\"0\"],\"p\":\"827\",\"v\":\"1\"}",
+   "order": "685559",
+   "params": {
+    "a": [
+     "1",
+     "0"
+    ],
+    "b": [
+     "15",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "825",
+     "0"
+    ],
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k2-tm1629-b8629594",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-1629"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-647-3-8e13b78b:12596:270827428:246,0,0:unk:unk:r:f478d28ffb79",
+   "j": "246,0,0",
+   "model_json": "{\"a\":[\"644\",\"0\",\"0\"],\"b\":[\"378\",\"0\",\"0\"],\"field\":\"fpk-647-3-8e13b78b\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"378\",\"644\",\"0\"],\"p\":\"647\",\"v\":\"1\"}",
+   "order": "270827428",
+   "params": {
+    "a": [
+     "644",
+     "0",
+     "0"
+    ],
+    "b": [
+     "378",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "378",
+     "644",
+     "0"
+    ],
+    "p": "647"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k3-t12596-f478d28f",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "12596"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-751-3-257fc0b8:38052:423526700:93,0,0:unk:unk:r:90001c60d232",
+   "j": "93,0,0",
+   "model_json": "{\"a\":[\"748\",\"0\",\"0\"],\"b\":[\"355\",\"0\",\"0\"],\"field\":\"fpk-751-3-257fc0b8\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"355\",\"748\",\"0\"],\"p\":\"751\",\"v\":\"1\"}",
+   "order": "423526700",
+   "params": {
+    "a": [
+     "748",
+     "0",
+     "0"
+    ],
+    "b": [
+     "355",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "355",
+     "748",
+     "0"
+    ],
+    "p": "751"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k3-t38052-90001c60",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "38052"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-827-3-77195402:-12280:565621564:463,0,0:unk:unk:r:e22c1f590cb7",
+   "j": "463,0,0",
+   "model_json": "{\"a\":[\"1\",\"0\",\"0\"],\"b\":[\"15\",\"0\",\"0\"],\"field\":\"fpk-827-3-77195402\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"15\",\"1\",\"0\"],\"p\":\"827\",\"v\":\"1\"}",
+   "order": "565621564",
+   "params": {
+    "a": [
+     "1",
+     "0",
+     "0"
+    ],
+    "b": [
+     "15",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "15",
+     "1",
+     "0"
+    ],
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k3-tm12280-e22c1f59",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-12280"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-751-6-1a537a45:600825202:179407097688866800:93,0,0,0,0,0:unk:unk:r:a09ee73abd42",
+   "j": "93,0,0,0,0,0",
+   "model_json": "{\"a\":[\"748\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"355\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-751-6-1a537a45\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"355\",\"0\",\"748\",\"0\",\"0\",\"0\"],\"p\":\"751\",\"v\":\"1\"}",
+   "order": "179407097688866800",
+   "params": {
+    "a": [
+     "748",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "355",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "355",
+     "0",
+     "748",
+     "0",
+     "0",
+     "0"
+    ],
+    "p": "751"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k6-t600825202-a09ee73a",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "600825202"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-647-6-54e17ee0:-383020830:73354318441661360:246,0,0,0,0,0:unk:unk:r:02acef325066",
+   "j": "246,0,0,0,0,0",
+   "model_json": "{\"a\":[\"644\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"378\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-647-6-54e17ee0\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"378\",\"0\",\"644\",\"0\",\"0\",\"0\"],\"p\":\"647\",\"v\":\"1\"}",
+   "order": "73354318441661360",
+   "params": {
+    "a": [
+     "644",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "378",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "378",
+     "0",
+     "644",
+     "0",
+     "0",
+     "0"
+    ],
+    "p": "647"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k6-tm383020830-02acef32",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-383020830"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-827-6-f0cd9ed6:-980420166:319913861996194256:463,0,0,0,0,0:unk:unk:r:dbc3c53e77f2",
+   "j": "463,0,0,0,0,0",
+   "model_json": "{\"a\":[\"1\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"15\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-827-6-f0cd9ed6\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"25\",\"0\",\"13\",\"0\",\"6\",\"0\"],\"p\":\"827\",\"v\":\"1\"}",
+   "order": "319913861996194256",
+   "params": {
+    "a": [
+     "1",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "15",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "25",
+     "0",
+     "13",
+     "0",
+     "6",
+     "0"
+    ],
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10k6-tm980420166-dbc3c53e",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-980420166"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-2903:47:2857:2698:unk:unk:r:86777f327764",
+   "j": "2698",
+   "model_json": "{\"a\":\"2900\",\"b\":\"2191\",\"field\":\"fp-2903\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2903\",\"v\":\"1\"}",
+   "order": "2857",
+   "params": {
+    "a": "2900",
+    "b": "2191",
+    "p": "2903"
+   },
+   "representations": [],
+   "slug": "icv1-fp12-t47-86777f32",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "47"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-2879:61:2819:2200:unk:unk:r:a9fcb1fdbd3b",
+   "j": "2200",
+   "model_json": "{\"a\":\"2876\",\"b\":\"66\",\"field\":\"fp-2879\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2879\",\"v\":\"1\"}",
+   "order": "2819",
+   "params": {
+    "a": "2876",
+    "b": "66",
+    "p": "2879"
+   },
+   "representations": [],
+   "slug": "icv1-fp12-t61-a9fcb1fd",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "61"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-2903:-47:2951:2698:unk:unk:r:7894124fe8a7",
+   "j": "2698",
+   "model_json": "{\"a\":\"2828\",\"b\":\"993\",\"field\":\"fp-2903\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2903\",\"v\":\"1\"}",
+   "order": "2951",
+   "params": {
+    "a": "2828",
+    "b": "993",
+    "p": "2903"
+   },
+   "representations": [],
+   "slug": "icv1-fp12-tm47-7894124f",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-47"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-2879:-61:2941:2200:unk:unk:r:2b47b90e2236",
+   "j": "2200",
+   "model_json": "{\"a\":\"2732\",\"b\":\"2485\",\"field\":\"fp-2879\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2879\",\"v\":\"1\"}",
+   "order": "2941",
+   "params": {
+    "a": "2732",
+    "b": "2485",
+    "p": "2879"
+   },
+   "representations": [],
+   "slug": "icv1-fp12-tm61-2b47b90e",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-61"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2879-2-53ce7d37:-2037:8290679:2200,0:unk:unk:r:2565297bcc0c",
+   "j": "2200,0",
+   "model_json": "{\"a\":[\"2876\",\"0\"],\"b\":[\"66\",\"0\"],\"field\":\"fpk-2879-2-53ce7d37\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"2872\",\"0\"],\"p\":\"2879\",\"v\":\"1\"}",
+   "order": "8290679",
+   "params": {
+    "a": [
+     "2876",
+     "0"
+    ],
+    "b": [
+     "66",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "2872",
+     "0"
+    ],
+    "p": "2879"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k2-tm2037-2565297b",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-2037"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2903-2-0ed8adfb:-3597:8431007:2698,0:unk:unk:r:1fa6042ec8aa",
+   "j": "2698,0",
+   "model_json": "{\"a\":[\"2900\",\"0\"],\"b\":[\"2191\",\"0\"],\"field\":\"fpk-2903-2-0ed8adfb\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"2898\",\"0\"],\"p\":\"2903\",\"v\":\"1\"}",
+   "order": "8431007",
+   "params": {
+    "a": [
+     "2900",
+     "0"
+    ],
+    "b": [
+     "2191",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "2898",
+     "0"
+    ],
+    "p": "2903"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k2-tm3597-1fa6042e",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-3597"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2879-3-9198d035:-299876:23863297316:2200,0,0:unk:unk:r:b171d812e28d",
+   "j": "2200,0,0",
+   "model_json": "{\"a\":[\"2876\",\"0\",\"0\"],\"b\":[\"66\",\"0\",\"0\"],\"field\":\"fpk-2879-3-9198d035\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"66\",\"2876\",\"0\"],\"p\":\"2879\",\"v\":\"1\"}",
+   "order": "23863297316",
+   "params": {
+    "a": [
+     "2876",
+     "0",
+     "0"
+    ],
+    "b": [
+     "66",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "66",
+     "2876",
+     "0"
+    ],
+    "p": "2879"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k3-tm299876-b171d812",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-299876"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2903-3-15a51b2a:-305500:24465073828:2698,0,0:unk:unk:r:3d6bf4f7f7b5",
+   "j": "2698,0,0",
+   "model_json": "{\"a\":[\"2900\",\"0\",\"0\"],\"b\":[\"2191\",\"0\",\"0\"],\"field\":\"fpk-2903-3-15a51b2a\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"2191\",\"2900\",\"0\"],\"p\":\"2903\",\"v\":\"1\"}",
+   "order": "24465073828",
+   "params": {
+    "a": [
+     "2900",
+     "0",
+     "0"
+    ],
+    "b": [
+     "2191",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "2191",
+     "2900",
+     "0"
+    ],
+    "p": "2903"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k3-tm305500-3d6bf4f7",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-305500"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2879-6-a3ebe1aa:42199620498:569442646731520938224:2200,0,0,0,0,0:unk:unk:r:bd90183c5ecf",
+   "j": "2200,0,0,0,0,0",
+   "model_json": "{\"a\":[\"2876\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"66\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-2879-6-a3ebe1aa\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"66\",\"0\",\"2876\",\"0\",\"0\",\"0\"],\"p\":\"2879\",\"v\":\"1\"}",
+   "order": "569442646731520938224",
+   "params": {
+    "a": [
+     "2876",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "66",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "66",
+     "0",
+     "2876",
+     "0",
+     "0",
+     "0"
+    ],
+    "p": "2879"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k6-t42199620498-bd90183c",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "42199620498"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-2903-6-e1da54c1:44400713346:598524889249381665584:2698,0,0,0,0,0:unk:unk:r:2666a90cf399",
+   "j": "2698,0,0,0,0,0",
+   "model_json": "{\"a\":[\"2900\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"2191\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-2903-6-e1da54c1\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"2193\",\"0\",\"9\",\"0\",\"6\",\"0\"],\"p\":\"2903\",\"v\":\"1\"}",
+   "order": "598524889249381665584",
+   "params": {
+    "a": [
+     "2900",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "2191",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "2193",
+     "0",
+     "9",
+     "0",
+     "6",
+     "0"
+    ],
+    "p": "2903"
+   },
+   "representations": [],
+   "slug": "icv1-fp12k6-t44400713346-2666a90c",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "44400713346"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-8501:113:8389:7492:unk:unk:r:1169939b8297",
+   "j": "7492",
+   "model_json": "{\"a\":\"8498\",\"b\":\"6578\",\"field\":\"fp-8501\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"8501\",\"v\":\"1\"}",
+   "order": "8389",
+   "params": {
+    "a": "8498",
+    "b": "6578",
+    "p": "8501"
+   },
+   "representations": [],
+   "slug": "icv1-fp14-t113-1169939b",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "113"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-10111:33:10079:8607:unk:unk:r:d98086aeb1b3",
+   "j": "8607",
+   "model_json": "{\"a\":\"10108\",\"b\":\"2486\",\"field\":\"fp-10111\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"10111\",\"v\":\"1\"}",
+   "order": "10079",
+   "params": {
+    "a": "10108",
+    "b": "2486",
+    "p": "10111"
+   },
+   "representations": [],
+   "slug": "icv1-fp14-t33-d98086ae",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "33"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-8501:-113:8615:7492:unk:unk:r:e2f0c8e3e9ee",
+   "j": "7492",
+   "model_json": "{\"a\":\"8489\",\"b\":\"1618\",\"field\":\"fp-8501\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"8501\",\"v\":\"1\"}",
+   "order": "8615",
+   "params": {
+    "a": "8489",
+    "b": "1618",
+    "p": "8501"
+   },
+   "representations": [],
+   "slug": "icv1-fp14-tm113-e2f0c8e3",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-113"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-10111:-33:10145:8607:unk:unk:r:d3ec4530da84",
+   "j": "8607",
+   "model_json": "{\"a\":\"10084\",\"b\":\"6456\",\"field\":\"fp-10111\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"10111\",\"v\":\"1\"}",
+   "order": "10145",
+   "params": {
+    "a": "10084",
+    "b": "6456",
+    "p": "10111"
+   },
+   "representations": [],
+   "slug": "icv1-fp14-tm33-d3ec4530",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-33"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-10111-2-03b1fa8c:-19133:102251455:8607,0:unk:unk:r:79c676340579",
+   "j": "8607,0",
+   "model_json": "{\"a\":[\"10108\",\"0\"],\"b\":[\"2486\",\"0\"],\"field\":\"fpk-10111-2-03b1fa8c\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"10108\",\"0\"],\"p\":\"10111\",\"v\":\"1\"}",
+   "order": "102251455",
+   "params": {
+    "a": [
+     "10108",
+     "0"
+    ],
+    "b": [
+     "2486",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "10108",
+     "0"
+    ],
+    "p": "10111"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k2-tm19133-79c67634",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-19133"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-8501-2-b98b5982:-4233:72271235:7492,0:unk:unk:r:891450058879",
+   "j": "7492,0",
+   "model_json": "{\"a\":[\"8498\",\"0\"],\"b\":[\"6578\",\"0\"],\"field\":\"fpk-8501-2-b98b5982\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"8499\",\"0\"],\"p\":\"8501\",\"v\":\"1\"}",
+   "order": "72271235",
+   "params": {
+    "a": [
+     "8498",
+     "0"
+    ],
+    "b": [
+     "6578",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "8499",
+     "0"
+    ],
+    "p": "8501"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k2-tm4233-89145005",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-4233"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-8501-3-3ae638d3:-1438942:614343214444:7492,0,0:unk:unk:r:6eec8c1750e4",
+   "j": "7492,0,0",
+   "model_json": "{\"a\":[\"8498\",\"0\",\"0\"],\"b\":[\"6578\",\"0\",\"0\"],\"field\":\"fpk-8501-3-3ae638d3\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"6578\",\"8498\",\"0\"],\"p\":\"8501\",\"v\":\"1\"}",
+   "order": "614343214444",
+   "params": {
+    "a": [
+     "8498",
+     "0",
+     "0"
+    ],
+    "b": [
+     "6578",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "6578",
+     "8498",
+     "0"
+    ],
+    "p": "8501"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k3-tm1438942-6eec8c17",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-1438942"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-10111-3-4b57305f:-965052:1033671962684:8607,0,0:unk:unk:r:2dce67f8315c",
+   "j": "8607,0,0",
+   "model_json": "{\"a\":[\"10108\",\"0\",\"0\"],\"b\":[\"2486\",\"0\",\"0\"],\"field\":\"fpk-10111-3-4b57305f\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"2486\",\"10108\",\"0\"],\"p\":\"10111\",\"v\":\"1\"}",
+   "order": "1033671962684",
+   "params": {
+    "a": [
+     "10108",
+     "0",
+     "0"
+    ],
+    "b": [
+     "2486",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "2486",
+     "10108",
+     "0"
+    ],
+    "p": "10111"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k3-tm965052-2dce67f8",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-965052"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-8501-6-4e6f7f41:841870528362:377415817124879213272640:7492,0,0,0,0,0:unk:unk:r:781bfce93e38",
+   "j": "7492,0,0,0,0,0",
+   "model_json": "{\"a\":[\"8498\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"6578\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-8501-6-4e6f7f41\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"6576\",\"0\",\"0\",\"0\",\"3\",\"0\"],\"p\":\"8501\",\"v\":\"1\"}",
+   "order": "377415817124879213272640",
+   "params": {
+    "a": [
+     "8498",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "6578",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "6576",
+     "0",
+     "0",
+     "0",
+     "3",
+     "0"
+    ],
+    "p": "8501"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k6-t841870528362-781bfce9",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "841870528362"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-10111-6-e4791a2a:-1136016632558:1068475731344602824244720:8607,0,0,0,0,0:unk:unk:r:01c777778a47",
+   "j": "8607,0,0,0,0,0",
+   "model_json": "{\"a\":[\"10108\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"2486\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-10111-6-e4791a2a\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"2538\",\"0\",\"45\",\"0\",\"12\",\"0\"],\"p\":\"10111\",\"v\":\"1\"}",
+   "order": "1068475731344602824244720",
+   "params": {
+    "a": [
+     "10108",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "2486",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "2538",
+     "0",
+     "45",
+     "0",
+     "12",
+     "0"
+    ],
+    "p": "10111"
+   },
+   "representations": [],
+   "slug": "icv1-fp14k6-tm1136016632558-01c77777",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-1136016632558"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-59:7:53:52:unk:unk:r:ae06a30900a1",
+   "j": "52",
+   "model_json": "{\"a\":\"4\",\"b\":\"45\",\"field\":\"fp-59\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59\",\"v\":\"1\"}",
+   "order": "53",
+   "params": {
+    "a": "4",
+    "b": "45",
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6-t7-ae06a309",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "7"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-59-2-734a5192:-69:3551:52,0:unk:unk:r:92c3dc003ddf",
+   "j": "52,0",
+   "model_json": "{\"a\":[\"1\",\"0\"],\"b\":[\"13\",\"0\"],\"field\":\"fpk-59-2-734a5192\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"57\",\"0\"],\"p\":\"59\",\"v\":\"1\"}",
+   "order": "3551",
+   "params": {
+    "a": [
+     "1",
+     "0"
+    ],
+    "b": [
+     "13",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "57",
+     "0"
+    ],
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6k2-tm69-92c3dc00",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-69"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-59-3-7b8f3249:896:204484:52,0,0:unk:unk:r:caa8edd88cfc",
+   "j": "52,0,0",
+   "model_json": "{\"a\":[\"1\",\"0\",\"0\"],\"b\":[\"13\",\"0\",\"0\"],\"field\":\"fpk-59-3-7b8f3249\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"13\",\"1\",\"0\"],\"p\":\"59\",\"v\":\"1\"}",
+   "order": "204484",
+   "params": {
+    "a": [
+     "1",
+     "0",
+     "0"
+    ],
+    "b": [
+     "13",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "13",
+     "1",
+     "0"
+    ],
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6k3-t896-caa8edd8",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "896"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-59-6-1966ec00:392058:42180141584:52,0,0,0,0,0:unk:unk:r:c4e2ee764b24",
+   "j": "52,0,0,0,0,0",
+   "model_json": "{\"a\":[\"1\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"13\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-59-6-1966ec00\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"15\",\"0\",\"4\",\"0\",\"3\",\"0\"],\"p\":\"59\",\"v\":\"1\"}",
+   "order": "42180141584",
+   "params": {
+    "a": [
+     "1",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "13",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "15",
+     "0",
+     "4",
+     "0",
+     "3",
+     "0"
+    ],
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6k6-t392058-c4e2ee76",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "392058"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-113:-2:116:15:unk:unk:r:2eacc96a5021",
+   "j": "15",
+   "model_json": "{\"a\":\"58\",\"b\":\"54\",\"field\":\"fp-113\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"113\",\"v\":\"1\"}",
+   "order": "116",
+   "params": {
+    "a": "58",
+    "b": "54",
+    "p": "113"
+   },
+   "representations": [],
+   "slug": "icv1-fp7-tm2-2eacc96a",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-2"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-67:-4:72:42:unk:unk:r:286b95958db3",
+   "j": "42",
+   "model_json": "{\"a\":\"50\",\"b\":\"41\",\"field\":\"fp-67\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"67\",\"v\":\"1\"}",
+   "order": "72",
+   "params": {
+    "a": "50",
+    "b": "41",
+    "p": "67"
+   },
+   "representations": [],
+   "slug": "icv1-fp7-tm4-286b9595",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-4"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-67-2-4083a0ca:-118:4608:42,0:unk:unk:r:464c4daca334",
+   "j": "42,0",
+   "model_json": "{\"a\":[\"46\",\"0\"],\"b\":[\"47\",\"0\"],\"field\":\"fpk-67-2-4083a0ca\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"65\",\"0\"],\"p\":\"67\",\"v\":\"1\"}",
+   "order": "4608",
+   "params": {
+    "a": [
+     "46",
+     "0"
+    ],
+    "b": [
+     "47",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "65",
+     "0"
+    ],
+    "p": "67"
+   },
+   "representations": [],
+   "slug": "icv1-fp7k2-tm118-464c4dac",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-118"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-113-2-f6d95e65:-222:12992:15,0:unk:unk:r:7e740f6d0f36",
+   "j": "15,0",
+   "model_json": "{\"a\":[\"19\",\"0\"],\"b\":[\"2\",\"0\"],\"field\":\"fpk-113-2-f6d95e65\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"110\",\"0\"],\"p\":\"113\",\"v\":\"1\"}",
+   "order": "12992",
+   "params": {
+    "a": [
+     "19",
+     "0"
+    ],
+    "b": [
+     "2",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "110",
+     "0"
+    ],
+    "p": "113"
+   },
+   "representations": [],
+   "slug": "icv1-fp7k2-tm222-7e740f6d",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-222"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-223:1:223:13:unk:unk:r:37f69e50c818",
+   "j": "13",
+   "model_json": "{\"a\":\"88\",\"b\":\"121\",\"field\":\"fp-223\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"223\",\"v\":\"1\"}",
+   "order": "223",
+   "params": {
+    "a": "88",
+    "b": "121",
+    "p": "223"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-t1-37f69e50",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "1"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-211:21:191:121:unk:unk:r:948bccca9aa0",
+   "j": "121",
+   "model_json": "{\"a\":\"199\",\"b\":\"102\",\"field\":\"fp-211\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"211\",\"v\":\"1\"}",
+   "order": "191",
+   "params": {
+    "a": "199",
+    "b": "102",
+    "p": "211"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-t21-948bccca",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "21"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-251:5:247:125:unk:unk:r:cf313cd0a99e",
+   "j": "125",
+   "model_json": "{\"a\":\"239\",\"b\":\"79\",\"field\":\"fp-251\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"251\",\"v\":\"1\"}",
+   "order": "247",
+   "params": {
+    "a": "239",
+    "b": "79",
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-t5-cf313cd0",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-211:-21:233:121:unk:unk:r:71e3bcb74063",
+   "j": "121",
+   "model_json": "{\"a\":\"208\",\"b\":\"171\",\"field\":\"fp-211\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"211\",\"v\":\"1\"}",
+   "order": "233",
+   "params": {
+    "a": "208",
+    "b": "171",
+    "p": "211"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-tm21-71e3bcb7",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-21"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-251:-5:257:125:unk:unk:r:23216e9c3346",
+   "j": "125",
+   "model_json": "{\"a\":\"248\",\"b\":\"104\",\"field\":\"fp-251\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"251\",\"v\":\"1\"}",
+   "order": "257",
+   "params": {
+    "a": "248",
+    "b": "104",
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-tm5-23216e9c",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-211-2-7e5f9ffe:19:44503:121,0:unk:unk:r:aa93fedf7b1a",
+   "j": "121,0",
+   "model_json": "{\"a\":[\"208\",\"0\"],\"b\":[\"171\",\"0\"],\"field\":\"fpk-211-2-7e5f9ffe\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"209\",\"0\"],\"p\":\"211\",\"v\":\"1\"}",
+   "order": "44503",
+   "params": {
+    "a": [
+     "208",
+     "0"
+    ],
+    "b": [
+     "171",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "209",
+     "0"
+    ],
+    "p": "211"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k2-t19-aa93fedf",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "19"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-223-2-73e8b817:-445:50175:13,0:unk:unk:r:b73c777bc210",
+   "j": "13,0",
+   "model_json": "{\"a\":[\"208\",\"0\"],\"b\":[\"21\",\"0\"],\"field\":\"fpk-223-2-73e8b817\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"220\",\"0\"],\"p\":\"223\",\"v\":\"1\"}",
+   "order": "50175",
+   "params": {
+    "a": [
+     "208",
+     "0"
+    ],
+    "b": [
+     "21",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "220",
+     "0"
+    ],
+    "p": "223"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k2-tm445-b73c777b",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-445"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-251-2-3797b3ae:-477:63479:125,0:unk:unk:r:37b4f4feb28e",
+   "j": "125,0",
+   "model_json": "{\"a\":[\"248\",\"0\"],\"b\":[\"104\",\"0\"],\"field\":\"fpk-251-2-3797b3ae\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"249\",\"0\"],\"p\":\"251\",\"v\":\"1\"}",
+   "order": "63479",
+   "params": {
+    "a": [
+     "248",
+     "0"
+    ],
+    "b": [
+     "104",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "249",
+     "0"
+    ],
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k2-tm477-37b4f4fe",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-477"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-251-3-44b0d3e0:3640:15809612:125,0,0:unk:unk:r:8afd331fa015",
+   "j": "125,0,0",
+   "model_json": "{\"a\":[\"248\",\"0\",\"0\"],\"b\":[\"104\",\"0\",\"0\"],\"field\":\"fpk-251-3-44b0d3e0\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"104\",\"248\",\"0\"],\"p\":\"251\",\"v\":\"1\"}",
+   "order": "15809612",
+   "params": {
+    "a": [
+     "248",
+     "0",
+     "0"
+    ],
+    "b": [
+     "104",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "104",
+     "248",
+     "0"
+    ],
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k3-t3640-8afd331f",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "3640"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-211-3-85b603e3:4032:9389900:121,0,0:unk:unk:r:d1c4dc0976a8",
+   "j": "121,0,0",
+   "model_json": "{\"a\":[\"208\",\"0\",\"0\"],\"b\":[\"171\",\"0\",\"0\"],\"field\":\"fpk-211-3-85b603e3\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"3\",\"modulus\":[\"171\",\"208\",\"0\"],\"p\":\"211\",\"v\":\"1\"}",
+   "order": "9389900",
+   "params": {
+    "a": [
+     "208",
+     "0",
+     "0"
+    ],
+    "b": [
+     "171",
+     "0",
+     "0"
+    ],
+    "k": "3",
+    "modulus": [
+     "171",
+     "208",
+     "0"
+    ],
+    "p": "211"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k3-t4032-d1c4dc09",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "4032"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-251-6-78717d37:-18376902:250058925565904:125,0,0,0,0,0:unk:unk:r:06d31f14cf6f",
+   "j": "125,0,0,0,0,0",
+   "model_json": "{\"a\":[\"248\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"104\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-251-6-78717d37\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"106\",\"0\",\"9\",\"0\",\"6\",\"0\"],\"p\":\"251\",\"v\":\"1\"}",
+   "order": "250058925565904",
+   "params": {
+    "a": [
+     "248",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "104",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "106",
+     "0",
+     "9",
+     "0",
+     "6",
+     "0"
+    ],
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k6-tm18376902-06d31f14",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-18376902"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-211-6-d612ec65:-2530838:88245942163600:121,0,0,0,0,0:unk:unk:r:879d812bf1c4",
+   "j": "121,0,0,0,0,0",
+   "model_json": "{\"a\":[\"208\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"b\":[\"171\",\"0\",\"0\",\"0\",\"0\",\"0\"],\"field\":\"fpk-211-6-d612ec65\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"6\",\"modulus\":[\"171\",\"0\",\"208\",\"0\",\"0\",\"0\"],\"p\":\"211\",\"v\":\"1\"}",
+   "order": "88245942163600",
+   "params": {
+    "a": [
+     "208",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "b": [
+     "171",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "k": "6",
+    "modulus": [
+     "171",
+     "0",
+     "208",
+     "0",
+     "0",
+     "0"
+    ],
+    "p": "211"
+   },
+   "representations": [],
+   "slug": "icv1-fp8k6-tm2530838-879d812b",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-2530838"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-827:5:823:463:unk:unk:r:3c13113522d4",
+   "j": "463",
+   "model_json": "{\"a\":\"81\",\"b\":\"184\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "order": "823",
+   "params": {
+    "a": "81",
+    "b": "184",
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-t5-3c131135",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-827:5:823:463:unk:unk:r:c4f097de2fa4",
+   "j": "463",
+   "model_json": "{\"a\":\"16\",\"b\":\"133\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "order": "823",
+   "params": {
+    "a": "16",
+    "b": "133",
+    "p": "827"
+   },
+   "representations": [],
+   "slug": "icv1-fp10-t5-c4f097de",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-59:-7:67:52:unk:unk:r:0285d8ffcf71",
+   "j": "52",
+   "model_json": "{\"a\":\"22\",\"b\":\"37\",\"field\":\"fp-59\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59\",\"v\":\"1\"}",
+   "order": "67",
+   "params": {
+    "a": "22",
+    "b": "37",
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6-tm7-0285d8ff",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-7"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-59:-7:67:52:unk:unk:r:ba95cf3eaf1f",
+   "j": "52",
+   "model_json": "{\"a\":\"16\",\"b\":\"6\",\"field\":\"fp-59\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59\",\"v\":\"1\"}",
+   "order": "67",
+   "params": {
+    "a": "16",
+    "b": "6",
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6-tm7-ba95cf3e",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-7"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-59:-7:67:21:unk:unk:r:dc86148469ea",
+   "j": "21",
+   "model_json": "{\"a\":\"30\",\"b\":\"53\",\"field\":\"fp-59\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59\",\"v\":\"1\"}",
+   "order": "67",
+   "params": {
+    "a": "30",
+    "b": "53",
+    "p": "59"
+   },
+   "representations": [],
+   "slug": "icv1-fp6-tm7-dc861484",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-7"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-251:-5:257:125:unk:unk:r:82a82b6387d1",
+   "j": "125",
+   "model_json": "{\"a\":\"8\",\"b\":\"14\",\"field\":\"fp-251\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"251\",\"v\":\"1\"}",
+   "order": "257",
+   "params": {
+    "a": "8",
+    "b": "14",
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-tm5-82a82b63",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-251:-5:257:31:unk:unk:r:9d998e987fd7",
+   "j": "31",
+   "model_json": "{\"a\":\"77\",\"b\":\"148\",\"field\":\"fp-251\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"251\",\"v\":\"1\"}",
+   "order": "257",
+   "params": {
+    "a": "77",
+    "b": "148",
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-tm5-9d998e98",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-251:-5:257:125:unk:unk:r:a26ee9a58678",
+   "j": "125",
+   "model_json": "{\"a\":\"203\",\"b\":\"130\",\"field\":\"fp-251\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"251\",\"v\":\"1\"}",
+   "order": "257",
+   "params": {
+    "a": "203",
+    "b": "130",
+    "p": "251"
+   },
+   "representations": [],
+   "slug": "icv1-fp8-tm5-a26ee9a5",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/fixtures.json"
+   ],
+   "standard_names": [],
+   "trace": "-5"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Supersingular positive control only. The linked fixture specifies x^2+1 over F43, its exact source subgroup of order 11, generator, distortion point and embedding; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "prime",
+   "icv1": "ICV1:fp-43:0:44:8:unk:unk:r:74779950ae8b",
+   "j": "8",
+   "model_json": "{\"a\":\"1\",\"b\":\"0\",\"field\":\"fp-43\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"43\",\"v\":\"1\"}",
+   "order": "44",
+   "params": {
+    "a": "1",
+    "b": "0",
+    "p": "43"
+   },
+   "representations": [],
+   "slug": "icv1-fp6-t0-74779950",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/pairing-fixture.json"
+   ],
+   "standard_names": [],
+   "trace": "0"
+  },
+  {
+   "aliases": [],
+   "ec1_unresolved": "Supersingular positive control only. The linked fixture specifies x^2+1 over F43, its exact source subgroup of order 11, generator, distortion point and embedding; no cross-repository EC1 comparison is claimed.",
+   "end": "unk",
+   "family": "extension",
+   "icv1": "ICV1:fpk-43-2-47680893:-86:1936:8,0:unk:unk:r:70f2251ba556",
+   "j": "8,0",
+   "model_json": "{\"a\":[\"1\",\"0\"],\"b\":[\"0\",\"0\"],\"field\":\"fpk-43-2-47680893\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"2\",\"modulus\":[\"1\",\"0\"],\"p\":\"43\",\"v\":\"1\"}",
+   "order": "1936",
+   "params": {
+    "a": [
+     "1",
+     "0"
+    ],
+    "b": [
+     "0",
+     "0"
+    ],
+    "k": "2",
+    "modulus": [
+     "1",
+     "0"
+    ],
+    "p": "43"
+   },
+   "representations": [],
+   "slug": "icv1-fp6k2-tm86-70f2251b",
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/pairing-fixture.json"
+   ],
+   "standard_names": [],
+   "trace": "-86"
+  },
+  {
+   "slug": "icv1-fp10-t5-4f35b085",
+   "icv1": "ICV1:fp-827:5:823:463:unk:unk:r:4f35b085e666",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "31",
+    "b": "77"
+   },
+   "model_json": "{\"a\":\"31\",\"b\":\"77\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "463",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v10/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-f0e73976",
+   "icv1": "ICV1:fp-827:5:823:56:unk:unk:r:f0e73976f5f5",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "483",
+    "b": "333"
+   },
+   "model_json": "{\"a\":\"483\",\"b\":\"333\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "56",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-cde18c97",
+   "icv1": "ICV1:fp-827:5:823:349:unk:unk:r:cde18c97f874",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "767",
+    "b": "528"
+   },
+   "model_json": "{\"a\":\"767\",\"b\":\"528\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "349",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-69a9dc43",
+   "icv1": "ICV1:fp-827:5:823:785:unk:unk:r:69a9dc43a8c4",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "341",
+    "b": "141"
+   },
+   "model_json": "{\"a\":\"341\",\"b\":\"141\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "785",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-e27793a1",
+   "icv1": "ICV1:fp-827:5:823:304:unk:unk:r:e27793a16d12",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "752",
+    "b": "811"
+   },
+   "model_json": "{\"a\":\"752\",\"b\":\"811\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "304",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-a0d49907",
+   "icv1": "ICV1:fp-827:5:823:558:unk:unk:r:a0d49907591d",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "626",
+    "b": "170"
+   },
+   "model_json": "{\"a\":\"626\",\"b\":\"170\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "558",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-6ab7b186",
+   "icv1": "ICV1:fp-827:5:823:7:unk:unk:r:6ab7b1868dba",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "10",
+    "b": "764"
+   },
+   "model_json": "{\"a\":\"10\",\"b\":\"764\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "7",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-061dd6fd",
+   "icv1": "ICV1:fp-827:5:823:596:unk:unk:r:061dd6fd432a",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "20",
+    "b": "566"
+   },
+   "model_json": "{\"a\":\"20\",\"b\":\"566\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "596",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp10-t5-1f338187",
+   "icv1": "ICV1:fp-827:5:823:179:unk:unk:r:1f338187fbdb",
+   "family": "prime",
+   "params": {
+    "p": "827",
+    "a": "527",
+    "b": "549"
+   },
+   "model_json": "{\"a\":\"527\",\"b\":\"549\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
+   "trace": "5",
+   "order": "823",
+   "j": "179",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v13/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact field, whole order, source subgroup generator and verified tower-to-flat generator are frozen in the linked execution fixture; no cross-repository EC1 comparison is claimed."
+  },
+  {
+   "slug": "icv1-fp16-t119-e81b5822",
+   "icv1": "ICV1:fp-32909:119:32791:20393:unk:unk:r:e81b58220c07",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "4",
+    "b": "8"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"8\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "119",
+   "order": "32791",
+   "j": "20393",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-t239-c79a83ff",
+   "icv1": "ICV1:fp-32909:239:32671:20621:unk:unk:r:c79a83ffd8a6",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "4",
+    "b": "376"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"376\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "239",
+   "order": "32671",
+   "j": "20621",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-t45-935266e2",
+   "icv1": "ICV1:fp-37507:45:37463:32329:unk:unk:r:935266e2413b",
+   "family": "prime",
+   "params": {
+    "p": "37507",
+    "a": "10458",
+    "b": "6972"
+   },
+   "model_json": "{\"a\":\"10458\",\"b\":\"6972\",\"field\":\"fp-37507\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"37507\",\"v\":\"1\"}",
+   "trace": "45",
+   "order": "37463",
+   "j": "32329",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-t57-62a8ad64",
+   "icv1": "ICV1:fp-59119:57:59063:22221:unk:unk:r:62a8ad64c606",
+   "family": "prime",
+   "params": {
+    "p": "59119",
+    "a": "11213",
+    "b": "46888"
+   },
+   "model_json": "{\"a\":\"11213\",\"b\":\"46888\",\"field\":\"fp-59119\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59119\",\"v\":\"1\"}",
+   "trace": "57",
+   "order": "59063",
+   "j": "22221",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-t79-f9111c85",
+   "icv1": "ICV1:fp-32909:79:32831:26223:unk:unk:r:f9111c85691f",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "1",
+    "b": "22"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"22\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "79",
+   "order": "32831",
+   "j": "26223",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-tm119-4dc6177b",
+   "icv1": "ICV1:fp-32909:-119:33029:20393:unk:unk:r:4dc6177b1426",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "1",
+    "b": "1"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"1\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "-119",
+   "order": "33029",
+   "j": "20393",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-tm239-e34a9fc9",
+   "icv1": "ICV1:fp-32909:-239:33149:20621:unk:unk:r:e34a9fc96926",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "1",
+    "b": "47"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"47\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "-239",
+   "order": "33149",
+   "j": "20621",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-tm45-6acc139b",
+   "icv1": "ICV1:fp-37507:-45:37553:32329:unk:unk:r:6acc139b8ee8",
+   "family": "prime",
+   "params": {
+    "p": "37507",
+    "a": "4325",
+    "b": "18269"
+   },
+   "model_json": "{\"a\":\"4325\",\"b\":\"18269\",\"field\":\"fp-37507\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"37507\",\"v\":\"1\"}",
+   "trace": "-45",
+   "order": "37553",
+   "j": "32329",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-tm57-8621fa09",
+   "icv1": "ICV1:fp-59119:-57:59177:22221:unk:unk:r:8621fa09093f",
+   "family": "prime",
+   "params": {
+    "p": "59119",
+    "a": "41798",
+    "b": "24477"
+   },
+   "model_json": "{\"a\":\"41798\",\"b\":\"24477\",\"field\":\"fp-59119\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"59119\",\"v\":\"1\"}",
+   "trace": "-57",
+   "order": "59177",
+   "j": "22221",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp16-tm79-585677b1",
+   "icv1": "ICV1:fp-32909:-79:32989:26223:unk:unk:r:585677b176fb",
+   "family": "prime",
+   "params": {
+    "p": "32909",
+    "a": "4",
+    "b": "176"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"176\",\"field\":\"fp-32909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"32909\",\"v\":\"1\"}",
+   "trace": "-79",
+   "order": "32989",
+   "j": "26223",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp17-t63-cc59b5df",
+   "icv1": "ICV1:fp-71761:63:71699:5225:unk:unk:r:cc59b5dfe8bd",
+   "family": "prime",
+   "params": {
+    "p": "71761",
+    "a": "41550",
+    "b": "27700"
+   },
+   "model_json": "{\"a\":\"41550\",\"b\":\"27700\",\"field\":\"fp-71761\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"71761\",\"v\":\"1\"}",
+   "trace": "63",
+   "order": "71699",
+   "j": "5225",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp17-tm63-4ce4f1b3",
+   "icv1": "ICV1:fp-71761:-63:71825:5225:unk:unk:r:4ce4f1b33327",
+   "family": "prime",
+   "params": {
+    "p": "71761",
+    "a": "4280",
+    "b": "55307"
+   },
+   "model_json": "{\"a\":\"4280\",\"b\":\"55307\",\"field\":\"fp-71761\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"71761\",\"v\":\"1\"}",
+   "trace": "-63",
+   "order": "71825",
+   "j": "5225",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-t297-5b303d70",
+   "icv1": "ICV1:fp-131203:297:130907:60508:unk:unk:r:5b303d70262d",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "4",
+    "b": "952"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"952\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "297",
+   "order": "130907",
+   "j": "60508",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-t33-75653416",
+   "icv1": "ICV1:fp-131203:33:131171:34869:unk:unk:r:756534165208",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "1",
+    "b": "112"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"112\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "33",
+   "order": "131171",
+   "j": "34869",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-t575-32e5a956",
+   "icv1": "ICV1:fp-131203:575:130629:1716:unk:unk:r:32e5a9563cf3",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "4",
+    "b": "1240"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"1240\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "575",
+   "order": "130629",
+   "j": "1716",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-t95-b7709bed",
+   "icv1": "ICV1:fp-159857:95:159763:132027:unk:unk:r:b7709bed5586",
+   "family": "prime",
+   "params": {
+    "p": "159857",
+    "a": "86302",
+    "b": "4249"
+   },
+   "model_json": "{\"a\":\"86302\",\"b\":\"4249\",\"field\":\"fp-159857\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"159857\",\"v\":\"1\"}",
+   "trace": "95",
+   "order": "159763",
+   "j": "132027",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-tm297-e2548ae2",
+   "icv1": "ICV1:fp-131203:-297:131501:60508:unk:unk:r:e2548ae24c33",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "1",
+    "b": "119"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"119\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "-297",
+   "order": "131501",
+   "j": "60508",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-tm33-b71540e4",
+   "icv1": "ICV1:fp-131203:-33:131237:34869:unk:unk:r:b71540e4d1b1",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "4",
+    "b": "896"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"896\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "-33",
+   "order": "131237",
+   "j": "34869",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-tm575-baaba358",
+   "icv1": "ICV1:fp-131203:-575:131779:1716:unk:unk:r:baaba3583465",
+   "family": "prime",
+   "params": {
+    "p": "131203",
+    "a": "1",
+    "b": "155"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"155\",\"field\":\"fp-131203\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"131203\",\"v\":\"1\"}",
+   "trace": "-575",
+   "order": "131779",
+   "j": "1716",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp18-tm95-271f8211",
+   "icv1": "ICV1:fp-159857:-95:159953:132027:unk:unk:r:271f8211e278",
+   "family": "prime",
+   "params": {
+    "p": "159857",
+    "a": "137290",
+    "b": "114723"
+   },
+   "model_json": "{\"a\":\"137290\",\"b\":\"114723\",\"field\":\"fp-159857\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"159857\",\"v\":\"1\"}",
+   "trace": "-95",
+   "order": "159953",
+   "j": "132027",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp19-t143-cfaea1cf",
+   "icv1": "ICV1:fp-357281:143:357139:33595:unk:unk:r:cfaea1cf5b68",
+   "family": "prime",
+   "params": {
+    "p": "357281",
+    "a": "241627",
+    "b": "125973"
+   },
+   "model_json": "{\"a\":\"241627\",\"b\":\"125973\",\"field\":\"fp-357281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"357281\",\"v\":\"1\"}",
+   "trace": "143",
+   "order": "357139",
+   "j": "33595",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp19-t159-8c91e74a",
+   "icv1": "ICV1:fp-440497:159:440339:287508:unk:unk:r:8c91e74a976d",
+   "family": "prime",
+   "params": {
+    "p": "440497",
+    "a": "432468",
+    "b": "120069"
+   },
+   "model_json": "{\"a\":\"432468\",\"b\":\"120069\",\"field\":\"fp-440497\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"440497\",\"v\":\"1\"}",
+   "trace": "159",
+   "order": "440339",
+   "j": "287508",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp19-tm143-27ea64fd",
+   "icv1": "ICV1:fp-357281:-143:357425:33595:unk:unk:r:27ea64fd6b51",
+   "family": "prime",
+   "params": {
+    "p": "357281",
+    "a": "30957",
+    "b": "185742"
+   },
+   "model_json": "{\"a\":\"30957\",\"b\":\"185742\",\"field\":\"fp-357281\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"357281\",\"v\":\"1\"}",
+   "trace": "-143",
+   "order": "357425",
+   "j": "33595",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp19-tm159-19002a35",
+   "icv1": "ICV1:fp-440497:-159:440657:287508:unk:unk:r:19002a35f7a7",
+   "family": "prime",
+   "params": {
+    "p": "440497",
+    "a": "239772",
+    "b": "31727"
+   },
+   "model_json": "{\"a\":\"239772\",\"b\":\"31727\",\"field\":\"fp-440497\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"440497\",\"v\":\"1\"}",
+   "trace": "-159",
+   "order": "440657",
+   "j": "287508",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t185-628e70ba",
+   "icv1": "ICV1:fp-594287:185:594103:400743:unk:unk:r:628e70ba8aeb",
+   "family": "prime",
+   "params": {
+    "p": "594287",
+    "a": "271030",
+    "b": "507242"
+   },
+   "model_json": "{\"a\":\"271030\",\"b\":\"507242\",\"field\":\"fp-594287\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"594287\",\"v\":\"1\"}",
+   "trace": "185",
+   "order": "594103",
+   "j": "400743",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t197-add72ea1",
+   "icv1": "ICV1:fp-673019:197:672823:52547:unk:unk:r:add72ea1a19f",
+   "family": "prime",
+   "params": {
+    "p": "673019",
+    "a": "160587",
+    "b": "107058"
+   },
+   "model_json": "{\"a\":\"160587\",\"b\":\"107058\",\"field\":\"fp-673019\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"673019\",\"v\":\"1\"}",
+   "trace": "197",
+   "order": "672823",
+   "j": "52547",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t231-a93c8b49",
+   "icv1": "ICV1:fp-922681:231:922451:115973:unk:unk:r:a93c8b497670",
+   "family": "prime",
+   "params": {
+    "p": "922681",
+    "a": "871264",
+    "b": "888403"
+   },
+   "model_json": "{\"a\":\"871264\",\"b\":\"888403\",\"field\":\"fp-922681\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"922681\",\"v\":\"1\"}",
+   "trace": "231",
+   "order": "922451",
+   "j": "115973",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t521-4f44255b",
+   "icv1": "ICV1:fp-524411:521:523891:141828:unk:unk:r:4f44255b645f",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "4",
+    "b": "856"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"856\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "521",
+   "order": "523891",
+   "j": "141828",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t71-2ce051ee",
+   "icv1": "ICV1:fp-524411:71:524341:27273:unk:unk:r:2ce051eeb518",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "1",
+    "b": "7"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"7\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "71",
+   "order": "524341",
+   "j": "27273",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-t961-3684853a",
+   "icv1": "ICV1:fp-524411:961:523451:166154:unk:unk:r:3684853a0994",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "4",
+    "b": "936"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"936\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "961",
+   "order": "523451",
+   "j": "166154",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm185-34d9e4d9",
+   "icv1": "ICV1:fp-594287:-185:594473:400743:unk:unk:r:34d9e4d9b700",
+   "family": "prime",
+   "params": {
+    "p": "594287",
+    "a": "238593",
+    "b": "410828"
+   },
+   "model_json": "{\"a\":\"238593\",\"b\":\"410828\",\"field\":\"fp-594287\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"594287\",\"v\":\"1\"}",
+   "trace": "-185",
+   "order": "594473",
+   "j": "400743",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm197-f6d223cd",
+   "icv1": "ICV1:fp-673019:-197:673217:52547:unk:unk:r:f6d223cd4c6c",
+   "family": "prime",
+   "params": {
+    "p": "673019",
+    "a": "642348",
+    "b": "183445"
+   },
+   "model_json": "{\"a\":\"642348\",\"b\":\"183445\",\"field\":\"fp-673019\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"673019\",\"v\":\"1\"}",
+   "trace": "-197",
+   "order": "673217",
+   "j": "52547",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm231-3ece17fe",
+   "icv1": "ICV1:fp-922681:-231:922913:115973:unk:unk:r:3ece17fea2a8",
+   "family": "prime",
+   "params": {
+    "p": "922681",
+    "a": "537337",
+    "b": "351076"
+   },
+   "model_json": "{\"a\":\"537337\",\"b\":\"351076\",\"field\":\"fp-922681\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"922681\",\"v\":\"1\"}",
+   "trace": "-231",
+   "order": "922913",
+   "j": "115973",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm521-eac2ee4b",
+   "icv1": "ICV1:fp-524411:-521:524933:141828:unk:unk:r:eac2ee4b5545",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "1",
+    "b": "107"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"107\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "-521",
+   "order": "524933",
+   "j": "141828",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm71-24ddf6df",
+   "icv1": "ICV1:fp-524411:-71:524483:27273:unk:unk:r:24ddf6dfea97",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "4",
+    "b": "56"
+   },
+   "model_json": "{\"a\":\"4\",\"b\":\"56\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "-71",
+   "order": "524483",
+   "j": "27273",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
+  },
+  {
+   "slug": "icv1-fp20-tm961-61f36a6b",
+   "icv1": "ICV1:fp-524411:-961:525373:166154:unk:unk:r:61f36a6bafe3",
+   "family": "prime",
+   "params": {
+    "p": "524411",
+    "a": "1",
+    "b": "117"
+   },
+   "model_json": "{\"a\":\"1\",\"b\":\"117\",\"field\":\"fp-524411\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"524411\",\"v\":\"1\"}",
+   "trace": "-961",
+   "order": "525373",
+   "j": "166154",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/twist_routes_1_3_20261021/execution-v15/FIXTURES.json",
+    "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "Exact prime field/model and independently checked whole order are recorded in the frozen fixture. Source subgroup/generator are explicit; twist discovery generator is method-specific. No cross-repository EC1 comparison or representation match is asserted."
   }
  ]
 }
