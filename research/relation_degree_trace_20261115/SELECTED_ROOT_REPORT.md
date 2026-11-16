@@ -52,9 +52,21 @@ field-operation counts nor time or memory measurements. Certificate storage
 and degree diagnostics retain their prior meaning. Neither an F4 solving
 degree nor degree of regularity is inferred [pcc:unverified].
 
-Actual-root optimized API/CLI qualification is pending completion of its build.
-Separate immutable binary and pre/post records will identify that source.
-The full root unit suite is not claimed to pass.
+Actual-root optimized qualifiers built at e060f3ee6 completed six API checks
+and three CLI contract checks. The API case checks both-field six-variable
+lazy/eager full-certificate equality and rejects altered public data. The
+complete CLI case compares F4, expanded, lazy compact and eager compact bases;
+the other cases retain capped-F4 incompleteness and unsupported wide-F4 status.
+All three copied native executable hashes match before/after calls. Records
+PCC-20261116-786af5 and PCC-20261116-31210e remain unsigned and unverified;
+source-relationship-01.json records the test-only difference from fc85acc26
+[pcc:unverified]. The full root unit suite is not claimed to pass.
+
+Strict release clippy completed for the shared normal/counter targets and the
+actual-root qualifier package's targets (PCC-20261116-1e80f2, unsigned and
+unverified). Both qualifier archives retain separate source/hash envelopes;
+the migrated core archive's content-addressed pointer matches its envelope
+[pcc:unverified].
 
 ## Runtime admission and next step
 
