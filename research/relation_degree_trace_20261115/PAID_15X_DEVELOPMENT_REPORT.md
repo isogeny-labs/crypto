@@ -1,0 +1,20 @@
+# Registered15x full-cost development milestone
+
+The unchanged development15 gate passes on the selected known p2147483647,n16,LAST star,seed7. All six A/A intervals admit,21 main blocks finish and all108 workflow answers match. Full-paid medians and conservative bootstrap lower endpoints are below; both lower endpoints are strictly>15. Producer data/recomputation are unsigned, not signed independent execution or fresh-family validation. PCC370e58/fd9d91. [pcc:unverified]
+
+| Original named control | Pipeline-work median | Full-paid median | Full-paid adjusted lower1/720 |
+|---|---:|---:|---:|
+| F4 plus fresh3CAS validation |9.877205|22.418114|20.579510|
+| Expanded plus fresh3CAS validation |4.310077|16.919984|15.841749|
+
+Ratios are control/candidate on the same complete reduced basis. Full-paid charges original measured preparation to every workflow and complete freshly regenerated three-route reference validation to both original controls. Candidate pays native certificate construction/final checks, all proof transfer, unchanged independent root replay and output consumption; no reference enters construction. Pipeline work is a separate scope. This15x result includes validation-algorithm differences. No fresh generation is timed. [pcc:unverified]
+
+The new frontier is an incremental improvement over already optimized controls: in the separate32-way screen, matched-streamed-baseline/candidate is1.072 and prior-fastest-streamed/candidate is1.058. These single-call ratios are not paired estimates; smaller-case regressions remain in the full screen. No15x improvement over the previous fastest follows. PCCa780ec/877bd3. [pcc:unverified]
+
+The implementation generates cheap structured consequences with compact acyclic identities and preserves complete ideal equality/reducedness/S-pair checking. Opt-in exact FGLM frontier103 starts at1, expands only independent standard monomials, deduplicates, skips known leading multiples and caches immutable leading monomials. It retains the old grid reference and same surviving monomial sequence, quotient arithmetic, relation/provenance order and field counters. This avoids redundant enumeration/scans; it is established FGLM engineering, with no intrinsic degree-of-regularity conclusion. The regular F4 path remains unchanged.
+
+Shared60/61/62 release suites/lint, scoped root9API/3worker/lint,30 native cells through16 with old-wire/fresh-Singular equality, all32 n3 capture workflows and exact old-statistics/wrong-mode guards pass locally. Both requested primes are in shared arithmetic tests; the measured root-native wire path remains p2147483647 only. This is not a whole-root test-suite verdict. See FRONTIER_QUALIFICATION_REPORT, PCC1d67ff/e3dd43/3d6110/113347/c9957d/4bffa0. [pcc:unverified]
+
+Evidence: frontier-screen-01/report-01 (all192 answers/186 ratios/four paid recoveries), FRONTIER_PAIRED_PROTOCOL and FRONTIER_PAIRED_QUALIFICATION, frontier-paired-01/report-01/{report.md,report.pdf,audit.json} and archive-envelope.json. Closed record1321 preserves exact commands/host/defaultCPU0 reservation and monitor0contention; all program/runtime hashes remain unchanged. Rust recomputes every paid sum/order/A-A/main interval with unchanged100000 joint block resamples and strict thresholds. Percentile coverage is approximate, not an exact probability theorem. [pcc:unverified]
+
+All earlier nulls, A/A rejections, raw evidence and corrective claims remain immutable. LocalL0/checkpointwaived/zero cloud spend. Reserved19001/23003/29009 remain untouched. Signed validation/CI/review and inherited main-prefix PCC reconciliation are pending. This unsigned component study has no eligible promoted curve leaderboard row under the validation gate; no official row/source is added. Benchmark progress records use a separate LAST-target ratio series to avoid treating older FIRST-target results as matched before/after evidence. The user-requested registered15 development milestone is complete; broader fresh scope requires its own prospective protocol. [pcc:unverified]

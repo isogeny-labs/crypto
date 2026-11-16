@@ -1,0 +1,17 @@
+    Checking certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+error: called `map(f)` on an `Option` value where `f` is a closure that returns the unit type `()`
+   --> src/quotient/compact.rs:353:9
+    |
+353 |         bad.definitions[0].poly.values_mut().next().map(|c| *c = p);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#option_map_unit_fn
+    = note: `-D clippy::option-map-unit-fn` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::option_map_unit_fn)]`
+help: use `if let` instead
+    |
+353 -         bad.definitions[0].poly.values_mut().next().map(|c| *c = p);
+353 +         if let Some(c) = bad.definitions[0].poly.values_mut().next() { ... }
+    |
+
+error: could not compile `certified-relations` (lib test) due to 1 previous error
