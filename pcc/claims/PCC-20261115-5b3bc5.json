@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-15T21:15:55Z",
+ "id": "PCC-20261115-5b3bc5",
+ "kind": "statement",
+ "producer": {
+  "commit": "f7fc9d687d490c174608d8bf8d54b54439167cc4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/summary.json",
+    "sha256": "75707a455b99211a38f39e2380c214437988ac8853c7cc0a2c7bcef592093efe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/grid-audit.json",
+    "sha256": "3d77abe0b53fdbdf9593af5e68785ed2e45922537b9446669733298c284b50a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/independent-audit.json",
+    "sha256": "d2e5fc5ad5063a73857c643a5f623b0f0d37e232c168a7dd29e034397347cc81"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Five repeats per fixed exposed cell, same executable and exact output comparisons; simulated instruction reduction only, unsigned producer evidence, no native-time/cycles/external-best/population/scaling claim.",
+ "statement": "Frozen90-execution cold-query comparison completes with identical old/new decisions and exact witness order in all rows. Candidate whole-process simulated instructions decrease25.03% for n131 planted and54.46% for n131 uniform,35.15%/53.80% for corresponding n83 cells; cancellation changes fail the frozen5% reduction criterion and remain inconclusive. Four of six cells pass with baseline A/A median relative differences below0.000001. Separate polynomial arithmetic replays all60 new saved relations and validates all65 input truths."
+}
