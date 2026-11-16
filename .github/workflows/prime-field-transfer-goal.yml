@@ -37,3 +37,13 @@ jobs:
             timeout 60s /tmp/local-public "$point" > "/tmp/local-public-$point.jsonl"
             cmp "/tmp/local-public-$point.jsonl" "$study/receipts/round-02/native-04-public-$point.jsonl"
           done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-03/wild_target.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/cm-target
+          for m in 1 12 24 48 96 112; do
+            timeout 60s /tmp/cm-target "$m" > "/tmp/cm-target-$m.jsonl"
+            cmp "/tmp/cm-target-$m.jsonl" "$study/receipts/round-03/native-01-m$m.jsonl"
+          done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-03/identity_certificate.cpp" -lcrypto -o /tmp/cm-identities
+          /tmp/cm-identities /tmp/cm-idc1 "$study/lean/CMTargetBoundary.lean"
+          for identity in parameter-norm parameter-factor; do
+            cmp "/tmp/cm-idc1/$identity.json" "$study/receipts/round-03/identities/$identity.json"
+          done

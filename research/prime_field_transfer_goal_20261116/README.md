@@ -1,5 +1,14 @@
 # Prime-field transfer goal: component targets, round one
 
+Latest component: [round03 result](round-03/RESULT.md) and
+[two-page report](reports/round-03.pdf), covering compact CM models and
+smaller anomalous targets on six generated fixtures. The native target-only
+Smart solver is implemented; the arbitrary-source-point evaluator remains
+open. Claims are unsigned. [pcc:unverified]
+
+The earlier [round02 local lift](round-02/RESULT.md) and its frozen receipts
+remain unchanged.
+
 The round constructs and checks one compact curve-model component, rejects an
 independent-lift shortcut on an actual order-five source subgroup, and tests
 the precision needed by a proposed target encoding. **An efficient

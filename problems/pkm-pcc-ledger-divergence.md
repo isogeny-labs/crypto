@@ -41,3 +41,15 @@ unchanged claim files. Its *unpublished* local ledger snapshot is retained,
 and new registrations use the existing append tool after the current main
 prefix. That normal publication check does not retroactively preserve the
 older published prefix or resolve this canonical reconciliation problem.
+
+## 2026-11-16: external PR4388 merge audit
+
+The read-only [round-two merge audit](../research/prime_field_transfer_goal_20261116/receipts/round-03/round02-external-merge-audit.json)
+finds merged head619cb13e5af20fdb6fee5ed7904fb7fbc92b8bc4 retains all18
+frozen source/proof/report pins, five claim bodies, the old PNG artifact
+manifest and both parent journal-block multisets. The old published parent's
+1193-row ledger is not a prefix (common1188); incoming-main's1190-row
+prefix survives in the1195-row merged ledger. PR4388 merged at
+6ebf026274395b5de50ddbc8d0523a72ba016a7b,03:21:51Z. This authoring
+session neither performed nor repairs that external frozen-history
+resolution. The closed PR's monitor is stopped. [pcc:unverified]
