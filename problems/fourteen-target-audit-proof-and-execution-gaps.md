@@ -3420,3 +3420,103 @@ absence claim; expandedpublicationConductor127beforemaps/outsidepins.
 Same prover/host/procedural binding, no independent compiler/parser/physical-
 host assurance. Standardfoundations/defaultlimits/no holes/customaxioms/native
 proofeval/newflags/waivers/frozenedits/cryptoPython/spend/uploads. [pcc:unverified]
+
+
+### Actual quadratic elliptic field norms and separability controls
+
+The [actual quadratic elliptic field-norm proof](../research/elliptic_field_norm_audit_20261116/README.md)
+constructs the actual K(x)=RatFunc K embedding/scalar towers, derives actual
+full-field localization by clearing every denominator with its conjugate and
+coordinate norm, and localizes the actual1,y basis to derive degree2.
+Official norm-localization and actual fractions give the finite-base norm
+N(f)=f·iota(f) for every actual function. Literal minimal quadratic,
+irreducibility and rational-linear representation are derived. Actual normality
+always holds; separability and Galoisness hold exactly when not(2=0 and
+a1=0 and a3=0). Actual discriminant excludes that boundary on every nonsingular
+general model, including characteristics2/3. Actual finite-base conjugation
+fixes every rational-base function, preserves norm and is nonidentity on every
+nonsingular model. No rank/norm/separability/Galois premise is supplied.
+
+Skeptical controls use actual functions and models. Actual x is transcendental
+over K; the coefficient extension is not finite, so the official determinant
+norm over that wrong base defaults1, while the finite-base norm of x has a
+pole and differs. A credited actual nonsingular F5 example instantiates it.
+Actual nonsingular F2/F3 positives have degree2 and are Galois. Actual singular
+F2 cusp y²=x³ has degree2 and is normal, but is neither separable nor Galois;
+its actual conjugation is identity and its actual norm is squaring. This
+refutes deleted hypotheses, with no qualified-source refutation or novelty.
+
+Exact local **PCC-20261116-826480 PASS at 2026-11-16T00:45:06Z**; signed standing unverified.
+Whole tracked gate57/0failures/0trusted-native;11modules(10concrete/1official
+bridge),246formal17artifact263pins/198pinnedcustom180actuallyimported
+(169credited frozen+11new).249oldpins beforeafter12states/gate;10failedstates
+01–10 and successes11/12 retained. Exact roots from01/24packages/0copies/
+0hydration/no lakeupdate. Finalnewwarnings0/39frozen inherited per build/
+oneauditor deprecation. Full1984header SHA
+cfa04ee22e730426f22ddc08fcfb61d56a28200e218393752dd8582efe56d33f,
+native1complete0prefix0unresolved/empty suffix after completedgate. Lossless
+275files99objects53048B XZ/roundtrip/actualrestoreequal. Firstvalidonepage
+47138B PDF/all4957charsread/individualfullpage inspected/inbounds. Stale
+preparation stdout14states corrected against actual12without repackaging;
+sourceplan55573B retains full paths and module map. Same prover/host/procedural
+binding, no independent compiler/parser/physical-host assurance. Seven correct
+KB calls/initial and expandedConductor127/bounded primary-official-prior
+fallback/noabsence or novelty. Complete bounded local normcompatibility and
+Galbraith normalform proofs read; earlier full Kato dependencies notallread.
+Known methods and transparent local Field.toCommRing pattern credited.
+General local norm/tame projection/ramification/P1/global reciprocity,
+arbitrary divisor representatives/multiplication-isogeny comparison/general
+geometric descent/canonical Tate/general MOV-FR/full14 remain open. No holes/
+customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedit/
+cryptoPython/paidcompute/uploads. [pcc:unverified]
+
+
+### Actual local norm transport and invalid-square-cancellation control
+
+The [actual elliptic norm transport proof](../research/elliptic_norm_transport_audit_20261116/README.md)
+now derives actual official norm-unit/point-order/principal-divisor transport:
+ord_P(Nf)=ord_P(f)+ord_-P(f), D(Nf)=D(f)+iota*D(f), with actual finite support.
+Actual RatFunc infinity valuation of Nf equals actual elliptic infinity
+valuation of f for every function, including0. Base infinity order of Nf
+equals elliptic order of f; the embedded norm upstairs has twice that order.
+Every actual rational-base unit has infinity pullback factor2. Actual local
+unit residues of Nf multiply the actual residues at P and -P, under both
+actual unit guards. Actual signed tame-symbol negation covariance, local
+norm orbit formula and derived rational-base invariance hold. Actual finite
+support/negation permutation gives global covariance and the norm/square
+identity; no reciprocity conclusion is inferred from a square being1.
+
+Actual credited F5 tangent has orders3/0 at distinct P/-P, giving normorder3
+not6. Everymodel infinity parameter has base normorder1/upstairs2; actual
+nonsingular binary/ternary models instantiate the distinction without a tame-
+ramification premise. Credited actual F5 rational-only product4≠1 has square1
+and actual normproduct1, disproving invalid square cancellation on an actual
+curve/function pair. Matched geometric positive stays separately credited.
+No qualified-source refutation or novelty claim. General closed points/residue
+extensions/scheme ramification/arbitrary base places/local norm projection/P1/
+global reciprocity/arbitrary divisor representatives/isogeny comparison/general
+geometric descent/canonical Tate/general MOV-FR/full14 remain open.
+
+Exact local **PCC-20261116-06a53c PASS at 2026-11-16T01:09:49Z**, signedunverified. Whole tracked gate02
+29/0failures/0trusted-native/7modules(6concrete/1officialbridge);256formal17artifact
+273pins/205pinnedcustom187actuallyimported(180credited frozen+7new).263oldpins
+beforeafter7states/bothgates;3failed02–04 and passes01,05,06,07 retained.
+Exact roots from01/25packages/0copies0hydration/no lakeupdate. Final07newwarnings0/
+39frozen inherited per build/one auditor deprecation. Native01actualexit0 but
+prefix correctly rejected; exact same main guard named via separately proved
+helper. Actualgate02 then native02full3663header SHA
+1cae4115737fd03b2835cab7a3d71d1f889483a3d9a48a286e678ebba5fafaf3,
+1complete0prefix0unresolved/empty suffix/fullnormalized+parsedheaderread.
+Lossless195files83objects54672B XZ/roundtrip/actualrestoreequal/bothnativeinputs/
+oldgate01 retained. Duplicate archivepath preparation failure and dependent
+missing-metadata/report failures retained as actual structured observations,
+not fabricated rawstderr/PDF. Overlap removed before first archive; no evidence
+omitted or issued archive repacked. Firstvalidonepage47294B PDF/all4844chars
+read/individualfullpagevisual/inbounds; sourceplan58804B. SixcorrectKBcalls/
+initial+expandedConductor127/boundedfallback/noabsence. FreshAppendixA.6PDF327/
+printed313 fulltextvisual statements/reference-only proofs read; underlying
+Serre/Neukirch proofs NOTread. Prior completebounded7.3.9/7.3.10 credited,
+earlierfullnormconstructionnotallread. Samehost/prover/proceduralbinding,
+no independent compiler/parser/physicalhost assurance. No holes/customaxioms/
+nativeproofeval/raisedlimits/newflags/waivers/frozenedit/cryptoPython/spend/
+uploads. [pcc:unverified]
