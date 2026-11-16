@@ -1,0 +1,21 @@
+# Compatibility post-merge follow-up
+
+GitHub reports cryptanalysis PR 1572 merged at 2026-11-15T22:53:57Z as 08acc99defa8da5c8b2db3a5b139f0e0be97fe36, with final head 67720b0c7b620fda9fcdec271e17c2d93c4dc488. The timeline records auto-merge disabled at 22:27:39Z and a subsequent merge by aburan28. This session did not issue that merge; no policy override or reconciliation authorization is inferred from the actor alone. Three final-head CI runs began at 22:53:56Z and later failed. [pcc:unverified]
+
+Five focused Rust binary tests and a separate 256-vector field replay pass locally on that final head. These are producer development checks; independent standing is pending. Commands retain CARGO_BUILD_JOBS=1, CARGO_PROFILE_DEV_DEBUG=0 and CARGO_TARGET_DIR=/workspace/isogeny-labs/cryptanalysis-target. The test arguments are cargo test --locked --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml --lib binary::tests (from cryptanalysis) and cargo test --locked --manifest-path research/courtois_native_20261115/replay-cryptanalysis/Cargo.toml -- --nocapture (from crypto c07c7ee38). Raw logs and explicit exits are retained. No native timing experiment ran. [pcc:unverified]
+
+## CI diagnosis and correction boundary
+
+- PCC gate: our published claim PCC-20261115-8d2645 incorrectly assigns the recompute proof kind to raw Cargo text logs. The canonical verifier expects JSON validator reports and rejects both references. The local canonical command reproduces exit 1; pcc-local-verdict.json retains both parse errors. This is a claim-construction error, not evidence that a Rust assertion failed. [pcc:unverified]
+- Native: the job's Rust test groups pass, then the structured consumer refuses its stale crates/hashed-ecdl-tensor/Cargo.lock under --locked. Main already contains commit 5d674f1e0443e1ea88e75a718691d9ec7197edb1, which refreshes that consumer lock and raises the declared Rust floor to 1.85. The inspected CI run for that exact fix was cancelled, so no fresh CI success is inferred. Do not duplicate or revert the existing fix. [pcc:unverified]
+- Store: the job rejects the 72,227-byte canonical pcc/ledger.jsonl as a data file over its Git threshold. Do not move, split or rewrite that ledger, exempt the path, or add a bypass label. This requires canonical ledger/storage policy reconciliation. [pcc:unverified]
+
+The final merge rechained the same published event again, from seq 144 / hash 33934547... to seq 162 / hash dfc79117.... The main-parent ledger prefix passes, while both previously published branch-parent prefix checks fail. The original seq 143 event, intermediate seq 144 event, final seq 162 event and all parent revisions are retained in the audit. The claim body, prior raw reports and scoped arithmetic/field inputs remain byte-identical to 1af49ed8. [pcc:unverified]
+
+The task explicitly prohibits altering claims or choosing/rechaining frozen ledger history. The readable AGENTS.md files prohibit ledger rewrites. The inspected canonical PCC CLI provides no claim withdrawal or supersession command. Correction therefore needs a maintainer-authorized, versioned route that preserves the old claim/events and validator failure. New report files alone cannot make the old invalid recompute proof parse as JSON. No claim, ledger, frozen evidence, verification condition or workflow is changed here.
+
+## Scope and lifecycle
+
+Crypto PR 4345 remains at c07c7ee38, with review/migrate successful and no new Copilot response at this check. The renewed merge request at issuecomment-6902485996 remains pending. Its shared journal is left untouched as requested; SESSION_LOG_PENDING.md carries the entry for later append after resolution. No manual merge or empty rerun commit is used.
+
+The compatibility lifecycle entry uses the earliest recorded producer claim (20:50:50Z) as its explicit observed start boundary; the earlier coding-start time is unavailable. It records a partial result and ci_green_at_merge=false. The unresolved PCC incident uses the tool's HUMAN/non-self disposition because a maintainer route is required; this does not assert a human fix or message. No human message followed the compatibility subtask's publication in this record. The broader research episode and its earlier user redirect remain open until crypto's PR closes. Fourteen-day revert checks remain due after 2026-11-29T22:53:57Z.

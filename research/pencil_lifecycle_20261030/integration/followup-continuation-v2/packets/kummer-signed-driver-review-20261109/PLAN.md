@@ -1,1 +1,0 @@
-Review exact source delta from retained Kummer driver: arithmetic helper identity, original signed label and graph ordering, disabled/observed control paths, callback failure propagation, protocol state/counter checks and fixed qualification coverage. No compiler or payload execution. Do not infer zero overhead or whole-cohort outcome. Pending runtime protocol is separate.

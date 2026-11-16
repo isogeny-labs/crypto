@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T15:58:26Z",
+ "id": "PCC-20261116-50d4da",
+ "kind": "statement",
+ "producer": {
+  "commit": "016b19ffa20767c5db2b7c52e0f4008998c2a765",
+  "model": "Codex",
+  "session": "nist-readonly-admission-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "taskq/deploy/eks-karpenter/nist-admission/evidence/CONTROLS.json",
+    "sha256": "26730ba7d6055771e5f7953f2ad50409aebaaff9e706981bee8ca5a7ad03138e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "taskq/deploy/eks-karpenter/nist-admission/evidence/controls.stdout",
+    "sha256": "a6ee860f938ae32ddacdb45949550d2d4cb4e62f32c198817831b892cfdbce5a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "taskq/deploy/eks-karpenter/nist-admission",
+ "statement": "Read-only NIST OIDC admission workflow preparation: five synthetic administrative controls completed locally; no live AWS read, job, build, image, scientific sample or signed execution proof is asserted."
+}

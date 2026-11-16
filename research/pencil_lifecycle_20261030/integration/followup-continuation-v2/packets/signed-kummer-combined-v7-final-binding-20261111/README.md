@@ -1,1 +1,0 @@
-One bounded combined v7 qualification. Corrected source and independent source review are pinned. Current campaign reservation is 2400 seconds; no automatic retry. Publication precedes invocation. Initial static loader rejection is preserved in validation.json. [pcc:unverified]

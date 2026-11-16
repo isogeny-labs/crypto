@@ -1,0 +1,11 @@
+# Recorded-kernel continuation contract
+
+2026-11-16. Continue the same actual P-192 d7 cover through the original eight RREF kernels in ascending recorded order. The kernel1 conditional differential scalar is nonsquare (unsigned PCC-20261116-08b9be). The next input is kernel2; this observation does not establish a result for any other kernel.
+
+Use a fresh isolated study tree for each input. Copy unchanged original cover/torsion/module witnesses. A native source-derivation utility changes only the Weil producer's input selector, kernel-identity strings and the exporter's numeric kernel metadata in copied source/runners. It must find exactly one original selector block, exporter metadata occurrence and selected row, retain that row verbatim, and retain source hashes before and after derivation. No field/curve/arithmetic formula, acceptance check, chart bound or control is replaced. Frozen originals remain unchanged.
+
+Every kernel-dependent stage is recomputed: principal/normalized Weil3 functions, collision values, quotient theta squares, Riemann candidate, labelled bitangents and curve descent. Source level2 input is reconstructed as well. Export the actual new candidate, collect its fixed coordinate-window relations, qualify its target functions and apply the identical conditional differential comparison. Never copy kernel1 computed moduli, candidate, target functions or twist scalar into another kernel's run.
+
+Stop the individual chain on its first failed guard and retain stage name, output, error and exit status. A vanishing even theta value or unsupported reconstruction chart is an outcome for that exact path, not permission to substitute data. A completed conditional comparison remains producer-unverified and does not supply an executable divisor map. If a same-field candidate passes, the next requirement is the actual source divisor-class lift and public homomorphism/dual/transfer checks.
+
+This is fixed-input native construction development. No timing, speedup or security claim, paid experiment, expanded solver panel or budget bypass is authorized by this runner. Preserve completion/failure counts and original kernel identities. Archives may retain raw isolated trees; sources and exact manifests remain reviewable in Git.

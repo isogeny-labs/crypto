@@ -1,0 +1,159 @@
+{
+  "audit": {
+    "checks": {
+      "arms": true,
+      "env_class": true,
+      "executions": true,
+      "host_hash": true,
+      "plan_hash": true,
+      "record_count": true,
+      "records": true,
+      "records_hash": true,
+      "replays": true,
+      "session_complete": true,
+      "spec_id": true,
+      "workloads": true
+    },
+    "ok": true,
+    "problems": [],
+    "records": 1344,
+    "records_bound": true,
+    "regraded": true,
+    "replay_detail_counts": {
+      "identical": 1152
+    },
+    "replays_reproduced_true": 1152,
+    "replays_total": 1152,
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1hefe658929ef4",
+    "session_status": "complete",
+    "verified_records": 1344
+  },
+  "audit_path": "audit.json",
+  "binary_sha256_file": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c  /usr/local/bin/ecbench",
+  "binary_sha256_file_first_field_equals_build_info_ecbench_sha256": true,
+  "binary_used": "/dev/shm/isolab-build/ecbench",
+  "binary_used_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+  "binary_used_sha256_equals_build_info_ecbench_sha256": true,
+  "binary_used_source": "dev-shm-build",
+  "build_info": {
+    "architecture": "linux/amd64",
+    "built_at": "2026-10-29T07:29:58Z",
+    "default_features": false,
+    "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+    "rustflags": "-C target-cpu=x86-64",
+    "source_repository": "https://github.com/aburan28/crypto",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "target": "x86_64-unknown-linux-musl"
+  },
+  "build_info_path": "build-info.json",
+  "control_comparison_present": false,
+  "job_exit": {
+    "exit_code": 42,
+    "job_name": "ic-dgb-p32-20261029",
+    "node_name": "ip-10-84-161-115.us-east-2.compute.internal",
+    "pod_uid": "1337ff32-0f5c-48bf-b7fa-66d96ed10719"
+  },
+  "job_exit_path": "job-exit.json",
+  "l2_gate": {
+    "accepted": false,
+    "below_l2": [
+      {
+        "arm": "dg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              0.994140625,
+              0.63525390625,
+              0.2841796875
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 24639873,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 25745,
+                "idle": 9353,
+                "steal": 5
+              }
+            },
+            "unix_ms": 1793280950395
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              0.994140625,
+              0.63525390625,
+              0.2841796875
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 24639852,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 25723,
+                "idle": 9353,
+                "steal": 5
+              }
+            },
+            "unix_ms": 1793280950172
+          },
+          "blockers": [
+            "L2: 3 foreign task slices on the run CPU during the solve (0 \u00b5s)",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2031
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 1313
+      }
+    ],
+    "executions": 1344,
+    "grades": [
+      {
+        "count": 1,
+        "level": "L1"
+      },
+      {
+        "count": 1343,
+        "level": "L2"
+      }
+    ],
+    "invalid_outcomes": [],
+    "required": "L2"
+  },
+  "l2_gate_path": "l2-gate.json",
+  "session_spec_equals_input_spec": true,
+  "source_revision_equals_want": true
+}

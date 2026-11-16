@@ -132,13 +132,19 @@ fn curve_orientation_controls() -> Value {
     let mut group_images = HashSet::<Point>::new();
     let mut first_target = None;
     let mut flipped_target = None;
+    let mut squarefree_identity_sign_orientations = 0_usize;
     for mask in 0_u16..256 {
         let q = signed_point_sum(&mut ar, &points, mask);
         assert!(ar.on_curve(PRIME31, q));
+        squarefree_identity_sign_orientations += usize::from(q.is_none());
         group_images.insert(q);
         if mask == 0 { first_target = q; }
         if mask == 1 { flipped_target = q; }
     }
+    // D4-injectivity on this fixed Dickson31 base rules out any nonzero
+    // eight-net returning the identity: all squarefree sign masks have norm 8.
+    assert_eq!(squarefree_identity_sign_orientations, 0,
+        "squarefree eight-leaf polynomial would contradict D4 injectivity");
     // The x polynomial is IDENTICAL in these two cases: eight distinct x_i.
     // The group targets are distinct since P_0 != -P_0 in a prime odd group.
     assert_ne!(first_target, flipped_target, "sign forgotten by x-only f");
@@ -169,6 +175,7 @@ fn curve_orientation_controls() -> Value {
         "selected_eight_x": points.iter().map(|p| p.0).collect::<Vec<_>>(),
         "one_fixed_squarefree_x_polynomial": "product_i(T-x_i), eight distinct selected x",
         "oriented_masks_evaluated": 256,
+        "squarefree_identity_sign_orientations": squarefree_identity_sign_orientations,
         "distinct_group_targets_for_fixed_x_polynomial": group_images.len(),
         "first_two_sign_orientations_have_distinct_Q": first_target != flipped_target,
         "squarefree_orientation_group_additions": squarefree_sign_adds,
@@ -216,6 +223,7 @@ mod tests {
     fn real_curve_sign_and_repeated_root_infinity_controls() {
         let row = curve_orientation_controls();
         assert_eq!(row["oriented_masks_evaluated"], 256);
+        assert_eq!(row["squarefree_identity_sign_orientations"], 0);
         assert_eq!(row["first_two_sign_orientations_have_distinct_Q"], true);
         assert_eq!(row["repeated_x_identity_cases"], 1);
         assert_eq!(row["distinct_group_targets_for_repeated_x"], 9);
