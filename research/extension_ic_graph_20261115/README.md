@@ -59,6 +59,17 @@ or IC/rho comparison. The4vCPU/8GiB CPU runner was terminated after exact
 artifact collection and portable hash checks(DELETE204/lookup404).
 All scientific raw/export/summary files fit Git. [pcc:unverified]
 
+The [matched Runpod portfolio](runpod-ic-graph-rho-portfolio-20261116-34/report.pdf)
+uses one Rust executable for original IC, rank-stopped graph elimination and
+plain/negation rho crossed with batch1/16. All six recover89981502037382902
+on p1009, seed337, with copied native qualification. Observed primitive
+subtotals are4789001535986IC/7145741221826graph and122280490918974to414751415176544
+across rho configurations. Missing native counts keep every arm unrankable;
+complete totals/band/ratios remain null. Exact artifacts were collected and
+checked before owned pod termination through the official GraphQL fallback.
+The [failed33capture](runpod-ic-graph-rho-portfolio-20261116-33/report.pdf)
+and its native transport controls remain preserved. [pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |

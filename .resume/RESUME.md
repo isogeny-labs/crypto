@@ -1,3 +1,62 @@
+# Current checkpoint:34COMPLETE/COLLECTED/TERMINATED; graph-gate root checks running
+
+GoalACTIVE:Rust elliptic graphIC/extension-field relationfinder integration and
+Runpod measurements towardrho parity. UserallscienceRust/noPython, allmeasurements
+Runpod. No subagents. Do not stopgoal. All OWN paidpodsDELETED/absent; no cloudjob.
+
+34sourcea06c298bc63f3e2d1fd04d5900c8b4fda46a7798pushedBEFOREsingle34dispatch202.
+OwnCPUcy2tbnhzgtwr6e/4vCPU8GiB0.12USDh/pinnedRustimage/actualCPU71. Sixworkers+
+copiedRustqualifierexit0,971.404swholepracticalityonly,1round0warm/retry.
+p1009seed337/L263807419626071897, allactualscalar89981502037382902.
+ObservedINCOMPLETEbitops:4789001535986IC/7145741221826graph/
+122280490918974plain1/208968828976322neg1/414751415176544plain16/
+164267600135514neg16. Missingnativecounts=>ALLUNRANKABLE,total/band/ratiosnull.
+Known-answerfixturewithheld-outparentanswerNOTT1unknown-log. Noparityclaim.
+Graph487full365smallbase,493sources(66/178/249),2descents1396resids,
+374affinecertreplays/targetrank366;checkpoint243then364target364/allcertsPASS.
+271committedsourceblobpostcallrehashPASS;allportablepre/preworker/post/qualifiedPASS.
+PCCc57d97results/8b685ecustodyUNVERIFIED. FinalonepagePDFVIEWED/exactcopies/hashPASS.
+
+LOCALexactcustody /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-34/
+returned/task/run;645207Bgraphraw/731419BnativeexportLOCALhashbound;37630Bsummary
+andallsixother-smallrawsGitpacket,benchmarkPDF/SVG/150dpiPNG. Sealedbundle/source/
+binaries/returnedarchivealsoLOCAL. NoAPIkey/tasktokeninbundleorreturnedrun.
+RESTcleanupCONNECT403(proxy,noproviderresponse),oneadminretryfailed. Official
+GraphQLpodTerminateacceptedHTTP200/noerrors,subsequentpodlookupnullHTTP200.
+Actualcleanupreceipt17:07:01Z,privatepod-ID.deletedmarker;guardinert. Don'tclaim
+REST204/404for34. Alloldown32/33podsdeleted. AuthONLYprivatepointer
+/tmp/ic-runpod-auth-location;NEVERprintheaders/tokens/envresponses;userauthorization
+persists. FutureRESTrouteifblockeduseofficialGraphQLdocumentedCPUprovisionfallback.
+
+CURRENTDIRTYNEXTCODE(no35scientificprotocol/callyet): productionhelper
+src/cryptanalysis/jv_large_prime_rank_bound.rs;oldresearchhelperpathnowincludes
+exactsameproductionfile. Separatepublic opt-in run_two_large_prime_dlp_on_with_structural_gate,
+newexample--structural-rank-gateflag. Defaults/oldoptions/outputschemaavailable.
+Gatekeepssamebaselinecheckpointsource-stridescheduleevenwhenitsboundskipsadoomed
+check,retainsfullrank/affinedescent/ellipticverification. Source-prefixstatesrecorded.
+Knowninitialization/supportread/parentprobe/boundreadwordschargedlowerbound,
+remainingDSUbookkeepinggapexplicit. Actualgatealgorithmnotperformancemeasuredyet.
+
+Rootnativecheckjob81217(inexecsession)STRICTClippyPASS1m45s, nowcargo release
+LIBTEST compilation started~17:03; maytake~20min. Thenqueued sieve tests,example3tests,
+productionexamplebuild,finalsourcehashrecheck. DO NOTeditrootfrozenfileswhilebuildreads.
+Frozen5rootpathhashes/tmp/ic-structural-integrated-final-source-before-checks.sha256.
+OldinitialClippyinterrupt143retained;processesconfirmedZbeforefinalscheduleedit/restart.
+Standaloneproduction-source4controlsPASS. Independent structural-gate-analysis
+nativequalifierBFS+denseLPrankchecks(oldhelperNOTincluded),checksallskip-prefixes,
+source/descent/checkpointscheduleidentityandprimitivephaseconservation.
+Finalqualifier19tests/strictClippy/buildPASS(session38374finished);sourcehashPASS
+/tmp/ic-structural-qualifier-final-before-tests.sha256. No35data/protocolselectedyet.
+
+NEXT: commit/push34packetONLY(keepunvalidatedrootcodeout),updatePRactual34afterPCC
+proselint0. Finishrootchecks/candidatecodejournal/PCC; thenfreeze35matchedbaseline
+rankstopvsstructuralgateRunpodexperiment(2workersprobably1900whole/2700runner,
+planNOTYETSELECTED). Needprocpsbootstrap/stdoutsummaryseparate(Rusttransportcontrol).
+No scientificretryof33. Preservefailed33packet/reportandoldtestfailures.
+PR4288regular/automerge,requiredCI/reviewunconfirmed/no manualmerge. Artifactbotif
+laterPNGmigrationinspect/FFnonoverlap/exactignoredPNGrestorefromLOCAL/hash.
+Maintaincommentary<=60sec/concreteactionloops;avoidlongspeculativeplanning.
+
 # Current checkpoint:34RUNNING ON RUNPOD; do not redispatch
 
 Sourcea06c298bc63f3e2d1fd04d5900c8b4fda46a7798(clean/pushed)precededone34dispatch202.

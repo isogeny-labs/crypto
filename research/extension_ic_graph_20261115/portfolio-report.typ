@@ -4,7 +4,7 @@
 #let e=json("local-evidence.json")
 #let display_value(v)=if v==none {[unknown]} else if type(v)==bool {repr(v)} else {str(v)}
 = One Rust executable: IC, graph elimination and rho
-16 November 2026 · Runpod CPU · Matched public-input validation
+16 November 2026 · Runpod CPU · Restricted weak Fp6 cover family
 
 Source #raw(s.source_revision.slice(0,9)), p=#display_value(s.p),
 subgroup order #display_value(s.l), seed #display_value(s.seed).
@@ -53,6 +53,6 @@ No failed raw was replaced. [pcc:unverified]
 
 Original argv, flow, statuses, raw records, copied source/binaries/qualifier
 and portable hashes: #raw(e.run_path). Artifact collection precedes owned
-pod deletion (204/lookup404). Large raw data remain exact and hash-bound;
+pod termination (GraphQL accepted; subsequent lookup null). Large raw data remain exact and hash-bound;
 the native export claims no unavailable canonical-schema conformance.
 Producer checks carry no independent signed verdict. [pcc:unverified]
