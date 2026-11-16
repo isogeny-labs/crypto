@@ -1643,10 +1643,10 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
     if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
         let Some(root) = curve.half_trace_root_cached(rhs) else {
-            return Vec::new();
+            return (none, 0);
         };
         let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
-        return vec![curve.lower(point), curve.lower(curve.neg(point))];
+        return ([point, curve.neg(point)], 2);
     }
     let mut root = rhs;
     let mut power = rhs;
@@ -17854,6 +17854,22 @@ mod tests {
             checked >= 200,
             "insufficient independent arithmetic cases: {checked}"
         );
+    }
+
+    #[test]
+    fn cached_packed_lifts_cover_all_result_counts() {
+        let kc = KoblitzCurve::new(0, 5).unwrap();
+        let fast = FastCurve::new(&kc.curve).unwrap();
+        let mut seen = [false; 3];
+        for coordinate in 0..32 {
+            let expected = lift_x_packed(&fast, coordinate);
+            let cached = crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                lift_x_packed(&fast, coordinate)
+            });
+            assert_eq!(cached, expected, "coordinate {coordinate}");
+            seen[cached.1] = true;
+        }
+        assert_eq!(seen, [true; 3]);
     }
 
     #[test]

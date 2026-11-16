@@ -1,0 +1,52 @@
+{
+  "commands": [
+    {
+      "command": "lake build CauchyNormalizer KernelNodes",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "command": "lake env leanchecker --fresh --verbose KernelNodes",
+      "exit_code": 124,
+      "log": "leanchecker-180s.log",
+      "status": "infrastructure_timeout",
+      "timeout_seconds": 180
+    },
+    {
+      "audited_theorems": 26,
+      "command": "lake env lean --run tools/lean/AuditAxioms.lean -- CauchyNormalizer KernelNodes",
+      "exit_code": 0,
+      "failing": 0,
+      "log": "axiom-audit.log",
+      "native_trusted": 0
+    }
+  ],
+  "dependencies": {
+    "Cli": "c24fe6078c630e89b489bffe59b3e20ac30d12c8",
+    "CryptoLean": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "LeanSearchClient": "d6b4c7be5be75ec4917c873ac50c756dc1436372",
+    "Qq": "dce0ad79c486cb1fb504af04f953c3466b0c6db8",
+    "aesop": "4a174c490d8707121c4a9290800489f105d85e07",
+    "batteries": "66e469188fe07963e5cf666c7d4433f45b8131c5",
+    "importGraph": "a41f0e9a4dea23188ea9cc1c41ac9f8bbafe0b93",
+    "mathlib": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+    "plausible": "dfa4f38190d07c37e315953e08b90fe2d95b3c24",
+    "proofwidgets": "df72b022e558978a1c50264cfc4d7fec86fa8e04"
+  },
+  "input_sha256": {
+    "CauchyNormalizer.lean": "b30198a97a6564b81b68cb373999e9d49922e1e3a087455a09ae787dc150019a",
+    "KernelNodes.lean": "f14e3da98cb3270fb7e4b82de8d5ebe9b73584a092ccf936444047cf6e6557f9",
+    "lakefile.toml": "66b7802092ddd66d46bba3f71ad572ee4cd07d3994f0d69e3fc2a3b0ff1cfb8d",
+    "lean-toolchain": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+  },
+  "log_sha256": {
+    "axiom-audit.log": "40d9e2a6d9539d29e32e20341bb14a7eede1846a768f0db32ec22d260e67ac97",
+    "build.log": "021090c19ed46e18946cdf10130fd6ced8722d3eee006b24e1da8167e1205ac7",
+    "leanchecker-180s.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "machine_status": "build_and_axiom_audit_passed; independent_fresh_recheck_infrastructure_timeout",
+  "producer_commit": "a2be660914e8e485eefd45f2958eb6d18344dadf",
+  "schema": "square-kernel-independent-machine-attempt/v1",
+  "task": "T-1829",
+  "toolchain": "Lean 4.35.0 /var/tmp/a15-lean-toolchain/bin"
+}

@@ -1,5 +1,45 @@
 # Vieta Rust port: continuation receipt
 
+## Current follow-up — 16 November, 03:14 UTC
+
+PR4358 had no Copilot response after four hours; generic autofix lacked its API
+key. The documented timeout fallback is merging main222394077d locally, with
+exact main ledger prefix, two unchanged appended local bodies and complete
+journal block multisets. See results-merge-20261116T0311Z.json in the scale
+directory and today's session log. Sources/protocols/claims/data are unchanged.
+Merge9c9801cd05 is pushed and PR4358 is mergeable again. Native formatting,
+clippy -D warnings, five unit groups and three CLI tests pass. Ledger1190,
+lessons170, relevant two censored records and progress checks pass locally;
+claim-file and pinned-proof hashes agree [pcc:unverified]. Receipts/logs are
+postmerge-checks-20261116T0314Z.json and postmerge-*-20261116.log in the scale
+directory. Current-head merge gates started; auto-merge remains enabled.
+Next bounded follow-up: inspect the then-current head and required reviews,
+record merge if landed, otherwise diagnose actual failures. No benchmarks needed.
+
+## Current state — 22:15 UTC
+
+PR 4340 merged (merge 5181b305c62eb8032b7f0ea5e0b81a6d6a14eb31).
+User authorized local isolated execution and Git-only checkpoints. The full
+matrix plus a separate fixture repair is now complete; see RESULTS.md, ERRATA.md
+and reports/local-scale/report.pdf. The older receipt below is historical.
+No benchmark is active and no further run is needed to reproduce the report.
+Both bench records are closed censored; no admitted canonical row or clock
+speedup is asserted. New results branch is codex/vieta-local-run-20261115.
+Native formatting, clippy and 5 unit/3 CLI checks pass [pcc:unverified].
+All 2,184 successful rows replayed without mismatch [pcc:unverified]. Twelve
+Vieta deadlines and twelve original missing three-term calls remain recorded.
+The proposed last-fall-degree bound is a hand argument awaiting independent
+or formal validation, not a running-time claim.
+
+Results PR [4358](https://github.com/isogeny-labs/crypto/pull/4358) is regular,
+mergeable and auto-merge enabled subject to gates. Shared metadata were
+reconciled, statements registered (6a8b11, 74f8a5; both unverified), and reports
+pushed. Check current-head CI/review and required gates on the bounded cadence;
+do not rerun the finished benchmarks. Old follow-up automation was paused when
+this active work resumed and is repurposed for the results PR at handoff.
+
+## Historical receipt
+
 2026-11-15 20:49 UTC. PR https://github.com/isogeny-labs/crypto/pull/4340
 is open, ready for review. Source commit `5306b099f`; pending statement
 `PCC-20261115-0b04ff` in `47b244609`. No performance run has launched.

@@ -58,6 +58,14 @@
 //! `negation_folded=1`.  Completeness is unchanged; cold `S` drops by the
 //! saved set-up.  `rootfind-window-negfold` is the windowed `m = 3` scan
 //! on that half table.
+//! `rootfind-negfold-batch` keeps the same ordered half table and probe,
+//! but shares an inversion over each binary table row's ordinary additions.
+//! For `m = 3`, consecutive scan additions share an inversion in blocks of
+//! eight. The scan computes an ordinate only when a table key is present.
+//! Completed blocks charge every addition, including any candidates after
+//! the first hit. Any wall benefit needs a
+//! separate controlled measurement. It has a separate method identity so
+//! the scalar arm remains reproducible.
 //!
 //! ## The base
 //!
@@ -130,7 +138,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
 };
-use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
+use crypto_lib::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
     SolveStats, SolverEngine,
@@ -356,6 +364,9 @@ pub enum Pdp3Engine {
     /// Root finding on [`PairTable::build_negation_folded`]: about half
     /// the set-up additions of [`Self::Rootfind`], sign-recovering probe.
     RootfindNegfold,
+    /// The same negation-folded table and probe, with batched binary
+    /// additions during table construction.
+    RootfindNegfoldBatch,
     /// Windowed `m = 3` scan on the negation-folded [`PairTable`].
     RootfindWindowNegfold,
 }
@@ -371,11 +382,13 @@ impl Pdp3Engine {
             "rootfind" => Ok(Self::Rootfind),
             "rootfind-window" => Ok(Self::RootfindWindow),
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
+            "rootfind-negfold-batch" => Ok(Self::RootfindNegfoldBatch),
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
                 "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
                  matrix-f5, \
-                 rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold"
+                 rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+                 or rootfind-window-negfold"
             )),
         }
     }
@@ -390,6 +403,7 @@ impl Pdp3Engine {
             Self::Rootfind => "rootfind",
             Self::RootfindWindow => "rootfind-window",
             Self::RootfindNegfold => "rootfind-negfold",
+            Self::RootfindNegfoldBatch => "rootfind-negfold-batch",
             Self::RootfindWindowNegfold => "rootfind-window-negfold",
         }
     }
@@ -407,13 +421,17 @@ impl Pdp3Engine {
             Self::Rootfind
                 | Self::RootfindWindow
                 | Self::RootfindNegfold
+                | Self::RootfindNegfoldBatch
                 | Self::RootfindWindowNegfold
         )
     }
 
     /// Whether set-up uses [`PairTable::build_negation_folded`].
     pub fn is_negfold(self) -> bool {
-        matches!(self, Self::RootfindNegfold | Self::RootfindWindowNegfold)
+        matches!(
+            self,
+            Self::RootfindNegfold | Self::RootfindNegfoldBatch | Self::RootfindWindowNegfold
+        )
     }
 
     /// Whether the `m = 3` third-summand scan is windowed.
@@ -433,6 +451,7 @@ impl Pdp3Engine {
             Self::Rootfind
             | Self::RootfindWindow
             | Self::RootfindNegfold
+            | Self::RootfindNegfoldBatch
             | Self::RootfindWindowNegfold => None,
         }
     }
@@ -498,6 +517,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch`, or
 /// `pdp3-koblitz:m=3,engine=rootfind-window-negfold`.
 pub struct Pdp3KoblitzOracle<'i> {
     name: &'static str,
@@ -521,6 +541,16 @@ pub struct Pdp3KoblitzOracle<'i> {
     pair: Option<PairSumTable>,
     /// Negation-folded [`PairTable`] under `*-negfold` engines.
     pair_neg: Option<PairTable>,
+    /// Reused by the batched `m = 3` scan; all completed additions are charged.
+    scan_scratch: BatchScratch,
+    scan_addends: Vec<FastPoint>,
+    scan_sums: Vec<FastPoint>,
+    scan_lambdas: Vec<u64>,
+    #[cfg(target_arch = "x86_64")]
+    scan_x3: Vec<u64>,
+    /// The signed base starts with one self-negative point, then adjacent
+    /// pairs. Checked once so every later relation scan can align its blocks.
+    scan_pair_layout: Option<bool>,
     /// Base size the table was built on; `0` under a Groebner engine.
     pair_table_points: usize,
     /// Third-summand window for windowed engines; `0` otherwise.
@@ -554,6 +584,13 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             totals: SolverTotals::default(),
             pair: None,
             pair_neg: None,
+            scan_scratch: BatchScratch::default(),
+            scan_addends: Vec::new(),
+            scan_sums: Vec::new(),
+            scan_lambdas: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            scan_x3: Vec::new(),
+            scan_pair_layout: None,
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
@@ -650,6 +687,108 @@ impl<'i> Pdp3KoblitzOracle<'i> {
     ) -> Option<Vec<usize>> {
         let table = self.pair_neg.as_ref()?;
         let g = ctx.group;
+        if self.engine == Pdp3Engine::RootfindNegfoldBatch && self.summands == 3 {
+            const SCAN_BLOCK: usize = 8;
+            let paired_layout = *self.scan_pair_layout.get_or_insert_with(|| {
+                fb.points.len() % 2 == 1
+                    && fb.neg_index.first() == Some(&0)
+                    && fb.points[1..].chunks_exact(2).enumerate().all(|(j, pair)| {
+                        let k = 1 + 2 * j;
+                        fb.neg_index[k] == k + 1
+                            && fb.neg_index[k + 1] == k
+                            && !pair[0].infinity
+                            && !pair[1].infinity
+                            && pair[0].x == pair[1].x
+                    })
+            });
+            let mut from = 0;
+            while from < fb.points.len() {
+                // The first point has no signed twin. Keeping it in its
+                // own block makes every following eight-point block four
+                // complete pairs, ready for the existing paired SIMD kernel.
+                let to = if paired_layout && from == 0 {
+                    1
+                } else {
+                    (from + SCAN_BLOCK).min(fb.points.len())
+                };
+                self.scan_addends.clear();
+                self.scan_addends
+                    .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
+                self.scan_sums.clear();
+                self.scan_lambdas.clear();
+                #[cfg(target_arch = "x86_64")]
+                let simd_paired = if paired_layout && from > 0 {
+                    let pairs = self.scan_addends.len() / 2;
+                    debug_assert_eq!(2 * pairs, self.scan_addends.len());
+                    debug_assert!(pairs <= SCAN_BLOCK / 2);
+                    let (mut px, mut pya, mut pyb) = ([0u64; 4], [0u64; 4], [0u64; 4]);
+                    for (j, pair) in self.scan_addends.chunks_exact(2).enumerate() {
+                        debug_assert_eq!(pair[0].x, pair[1].x);
+                        px[j] = pair[0].x;
+                        pya[j] = pair[0].y;
+                        pyb[j] = pair[1].y;
+                    }
+                    self.scan_x3.clear();
+                    g.0.add_many_lazy_soa_paired(
+                        point,
+                        &px[..pairs],
+                        &pya[..pairs],
+                        &pyb[..pairs],
+                        &mut self.scan_x3,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                        self.scan_addends.len() as u64,
+                    )
+                } else {
+                    false
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let simd_paired = false;
+                #[cfg(target_arch = "x86_64")]
+                if simd_paired {
+                    self.scan_sums.extend(
+                        self.scan_x3
+                            .iter()
+                            .copied()
+                            .map(|x| FastPoint::affine(x, 0)),
+                    );
+                }
+                if !simd_paired {
+                    g.0.add_many_lazy_paired_x(
+                        point,
+                        &self.scan_addends,
+                        &mut self.scan_sums,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                    );
+                }
+                assert_eq!(self.scan_sums.len(), self.scan_addends.len());
+                assert_eq!(self.scan_lambdas.len(), self.scan_addends.len());
+                // The batch has already formed all sums, even if an early
+                // probe hits. The ledger therefore charges the entire block.
+                ops.adds += self.scan_addends.len() as u64;
+                for (offset, (&rest, &lambda)) in
+                    self.scan_sums.iter().zip(&self.scan_lambdas).enumerate()
+                {
+                    if g.is_identity(&rest) {
+                        continue;
+                    }
+                    if let Some((i, j)) = table.probe_binary_lazy(
+                        g,
+                        fb,
+                        ops,
+                        &mut counters.lookups,
+                        point,
+                        rest,
+                        lambda,
+                    ) {
+                        return Some(vec![from + offset, i, j]);
+                    }
+                }
+                from = to;
+            }
+            return None;
+        }
         if !self.engine.is_window() {
             return decompose_mitm(g, fb, table, self.summands, ops, counters, point);
         }
@@ -705,6 +844,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  (m = {}); no Groebner search",
                 self.summands
             ),
+            Some("rootfind-negfold-batch") => format!(
+                "root finding over the standard subspace on a negation-folded PairTable \
+                 built with batched binary additions; the same probe as rootfind-negfold \
+                 (m = {}); no Groebner search",
+                self.summands
+            ),
             Some("rootfind-window-negfold") => format!(
                 "root finding with negation-folded PairTable and cyclic third-summand window \
                  of length ⌈|F|/window_div⌉ (div={}); m = {}; no Groebner search",
@@ -726,14 +871,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         &[
             (
                 "m",
-                "summands; #1333 ran 3 (Semaev S4); rootfind and rootfind-negfold take 2 or 3; \
+                "summands; #1333 ran 3 (Semaev S4); rootfind, rootfind-negfold and \
+                 rootfind-negfold-batch take 2 or 3; \
                  window engines take 3 only",
             ),
             (
                 "engine",
                 "inherited-f4 (the control), f6-ic, matrix-f4, matrix-f5, rootfind (full \
                  PairSumTable), rootfind-window (m = 3 cyclic ⌈|F|/3⌉ window), \
-                 rootfind-negfold (PairTable negation fold, ~half set-up), or \
+                 rootfind-negfold (PairTable negation fold, ~half set-up), \
+                 rootfind-negfold-batch (same table with batched binary additions), or \
                  rootfind-window-negfold (window + negation fold)",
             ),
             (
@@ -791,9 +938,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         // Parameters that change the search have no default.
         let engine = params.get("engine").ok_or(
             "missing parameter `engine`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
-             rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
+             rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+             or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        self.scan_pair_layout = None;
         if self.engine == Pdp3Engine::F6IcPair {
             // Reuse within this pipeline solve, never across independent
             // records or replayed records in the auditor process.
@@ -955,7 +1104,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                         "engine=rootfind-negfold needs a factor base with abscissa grouping".into(),
                     );
                 }
-                let table = PairTable::build_negation_folded(ctx.group, fb);
+                let table = if self.engine == Pdp3Engine::RootfindNegfoldBatch {
+                    PairTable::build_negation_folded_binary_batch(ctx.group, fb)
+                } else {
+                    PairTable::build_negation_folded(ctx.group, fb)
+                };
                 ops.merge(table.build_ops);
                 self.pair_neg = Some(table);
                 self.pair = None;
@@ -1200,7 +1353,7 @@ pub fn plugins() -> BinaryPlugins {
 /// it.  The oracle lives in this binary, so the replays do too.
 #[cfg(test)]
 mod engine_names {
-    use super::Pdp3Engine;
+    use super::{Pdp3Engine, Pdp3KoblitzOracle};
 
     #[test]
     fn f6_ic_pair_parses_and_shares_the_f6_solver() {
@@ -1209,6 +1362,95 @@ mod engine_names {
         assert_eq!(engine.name(), "f6-ic-pair");
         assert!(engine.is_groebner());
         assert_eq!(engine.solver(3), Pdp3Engine::F6Ic.solver(3));
+    }
+
+    #[test]
+    fn binary_batch_table_engine_keeps_the_rootfind_contract() {
+        let engine = Pdp3Engine::parse("rootfind-negfold-batch").unwrap();
+        assert_eq!(engine.name(), "rootfind-negfold-batch");
+        assert!(engine.is_rootfind());
+        assert!(engine.is_negfold());
+        assert!(!engine.is_window());
+        assert_eq!(engine.solver(3), None);
+    }
+
+    #[test]
+    fn binary_batch_scan_keeps_scalar_first_witness_and_lookup_order() {
+        use super::{decompose_mitm, BinaryGroup, ColumnFold, FastPoint, GroupOps};
+        use super::{OracleCounters, PairTable};
+        use crypto_lib::cryptanalysis::ic_boundary::{koblitz_factor_base, koblitz_instance};
+        use crypto_lib::cryptanalysis::ic_framework::stages::InstanceCtx;
+        use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+        use num_bigint::BigUint;
+
+        let inst = koblitz_instance(0, 13).expect("Koblitz E0 n13");
+        let frob = build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), 5)
+            .expect("standard subspace");
+        let fb = koblitz_factor_base(&inst, &frob, ColumnFold::Abscissa, "d5".into())
+            .expect("signed base");
+        assert_eq!(fb.points.len(), 33);
+        assert_eq!(fb.neg_index[0], 0, "the first K13 point is self-negative");
+        for k in (1..fb.points.len()).step_by(2) {
+            assert_eq!(fb.neg_index[k], k + 1, "K13 signed pair at {k}");
+            assert_eq!(fb.points[k].x, fb.points[k + 1].x);
+        }
+        let group = BinaryGroup(&inst.fast);
+        let table = PairTable::build_negation_folded_binary_batch(&group, &fb);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut batch = Pdp3KoblitzOracle::new("pdp3-binary", 3, &inst);
+        batch.engine = Pdp3Engine::RootfindNegfoldBatch;
+        batch.pair_neg = Some(table);
+        let mut points = Vec::new();
+        for k in 1..=256u64 {
+            points.push(
+                group
+                    .0
+                    .mul(inst.generator, &BigUint::from((53 * k % (inst.r - 1)) + 1)),
+            );
+        }
+        for k in [0, 1, fb.points.len() / 2, fb.points.len() - 1] {
+            points.push(
+                group
+                    .0
+                    .add(fb.points[k], group.0.add(fb.points[3], fb.points[7])),
+            );
+        }
+        points.push(fb.points[0]);
+        points.push(group.0.neg(fb.points[0]));
+        points.push(FastPoint::INFINITY);
+        for point in points {
+            let mut scalar_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let expected = decompose_mitm(
+                &group,
+                &fb,
+                batch.pair_neg.as_ref().unwrap(),
+                3,
+                &mut scalar_ops,
+                &mut scalar_ctr,
+                point,
+            );
+            let mut batch_ops = GroupOps::default();
+            let mut batch_ctr = OracleCounters::default();
+            let got =
+                batch.decompose_rootfind_negfold(&ctx, &fb, &mut batch_ops, &mut batch_ctr, point);
+            assert_eq!(got, expected, "first witness at {point:?}");
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+            // A completed eight-point block may do up to seven additions
+            // beyond the scalar first-hit point; misses do identical work.
+            assert!(batch_ops.adds >= scalar_ops.adds);
+            assert!(batch_ops.adds <= scalar_ops.adds + 7);
+        }
+        assert_eq!(batch.scan_pair_layout, Some(true));
     }
 }
 
