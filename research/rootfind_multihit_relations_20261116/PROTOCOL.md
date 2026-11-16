@@ -17,6 +17,7 @@ another target construction. A row from the same target can also be
 dependent. The candidate enumerates every `k` in the production factor-base
 order and retains the pair table's first witness for each key. The control
 retains only the first verified hit from that identical scan.
+[pcc:unverified]
 
 If all-hit reaches full rank in no fewer target queries, or its saved
 queries do not repay its additional scan probes under the stated
@@ -44,6 +45,7 @@ coprime to each `r`. The stride is a deterministic diagnostic stream, not
 a model of a random collector. Both arms start with the same verified
 collision rows and the torsion seed row. The original pair builder and
 first-hit arm are controls; the planted scalar is a positive check.
+[pcc:unverified]
 
 ## Measures and decision
 
