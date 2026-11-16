@@ -25,7 +25,13 @@ and unverified. Completed reports, final local receipts and lessons are committe
 A retrospective registration correction is documented in
 continuation-20261116/REGISTRATION_ERRATA.md; the original closed record is unchanged.
 Main4b2d25c933 is merged with both journal block multisets and exact ledger prefix.
-Remaining: push final head, update PR4410 and inspect its actual gates. No
+PR4410 metadata and completed head1a2bd78c48 are published. Initial current-head
+read found zero checks attached yet, no reviews; auto-merge uses MERGE. Effective
+rules require gate/size/artifacts and resolved threads. Two counts.png files
+exceed the artifact threshold; official same-repo artifact autofix must migrate
+them and its exact blobs must be audited. No local S3 action occurred.
+See evidence/publication-status-20261116T1649Z.json. Follow current-head gates
+without benchmark reruns or force/empty commits. No
 measurement active. Retain original closeout notes below as history.
 
 ## Publication closed — 16 November, 07:30 UTC
