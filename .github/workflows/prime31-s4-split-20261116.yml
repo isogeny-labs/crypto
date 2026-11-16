@@ -93,6 +93,9 @@ jobs:
       - name: Fresh 24-Q prime31 APS x-only S3 discriminant fibre comparison with A/A
         timeout-minutes: 6
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --xfibre-confirm
+      - name: Fresh 24-Q exact-source affine versus Jacobian batched APS cold solver A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --jacbatch-confirm
       - name: Twelve held-out complete prime31 Rust APS logarithms
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
