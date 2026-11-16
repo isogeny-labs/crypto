@@ -62,6 +62,8 @@ def analyze(session_dir, replay_path, work_path):
             "process_wall_ns_median_valid": median([(r.get("time") or {}).get("process_wall_ns") for r in good]),
             "method_call_wall_ns_median_valid": median([(r.get("time") or {}).get("method_call_wall_ns") for r in good if isinstance((r.get("time") or {}).get("method_call_wall_ns"), (int, float))]),
             "max_rss_kib_median_valid": median([(r.get("time") or {}).get("max_rss_kib") for r in good if isinstance((r.get("time") or {}).get("max_rss_kib"), (int, float))]),
+            "factor_base_sha256s_valid": sorted({(r.get("factor_base") or {}).get("fb_sha256") for r in good if (r.get("factor_base") or {}).get("fb_sha256")}),
+            "counter_median_valid": {name: median([(r.get("counters") or {}).get(name) for r in good if isinstance((r.get("counters") or {}).get(name), (int, float))]) for name in ("targets_tried", "relations_found", "matrix_rows", "matrix_rank", "matrix_dependent")},
             "phase_wall_ns_median_valid": {name: median(vals) for name, vals in sorted(phases.items())},
             "work_rows": len(work_rows),
             "work_complete_rows": sum(bool((x.get("work") or {}).get("Ok", {}).get("complete")) for x in work_rows),
