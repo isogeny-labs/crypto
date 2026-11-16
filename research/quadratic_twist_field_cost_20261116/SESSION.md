@@ -30,3 +30,17 @@ Complete scoped native experiment within original01:42deadline; no timeout/scope
 
 ### Errors
 Native auditor syntax failure retained, not a failed mathematical or cost result. A JS metadata wrapper syntax error refused before action, then corrected. [pcc:unverified]
+
+## Completed scientific window and evidence preservation
+
+### What was done
+Frozen protocol77efe713 before data. Corrected builds3/3 pass. Full native experiment01:30:37–01:31:14UTC completes34 stages,14 genuine rejection controls and independent Rust replay. Separately declared post-data summary source586ec0f2 runs01:36:49–01:36:57UTC, within original01:42deadline. Four fields61/277/1093/4261 and base sizes3/5/8/12; all raw cases and failures preserved. Three-page report rendered; canonical export/file checks0; local raw archive restores/repackages exactly (README gives hashes and scope). [pcc:unverified]
+
+### Decisions made
+Report generic cold pairing recovery separately from algebraic kernel timing. Faster Tate wins against our Weil reference about1.56–1.71x, but plain curve BSGS wins every tested workload. Retain all losses and TWO duplicate seeded F61 workloads. No index-calculus/regularity/overall-fastest promotion. Source/protocol/narrative publication only; raw/PDF/archive remain local. [pcc:unverified]
+
+### Open threads
+Actual admitted-public-log collector integration is next, with cold setup and the entire source frontier. Remove redundant denominator/group work only under new frozen controls. Current window FINISHED; no scientific process in flight. No lease/coordinator or signed PCC verdict is asserted. [pcc:unverified]
+
+### Errors
+Initial failed Rust source and build logs retained. Metadata wrappers refused before execution; report initial wrong working directory failed before PDF then corrected. An ordinary follow-up PCC help invocation used unsupported proselint; official subcommand is lint-prose. No data or scientific predicate changed for these metadata errors. [pcc:unverified]
