@@ -68,6 +68,14 @@ fallback and checks. The fixed spec and Amendment 3 wall decision remain
 unchanged. A separate `publication-amendment-6.json` receipt must bind
 this source before a scientific job; earlier receipts remain historical.
 
+**Seventh before-data amendment:** [`AMENDMENT-7.md`](AMENDMENT-7.md)
+peels the exceptional same-abscissa group from each candidate binary
+pair-table row, then offers complete signed pairs to the existing x-only
+paired SIMD routine. The [source review](PAIR_TABLE_DIAGONAL_REVIEW_20261115.md)
+records the route and checks. The fixed spec and Amendment 3 wall decision
+remain unchanged. This revision needs a separate pushed-source
+`publication-amendment-7.json` receipt before a scientific job.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)
