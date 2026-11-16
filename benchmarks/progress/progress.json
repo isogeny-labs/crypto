@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+  "latest_record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 5,
-    "measured": 203,
+    "measured": 204,
     "open": 1
   },
   "repo": "crypto",
@@ -1407,6 +1407,190 @@
         }
       ],
       "problem": "ecdlp-rho-step-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.010774646,
+      "latest": 0.010774646,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_complete_process_wall_median",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 0.010774646
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0385716096459026,
+      "latest": 1.0385716096459026,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_batch_m3_aa_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 1.0385716096459026
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.22155060492401862,
+      "latest": 0.22155060492401862,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_f6_ic_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 0.22155060492401862
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.10224557815167018,
+      "latest": 0.10224557815167018,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_inherited_f4_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 0.10224557815167018
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.000924480426925755,
+      "latest": 0.000924480426925755,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_matrix_f4_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 0.000924480426925755
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0011014841769916715,
+      "latest": 0.0011014841769916715,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_matrix_f5_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 0.0011014841769916715
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.139284615944602,
+      "latest": 1.139284615944602,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_rho_strong_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 1.139284615944602
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.106297622667769,
+      "latest": 1.106297622667769,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_rootfind_m3_complete_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "8f4cc824c87a",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+          "value": 1.106297622667769
+        }
+      ],
+      "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
       "unit": "ratio"
     },
     {
