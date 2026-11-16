@@ -1,21 +1,442 @@
-# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
+# NEWFOLLOWUP ACTIVE: fresh comparison+relation ablations; publication31pending; NOnewfreshgeneration
 
-## Goal
-Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
-## Lead / hypothesis
-C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
-## Spec
-research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
-## State
-Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
-## Next steps
-Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
-## Runs in flight
-None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
-## Stop and success conditions
-Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
+UserChase-those-leads authorizesnewgoal afterprevious15development milestone. OriginalCOMPACT_SPEED_PROTOCOL requiresALL3exploratoryseedadmissions before19001/23003/29009; unmet byseed7singlecase, sooriginalholdoutsPROTECTED. NewseparateFRESH_NATIVE_COMPARISON_PROTOCOL49c28b fixes41011/43013/47017,p31,n16,LAST priorfastestcfbstream39 /same-sourcec394stream39 /frontierc394103. Generation/prep/fresh3CASreferences/equality commonfullypaidALLroutes; work/fullpaid separate;7AAall6gates/21blocks/old100kjointbootstrap; conditional ceiling baselinepaid/shared, strictincrements>1/10/15 acrossbothcontrols/scopes, all3required/no pooledadmitted-only/newbaselineclaim. LocalL0/waivedcheckpoint/zero$/noagents persists.
+
+Timeddiagnosticwrapperssourceb2aeebeb1, root-timed-{streamed,frontier}-b2aeebeb1-43, compile/strictlint43 pass8f49ee and30oldnativecells exactwire/input/basis/counters/freshSingular3b2451. Coreproducer/checker/pinnedquotientbytes unchanged; originaltimingbinaries untouched. Newfreshcapture/reportsource03556f439, frozen /workspace/relation-native-qualifiers/fresh-driver-03556f439-45.38tests/lint/build45 f350ed. Oldn3seed7 calibration3uninst+2timed match/nullstats/pins/rawreference+proofreplay/phasesums, invalidwireversion refusesbeforeoutput d18079. Fullqualarchives45raw1038848/exes4984124; no newfixture. FOLLOWUP_FRESH_QUALIFICATION authoritative. Config followup-development/fresh-config-45.json.
+
+Publish31 BEFOREfresh-native run(newseedgeninside). Priorplan30 tree7a5d2148eb8ddcec16a63b9437e73dda4811e356; ctx/tmp/fresh31-remote.json headdf0e514e0eb74189a08aa1be96220311c8b5c789 artifact-only2metas/1removed mirroredphysicalsummarykept. Bundle31 excludes c8d942a37843ff88ed3aacba17d21c09e8a751c3; envelope followup-development/archives-45.json2raw. Finalcommit/bundle/plan/uploadpending. PR4349bodyupdatedlinted; signedCI/inheritedPCCmainprefixconflict pending/no merge/force/ledgerrewrite. AppworksCLI401.
+
+Afterpub31 cleanbenchrec/defaultCPU0reserve/noheavyjobs: frozenfresh-driver035... fresh-native /workspace/fresh-native-results-03556f439-01 research/relation_degree_trace_20261115/followup-development/fresh-config-45.json fresh. Monitor /workspace/fresh-native-isolation-03556f439-01.jsonl.3fixedcases sequential, case180/global600/perchild30s2GiB16MiB; failures/AArejectretained,noretry/seedreplacement. READactualoutputsBEFOREPCC. Report SAMEfrozendriver fresh-native-report RAW MONITOR NEW_REPORT RESULTPCC, replaysallnativewires/matureoutputs/recomputescosts/stats/phasecomponents. Rawreport/PDF/SVG/PNG/allfailures/archive/close/upload BEFOREnextlead.
+
+ThenRELATION_ABLATION_PROTOCOL49c28b fixeddevelopmentp31seed7 n3/4/6 sixclasses:basestar,rootprojection,nonrootprojections,allprojections,star+leafedge(0,1),clique. Samepoint/scalaridentity; projectionallconstructionfullypaid evenifsubsetselected. Exactprovenance/Singularidentitychecks; freshcompletebasescomparebaseideal, differentidealsdescriptiveonly. OneF4trace/cell degree12deadline10s plusseparate affineclosure/Hilberttopform diagnostics(degree8n3/4,6n6,maxcolumns700), retainnulls/caps. Stage18cells/sourcequalification/publicationbeforeexecution. DoNOTtuneusingfreshresults; newgoalneedsbothboundedstudiesandreport/upload/evidence-basednextlead. No sourceimplablationsyet.
+
+Historicalold15goalcompletebelowdoesNOTendthisnewgoal. Commentary<60sec; Rustallmath/capture/reporting, Pythonmetadata/hash/archive/Gitonly.
+
+# COMPLETE: registered15x full-cost development milestone; finalpublication30delivery
+
+SelectedLAST/p2147483647/n16/seed7 frontier103 passedall6A/Agates and21mainblocks/108matchinganswers, pinsunchanged/0contention. Fullpaidmedians22.418113595636463F4/16.91998407691807expanded, adjustedlowers20.579510262650988/15.841748657660663, strict15flagtrue. PCC370e58/fd9d91/af017e unsigned knownfixture. Pipelineworkmedians9.877205/4.310077 andpriorfastest/candidate1.058singlescreen remainexplicit; no15againstpreviousbest/rawkernel/freshfamily/signedstanding. Reportfrontier-paired-01/report-01; rawarchiveb58d06f6/49048bytes; CLOSED1321/scopedintegrity/progresspass, PDFs/plotschecked. Milestone PAID_15X_DEVELOPMENT_REPORT and finalPRbody conciseandaccurate.
+
+Productionc394bb471frontier103/oldgridreference/defaults/fullnative+unchangedrootchecks; core60/61/62/lint39, root9API/3worker/lint39, native30through16oldwire/freshSingular/n3all32; frozenproofsourceclarificatione3dd43 preservesquotientbytes. Capture6bd17982f31+3guards/lints; pairedold6f3unchangedstrictLASTselector/math/costs/gates, newconfig41/n3smoke/PCC073f14. Allsource/programs/protocols alreadypublished29; final30addsactualpairedresult/closedrecord/raw/report/summary. No jobsrunning. No newbenchmark needed forcurrentgoal.
+
+Finalpublication30pendinguntil /tmp/frontier30-publication-receipt.json existsandPRheadreadbackconfirms it. Priorplan29 tree3294bdf9f603a82d22584ef5cfeb3293418e44a4, ctx/tmp/frontier30-remote.json headeff578bb0688853bb1b666f05e5f1c2172846c22 artifact-only6meta/10removes mirrored. Bundle30excludespriorlocal0bc4ca58133f9fd2231d0d99c3fe31d7b1ac4af2; envelopefrontier-paired-01/archive-envelope.json1raw. Finalcommit/bundle/plan30/upload/PRtitleandbody/readback thenGOALCOMPLETE. PR4349ready, inheritedPCCmainprefixconflict/CIreview/signedstandingpending; noforce/merge/ledgerrewrite. AppAPIworksCLI401.
+
+Reservedfresh19001/23003/29009unused. Furtherfreshscope needsseparateprospectiveprotocol ifpursuedlater; currentuser-requestedregistereddevelopment15criterionmet. L0/checkpointwaived/zero$/noagents/Rustallmath/Pythonmetadata. LessonsoutcomeO-00047bd32b59andthreeconfirmationentries recorded/verify0errors. Historicalpendingentriesbelowaresupersededbythiscompletehandoff.
+
+# Publication29DONE; selected frontier paired run NEXT
+
+Remote272a42214586fe21eed8904462dadca368d8497e/tree3294bdf9f603a82d22584ef5cfeb3293418e44a4 exactlocal0bc4ca58133f9fd2231d0d99c3fe31d7b1ac4af2; bundle29acbd1b09/418705bytes. /tmp/relation-publication-29-plan.json and/tmp/frontier29-publication-receipt.json. Fullscreen+pairedqual/PRupdated. Registerclean-source selectedpaired now, commands/reportguard details below. Goal15ACTIVE, stillno paired15confirmation.
+
+# Latest:1312 frontier32 SCREEN ADMITS; pairedQUALIFIED, pub29pending, paired NOT RUN
+
+Screenall192match/4paidrecoveries/0contention/pinsunchanged, ONLYfixedLAST/index31/both_updates_frontier. OriginalpaidF427.588966996944627/expanded21.606010349848763, matchedbaseline1.0724620259411928/priorstream1.0578941126148633. PCCa780ec/877bd3, frontier-screen-01/report-01 all186ratios/recoverysumsRust, PDFA3table/plotchecked/noPDFwarnings, raw7archives/CLOSED1312/scopedintegrity/progresspass. Notpaired15confirmation.
+
+SelectedpairedprotocolFRONTIER_PAIRED_PROTOCOL dc57c5, paired-config-41.json onlyroot_both=newimmutable root-frontier-direct-c394bb471-39, old update-paired-driver-6f3f14d0d-27/update-paired entry strictLAST selector/costs/calculator/gates unchanged. N3smoke3complete/matching/frontiermode/exports0/fullnative+root/nullresult/pinsunchanged PCC073f14. Rawsmoke+driverarchive41 complete. FRONTIER_PAIRED_QUALIFICATION authoritative. Nine-modeguardreporters6bd40 old108/latest45exact/wrongmode rejects4bffa0 alreadyqualified. No nativepairedcall yet.
+
+Publish29 BEFOREpairedregistration. Priorplan28 treebd838f8ffc47610f00beaf332e62216558e0a637; ctx/tmp/frontier29-remote.json headccfa19de27b39331ab62127319a8361985c70568 artifact-only2metadata/2removes mirrored. Bundle29 excludes5a70ea20e0ed5cfbf97afbe0b237df91f930431f; envelopesfrontier-screen-01/archive-envelope7raw +frontier-development/archives-paired-41.json1raw. Finalcommit/bundle/plan29/uploadpending; PRupdated/linted.
+
+Afterpub29 cleanbenchrec/defaultCPU0reserve/noheavyjobs: /workspace/relation-native-qualifiers/update-paired-driver-6f3f14d0d-27 update-paired /workspace/root-paid-inputs-723f4c2dd-01 /workspace/frontier-paired-results-6f3f14d0d-01 research/relation_degree_trace_20261115/frontier-development/paired-config-41.json. Monitor /workspace/frontier-paired-isolation-6f3f14d0d-01.jsonl. Original1warmup+7A/Apairs eacharm, all6ordinary95%include1 before21blocks. Bothpaid adjustedlowers strictly>15 for15flag, >10partial distinct; no retry/runnerup/gateweakening/newseed. READactualsummary beforePCCclaim.
+
+Reportifadmitted: frontier-paired-report-6bd17982f-40 RAW MONITOR NEW_REPORT RESULTPCC 0 both_updates_frontier. IfAAreject: frontier-rejection-report-6bd17982f-40 RAW MONITOR NEW_REPORT RESULTPCC both_updates_frontier. Fullraw/report/archive/close/upload alloutcomes BEFOREnextlead. Goal15ACTIVE/unconfirmed/L0/checkpointwaived/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched. Commentary<60sec. PR4349ready/inheritedprefixconflict/APIworksCLI401/no force/merge/ledgerrewrite.
+
+Historical follows:
+
+# Latest: FGLM frontier fullyQUALIFIED; publication28pending, paid32 NOT RUN
+
+Productionc394bb471 core60/61/62/lint39 PCC1d67ff+e3dd43format/sourceclarification. Root9API/3worker/lint39 DONE PCC3d6110. Native30 through16 oldinput/wire/basis/consumer/freshSingular equal, n3all32 complete/no recovery/nullselection/pinsunchanged PCC113347. Capture6bd17982f31tests/guard3/lints/build40 PCCc9957d, nine-modeold108/latest45exact/wrongmodereject4bffa0. FRONTIER_QUALIFICATION_REPORT authoritative; archives40raw1081972/exes4934980 done, no jobsrunning.
+
+Publish28 nowbeforecleanpaid32. Priorplan27 treef7aaec21b35a2cbe7c40ffdd39f46d28b83ad0fb, ctx/tmp/frontier28-remote.json headb8d2502d48d4a6b9a3648071f32f245d2c5f487f/no newartifactmigrationat13:07. Bundle28 excludes8afde06aa8ee673085761dddf606f0978cc7ad8f; envelopefrontier-development/archives-40.json2raw. Newcommit/sourcebundle/plan28/uploadpending. PRbodyupdatedlinted.
+
+Afterpub28 cleanbenchrec init/defaultCPU0reserve/noheavyjobs: /workspace/relation-native-qualifiers/frontier-driver-6bd17982f-40 frontier-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/frontier-paid-results-6bd17982f-01 research/relation_degree_trace_20261115/frontier-development/capture-config-40.json; monitor /workspace/frontier-screen-isolation-6bd17982f-01.jsonl. Protocol99d979 only31/fixedLASThashe4d22ea9 all32/all6/31ratios/fulloldcost/gates/caps/recovery. READactualselection beforePCC. Reportprogram frontier-report6bd40RAW NEW_REPORT RESULTPCC, fullraw/report/archive/close/upload BEFOREfollowup/newalgorithm. Onlyifadmit freezepairedexactbinary/config/n3smoke/protocol/publication first, existingupdate-paired-driver6f3 supportsfixedLAST. Goal15ACTIVE/no15confirmation/L0/checkpointwaived/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/no retry/gateweakening. Commentary<60sec.
+
+
+# Latest: FGLM frontier IMPLEMENTED/COREPASS; ROOTbuild39running, paid32 NOT RUN
+
+Productionc394bb4715a3e4dfd5ed6388b7935aa3a7857a85, native103=stream39|64. NeworderedBTreeSet frontier/dedup expandsindependentmonomialsonly/cachedimmutableleads; oldgridreference/defaults/fullnative+unchangedrootchecks retained. Core60/61/62/lint39 pass exactmixed/nonradicalprocessedorder/bound, bothprimefirst/laststar fullbasis/proof/metadata/fieldcounts. PCC1d67ff; wording/sourcebindingsiblinge3dd43 clarifiesformat-only/mutablequotient attestation, immutablequotient-core-source-39.rs.txt (do noteditpinnedquotientbytes). ROOT /tmp/build-frontier-root39.sh session58667 started~12:59UTC, rootbuild~7m20+tests9/3+lint~1m50. DO NOTeditproductionsource/restart. Checkfrontier-development/root-{build,tests,clippy}-39.log; frozenroot-frontier-{baseline,direct}-c394bb471-39.
+
+Capture6bd17982fd5867d0dc0a6292c8735efb7f6d0b03,31capture+3guardtests/lints/build40 PCCc9957d. FRONTIER_PAID_SCREEN_PROTOCOL99d979 ONLY31/fixedLASThashe4d22ea9, all30old+matched2=32/all6/31ratios/fulloldfees/gates/caps/recovery. Immutable /tmp/frontier-programs-40.json five programs. Read-onlyold108/latest45exact/wrongfrontiermode rejects PCC4bffa0.
+
+Afterrootfreeze /tmp/qualify-frontier40.sh (preparedNOTRUN): native30 through16 oldwire/input/basis/consumer counters+freshSingular/n3all32/no recovery/nullcomparisons+selection/pins/Rustcomposition. /tmp/frontier-identities40.py pre/post. Outputs /workspace/frontier-qualification-c394bb471-39-{baseline,direct}, frontier-capture-qualification-6bd17982f-40, frontier-audit-6bd17982f-40. Then /tmp/package-frontier40.py2archives raw/exes+oldreportcompat. RootPCC/fullFRONTIER_QUALIFICATION_REPORT/finalcommit/PR/log/resume+bundle28.
+
+Publish28 BEFOREpaidcalls. Priorpub27=b8d2502d48d4a6b9a3648071f32f245d2c5f487f/treef7aaec21b35a2cbe7c40ffdd39f46d28b83ad0fb exactlocal8afde06aa8ee673085761dddf606f0978cc7ad8f, bundle27233a9e89/269688. Priorplan27, newbundle28 excludes8afde06aa8ee673085761dddf606f0978cc7ad8f, envelopefrontier-development/archives-40.json2raw. Latestappheadsameb8d at13:01, refresh/mirrorartifactmigrations beforefinalpub. APIworksCLI401/PR4349ready/inheritedPCCprefixconflict/no force/merge/ledgerrewrite.
+
+Afterpub28 cleanbenchrec/defaultCPU0reserve/noheavyjobs: frontier-driver-6bd17982f-40 frontier-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/frontier-paid-results-6bd17982f-01 frontier-development/capture-config-40.json; monitor /workspace/frontier-screen-isolation-6bd17982f-01.jsonl. READactualselection beforePCC; all192outputs/raw/report/archive/close/upload BEFOREfollowup/newalgorithm. Onlyadmitpermitsseparatelyfrozenpairedexactbinary/config/n3smoke/publication. Goal15ACTIVE/unconfirmed/L0/waivedcheckpoint/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/no retry/runnerup/gateweakening. Commentary<60sec.
+
+
+# Latest: matched1243 profiles CLOSED; nextFGLMfrontier NOTimplemented, pub27pending
+
+1243baseline111865803/direct108491681guestIr, samecheckedbasis/modes/pins/0contention; PCC0e4eac/380191. Directleadself14074655, axpyself12410313, checkeraddself3480336. Two rawarchives andtwo completeRustself/summary/totals/Collected reports, A3PDFwarningfree/visualchecked, CLOSED1243/scopedintegrity/progresspass. No nativegain fromIr. Profiledata fused-profile-01.
+
+Next FGLM_FRONTIER_HYPOTHESIS efbd44 proposedNOTcode. Currentquotient::change_order enumeratesall degree0..d monomials then skipsleadingmultiples. EstablishedFGLM orderedfrontier starts1, expandsONLYindependentstandardmonomials bynvariables, dedup globally/degree<=d cap, skipscachedimmutableleadingterms. Samegrevlexnon-skippedsequence: eachsurvivingmhasindependentproperdivisor; dependentproperdivisor wouldlead-dividem. Atmost1+n*d insertedcandidates beforedimensionoverflow. Keep sameqmul/dependence/rewrite/sign/finalsort/fullnative+unchangedrootchecks, exactbasis/proof/fieldcounters. Privatebit64newBothUpdatesFrontier103=39|64, degreecache16off. Oldgridverbatimdefault. SourcesreviewedlocalQUOTIENT_PROTOCOL andquotientcode, labsparseFGLMREADME appblob2a884..., primarySymPy1.13.3fglmtools.py appblobd68fe5... (borderonlyexpandindependent/pruneLM, zero-dim). Paper503/Sage403gaprecorded, unrelatedSingularpageexcluded. KBunavailable. No novelty/degreeclaim/timingprediction.
+
+Firstpublish27 fullclosed1243+unimplementedhypothesis BEFOREcode. Priorplan26 tree6b3bef762df2f3edb9350e465284a12710e0da97; ctx/tmp/frontier27-remote.json heade4813572fd6c2955e49a27d572a1bdb5933c6365 artifact-only6metadata/11removesmirrored. Bundle27 excludesf473158d7949f8a22225ceb72a333e22636ef55c; envelopefused-profile-01/archive-envelope.json2raw. Finalcommit/bundle/plan27/uploadpending, PRbodyupdated.
+
+Afterpub implementnewfrontier withorderedBTreeSetwrapper cmpandseenset, cachedownedleads onimmutablepush; exactoldcoords/innerprocessing clones. EnqueuechildrenONLYindependent anddegree<d, preservecols>=d failurebeforepush. Differentialprocessedsequence vsoldgrid onstaticmonomialideals(nonradical,mixed,n3/8/16) andbound<=1+n*d, basis/proof/fieldcounts bothfields/fullfixtures/failure. Corefeaturetests/rootnewwrappers (matchedstream39 vsfrontier103)/APItests, compileonce7m+lint2m; no productioneditsduringbuild. Native30cellsoldwire/basis/counters/freshSingular+n3all32, prospective32all30old+matched2 only31/fixedLASThash, all6/31ratios/fullcost/gates unchanged; source/protocol/qualificationpub BEFOREpaidcalls. Goal15ACTIVE/unconfirmed/L0/waivedcheckpoint/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/noretry/gateweakening. Commentary<60sec.
+
+
+# Publication26 DONE; matched n16 profiles next
+
+Remote74989d2f363b80bea51758ce51d0f4e9492cfe45/tree6b3bef762df2f3edb9350e465284a12710e0da97 exactlocalf473158d7949f8a22225ceb72a333e22636ef55c, bundle26be445742/419364bytes. /tmp/relation-publication-26-plan.json, /tmp/fused26-publication-receipt.json. PRupdated. Below profilequalification/source/commands authoritative; no n16profileyet. Registercleanmatchedrecordthenfixedbaseline/direct. Goal15ACTIVE, 1232paidnullfullypublished.
+
+# Latest:1232 streamed paid30 CLOSED/NULL; matched profile QUALIFIED, pub26 pending
+
+Paid30 all180match/4recoveries/0contention/pinsunchanged. Fixedlast F4primary16.993/expanded12.750, matchedbaseline1.370/oldlead0.858; no admission/no pair/retry. PCC747182/589c8f, fused-screen-01/report-01 all174ratios/recoverysums computedRust, PDFA3/plot/tablechecked, raw7archives, closed1232/scopedintegrity/progresspass.
+
+Nextdiagnose matchedbaseline/direct instructions beforeanotherkernel. Newprofileentrysourcecb2817388 strictLASThashe4d22ea9/expectedkernel both_updates or both_updates_fused; oldFIRST/n3entry/parser/reporter/runtime unchanged.29capturetests/lint/build38 PCC20de46. Botholdn3profilecalibrations exactmodes/bases/native symbols/pins/rawself-summary-totals-Collected reconcile PCC941c40; fullraw+newdriver2archives-profile38 done. FUSED_PROFILE_PROTOCOL PCC0b992e andFUSED_PROFILE_QUALIFICATION authoritative. No n16profileyet.
+
+Publish26 BEFOREcleanregistration. Priorplan25 tree78fdf761da57463aebbee5980eee82963347abdb, ctx/tmp/fused26-remote.json heada3661efe6fa645ca244022f0971bbbe3a999f320 artifact-only2metadata/2removed mirrored. Bundle26 excludes priorlocal994abeb2444ffd4e46f9bad2a3baee9fea968e23; envelopesfused-screen-01/archive-envelope7raw +fused-development/archives-profile-38.json2raw. Finalcommit/bundle/sourceplan26/uploadneeded. PRbodyupdatedlinted, no jobsrunning.
+
+Afterpub26 registerone matchedinstructionrecord; reserveCPU0default; sequential /workspace/relation-native-qualifiers/fused-profile-driver-cb2817388-38 fused-profile oldpaidinputs new /workspace/fused-profile-results-cb2817388-01-{baseline,direct} configs fused-development/profile-config-{baseline,direct}-38.json. SameLASTfixture, one perbinary, no retry/capraise. Oldreporter /workspace/relation-native-qualifiers/callgrind-report-6bd05b0e5-17 RAW NEW_REPORT RESULTPCC. ReconcilesRustrawselftotals/log; fullfunctions retained. UseA3 PDF width65% forself.svg toavoidheightwarning; checkPDF/fig BEFOREclose; rawprofilecounts areNOTnativegain. Interpretremainingwork onlyafteractualresults, theninformedsuccessor. Goal15ACTIVE/no15confirmed/L0/checkpointwaived/zero$/noagents/Rustallmath/Pythonmetadataonly/no freshseeds/no gateweakening. All oldrejectionsretained.
+
+
+# Latest: streamed reducer fully QUALIFIED; publication25 pending, paid30 NOT RUN
+
+Corecfb9e82a0 shared57/58/59/lint36 PCCc4783c, root9API/3worker/lint36 DONE PCCf4f8b4. Native30 through16 oldinput/wire/basis/consumercounters/freshSingular andn3all30 match/no recovery/nullselection/pinsunchanged PCCfcfab0. Capture33ecd0d47 27tests+3guards/lints/build37 PCC3f9be4, old108/latest45reportsexact/wrongmode rejectPCCf0f7bf. FUSED_QUALIFICATION_REPORT authoritative. archives37 two payloads raw1081088/exes4907588 done; frozenroot-fused-{baseline,direct}-cfb9e82a0-36 +fivefused-tools33ecd37. No jobsrunning.
+
+Publish25 now BEFOREcleanbenchrec/timing. Prior24plan, ctx/tmp/fused25-remote.json head736ac1c20f97afd488e19cb2d1faa6f257a62b7e artifact-onlymigrationmirrored, bundle25excludes67bf9ea440d80d0873ff90d330f7a5fcdb5f011b, addfused-development/archives-37.json. PRbodyupdatedlinted. Priorpub24=1d847316570c99ee87a7de98e8da4519af169f51 tree556d22a2b924d344531f6e226414802ded9fb715. APIworksCLI401, preserveartifactmetadata/appendonlyPCCmainprefixconflict, noforce/merge/ledgerrewrite.
+
+Then frozenfused-driver-33ecd0d47-37 fused-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/fused-paid-results-33ecd0d47-01 research/relation_degree_trace_20261115/fused-development/capture-config-37.json defaultCPU0reserve+monitor/workspace/fused-screen-isolation-33ecd0d47-01.jsonl. Protocol656e19 only29/fixedLASThashe4d22ea9, all30/all6/29ratios, oldfees/gates/caps/recovery unchanged. READactualselection beforePCC. Fullraw/report/archive/close/upload BEFOREfollowup/newalgorithm. Ifadmit separatelyfreeze pairedexactbinary/config/n3smoke/publication. Goal15ACTIVE/unconfirmed/L0/waivedcheckpoint/zero$/noagents/Rustmath/Pythonmetadataonly/no freshseeds/no retry/runnerup. Commentary<60sec.
+
+
+# Latest: streamed reducer implemented; root build36 running, paid30 NOT RUN
+
+Production cfb9e82a0089e73f022d515e4e4cd13d33dbe5d9, privateFused39=selectedinplace7|32, rejecteddegreebit16off. Check dimensions/overflow beforefactor/inversion/mutation; malformedfallback oldrow_shift beforeinverse. Zeroshift oldinplace, nonzeroshift ownedkeys streamed, all full native/root checks unchanged. Core57/58/59 release/lint36 pass PCCc4783c unsigned. Rootbuild /tmp/build-fused-root36.sh session16139 started~12:19UTC, ~7m build+2m lint; inspect fused-development/root-{build,tests,clippy}-36.log and wait withoutrebuild/productionedits. New immutable root-fused-{baseline,direct}-cfb9e82a0-36.
+
+Standalone capture/report/audit/guards source33ecd0d47, 27capture+3guardtests/lint/build37 pass PCC3f9be4. Protocol FUSED_PAID_SCREEN_PROTOCOL PCC656e19 ONLYcandidate29/fixedLASThashe4d22ea9, all28prior+matched2=30/all6cases/all29ratios, fulloldfees/caps/recovery/gates. Immutable /tmp/fused-programs-37.json fiveprograms. Readonlyold108/latest45exact/wrongmode rejection PCCf0f7bf. /tmp/qualify-fused37.sh preparedNOTRUN: root30nativecells through16/freshSingular+n3all30+Rustcomposition/pins; /tmp/fused-identities37.py pre/post. Native dirs /workspace/fused-qualification-cfb9e82a0-36-{baseline,direct}, fused-capture-qualification-33ecd0d47-37, fused-audit-33ecd0d47-37.
+
+Nextfinishroot/nativequal, packagefullraw/executables/archive-37, FUSED_QUALIFICATION_REPORT andPCC. Then publish25 BEFORE paidcalls usingprior24plan + /tmp/fused25-remote.json ctxhead736ac1c20f97afd488e19cb2d1faa6f257a62b7e (artifact-onlychangesmirrored4metadata/9removes). Bundle25 excludes local67bf9ea440d80d0873ff90d330f7a5fcdb5f011b. Latestpublished24=1d847316570c99ee87a7de98e8da4519af169f51 tree556d22a2b924d344531f6e226414802ded9fb715, plan/tmp/relation-publication-24-plan.json. APIworksCLI401, preserveartifactmigrations/appendonlyPCCprefixconflict. PR4349 ready. No force/merge/ledgerrewrite.
+
+Afterpublication25cleanbenchrec init, defaultCPU0reserve, no compiler/test/compressor, run frozenfused-driver33ecd fused-screen oldpaidinputs new /workspace/fused-paid-results-33ecd0d47-01 configfused-development/capture-config-37.json; monitorfused-screen-isolation-33ecd0d47-01.jsonl. READactualselection BEFOREPCC. Fullreport/raw/close/upload alloutcomes BEFOREfollowup/newalgorithm. Only ifadmit freezepairedprotocol/config/n3smoke/publication first. Goal15ACTIVE, stillunconfirmed. No same-source retry/runnerup/gateweakening/newseed. L0/checkpointwaived/zero$/noagents/Rustallmath/Pythonmetadataonly. Fresh19001/23003/29009untouched. Commentary<60sec.
+
+Historical entries below; latest overrides:
+
+# Latest:1155 leading-degree screen CLOSED/NULL; next streamed-shift NOTimplemented
+
+1155all168match/fourpaidrecoveries/0monitorcontention/unchangedpins. Fixedlast candidate27 fails originalexpanded14.838<15 andcheapercontrols; F4primary19.647/matchedbaseline0.994/priorinplace0.872/sum0.813. No admission/no pairedfollowup/retry. PCCd332f5/0a9664. lead-screen-01/report-01 all162ratios/recovery sums computedRust, A3PDFwarningfree/tableplotschecked,7rawarchives; CLOSED1155/scopedintegrityprogresspass. Currentpipelinelegacydefaults unchanged, no15confirmed. All previous AA rejections retained, no newseed.
+
+NEXT AFTERpublication24: FUSED_SHIFT_HYPOTHESIS (justpinned, codeNOTyet). Streamfactor*monomial*reducer into row.poly/proof instead of temporaryRowShift2BtreeMaps, onprivatebit32/newBothUpdatesFused39=7|32 selectedinplaceoldsum; rejectedlead16off. Precheckallkeydimensions+checked_addbeforemutation/factorinverse; invalidfallbackOLDrow_shift BEFOREinv toretaincollisions/panic/counter behavior. Zero-shift reuseaxpy_in_place(false); nonzeroowned shiftedkeys updateonefieldproduct/update peroldterm, targetoldkeyidentity retained. Fixedshift preserveslex/proofindexorder whenvalid. Differentialremainders/provenance/counters bothfields, nonmonic/nonGB/zero shifts/dimcollisionfallback/overflow-before-inverse thenfeaturetests/rootbuild once2wrappers, native30cellsfreshSingular/n3all30, fullsource/protocol/qualpublication BEFOREnewtiming. Futureall28old+2=30 only29/fixedlasteligible all6costs. No speedprediction/regularity/noisefix/retry.
+
+Publication24pending: prior/tmp/relation-publication-23-plan.json; latestremoteheadd51c50c4a06d6bde8a722136d247a135737bfe86 /storef24_pr; comparepub23ddf274...tohead, fetch/mirrorartifactmeta beforefinalcommit. Priorlocalb4b153afd/fullresolve/endbundle23. Newbundle24excludesprior, envelopelead-screen-01/archive-envelope7raw. Includeclosed1155+nextunimplementedplan beforecode. Currentlocalb4b153sourcecommitted, pendingclosedrecord/progress/rawreport/PCC/PR/log/resumeneedcommit/bundle/upload. PR4349ready/inheritedPCCprefixconflict/appworksCLI401/no force/ledgerrewrite. Goal15ACTIVE/checkpointwaived/L0zero$/noagents/keepcommentary<60sec. No jobsrunning. Production666/capture5a285 qualified54/55/56/root9+3/native30/n3all28 asbelow. Rustallmath/Pythonmetadataonly. Reservedfresh19001/23003/29009untouched.
+
+# Latest: lead-degree cache QUALIFIED; paid28 screen NOT RUN
+
+Production666cd9b6a45335abc45dfa0525f4f28c3f457556 nativebit23=selectedinplace7|16, exactdegree-per-key once/scan/max_byoldorder/empty/singleton preserved. Core54/55/56release/lint33PCC877390, root9API/3worker/lint33 DONE(build7m20/lint1m53). Native30cells through16 oldinput/wire/basis/consumercounters andfreshSingular equal; n3all28complete/no recovery/nullselection/pinsunchanged PCCeec7fd. Sourcecapture/report/audit/guards5a285c348ab8d5a178b1d2756dec6a404cfffba5,25tests/lint/report3guardtests/build35passPCCd5bd3a; old108/latest45lastreportexactcompat/wrongnewmoderejectPCC0e029c. LEAD_QUALIFICATION_REPORT authoritative. Allroot/qualsessionsfinished; no compiler/nativejobrunning.
+
+LEAD_PAID_SCREEN_PROTOCOL PCC4e60e6 all26old+matched2=28, ONLYnewcandidate27/fixedlast-hashe4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3 eligible, all6casecostsretained. Fulloldfees/recovery/caps/uniquecheapest+bothoriginalprimary>=15 beforeseparatepairedconfirmation; no target/mode search/retry/runnerup/newseed. Afterpublication23/cleanbenchrec: /workspace/relation-native-qualifiers/lead-driver-5a285c348-35 lead-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/lead-paid-results-5a285c348-01 research/relation_degree_trace_20261115/lead-development/capture-config-35.json underdefaultCPU0reserve monitor/workspace/lead-screen-isolation-5a285c348-01.jsonl.168outeranswers. Reporter lead-report-5a285c348-35 RAW NEW_REPORT RESULTPCC, fullPCC/report/archive/close/upload beforeanyfollowup/newalgorithm.
+
+FutureifONLYfixedlastadmitted: oldfrozenpaired-driver6f3 update-paired supportsstrictlast input andJSONnewmode (no decoderchange), newconfigroot_both root-lead-cached-666cd9b6a-33; separateprotocol/n3smoke/publication requiredbeforecalls. Readonly guards lead-{paired-report,rejection-report}-5a285c348-35 allowboth_updates_lead andbindfirst/lasthash; resultreport args RAW MONITOR NEW_REPORT RESULTPCC 0 both_updates_lead, reject args RAW MONITOR NEW_REPORT RESULTPCC both_updates_lead. OldAArejections0755/1029/1110 stand; no15confirmed, no freshseeds.
+
+Publication23pending: prior/tmp/relation-publication-22-plan.json; remoteheade9efbdc66cdfa69948b47aa0ca8dd8cc45164cc4 /storel23compare+metasneedfetch/mirror, basepublication2206a1f994 tree7f59d599 exactlocal96c46de71 (resolvefullgit)/endbundle22. Newbundle23excludes96c; envelopelead-development/archives-35.json2payloads (packagingsession84134maybeongoing, wait/checkbeforecommit). Currentlocal5a285sourcecommitted; finalqual/report/PCC/log/resumeneedcommitthenpub23BEFOREnativebench. PR4349ready/inheritedPCCprefixconflict/appworksCLI401,no force/ledgerrewrite. Goal15ACTIVE, checkpointwaived/L0zero$/noagents/keepcommentary<60sec. Pythonmetadata/hash/Gitonly,Rustallmath. Reservedfreshseeds19001/23003/29009untouched.
+
+# Live: lead-degree cache IMPLEMENTED; ROOT lint/qualification RUNNING, no new timing
+
+Productioncore666cd9b6a45335abc45dfa0525f4f28c3f457556, BothUpdatesLead23=7|16. Exactdegree-per-key once/scan, empty/singleton/lastmax behavior preserved.54/55/56release/lint33pass PCC877390; failedtestborrow32fixed33. Rootbuild33DONE7m20s, binaries root-lead-{baseline,cached}-666cd9b6a-33 frozen; root9API3workerpass, strictlintcurrentlysession74824/PID100728 checkps, ~2minusual. No productioncodeedits/restartneeded.
+
+Capture/report/audit source5a285c348ab8d5a178b1d2756dec6a404cfffba5,25tests/lint/report3guardtests/reports35compilepass PCCd5bd3a; firstreportlabels34arraymismatchfixed35. LEAD_PAID_SCREEN_PROTOCOL PCC4e60e6 all26old+2=28, ONLYcandidate27 andfixedlast-hashe4d22ea9 eligible, all6casecostsretained. Configlead-development/capture-config-35.json, immutable /workspace/relation-native-qualifiers/lead-{driver,report,audit,paired-report,rejection-report}-5a285c348-35. Oldreportcompat108+latest45last/wrongnewmoderejectDONE /tmp/qualify-lead-reports35.py, reports-qualification-35.json/newPCCbeforethisprefix. No nativeperformancecall.
+
+Nativecorrectnessqualification session92939; durable /tmp/qualify-leads35.sh invoked via timeout600. DoNOTrepeat. It runs2modesx15=30cells through16freshSingular207compatibleexporter thenn3all28 andRustcompositionaudit, pre/postpins /tmp/lead-identities35.py. Output/workspace/lead-qualification-666cd9b6a-33-{baseline,cached}, lead-capture-qualification-5a285c348-35, lead-audit-5a285c348-35. Checklead-development/audit-summary-35.json/logs/post pins aftercompleted; don'tclaimuntilactualPCC. Afterrootlint+qualpassed packagearchives(needcreatehelper) rawdirs+7programs+oldreportcompatoutputs, finalLEAD_QUALIFICATION_REPORT/PCC/log/resume/publication23BEFOREnewpaidregistration.
+
+Lastpublished22=06a1f994cd510f8ca792f5fa3b36a200bde7d30f/tree7f59d599dc84362a8eb4339bb30b220ec07cbb90 exactlocal96c46de710? usegitrevparse96c46de71/endbundle22. Currentserverartifacthead e9efbdc66cdfa69948b47aa0ca8dd8cc45164cc4 /storel23_pr; refreshcompare22->head andmirror metadata BEFOREpub23. Priorplan/tmp/relation-publication-22-plan.json. Newbundle23exclude96c46de71; newenvelopelead-development/archives-35.jsonnotcreatedyet. Currentlocal5a285sourcecommitted; pendingrootlogs/nativequal/guardPCC andhandofffinalclosurecommit. PR4349ready/inheritedPCCprefixconflict/appworksCLI401,no force/ledgerrewrite. Goal15ACTIVE,L0zero$/checkpointwaived/noagents/keepcommentary<60sec. Noreservedfreshseed19001/23003/29009. DoNOTrun nativebenchwithcompiler. Historicalbelow.
+
+Authoritative next lead: LEAD_DEGREE_CACHE_HYPOTHESIS_02.md (initial c1e030 subject retained with a prospective-prose lint omission, no code/timing change).
+
+# Latest:1110 last/in-place A/A REJECTED/CLOSED; costtrace complete; lead-degree NOTimplemented
+
+1110all45match/unchangedpins/0monitorcontention, F4fullpaid95[1.004183,1.055203]excludes1 other5scopepass; main0/resultnull. PCCe10346/33be70. update-paired-01/report-01 exactpaidsums/6AA/mode/hashbinding, PDFwarningfree/visuallychecked, rawonearchive/scopedintegrityprogresspass; CLOSED. No retry/runnerup/freshseed/15confirmation. GoalACTIVE.
+
+RetrospectiveAAcosttrace AA_COST_TRACE_PLAN94e09e, Rustaa-cost-trace sourcecurrentlyuncommittedfinal31:3tests/lintpass; all5records0755/0827/0906/1029/1110 70panels210paidintervals/oldgatesrecompute, exactnestedsetup/controlprocess/nativephase/parent sums. F4obsdegree/step/maxrows/cols hashes same across14perstudy; no physicalcause. Latest7pair summedF4paidA-B145.108ms=work97.961+setup47.152+eq-.005; processwork98.086 constructionphase93.667, notCPUtime. No newnativecall/gatechange. Report aa-cost-trace-03 FINAL, PDFwarningfreeA3/visuallychecked, fullauditJSON/plots; earlier01/02retained. PCC0399d0/c1e90c. /tmp/bind-aa-trace-archives31.py verifiesall635sourcefiles match5oldclosedrawarchives andtheirrecordedSHA; archive-binding-31.json. Failedfirstcompile28missingclosurebarfixed29, final31extendednativephases. KBtoolsabsent/wrappernoexecutable, officialRustInstant/Commandstatus/max_bycontractsread. No codeclockbugorfeeomissionfoundintheserecordedfields; causeunknown.
+
+NEXTAFTERpublication22: LEAD_DEGREE_CACHE_HYPOTHESIS privatebit16/nativeBothUpdatesLead23 (inplace7|16), no codeyet. lead_legacy keysmaxcmp repeatedlysumdegree; newperpass .map(m=> (degree,m)).max_bycacheddegree+same reverselex; same last-max; emptypanic/singletonreturndirect(no degreeoverflowon1extremekey). No cacheacrossmutations/consumer/checkremoval, olddefault0. Matchedinplacebaseline7/newlead23 two wrappers one~9minrootbuild; all26oldcontrols+2=28, only27eligible FIXlastn16hashe4d22ea9 beforetiming, all6costsretained. Differentialmaps/ties/empty/singleton/featuretests/lint/fullwire/counter/root9API3worker/native30cellsfreshSingularthrough16/n3all28pins BEFOREsource/protocolpublication/newtiming. No prediction15 ornoise-causefix; old1110rejectretained.
+
+Publication22pending: prior/tmp/relation-publication-21-plan.json ctx/tmp/updates22-remote.json migrationb52b8628a88b9897fa6211535283465ef27d2895 mirrored8metas/11removes? useJSONactual; physicalbyteskeep. Priorlocal2edfc6505 fullgitresolve/end21; bundle22excludeprior, envelopeupdate-paired-01/archive-envelope.json1raw+aa-cost-development/archives-31.json (NOTCREATEDYET: freezeexe/archive aftersourcecommit). Includeclosed1110+source/AAtracealloutputs+nextunimplementedhypothesis22BEFOREnewalgorithm. CurrentPR4349ready/inheritedPCCprefixconflict/appworksCLI401 noforce/ledgerrewrite. No build/jobrunning. CheckpointwaivedL0zero$/noagents/keepcommentary<60sec. Rustallmath/Pythonmetadata/Gitonly. Reservedfreshseeds19001/23003/29009untouched.
+
+# Latest:1058 update screen CLOSED; last-star/in-place paired QUALIFIED, NOT RUN
+
+Actualselected star-last-n16-s7/index24/both_updates, hash e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3.156matching/4paidrecoveries/0monitorcontention/pinsunchanged; primary30.160/24.198, priorzeroexport1.358/matchedbaseline1.087/sum1.324. PCCb94249/2bf25a. Initialc231a8 selectionwrong explicitlycorrected, raw/draftpreserved, finalupdate-screen-01/report-02 all150ratios/sumsrecomputed PDFwarningfree/tableplotschecked/scopedintegrityprogresspass,7rawenvelope. No15confirmation.
+
+Authoritative UPDATE_PAIRED_PROTOCOL_02 PCC28217a fixesearliercapturewording(0a86d5retained), allsamecosts7AA/21blocks/calculator/gates/caps/defaultCPU0. Newdriver source6f3f14d0d9? /tmp/update-paired-source-27 exact; capturesonlystrictlastselector via update-paired, oldroot-pairedfirstunchanged.23capturetests/lint,3reporttests/lint, n3smoke3complete modeboth_updates0exports/nullresult/pins, old108/45statsreproduce/wrongmode reject PCC434fda. UPDATE_PAIRED_QUALIFICATION_REPORT authoritative.
+
+Afterpublication21+cleanbenchrecregister: /workspace/relation-native-qualifiers/update-paired-driver-6f3f14d0d-27 update-paired /workspace/root-paid-inputs-723f4c2dd-01 /workspace/update-paired-results-6f3f14d0d-01 research/relation_degree_trace_20261115/update-development/paired-config-27.json underCPU0reserve/out/workspace/update-paired-isolation-6f3f14d0d-01.jsonl. Candidatefrozenroot-update-in-place-213656108-24 (core53/54/55/root9+3/native45 alreadyqualified). REPORT /workspace/relation-native-qualifiers/update-paired-report-6f3f14d0d-27 RAW MONITOR NEW_REPORT RESULTPCC 0 both_updates; rejection /workspace/relation-native-qualifiers/update-paired-rejection-report-6f3f14d0d-27 RAW MONITOR NEW_REPORT RESULTPCC both_updates. Bothbindactualinputhash/labels; no15claimafterAAreject/no runnerup/retry. No newpairedPERFORMANCEyet.
+
+Publication21pending: /tmp/relation-publication-20-plan.json ctx/tmp/updates21-remote.json migration4484185326a455fa3c0961c5fe1d41f210e79c77 mirrored2metas/3removals (keepphysical). Priorlocalab40ad935295f185c1b533f9fae03a082f5b5a44/end20; newbundle21excludeprior; envelopesupdate-screen-01/archive-envelope7raw +update-development/archives-paired-27.json2raw. Currentlocal6f3sourcecommitted, finalqual/docs/log/PCC/resume needcommit/bundle/publicationBEFOREpairedcalls. AppGitHubworksCLI401PR4349ready/inheritedPCCprefixconflict,no force/ledgerrewrite. Goal15ACTIVE/checkpointwaivedL0zero$/noagents/keepcommentary<60s. No jobsrunning/no newreservedseeds19001/23003/29009. Rustallmath/Pythonmetadataonly.
+
+# Latest: paid26 screen1058 CLOSED; actualselected LASTn16/in-place; pairedcapture qualifying
+
+All156match/fourpaidrecoveries/0monitorcontention/unchangedpins. Actualprospectiveselectionstar-last-n16-s7/index24/both_updates. Primary30.160/24.198, priorzeroexport1.358/matchedbaseline1.087/sum1.324; oldboth1.256. PCCb94249/2bf25a. Initialclaimc231a8 wronglyassumedfirst/fastsum; explicitcorrection b94249, retainimmutablefalseinitialclaim/raw,draftreportplaceholder. Finalupdate-screen-01/report-02 correctPCC/recomputes150ratios/allrecoverysums, warningfreeA3PDF/tableSVGPNGvisuallychecked. Closed1058/scopedintegrity/progresspass; archive-envelope7ignoredpayloads. No15confirmed/no freshseeds.
+
+PairedNEWselectorcode root_paired::run_last via CLI update-paired bindsactual LASThash e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3; oldroot-paired firsthash/loopscostsgatesunchanged.23localpilotrelease/lintpassinclnewwrongcase/hash/n/seedguards, reports3focusedtests/lintpass bindfirst/lasthash labels. Sourceuncommittedcurrentlynewcommitwillfreeze. Rootcandidate /workspace/relation-native-qualifiers/root-update-in-place-213656108-24 modeboth_updates0exports. Configupdate-development/paired-config-27.json. Authoritative UPDATE_PAIRED_PROTOCOL_02.md correctsinitialprotocolcapturewording(0a86d5draftretained). Same7AA/21blocks/100kcalculator/caps/defaultCPU0, no runnerup/retry. Needn3smoke3answers/nullresult/pinsunchanged+oldreportcompat andguard sourcefreeze/archives BEFOREpublication21/cleanpairedregistration. No pairedPERFORMANCEcall.
+
+Publication21pending: prior/tmp/relation-publication-20-plan.json ctx/tmp/updates21-remote.json migration4484185326a455fa3c0961c5fe1d41f210e79c77 mirrored2metas/3deletionsphyskeep. Priorlocalab40ad935295f185c1b533f9fae03a082f5b5a44/endbundle20. Newbundle21excludeprior, envelopesupdate-screen-01/archive-envelope7raw+newpairedqualarchives27whencreated. Fullclosed1058+newpairedsource/protocol02/qualification BEFOREcalls. Lastpublication20=f6b75dcb tree9bdf5d3f, PR4349ready/inheritedPCCprefixconflict, appworksCLI401/no force/ledgerrewrite. Goal15ACTIVE/L0zero$/checkpointwaived/noagents/keepcommentary<60sec. Productioncore213 andnative45/capture26 remainqualifiedunchanged. No build/nativejobrunning. Rustallmath/Pythonmetadataonly, freshreservedseeds19001/23003/29009untouched.
+
+# Latest: exact updates QUALIFIED; paid26 screen NOT RUN
+
+Rootproduction213656108dd57e594651c9c13a871d065a83f1c1 andcapture/report/auditff17f77dd28bb90f60fbf62bc0fd82a7fdad913b frozen. Core53/54/55release/lint24PCCa70fe1; root9API/3worker/lint24pass; native45cells through16 oldwire/input/basis/consumercounters/freshSingular equal, n3all26complete/no recovery/nullselection/unchangedpins PCCd52cd3. Capture22tests/lint/report-auditbuild PCC31ddc5. FullUPDATE_QUALIFICATION_REPORT authoritative; initialunusedenumlint23 retainedcorrected24, no nativequalfailure. Noactivecompiler/job.
+
+UPDATE_PAID_SCREEN_PROTOCOL PCCa87be0 freezesall23oldcontrols+newmatched3 indices23baselineboth,24both_updates,25both_updates_sum; only24/25eligible uniquegloballycheapestproof-fast/no recovery+bothoriginalpaidprimary>=15; atmostonecase/mode, no runnerup/retry. Fulloldfees/recovery/caps/knownsixinputs unchanged, no freshseeds. Afterpublication20: BENCHREC L0cleanregister, defaultCPU0reserve/noheavyjobs then /workspace/relation-native-qualifiers/update-driver-ff17f77dd-25 update-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/update-paid-results-ff17f77dd-01 research/relation_degree_trace_20261115/update-development/capture-config-25.json. Monitor/workspace/update-screen-isolation-ff17f77dd-01.jsonl. Expect156outeranswers. PCCbeforecite, reporter /workspace/relation-native-qualifiers/update-report-ff17f77dd-25 RAW NEW_REPORT RESULTPCC, fullraw/report/archive/close/upload alloutcomes BEFOREnewalgorithm/followup.
+
+Prequalifiedreadonlyguards forfuturepairedchoice: /workspace/relation-native-qualifiers/update-paired-report-182707233-26 RAW MONITOR NEW_REPORT RESULTPCC 0 EXPECTED_MODE; rejectionreport update-rejection-report-182707233-26 RAW MONITOR NEW_REPORT RESULTPCC EXPECTED_MODE. Modes six inclboth_updates/_sum. Old108statistics+45rejectionexact/wrongnewmodereject PCC28bc06, archives-reports-26 (1payloadwithprograms/compat). Existingpaired driver7cb supportsfirstn16only. Only ifnewscreenadmits freezeNEWpairedprotocol/config/n3smoke/publication BEFOREcalls; no retry1029/botholdkernel. No new15confirmation.
+
+Publication20pending: prior/tmp/relation-publication-19-plan.json ctx/tmp/updates20-remote.json head55ebf7f4a1ae0bc71c33af8a5cd156404f22f038 no migration atlatestread. Priorlocal11ac81605 fullresolve/endbundle19. Newbundle20excludesprior, envelopesupdate-development/archives-25.json2raw+archives-reports-26.json1raw. /tmp/package-updates-25.py maybeSTILLRUNNINGsession72275 ifarchives-25notexist; waitcompletion BEFOREpublish. Localcompiler-source213, captureff17, guards182 allcommitted; finalqual/report/PCC/log/resumeneedcommit. APIGitHubworksCLI401PR4349readyinheritedPCCprefixconflict; noforce/ledgerrewrite. Goal15ACTIVE/checkpointwaived/L0zero$/noagents/keepcommentary<60sec. Rootbuild24done7m24+lint1m57, oldrustc84631Zignore. Noreservedfreshseeds19001/23003/29009generated. Rustallmath/capture/stats/reports; Pythonmetadata/hash/Gitonly.
+
+Historicalbelowlatestoverrides:
+
+# Live update: exact axpy modes implemented; ROOT BUILD RUNNING, no new timing
+
+Productioncore213656108dd57e594651c9c13a871d065a83f1c1, native BothUpdates7/BothUpdatesSum15, privateaxpydispatch, olddefaults/native+rootchecks intact. Core53/54/55release/clippy24passes PCCa70fe1. InitialunusedCompletionExports editclippy23caught, corrected/rerunall, retainalllogs. Currentrootbuild via /tmp/build-update-root-24.sh session3772/PID92501 rustc started~10:44UTC (old84631Zignore), rootcompile~7m +tests9/3 +lint~2m. DO NOTeditproductionsource/restartbuild. Scriptcopiesimmutable root-update-{baseline,in-place,fastsum}-213656108-24 then tests/lint. Checklogs update-development/root-{build,tests,clippy}-24. No nativebench concurrent withcompiler.
+
+26capture/report/audit frozen sourceff17f77dd28bb90f60fbf62bc0fd82a7fdad913b,22tests/lint PCC31ddc5, UPDATE_PAID_SCREEN_PROTOCOL PCCa87be0. All23oldcontrols+matched3 (baseline23 both,24 both_updates,25 both_updates_sum); only24/25eligible uniquecheapest+bothprimary>=15. Existingfees/recovery/caps/no runnerup/retry. Configupdate-development/capture-config-25.json. Immutable /workspace/relation-native-qualifiers/update-{driver,report,audit}-ff17f77dd-25. NOnewqualification/native timingyet.
+
+Afterrootbuild: run /tmp/qualify-updates-25.sh (45nativecells through16+freshSingular oldcompatible207 exporter, n3all26, Rustcomposition audit); /tmp/update-identities-25.py pre/postpins+copy summaries. Outputs update-qualification-213656108-24-{baseline,in-place,fastsum}, update-capture-qualification-ff17f77dd-25, update-audit-ff17f77dd-25. ScriptpreparedNOTRUN. Needactualallpass+PCC beforeciting. Then /tmp/package-updates-25.py 2archives; rootPCCtest/lint; UPDATE_QUALIFICATION_REPORT; pub20 BEFOREcleanbenchrec/newpaidcall.
+
+Readonlypaired/rejectionreporters modesextendedsixstrings (uncommittedsource, built),1guardtest/lint/old108exact+old45rejectionexact/wrongnewmoderejectPCC28bc06, /tmp/qualify-update-reports-26.py DONE. Needfreezecommit/copy binaries+archive ifusingfuturepair. No estimator/timer change. Rootsourceunchanged. Couldfinishthiswhile rootcompiles.
+
+Lastpublication19=55ebf7f4a1ae0bc71c33af8a5cd156404f22f038/tree646c76bdebb68c918be46ca537c56757c490632d, exactlocal11ac81605/fullgitresolve, bundle19. prior/tmp/relation-publication-19-plan.json; currentremoteheadstill55eb atlastsnapshot/no migration (refreshbeforepub20). Nextbundle20excludes11ac; includeupdate-development/archives-25.json2raw +reportguardarchiveifcreated. .resume latestmustsurvivecommit. PR4349ready/inheritedPCCprefixconflict/appworksCLI401.15goalACTIVE, checkpointwaivedL0zero$/noagents/no newseeds. Keepcommentary<60sec; userlatestResume wantscontinuedwork, don'tfinishatpartial. Allmath Rust, Pythonmetadata/Gitonly. Historicalbelow.
+
+# Latest: selected-both instruction diagnosis CLOSED; axpy lead NOT implemented
+
+1035profile136731306guestIr, samebasis/bothmode/0exports/pinsunchanged/0monitorcontention, PCC84b178/1ca715. Topselflead15864276, axpy13015229, Btreeinsert12058373. Inclusive axpy31100449 overlaps; not nativewallfractions. Producer98196540 vs separatechecker35609700 inclusive. Reportkernel-profile-01/report-03 FINALpresentation (fullJSONreport01), warningfreeA3PDF/plotvisuallychecked. Closedrecord1035 immutablepointsreport01PDF whichhasoverlap; retainedwithcorrectionclaims37b8a6 andfinalnewclaim, doNOTrewriteclosedrecord. Report02 has6ptfigurewarning, report03 fixes. Rawarchiveone, scopedintegrity/progresspass. Allold15failures/1029AArejectkept, no freshseeds/15win.
+
+Next AFTERpublication19: AXPY_UPDATE_HYPOTHESIS scoped notimplemented. OfficialRustget_mut/insert docs read, Solinasp2/priorM31derivation reused, KBunavailable. Optimizeprivateaxpy surviving-existingvalue via get_mut avoidskeyclone+secondlookup, retainzero remove/vacantinsert/sortedloop/oneupdate+mulcounters. SeparateablationguardedM31add: ifp==M and(a|b)<=M, s=a+b<=2M, t=(s&M)+(s>>31)<=M, ift>=M subtractM, otherwiseold128sum%p. arbitraryu64wide/noncanonicalfallback preserved. Newprivatebits4=inplace,8=fastsum layeredoldboth3; enums BothUpdates7/BothUpdatesSum15; publiclegacydefaultold, opaque pendingfactoryonly, fullnative+rootchecks unchanged. Matched root currentboth vsupdates vssum3newbinaries(onegraph9minbuild), addall23oldcontrols=>26prospectivepaidroster, onlytwooptimizedeligible; no retry/runnerup. Differentialmap/proofs/counters bothfields/zero/cancel/noncanonical, boundaries+fixedpairs, affectedfeaturetests/rootAPI/cellsfreshSingularthrough16 BEFOREsource/protocolpublication/nativecall. No speedprediction.
+
+Publication19pending: prior/tmp/relation-publication-18-plan.json ctx/tmp/kernels19-remote.json=head7955376c/no migration atlastsnapshot; priorlocald21884f83/fullfindgitrevparse, bundle19excludesprior/end18; envelopekernel-profile-01/archive-envelope.json1raw. Preserveoldextrasminusmigration. Includeclosedprofile+presentationcorrection+newhypothesis thenpublishBEFOREnewcode. PR4349ready/inheritedPCCprefixconflict, appGitHubworksCLI401; noforce/ledgerrewrite. Goal15ACTIVE,checkpointwaived/L0zero$/noagents. Keepcommentary<60sec. Nojobsrunning. Rustallmath/capture/stats/report, Pythonmetadata/Gitonly. No originalfreshseeds19001/23003/29009.
+
+# Latest: selectedboth paired A/A REJECTED/CLOSED; new profile QUALIFIED, NOT RUN
+
+1029 run45matching/unchangedpins/zero monitorcontention, F4work95[1.001575,1.070291]excludes1; allother5scopepass; main0/resultnull. No retry/runnerup, no15numericclaim. PCC3510d3/5d9667. kernel-paired-01/report-01 newRustreadonlyreport checksallpaidsums/6intervals/bothmode0exports/native+rootperpanel/wrongmodereject. Rawonearchive, PDFwarningfreeSVGPNGvisuallychecked, scopedintegrity/progresspass; recordCLOSED.
+
+Next AFTERpublication18: oneinstructiondiagnosis selectedboth source608 usingfrozen /workspace/relation-native-qualifiers/callgrind-driver-6bd05b0e5-17 callgrind-profile /workspace/root-paid-inputs-723f4c2dd-01 /workspace/kernel-callgrind-results-22-01 research/relation_degree_trace_20261115/kernel-development/profile-config-22.json. Existing reporter callgrind-report-6bd05b0e5-17 RAW NEW_REPORT RESULT_PCC. EXACT_KERNEL_PROFILE_PROTOCOL PCC5c9573, oldn3basis/mode/pins+rawlogreconciliation pass PCCb2881e, archives-profile-22 oneignoredraw; runtimes/programsold archives17 androotkernelarchives19. Registercleanbenchrec first; CPU0defaultreserve/noheavyjobs; Irnotnativecycles/time/speed. Postprofilemandatoryanswer.kernel_modeboth. All completechecks/capsretained, no newseeds.
+
+Publication18 pending: prior/tmp/relation-publication-17-plan.json ctx/tmp/kernels18-remote.json migration66e63a3b9388dae68ab6ccb61162cd542fd3bf9b 6metas/10removed mirrored (physicalkeep), priorlocal67281a8b9a55b717941f168a9ae12937f106bd0b. Bundle18 excludesprior/end17, envelopes kernel-paired-01/archive-envelope.json1raw+kernel-development/archives-profile-22.json1raw. Includeclosed1029+readonlyreportersource+newprofileprotocol/config/qualification BEFOREprofile. CurrentPR4349ready/inheritedPCCprefixconflict; appworksCLI401,no force/ledgerrewrite. Goal15ACTIVE/usercheckpointwaiver/L0zero$/noagents. Keepcommentary<60sec. Nojobsrunning. Seehistoricalbelowfor source/protocols/knownscreencontrolroster. No originalfreshseeds19001/23003/29009.
+
+# Latest: exact23 screen CLOSED; selected both-mode paired QUALIFIED, NOT RUN
+
+1021screen all138match/fourpaidrecoveries/0monitorcontention/pinsunchanged, PCC286258/051bfd. Firstn16 bothmode/index22 soleadmit primary29.511/17.334 previousZeroExport1.158/matchedLegacy1.134/ordered1.029. kernel-screen-01/report-01 all132ratios/recoverysumsrecomputed, standaloneA3PDFwarningfreeSVGPNGvisuallychecked; archive-envelope7ignoredraws; scopedintegrity/progresspass. Exactkernelbehavior native60cells/n3all23 equal old/freshSingular, core50/51/52 root9API/3worker qualified. Allprior15failures retained,15goalACTIVE.
+
+New EXACT_KERNEL_PAIRED_PROTOCOL PCCf89590: freeze firstn16source608ac0fd4 bothmode, noexport/fullnative/rootchecks; same7AA/21blocks/calculator/gates/caps. No runnerup/retry. Existingdriver /workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09 root-paired /workspace/root-paid-inputs-723f4c2dd-01 /workspace/kernel-paired-results-7cb431bf0-01 research/relation_degree_trace_20261115/kernel-development/paired-config-20.json underdefaultCPU0reservation withmonitor /workspace/kernel-paired-isolation-7cb431bf0-01.jsonl. RegistercleanrecordONLYAFTERpublication17. Runtimeenvsamebelow. Guardedreadonlyreporter /workspace/relation-native-qualifiers/kernel-paired-report-b207c2172-21 RAW MONITOR NEW_REPORT RESULT_PCC 0 both. Guard checksallcandidatepanels, no statistic change. Smoke3complete/nullresult/pinsunchanged,1modeguardtest/lint, old108-reportexactcompatibility andwrongmodereject passes PCC46362b. Capturefrozen7cb, rootbinaries608, reportersourceb207. No newpairedPERFORMANCEcall.
+
+Publication17 pending: /tmp/relation-publication-16-plan.json andctx/tmp/kernels17-remote.json (migration051f06905aaf72c16279d057f38cfddccf9b049c; manifests2/removes2 mirrored). Priorlocal2ef3782405e8cb361aea2dcfc4683f23e58c659e/endbundle16. Newincrementalbundle17 plus kernel-screen-01/archive-envelope.json7raw andkernel-development/archives-paired-21.json2raw. Generic/tmp/relation-publication-plan.py. Includeclosed1021+newsource/protocol/qualification beforepaired. PR4349ready/inheritedPCCprefixconflict; appGitHubworksCLI401 noforce/ledgerrewrite. CheckpointwaivedL0zero$/noagents. No build/nativejobrunning. Keepcommentary<60sec;persistuntil15goalcomplete, nofreshseeds19001/23003/29009.
+
+Historical below (latest overrides):
+
+# Latest: exact kernels QUALIFIED; paid23 screen NOT RUN
+
+Current source608ac0fd4 (root four modes) and capture/report/audit c3df501fc frozen. All60 native cells through16 equal old input/wire/basis/counters and fresh Singular; n3 all23complete/no recovery/nullselection; pins unchanged. PCC03358d. Core50/51/52release/lint02, root9API/3worker/lint, capture20/lint; PCCff2cd9/7a1ea8. Additional cfgtest-only nonGB probe/lint03 passes PCC6724f7, production binaries unchanged. EXACT_KERNEL_QUALIFICATION_REPORT/PAID_SCREEN_PROTOCOL authoritative. Native mode legacy/order/cache/both typed pending factory retains complete native+root verification. All19oldcontrols+4matched; select only unique globally cheapest optimized mode20/21/22, both original primary>=15; no runnerup/retry after AA. Goal15ACTIVE; old paid E lower12.792 remains below15, no fresh seeds.
+
+Publication16 pending: prior /tmp/relation-publication-15-plan.json, ctx/tmp/kernels16-remote.json (head424a6934, no migration yet), base local2999c0170bf68e5c2e7d4eb5a129043b18d889ee. New bundle16 excludes that prior source, envelope kernel-development/archives-19.json2ignoredpayloads. /tmp/relation-publication-plan.py helper. Full source/protocol/qualification publication BEFORE clean benchrec registration. CurrentPR4349 ready/inheritedPCCmainprefixconflict, appGitHub works/CLI401; no force or ledger rewrite. Checkpointwaived, L0zero$, noagents. No active compilation/native timing. Keep commentary<60sec.
+
+Next: kernel-driver-c3df501fc-19 kernel-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/kernel-paid-results-c3df501fc-01 research/relation_degree_trace_20261115/kernel-development/capture-config-19.json under default isolated_bench CPU0 reservation, no heavy jobs. Runtime LD_LIBRARY_PATH=/workspace/msolve-source/src/neogb/.libs:/workspace/native-cas/lib; SINGULARPATH=/workspace/native-cas/share/singular/LIB. Register clean-source record first, retain138 answers/paid recovery, PCC then reporter/archive/close/upload every outcome. Only later separate selected-mode paired test; existing paired-driver7cb supportsfirstn16; guardedreporter needs mandatory selectedkernel check, immutable config before calls. No new seeds19001/23003/29009.
+
+Historical handoff follows (latest section overrides stale statements):
+
+# Latest: instruction diagnosis CLOSED; next exact kernels NOT implemented
+
+Publication14=8c297e99f2262976ebd1357fa5453a000eaebde0/tree3433e6795d9581f185a5375f9bf72e0d19c320e3 corresponds local1223113f8f1dffde34d002553a5c4229d23e5188 bundle14. Servermigration1d85c742912d5e86621d36bf8cefcb8d59498023 mirrored /tmp/kernels15-remote.json. Closed0934 profile oneoldfirstn16source9baRootNoExport samebasis/pins0monitorcontention. Total160575923guestIr; leadself27079477; normalforminclusive46883266; monomialquicksortinclusive32663999. Overlapnotadditive,nocycle/time/speedinference. PCC40f7a9/a29e0f, callgrind-profile-01/report-01(allrowsJSON/rusttotals/rawlogmatch), archive-envelope1ignoredraw. StandalonePDFwarningfree/SVGPNGvisuallychecked; scopedintegrity/progresspass. Old0906paid10partialF419.107/E12.792below15 stillgoalACTIVE. No freshseeds.
+
+NEXT AFTERpublication15: KERNEL_SCAN_ENUM_HYPOTHESIS.md scoped exactpurekernelengineering(no codeyet). monomials(n,d,exact)currentlyrecursivegenerate+sort cmp(b,a)=DESCgrevlex. Directgeneratefixeddegree e_last0..left recursivelyreversevariableorder, remainderinfirstvar; alluptodegrees high->low; exactoldvectororder required. normal_form immutablebasis repeatedlylead(g.poly) =>cacheleadingrefspercall, originalreducerorder/inversions/proofupdates unchanged, no changingtargetleadcache. Keepemptytarget andemptyreducerbehavior. No native/rootcheckremoved, allcapsunchanged, expectedexactwire/counterdegreebehaviorsamebothfields.
+
+Fourtypednative-onlykernels old/order/cache/both viaPRIVATEscopedthreadlocalguard(noexternalcallback/setter), restoreregular/error/panic/nested. Legacypublicdefaultsold, newopaque pendingnativefactoryp31choosesmode withinownconstruction/completion; rootconsumerseparateunchanged/fullchecks. Allowsone8minrootrebuild+4matchedwrappersinonegraph(insteadof4rootbuilds). MatchednewoldmoderevealsTLS/rebuildcost vsfrozen19controlcandidate. Future23rosterall19prior+4newmatched; requireflagscompleteproof/wire equality/nativechecks/rootAPI andbothprimary>=15plusbeateverycontrolbeforepaired. No timerspredict15; provebehaviorwithlegacyenumvectorgrid, normalformremainder+proof+counterequalitynonmonic/nonGBbothfields, guardRAIIrestoration, allfeaturesuites/rootAPI/cellsfreshSingularthrough16. Source/protocol/qualificationpublicationBEFOREtiming. Dontcallnewkernelsimplementeduntilcodeactuallydone.
+
+Publication15pending: newlocalHEADafterclosurecommit, bundle15exclude local1223113f8f1dffde34d002553a5c4229d23e5188/end14. Genericplanprior/tmp/relation-publication-14-plan.json ctx/tmp/kernels15-remote.json num15 base122311..., envelope callgrind-profile-01/archive-envelope.json1raw. Preservepreviousserverextrasminusctxremoves +bundle15/meta. AppGitHubworksCLI401PR4349readyinheritedPCCmainprefixconflict(no rewrite/force); goal15ACTIVEcheckpointwaivedL0zero$/noagents. NOactivecompiler/test/benchmark. Keepcommentary<60s; priorlonganalysiscausedbadgaps, biasactionshortanalysis. Lastactualtime09:46UTC. Currentrootlibrarysource9baNoExportalreadycompiledcached; sharednewcodewillneed~7mroot+2mlint; doindependentqual/protocolwhilebuildbutnoheavyworkduringtiming. Existingprofilertools frozen6bd useful, no profilerrepeatwithoutnewprospectivescope. Detailsbelow.
+
+# Latest: native paired partial CLOSED; instruction diagnosis qualified, not measured
+
+Lastsourcepublication13=10e1ff99ff3bae98fed1baf8346693534f853562/tree054830f414d0f8677ebbd6804cc7158e6fd471af, exactlocalb2f32242572997d1b37d397546f257defa5c9cc5 bundle13. Servermigration1c2b711c47a4925fa5d6138e7ccfed860e8d02f8 mirrored /tmp/profile14-remote.json. Closed0906 nativeexportpaired:allAApass21blocks108matching0monitorcontended/exports0/pinsunchanged; paidmediansF421.3606/E14.2591 adjustedlower19.1072/12.7918 =>10partialtrue15false. PCCfa96a5/952d7c; native-export-paired-01/report-01 warnednone, scopedintegrity/progresspass, archive-envelope1ignoredrawpayload.15ACTIVE/no freshseeds.
+
+NEXTprofile BEFOREchoosingmorecode: CALLGRIND_NATIVE_PROFILE_PROTOCOL PCC627cd4 one descriptive known firstn16zero-exportcandidate source9ba, wholeprocessIr guestcounts only; generation/prep/parentexcluded, no nativewall ratio/CI/AA/admission. Same30s2GiB16MiB180/600caps/CPU0defaultreservation, no capraise/retry. Frozen nativecandidate /workspace/relation-native-qualifiers/root-export-rust-9ba48d964-13; existingfirstn16Systemhash63f5..., completecanonicalbasis mustequal old uninstrumented sourcebaseline; no reference entersconstruction. Nativefinalchecks+rootfullproofchecks stillallrun.
+
+Profilecapture/parser/reporter source6bd05b0e5f074575b28cb5899cc85c2006ed58c9. Frozen /workspace/relation-native-qualifiers/callgrind-{driver,report}-6bd05b0e5-17. DRIVER callgrind-profile /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS research/relation_degree_trace_20261115/callgrind-development/capture-config-17.json. REPORT RAW NEW_REPORT RESULT_PCC. Config16initialminimalpin retained;17requiredfullruntimepins. SourceRustparser4focusedtests+clippy/build; oldn3instrumentedqual16/17completeequal/nativefunctionsymbols/pinsunchanged, selfsum==rawsummary/totals/logColleced; reporter17draft18centered19abbrevdisplaylabels(allfullnamescountsJSON); PCC09a995. CALLGRIND_QUALIFICATION_REPORT authoritative. No n16profilecall yet.
+
+Valgrind3.24.0+matchingloaderdbg stagedonly /workspace/relation-tools/valgrind-3.24. Runtime .bin/engine/preload/defaultsuppression/loaderdebug/docs/license minimalarchive, exactpackagesURLs+hashes runtime-manifest-17; host/native librariespinned. /bintrueunder2GB30spassed. NativeprofilesourcecapturesCLIenvVALGRIND_LIB explicitly; nativechildstderrmustempty (Valgrindlogseparate). Capturerawresultschema native-callgrind-profile/v1 nofailure+unchanged+completeeq+functionsIr. Functionexclusive costsaddtototal; inclusiveoverlapnotadditive. Require native symbols. Profile tofindactualnextcost; donotoptimizefromn3calibrationorclaimIrmeanscycles/speed.
+
+Publication14pending: newlocalHEADafterfinalruntimequalcommit willinclude6bd05sourcealreadycommitted. Bundle14exclude localb2f32242572997d1b37d397546f257defa5c9cc5/end13. Genericplanprior/tmp/relation-publication-13-plan.json ctx/tmp/profile14-remote.json num14 baseb2f322..., envelopesnative-export-paired-01/archive-envelope.json1raw +callgrind-development/archives-17.json3payloads(rawqualification/exes/minimalruntime). Base054830...plusctx; preservepriorserverextrasminusctxremoves. Publishfullsource/protocol/qualification/closed0906 BEFOREclean-sourceprofile record/native16call. No activebuild/test/benchmark now. PR4349readyinheritedmainprefixPCCconflict(no rewrite/force);CLI401/appworks. Zero$/checkpointwaived/noagents. Keepcommentary<60s thenpersistuntil15goalcomplete, noquestionsforcheckpoint.
+
+# Latest: native export screen CLOSED, paired not run
+
+Publication12d820f8ca558aa06d30e46c2707363093889b5959 corresponds localbc4fa2c6f00e5aed418e33814d6e248a85891a52/bundle12. Servermigration5f2913a94ed9d8b4db64437a456fface7b680916 mirrored /tmp/export13-remote.json. Closed0854 nineteenworkflow screen114match4paidrecoveries0monitorcontended/unchanged: firstn16onlyadmitprimary27.641/17.629,oldM311.120,matchedBoth1.097/Final1.041. Smallerlosseskept; no15confirmation. PCCd1bcf8/1cbadd; native-export-screen-01/report-01 (landscapePDFwarningfree/all18ratiosrecomputed/traces), scopedintegrity/progresspass; archive-envelope7ignoredrawarchives.
+
+NEXTnewNATIVE_EXPORT_PAIRED_PROTOCOL (PCCeb5165) exactsame7AA/21blocks/gates/statistics/defaultCPU0monitor/knownfirstn16hash. ExistingfrozenDRIVER /workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09 root-paired /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS research/relation_degree_trace_20261115/native-export-development/paired-config-15.json. Newconfigroot_both=/workspace/relation-native-qualifiers/root-export-rust-9ba48d964-13; mandatoryfullnativeandrootreplay/candidateexports0. Smoke3matchnullfailure/resultunchanged PCC323855. Newread-only reporter optionalEXPECTED_EXPORTS verifiesallcandidatepanels0, recalculatesexistingmath; goldenprior+wrongmodechecks/clippy PCC75a340. Frozenreporter /workspace/relation-native-qualifiers/export-paired-report-guard-15 RAW MONITOR NEW_REPORT RESULT_PCC 0. Rejectoldwrongmodebeforewritingreport; no estimator/codeclockchange. Native-export-development/archives-paired-15.json2newignoredpayloads(smokeraw+reporterexe), olddriver/candidatearchivesreused. No new pairedperformancecall.
+
+Publish13pending: bundle13excludebc4fa2c6f00e5aed418e33814d6e248a85891a52/end12, newlocalHEADafterclosurecommit. Genericplanprior/tmp/relation-publication-12-plan.json ctx/tmp/export13-remote.json num13 basebc4..., envelopesnative-export-screen-01/archive-envelope.json(7raw),native-export-development/archives-paired-15.json(2raw). Preservepriorserverextrasminusmigrationremoves,newbundle/meta. Basepreviouspublicationtreeeb8470946091214010cc8ec45908b08ca4adaf85+ctx. AppworksCLI401PR4349ready/inheritedconflict. Sourceproducer9ba48d964/capture73e36b19d unchangedqualified45cells+19n3+8API/3worker+47/48/49features. No jobsrunning. Goal15ACTIVE; old0827paid10partialF419.86/E12.87below15 kept, original0755AArejectkept. No freshseeds/checkpointquestions/agents/cloudspend. Keepcommentary<60s,persistafterinternalnulls.
+
+# Latest: native export variants QUALIFIED, no paid call
+
+Lastsourcepublication11=675ac941f60a12eb900d665969736cad201a7cd8/tree42c1731638fd84dd6a257625c230e305f1699c0a, exactlocalcc7036352e9c5f4c5e8b82ae59bf21788445647d bundle11. Servermigrationf493710537f9660d6715b110044895c79a735ef8 mirrored /tmp/export12-remote.json. Paired0827CLOSED10partialtrue15false, allAApass21blocks108matching0monitorcontended; paidlowerF419.860/E12.874, PCCcd096e/6f927f. No freshseeds.
+
+NEWimplementedsource9ba48d964: private native-owned CompletionExports Both/Final/RustConsumer; legacy/imported completionalwaysBoth. Singleexportretainsfinallegacyshape/textcap; noexportreturnsopaqueUnverifiedNativeWire(p31,16MiBwirecap), noacceptedbasis. Allnativefinalchecks kept; adapterretainswire andmustcallunchangedactualrootcheckerbeforebasis; usesonlyCheckedcanonicaloutput. Noimportedrowbypass. Three newmatchedrootbins(both/final/rust), flagscompletion_exports2/1/0; new8throotAPItestrejectschangedproof/missingpair. Shared47/48/49testsclippyPCC2cbd9b, root8API/3worker/clippyPCC526b21.
+
+Capture/auditor/reporter source73e36b19d, 18capturetests/lint PCC0a6db6. Newexport-screen exact19workflows: preserveold16 inclM31, addnewmatchedBoth/Final/Rust-only. Privatecapturemode15/16/19requirescorrectoptionalpaths. Newadmissionfullall18controls + primary>=15 + matched2/1/0/rootflags +candidateproof fastpath/no recovery. ProtocolNATIVE_EXPORT_PAID_SCREEN_PROTOCOL PCC3adfbb frozen. Knownoldinputs/prepcharges, no freshgeneration. New runtimequalification COMPLETE PCC83fbbb:45nativecells across3variants×5fixtures×3kinds through16, exactoldinput/wire/basis/consumerstats andfreshSingularallagree; n3all19capturecomplete/match/no recovery/nullratios; identitiesunchanged. NATIVE_EXPORT_QUALIFICATION_REPORT authoritative. Allclaimsunsigned L0; no speedfromqual.
+
+Frozen /workspace/relation-native-qualifiers/root-export-{both,final,rust}-9ba48d964-13; export-{driver,report,audit}-73e36b19d-14. Config native-export-development/capture-config-14.json. DRIVER export-screen /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS CONFIG. Runonlyafterpublication12/registercleanrecord underdefaultisolated_benchCPU0 monitor;no heavyworkduringtiming. Rootbuild/tests/clippyDONE andallarchivesfinished; no compiler/test/benchmarkrunning.
+
+Publication12pending: bundle12excludelocalcc7036352e9c5f4c5e8b82ae59bf21788445647d/end11. Generic/tmp/relation-publication-plan.py prior/tmp/relation-publication-11-plan.json ctx/tmp/export12-remote.json num12 basecommitcc703... envelope native-export-development/archives-14.json (2ignoredraw+exe payloads) +newbundle12/meta. Priorserverextrasminusctxremoves andbaseprevious42c...plusctx. CurrentnewsourceHEADafterfinalqualificationcommit willsupersede73e; codeunchanged. PR4349readyinheritedconflict/appworksCLI401,no force/ledgerrewrite. Goal15ACTIVE/checkpointwaived/L0zero$/noagents; keepcommentary<60sec. Next actualpaid19screen, thenreport/archive/close/uploadalloutcomesbeforeseparatepairedconfirmation. Oldcosts/regressions/nullsremain.
+
+# Latest: paired10x partial CLOSED; native export lead next
+
+Publication10cd2e1300f18c25ef4b145a1fa02cf8aa882114a7 corresponds localb2e61b478ef171d1528ff2ffb0c972f9a533c7d2 (bundle10). Servermigrationdb829a65e88de351cc32970a783cc3971b39330c mirrored /tmp/m31_11-remote.json. Closed0827 M31paired allAApass21blocks108matching/0monitorcontended/unchanged. Paid medianF421.4397/E13.7236 adjustedlower19.8605/12.8736:10partialtrue15false; workadjusted9.783/2.694 notkernels. PCCcd096e/6f927f. m31-paired-01/report-01 Rustaudit agreesallstats/paid/order; PDFwarningfreeplotschecked; archive-envelope2ignoredpayloads; scopedintegrity/progresspass. No freshseeds. Prior0755AArejectkept; M31screenonly1.027vsoldcandidatefirstn16, smallerregressionsretained.
+
+NEXT afterpublication11: NATIVE_COMPLETION_EXPORT_HYPOTHESIS.md scopedNOTimplemented. Nativeconstructor finalverificationkept. Add private completionmodes skippreliminaryexportonly(ablation) andskipbothforRustconsumer. Legacy/importedpaths unchanged; no arbitraryimportedrows maybypasspreflight. NoexportreturnsopaqueUNVERIFIEDwirecandidate; rootadapterretainswire, mandatoryunchanged rootAPI beforeacceptedbasis, takesbasisfromCheckedonly. p31/default8scale16, actualwire/input/proof/work/processcapsunchanged; singleexportlegacyfinal16MiBscriptcap, noexportunusedscriptabsentexplicit. Compare exactwirebytesold/new, newrootAPItests/cellsfreshSingularcorrectsparseCLI, allaffectedreleasesuites/lint. Laternewpaidrosterkeepall16oldcontrols+singleexport+candidate18. Newsource/protocol/qualificationpublicationBEFOREtiming.15goalACTIVE,persistafterinternalnulls, noagents/checkpointquestions/cloudspend. Rustallmath/capture/report. Keepcommentary<60s.
+
+Publication11pending: exactnewlocalHEADbundle11exclude b2e61b478ef171d1528ff2ffb0c972f9a533c7d2/end10. Generic/tmp/relation-publication-plan.py PRIOR_CTX NUM BASECOMMIT ENVELOPES supportsallmetadata; prior/tmp/relation-publication-10-plan.json,ctx/tmp/m31_11-remote.json,basepreviouspublicationtreea40f57ace4c3aef3a092cc39c3f708e8fc8d8648; addm31-paired-01/archive-envelope.json2newraws, retainoldserverextrasminusmigrationremoves andbundle11/meta. AppGitHubworksCLI401PR4349readyinheritedPCC/mainprefixconflict(no rewrite/force). LastrootM31compile7m13+tests7/3/clippy1m49 cachedtargetroot. Futurecodechange sharedwillneedrebuild~8min, usefulotherqualworkwhilebuildbutNOheavyworkduringtiming. Configpaths/detailsbelowhistorical.
+
+# Latest: M31 screen CLOSED; paired not run
+
+Publication09b587a416fa16f01a21b74dd60e84ee6470ef02a6, localc9d27bcd79775f0bc19c67600e0258e2c2c55728 bundle09. Servermigration1ca44730cc13188734f344b9970b117fd38323b2 mirrored /tmp/m31_10-remote.json. Closed0819screen96matching/fourpaidrecoveries/zero monitorcontended, onlyfirstn16admit26.978/17.578primary,oldcandidate1.027,Eopt7.274; smallerregressionsretained. PCC5449c2/68f7f0, m31-screen-01/report-01 (all15ratio recompute/traces); envelope7ignoredrawarchives, integrity/progresspass. No15xconfirmed.
+
+New M31_PAIRED_CONFIRMATION_PROTOCOL PCCe1838d: same7AA/21blocks/exactgates/calculator/oldcontrols, newrootM31candidateonly, defaultCPU0reservation. Old0755AArejectkept. Smoke3complete/nullfailure/result/unchanged PCC944d26. Config m31-development/paired-config-12.json; DRIVER /workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09 root-paired /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS CONFIG. RegisteronlyAFTERpublication10. monitorpathoutside NEW_RESULTS, thenarchiveboth. No freshgeneration. Numerical15requiresbothpaidadjustedlower>15 plusuncontended andallAApass;10partialdistinct, nofastest-control/family/signedstanding.
+
+Publish10needsbundle10exclude localc9d27bcd79775f0bc19c67600e0258e2c2c55728/end09; basea55921f0e65538276d8576bfd7d998624ccf670c plusmigrationctx; retain/tmp/m31_09-plan.jsonextrasminusremoved; addm31-screen-01/envelope7raw andm31-development/archives-paired-12.json1raw +source10/meta. Rawpayloads ignoredlocally, apppublish. Source newhead willinclude closure/protocol/smoke. PR4349ready/inheritedconflictappworkingCLI401. Goal15xACTIVEcheckpointwaivedL0zero$noagents. Keepcommentary<60s. Allclaimsunsigned. Detailsbelowhistorical.
+
+# Latest: M31 qualified, paid screen not run
+
+Goal ACTIVE15x; no fresh seeds/checkpoint/agents. Old0755 A/A rejection CLOSED/publisheda562f46f597b02d34f4de1a489fdab4533c219a6; server migration79c28108c6f6b246d8e2383428c437846e8d57cc mirrored /tmp/m31_09-remote.json. Exact local369ab46e5 bundle08. Current newlead M31 mul guarded p==2^31-1 and(a|b)<=M otherwiseold128remainder; source488528cf4. Tests45/46/47clippy (PCCa5cfa1),root7API/3worker/clippy; corrected15nativecases through16 freshSingular and15exactoldwirehashes, n3all16capturematch/nullratios (PCCfe3874). Failed exporterattempt10 usesoldschemaCLI and retained PCCb9d4cf; correct11usesfrozen sparseCLI207. ExportrefactorDEFERRED/unimplemented. Driver/sourceecf74b246,17capturetests/lint. New M31_PAID_SCREEN_PROTOCOL (PCCa82767) retainsall15oldcontrols andappendsnewcandidate16, knownoldinputs andfulloldprepcharge, samefees/recovery/gates/caps. Defaultisolated_bench reservationCPU0 (restoredexactHEADtools/result_switches.py), contended/refusednoadmission; no compiler during timing. No new performance call.
+
+Executables /workspace/relation-native-qualifiers/root-m31-488528cf4-10, m31-driver-ecf74b246-10, m31-report-prequalified-10. Configm31-development/capture-config-10.json. Use DRIVER m31-screen /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS CONFIG after publication09/registercleanrecord. Qualificationm31-development/ archives-11.json2ignoredraw/exes; failed/correctedraw dirs /workspace/m31-root-qualification-488528cf4-{10,11}, capture /workspace/m31-capture-qualification-ecf74b246-10. Sourcebundle09 mustexclude local369ab46e5/endbundle08, add priorserverextras minusmigrationremoves, bundle09/meta+new2archives. Expectedbase derive65a6d8818dcfec722749f1932ee2dd71b787e487 plusctx. PR4349ready/oldconflict; appworks/CLI401. Allclaimsunsigned; no15xconfirmationyet. Keepcommentary<60s andpersistnextlead afternull.
+
+# Latest: paired development rejected; next redundant-export lead
+
+Publication07 completed6ad8e22d18c54b6100cc40c8650641cc66bd211a (localdc5a exactbundle07). Server migration862d71d05796059350ec34988b756ed1aff259b5 mirrored in/tmp/paired08-remote.json; base migration metas6/removals10, preserve physicalraw. New0755 closed record:45 complete matching warmup/A-A answers, both regeneration paid intervals exclude1; candidate passes; main0/resultnull/no retry. PCCc272fa/0adb1a; root-paired-01/report-01 includes Rust recomputation audit/SVG/PNG/finalPDF, scopedintegrity/progresspass, envelope2ignoredraw/exe archives. Publish closure08 BEFORE next producer optimization. Next investigate avoiding double Singular script export in replay completion, with explicit unaccepted candidate type and mandatory unchanged separate Rust full checker. No code/performance for that lead yet. Goal15x ACTIVE; no fresh seeds. All prior controls/nulls remain. Same waivedcheckpoint/L0/zero$/noagents. Keep commentary<60s. CLIauth401/appGitHubworking;PR4349ready/inheritedconflict. Detailsbelowhistorical.
+
+# Latest: admitted screen CLOSED, paired development ready (2026-11-16)
+
+Actual-root0724 screen finished at registered local5aac/sourcepublicationa5eb0a34ab5. All90 outer answers match;4 paid recoveries. PCC37a51f/5d63eb, report actual-root-screen-01/report-01. Only first-star-n16-s7 admitted: F4paid24.828,expandedpaid15.130,priorfused1.760,optimizedexpanded5.835. No15x confirmation; no single ratio against fastest control. Allraw archived and record CLOSED immutable. Field/degree caps unchanged.
+
+NEW ROOT_PAIRED_CONFIRMATION_PROTOCOL.md (PCC03037e): known exact selected input, primary3 arms only, fixedprep charge fromscreen, fresh3CASreference eachpanel charged toF4/E, candidate own complete proofchecker cost. Warmup1panel;7 A/A pairs/arm (14panels) withalternatingABlabels;ordinary95 intervals include1 for pipeline-work ANDfullpaid ineacharm; onlythen21blocks sixF/E/C permutations. Existing100000draw/SplitMixseed20261115/nearest-rank adjustedlower1/720 used. Requirebothpaidlower>15 for15flag;>10 separatepartial. No freshgenerationunlessdev15passesandseparatefreshprotocol frozen. No substitutions/retries; retain AAreject and skipmain. No fastest-control/family/signed verdict fromthis3-arm test.
+
+Pairedmath/capture implemented in rust-protocol/src/root_paired.rs; librarypaired_statistics exposes only bounded7/21positivefinite rows without weakening oldvalidate. Qualified frozen /workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09:11calculatortests/16capturetests+clippy,n3warmup3complete/match, nofailure/result, hashesunchanged (PCC422441). No paired PERFORMANCE call yet. Config rust-consumer-development/capture-config-08.json. Use:
+DRIVER root-paired /workspace/root-paid-inputs-723f4c2dd-01 NEW_RESULTS research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json
+Register via benchrec AFTER appsource/protocol/qualification publication07. Source/workers/root API allqualified; don'trerun unchangedsolversuites.
+
+CURRENT publication07 pending. Lastappsourcea5eb0a34ab504bde9921fb5adfcf9b4c8766c472 treea43f30963e5b90a8ad37ffb112adb8c49109020a correspondslocal5aac4f991d2fb4acd57fe609d760611281d66488. Currentartifacthead4519789f3f2786c3db742b45263bfc0abcdff008. Migrationctx/tmp/paired07-remote.json; metadatajustmirrored, physicalrawbytesretained. Priorplan/tmp/root06-plan.json holdsserverextras includingall archivedmanifestrefs (fused05ignorednottrackedwasincludedbeforepub). Need verified incremental sourcebundle07 excluding5aac using namedref. Addoldextrasminusnewmigrationdeletes, source07/meta, actual-root-screen-01/archive-envelope.json7rawarchives and rust-consumer-development/archives-paired-09.json2archives. These rawpayloads ignored locally,app-publish extras. Exactsource commits/binaries immutable. Tree scratch --missing-ok/GIT_NO_LAZY_FETCH toavoidexpiredCLIauth. AppGitHubworks; PR4349ready/conflictinginheritedPCCmainprefix,no force/rewrite. UpdatebodyfromPR_BODY_CURRENT.md. Commit updatedhandoffwithmetadata thenbundle07; source-qualifiedcode7cb unchanged. No runningtest/build/benchmark. [pcc:unverified]
+
+Goal ACTIVE15x (atleast10), completeanswerspaidchecking. User checkpointwaiver persists, no credentials/question, localL0zero$; no subagents. AllPCC unsigned [pcc:unverified]. Root7API/3CLI, own73, fused127, root133 andcapture15qual alreadydone. Originalconditionalfreshseeds19001/23003/29009 untouched. Recentlogs authoritative; keepmeaningfulcommentary<60sec. Continue afternegativeinternalstage. Historical detailsbelow:
+
+# Live update: actual-root Rust consumer ready for paid screen (2026-11-16)
+
+Goal remains ACTIVE: accurate measured15x with complete answers/paid checking, PR4349. User waived checkpoint; no credentials needed, zero cloud spend, bounded local L0. No subagents. No15x result yet.
+
+Current implementation: separate crates/relation-replay-checker (no producer arithmetic dependency), own exact p31 JSON/order/field/ideal/S-pair consumer; opt-in native product-criterion checks in shared constructor; actual root public certified::verify_replay_certificate_json; four matched actual-root adapter cells (native full/product x CAS/Rust). Legacy algorithms/wires/binaries preserved. Mature controls use same Rust consumer directly. No input/proof/work/file cap changed. Default shared8/research16; newchecker onlyp2147483647,n3..16.
+
+Qualification COMPLETE: standalone73 cases45accept/28reject freshSingular (PCCa81c66); fused73 embedded+54 native/mature cases freshCAS (af1681); actual root7 API/3CLI tests97164a and strictclippy; actual-root73 wires +60 four-cell native cases through16; n3 capture15 workflows allcomplete/match/zero recovery/null ratios,14 capture tests/clippy, all hashes unchanged (PCC724858). Shared native tests43default/44scale/45counter. RUST_CONSUMER_QUALIFICATION_REPORT.md is authoritative. Earlier errors/nulls retained. No whole-root-suite/signed independent standing.
+
+Qualified source-bound executables: /workspace/relation-native-qualifiers/root-{baseline,consumer,native,both}-8e17003a8-07; root-wire-qualifier/root-cell-qualifier same suffix; root-paid-driver-723f4c2dd-08. Frozen config research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json contains all old/new controls and CPU0. Root normal CLI is INPUT KIND SINGULAR MSOLVE NEW_OUTPUT; root verify mode SYSTEM WITNESS. CAS markers strict/empty stderr. All immutable programs/runtime pinned pre-root-07/post-root-08, archives-root-08.
+
+NEW prospective RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md (PCC8b3a72):15workflows, fixed6 n10/12/16 first/last stars seed7 p31; freshly regenerate and assertold published System hashes. All15 complete/match before any ratios; onecall each, allfailed innerwork+onefresh3CAS recoverycharged, no capraise/retry. Candidate actualRoot/Rust/native-product/sparse proof fastpath only. Admission requires lower cost than all14 controls/ablations and BOTH original F4+regeneration and expanded+regeneration ratios>=15; rank smallerprimary/tie fixedorder. No numerical confirmation fromscreen. Native/mature/currentbest stronger controls remain visible even below15 ratios. Separate paired/A-A/adjusted-interval/fresh protocol needed afterward. Originalreservedseeds19001/23003/29009 untouched.
+
+FIRST NEW PAID CALL NOT RUN. Next finish app-publication06 of exactsource/protocol/qualification plus closedphase0620/raw/report, then registerclean-source and execute:
+DRIVER prepare NEW_INPUTS rust-consumer-screen
+DRIVER rust-screen NEW_INPUTS NEW_RESULTS research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json
+Use benchrec separate record. CPU0/thread1, child/group30s2GiB16MiB,F4coop10sdegree12,case180/global600. No compiler running when measuring.
+
+Most recent COMPLETED measurements:0605 closed sparse66 complete/4paidrecoveries,no admission; bestF4paid13.411 hasexpanded8.437 samecase, oldreplay1.950. No15x. F4observeddegree5all6; sparsecertificatebounds14(original21) differentnotregularity. Report sparse-pipeline-01/report-01.0620 CLOSED phase18observations,knowninputs/generationexcluded,no ratios; n16sparse production+completion15–16ms/CAS12–15ms. Report phase-profile-01/report-02 centeredplot; firstplotretaineddraft. PCCd6a9a8. Both motivate current two-factor changes, not completedobjective.
+
+Git/API: mainworktree /workspace/crypto-integrate, branchcodex/native-certified-relation-integration-20261115, readyPRhttps://github.com/isogeny-labs/crypto/pull/4349,auto-mergeenabled,inheritedPCC/mainprefixCONFLICTING; noforce/rebase/ledgerrewrite. CLIauth401, connectedGitHubappworks. Lastpublishedbd96816596a0bc45a24e77c9f539ea2a3bab9bd6 tree8f528a7221fd718ca43c8fc50d133975fcd3b4c7 corresponds localsource78183b28b8cc91fba7e0a5bea07d251e5b37667b +extras. Currentartifactheadc45c1c090a79696f89d40cfbfa8e48696af61012; mainbase592395bac95cca39cb07bddf25ad8a8ebbd87c37. Migrationmetadata mirrored; no physicalrawpayloaddeleted.
+
+Publication06 pending. Source bundle06 NOT generatedyet: namedrefs/codex/replay-publication-06 HEAD, bundle exclude78183b28b. Incrementalbundle05 holds thatsource; exactlocalcommits differ appmetadata, retainbundles. .gitignore already06bundle/metapatterns. Priorplan/tmp/phase05-plan.json contains serverextras; migrationctx/tmp/root06-remote.json hashead,deletedpaths,metas+SHAs. Constructbase8f528+ctxdelta in scratchindex then candidateHEAD+retainedpriorserverextras+bundle06/meta+NEWignoredraws: phase-profile-01/archive-envelope.json2archives and rust-consumer-development/archives-root-08.json4archives. Olderconsumer03/05archivesalreadytracked/history. Preserve migrationdeletions (sparse-pipeline summary/traces movedtopointers, phaseexes05,etc); metadata mirrored andgittrackingremoved, rawphysicalbytesstay. Current0605scopedintegritywithmanifests passed. Newrootarchivesignorednotlocalhistory; apppublishasextras. No source/control/benchmark active.
+
+API createblob uses393216bytebase64chunks, max_output_tokens1000000, verifylengthandGitblobSHA; neverprintbase64. Buildexpectedtrees withalternateindex,write-tree --missing-ok,GIT_NO_LAZY_FETCH=1 toavoidexpiredlazyfetch. createtreeassertrootSHA, commitparentcurrentremote, leasedupdate_ref(forcefalse). UpdatePRbodyfromPR_BODY_CURRENT.md (now rewrittenaroundnewcode, alloldnulls/qualification; newpaidoutcomepending). Capture all receiptsdisk; tools.store mayreseton usermessages. New sourcebundle may be severalMiB because oldqualarchives are alreadylocalhistory; GitHub supportslargeblobs. No wrapper only-upload success claim; establish actualnewcosts next.
+
+Research obligations: Rustmath/capture/stats/reports; Pythonmetadata/hash/Git/archive/PCC only. Exactboundedcheckingnotformalproof; allresultsunsigned[pcc:unverified] until signedCIverdict. LintproseBEFOREpinning; dependent shellset-e. Nevereditfrozenproofsubject/closedrecord; usecorrectiveclaim/sibling. Scopeintegrity+artifactmanifests notglobalcatalog. KB MCPabsent/wrapperunavailable; primarySingularprodcrit/manual+replayderivationreviewrecorded. Conductorabsent. Frequentmeaningfulcommentary<60sec. Keepgoing after nullsubtask.
 
 ---
+Historical handoff below (superseded by live update above):
+
+# Resume: accurate 15x Rust relation pipeline objective
+
+## Goal and authorization
+Goal ACTIVE: pursue a measured validation-inclusive15x (at least10x) Rust solver gain with identical complete answers, paid checking, controls and accurate PR. User waived checkpoint access repeatedly; no credentials needed. Bounded local L0, zero cloud spend. Do not stop on an internal failed hypothesis. No subagents authorized. Current latest user: Resume.
+
+## Workspace and publication
+/workspace/crypto-integrate; branch codex/native-certified-relation-integration-20261115; ready PR https://github.com/isogeny-labs/crypto/pull/4349, auto-merge enabled but inherited main-prefix/PCC conflict remains. Do not force/rebase/rewrite ledger.
+CLI Git/gh401; connected GitHub app works. Last source publication39ba002fe0d9fe4a9ab7aa1028a05193bfceec7d, tree25bdc71c3fd7f40c2e51f751a1a9472669097bf2, local source1b90e1c568e16b1043acdafd3b8c83cd00ae550e. Current artifact head d26a45a4de643dbe9f71aee8af5e42db3fd49712, app base592395bac95cca39cb07bddf25ad8a8ebbd87c37. Mirror migrations without removing physical raw bytes; metadata in /tmp/phase05-remote.json.
+Exact local commits are preserved by verified incremental Git bundles, because app commit metadata differs. Bundles01..04 in replay-development;04 requires localc728cbc88 from03 and includes through1b90e1c56. Source bundle05 not generated yet; use a named refs/codex/replay-publication-05 and exclude1b90e1c56. Bundle05/metadata ignored locally, app tree extras only.
+
+## Latest results, immutable
+Previous0445 replay pipeline record CLOSED:48 matching complete outputs,6 required Std failures, no ratios/no admission. Four explicitcofactor budget errors; two terminated imports at16MiB with no recorded signal. Report02/CAUSE_ERRATA/PCC883af8 authoritative; preserve bad cause claimb4b6bd and draft report01 unchanged.
+Newest0605 sparse paid record CLOSED at benchmarks/records/20261116T0605Z-sparse-paid-screen-20261116.json. Source/protocol/qualification published BEFORE registration/calls. Six fixed n10/12/16 first/last stars seed7 p2147483647. All66 outer workflows complete and match; four Std proof failures recover using fresh3CAS solves with all failure/recovery work charged. Rust report checks exact cost sums. Source/exe/library hashes unchanged. No follow-up selected. Best F4+regeneration/candidate13.411 at firstn16 has expanded+regeneration/candidate8.437; legacy replay1.950. No case reaches10 against both primary paid controls. Sparse loses to full-projection ablation on some calls. No15x confirmation. F4 observed solving degree5 all6; local certificate product bound14/original bound21 are different notions, no intrinsic regularity inference. PCCf8e097 raw, PCC437abb report.
+Authoritative sparse-pipeline-01/report-01/report.md/pdf, costs.svg/png/pdf, traces.json. Scoped integrity/progress passed before raw unstaging; closed record immutable. Raw/report archives pinned archive-envelope.json. Raw payloads ignored locally and NOT in local history, pending app publication as extras. All eight payload files physically available. Prior runtime43MB archive reused byhash, no duplication. First PDF8pt warning retaineddraft, final extarticle warning-free; Inkscape GTK warnings retained and plot visually inspected.
+
+## Implemented qualified mechanism
+Shared crate crates/certified-relations. New exact f3 pair metadata avoids unused cubic consequences. Opt-in compact::solve_sparse takes two incident resultants once certifiedGCD degree2..4, but every original containment/full final certificate still checked; falls back to unchanged full constructor, paid caller interval. Legacy functions/wires unchanged.
+Replay PairReduction optional product_criterion defaultfalse omittedserialization. Consumer checks actual leading monomial coprimality, empty proof, pair coverage/order and CAS binds actual leading monomials. Noncoprime pairs keep strict standard representations. Exact acyclic membership, both ideal containments, monic/reducedness remain mandatory. No solve in arithmetic checker.
+Source207e9a409 default42/scale43/counter44 tests, strict clippy; correctness31 outcomes pass (21 complete acceptance paths +10 tamper rejects), n3cycle/n8stars seed7. Raw sparse-development/. Copy immutable sparse-cli/fused/qualifier-207e9a409-03. No speed from qualification clocks. First failed fixture/build receipts retained.
+Frozen capture33e8f2914:11 release checks/clippy/all11 n3 workflows complete-match/no ratios. Copied sparse-driver-33e8f2914-04. Explicit fresh recovery retains inner failures, pays all work; recovered candidate cannot admit. Native recovery retains prior validation setup without double-prep. Protocol SPARSE_PIPELINE_SCREEN_PROTOCOL_02.md (PCC891b7c) authoritative; first pinned draft retains prose-lint issue only.
+Actual root worker frozen scale-worker-8d0ba116c-01 with explicit16 researchfeature; rootAPI6/CLI3 priorchecks retained, no fullroot-suite pass. Default shared8/scale16; no dimensions above16 yet. F4 packed<=15/vector fallback16 recorded. Wire/proof/work/file caps unchanged. Prime2^31-1; wide prime9007199254740881 shared-only. No wide F4 claim.
+
+## Current next experiment (not yet measured)
+PHASE_PROFILE_PROTOCOL.md (PCC532daa): descriptive18 observations on SAME six known System files, compact/expanded/sparse order. Generation excluded explicitly, no ratios, no selection. Optional profile-replay entry point adds disjoint construction+completion / wirewrite / scriptexportwrite / checker-process-consumption timers, parent records remaining unattributed time. No old clock changed.
+Source856523032611921eb38738a7b0e6611975583922 qualifies12 capture +2 parser tests each producer entry, strictclippy. Existing n3 all3 modes complete/match, positive phases/nonnegative remainder and unchanged identities. PCC8ccd7d. Read phase-development/{pre,post,qualification-summary,archives}-05.json; raw/executables archived. No phase PERFORMANCE call yet.
+Copied /workspace/relation-native-qualifiers/phase-driver-856523032-05 and phase-producer-856523032-05.
+Next finish app publication05 (closed0605 raw/report+profile source/protocol/qualification), register clean source record, run:
+DRIVER phase-profile /workspace/sparse-paid-inputs-33e8f2914-01 NEW_RESULTS PRODUCER SINGULAR MSOLVE 0.
+Use benchrec for separate record. Input original hashes must match;18 attempts no retry/recovery in diagnostic. CPU0/thread1,child30s2GiB16MiB,case180/global600 unchanged. Inspect actual phases before choosing next optimization. If checker/transfer dominates consider independently implemented exact arithmetic consumer; if construction+completion dominates split it before new optimization. Any new checker must retain all exact full-ideal obligations/tampers and prospective paid comparison.
+
+## Tools and obligations
+Cargo /home/agent/.cargo/bin/cargo. Singular /workspace/relation-native-qualifiers/pilot-singular-e069707f6-01, msolve pilot-msolve-e069707f6-01. LD_LIBRARY_PATH=/workspace/msolve-source/src/neogb/.libs:/workspace/native-cas/lib; SINGULARPATH=/workspace/native-cas/share/singular/LIB REQUIRED. No warnings accepted as proof marker.
+Rust does math/capture/stats/reports. Python metadata/Git/hash/archive/PCC only. Optional no unchanged test reruns. Always set-e for dependent shell commands; lint prose BEFORE freezing claims. Attestation proofkind; all producer results unsigned [pcc:unverified]. Ledger append-only, never edit frozen proof subjects. New corrective claim/sibling report if wrong. Logs fourheading format, app main metadata before append. Frequent user commentary under60sec. No newly generated original conditional fresh seeds19001/23003/29009.
+KB MCP absent/wrapper unavailable; fallback literature recorded in hypotheses and reports. Conductor absent. Read lessons brief applies.
+
+## App publication mechanics
+Current local closure/raw upload pending; source+profile ready. Durable plans /tmp/sparse04-plan.json, /tmp/phase05-remote.json. tools.store may reset on user messages; persist important receipts on disk. API blob uploads use git cat-file blobs,393216-byte base64chunks (524288chars) with exec max_output_tokens1000000, length/SHA verify. Whole multiMB tool output truncates at1MiB. Never printbase64 or whole fetch_commit diff.
+Create expected publication tree via task-only alternate index, git write-tree --missing-ok and GIT_NO_LAZY_FETCH=1 (otherwise missing unrelated blobs trigger expiredfetch). Base tree from published25bd + current migration delta /tmp/phase05-remote.json. Candidate localHEAD plus retained previous server extras (source metadata/bundles03,rawrun/stdlibrary), NEWrawarchives from sparse-pipeline envelope and sourcebundle05/metadata. Preserve migrated artifact metadata/deletions; remove known archived paths from scratch index only. Sourcebundle04 migrated to manifest; no reintroduce. API create_tree assert exact local root tree, commit parentcurrenthead and leased update_ref(force:false). Update PR body from PR_BODY_CURRENT.md. Later mirror app artifact manifests and verify specific closed record using benchrec.artifact_manifests.
+No build/test/benchmark running at this handoff. Qualified phase source remains unpublished. Goal active and technically tractable; no external blocker.
+
+## Latest 2026-11-16 fresh closure override
+Fresh completed/null sustained increment; see fresh-native-01/report-01 and session16:xx. PCCe67478/91e8cf. Next publish32, implement/qualify/run immutable RELATION_ABLATION_PROTOCOL sixclasses n3/4/6. Original reserved seeds untouched; localCPU0/checkpointwaived/zero$. Active goal includes BOTH fresh+ablations; do not stop on fresh null. Prior compiler driver03556f439-45; productionquotient unchanged.
+
+## Latest 2026-11-16 follow-up completion override
+Both studies measured/closed: fresh3cases324answers+6diagnostics, all-case sustained increment false PCCe67478/91e8cf;18fixed relationcells allF4degree5/affine5/topformnull, rootrowsdrop/cliquegrows, PCC13cd4f/22d2c0.19complete ablationrawarchives+4fresharchives, bothclosedrecords scopedintegrityerrors[]. See FOLLOWUP_LEAD_REPORT.md and current sessionlog. Next finishpublication34 (based33 remote8f209cdd469c77547d0ad1acdd4d495d66bc5fbd, local0c661d637...) then boundedfollowupgoalcomplete. No current benchmark. Originalholdoutsunused. Successor rank-budget selection is HYPOTHESIS only; new protocol required before measurement. UnsignedlocalL0/CPU0/checkpointwaived/zero$.
+
+## Final follow-up publication34 receipt
+Remote115a6f26f62902e35a3bdff10638d80e84550452/tree54b7d86dff3bdfa5d2b028d0f694fd535b2e096b/exactlocal5a6dca9eb... verified; PR4349 updated, all60blobs and remote reportSHA passed. See followup-publication-34.json. BOTH bounded studies complete; no benchmark/background job. Originalholdoutsunused. No new15x; no degree drop. Current nextlead budgeted early rank contribution unmeasured. Signedvalidation/CI/review remain; no canonicalexportconformance. Finalhandoffmetadata being published; mathematical source/raw/result payload alreadyremote34.
+
+## Active successor override: budgeted early rank
+User requested continued work; new activegoal fixed RANK_BUDGET_PROTOCOL_02.md PCCd8ef6a (01tagerror1d2f7b retained). Source47tests/lint/build50 passe54197. Nextfreeze source then4Singular matrix probes +6oldn3 correctness cells, corruptedrankrefusal, publish36 then18n3/4/6seed7arms. Actualrootworker8d0ba116c unchanged. No fresh/reservedinputs allowed. LocalCPU0/L0/checkpointwaived/zero$. Prior studiescomplete.
+
+## Latest early-rank study completion
+18cells complete allchecks; PCCedfc6c/de603d. Two syzygies each10poly/8proof terms/proddegree6 lower actualF4 and affine5to4 at n3/4/6; negativecountdiffgain0degree5, n6matrix136x175to78x73. All18basisideals equalstar, zero failures/contention, unchangedpins.19rawarchives; closedrecord20261116T2046Z-budgeted-early-rank-relations-20261116, integrityerrors[], PDF4pages inspected. Next finishpublication37 andreceipt; no new15x timing claim. Successor firsttwo structuralrule unmeasured. Allfresh/reservedseedsuntouched.
+
+## Verified final early-rank result37
+Remote728386c0e7d550eefb33b72eb4055f279a549aee/tree82cd30eadfb6f932776a26b273473b663b64a94e; actual full source in rank-publication-37.json.59blobs/exacttree/reflease and remote reportGitSHA226084ef pass. PR4349updated, all source/raw19/PDF4pages/costs uploaded. Boundedearlyrankgoalcomplete pendingreceiptmetadata publication38/goalstatusclose. ActualF4degree5to4 and n6matrix136x175to78x73, NOT a repeated timing/15x claim. Nextunmeasured:firsttwo certifiedsyzygies without scout, new prospectivetimingprotocol needed. No newexperiment/backgroundtask; originalallholdoutsuntouched; localL0/CPU0/checkpointwaiver/zero$.
+# Resume: crypto @ claude/funny-brown-735uvs (Gröbner/F4 speed leads, parallel workflow)
+
+## Goal
+Owner (2026-11-16): "Pursue all the leads here in parallel workflow" after the
+Gröbner/F4 assessment (session log 2026-11-16 ~16:30Z, PR #4436). Find measured,
+output-identical speedups in the F4 engines used by index calculus.
+## Lead / hypothesis
+L1 f4_fp parallel RREF scaling (1.63x on 4 cores) + adaptive FL/thread cutoffs
+(FL and threads net-negative on cubic_n5). L2 f4_fp memory traffic (axpy is
+memory-bound: scalar only 1.40x slower than AVX-512). L3 GF(2) M4RI /
+inherited-F4 inner loop (koblitz_f4_kernel_bench). L4 crossbred vs InheritedF4
+for m>=3 (crossbred ~160x fewer bit ops than matrix-F4 at m=2). L5 isolab-eks
+readiness for a many-core confirmation run.
+## Spec
+Every change env-gated with a same-binary OLD toggle; correctness = identical
+basis/solve fingerprints and deterministic counters; wall-clock only in a serial
+interleaved A/B stage with an A/A noise control. Baseline numbers: session log.
+## State
+Workflow launched. Agents edit the shared checkout only under flock
+/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/repo.lock and revert after;
+patches kept under scratchpad/leads/<lead>/.
+## Next steps
+Integrate surviving patches, one build, serial A/B, adversarial review, then
+PR + bench records; isolab-eks confirmation only with owner-visible cost.
+## Runs in flight
+Local f4_fp_bench / crossbred_bench / koblitz_f4_kernel_bench only.
+## Stop and success conditions
+Success = any lead with a measured, output-identical speedup beyond the A/A
+noise floor. Stop a lead on fingerprint mismatch or no effect beyond noise.
+
+
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
+
+Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
+C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
+research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
+Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
+Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
+None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
+Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
+
 
 # Current chord proof task - source only
 Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
@@ -162,8 +583,51 @@ All preceding resume content is preserved; no unrelated worker is started by thi
 New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
 Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
 close benchrec record, write REPORT + figure + PDF, update PR.
+# Resume: crypto @ claude/peaceful-babbage-wddn3o (genus>=2 IC leads L01-L12)
 
----
+Owner (2026-11-16): pursue twelve new genus>=2 index-calculus leads in parallel (opus coordinators, sonnet/haiku executors).
+L01 anchored pencil sieve; L02 automorphism-orbit bases; L03 base re-balance; L04 batch smooth-part; L05 even-degree function relations; L06 odd-l (l,l,l) isogeny census g3; L07 Prym IC desk count; L08 non-hyperelliptic ladder g4-6; L09 gonal pencil seeds; L10 C34/Picard targets + matched rho; L11 Laine-Lauter memory curve; L12 bielliptic quartic orbits.
+research/g2plus_leads_20261116/Lxx_*/PROTOCOL.md, each frozen (sha256 in frozen.sha256) by its coordinator before any data.
+Workflow launched from the main session; each lead owns only its own directory. Standalone code, counted field multiplications, local CPU, no wall-time benchmark claims.
+Read each Lxx/RESULTS.md and ASSESSMENT.md; write research/g2plus_leads_20261116/README.md summary; session log; commit; PR.
+Per-lead local runs, each capped at about 10 CPU-minutes; outputs in Lxx/raw/.
+Each lead stops at its preregistered kill criterion. Success = a verified component advance, reported as distance to matched rho; nothing reaches the leaderboard from this pass.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # K13 rootfinding F4/F5/F6 screen, custody repeat (2026-11-16)
 
@@ -172,198 +636,6 @@ Spec: research/rootfind_k13_local_f456_screen_20261116/SPEC-K13-SCREEN.json, SHA
 State: first epoch ECBS1h124a5b50bd9a is closed invalid for executable-path Git stamp mismatch. Custody-correct repeat ECBS1hc322a24b6610, bound to clean commit 8f4cc824c87a236aafd28aa390c744e355a08e45 and binary SHA-256 dba933709f466966dc13f069b9bf0e91def033284f8b1cb779b25c8c9b3448c1, completed 48/48 verified answers and 32/32 deterministic measured replays. Its separate benchmark record is closed measured. Four exact target-round pairs per comparison are reported as local L0 diagnostics in reports/repeat/; PCC-20261116-3b7488 is not_covered for independent validation. Batch oracle 14/14 and focused registry checks passed. Broad suite has 23 known failures and was interrupted; see validation/.
 Next: complete archive validation, commit/push and open a ready PR for this local study. Keep the ten-arm EKS L2 panel frozen and resource-gated. Do not pool invalid and repeat epochs.
 Runs in flight: none.
-||||||| base
-# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
-
-## Goal
-Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
-## Lead / hypothesis
-C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
-## Spec
-research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
-## State
-Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
-## Next steps
-Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
-## Runs in flight
-None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
-## Stop and success conditions
-Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
-
----
-
-# Current chord proof task - source only
-## Goal
-Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
-## Lead / hypothesis
-The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
-## Spec
-research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
-## State
-New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
-## Next steps
-Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
-## Runs in flight
-None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
-## Stop and success conditions
-Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
-
-# Preserved incoming resume (historical task state)
-# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
-
----
-
-# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
-
-## Goal
-Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
-Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
-
-## Lead / hypothesis
-Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
-(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
-
-## Spec
-research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
-Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
-
-## State
-Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
-
-## Runs in flight
-RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
-Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
-
-## Stop and success conditions
-Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
-Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
-
-## Open questions
-- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
-- /home/user/crypto-autoresearcher is half-switched, pending the owner.
-
-# Preserved previous branch resume (historical task state)
-# Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
-
-## Goal
-Complete the arity dimension of elliptic-curve index calculus with the
-preregistered cells no record covers: PKM prime towers at m = 5 (N = 10, 15,
-20); chained-S3 SAT with a Frobenius-union base at m = 5 and 6 on Koblitz
-n = 23..41; the same at n = 83 with the cell cap lifted to 1800 s. Study
-directory `research/arity_completion_20261104/` (README there), PR #3378.
-
-## Lead / hypothesis
-Prime towers: D(m=5, N=10) in {6, 7}, D(m=5, N=15) in {7, 8}, D(m=5, N=20)
->= 8 or capped; tower kind does not change D; N = 15 finishes in 7200 s and
-8 GiB. Kill: D >= 8 at N <= 15 closes m = 5 on prime towers.
-Koblitz: m = 5, 6 decide at n = 23 within 600 s for S = 2; cost grows so that
-n = 37, 41 cap at m = 6; planted controls always recover; n = 83 stays
-undecided at 1800 s; no decided query at n >= 31 under the 188 s m = 4
-root-table parity point. Kill: K4 and K5 both supported.
-
-## Spec
-- `research/arity_completion_20261104/prime_tower_m5/protocol.json`, frozen at
-  commit 1fd6ece55f (sha 2b82eecd…); commands in arms[*].instrument.flags.
-- `research/arity_completion_20261104/koblitz_m5_m6/protocol.json` + grid.tsv
-  + run_shard.sh (freeze block records its commit once frozen).
-- Cards: `research/arity_completion_20261104/cards/CARD-arity-prime-m5-*.yaml`
-  (lint CARD OK); Koblitz cards follow the same pattern after its freeze.
-- Instruments: `examples/pkm_tower_pilot.rs` (engine tower, p 2013265921),
-  `examples/n83_msweep_cell.rs` (chain-s3 and chain-s3-orbit, union:S base).
-
-## State
-- Protocols validated with crypto-autoresearcher tools/experiment_protocol.py
-  (main commit, files fetched raw); prime-tower frozen before data.
-- No cell has run. Development release builds in /dev/shm only.
-- Launch gates fail in the authoring container: STS InvalidClientTokenId, no
-  checkpoint upload token (problems/arity-completion-launch-gates.md).
-
-## Next steps
-1. From a session with account 104186811093 (or an upload token): push this
-   checkpoint, run the build cards, re-dispatch the director with the binary
-   sha256 for the cell cards, submit through isolab-eks per AGENTS.md §9a.
-2. Run controls first; a failed control voids the study (both protocols).
-3. analyze.py per study; export with experiment_protocol.py from-rows;
-   report, figure, PDF; no leaderboard row (stage diagnostics).
-4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
-
-## Runs in flight
-Multi-curve re-baseline done (PCC-20261105-37a78d): plateau 1.57-1.91x rho across five family curves per size; next: owner decision or new structural idea.
-Specs: research/curve25519_autolab_20261104/multicurve/spec-k*.json (frozen before data); siblings from `curve25519_family siblings`. Binaries rebuilt from main.
-After it: add-raw, metric per size (mean S/rho over curves and its curve-to-curve spread), close the record, pcc claim, README row, commit, PR. If the incumbents' ratios move materially, update the ledger incumbents and OBSTRUCTION.md.
-
-## Stop and success conditions
-Stop: per-cell caps in the protocols; Part A stops at a given m after two
-consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
-decided cell with a verified planted control; the preregistered kill criteria
-close the respective m >= 5 lines. No cap is raised after the freezes.
-
-# Round 5 (2026-11-04, written before any round-5 run): solver side
-
-## Derived first (no runs; awk on recorded logs)
-- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
-- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
-
-## Test H: character-hybrid on the separators
-Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
-2 branches per separator.
-- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
-- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
-- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
-- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
-
-## Round 5, test H outcome (recorded before test L)
-- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
-- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
-- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
-
-## Test L (fat-leaf tree, written before any L run)
-- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
-- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
-- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
-- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
-
-## Test Y (function coupling, written before any Y run)
-- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
-- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
-- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
-- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
-- Cells: m3 at t4 and t5, k0.
-
-## Round 6 (2026-11-04): local long run of the P2 cell m5 t4 (written before the run)
-- The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
-- Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
-- Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
-
-## Round 7d: decisive Riemann–Roch cell (written before the run)
-- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
-- Reading, from round7_rr's kill criterion:
-  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
-  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
-  - D_RR ≥ 9 means no gain at m = 5.
-  - Cut off again: undecided.
-
-## Round 7e: E1Q at m4 t5 (written before the run)
-- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
-- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
-- Reading:
-  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
-  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
-
-
-# Current twist proof continuation, 2026-11-06
-All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
-
-Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
-The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
-research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
-New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
-Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
-None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
-Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
-Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
-close benchrec record, write REPORT + figure + PDF, update PR.
-=======
 # Preserve metadata transport parser failure; separate original output channels
 
 ## What was done
@@ -378,7 +650,6 @@ Publishcomplete onepayloadmetadata source/readypreservedcontinuationPR and close
 ## Errors
 I reused the older governor with a parser bug already corrected in an earlier sidecar. This failure is preserved; retry changes only output-channel parsing and records a fresh complete attempt. [pcc:unverified]
 
----
 
 # Preserve original artifact-policy failure; route complete metadata archive through original store
 
@@ -1016,25 +1287,18 @@ GitHub3877/1523/3904 bodies actuallyupdated; rootsettlement pcc/claims/PCC-20261
 
 # Resume: Chained ECDLP Transfers — 2026-11-13T23:29:21.914982+00:00
 
-## Goal
 Continue DLP-preserving transfers,chained Jacobian maps,prime-field descent and admitted computational comparisons acrosscrypto/cryptanalysis/lockedautoresearcher. Continueaftereachrung. [pcc:unverified]
 
-## Lead / hypothesis
 Actualthree F223 Jacobians now solveall15publicICcases;currenttestingchecks class-inputsolver/affinelog cancellation andsame-outputFastSourceChain. Nextsame-origin compatibility/completecostcoverage/completeodddegreecoordinates areopen;correctnessisnotcostevidence. [pcc:unverified]
 
-## Spec
 Consumerprospective98c6f0/2aee BEFOREcode;scientific1816c3b99cb69e2072a7f0a246bdeb98b9f005e8 normallypublished;nativee869bd/written1e65f0/twofaithfulbindings/57total/reportd1027f. Strictci_new_target_ic729+self730/ninephasepairs/82wholeJSONexceptdeclaredwalls/bothoriginal2declgates/2bindings. Originalroot3d scientificpin unchanged. [pcc:unverified]
 
-## State
 Rootbote563da1b1734d353b751868f8f57cb3fac6f570c afternormal4125274f. Genuine43d6ba/babda6 12wholecaptures+12indices+wholePDF25objects13S3+12Git;43525890255/132231419911 actual13remote replays/exactFF15paths/all3455guard07+dirtybytes+PDFlinktypes preserved/hold07released. FutureFFfreezeNEWguard08. Originalfixture restored1ea795/67ef1d/2293097bytesSHA8970667e/originalverify0/sameoriginalbinarytargetedpass. Fullrootretry03 remains124/1800s/2137guards0/unknowntotals;633ab0 twoexact101failures occur atDiagnosticSessionClock initialization,mandatory/proc/self/ns/time and/proc/self/timens_offsets absent. No unchangedwhole retry. [pcc:unverified]
 
-## Next steps
 Collectcurrent730full/native.exit/guard.exit/driver phases andfouractualcontrols;fetchALL14source1816workflows/190native57canonicaldigests,wholeAPI/logs/sourcecopies;checkpointinGitHubPR1523/root3877/queue3904. ThenoriginalS3uploaderCIroute withtrustedpinnedtool andno keyexport;nativecommonorigin/costcoverage/completebeta coordinates. Preserveallfailuresandgenuinewholedata. [pcc:unverified]
 
-## Runs in flight
 Routineboundedcleanphysicalindependentfull:bash /workspace/scratch/ct69-new-target-IC-full-01.sh;source1816/original3d,730guards/2100sbound/freshoutsidecache. Raw/log/exits at /workspace/scratch/ct69-new-target-IC-full-01. Own14sourceCI auditpending;no paidbenchmark oradmittedperformancerun. [pcc:unverified]
 
-## Stop and success conditions
 Currentfullrequiresnine native+tee0/0/oneunfiltered/82wholeJSONexceptdeclaredrawwalls/bothoriginal2declgates/2canonicalbindings/all730guards0/fouractual2nooutput/restored. Nativefailure/timeout retainedanddiagnosed. PerformanceonlyafterORIGINALS3gate/livebudget/capacity/isolation/completecosts/strongestrefs;rootglobal/mainledger/signing/reviews/conflict/geometry/vault/KB gapsareseparate. Continuewhileusefulauthorizedworkavailable. [pcc:unverified]
 
 
@@ -1054,7 +1318,6 @@ Starting ordinary originalrootlibraryretry03:bash /workspace/scratch/ct68-root-l
 
 Routineunitretryneedsnative0/all2137guards0/no filters orignores. Timeout/errorisretainedandnextfailurediagnosed,notglobalgreen. PerformanceexperimentsremainblockedbyoriginalS3checkpoint/livebudget/capacity/countercoverage;neverinfercostadvantagefromcorrectness. [pcc:unverified]
 
-## Open questions
 Actualgeometric/formalbridges/completebeta coordinates/allmapcosts/strongestmatchedICrho/mainledger/signing/reviews/conflict/vault8edec422locked/KBecdbunavailable. KeepqueueandGitHubcheckpointcurrent. [pcc:unverified]
 
 
@@ -2398,27 +2661,13 @@ Rootmirror02publication and genuineNEW27 preparation; repeat all58919hash/177lin
 Oldproblem-indexinstruction prose lackedtags and a historicalscratch staging-list filename was reused. No mathematical or native result changed. [pcc:unverified]
 
 
-# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
-Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
-Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
-Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
-(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
-research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
-Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
-Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
-RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
-Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
-Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
-Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
-Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
-close benchrec record, write REPORT + figure + PDF, update PR.
 # Current checkpoint:40COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet then integrate
 
 GoalACTIVE, Rust graph IC+cheap extension-field relation finder toward rho parity.
@@ -4759,17 +5008,7 @@ NEXT: commitfinished14/15evidence/presentation/log/resume and normalpush(ormerge
 
 The incoming file already contained conflict-marker text. Only those marker lines below are indented for literal archival display; removing that indentation recovers the exact incoming bytes. Original source: main commit b478a9770ea35f84bddf4e9b9ffbf7efeab30f06, path .resume/RESUME.md. Local original: /tmp/ic-main-reconcile/resume.theirs.
 
-# Current chord proof task - source only
-Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
-The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
-research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
-New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
-Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
-None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
-Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
 
-# Preserved incoming resume (historical task state)
-# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
 
 
 
@@ -4780,115 +5019,26 @@ Stop each stage at600s and the focused scientific window at3600s. No paid comput
 
 
     <<<<<<< HEAD
-- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
-- /home/user/crypto-autoresearcher is half-switched, pending the owner.
-
-# Preserved previous branch resume (historical task state)
-# Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
-
-Complete the arity dimension of elliptic-curve index calculus with the
-preregistered cells no record covers: PKM prime towers at m = 5 (N = 10, 15,
-20); chained-S3 SAT with a Frobenius-union base at m = 5 and 6 on Koblitz
-n = 23..41; the same at n = 83 with the cell cap lifted to 1800 s. Study
-directory `research/arity_completion_20261104/` (README there), PR #3378.
-
-Prime towers: D(m=5, N=10) in {6, 7}, D(m=5, N=15) in {7, 8}, D(m=5, N=20)
->= 8 or capped; tower kind does not change D; N = 15 finishes in 7200 s and
-8 GiB. Kill: D >= 8 at N <= 15 closes m = 5 on prime towers.
-Koblitz: m = 5, 6 decide at n = 23 within 600 s for S = 2; cost grows so that
-n = 37, 41 cap at m = 6; planted controls always recover; n = 83 stays
-undecided at 1800 s; no decided query at n >= 31 under the 188 s m = 4
-root-table parity point. Kill: K4 and K5 both supported.
-
-- `research/arity_completion_20261104/prime_tower_m5/protocol.json`, frozen at
-  commit 1fd6ece55f (sha 2b82eecd…); commands in arms[*].instrument.flags.
-- `research/arity_completion_20261104/koblitz_m5_m6/protocol.json` + grid.tsv
-  + run_shard.sh (freeze block records its commit once frozen).
-- Cards: `research/arity_completion_20261104/cards/CARD-arity-prime-m5-*.yaml`
-  (lint CARD OK); Koblitz cards follow the same pattern after its freeze.
-- Instruments: `examples/pkm_tower_pilot.rs` (engine tower, p 2013265921),
-  `examples/n83_msweep_cell.rs` (chain-s3 and chain-s3-orbit, union:S base).
-
-- Protocols validated with crypto-autoresearcher tools/experiment_protocol.py
-  (main commit, files fetched raw); prime-tower frozen before data.
-- No cell has run. Development release builds in /dev/shm only.
-- Launch gates fail in the authoring container: STS InvalidClientTokenId, no
-  checkpoint upload token (problems/arity-completion-launch-gates.md).
-
-1. From a session with account 104186811093 (or an upload token): push this
-   checkpoint, run the build cards, re-dispatch the director with the binary
-   sha256 for the cell cards, submit through isolab-eks per AGENTS.md §9a.
-2. Run controls first; a failed control voids the study (both protocols).
-3. analyze.py per study; export with experiment_protocol.py from-rows;
-   report, figure, PDF; no leaderboard row (stage diagnostics).
-4. dreg v4 refreeze steps a–h in research/dreg_high_arity_20261101/README.md.
-
-Multi-curve re-baseline done (PCC-20261105-37a78d): plateau 1.57-1.91x rho across five family curves per size; next: owner decision or new structural idea.
-Specs: research/curve25519_autolab_20261104/multicurve/spec-k*.json (frozen before data); siblings from `curve25519_family siblings`. Binaries rebuilt from main.
-After it: add-raw, metric per size (mean S/rho over curves and its curve-to-curve spread), close the record, pcc claim, README row, commit, PR. If the incumbents' ratios move materially, update the ledger incumbents and OBSTRUCTION.md.
-
-Stop: per-cell caps in the protocols; Part A stops at a given m after two
-consecutive n cap; t = 4 prime cells do not run if t = 3 caps. Success is any
-decided cell with a verified planted control; the preregistered kill criteria
-close the respective m >= 5 lines. No cap is raised after the freezes.
-
-# Round 5 (2026-11-04, written before any round-5 run): solver side
-
-## Derived first (no runs; awk on recorded logs)
-- Cost model with LA exponent ω from 1.0 to 2.0: beating rho at 2^256 needs ω ≤ ~1.3 and β = 0.
-- Effective sparse-LA exponent of the recorded msolve matrices: 2.41–2.72. Sparsity does not get there.
-
-## Test H: character-hybrid on the separators
-Branch on the quadratic character of each separator, adding X_c = n_j·z_c² with n_j ∈ {1, a non-square}:
-2 branches per separator.
-- Cells: T at m3 t4 (D = 6, 3.7 s), m3 t5 (D = 6, 512 s) and m4 t4 (D = 7, 697 s). Run the planted (true) branch and one false branch each.
-- Prediction (Elekes–Szabó reading): D_H = D_T in the true branch (no degree drop), and the false branch costs about the same time.
-- Win condition: D drops by ≥ 1 per guessed bit, or total time over all branches < T's time.
-- Runs: msolve 1 thread, 1800 s cap, 6 GiB.
-
-## Round 5, test H outcome (recorded before test L)
-- At m3 t4, Htrue and Hfalse match T exactly (D = 6, widest 7,077), each with quotient dimension 6 (z ↦ −z).
-- Reason: over F̄_p every X is c·z²; F_p-rationality is not a low-degree algebraic constraint.
-- m3 t5 was stopped at 42 s, still on T's matrices; m4 t4 was not run.
-
-## Test L (fat-leaf tree, written before any L run)
-- m = 4 as one triple (S4sym in e1, e2, e3 with output X1, degree-3 remainder chain) plus one leaf (Kummer chain), root S3(X1, x4, xR).
-- That is 1 separator against T's 2 separators (X1, X2) with a symmetric root.
-- Prediction (excess ∝ number of separators): D_L(4,4) ≤ 6 < D_T = 7.
-- Falsified if D_L ≥ 7. Cells: m4 at t4 and t5, k0.
-
-## Test Y (function coupling, written before any Y run)
-- m = 3, first cherry by chord: per-root Kummer chains for w1 and w2; y1, y2 with y_i² = f(g·w_i); slope lam with lam·(x2 − x1) = y2 − y1; X1 = lam² − x1 − x2.
-- Then the x-only root S3(X1, g·w3, xR) with leaf 3 on a Kummer chain.
-- The coupling is a function of the inputs (no 2-to-2 correspondence). Solutions are not quotiented: ordered pair × signs.
-- Prediction: D_Y ≥ D_T (6 at t = 4), since lost symmetry and degree-3 curve equations offset the determinism. Win condition: D_Y ≤ 5 at t = 4 or 5.
-- Cells: m3 at t4 and t5, k0.
-
-## Round 6 (2026-11-04): local long run of the P2 cell m5 t4 (written before the run)
-- The big host is blocked: AWS STS rejects the keys, the lab routes run only ecbench specs (≤ 3,600 s), and no other route is authorized.
-- Locally: T at m5 t4 (round 3; cut off at 2,400 s while reducing degree 9, memory not exhausted), rerun alone with TLIMIT = 18,000 s and VLIMIT = 14.5 GiB.
-- Registered reading (from round 3): if the run completes with D = 9 then E(5) = 5 ≤ 5 and P2 holds at m = 5; D ≥ 10 means P2 fails at m = 5; another cut-off is still undecided.
-
-## Round 7d: decisive Riemann–Roch cell (written before the run)
-- RR at m5 t4 (round7_rr/genrr.sing, input in scratchpad rr/logs/m5_t4_k0_RR.ms), alone on the host after the memory-lean F4 run exits: 13 GiB cap, 10,800 s.
-- Reading, from round7_rr's kill criterion:
-  - D_RR ≤ 8 (below T's ≥ 9) with a finished run: RR beats T in D at m = 5.
-  - Improvement only if the widest matrix is also below T's (≥ 999,374 cut off).
-  - D_RR ≥ 9 means no gain at m = 5.
-  - Cut off again: undecided.
-
-## Round 7e: E1Q at m4 t5 (written before the run)
-- Edwards 2-torsion-quotient tree, input round7_edwards m4_t5_E1Q.ms (sha256 5592ad57…f099).
-- Runs alone after RR m5 t4 exits, with a 13 GiB cap and 7,200 s.
-- Reading:
-  - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
-  - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
 
 
-# Current twist proof continuation, 2026-11-06
-All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
 
-New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     =======
     >>>>>>> origin/main
 
@@ -5056,15 +5206,7 @@ only the frozen complete-call L2 F4/F5/F6 panel can decide the larger goal.
 The following notes are historical and have not been revalidated in this
 session. They are retained so checkpoint repair loses no preceding handoff.
 
-# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
 
-Owner (2026-11-14/16): "keep going" on hyperelliptic IC. Move the genus-3 positive control's arm C toward the matched negation rho by porting round 4's C1 splitting test.
-C pays ~362 F_p mults per trial (x^p mod u + CZ roots). C1 (Stickelberger + Lucas cube test, Cardano roots) gives identical decisions for ~1/3 of the cost.
-research/ic_positive_control_lucas_20261116/PROTOCOL.md (frozen, frozen.sha256; commit 4feb188f47). Arms C, L, M, R.
-Code + exhaustive tests pass (cargo test --release --lib chained_transfer::ic_control: 6 passed). Binary built. Run not yet started.
-Run the PROTOCOL §3 command (~15-20 min local), check gates G1-G3, render RESULTS.md/SVG/PDF, bench record, session log, PR.
-None yet. Output: research/ic_positive_control_lucas_20261116/run.json and run.log.
-Stop on any G1/G2/G3 failure. Success = component advance per PROTOCOL §7; end-to-end reported as distance to rho.
 
 
 
