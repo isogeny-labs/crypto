@@ -90,6 +90,12 @@ fn main() -> Result<()> {
         .flatten()
         .fold(32., f64::max)
         * 1.1;
+    let min_ratio = plot_rows
+        .iter()
+        .flat_map(|(_, f, e)| [*f, *e])
+        .flatten()
+        .fold(0.1, f64::min)
+        * 0.9;
     let path = output.join("ratios.svg");
     let root = SVGBackend::new(&path, (1150, 650)).into_drawing_area();
     root.fill(&WHITE)?;
@@ -101,7 +107,7 @@ fn main() -> Result<()> {
         .margin(20)
         .x_label_area_size(60)
         .y_label_area_size(230)
-        .build_cartesian_2d((0.1f64..max_ratio).log_scale(), 0usize..plot_rows.len() + 1)?;
+        .build_cartesian_2d((min_ratio..max_ratio).log_scale(), 0usize..plot_rows.len() + 1)?;
     chart
         .configure_mesh()
         .disable_y_mesh()
