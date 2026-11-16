@@ -21,7 +21,7 @@ Public targets are cofactor projections of separate places, with no supplied or 
 == Weil recovery and necessary obstruction
 All first 3p coefficients of f^((p−1)/2) agree between p-adic recurrence and independent polynomial multiplication. Exact lift/root-bracket checks recover L, matching certified N and counted N1. No extension-field counts were used.
 
-For p≡1 mod3, an invariant Lagrangian W forces the Frobenius polynomial to factor as h(T)h*(T), where h is an invertible-constant monic cubic over F3 and h* its normalized reciprocal. All18 possibilities were checked. None works for the three larger sources. Presence is only necessary; absence excludes the required rational kernel for this route without a semisimplicity assumption.
+For p≡1 mod3, an invariant Lagrangian W forces the Frobenius polynomial to factor as h(T)h-star(T), where h is an invertible-constant monic cubic over F3 and h-star its normalized reciprocal. All18 possibilities were checked. None works for the three larger sources. Presence is only necessary; absence excludes the required rational kernel for this route without a semisimplicity assumption.
 
 KernelObstruction.lean verifies the three finite coefficient impossibilities. The symplectic, geometric and group-cardinality arguments remain explicit mathematical premises rather than formalized code guarantees.
 
