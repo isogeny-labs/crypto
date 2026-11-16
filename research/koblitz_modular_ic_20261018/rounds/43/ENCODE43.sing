@@ -1,0 +1,15 @@
+ring reference43=(2,a),(z,T,w),dp;minpoly=a^5+a^2+1;
+< "reference-jets154.sing";
+list words43;int i43;int j43;int rem43;number val43;
+for(i43=0;i43<32;i43++){rem43=i43;val43=0;for(j43=0;j43<5;j43++){if(rem43%2==1){val43=val43+a^j43;}rem43=rem43 div 2;}words43[i43+1]=val43;}
+for(i43=1;i43<=32;i43++){for(j43=i43+1;j43<=32;j43++){if(number(words43[i43])==number(words43[j43])){ERROR("ENC43_FIELD_COLLISION");}}}
+proc code43(number x){int k;for(k=1;k<=32;k++){if(x==number(words43[k])){return(k-1);}}ERROR("ENC43_WORD");return(-1);}
+proc export43(string tag,int index,poly f,link output){int k;poly co;poly rebuilt=0;intvec words;int word;
+ for(k=0;k<154;k++){co=jet(f,k);if(k>0){co=co+jet(f,k-1);}co=co/z^k;if(co!=number(co)){ERROR("ENC43_NOT_SCALAR");}word=code43(number(co));words[k+1]=word;rebuilt=rebuilt+number(words43[word+1])*z^k;}
+ if(rebuilt!=f){ERROR("ENC43_RECONSTRUCTION");}write(output,tag+" "+string(index)+" "+string(words));return(1);
+}
+link output43="ASCII:w reference-coordinates-units154.txt";open(output43);int unused43;
+list coords43=paddingUJet35,paddingVJet35,paddingBJet35,paddingCJet35,paddingLambdaJet35,paddingNuJet35;
+for(i43=1;i43<=6;i43++){unused43=export43("C",i43,poly(coords43[i43]),output43);}
+for(i43=1;i43<=8;i43++){unused43=export43("U",i43,sourceUnits35[i43],output43);unused43=export43("I",i43,sourceInverses35[i43],output43);}close(output43);
+print("ENC43_RESULT coordinates=6 units=8 inverses=8 precision=154 every_polynomial_reconstructed=true");print("ENC43_ALL_CHECKS_PASS");quit;

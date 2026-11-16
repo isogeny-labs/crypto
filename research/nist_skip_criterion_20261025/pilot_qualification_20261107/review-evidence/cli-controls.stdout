@@ -1,0 +1,10 @@
+{"schema":"nist-journal-check/v1","mode":"inspect","status":"incomplete","order_replay":"ellcard-all-mapped","bits":192,"p":"6277101735386680763835789423207666416083908700390324961279","nonce":"0000000000000000000000000000000000000000000000000000000000000000","target":10,"cohort_sha256":"f425dc7c323bdbe6660fc599d1c625e1851a0e30d2a83d38a1c62d35e002f8fe","attempts":0,"accepted":0,"next_index":0,"replay_last_accepted":false,"attempt_prefix_bytes":29,"accepted_prefix_bytes":58,"attempt_tail_bytes":0,"accepted_tail_bytes":0,"attempts_bytes":29,"attempts_sha256":"7a0bb6134db47d3c3dba9cf7a4d61238c5496d3c1434bfba5934ebf9205ac1e4","accepted_bytes":58,"accepted_sha256":"e5ab44c6db0a9b0817f7c8dfd14408f66242566206ce6327bc6732b9f935c234","mutated_inputs":false,"production_qualified":false,"signed_verification":false}
+ok CLI refusal incomplete exit=1: REFUSED: accepted target incomplete
+ok CLI refusal toy-field exit=1: REFUSED: six frozen fields
+ok CLI refusal target exit=1: REFUSED: protocol pilot or primary target
+ok CLI refusal format exit=1: REFUSED: format must be sampler-v1
+ok CLI refusal acknowledgement exit=1: FAIL: explicit checkpoint acknowledgement
+Operational errors are not curve rejections.
+ok CLI refusal worker-toy-field exit=1: FAIL: six frozen fields
+Operational errors are not curve rejections.
+CLI controls complete: one empty-prefix inspection, six refusals, no sampler launch

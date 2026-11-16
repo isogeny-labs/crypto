@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",ranksep=.45,nodesep=.35];
+ node [shape=box,style="rounded,filled",fillcolor="#eef4ff",color="#31568b",fontname="Helvetica",fontsize=11];
+ edge [color="#41658d"];
+ actual [label="Actual W, retained t, existing diagonal c\nNo nonzero local-first-jet premise"];
+ denom [label="Construct actual bivariate D(H,Z), N(Z)\nH=h evaluates to actual row denominator"];
+ coeff [label="Actual coefficient-H^b content >= b\nFinite geometric sum + row-class identity"];
+ trunc [label="Truncate H degrees >= k\nWhole-polynomial error k at actual integer h"];
+ factors [label="Literal selector-moment left; coefficient right\n2^u*k labels; right integral; scaled error w+k"];
+ costs [label="OPEN: combined H/Z grade, degree/precision/bit/entry\nOriginal mode density, recovery and full expected cost",fillcolor="#fff2d9",color="#a66a13"];
+ actual -> denom -> coeff -> trunc -> factors;
+ factors -> costs [style=dashed];
+}

@@ -1,0 +1,247 @@
+{
+  "actual_scalar": 216251322113766629,
+  "comparative_eligibility": false,
+  "complete_cost": false,
+  "cost_ratios": null,
+  "flow": {
+    "attempted": 3,
+    "automatic_retries": 0,
+    "completed": 3,
+    "excluded": 0,
+    "planned": 3
+  },
+  "independent_signed_verdict": false,
+  "l": 263807419864521289,
+  "outcomes": [
+    {
+      "accepted_descents": null,
+      "actual_scalar": 216251322113766629,
+      "all_prefix_bounds_checked": null,
+      "arm": "ic",
+      "b_count": null,
+      "descent_residuals": null,
+      "exit_code": null,
+      "full_base": null,
+      "observed_primitive_subtotal_bitops": "6787702462546",
+      "phases": [
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "diagnostic_priced_bitops": "543743540",
+          "phase": "model"
+        },
+        {
+          "diagnostic_priced_bitops": "662928918",
+          "phase": "factor_base"
+        },
+        {
+          "diagnostic_priced_bitops": "3001722368526",
+          "phase": "relations"
+        },
+        {
+          "diagnostic_priced_bitops": "3463709644428",
+          "phase": "descent"
+        },
+        {
+          "diagnostic_priced_bitops": "320975823394",
+          "phase": "linear_algebra"
+        },
+        {
+          "diagnostic_priced_bitops": "87953740",
+          "phase": "verification"
+        }
+      ],
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 39788170924,
+      "small_base": null,
+      "source_rows": null,
+      "status": null,
+      "total_bitops": null,
+      "verified": true
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 216251322113766629,
+      "all_prefix_bounds_checked": true,
+      "arm": "structural-gate",
+      "b_count": null,
+      "descent_residuals": null,
+      "exit_code": null,
+      "full_base": null,
+      "observed_primitive_subtotal_bitops": "7919959237308",
+      "phases": [
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "diagnostic_priced_bitops": "584786996",
+          "phase": "model"
+        },
+        {
+          "diagnostic_priced_bitops": "703780140",
+          "phase": "factor_base"
+        },
+        {
+          "diagnostic_priced_bitops": "3719258435526",
+          "phase": "relations"
+        },
+        {
+          "diagnostic_priced_bitops": "3435088679132",
+          "phase": "descent"
+        },
+        {
+          "diagnostic_priced_bitops": "764235601774",
+          "phase": "linear_algebra"
+        },
+        {
+          "diagnostic_priced_bitops": "87953740",
+          "phase": "verification"
+        }
+      ],
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 48341491323,
+      "small_base": null,
+      "source_rows": null,
+      "status": null,
+      "total_bitops": null,
+      "verified": true
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 216251322113766629,
+      "all_prefix_bounds_checked": true,
+      "arm": "quotient-reuse",
+      "b_count": null,
+      "descent_residuals": null,
+      "exit_code": null,
+      "full_base": null,
+      "observed_primitive_subtotal_bitops": "7541914541330",
+      "phases": [
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "diagnostic_priced_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "diagnostic_priced_bitops": "584786996",
+          "phase": "model"
+        },
+        {
+          "diagnostic_priced_bitops": "703780140",
+          "phase": "factor_base"
+        },
+        {
+          "diagnostic_priced_bitops": "3719258435526",
+          "phase": "relations"
+        },
+        {
+          "diagnostic_priced_bitops": "3435088679132",
+          "phase": "descent"
+        },
+        {
+          "diagnostic_priced_bitops": "386190905796",
+          "phase": "linear_algebra"
+        },
+        {
+          "diagnostic_priced_bitops": "87953740",
+          "phase": "verification"
+        }
+      ],
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 48371523425,
+      "small_base": null,
+      "source_rows": null,
+      "status": null,
+      "total_bitops": null,
+      "verified": true
+    }
+  ],
+  "p": 1009,
+  "reuse_proof": {
+    "actual_scalar": 216251322113766629,
+    "all_projected_rows_and_target_checked": true,
+    "baseline_rows_used": 419,
+    "candidate_rows_used": 124,
+    "independent_full_affine_rank": 419,
+    "independent_homogeneous_rank": 417,
+    "independent_quotient_rank": 2,
+    "initial_kernel_counts": {
+      "additions": 417,
+      "products": 0,
+      "word_events": 702233
+    },
+    "phase_conservation": {
+      "added_quotient_solver_kernel_projection_and_conversion": {
+        "field_add": 0,
+        "field_inv": 0,
+        "field_mul": 0,
+        "field_sqr": 0,
+        "field_sqrt": 0,
+        "hash_probe": 0,
+        "legendre": 0,
+        "modr_add": 1532,
+        "modr_inv": 2,
+        "modr_mul": 1121,
+        "rng_words": 0,
+        "word_op": 1016069
+      },
+      "all_phase_counts_conserved": true,
+      "removed_original_affine_solver_and_conversion": {
+        "field_add": 0,
+        "field_inv": 0,
+        "field_mul": 0,
+        "field_sqr": 0,
+        "field_sqrt": 0,
+        "hash_probe": 0,
+        "legendre": 0,
+        "modr_add": 8983271,
+        "modr_inv": 419,
+        "modr_mul": 9159251,
+        "rng_words": 0,
+        "word_op": 189285
+      }
+    },
+    "projection_counts": {
+      "additions": 1110,
+      "products": 1110,
+      "word_events": 259656
+    },
+    "same_checkpoint_matrices_and_rank": true,
+    "same_original_sources_descents_endpoint_projection": true
+  },
+  "rho_parity": false,
+  "schema": "cover.production-quotient-presentation/v1",
+  "scope": "post-call field projection only; original summary retained separately",
+  "seed": 367,
+  "source_revision": "b2cf8aaf10aa667e20d4d512a92a6a9d24c4524d",
+  "total_bitops": null
+}

@@ -1,0 +1,48 @@
+string savedPid51=read("../../../50/runs/rr-pid50-01/rr-pid50.sing");
+int savedStart51=find(savedPid51,"ring inverseBaseCertificate50=");
+if(savedStart51<=0){ERROR("GLUE_PREP51_MISSING_RING_HEADER");quit;}
+execute(savedPid51[savedStart51,size(savedPid51)-savedStart51+1]);
+execute(read("../../source-data/diamond-iterates51.sing"));
+setring inverseBaseCertificate50;short=0;
+matrix H51=matrix(basis50);matrix A51=matrix(integerColumns50);
+if(nrows(H51)!=32 || ncols(H51)!=32 || deg(commonDenominator50)!=37 || normalizationIndex50!=376){ERROR("GLUE_PREP51_DONOR_SHAPE");quit;}
+if(A51*originalLift50!=H51 || H51*reverseLift50!=A51){ERROR("GLUE_PREP51_ORIGINAL_MODULE_PRODUCTS");quit;}
+matrix sourceIdentity51[32][32];int i51;int j51;
+for(i51=1;i51<=32;i51++){sourceIdentity51[i51,i51]=commonDenominator50;}
+if(H51*sourceLift50!=sourceIdentity51){ERROR("GLUE_PREP51_SOURCE_EMBEDDING");quit;}
+int d51=0;int witnessRow51=0;int witnessColumn51=0;
+for(i51=1;i51<=196;i51++){for(j51=1;j51<=32;j51++){
+ if(deg(originalLift50[i51,j51])>d51){d51=deg(originalLift50[i51,j51]);witnessRow51=i51;witnessColumn51=j51;}
+}}
+int clearingPower51=14+d51;int maxPower51=deg(commonDenominator50);
+for(i51=1;i51<=32;i51++){for(j51=1;j51<=32;j51++){if(deg(H51[i51,j51])>maxPower51){maxPower51=deg(H51[i51,j51]);}}}
+link out51="ASCII:w compact-pid51.sing";open(out51);
+write(out51,"// Native u denotes z=1/original_u; row basis is lambda^i V^j.");
+write(out51,"ring compactPid51=2,(u),(c,dp);short=0;poly commonDenominator51="+string(commonDenominator50)+";module basis51;matrix sourceLift51[32][32];int originalLiftMaxDegree51="+string(d51)+";int clearingPower51="+string(clearingPower51)+";int maxPower51="+string(maxPower51)+";");
+for(i51=1;i51<=32;i51++){
+ write(out51,"basis51["+string(i51)+"]="+string(basis50[i51])+";");
+ for(j51=1;j51<=32;j51++){write(out51,"sourceLift51["+string(j51)+","+string(i51)+"]="+string(sourceLift50[j51,i51])+";");}
+}
+if(witnessRow51>0){write(out51,"poly degreeWitness51="+string(originalLift50[witnessRow51,witnessColumn51])+";int witnessOriginalRow51="+string(witnessRow51)+";int witnessOriginalColumn51="+string(witnessColumn51)+";");}
+close(out51);
+execute(read("compact-pid51.sing"));
+map comparePid51=inverseBaseCertificate50,u;
+matrix compareH51=comparePid51(H51);matrix compareSourceLift51=comparePid51(sourceLift50);
+if(matrix(basis51)!=compareH51 || sourceLift51!=compareSourceLift51 || commonDenominator51!=comparePid51(commonDenominator50)){ERROR("GLUE_PREP51_FULL_PID_RELOAD");quit;}
+setring diamondIteratesCertificate51;
+list first51=images51[1];list ninth51=images51[9];
+link fieldOut51="ASCII:w compact-field51.sing";open(fieldOut51);
+write(fieldOut51,"ring compactField51=(2,u),(l,v),dp;short=0;ideal forwardImages51;ideal inverseImages51;");
+for(i51=1;i51<=3;i51++){
+ write(fieldOut51,"forwardImages51["+string(i51)+"]="+string(first51[i51])+";");
+ write(fieldOut51,"inverseImages51["+string(i51)+"]="+string(ninth51[i51])+";");
+}
+close(fieldOut51);
+execute(read("compact-field51.sing"));
+map compareField51=diamondIteratesCertificate51,l,v;
+setring diamondIteratesCertificate51;ideal firstIdeal51=first51[1],first51[2],first51[3];ideal ninthIdeal51=ninth51[1],ninth51[2],ninth51[3];
+setring compactField51;
+ideal expectedFirst51=compareField51(firstIdeal51);ideal expectedNinth51=compareField51(ninthIdeal51);
+for(i51=1;i51<=3;i51++){if(forwardImages51[i51]!=expectedFirst51[i51] || inverseImages51[i51]!=expectedNinth51[i51]){ERROR("GLUE_PREP51_FULL_FIELD_RELOAD");quit;}}
+print("GLUE_PREP51_RESULT PID_rank=32 original_lift_max_degree="+string(d51)+" clearing_power="+string(clearingPower51)+" maximum_coefficient_power="+string(maxPower51)+" all_PID_and_field_entries_reloaded=true");
+print("GLUE_PREP51_ALL_CHECKS_PASS");quit;

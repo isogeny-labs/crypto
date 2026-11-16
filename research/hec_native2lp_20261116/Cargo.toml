@@ -1,0 +1,13 @@
+[package]
+name="hec-native2lp"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="graph2lp-control"
+path="main.rs"
+[[bin]]
+name="curve2lp-control"
+path="curve_control.rs"

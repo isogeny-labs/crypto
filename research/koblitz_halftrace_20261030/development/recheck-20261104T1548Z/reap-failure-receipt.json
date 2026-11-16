@@ -1,0 +1,33 @@
+{
+  "schema": "crypto.native-halftrace-development-failure/v1",
+  "recorded_on": "2026-11-04",
+  "native_source_commit": "507829726fbc731543f4527348b55c5e479242c9",
+  "command": [
+    "target/release/deps/crypto_lib-68f0c4e7d1291d56",
+    "diagnostic_reap_publication_regression_tests::",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "passed": 2,
+  "failed": 2,
+  "ignored": 0,
+  "log": "reap-reproduce.txt",
+  "source_and_binary_manifest": "diagnostic-source-binary.sha256",
+  "failed_tests": [
+    "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars",
+    "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure"
+  ],
+  "panic": "DiagnosticSessionClock::begin().unwrap() received No such file or directory (os error 2).",
+  "runtime_paths": {
+    "/proc/sys/kernel/random/boot_id": "present",
+    "/proc/self/ns/time": "absent",
+    "/proc/self/timens_offsets": "absent"
+  },
+  "source_file": "src/cryptanalysis/ecbench/runner.rs",
+  "source_matches_upstream_main": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+  "source_changes_made": false,
+  "tests_disabled": false,
+  "full_library_parent_result": "pending_with_two_failures_already_observed",
+  "scientific_execution": false,
+  "performance_measurement": false
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "theorem": "G3PrimeDescent.completed_square_quartic",
+    "claim_path": "pcc/claims/PCC-20261113-3fc2f3.json",
+    "statement": "theorem completed_square_quartic {K : Type} [CommRing K] (t B s alpha beta : K) : (t^2+B*t+s)^2+alpha*t+beta = t^4+2*B*t^3+(B^2+2*s)*t^2+(2*B*s+alpha)*t+s^2+beta",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.completed_square_quartic",
+      "decl_sha256": "2fc6e730414edc56215c6dfd790c0920376070dfcc7c3a4c974d75d3e4aa935f"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.quartic_to_weierstrass",
+    "claim_path": "pcc/claims/PCC-20261113-3ba1c4.json",
+    "statement": "theorem quartic_to_weierstrass {K : Type} [CommRing K] (t y B s alpha beta x Y : K) (curve : y^2=(t^2+B*t+s)^2+alpha*t+beta) (abscissa : x=2*(y+t^2+B*t+s)) (ordinate : Y=2*x*t+B*x+alpha) : Y^2=x^3+(B^2-4*s)*x^2+(2*B*alpha-4*beta)*x+alpha^2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.quartic_to_weierstrass",
+      "decl_sha256": "731004b0921205ee84d858dd450dbdab1b196f4df00b2c9cb448c6dc12e41742"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.inverse_finite_branch",
+    "claim_path": "pcc/claims/PCC-20261113-b8507f.json",
+    "statement": "theorem inverse_finite_branch {K : Type} [CommRing K] (t B alpha x Y inverse : K) (ordinate : Y=2*x*t+B*x+alpha) (unit : inverse*(2*x)=1) : inverse*(Y-B*x-alpha)=t",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.inverse_finite_branch",
+      "decl_sha256": "7e0199632f58e21aafd0dab1b8b029121f1d7c65476715b209e5e85a75137a36"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.zero_abscissa_ordinate_factor",
+    "claim_path": "pcc/claims/PCC-20261113-aac37c.json",
+    "statement": "theorem zero_abscissa_ordinate_factor {K : Type} [CommRing K] (Y alpha : K) (curve_at_zero : Y^2=alpha^2) : (Y-alpha)*(Y+alpha)=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.zero_abscissa_ordinate_factor",
+      "decl_sha256": "65ce9c199663449ad222dcdc9c88e1f900f9507f80d28d4c01ff9d458537ab7e"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.actual_finite_zero_branch",
+    "claim_path": "pcc/claims/PCC-20261113-97840b.json",
+    "statement": "theorem actual_finite_zero_branch {K : Type} [CommRing K] (t B s alpha beta y x Y : K) (finite_root : alpha*t+beta=0) (ordinate_y : y= -(t^2+B*t+s)) (abscissa : x=2*(y+t^2+B*t+s)) (ordinate_Y : Y=2*x*t+B*x+alpha) : y^2=(t^2+B*t+s)^2+alpha*t+beta \u2227 x=0 \u2227 Y=alpha",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.actual_finite_zero_branch",
+      "decl_sha256": "c026923f729c8b3318ce36be7ab6b793e1a34a74bb5743a7305bf8231063de44"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.unique_finite_zero_parameter",
+    "claim_path": "pcc/claims/PCC-20261113-557fdf.json",
+    "statement": "theorem unique_finite_zero_parameter {K : Type} [CommRing K] (t alpha beta inverse : K) (unit : inverse*alpha=1) (finite_root : alpha*t+beta=0) : t= -inverse*beta",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.unique_finite_zero_parameter",
+      "decl_sha256": "3dadb5f036bf1a1e65b605a3602287f3fc09182e854b98bc75ccc32674a53168"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.conditional_trace_pullback_composition",
+    "claim_path": "pcc/claims/PCC-20261113-15ab8f.json",
+    "statement": "theorem conditional_trace_pullback_composition {E0 E1 E2 J : Type} [IntModule E0] [IntModule E1] [IntModule E2] [IntModule J] (p0 : E0 \u2192 J) (p1 : E1 \u2192 J) (p2 : E2 \u2192 J) (norm : J \u2192 E0) (norm_add : \u2200 a b, norm (a+b)=norm a+norm b) (diagonal : \u2200 x, norm (p0 x)=(2 : Int) \u2022 x) (cross1 : \u2200 x, norm (p1 x)=0) (cross2 : \u2200 x, norm (p2 x)=0) (x0 : E0) (x1 : E1) (x2 : E2) : norm (p0 x0+p1 x1+p2 x2)=(2 : Int) \u2022 x0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.conditional_trace_pullback_composition",
+      "decl_sha256": "ab578b7f119dc5961c276acdac2f7082e3519ef0eb3f7fbc6e4509ec1f0afd67"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.conditional_odd_subgroup_injectivity",
+    "claim_path": "pcc/claims/PCC-20261113-88dd89.json",
+    "statement": "theorem conditional_odd_subgroup_injectivity {E J : Type} [IntModule E] (phi : E \u2192 J) (norm : J \u2192 E) (composite : \u2200 x, norm (phi x)=(2 : Int) \u2022 x) (ell u v : Int) (bezout : 2*u+ell*v=1) (x y : E) (order_x : ell \u2022 x=0) (order_y : ell \u2022 y=0) (images_equal : phi x=phi y) : x=y",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.conditional_odd_subgroup_injectivity",
+      "decl_sha256": "211521b185e37cf65bf56d17d53d9d1884882cf0e7783635f79e0c01fd07dc5e"
+    }
+  },
+  {
+    "theorem": "G3PrimeDescent.conditional_dlp_scalar_transfer",
+    "claim_path": "pcc/claims/PCC-20261113-ca977c.json",
+    "statement": "theorem conditional_dlp_scalar_transfer {E J : Type} [IntModule E] [IntModule J] (phi : E \u2192 J) (zero : phi 0=0) (addition : \u2200 x y, phi (x+y)=phi x+phi y) (x : E) (k : Nat) : phi (repeatAdd x k)=repeatAdd (phi x) k",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+      "theorem": "G3PrimeDescent.conditional_dlp_scalar_transfer",
+      "decl_sha256": "2650df0cd2dc5fd0769f5ae2324398d6611ab04b82645fde7781028ff45307b5"
+    }
+  },
+  {
+    "theorem": "G3ModelTransport.primitive_shift_square",
+    "claim_path": "pcc/claims/PCC-20261113-26cccb.json",
+    "statement": "theorem primitive_shift_square {K : Type} [CommRing K] (g s : K) : (g+s)^2=g^2+2*s*g+s^2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/ModelTransport.lean",
+      "theorem": "G3ModelTransport.primitive_shift_square",
+      "decl_sha256": "997d740939b65672f34a9d09ac7732ac1f479196203b50157d08270917c6897b"
+    }
+  },
+  {
+    "theorem": "G3ModelTransport.triangular_moore_transport_inverse",
+    "claim_path": "pcc/claims/PCC-20261113-101c39.json",
+    "statement": "theorem triangular_moore_transport_inverse {K : Type} [CommRing K] (s w0 w1 w2 v0 v1 v2 : K) (first : v0=w0) (second : v1=w1+s*w0) (third : v2=w2+2*s*w1+s^2*w0) : v0=w0 \u2227 v1-s*v0=w1 \u2227 v2-2*s*v1+s^2*v0=w2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/ModelTransport.lean",
+      "theorem": "G3ModelTransport.triangular_moore_transport_inverse",
+      "decl_sha256": "8b0b5fcc3fbf2855254d72081874481e4654de55d57c31c8e99ae9d8cc382779"
+    }
+  }
+]

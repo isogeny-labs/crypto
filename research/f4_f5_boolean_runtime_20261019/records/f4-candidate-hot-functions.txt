@@ -1,0 +1,56 @@
+--------------------------------------------------------------------------------
+Profile data file 'research/f4_f5_boolean_runtime_20261019/profiles-corrected/matrix-f4-0-b/region.callgrind.1' (creator: callgrind-3.19.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 76015773
+Trigger: Client Request: ["matrix-f4",23,230,0,0]
+Profiled target:  /tmp/boolean-native-candidate-20261019 --profile 1 --arm matrix-f4 (PID 32, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+474,009,079 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                   file:function
+--------------------------------------------------------------------------------
+80,886,078 (17.06%)  ???:crypto_lib::cryptanalysis::gf2_elim::xor_entries_avx2 [/tmp/boolean-native-candidate-20261019]
+62,058,112 (13.09%)  ???:crypto_lib::cryptanalysis::gf2_elim::clear_block::{closure#1} [/tmp/boolean-native-candidate-20261019]
+55,574,475 (11.72%)  ???:crypto_lib::cryptanalysis::gf2_elim::eliminate_with [/tmp/boolean-native-candidate-20261019]
+50,126,127 (10.57%)  ???:crypto_lib::cryptanalysis::gf2_elim::xor_entries [/tmp/boolean-native-candidate-20261019]
+43,999,308 ( 9.28%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::row_monos [/tmp/boolean-native-candidate-20261019]
+31,898,287 ( 6.73%)  ???:crypto_lib::cryptanalysis::gf2_elim::clear_strip_avx2 [/tmp/boolean-native-candidate-20261019]
+20,402,179 ( 4.30%)  ???:<crypto_lib::cryptanalysis::koblitz_groebner::F4ColumnIndex>::get [/tmp/boolean-native-candidate-20261019]
+19,520,468 ( 4.12%)  ???:crypto_lib::cryptanalysis::gf2_elim::write_table_entry_avx2 [/tmp/boolean-native-candidate-20261019]
+19,212,905 ( 4.05%)  ???:<hashbrown::map::HashMap<u64, (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>>::insert [/tmp/boolean-native-candidate-20261019]
+12,053,787 ( 2.54%)  ???:core::slice::sort::shared::smallsort::small_sort_network::<usize, <usize as core::cmp::PartialOrd>::lt> [/tmp/boolean-native-candidate-20261019]
+10,803,282 ( 2.28%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::macaulay_rows_monos_with_mask [/tmp/boolean-native-candidate-20261019]
+ 9,620,397 ( 2.03%)  ???:core::slice::sort::unstable::quicksort::quicksort::<u64, <u64 as core::cmp::PartialOrd>::lt> [/tmp/boolean-native-candidate-20261019]
+ 9,115,231 ( 1.92%)  ???:crypto_lib::cryptanalysis::gf2_elim::clear_block [/tmp/boolean-native-candidate-20261019]
+ 9,041,838 ( 1.91%)  ???:<&mut core::iter::adapters::map::map_fold<&mut alloc::vec::Vec<u64>, u64, u64, crypto_lib::cryptanalysis::gf2_elim::clear_block::{closure#1}, <u64 as core::iter::traits::accum::Sum>::sum<core::iter::adapters::map::Map<core::iter::adapters::chain::Chain<core::slice::iter::IterMut<alloc::vec::Vec<u64>>, core::slice::iter::IterMut<alloc::vec::Vec<u64>>>, crypto_lib::cryptanalysis::gf2_elim::clear_block::{closure#1}>>::{closure#0}>::{closure#0} as core::ops::function::FnMut<(u64, &mut alloc::vec::Vec<u64>)>>::call_mut [/tmp/boolean-native-candidate-20261019]
+ 8,387,442 ( 1.77%)  ???:rayon::iter::plumbing::bridge_producer_consumer::helper::<rayon::iter::len::MinLenProducer<rayon::iter::chain::ChainProducer<rayon::slice::IterMutProducer<alloc::vec::Vec<u64>>, rayon::slice::IterMutProducer<alloc::vec::Vec<u64>>>>, rayon::iter::map::MapConsumer<rayon::iter::sum::SumConsumer<u64>, crypto_lib::cryptanalysis::gf2_elim::clear_block::{closure#1}>>'2 [/tmp/boolean-native-candidate-20261019]
+ 5,808,057 ( 1.23%)  ???:<crypto_lib::cryptanalysis::koblitz_groebner::pack_rows_with_layout as core::ops::function::Fn<(&[alloc::vec::Vec<u64>], &crypto_lib::cryptanalysis::koblitz_groebner::F4ColumnLayout, bool)>>::call [/tmp/boolean-native-candidate-20261019]
+ 3,934,662 ( 0.83%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns [/tmp/boolean-native-candidate-20261019]
+ 2,669,724 ( 0.56%)  ???:_int_malloc [/usr/lib64/libc.so.6]
+ 2,174,330 ( 0.46%)  ???:crypto_lib::cryptanalysis::gf2_elim::pext_bmi2 [/tmp/boolean-native-candidate-20261019]
+ 2,061,099 ( 0.43%)  ???:malloc_consolidate [/usr/lib64/libc.so.6]
+ 1,672,187 ( 0.35%)  ???:core::slice::sort::unstable::quicksort::quicksort::<u64, <[u64]>::sort_unstable_by_key<core::cmp::Reverse<u128>, crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns::{closure#0}>::{closure#0}>'2 [/tmp/boolean-native-candidate-20261019]
+ 1,437,554 ( 0.30%)  ???:_int_free [/usr/lib64/libc.so.6]
+ 1,254,149 ( 0.26%)  ???:core::slice::sort::shared::smallsort::small_sort_network::<u64, <[u64]>::sort_unstable_by_key<core::cmp::Reverse<u128>, crypto_lib::cryptanalysis::koblitz_groebner::macaulay_columns::{closure#0}>::{closure#0}> [/tmp/boolean-native-candidate-20261019]
+ 1,182,815 ( 0.25%)  ???:unlink_chunk.constprop.0 [/usr/lib64/libc.so.6]
+ 1,056,294 ( 0.22%)  ???:__memcpy_avx_unaligned_erms [/usr/lib64/libc.so.6]
+ 1,001,902 ( 0.21%)  ???:core::slice::sort::unstable::quicksort::quicksort::<u64, <u64 as core::cmp::PartialOrd>::lt>'2 [/tmp/boolean-native-candidate-20261019]
+   671,311 ( 0.14%)  ???:<hashbrown::map::HashMap<u64, usize, core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>>::insert [/tmp/boolean-native-candidate-20261019]
+   667,365 ( 0.14%)  ???:<hashbrown::raw::RawTable<(u64, ())>>::reserve_rehash::<hashbrown::map::make_hasher<u64, (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::MaskHasher>>::{closure#0}> [/tmp/boolean-native-candidate-20261019]
+   630,223 ( 0.13%)  ???:core::slice::sort::unstable::ipnsort::<u64, <u64 as core::cmp::PartialOrd>::lt> [/tmp/boolean-native-candidate-20261019]
+   604,452 ( 0.13%)  ???:core::slice::sort::shared::pivot::median3_rec::<usize, <usize as core::cmp::PartialOrd>::lt>'2 [/tmp/boolean-native-candidate-20261019]
+

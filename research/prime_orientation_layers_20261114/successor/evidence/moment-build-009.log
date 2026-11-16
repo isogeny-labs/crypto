@@ -1,0 +1,95 @@
+../evidence/moment-draft-009.lean.txt:347:6: error: Application type mismatch: The argument
+  (OrientationRank.classPort a u hu rb.1).isLt
+has type
+  ↑(OrientationRank.classPort a u hu rb.1) < 2 ^ a
+but is expected to have type
+  ↑rb.1 < 2 ^ a
+in the application
+  crossing_normalized_integral a u i (↑rb.1) (↑y) m (OrientationRank.classPort a u hu rb.1).isLt
+
+Note: The following definitions were not unfolded because their definition is not exposed:
+  OrientationRank.classPort ↦ 7
+../evidence/moment-draft-009.lean.txt:348:67: error: Application type mismatch: The argument
+  hc
+has type
+  (↑(OrientationRank.classPort a u hu rb.1)).testBit i = (↑y).testBit i
+but is expected to have type
+  (↑rb.1).testBit i = (↑y).testBit i
+in the application
+  actual_denominator_weighted u i (↑rb.1) (↑y) m hi hc
+
+Note: The following definitions were not unfolded because their definition is not exposed:
+  Nat.land ↦ 22
+  OrientationRank.classPort ↦ 7
+../evidence/moment-draft-009.lean.txt:352:4: error: Type mismatch: After simplification, term
+  VBound.mul hR hq
+ has type
+  VBound 0
+    (firstJet a u i (↑rb.1) (↑y) m / diagonalJet a u i m *
+      ((PowerSeries.coeff ↑rb.2) (inverseSeries (denominatorPolynomial u i (↑rb.1) (↑y) m)) / 2 ^ ↑rb.2))
+but is expected to have type
+  VBound 0
+    (firstJet a u i (↑(OrientationRank.classPort a u hu rb.1)) (↑y) m / diagonalJet a u i m *
+      ((PowerSeries.coeff ↑rb.2) (inverseSeries (denominatorPolynomial u i (↑rb.1) (↑y) m)) / 2 ^ ↑rb.2))
+
+Note: The following definitions were not unfolded because their definition is not exposed:
+  OrientationRank.classPort ↦ 7
+../evidence/moment-draft-009.lean.txt:386:2: error: No goals to be solved
+../evidence/moment-draft-009.lean.txt:397:40: error: Invalid simp theorem `OrientationRank.classPort`: Expected a definition with an exposed body
+../evidence/moment-draft-009.lean.txt:398:4: error: Type mismatch
+  actual_moment_error a u i (↑x) (↑y) k m x.isLt y.isLt hi hu hm hc
+has type
+  VBound (↑k)
+    (firstJet a u i (↑x) (↑y) m / diagonalJet a u i m -
+      firstJet a u i (rowResidue u ↑x) (↑y) m / diagonalJet a u i m *
+        eval (↑(rowQuotient u ↑x)) (inverseTrunc (denominatorPolynomial u i (rowResidue u ↑x) (↑y) m) k))
+but is expected to have type
+  VBound (↑k)
+    (firstJet a u i (↑x) (↑y) m / diagonalJet a u i m -
+      (if (↑(OrientationRank.classPort a u hu ⟨rowResidue u ↑x, ⋯⟩)).testBit i = (↑y).testBit i then
+          firstJet a u i (↑(OrientationRank.classPort a u hu ⟨rowResidue u ↑x, ⋯⟩)) (↑y) m / diagonalJet a u i m
+        else 0) *
+        eval (↑(rowQuotient u ↑x)) (inverseTrunc (denominatorPolynomial u i (rowResidue u ↑x) (↑y) m) k))
+
+Note: The following definitions were not unfolded because their definition is not exposed:
+  Nat.land ↦ 14
+../evidence/moment-draft-009.lean.txt:400:40: error: Invalid simp theorem `OrientationRank.classPort`: Expected a definition with an exposed body
+../evidence/moment-draft-009.lean.txt:401:4: error: Type mismatch
+  VBound.zero ?m.78
+has type
+  VBound ?m.78 0
+but is expected to have type
+  VBound (↑k)
+    (0 -
+      (if (↑(OrientationRank.classPort a u hu ⟨rowResidue u ↑x, ⋯⟩)).testBit i = (↑y).testBit i then
+          firstJet a u i (↑(OrientationRank.classPort a u hu ⟨rowResidue u ↑x, ⋯⟩)) (↑y) m / diagonalJet a u i m
+        else 0) *
+        eval (↑(rowQuotient u ↑x)) (inverseTrunc (denominatorPolynomial u i (rowResidue u ↑x) (↑y) m) k))
+../evidence/moment-draft-009.lean.txt:397:37: warning: This simp argument is unused:
+  hr
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [normalizedCrossing, hc, OrientationRank.classPort, ite_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-009.lean.txt:400:37: warning: This simp argument is unused:
+  hr
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [normalizedCrossing, hc, OrientationRank.classPort, ite_false, zero_mul, sub_self]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-009.lean.txt:400:76: warning: This simp argument is unused:
+  zero_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [normalizedCrossing, hc, hr, OrientationRank.classPort, ite_false, sub_self]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-009.lean.txt:400:85: warning: This simp argument is unused:
+  sub_self
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [normalizedCrossing, hc, hr, OrientationRank.classPort, ite_false, zero_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

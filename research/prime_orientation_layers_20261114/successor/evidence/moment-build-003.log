@@ -1,0 +1,94 @@
+../evidence/moment-draft-003.lean.txt:103:70: error: Application type mismatch: The argument
+  n
+has type
+  ℤ
+but is expected to have type
+  ℕ
+in the application
+  P.coeff n
+../evidence/moment-draft-003.lean.txt:108:2: error: unsolved goals
+case pos
+⊢ (coeff 1) (sorry ()) = 0 ∨ 0 ≤ padicValRat 2 ((coeff 1) (sorry ()))
+../evidence/moment-draft-003.lean.txt:109:2: error: unsolved goals
+case neg
+n : ℤ
+hn : ¬n = 0
+⊢ ¬sorry () = 0 ∨ n ≤ padicValRat 2 (if sorry () = 0 then 1 else 0)
+../evidence/moment-draft-003.lean.txt:109:20: warning: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_one, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-003.lean.txt:111:8: warning: declaration uses `sorry`
+../evidence/moment-draft-003.lean.txt:111:45: warning: Variable name `hP` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hP
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../evidence/moment-draft-003.lean.txt:112:5: warning: Variable name `hQ` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hQ
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../evidence/moment-draft-003.lean.txt:118:2: warning: Unused tactic linter: `simpa only [← Nat.cast_add, hs] using (hP ij.1).mul (hQ ij.2)` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../evidence/moment-draft-003.lean.txt:139:2: error: unsolved goals
+case pos
+e : ℚ
+he : VBound 1 e
+⊢ (coeff 1) (sorry ()) + e * X.coeff (sorry ()) = 0 ∨ 0 ≤ padicValRat 2 ((coeff 1) (sorry ()) + e * X.coeff (sorry ()))
+../evidence/moment-draft-003.lean.txt:142:2: error: unsolved goals
+case neg
+e : ℚ
+he : VBound 1 e
+n : ℤ
+h0 : ¬n = 0
+h1 : ¬n = 1
+⊢ ((if sorry () = 0 then 1 else 0) + if 1 = sorry () then e else 0) = 0 ∨
+    n ≤ padicValRat 2 ((if sorry () = 0 then 1 else 0) + if 1 = sorry () then e else 0)
+../evidence/moment-draft-003.lean.txt:142:50: warning: This simp argument is unused:
+  h0
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_add, coeff_one, coeff_C_mul, coeff_X, h1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-003.lean.txt:142:53: warning: This simp argument is unused:
+  h1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_add, coeff_one, coeff_C_mul, coeff_X, h0, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-003.lean.txt:157:53: error: unsolved goals
+u i x y : ℕ
+m : ℕ → ℕ
+⊢ eval 0 (∏ j ∈ mask u x y, (1 + C (slope u (rowResidue u x) y (2 ^ j)) * X) ^ m j) = 1
+../evidence/moment-draft-003.lean.txt:164:8: warning: Possibly looping simp theorem: `denominatorPolynomial.eq_1`
+
+Note: Possibly caused by: `mul_comm` and `X_mul_C`
+
+Hint: You can disable a simp theorem from the default simp set by passing `- theoremName` to `simp`.
+../evidence/moment-draft-003.lean.txt:164:2: error: Tactic `simp` failed with a nested error:
+maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+../evidence/moment-draft-003.lean.txt:171:40: error: Application type mismatch: The argument
+  n
+has type
+  ℤ
+but is expected to have type
+  ℕ
+in the application
+  PowerSeries.coeff n
+../evidence/moment-draft-003.lean.txt:173:2: error: Invalid target:
+  n
+has type
+  ℤ
+but is expected to have type
+  ℕ
