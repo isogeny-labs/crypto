@@ -41,3 +41,13 @@ The attraction is a **compact 9x9 determinantal presentation of an original-curv
 ## Follow-on independent verification
 
 Even a 100% predicate pilot is not a cheaper **complete** ECDLP solver. Preserve source-exact CI, raw output, an independent original-curve replay (different arithmetic code or PCC signed verifier), compiler version/commit, and a genuine blinded unknown-scalar log panel before advancing a claim. No paid compute, merge, secrets, leaderboard edit or independent signed PCC requested.
+
+## Prospective extension A — Hermite-jetted repeated leaves (committed before code)
+
+The initial squarefree gate deliberately rejects a repeated point. After independently verifying the underlying `D_y=F'(x)/(2y)` tangent identity, add a second predicate for divisors where **each distinct affine point occurs at most twice and y≠0**. Use the unique local parameter `t=x-x(P)` at nonsingular non-2-torsion P. Replace the second identical evaluation row by the order-one jet `D=` d/dx along E, where `D(y)= (3x²+a)/(2y)`. Thus, for the L9 basis, the derivative row is
+`[0,1,t,2x,y+xt,3x²,2xy+x²t,4x³,3x²y+x³t]` with `t=(3x²+a)/(2y)`.
+Riemann–Roch then gives determinant zero iff the full **length-nine effective divisor counted with multiplicity** sums to O. Reject any triple occurrences or repeated rational y=0 points until higher jets / the y-local parameter are proved. This is classical confluent evaluation, not a novel attack.
+
+Add a predeclared adversarial original-curve fixture with one duplicated signed factor-base point: the **naive** repeated-row determinant must spuriously vanish against a deliberately wrong target; the **Hermite-jetted** determinant must be nonzero against the same wrong target and zero for its true group residual. Run this fixture on both actual prime31 bases and record exact determinant values and all positivity/rejection flags. All distinct-point 128 checks remain unchanged; no hidden scalar or F4 root extraction is claimed.
+
+If the root runner compilation or result fails, retain the negative evidence and correct the source via a separate commit; no magic `det==0` claim is made on diagonals without jet certification.
