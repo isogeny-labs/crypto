@@ -18,3 +18,39 @@
 ### Errors
 
 - None in the read-only setup. The checkpoint scope conflict is a run-admission obstruction, not experimental data.
+
+## 2026-11-16, pre-data order correction
+
+### What was done
+
+- The cached release planner accepted the first spec but warned that one measured round leaves alternating arm order unbalanced. Saved its plan and spec as version 1. No timed run occurred. [pcc:unverified]
+
+### Decisions made
+
+- Amendment 1 increases measured rounds from one to two; this balances arm order within each fixed target while preserving every method, seed and target. The new plan has 48 scheduled executions. [pcc:unverified]
+
+### Open threads
+
+- Plan version 2, bind source/binary, and satisfy the checkpoint gate before execution.
+
+### Errors
+
+- The planner warning was a pre-data protocol defect, corrected additively.
+
+## 2026-11-16, version 2 plan check
+
+### What was done
+
+- Cached-binary `ecbench plan --doc` accepted the amended spec with 48 scheduled executions, 16 warmups and 32 measured calls. `check_plan.py` compared both K13 workloads byte-for-byte with the first two workloads of the frozen L2 panel and checked all eight selected arm definitions. `PLAN_CHECK.json` records IDs, target points, spec/plan/binary hashes and the pending clean-build binding. [pcc:unverified]
+
+### Decisions made
+
+- Use this plan only as preflight until a clean source-bound release binary is built. The current cached binary hash is diagnostic and is not asserted to be built from this branch. [pcc:unverified]
+
+### Open threads
+
+- Build source-bound release ecbench when disk headroom permits, then obtain branch-specific `.resume` scope and S3 checkpoint gate before any timed call.
+
+### Errors
+
+- None in the version 2 planner; the version 1 arm-order warning remains preserved in Amendment 1.
