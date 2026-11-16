@@ -49,7 +49,7 @@ if [[ $# == 2 && $1 == --execute ]]; then
     mapfile -t argv < <(jq -er '.[]' "$run/$mode.argv.json")
     jq -cn --arg mode "$mode" --arg source "$source" '{record_type:"execution_start",mode:$mode,source_revision:$source}' >> "$run/flow.jsonl"
     TIMEFORMAT=$'real_s=%R\nuser_s=%U\nsys_s=%S\ncpu_percent=%P'
-    { time timeout --signal=TERM --kill-after=5s "$(jq -er .worker_timeout_seconds "$plan")s" taskset -c "$cpu" "${argv[@]}" > "$run/$mode.raw.json" 2> "$run/$mode.stderr"; } 2> "$run/$mode.time.txt"
+    { time timeout --signal=TERM --kill-after=5s "$(jq -er .worker_timeout_seconds "$plan")s" taskset -c "$cpu" "${argv[@]}" > "$run/$mode.summary.jsonl" 2> "$run/$mode.stderr"; } 2> "$run/$mode.time.txt"
     status=$?
     printf '%s\n' "$status" > "$run/$mode.exit-code.txt"
     jq -cn --arg source "$source" --arg mode "$mode" --argjson status "$status" '{record_type:"execution",mode:$mode,source_revision:$source,exit_code:$status}' >> "$run/flow.jsonl"
@@ -60,6 +60,7 @@ fi
 [[ $# == 0 ]] || { echo 'usage: run-portfolio-task.sh (inside immutable Runpod bundle)' >&2; exit 2; }
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$here" || exit 2
+command -v ps >/dev/null || { echo 'Required process preflight unavailable.' >&2; exit 2; }
 if ps -eo stat=,comm= | awk '$2 ~ /^(rustc|cargo|clippy-driver)$/ && $1 !~ /^Z/ { active=1 } END { exit !active }'; then echo 'Finish builds before timing.' >&2; exit 2; fi
 sha256sum -c bundle.sha256 > bundle-recheck.log || exit 2
 plan=$here/portfolio-plan.json

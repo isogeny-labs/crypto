@@ -7,8 +7,8 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo=$(/usr/bin/git -C "$here" rev-parse --show-toplevel)
 cd "$repo"
 [[ -z $(/usr/bin/git status --porcelain --untracked-files=normal) ]] || { echo 'Publish clean source/spec first.' >&2; exit 2; }
-sha256sum -c "$here/validation/portfolio-source.sha256" >/dev/null
-sha256sum -c "$here/validation/portfolio-build.sha256" >/dev/null
+sha256sum -c "$here/validation/portfolio34-source.sha256" >/dev/null
+sha256sum -c "$here/validation/portfolio34-build.sha256" >/dev/null
 mkdir "$1"
 stage=$(cd "$1" && pwd)
 mkdir "$stage/bundle"
@@ -16,7 +16,7 @@ bundle=$stage/bundle
 cp target/release/examples/jv_sieve_two_large_prime_dlp_compare "$bundle/driver"
 cp "$here/native_analysis/target/release/portfolio-analysis" "$bundle/analyzer"
 cp "$here/run-portfolio-task.sh" "$here/portfolio-plan.json" "$bundle/"
-cp "$here/validation/runpod33-allocation.json" "$bundle/allocation.json"
+cp "$here/validation/runpod34-allocation.json" "$bundle/allocation.json"
 cp .resume/RESUME.md "$bundle/RESUME-before.md"
 /usr/bin/git rev-parse HEAD > "$bundle/source-revision.txt"
 "$HOME/.cargo/bin/rustc" -Vv > "$bundle/build-rustc.txt"

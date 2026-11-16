@@ -1,3 +1,30 @@
+# Current checkpoint:34SOURCE READY;33transport failure preserved/deleted
+
+User wants Rust graphIC/rhoparity research on Runpod. GoalACTIVE/no subagents.
+Trial33failed BEFOREscientificcode:stdoutredirectcreatedworkerraw--out paths,
+all6AlreadyExists. Originalpacket research/.../runpod-ic-graph-rho-portfolio-20261116-33,
+PCCb60806unverified, allportablehashPASS,ownpod3lmv488eiypxctdeleted204/40416:43:31Z.
+ExactLOCALcustody /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-33.
+
+Correctedactualwrapper keepsstdout.summary/rawseparate, requiresps/procpsbootstrap.
+NativeRusttransport-onlycontrolrejectsold33exactly/acceptsall6newpaths(noECscience).
+Qualifier33tests/strictClippy/buildPASS, finalsourcehashPASS. PCC5199ccunverified.
+NewAmendment29/portfolio-plan p1009FRESHseed337, same6arms/costgaps/budgetsas28.
+prepare-portfolio-runpod.sh usesvalidation/portfolio34-{source,build}.sha256 and
+runpod34-allocation.json. No library/workerbinarychange.34scientificNOTDISPATCHEDyet.
+NewownCPU4vCPU8GiB0.12USDh/pinnedimage/7200sDELETEguardian; podID/privateheader
+ONLYauthdirpointer/tmp/ic-runpod-auth-location (pod34.id/task34-header/token).
+NEVERprintkey/envorcopycredentials. Alloldownpodsdeleted, no unrelatedpodchanges.
+
+NEXTpublishcleansource/spec+271source/buildhashbeforeprepareNEW34stage, uploadand
+POST/runONCE. BindfirstallowedCPU;900sworker5500swhole0warm/retry8GiB/7200srunnerttl.
+Collectafterfinished,portablehashcheckthenimmediateDELETEown34+confirm404+private
+pod-ID.deletedmarker. Missinganalysislogmustnotstopcleanup. Retainfullfailuredata.
+ReportPDF/SVG/150dpiPNG/inspectallpages, actualresultPCC/lesson/commitPRupdate.
+Completecost/band/ratiosNULLallarmsunrankable; held-outplantedanswerNOTT1unknownlog.
+No manualmerge. S3checkpointunavailablepreviously;userexplicitRunpoddirectionpersists.
+Maintaincommentary<=60s;chooseconcretecode/dataactions,avoidlongspeculation.
+
 # Current checkpoint:33SOURCE READY; Runpod provisioning, no scientific dispatch
 
 GoalACTIVE: Rust elliptic graph IC integration and Runpod measurements toward rho parity.

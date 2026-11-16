@@ -75,7 +75,7 @@ fn analyze(fixture: &Value, workers: &[Value], plan: &Value) -> Result<Value, St
         || plan["mode_order"] != json!(MODES)
         || plan["p"] != 1009
         || p != 1009
-        || plan["seed"] != 331
+        || plan["seed"] != 337
         || plan["m"] != 9
         || plan["small_percent"] != 75
         || plan["b_count"] != p * p
