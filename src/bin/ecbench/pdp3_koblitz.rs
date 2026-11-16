@@ -499,7 +499,20 @@ fn verified_collision_rows(
             return Err("pair-table collision has unequal or infinite sums".into());
         }
         let (indices, check_rhs) = if current == first {
-            ([i, j, fb.neg_index[fi], fb.neg_index[fj]], g.neg(first))
+            let nfi = *fb
+                .neg_index
+                .get(fi)
+                .ok_or("pair-table collision has a missing negative index")?;
+            let nfj = *fb
+                .neg_index
+                .get(fj)
+                .ok_or("pair-table collision has a missing negative index")?;
+            if fb.points.get(nfi) != Some(&g.neg(fb.points[fi]))
+                || fb.points.get(nfj) != Some(&g.neg(fb.points[fj]))
+            {
+                return Err("pair-table collision has an incorrect negative index".into());
+            }
+            ([i, j, nfi, nfj], g.neg(first))
         } else if current == g.neg(first) {
             ([i, j, fi, fj], first)
         } else {
@@ -1504,10 +1517,11 @@ mod engine_names {
     fn batch_collision_rows_match_fixed_census_and_reject_tampering() {
         use super::{BinaryGroup, ColumnFold, GroupOps, PairTable};
         use crypto_lib::cryptanalysis::ic_boundary::{
-            koblitz_factor_base, koblitz_instance, IncrementalGauss, RowStatus,
+            koblitz_factor_base, koblitz_instance, CountedGroup, IncrementalGauss, RowStatus,
         };
         use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
 
+        let mut checked_negative_index = false;
         for (n, d, expected_candidates, expected_rank) in
             [(13, 5, 27, 5), (19, 7, 99, 11), (23, 8, 201, 23)]
         {
@@ -1553,7 +1567,43 @@ mod engine_names {
                 }
             }
             assert!(rejected, "a modified collision witness must be rejected");
+            for &collision in &collisions {
+                let mut check_ops = GroupOps::default();
+                let current = group.add(
+                    &mut check_ops,
+                    fb.points[collision[0]],
+                    fb.points[collision[1]],
+                );
+                let first = group.add(
+                    &mut check_ops,
+                    fb.points[collision[2]],
+                    fb.points[collision[3]],
+                );
+                if current != first {
+                    continue;
+                }
+                let mut corrupt_fb = fb.clone();
+                let fi = collision[2];
+                corrupt_fb.neg_index[fi] = (0..fb.points.len())
+                    .find(|&index| fb.points[index] != group.neg(fb.points[fi]))
+                    .unwrap();
+                let error = verified_collision_rows(
+                    &group,
+                    &corrupt_fb,
+                    inst.r,
+                    &[collision],
+                    &mut GroupOps::default(),
+                )
+                .unwrap_err();
+                assert!(error.contains("incorrect negative index"));
+                checked_negative_index = true;
+                break;
+            }
         }
+        assert!(
+            checked_negative_index,
+            "an equal-sum collision must test the negative index"
+        );
     }
 
     #[test]
