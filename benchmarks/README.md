@@ -1,5 +1,39 @@
 # Benchmarks
 
+The [controlled compiled-map comparison](20261115-hec-tensor631/) verifies all twenty cells but fails its frozen stability qualification: baseline-A max/min 1.426 exceeds 1.25. A/A medians pass; the observed 1.146 ratio is unqualified and the 10x gate fails. Phase data show section work is minor and repeated generation/reconstruction remain material. No cold end-to-end claim. [Record](records/20261116T0351Z-hec-tensor631.json) [pcc:unverified].
+
+The [production section-shortcut comparison](20261115-hec-jetfree631/) verifies all ten cells but demonstrates no stable speedup: median previous-direct/production ratio 0.930, with strong run-order drift in both arms. The registered 10x gate fails. Component accounting only; separate from the prior 1.621x cohort and outside admitted results. [Record](records/20261116T0331Z-hec-jetfree631.json) [pcc:unverified].
+
+The [F631 inverse component comparison](20261115-hec-inversecost631/) verifies all ten cells. Direct symmetric inversion has median 1.503780 s versus ordered 2.437092 s, a derived 1.621x component gain; the 10x gate fails. Quotient setup and public-coordinate preparation are reused outside the timer. Shared ARM host, unvalidated producer evidence; no cold end-to-end gain or admitted leaderboard change. [Record](records/20261116T0314Z-hec-inversecost631.json) [pcc:unverified].
+
+The [15 November complete-cold genus-3 quotient comparison](20261115-hec-coldcost13/)
+([PDF](20261115-hec-coldcost13/REPORT.pdf)) remains outside the admitted table.
+All 20 cells recover and verify scalar 183049. Cold median 1.780975 s versus
+best existing Compact median 0.797166 ms gives best/cold 0.000447601; the
+registered 10x criterion fails. Local ARM L0, unisolated producer observations
+pending independent validation. [Record](records/20261115T1859Z-hec-coldcost13.json)
+[pcc:unverified].
+
+The [15 November zero-core genus-2 cold pilot](20261115-hec-zero-core-cold/)
+([PDF](20261115-hec-zero-core-cold/REPORT.pdf)) remains outside the admitted table.
+Six targets recover; six gates and 102 cold timed children pass. Z1 passes and
+the Z2 10x criterion fails. Fastest-existing/zero-core fixture medians are
+0.245 and 0.362, favoring existing controls. Local ARM L0, A/A maximum 1.091;
+producer observations pending independent validation [pcc:unverified].
+
+The [15 November complete point-sieve cold pilot](20261115-hec-point-cold/)
+([PDF](20261115-hec-point-cold/REPORT.pdf)) remains outside the admitted table.
+All18targets recover and18gates/306cold cells pass checks; E8passes and E9fails.
+Fastest-existing/point-lazy fixture medians0.066–0.430favor existing controls.
+Local ARM L0, A/Amax2.923; producer observations pending independent validation
+
+The [15 November linear-denominator hyperelliptic cold screen](20261115-hec-linear-cold/)
+([PDF](20261115-hec-linear-cold/REPORT.pdf)) is retained outside the admitted table.
+All18target gates and288cold cells pass; exact-work specialization/generic median
+runtime ratios are1.46–3.02x, while ratios against the fastest existing arm are
+0.70–1.43x. The10xpilot criterion fails. Local ARM L0, A/Amax2.55x; producer
+observations pending independent validation [pcc:unverified].
+
 The visual record of every performance measurement and speedup: report PDFs,
 graphs (SVG) and PNG renders, one directory per entry
 (`<YYYYMMDD>-<slug>/`). The study directory linked from each row holds the
@@ -44,6 +78,59 @@ The [retained wide-variable engine report](WIDE_VARS_UNADMITTED_20261021.md)
 remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
+
+The [14 November hyperelliptic IC follow-ups](20261114-hec-followups/)
+([PDF](20261114-hec-followups/REPORT.pdf)) record the hybrid residual solver, direct squarefree
+oracle and bounded genus-4 0/1/2-large-prime baseline. All 660 paired answers and 36 LP arms pass
+their checks. Median Hybrid/Fast solve ratio is 0.50–0.78 at genus2 p>=503; the direct oracle
+misses its threshold at genus4 p31, so the reference stays default. Unvalidated local L0 timing;
+external comparison not run. Record: `20261114T2210Z-hec-followups`.
+
+The [13 November native hyperelliptic IC engine and solver](20261113-hec-native-ic/)
+([PDF](20261113-hec-native-ic/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of an engineering
+before/after on round eight's genus 2–4 rows, eleven rows at five seeds each. The rows are named by
+equation, since ICV1 covers elliptic curves only. Record: `20261114T0356Z-hec-native-ic`.
+
+- **Solver.** The S2a sparse solver makes the same pivots and the same multiplications mod ℓ as the
+  S1 solver on all 55 (row, seed) pairs. At genus 2, p ≥ 503, its solve is 3.19–3.44× faster.
+- **End to end.** The native engine with S2a is 7.6–13× faster than the BigUint engine at genus 2,
+  12.6–18.6× at genus 3 and 16.7–18.9× at genus 4. These are wall-time ratios of means, post hoc.
+- **External comparison: not run.** No open hyperelliptic-IC implementation is known.
+- **Unvalidated.** The run used one L0 development host and measured wall clock only. There is no
+  `VALIDATION.json` and no matched rho, so it remains outside the admitted table. [pcc:unverified]
+
+Source of truth:
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T0356Z/).
+
+The [14 November S2b dense step-column block](20261114-hec-s2b-dense-solve/)
+([PDF](20261114-hec-s2b-dense-solve/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a second
+solver change on the same eleven rows, five repeats of five seeds each. Record:
+`20261114T2233Z-hec-s2b-dense-solve`.
+
+- **Exactness.** `Solver::Dense` gives the same `k`, trials, relations and solve rounds as S2a on all
+  275 runs; all 550 solves check `k·D₁ = D₂`.
+- **Solve.** At genus 2, p ≥ 503, the median paired S2a/Dense solve ratio is 4.04–5.75×, and the solve
+  falls to 18–26% of native wall time. Dense does 2.5–52% more multiplications mod ℓ there; the gain
+  is memory layout.
+- **External comparison: not run.**
+- **Unvalidated.** The host was shared (load average 81–95), not L0, and only wall clock was measured.
+  There is no `VALIDATION.json` and no matched rho, so it remains outside the admitted table.
+  [pcc:unverified]
+
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T2233Z/).
+
+The [14 November S3 inversion hygiene](20261114-hec-s3-inversion-hygiene/)
+([PDF](20261114-hec-s3-inversion-hygiene/REPORT.pdf)) keeps documentary copies of the first T2
+slice. Record: `20261115T0426Z-hec-s3-inversion-hygiene`.
+
+- **Exactness.** The old and new builds give identical stream hashes and identical runs.
+- **Counts.** Field inversions per walk step fall from 6.5–9.0 to 3.0–4.5. Per genus-3/4 oracle call
+  they fall from 9.4–16.2 to 3.6–5.2. The ≤ 5 bar fails on two genus-4 rows.
+- **Timing: not determined.** The A/A floor failed in both sets, at load average 50–401.
+- **Unvalidated.** This was a shared host. There is no `VALIDATION.json`, so the slice stays outside
+  the admitted table. [pcc:unverified]
+
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261115T0426Z/).
 
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
@@ -103,7 +190,6 @@ so this is counted scientific evidence rather than a performance result and
 remains outside the admitted table.
 
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
-is preserved separately pending validation admission.
 
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
 has documentary browsing copies (0.040s / 0.170s / 0.458s; n=1 per phase,
@@ -238,7 +324,6 @@ figures and exact proposed row are preserved there.
 | 2026-10-16 | [`20261016-isogeny-large-ell`](20261016-isogeny-large-ell/) | isogeny_algos kernel → codomain and one point image at large prime degree ℓ = 101–10007 (pair-by-pair vs remainder tree to ℓ = 250007), 256- and 511-bit p: √élu (Montgomery, short Weierstrass) vs projective / x-only Vélu; CSIDH-512 with √élu leaves | Montgomery √élu codomain 5.58× (256-bit) / 5.27× (511-bit) Vélu at ℓ = 10007 (was 1.51× / 1.62×), crossover ≈ ℓ 150 (was ≈ 1000); images 1.27–1.51×; Weierstrass √élu 2.7–2.8× x-only Vélu (was slower), x-only Vélu itself 15–25 % faster; remainder-tree path slower than pair-by-pair to ℓ = 250007; CSIDH-512 no change outside noise; all outputs equal Vélu (130/130 tests) | 4 vCPU shared VM, one run per setting, L0 wall | [`isogeny_algos/docs/large-ell-20261016`](../isogeny_algos/docs/large-ell-20261016/REPORT.md) ([PDF](20261016-isogeny-large-ell/REPORT.pdf)) |
 | 2026-10-16 | [`20261015-ic-improve4-01-genus3-relations`](20261015-ic-improve4-01-genus3-relations/) | genus-3 IC after cubic GHS, relation phase vs round 3's R2 (`r2:lpsgebw2`): C1 = field-level splitting test (Lucas test of the Cardano resolvent's cubic character, V_{n/3}(2+27·disc/P'^3)=2, n=q−(−3\|q); identical relations, shadow-verified every trial); C2 = 32 lockstep walks sharing one inversion (Montgomery); C3 = 70% oversampling + clique removal + SGE cx 32; C4 = C1+C2+C3 with κ re-tuned on training; held-out curves 0–4, q = 2^12–2^22; F_q-mult equivalents | C1 ADVANCES (exponent, constant, primitive): whole 0.756× at 2^22, exponent Δ −0.015 (12..22) / −0.034 (16..22), local 21–22 1.364 vs 1.408, per-trial log slope 9.75→2.71 units/bit. C2 ADVANCES (constant) 0.959×; C1+C2 0.715×, local 1.356. C3 TRADES (0.979×, LA 0.78×, gain shrinks with q). C4 TRADES: 0.690× at 2^22 but steep κ schedule, exponent +0.0045 (16..22). Distance to 4/3 (16..22 fit): 0.035 (C1+C2) vs 0.075. A/A Δ −0.0012; gate 0 41/41; every log verified | 4-core host, ≤ 3 single-threaded jobs, 4.5 GB cap (2^23 memory-limited) | [`research/ic_improve4_20261015/01-genus3-relations`](../research/ic_improve4_20261015/01-genus3-relations/README.md) |
 | 2026-10-15 | [`20261015-genus3-2lp-rebalance`](20261015-genus3-2lp-rebalance/) | genus-3 index calculus with double large primes on GHS cubic covers (q prime ≈ 2^10–2^20), whole method in F_q plus mod-ℓ multiplications: rebuilt baseline (κ = 2, tree-cycle elimination + Lanczos) against a factor base retuned per size (κ ∈ {0.5…2} on training curves) and structured Gaussian elimination before Lanczos; 12 paired test instances per size, all 360 logs verified | baseline fit q^1.383 over 2^14–2^20 (99% [1.382, 1.384]), relation phase q^1.332, linear algebra q^1.447 (row weight 7.8 → 14.4); retuned κ: q^1.373, paired ratio 0.961 at 2^20; SGE: q^1.419, ratio 0.781 at 2^14 → 0.906 at 2^20; rebuilt baseline / rho on Jac(C) 0.16 raw at 2^14 (n = 4) | 4-vCPU Xeon cloud container, unisolated (counts are the metric) | [study](../research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md), [run report](../research/ic_improve_20261014/04b-genus3-2lp-rebalance/reports/run-20261015T0200Z/run-report.pdf) |
-| 2026-10-16 | [`20261016-isogeny-round5`](20261016-isogeny-round5/) | isogeny_algos optimisation round 5: multi-prime NTT for long products over multi-limb prime fields (1/2/4/8 limbs), shared q-series for Φ_ℓ, lazy squarings, sliding-window polynomial powers, table reducer to 160 coefficients, BMSS linear-algebra loop fix; SEA over 2^127 − 1 profiled per phase; full benchmark suite main vs branch, min of two runs per arm | NTT 10–11× Karatsuba at n = 8192 (2/4 limbs), bit-identical output; Φ_ℓ for ℓ ≤ 89 over 2^127 − 1 9.4–9.6 s → 2.3 s (4.1×); SEA point count 2^127 − 1 1.14× geomean (0.82–1.42); BMSS linear algebra ℓ = 101 40/64/52× (40/256/511-bit); Kohel ℓ = 1009 2.0–2.4×; CSIDH-512, √élu, kernel/find groups unchanged; 148/148 tests | 4 vCPU shared VM, one run per profile, min of two per suite arm, L0 wall | [`isogeny_algos/docs/round5-20261016`](../isogeny_algos/docs/round5-20261016/REPORT.md) ([PDF](20261016-isogeny-round5/REPORT.pdf)) |
 | 2026-10-15 | [`20261015-p61-adjacency-pilot`](20261015-p61-adjacency-pilot/) | selected-degree 5/13/37/59 adjacency generation and distinct kernel-first replay on admitted vertices of the certified `p61-i0025` class over `p = 2^61 - 1`; nested one-, 64-, and 4,096-vertex windows | 4,096 vertices, 28,672 edges and 471,040 kernel coefficients: 191.551 s generation, 296.931 s replay, 41,543,871 logical and 8,552,556 gzip bytes; exact shard, chain, source, and summary replay; one shared-host observation, L0 descriptive; full-class projection 3.632 TB logical / 0.748 TB gzip | macOS arm64, shared and unisolated; concurrent 8-thread p61 census | [`research/p61_isogeny_class_20261014`](../research/p61_isogeny_class_20261014/) ([PDF](20261015-p61-adjacency-pilot/p61-adjacency-pilot-report.pdf)) |
 | 2026-10-15 | [`20261015-pdp-root-shape-replay`](20261015-pdp-root-shape-replay/) | the inherited-F4 decomposition stage (Koblitz curves over `F_{2^n}`, `n` prime) with and without cross-target root shape replay (F4Remake's idea, `KIC_F4_ROOT_REPLAY=1`), on the stage bench's `chain`, `chain-holdout` and `holdout` ladders, one binary; and `decompose_by_e3` (exact `m = 3`) against the pair-table oracle, 8 `(n, ℓ)` cells × 16 targets | default ÷ replay word operations **0.970, 0.954, 0.983**: replay costs more on all 9 cells (0.753–0.985×), verdicts identical; pilot on the frozen ladder 1.016 — a recorded null, the switch stays off; `decompose_by_e3` costs **553–34,901×** the table oracle's field multiplications — engineering, stage diagnostic | 4 vCPU Xeon 2.10 GHz, shared; deterministic counts | [`research/pdp_shape_replay_20261015`](../research/pdp_shape_replay_20261015/) ([report](../research/pdp_shape_replay_20261015/REPORT.pdf)) |
 | 2026-10-15 | [`20261015-binary-mitm-ladder-l9-l10`](20261015-binary-mitm-ladder-l9-l10/) | binary MITM oracle ladder, `ℓ = 9` over `F_{2^27}` and `ℓ = 10` over `F_{2^31}` on the non-Koblitz `y^2+xy=x^3+zx+1` (519 / 1,053-point bases; pair tables 134,594 / 554,304 sums, 4.1 / 16.9 MiB), 64 targets each, vs Gaudry pairs-and-solve on the same subspace | 0 disagreements on all 128 targets; median 0.293 ms vs 724.9 ms (2,473.9×) at ℓ=9 and 0.735 ms vs 3,119.2 ms (4,244.2×) at ℓ=10; max 2,076 / 4,212 counted point-adds vs 134,912 / 525,312 quartic solves; all witnesses group-verified — engineering, no exponent or vs_rho claim | arm64 macOS, shared, unpinned (L0 wall, contended by other builds) | [`research/binary_mitm_oracle_l9_l10_20261015`](../research/binary_mitm_oracle_l9_l10_20261015/) ([PDF](20261015-binary-mitm-ladder-l9-l10/REPORT.pdf)) |
@@ -341,3 +426,134 @@ above.
 The [Certicom 131-bit symmetry-breaking + double-large-prime study](20261025-certicom131-symlp/) is not admitted to the results table until it has its own `VALIDATION.json`. On this host (single thread, seed 20261025), the symmetric-coordinate `m=2` decomposition oracle for ECC2-131 runs at 5.24 Msteps/s, about 28.7× the per-point baseline and 1.20× the same-field rho adding-walk step (4.35 Msteps/s); for ECCp-131 the interval factor base gives no saving (0.09 Msteps/s, 0.6× its baseline, 0.02× rho). Direct (zero-large-prime) relations are ~5e-7 of decompositions, so the double-large-prime graph carries the yield; the planted full-size pipeline recovers a logarithm through it on both real groups (known logs, synthetic target, no published-point claim). Derived distance to rho at n=131 is ~2^22 steps (m=2 floor 2^{2n/3} vs rho 2^{n/2}), a constant-factor the two accelerators do not change; the 2n/3 exponent matches PR #2493's measured 0.647 slope. Source: [`research/certicom131_symlp_20261025`](../research/certicom131_symlp_20261025/REPORT.pdf).
 
 The [R12 rho ns/step reconciliation](20261026-r12-rho-ns-per-step/) (ecbench tuned versus strong rho 5.5 to 9.6x per step at n = 41 to 61; wide versus fold backend 1.07 to 1.08x at m = 83, both on one arm64 L0 host) is a diagnostic and is not admitted to the results table; it has no `VALIDATION.json`.
+
+
+| 2026-11-15 | [`20261115-isogeny-dual-projected`](20261115-isogeny-dual-projected/) | explicit degree-three dual transport of the witness-free projected destination base, ten cold arms at order 229 and B=8/16/32/64 | 480/480 cold children and independent replays; 96 paired cells and 13,482 relation witnesses matched. At B=64, mean whole-child `S_group`: direct dual 2,492.134, direct inverse 2,559.868, destination direct 2,431.537, BSGS 4.361, signed rho 7.979; inverse/dual 1.027179, dual/rho 312.322. Mean whole-child CPU direct dual/inverse 9.006/15.557 ms. Complete portable `S` unset. | Darwin arm64 shared L0; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/RESULTS_V1.md); [run report](../research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/reports/run-20261115T054358Z/RUN_REPORT_V1.md); [run PDF](20261115-isogeny-dual-projected/run.pdf); [results PDF](20261115-isogeny-dual-projected/results.pdf) |
+| 2026-11-15 | [`20261115-isogeny-fiber-grid-v2`](20261115-isogeny-fiber-grid-v2/) | frozen 384-child order-229 different-j factor-base grid accounting replay, eight arms at B=8/16/32/64 | 384/384 cold solves and independent replays; native V1/V2 audit compared 33,705 relation witnesses with zero mismatches. At B=64, mean whole-child `S_group`: χ inverse 14,876.431, direct inverse 2,559.868, destination direct 2,431.537, BSGS 4.361, signed rho 7.979; inverse/destination direct 1.053, χ/direct inverse 5.811. Complete portable `S` unset; disjoint CPU phase table is descriptive. | Darwin arm64 shared L0, high concurrent load; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/factor_base_grid_20261016/RESULTS_V2.md); [run PDF](20261115-isogeny-fiber-grid-v2/run.pdf); [results PDF](20261115-isogeny-fiber-grid-v2/results.pdf) |
+| 2026-10-16 | [`20261016-isogeny-fiber-primitive-price`](20261016-isogeny-fiber-primitive-price/) | disjoint Fp² field-call census of 60 cold inverse-Vélu/full-image/BSGS/rho/rho-A/A children at order 1,201; independent Linux V2 and order-229 nine-arm replay; hard-capped larger-order full-image probe | 60/60 exact V2 deterministic matches, 1,275 scalar and 6,126 relation-witness replays. Cold N1 mean whole-child `S_group`: full-image 88,499.672, inverse 134.457, rho 4.905; full/inverse 658.201 and inverse/rho 27.410. Inverse Fp² multiply calls inside/outside group: 9,286/29,140; portable price unset. Linux V2 60-child and V4 108-child independent replays passed; order-2,437 full-image exited 134 at the 512 MiB address-space cap. | Darwin arm64 shared L0; GitHub-hosted Ubuntu x86-64 L1; no L2 wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/primitive_price_20261016/RESULTS_V1.md); [run PDF](20261016-isogeny-fiber-primitive-price/run.pdf); [results PDF](20261016-isogeny-fiber-primitive-price/results.pdf) |
+| 2026-10-16 | [`20261016-chi-heldout-nine-arm`](20261016-chi-heldout-nine-arm/) | χ, direct pair, source/quotient S3, direct inverse-Vélu, full-image, BSGS, signed rho and rho A/A on four held-out order-229 targets, three rounds | 108/108 scalars and 996 relation witnesses independently checked; six relation arms had identical support. Mean cold `S_group`: inverse 104.663, full-image 5,990.706, rho 7.979, BSGS 4.361; full/inverse 57.238 and inverse/rho 13.117. Whole-child CPU full/inverse 58.728/6.700 ms, ratio 8.766; rho A/A/rho 0.995. Portable `S` pending. | Darwin arm64, shared L0; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RESULTS_V4.md); [run report](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RUN_REPORT_V4.md); [run PDF](20261016-chi-heldout-nine-arm/run.pdf); [results PDF](20261016-chi-heldout-nine-arm/results.pdf) |
+| 2026-10-16 | [`20261016-chi-heldout-seven-arm`](20261016-chi-heldout-seven-arm/) | exhaustive source/quotient S3 polynomial pair sets and χ, direct-pair, source/quotient S3, BSGS, signed rho, rho A/A on four held-out order-229 targets, three rounds | 229/229 source and quotient pair sets independently matched; 84/84 scalars and 664 relation witnesses checked. Mean cold `S_group`: χ 140.672, direct pair 88.908, source/quotient S3 87.470, rho 7.979, BSGS 4.361. S3/rho counted-group ratio 10.962; mean whole-child CPU source S3/rho 5.824/5.791 ms with rho A/A/rho 1.058. Direct inverse/full-image and portable `S` pending. | Darwin arm64, shared L0; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RESULTS_V3.md); [run report](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RUN_REPORT_V3.md); [run PDF](20261016-chi-heldout-seven-arm/run.pdf); [results PDF](20261016-chi-heldout-seven-arm/results.pdf) |
+| 2026-10-16 | [`20261016-inverse-velu-four-order`](20261016-inverse-velu-four-order/) | direct inverse-Vélu, source BSGS, signed rho and rho A/A; N1/N64 at four different-`j` subgroup orders, three rounds | 96/96 children and 3,120 scalars checked. Cold N1 `S_group` inverse/rho: 314.049/3.221 at order 2,437, 341.857/3.676 at 5,569, 611.278/2.792 at 9,679, 730.064/3.964 at 19,249; ratios 97.505, 92.994, 218.951, 184.163. Full-image and complete portable `S` pending. | Darwin arm64, shared L0; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/trend_four_cell_v1/TREND_RESULTS_V1.md); [run report](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/trend_four_cell_v1/TREND_RUN_REPORT_V1.md); [run PDF](20261016-inverse-velu-four-order/run.pdf); [results PDF](20261016-inverse-velu-four-order/results.pdf) |
+| 2026-10-16 | [`20261016-chi-heldout-five-arm`](20261016-chi-heldout-five-arm/) | χ chord resultant, direct pair table, source BSGS, signed rho and rho A/A on four held-out order-229 targets, three rounds | 60/60 scalars and 332 relation witnesses checked; mean cold `S_group`: χ 140.672, direct pair 88.908, rho 7.979, BSGS 4.361. χ/rho counted-group ratio 17.629; mean whole-child CPU 14.304/6.428 ms. Three planned relation arms and complete portable `S` pending. | Darwin arm64, shared L0; no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RESULTS_V2.md); [run report](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/HELDOUT_RUN_REPORT_V2.md); [run PDF](20261016-chi-heldout-five-arm/run.pdf); [results PDF](20261016-chi-heldout-five-arm/results.pdf) |
+| 2026-10-16 | [`20261016-chi-resultant-exactness`](20261016-chi-resultant-exactness/) | Direct χ chord-resultant exactness and metered replay on the different-`j` order-229 cell | 231/231 independent pair-set matches, 136 valid pairs, 132 empty cases; 3,640 resultants, 7,410 gcds, 6,598 exact checks, 6,358 rejections; 7,094,272 bytes peak RSS and 0.39 s real for metered repeat. No cross-method ratio. | Darwin arm64, shared L0 | [study and raw records](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/RESULTS_V1.md); [run report](../research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/RUN_REPORT_V1.md); [run PDF](20261016-chi-resultant-exactness/run.pdf); [results PDF](20261016-chi-resultant-exactness/results.pdf) |
+| 2026-10-16 | [`20261016-isogeny-inverse-velu`](20261016-isogeny-inverse-velu/) | direct inverse-Vélu image-base construction versus full source census, source BSGS, signed rho and rho A/A; 60 cold children at `p=1237,r=1201`, prefixes 1/4/16/64, three rounds | At N64, `S_group` inverse 151.595, full census 1,532.302, rho 4.071 and BSGS 1.315; paired group full/inverse 10.108 and inverse/rho 37.235. Whole-child CPU full/inverse 43.664 and inverse/rho 9.159, with rho A/A 0.823–1.054. All 1,275 scalars and 6,126 relation witnesses checked; 255 inverse/full rows identical. Complete portable S unset. | Darwin arm64, shared L0; host CPU-model sysctl denied, no isolated wall admission | [study and raw records](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/RESULTS.md); [run report](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/reports/run-20261016T0605Z-v2/REPORT.md); [run PDF](20261016-isogeny-inverse-velu/run.pdf); [results PDF](20261016-isogeny-inverse-velu/results.pdf) |
+| 2026-10-16 | [`20261016-isogeny-fiber-order1201-linux`](20261016-isogeny-fiber-order1201-linux/) | independent Linux replay of frozen seven-arm full-image order-1,201 panel; 84 children over prefixes 1/4/16/64 and three rounds | At N64, median whole-child process CPU full-image/rho 722.485 (716.116–748.995), full-image/BSGS 1,565.199 (1,564.428–1,569.442), rho A/A 1.003 (1.003–1.017). All 1,785 scalars and 12,486 relation witnesses checked; 84 arithmetic vectors matched Darwin. Complete portable S unset. | Ubuntu 24.04 Azure VM, four Xeon 6973P-C vCPUs, unreserved L1 descriptive | [study and raw archive](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/linux_host_order1201_v1/README.md); [run report](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/reports/run-20261016T0550Z-linux-order1201/REPORT.md); [run PDF](20261016-isogeny-fiber-order1201-linux/run.pdf); [results PDF](20261016-isogeny-fiber-order1201-linux/results.pdf) |
+| 2026-10-16 | [`20261016-isogeny-fiber-five-price`](20261016-isogeny-fiber-five-price/) | native deterministic missing-price sensitivity across five frozen different-j cells, 60 paired rows and 8,925 independently replayed scalar outputs; no new DLP solver or timing run | At N64, median extra omitted rho GAE per observed step needed to tie the full-image group-count lower bound if omitted full-image work costs zero: 112.973/303.573/334.844/288.595/1,390.865 at orders 229/421/433/457/1,201. New fifth three-round range 1,266.482–1,575.602. Threshold only; complete portable S unset. | Darwin arm64, shared L0; checked arithmetic, timing irrelevant | [study, protocol and 60 rows](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/sensitivity_five/RESULTS.md); [run report](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/reports/run-20261016T0153Z-five-price/REPORT.md); [run PDF](20261016-isogeny-fiber-five-price/run.pdf); [results PDF](20261016-isogeny-fiber-five-price/results.pdf) |
+| 2026-10-16 | [`20261016-isogeny-fiber-linux-host`](20261016-isogeny-fiber-linux-host/) | independent Linux native replay of the frozen three-cell four-order panel: 252 cold children, seven arms, three rounds and N=1/4/16/64; 5,355 scalar outputs and 37,061 relation witnesses checked | At N64, median whole-child CPU full-image/rho ratios at orders 421/433/457: 68.750/56.331/59.050; full-image/BSGS: 135.798/109.094/114.506; rho A/A: 0.994/1.006/0.994. Counted arithmetic matched all 252 Darwin children. Descriptive CPU, with complete portable S unset. | Ubuntu 24.04 Azure hosted VM, four AMD EPYC 9V74 vCPUs, L1 descriptive | [study and raw archive](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/linux_host_v1/README.md); [run report](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/reports/run-20261016T0050Z-linux-host/REPORT.md); [run PDF](20261016-isogeny-fiber-linux-host/run.pdf); [results PDF](20261016-isogeny-fiber-linux-host/results.pdf) |
+| 2026-10-15 | [`20261015-isogeny-fiber-order1201`](20261015-isogeny-fiber-order1201/) | first frozen eligible different-j cell above order 1,000, `p=1237,r=1201`; exact full-fiber audit and seven-arm cold `N=1/4/16/64` solve, 84 children; five-order native count derivation | At N64 median `S_group` per target: full rational image 1,532.302, source rho 4.071, source BSGS 1.315; paired full/rho 376.364 and full/BSGS 1,165.090. All 1,785 order-1,201 scalars and 12,486 relation witnesses independently replayed; five-order total 420 children/8,925 scalars. Complete portable S and scaling exponent remain unset. | Darwin arm64, shared L0; 512 MiB child cap, no isolated wall admission | [study, raw records, and results](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/order1000/RESULTS.md); [run PDF](20261015-isogeny-fiber-order1201/run.pdf); [results PDF](20261015-isogeny-fiber-order1201/results.pdf); [screen PDF](20261015-isogeny-fiber-order1201/screen-run.pdf); [fiber PDF](20261015-isogeny-fiber-order1201/fiber-run.pdf) |
+| 2026-10-15 | [`20261015-isogeny-fiber-price-sensitivity`](20261015-isogeny-fiber-price-sensitivity/) | native derivation from 48 frozen matched full-image/rho cold child pairs across orders 229, 421, 433, 457; missing-price threshold, no new timing measurement | At N64, median extra omitted rho GAE per observed step needed to tie the full-image group-count lower bound, setting all omitted full-image costs to zero: 112.973, 303.573, 334.844, 288.595; all-row minimum 99.105, maximum 46,594.667. This is a sensitivity threshold, not a complete portable S or measured operation price. | Darwin arm64, shared L0; deterministic checked counts, no isolated timing | [study and 48 raw derivation rows](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/sensitivity/RESULTS.md); [run PDF](20261015-isogeny-fiber-price-sensitivity/run.pdf); [results PDF](20261015-isogeny-fiber-price-sensitivity/results.pdf) |
+| 2026-10-15 | [`20261015-isogeny-fiber-four-order-trend`](20261015-isogeny-fiber-four-order-trend/) | cold 64-target different-j degree-three full-image relation solve and six matched controls across subgroup orders 229, 421, 433, 457; 336 child runs and 7,140 independently checked scalar outputs | Median counted `S_group` full image 148.49, 405.89, 332.16, 336.69 versus direct rho 6.64, 5.59, 5.14, 5.31; paired full/rho ratios 22.355, 72.401, 64.275, 63.389. Full portable `S` remains unpriced; four-order span is insufficient for an exponent. | Darwin arm64, shared L0; deterministic counts and independent arithmetic replay, no isolated wall or second-host performance replay | [study and raw records](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/RESULTS_V2.md); [run PDF](20261015-isogeny-fiber-four-order-trend/run-batch-v1.pdf); [results PDF](20261015-isogeny-fiber-four-order-trend/results-v2.pdf) |
+| 2026-10-15 | [`20261015-isogeny-fiber-portable-trend`](20261015-isogeny-fiber-portable-trend/) | re-derived cold counted group-addition-equivalent lower bounds and separate Fp multiplication/inversion axes for 84 checked order-229 child solves; bounded larger-order candidate screen with independent arithmetic replay | At N=64, median `S_group` per target: full rational image 148.49, direct source BSGS 1.76, negation rho 6.64; paired full/rho 21.544–23.402 and full/BSGS 83.618–85.200 across three rounds. Complete portable `S` remains unpriced. The screen checked 30 primes, accepted eight rows and replayed 512 map witnesses; V2 selects prime-to-characteristic orders 421, 433 and 457 for a pending solve panel. | Darwin arm64, shared L0; deterministic counts and screen, no isolated timing | [study and raw records](../research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/RESULTS_V1.md); [portable run PDF](20261015-isogeny-fiber-portable-trend/run-portable-v1.pdf); [screen run PDF](20261015-isogeny-fiber-portable-trend/run-screen-v1.pdf); [results PDF](20261015-isogeny-fiber-portable-trend/results-v1.pdf) |
+| 2026-10-15 | [`20261015-different-j-order-batch`](20261015-different-j-order-batch/) | cold 1/4/16/64-target order-229 ECDLP through a different-`j` degree-three full rational-image factor base versus source projected relations, isogeny image, destination direct, reusable source BSGS, negation rho and rho A/A; 84 fresh children | At `N=64`, median whole-child CPU full image 72,774 µs, source BSGS 6,383 µs, negation rho 7,653 µs; median paired full/BSGS 11.139 and full/rho 9.509. Full-image/destination-direct two-sum support 98/90 keys, 40 shared. All 1,785 scalar outputs and 13,141 relation witnesses independently replayed. Portable counted `S`, isolated wall and scaling remain open. | Darwin 25.6 arm64 T6041, shared L0 | [study and raw records](../research/isogeny_torsion_fibers_20261012/different_j_order_batch_20261015/RESULTS.md); [run PDF](20261015-different-j-order-batch/run.pdf); [results PDF](20261015-different-j-order-batch/results.pdf) |
+| 2026-10-15 | [`20261015-torsion-pairing-transfer`](20261015-torsion-pairing-transfer/) | exact cold Tate-pairing transfer to a multiplicative-field DLP on the same two frozen `F_(p²)` targets as matched negation rho; native V1 and phase-separated V2, three rounds per target | V2 cold solve plus independent replay median `S_cpu_gae` 163,807.34 at `r=19` and 21,978.75 at `r=61`, versus rho 64.01 and 32.76; paired complete-solve CPU/rho ratios 2,666.48 and 660.71. Charging three extra post-solve pairing checks gives 2,781.81 and 698.15. All six pairing scalar replays, 18 extra pairing checks, and 12 rho controls passed. Candidate search used 26,469/27,169 and 39,115/39,673 selection extension multiplications. V1 records and run report retained. | Darwin 25.6 arm64, shared, L0 | [study and raw records](../research/isogeny_torsion_fibers_20261012/pairing_transfer_20261015/RESULTS.md); [results PDF](20261015-torsion-pairing-transfer/results.pdf); [V2 run PDF](20261015-torsion-pairing-transfer/run-v2.pdf); [V1 run PDF](20261015-torsion-pairing-transfer/run-v1.pdf) |
+| 2026-10-14 | [`20261014-torsion-extension`](20261014-torsion-extension/) | cold native ECDLP over four ordinary `F_(p²)` fields; V3 seven-arm run followed by V4 scaling-isomorphism attribution control, matched negation/A/A/six-class rho; three rounds per size | V4 at `r=811`, median `S_cpu_gae`: projected 198.17, χ index 277.34, degree-three image 200.41, scaling image 204.56, negation rho 6.91; paired complete-cost χ/rho 50.27 and scaling/rho 28.53. Independent arithmetic replay checked 87/96 V4 arm scalars; nine raw-pair rows capped. The retained V3 run checked 75/84. Local shared-host CPU conversion only; χ polynomial oracle and pairing transfer remain unpriced. | Darwin 25.6 arm64, shared, L0 | [V4 study](../research/isogeny_torsion_fibers_20261012/extension_field_20261014/REPORT.md); [V4 results PDF](20261014-torsion-extension/report.pdf); [V4 run PDF](20261014-torsion-extension/run-report.pdf); [V3 results PDF](20261014-torsion-extension/report-v3.pdf) |
+| 2026-10-13 | [`20261013-isogeny-fiber-full-cost`](20261013-isogeny-fiber-full-cost/) | cold native source/destination relation solves, matched negation rho and duplicate-rho controls; four non-isomorphic degree-three pairs, eight public targets per size, five measured rounds | V3 complete current-thread CPU transport/rho ratios: 3.449, 9.789, 25.459, 81.820 at subgroup orders 103, 439, 1,613, 6,427; transport/source 1.043, 1.028, 1.058, 0.975, with all paired intervals crossing 1; 640/640 measured answers independently checked. V1 wall and V2 CPU control failures retained; L2 wall and independent-host gates remain open | Darwin arm64, shared, L0 | [study and three run reports](../research/isogeny_torsion_fibers_20261012/full_cost_20261013/REPORT.md); [results PDF](20261013-isogeny-fiber-full-cost/report.pdf) |
+| 2026-10-13 | [`20261013-isogeny-nonisomorphic`](20261013-isogeny-nonisomorphic/) | explicit non-isomorphic degree-three transport with rational kernel 3; source/destination relation solves and matched negation rho on eight same-source order-103 targets | mean counted-group `S`: rho 8.178, source relations 40.793, destination relations 46.729; destination/source counted-total ratio 3,794/3,312 = 1.145531; 24/24 independently verified. V1 timing wrapper failed after complete native output; clean v2 and replay passed. Full native-cost and wall comparisons remain open | Darwin arm64, shared, L0 | [study](../research/isogeny_torsion_fibers_20261012/nonisomorphic_pair_20261013/REPORT.md); [final run](../research/isogeny_torsion_fibers_20261012/nonisomorphic_pair_20261013/reports/run-20261013T1744Z/README.md) |
+| 2026-10-13 | [`20261013-isogeny-iso-control`](20261013-isogeny-iso-control/) | degree-three versus public scaling-isomorphism transport and charged six-class rho; counted group operations on 16 same-source targets | order 211 mean `S`: negation rho 5.938, six-class rho 6.342, source relations 50.186, degree-three relations 41.917, scaling relations 43.423; scaling/degree-three counted-total ratio 1.035927; 80/80 verified arm records. At order 19, three charged six-class restarts yielded mean `S` 16,320.893 versus negation rho 10.725 | Darwin arm64, shared, L0 | [study](../research/isogeny_torsion_fibers_20261012/paired_round/iso_control_20261013/REPORT.md); [final run](../research/isogeny_torsion_fibers_20261012/paired_round/iso_control_20261013/reports/run-20261013T1634Z/README.md) |
+| 2026-10-12 | [`20261012-isogeny-fiber-paired`](20261012-isogeny-fiber-paired/) | explicit degree-3 same-target transport, source/destination relation solves, matched negation rho; counted group operations on 16 public targets | order 211 mean `S`: rho 5.938, source 50.186, transport 41.332; source/transport counted-group ratio 1.21424; 48/48 verified. Both destinations are also base-field isomorphic to their sources; isomorphism-only solve and full native-work pricing remain open | Darwin arm64, shared, L0 | [study](../research/isogeny_torsion_fibers_20261012/paired_round/REPORT.md); [final run](../research/isogeny_torsion_fibers_20261012/paired_round/reports/run-20261013T0200Z/README.md) |
+| 2026-10-13 | [`20261013-gaudry-quartic-d4`](20261013-gaudry-quartic-d4/) | `C₄`, one `k = 4` decomposition over `F_{p⁴}` at `p = 269`: FGHR's `D₄`-symmetric system on a curve with rational 2-torsion (`Y`-line base) against Gaudry's `S₄` system (`x`-line base); 20 targets, exactness against meet in the middle, decomposition rates on 8,000 targets | `C₄` `1.21·10¹²` → `2.54·10¹⁰` `F_p` multiplications (47.5–48.4×), quotient dimension 4,096 → 512, 3 min → 5 s a solve; on §11.16's model the crossover with rho moves from `2^{150}` to `2^{135}` (`h = 2`); 1 of 20 targets degenerate — engineering, a constant | 4 vCPU Xeon 2.10 GHz, shared, 4 threads | [`research/gaudry_quartic_d4_20261013`](../research/gaudry_quartic_d4_20261013/) |
+| 2026-10-13 | [`20261013-ecbench-frontier`](20261013-ecbench-frontier/) | evidence synthesis and current-binary ECBench replay audit across the ten-base catalog, torsion/Frobenius symmetry, F4/F5/F6-IC, native pair/subtraction root finding, and the N83 dense five-byte root index | cold one-target frontier remains signed-Frobenius rho (medium-tier 1.089x floor [0.927, 1.261]); compact orbit is the best measured factor-base arm but 9.985x matched rho at n17; admitted retained-setup online frontier is n61 rho/IC 13.9x [9.8, 19.1], while N83 is exploratory at 18.528x; its complete IC process is 339.068 s, reported separately from rho online and not as a matched cold ratio; current replays: factor-base 8/8 and representative F4/F5/F6 7/7 identical, root-finder session 120/168 with 48 inherited-F4 solver-counter mismatches retained | source studies span their recorded hosts; current auditor: virtual AMD EPYC 9V74, Linux x86_64, `ECBHW1h7373da65e433`; no new wall benchmark | [`research/ecbench_frontier_20261013`](../research/ecbench_frontier_20261013/) ([report PDF](20261013-ecbench-frontier/REPORT.pdf)) |
+| 2026-10-13 | [`20261013-n83-dense-root`](20261013-n83-dense-root/) | opt-in dense packed S3 root table and prefix-base widths K1271/K1500/K1798 on exact N83 Koblitz `a=1`; one public target paired with selected strong rho, then a secondary 64-point panel | K1798 dense: 298,468 actual base points, 8 GiB allocated slots, 169,069.8 mean probes versus K1500 dense 300,021.9; paired difference 130,952.1 probes, 95% bootstrap [52,057.7, 209,990.8]; one-target online 63.324 ms versus same-point rho 1,173.293 ms, exploratory ratio 18.528; two K1500 regular 900 s timeouts retained; 256 completed panel rows independently replayed | Apple M4 Pro 14 cores, shared, no host-isolation receipt (exploratory CPU times) | [`research/n83_dense_root_20261013`](../research/n83_dense_root_20261013/) ([result PDF](../research/n83_dense_root_20261013/REPORT.pdf), [primary](../research/n83_dense_root_20261013/reports/run-20261013T0942Z/), [panel](../research/n83_dense_root_20261013/reports/run-20261013T1018Z/)) |
+
+
+
+
+
+
+
+| Date | Documentary run outside admitted table | Headline measurement | Host and isolation | Study record |
+| --- | --- | --- | --- | --- |
+| 2026-11-16 | [N83 K600 zero-trial preflight](20261116-n83-k600-zero-trial-preflight/) ([run PDF](20261116-n83-k600-zero-trial-preflight/run-report.pdf), [results PDF](20261116-n83-k600-zero-trial-preflight/results-report.pdf), [SVG](20261116-n83-k600-zero-trial-preflight/diagram.svg), [150 dpi PNG](20261116-n83-k600-zero-trial-preflight/diagram.png)) | One native outer wall 4,040.215208 ms; external second-resolution endpoints span 5 s; cgroup peak 105,897,984 B of a 4,294,967,296 B limit; 0 trials, relations and SAT calls; no comparative ratio | Shared macOS ARM64 host, native supervisor plus Linux ARM64 container, one CPU, 4 GiB, no swap, no network; resource-capped preflight, not isolation-tier IC comparison | [Source-linked report and raw run receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-6-zero-trial-pass/REPORT.md) |
+
+This row records a passed source/input/resource preflight. It does not report a
+factor-base search result, cold one-target IC runtime or matched rho. It is
+outside the admitted results table because it has no cryptographic outcome or
+paired reference. The earlier stopped attempts and setup builds remain in the
+study records.
+
+The [16 November N83 K600 host-native supervisor build](20261116-n83-k600-mac-supervisor-build/)
+([run PDF](20261116-n83-k600-mac-supervisor-build/run-report.pdf),
+[results PDF](20261116-n83-k600-mac-supervisor-build/results-report.pdf),
+[SVG](20261116-n83-k600-mac-supervisor-build/build-intervals.svg),
+[150 dpi PNG](20261116-n83-k600-mac-supervisor-build/build-intervals.png))
+records one shared macOS ARM64 setup build with Rust 1.99.1 and one Cargo
+job. The complete wrapper interval was 1,531 s by UTC endpoints; Cargo
+reported 1,530 s. The executable digest, 51 disk samples and terminal exit
+are in the [source-linked study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-3-mac-supervisor-build/REPORT.md).
+There is one sample per interval and no comparative ratio. This is a
+documentary setup measurement outside the admitted results table; it does
+not report relation yield, rank, descent, matched rho or cold one-target IC
+cost.
+
+The [16 November N83 K600 source-matched charged build](20261116-n83-k600-charged-build/)
+([PDF](20261116-n83-k600-charged-build/run-report.pdf),
+[SVG](20261116-n83-k600-charged-build/build-cost.svg),
+[150 dpi PNG](20261116-n83-k600-charged-build/build-cost.png))
+records one Linux ARM64 setup build on a shared local macOS host with a hard
+12 GiB container cgroup. The outer interval was 2,978 s; Rust, solver and
+runtime-image stage intervals to receipt start were 1,540.905, 523.518 and
+199.725 s. All stages, image/source hashes and cleanup passed. There is one
+sample per interval and no comparative ratio. The [study report and raw
+receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-charged-retry/attempt-6-build-success/REPORT.md)
+are authoritative. This documentary setup timing has no relation, rank,
+descent, matched rho or cold one-target IC result, and therefore remains
+outside the admitted results table under the validation gate.
+
+The [15 November N83 K600 v3 local-store construction control](20261115-n83-k600-v3-local-custody/)
+([PDF](20261115-n83-k600-v3-local-custody/REPORT.pdf),
+[SVG](20261115-n83-k600-v3-local-custody/custody-flow.svg),
+[150 dpi PNG](20261115-n83-k600-v3-local-custody/custody-flow.png))
+records one primary GF(2^83) base construction and independent local-store
+import: 600 signed-Frobenius columns, 99,600 points, and an exact match to
+the historical 3,025,798-byte compressed object. Construction took
+1,102.783 ms; generic replay took 753.807 ms; local publish and fresh pull
+took 36.091 and 22.700 ms; the producer's in-process wall was 1,963.477 ms.
+These are single-sample L0 diagnostics on a shared macOS arm64 Darwin 27.2.0
+host, with no comparative ratio. The [study result and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/RESULT.md)
+are the source of truth. No relation search, matched rho or cold IC total
+runtime was measured, so this documentary record remains outside the admitted
+table; the temporary file store was not an S3 publication.
+The repository bot subsequently archived the object and PNG to its configured
+S3 artifact store; the [fresh GET and hash addendum](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/S3_CUSTODY_ADDENDUM_20261115.md)
+records that later custody event without changing the run's scope.
+
+The [15 November K600 native read-only S3 adoption](20261115-k600-s3-adoption/)
+([PDF](20261115-k600-s3-adoption/RUN_REPORT.pdf),
+[SVG](20261115-k600-s3-adoption/timings.svg),
+[150 dpi PNG](20261115-k600-s3-adoption/timings.png)) preserves the separate
+custody control against the exact 3,025,798-byte archived object. Two fresh
+GETs from distinct empty caches and native v3 imports passed, each replaying
+99,600 points and 600 representatives. Shared Darwin arm64 L0 diagnostics:
+S3 pulls 2099.774 and 2166.021 ms; generic replays 767.248 and 765.460 ms;
+in-process walls 2907.904 and 2973.111 ms. The [study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/RUN_REPORT.md)
+are authoritative. This custody measurement has no relation, rank, descent,
+cold IC total or matched rho, so it remains outside the admitted results table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,25 @@
+{
+  "toolchains": [
+    "leanprover/lean4:v4.35.0",
+    "leanprover/lean4:v4.34.1"
+  ],
+  "argv": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "20",
+    "/home/agent/.elan/bin/lean",
+    "-j1",
+    "/workspace/scratch/ct437-coefficient-separation-diagnostic/structural-lemmas.lean"
+  ],
+  "exits": [
+    0,
+    0
+  ],
+  "scope": "isolated three generic structural lemmas, full03 not yet run",
+  "actual_local_commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "actual_committed_paths": 202,
+  "prior_receipt_paths_10": "only second-stage newly changed path count; total commit202 from actual diff-tree, no file loss",
+  "prior_governance_claim_typo": "bfca95 has literal323d? placeholder; correct preregistration isPCC-20261116-332d4d, no claim323d exists/was accepted",
+  "remote_publication": false
+}

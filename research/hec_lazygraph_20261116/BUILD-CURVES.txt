@@ -1,0 +1,21 @@
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-lazygraph v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_lazygraph_20261116)
+warning: function `value` is never used
+ --> ../hec_native2lp_20261116/graph.rs:5:8
+  |
+5 | pub fn value(f:&Fp,row:&Row,x:&[u64])->u64{row.iter().fold(0,|z,&(i,a)|f.add(z,f.mul(a,x[i as usize])))}
+  |        ^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `check` is never used
+  --> ../hec_native2lp_20261116/graph.rs:15:9
+   |
+ 8 | impl Graph{
+   | ---------- method in this implementation
+...
+15 |  pub fn check(&mut self,small:&[u64],large:&[u64]){assert_eq!(small.len(),self.dim+1);assert_eq!(large.len(),self.parent.len());asse...
+   |         ^^^^^
+
+warning: `hec-lazygraph` (bin "lazycurve-control") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 2.58s

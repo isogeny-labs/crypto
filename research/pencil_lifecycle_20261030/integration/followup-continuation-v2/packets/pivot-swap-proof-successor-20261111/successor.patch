@@ -1,0 +1,212 @@
+--- a/PivotSwap.lean.txt
++++ b/PivotSwap.lean.txt
+@@ -57,7 +57,9 @@
+ theorem swap_involutive (a b i : Fin 4) : swapIndex a b (swapIndex a b i) = i := by
+   by_cases hab : a = b
+   · subst b
+-    simp [swapIndex]
++    by_cases hi : i = a
++    · subst i; simp [swapIndex]
++    · simp [swapIndex, hi]
+   · have hba : b ≠ a := Ne.symm hab
+     by_cases ha : i = a
+     · subst i; simp [swapIndex, hab, hba]
+--- a/launch.py
++++ b/launch.py
+@@ -3,7 +3,7 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-renewal-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-swap-proof-successor-20261111')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1794398400
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+@@ -25,8 +25,8 @@
+ assert release['campaign_total_seconds']==129600 and release['deadline']=='2026-11-11T12:00:00Z'
+ assert type(F['prior_attempt_conservative_debit_seconds']) is int, 'campaign ledger binding pending'
+ assert type(F['remaining_before_attempt_seconds']) is int
+-assert F['prior_attempt_conservative_debit_seconds']==1200
+-assert F['remaining_before_attempt_seconds']==128400
++assert 0<=F['prior_attempt_conservative_debit_seconds']<=129600-2400
++assert F['remaining_before_attempt_seconds']>=2400
+ assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==129600
+ assert release['prior_debit_seconds']==F['prior_attempt_conservative_debit_seconds']
+ assert release['remaining_before_attempt_seconds']==F['remaining_before_attempt_seconds']
+@@ -150,7 +150,7 @@
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-pivot-swap-renewal-20261111-'+phase
++  unit='pencil-pivot-swap-proof-successor-20261111-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',
+--- a/replay.py
++++ b/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-renewal-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-swap-proof-successor-20261111')
+ ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+--- a/freeze.json
++++ b/freeze.json
+@@ -4,22 +4,22 @@
+   "files": {
+     "launch.py.patch": "2cfbb47f53f0f6069da0808b6fe0daaff3a4252aa238fbe5fa5548757d747152",
+     "Controls.lean.txt": "f7e17f2ea9b1a331c805cb0faf2be610c4edc691e6d54e132814adaeb88bf9b9",
+-    "replay.py": "25420f6ac4363d0131e68af50f40d860e5999ce51d1ac530526e0e8b728ee1ee",
++    "replay.py": "3cd59170142395d7faae4e3f4a4e0274f28d35d6379dfbdb05867b9db0ee9ab3",
+     "names.json": "83fb9beccf08c88a28a42393427df16cf10ef38b4982a67ef390fb11fac182e6",
+     "replay.py.patch": "63c9cad7f4d5fb8d43495fe93a3d53e127ef97ed5a771e780e69ac4599fd2e1f",
+-    "launch.py": "e6d9ff9066b41833dec6b33059f0443151b6849b88f718f3ce1a980f4b3641b8",
++    "launch.py": "e5f53bc308ba2a6c1a3b54ae9060b294fbcd7706740c96988a73ff5c7c74ceb4",
+     "import-amendments.patch": "d09477486760ffad0cd10682fff1ab6ea71996964bdaa352c3730892f09af49b",
+-    "PLAN.md": "cc38cc7a46eae2a3e566541b874a8c40499131ac318e39ce465cb44a5776a6c6",
++    "PLAN.md": "f7c0e6634ba1808be00d69feb4ab4ac989bff03b51c354e8385340aea3a91906",
+     "ExpectedFailure.lean.txt": "2be0ca38af19258af54466c6aa9b356f02071b7d2479395093885bab1dc08595",
+     "import-bindings.json": "b0d10d410cb99cf91bd3728211c9ec24d6c6c50ee1d5a798bba0bd7bc6306845",
+     "release-record-template.json": "6ef7a106d9e53e4e8fb4b2365b6d3434dbcbb46c6bc36e76d595a3b213ca2937",
+-    "renewal-bindings.json": "44d0b4f89d481415d211ae5363ae094c9e5ac3c18173be58fc63a2a7e16ff96e",
++    "renewal-bindings.json": "5f34bf2d1df8bd55eb04d6308c46ed7908fd88fd3e3c7cd91a3f05b5a877ffc6",
+     "modules.json": "8c0ba5f9b06ff31c9254f983d0bfcf937ebb8d0e69fca437e2d294a0677360db",
+     "Readback.lean.txt": "9580b51aa480241c05543c7b08ebe65b15ffa6f2a869669f43ffab04a34c8079",
+-    "PivotSwap.lean.txt": "9535830381d9f1a49e8769f9554d78a394415eb8fa658f35ca41edd89da91111",
++    "PivotSwap.lean.txt": "3b1cd17e1a80b30dbc9d9401be35f198031ad5a7b16b2cbdcbf4156289a6524c",
+     "EliminationField.lean.txt": "f3cbd5bf902740417c34ff20be9b89332103e510aaa8435d4453cc08b43134c4",
+     "additional-runtime-pins.json": "9c4de8d3075b6536e9b0f8c7f457080459c3606b723357d4e73aa4412113b9c1",
+-    "SESSION.md": "ca37c8dc00e94b9a22ec5b570cd48a10cd50166a1b2a6e4c68e8cd26944e87fc",
++    "SESSION.md": "626cbff3b819146c3ed5cc10d2d89d1ac7007283e7d117730e512a1cc5fc908b",
+     "runtime-pins.json": "03ba74a8437d56f9c7257109676f59c543d9d286693f7691d211f0deee444b41",
+     "prior-bindings.json": "40ae8dc4c71e83254762984aac075701204ca3cb90f1098581dc0452a558e640"
+   },
+@@ -79,10 +79,10 @@
+   "retry_limit": 0,
+   "as_bytes": 8589934592,
+   "absolute_deadline": "2026-11-11T12:00:00Z",
+-  "workspace": "/home/ec2-user/pencil-native-solve4-pivot-swap-renewal-20261111",
++  "workspace": "/home/ec2-user/pencil-native-pivot-swap-proof-successor-20261111",
+   "campaign_total_seconds": 129600,
+-  "prior_attempt_conservative_debit_seconds": 1200,
+-  "remaining_before_attempt_seconds": 128400,
++  "prior_attempt_conservative_debit_seconds": null,
++  "remaining_before_attempt_seconds": null,
+   "new_plan_attempt_limit": 1,
+   "materializer_conservative_debit_seconds": 900,
+   "current_boot_id": "31b37cfb156242ff8b0ffadc5cec5a12",
+--- a/PLAN.md
++++ b/PLAN.md
+@@ -1,17 +1,5 @@
+-# Prospective solve4 pivot search and whole-row swap replay
++# Pivot/swap equal-row proof successor
+ 
+-This is a five-call bounded elaboration and separate axiom readback, with no scientific experiment or timing comparison. The unchanged PivotSwap candidate is source953583 and the prior scoped review is independently bound. Statements cover first nonzero search in a supplied list, bounds, row permutation/involution, canonical-entry predicate preservation, selected pivot and conditional zero-prefix transfer, and augmented equation-set preservation. Ascending candidate-list refinement, physical mutation, loop invariants and full returned-vector correctness are outside these claims.
++Only the equal-row branch of swap_involutive changes: after subst b, split i = a, substitute in the positive case and simplify with hi in the negative case. All theorem statements, other proofs, controls, five calls and seventeen readback names are unchanged. No sorry or axiom is added. This repair has not been compiled.
+ 
+-The original four-call proposal requires EliminationField, absent from the inherited cache. Its namespace/body is copied exactly, while only import RowFold is replaced by the field and Ring/Omega imports actually used. This avoids relying on the unavailable legacy RowFold closure. The new prerequisite is explicitly compiled first, then PivotSwap, Controls, Readback and ExpectedFailure. The control import Mathlib.Tactic.Decide does not exist in the pinned tree and is replaced by Lean.Elab.Tactic.Decide; all control statements and proofs remain unchanged. Both context amendments require independent source/import review before release.
+-
+-Nine candidate names and eight control names are separately read back. Exact controls exercise selecting row2 from values0,2,3, moving RHS6, unchanged earlier row, zero-prefix transfer, exhausted search, rejection of an automatic prefix and coefficient-only swap. The expected-failure file asserts that swapping an all-ones matrix yields a zero entry; require exactly one unsolved False goal and reject syntax, import, resource or elaboration-environment failures. A nonzero ordinary compiler exit stops later calls; preserve all attempts including sorryAx output and missing controls.
+-
+-Use unchanged native runtime ownership and cleanup machinery with fresh solve4-pivot units/workspace. Precheck900/compiler600/postcheck900 seconds, total2400, one CPU,8GiB, no swap,128tasks; no retries. The prior four-call norm compiler phase took217.644seconds, supplying a conservative scheduling reference but no guarantee for the five different modules. A600second compiler ceiling is a cap, not a success forecast. Any timeout remains a recorded failure; no automatic extension.
+-
+-Inherited custody covers16736files3111892318bytes and pinned native runtime. Direct import mapping is frozen. Additional modules are recursively resolved from their compiled .ilean directImports until the inherited baseline; every extra .olean/private/server, .ir/signature, matching source and import-metadata file is pinned in the runtime map, checked pre/post and around compilation by existing machinery. No module or payload was executed during planning.
+-
+-The renewed campaign ceiling is129600worker seconds with deadline2026-11-11T12:00:00Z. This prospective packet forecasts1200prior seconds after two600second attempts and128400remaining before this2400second attempt. The forecast is not an actual debit or execution release. Root must establish the second attempt terminal receipt, reconcile the actual ledger and publish exact final release before launch. If ledger differs, this packet rejects admission and requires a separately reviewed binding change. Historical campaigns and attempts remain unchanged.
+-
+-Fresh workspace pencil-native-solve4-pivot-swap-renewal-20261111 and phase units pencil-pivot-swap-renewal-20261111 are used. Current boot is pinned. Release template staysfalse with final ledger/owner/publication receipts null. All five mathematical source files, five-call order, seventeen readback names, prerequisite import amendments and runtime pins are unchanged. No compiler, test, solver, cache scan or materialization occurred while constructing this packet. Independent operational review remains pending.
+-
+-After a terminal attempt produce native receipts, PDF/SVG/CSV/JSON and immutable archive with full measured/reserved costs, missing stages and scoped conclusions. Planned launch after binding is: python3 launch.py --execute --freeze-sha256 EXACT_FREEZE --release-record ABSOLUTE_RELEASE --release-sha256 EXACT_RELEASE. One explicit invocation only.
++Preserve the failed predecessor attempt and its 2400-second charge. Fresh workspace and phase units; current 129600-second campaign and 2026-11-11T12:00:00Z deadline. Actual prior debit and remaining allowance are null until final serial reconciliation. Resource caps remain 900/600/900 = 2400 seconds, unchanged CPU/RAM and no automatic retry. Independent review, publication and final release required.
+--- a/renewal-bindings.json
++++ b/renewal-bindings.json
+@@ -1,64 +1,25 @@
+ {
+-  "schema": "operational-renewal-bindings/v1",
+-  "predecessor_freeze": {
+-    "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/solve4-pivot-swap-replay-20261109/freeze.json",
+-    "sha256": "e3dcbb5a5363d54f69859b7aef5c88dc75d0548a497716b24059b97172f7a959"
++  "schema": "proof.successor-bindings/v1",
++  "predecessor": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/solve4-pivot-swap-renewal-20261111",
++  "predecessor_freeze_sha256": "dffa9f313ca8daf569d97f09a1103cf1c858b11e42a35d069a279146a8f3180b",
++  "terminal_archive": "../pivot-swap-results-20261111/manifest.json",
++  "failed_stdout_sha256": "c410446d3be0712f117a0cf48a3cbf48496353fabfad3aeaeb56d2eb80858580",
++  "source_delta": "Only equal-row branch explicitly splits i=a; all theorem statements unchanged.",
++  "unchanged_files": {
++    "EliminationField.lean.txt": "f3cbd5bf902740417c34ff20be9b89332103e510aaa8435d4453cc08b43134c4",
++    "Controls.lean.txt": "f7e17f2ea9b1a331c805cb0faf2be610c4edc691e6d54e132814adaeb88bf9b9",
++    "Readback.lean.txt": "9580b51aa480241c05543c7b08ebe65b15ffa6f2a869669f43ffab04a34c8079",
++    "ExpectedFailure.lean.txt": "2be0ca38af19258af54466c6aa9b356f02071b7d2479395093885bab1dc08595",
++    "modules.json": "8c0ba5f9b06ff31c9254f983d0bfcf937ebb8d0e69fca437e2d294a0677360db",
++    "names.json": "83fb9beccf08c88a28a42393427df16cf10ef38b4982a67ef390fb11fac182e6",
++    "runtime-pins.json": "03ba74a8437d56f9c7257109676f59c543d9d286693f7691d211f0deee444b41",
++    "additional-runtime-pins.json": "9c4de8d3075b6536e9b0f8c7f457080459c3606b723357d4e73aa4412113b9c1",
++    "import-bindings.json": "b0d10d410cb99cf91bd3728211c9ec24d6c6c50ee1d5a798bba0bd7bc6306845",
++    "import-amendments.patch": "d09477486760ffad0cd10682fff1ab6ea71996964bdaa352c3730892f09af49b",
++    "prior-bindings.json": "40ae8dc4c71e83254762984aac075701204ca3cb90f1098581dc0452a558e640"
+   },
+-  "preserved": {
+-    "Controls.lean.txt": {
+-      "sha256": "f7e17f2ea9b1a331c805cb0faf2be610c4edc691e6d54e132814adaeb88bf9b9",
+-      "bytes": 1112
+-    },
+-    "names.json": {
+-      "sha256": "83fb9beccf08c88a28a42393427df16cf10ef38b4982a67ef390fb11fac182e6",
+-      "bytes": 816
+-    },
+-    "import-amendments.patch": {
+-      "sha256": "d09477486760ffad0cd10682fff1ab6ea71996964bdaa352c3730892f09af49b",
+-      "bytes": 592
+-    },
+-    "ExpectedFailure.lean.txt": {
+-      "sha256": "2be0ca38af19258af54466c6aa9b356f02071b7d2479395093885bab1dc08595",
+-      "bytes": 120
+-    },
+-    "import-bindings.json": {
+-      "sha256": "b0d10d410cb99cf91bd3728211c9ec24d6c6c50ee1d5a798bba0bd7bc6306845",
+-      "bytes": 4790
+-    },
+-    "modules.json": {
+-      "sha256": "8c0ba5f9b06ff31c9254f983d0bfcf937ebb8d0e69fca437e2d294a0677360db",
+-      "bytes": 89
+-    },
+-    "Readback.lean.txt": {
+-      "sha256": "9580b51aa480241c05543c7b08ebe65b15ffa6f2a869669f43ffab04a34c8079",
+-      "bytes": 908
+-    },
+-    "PivotSwap.lean.txt": {
+-      "sha256": "9535830381d9f1a49e8769f9554d78a394415eb8fa658f35ca41edd89da91111",
+-      "bytes": 4229
+-    },
+-    "EliminationField.lean.txt": {
+-      "sha256": "f3cbd5bf902740417c34ff20be9b89332103e510aaa8435d4453cc08b43134c4",
+-      "bytes": 1610
+-    },
+-    "additional-runtime-pins.json": {
+-      "sha256": "9c4de8d3075b6536e9b0f8c7f457080459c3606b723357d4e73aa4412113b9c1",
+-      "bytes": 2386
+-    },
+-    "runtime-pins.json": {
+-      "sha256": "03ba74a8437d56f9c7257109676f59c543d9d286693f7691d211f0deee444b41",
+-      "bytes": 3728
+-    },
+-    "prior-bindings.json": {
+-      "sha256": "40ae8dc4c71e83254762984aac075701204ca3cb90f1098581dc0452a558e640",
+-      "bytes": 953
+-    }
+-  },
+-  "campaign_authorization": {
+-    "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261110/authorization-confirmed.json",
+-    "sha256": "e7528c379ccef5e44bf41f63d8007ae8625618de5b5db4362ccc330f2c4926d8"
+-  },
+-  "forecast_prior_seconds": 1200,
+-  "forecast_remaining_seconds": 128400,
+-  "forecast_not_release": true
++  "compiler_calls": 5,
++  "readback_names": 17,
++  "kernel_checked": false,
++  "independent_review_pending": true
+ }

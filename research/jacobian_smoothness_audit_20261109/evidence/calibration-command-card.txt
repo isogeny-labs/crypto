@@ -1,0 +1,19 @@
+Frozen protocol: AUDIT-MUMFORD-CALIBRATION-20261109-v1
+Canonical hash: f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6
+Committed protocol tree: eb164a7eb892c0ab9e7553dcbaf4df90f3c2daa0
+Committed arithmetic source: 11100a8512bac3840bf1f85b1e7f0f523cd78464
+Workdir: /workspace/crypto-audit
+Environment: RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1
+Each execution: GNUtime diagnostic around timeout120s and these three sequential native commands.
+F3positive first; inspect successful completion and exact analysis before F5negative.
+No scientific clock; every failure/timeout and partial artifact retained.
+
+f3-positive, instance0, replicate0, seed202611090301:
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/release/mumford-census-audit census 3 fixture research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p3 202611090301 0 11100a8512bac3840bf1f85b1e7f0f523cd78464 f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/mumford_cpp_counts research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p3/audit.tsv research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p3/cpp-check.json
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/release/mumford-census-audit analyze research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p3 research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p3/cpp-check.json
+
+f5-all-smooth, instance0, replicate0, seed202611090501:
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/release/mumford-census-audit census 5 fixture research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p5 202611090501 0 11100a8512bac3840bf1f85b1e7f0f523cd78464 f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/mumford_cpp_counts research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p5/audit.tsv research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p5/cpp-check.json
+research/jacobian_smoothness_audit_20261109/native-census-v1/target/release/mumford-census-audit analyze research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p5 research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/calibration-p5/cpp-check.json

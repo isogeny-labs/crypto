@@ -1,0 +1,11 @@
+# Independent static code review
+
+Decision: ADMITTED_COMPONENT_ONLY. No scientific algorithm, compilation or timing was executed by this reviewer. The complete new worker/proof/input rule and the full frozen Field/TableOracle module were read before admission.
+
+The candidate uses generic convolution field arithmetic with c=-d mod p, actual binary exponentiation t^p, and q-2 powers for inverse constants. It explicitly checks decoded coordinates lie in the prime subfield and reconstruct t. The independent closed-form table oracle enumerates each p² source image once, checks injectivity, compares every q² target row, and substitutes every emitted source into both equations. Fixed small-field nonsquare and primality checks justify the field construction. Every target batch is fully serialized before its completion flag is accepted.
+
+Controls precede timings in the same worker. The all-field arithmetic and target loops have 46309 cases each; profile target comparisons add 18642 and decoded source checks add 622, leaving the declared predicates below113000 and below200000. These counters are predicates, not every field operation. The exact eight-functional false-positive witnesses and the joint projection rejection are checked separately.
+
+Both measured methods serialize the identical root payload and independently check complete batches. Field construction, candidate power/inverse setup or indexed source construction, root verification and serialization are inside paid arms; common oracle preparation is charged to the full worker but outside both ratios. All-t caching costs O(q), and O(q²) rows dominate retained output. No measured constant-space or large-field claim follows. Generic exponentiation versus indexing is a small structured comparison, not a strongest possible Frobenius backend claim.
+
+The eighty-second work predicate, exclusive raw creation after full serialization, eighty-four-second final-result demotion and eighty-eight-second print guard are additionally covered by the runner's ninety-second full-process deadline. Late or incomplete results clear comparison flags and ratios. Peak self RSS is per process. Characteristic two, curve-chart coverage, global original-root completeness, genuine F4/F5/F6, novelty and qualified8x standing remain unestablished.

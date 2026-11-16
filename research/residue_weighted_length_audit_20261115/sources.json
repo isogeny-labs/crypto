@@ -1,0 +1,491 @@
+{
+  "schema": "residue-weighted-source-plan/v1",
+  "created": "2026-11-15T15:18:51.962360+00:00",
+  "formal": {
+    "project": "research/residue_weighted_length_audit_20261115/lean",
+    "theorem": "ResidueWeightedLengthAudit.residue_weighted_length_certificate",
+    "statement": "theorem residue_weighted_length_certificate : (∀ (K A : Type) [Field K] [CommRing A] [Algebra K A] [Module.Finite K A], Module.finrank K A = weightedDegree K A) ∧ (∀ (K A : Type) [Field K] [CommRing A] [Algebra K A] [Module.Finite K A], Module.finrank K A = schemeWeightedDegree K A) ∧ (∀ (R : Type) [CommRing R] (p : PrimeSpectrum R), Nonempty (p.asIdeal.ResidueField ≃+* IsLocalRing.ResidueField (ActualAffineStalk R p))) ∧ (∀ (K R : Type) [Field K] [CommRing R] [Algebra K R] (p : PrimeSpectrum R), Nonempty (p.asIdeal.ResidueField ≃ₐ[K] IsLocalRing.ResidueField (ActualAffineStalk R p))) ∧ (∀ (K B M : Type) [Field K] [CommRing B] [IsLocalRing B] [Algebra K B] [Module.Finite K B] [AddCommGroup M] [Module K M] [Module B M] [IsScalarTower K B M], Module.length K M = Module.length B M * Module.finrank K (IsLocalRing.ResidueField B)) ∧ (∀ (K A : Type) [Field K] [CommRing A] [Algebra K A] [Module.Finite K A] [IsReduced A], unweightedDegree K A = Nat.card (PrimeSpectrum A)) ∧ Module.finrank Base ProductAlgebra = 3 ∧ Module.length ProductAlgebra ProductAlgebra = 2 ∧ Nat.card (PrimeSpectrum ProductAlgebra) = 2 ∧ (∀ p : PrimeSpectrum ProductAlgebra, p = firstPoint ∨ p = secondPoint) ∧ firstPoint ≠ secondPoint ∧ (∀ p : PrimeSpectrum ProductAlgebra, Module.length (Localization.AtPrime p.asIdeal) (Localization.AtPrime p.asIdeal) = 1) ∧ Nonempty (firstIdeal.ResidueField ≃ₐ[Base] Base) ∧ Nonempty (secondIdeal.ResidueField ≃ₐ[Base] Quad) ∧ Module.finrank Base firstIdeal.ResidueField = 1 ∧ Module.finrank Base secondIdeal.ResidueField = 2 ∧ weightedDegree Base ProductAlgebra = 3 ∧ unweightedDegree Base ProductAlgebra = 2 ∧ weightedDegree Base ProductAlgebra ≠ unweightedDegree Base ProductAlgebra ∧ ¬ IsLocalRing ProductAlgebra ∧ weightedDegree Base (Base × Base) = 2 ∧ unweightedDegree Base (Base × Base) = 2 ∧ weightedDegree JVHilbertAudit.F JVHilbertAudit.A = 8 ∧ Module.finrank JVHilbertAudit.F JVLocalMultiplicityAudit.originIdeal.ResidueField = 1 ∧ weightedDegree JVHilbertAudit.F JVLocalMultiplicityAudit.FirstChart = 0",
+    "decl_sha256": "dbc58003cb9d2d0b43292135c7e00c0fc26ee1965d82d6d8b9606b0e1c3c8732",
+    "scope": "Every fieldK and finite-dimensional commutative K-algebraA: scalar dimension equals the actual finite prime sum of canonical prime-localization self-module lengths times actual prime residue-field K-degrees. Also equals the actual affine-Spec structure-sheaf stalk self-length sum weighted by actual stalk canonical residue-field K-degrees. Actual canonical prime/stalk residue comparison is K-linear; actual K→A→stalk coefficient algebra/tower and actual stalk locality derived, not supplied. Artinian/finite-prime/finite-localization data derived from finite scalar dimension. Generic compatible localB-moduleM has scalar length=Blength times canonical residue degree; usual field/locality/finiteB/module/tower hypotheses retained. Reduced finite algebra unweighted local length equals primecard; zero algebra guard retained. Actual F2×GaloisField(2,2) scalar dimension3/selflength2/exactly2prime closed points, actual complete projection-kernel classification/distinctness/localselflength1,1/residue algebraequivalences toF2,F4/degrees1,2/weighted3/unweighted2/nonlocality. Dropping residue weights fails; no base-rational/geometric point population claimed. Split actual F2×F2 weighted/unweighted2. Known actual literal JV F101 quotient weighted8 and derived canonical origin residue degree1; credited actual zero first chart weighted0. Existing F4/F2 local-degree control/JV populations/official decomposition-composition-series-stalk methods credited, no novelty. Seven new modules(6concrete1import-only),28frozen local modules/0copies/49oldformalconfigs/67oldformal-artifactpins checked before/after every numberedstate and gate. Qualified Diem n!d^n with multiplicities unrefuted; ordinary cone not product-projective instance. General Chow/cycle/intersection/positive-dimensional isolated components/projective bound/RojasC refinement and other14 obligations remainopen. Samehost/prover/no new solver or cryptographic experiment/compilerrefinement/physicalhost independence/canonicalpromotion/full14 claim. Defaultlimits/foundations only/noholes/customaxioms/nativeproofeval/raisedlimits/globalflags/waivers/frozenedits/cryptoPython/spend/upload.",
+    "sources": [
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+        "bytes": 3989,
+        "sha256": "4d43f6ad60e25982f57184aaf3743f7a932fb2df0e30e19765db043e6aa32b56"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+        "bytes": 4758,
+        "sha256": "452b39f6ada2f9440a0b5f5227d23e06b4ea7c66b20eb87fd1cbbfd0a8c8fbc3"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+        "bytes": 1401,
+        "sha256": "0df13f8f45cb4a5e3da6917bb009a37082c9e6f75158ed03e21b9bd7e92ad4f6"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+        "bytes": 3956,
+        "sha256": "98eed2dc8c32352381e1b546dd59866f4102c20f8be0cf897f9e3493f38bc274"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+        "bytes": 3137,
+        "sha256": "9da34ce7da5810aed405ce5d79e7a3a4e10c33509c047fe259a39419b35dfe7a"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+        "bytes": 9044,
+        "sha256": "fce18061d53ae6d02800947e9602a0312f82e0058c7488919f00e9fd27c32666"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+        "bytes": 2430,
+        "sha256": "735ab1b0f042c5dec927b36a60417d090c5024a75285a9a960f7c5cfc50e5648"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+        "bytes": 2914,
+        "sha256": "6f71f8014dee9a161b4a85efdacc7200611463f675c2d25893247f04c37c74c5"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+        "bytes": 4508,
+        "sha256": "c4fddf97dfcee2b00c4b1113282f57c83fca4d7eefbd89506912af036ae24615"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+        "bytes": 2125,
+        "sha256": "51196e6a76de350be0ece641393f58240beff5eff9903e6d31bca85f75893ecb"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+        "bytes": 4097,
+        "sha256": "b3c3f41025759c5c212cd858d7f43fc21da223b3287b133301b9d86cc160f5aa"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lakefile.toml",
+        "bytes": 286,
+        "sha256": "9bd69ed91399c89671fb786dac49e4c7be64635cc7e211a34bf244e96d1158c7"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3692,
+        "sha256": "7aaef10cdce5986ff39f1dc481e8b3eb58bf476d4e73dff7f7117178d6559c20"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lakefile.toml",
+        "bytes": 284,
+        "sha256": "56ba6962a29ea7af7943e194fdc07e807dd30b945f007f365668c4046721ab85"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3831,
+        "sha256": "21f977f9eb39b2d00119a8a77dd8e2f2a9d4287ca1b8498e0e7eb1e92628dfdd"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "f18793a72f079915913fa45693b8eabe5a0e33c7c04ad51353ddcc1726517fc0"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lake-manifest.json",
+        "bytes": 3557,
+        "sha256": "21b41c4e076c955374b730d6cc0a6c09033563089eab25dd0989b5084ff43c91"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+        "bytes": 5748,
+        "sha256": "9a88d8e710b0681b31574c3d5094c123046da9bd14ddedb5724ae02a2399276e"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+        "bytes": 2996,
+        "sha256": "2ea90976a4f54837acb810ef91f7d25b099c05debf311bfae1eaa43ee09fcd38"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+        "bytes": 3021,
+        "sha256": "05cdaa45ad42e17ec286d390c91fb1f1a53f93f7155ca32b979b8e2f3f8abfac"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+        "bytes": 1497,
+        "sha256": "8fce3febd13be9cc84409e0f3b634a65061a88fc817d3e9babb85a914c5574b1"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+        "bytes": 5142,
+        "sha256": "c44d00a3f7098707c541bb8577eceef3f4d9d923fb4b1efe577121fe47db7f1b"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+        "bytes": 924,
+        "sha256": "3a4725e219e694124003ada1c55f71f39cb41cbda83dc03ab0748b0c5443bdaa"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean",
+        "bytes": 4184,
+        "sha256": "ea8166ea9807e75e168ae6dd1b7e4d687232950f73057f0ecd3156c6853e7bdb"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 342,
+        "sha256": "0f21c3133e3fdc0eb5ec0133f4563f7a3efa9dc5297ae89b7f6817ae08036164"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3423,
+        "sha256": "2fdad587ea840838497a8629ecae4b91a3c634e467be281ec21e3068e283d670"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 366,
+        "sha256": "9833ac9c49c342d6153d0cab3c3613aa29007d4e928c39e4e0b463df95f0f065"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3244,
+        "sha256": "24ef2554ad6ad3a76d566d53e4022fdfc6cf0600e07371448d626eea6ebd6169"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVCharts.lean",
+        "bytes": 5395,
+        "sha256": "140f704e7ac69e3abde29b250de59bb8b3144369c6481e143f9898e1980fa563"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVConePoints.lean",
+        "bytes": 1491,
+        "sha256": "62e32c10dcae8da22000b925f98aa59cc3dee2704c5687e83ab0370181f05709"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalCertificate.lean",
+        "bytes": 2053,
+        "sha256": "944c2f9cfa15172ea016fde42ccada8350c26777a5727ec26164fd92fbba1789"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalization.lean",
+        "bytes": 3767,
+        "sha256": "83d29f444c93257cba26620369146ad5b52dfceba4cca121d739ec7a7fb62652"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVOrigin.lean",
+        "bytes": 6372,
+        "sha256": "ad8f1a5eea6636d44e054ea87590c71abca9a5317f9e09199aaea6c29346d13d"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVTailFlags.lean",
+        "bytes": 4396,
+        "sha256": "fb620161b8992489cdc2bef096caa70511ace58cf7dc5faf6bfcbe3012d82a71"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lakefile.toml",
+        "bytes": 457,
+        "sha256": "e4af3e1d76959877c22b43466098993996b44e04d7eb971df4439951a71b3b93"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4959,
+        "sha256": "aafc7b4aa1f7ac945cd926288bc9024a2126acb8fce8a858de00aaf74081a352"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCertificate.lean",
+        "bytes": 1634,
+        "sha256": "7c1daf231623eecca1cd4ba6ab3d39bcdb47f983c31bdd2067c42c5ccd043890"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCharts.lean",
+        "bytes": 2550,
+        "sha256": "98c5c6fed01c5c356ed82f6a8d874005469a420c70bad93558121a6355bac680"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeImports.lean",
+        "bytes": 58,
+        "sha256": "970d16756c84fd01a06f4a90f2697c389fd49de0429a5d462530395cd27787eb"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeStalk.lean",
+        "bytes": 3723,
+        "sha256": "cd982e76e0e1bae5ece2ca765e55d3058716affd586bde4201fba7c2aa449d48"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lakefile.toml",
+        "bytes": 324,
+        "sha256": "360300ee8a997ea16b5f2e69ca8fa5fa9db21e5c6cc25a7003c47c7a4e944034"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lake-manifest.json",
+        "bytes": 5241,
+        "sha256": "6cdccb78bf37a303ba86e13d83c2a55ba76b7d49faaf25596403a5e0d6fb67f5"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/GlobalWeights.lean",
+        "bytes": 3226,
+        "sha256": "d3ee9ffe2b92ce8636bde56205bbb1d57dd026f50cc856642885425a80b21225"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/JVWeights.lean",
+        "bytes": 1663,
+        "sha256": "28a6914cf4c6a01177ad6f0a138a4e457d7c5f37150db7dd9e38fc61ebfc66fc"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/LocalWeights.lean",
+        "bytes": 1732,
+        "sha256": "0484a3cbc4dc4bfb1cb5817289ace51f746bb37932d137c1a6ceb465976ee4e1"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/ProductWeights.lean",
+        "bytes": 8365,
+        "sha256": "0a2c592575f235b226d9b394ec2330b3ffac6c2da9fd27353cfde8c04b638635"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/ResidueLengthImports.lean",
+        "bytes": 178,
+        "sha256": "5727b57107985ce42520d5f7b52783833988ca069464d07109a981f5e239d72a"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/SchemeWeights.lean",
+        "bytes": 4846,
+        "sha256": "851ba158fa077daafdaee36fa1b2e7b1621cfd1839fe1e2b8d6b6a1a5b9911ea"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/WeightedCertificate.lean",
+        "bytes": 3551,
+        "sha256": "cf1f9b6f60d0f227e4da26f8b706f09442fb3a46e1bd5ff2ba17538608216833"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/lakefile.toml",
+        "bytes": 387,
+        "sha256": "be5f42e2e44dd42393096cbb19895c9af8d4fe18f7012fc211ad9c6fd40efb55"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/lake-manifest.json",
+        "bytes": 5526,
+        "sha256": "658b64b6ef55ad55ed427ace0fae230cc68f9fdda7fbb4d534ff22e56532a9c8"
+      },
+      {
+        "path": "research/residue_weighted_length_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualIdeal",
+    "Bivariate",
+    "CanonicalPieces",
+    "CubicDual",
+    "CubicNormalForms",
+    "DualBasis",
+    "GlobalWeights",
+    "GradedBasis",
+    "GradedCertificate",
+    "JVCharts",
+    "JVConePoints",
+    "JVLocalCertificate",
+    "JVLocalization",
+    "JVOrigin",
+    "JVSchemeCertificate",
+    "JVSchemeCharts",
+    "JVSchemeImports",
+    "JVSchemeStalk",
+    "JVTailFlags",
+    "JVWeights",
+    "LiteralQuadratics",
+    "LocalLengthCertificate",
+    "LocalWeights",
+    "MacaulayCertificate",
+    "PowerBasisLength",
+    "ProductWeights",
+    "QuotientBasis",
+    "ResidueDegreeControl",
+    "ResidueLengthImports",
+    "SchemeWeights",
+    "SharpCutoff",
+    "Solutions",
+    "Thickening",
+    "TruncatedLocal",
+    "WeightedCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 26216,
+      "sha256": "1b65452afadfadcf3ff0541835ced94022e911d7cea4b5f90c706b3f146f75b0"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "0c8bd766bd20c707600aa200bba1f5b6b6f08fbaaecffcaf8d8c3f6b2248781f"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/attempts.json",
+      "bytes": 233,
+      "sha256": "4dec7f7b3fd4d9df4af2b6ecd124ead89f0bc41bd8cf11da7ca6a95c4cd31fbc"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 3077,
+      "sha256": "e4ee353b1cd7afb19ab0fdde2ccf62487be5cb082f55f05bd9fb4f97eaa369e0"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/gate.json",
+      "bytes": 15473,
+      "sha256": "ad9da6ef6c51046eef9b68a3804fab88a94e160f86602b4a3d3baa1d966416ec"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/source-review.json",
+      "bytes": 8748,
+      "sha256": "2c11d3cf77792ccc54e8441f1d03b796583bf81a367986ec5ff2452827b6a301"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/binding-check.json",
+      "bytes": 8096,
+      "sha256": "2383b3a7a742f4c072c06eea3fa7ee6ba1acc72e7b9c97b6f33a79ddfdb79625"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/proof-map.json",
+      "bytes": 10161,
+      "sha256": "4f3f265a9096453c6c0518720a27f8ecfbb6e54768d4c9e1462279106b8bdfb7"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/render_report.py",
+      "bytes": 8135,
+      "sha256": "23b597b8f892fa2eab26536e880e1826a2ca24ebbef7108d26e0969cf24acaed"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/export_binding_input.py",
+      "bytes": 1758,
+      "sha256": "d332c17caaa7d7643e8de50373a9ea9ea1d2303adc1dc3fb2489bc2df74ef7cb"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/PROTOCOL.md",
+      "bytes": 7727,
+      "sha256": "a938f51e2f9228fa93c798e97b5a0a97f1fdbebfd8a38d703ee52145982b0b1f"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/reports/layout.json",
+      "bytes": 363,
+      "sha256": "d88c5f1dbf7b1c22400b008b2fb36bc5ba61f611adbfb3515c43fd2ed0dfcca7"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/reports/report.pdf",
+      "bytes": 47955,
+      "sha256": "bb79ff08e1836cb3f8009f39f6c667282fa10b3e71fef74052581bc0232ea9d7"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/reports/residue-weighted.svg",
+      "bytes": 1445,
+      "sha256": "e027aa4f8a350d0acf6467984de61f3ae79b1133f98bae7aececd7d0248e42af"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/sources.json",
+      "bytes": 19171,
+      "sha256": "83c96542454fae25844d50ced83393f6916bbea4668046aae4efbcb6f47b493b"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/report-drafts.tar.xz",
+      "bytes": 48740,
+      "sha256": "e6d82a63788289583640213243a70bb6466202a422c6b7af5a2e2ad3786c4981"
+    },
+    {
+      "path": "research/residue_weighted_length_audit_20261115/evidence/report-drafts.json",
+      "bytes": 235,
+      "sha256": "e897380c7276706354bd8a5b6163aa01bc2ae1c842c3aff3f90b12d21a38bfe8"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 42,
+    "fresh_project_modules": 7,
+    "new_concrete_modules": 6,
+    "import_only_adapter": 1,
+    "credited_dependency_modules": 28,
+    "credited_predecessor_gate": 21,
+    "copied_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "new_source_warnings": 0,
+    "inherited_module_advisories_per_final_log": 22,
+    "inherited_auditor_String_mk_deprecation": 1,
+    "all49dependency_formal_configs_pinned": true,
+    "all67predecessor_pins_checked_each_state": true,
+    "generic_local_module_scalar_length_residue_degree": true,
+    "generic_finite_algebra_weighted_prime_local_length": true,
+    "finite_prime_localization_Artinian_data_derived": true,
+    "generic_actual_Spec_stalk_selflength_weighted_sum": true,
+    "actual_stalk_residue_K_linear_comparison": true,
+    "actual_coefficient_composite_tower_derived": true,
+    "generic_reduced_unweighted_equals_primecard": true,
+    "actual_F2_times_F4_scalar3_selflength2_two_prime_closed_points": true,
+    "actual_projection_kernel_complete_classification": true,
+    "actual_all_product_prime_local_lengths1": true,
+    "actual_residue_algebra_equiv_F2_F4_degrees1_2": true,
+    "actual_weighted3_unweighted2_failure": true,
+    "actual_product_not_local": true,
+    "actual_split_product_weighted_unweighted2": true,
+    "known_JV_weighted8_residue_degree1_and_zerochart0": true,
+    "known_JV_and_F4_control_populations_credited": true,
+    "new_rational_or_geometric_point_population": false,
+    "qualified_Diem_bound_refuted": false,
+    "general_Chow_cycle_intersection_or_positive_components": false,
+    "Rojas_C_refinement": false,
+    "new_curve_order_scalar_decomposition": false,
+    "new_solver_native_experiment": false,
+    "new_host_or_compiler_independence": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

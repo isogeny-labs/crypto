@@ -1,0 +1,29 @@
+warning: associated functions `sum` and `product` are never used
+   --> src/bin/../../../../../src/cryptanalysis/identity_certificate.rs:106:12
+    |
+ 92 | impl Expr {
+    | --------- associated functions in this implementation
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |            ^^^
+...
+110 |     pub fn product(terms: Vec<Expr>) -> Expr {
+    |            ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `check` is never used
+   --> src/bin/../../../../../src/cryptanalysis/identity_certificate.rs:528:8
+    |
+528 | pub fn check(c: &IdentityCertificate) -> Result<Verdict, Malformed> {
+    |        ^^^^^
+
+warning: function `schoenhage_identity` is never used
+   --> src/bin/../../../../../src/cryptanalysis/identity_certificate.rs:580:8
+    |
+580 | pub fn schoenhage_identity() -> IdentityStatement {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: `theorem-audit-identity` (bin "general_s3") generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/general_s3`

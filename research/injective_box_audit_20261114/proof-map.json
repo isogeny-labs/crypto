@@ -1,0 +1,45 @@
+{
+  "main": "InjectiveBoxAudit.injective_box_certificate",
+  "binding": "74bd1e4a6ad421bdc085caeacc841339cffa62495e283ed494f6c18499ec6f35",
+  "custom_imports": {
+    "CenteredCell": "research/hildebrand_cell_audit_20261114/lean/CenteredCell.lean",
+    "FairKernel": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+    "GeneralSupports": "research/injective_box_audit_20261114/lean/GeneralSupports.lean",
+    "InjectiveSampling": "research/injective_box_audit_20261114/lean/InjectiveSampling.lean",
+    "IntegerCounts": "research/injective_box_audit_20261114/lean/IntegerCounts.lean",
+    "PrimeFieldBoxes": "research/injective_box_audit_20261114/lean/PrimeFieldBoxes.lean",
+    "SamplingCertificate": "research/injective_box_audit_20261114/lean/SamplingCertificate.lean",
+    "UniformChoices": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+    "UniformEvents": "research/injective_box_audit_20261114/lean/UniformEvents.lean",
+    "WeightedKernel": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean"
+  },
+  "modules": [
+    {
+      "file": "UniformEvents.lean",
+      "role": "Actual uniform PMF expectation/card ratio, map expectation and empty-domain guard."
+    },
+    {
+      "file": "InjectiveSampling.lean",
+      "role": "Actual injective samples, falling-factorial cardinality, uniform point masses and exact box product bound."
+    },
+    {
+      "file": "GeneralSupports.lean",
+      "role": "Explicit bijection to all prime-field injective supports with fixed first point, proved full cardinality and uniform source-law pushforward."
+    },
+    {
+      "file": "IntegerCounts.lean",
+      "role": "Actual finite integer-set cardinality <= interval width+1, with injective-image form."
+    },
+    {
+      "file": "PrimeFieldBoxes.lean",
+      "role": "Canonical transformed centered coordinates, product source-probability bound with j nonzero, and actual j=0 cardinality/probability counterexamples."
+    },
+    {
+      "file": "SamplingCertificate.lean",
+      "role": "Closed binding of actual probability laws, derived cardinalities, exact finite core and deleted-index negative controls."
+    }
+  ],
+  "gate_declarations": 49,
+  "signed_standing": "not established",
+  "open": "Corrected asymptotic 1.1 bound and stronger expected random-support Theorem1 exponent remain open, together with original fourteen-item gaps. Qualified source theorems retained."
+}

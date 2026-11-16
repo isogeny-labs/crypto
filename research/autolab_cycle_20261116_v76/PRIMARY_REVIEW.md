@@ -1,0 +1,1 @@
+The attempted primary source https://eprint.iacr.org/2004/031.pdf returned HTTP403 through a read-only network request. The PDF was not read and no novelty conclusion follows. Frobenius traces, characteristic polynomials, modular composition and addition chains are classical; complete-search novelty remains to be reviewed.
