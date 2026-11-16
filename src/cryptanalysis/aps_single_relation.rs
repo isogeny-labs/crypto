@@ -16,11 +16,81 @@ use super::f4_fp::{self, F4Options, Ordering, Poly, Verdict};
 use super::prime_fast::{FastCurve, Pt};
 use super::residual_walk::{inv_mod, is_prime_u64};
 
+/// Opt-in extensions; existing encodings and registered method IDs are unchanged.
+pub mod leads;
 /// Independent, bounded replay of the public fixture transcripts.
 pub mod replay;
 
 /// A deliberately bounded instrument: the substitution solver may enumerate F_p.
 pub const MAX_FIELD: u64 = 65_521;
+
+/// Work this module's own code performs outside the F4 and root-finding
+/// solvers, counted per calling thread and never priced. A caller that wants
+/// it resets the tally before a run and reads it after: group-operation calls
+/// on the module's [`FastCurve`] (each call, not each field operation inside
+/// it) and the coefficient multiplications of polynomial construction.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct CoreWork {
+    /// `FastCurve::mul` calls (scalar multiplications, subgroup-order checks
+    /// and label verifications included).
+    pub scalar_mults: u64,
+    /// `FastCurve::combine` calls (`uG + vQ`).
+    pub combines: u64,
+    /// `FastCurve::add` calls made directly by this module.
+    pub point_adds: u64,
+    /// `FastCurve::lift_x` calls (one square root each).
+    pub lifts: u64,
+    /// Coefficient multiplications of `Expr::mul`, one per pair of terms.
+    pub expression_multiplications: u64,
+}
+
+thread_local! {
+    static CORE_WORK: std::cell::Cell<CoreWork> = const { std::cell::Cell::new(CoreWork {
+        scalar_mults: 0,
+        combines: 0,
+        point_adds: 0,
+        lifts: 0,
+        expression_multiplications: 0,
+    }) };
+}
+
+/// Zero this thread's [`CoreWork`] tally.
+pub fn reset_core_work() {
+    CORE_WORK.with(|c| c.set(CoreWork::default()));
+}
+
+/// This thread's [`CoreWork`] since the last [`reset_core_work`].
+pub fn core_work() -> CoreWork {
+    CORE_WORK.with(std::cell::Cell::get)
+}
+
+fn bump_core_work(f: impl FnOnce(&mut CoreWork)) {
+    CORE_WORK.with(|c| {
+        let mut w = c.get();
+        f(&mut w);
+        c.set(w);
+    });
+}
+
+fn counted_mul(curve: &FastCurve, p: Option<Pt>, k: u64) -> Option<Pt> {
+    bump_core_work(|w| w.scalar_mults += 1);
+    curve.mul(p, k)
+}
+
+fn counted_add(curve: &FastCurve, a: Option<Pt>, b: Option<Pt>) -> Option<Pt> {
+    bump_core_work(|w| w.point_adds += 1);
+    curve.add(a, b)
+}
+
+fn counted_lift_x(curve: &FastCurve, x: u64) -> Option<Pt> {
+    bump_core_work(|w| w.lifts += 1);
+    curve.lift_x(x)
+}
+
+fn counted_combine(curve: &FastCurve, g: Pt, q: Pt, u: u64, v: u64) -> Option<Pt> {
+    bump_core_work(|w| w.combines += 1);
+    curve.combine(g, q, u, v)
+}
 
 fn mul(a: u64, b: u64, p: u64) -> u64 {
     (u128::from(a) * u128::from(b) % u128::from(p)) as u64
@@ -88,6 +158,10 @@ impl Expr {
         self.add(&minus)
     }
     fn mul(&self, rhs: &Self) -> Self {
+        let pairs = (self.terms.len() as u64).saturating_mul(rhs.terms.len() as u64);
+        bump_core_work(|w| {
+            w.expression_multiplications = w.expression_multiplications.saturating_add(pairs)
+        });
         let terms: Poly = self
             .terms
             .iter()
@@ -225,6 +299,8 @@ enum Decode {
     Coordinates(usize),
     Cubic(Vec<u64>),
     Line { values: Vec<u64>, a: u64, b: u64 },
+    LineChart { values: Vec<u64>, a: u64, b: u64 },
+    Horizontal { values: Vec<u64>, a: u64, b: u64 },
     TwoPairs(Vec<Vec<u64>>),
 }
 #[derive(Clone)]
@@ -259,23 +335,7 @@ pub fn build_system(
     parts: &[Vec<u64>],
     encoding: Encoding,
 ) -> Result<System, String> {
-    let p = curve.f.p;
-    if p <= 3 || p > MAX_FIELD || !is_prime_u64(p) {
-        return Err("unsupported prime field".into());
-    }
-    for part in parts {
-        checked_coordinates(part, p)?;
-    }
-    let all: Vec<_> = parts.iter().flatten().copied().collect();
-    checked_coordinates(&all, p)?;
-    if all.iter().any(|&x| curve.lift_x(x).is_none()) {
-        return Err("coordinate without a rational curve lift".into());
-    }
-    let a = curve.f.from_mont(curve.a);
-    let b = curve.f.from_mont(curve.b);
-    if (4 * mul(mul(a, a, p), a, p) + 27 * mul(b, b, p)).is_multiple_of(p) {
-        return Err("singular curve".into());
-    }
+    let (p, all, a, b) = checked_model(curve, parts)?;
     let (vars, expected) = match encoding {
         Encoding::Partitioned3 => (3, 3),
         Encoding::Unordered3 => (3, 1),
@@ -289,6 +349,43 @@ pub fn build_system(
             "encoding {encoding:?} requires {expected} coordinate blocks"
         ));
     }
+    build_checked_system(p, all, a, b, vars, parts, encoding)
+}
+
+fn checked_model(
+    curve: &FastCurve,
+    parts: &[Vec<u64>],
+) -> Result<(u64, Vec<u64>, u64, u64), String> {
+    let p = curve.f.p;
+    if p <= 3 || p > MAX_FIELD || !is_prime_u64(p) {
+        return Err("unsupported prime field".into());
+    }
+    for part in parts {
+        checked_coordinates(part, p)?;
+    }
+    let all: Vec<_> = parts.iter().flatten().copied().collect();
+    checked_coordinates(&all, p)?;
+    if all.iter().any(|&x| counted_lift_x(curve, x).is_none()) {
+        return Err("coordinate without a rational curve lift".into());
+    }
+    let a = curve.f.from_mont(curve.a);
+    let b = curve.f.from_mont(curve.b);
+    if (4 * mul(mul(a, a, p), a, p) + 27 * mul(b, b, p)).is_multiple_of(p) {
+        return Err("singular curve".into());
+    }
+    Ok((p, all, a, b))
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_checked_system(
+    p: u64,
+    all: Vec<u64>,
+    a: u64,
+    b: u64,
+    vars: usize,
+    parts: &[Vec<u64>],
+    encoding: Encoding,
+) -> Result<System, String> {
     let x: Vec<_> = (0..vars).map(|i| Expr::var(i, vars, p)).collect();
     let (mut equations, decode) = match encoding {
         Encoding::Partitioned3 => (vec![s3(&x[0], &x[1], &x[2], a, b)], Decode::Coordinates(3)),
@@ -384,6 +481,28 @@ fn decode_root(system: &System, root: &[u64]) -> Result<Vec<u64>, String> {
                 ],
                 p,
             )?
+        }
+        Decode::LineChart { values, a, b } => {
+            let (u, v) = (root[0], root[1]);
+            if u == 0 {
+                return Err("nonhorizontal chart has zero U".into());
+            }
+            let out = divisor_roots(
+                values,
+                &[
+                    u,
+                    (a + p - mul(2 * u % p, v, p)) % p,
+                    (mul(u, mul(v, v, p), p) + p - b) % p,
+                ],
+                p,
+            )?;
+            if out.iter().any(|x| (x + v) % p == 0) {
+                return Err("nonhorizontal chart has a zero lifting denominator".into());
+            }
+            out
+        }
+        Decode::Horizontal { values, a, b } => {
+            divisor_roots(values, &[0, *a, (mul(root[0], root[0], p) + p - b) % p], p)?
         }
         Decode::TwoPairs(parts) => {
             let mut values = divisor_roots(&parts[0], &root[..2], p)?;
@@ -858,8 +977,8 @@ pub fn validate_instance(curve: &FastCurve, g: Pt, q: Pt) -> Result<(), String> 
     }
     if !curve.is_on_curve(g)
         || !curve.is_on_curve(q)
-        || curve.mul(Some(g), curve.n).is_some()
-        || curve.mul(Some(q), curve.n).is_some()
+        || counted_mul(curve, Some(g), curve.n).is_some()
+        || counted_mul(curve, Some(q), curve.n).is_some()
     {
         return Err("points are not in the declared prime-order subgroup".into());
     }
@@ -900,7 +1019,10 @@ pub fn sample_base(
     } else {
         vec![0; sizes.len()]
     };
-    let shifts: Vec<_> = weights.iter().map(|&w| curve.mul(Some(q), w)).collect();
+    let shifts: Vec<_> = weights
+        .iter()
+        .map(|&w| counted_mul(curve, Some(q), w))
+        .collect();
     let mut rng = StdRng::seed_from_u64(seed);
     let mut base = LabeledBase {
         parts: vec![vec![]; sizes.len()],
@@ -919,9 +1041,9 @@ pub fn sample_base(
                 rng.gen_range(0..curve.n)
             };
             let point = if labels == Labels::Guaranteed {
-                curve.add(curve.mul(Some(g), u), shifts[slot])
+                counted_add(curve, counted_mul(curve, Some(g), u), shifts[slot])
             } else {
-                curve.combine(g, q, u, v)
+                counted_combine(curve, g, q, u, v)
             };
             base.draws += 1;
             let Some(point) = point else {
@@ -950,7 +1072,9 @@ pub fn validate_base(curve: &FastCurve, g: Pt, q: Pt, base: &LabeledBase) -> Res
             return Err("noncanonical labeled point".into());
         }
         let point = curve.point(entry.x, entry.y);
-        if !curve.is_on_curve(point) || curve.combine(g, q, entry.u, entry.v) != Some(point) {
+        if !curve.is_on_curve(point)
+            || counted_combine(curve, g, q, entry.u, entry.v) != Some(point)
+        {
             return Err("invalid known point representation".into());
         }
     }
@@ -1029,7 +1153,9 @@ fn checked_order_three(
         x: curve.f.mul(point.x, beta_mont),
         y: point.y,
     };
-    if curve.mul(Some(g), lambda) != Some(phi(g)) || curve.mul(Some(q), lambda) != Some(phi(q)) {
+    if counted_mul(curve, Some(g), lambda) != Some(phi(g))
+        || counted_mul(curve, Some(q), lambda) != Some(phi(q))
+    {
         return Err("incorrect automorphism eigenvalue".into());
     }
     Ok(beta_mont)
@@ -1046,6 +1172,36 @@ pub fn build_pruned_line_system(
     beta: u64,
     lambda: u64,
 ) -> Result<System, String> {
+    let values = certified_line_values(curve, g, q, base, beta, lambda)?;
+    let p = curve.f.p;
+    let mut system = build_system(curve, &[values], Encoding::Line3)?;
+    // Extend the two line parameters by the inverse of t. Do not give
+    // that inverse a coordinate-domain tag.
+    for equation in &mut system.equations {
+        for (e, _) in equation {
+            e.push(0);
+        }
+    }
+    let t = Expr::var(0, 3, p);
+    let z = Expr::var(2, 3, p);
+    system.equations.push(f4_fp::normalise(
+        &t.mul(&z).sub(&t.c(1)).terms,
+        p,
+        Ordering::Grevlex,
+    ));
+    system.variables = 3;
+    system.domains.push(None);
+    Ok(system)
+}
+
+fn certified_line_values(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    base: &LabeledBase,
+    beta: u64,
+    lambda: u64,
+) -> Result<Vec<u64>, String> {
     validate_instance(curve, g, q)?;
     validate_base(curve, g, q, base)?;
     checked_order_three(curve, g, q, beta, lambda)?;
@@ -1074,25 +1230,7 @@ pub fn build_pruned_line_system(
             return Err("orbit labels are independent; horizontal pruning is not justified".into());
         }
     }
-    let values: Vec<_> = base.points.keys().copied().collect();
-    let mut system = build_system(curve, &[values], Encoding::Line3)?;
-    // Extend the two line parameters by the inverse of t. Do not give
-    // that inverse a coordinate-domain tag.
-    for equation in &mut system.equations {
-        for (e, _) in equation {
-            e.push(0);
-        }
-    }
-    let t = Expr::var(0, 3, p);
-    let z = Expr::var(2, 3, p);
-    system.equations.push(f4_fp::normalise(
-        &t.mul(&z).sub(&t.c(1)).terms,
-        p,
-        Ordering::Grevlex,
-    ));
-    system.variables = 3;
-    system.domains.push(None);
-    Ok(system)
+    Ok(base.points.keys().copied().collect())
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -1216,7 +1354,11 @@ fn recover_validated_observed(
             let mut b = 0;
             for (entry, &sign) in entries.iter().zip(&signs) {
                 let point = curve.point(entry.x, entry.y);
-                sum = curve.add(sum, Some(if sign == 1 { point } else { curve.neg(point) }));
+                sum = counted_add(
+                    curve,
+                    sum,
+                    Some(if sign == 1 { point } else { curve.neg(point) }),
+                );
                 a = (a + if sign == 1 {
                     entry.u
                 } else {
@@ -1234,7 +1376,7 @@ fn recover_validated_observed(
             observer(RecoveryPhase::Descent);
             let logarithm = mul(neg(a, curve.n), inv_mod(b, curve.n), curve.n);
             observer(RecoveryPhase::Verification);
-            if curve.mul(Some(g), logarithm) != Some(q) {
+            if counted_mul(curve, Some(g), logarithm) != Some(q) {
                 return Err("signed point relation failed logarithm verification".into());
             }
             return Ok(Some(Recovery {

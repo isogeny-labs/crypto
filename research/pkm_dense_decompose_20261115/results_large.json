@@ -1,0 +1,234 @@
+{
+ "study": "EXP-PKM-DENSE-DEC-001 Amendment 1 (larger S)",
+ "validity": {
+  "V1_disagreements": [],
+  "V2_planted_without_relation": [],
+  "valid": true
+ },
+ "L1": {
+  "cells": [
+   [
+    512,
+    0.00045554553797155567
+   ],
+   [
+    1024,
+    0.00011475876415847307
+   ]
+  ],
+  "verdict": "held"
+ },
+ "L2": {
+  "cells": [
+   [
+    "m2-t9-both",
+    376.40048557554985
+   ],
+   [
+    "m2-t9-random",
+    402.07709034008354
+   ],
+   [
+    "m2-t10-both",
+    780.546873307134
+   ],
+   [
+    "m3-t6-dense",
+    1652773.3318171927
+   ],
+   [
+    "P3-m2-t8-both",
+    202.7572185239381
+   ],
+   [
+    "P3-m2-t11-dense",
+    1581.2393865486135
+   ],
+   [
+    "P3-m2-t11-random",
+    1499.2410380299252
+   ],
+   [
+    "P3-m2-t12-dense",
+    3150.1259568631876
+   ]
+  ],
+  "verdict": "held"
+ },
+ "L3": {
+  "m2_points": [
+   [
+    256,
+    9837983.0
+   ],
+   [
+    2048,
+    634711071.0
+   ],
+   [
+    4096,
+    2540296223.0
+   ]
+  ],
+  "m2_exponent": 2.0032799837405952,
+  "m3_points": [
+   [
+    32,
+    25130302513.0
+   ],
+   [
+    64,
+    736738587617.5
+   ]
+  ],
+  "m3_exponent": 4.873652864307026,
+  "verdict_m2": "held",
+  "verdict_m3": "held"
+ },
+ "L4": {
+  "cells": [
+   [
+    "m2-t9-random",
+    1.0009581279276079
+   ],
+   [
+    "P3-m2-t11-random",
+    1.0002387574550438
+   ]
+  ],
+  "verdict": "held"
+ },
+ "cells": [
+  {
+   "cell": "m2-t9-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 512,
+   "vkind": "coset",
+   "membership": "both",
+   "rows": 6,
+   "enum_ops": 105030,
+   "censored": [],
+   "tower_planted_ops_median": 86782417354.0,
+   "tower_over_enum_median": 826263.1377130344,
+   "tower_ms_median": 43053.3259175,
+   "dense_planted_ops_median": 39533343.0,
+   "dense_over_enum_median": 376.40048557554985,
+   "dense_ms_median": 1169.589531,
+   "dense_over_tower_median": 0.00045554553797155567,
+   "maxrss_gb": 1.3908500671386719
+  },
+  {
+   "cell": "m2-t9-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 512,
+   "vkind": "random",
+   "membership": "dense",
+   "rows": 6,
+   "enum_ops": 98417,
+   "censored": [],
+   "dense_planted_ops_median": 39571221.0,
+   "dense_over_enum_median": 402.07709034008354,
+   "dense_ms_median": 1369.2131115,
+   "maxrss_gb": 0.17518997192382812
+  },
+  {
+   "cell": "m2-t10-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 1024,
+   "vkind": "coset",
+   "membership": "both",
+   "rows": 3,
+   "enum_ops": 203058,
+   "censored": [],
+   "tower_planted_ops_median": 1381125774247,
+   "tower_over_enum_median": 6801631.919190576,
+   "tower_ms_median": 689793.946619,
+   "dense_planted_ops_median": 158496287,
+   "dense_over_enum_median": 780.546873307134,
+   "dense_ms_median": 6620.011325,
+   "dense_over_tower_median": 0.00011475876415847307
+  },
+  {
+   "cell": "m3-t6-dense",
+   "p": 1399680001,
+   "m": 3,
+   "S": 64,
+   "vkind": "coset",
+   "membership": "dense",
+   "rows": 2,
+   "enum_ops": 445759,
+   "censored": [],
+   "dense_planted_ops_median": 736738587617.5,
+   "dense_over_enum_median": 1652773.3318171927,
+   "dense_ms_median": 996875.411874
+  },
+  {
+   "cell": "P3-m2-t8-both",
+   "p": 3221225473,
+   "m": 2,
+   "S": 256,
+   "vkind": "coset",
+   "membership": "both",
+   "rows": 6,
+   "enum_ops": 48521,
+   "censored": [],
+   "tower_planted_ops_median": 9985340176.0,
+   "tower_over_enum_median": 205794.19583273222,
+   "tower_ms_median": 6648.442677999999,
+   "dense_planted_ops_median": 9837983.0,
+   "dense_over_enum_median": 202.7572185239381,
+   "dense_ms_median": 224.22683899999998,
+   "dense_over_tower_median": 0.0009852426485618313,
+   "maxrss_gb": 0.3483428955078125
+  },
+  {
+   "cell": "P3-m2-t11-dense",
+   "p": 3221225473,
+   "m": 2,
+   "S": 2048,
+   "vkind": "coset",
+   "membership": "dense",
+   "rows": 6,
+   "enum_ops": 401401,
+   "censored": [],
+   "dense_planted_ops_median": 634711071.0,
+   "dense_over_enum_median": 1581.2393865486135,
+   "dense_ms_median": 42574.984790500006,
+   "maxrss_gb": 2.088592529296875
+  },
+  {
+   "cell": "P3-m2-t11-random",
+   "p": 3221225473,
+   "m": 2,
+   "S": 2048,
+   "vkind": "random",
+   "membership": "dense",
+   "rows": 6,
+   "enum_ops": 423456,
+   "censored": [],
+   "dense_planted_ops_median": 634862613.0,
+   "dense_over_enum_median": 1499.2410380299252,
+   "dense_ms_median": 44174.789668,
+   "maxrss_gb": 2.816364288330078
+  },
+  {
+   "cell": "P3-m2-t12-dense",
+   "p": 3221225473,
+   "m": 2,
+   "S": 4096,
+   "vkind": "coset",
+   "membership": "dense",
+   "rows": 6,
+   "enum_ops": 806411,
+   "censored": [],
+   "dense_planted_ops_median": 2540296223.0,
+   "dense_over_enum_median": 3150.1259568631876,
+   "dense_ms_median": 322475.30484750005,
+   "maxrss_gb": 8.725452423095703
+  }
+ ],
+ "note": "Labelled extension (Amendment 1); frozen verdicts stand. No claim about cryptographic sizes or Pollard rho [pcc:unverified]."
+}

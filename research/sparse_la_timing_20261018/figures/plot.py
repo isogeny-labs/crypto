@@ -91,7 +91,7 @@ def fp4():
     if not p.exists():
         return
     s = json.load(open(p))
-    arms = [r for r in s["rows"]]
+    arms = [r for r in s["rows"] if r["arm"] in ("ig","igfr","sparse-cado","filter-lanczos","wiedemann","lanczos")]
     fig, ax = plt.subplots(1, 2, figsize=(12, 4.4))
     names = [r["linalg_arm"] for r in arms]
     ax[0].bar(names, [r["s_band"]["0.0"] for r in arms], color=[STYLE.get(n, ("", "#bbbbbb"))[1] for n in names])

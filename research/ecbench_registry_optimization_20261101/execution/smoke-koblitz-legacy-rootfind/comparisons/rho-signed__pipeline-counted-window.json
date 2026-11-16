@@ -1,0 +1,182 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h4f6801971115",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1h1b47fad824ab",
+    "arm": "rho-signed",
+    "method_id": "ECM1h64b303e4183b",
+    "method": "rho.signed_frobenius",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 1.7372404104310228,
+    "mean_ratio_to_floor": 7.067839170444001,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 1.7763422846207888,
+      "max_s": 1.8322021048918824,
+      "max_over_median": 1.031446540880503,
+      "top_run_share": 0.26366559485530544,
+      "top_run_id": "ECM1h64b303e4183bW83a1e84beae5R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 68
+    }
+  },
+  "b": {
+    "session_id": "ECBS1h1b47fad824ab",
+    "arm": "pipeline-counted-window",
+    "method_id": "ECM1hdc04078cfc90",
+    "method": "ic.pipeline_counted",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 34.20538430816622,
+    "mean_ratio_to_floor": 139.16217559857802,
+    "lower_bound": false,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 34.5866342120771,
+      "max_s": 36.43487261003223,
+      "max_over_median": 1.0534379375171972,
+      "top_run_share": 0.26629486371049005,
+      "top_run_id": "ECM1hdc04078cfc90W83a1e84beae5R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {}
+  },
+  "workloads": [
+    {
+      "workload_id": "W83a1e84beae5",
+      "slug": "icv1-f2m13-t181-515ee569",
+      "r": 2003,
+      "floor_s": 0.2457951247243632,
+      "pairs": 4,
+      "a_mean_s": 1.7372404104310228,
+      "b_mean_s": 34.20538430816622,
+      "ratio_b_over_a": 19.689493810289385,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 19.689493810289385,
+      "ci95": [
+        19.281891355404504,
+        20.105712627447335
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        19.470703654088048,
+        19.918359828947366
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 19.689493810289385,
+    "ci95": [
+      19.281891355404504,
+      20.105712627447335
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 10000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      19.470703654088048,
+      19.918359828947366
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 19.689493810289385,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        19.488745980707392,
+        20.191629955947135,
+        25.382585751978887
+      ],
+      "order": "pipeline-counted-window > rho-signed at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 of 4 pairs did not reach L2",
+      "0 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L2",
+    "pairs": 4,
+    "pairs_below_level": 4,
+    "median_ratio": 4.010846235353162,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.20136261526125762,
+    "ns_per_gae_a": 2242.1961414791,
+    "ns_per_gae_b": 451.4944789769323,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-signed"
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): pipeline-counted-window / rho-signed = 19.6895 [19.282, 20.106] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 19.4887, w=0.1: 20.1916, w=1: 25.3826): pipeline-counted-window > rho-signed at every weight; heavy tail in rho-signed: top run is 26% of the arm's total S (max/median 1.0); more runs needed; heavy tail in pipeline-counted-window: top run is 27% of the arm's total S (max/median 1.1); more runs needed; wall: descriptive (ns/GAE 0.2014, not a result: 4 of 4 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-signed is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1h7b8c8e8b3c49",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

@@ -1,0 +1,3 @@
+Prepare the already-reviewed five-call helper replay after the active root v4 attempt. This packet claims T2070 epoch1 and records exact launcher arguments, custody and final-admission fields. Frozen source remains unchanged; no compute reservation or release occurs here.
+
+Current campaign is16440 charged plus1800 reserved for rootv4. Conditional planning gives18240 charged and24960 remaining only after actual rootterminal and fullcharge. The next2400-second helper reservation would leave22560 unreserved; these are conditional values, not ledger updates. Root must supply actual latest receipts, verify serial terminal/cleanup, publish numeric finalfreeze delta, retain currentlease and explicitly release.

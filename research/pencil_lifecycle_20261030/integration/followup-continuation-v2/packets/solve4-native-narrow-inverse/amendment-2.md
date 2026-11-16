@@ -1,0 +1,1 @@
+Before attempt2: qualify imported WideModPow.half_value. Preserve attempt1 unknownIdentifier failure. Runner now records post-input hashes even on failed proof outcomes. No new theorem/premise or resource expansion; two attempts remain within original360-second maximum.

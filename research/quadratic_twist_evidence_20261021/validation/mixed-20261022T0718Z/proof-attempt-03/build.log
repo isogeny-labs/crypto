@@ -1,0 +1,67 @@
+TwistEmbedding.lean:18:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.nonsquare_ne_zero`:
+  [Fintype k]
+  [DecidableEq k]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype k] [DecidableEq k] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:22:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.frobenius_root_neg`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:35:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.twist_image_equation`:
+  [Fintype k]
+  [DecidableEq k]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype k] [DecidableEq k] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:48:24: warning: This simp argument is unused:
+  mul_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [twist, short, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, zero_mul, add_zero,
+    zero_add] at h ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:48:44: warning: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [twist, short, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, zero_mul, mul_zero,
+    add_zero] at h ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:82:4: error: unsolved goals
+case some.right
+k : Type u_1
+K : Type u_2
+inst✝⁶ : Field k
+inst✝⁵ : Fintype k
+inst✝⁴ : Field K
+inst✝³ : Algebra k K
+inst✝² : DecidableEq k
+inst✝¹ : DecidableEq K
+a b d : k
+inst✝ : WeierstrassCurve.IsElliptic (short a b)
+hchar : ringChar k ≠ 2
+hd : ¬IsSquare d
+u : K
+hu : u ^ 2 = (algebraMap k K) d
+x y : k
+h : (twist a b d).Nonsingular x y
+⊢ (algebraMap k K) y / -((algebraMap k K) d * u) = -((algebraMap k K) y / ((algebraMap k K) d * u))
+TwistEmbedding.lean:78:21: warning: This simp argument is unused:
+  Point.mk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [lift, FrobeniusBridge.curveFrobenius, Point.map_some, Point.neg_some, Point.some.injEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'TwistEmbedding.nonsquare_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_root_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.twist_image_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_lift_neg' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -1,0 +1,106 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261025-signed-base-cache",
+  "title": "Cache checked signed base points for actual S3 lifting",
+  "status": "draft",
+  "status_note": "Executed local evidence in PR2381:80 paired setups/800 scalar checks, exact ordered lifts/certificates and7 rehashed controls. Remains draft for main-ancestry/Cairn gates; no task lease/publication claimed.",
+  "created": "2026-10-25",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Existing PR2381 research continuation",
+  "question": "Can a setup-validated cache of plus/minus base points replace repeated binary scalar requests during actual S3 sign lifting while preserving every lift, row, log and main-source scalar?",
+  "decision_value": "Independently checked equality plus separate setup, online and cold request deltas decides whether to retain this cache implementation. A request decrease alone does not establish a calibrated speed result; a changed lift or scalar rejects the implementation.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/quadratic-twist-evidence-import",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/signed-cache-audit/Cargo.toml"
+      ]
+    ]
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "research/quadratic_twist_evidence_20261021/run-signed-cache.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Use existing local resources; native command caps600 seconds and one iteration envelope3600 seconds. Estimates remain null until the implementation and protocol are fixed; no paid compute or upload requested."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261025-signed-base-cache"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Executed local paired evidence is linked in notes; draft routing card only, no Cairn lease or publication. Preserve setup-charged requests and every ordered sign lift."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261025-signed-base-cache"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "quadratic-twist-signed-cache/v1",
+    "verify": [
+      "bash research/quadratic_twist_evidence_20261021/run-signed-cache.sh {out}/replay"
+    ],
+    "land": "research/quadratic_twist_evidence_20261021"
+  },
+  "links": {
+    "prs": [
+      2381
+    ],
+    "lead": "crypto-autoresearcher:LEAD-ICE-charged-toy-ic-exponent-vs-rho",
+    "notes": [
+      "research/quadratic_twist_evidence_20261021/reports/known-roots-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md",
+      "research/quadratic_twist_evidence_20261021/SIGNED_CACHE_20261025_PROTOCOL.md",
+      "research/quadratic_twist_evidence_20261021/reports/signed-cache-20261025/README.md"
+    ]
+  },
+  "blocked_on": []
+}

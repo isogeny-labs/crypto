@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:18Z",
+ "id": "PCC-20261113-15ab8f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ab578b7f119dc5961c276acdac2f7082e3519ef0eb3f7fbc6e4509ec1f0afd67",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.conditional_trace_pullback_composition"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem conditional_trace_pullback_composition {E0 E1 E2 J : Type} [IntModule E0] [IntModule E1] [IntModule E2] [IntModule J] (p0 : E0 \u2192 J) (p1 : E1 \u2192 J) (p2 : E2 \u2192 J) (norm : J \u2192 E0) (norm_add : \u2200 a b, norm (a+b)=norm a+norm b) (diagonal : \u2200 x, norm (p0 x)=(2 : Int) \u2022 x) (cross1 : \u2200 x, norm (p1 x)=0) (cross2 : \u2200 x, norm (p2 x)=0) (x0 : E0) (x1 : E1) (x2 : E2) : norm (p0 x0+p1 x1+p2 x2)=(2 : Int) \u2022 x0"
+}

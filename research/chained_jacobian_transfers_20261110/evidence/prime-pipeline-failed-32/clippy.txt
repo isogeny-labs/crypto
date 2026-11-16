@@ -1,0 +1,11 @@
+    Checking chained-transfer-reference v0.1.0 (/workspace/scratch/ct27-prototype)
+error: unused import: `Pt`
+  --> src/ct30_prime_pipeline.rs:11:50
+   |
+11 | use isogeny_algos::curve::{self, Curve, Isogeny, Pt, RatIsogeny};
+   |                                                  ^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: could not compile `chained-transfer-reference` (bin "chained-transfer-reference" test) due to 1 previous error

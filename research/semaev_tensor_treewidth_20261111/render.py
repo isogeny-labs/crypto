@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""Lay out the recorded census rows: a Markdown table, least-squares slopes of
+the recorded widths against b, an SVG graph (matplotlib) and the Typst source
+for the PDF. Reads rows/*.json only; computes nothing about any network."""
+import glob, json, math, os, sys
+HERE = os.path.dirname(os.path.abspath(__file__))
+rows = []
+for path in sorted(glob.glob(os.path.join(HERE, "rows", "*.json"))):
+    rows.extend(json.load(open(path)))
+rows.sort(key=lambda r: (r["multiplier"], r["relation"], r["bits"], -r.get("restarts", 1)))
+ORDER = ["grouplaw-hash", "grouplaw-smallx", "semaev-s3-smallx", "chained-s3-smallx"]
+LABEL = {"grouplaw-hash": "group law + hash (Bochum, m=2)",
+         "grouplaw-smallx": "group law, small-x (m=2)",
+         "semaev-s3-smallx": "Semaev S3, small-x (m=2)",
+         "chained-s3-smallx": "chained S3 (sparse S4), small-x (m=3)"}
+
+def fit(xs, ys):
+    n = len(xs)
+    if n < 2:
+        return float("nan"), float("nan")
+    mx, my = sum(xs) / n, sum(ys) / n
+    sxx = sum((x - mx) ** 2 for x in xs)
+    slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
+    return slope, my - slope * mx
+
+def ub(r):
+    return r.get("upper_bound")
+
+# ---- table -----------------------------------------------------------------
+lines = ["| multiplier | relation | b | l | restarts | s (edges) | V | max arity | free bits | core vars | tw lower | min-degree | min-fill | min-fill lazy | best upper | log2 cost (best) | s/sqrt(log2 s) | enum (m-1)b/m | validated |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+for r in rows:
+    mf = r.get("min_fill"); mfl = r.get("min_fill_lazy"); v = r.get("validation")
+    costs = [x["log2_cost"] for x in [r["min_degree"], mf, mfl] if x and x["width"] == ub(r)]
+    val = "-" if not v else ("pass %d/%d" % (v["positives"], v["evaluated"]) if v["passed"] else "FAIL")
+    lines.append("| %s | %s | %d | %d | %d | %s | %s | %d | %s | %s | %d | %d | %s | %s | %d | %.1f | %.0f | %.2f | %s |" % (
+        r["multiplier"], r["relation"], r["bits"], r["low_bits"], r.get("restarts", 1), format(r["edges"], ","), format(r["vertices"], ","),
+        r["max_arity"], r["free_bits"], format(r["core_variables"], ","), r["lower_bound"], r["min_degree"]["width"],
+        mf["width"] if mf else "-", mfl["width"] if mfl else "-", ub(r), min(costs) if costs else float("nan"),
+        r["d1_exponent_c1"], r["enumeration_exponent"], val))
+table = "\n".join(lines)
+
+# ---- slopes ----------------------------------------------------------------
+slope_lines = ["| multiplier | relation | b range | n | lower-bound slope (per bit) | best-upper slope (per bit) | eager min-fill slope where run (per bit) | lower/(b/2) at max b | upper/(b/2) at max b | s slope (log-log) |",
+               "|---|---|---|---|---|---|---|---|---|---|"]
+slopes = {}
+for mult in ["schoolbook", "fourier"]:
+    for rel in ORDER:
+        sel = [r for r in rows if r["multiplier"] == mult and r["relation"] == rel]
+        if len(sel) < 2:
+            continue
+        xs = [r["bits"] for r in sel]
+        lb_slope, _ = fit(xs, [r["lower_bound"] for r in sel])
+        ub_slope, _ = fit(xs, [ub(r) for r in sel])
+        s_slope, _ = fit([math.log2(x) for x in xs], [math.log2(r["edges"]) for r in sel])
+        last = sel[-1]
+        eager = [r for r in sel if r.get("min_fill")]
+        eager_slope = fit([r["bits"] for r in eager], [r["min_fill"]["width"] for r in eager])[0] if len(eager) >= 2 else float("nan")
+        slopes[(mult, rel)] = (lb_slope, ub_slope, eager_slope)
+        slope_lines.append("| %s | %s | %d-%d | %d | %.2f | %.2f | %s | %.1f | %.1f | %.2f |" % (
+            mult, rel, xs[0], xs[-1], len(xs), lb_slope, ub_slope,
+            "%.2f" % eager_slope if eager_slope == eager_slope else "-",
+            last["lower_bound"] / (last["bits"] / 2), ub(last) / (last["bits"] / 2), s_slope))
+slope_table = "\n".join(slope_lines)
+open(os.path.join(HERE, "TABLE.md"), "w").write("# Recorded rows\n\n" + table + "\n\n# Least-squares slopes\n\n" + slope_table + "\n")
+json.dump({"rows": len(rows), "slopes": {"%s/%s" % k: {"lower": v[0], "upper": v[1], "eager_min_fill": v[2]} for k, v in slopes.items()}},
+          open(os.path.join(HERE, "slopes.json"), "w"), indent=1)
+
+# ---- Typst tables (included by REPORT.typ) ----------------------------------
+def typ_escape(x):
+    return str(x).replace("#", "\\#").replace("$", "\\$").replace("_", "\\_")
+def typ_table(md_lines, size="6.2pt"):
+    header = [c.strip() for c in md_lines[0].strip("|").split("|")]
+    body = [[c.strip() for c in l.strip("|").split("|")] for l in md_lines[2:]]
+    cols = len(header)
+    out = ["#text(size: %s)[" % size, "#table(columns: %d, stroke: 0.3pt, inset: 2pt, align: (left,) * 2 + (right,) * %d," % (cols, cols - 2)]
+    out.append("  " + ", ".join("[*%s*]" % typ_escape(h) for h in header) + ",")
+    for row in body:
+        out.append("  " + ", ".join("[%s]" % typ_escape(c) for c in row) + ",")
+    out.append(")]")
+    return "\n".join(out)
+rows_lines = table.split("\n")
+slope_lines_md = slope_table.split("\n")
+open(os.path.join(HERE, "tables.typ"), "w").write(
+    "// Generated by render.py from rows/*.json. Do not edit.\n"
+    "#let rows_table = [" + typ_table(rows_lines) + "]\n"
+    "#let slopes_table = [" + typ_table(slope_lines_md, "7.5pt") + "]\n")
+
+# ---- graph -----------------------------------------------------------------
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+COLORS = {"grouplaw-hash": "#1f77b4", "grouplaw-smallx": "#ff7f0e", "semaev-s3-smallx": "#2ca02c", "chained-s3-smallx": "#d62728"}
+fig, axes = plt.subplots(1, 2, figsize=(12, 5.2))
+for ax, mult in zip(axes, ["schoolbook", "fourier"]):
+    bmax = 0
+    for rel in ORDER:
+        sel = [r for r in rows if r["multiplier"] == mult and r["relation"] == rel]
+        if not sel:
+            continue
+        xs = [r["bits"] for r in sel]; bmax = max(bmax, max(xs))
+        ax.fill_between(xs, [r["lower_bound"] for r in sel], [ub(r) for r in sel], color=COLORS[rel], alpha=0.12)
+        ax.plot(xs, [ub(r) for r in sel], "o-", color=COLORS[rel], label=LABEL[rel] + " (best upper)")
+        ax.plot(xs, [r["lower_bound"] for r in sel], "v--", color=COLORS[rel], label=LABEL[rel] + " (lower)")
+    bs = list(range(8, max(bmax, 8) + 1))
+    ax.plot(bs, [b / 2 for b in bs], "k:", label="enumeration / rho exponent b/2")
+    ax.set_xlabel("field size b = ceil(log2 p) (bits)")
+    ax.set_ylabel("treewidth bound of the primal graph (bits of table width)")
+    ax.set_title("%s multiplier" % mult)
+    ax.grid(True, alpha=0.3)
+    if mult == "schoolbook":
+        ax.legend(fontsize=7, loc="upper left")
+    else:
+        ax.legend(fontsize=7, loc="upper left")
+fig.suptitle("Treewidth of relation networks vs field size (toy prime-order curves, seed 20261111; shaded = bracket between lower and best upper bound)", fontsize=9)
+fig.tight_layout()
+fig.savefig(os.path.join(HERE, "treewidth_vs_bits.svg"))
+fig.savefig(os.path.join(HERE, "treewidth_vs_bits.png"), dpi=150)
+
+# second graph: exponents compared, schoolbook only
+fig, ax = plt.subplots(figsize=(7.5, 5.8))
+for rel in ORDER:
+    sel = [r for r in rows if r["multiplier"] == "schoolbook" and r["relation"] == rel]
+    if not sel:
+        continue
+    xs = [r["bits"] for r in sel]
+    ax.plot(xs, [r["d1_exponent_c1"] for r in sel], "s-", color=COLORS[rel], label=LABEL[rel] + ": s/sqrt(log2 s)")
+    ax.plot(xs, [ub(r) for r in sel], "o--", color=COLORS[rel], label=LABEL[rel] + ": best treewidth upper bound")
+sel = [r for r in rows if r["multiplier"] == "schoolbook" and r["relation"] == "semaev-s3-smallx"]
+if sel:
+    xs = [r["bits"] for r in sel]
+    ax.plot(xs, [r["enumeration_exponent"] for r in sel], "k:", label="enumeration exponent (m-1)b/m, m=2")
+ax.set_yscale("log")
+ax.set_xlabel("field size b (bits)")
+ax.set_ylabel("exponent (log2 of operations)")
+ax.set_title("Generic contraction bound vs tree-decomposition width vs enumeration (schoolbook networks)", fontsize=9)
+ax.grid(True, which="both", alpha=0.3)
+ax.legend(fontsize=6.5, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2)
+fig.tight_layout()
+fig.savefig(os.path.join(HERE, "exponents_vs_bits.svg"), bbox_inches="tight")
+fig.savefig(os.path.join(HERE, "exponents_vs_bits.png"), dpi=150, bbox_inches="tight")
+print("rows", len(rows))
+print(slope_table)

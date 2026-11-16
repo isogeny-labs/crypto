@@ -1,0 +1,22 @@
+/var/tmp/pencil-union-size-20261101-v1/UnionSize.lean:9:82: error: unexpected token 'at'; expected term
+/var/tmp/pencil-union-size-20261101-v1/UnionSize.lean:14:25: error: unsolved goals
+n : ℕ
+s : Sizes n
+ru rv : Fin n
+he : sizeAt s ru = sizeAt s rv
+⊢ sizeAt s rv ≤ sorry ()
+/var/tmp/pencil-union-size-20261101-v1/UnionSize.lean:14:34: warning: declaration uses `sorry`
+/var/tmp/pencil-union-size-20261101-v1/UnionSize.lean:33:39: error: unsolved goals
+n : ℕ
+s : Sizes n
+c p i : Fin n
+hi : i ≠ p
+hv : ↑p ≠ ↑i
+⊢ ((↑s).set (↑p) ((↑s)[↑p] + (↑s)[↑c]) ⋯)[↑i] = (↑s)[↑i]
+/var/tmp/pencil-union-size-20261101-v1/UnionSize.lean:35:21: warning: This simp argument is unused:
+  hv
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [sizeAt, update]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

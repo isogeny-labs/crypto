@@ -467,8 +467,15 @@ reduction modulo $S_{fe}$ and with $\sum_ig_if_i\not\equiv0$.
 Lemma 4 of \cite{Nag15} asserts $d_F\le d'_F$; the paper derives it from a lemma
 whose proof it declines to reproduce, and the fake quantity is what its applications
 bound (\ev{E29}). The printed condition reads ``$\max_i\deg(g_if_i)\ge d$''; under
-that literal reading the lemma holds only vacuously (\ev{E15}). We state the result
-for the equality reading, which is the one the complexity estimates need. We
+that literal reading the lemma fails with the field equations outside (witness~A
+gives $d_F=3$, $d'_F=2$) and holds with them inside, for every system: a fake fall
+lifts to a true fall at the same degree once its sum is replaced by a least-degree
+representative modulo the field equations (Lean,
+\texttt{research/ecdlp\_weakness\_lean\_20261104/lean/NagaoLiteralInside.lean},
+\texttt{lemma4\_literal\_inside}). An earlier version of this sentence said the
+lemma holds only vacuously under the literal reading (\ev{E15}); that is too broad.
+We state the result for the equality reading, which is the one the complexity
+estimates need. We
 consider $d_F$ with the field equations \emph{outside} the generating set
 ($F$ alone) and \emph{inside} ($F\cup S_{fe}$).
 

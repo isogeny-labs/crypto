@@ -1,0 +1,33 @@
+# frozen analysis output (bootstrap: Park-Miller seed 20261101, 10000 resamples, h=596)
+## per (d, arm)
+d=10 torsion=on K=500 h/K=1.19 finished=6/6 mean_trials=53859436 (11910565..78124080) mean_rels=203 mean_largest=33.7 mean_wall=59.0s
+d=10 torsion=off K=500 h/K=1.19 finished=6/6 mean_trials=7473531 (3655822..10153168) mean_rels=27 mean_largest=3.2 mean_wall=8.3s
+d=08 torsion=on K=121 h/K=4.93 finished=6/6 mean_trials=338953629 (253451581..449130540) mean_rels=73 mean_largest=21.8 mean_wall=257.2s
+d=08 torsion=off K=121 h/K=4.93 finished=6/6 mean_trials=30010957 (3655822..59135385) mean_rels=7 mean_largest=2.2 mean_wall=23.0s
+d=07 torsion=on K=55 h/K=10.84 finished=6/6 mean_trials=588115811 (334123188..767967947) mean_rels=26 mean_largest=7.8 mean_wall=360.6s
+d=07 torsion=off K=55 h/K=10.84 finished=6/6 mean_trials=102497825 (36846703..169842866) mean_rels=2 mean_largest=2.0 mean_wall=63.6s
+## paired ON/OFF trials per seed
+d=10 seed=20261024 off=7988238 on=72678287 on/off=9.10
+d=10 seed=20261101 off=3655822 on=40677010 on/off=11.13
+d=10 seed=20261102 off=8378562 on=11910565 on/off=1.42
+d=10 seed=20261103 off=6885174 on=49586316 on/off=7.20
+d=10 seed=20261104 off=7780224 on=78124080 on/off=10.04
+d=10 seed=20261105 off=10153168 on=70180355 on/off=6.91
+d=8 seed=20261024 off=31726279 on=281775947 on/off=8.88
+d=8 seed=20261101 off=3655822 on=334123188 on/off=91.39
+d=8 seed=20261102 off=38327382 on=399890387 on/off=10.43
+d=8 seed=20261103 off=59135385 on=253451581 on/off=4.29
+d=8 seed=20261104 off=21937453 on=315350133 on/off=14.37
+d=8 seed=20261105 off=25283422 on=449130540 on/off=17.76
+d=7 seed=20261024 off=125633434 on=628882818 on/off=5.01
+d=7 seed=20261101 off=169842866 on=334123188 on/off=1.97
+d=7 seed=20261102 off=67254711 on=692734923 on/off=10.30
+d=7 seed=20261103 off=59135385 on=384698428 on/off=6.51
+d=7 seed=20261104 off=36846703 on=720287560 on/off=19.55
+d=7 seed=20261105 off=156273851 on=767967947 on/off=4.91
+## per d: pairs, geometric mean ON/OFF, 95% bootstrap interval (csv: d,K,h_over_K,pairs,geomean,lo,hi)
+d,K,h_over_K,pairs,geomean_on_over_off,ci_lo,ci_hi
+12,2011,0.30,8,7.462,4.904,11.920
+10,500,1.19,6,6.449,3.417,9.723
+8,121,4.93,6,14.493,7.441,32.850
+7,55,10.84,6,6.314,3.633,10.941

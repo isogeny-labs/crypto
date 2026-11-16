@@ -1,0 +1,34 @@
+{
+  "schema": "n83.s3-custody/v1",
+  "dataset": "model-expansion-followup-20261101-attempt-08",
+  "source_git_commit": "8111a5c6e7b9",
+  "archive": {
+    "uri": "s3://setec-astronomy-artifacts/runs/n83-model-expansion-followup-20261101-attempt-08/snapshots/sha256-be88ab79244819dd52248281ceee01f50b0ab830b3849613fc397751327dd3dc.tar.gz",
+    "sha256": "be88ab79244819dd52248281ceee01f50b0ab830b3849613fc397751327dd3dc",
+    "bytes": 7851094,
+    "s3_readback": "byte-identical; SHA-256 verified",
+    "contents": "556 Git-tracked files from attempt-08 and its ten-base report directory"
+  },
+  "factor_base_payloads": {
+    "artifact_store": "s3://setec-astronomy-artifacts/store/sha256/",
+    "attempt08_system_sing_payloads": 144,
+    "remote_verification": "144 hydrated, 0 not pulled, 0 problems",
+    "dataset_index": "research/n83_candidate_pdp_20261028/evidence/model-expansion-followup-20261101/attempt-08/DATASET-INDEX.json"
+  },
+  "fixed_factor_base_datasets": [
+    {
+      "variant": "r38",
+      "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r38-20261031-r1/attempt-01/",
+      "file_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+      "git_recovery_readme": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r38-attempt-01/terminal-recovery-20261101T2000Z/README.md"
+    },
+    {
+      "variant": "r39",
+      "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r39-20261031-r1/attempt-01/",
+      "file_index_sha256": "0baee0b147a21fb2921d3fb897598c5596ce3defdd61e6321984ad677f052b30",
+      "git_recovery_readme": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r39-attempt-01/terminal-recovery-20261101T2020Z/README.md"
+    }
+  ],
+  "index_sha256": "eb5c08620c9c7647dc7d580f254ab436f1fd56d8687c8179b330b017e2aaef1c",
+  "limitations": "The snapshot archive includes the tracked metadata, certificates, model outputs, source and report. Large ignored system.sing payloads are referenced through the content-addressed store above; the fixed factor-base point shards remain in their existing isolated-results S3 prefixes."
+}

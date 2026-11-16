@@ -1,0 +1,412 @@
+{
+  "false_identity": {
+    "counterexample": {
+      "assignment": [
+        58823141100517264,
+        1448009689811688343,
+        1578107885037998643,
+        1447670334990308391,
+        348798574440396907,
+        1159520472642582388,
+        252392899992886059
+      ],
+      "index": 0,
+      "lhs": 2001607925772670463,
+      "rhs": 2001607925772670464
+    },
+    "statement": {
+      "degree_bound": 3,
+      "lhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": "oT",
+                        "op": "var"
+                      },
+                      {
+                        "args": "pT",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": "rows",
+                        "op": "var"
+                      },
+                      {
+                        "args": "cT",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  }
+                ],
+                "op": "add"
+              },
+              {
+                "args": "pE",
+                "op": "var"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "oE",
+                          "op": "var"
+                        },
+                        {
+                          "args": "pE",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "rows",
+                          "op": "var"
+                        },
+                        {
+                          "args": "cE",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "pT",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            "op": "neg"
+          }
+        ],
+        "op": "add"
+      },
+      "name": "twist-yield-cleared-budget-difference",
+      "rhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "oT",
+                            "op": "var"
+                          },
+                          {
+                            "args": {
+                              "args": "oE",
+                              "op": "var"
+                            },
+                            "op": "neg"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": "pE",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": "pT",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": "rows",
+                    "op": "var"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "cT",
+                            "op": "var"
+                          },
+                          {
+                            "args": "pE",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": {
+                          "args": [
+                            {
+                              "args": "cE",
+                              "op": "var"
+                            },
+                            {
+                              "args": "pT",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        "op": "neg"
+                      }
+                    ],
+                    "op": "add"
+                  }
+                ],
+                "op": "mul"
+              }
+            ],
+            "op": "add"
+          },
+          {
+            "args": 1,
+            "op": "const"
+          }
+        ],
+        "op": "add"
+      },
+      "source": "research/quadratic_twist_evidence_20261021/lean/RelationCost.lean:RelationCost.cleared_budget_difference_identity; polynomial part only; positivity and inequalities are checked separately in Lean",
+      "variables": [
+        "oT",
+        "oE",
+        "rows",
+        "cT",
+        "cE",
+        "pT",
+        "pE"
+      ]
+    }
+  },
+  "false_source": {
+    "certificate": {
+      "id": "IDC1h1fac46ceb41801ac",
+      "independence": "Polynomial budget difference only; no measured advantage or regularity bound",
+      "modulus": 2305843009213693951,
+      "points": 32,
+      "proof": {
+        "kind": "lean4",
+        "path": "research/quadratic_twist_evidence_20261021/lean/RelationCost.lean",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "schema": "identity.certificate/v1",
+      "seed": 20261024,
+      "statement": {
+        "degree_bound": 3,
+        "lhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "oT",
+                          "op": "var"
+                        },
+                        {
+                          "args": "pT",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "rows",
+                          "op": "var"
+                        },
+                        {
+                          "args": "cT",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "pE",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "oE",
+                            "op": "var"
+                          },
+                          {
+                            "args": "pE",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": "rows",
+                            "op": "var"
+                          },
+                          {
+                            "args": "cE",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": "pT",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        },
+        "name": "twist-yield-cleared-budget-difference",
+        "rhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "oT",
+                          "op": "var"
+                        },
+                        {
+                          "args": {
+                            "args": "oE",
+                            "op": "var"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": "pE",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "pT",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": "rows",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "cT",
+                          "op": "var"
+                        },
+                        {
+                          "args": "pE",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": {
+                        "args": [
+                          {
+                            "args": "cE",
+                            "op": "var"
+                          },
+                          {
+                            "args": "pT",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      "op": "neg"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        "source": "research/quadratic_twist_evidence_20261021/lean/RelationCost.lean:RelationCost.cleared_budget_difference_identity; polynomial part only; positivity and inequalities are checked separately in Lean",
+        "variables": [
+          "oT",
+          "oE",
+          "rows",
+          "cT",
+          "cE",
+          "pT",
+          "pE"
+        ]
+      },
+      "value_digest": "90e03fe9ddd0310537ffc07947cf544677dee0cf0c98c535029ccaa70e74e7c1"
+    },
+    "rejection": "Lean source SHA-256 mismatch"
+  }
+}

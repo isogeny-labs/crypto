@@ -1,0 +1,10 @@
+RecursiveSemaevSymmetry.lean:66:2: error: Type mismatch: After simplification, term
+  recursivePolynomial_natDegree W (n + 1)
+ has type
+  @Eq ℕ (recursivePolynomial W (n + 1)).natDegree (2 ^ (n + (1 + 1)))
+but is expected to have type
+  @Eq ℕ (recursivePolynomial W (n + 1)).natDegree (2 ^ (n + 2))
+'RecursiveSemaevSymmetryAudit.newest_pair_audit_certificate' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
