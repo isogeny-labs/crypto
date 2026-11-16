@@ -51,3 +51,5 @@ sources/criteria unchanged. Metadata character/UTF8-byte assertion corrected
 from unchanged chunks, no ledgercontentchange. No holes/customaxioms/native
 proofeval/raisedlimits/newflags/waivers/frozenedit/cryptoPython/spend/uploads.
 [pcc:unverified]
+
+Publication: ready [PR #4377](https://github.com/isogeny-labs/crypto/pull/4377), new follow-up stacked on #3739 after external merge #4369. Remote proof `513cc639cabbc50e1eab82fa61c74afc370b904e` and local receipt `999878fa7f119b5e4c7013da0b4e1c69f6c46329` share tree `596638ecbf200f88ef26c6afee6dc54f9657968d`. Anonymous fetch completed; fresh exact head/body/title/open/ready matched. Body has4035characters. All38pinsets3464entries/77scope links match;631nonemptyledgerprefix preserved through632. Current-head CI/review/signing pending. [pcc:unverified]
