@@ -1,0 +1,44 @@
+{
+  "cli-build.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/cli-build.log",
+    "bytes": 479,
+    "sha256": "47f06d8ec9b428769741ae34ad93cfce4c2e1381d2225371386d57000ae72d6d",
+    "raw_utf8": "warning: function `solve_one_with_trace` is never used\n    --> src/cryptanalysis/ecbench/../../../research/pencil_large_prime_20261029/src/native_solver.rs:1351:8\n     |\n1351 | pub fn solve_one_with_trace(\n     |        ^^^^^^^^^^^^^^^^^^^^\n     |\n     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `crypto` (lib) generated 1 warning\n   Compiling crypto v0.1.0 (/workspace/crypto)\n    Finished `release` profile [optimized] target(s) in 15.51s\n"
+  },
+  "cli-gate.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/cli-gate.log",
+    "bytes": 251,
+    "sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+    "raw_utf8": "checkpoint: no way to upload: no AWS profile 'ecc-challenges-new', no CHECKPOINT_UPLOAD_TOKEN, no /home/agent/.config/checkpoint/upload-token\ncheckpoint: cannot upload, so nothing was checkpointed\nError: \"checkpoint gate refused experiment or replay\"\n"
+  },
+  "example-tests.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/example-tests.log",
+    "bytes": 4061,
+    "sha256": "338cd098becc2251e9c696ea4bff424ff2b6d8dd1d088adc3fd7b8560d1f38e0",
+    "raw_utf8": "warning: function `solve_one_with_trace` is never used\n    --> src/cryptanalysis/ecbench/../../../research/pencil_large_prime_20261029/src/native_solver.rs:1351:8\n     |\n1351 | pub fn solve_one_with_trace(\n     |        ^^^^^^^^^^^^^^^^^^^^\n     |\n     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `crypto` (lib) generated 1 warning\n   Compiling crypto v0.1.0 (/workspace/crypto)\n    Finished `release` profile [optimized] target(s) in 15.44s\n     Running unittests examples/pkm_oracle_program.rs (target/release/examples/pkm_oracle_program-74cbc51b8a68a70f)\n\nrunning 36 tests\ntest algebra::helper_work_tests::helper_counter_and_aggregate_overflow_are_unavailable_without_changing_math ... ok\ntest algebra::helper_work_tests::result_errors_keep_helper_work_without_charging_calls_between_scopes ... ok\ntest native_work::tests::observed_backwards_incoherent_and_overflowing_differences_stay_unavailable ... ok\ntest native_work::tests::observed_callback_native_work_is_not_charged_again_outside_callbacks ... ok\ntest native_work::tests::refusal_and_zero_call_states_are_retained_without_inventing_completion ... ok\ntest pipeline::tests::cap_and_full_group_order_are_checked ... ok\ntest pipeline::tests::emitted_encoder_diagnostics_bind_when_present_and_old_records_remain_readable ... ok\ntest pipeline::tests::helper_setup_scopes_conserve_parameter_and_constructor_calls_on_refusal ... ok\ntest pipeline::tests::independent_replay_emits_separate_scalar_affine_and_nested_operation_views ... ok\ntest pipeline::tests::inverse_diagnostic_does_not_replace_expanded_multiplications ... ok\ntest pipeline::tests::late_setup_refusal_retains_the_full_scan_without_starting_oracle_work ... ok\ntest pipeline::tests::public_target_recovery_has_no_scalar_input_and_replays ... ok\ntest pipeline::tests::query_field_emission_conserves_every_attempt_including_identity ... ok\ntest pipeline::tests::rank_deficiency_and_contradiction_are_not_answers ... ok\ntest pipeline::tests::rejected_replays_retain_reference_work_before_returning_errors ... ok\ntest pipeline::tests::relation_encoder_counts_scalar_and_orientation_prefixes_and_marks_overflow ... ok\ntest rank_reference::tests::all_two_by_three_f3_spaces_match_minor_rank_and_check_every_certificate ... ok\ntest rank_reference::tests::counted_inverse_children_and_failed_calls_stay_with_the_caller ... ok\ntest rank_reference::tests::counter_overflow_is_unavailable_not_zero_or_saturated_exact_work ... ok\ntest rank_reference::tests::malformed_rank_recovery_and_ambiguity_certificates_fail_closed ... ok\ntest rank_reference::tests::recovery_combinations_survive_row_order_and_large_residues ... ok\ntest rank_reference::tests::shared_space_ledgers_conserve_work_and_late_certificate_refusals ... ok\ntest reference::accounting_tests::corrupt_witness_keeps_checked_prefix_and_duplicate_refusal_starts_no_arithmetic ... ok\ntest reference::accounting_tests::enumeration_budget_refusal_retains_the_completed_field_scan ... ok\ntest reference::accounting_tests::successful_and_lost_output_checks_keep_disjoint_witness_and_enumeration_work ... ok\ntest tests::all_presentations_agree_on_supported_two_sum_sets ... ok\ntest tests::budget_and_output_caps_remain_incomplete ... ok\ntest tests::canonical_export_is_deterministic_and_uses_full_field_domains ... ok\ntest tests::certified_miss_does_not_depend_on_a_planted_target ... ok\ntest tests::complete_m4_sets_match_independent_affine_control_on_all_finite_targets ... ok\ntest tests::independent_affine_reference_matches_known_group_equations ... ok\ntest tests::malformed_public_inputs_fail_before_polynomial_construction ... ok\ntest tests::native_window_metadata_binds_attempt_state_and_keeps_legacy_records_readable ... ok\ntest tests::replay_rejects_binding_completion_and_ledger_tampering ... ok\ntest tests::tiny_control_rejects_lost_duplicate_and_corrupt_witnesses ... ok\ntest tests::validation_counts_survive_acceptance_refusal_and_serialization ... ok\n\ntest result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 359.26s\n\n"
+  },
+  "format.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/format.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw_utf8": ""
+  },
+  "scoped-clippy.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/scoped-clippy.log",
+    "bytes": 1059,
+    "sha256": "a98e164b1cc43259431d5bf55e929fc016d3ac2fa76aa0ad32f594aafaa5772d",
+    "raw_utf8": "    Checking crypto v0.1.0 (/workspace/crypto)\nerror: function `solve_one_with_trace` is never used\n    --> src/cryptanalysis/ecbench/../../../research/pencil_large_prime_20261029/src/native_solver.rs:1351:8\n     |\n1351 | pub fn solve_one_with_trace(\n     |        ^^^^^^^^^^^^^^^^^^^^\n     |\n     = note: `-D dead-code` implied by `-D warnings`\n     = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`\n\nerror: equality checks against false can be replaced by a negation\n   --> src/ml_dataset/custody.rs:713:8\n    |\n713 |     if receipt.completion.roundtrip_verified == false\n    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `!receipt.completion.roundtrip_verified`\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#bool_comparison\n    = note: `-D clippy::bool-comparison` implied by `-D warnings`\n    = help: to override `-D warnings` add `#[allow(clippy::bool_comparison)]`\n\nerror: could not compile `crypto` (lib) due to 2 previous errors\n"
+  },
+  "supervisor.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/supervisor.log",
+    "bytes": 108,
+    "sha256": "597e857369d175cf41d2c4ae19a651502fba35ece8c34803f77dbcf544247a46",
+    "raw_utf8": "toolchain exit=0\nexample-tests exit=0\nformat exit=0\ncli-build exit=0\ncli-gate exit=1\nscoped-clippy exit=101\n"
+  },
+  "toolchain.log": {
+    "path": "/workspace/pkm-native-windows-20261106/native/toolchain.log",
+    "bytes": 36,
+    "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+    "raw_utf8": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n"
+  }
+}

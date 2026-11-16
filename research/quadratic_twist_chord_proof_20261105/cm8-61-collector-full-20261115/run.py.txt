@@ -1,0 +1,40 @@
+# Thin file/process/hash qualifier only, no research arithmetic.
+from pathlib import Path
+import subprocess,sys,json,hashlib,os,datetime
+root=Path('/workspace/crypto-twist-chord-proof');scope=Path('research/quadratic_twist_chord_proof_20261105/cm8-61-collector-full-20261115');out=Path(sys.argv[1]);checkpoint=sys.argv[2]
+phase=sys.argv[3];assert phase in ['build','run'];assert (not out.exists()) if phase=='build' else (out/'build.json').exists();assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==checkpoint
+assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+pins=json.loads((root/scope/'PINS.json').read_text())
+for p,h in pins['inputs'].items():assert hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+if phase=='build':out.mkdir()
+stages=[];started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat()
+env=dict(os.environ,CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR='/workspace/twist-cm8-61-collector-full-build-20261115')
+def run(name,cmd,want=0):
+    with(out/(name+'.stdout')).open('wb')as a,(out/(name+'.stderr')).open('wb')as b:r=subprocess.run(['timeout','600',*cmd],cwd=root,stdout=a,stderr=b,env=env)
+    stages.append(dict(name=name,command=cmd,exit=r.returncode,expected=want));(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert r.returncode==want,(name,r.returncode)
+try:
+    if phase=='build':
+        run('cpp',['g++','-std=c++20','-O2','-Wall','-Wextra','-I/workspace/twist-native-tooling/include',str(scope/'collector.cpp'),'-lcrypto','-o',str(out/'producer')])
+        run('rust',['/workspace/twist-native-tooling/cargo/bin/cargo','+1.85.1','build','--offline','--locked','--release','--manifest-path',str(scope/'Cargo.toml')])
+        import shutil
+        shutil.copyfile(Path(env['CARGO_TARGET_DIR'])/'release/twist-cm61-collector-full-audit',out/'auditor');(out/'auditor').chmod(0o700)
+        build=dict(checkpoint=checkpoint,source_inputs=pins['inputs'],binaries={n:hashlib.sha256((out/n).read_bytes()).hexdigest()for n in ['producer','auditor']},commands=stages.copy())
+        with(out/'build.json').open('x')as f:f.write(json.dumps(build,indent=2)+'\n')
+        sys.exit(0)
+    build=json.loads((out/'build.json').read_text());protocol=json.loads((root/scope/'protocol.json').read_text())
+    assert all(hashlib.sha256((out/n).read_bytes()).hexdigest()==h for n,h in build['binaries'].items());assert protocol['extensions']['binary_pins']==build['binaries']
+    with(out/'precall.json').open('x')as f:f.write(json.dumps(dict(build=build,protocol_checkpoint=checkpoint,protocol_sha256=hashlib.sha256((root/scope/'protocol.json').read_bytes()).hexdigest(),started_utc=started_utc,qualifier_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()),indent=2)+'\n')
+    for tag in ['A','B']:
+        run('producer'+tag,[str(out/'producer'),'produce','/workspace/twist-cm8-61-full-run01-20261115/casesA',str(out/('cases'+tag+'.json'))])
+        run('audit'+tag,[str(out/'auditor'),'audit','/workspace/twist-cm8-61-full-run01-20261115/casesA',str(out/('cases'+tag+'.json')),str(out/('audit'+tag+'.json'))])
+    assert(out/'casesA.json').read_bytes()==(out/'casesB.json').read_bytes();assert(out/'auditA.json').read_bytes()==(out/'auditB.json').read_bytes()
+    controls=[]
+    for mode in ['source','free-second-call','missing-state','state','rank','increment','multiplicity','coupling','missing-failed-query','missing-cap','dominance','operational-degree']:
+        p=out/('false-'+mode+'.json');receipt=out/('false-'+mode+'-receipt.json')
+        run('mutate-'+mode,[str(out/'producer'),'mutate',str(out/'casesA.json'),str(p),mode]);assert p.read_bytes()!=(out/'casesA.json').read_bytes()
+        run('reject-'+mode,[str(out/'auditor'),'audit','/workspace/twist-cm8-61-full-run01-20261115/casesA',str(p),str(receipt)],101);assert not receipt.exists();controls.append(dict(mode=mode,sha256=hashlib.sha256(p.read_bytes()).hexdigest(),receipt=False))
+    (out/'controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+finally:
+    record=dict(checkpoint=checkpoint,started_utc=started_utc,finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),stages=len(stages))
+    (out/(phase+'-run.json')).write_text(json.dumps(record,indent=2)+'\n')
+    with(out/('postcall.json'if phase=='run'else 'build-postcall.json')).open('x')as f:f.write(json.dumps(record,indent=2)+'\n')
