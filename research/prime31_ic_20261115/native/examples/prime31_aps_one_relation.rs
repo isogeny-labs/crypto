@@ -135,6 +135,13 @@ fn source_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
 // observed success probability must be measured, not assumed.
 fn source_walk_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
     ->Result<([Vec<Labelled>;3],u64,u64),String>{
+    source_walk_profile(q,seed,ar,[count;3])
+}
+// The exact same 64-step public random walk as the incumbent, but its three
+// labelled-list sizes can differ. A single GLOBAL abscissa dedup set protects
+// the independent coordinate partitions. No target secret is available here.
+fn source_walk_profile(q:(u64,u64),seed:u64,ar:&mut Arithmetic,sizes:[usize;3])
+    ->Result<([Vec<Labelled>;3],u64,u64),String>{
     const STEPS:usize=64;
     let mut rng=seed^0x5741_4c4b_5f53_5445_u64;
     let mut steps=Vec::with_capacity(STEPS);
@@ -151,11 +158,12 @@ fn source_walk_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
         };
         steps.push(jump);
     }
-    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|_|Vec::with_capacity(count));
-    let mut xs=HashSet::with_capacity(3*count);
+    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|i|Vec::with_capacity(sizes[i]));
+    let mut xs=HashSet::with_capacity(sizes.iter().sum());
     let mut identity=0u64;
     let mut duplicated=0u64;
-    for part in &mut out {
+    for (part_idx,part) in out.iter_mut().enumerate() {
+        let count=sizes[part_idx];
         let mut cur=loop {
             let a=prng(&mut rng)%N;
             let b=prng(&mut rng)%N;
@@ -825,6 +833,138 @@ fn mersenne_field_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+ // EXP-R31-APS-UNEQUAL: complete published APS S3 single-relation solver with
+ // non-equal labelled partitions. This is a *generic-MITM-equivalent* Rust
+ // engineering test, not a claimed non-generic attack or full m8 solver.
+fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
+    ->Result<serde_json::Value,String>{
+    if sizes.iter().any(|&n|n<16 || n>32_768) ||
+        sizes.iter().sum::<usize>()>40_000 ||
+        round_limit==0 || round_limit>8 {
+        return Err("unequal-profile admission limit exceeded".into());
+    }
+    let cold=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar)?;
+    if !ar.on_curve(PRIME31,Some(q)) || q==PRIME31.g {
+        return Err("invalid public target for unequal APS".into());
+    }
+    let mut attempts=Vec::new();
+    for round in 0..round_limit {
+        let seed=SEED.wrapping_add((round as u64).wrapping_mul(0xd1b5_4a32_d192_ed03));
+        let setup_begin=Instant::now();
+        let additions_before=ar.counts.group_additions;
+        let (parts,identities,duplicates)=source_walk_profile(q,seed,&mut ar,sizes)?;
+        let setup_ns=setup_begin.elapsed().as_nanos();
+        let source_additions=ar.counts.group_additions-additions_before;
+        let root_begin=Instant::now();
+        let before_verify=ar.counts.group_additions;
+        let (solution,stats)=algebraic_mode::<true>(&parts,q,&mut ar)?;
+        let root_ns=root_begin.elapsed().as_nanos();
+        let verification_additions=ar.counts.group_additions-before_verify;
+        let found=solution.is_some();
+        attempts.push(json!({
+            "round":round,"seed":format!("{seed:016x}"),"profile":sizes,
+            "source_setup_ns":setup_ns,"source_group_additions":source_additions,
+            "rejected_identity":identities,"rejected_duplicate_x":duplicates,
+            "s3_query_ns":root_ns,"s3_pair_quadratics":stats.pair_s3,
+            "s3_sqrts":stats.s3_sqrt,"s3_batch_inversions":stats.batch_inversions,
+            "signed_candidates":stats.signed_candidates,
+            "verification_group_additions":verification_additions,
+            "solution":json_solution(&solution),
+            "elapsed_cold_ns":cold.elapsed().as_nanos(),
+        }));
+        if found {
+            return Ok(json!({
+                "standing":"[pcc:unverified]","method":"APS one relation, unequal sampled labelled public lists",
+                "classification":"published index calculus, generic pair-MITM equivalent",
+                "p":P,"n":N,"cofactor":1,"public_Q":q,
+                "profile":sizes,"round_cap":round_limit,
+                "complete_target_scalar_recovered":true,"known_answer_in_solver":false,
+                "cold_wall_ns":cold.elapsed().as_nanos(),"attempts":attempts
+            }));
+        }
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]","method":"APS one relation, unequal sampled labelled public lists",
+        "classification":"published index calculus, generic pair-MITM equivalent",
+        "p":P,"n":N,"cofactor":1,"public_Q":q,
+        "profile":sizes,"round_cap":round_limit,
+        "complete_target_scalar_recovered":false,"status":"bounded_exhaustion",
+        "cold_wall_ns":cold.elapsed().as_nanos(),"attempts":attempts
+    }))
+}
+fn unequal_profile_confirmation()->Result<serde_json::Value,String>{
+    // Caller-side deterministic holdouts are distinct from historical
+    // APS panels; known k never enters execute_unequal_profile.
+    const CASES:usize=24;
+    let profiles=[[1536,1536,1536],[256,256,32768],[384,384,16384],[256,256,32768]];
+    let names=["control1536","unequal256","unequal384","unequal256_repeat"];
+    let mut rng=0x554e_4551_5541_4c32_u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut totals=[0u128;4];
+    let mut successes=[0usize;4];
+    let mut queries=[0u64;4];
+    let mut source_groups=[0u64;4];
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES {
+        let k=loop {
+            let x=prng(&mut rng)%N;
+            if x>1 && used.insert(x) {break x;}
+        };
+        let q=verifier.scalar(PRIME31,k,Some(PRIME31.g))
+            .ok_or("generated identity public Q")?;
+        let order: [usize;4]=if case%2==0 {[0,1,2,3]}else{[1,2,3,0]};
+        let mut arms=Vec::new();
+        for (position,&arm) in order.iter().enumerate() {
+            let result=execute_unequal_profile(q,profiles[arm],6)?;
+            let solved=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let attempts=result["attempts"].as_array().ok_or("missing attempts")?;
+            let output=attempts.last().and_then(|v|
+                v.pointer("/solution/log")).and_then(|v|v.as_u64());
+            if solved && (output!=Some(k) ||
+                verifier.scalar(PRIME31,output.unwrap(),Some(PRIME31.g))!=Some(q)){
+                return Err(format!("unequal arm {} wrong scalar case {}",names[arm],case));
+            }
+            let cost=result["cold_wall_ns"].as_u64().ok_or("missing cold time")?;
+            let n_queries=attempts.iter().map(|a|
+                a["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            let n_groups=attempts.iter().map(|a|
+                a["source_group_additions"].as_u64().unwrap_or(0)).sum::<u64>();
+            totals[arm]+=u128::from(cost);
+            queries[arm]+=n_queries;
+            source_groups[arm]+=n_groups;
+            if solved {successes[arm]+=1;}
+            arms.push(json!({
+                "arm":names[arm],"order":position,"profile":profiles[arm],
+                "complete_target_scalar_recovered":solved,"recovered_log":output,
+                "rounds":attempts.len(),"cold_wall_ns":cost,
+                "all_s3_pair_queries":n_queries,"all_source_group_additions":n_groups,
+                "bounded_failure":!solved,"attempts":attempts
+            }));
+        }
+        cases.push(json!({
+            "case":case,"public_Q":q,"known_answer_caller_verifier_only":k,
+            "arm_order":arms
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experiment":"EXP-R31-APS-UNEQUAL-20261116",
+        "classification":"published APS prime-field one-relation IC, generic MITM-equivalent",
+        "curve_p":P,"curve_n":N,"cofactor":1,
+        "public_holdouts":CASES,"profiles":profiles,"names":names,
+        "round_limit":6,"successes":successes,
+        "all_complete":successes.iter().all(|&count|count==CASES),
+        "cold_total_ns":totals.map(|v|v.to_string()),
+        "s3_pair_queries":queries,"source_group_additions":source_groups,
+        "interpretation":"full in-process cold producer-only, no external PKM/APS/CAS or PCC",
+        "cases_detail":cases
+    }))
+}
+
 fn heldout_twelve()->Result<serde_json::Value,String>{
     // Caller-side fixture generation; the scalar is never passed to execute().
     // These known answers are verified only after the complete algebraic solve.
@@ -881,6 +1021,14 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--unequal-confirm" {
+        let result=unequal_profile_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e| e.to_string())?);
+        if result["all_complete"].as_bool()!=Some(true) {
+            return Err("not every unequal-profile candidate recovered its target".into());
+        }
+        return Ok(());
+    }
     // Reproducible complete optimized Rust APS one-relation solver,
     // with all public labelled-walk setup, algebraic work and replay paid.
     if args.len()==1 && args[0]=="--walk-mersenne-one" {
@@ -938,6 +1086,26 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn unequal_walk_profiles_preserve_labelled_point_semantics() {
+        let q=PUBLIC_Q;
+        let mut ar=Arithmetic::default();
+        let (parts,identities,_duplicates)=
+            source_walk_profile(q,SEED,&mut ar,[32,48,64]).unwrap();
+        assert_eq!(parts.iter().map(Vec::len).collect::<Vec<_>>(),vec![32,48,64]);
+        assert!(identities<10);
+        let all=parts.iter().flat_map(|v|v.iter().map(|pt|pt.pt.0))
+            .collect::<HashSet<_>>();
+        assert_eq!(all.len(),144);
+        for point in parts.iter().flat_map(|v|v.iter()){
+            let a=ar.scalar(PRIME31,point.a,Some(PRIME31.g));
+            let b=ar.scalar(PRIME31,point.b,Some(q));
+            assert_eq!(ar.add(PRIME31,a,b),Some(point.pt));
+        }
+        let result=execute_unequal_profile(q,[32,48,64],1).unwrap();
+        assert_eq!(result["profile"],json!([32,48,64]));
+        assert!(result["attempts"].as_array().is_some());
+    }
     #[test]
     fn mersenne_field_mul_canonical_and_s3_equivalent() {
         let vals=[0,1,2,3,4,31,P/2,P-2,P-1];
