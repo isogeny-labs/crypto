@@ -1,5 +1,23 @@
 # Curve25519 torus/S4: native Rust qualification
 
+## Bounded sparse solver and next representation comparison
+
+The [new solver report](reports/direct-elimination-v1/REPORT.md) and
+[inspected PDF](reports/direct-elimination-v1/report.pdf) describe the isolated
+[Rust baseline](../../tools/torus-sparse-elimination/README.md). From public
+equations alone it returns a 71-variable original witness and indexed-row
+replay for the declared actual-field TWO-column q1/k2 control. That case
+uses eight propagation branches and no Buchberger calls. Native9dda07,
+source-review3aeb9e and report44b39a remain unsigned. [pcc:unverified]
+
+The 1,100-variable test has only one constrained variable; the original
+1,059-variable input gets a forced work1 refusal, not a full solve attempt.
+Full accounting and large-base discovery remain open. The
+[next comparison](direct-elimination-v1/NEXT.md) tests dependency propagation
+and redundant unknown-index-bit constraints on the same public inputs,
+preserving every original guard. No phase/exponent gain follows merely by
+moving index work into the witness.
+
 ## Guarded trace lift and next direct-solver gate
 
 The [trace-lift report](reports/trace-lift-v1/REPORT.md) and
