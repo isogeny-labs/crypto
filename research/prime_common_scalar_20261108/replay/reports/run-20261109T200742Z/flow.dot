@@ -1,0 +1,10 @@
+digraph flow {
+ graph[rankdir=TB,bgcolor="white",pad="0.15"];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4fb",fontname="Helvetica"];
+ A[label="Frozen v2 before data\nOwner-approved GitHub checkpoint substitution"];
+ B[label="Execution0:180 positive +3 defective controls\nAll accepted; raw evidence checkpointed"];
+ C[label="Execution1: identical full replay\n180 positive +3 controls; all accepted"];
+ D[label="Frozen native recount:366 records\nUnique coverage; exact congruence; A/A bytes equal",fillcolor="#d9f0dc"];
+ E[label="Unsigned component correctness evidence\nNo native timing, memory gain or recursive cost claim",fillcolor="#fff1d6"];
+ A->B;B->C;C->D;D->E;
+}

@@ -471,6 +471,27 @@ def cmd_snapshot(args) -> int:
     return 0
 
 
+KB_REMINDER = (
+    "Research KB: query it before a survey, lead proposal, novelty or negative "
+    "claim, cross-repository question or subagent handoff (AGENTS.md \"Knowledge "
+    "base first\"; skill research-kb; fallback scripts/research-kb)."
+)
+KB_UNAVAILABLE = (
+    "Research KB: unavailable here (no shared catalog at {home}). Record "
+    "`KB unavailable: <why>` under Sources checked and use the lead atlas "
+    "(crypto-autoresearcher:knowledge/leads/ecdlp/) plus a file search; a miss "
+    "is not evidence of absence."
+)
+
+
+def kb_reminder(root: Path) -> str:
+    """The reminder that can be followed in this checkout's environment."""
+    home = Path(os.environ.get("RESEARCH_KB_HOME") or (root.parent / "research-kb" / "data"))
+    if (home / "catalog.sqlite").is_file():
+        return KB_REMINDER
+    return KB_UNAVAILABLE.format(home=home)
+
+
 def cmd_session_start(args) -> int:
     hook = read_hook()
     root_s = git(Path(hook.get("cwd") or "."), "rev-parse", "--show-toplevel")
@@ -478,11 +499,14 @@ def cmd_session_start(args) -> int:
         return 0
     root = Path(root_s)
     h = load(root)
-    if h.get("status") != "pending" or h.get("session_id") == hook.get("session_id"):
-        return 0
+    pending = h.get("status") == "pending" and h.get("session_id") != hook.get("session_id")
+    reminder = kb_reminder(root)
+    if pending:
+        msg = (f"A pending runtime handoff from {h.get('from')} ({h.get('reason')}, {h.get('written_utc')}) is in "
+               f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h) + "\n\n" + reminder)
+    else:
+        msg = reminder
     runtime = args.runtime or detect_runtime(hook)
-    msg = (f"A pending runtime handoff from {h.get('from')} ({h.get('reason')}, {h.get('written_utc')}) is in "
-           f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h))
     if runtime == "claude":
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": msg}}))
     else:

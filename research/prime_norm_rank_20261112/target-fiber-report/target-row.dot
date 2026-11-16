@@ -1,0 +1,18 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",nodesep="0.3",ranksep="0.3",fontname="Helvetica"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fc",color="#365a7c",fontname="Helvetica",fontsize=11];
+ edge [fontname="Helvetica",fontsize=10,color="#365a7c"];
+ norm [label="Actual completed norm / target curve equation\nComputed support quotient U"];
+ factor [label="Differentiate actual norm division\nU(r) = B(r)*J(r); both target factors affine"];
+ scaled [label="Scaled support at q = e^2*r\nU_e(q) = e^3 * B(q) * J_e"];
+ rem [label="Actual quotient Q_e and remainder R_e\nR_e(q) = e^3*T_e, d >= 3"];
+ ring [label="Actual divisibility over K[E]\nMonic base change specializes to field model",fillcolor="#e7f2e7"];
+ rows [label="Field e != 0: lossless replacement\nT_e = 0 + four nonconstant coefficient rows",fillcolor="#e7f2e7"];
+ open [label="Open: exact grading, full weighted closure\nGrowing-family expected bit cost",fillcolor="#fff2d6",color="#a87926"];
+ norm -> factor;
+ factor -> scaled;
+ scaled -> rem;
+ rem -> ring [label="PCC-20261114-af9c9e (unsigned)"];
+ ring -> rows [label="PCC-20261114-2ceac7 (unsigned)"];
+ rows -> open [style=dashed,color="#a87926",label="no solving-degree inference"];
+}

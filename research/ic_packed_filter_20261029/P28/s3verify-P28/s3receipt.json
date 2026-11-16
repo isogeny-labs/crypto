@@ -1,0 +1,144 @@
+{
+ "b": 28,
+ "card_sha256": "8fa7610fa63ae4043a55c17459167ee874ebcfde7616e332c42ebe6a048cd526",
+ "downloaded_files": [
+  "SHA256SUMS",
+  "binary.sha256",
+  "build-info.json",
+  "input-spec.json",
+  "job-exit.json",
+  "pod-cpuset.txt",
+  "process-status.txt",
+  "run-summary.json",
+  "run.stderr",
+  "runner-identity.json",
+  "session/host.json",
+  "session/plan.json",
+  "session/records.jsonl",
+  "session/session.json",
+  "session/spec.json"
+ ],
+ "facts": {
+  "S3V_AUDIT": "absent",
+  "S3V_BINARY_SHA": true,
+  "S3V_BUILD_INFO": true,
+  "S3V_CONTROL": "absent",
+  "S3V_EXIT0": false,
+  "S3V_EXIT_CODE": "143",
+  "S3V_IMAGE_DIGEST": "unverifiable_without_pod_status",
+  "S3V_INPUT_SPEC": true,
+  "S3V_JOB_EXIT_IDENTITY": true,
+  "S3V_JOB_EXIT_PRESENT": true,
+  "S3V_L2GATE": "absent",
+  "S3V_MANIFEST_COMPLETE": true,
+  "S3V_POD_UID_COUNT": 1,
+  "S3V_SHA256SUMS_OK": true
+ },
+ "generated_utc": "2026-10-29T21:33:13Z",
+ "job": "ic-dgbf-p28-20261029",
+ "job_exit_json": {
+  "exit_code": 143,
+  "job_name": "ic-dgbf-p28-20261029",
+  "node_name": "ip-10-84-191-237.us-east-2.compute.internal",
+  "pod_uid": "cd784143-0134-418f-a84b-061e39ecc0c7"
+ },
+ "jq_expressions": {
+  "S3V_AUDIT": ".ok and .regraded and .records_bound and .verified_records==.records and (.replays|length)>0 and all(.replays[];.reproduced)",
+  "S3V_BUILD_INFO": ".source_revision==$request[0].job.build.source_revision and .ecbench_sha256==$request[0].job.build.ecbench_sha256",
+  "S3V_CONTROL": ".wall.status==\"admitted\" and .wall.aa_pairs>=5 and .wall.aa_ci95!=null",
+  "S3V_EXIT0": ".exit_code==0",
+  "S3V_IMAGE_DIGEST": "[.pods[] | select(.uid==$pod) | .status.containerStatuses[] | select(.name==\"task\" and .state.terminated.exitCode==0) | .imageID | sub(\"^docker-pullable://\";\"\")] == [$request[0].job.build.image_uri]",
+  "S3V_L2GATE": ".accepted and .executions>0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0"
+ },
+ "mode": "s3",
+ "not_checked": [
+  "pod image digest from Kubernetes status (verify-build lines 12-16) unless S3V_IMAGE_DIGEST is true or false",
+  "Kubernetes Job state and pod identity (run-request lines 56-58, 68)"
+ ],
+ "pod_status_sha256": null,
+ "pod_uid": "cd784143-0134-418f-a84b-061e39ecc0c7",
+ "request_sha256": "53c64a25967a8b5aa6a766377c4430f8857cbcf007b9712a85333126f818df61",
+ "s3_listing": [
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/SHA256SUMS",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 1164
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/binary.sha256",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 89
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/build-info.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 613
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/input-spec.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 1709
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/job-exit.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 159
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/pod-cpuset.txt",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 4
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/process-status.txt",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 1426
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/run-summary.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 0
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/run.stderr",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 116352
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/runner-identity.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 193
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/session/host.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 4839
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/session/plan.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 260780
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/session/records.jsonl",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 12066389
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/session/session.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 3186
+  },
+  {
+   "key": "cd784143-0134-418f-a84b-061e39ecc0c7/session/spec.json",
+   "last_modified": "2026-10-29 20:07:38",
+   "size": 1709
+  }
+ ],
+ "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/ic-dgbf-p28-20261029/",
+ "s3_terminal": true,
+ "schema": "pf.s3verify/v1",
+ "sha256sums_sha256": "78c19b7fd4ccd2326935e9d92b9b4e067d764fa92c74be767a224a0ee98ec126",
+ "tag": "P28",
+ "tool_sha256": "7c624b8c7761140ea321e55cb6c355360999f106ed69b7f7d8d68ff66c289bec"
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "formal-source-review-plan/v1",
+  "created_utc": "2026-11-05T18:27:02.954471+00:00",
+  "producer_correction_source_read": false,
+  "announced_commit": "7863b3ea2c",
+  "prior_known": "V3 producer compiled, fixture failed: residual simp theorem, polynomial and Bezout normalization, unknown tactic, additive valuation multiplicative API mismatch. Full review never completed.",
+  "blind": false,
+  "scope": [
+    "Exact unchanged theorem statements and hypotheses; no weaker fixture",
+    "Each diagnostic matched to primary local imported API and proof-script correction",
+    "Explicit additive valuation product-to-sum law rather than multiplicative-hom map_mul",
+    "No sorry/axiom insertion or missing negative controls; all30names retained",
+    "Source-only candidate remains uncompiled; no fourth attempt authorized"
+  ],
+  "attacks": [
+    "weakened proposition or added result hypothesis",
+    "wrong numeral coercion that changes polynomial",
+    "qualified name points to unrelated residual",
+    "tactic workaround bypasses requiredgoal",
+    "map_mul changes additive valuation semantics",
+    "counts/control audit weakened"
+  ],
+  "execution": false,
+  "producer_edits": false,
+  "publication": "wait exact GitHub confirmation before source inspection",
+  "deliverables": [
+    "PDF",
+    "SVG",
+    "JSON",
+    "manifest"
+  ]
+}

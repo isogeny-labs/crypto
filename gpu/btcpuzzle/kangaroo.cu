@@ -24,6 +24,7 @@
  * The host code this checks against is the same code test_kangaroo.cpp
  * verifies, so `selftest` closes the loop on the device.
  */
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -33,6 +34,9 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "kernels_kangaroo.cuh"
 #include "kangaroo_host.hpp"
@@ -116,6 +120,7 @@ struct DeviceRun {
     kg_ctx dc{};
     uint32_t nkang = 0;
     kg_jump *d_jumps = nullptr;
+    size_t njumps = 0;
     uint32_t dpcap = 1u << 20;
     size_t smem = 0;
     uint32_t blocks = 0;
@@ -138,7 +143,8 @@ struct DeviceRun {
         CU(cudaMalloc(&dc.D, 8 * (size_t)nkang * 4));
         CU(cudaMalloc(&dc.steps, (size_t)nkang * 4));
         CU(cudaMalloc(&dc.restarts, (size_t)nkang * 4));
-        CU(cudaMalloc(&d_jumps, h.jumps.size() * sizeof(kg_jump)));
+        njumps = h.jumps.size();
+        CU(cudaMalloc(&d_jumps, njumps * sizeof(kg_jump)));
         CU(cudaMemcpy(d_jumps, h.jumps.data(), h.jumps.size() * sizeof(kg_jump),
                       cudaMemcpyHostToDevice));
         dc.jumps = d_jumps;
@@ -149,10 +155,29 @@ struct DeviceRun {
         blocks = (T + KG_BLOCK - 1) / KG_BLOCK;
     }
 
+    /* Freed device memory is not cleared by the driver, and the next tenant
+     * of a shared or rented GPU can be handed the same pages.  The tame
+     * distances in D and the DP records are what the key is rebuilt from
+     * (k = centre + d_tame - d_wild), so everything is zeroed before it is
+     * released.  cudaFree synchronises, so each memset lands first; errors
+     * are ignored because teardown must still free. */
+    static void scrub_free(void *d, size_t bytes) {
+        if (!d) return;
+        (void)cudaMemset(d, 0, bytes);
+        cudaFree(d);
+    }
+
     void free_all() {
-        cudaFree(dc.X); cudaFree(dc.Y); cudaFree(dc.D);
-        cudaFree(dc.steps); cudaFree(dc.restarts);
-        cudaFree(d_jumps); cudaFree(dc.dp_out); cudaFree(dc.dp_count);
+        const size_t pt = 8 * (size_t)nkang * 4, word = (size_t)nkang * 4;
+        scrub_free(dc.X, pt); scrub_free(dc.Y, pt); scrub_free(dc.D, pt);
+        scrub_free(dc.steps, word); scrub_free(dc.restarts, word);
+        scrub_free(d_jumps, njumps * sizeof(kg_jump));
+        scrub_free(dc.dp_out, (size_t)dpcap * sizeof(kg_dp));
+        scrub_free(dc.dp_count, 4);
+        dc.X = dc.Y = dc.D = nullptr;
+        dc.steps = dc.restarts = dc.dp_count = nullptr;
+        dc.dp_out = nullptr;
+        d_jumps = nullptr;
     }
 };
 
@@ -177,6 +202,8 @@ struct Opts {
     int bits = 40, puzzle = 0;
     bool self = false;
     std::string variant = "lowmem", pubkey, gpus = "0";
+    std::string key_out;    /* where a recovered unknown key is written */
+    bool print_key = false; /* --print-key: also put it on stdout */
 };
 
 template <int W>
@@ -377,6 +404,48 @@ struct Shared {
     unsigned long long dps() const { return h->seen.size(); }
 };
 
+/* Zero host memory in a way the compiler may not drop as a dead store. */
+static void scrub(void *p, size_t bytes) {
+    volatile unsigned char *v = static_cast<volatile unsigned char *>(p);
+    for (size_t i = 0; i < bytes; i++) v[i] = 0;
+}
+
+/* A recovered key for a target whose answer is not already known controls
+ * whatever that key controls (for a puzzle, the funds at its address), so
+ * it is not printed: stdout of a cloud or batch run usually ends up in a
+ * log store the operator does not control.  It goes to a new file, mode
+ * 0600; an existing file is never overwritten.  If no file can be written
+ * the key is printed anyway: losing it would be worse. */
+static void report_unknown_key(const Opts &o, const u256 &key) {
+    std::string path = o.key_out;
+    if (path.empty())
+        path = o.puzzle ? "puzzle-" + std::to_string(o.puzzle) + ".key" : "kangaroo-found.key";
+    std::string hex = u256_hex(key) + "\n";
+    /* Never overwrite an earlier result: on a name clash try path.1, path.2, ... */
+    std::string base = path;
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    for (int i = 1; fd < 0 && errno == EEXIST && i < 100; i++) {
+        path = base + "." + std::to_string(i);
+        fd = open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    }
+    bool ok = fd >= 0;
+    if (ok) {
+        ok = write(fd, hex.data(), hex.size()) == (ssize_t)hex.size();
+        ok = (fsync(fd) == 0) && ok;
+        ok = (close(fd) == 0) && ok;
+    }
+    if (ok) {
+        printf("  SOLVED: key verified against the public key and written to %s (mode 0600)\n",
+               path.c_str());
+        if (o.print_key) printf("  k = %s", hex.c_str());
+    } else {
+        fprintf(stderr, "  could not write %s (%s); printing the key instead\n", path.c_str(),
+                strerror(errno));
+        printf("  SOLVED: k = %s", hex.c_str());
+    }
+    scrub(&hex[0], hex.size());
+}
+
 static void lane_main(const Opts &o, const Lane &lane, size_t li, Shared &sh) {
     CU(cudaSetDevice(lane.dev.id));
     DeviceRun dr;
@@ -426,6 +495,7 @@ static void lane_main(const Opts &o, const Lane &lane, size_t li, Shared &sh) {
         }
     }
     dr.free_all();
+    scrub(host_dp.data(), host_dp.size() * sizeof(kg_dp));
 }
 
 static void run_solver(Opts &o, KangarooHost &h, const u256 *known) {
@@ -458,7 +528,8 @@ static void run_solver(Opts &o, KangarooHost &h, const u256 *known) {
             printf("    device %d: %.3e steps, %.3f Gstep/s\n", lanes[i].dev.id, sh.steps[i],
                    sh.elapsed[i] > 0 ? sh.steps[i] / sh.elapsed[i] / 1e9 : 0.0);
     if (sh.solved) {
-        printf("  SOLVED: k = %s\n", u256_hex(sh.key).c_str());
+        if (known) printf("  SOLVED: k = %s\n", u256_hex(sh.key).c_str()); /* already public */
+        else report_unknown_key(o, sh.key);
         printf("  took %.2f * sqrt(W)\n", steps / ldexp(1.0, (int)h.prm.w_bits / 2.0));
         if (known) CHECK(u256_cmp(sh.key, *known) == 0, "recovered key differs from the planted one");
     } else if (sh.overflow) {
@@ -612,6 +683,8 @@ int main(int argc, char **argv) {
         else if (a == "--pubkey" && i + 1 < argc) o.pubkey = argv[++i];
         else if (a == "--variant" && i + 1 < argc) o.variant = argv[++i];
         else if (a == "--gpu" && i + 1 < argc) o.gpus = argv[++i];
+        else if (a == "--key-out" && i + 1 < argc) o.key_out = argv[++i];
+        else if (a == "--print-key") o.print_key = true;
         else { fprintf(stderr, "unknown option %s\n", a.c_str()); return 2; }
     }
     if (o.w != 8 && o.w != 16 && o.w != 32) {

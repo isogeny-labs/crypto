@@ -1,0 +1,11 @@
+{
+ "date":"2026-11-09","task":"T-1983","classes":["theorem","exact_computation"],
+ "construction":"For f(X)=X^3+aX+b, N(x,t)=t*x^2+(a+t^2)*x+a*t+2b, F(x,t)=(x*t-a)^2-4b*(x+t), prove N^2-4f(x)f(t)=(x-t)^2F. Then E0=D*M0,E1=D*M1 with M0=F_G*D_Q+F_Q*D_G-2*N_G*N_Q+8*y*w*gamma and M1=2L. Use Norm(M0+sM1)/[H_G(x)^2 H_Q(z)^2].",
+ "identity_control":"Independent native sparse integer-coefficient expansion verifies universal polynomial identities with checked integer arithmetic; wrong gamma sign residual nonzero; retain complete coefficient support.",
+ "response_control":"same381 small decoder cases,2694 queries,11382 complete baby norms and24 prescribed P19227-factor windows/72degree4 baby norms. Reduced default versus expanded Round66 numerator with cached denominator, same instrument. All coefficients and recovered points must preserve sealed responses. No full order-r P192 response.",
+ "accounting":"same source,target,cache construction,query point inputs,decoder and references. Only numerator representation and corresponding denominator exponent change. Selected response costs, P192 numerator+norm,denominator,division separately. All constructor/memory and whole-qualifier counts retained. All fixed cases reported including losses.",
+ "controls":{"AA":"fresh-copy byte equality for both modes and receipts plus universal identity certificate","positive":"frozen decoder/P192 outputs","negative":"universal wrong-sign residual and changed output rejection","randomization":"none,complete prescribed exact panel","blinding":"none,exact identities","statistics":"no timings,p-values or population inference"},
+ "bounds":{"command_seconds":120,"build_jobs":1,"native_processes":1,"cloud_jobs":0,"generators":0,"retries":0},
+ "stopping":"fixed full panel; preserve failures and any amendment before affected rerun",
+ "sources":"Round63 paired-algebra-proof.md,Round64 resultant-proof.md,Round66 report and continuation. BFLS arXiv2003.10118 Lemma4.3 and section4.16 read2026-11-09; classical biquadratics motivate cancellation, no novelty asserted for identity. KB tools/wrapper unavailable."
+}

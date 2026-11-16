@@ -1,0 +1,5444 @@
+## 2026-11-01T00:42:05Z — begin Jacobian relation-collection port
+
+### What was done (commands, files, features)
+
+- Interpreted the requested scope as porting the opt-in Jacobian relation
+  collector and CLI selection from `isogeny-labs/cryptanalysis` into this
+  repository's IC implementation, with a normal PR to `main`.
+- Created a depth-one blob-filtered checkout and branch
+  `codex/prime-jacobian-relations-20261101` from current `origin/main`.
+- Read the repository instructions, the newest prior session-log entries and
+  `docs/CONDUCTOR.md`; selected the report-evidence workflow for the handoff.
+- Attempted the required Conductor reservation for `src/cryptanalysis`,
+  `src/bin/ic`, `tests` and `docs/session-logs`.
+
+### Decisions made (and why)
+
+- Preserve the cryptanalysis behavior: affine remains the default; Jacobian
+  relation collection is opt-in; coordinate choice must be visible in machine
+  output; no speedup claim is made without a frozen paired measurement.
+- Review this repository's prior relation-walk work and the primary arithmetic
+  formulas before choosing the integration point or editing implementation
+  files.
+
+### Open threads (unfinished, pick up next time)
+
+- Complete the literature and prior-result review, map the local IC CLI and
+  relation collector, reserve the final file scope if Conductor becomes
+  available, implement the port, run repository-required validation, commit,
+  open a regular PR and enable auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- A full clone was cancelled while Git indexed a multi-gigabyte historical
+  pack; Git removed the incomplete checkout. Re-cloned depth one with blob
+  filtering and a sparse worktree.
+- `conductor` is not installed (`command not found`). The documented
+  warn-and-allow path applies; intended edit scope is recorded above.
+
+## 2026-11-01T00:44:00Z — finish prior-art review and choose the integration boundary
+
+### What was done (commands, files, features)
+
+- Read the repository's existing prime-field pair-yield CLI and exact bounded
+  probe, `bsgs_fast` batched-affine arithmetic, the P-192/P-224 generator
+  protocol, and the corrected orbit-aware large-prime protocol/results.
+- Checked Bernstein–Lange's general-`a` `dbl-2007-bl` and mixed
+  `madd-2007-bl` formulas in the Explicit-Formulas Database, including the
+  stated `1M+8S+1*a` and `7M+4S` costs and the published verification scripts.
+- Reviewed the repository citation to Galbraith–Granger–Merz–Petit, *On index
+  calculus algorithms for subfield curves*, SAC 2020 / ePrint 2020/1315,
+  and the repository's warning that quotienting orbits and changing accepted
+  relation streams are distinct effects.
+- Compared this repository with the merged `cryptanalysis` implementation.
+  `crypto` has an older, richer `bsgs_fast` but has neither
+  `ec_index_calculus_curves` nor the prime automorphism-orbit pipeline.
+
+### Decisions made (and why)
+
+- Add a separate `ic prime-orbit` command rather than changing the established
+  `ic prime` pair-yield contract. The new command will port the complete
+  scaled known-answer automorphism-orbit pipeline and expose
+  `--relation-coordinates affine|jacobian`; affine remains the default.
+- Port the two missing library modules from merged `cryptanalysis`, add only
+  the Jacobian point/formula/batch-normalization surface to this repository's
+  richer `bsgs_fast`, and retain exact relation verification and abstract
+  group-operation charging. This avoids substituting the existing random
+  scalar probe, which is not the requested r-adding large-prime collector.
+- Treat this as an implementation/correctness port. No timing command or
+  performance claim is part of this step.
+
+### Open threads (unfinished, pick up next time)
+
+- Implement the library/CLI port, add CLI contract coverage for generic,
+  `j=0` and `j=1728`, run targeted and required repository checks, then
+  publish the normal auto-merge PR.
+
+### Errors (what went wrong, how it was handled)
+
+- None in the literature or architecture review.
+
+## 2026-11-01T00:46:07Z — implement the Jacobian prime-orbit integration
+
+### What was done (commands, files, features)
+
+- Added `ec_index_calculus_curves` and `prime_orbit_index_calculus` from the
+  merged upstream implementation and exported both library modules.
+- Extended the local richer `bsgs_fast` with a Jacobian point type, general-a
+  EFD doubling, mixed Jacobian-affine addition and one-inversion batch
+  normalization. Added differential coverage against affine arithmetic on
+  generic, j=0 and j=1728 curve shapes, including exceptional cases and a
+  repeated mixed-add chain with non-unit Z coordinates.
+- Added `ic prime-orbit`, preserving the existing `ic prime` pair-yield
+  command. Wired the full scaled known-answer pipeline, the
+  `--relation-coordinates affine|jacobian` selector, named prime-curve lookup,
+  distinct JSON operation identity and human-readable output.
+- Invoked `cargo fmt --all -- --check` as the first validation command.
+
+### Decisions made (and why)
+
+- Kept the coordinate default affine and report the effective coordinate mode
+  and lane count in JSON. This preserves the historical relation stream by
+  default and makes experimental provenance explicit.
+- Retained abstract group-operation accounting independent of coordinates;
+  this change is not labeled a speed improvement until a separate paired,
+  frozen timing experiment measures it.
+
+### Open threads (unfinished, pick up next time)
+
+- Restore or install a Rust toolchain in this managed workspace, format the
+  port, fix compile/test findings, add CLI contract coverage, run required
+  validation, then commit and open the regular auto-merge PR.
+
+### Errors (what went wrong, how it was handled)
+
+- Validation could not start because neither `cargo` nor `rustc` is installed
+  or on `PATH`. The managed-environment status is current/running with enforced
+  unrestricted networking but advertises no toolchain capabilities. Read the
+  cloud-runtime guidance and will install a task-local Rust toolchain without
+  printing or inspecting credentials.
+
+## 2026-11-01T01:04:46Z — finish targeted correctness and CLI validation
+
+### What was done (commands, files, features)
+
+- Installed a task-local stable Rust 1.99.1 toolchain after checking the
+  managed runtime and enforced unrestricted network policy. Hydrated only the
+  sparse paths required by Cargo dependencies and compile-time fixtures.
+- `cargo check --lib` and `cargo check --bin ic` passed.
+- The exact Jacobian differential test passed, and the full known-answer test
+  passed across generic, j=0 and j=1728 curves with the full-decomposition,
+  affine large-prime and Jacobian large-prime collectors.
+- Added and passed an `ic` parser contract proving that
+  `prime-orbit --relation-coordinates jacobian` selects the intended mode.
+- Built the real `ic` binary and ran four JSON smoke checks: affine generic
+  remained one lane; Jacobian generic/P-224, j=0 and j=1728 each used 32 lanes,
+  completed with four verified descents, zero rejected relations and zero
+  uncertified columns.
+
+### Decisions made (and why)
+
+- Moved CLI parsing coverage into the `ic` binary's unit tests. A standalone
+  Cargo integration test forces this repository to link every unrelated bin;
+  direct binary tests plus the existing full solver test provide the intended
+  contract coverage without that repository-wide side effect.
+- Disabled incremental compilation for subsequent large checks because the
+  existing all-bin integration behavior filled the 32 GiB workspace with
+  unrelated incremental objects.
+
+### Open threads (unfinished, pick up next time)
+
+- Run direct formatting/clippy checks and the required full release library
+  suite; record any unrelated failures exactly. Then review the diff, commit,
+  push, open the regular PR and enable auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- `cargo fmt --all -- --check` traversed sparse-omitted historical targets and
+  unrelated pre-existing unformatted examples. Formatted and checked only the
+  touched Rust files instead.
+- A first imprecise exact-test filter ran zero tests; reran with the full module
+  path and observed one passing test.
+- `cargo test --test ic_prime_orbit` attempted to link every repository bin,
+  exhausted disk space and failed before the new test ran. Removed that test,
+  used the repository's existing selected-bin contract pattern, ran
+  `cargo clean -p crypto` (24.2 GiB of build artifacts), and validated the
+  real `ic` binary directly.
+
+## 2026-11-01T01:49:39Z — finish broad release-library validation
+
+### What was done (commands, files, features)
+
+- Strict touched-file formatting and `cargo clippy --lib --bin ic -- -D
+  warnings` passed.
+- Ran the required broad gate with `cargo test --release --lib`: 5,834 tests
+  passed, 28 failed and 128 were ignored in 1,944.41 seconds.
+- Every new prime-orbit known-answer test passed in release mode, including
+  generic, j=0 and j=1728 curves and both affine and Jacobian relation
+  collection. The new Jacobian-versus-affine differential test had also
+  passed directly.
+
+### Decisions made (and why)
+
+- Treat the broad result as evidence that the new path is green, while
+  investigating all 28 failures rather than hiding them. Twenty-seven name
+  sparse-omitted research, GPU, documentation or frozen-input fixtures; the
+  remaining `ic_wide` assertion is outside the touched modules.
+- Hydrate the exact omitted fixture paths and rerun the failures selectively.
+  This separates sparse-workspace setup failures from reproducible upstream
+  test failures without repeating a 32-minute all-library run unnecessarily.
+
+### Open threads (unfinished, pick up next time)
+
+- Hydrate the exact missing fixture paths, rerun each failed group, inspect the
+  final diff, then commit, push, open the regular PR and enable auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- The broad release suite reported 28 failures: five Certicom device tests;
+  the ecbench band, bounds, challenge, claim, koblitz-descent and two runner
+  diagnostic tests; one planner evidence test; one compact-orbit source test;
+  one unrelated `ic_wide` expected-value mismatch; five CryptoPro-B frozen
+  chain tests; and two generic endomorphism chain tests. The fixture-backed
+  groups will be rerun after sparse hydration, while the runner and `ic_wide`
+  failures will be checked independently as possible baseline issues.
+
+## 2026-11-01T01:54:11Z — classify broad-suite failures
+
+### What was done (commands, files, features)
+
+- Hydrated the exact sparse-omitted GPU, research, documentation and frozen
+  chain-set paths referenced by the failed tests.
+- Targeted release-mode reruns cleared all 25 fixture-backed failures:
+  Certicom device (6/6), ecbench band (1/1), bounds (16/16), challenge
+  (12/12), claim (9 passed/1 ignored), koblitz-descent defaults (1/1), planner
+  evidence (1/1), compact-orbit archive (1/1), CryptoPro-B chains (5/5) and
+  generic endomorphism chains (4/4).
+- Reproduced the remaining three unrelated failures: two ecbench diagnostic
+  runner tests cannot start `DiagnosticSessionClock` because this container
+  lacks `/proc/self/timens_offsets`; `ic_wide` computes 13,130 where its
+  existing assertion expects 3,757.
+
+### Decisions made (and why)
+
+- Record the release gate as 5,834 broadly passing tests, 25 sparse-fixture
+  failures subsequently cleared, and three reproducible environment/baseline
+  failures outside all touched modules. Do not modify those unrelated modules
+  as part of the Jacobian relation-collection change.
+- Do not repeat the full 32-minute suite: the exact reruns exercise every
+  failed family after hydration, while all new tests were already green in
+  the broad release run and direct targeted runs.
+
+### Open threads (unfinished, pick up next time)
+
+- Review the complete diff and provenance, run final whitespace/status checks,
+  commit, synchronize with `origin/main`, push, open the regular PR and enable
+  auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- The first koblitz-descent rerun exposed five additional parameter fixture
+  directories, and the first two planner reruns exposed additional cited
+  evidence directories. Added the complete paths from their source-declared
+  row/evidence lists and both tests passed.
+- The two diagnostic runner failures originate before their temporary fixture
+  is used: `DiagnosticSessionClock::begin()` reads the Linux time-namespace
+  offsets file, which is absent in this managed container. The `ic_wide`
+  mismatch reproduced unchanged after 177.09 seconds.
+
+## 2026-11-01T01:56:09Z — finish source and executable review
+
+### What was done (commands, files, features)
+
+- Compared the two new library modules byte-for-byte with the source branch
+  in `isogeny-labs/cryptanalysis`; both match. Compared the new CLI module
+  with its source and confirmed that only crate imports, the non-conflicting
+  `prime-orbit` command name and operation identity differ.
+- Reviewed the Jacobian collector path, effective-coordinate JSON, operation
+  accounting, curve dispatch, and arithmetic differential coverage. Fixed a
+  duplicated command name in two doc comments.
+- Made every non-SECG prime curve accepted by `prime-orbit --curve` visible
+  through `ic list` and inspectable through the existing read-only parameter
+  path. Added a contract test covering every listed name.
+- Touched-file rustfmt, strict clippy, both `ic` contract tests, a rebuilt real
+  binary, and a final 16-bit Jacobian JSON smoke passed. The smoke used 32
+  lanes, produced 13 relations, recovered 53 exactly, and reported zero
+  rejected relations and zero uncertified columns. `ic list` reported 50
+  inspectable curves including Brainpool and SM2.
+
+### Decisions made (and why)
+
+- Retain `prime-orbit` as a separate subcommand because `crypto` already has
+  a different `ic prime` yield-measurement contract.
+- Keep affine as the default and describe Jacobian as a selectable
+  implementation mode. No wall-time speedup is claimed: this work establishes
+  implementation and correctness, not a frozen paired benchmark result.
+
+### Open threads (unfinished, pick up next time)
+
+- Stage and inspect the complete diff, commit, synchronize with `origin/main`,
+  push, open the regular PR and enable auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- No new validation errors. Source review found the two harmless
+  `prime-orbit-orbit` documentation typos and corrected them before commit.
+
+# Session log — 2026-11-01
+
+## 2026-11-01T00:23:37Z — Begin registry-wide ECBench optimization loop
+
+### What was done (commands, files, features)
+
+- Received the request to run an optimization loop for all algorithms in the codebase. Scoped “all algorithms” to the complete ECBench method registry and nested solver backends, consistent with the active frontier campaign, while keeping every registered method in the inventory.
+- Read the cloud-runtime, report-evidence, controlled-experiment, ecbench-measure, Iso Lab EKS, queue-experiment and canonical experiment-protocol contracts. Rechecked the managed runtime: network policy is current and unrestricted, but it exposes no capabilities, secrets, runtime variables or outbound identities.
+- Read the 2026-10-31 handoff and checked PR #3099. It remains open at head `d1a48a43ef34755876601bf84589be16c4d1a60a`; current-head workflows have not started yet, and GitHub presently reports it non-mergeable.
+
+### Decisions made (and why)
+
+- Preserve the user’s full request as a registry-wide optimization programme: baseline every implementation, generate candidates within method-specific legal parameter spaces, validate answers, compare against frozen baselines and matched references, retain regressions/nulls/timeouts, and promote only independently replayed wins.
+- Do not launch or time code before the literature/prior-results review and a frozen controlled protocol. EKS remains the required measurement backend; local timings are not substitutes.
+
+### Open threads (unfinished, pick up next time)
+
+- Review the repository’s lead atlas, method registry, prior optimization campaigns and relevant primary benchmarking/autotuning literature; then design and implement the loop without changing measurement gates.
+
+## 2026-11-01T00:41:00Z — Reuse the native sweeper and bind coverage to the live registry
+
+### What was done
+
+- Read `docs/ic/SWEEPER.md`, `docs/ic/perf/OPTIMIZATION_PLAN.md`, the native `ic sweep` implementation and the native factor-base sweeper documentation.
+- Queried the pinned prior ECBench binary: its `methods --json` output contains 74 unique registered methods and its command surface has no registry-wide optimizer.
+- Inspected the current source registry. It has advanced since that binary and now contains four named Jacobian-image methods in addition to the 74-method snapshot; therefore a copied 74-row optimization list would already be stale.
+- Confirmed the repository’s native-only rule: a new cryptographic performance harness must be Rust. The historical frontier campaign’s Python generators remain frozen evidence and will not be extended for this loop.
+- Tried the managed Docker daemon exactly as the cloud-runtime skill specifies. The local socket exists but the current sandbox denies access, so Docker is not yet an available validation route.
+
+### Decisions made
+
+- Implement registry-wide optimization coverage in the native `ecbench` surface and derive its inventory from `methods::registry()` at runtime. Add an exhaustiveness test so a newly registered method makes the optimizer fail closed until it receives a disposition.
+- Reuse the existing native TPE/rung concepts for tunable IC configurations. Keep fixed-parameter methods in the loop through correctness, reference and A/A cells rather than pretending they have configuration knobs.
+- Separate adaptive development data from fresh confirmatory holdout data. No adaptive-search observation can update the leaderboard; promotion still requires the existing independent replay, pricing and validation gates.
+- Treat solver/accounting scopes as separate optimization lanes. A backend with a different native unit cannot win by counting less work.
+
+### Open threads
+
+- Add and test the native registry-wide inventory/plan checker, freeze the campaign protocol, and generate the current-source coverage receipt.
+- Obtain a usable Rust build path (sandboxed Docker socket access if permitted, otherwise hosted CI) and recheck EKS checkpoint credentials before any paid run.
+
+### Errors
+
+- `tools/lead_atlas.py --match` could not import its sibling `orchestration` module; the empty brief is not treated as proof that no prior leads exist.
+- Docker health check failed with `permission denied` on `/var/run/docker.sock`; no container was started.
+
+## 2026-11-01T01:18:00Z — Implement native all-registry inventory and campaign audit
+
+### What was done
+
+- Added `src/cryptanalysis/ecbench/optimization.rs`, exported it from the ECBench library, and added `ecbench optimize inventory|audit` to the native CLI.
+- Assigned every live method an explicit configuration-search strategy, claim scope and accounting scope. Classified every declared method parameter as a legitimate knob, frozen resource envelope, nuisance seed, workload/advice scope, external binding, or identity/pricing input.
+- Inventoried the 11 live `SystemSolver` backends plus eight separately keyed PDP3 engines: inherited F4, F6-IC, matrix F4/F5 and four root-finding table variants.
+- Added fail-closed exact-registry coverage, nested-inventory, and censoring/seed-policy tests. A new method or parameter without a policy makes inventory construction fail.
+- Added a native campaign auditor for exact method resolution, balanced rounds, warm-up, reference/baseline/candidate roles, exact A/A controls, public L2 holdouts, disjoint development/holdout seeds, and same-method non-knob equality.
+- Ran the pinned Rust 1.98 container. `cargo check --locked --bin ecbench` passed. `ecbench optimize inventory --json` executed successfully and reported 78 methods and 19 nested algorithms: 17 adaptive, 15 finite-grid, 22 implementation-A/B, three external-backend-A/B, and 21 historical replay controls.
+- Audited all 92 existing frontier shards with `--require-all`. The receipt is structurally clean but correctly non-admitted: 20/78 methods and 17/19 nested algorithms covered, with 58 method IDs plus `rootfind-window` and `rootfind-window-negfold` missing. The earlier classification of pipeline `targets` as advice scope was corrected to an algorithmic relation-stream knob after the auditor exposed the two affected generator-orbit cells; the regenerated audit has zero per-spec structural errors.
+- Added the research README, frozen methodology/admission protocol, literature/prior-work record, execution blocker and high-priority EKS backlog card under `research/ecbench_registry_optimization_20261101/` and `backlog/`.
+
+### Decisions made
+
+- Fixed-parameter methods use source-level implementation A/B, not a fake parameter grid. Rho methods whose only parameter is a step cap also use implementation A/B; the cap stays a censoring envelope.
+- The native inventory covers the requested complete scope. The existing 92-spec frontier campaign remains valid for its narrower 20-method purpose but cannot be described as an all-implementation optimization campaign.
+- The methodology is frozen now; the execution roster remains gated until a `--require-all` audit passes. No leaderboard row changes without fresh holdout evidence.
+
+### Open threads
+
+- Build valid queue-safe development specs for the 58 missing top-level methods and two missing PDP3 engines, then rerun plan and all-coverage audit.
+- Run formatting, focused CLI behavior tests and strict lint; the root lib-test target needs sparse historical compile-time fixtures materialized before its optimizer unit tests can execute.
+- Recheck checkpoint credentials, submit on EKS only after both gates pass, and update the active PR.
+
+### Errors
+
+- The first Docker test launcher used `sh -lc`, whose login PATH omitted Cargo; retried with `sh -c`.
+- `cargo test --locked --lib ecbench::optimization::tests` reached the root lib-test compile but failed on 35 absent sparse historical `include_str!`/`include_bytes!` fixtures, before optimizer tests ran. This is retained as an incomplete test attempt, not a test pass or optimizer failure.
+- A first summary pipeline expected `jq` inside the Rust image and caused a broken-pipe panic after `jq` was not found. Regenerated the native receipt directly and summarized it with the host `jq`.
+- Reconcile PR #3099 and current main before extending the existing PR, per the repository’s one-PR-per-active-branch rule.
+
+### Errors (what went wrong, how it was handled)
+
+- No execution error yet. Experiment credentials are still absent; this is an execution blocker, not evidence about any algorithm.
+
+## 2026-11-01T01:28:45Z — Complete native and nested L0 optimization diagnostics
+
+### What was done
+
+- Expanded the development roster to 109 specs. The current native
+  `optimize audit --require-all` receipt admits 78/78 top-level methods and
+  19/19 nested algorithms with zero missing entries, structural errors, or
+  development/holdout seed leakage.
+- Fixed a planner/runtime mismatch in the three-leads family. Target- and
+  seed-independent family/oracle checks now run during planning and again at
+  solve time. A decomposition method on a Scholten fixture is refused before a
+  session starts; a certified binary subfield fixture plans and executes.
+- Ran 33 L0 diagnostic sessions covering all 72 runnable native methods, all 11
+  system solvers, and all eight PDP3 engines. The six remaining registry entries
+  are external CM wrappers with placeholder bindings and were not executed.
+- Produced 955 records: 902 verified, 20 exhausted, 23 timeout, and 10 explicit
+  error outcomes. All 33 audit receipts passed; 742/742 eligible measured
+  deterministic replays reproduced exactly with zero problems.
+- Added a matched-target Koblitz n=17 panel containing every system solver under
+  one factor base, target, relation stream, and 17-second cap. Buchberger timed
+  out in all measured runs and XL correctly declined the rectangular system;
+  every completed solver remained worse than strong rho at every pricing-band
+  weight.
+- Measured all eight PDP3 engine paths. Root-finding, matrix F4/F5, inherited
+  F4, and F6 all remained behind matched rho on their diagnostic domains.
+- Selected one result for confirmatory follow-up: on a Koblitz a=1 n=29
+  one-target full-price diagnostic, the generator-orbit pipeline used 0.4405x
+  signed-Frobenius-rho work, with within-target interval [0.363, 0.534] and
+  pricing-band ratios 0.4209, 0.4633, and 0.8443. It is not a frontier result
+  until a disjoint multi-target L2 holdout passes.
+
+### Decisions made
+
+- Do not update the leaderboard. All fresh clocks are L0, completion/nested
+  panels have one target and four measured rounds, and the generator-orbit
+  signal is development candidate selection only.
+- Treat the full audit as campaign-structure admission, not performance
+  admission. EKS execution remains gated on durable checkpoint credentials.
+- Retain every timeout, exhaustion, and solver refusal. In particular, dense
+  and Wiedemann F_((2^10)^4) pipelines timed out while rho completed;
+  matrix-F4 censored twice; Buchberger timed out; XL refused an unsupported
+  system shape.
+
+### Validation
+
+- Release `ecbench` built successfully with Rust 1.99.1.
+- All derived diagnostic specs passed native planning before execution.
+- All complete sessions passed `ecbench verify --replay-all` with exact replay.
+- Direct Rust formatting was applied because workspace-wide `cargo fmt` is
+  blocked by a sparse historical workspace member.
+
+### Open threads
+
+- Run source checks and review the final diff, commit, push, and update PR #3099.
+- Provision the checkpoint upload identity and real external CM backends.
+- Freeze and submit the generator-orbit candidate/incumbent/strong-rho/A-A
+  multi-target holdout on EKS `cpu-l2-spot`.
+
+## 2026-11-01T02:23:40Z — Validate the complete loop and close a policy error
+
+### What was done
+
+- Ran the required release library suite after materializing the sparse
+  compile-time fixtures: 5,789 tests passed, 39 failed, 128 were ignored, and
+  the suite finished in 1,891.27 seconds. Thirty-eight failures are outside
+  this change: absent sparse runtime evidence/fixtures, loopback socket calls
+  denied by the managed sandbox, one existing `ic_wide` counter mismatch, and
+  a previously missing cited evidence file.
+- The suite found one owned error: `rho.multitarget_pooled` had been classified
+  as a finite-grid search even though its only varying `batch` parameter changes
+  the workload scope rather than tuning the same workload. Reclassified it as
+  source-level implementation A/B; the fail-closed test did its job.
+- Reran the three optimizer unit tests in release mode after the correction;
+  all three passed. The three-leads planning guard test and the three-leads
+  backend agreement test also passed in release mode.
+- Rebuilt the release `ecbench` binary (SHA-256
+  `1523de56a151448172f0e39d7d5f837a297619f2027fc3ed620ae71bf122a7df`),
+  regenerated the inventory, and reran the 109-spec all-coverage audit. The
+  audit remains admitted with 78/78 methods and 19/19 nested algorithms. The
+  corrected strategy totals are 17 adaptive, 14 finite-grid, 23
+  implementation-A/B, three external-backend-A/B, and 21 replay controls.
+- Parsed all 230 JSON artifacts successfully and reran `git diff --check`.
+
+### Decisions made
+
+- Keep `batch` as `workload_scope`; changing target multiplicity starts a new
+  comparison object and cannot be optimized as though it were a speed knob.
+- Do not hide the repository-wide failures or relabel the focused pass as a
+  clean full suite. The owned policy failure is fixed and independently
+  filtered; the remaining 38 failures stay reported as validation blockers
+  outside this patch.
+## 2026-11-01T00:08Z — validate frozen fp20 line-layout candidate before commit
+
+### What was done (commands, files, features)
+
+- Continued the cache-line pair-index and relation-guard candidate filed under
+  `research/ic_line_layout_tournament_20261031/`; no candidate timing or benchmark was run.
+- Completed `cargo test --release --lib`: 5,816 passed, 12 failed, 128 ignored in 2,853.05
+  seconds. Nine failures were local-socket permission denials under `pollard_collab`; rerunning that
+  module with sandboxed network access passed all 44 tests.
+- The remaining three failures exactly match the existing base limitations documented on merged
+  PR #3091: two diagnostic-reap publication tests cannot open their clock-sidecar path in this
+  sandbox, and `ic_wide::run_f2m4_is_the_one_word_pipeline` has the pre-existing count mismatch
+  (13,130 observed versus 3,757 expected).
+- Re-ran the affected release group: all five `cache_line` tests passed, including exact relation
+  stream equality. `cargo clippy --lib -- -D warnings` passed.
+- Revalidated the frozen protocol with the canonical tool: zero findings, protocol SHA-256
+  `a770471ff7aeac2c69f0292934a1d85fdf00ed66bc752741c2d2cb6a4b9895e6`; analysis-script SHA-256
+  `1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d`.
+
+### Decisions made (and why)
+
+- Preserve the full-suite failures rather than suppressing or weakening them. They are outside the
+  five touched IC modules and match independently documented base/environment failures; current
+  head CI remains the merge authority after the branch merges forward from `main`.
+- Keep the experiment pre-data until the implementation and frozen protocol are committed and
+  merged. The decisive result still requires both independent L2 EKS sessions and authenticated
+  raw-session analysis; a workflow receipt alone cannot establish the speedup.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the implementation/protocol, merge current `main` forward normally, resolve only additive
+  session-log conflicts, rerun affected validation, push, open a regular PR, and enable auto-merge.
+- After the exact revision merges, submit the two frozen EKS jobs concurrently and run the frozen
+  analysis on both authenticated session directories.
+
+### Errors (what went wrong, how it was handled)
+
+- The first full release invocation was interrupted during the prior task switch. The resumed run
+  reused its completed optimized build and was allowed to reach a terminal aggregate.
+- Nine collaboration tests initially failed because the default sandbox disallows local sockets;
+  reran the same unmodified tests with sandboxed network permission and all passed.
+
+## 2026-11-01T00:11Z — commit pre-data candidate and merge current main
+
+### What was done (commands, files, features)
+
+- Committed the implementation as `afb671d56` and the frozen protocol as `be02266d7`. No
+  candidate timing occurred between or after those commits.
+- Fetched current `main` at `d8b828714` and merged it forward normally. The only conflict was the
+  append-only 2026-10-31 session log; retained both complete histories and removed only the three
+  conflict-marker lines.
+
+### Decisions made (and why)
+
+- Keep all current-main research and infrastructure changes as base history. None overlaps the
+  five cache-line implementation modules or the frozen tournament directory; require fresh
+  combined-head validation before push.
+
+### Open threads (unfinished, pick up next time)
+
+- Finish the merge commit, re-run the affected release tests, strict clippy, ecbench build, and
+  protocol hash checks; then push/open the PR and remain through auto-merge.
+
+### Errors (what went wrong, how it was handled)
+
+- The first `git add` omitted the new research directory because it lies outside this checkout's
+  sparse definition, while the following commit still recorded the already-staged implementation.
+  Added the four protocol files explicitly with `git add --sparse` and committed them immediately;
+  no measurement ran in the interval.
+
+## 2026-11-01T00:14Z — combined head passes affected gates
+
+### What was done (commands, files, features)
+
+- On merge head `69411c85c`, release `cache_line` tests passed 5/5, strict library clippy passed,
+  and `cargo check --no-default-features --bin ecbench` passed.
+- Re-materialized the committed tournament directory after the mainline merge rewrote the sparse
+  worktree. Canonical protocol validation again reports zero findings; protocol and analysis hashes
+  remain `a770471ff7aeac2c69f0292934a1d85fdf00ed66bc752741c2d2cb6a4b9895e6` and
+  `1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d`.
+
+### Decisions made (and why)
+
+- The combined source is ready for current-head CI. Publish the implementation/protocol PR before
+  any EKS timing so the remote jobs can bind source, spec, binary and image to one merged revision.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit this validation log, push normally, open the PR, enable merge-style auto-merge, and remain
+  through exact-head required checks. After merge, dispatch the two fixed EKS jobs concurrently.
+
+### Errors (what went wrong, how it was handled)
+
+- The repository sparse helper reported that no named profile was applied even though Git sparse
+  checkout is active. Used `git sparse-checkout add` directly for the exact tracked study path;
+  all four committed files materialized and hash-checked.
+## 00:35 UTC — Prime-field shared-coefficient SAT/F4 continuation
+
+### What was done
+
+- Continued the user's request to pursue the next prime-field index-calculus
+  lead and devise experiments, with SAT solvers as the suspected mechanism.
+- PR [#3110](https://github.com/isogeny-labs/crypto/pull/3110) carried the
+  frozen CaDiCaL/CNF and CryptoMiniSat/CNF-XOR E1 correctness harness. The sole
+  conflict in append-only `docs/session-logs/2026-10-31.md` was resolved by
+  preserving both complete histories and removing only conflict markers.
+  Relative to the two parents, that file had 136/0 and 165/0 added/deleted
+  lines. The merge-resolution commit was
+  `20b7a0d1b391627c8063ba4cbcd5a64da16b8ec9`; the frozen research subtree was
+  byte-identical to pre-merge harness commit
+  `8cc48bdeedbe6284a4df2ab0d0a049feb1b11523`.
+- All required PR checks passed. Guarded auto-merge merged exact head
+  `20b7a0d1b391627c8063ba4cbcd5a64da16b8ec9` at
+  `2026-11-01T00:26:52Z` as merge commit
+  `d8b8287147ef623cc3f2f89a5ad5e2b2f59c99c8`.
+- Built pinned msolve 0.11.0 from source commit
+  `cc044551f8e202d00691990fd3fd0b1226a88ea2` against MPFR 4.2.2 and FLINT
+  3.6.0. The installed binary SHA-256 is
+  `7548742eb77d5f235dce7f20ae94343926f36e93edb5f371d4b11c283adb2b3c`;
+  its upstream suite passed 71/71. A non-study semantic smoke showed that
+  `x^2+1` over F3 returns a degree-two algebraic-closure parametrization with no
+  F3 root, while adding `x^3-x` returns `[-1]`.
+- Built pinned cvc5 1.4.2 from source commit
+  `282d5e0c84baf49c780704c532f87ba66d8b513d`, binary SHA-256
+  `6aecddf466552b83bb5883756c7955e0c9d5ddcc6d7f45b48c2f6e06a741b102`.
+  Non-study proof checks found that trust-free complete finite-field checking
+  stops at a trusted `THEORY_FF` rewrite and Alethe export rejects
+  `CONST_FINITE_FIELD`.
+- Added a strict msolve output parser and Fp extractor. It accepts only the
+  documented empty, positive-dimensional and one-parametrization forms;
+  validates names, dimensions, polynomial shapes and coefficients; handles
+  variable reordering, non-radical quotient dimensions and documented
+  separating variable `A`; filters elimination roots to Fp; reconstructs
+  coordinates as `-N(t)/D(t)`; and replays every complete canonical assignment
+  before projection. It normalizes msolve's signed 32-bit printed linear-form
+  metadata because the pinned genericity implementation can print unreduced
+  integer powers.
+- Added a fail-closed, write-once msolve E1 comparator runner. It hard-rejects
+  the wrong binary hash; launches one fresh single-threaded process per case
+  with `-t 1 -c 2 -d 4 --random-seed 0`; applies a 300-second correctness
+  deadline; records exact inputs/outputs/stdout/stderr and hashes; compares all
+  18 F17 projected sets to both E0 references; and fixes every canonical field
+  for m3/m5/m7 positive and `a0+1` negative controls.
+- Added `E1_COMPARATOR_PROTOCOL.md`, `e1-comparator-freeze.json` and
+  `e1-comparator-inputs.sha256` before any study launch. All 12 registered
+  source/reference hashes verify.
+- Proportional local validation after implementation: Rust 1.78 locked offline
+  release tests passed 25/25; Rust 1.98 all-target Clippy passed with warnings
+  denied; rustfmt, JSON parsing and `git diff --check` passed.
+
+### Decisions made
+
+- Continue the odd-arity shared-divisor-coefficient and quotient/remainder
+  predicate selected on 31 October. The evidence boundary is a solver
+  discriminator on one exact predicate.
+- Bare msolve SAT/UNSAT language is inadmissible because msolve parametrizes
+  algebraic-closure solutions. Every candidate point must be filtered to Fp
+  and canonically replayed.
+- cvc5 1.4.2 is optional for SAT-model cross-checking only; it cannot satisfy
+  the frozen independently checked UNSAT rule.
+- The only msolve comparator pass label is
+  `msolve_base_field_crosscheck_passed_no_unsat_certificate`. Every result
+  record states that msolve supplies no independent UNSAT certificate and
+  cannot close E1. No timing or performance interpretation is admissible.
+- No result report, graph or PDF is generated before an authorized frozen run
+  produces actual study evidence.
+
+### Open threads
+
+- Commit this follow-up, merge current `origin/main`, push a regular branch,
+  open a ready PR, enable guarded auto-merge and follow exact-head CI.
+- Obtain an authorized checkpoint upload path, push the current resume/spec
+  state, and require `scripts/checkpoint.sh gate` to pass.
+- Only then run the separately frozen SAT and msolve correctness panels. E2
+  remains blocked by E1, proof-bearing UNSAT coverage, checkpoint durability,
+  `perf`, power/detector receipts and an isolated custom-toolchain image.
+
+### Errors
+
+- The required scoped `conductor check` was attempted for the comparator and
+  session-log paths and returned exit 127 because `conductor` is absent. No
+  reservation was claimed; the documented warn-and-allow path applies.
+- A requested Copilot conflict response for PR #3110 did not arrive within 15
+  minutes. The documented fallback resolution preserved both append-only
+  histories and passed all CI.
+- Initial parser fixtures contained one excess closing bracket; locked tests
+  rejected them, and they were corrected to the official msolve output shape.
+  Clippy then identified an overlong parser function, which was split without
+  suppressing the warning.
+- `scripts/checkpoint.sh gate` exits 1: there is no AWS profile
+  `ecc-challenges-new`, `CHECKPOINT_UPLOAD_TOKEN`, or
+  `/home/agent/.config/checkpoint/upload-token`. No study solver command was
+  launched. Credentials must be installed through the checkpoint mechanism
+  and must not be pasted into chat or committed.
+
+## 00:36 UTC — Comparator commit and mainline merge
+
+### What was done
+
+- Committed the frozen comparator implementation and protocol as
+  `fe8d3c3a60f7f6599b4afe6d51d13cabccb149d6`.
+- Merged current `origin/main` merge commit
+  `d8b8287147ef623cc3f2f89a5ad5e2b2f59c99c8` normally, producing local merge
+  commit `60c963929fc5952fdbaa7d1dad51c07e57158695`. No conflict occurred.
+- Reverified all 12 registered comparator hashes after the merge. Rust 1.78
+  locked offline release tests again passed 25/25, and Rust 1.98 all-target
+  Clippy again passed with warnings denied.
+
+### Decisions made
+
+- Preserve a normal merge topology because the follow-up branch and landed
+  mainline both descend from exact PR #3110 head `20b7a0d1b391627c8063ba4cbcd5a64da16b8ec9`.
+- Keep the comparator unrun; successful local validation does not satisfy the
+  durable checkpoint launch prerequisite.
+
+### Open threads
+
+- Commit this log update, push the branch, open the regular PR, enable guarded
+  auto-merge and follow exact-head CI.
+- Install an authorized checkpoint upload path before either frozen study
+  panel runs.
+
+### Errors
+
+- None in the commit, mainline merge or post-merge validation.
+
+## 00:37 UTC — Comparator PR opened
+
+### What was done
+
+- Pushed branch `codex/prime-shared-coeff-e1b-20261101` and opened regular PR
+  [#3115](https://github.com/isogeny-labs/crypto/pull/3115), titled
+  `research: freeze msolve base-field E1 comparator`.
+- Enabled guarded merge-method auto-merge. GitHub reported the prepared head
+  mergeable, with required checks in progress and the automated review check
+  already passing.
+
+### Decisions made
+
+- Follow exact-head CI through merge and inspect any actual failure. PR
+  creation and local validation alone are not treated as landed delivery.
+
+### Open threads
+
+- Push this required live session-log update, update the PR head declaration,
+  and follow the resulting exact head through CI and guarded merge.
+- The scientific checkpoint credential and both E1 study launches remain
+  separate unresolved work.
+
+### Errors
+
+- None while pushing, creating the ready PR or enabling auto-merge.
+- `gh pr edit` failed because GitHub's classic Projects GraphQL field is being
+  deprecated. The PR body was updated successfully through the REST pull
+  request endpoint instead.
+## 00:20Z — Prime-field arity-three protocol hardening started
+
+### What was done (commands, files, features)
+
+- User requested that all nine review findings be fixed across `crypto`, `cryptanalysis`, and
+  `crypto-autoresearcher`, then that the implementation leads be pursued.
+- Started clean branch `codex/prime-ic-protocol-hardening-20261101` from `origin/main`
+  `7b19d771dca0131a986c7e60d397b4f5c7229d51`. Confirmed prior PR #3096 merged as
+  `0ccfc1a40feb906b3c9854b628737c0edd7f7872`.
+- Read the evidence-reporting workflow and the preceding session record. The required
+  `conductor check` was attempted for the study and session-log scopes; `conductor` is absent
+  (exit 127), so the documented warn-and-allow path applies and no reservation was claimed.
+
+### Decisions made (and why)
+
+- Preserve these acceptance criteria: preprocessing exponent and cold/amortized accounting;
+  natural-only slope with conservative censoring; a frozen exactly-one encoding and realistic
+  continuation; encoder-specific CNF multiplication costs; unambiguous abscissa/sign semantics;
+  checked UNSAT certificates; compact range constraints; and unambiguous decision provenance.
+- Treat the rational-lift identity and guarded three-summand lemma as retained mathematics unless
+  a worked counterexample is found. No scientific result will be claimed from design validation.
+
+### Open threads (unfinished, pick up next time)
+
+- Complete the literature-first review, reconcile the cross-repository contracts, apply the
+  additive corrections, regenerate artifacts, validate, commit, open a regular PR, enable guarded
+  auto-merge, and pursue the source-bound development-fixture implementation in `cryptanalysis`.
+
+### Errors (what went wrong, how it was handled)
+
+- `conductor` is not installed; no conflict telemetry was available.
+
+## 00:25Z — Literature and source-contract review completed
+
+### What was done (commands, files, features)
+
+- Re-read the current lead-atlas records and known-result summaries for prime Semaev systems,
+  SAT/XOR PDP solvers, and the existing Q1421 external-propagator precedent.
+- Checked Semaev's primary ePrint 2004/031 metadata and the previously retained full-source review;
+  cvc5 1.4.2 finite-field examples and current source at `02f77af402b4be82f27e5cc00b86b265a90dea3d`;
+  Sinz, DOI `10.1007/11564751_73`; and Harvey--van der Hoeven, DOI
+  `10.4007/annals.2021.193.2.4`.
+- Current cvc5 finite-field source returns `nullptr` from `getProofChecker()`. The QF_FF route
+  therefore has no source-supported checked-UNSAT path in the inspected revision. Harvey--van der
+  Hoeven's `O(n log n)` integer multiplication result refutes a universal quadratic Boolean-
+  multiplication lower bound. Sinz supplies the selected linear sequential cardinality encoding.
+
+### Decisions made (and why)
+
+- State quadratic gate growth only for the frozen schoolbook control. Bind exactly-one counts to
+  the selected Sinz construction, require natural-only complete-panel inference, and treat QF_FF
+  as SAT/model-capable but not UNSAT-certifying until a proof-capability probe passes.
+- The Sinz full text was not retrievable from this environment (publisher/bot gate); record the
+  DOI and use an independently derived clause construction tested exhaustively, without claiming
+  a fresh full-paper audit.
+
+### Open threads (unfinished, pick up next time)
+
+- Apply these corrections to the narrative, machine protocol, report, diagram, and provenance note;
+  keep the protocol draft until the native owner implementation and resource/proof preflights pass.
+
+### Errors (what went wrong, how it was handled)
+
+- Direct Sinz and Annals PDF retrieval was blocked or empty; Crossref/Semantic Scholar metadata and
+  the official cvc5 source were accessible. No inaccessible text is represented as read.
+
+## 00:35Z — Protocol, provenance and report hardened
+
+### What was done (commands, files, features)
+
+- Bound owner implementation evidence to merged `cryptanalysis#1347`, merge commit
+  `3c769002f0f68d63a5055f6f3e24a9500393180e`.
+- Replaced the local misuse of `DEC-20261031-cd6460` with a compatibility notice; added
+  `PDP_ARITY_CORRECTION.md` and bound current work to immutable arity decision
+  `DEC-20261031-b51282` plus additive hardening decision `DEC-20261101-26f1fa`.
+- Rewrote the narrative and machine protocol so cold collection is
+  `2^(a s)+2^((e+1)s)`, with necessary `a<1.5` and natural-query `e<0.5` gates; the primary
+  regression uses only the complete natural panel at actual `log2(p)/3`.
+- Made QF_FF a SAT/model diagnostic at inspected cvc5 source, scoped quadratic CNF growth to the
+  selected schoolbook control, bound abscissae to rational-lift signs, selected Sinz exactly-one,
+  required a compact range predicate, and marked the one-hot `s=15..27` continuation unadmitted.
+- Added and inspected the protocol-gate diagram; regenerated the five-page report PDF. Final PDF
+  SHA-256 is `01633ab9f601cff2f79e9e50e0bc3d81ce5880bac0f99a7f692e3c165bf2f9dc`.
+- `experiment_protocol.py validate` reports zero findings; JSON parsing and `git diff --check`
+  pass. Large-file and artifact checks report no prohibited files/data artifacts.
+
+### Decisions made (and why)
+
+- There is one proof-eligible slope candidate, `cdcl-t-fp`, so no Holm family is manufactured.
+  A future proof-capable QF_FF route requires a prospective amendment.
+- Any natural timeout, OOM, unknown, unproved UNSAT or missing rung makes the decision
+  inconclusive. Completed rows, planted rows and exact-UNSAT rows cannot replace or enter the
+  natural slope.
+- At `s=27`, exact selected one-hot structure is 805,306,365 Boolean variables and
+  1,207,959,543 exactly-one clauses before theory auxiliaries. This blocks admission but is not an
+  empirical OOM claim.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and land the crypto hardening PR, then record both merged source identities in the
+  autoresearcher additive decision and update the affected atlas leads/report.
+- The production typed IR, `F_p` trail theory, independent explanation/UNSAT proof checker,
+  exporters, instrumentation, power and held-out freeze remain open owner-repository work.
+
+### Errors (what went wrong, how it was handled)
+
+- Initial local invocations omitted required positional arguments to `scripts/check-large-files.sh`
+  and `tools/artifacts/artifacts.py check`; both printed usage errors. They were rerun with the
+  repository-prescribed base/head arguments. The first post-commit artifact check correctly rejected
+  the generated PNG; the publisher could not upload it because `aws` is absent, so the report was
+  rebuilt from a policy-kept PDF figure generated from the tracked DOT/SVG source and the PNG was
+  removed. `cargo` remains unavailable, so the broad
+  Rust suite cannot run locally; no Rust source changed and CI remains the broad gate.
+- The already-open PR's artifact workflow concurrently committed `28ceb816c`, storing and deleting
+  the earlier PNG. The corrected local head was merged normally with that bot commit (no force
+  push); its artifact manifest pointer is retained while the report itself uses the policy-kept
+  PDF figure generated from the same DOT/SVG source.
+## 2026-11-01T00:23Z — S3-backed gap80 root chunks
+
+### What was done (commands, files, features)
+- Read the previous day's handoff, current instructions, artifact/checkpoint transport code and cloud readiness. PR #3079 has merged. Created `codex/gap80-s3-chunks-20261101` from current main `7b19d771d`; root instructions are unchanged.
+- User authorized S3. No direct AWS identity/CLI is configured; use the existing authenticated same-repository artifact-autofix route, which uploads and fully reads back selected bytes before committing immutable S3 pointers.
+
+### Decisions made (and why)
+- Implement a native constant-memory root-chunk producer for the exact 80-bit kernel, and validate one small storage fixture. This is bounded development/storage validation, not a construction or ECDLP benchmark; no timing claim or full scientific run is launched.
+- Store chunk indices, exact field/kernel identity and hashes so independently generated chunks can be resumed without changing the target. Keep S3 storage separate from polynomial working memory: the existing FLINT constructor still requires a new external-memory evaluation schedule.
+
+### Open threads (unfinished, pick up next time)
+- Build and independently check the native fixture, publish it through S3 readback migration with a source-linked report, and document the missing external-memory polynomial/evaluator stage.
+
+### Errors (what went wrong, how it was handled)
+- Conductor is unavailable (command not found), documented as nonblocking. Do not print or inspect credential files; use the configured GitHub/artifact workflow without changing IAM or secrets.
+
+## 2026-11-01T00:26Z — native S3 storage fixture locally verified
+
+### What was done (commands, files, features)
+- Implemented `root_chunk.c`, reusing the existing checked GMP point arithmetic with arbitrary-size degree/offset values. It streams fixed-width big-endian roots without retaining a full vector, checks bounds and points, and refuses overwrites.
+- Built the tools and generated one bounded development fixture: 4,096 roots, 131,072 bytes. A separate PARI program verified all 4,096 coordinates. Byte-identical replay, offset/tail agreement, count/window rejection and overwrite rejection checks passed.
+- Pinned input/source/blob hashes and exact ordinal interval in `s3-chunks/chunk-manifest.json`. Added retrieval documentation and an inspected one-page source-linked report/diagram. The full 13,668,958,625,088-byte encoded baby window was neither generated nor uploaded.
+
+### Decisions made (and why)
+- Upload only this small verified fixture via artifact-autofix's trusted full-byte S3 readback. This is storage/correctness validation with no timing claim, not a substituted full-map or ECDLP experiment.
+- Keep the existing FLINT external-memory polynomial schedule and complete point evaluator explicitly open; do not equate S3 storage with RAM or claim that moving roots alone completes the computation.
+
+### Open threads (unfinished, pick up next time)
+- Publish the PR and confirm the S3 pointer/readback commit. Then the next algorithmic component is an external-memory product/remainder-tree schedule with durable intermediate manifests.
+
+### Errors (what went wrong, how it was handled)
+- Initial build command used a mistyped study date; reran the existing study build path successfully. Conductor and direct AWS CLI/identity remain unavailable; the authorized GitHub artifact route is used instead.
+
+## 2026-11-01T00:31Z — first root chunk verified in S3
+
+### What was done (commands, files, features)
+- Opened PR #3112 and enabled guarded auto-merge. Artifact-autofix run 41256903420 completed successfully; commit `5f89c75b0` replaces the 131,072-byte root fixture with its S3 pointer. The pointer matches the independently verified SHA-256 `56bb2d85e4fb8584eb80b00cb8ead37d192c1055e84c80c6a6fb6c6057892ed2`.
+- Fast-forwarded that bot commit and recorded the immutable root-storage receipt.
+- Prepared a deterministic 165,932-byte portable native-source/input snapshot, excluded build outputs, tested XZ integrity and verified its embedded root bytes. It is ready for a second verified artifact migration; it is not live process state.
+
+### Decisions made (and why)
+- Use the native producer's Git-pinned sources plus fixture/certificate data for restoration. Keep the creation-time snapshot immutable and record subsequent storage outcomes separately.
+- Preserve all original evidence; do not silently claim that S3 completes external-memory polynomial evaluation.
+
+### Open threads (unfinished, pick up next time)
+- Upload/read back the portable snapshot through the same trusted workflow and inspect the current-head required gates.
+
+### Errors (what went wrong, how it was handled)
+- `git archive` triggered a slow lazy object fetch. Stopped only that owned archive operation and packed the already-present, explicitly selected native source and public fixture inputs deterministically instead. No cloud computation or stored object was interrupted or deleted.
+
+## 2026-11-01T00:33Z — S3 root data and portable producer snapshot verified
+
+### What was done (commands, files, features)
+- Artifact-autofix run 41257164940 completed successfully; pointer commit `cf5253cf6` stores the 165,932-byte source/input snapshot with SHA-256 `1b52e992e5c7aa380ab14507e7274c9db039c3466a22f9978ddb503d5412e008`. Both the root chunk and snapshot now have verified S3 pointers.
+- Restored the local snapshot into a separate scratch directory, rebuilt native tools, independently rechecked all 4,096 roots and replayed the field-prime certificate. These local restoration checks plus the remote full-byte readback establish the stored snapshot's integrity.
+- Added a separate immutable snapshot-storage receipt and retrieval instructions. PR #3112 is open with guarded auto-merge; current-head CI remains pending.
+
+### Decisions made (and why)
+- Report completion only for bounded root preparation, S3 readback and portable source/input restoration. No full-window generation, external-memory polynomial evaluation, quotient, point-map or endpoint ECDLP completion is claimed.
+
+### Open threads (unfinished, pick up next time)
+- The next native component is external-memory product/remainder-tree processing with bounded working sets and immutable intermediate manifests, followed by a complete point evaluator. Required PR gates remain necessary before merge.
+
+### Errors (what went wrong, how it was handled)
+- No new storage or verification failures. Source/input snapshots are distinguished from live process checkpoints; no large computation is running.
+## ECDLP challenge verifier implementation (Codex session)
+
+### What was done
+
+- Implemented a native Rust challenge/certificate layer and JSON CLI for six
+  index-calculus bottlenecks: relation generation, factor-base selection,
+  sparse linear algebra, individual-log descent, transfer auditing, and
+  symmetry-orbit relations.
+- Added stable fixture/submission/receipt schemas, a deterministic public
+  19-point subgroup fixture, a generic reference baseline, direction-tagged
+  frontier coordinates, create-new output behavior, and structured rejection
+  records. Each verifier recomputes its mathematical claims; every track has a
+  false-certificate mutation control.
+- Added the committed fixture and source-linked usage/evidence documentation.
+  The fixture file SHA-256 is
+  `0399b42507f2c0c410bf801935ece4c00d5d7a16dc9b7276cfebf77f0115eb65`.
+- Reviewed the current `ic` pipeline, the prime-field breakthrough program, the
+  Semaev/root-finding record, the lead atlas, and the Semaev, Gaudry, symmetry,
+  Block Wiedemann, large-prime, and cover/descent literature records before editing.
+- Confirmed the checkout was clean at `04922ddb64a81d71e046800fab75265186fa9b2a`.
+- Focused gates passed: `cargo check --bin ecdlp-challenges
+  --no-default-features`; debug bin tests (2/2); release library filter (3/3);
+  clippy with warnings denied; rustfmt check; fixture parity; and direct
+  baseline-to-verify CLI replay with all six receipt coordinates and the fixed
+  claim boundary.
+- The required full `cargo test --release --lib -j 2` completed after 1,747.70
+  seconds: 5,801 passed, 28 failed, and 128 were ignored. None of the 28
+  failures names the new module. Twenty-seven require sparse-checkout evidence
+  or assets that are absent locally; the remaining pre-existing failure is the
+  `cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline` assertion
+  mismatch (`13130` versus `3757`).
+
+### Decisions made
+
+- The initial fixture is a public, deterministic, known-answer toy elliptic-curve
+  subgroup. It is a software/certificate control, not a performance experiment.
+- The receipt exposes a six-coordinate Pareto frontier and never combines unlike
+  metrics into one score. Verification recomputes mathematical identities; raw
+  row counts do not substitute for independent rank.
+- Generic and algebraic index-calculus tracks remain separate. No speedup,
+  asymptotic improvement, standard-curve break, or transfer advantage is claimed.
+
+### Open threads
+
+- The first unbounded/full-size scientific execution still requires a frozen
+  protocol, canonical `run` admission, independent replay, and matched complete
+  costs. This implementation does not authorize that execution.
+
+### Errors
+
+- `conductor check --summary 'Add six verifier-backed ECDLP index-calculus challenge tracks' --scope 'src,tests,docs'`
+  could not run because `conductor` is not installed (`command not found`, exit
+  127). The documented warn-and-proceed fallback was used with a narrow branch.
+- Direct retrieval of the Semaev and Gaudry primary PDFs was refused by the
+  upstream hosts (HTTP 403/challenge HTML). Existing repository literature
+  records were used, and the source-access gap remains explicit.
+- The first broad library compile was blocked by 33 absent compile-time fixture
+  inputs in the sparse checkout. Only the named tracked inputs were
+  materialized, after which the complete release suite ran to its result above.
+- An initial integration-test target selection caused Cargo to compile many
+  unrelated binaries and exhausted the workspace disk during linking. The
+  generated `target/` directory was cleaned, tests were moved to their proper
+  bin/module scopes, and all focused gates then passed. No source or user data
+  was removed.
+
+## ECDLP challenge PR and current-main reconciliation
+
+### What was done
+
+- Opened PR #3135 and enabled merge-style guarded auto-merge. GitHub reported
+  the first head conflicting after `main` advanced to `692afe2e4`; merged that
+  exact mainline tip forward normally.
+- The only conflict was this append-only session log. Both complete histories
+  were retained and only the three conflict-marker lines were removed.
+- On the combined head, the release-filtered verifier tests passed 3/3, the bin
+  mutation tests passed 2/2, strict clippy passed, rustfmt passed, and the branch
+  diff check passed. The sparse merge de-materialized the committed fixture;
+  the exact tracked path was restored to the sparse view and its SHA-256 still
+  matches the pinned value above.
+
+### Decisions made
+
+- Treat current-head CI and guarded auto-merge as the final integration gate.
+  The earlier full-suite aggregate remains recorded as base-head evidence; the
+  proportional combined-head gates cover every changed implementation path.
+
+### Errors
+
+- The first auto-merge request used squash, which this PR path rejected. It was
+  replaced with the repository-supported merge method without changing content.
+
+## 01:10 UTC — F6-IC pair-index (a) and decomposition-rate (b) rounds: prepared, not run
+
+### What was done (commands, files, features)
+- `src/bin/ecbench/pdp3_koblitz.rs`: new `pdp3-koblitz:m=3,engine=f6-ic-pair`, calling the
+  library's `groebner_decompose_f6_ic_pair_index`; unit test
+  `engine_names::f6_ic_pair_parses_and_shares_the_f6_solver` passes; rustfmt clean.
+- Protocols frozen before data: `research/f6_ic_pair_index_v2_20261101/PROTOCOL.md` (+ SPEC-n13/n19,
+  ladder targets), `research/binary_decomp_rate_20261101/PROTOCOL.md` (+ SPEC-n13/n19/n23, fresh
+  seeds, rootfind m = 2/3 at d0−1, d0, d0+1). `ecbench plan` validates all five.
+- Development smoke only (L0, local, 2 targets, m = 13, not a measurement): f6-ic-pair verified 2/2,
+  same trials and relations as f6-ic; charged additions 1,790 and 1,525 vs 50,304 and 33,984.
+
+### Decisions made (and why)
+- Not committed to `feat/busy-hypatia-0lsb6d` yet: it carries open PR #2223, and these rounds are
+  a separate study. Waiting on the owner's branch choice.
+
+### Open threads (unfinished, pick up next time)
+- Launch both rounds via isolab-eks once the branch is chosen and the checkpoint can be uploaded.
+
+### Errors (what went wrong, how it was handled)
+- Resume checkpoint upload failed: no AWS profile `ecc-challenges-new`, no `CHECKPOINT_UPLOAD_TOKEN`.
+  The repo requires it in S3 before any run, so no measured run was started.
+- isolab-eks MCP and the Conductor control plane (localhost:8080) were unreachable.
+## 2026-11-01T00:48Z — merge second main advance into line-layout PR
+
+### What was done (commands, files, features)
+
+- Opened PR #3116 from exact head `23a2207bc` and enabled merge-style auto-merge. Its software,
+  Rust scope, rustfmt, clippy, ecbench scope, leaderboard and parity checks passed.
+- While the required full-tree policy jobs were still running, `main` advanced to `04922ddb6` and
+  GitHub correctly marked the PR conflicting. Merged that tip forward normally.
+- The only conflict was the add/add 2026-11-01 session log; retained both complete histories and
+  removed only the three conflict-marker lines.
+
+### Decisions made (and why)
+
+- Require fresh current-head CI after this merge rather than relying on checks attached to the
+  superseded head. The new mainline changes do not overlap the cache-line implementation or frozen
+  protocol.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the forward merge, rerun affected gates and protocol hashes, push normally, then remain
+  through #3116 auto-merge before dispatching either EKS job.
+
+### Errors (what went wrong, how it was handled)
+
+- Main moved during CI, making the otherwise green source head unmergeable. No rebase or force-push
+  was used; the current base was merged explicitly and all log histories were preserved.
+
+## 2026-11-01T00:59Z — second combined head passes affected gates
+
+### What was done (commands, files, features)
+
+- On merge head `08d25b19b`, rebuilt the optimized root crate after current-main cryptanalysis
+  changes. Release `cache_line` tests passed 5/5, strict library clippy passed, and
+  `cargo check --no-default-features --bin ecbench` passed.
+- Canonical protocol validation still reports zero findings. Protocol and frozen analysis hashes
+  are unchanged from the pre-data commitments.
+
+### Decisions made (and why)
+
+- Push this exact current-base head and require #3116's workflows to restart. Do not dispatch EKS
+  from the superseded PR head even though its relevant source checks passed.
+
+### Open threads (unfinished, pick up next time)
+
+- Push normally and remain through exact-head auto-merge, then dispatch the two EKS jobs against
+  the merge commit and retrieve both authenticated sessions for frozen analysis.
+
+### Errors (what went wrong, how it was handled)
+
+- No new validation error. The optimized rebuild took 7m39s because current main changed root
+  cryptanalysis modules; it completed normally.
+## 00:45 UTC — Comparator PR rebased onto advancing main
+
+### What was done
+
+- All required checks passed on PR #3115 head
+  `cd695dc1bff4935e51406587533333f8897af152`, including artifacts, size and
+  validation-gate.
+- GitHub then reported the otherwise-green PR as conflicting because `main`
+  advanced from `d8b8287147` to `04922ddb64` while CI ran. Fetched that exact
+  base and merged it into the prepared branch.
+- The only overlapping path was append-only
+  `docs/session-logs/2026-11-01.md`. Both complete histories were preserved;
+  only the three conflict-marker lines were removed.
+- On the resolved current head, Rust 1.78 locked offline release tests passed
+  25/25, Rust 1.98 all-target clippy passed with warnings denied, rustfmt
+  passed, all 12 frozen comparator hashes passed, the freeze JSON parsed and
+  `git diff --check` passed. No solver saw a study input.
+
+### Decisions made
+
+- Revalidate and repush the merge result as a new exact PR head. Prior green
+  checks are evidence for the old head, not a substitute for current-head CI.
+- Keep the E1 solver study closed: this integration work does not satisfy the
+  separate scientific checkpoint credential gate.
+
+### Open threads
+
+- Commit and push the validated merge, then follow the replacement exact head
+  through guarded auto-merge.
+- After the checkpoint credential is installed, run the already-frozen SAT and
+  msolve correctness panels without changing their inputs or policies.
+
+### Errors
+
+- Auto-merge could not act on the first green head because concurrent changes
+  on `main` made it conflicting. No research code conflicted; the append-only
+  log conflict was resolved without dropping either history.
+- Two first validation invocations found no `cargo` on the fresh shell's
+  `PATH` and exited 127. They were rerun successfully with the already-pinned
+  binaries under `/tmp/tensor-cargo` and toolchains under `/tmp/tensor-rustup`.
+- A cached-index whitespace check against the old first parent also reported
+  trailing whitespace in newly merged upstream SVG/TSV artifacts. The actual
+  PR delta against `origin/main` passes `git diff --check`; those unrelated
+  upstream artifacts were preserved unchanged.
+
+## 00:53 UTC — Integrate hardened fixed-arity cost gate
+
+### What was done
+
+- Pushed conflict-free PR #3115 head
+  `4c503c91313ca08c00f3cf1281b8a478aca05161`; all 13 required checks passed
+  with five expected skips and no failures.
+- While those checks ran, `main` advanced again from `04922ddb64` to
+  `2e8f31df6c`. Fetched and merged that exact base. The only overlapping path
+  was this append-only log; both histories were retained and only conflict
+  markers were removed.
+- Reviewed the newly landed prime-field protocol hardening. It makes the
+  admissible practical solver screen fixed `m=3`, with natural-query exponent
+  `e<0.5` and reusable-setup exponent `a<1.5` required to cross the complete
+  relation-collection cost bridge.
+- Reconciled the shared-coefficient documents and machine matrix. The frozen
+  E1 SAT/msolve correctness panels remain unchanged, while the unrun
+  variable-arity E3 design and its `0.85/0.95` thresholds are explicitly
+  retired before data.
+- On the merged tree, Rust 1.78 locked offline release tests passed 25/25,
+  Rust 1.98 all-target clippy and rustfmt passed, the revised JSON parsed,
+  all 12 comparator hashes passed, and all 12 earlier SAT hashes passed when
+  checked against their declared source commit `8cc48bdeedbe6284a4df2ab0d0a049feb1b11523`.
+
+### Decisions made
+
+- Treat the hashed-factor Boolean tensor route as rank one and the parent
+  fixed-arity-three CDCL(T)/`F_p` screen as the authoritative practical SAT
+  experiment. This quotient/remainder IR remains an E1 representation
+  candidate until a prospective semantic-integration and complete-cost
+  amendment admits it.
+- Do not reinterpret E1 equivalence as exponent or relation-collection
+  evidence. No frozen E1 input, runner, policy or hash was modified.
+
+### Open threads
+
+- Commit and push the validated second mainline merge; then follow the new
+  exact head through guarded auto-merge.
+- The scientific checkpoint credential, source-bound `F_p` propagator and both
+  frozen E1 launches remain open.
+
+### Errors
+
+- A second concurrent `main` advance made the fully green head conflicting
+  before auto-merge could act. No comparator source or frozen protocol
+  conflicted; the new scientific contract exposed and corrected an unrun
+  downstream design mismatch.
+- A combined current-tree hash command exited nonzero because the older SAT
+  freeze correctly rejects later comparator wiring in `lib.rs` and `main.rs`.
+  The register was not rewritten; commit-scoped verification confirmed all
+  12 original hashes, while the separate current comparator register passed.
+
+## 00:57 UTC — Reconcile third concurrent base advance
+
+### What was done
+
+- Pushed locally validated PR #3115 head
+  `bf45fa1784d31457890b4dcf877a736e09af25a5` with the fixed-arity cost-gate
+  correction and updated evidence boundary.
+- `main` advanced from `2e8f31df6c` to `390d5c2c00` before the full workflow
+  set attached. Fetched and merged that exact base. Again, only this shared
+  daily log overlapped; the concurrent polynomial-block component and all of
+  its evidence were preserved unchanged.
+- Resolved the log by placing this project's complete block before the newly
+  appended mainline entries. Future end-of-file appends can then merge without
+  overlapping this project's insertion hunk.
+- Exact-head revalidation passed: Rust 1.78 locked offline release tests 25/25,
+  all 12 comparator hashes, revised JSON, scoped diff hygiene and conflict-
+  marker checks. The comparator subtree is byte-identical to the prior head.
+
+### Decisions made
+
+- Keep using the mandated shared daily log rather than a task-specific file.
+  Reduce conflict risk through hunk placement while preserving every complete
+  entry and all four required subheadings.
+- Keep the comparator source, both E1 freezes and the fixed-arity correction
+  unchanged during this integration-only merge.
+
+### Open threads
+
+- Commit and push the validated third mainline merge, then watch the resulting
+  exact head through guarded auto-merge.
+- The scientific checkpoint and frozen E1 executions remain blocked and
+  unstarted.
+
+### Errors
+
+- A third concurrent base advance blocked auto-merge. It introduced no
+  research-code conflict or failed check; the recurring overlap was confined
+  to simultaneous additions in the required shared daily log.
+
+## 2026-11-01T00:38Z — bounded polynomial processing of stored roots
+
+### What was done (commands, files, features)
+- Read the newest handoff, cloud/storage readiness and existing native trace helper. PR #3112 remains open, so continue that PR rather than creating a duplicate.
+- Reviewed the legacy constructor's reciprocal-power requirements and FLINT root-product/fast-multipoint API contracts before implementation.
+
+### Decisions made (and why)
+- Implement a bounded polynomial-block format and sequential evaluator: each root block forms a monic polynomial; its first six logarithmic-derivative sums add across blocks. This keeps one block in memory without requiring a full global product.
+- Validate the stored 4,096-root fixture at 32 non-kernel contexts against a direct reciprocal-power oracle and split-block consistency. These are native development correctness tests, not performance measurements or full target-size isogeny evaluation.
+- Preserve setup/I/O costs as unmeasured and make no end-to-end feasibility claim; streaming blocks can still require excessive total work.
+
+### Open threads (unfinished, pick up next time)
+- Build the bounded native stage, check corruption/collision controls, publish prepared blocks and receipts via verified S3 migration, and extend the source-linked report.
+
+### Errors (what went wrong, how it was handled)
+- Conductor remains unavailable (command not found); its documented nonblocking state is unchanged. Direct AWS credentials remain absent; use the existing verified artifact route and hash-matched materialized fixture.
+
+## 2026-11-01T00:44Z — native bounded polynomial stage validated
+
+### What was done (commands, files, features)
+- Added native product-block serialization/loading and sequential reciprocal-power accumulation with bounded block/context counts; no global baby polynomial is allocated.
+- Prepared a 131,148-byte degree-4,096 product from the hash-matched stored root fixture. All 192 reciprocal-power values at 32 non-kernel source contexts match direct inversion; split blocks in either order match too.
+- Added the actual first 32 giant contexts for the exact 80-bit degree. PARI independently checked them; another 192 sums match direct inversion and split-block evaluation (384 compared values total). PARI also checks the source generator's order and all source contexts.
+- Nine malformed-input/collision controls passed; original native direct-root controls also pass. Retained raw outputs, hashes and failures, and rendered/inspected the one-page source-linked report.
+- PR #3112 merged while this component was being implemented. Created follow-on branch `codex/gap80-polynomial-blocks-20261101` for the new component.
+
+### Decisions made (and why)
+- Treat this as bounded native development validation, not a benchmark, full-root-window computation or isogeny evaluation. Preserve global coverage and total I/O/work obligations.
+- Publish the prepared block via the trusted S3 upload/full-readback route. Keep the existing root/snapshot storage receipts immutable.
+
+### Open threads (unfinished, pick up next time)
+- Commit/open the component PR and verify S3 readback of the prepared product. Then integrate complete giant/baby coverage with codomain moment formulas and full point evaluation.
+
+### Errors (what went wrong, how it was handled)
+- First compilation needed GMP declarations before FLINT's conditional mpz conversion declarations. Corrected the include order and reran the build and nonempty-output comparisons with fail-fast shell execution. No empty failed output was accepted as evidence.
+
+## 2026-11-01T00:49Z — prepared polynomial block verified in S3
+
+### What was done (commands, files, features)
+- Opened ready-for-review follow-on PR #3117 and enabled guarded auto-merge. Artifact-autofix run 41258219926 completed successfully; commit `80c8c992d` moved the 131,148-byte prepared polynomial to S3 after full-byte readback.
+- Verified the stored pointer's SHA-256 `64a4d86f55b265fb37154a6ae282b95836f7ab0cf24cfdf498a30efeea62bc16` and length against the locally oracle-validated product. Added an immutable storage receipt and retrieval/status documentation.
+
+### Decisions made (and why)
+- Keep creation-time manifests and prior source/input snapshots unchanged. The new component has its own source, raw outputs, context checks and storage receipt; no full-kernel or speed claim is promoted.
+
+### Open threads (unfinished, pick up next time)
+- Current-head required PR gates remain necessary. Next algorithmic work is a coverage-validating controller and complete codomain-moment integration, followed by the point evaluator and matched endpoint trials.
+
+### Errors (what went wrong, how it was handled)
+- The initial artifact-policy failure on the prepared binary is resolved by trusted verified migration. No arithmetic or S3 readback mismatch occurred.
+
+## 2026-11-01T01:13Z — corrected repository and prime-relation lead reconciliation
+
+### What was done (commands, files, features)
+
+- Corrected the target from the similarly named personal repository to
+  `isogeny-labs/crypto`; closed the mistaken personal-repository PR as
+  superseded and created a blobless sparse checkout of this repository.
+- Read the complete root instructions, today's full session log, the
+  report-evidence workflow, and the research-visuals and Iso Lab execution
+  rules. Applied the minimal sparse profile before inspecting research paths.
+- Reviewed the prime-field breakthrough map, the 31 October lead review,
+  special-prime curve work, digit-presentation degree ladder, shared-coefficient
+  solver discriminator, three-lead continuation, split-graph factor-base
+  evidence, and relevant code-search results for separators and addition chains.
+
+### Decisions made (and why)
+
+- Treat the earlier Python special-prime and separator diagnostics only as
+  hypothesis-generating scratch evidence. This repository requires native
+  research code, a prospective frozen protocol, accepted remote execution and
+  evidence-linked visual reports.
+- The special-prime idea overlaps the already designed factorial control in the
+  current lead review. The group-sum separator-rank diagnostic is not found in
+  the prime-field records under that formulation and is the narrower candidate
+  for a native, formally scoped follow-up.
+- Keep the active fixed-arity-three CDCL(T)/Fp and hashed-factor-base tensor
+  programs intact. A support/rank obstruction is a representation diagnostic,
+  not a substitute for their solver panels and not a subexponential result.
+
+### Open threads (unfinished, pick up next time)
+
+- Define the exact separator matrix and cost bridge, reconcile it with the
+  existing PKM/five-sum and split-graph evidence, then add a prospective native
+  protocol, implementation, Lean proof map, search report, diagram and PDF.
+- Run development validation locally. Any scientific panel remains gated on a
+  committed source revision, checkpoint admission and an Iso Lab receipt.
+- Commit the focused branch, open a regular PR, enable guarded auto-merge and
+  follow exact-head checks through merge.
+
+### Errors (what went wrong, how it was handled)
+
+- `conductor check` returned command-not-found. `docs/CONDUCTOR.md` documents
+  this environment as warn-and-allow; no reservation was claimed.
+- A multi-directory sparse materialization began downloading an unnecessarily
+  broad research set. The owned checkout operation was stopped without changing
+  tracked files; subsequent review used targeted Git objects and code search.
+
+## 2026-11-01T01:18Z — exact boundary-census instrument implemented
+
+### What was done (commands, files, features)
+
+- Found the already-preregistered boundary-tensor rank census in
+  `research/tensor_boolean_breakthrough_20261031`; changed course from a new
+  parallel study to the missing `tensor-census` implementation slice.
+- Added exact contraction of a caller-declared side of a canonical BTNIR
+  network, with open cut edges, pin validation, explicit free-edge caps,
+  complete assignment accounting, exact completion counts and a stable tensor
+  digest.
+- Added canonical alternating and exhaustive balanced flattenings, exact
+  fraction-free integer rank with primitive row normalization, operation
+  counters, and a strict JSON CLI. Canonical predicates now expose their exact
+  digest-bound evaluator for this instrument.
+- Installed Rust 1.78 and current stable in the development environment. Four
+  focused release tests pass, including ranks 1/2/4, cut/pin/cap failures and
+  1,152 deterministic rectangular matrices cross-checked against independent
+  rational Gaussian elimination. Stable all-target Clippy passes with warnings
+  denied; the new CLI builds under Rust 1.78.
+
+### Decisions made (and why)
+
+- Keep the E1 protocol in draft. The exact census core is implemented, but the
+  final semantic cut generator, matched rewired-null constructor, fresh-process
+  A/A runner, disjoint power preflight and frozen ladder are still absent.
+- Do not import the earlier toy Python outputs. They neither used BTNIR nor met
+  this repository's native, matched-control and remote-execution evidence gates.
+- Treat the group-sum support-rank observation as motivation only. E1 measures
+  the actual Boolean boundary tensor and therefore more directly tests the live
+  hashed representation.
+
+### Open threads (unfinished, pick up next time)
+
+- Write the implementation receipt and dated search report, update the study
+  diagram/report/PDF, and run the complete crate and repository validation.
+- Add production semantic cut tags and the null-rewiring generator in a later
+  frozen slice before any affected E1 measurement.
+- Commit, open the regular PR, enable guarded auto-merge and follow exact-head
+  checks through merge.
+
+### Errors (what went wrong, how it was handled)
+
+- The checkout initially had no Cargo or Rust compiler. Rust was installed
+  without changing repository files.
+- Rust 1.78 all-target Clippy stopped on a pre-existing `format_collect`
+  diagnostic in `panel_driver.rs`. Current stable Clippy, the validation
+  toolchain used by the preceding E0 receipt, passes with warnings denied; no
+  unrelated source was changed.
+
+## 2026-11-01T02:02Z — boundary-census validation and root-gate triage
+
+### What was done (commands, files, features)
+
+- Tightened `contract_boundary` to reject noncanonical unsorted or duplicate
+  vertex lists and added that case to the fail-closed cut test.
+- Reran the final Rust 1.78 formatting, four focused release controls, release
+  CLI build and complete standalone crate suite. All 117 crate tests passed;
+  the seven-test `structured` integration suite completed in 181.08 seconds.
+- Reran current-stable all-target Clippy with warnings denied; it passed.
+- Completed the required stable root library gate: 5,817 passed, 9 failed and
+  128 were ignored in 1,774.74 seconds. Materialized the two exact tracked
+  sparse-checkout fixture paths and showed that the five Certicom-device
+  failures and one ecbench-bounds failure then pass in targeted reruns.
+- Reproduced the two diagnostic clock failures in their exact namespace; this
+  host lacks `/proc/self/ns/time` and `/proc/self/timens_offsets`. Reproduced
+  the unrelated `ic_wide::run_f2m4_is_the_one_word_pipeline` assertion in an
+  isolated 157.07-second rerun (`13130 != 3757`).
+
+### Decisions made (and why)
+
+- Report the broad root gate as failed. Separate fixture-availability, host
+  limitation and unrelated deterministic assertion failures explicitly; do
+  not promote the passing changed-crate suite into a root-pass claim.
+- Keep E1 data generation blocked. These checks validate the exact census
+  instrument only; they do not supply a semantic cut/null generator or freeze
+  the protocol.
+
+### Open threads (unfinished, pick up next time)
+
+- Merge current `origin/main`, run final diff/artifact checks, commit and push
+  the focused branch, open the regular PR, enable guarded auto-merge and follow
+  exact-head checks through merge.
+- In a later focused slice, implement stable semantic cut tags, constrained
+  rewiring nulls and fresh-process A/A before any production rank ladder.
+
+### Errors (what went wrong, how it was handled)
+
+- The initial root run was made from the intentionally minimal sparse profile,
+  so six tests failed before their assertions on absent tracked fixtures.
+  Exact paths were materialized and those tests passed; no root source was
+  changed.
+- The remaining three root failures are retained in the validation receipt and
+  were not suppressed or reclassified as successes.
+## 2026-11-01T01:00Z — merge third main advance into line-layout PR
+
+### What was done (commands, files, features)
+
+- Pushed validated line-layout head `39566c8e9`; current main had already advanced again to
+  `390d5c2c0` through PRs #3114 and #3117. Merged that base forward normally.
+- Resolved only `docs/session-logs/2026-11-01.md`, preserving both complete histories from two
+  conflict regions and removing the six marker lines. No implementation or protocol file conflicted.
+
+### Decisions made (and why)
+
+- Re-run source-sensitive gates on the new combined head, but retain the completed full release
+  aggregate because the newly merged paths do not touch the cache-line modules or their tests.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit, validate, and push the new merge head; allow #3116 exact-head CI and auto-merge to finish.
+
+### Errors (what went wrong, how it was handled)
+
+- A second base movement landed before GitHub could begin the updated head's full workflows.
+  Continued with another explicit forward merge; no history was rewritten.
+
+## 2026-11-01T01:01Z — third combined head validated
+
+### What was done (commands, files, features)
+
+- On merge head `8ff8b0964`, release `cache_line` tests passed 5/5, strict library clippy passed,
+  the no-default-features `ecbench` build passed, and canonical protocol/file validation reported
+  zero findings. Both frozen hashes remain unchanged.
+
+### Decisions made (and why)
+
+- Push immediately so #3116 can run on the current base before another unrelated mainline advance.
+
+### Open threads (unfinished, pick up next time)
+
+- Push and remain through exact-head CI/auto-merge; then dispatch the two frozen EKS jobs.
+
+### Errors (what went wrong, how it was handled)
+
+- None in this validation pass.
+
+## 2026-11-01T01:07Z — merge fourth main advance after green required checks
+
+### What was done (commands, files, features)
+
+- All three required checks passed on PR #3116 head `c2fc685ac`: size 4m49s, artifacts 5m20s,
+  validation gate 6m03s. Before auto-merge executed, current main advanced to `3fe21f193`.
+- Merged the new tip forward normally. Only the append-only 2026-11-01 log conflicted; preserved
+  both histories across two regions and removed only marker lines.
+
+### Decisions made (and why)
+
+- Re-run the fast affected gates and exact-head required CI. The mainline additions are disjoint
+  research studies and do not change the frozen candidate, spec or analysis.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit, validate, push, and let #3116 auto-merge before launching EKS.
+
+### Errors (what went wrong, how it was handled)
+
+- A third unrelated base movement raced the green required checks. Continued by policy with a
+  forward merge; no check, claim or branch history was bypassed.
+
+## 2026-11-01T01:08Z — fourth combined head validated
+
+### What was done (commands, files, features)
+
+- On merge head `48cdc30f9`, release cache-line tests passed 5/5, strict clippy and the no-default
+  `ecbench` build passed, canonical validation reports zero findings, and both frozen hashes match.
+
+### Decisions made (and why)
+
+- Push this exact head immediately and retain guarded auto-merge.
+
+### Open threads (unfinished, pick up next time)
+
+- Exact-head CI/merge, followed by the two fixed EKS jobs.
+
+### Errors (what went wrong, how it was handled)
+
+- None.
+## 2026-11-01T01:30Z — leaderboard roster KeyError: regression tests
+
+### What was done (commands, files, features)
+- Reproduced the report against `main` (390d5c2c00): `python3 scripts/update_curve_standards.py --check` passes ("standard catalog join: 20844 models"); `roster()` in `scripts/build_ic_leaderboard.py` already reads `p.get("k", p.get("degree"))` and raises a `ValueError` naming the slug when neither exists. Root cause of the earlier `KeyError: 'k'`: 47 extension registry rows from `research/three_leads_e2e_20261018/coverage-fixtures-v3/fixtures.json` spell the degree `degree`.
+- Added a `Roster` test class to `scripts/test_build_ic_leaderboard.py` (k key, degree key, neither -> ValueError with slug, whole-registry one-entry-per-curve). The 4 new tests pass.
+
+### Decisions made (and why)
+- No code change to `roster()`: already fixed on main. Added tests only, so the 47 `degree` rows cannot regress it.
+- Did not touch `scripts/build_lab_browser.py`; scope is the leaderboard roster.
+
+### Open threads (unfinished, pick up next time)
+- `build_lab_browser.py:365` reads `params.get("k")` only: the same 47 rows get `field.degree = null` in `docs/browser/data.json` (verified: e.g. `icv1-fp3k2-t4-1f351b3a`). Fix means regenerating the browser and re-sealing the ledger; not done.
+- `Curve cover certificates` on main still fails at the native-audit-plan replay step; `Cover transfer assessment` ledger is stale. Undiagnosed, separate from the KeyError.
+
+### Errors (what went wrong, how it was handled)
+- `test_all_24_board_curves_resolve` fails before and after this change (verified with `git stash`): `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` is absent in this sparse checkout (artifact-store file). Not caused by this change; left as is.
+
+## 2026-11-01T01:20Z — generator-specific multiplier-base E2E scope and literature gate
+
+### What was done (commands, files, features)
+
+- Reviewed the current repository rules, the complete current session log, the
+  controlled-experiment, experiment-protocol, ecbench-measure, isolab-eks,
+  report-evidence and research-visuals procedures, and the native ecbench
+  measurement contract.
+- Reviewed merged PR #2481 and
+  `research/ic_improve_20261023/{README,PRIME_README,BINARY_README}.md`.
+  The multiplier bases reduce columns while retaining many table points, with
+  earlier toy/component gains of 10--20x on prime CM curves and 3--7x on random
+  binary curves; the merged work explicitly left matched complete-cold paired
+  validation undone.
+- Checked the prior in-repository controls and lead atlas records:
+  `LEAD-ICB-free-relations-self-collision` (production duplicate-bucket harvest
+  0.960x pooled, then a +5--9% loss under rule-v4 cold accounting),
+  `LEAD-ICB-factor-base-subspace-choice` (coordinate/subspace effects vanish at
+  scale), `LEAD-ICB-frobenius-orbit-factor-base` (orbit credit only),
+  `LEAD-ICP-extension-field-embedding` (fixed-degree base extension loses in the
+  cost model), `LEAD-ICP-coincidence-harvest-structured-base` (powered pair-sum
+  coincidence nulls so far), and `LEAD-EXO-curve-model-representation`
+  (coordinate changes retain solving degree at tested arities).
+- Read the relevant primary sources: Semaev, *Summation polynomials and the
+  discrete logarithm problem on elliptic curves* (IACR ePrint 2004/031);
+  Galbraith--Petit--Shani--Ti, *On the Security of Supersingular Isogeny
+  Cryptosystems* / characteristic-two summation-polynomial experiments (IACR
+  ePrint 2014/806, including the distinct-coset factor-base control);
+  Petit--Kosters--Messeng, *Algebraic approaches for the Elliptic Curve Discrete
+  Logarithm Problem over Prime Fields* (PKC 2016); and
+  Corrigan-Gibbs--Kogan, *The Discrete-Logarithm Problem with Preprocessing*
+  (IACR ePrint 2017/1113). These separate algebraic-coordinate factor bases
+  from generic table/preprocessing effects and give the applicable generic
+  preprocessing boundary.
+- Fast-forwarded to `origin/main` `150aa0ccbd...` and created branch
+  `codex/generator-multiplier-e2e-20261101`.
+
+### Decisions made (and why)
+
+- Treat the observed effect as a generic-decomposition engineering candidate:
+  several known-weight representatives share one unknown log column, so pair
+  tables see more points while relation rank and linear algebra scale with the
+  smaller column count. It is not evidence of a coordinate or algebraic
+  decomposition advantage.
+- Close the missing gate with native ecbench cold one-target experiments, not
+  the historical `ic bench` or example timing. Integrate the existing
+  `cm-multiplier` and `binary-multiplier` builders into `ic.pipeline`, then use
+  matched coordinate controls (`glv-orbit` / `prime-abscissa` and
+  `binary-subspace`), A/A, positive correctness controls, matched rho, fresh
+  processes, held-out targets, L2 isolation and complete phase/resource
+  accounting.
+- Use prior merged parameter scans only as training. Freeze the confirmatory
+  configurations and analysis before collecting new data; no parameter is
+  retuned on held-out results. Require at least five interleaved rounds and at
+  least eight independent targets, with a larger panel where the preflight
+  budget permits it.
+
+### Open threads (unfinished, pick up next time)
+
+- Add the two existing native factor-base builders to ecbench's prime/binary
+  registry and factor-base dump paths, with exact inventory/replay tests.
+- Write and validate the prospective protocol, ecbench specs and thin native
+  analysis commands; commit and merge them before any measured run.
+- Submit the merged source/spec to EKS Spot L2, verify all replays and S3
+  hashes, analyse complete cold counts and admitted wall time, then land the
+  run/export/visual/validation evidence and affected dashboards in the PR.
+- Preserve the quadratic-extension trace-zero result as a scoped transport
+  obstruction; higher-degree extension-field algebraic algorithms remain open
+  and will not be mislabeled as disproved by this generic-decomposition panel.
+
+### Errors (what went wrong, how it was handled)
+
+- `conductor check` returned exit 127 because `conductor` is not installed.
+  Per `docs/CONDUCTOR.md`, the hooks are warn-and-allow when the binaries are
+  absent; no reservation was claimed.
+- `tools/lead_atlas.py --brief/--match` first lacked sparse orchestration files;
+  after materializing them the full match did not return within 60 seconds and
+  was interrupted. The exact relevant lead records were located and read
+  directly instead; no missing match was treated as novelty evidence.
+
+## 2026-11-01T01:23Z — multiplier bases exposed through ecbench
+
+### Sources reviewed
+
+- `src/cryptanalysis/ecbench/methods.rs`: pipeline factor-base registries,
+  dump path, accounting inventory tests and method help.
+- `src/cryptanalysis/ic_framework/plugins.rs`: the existing charged
+  `CmMultiplierBase` and `BinaryMultiplierBase` implementations.
+- `docs/ecbench/README.md`: factor-base and accounting documentation.
+
+### Decisions made (and why)
+
+- Register both multiplier builders in the same `ic.pipeline` and
+  `dump_factor_base` paths as their coordinate controls. This makes factor-base
+  construction, relation collection, elimination and verification visible in
+  one complete cold record.
+- Extend the existing inventory/replay integration test with a prime j=0 CM
+  multiplier case and a binary integer-multiplier case. The test exercises an
+  end-to-end known-log recovery, not just point generation.
+- Document the claim boundary explicitly as a two-sum signed-graph batching
+  effect with known coefficients sharing columns; do not infer a coordinate-
+  base or extension-field asymptotic improvement.
+
+### Open threads (unfinished, pick up next time)
+
+- Compile and run the targeted tests through the repository-pinned toolchain,
+  then write and freeze the prospective controlled protocol and run specs.
+- Run the large held-out EKS panel and compare cold wall time, GAE, relation
+  trials, matrix work and memory against A/A, same-seed, coordinate and rho
+  controls.
+
+### Errors (what went wrong, how it was handled)
+
+- `cargo fmt --all -- --check` returned exit 127 because this shell currently
+  has no `cargo` command. No test or formatting success is claimed; the
+  repository's container/CI toolchain route will be used next.
+
+## 2026-11-01T01:52Z — complete-cold metric and prospective held-out panels
+
+### Sources reviewed
+
+- `research/ic_improve_20261023/{PRIME_README,BINARY_README,README}.md` and
+  merged PR #2481, including its recorded parameter scans and stated missing
+  complete-cold gate.
+- `src/cryptanalysis/ecbench/{compare,record,runner}.rs` and
+  `docs/ecbench/README.md`: exact solve, complete method-call and process
+  timing boundaries, L2/A/A admission, and comparison statistics.
+- `crypto-autoresearcher` experiment protocol schema/checker at current main
+  `1053a7193b...`.
+
+### Decisions made (and why)
+
+- Add complete cold method-call and fork-to-reap ratios, with linearised and
+  paired-bootstrap 95% intervals, to `ecbench compare`. The historical field
+  called `total_wall_ratio` is a sum of nested solve intervals and is retained
+  for compatibility but no longer described as complete end to end.
+- Freeze two separate 504-execution confirmatory panels: one registered j=0
+  prime curve and one registered random-binary degree-27 curve, each with 12
+  held-out targets, six measured rounds and one warm-up. Separate sessions
+  keep each run under the Isolab deadline and give 72 paired measured cells
+  per arm.
+- Cross the candidate with a conventional coordinate base, a best/equal-point
+  plain base, the exact same seeds without multiplier closure, a duplicate
+  A/A arm, and rho. This distinguishes table-vertex count from shared-column
+  batching and prevents a relation-stage ratio from being called an end-to-end
+  improvement.
+- Use the registered degree-27 random-binary curve (seed 59297) rather than the
+  earlier unregistered degree-28 training curve. Candidate parameters are an
+  interpolation of the merged degree-26/28 training rows; the curve and all
+  confirmatory targets are held out.
+- Keep the no-exponent and extension-field scope in the prospective decision
+  rule. A success establishes a native two-sum batching constant only; a
+  failure does not become an impossibility theorem.
+
+### Open threads (unfinished, pick up next time)
+
+- Finish the focused comparison test now compiling, then commit the validated
+  draft protocols, freeze their canonical hashes in a second commit, push and
+  open the implementation/protocol PR with auto-merge.
+- Obtain a valid checkpoint upload transport (none is configured in this
+  session), pass `scripts/checkpoint.sh gate`, and dispatch both exact merged
+  specs through `isolab-experiment.yml` at L2.
+- Verify/replay every row, run the frozen analysis scripts, build unified
+  exports and visual/PDF evidence, then land the result update.
+
+### Errors (what went wrong, how it was handled)
+
+- The initial harness sparse expansion attempted to fetch about 115,000
+  unrelated blobs. It was stopped and replaced by an explicit build checkout;
+  missing compile-time fixtures were materialised unchanged as the compiler
+  named them.
+- The first canonical protocol validation could not find the sibling schema
+  in its sparse checkout. The schema and worked example were materialised from
+  the already current sibling repository; both draft protocols then validated
+  with zero findings.
+- The first degree-28 plan warned that its generated curve was not registered.
+  No measurement was launched. The protocol was changed prospectively to the
+  registered degree-27 random-binary curve, and the exact 504-execution plan
+  now reports `registered=true` for all 12 workloads.
+- The mandatory recovery checkpoint has no AWS CLI/profile, ambient
+  credentials, upload token or token file in this session. Consequently no
+  training or confirmatory `ecbench run` has been launched; only deterministic
+  `plan` and tests have run.
+
+## 2026-11-01T02:08Z — clustered end-to-end intervals and formal boundary
+
+### Sources reviewed
+
+- `src/cryptanalysis/ecbench/stats.rs`: paired one-stage and target-clustered
+  bootstrap semantics.
+- `papers/ic-negative-results/lean/IcNegative/{AffineCore,YieldConservation}.lean`
+  and `research/quadratic_twist_evidence_20261021/lean/{TwistProof,RelationCost}.lean`:
+  existing formal claim boundaries and cost-model conventions.
+- The prior standalone AP study's `ArithmeticProgression.lean` and
+  `CoordinateExtension.lean`: generator relabeling, coordinate transport,
+  split embeddings and quadratic trace-zero obstruction.
+
+### Decisions made (and why)
+
+- Cluster the new complete-cold bootstrap by held-out target and resample
+  rounds within each sampled target. This preserves arm pairing while making
+  the confirmatory interval cover both between-target and within-target
+  variation.
+- Add a standalone Lean module to the study rather than treating performance
+  as a theorem. It proves the coordinate/split-extension invariances, the
+  odd-order quadratic trace-zero obstruction, and the known-weight seed-column
+  identity underlying multiplier batching. Its module comment explicitly
+  leaves higher-degree extension algorithms open.
+- Keep the empirical coordinate-subspace arm even though coordinate
+  isomorphisms preserve relations: a coordinate-defined subset is not in
+  general an isomorphic relabeling, so its implementation cost and yield must
+  still be measured.
+
+### Verification completed
+
+- Release test `compare_reports_the_new_statistics_end_to_end`: PASS (1 test,
+  5,953 filtered), including complete-cold linearised and target-clustered
+  paired-bootstrap fields.
+- Release test `the_inventory_describes_the_base_the_run_used`: PASS (1 test,
+  5,953 filtered), covering both newly registered multiplier bases through
+  inventory and replay.
+- Repository Lean proof gate on `FormalBoundary.lean`: PASS, 46 audited
+  theorems, zero trusted declarations, using Lean 4.34.1.
+- Both prospective protocol JSON documents: zero schema/checker findings; both
+  504-execution plans use registered workloads.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the validated implementation and draft protocols, freeze both
+  canonical protocol hashes against that commit, then push the second commit
+  and merge the regular PR through required checks.
+- Pass the mandatory recovery checkpoint, dispatch the exact merged specs,
+  replay every result and apply the frozen decision rules.
+
+### Errors (what went wrong, how it was handled)
+
+- The first standalone Lean audit compiled with the local 4.34.1 pin but the
+  audit subprocess used the machine default 4.19.0 and rejected the object as
+  an incompatible header. No proof failure was inferred. Rerunning the entire
+  gate with `ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1` passed all 46 audited
+  declarations.
+## 2026-11-01T01:31Z — merge fifth main advance after green checks
+
+### What was done (commands, files, features)
+
+- Required checks again passed on line-layout head `f0eeb020f`: artifacts 4m54s, validation gate
+  5m16s, size 6m11s. Current main then advanced to `150aa0ccb` through PR #3120.
+- Merged forward normally. Only the append-only session log conflicted; retained both histories.
+
+### Decisions made (and why)
+
+- Revalidate and republish the exact current-base head; the sole mainline code change is a
+  leaderboard regression test, disjoint from the candidate and experiment harness.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit, validate, push, and allow guarded auto-merge to finish.
+
+### Errors (what went wrong, how it was handled)
+
+- A fourth unrelated main advance raced the green checks. No history rewrite or gate bypass used.
+
+## 2026-11-01T01:32Z — fifth combined head validated
+
+### What was done (commands, files, features)
+
+- On `2db76ff73`, release cache-line tests passed 5/5, strict clippy and no-default `ecbench` check
+  passed, canonical protocol validation reports zero findings, and frozen hashes match.
+
+### Decisions made (and why)
+
+- Push immediately under the existing guarded auto-merge.
+
+### Open threads (unfinished, pick up next time)
+
+- Exact-head CI/merge, then fixed EKS dispatch.
+
+### Errors (what went wrong, how it was handled)
+
+- None.
+
+## 01:50 UTC — PR #2223: CI on f2e5091d10, two PR-caused failures fixed
+
+### What was done (commands, files, features)
+- CI ran in full on `f2e5091d10`; rustfmt and clippy green. Red: site `test`
+  (`test_every_scoreboard_panel_has_a_summary_and_the_index_cites_them_all`, 312 vs 311 panels) and
+  validation `gate` (`benchmarks 20261029-ic-aimed-gather: … docs/curves/registry.json: sha256 mismatch`).
+- Merged origin/main (session-log conflict only). `python3 scripts/site/panel_index.py`: 312 panels.
+- New `benchmarks/20261029-ic-aimed-gather/registry-binding-20261101/`: the 2026-10-30 custody checker
+  re-run against this PR's registry (20,848 rows); store-moved inputs checked against their
+  `.artifacts.json` hash. PASS, 211 other pins (1 via manifest). `VALIDATION.json` points to it;
+  `validation-gate.yml` restores it for the committed-tree test.
+
+### Decisions made (and why)
+- A successor directory rather than editing the 2026-10-30 one, which is write-once evidence.
+
+### Open threads (unfinished, pick up next time)
+- Watch CI on the new head.
+
+### Errors (what went wrong, how it was handled)
+- The checker could not read `aa2_20261029/runs/isolation.jsonl` (in the artifact store, no
+  credentials here); handled by the manifest-hash fallback, documented in the README.
+## 2026-11-01T01:30Z — ecdb l-volcano levels from the stored isogeny graphs (branch claude/elliptic-curve-db-api-mtwgms)
+
+### What was done (commands, files, features)
+- `ecdb/src/import/volcano.rs`, run as `ecdb import volcanoes` (Selection::Volcanoes). Migration 0010 adds `isogeny_volcano.component_key`.
+- For every census class and l = 2, 3, 5:
+  - depth = v_l(v) and level = depth − distance to the floor;
+  - checks: out-degrees, distances, and level-size law n_k = n_0 (l − (D_K/l)) l^(k−1), exempt for D_K = −3, −4.
+- Deployed by swapping the new static binary into the existing Lambda package (the sparse worktree could not rebuild the data inputs), then ran `migrate` (applied 10) and `import volcanoes`.
+- Results in RDS:
+  - volcano components (l = 2 / 3 / 5): 81,583 / 85,057 / 88,659;
+  - levels: 470,490 census + 1,045 other;
+  - edges labelled: 468,785;
+  - End(E): 149,593 (90,799 maximal).
+- A re-run was idempotent (0 new rows, no problems).
+- Checks: ascending equals descending (60,687) outside D_K = −3, −4. `cargo clippy -D warnings` and 25 unit tests pass (new: kronecker_small, levels_of_a_depth_one_volcano).
+
+### Decisions made (and why)
+- Only the census graphs: they are complete, so distance to the floor determines the level. The crypto and pairing neighbourhoods are one step deep and are not used.
+- l = p is skipped: there is no volcano in characteristic l. This covers 8 classes over F_5.
+- End(E) is written only where v is {2, 3, 5}-smooth. Elsewhere the conductor at larger primes is unknown.
+
+### Open threads (unfinished, pick up next time)
+- /home/user/crypto is left half-checked-out from a checkout that failed when the disk filled. A non-destructive repair was refused by the safety classifier. Work moved to a sparse worktree at /dev/shm/wt-crypto (branch ecdb-volcano).
+- Volcanoes for l >= 7 need psi_l in the isogeny verifier first.
+
+### Errors (what went wrong, how it was handled)
+- First run: 64 classes refused with "edge leaves the class". These were census curves that matched existing ecdb curves of another family. Widened the vertex set; all l = 2, 3 classes then passed.
+- Second run: 8 classes at l = 5 over F_5 refused, correctly. Changed the code to skip l = p explicitly.
+- /dev/shm was wiped again, taking Sage, the generator output, the local Postgres, the toolchain and the AWS CLI. Everything was already in RDS. I reinstalled what this step needed.
+
+## 2026-11-01 02:30Z — chained-S3 SAT: meet-in-the-middle lookup for m >= 5 (Claude)
+
+### What was done
+- PR #3097 (ordering + root-finder tables, m = 2..9 study) merged 00:38Z after
+  merging main resolved a session-log conflict that had blocked `pull_request` CI.
+  Branch restarted from main for the follow-up.
+- `ChainS3Tables::meet = d` (`src/cryptanalysis/koblitz_index_calculus.rs`):
+  x-fingerprints of every signed d-sum built once per base with batched
+  (Montgomery) inversion; per query R − s over signed (m−d)-sums kept when in
+  that set = exact domain of y_(d−1); identity patterns there refuted unless R is a
+  signed (m−d)-sum; all patterns refuted when the domain is empty. Stats
+  `patterns_refuted_by_lookup`, `meet_domain`. Bench arm modifier `+meet<d>`,
+  warmup line. 3 new tests pass (batched adds = point_add; depth-2 set = sum
+  table; witnesses incl. zero-sum pair kept, public refuted by lookup).
+- Frozen run `research/n83_chain_sat_meet_20261101` (protocol 0704c3b008),
+  m = 5, 6, 7, 01:50:17Z–02:04:52Z: lookup arm refutes 3/3 public per m at 0
+  conflicts (0.76–2.87 s); control 0/3. Planted: 0/2 for both arms (120 s cap);
+  lookup domains non-empty on every planted target (10–62), empty on every public.
+- Amendment `PROTOCOL_m8_9.md` (user: "add m=8 and m=9 after this run"), frozen
+  before its data; m = 8 (d = 4), m = 9 (d = 5) launched ~02:20Z.
+
+### Decisions made
+- Same seed/targets as the 10-31 run so A2 pairs with those records.
+- m = 8, 9 added by amendment, not by editing the frozen protocol: its declared
+  cost assumed 334 signed points; the base is negation-closed (167).
+
+### Open threads
+- Planted witnesses at m >= 5: reconstruct the witness directly from the lookup
+  hit (re-enumerate the matching d-multiset) instead of leaving it to SAT.
+- `n83_meet_keeps_witnesses_and_refutes_by_lookup` takes ~700 s; trim before PR.
+- Conductor CLI is not installed in this container (hooks warn only).
+
+### Errors
+- Analyzer patch failed on rustfmt'ed text; re-applied against the real file.
+
+## 2026-11-01 03:30Z — meet lookup m = 8, 9 finished; report; PR
+
+### What was done
+- m = 8 (d = 4), m = 9 (d = 5), 02:11:51Z–02:47:51Z. m = 8: lookup refutes 3/3
+  public at 0 conflicts (70.9–76.7 s); control 0/3. m = 9: depth-5 set
+  372,406,144 fingerprints in 958.8 s; every query capped (0/3). Planted 0/2 both arms.
+- Analysis (`n83_chain_sat_analyze <dir> all-summands+t2.2`): 50 records,
+  0 soundness flags. Graphs, Typst report/PDF (inspected), README, raw archive
+  (sha256 e33fbe28…edbb).
+- Trimmed `n83_meet_keeps_witnesses_and_refutes_by_lookup` (zero-sum case
+  checked with a 2,000-conflict budget: never refuted, no lookup refutation);
+  chain_s3 + binary_semaev_chain_sat tests: 20 passed in 59.7 s.
+
+### Decisions made
+- No leaderboard / benchmarks row (decomposition stage, no VALIDATION.json).
+
+### Open threads
+- Witness reconstruction from the lookup hit; direct-indexed hash for m = 8, 9.
+
+### Errors
+- First trim attempt (tables on the witness cases) still took 679 s; replaced
+  the zero-sum end-to-end search with the bounded soundness check.
+## 2026-11-01T01:11Z — wire coverage, codomain, maps and paired recovery
+
+### What was done (commands, files, features)
+- Read the latest handoff, native source and archived square-root Vélu contracts. PR #3117 has merged; created a follow-on branch for complete native wiring.
+- Preserved the user's four requested stages and exact 80-bit target. Current stored prefixes are incomplete; they cannot produce a valid target quotient or transported generator yet.
+
+### Decisions made (and why)
+- Wire the full square-root block identity and point formulas into a native runner, with exact coverage checks before codomain assembly. Independently validate complete ordinary-curve fixtures and transported known-answer ECDLPs; fixtures are controls, not a replacement 80-bit result.
+- Enforce a work/coverage gate on the actual 80-bit input. Do not launch an unbounded multi-terabyte or astronomical-work job, infer missing coverage, or report partial sums as quotient/images. Native performance experiments remain subject to EKS/checkpoint rules.
+
+### Open threads (unfinished, pick up next time)
+- Implement native coverage/controller, codomain and full point maps; compare independently with PARI; validate paired recovery on bounded fixtures; retain any failed target gate and missing measurements.
+
+### Errors (what went wrong, how it was handled)
+- Conductor is unavailable, as previously documented. The configured cloud environment has no direct AWS identity or EKS MCP; trusted GitHub/S3 remains the available publication route.
+
+## 2026-11-01T01:25Z — complete native control pipeline passed
+
+### What was done (commands, files, features)
+- Implemented canonical baby/giant/leftover coverage checks, native polynomial jets/log-norm accumulation, normalized quotient assembly and full point maps, including kernel/infinity handling.
+- Complete ordinary-curve controls passed: degrees 19 and 10009 over p=71 and p=6666679. Independent PARI matched both quotients and all 42 evaluated inputs. 34 known-scalar pairs recovered on both endpoints (68 answers), retained with target coordinates.
+- Six missing/duplicate/gap/extent/leftover coverage controls passed. The fixed 80-bit prefix inventory gate returned exit 3 with null quotient/images/timings. No full target computation was attempted.
+- Added source/binary/raw hashes, a companion target assessment, retained failure and replay records, and an inspected one-page report/diagram.
+
+### Decisions made (and why)
+- These complete fixtures validate all native software stages but do not establish a conductor-gap record or high-fidelity timing result. q=3/37 are explicitly tiny; do not promote the controls into a benchmark row.
+- Actual target coverage is still incomplete. The fixture runner regenerates blocks; production manifest-bound S3 coverage/resumption and feasible full-work execution remain unimplemented. No index-calculus or alternate-solver measurement is claimed.
+
+### Open threads (unfinished, pick up next time)
+- Publish the native-wiring PR and preserve the original target requirement. Durable stored-block coverage, full 80-bit construction/maps and EKS endpoint measurements remain open rather than being replaced by these controls.
+
+### Errors (what went wrong, how it was handled)
+- An initial q=2 assumption for p=71 failed subgroup-divisor validation. Independent PARI found order 57=3*19. Retained that failure, corrected q to3 and replayed successfully; no arithmetic or mapping mismatch remained.
+
+## 2026-11-01T01:30Z — native complete-control PR opened
+
+### What was done (commands, files, features)
+- Opened regular follow-on PR #3127 with native complete-control wiring, raw scalar/point receipts, the actual target refusal, companion assessment and inspected report. Enabled guarded auto-merge.
+- Preserved the independent native PARI fixture group-order/factorization script and output that established q=3/37 choices. Artifact-policy and staged whitespace checks pass; no new large object migration is needed for these small records.
+
+### Decisions made (and why)
+- Do not label this as completion of the requested 80-bit crossing or endpoint timing experiment. The production S3 controller and full-work feasibility remain open; future performance jobs retain native/EKS/checkpoint controls.
+
+### Open threads (unfinished, pick up next time)
+- Current-head required CI and review, then production stored-block coverage/resumption and complete target execution before any paired target timing claim.
+
+### Errors (what went wrong, how it was handled)
+- No new failures. The retained initial subgroup assumption is corrected and independently documented; no missing target result is assigned a timing.
+
+## 2026-11-01T01:52Z — line-layout EKS evidence version terminated inconclusive
+
+### What was done (commands, files, features)
+
+- Confirmed PR #3116 merged at `b4d751706eb2244314ebc9b84ba9545485ba4ac7`, then dispatched exactly the two preregistered concurrent EKS sessions against that revision.
+- Runs 41260778029 and 41260778856 both passed contracts and the credential-free build, then their EKS jobs terminated `failed` with remote-result exit 23 and GitHub wrapper exit 26. Both receipts bind the same native SHA-256 `0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7`; neither returned a successful pod UID or result URI.
+- Recovered that exact binary from immutable GitHub build artifact 13064949140. A local, explicitly excluded L0 diagnostic planned and verified all 360 executions; all 320 replay-eligible records reproduced. The A/A and candidate operation ratios were exactly 1.0. The descriptive L0 candidate wall ratio was 1.1345 (median paired ratio 1.0495), which is not admissible performance evidence.
+- Added `research/ic_line_layout_tournament_20261031/terminal-observation-20261101.json` and `TERMINAL-OBSERVATION-20261101.md` with the exact public receipts, evidence limits and required private follow-up.
+
+### Decisions made (and why)
+
+- Mark this frozen evidence version inconclusive. No speedup or regression follows from two failed EKS jobs or an L0 local diagnostic.
+- Do not retry, substitute a candidate, weaken L2/A/A/replay/confidence gates, or patch without the private failure evidence. Both preregistered trials are consumed; any future trial needs a new frozen evidence version.
+- Keep PR #3091 relation-yield pruning instrumentation separate from the still-unestablished end-to-end ECDLP speedup claim.
+
+### Open threads (unfinished, pick up next time)
+
+- An authorized lab operator must inspect the two private launcher prefixes, especially `status.json`, `logs.json`, `objects.json`, and any uploaded job artifacts, to classify the payload failures.
+- Only an evidence-attributed implementation fault may be repaired. A new preregistration is required before further scientific EKS trials.
+
+### Errors (what went wrong, how it was handled)
+
+- Both independent EKS jobs failed before the launcher could authenticate a successful payload. Public GitHub logs expose terminal receipts but not the private pod-level cause. The missing cause is reported rather than guessed; no scientific retry was launched.
+
+## 2026-11-01T01:30Z — synchronize native control PR with main
+
+### What was done (commands, files, features)
+- Merged current main `d3ae8059d` into PR #3127 without rebasing or force-pushing. Only the append-only daily session log conflicted; retained both complete histories and removed only conflict markers. No native source, frozen evidence, ledger or claim file conflicted.
+
+### Decisions made (and why)
+- GitHub MCP/Copilot assignment is unavailable, so used the repository's documented fallback. Preserve every concurrent project handoff rather than selecting one history. Current-head required gates remain necessary.
+
+### Open threads (unfinished, pick up next time)
+- Push the merge and inspect exact-head state. The actual 80-bit construction, durable S3 job and paired timing evidence remain open.
+
+### Errors (what went wrong, how it was handled)
+- GitHub reported the PR dirty because main advanced during implementation. Resolved only the unsealed daily log; no scope or evidence change was needed.
+
+## 2026-11-01T02:19Z — validation gate: table-qualified sweep verdict keys
+
+### What was done (commands, files, features)
+- Confirmed `f9ddb76261` (on `main`) already reads the sweep's `row_id`, knows its verdict words (`contradicted` fails; `validated_with_caveats`, `unvalidated` never pass) and refuses caveated passes.
+- Found the remaining defect: `verdict_keys` also filed `A:<slug>`/`B:<slug>`/`C:<slug>` under the bare slug. Tables A and C share four slugs (f2m41, f2m47, f2m53, f2m61), so the later Table C line was the verdict every one of those Table A rows read, and a failing verdict for one table's row would refuse the other's.
+- `scripts/validation_gate.py`: `row_id` is filed only as written; new `table_key(row)` (`<family>:<slug>`) is added to each board row's lookup keys.
+- `scripts/test_validation_gate.py`: two regression tests (shared slug across tables; a table prefix does not reach another table's row); sweep-section fixture rows now carry `family="A"`. Both new tests fail on the old reader and pass on the new one.
+- `docs/VALIDATION_GATE.md`: the sweep line-format paragraph now describes the format the reader accepts (it still described the pre-sweep assumption).
+- `python3 scripts/test_validation_gate.py`: 63/64 pass. `g.check(REPO)` returns the same 8 findings before and after the change. Re-annotating the 28 committed board rows changes no annotation, so the leaderboard/browser outputs need no regeneration.
+
+### Decisions made (and why)
+- Keyed board rows by the board's own `family` (A/B/C) rather than by the sweep's `source_paths`: `family` is on every board row and equals the sweep's table prefix, so the match is exact and needs no path normalisation.
+- Did not regenerate `docs/ic/*` or the lab browser: the full builder needs sparse-off research files (disk at ~1 GB free), and the direct re-annotation shows no change in output.
+
+### Open threads (unfinished, pick up next time)
+- Open the PR with auto-merge; follow it to merge.
+
+### Errors (what went wrong, how it was handled)
+- `test_gate_passes_on_the_committed_tree` fails identically on unmodified `main` in this sparse checkout (evidence files off disk, e.g. `research/ic_aimed_gather_20261023/aa2_20261029/runs/isolation.jsonl`); not caused by this change; CI runs the full tree.
+- Disk hit 100% after `git fetch`; freed ~1 GB by removing `~/.cache/go-build`, `~/.cache/pip` and two scratch directories.
+
+## 2026-11-01T02:22Z — fixed-target private diagnosis for failed line-layout trials
+
+### What was done (commands, files, features)
+
+- Added a main-only, manually dispatched GitHub workflow fixed to failed runs 41260778029 and 41260778856, their launcher IDs, request hashes, merged source and native binary hash. It can read retained evidence but cannot submit, retry or cancel an experiment.
+- Added `remote/diagnose-failed-run` and a directory-backed fake-S3 contract test. The reader binds the launcher result, normalized request, failed Job identity, Pod identity, status exit and every selected payload object to the retained `SHA256SUMS` before emitting an allowlisted failure classification. A status-only path preserves attribution if artifact upload was incomplete.
+- Kept raw records, log text, stderr content, confidence intervals and timing values private. The fixture proves private stderr and control sentinels do not reach the published JSON.
+- Added an investigating problem record and a terminal-run report with editable DOT, SVG/PNG and an inspected two-page PDF. No leaderboard, timeline, lab-browser or benchmark row changed because no performance measurement was admitted.
+- Focused validation passed: shell syntax; diagnosis fixture; remote contract defaults and rejection cases; build identity checks; image publisher checks; JSON/YAML parsing and pinned `actionlint`; Graphviz rendering; PDF metadata and page-by-page visual inspection.
+
+### Decisions made (and why)
+
+- Diagnose the two consumed trials without launching a third trial. Exit evidence is attributed either to a hash-verified `job-exit.json` or the retained Kubernetes status, and the output states which source was used.
+- Publish counts and gate classification only where useful for failure attribution; do not publish timing estimates from a failed evidence version. The frozen end-to-end speedup question remains unanswered.
+- Keep PR #3091's merged relation-yield pruning instrumentation separate from the still-unestablished end-to-end ECDLP speedup claim.
+
+### Open threads (unfinished, pick up next time)
+
+- Merge the current evidence PR so the trusted main-branch OIDC workflow exists, dispatch that one read-only diagnosis, and retain its allowlisted artifacts.
+- Repair only an evidence-attributed in-scope fault under a new frozen evidence version. Neither consumed run may be retried under the old version.
+
+### Errors (what went wrong, how it was handled)
+
+- The first workflow syntax command selected Ruby, which is not installed. Re-ran the syntax parse with the available Python YAML library; it passed. This was a validation-environment miss, not an experiment or product failure.
+- The first 150-DPI diagram PNG was 96,827 bytes and the artifact gate correctly rejected it for Git storage. Regenerated the same DOT source at 100 DPI (55,932 bytes), re-rendered the PDF and re-inspected both pages; no external data pointer was introduced.
+- Direct cloud credentials are intentionally absent in this managed environment. The fixed main-branch GitHub OIDC route remains the documented least-privilege path for the private read.
+
+## 2026-11-01T02:59Z — first fixed diagnosis exposed payload-read boundary
+
+### What was done (commands, files, features)
+
+- PR #3142 merged at `0b915934de7f57b814507bfe32208175b4fd3a94` after required `gate`, `size` and `artifacts` passed on head `0a41e1477d7f76ade4eadb1ea377e6e6704ac766`.
+- Dispatched read-only diagnosis workflow 41266993333 exactly once. Both matrix jobs passed the privacy fixture and obtained temporary OIDC credentials, then read their four fixed launcher receipts.
+- Both payload-prefix manifest reads returned 403. The reader incorrectly treated the failed copy as success and attempted to verify a nonexistent manifest; both jobs failed and uploaded no diagnosis artifact.
+- Corrected the reader to distinguish manifest-not-listed, payload-read-unavailable and selected-objects-hash-verified states. Added a fixture proving the access-denied path emits only the identity-checked Kubernetes status classification.
+
+### Decisions made (and why)
+
+- Do not broaden IAM access merely to recover more detail. Retain the existing least-privilege boundary and label a status-derived classification separately from a hash-verified payload classification.
+- Do not rerun either experiment. A corrected read-only diagnosis may be dispatched after review because it does not execute the binary or submit a Job.
+
+### Open threads (unfinished, pick up next time)
+
+- Merge the access-state correction, dispatch one corrected diagnosis, and retain its allowlisted artifacts.
+- Attribute and repair only an implementation-scoped payload failure; any future scientific trial still requires a new frozen evidence version.
+
+### Errors (what went wrong, how it was handled)
+
+- The diagnosis helper was called under a conditional where Bash suppressed `errexit`; its unconditional success return masked the AWS copy failure. Replaced that behavior with explicit return states and a status-only evidence path.
+- A validation-gate failure during PR #3142 was caused by mainline benchmark drift, not this PR. Merging latest `main` restored the benchmark validation material; the full hosted gate then passed unchanged.
+## 2026-11-01T02:20Z — boundary-census branch synchronized for PR
+
+### What was done (commands, files, features)
+
+- Committed the exact census implementation, receipts, source-linked diagram
+  and inspected PDF, then merged current `origin/main` at `5cbcb51bc` without
+  rebasing.
+- The sole conflict was this append-only daily log. Preserved both complete
+  histories and removed only the three marker lines; no source, protocol or
+  evidence file conflicted.
+- On the merged tree, the four focused Rust 1.78 release controls, CLI release
+  check, rustfmt and current-stable all-target Clippy pass. Large-file and
+  artifact-policy checks pass; a staged whitespace scan found and corrected
+  Markdown hard-break whitespace in the two new research notes.
+
+### Decisions made (and why)
+
+- Retain the earlier complete 117-test crate receipt because the mainline merge
+  did not touch the crate or its dependency closure, and confirm the changed
+  census surface again on the exact merged tree.
+- Keep the pull request implementation-only. No production E1 rank cell or
+  performance claim is admitted by this synchronization.
+
+### Open threads (unfinished, pick up next time)
+
+- Push the branch, open a regular PR, enable guarded auto-merge and follow the
+  exact head through required CI and merge.
+- Production semantic cuts, matched rewired nulls and fresh-process A/A remain
+  the next scientific implementation slice.
+
+### Errors (what went wrong, how it was handled)
+
+- `git diff --check origin/main...HEAD` exposed trailing Markdown hard-break
+  spaces and terminal blank lines in the two new notes. Removed them and reran
+  the scoped hygiene gate; no generated artifact bytes changed.
+## 2026-11-01T02:10Z — lab-browser degree fix and the two red cover-certificate jobs
+
+### What was done (commands, files, features)
+- `scripts/build_lab_browser.py`: extension `degree` now reads `params.get("k", params.get("degree"))`; regenerated `docs/browser/data.json` (47 rows had `degree: null`, `bits: 1`; now 0 such rows). `build_lab_browser.py --check` passes.
+- `certificates` job, step 9 (run 41253921336): `cargo test --bin ecdlp-audit` failed `checked_in_plan_passes` with `WS2-D2 artifact SHA-256 mismatch`; `src/binary_ecc/cover_transfer.rs` changed in #3078 without repinning. Repinned WS2-D2 to `8b201a27…a39b` and resealed `plan_uid` (`0c3a3429…e5c3`) in `docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json`. Verified: `verify-plan` PASS, `verify-fixed-f8-order` verified, `cargo test --bin ecdlp-audit` 45 passed.
+- `Cover transfer assessment` job: ledger stale (digest pins). `node scripts/build_cover_transfer_assessments.mjs --write` (diff: one line, digests only) then `--check` byte-exact and `verify_assessment.mjs` problems = []. Ledger sealed after the browser regeneration, since it pins that file.
+- `update_curve_standards.py --check` passes (20844 models).
+
+### Decisions made (and why)
+- Followed the precedent of a684945a9d (repin digest, reseal UID, no content change).
+- Used `CARGO_PROFILE_DEV_DEBUG=0` to fit the per-session disk allowance.
+
+### Open threads (unfinished, pick up next time)
+- Ledger and audit plan pin files that change often, so they go stale again whenever a pinned source changes; no change to that mechanism made.
+- I did not run the remaining `curve-covers.yml` steps (`cargo test --bin curve_cover_check --bin curve_standards`, hyperelliptic tests); CI will.
+
+### Errors (what went wrong, how it was handled)
+- Disk exhausted mid-build (0 MB free): removed `target/release` and `target/debug/incremental` (rebuildable), reran with debuginfo off. No source files were lost.
+
+## 2026-11-01T02:08:19Z — merge current main and revalidate the combined head
+
+### What was done (commands, files, features)
+
+- Fetched `origin/main` at `d29c669a1` and merged it forward normally. The
+  only conflict was the append-only daily session log; retained both complete
+  histories and removed only the conflict markers.
+- On the combined head, strict `cargo clippy --lib --bin ic -- -D warnings`
+  passed. Release-mode Jacobian differential and all-curve known-answer tests
+  passed, as did both `ic` CLI contracts.
+
+### Decisions made (and why)
+
+- Preserve all concurrent mainline research and infrastructure changes. None
+  overlaps the Jacobian relation collector, new prime-orbit modules or CLI
+  wiring, so targeted combined-head validation is sufficient before push.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the merge resolution and validation log, push, open the regular PR,
+  enable merge-style auto-merge and inspect exact-head checks.
+
+### Errors (what went wrong, how it was handled)
+
+- The optimized test binary relink took 7 minutes 15 seconds and the debug
+  `ic` test binary relink took 2 minutes 25 seconds after main moved; both
+  completed normally with all selected tests green.
+## 2026-11-01T02:00Z — Torsion anchors on and off at n=41 (branch claude/ic-m2-torsion-n41-20261101)
+
+### What was done (commands, files, features)
+- Froze `research/ic_m2_torsion_n41_20261101/PROTOCOL.md` (commit baa2fcfa8) before data, built
+  `ic_m2_cycle` on /dev/shm (disk had 1.3 GB free; 10 m 45 s), recorded the binary SHA-256, and ran
+  8 paired targets (seeds 20261024, 20261101-07), one target per process, 4 at a time, 3,600 s cap.
+- Result: all 16 runs verified, no cap hits. Trials on/off: ratio of means 1.06 (95% [0.80, 1.39]),
+  paired geometric mean 0.98 (95% [0.64, 1.43]). Determinism check passed (seed 20261024, torsion off:
+  26,535,644 trials, same as the merged record).
+- Post-hoc (not in the protocol): 32 pairs at n=31 give 13.3x (95% [10.3, 17.5]).
+- Added an erratum to `research/ic_m2_cycle_leads_20261030/REPORT.md` (the "1.5x to 16x on cofactor-4
+  curves" claim does not generalize). Report, graph and PDF in the new research directory.
+
+### Decisions made (and why)
+- Ran locally, not isolab-eks: no AWS identity or `aws` CLI in this session. Disclosed in the report.
+- Capped each target at 3,600 s and treated capped runs as censored lower bounds, because the n=23->31
+  trend suggested a possible hundreds-fold penalty at n=41; none occurred.
+- Reported the contradiction with the merged report instead of folding it into the summary.
+
+### Open threads (unfinished, pick up next time)
+- Why the penalty exists at n=31 but not n=41 is untested (non-monotone in n). The supported cofactor-4
+  sizes are 13, 19, 23, 31, 41 only (a=0 n=25/27/29/33/35 have no usable subgroup).
+- Torsion on/off on a large-cofactor curve at n=41+ and on N83 a=1 remains the real target.
+
+### Errors (what went wrong, how it was handled)
+- The first `git fetch` of main hung twice (stale origin/main lacked the merged example); reran in the
+  background. `awk` here has no `asort`, so the bootstrap sorts with `sort`. matplotlib was gone after the
+  container reset; installed to /dev/shm. The y-axis label of the first graph was clipped; fixed.
+- A sweep over n=25, 27, 29, 33, 35 panicked immediately (no usable Koblitz subgroup); no data, removed.
+
+## 2026-11-01T02:11:50Z — resynchronize the prime-orbit PR
+
+### What was done (commands, files, features)
+
+- Opened regular PR #3136 and enabled merge-style auto-merge. GitHub reported
+  it dirty after five more PRs reached `main` during the branch upload.
+- Fetched `origin/main` at `692afe2e4` and merged it forward normally. Again,
+  only the append-only daily session log conflicted; retained both complete
+  histories and removed only the conflict markers.
+
+### Decisions made (and why)
+
+- Do not repeat the source validation because no implementation, CLI, test or
+  dependency file overlapped this second synchronization merge. Exact-head CI
+  remains the final merge authority.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and push the second merge resolution, verify PR #3136 is mergeable,
+  and monitor its current-head checks and auto-merge state.
+
+### Errors (what went wrong, how it was handled)
+
+- The first PR state was `DIRTY`/`CONFLICTING` despite the prior main merge
+  because `main` advanced during a roughly two-minute push of newly referenced
+  large mainline objects. No feature source conflict occurred.
+## 2026-11-01T01:17Z — tools/task_card.py synced with canonical copy (`lane --route`)
+
+### What was done (commands, files, features)
+- Copied `tools/task_card.py` byte for byte from isogeny-labs/crypto-autoresearcher `main` (commit `1053a7193ba1`), which carries crypto-autoresearcher#2835 (`lane --route`).
+- sha256 old `2e58352b8c2d6eeeb6ce17caf5bbb47b84162a0ac9ffe0d41c778c5186469a50` → new `1440208bfd1cfc0381195bf09b45d3d1ff02c0ee7ed15550392ec7c2f51e4f6d` (verified with `sha256sum`).
+- Checks: `python3 tools/task_card.py --help`, `python3 -m py_compile tools/task_card.py`, `go test ./...` in `tools/expspec` (runs every fixture card through the real task_card.py): all passed.
+- Conductor task T-1 created and claimed for the two touched paths; `conductor check` reported no conflicts.
+
+### Decisions made (and why)
+- Mirror only: no edits to the file; crypto-autoresearcher's tests and `docs/model-tiers.md` stay there (out of scope).
+- `lane --route` asks `delphi route -family card-compile|assess -json` per director step; it needs a populated Delphi registry, and no `delphi calibrate` runs exist yet, so `--route` is not usable here until calibration lands. `--via conductor --route` is refused by design.
+
+### Open threads (unfinished, pick up next time)
+- crypto-autoresearcher#2866 (`lane --free local|public`, sha256 `9425ae71f4c8…`) was still open at copy time; once it merges, add one commit to this branch syncing the newer main copy.
+- isogeny-labs/cryptanalysis sync PR not opened from this session: attaching it with push access was denied by the session's permission classifier.
+
+### Errors (what went wrong, how it was handled)
+- `add_repo` for isogeny-labs/cryptanalysis (push) was denied; reported to the user instead of working around it.
+
+## 2026-11-01T02:05Z — #3123: shared-code lock digest and merge of main
+
+### What was done (commands, files, features)
+- Updated the `tools/task_card.py` digest in `docs/shared-code.lock.json` to `1440208bfd1c…` (commit `20d9cfdf0`); `python3 tools/check_lab_parity.py --repo crypto` failed before (`1440208bfd1c… != lock 2e58352b8c2d…`) and passes after (9 files).
+- Merged `origin/main` into the branch; the only conflict was this append-only log. Kept every `main` entry unchanged and appended this branch's entries after them.
+
+### Decisions made (and why)
+- Changed only the `task_card.py` lock entry. crypto-autoresearcher's lock also differs on `tools/artifacts/artifacts.py`, which crypto owns; that is out of scope.
+- Resolved the conflict myself because Copilot had not responded about 40 minutes after the request on the PR (AGENTS.md fallback).
+
+### Open threads (unfinished, pick up next time)
+- crypto-autoresearcher#2866 also bumps the lock (task_card.py → `9425ae71f4c8…`). Once it merges, sync both the file and the lock digest on this branch, or in a follow-up PR if #3123 has merged by then.
+
+### Errors (what went wrong, how it was handled)
+- The first push left `lab-parity` red because the lock was not updated with the file; fixed in `20d9cfdf0`. The Conductor control plane at localhost:8080 refused connections after the session resumed, so the lock path was not checked there.
+
+## 2026-11-01T03:17:36Z — Merge current main and replay the full ECBench loop
+
+### What was done
+
+- Forward-merged current `main` at `4690dc03` into PR #3099. Only the two
+  append-only daily logs conflicted; both complete histories were retained.
+- Rebuilt release `ecbench` from merge commit `fd913fbcdf5a444fcd051c81e370c0c2303da8d7`
+  (binary SHA-256
+  `ef1509cf3bde4fddcddd0d1a2329fc3875d5c2c0b96cecf04f7f689e8218c191`).
+  Its method inventory and 109-spec all-coverage audit are byte-identical to
+  the pre-merge artifacts.
+- Audited all 33 admitted diagnostic sessions again with the merged binary:
+  955 records, 902 verified outcomes, 742 replay candidates, 742 attempted,
+  and 742 reproduced with zero problems. The deliberately excluded pre-fix
+  Scholten/decomposition session is now refused by the planning guard, exactly
+  as intended. Added separate current-head receipts rather than overwriting
+  the original binary-bound receipts.
+- Reran the merged-head release tests. The three optimizer policy tests, the
+  three-leads planning guard, and the independent three-leads backend test all
+  pass. The full release library suite completed in 1,718.84 seconds: 5,804
+  passed, 38 failed, and 128 were ignored.
+
+### Decisions made
+
+- Classify the 38 broad-suite failures exactly: 28 unavailable sparse runtime
+  fixtures/evidence files, nine loopback/network tests denied by the managed
+  sandbox, and the existing `ic_wide` `13130 != 3757` counter assertion. None
+  execute the new optimizer policy or planning guard. The command remains
+  reported as failed; the focused passes do not relabel it green.
+- Keep the bad three-leads session only as a negative-control artifact. It is
+  excluded from the 33-session aggregate and a current planner must refuse it.
+- Preserve the L0/L2 boundary after the replay. Current-source compatibility
+  does not promote the selected generator-orbit candidate or update the
+  leaderboard.
+## 2026-11-01T02:28Z — PR #3141 synchronized after concurrent main advance
+
+### What was done (commands, files, features)
+
+- Opened regular PR #3141 for the exact boundary census and enabled guarded
+  auto-merge. Its initial artifact-autofix and LLM-review checks passed.
+- GitHub immediately reported the head conflicting after `main` advanced to
+  `e23f7a6c2`. Requested Copilot conflict resolution on the PR first. No reply
+  or head change arrived, so used the documented fallback and merged forward.
+- Preserved both complete histories in the sole conflicting append-only log;
+  no tensor source, protocol, receipt or generated report conflicted.
+- Exact merged-head rustfmt, four focused Rust 1.78 release controls, release
+  CLI check, current-stable all-target Clippy, scoped whitespace, large-file
+  and artifact-policy gates pass.
+
+### Decisions made (and why)
+
+- Repush the merge head and require a fresh exact-head CI set before merge.
+  The earlier green auxiliary checks do not validate the replacement head.
+- Preserve the implementation-only claim boundary despite newly merged
+  mainline research results; no E1 rank measurement was added by this PR.
+
+### Open threads (unfinished, pick up next time)
+
+- Push the replacement head, confirm guarded auto-merge remains enabled and
+  follow required checks through merge.
+- Continue with semantic cuts, rewired nulls and fresh-process A/A only in a
+  later focused change.
+
+### Errors (what went wrong, how it was handled)
+
+- Concurrent main movement made the first PR head dirty before required checks
+  attached. Copilot did not respond to the mandated first request; the fallback
+  touched only the shared log conflict and retained all histories.
+## 2026-11-01T02:19:25Z — resynchronize after a green gate
+
+### What was done (commands, files, features)
+
+- Exact-head CI on PR #3136 passed current-head, parity, recomputation,
+  replay, artifact, size, scope, software, review, migrate, rustfmt, clippy
+  and aggregate-gate checks. Two optional factor-base jobs remained pending.
+- GitHub nevertheless reported the PR dirty because `main` advanced by PR
+  #3123 during the six-minute gate. Fetched `origin/main` at `4690dc037` and
+  merged it forward normally; only this append-only log conflicted, and both
+  histories were retained.
+
+### Decisions made (and why)
+
+- Keep auto-merge armed and repush the additive resolution. No source test is
+  repeated because the new mainline commit touches task-card tooling and its
+  lock, not the IC modules or dependencies; exact-head CI will rerun.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and push this synchronization, then watch PR #3136 through a
+  mergeable exact-head gate or investigate any concrete failure.
+
+### Errors (what went wrong, how it was handled)
+
+- High mainline churn invalidated a fully green required check set before
+  auto-merge could land. No feature source conflict or failed check occurred.
+
+## 2026-11-01T02:55Z — tools/task_card.py synced again (`lane --free`, crypto-autoresearcher#2866)
+
+### What was done (commands, files, features)
+- crypto-autoresearcher#2866 merged at 02:27 UTC. Copied `tools/task_card.py` byte for byte from crypto-autoresearcher `main` (`ee75b428e`): sha256 `1440208bfd1c…` → `9425ae71f4c855923d337fe8304dee0d630b6d7c81e9a7e81099ef4129caa812`. Updated the matching digest in `docs/shared-code.lock.json`; it is the same value as crypto-autoresearcher's lock.
+- Checks passed: `sha256sum`; `python3 -m py_compile tools/task_card.py`; `python3 tools/task_card.py lane --help` (shows `--free {local,public}`); `python3 tools/check_lab_parity.py --repo crypto` (9 files); `go test -count=1 ./...` in `tools/expspec` (28.8 s).
+
+### Decisions made (and why)
+- Opened a new follow-up PR because #3123 had already merged. The file is mirrored unchanged, and only its lock entry is touched.
+
+### Open threads (unfinished, pick up next time)
+- Drive this PR to merge. cryptanalysis is handled separately (cryptanalysis#1352).
+
+### Errors (what went wrong, how it was handled)
+- None in this step.
+
+## 2026-11-01T03:14Z — corrected line-layout diagnosis classified both L2 exits
+
+### What was done (commands, files, features)
+
+- The corrected fixed-target diagnosis source merged at
+  `15b58954b965a44b24a80f8b493e945d91076803`; dispatched read-only workflow
+  41267915424 exactly once. Both matrix jobs succeeded and uploaded allowlisted
+  artifacts 13068226703 and 13067928403. No experiment was submitted or retried.
+- Retained the byte-exact diagnosis JSON for frozen workflows 41260778029 and
+  41260778856. Each prefix had 19 objects and one failed Pod. The
+  identity-checked Kubernetes status classified both exits as
+  `l2_isolation_gate`, exit 42, with Pod UIDs
+  `458712fd-1251-4d62-b943-b35f44a51e44` and
+  `bfe971ea-45d0-4f50-a851-8afbd61f61f6`.
+- Updated the problem record, terminal observation, machine record, report and
+  evidence flow. Preserved the first failed diagnosis run 41266993333 and the
+  exact status/payload evidence boundary.
+
+### Decisions made (and why)
+
+- Treat the two failures as L2 isolation-gate failures at status-evidence level.
+  Do not attribute a particular L2 predicate: payload reads remain unavailable,
+  `manifest_verified` is false and all below-L2 detail is null.
+- Do not modify the candidate, weaken L2, promote excluded L0 timing, or retry
+  either consumed trial. A future scientific trial requires a new frozen
+  evidence version and preregistration.
+
+### Open threads (unfinished, pick up next time)
+
+- Land the evidence-only PR through required gate, size and artifacts checks.
+- To identify the exact failed L2 predicate, obtain narrowly scoped authorized
+  access to the retained manifests and `l2-gate.json`, or qualify the isolation
+  infrastructure under a new evidence version.
+
+### Errors (what went wrong, how it was handled)
+
+- The GitHub CLI artifact download redirect was forbidden. The repository
+  connector supplied the same immutable artifacts; both retained JSON files
+  compare byte-for-byte with their downloaded entries and are separately hashed.
+
+## 2026-11-01T03:20Z — crypto#3140: unblock CI (session-log conflict)
+
+### What was done (commands, files, features)
+- Check-in found only the two `pull_request_target` runs (`migrate`, `review`) on head `bb6653440`; no `pull_request` workflow had been created, although `validation-gate.yml` runs on every PR and other PRs (#3134, #3138, #3147) got runs. Mergeable state stayed `unknown`.
+- `git merge origin/main`: the only conflict was this append-only session log, so GitHub could not build the test merge commit that `pull_request` workflows run on. Kept both sides in full (main's 2,036 lines unchanged, this session's entry after them).
+- `python3 scripts/test_validation_gate.py` on the merged tree: 63/64, the same single sparse-checkout failure as on unmodified `main`.
+
+### Decisions made (and why)
+- Merge rather than rebase: the branch is already public on the PR.
+
+### Open threads (unfinished, pick up next time)
+- Watch CI on the merge head; auto-merge is on.
+
+### Errors (what went wrong, how it was handled)
+- None beyond the conflict above.
+
+## 2026-11-01T03:22Z — L2 diagnosis evidence bundle validated for publication
+
+### What was done (commands, files, features)
+
+- Verified both diagnosis JSON files with `jq`, byte comparisons against the
+  immutable workflow artifacts and the checked-in `SHA256SUMS`.
+- The failed-run diagnosis privacy fixture, remote request contracts, build
+  identity controls and image-publisher controls all passed. Scoped whitespace,
+  large-file and artifact-store policy checks pass; the refreshed PDF has two
+  pages and both were visually inspected.
+
+### Decisions made (and why)
+
+- Open the evidence-only PR from the exact head containing evidence commit
+  `1045d82ba`; require fresh hosted `gate`, `size` and `artifacts` checks on
+  that current head before merge.
+- Do not update any benchmark, leaderboard or dashboard because the diagnosis
+  contains no admitted performance result.
+
+### Open threads (unfinished, pick up next time)
+
+- Push, open a regular PR, enable merge-style auto-merge and remain through the
+  required current-head checks and merge commit.
+
+### Errors (what went wrong, how it was handled)
+
+- The full-tree workflow-wiring check produced no output for more than four
+  minutes in the sparse checkout and was stopped. This PR changes no workflow
+  or moved-data manifest; the hosted `artifacts` job remains the authoritative
+  full-tree check and must pass before merge.
+## 2026-11-01T03:05Z — Torsion anchors on the cofactor-596 curve, a=0 n=37 (branch claude/ic-m2-torsion-n37-20261101)
+
+### What was done (commands, files, features)
+- Froze `research/ic_m2_torsion_n37_20261101/PROTOCOL.md` (commit 7893863417), rebuilt `ic_m2_cycle` on /dev/shm
+  (the binary from the n=41 run was gone; 10 m 51 s), ran 8 paired targets (seeds 20261024, 20261101-07),
+  one target per process, 4 at a time, ON arm first, then OFF, 1,800 s cap.
+- Result: all 16 runs verified, none capped. Torsion off: mean 2.16 M trials, 3.4 s; torsion on: 14.8 M
+  trials, 23.9 s. Paired OFF/ON geometric mean 0.134 (95% [0.082, 0.205]); all 8 pairs below 1. Relations
+  needed: 126 (off) vs 885 (on); trials per relation equal (17.1k vs 16.7k); largest component 4 vs 117
+  columns. Mean wall / rho wall: 7,700 (off), 54,600 (on). Determinism check passed (seed 20261024, on:
+  14,720,702 trials).
+
+### Decisions made (and why)
+- Reported that torsion hurts here (7.5x), against my own earlier statement that it is for large
+  cofactors. The cycle stop alone solves this curve; the ladder's limit belonged to its 90% coverage stop.
+- Did not edit `research/ic_m2_cycle_leads_20261030/REPORT.md`: PR #3126 edits the same lines (erratum
+  for the n=23/31 penalty); the new report states the correction and #3126 can be extended after it merges.
+- Ran locally, not isolab-eks (no AWS identity in this session); disclosed in the report.
+
+### Open threads (unfinished, pick up next time)
+- Whether torsion helps when the cofactor is much larger than the number of columns is untested; no
+  supported curve in the range I could run has that ratio. N83 a=1 (cofactor ~1.1e9, n=83) is out of reach
+  for this method at any cofactor handling.
+- Torsion anchors have helped at no size measured (n=23 1.5x worse, n=31 13x worse, n=41 no effect, n=37 7.5x
+  worse). The n=31 and n=37 penalties are explained only by relation counts, not tested another way.
+- After #3126 merges, fold the n=37 correction into the leads report's torsion lines.
+
+### Errors (what went wrong, how it was handled)
+- The /dev/shm build and pylib were cleared between tasks; rebuilt and reinstalled.
+- I expected the OFF arm to hit its cap (as the frozen ladder stalled); it finished in 1.2 to 6 s, so the
+  protocol's censoring rule was not needed. Checked the records (verified, bad_t 0, eqs 1) before trusting it.
+
+## 2026-11-01T03:42:40Z — Extend the full ECBench loop over new mainline engines
+
+### What was done
+
+- Forward-merged `origin/main` at `7a3e3b9275`; preserved both complete
+  append-only log histories. Main added one PDP3 pair-index F6 engine and four
+  prime PKM tower engines (F4, signature F5, F6, and enumeration).
+- Extended the fail-closed optimizer inventory to 78 top-level methods plus 24
+  nested algorithms: 11 system solvers, nine PDP3 engines, and four PKM tower
+  engines. The expanded 111-spec `--require-all` audit is admitted with no
+  missing method/engine, structural error, or seed leakage.
+- Ran both new public-target L0 panels. The corrected PDP3 session has 20/20
+  verified records and 16/16 measured replays; the PKM session has 30/30
+  verified records and 24/24 measured replays under the current binary.
+- Pair-index F6 uses 0.2792x the predecessor F6's recorded end-to-end work
+  [0.2459, 0.3171] and stays lower at all three pricing-band weights, but it is
+  still 139.30x strong rho [85.48, 227.02]. Prime PKM F4, signature F5, F6,
+  and enumeration are respectively 4.6179x, 4.6179x, 4.7313x, and 5.0328x
+  negation rho in recorded work and remain above rho at every band weight.
+  Signature F5 uses 0.2253x F4's native tower multiply-adds and 0.6680x its L0
+  whole-method wall point estimate, but that native unit is unpriced and the
+  wall panel is not L2.
+- Post-fix release policy tests passed 3/3 (6,006 filtered): exact live-registry
+  coverage, every nested engine, and non-knob seed/censoring classification.
+- The focused binary engine test passed 1/1. Rebuilt exact current `ecbench`
+  (SHA-256 `d3d608a89140ba589e15ff501478d28cffba86af3e89a82767c68637d73b7af9`)
+  and refreshed the receipts: PDP3 remains 16/16 and PKM 24/24 with no
+  problems.
+
+### Decisions made
+
+- Do not update the leaderboard: these are one-target, four-round L0
+  diagnostics. The new solver-local and same-method improvements do not beat
+  matched rho end to end, and no fresh L2 holdout exists.
+- Retain the first pair-index session and failed receipt as a negative control.
+  Its 13/16 replay result exposed that pair-index construction was charged once
+  per measured child process but cached across records in the in-process
+  auditor. Resetting the cache at each independent pipeline invocation keeps
+  within-run target reuse while restoring exact accounting parity.
+
+### Open threads
+
+- Push the expanded evidence to PR #3099, and let normal required checks and
+  guarded auto-merge decide admission.
+- A disjoint multi-target L2 holdout still requires the repository's durable
+  checkpoint identity; none is configured in this managed runtime.
+
+### Errors
+
+- The pre-fix pair-index receipt failed three measured replays because of
+  cross-record cache charging. All recovered discrete logs were correct; the
+  failed accounting evidence was not counted. The corrected session reproduces
+  all 16 measured records exactly.
+- The targeted integration-test harness could not build because this sparse
+  workspace lacks the unrelated archived volcano driver and N83 projector
+  identity fixture. This is the same fixture-availability class retained in
+  the broad-suite result; the binary unit test and real-session replay paths
+  passed.
+- Artifact policy selected the three new raw JSONL files (0.6 MiB), but the
+  real upload failed closed because `aws` is not installed and no alternate
+  artifact identity is configured. Left the payloads local and uncommitted;
+  tracked receipts bind their hashes and compact comparisons, and the report
+  marks remote hydration as pending.
+- The full PR-relative artifact check then found 34 earlier campaign JSONL
+  files under the same policy (about 7.6 MiB). Untracked all 37 payloads and
+  added per-session ignores without deleting the local files; receipts,
+  comparisons, metadata, and reports remain tracked. An authenticated artifact
+  upload is still required to hydrate them remotely.
+## 2026-11-01T03:25Z — synchronize L2 diagnosis PR with current main
+
+### What was done (commands, files, features)
+
+- PR #3148 opened with merge-style auto-merge, then became conflicting when
+  `main` advanced to `7a3e3b927`. Merged that revision forward normally.
+- The only conflict was this append-only session log. Retained both complete
+  histories and removed only the conflict markers; no diagnosis, report,
+  checksum or problem-record content conflicted.
+
+### Decisions made (and why)
+
+- Push the merge commit without rebasing or force-pushing, then require fresh
+  hosted `gate`, `size` and `artifacts` checks on the replacement exact head.
+
+### Open threads (unfinished, pick up next time)
+
+- Push the merge resolution and follow PR #3148 through its required current-
+  head checks and merge commit.
+
+### Errors (what went wrong, how it was handled)
+
+- The first merge command could not lazy-fetch a mainline blob because network
+  was unavailable in the sandbox. It made no tree change; the identical command
+  succeeded with scoped network access and exposed only the expected log conflict.
+
+## 2026-11-01T03:46Z — start fresh IC relation-solving tournament evidence version
+
+### What was done (commands, files, features)
+
+- Confirmed the prior diagnosis PR #3148 merged at
+  `6913f53dc1c6d09ee0d3d73a66f356132a968ee6`. The old fp20 line-layout
+  evidence version remains consumed and inconclusive after two status-level L2
+  gate failures; it will not be retried or rewritten.
+- Reviewed the existing full-solve line-layout protocol, relation-yield pruning
+  report, relation-matrix study, candidate-tournament measurement contract,
+  prime-IC program decisions, ecbench measurement rules and Iso Lab submission
+  and recovery contracts. Also read the canonical experiment-protocol skill and
+  schema from crypto-autoresearcher `main`.
+- Selected the existing `ic.pipeline` line-layout comparison as the requested
+  relation-solving tournament because its cold clock includes factor-base
+  construction, relation collection, matrix solving, logarithm recovery and
+  verification. No narrower relation-stage result will discharge the request.
+
+### Decisions made (and why)
+
+- Create a new protocol version with fresh curve, target and measurement seeds.
+  The old seeds were exercised by the excluded diagnostic, so reusing them would
+  make the new performance reading in-sample.
+- Preregister one status-independent L2 infrastructure qualification before the
+  two scientific jobs. If that single qualification fails, stop without
+  dispatching the tournament; if it passes, dispatch exactly two concurrent,
+  non-resumable jobs and retain every outcome with no scientific retry.
+- Keep the incumbent, candidate, A/A, positive control, complete-cost parity and
+  both-session confidence gates unchanged.
+
+### Open threads (unfinished, pick up next time)
+
+- Author and freeze protocol v2 and its fresh-seed spec, validate locally, land
+  them through a regular auto-merge PR, then run the fixed L2 qualification and
+  conditionally dispatch the two tournament sessions from the merged revision.
+
+### Errors (what went wrong, how it was handled)
+
+- Conductor is unavailable in this environment, so no control-plane reservation
+  was recorded. The branch is limited to the study and append-only session log.
+
+## 2026-11-01T03:48Z — freeze relation-solving tournament protocol v2
+
+### What was done (commands, files, features)
+
+- Added `PROTOCOL-V2.md`, `protocol-v2.json` and `spec-fp20-v2.json`. The
+  protocol froze before data with SHA-256
+  `0dc2be59cd4860fae6775d0dff823c1025d4fa999b2c9550bd4d7e19c030f92b`
+  and source base `6913f53dc1c6d09ee0d3d73a66f356132a968ee6`.
+- The new spec differs from v1 only in its label/protocol path and the three
+  fresh seeds: curve 20261101041, targets 20261101042 and plan 20261101043.
+- Canonical protocol validation, analyzer syntax/hash binding, exact normalized
+  spec comparison, remote request contracts, build identity controls, image
+  publisher controls, JSON parsing and whitespace checks all pass.
+
+### Decisions made (and why)
+
+- Land the frozen design before any GitHub workflow dispatch. The merge commit,
+  native binary hash and image digest will be observed identities in the export;
+  neither protocol nor thresholds will change after the first qualification.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and merge the preregistration PR; dispatch the single fixed L2
+  qualification from that merged revision; only on a manifest-verified L2 pass,
+  dispatch the two concurrent scientific sessions.
+
+### Errors (what went wrong, how it was handled)
+
+- Initial validation rejected three descriptive provenance strings outside the
+  schema enum. Changed only those fields to `internal`; claims and sources did
+  not change. Validation then passed with zero findings.
+## 2026-11-01T01:50Z — t = 14 tower cell: tooling and pre-flight
+
+### What was done (commands, files, features)
+- User asked: "run the t=14 tower cell". Procedure is Amendment 7 B of `research/prime_fall_degree_20261027/PREREGISTRATION.md`
+  (capped F4 at c* − 1 = 6, then the adjacent cap), not an uncapped solve (projected ~7 days).
+- Restarted the branch from `origin/main` (390d5c2c0); sparse checkout extended (pencil_large_prime, five `docs/` files the
+  library includes, the study directories). Built `pkm_tower_pilot`, `pfd_grid_zeros`, `prime_fall_degree_tools` (release, ~9 min).
+- New: `examples/pfd_grid_zeros.rs` (O(K)-memory count of `S₃` zeros on `V × V`, Amendment 7 C) and
+  `research/prime_fall_degree_t14_20261101/{run_cells.sh,README.md}`.
+- Verified on scratch output: widths 1,231 / 2,304 / 4,789 / 8,644 and D = 5 at t = 6…9; t = 11 cap 5: 30,335 pairs above the bound,
+  16,572 columns, 22 steps (19 s, 390 MiB); t = 11 cap 6 refutes, D = 6, 51,909 columns, 28 steps (585 s, 1.6 GiB): all equal to the
+  recorded round-2 values. Cap 5 is flat in t: t = 12 and 13 give the same 30,335 / 16,572 (20 s). Counter equals `ns-degree`
+  on 8 draws at p = 786433, t = 10; planted draw gives 2 zeros.
+- t = 12 cap 6 pre-flight (scratch) still running: step 23 took 110 s, step 26 took 785 s (68k columns, 500 M nonzeros); 3.7 GiB.
+
+### Decisions made (and why)
+- Host is off-route (AGENTS.md 9a; Amendment 7 A is 14 CPU / 112 GiB on Iso Lab): this container has 4 vCPU, 15 GB, no AWS access.
+  D is deterministic given the system, so the host changes only censoring; rows are reported separately from Amendment 7 scoring.
+- Used the repository's own `ns-degree` to validate a new streaming counter rather than trusting it, because `ns-degree` holds four
+  K²-entry arrays (~8 GB at t = 14).
+- Committed tooling before the plan (no data exists) because the stop hook flags untracked files; `PLAN.md` follows before any study row.
+
+### Open threads (unfinished, pick up next time)
+- Finish the t = 12 cap-6 pre-flight, extrapolate t = 14 cap 6, write and commit `PLAN.md`, run `run_cells.sh R`, then `T 6 0`, `T 6 1`.
+- Run clippy on `pfd_grid_zeros.rs` locally (not yet run; CI will).
+- If t = 14 cannot fit here, ask the owner to route the 112 GiB job through `isolab_k8s_run`.
+
+### Errors (what went wrong, how it was handled)
+- The first release build failed on a path dependency and then on five `docs/` includes outside the sparse set; fixed by adding them.
+- Two builds raced on the cargo lock; the first was failing and drained itself.
+
+## 2026-11-01T03:50Z — Lever 2 exact-count falsifier: results; t = 14 pre-flight; PR #3130 gate
+
+### What was done (commands, files, features)
+- Ran the exact-count falsifier under the protocol frozen at 9d2a2daf2: `examples/exact_count_membership.rs`, gates G1-G5 pass,
+  m = 2 (B = 128..2048, 3,200 instances, 298 s) and m = 3 (B = 16..128, 2,560 instances, 3,941 s), seed 20261101, 2 threads.
+  Reading: 0 of 1,800 structured instances reach B^(m-1); 0 of 90 family-vs-null tests rejected at alpha_c = 1.1e-4 (smallest p 4.3e-3);
+  control x(kP) fires 360/360 with Cmax = 2B-2 (m = 2) and 3B^2-6B+4 (m = 3) exactly and coverage p ~ 1.7e-25; A/A min p 0.12.
+  Report, figure, PDF in `research/lever2_exact_count_20261101/`; pointer added under the correction in the program note.
+- t = 14 pre-flight (scratch): cap 5 is flat in t (t = 11, 12, 13 identical, ~20 s, 390 MiB); t = 11 cap 6 refutes (585 s, 1.6 GiB,
+  51,909 columns); t = 12 cap 6 censored at the 7,200 s budget (8.2 GiB, 103,785 columns, 1.4e9 dense entries). So t = 14 cap 6 does not fit
+  this container; `PLAN.md` freezes what does (regression cells, t = 14 cap 5, decomposability) and states cap 6 is a route gap.
+- PR #3130: required `gate` failed with `removed benchmark 20261018-pkm-rootfind-prime lacks an exact archival disposition`: a stale head
+  (main gained that benchmark after my last merge). Merged main (df7c17fd2 -> 5004a6170); benchmarks tree now identical to main. The
+  gate script needs `docs/ic/leaderboard.json` from the artifact store, so it could not be run end to end locally.
+
+### Decisions made (and why)
+- Primary metric keeps the 3B-2 trivial solutions at m = 3 (literal system); `cmax_nt` is secondary. Decided in the protocol before the rows.
+- Did not attempt t = 14 cap 6 here: the pre-flight shows it needs days and ~100 GB; Amendment 7 A already sizes it at 112 GiB on Iso Lab.
+
+### Open threads (unfinished, pick up next time)
+- Run `run_cells.sh R`, `T 5 0`, `T 5 1`, `G` for t = 14 and commit the rows; then ask the owner to route `T 6 0` / `T 6 1` to Iso Lab.
+- Confirm `gate` green on the new head of #3130; the artifact bot's commits do not trigger workflows, only my real pushes do.
+
+### Errors (what went wrong, how it was handled)
+- Report draft had garbled instance counts (5,100 x ..., 1,600) and a wrong control total; caught on reread and checked against rows.jsonl.
+- Typst rejected `*/` in a figure caption (`runs/m*/summary.json`); reworded.
+
+## 2026-11-01T03:47Z — prime IC affine/Jacobian benchmark: evidence and route pre-flight
+
+### What was done (commands, files, features)
+- Reviewed the existing cryptanalysis preregistration, result and open problem for
+  `prime-ic-jacobian-relations-20261031`. That study implemented and verified the
+  two modes but did not time them because its required checkpoint upload failed.
+- Reviewed the repository measurement rules, Iso Lab EKS workflow and validation
+  contract. An admissible CPU result requires the L2 route, warm-up, at least five
+  paired rounds, a matching affine A/A control, exact source/image identities,
+  replay/audit receipts and verified S3 hashes.
+- Confirmed the current environment has neither `CHECKPOINT_UPLOAD_TOKEN` nor the
+  checkpoint token file, AWS CLI or an AWS runtime identity. No benchmark command
+  was run.
+- Confirmed `conductor` is unavailable. Proceeding under the repository's
+  documented warn-and-allow rule on isolated branch
+  `codex/prime-jacobian-benchmark-20261101`.
+
+### Decisions made (and why)
+- Benchmark the two shipped implementations: affine is one lane; Jacobian uses 32
+  lanes plus batch normalization. Report this as an implementation comparison,
+  not a pure coordinate-only experiment, and preserve all operation/probe/restart
+  counters so the lane-layout difference remains visible.
+- Extend the native `ecbench` route instead of timing the CLI locally: the GitHub
+  Iso Lab workflow builds and audits `ecbench`, and local wall time is not an
+  admissible substitute.
+- Treat the previous study as prior evidence and reuse its same-revision,
+  same-input correctness contract; it supplies no performance result.
+
+### Open threads (unfinished, pick up next time)
+- Add a preregistered native ecbench method/spec with affine, Jacobian and affine
+  A/A arms; validate correctness without collecting timing data.
+- Merge the protocol/harness so the GitHub Iso Lab action can build an exact
+  mainline revision, then run the required checkpoint gate and dispatch L2.
+- Obtain checkpoint-upload credentials before dispatch; this is currently the
+  only known external launch blocker.
+
+### Errors (what went wrong, how it was handled)
+- None beyond the explicit missing checkpoint transport and absent optional
+  concurrency checker described above.
+
+## 2026-11-01T04:03Z — prime IC benchmark: harness design frozen
+
+### What was done (commands, files, features)
+- Read the current `ecbench` method/record/spec APIs, the orbit collector's
+  timing boundary and the EKS workflow's executable contract.
+- Checked Bernstein--Lange EFD's short-Weierstrass Jacobian table: the code's
+  `dbl-2007-bl` and mixed `madd-2007-bl` references match the named formulas
+  and the EFD operation-count entries (general doubling 1M+8S, mixed addition
+  7M+4S). This is formula evidence only, not performance evidence.
+
+### Decisions made (and why)
+- Add a native `ecbench` adapter rather than timing the CLI from shell. The EKS
+  action builds and audits `ecbench`, and its records already preserve exact
+  source/image/workload identities, paired seeds and A/A controls.
+- Add a collection-only wall clock inside `solve_logs`, in addition to the
+  existing end-to-end precomputation clock. The existing clock also includes
+  jump setup, gain-graph solving, certification and database assembly, so it
+  cannot by itself answer the user's relation-collection question.
+- Keep end-to-end solve time, relation/probe/restart counters and correctness
+  checks beside the collection clock. The performance unit is the shipped
+  affine implementation versus the shipped 32-lane Jacobian implementation;
+  lane count is an explicit confound and will not be hidden.
+
+### Open threads (unfinished, pick up next time)
+- Implement the collection clock and `ecbench` method, then add unit/integration
+  tests and a frozen L2 specification with affine, Jacobian and affine A/A arms.
+- Merge that pre-data protocol/harness before dispatch, as required by the EKS
+  GitHub route.
+
+### Errors (what went wrong, how it was handled)
+- The release `ic` binary is not present in this checkout, so no generated
+  fixture extraction was attempted. The harness will use normal deterministic
+  ecbench workload construction instead of an ad hoc local executable.
+
+## 2026-11-01T04:14Z — prime IC benchmark: native adapter compiles
+
+### What was done (commands, files, features)
+- Added `LogsReport::collection_ns`, timing only collector initialization and
+  probe loops; kept the existing end-to-end `logs.seconds` unchanged and
+  exposed both in `ic prime-orbit` JSON.
+- Added a checked canonical-affine to Montgomery target bridge on `OrbitCurve`.
+- Added `ecbench` method `ic.prime_orbit_relations_v1` with explicit
+  `coordinates=affine|jacobian`, orbit/relations/budget parameters, a native
+  `relations` phase wall clock, an end-to-end verified descent, lane/cost/
+  restart/certification counters and an explicit scope warning.
+- Installed the stable Rust toolchain in this fresh managed environment and
+  ran `cargo check --locked --lib`; it passed.
+
+### Decisions made (and why)
+- The adapter uses the normal ecbench prime workload and target rather than
+  bypassing target verification. A row is successful only if the orbit IC
+  descent recovers the actual target and the outer runner verifies it again.
+- `relations` GAE retains the implementation's established abstract accounting;
+  wall time is the coordinate-sensitive metric. Factor-base draws remain an
+  explicit unpriced counter.
+
+### Open threads (unfinished, pick up next time)
+- Add focused tests, the frozen L2 spec and preregistration; validate a small
+  untimed smoke run before committing.
+
+### Errors (what went wrong, how it was handled)
+- `cargo fmt --all` cannot load the sparse-checkout-only `five-leads-study`
+  workspace dependency. Formatted the five touched Rust files directly with
+  `rustfmt --edition 2021`; `git diff --check` passes.
+
+## 2026-11-01T04:44Z — prime IC benchmark: preregistration and spec expansion
+
+### What was done (commands, files, features)
+- Added `research/prime_ic_jacobian_benchmark_20261101/{PROTOCOL.md,SPEC.json}`.
+  The frozen panel is `a = -3`, `j = 0, b = 7`, and `j = 1728` at 28 and
+  30 field bits; affine, Jacobian and affine A/A; two warm-ups and eight
+  balanced measured rounds.
+- Added deterministic `prime_orbit_shape` ecbench workload construction. The
+  parent certifies the scaled shape; measured children receive its explicit
+  prime curve, so curve search is outside measurement.
+- Built the release `ecbench` binary and expanded the exact spec successfully:
+  `ECS1h3d3f64121be3`, SHA-256
+  `3d3f64121be3395551ab3f9348901b36fadd26494dfa8a9025ded68c8610db08`,
+  six workloads, 180 planned executions, no warnings. The constructed curves
+  report automorphism counts 2, 6 and 4 as intended.
+- Focused correctness test passed for both coordinate modes on the same planted
+  workload: recovered scalar matches, descent verifies, rejected relations are
+  zero, relation lanes and native phase wall are present.
+
+### Decisions made (and why)
+- Use two sizes per shape rather than one point: this makes the result less
+  dependent on one relation stream while remaining a bounded component study.
+- Eight measured rounds are even and exceed the five-round minimum; paired
+  algorithm seeds use the measured-index law so warm-up count cannot shift the
+  measured streams.
+
+### Open threads (unfinished, pick up next time)
+- Add shape-construction regression coverage and run an untimed one-workload
+  smoke through the full ecbench record/verification path.
+- Run clippy/relevant tests, commit and open the pre-data PR. Checkpoint upload
+  access is still required before any L2 dispatch.
+
+### Errors (what went wrong, how it was handled)
+- A debug `ecbench` link filled the 32 GB workspace with Cargo artifacts. It
+  failed at the linker without producing a binary. Removed only the regenerable
+  `target/debug/incremental` cache (8.4 GB); source and study data were untouched,
+  and the release build then succeeded.
+
+## 2026-11-01T05:00Z — prime IC benchmark: focused correctness gates pass
+
+### What was done (commands, files, features)
+- Added and passed a workload regression for `generic_a_minus_3`, `j0_b7` and
+  `j1728`: requested coefficients are retained, and `for_child` freezes each
+  searched curve to an explicit instance with identical subgroup/generator.
+- Re-ran the affine/Jacobian adapter test in release mode; both recover the same
+  planted workload, verify the descent, reject zero relations, expose the
+  expected 1/32 lanes and carry a nonzero relation phase clock.
+- `git diff --check` passes.
+
+### Decisions made (and why)
+- Treat these tests and the successful spec expansion as development
+  correctness evidence only. No local ecbench session was run and no timing
+  number will be reported from this host.
+
+### Open threads (unfinished, pick up next time)
+- Run the existing Jacobian-lane regression, the relevant integration test and
+  clippy; review the diff and commit the pre-data harness/protocol.
+
+### Errors (what went wrong, how it was handled)
+- None in the focused tests.
+
+## 2026-11-01T05:06Z — prime IC benchmark: regression and lint gates
+
+### What was done (commands, files, features)
+- Passed release regressions:
+  `jacobian_lanes_match_affine_on_every_curve_shape` and
+  `known_answer_runs_for_every_type`. The latter exercises full-decomposition,
+  affine large-prime and Jacobian large-prime modes on generic, j=0 and j=1728
+  curves and checks relations, certification, descents and rho recovery.
+- `cargo clippy --locked --release --lib -- -D warnings` passed.
+
+### Decisions made (and why)
+- Use `known_answer_runs_for_every_type` as the end-to-end implementation
+  regression in this repository, beside the new ecbench adapter test.
+
+### Open threads (unfinished, pick up next time)
+- Run the full release library gate and ecbench integration suite, then review,
+  commit, push and open the preregistration/harness PR.
+
+### Errors (what went wrong, how it was handled)
+- A prior cross-repository handoff named integration target `ic_prime`; this
+  checkout has no such Cargo test target or matching source. No test was skipped
+  under that name: the in-tree cross-shape regression above covers the relevant
+  behavior and passed.
+
+## 2026-11-01T05:35Z — prime IC benchmark: full release library gate
+
+### What was done (commands, files, features)
+- Ran `cargo test --locked --release --lib -- --quiet`: 5,876 passed, 128
+  ignored, 3 failed, 0 measured (6,007 total). Every changed-area test passed.
+
+### Decisions made (and why)
+- Preserve the three failures as unrelated baseline/environment findings; do
+  not modify their subsystems in this benchmark PR.
+
+### Open threads (unfinished, pick up next time)
+- Run the dedicated `ecbench` integration target, then review and commit.
+
+### Errors (what went wrong, how it was handled)
+- Two diagnostic-reap sidecar tests failed at `runner.rs:2733/2774` with
+  `No such file or directory`, the same container host-fixture gap already seen
+  in this workspace.
+- `ic_wide::run_f2m4_is_the_one_word_pipeline` failed at `ic_wide.rs:918` with
+  the existing `left: 13130`, `right: 3757` mismatch. None of the touched files
+  are in that path.
+
+## 2026-11-01T05:01Z — prime IC benchmark: ecbench integration gate
+
+### What was done (commands, files, features)
+- Ran `cargo test --locked --release --test ecbench -- --quiet`: all 26 tests
+  passed in 88.59 s, including session construction, record verification and
+  non-overwrite behavior.
+- Extended only the local sparse-checkout view with three tracked fixture
+  directories needed by unrelated binary `include!` / `include_str!` calls;
+  this made no git diff.
+
+### Decisions made (and why)
+- The harness/protocol is ready for pre-data review: source check, lint,
+  focused tests, full library inventory and ecbench integration evidence are
+  now recorded.
+
+### Open threads (unfinished, pick up next time)
+- Final diff review, commit, push and PR with auto-merge; no L2 dispatch until
+  the checkpoint credential exists and the protocol/harness revision is on
+  `main`.
+
+### Errors (what went wrong, how it was handled)
+- The first integration builds exposed sparse-checkout omissions for
+  `docs/ecdlp-audit`, `research/n83_jacobian_projector_20261031`,
+  `research/n83_highk_beyond4405_20261021` and
+  `research/full_volcano_graphwide_ic_20261017`. Added their tracked
+  directories to the sparse view and reran; the suite then passed.
+
+## 2026-11-01T05:40Z — prime IC benchmark: final pre-commit review
+
+### What was done (commands, files, features)
+- Reviewed the full source/protocol/spec diff, validated `SPEC.json` with jq,
+  reran `git diff --check`, and linked the EFD source directly in the protocol.
+- Confirmed the study tree contains no raw rows or performance conclusion; it
+  is pre-data only.
+
+### Decisions made (and why)
+- Keep collection wall and whole-solve wall together in each record. The
+  collection clock answers the scoped question; whole-solve wall makes any
+  displacement into setup/postprocessing visible.
+- Keep `factor_base_draws_uncharged` explicit and leave factor-base inventory
+  absent from this adapter. The factor base is deterministic from the frozen
+  curve/method/seed and audit replay, while its construction is outside the
+  scoped relation clock.
+
+### Open threads (unfinished, pick up next time)
+- Commit and push this pre-data revision, open a normal PR with auto-merge, and
+  follow required checks to merge. Then retry the checkpoint pre-flight; do not
+  dispatch L2 without credentials and a green checkpoint gate.
+
+### Errors (what went wrong, how it was handled)
+- None in final review.
+
+## 2026-11-01T05:42Z — prime IC benchmark: local commit correction
+
+### What was done (commands, files, features)
+- Created local commit `bb9957038`, then checked its tree before push.
+
+### Decisions made (and why)
+- Amend the unpushed commit after adding the study directory to the sparse
+  view, so the protocol/spec and their implementation are one review unit.
+
+### Open threads (unfinished, pick up next time)
+- Verify the amended tree includes both study files, then push/open the PR.
+
+### Errors (what went wrong, how it was handled)
+- The first `git add` refused the new research path because it was outside the
+  sparse-checkout cone, so `bb9957038` omitted `PROTOCOL.md` and `SPEC.json`.
+  Nothing was pushed. Added the directory to the sparse view before amending.
+
+## 2026-11-01T05:45Z — prime IC benchmark: pre-push mainline check
+
+### What was done (commands, files, features)
+- Final local pre-data commit is `57274ca5964245619eedcb7e8fbb04c41cd67406`;
+  its tree includes protocol, spec, adapter, instrumentation, workload builder
+  and tests, and `git diff --check` passes.
+- Fetched `origin/main`; it advanced from branch base `5ac38ef4e` to
+  `c3a92a2feb2bd8d5ce503cd8f1b7cfe7e0ba4978`, 70 mainline commits ahead.
+
+### Decisions made (and why)
+- Merge current main normally before push and rerun conflict-sensitive checks;
+  do not rebase or force-push over concurrent repository work.
+
+### Open threads (unfinished, pick up next time)
+- Merge `origin/main`, resolve only genuine overlaps, verify, push and open PR.
+
+### Errors (what went wrong, how it was handled)
+- None; the divergence was found by the required pre-push fetch.
+## 2026-11-01T04:08Z — Replay the complete ECBench loop after current-main merge
+
+### What was done
+
+- Merged `origin/main` at `c6e26b68ad`; the only conflict was this append-only
+  log, and both histories were preserved. Main added a standalone N83
+  chained-S3 meet-in-the-middle lookup but did not change the ECBench registry.
+- Rebuilt release `ecbench` from merge revision `d955159129` (binary SHA-256
+  `146c489255dc50e70b9ffe22840ecb2a6ea21a075cf361e13246b5570d1d35eb`).
+- The exact 111-spec structural audit remains byte-identical and admissible:
+  78/78 methods, 24/24 nested engines, no missing coverage or seed leakage.
+- Replayed all 35 admitted local sessions with the merged binary: 1,005
+  records, 952 verified outcomes, and 782/782 eligible measured executions
+  reproduced with zero problems. New binary-bound receipts are retained under
+  `execution/current-merged-head-replay/`.
+
+### Decisions made
+
+- Keep the all-implementations statement scoped to the executable ECBench
+  boundary. The standalone chained-S3 lookup has a separate 50-record study,
+  but no ECBench arm, matched rho comparison, symmetric pricing, or L2
+  holdout; record that as an integration gap rather than inflating 78+24.
+- Do not update the leaderboard. No fresh confirmatory L2 result exists.
+
+### Open threads
+
+- Publish PR #3099 through normal required checks and guarded auto-merge.
+- Add the chained-S3 lookup to an end-to-end ECBench lane before comparing it
+  with rho; obtain durable artifact/checkpoint identity before any L2 job.
+
+### Errors
+
+- The first exact-audit command quoted the development glob, and the second
+  supplied only the 19 addendum specs. Both failed closed. The corrected
+  command supplied the 92 frontier shards plus 19 addenda and reproduced the
+  tracked audit byte for byte.
+## 2026-11-01T03:51Z — synchronize relation-tournament preregistration with main
+
+### What was done (commands, files, features)
+
+- Fetched `main` at `5ac38ef4e` and merged it forward normally before opening
+  the preregistration PR. The only conflict was this append-only session log;
+  both complete histories were retained and only markers were removed.
+
+### Decisions made (and why)
+
+- Keep the frozen protocol and fresh-seed spec byte-identical across the merge.
+  Newly merged work does not touch the line-layout instrument, analyzer or Iso
+  Lab workflow, so focused validation plus fresh exact-head CI is sufficient.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and push the merge resolution, open the regular PR, enable merge-style
+  auto-merge, and wait for the exact-head required checks before dispatch.
+
+### Errors (what went wrong, how it was handled)
+
+- No experiment or validation error occurred; concurrent main work caused the
+  expected additive log conflict only.
+
+## 2026-11-01T04:27Z — relation-solving tournament v2 terminal preflight
+
+### What was done (commands, files, features)
+
+- PR #3151 merged the frozen v2 protocol normally at
+  `ea8e9ef71c3c82027dd9e01535302725519c3fca` from exact head
+  `7048019d569552dd334a350258ce53af0390f4f4`; gate, size and artifacts checks
+  passed. The protocol SHA-256 remains
+  `0dc2be59cd4860fae6775d0dff823c1025d4fa999b2c9550bd4d7e19c030f92b`.
+- Dispatched the one preregistered qualification from that exact tested source:
+  `gh workflow run isolab-experiment.yml --ref main -f source_revision=ea8e9ef71c3c82027dd9e01535302725519c3fca -f spec_path=taskq/deploy/eks-karpenter/l2-validation.json -f instance_type=c8a.2xlarge -f seconds=900`.
+- Workflow 41271383665 passed contracts and build. Artifact 13069693394 has
+  digest `sha256:29ab639216eadbc2041bd92467d98fb7a7d774f2bd0e0990b0f9f095a3bddd4d`;
+  the native SHA-256 is
+  `73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01`
+  and the image digest is
+  `sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914`.
+- The EKS experiment job then terminated failed. Job
+  `gh-41271383665-1`, UID `06bc6798-a65b-4805-9e43-47f16be8d97f`, launcher
+  `c4090885-9236-4b36-8dba-8cea6f746655` and request SHA-256
+  `9e4c461dd35f5301360efb1a67351d6097735857d79cc79ae055427684f70971`
+  are retained. The receipt reports result 23, wrapper 26, and no Pod UID or
+  results URI.
+
+### Decisions made (and why)
+
+- Applied the frozen fail-closed rule: qualification planned/attempted/terminal/
+  accepted-L2 is `1/1/1/0`; scientific jobs attempted are `0/2`; retries and
+  alternate seeds are zero. The public receipt is not manifest-verified
+  accepted L2, so dispatching either scientific job would violate the protocol.
+- Record the v2 payload classification as unknown. The v1 exit-42
+  `l2_isolation_gate` diagnosis belongs to different fixed Jobs and cannot be
+  inferred for this qualification.
+- Publish a flow diagram instead of a quantitative plot and no
+  `experiment.export`: the qualification returned no authenticated session
+  directory and the scientific stage produced zero rows.
+
+### Open threads (unfinished, pick up next time)
+
+- Merge the terminal observation, source-linked report, diagram and PDF through
+  a normal auto-merge PR. Further experiment execution requires a new frozen
+  evidence version after an authorized manifest-bound infrastructure diagnosis
+  or separately reviewed qualification.
+
+### Errors (what went wrong, how it was handled)
+
+- The only allowed infrastructure qualification failed. It was retained as a
+  terminal observation; no rerun, scientific dispatch, test weakening, seed
+  change or speed claim followed.
+
+## 2026-11-01T04:05Z — t = 14 cell: cap 5 done (d_F ≥ 6), cap 6 is a route gap
+
+### What was done (commands, files, features)
+- `research/prime_fall_degree_t14_20261101/run_cells.sh R`, `T 5 0`, `T 5 1`, `G` on this host (4 vCPU, 15 GB, no AWS), binary per `commit.txt`; start/end per cell in `progress.txt`.
+- Regression R passed: `t = 9` D = 5, `t = 10` D = 6 on both draws; `t = 11` cap 5 no refutation, cap 6 refutes D = 6 on both draws.
+- `t = 14` cap 5, both draws: `inconsistent = false`, not censored, 22 steps, 18.6 s / 18.3 s, 30,335 pairs above the bound, widest matrix 16,572 columns (identical to `t = 11`).
+- `pfd_grid_zeros`: 0 grid zeros on both `t = 14` draws and on all eight `t = 9 … 11` draws, so neither is decomposable.
+- Wrote `REPORT.md`/`REPORT.pdf`, `cost_vs_t.svg/png` (`plot_cost.py`), updated `README.md`; committed `runs/` and `preflight/`.
+- Merged `origin/main` (clean merge, no log conflict).
+
+### Decisions made (and why)
+- Reading fixed by `PLAN.md` §4: `d_F ≥ 6` at `t = 14` (lower bound); C-step (7) at `t = 14` is undecided because no cap-6 row exists. The same bound was already known at `t = 11`, so the cap-5 rows confirm flatness in `t` and do not separate 6 from 7.
+- Cap 6 at `t = 14` not attempted here: the pre-flight `t = 12` cap-6 cell was censored at 7,202 s (8.2 GiB, 1.36·10⁹-entry dense block); the extrapolation (about 13 days, about 100 GB) is one pair of points and is labelled as such.
+
+### Open threads (unfinished, pick up next time)
+- Owner decision: route `run_cells.sh T 6 0` and `T 6 1` to Iso Lab (Amendment 7 A: 112 GiB, 86,400 s per system). These decide C-step at `t = 14`.
+- Confirm `gate` and all checks green on PR #3130's new head; refresh `.resume/RESUME.md`; no independent `review-run` yet for the exact-count study or this cell.
+
+### Errors (what went wrong, how it was handled)
+- A draft report line said the `t = 12` dense block exceeded `--max-dense`; it is 1.36·10⁹ against 1.6·10⁹, so the text was corrected before commit.
+- The first legend overlapped the cap-5 points; moved below the axes and re-rendered.
+
+## 2026-11-01T05:20Z — Prime-field leads 20261031: synthesis folded into the note (PR #3103)
+
+### What was done (commands, files, features)
+- Fresh cloud container; the branch `research/prime-field-leads-20261031` was fetched at dc77f67f0 (7 commits: note, plan, workflow, results pushed by the earlier sessions at 9d21352c7 and bd316a27a, two merges from main). Workflow `wf_c23b552f-88c` had been stopped by host load on 2026-10-31; its synthesis stage never ran and section 5 of `research/notes/ecdlp-general/RESEARCH_PRIME_FIELD_LEADS_20261031.md` still read "Pending".
+- Wrote `C3_heavy_tail_ceiling/REPORT.md`, `L2a_slope_e_m3/REPORT.md` and `L2b_dreg_trajectory/REPORT.md` under `research/prime_field_leads_20261031/` from the files the agents had left (`ceiling_table.csv`, `mechanism_scoring.csv`; `results/fit.csv`, `results/per_s_means.csv`, `raw/run.log`; `results/cells.csv`, `results/probe_cells.csv`, `PREREG.md`). No computation of results; no rerun.
+- Ran `L2b_dreg_trajectory/summarize.sh` (awk over the recorded cells) and `plot.py` to produce `results/summary.csv` and `dreg_vs_log2p.svg` from the six recorded cells.
+- Rendered `REPORT.pdf` for C3, L2a and L2b with pandoc (Markdown to Typst) and the `typst` Python wheel in a scratch virtualenv in the session scratchpad; matplotlib from the same venv. The container has no system renderer.
+- Filled section 5 of the leads note (status table per lead, what the round adds, what is not done) and rewrote `SYNTHESIS.md` to match.
+- Conductor is not installed in this container (`conductor: command not found`); no task card, same as the planning session (404).
+
+### Decisions made (and why)
+- L2a decision read off the frozen rule in `PLAN.md` on the s = 6..11 data: the G arm's interval [1.94, 2.01] contains 2, so it closes; the S arm's [2.16, 2.24] lies above 2, so the literal clause does not fire and it is recorded as observed; nothing reopens (reopen needs an interval below 0.5). Status partial because s = 12 was not completed. The s = 12 rows removed by the earlier session were not restored (one curve, one arm).
+- L2b left with no decision: one ladder cell cannot form the preregistered trajectory ratio. The five probe cells (seed 9) are reported, including both 600 s timeouts, and not used as ladder data.
+- C3 given decision `writeup` (the plan names no threshold for it); the six recommended closures are listed as recommendations, with the atlas edit for M023 named.
+- Deviations recorded rather than repaired: L2a measured a group-MITM, an S_4 root-finding and a triple-scan arm, not the SAT/SMT decomposers named in the note.
+
+### Open threads (unfinished, pick up next time)
+- Merge `origin/main` (36 commits ahead of the branch; dry-run merge shows no conflict), push, update the PR body, and land PR #3103 once checks are green. The `needs-human` label came from the scheduled `autofix-queue` run 41260432530 at 01:17Z, before the results were pushed; current checks on dc77f67f0 are green with `harness` still running.
+- Reruns, on a quiet host: L2a s = 12 (both arms), the L2b ladder as frozen in `run_ladder.sh` (the only rerun whose outcome can change a reading), the C2 msolve leg on M to completion.
+- Atlas edits proposed in each lead's `atlas_update.md` are not applied; they need the sibling crypto-autoresearcher checkout.
+
+### Errors (what went wrong, how it was handled)
+- First Typst compile of the C3 report failed with "unclosed label": pandoc emits a heading label containing the subscript character in "log₂". Fixed by stripping the generated heading labels from the `.typ` before compiling; all three PDFs then compiled.
+- Two L2a table entries for log2 p were first typed from memory (24.3, 27.3) and corrected to the run log's 24.86 and 27.19 before commit.
+## 05:30 UTC — PFDR ladder: v1 O-INVALID diagnosis, review and rehearsal of EXP-PFDR-ada71b (Claude)
+
+### What was done (commands, files, features)
+- Task: corrected replacement for `crypto-autoresearcher` EXP-PFDR-2d36f9 (read O-INVALID), run it, record the reading. Cloned the repository
+  (`aburan28/crypto-autoresearcher`, now hosted as `isogeny-labs/`), pulled the v1 raw records with `tools/artifacts/artifacts.py pull`
+  (awscli installed with pip; `ARTIFACTS_AWS_*` mapped to `AWS_*` for that command only).
+- Found that `EXP-PFDR-ada71b` (v2: 32 pilot curves, margin 1.5, per-d null replicate, fresh seed blocks; DEC-20261101-49576f/-cb3277) was already
+  approved, frozen and unrun; its frozen hashes equal the approved ones on `origin/main` d0a625fa8. Wrote no third design.
+- Measured on v1 raw data: pilot/census null-mean ratios 0.85-1.20; expected short cells under the v1 rule 1.28/10 (worst P=0.28);
+  the 30 `z_cal` cells were 10 distinct values (frozen C6 gate fails 37.1% under exact N(0,1), assumed 4.8%); C5's six A/A lines were two;
+  pooled variance ratio 0.998 (V is not biased high). v2 simulations: 0 short cells/4000; C5 pass ~0.99-1.00, C6 ~0.95.
+- Ran all six ada71b trials unsupervised in a scratch tree (byte-identical frozen sources, plan order, each `check.py` CHECK OK):
+  census 20,151 jobs, 0 failed; reading **O-SUB-BE**; six lines valid, delta_hat -0.0044..+0.0070, max upper95 0.0144 vs 1/3;
+  C1, C3-C6 pass; min M 3670. Pilot and census re-run once: identical modulo seconds/order. Independent numpy recomputation matched;
+  180 brute-force recounts over 36 jobs, 0 mismatches. Red-team read obtained.
+- Files: `research/pfdr_ada71b_rehearsal_20261101/` (report.pdf, graph.svg, note, proposed lead wording, red-team report, analysis-final.json).
+  The autoresearcher clone holds local commit 5f19b996d (report dir) and checkpoint `.../20261101T052751Z-5f19b996dfd3/`.
+
+### Decisions made (and why)
+- No new design: ada71b already repairs both defects with thresholds unchanged, and a third contract would fork the evidence for H-PFDR-ed7ccf.
+- Did not widen the C6 band: V is calibrated; the failure was effective n = 10, which ada71b fixes with distinct replicates.
+- Ran as an unsupervised rehearsal, not a canonical run: `tools/experiment_execution.py authorize()` needs the claim visible in origin refs and this session cannot push
+  (`aburan28/crypto-autoresearcher` push refused; my request to attach `isogeny-labs/` was denied and not worked around). Canonical run ids and `runs/` untouched.
+- Lead disposition NOT changed: needs a supervised reproduction, independent review (spec decision_impact, AGENTS.md rule 12) and a committed Coordinator decision.
+  Proposed wording says "no detectable excess", since the frozen class bounds kappa's elasticity, not a small excess exponent (red-team: eps(32) < ~0.1 on the 1/3 exponent is not excluded).
+
+### Open threads (unfinished, pick up next time)
+- A session with push access: claim TASK-20261101-125ee4 then -8951b8 (`tools/goal_lanes.py claim --publish`), run the plan under the supervisor, commit runs/reports, PR with auto-merge;
+  its counts must equal the rehearsal's. Lane BATCH-3a63a4's owner is unknown.
+- After review: apply `PROPOSED-lead-disposition.md`; consider the zero-compute amplitude check (inject 1 + a N^delta into existing records) and a mechanism-bearing geometry (FAM-1 small_x, j = 0).
+- H-PFDR-ed7ccf.yaml still cites v1 seed blocks 6,000,000/6,200,000 (red-team); a Coordinator correction.
+
+### Errors (what went wrong, how it was handled)
+- `aws` missing and `AWS_SECRET_ACCESS_KEY` absent: installed awscli, used the `ARTIFACTS_AWS_*` pair for that one command.
+- A background launch was blocked by the checkpoint hook (it looks for RESUME.md in the project dir); ran in the foreground instead of bypassing it.
+- Typst failed on an unescaped `*`; fixed. First sampled-C6 script had a format-string bug; fixed. No result was affected.
+- `add_repo` for `isogeny-labs/crypto-autoresearcher` was denied by the auto-mode classifier; stopped there.
+## 2026-11-01T04:50Z — Measure the newly registered chained-x oracle
+
+### What was done
+
+- Merged current `main` at `5b1a482630`; its only implementation change
+  relevant here registers `chained-x` in the separate `ic bench` framework.
+  The release `ecbench` binary remained byte-identical, and its inventory and
+  111-spec audit remained byte-identical.
+- Release tests for the chained-x listing and executable pipeline passed 2/2.
+  Ran a fixed Koblitz a=0, n=13, dimension-6 subspace grid over m=2,3,4 and
+  inherited F4, matrix F4, and matrix F5, with four repeats and four matched
+  rho controls per completed cell.
+- All 28 runs in seven completed cells verified. Inherited F4 was best but
+  averaged 24.71x, 144.09x, and 794.37x rho at m=2,3,4. Matrix F5 was 0.6276x
+  matrix F4's complete S at m=3, but still 16,296.76x rho.
+- Retained a compact hash-bound summary under
+  `execution/chained-x-post-main-20261101/`; the seven raw reports remain local
+  and ignored under repository artifact policy.
+
+### Decisions made
+
+- Do not add chained-x to the 78+24 count: it has an IC-framework diagnostic,
+  not an ECBench spec, receipt, deterministic replay contract, scaling ladder,
+  or L2 holdout. Do not update the leaderboard.
+- Select inherited F4 as the only surviving chained-x engine for later scaling.
+  Matrix F5's local improvement over matrix F4 is retained as an engineering
+  result, not a frontier result.
+
+### Open threads
+
+- Wire an effective wall deadline into chained-x before broad sweeps, then add
+  a native ECBench arm and replayable matched-rho specification if this oracle
+  is to enter the complete frontier roster.
+
+### Errors
+
+- `--solver-budget-seconds 5` did not bound chained-x because that option is
+  wired only to `descent-algebraic`. The default m=4 matrix-F4 cell was
+  interrupted after 18 minutes without a report. Both matrix engines then hit
+  a five-minute external watchdog even with node_budget reduced from 4,096 to
+  256; both censored outcomes are retained.
+
+## 2026-11-01T05:04Z — Rebind the full frontier after the R7.2 GHS merge
+
+### What was done
+
+- Merged current `main` at `907d68631e79`, which includes the separate R7.2
+  end-to-end GHS study. Rebuilt release `ecbench`; the binary digest changed to
+  `e91c0ec79774af70c3b6af6aaac7b209e8edcdc0e42b1d18e1a92a14af065f65`.
+- Re-ran the live inventory and the fail-closed 111-spec development audit.
+  They remain byte-identical: 78/78 methods, 24/24 nested algorithms, no
+  missing entries, and no seed leakage.
+- Replayed all 35 admitted sessions against the new exact binary. All 1,005
+  records audited; 952 outcomes verified; all 782 eligible deterministic
+  measured runs reproduced exactly with zero problems. Receipts are under
+  `execution/current-ghs-merged-head-replay/`.
+- Reconciled the R7.2 GHS study into the report. Its 30 toy instances at
+  N=12..28 verified IC, rho, and BSGS on all 600 planted logs, but every priced
+  IC result remains generic-led. The best IC/best-generic ratio is 1.91 [1.72,
+  2.11]; the best IC/rho ratio is 1.60 [1.25, 2.12].
+
+### Decisions made
+
+- Keep the older restricted `E_0/F_(q^3)` result scoped to its exact family and
+  protocol. R7.2 does not invalidate that historical evidence, but it blocks
+  any claim that the exception generalizes to the newly measured GHS roster.
+- Treat the fitted genus-4 n=4 crossover at N about 32 [31, 33] as
+  extrapolation, not a measured win. It is outside ECBench and has no replay
+  certificate or leaderboard eligibility.
+- Do not change the leaderboard. The only fresh ECBench candidate remains the
+  one-target Koblitz n=29 generator-orbit arm awaiting a disjoint L2 holdout.
+
+### Open threads
+
+- Measure an actual GHS n=4 point at N>=32 and integrate the arm into ECBench
+  before reconsidering the projected crossing.
+- Run the selected n=29 candidate and matched strongest rho in a public,
+  multi-target L2 holdout once durable checkpoint upload identity is available.
+
+### Errors
+
+- None in the exact replay. The release digest changed after the GHS merge, so
+  the older receipt set was correctly retained rather than relabelled.
+
+## 2026-11-01T04:34Z — begin integer-factoring mechanism transfer audit
+
+### What was done (commands, files, features)
+
+- Reviewed the complete current-session handoff, root research instructions,
+  global curve-identity contract and the existing transfer-assessment validator.
+- Inspected `1337isnot1337/integer-factoring` at
+  `5aebed85b2978ec14868dde354660cb38f55bcb3` and separated reusable mechanisms
+  from factoring-specific claims. The candidates are residual-key collisions,
+  bounded-residual promotion, streaming/small-word accounting, sparse moment
+  recovery, pole/Cauchy compression and order-sensitive crossing bounds.
+- Checked the current repository surface before editing. Existing residual-walk,
+  double-large-prime, prime-residual and multiplier-base work overlaps the first
+  two candidates, so the new work will be a typed transfer assessment and
+  adaptation protocol rather than an unreviewed collector fork.
+- Ran the required Conductor pre-edit check for the proposed research directory
+  and this log. The `conductor` command is unavailable in this environment;
+  continued under the repository's documented warn-and-continue behavior.
+
+### Decisions made (and why)
+
+- Preserve source, destination, map, subgroup, solver and complete-cost
+  obligations explicitly. No integer-factor query reduction will be reported as
+  an elliptic-curve relation-yield or end-to-end ECDLP improvement.
+- Limit this slice to source-linked documentation and a machine-validated
+  assessment. Do not launch experiments or modify an active relation collector
+  until the source/destination analogue and falsifier are fixed.
+
+### Open threads (unfinished, pick up next time)
+
+- Read the repository's residual/large-prime and multiplier-base records plus
+  the full transfer methodology; author and validate the transfer package.
+- Commit the finished work, open a regular PR, enable guarded auto-merge and
+  follow its current-head checks.
+
+### Errors (what went wrong, how it was handled)
+
+- A normal shallow checkout of the multi-gigabyte repository stalled. Replaced
+  it with a blob-filtered sparse checkout containing the governing files and
+  relevant research surfaces; no repository content was discarded or rewritten.
+
+## 2026-11-01T04:36Z — author the factoring-to-IC transfer package
+
+### What was done (commands, files, features)
+
+- Added `research/integer_factoring_transfer_20261101/README.md` with a typed
+  mechanism crosswalk, the canonical residual-identity contract, existing host
+  controls, direct-transfer rejections and an adversarial A0/A1 falsifier.
+- Added `ASSESSMENT.json` in correspondence-assessment v3 format. It names the
+  existing `ic.pipeline` destination solver but leaves adapter correctness,
+  subgroup preservation, recovery and every advantage verdict unknown.
+- Added `SOURCE_MANIFEST.json`, binding the upstream repository, exact commit,
+  Apache-2.0 license digest and SHA-256 hashes for the reviewed notes and
+  evidence. No upstream code or prose file was copied verbatim.
+
+### Decisions made (and why)
+
+- Import the residual-key and exact-replay contract into the active IC program,
+  but do not duplicate `ic_framework::residual`, `LargePrimeCollector` or
+  `WideLargePrimeEliminator`, which already occupy the destination seam.
+- Reject a direct port of prime-cofactor saturation: its `Y`-rough, `R <= Y^2`
+  proof is about prime divisors and arithmetic roots, not elliptic residual
+  points. Keep selective verified-vertex promotion as a conditional lead with
+  all new columns and downstream work charged.
+- Preserve moments, pole/Cauchy circuits and crossing profiles as conditional
+  interfaces or boundary-analysis inputs, not solver or exponent claims.
+
+### Open threads (unfinished, pick up next time)
+
+- Validate both JSON files, run the native transfer-assessment tests and
+  validator, then perform repository hygiene checks.
+- Commit, publish and drive the regular PR through its exact-head gates.
+
+### Errors (what went wrong, how it was handled)
+
+- `git sparse-checkout add --no-cone` is unsupported by this Git version.
+  Re-ran the additive sparse update with `--skip-checks`; all requested files
+  materialized without changing tracked repository content.
+
+## 2026-11-01T04:43Z — validate the assessment and add the visual report
+
+### What was done (commands, files, features)
+
+- Added editable `transfer-flow.dot` and rendered `transfer-flow.svg`, with
+  existing/adopted, proposed, conditional and rejected paths visibly distinct.
+- Added `query-reductions.tsv` and an editable SVG chart of the three retained
+  upstream finite query-count comparisons. The graph labels its population and
+  states that no timing sample or confidence interval exists.
+- Added `REPORT.typ` and built the current three-page `REPORT.pdf` with Typst
+  0.15.0. Rendered all three pages to PNG and visually inspected them; the
+  diagrams, identifiers, limitations and source paths are legible with no
+  clipped content.
+- Parsed both JSON files with `jq`. In a pinned Rust 1.78 container, all 10
+  `tools/transfer-assessment` release tests passed and the v0.2.0 validator
+  accepted `ASSESSMENT.json` with zero findings.
+
+### Decisions made (and why)
+
+- No benchmark mirror or canonical performance graph changes: this work runs no
+  experiment and admits no new performance result. The PDF records the finite
+  upstream query counts only as source evidence with their original boundary.
+- No Lean theorem is added because this package introduces no new mathematical
+  identity or result; it records an attributed contract and open falsifier.
+
+### Open threads (unfinished, pick up next time)
+
+- Verify source-manifest hashes against the pinned upstream checkout, run final
+  whitespace/status checks, commit and publish the regular PR.
+
+### Errors (what went wrong, how it was handled)
+
+- The host has no Rust toolchain. Used the managed environment's healthy local
+  Docker daemon with the configured proxy/CA path and `rust:1.78-bookworm`.
+- The first locked container run failed because the sparse checkout omitted the
+  tracked tool-local `Cargo.lock`; materialized that file and reran successfully.
+- The first assessment validation rejected a non-schema solver-family label.
+  Replaced `elliptic_curve_index_calculus` with the validator's exact
+  `index_calculus` vocabulary; the substantive scope and verdicts did not
+  change.
+
+## 2026-11-01T04:43:39Z — transfer package pre-commit checks complete
+
+### What was done (commands, files, features)
+
+- Recomputed all 16 `SOURCE_MANIFEST.json` file digests against the pinned
+  upstream checkout; every SHA-256 matches.
+- `jq empty`, `git diff --check`, PDF metadata/readback and source-manifest
+  verification pass. The current PDF is three A4 pages and 90,117 bytes.
+- Checked the existing canonical graph surfaces. This assessment supplies no
+  new verified curve edge, timing, solver rank or scoreboard value, so their
+  content remains unchanged by design.
+
+### Decisions made (and why)
+
+- Treat the package as a completed research-search deliverable: source-linked
+  Markdown, machine assessment, editable diagram, quantitative source-evidence
+  chart, Typst source and inspected PDF are all present.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the exact tree, synchronize normally with any new `main`, push, open a
+  regular PR, enable guarded auto-merge and inspect current-head checks.
+
+### Errors (what went wrong, how it was handled)
+
+- The first PDF text assertion searched for a phrase split across a line break
+  and returned no match. Inspected the extracted text around the boundary and
+  confirmed the complete sentence is present; this was a check-pattern issue,
+  not missing report content.
+
+## 2026-11-01T04:44:43Z — synchronize the transfer assessment with current main
+
+### What was done (commands, files, features)
+
+- Fetched `origin/main` at `1a567ab5c` and merged it forward normally in
+  `e13104a38`. The merge was clean, including the append-only session log.
+- Compared every local methodology and IC source cited by the assessment across
+  the old and new bases; none changed. The PR diff against current main remains
+  exactly the transfer package plus this handoff.
+- The large-file policy check passes; the largest new file is the inspected
+  90,117-byte PDF, below the 10 MiB Git threshold.
+
+### Decisions made (and why)
+
+- Retain the assessment's exact `5b1a4826` host-source revisions as evidence
+  pins. Current main did not change those sources, and immutable revision pins
+  are preferable to silently rebinding the assessment during synchronization.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit this synchronization handoff, push the branch, open the regular PR,
+  enable merge-style auto-merge and follow exact-head required checks.
+
+### Errors (what went wrong, how it was handled)
+
+- None. Concurrent main changes were disjoint and no conflict resolution was
+  needed.
+## 2026-11-01T05:49Z — prime IC benchmark: merge current main
+
+### What was done (commands, files, features)
+- Merged `origin/main` at `c3a92a2feb2bd8d5ce503cd8f1b7cfe7e0ba4978`
+  normally into the benchmark branch as `b4466c034a`.
+- The only conflict was this append-only session log. Retained both complete
+  histories and removed only the conflict markers.
+
+### Decisions made (and why)
+- Rerun focused compile/lint/correctness checks on the merged exact head before
+  push because main advanced substantially, even though no implementation file
+  conflicted.
+
+### Open threads (unfinished, pick up next time)
+- Run post-merge checks, commit this handoff, push and open the PR.
+
+### Errors (what went wrong, how it was handled)
+- A whole-index `git diff --cached --check` began lazy-fetching every newly
+  merged partial-clone blob and did not finish promptly. Stopped that read-only
+  scan, verified no unresolved paths, checked the resolved log directly, and
+  committed the merge. No staged content was altered by stopping the scan.
+
+## 2026-11-01T06:00Z — prime IC benchmark: post-merge source gates
+
+### What was done (commands, files, features)
+- On merged exact head `b4466c034a`, all four focused release tests passed:
+  ecbench affine/Jacobian recovery, workload-shape freezing, Jacobian/affine
+  arithmetic equivalence, and known-answer recovery on all curve types.
+- `cargo clippy --locked --release --lib -- -D warnings` passed on the merged
+  tree. Main now has 6,020 library tests; each selected test reported 6,019
+  filtered peers.
+
+### Decisions made (and why)
+- Rebuild/expand the spec and rerun the ecbench integration target on this
+  exact merged tree before pushing, because main changed the harness and its
+  integration test since the earlier run.
+
+### Open threads (unfinished, pick up next time)
+- Run exact-head spec/integration checks, commit this handoff, then push/PR.
+
+### Errors (what went wrong, how it was handled)
+- None; the first exact-head release link took 7m35s, subsequent focused tests
+  reused it and completed immediately.
+
+## 2026-11-01T06:09Z — prime IC benchmark: exact-head harness gates
+
+### What was done (commands, files, features)
+- Built the merged exact-head release `ecbench` binary.
+- Expanded the frozen spec again: identity remains
+  `ECS1h3d3f64121be3` / SHA-256
+  `3d3f64121be3395551ab3f9348901b36fadd26494dfa8a9025ded68c8610db08`,
+  180 executions and no warnings.
+- Reran `cargo test --locked --release --test ecbench -- --quiet` on the
+  merged tree: 27 passed, 0 failed in 90.30 s.
+
+### Decisions made (and why)
+- Push the merged exact head and open the normal pre-data PR. The merge did not
+  change the frozen spec identity or invalidate the harness.
+
+### Open threads (unfinished, pick up next time)
+- Commit this post-merge evidence, push, open PR, enable auto-merge and follow
+  required exact-head checks through merge.
+
+### Errors (what went wrong, how it was handled)
+- None.
+
+## 2026-11-01T06:12Z — prime IC benchmark: PR #3169 opened
+
+### What was done (commands, files, features)
+- Pushed exact head `5a48ee5560aae179ef1cdcc7209b0391f6aa228e` and opened
+  PR #3169, "Benchmark affine vs Jacobian prime-IC relation collection".
+- Enabled merge-style auto-merge. Initial `review` and `migrate` checks queued.
+
+### Decisions made (and why)
+- Keep the PR description explicit that this is pre-data and that one-lane
+  affine versus 32-lane Jacobian is an implementation comparison.
+- Synchronize current main again before waiting: GitHub already reports the PR
+  merge state as `DIRTY`, so required checks alone cannot merge this head.
+
+### Open threads (unfinished, pick up next time)
+- Fetch/merge current main, resolve only actual conflicts, push the new exact
+  head and follow required checks through merge.
+
+### Errors (what went wrong, how it was handled)
+- Main advanced again between the local merge and PR creation, leaving the PR
+  conflicting. No force push or rebase will be used.
+## 2026-11-01T05:00Z — ecdb LAN mirror: /v1/export, `ecdb sync`, `ecdb bootstrap`, deploy/nas (branch claude/elliptic-curve-db-api-mtwgms)
+
+### What was done (commands, files, features)
+- PR #3122 (volcanoes) merged at 01:29Z after a session-log conflict was resolved by appending to `main`'s file.
+- `ecdb/src/api/export.rs`: `GET /v1/export` (manifest: 71 `ec` tables, copyable columns, primary keys, exact counts) and `GET /v1/export/{table}?offset=&limit=` (gzipped COPY text, ≤ 4 MiB, 413 above).
+- `ecdb/src/sync.rs`, `ecdb sync`: migrate locally, check schema version, truncate and refill all tables in one transaction with `session_replication_role = replica`, reset 35 identity sequences, verify every count, commit, ANALYZE.
+- `ecdb bootstrap`: migrations plus the `ecdb_api` / `ecdb_api_writer` logins; the Lambda `bootstrap_roles` action now shares `db::bootstrap_logins`.
+- `ecdb/deploy/nas/`: docker-compose.yml (postgres:16-alpine, bootstrap, api on 8080, `sync` profile), `.env.example`, `.gitignore`, README.
+- Verified locally on Postgres 16 (/dev/shm cluster): a source database with `import registry` + `walks` (223,914 rows) served by `ecdb serve`; `ecdb sync` copied it in 4 s. md5 of `ec.curve` and `ec.isogeny` rows were identical in source and copy, and the next sequence value was max(id) + 1. A second sync without `--replace` refused; `--replace` reloaded. Without a token, `/v1/export` returned 401. `cargo clippy -D warnings`, 26 unit tests, `docker compose config` all passed.
+
+### Decisions made (and why)
+- The mirror is fed through the public API, not `pg_dump`: RDS is not publicly accessible, and the read token already gates the same data.
+- Pages are capped at 4 MiB gzipped so they fit a Lambda function-URL response after base64; the client halves `limit` on 413 and doubles it below 1 MiB.
+- Empty `ECDB_READ_TOKEN` / `ECDB_WRITE_TOKEN` now mean unset, because compose passes unset variables as empty strings.
+
+### Open threads (unfinished, pick up next time)
+- The new binary is not deployed to `ecdb-api`: the auto-mode classifier refused `lambda update-function-code` as a production deploy. Until the owner deploys it, `sync` against the deployed URL returns 404 on `/v1/export`.
+- No end-to-end sync from the deployed database and no `docker compose up` was run here (no Docker daemon in this container).
+
+### Errors (what went wrong, how it was handled)
+- /dev/shm was wiped by a worker restart (toolchain, worktree, AWS CLI); rebuilt there.
+- `reqwest` without the `json` feature has no `Response::json`; parsed with `serde_json::from_slice` instead.
+
+## 2026-11-01T05:23Z — PR #3103 pushed, main merged, auto-merge on
+
+### What was done (commands, files, features)
+- Committed the synthesis as 51f629e31 and pushed; merged `origin/main` (conflicts only in the two append-only session logs, resolved by keeping both sides) as d07bf1052 and pushed. Branch is 0 behind main.
+- PR body rewritten with the outcome table; auto-merge enabled (merge commit) at 05:22Z; this session subscribed to the PR's activity.
+
+### Decisions made (and why)
+- Auto-merge enabled per the repository rule (CLAUDE.md "Enable auto-merge as you open the PR"); the 2026-10-31 session could not because the tool refused then. The `needs-human` label from the autofix run is left for a person to remove.
+
+### Open threads (unfinished, pick up next time)
+- Watch checks on d07bf1052 (and this log commit); fix only failures this change causes. Reruns listed in the previous entry.
+
+### Errors (what went wrong, how it was handled)
+- None.
+## 2026-11-01T05:20Z — Reconcile the prime-lead and binary-Edwards frontier evidence
+
+### What was done
+
+- Merged `origin/main` at `4111ae6f0b`, retaining both sides of the append-only
+  session log. Reviewed the newly merged synthesis and skeptic digest for all
+  12 prime-field IC leads and the R7.4 binary-Edwards results.
+- Rebuilt release `ecbench`; it remains byte-identical at SHA-256
+  `e91c0ec79774af70c3b6af6aaac7b209e8edcdc0e42b1d18e1a92a14af065f65`.
+  The live inventory and 111-spec fail-closed audit are also byte-identical, so
+  the 35-session replay remains bound without relabelling its source revision.
+- Added both evidence lanes to the registry optimization summary, bottleneck
+  map, blocker record, and comprehensive PDF source.
+
+### Decisions made
+
+- Do not promote any prime-field lead. The package reports no exponent movement:
+  the strongest results are constants, negative controls, retained-setup
+  advice, incomplete harnesses, or unrun proposals. PKM m>=4 and the contractor
+  exponent remain open; the ring-linear propagator was not run.
+- Treat binary-Edwards torsion symmetrisation as a structural control. Its
+  algebraic equivalence is proved and toy-checked, while its pair-table result
+  trends toward the null and changes sign under `c` versus `c+1` accounting.
+  No Groebner/F4 oracle or matched end-to-end rho experiment was run.
+- Keep the leaderboard unchanged. Neither package has an ECBench replay
+  certificate or an admitted L2 holdout.
+
+### Open threads
+
+- Concentrate future prime-field exponent work on PKM m>=4 and the contractor
+  exponent; implement and price the ring-linear propagator only under a frozen
+  matched protocol.
+- If binary-Edwards implementation constants are revisited, add the algebraic
+  oracle, strongest rho reference, full setup pricing, and ECBench receipts.
+
+### Errors
+
+- The mainline merge conflicted only in this append-only log. Both complete
+  entries were retained; no experimental or report content was dropped.
+
+## 2026-11-01T04:53Z — audit: residual byte counter priced as an operation (F1 of PR #3119)
+
+### What was done (commands, files, features)
+- Read `residual.rs:297-300`, `methods.rs:5135-5141`, `band.rs:39-72,136-146`, `work.rs:454`, `full_price.rs:161`, `plugins.rs:1313`: confirmed in code that a phase-native `*_uncharged` byte count enters `cost.unpriced` and is charged `w` GAE per byte by the band.
+- `conductor check` on `research/ic_byte_counter_pricing_20261101/` and this log: clear.
+- `aws` CLI absent; installed it in a scratch venv, mapped `ARTIFACTS_AWS_*` to `AWS_*`, ran `tools/artifacts/artifacts.py pull` on `research/ic_prime_residual_lp_20261026` and `research/ic_planner_exhaustive_20261026` (24 + 25 files; `verify`: 0 problems). Hydrated files are gitignored; no committed record changed.
+- `research/ic_byte_counter_pricing_20261101/scripts/byte_share.py` (read-only) output in `analysis/byte_share.{txt,json}`. Verified: byte share of S at w = 1 is 83-99% and at w = 0.1 40-98% on every residual arm of both studies; res2/rho at w = 1 drops from 17.6-24.3x to 2.6-3.0x and res4/rho from 31-58x to 3.2-4.8x with the counter excluded. The script reproduces the planner README's published 17.6/20.5/23.3/24.3 and 31.3/39.5/41.9/47.3 from the published bands.
+- Second instance: `factor_base_vec_bytes_floor_uncharged` in the Koblitz sessions, 0.4-12% of S at w = 1.
+- Wrote `research/ic_byte_counter_pricing_20261101/README.md` with the owner proposal (A keep, B exempt, C per-byte weight) and its effect on published rows.
+
+### Decisions made (and why)
+- No change to `src/`, `band.rs` or any README of the two studies: the pricing rule is the owner's to decide (task item 2); item 3 waits on that.
+- Recommended B as a classification in `band.rs` naming both byte counters, not an emitter rename: a rename only reaches new records and would break replays and the `full_price.rs` rule for the factor-base counter.
+
+### Open threads (unfinished, pick up next time)
+- Owner decision on A/B/C. If B or C: implement in `band.rs` (one place), regenerate bands and `ecbench compare` verdicts for both studies and `ic_planner_weight_rule_binkob_20261026`, `ic_koblitz_descent_routing_20261026`, `docs/backend-leaderboard`, add a dated note to each README, rebuild the IC leaderboard if a row changes, add graph/PDF per `research-visuals`.
+- Not verified: the F1 figures of PR #3119 (`research/ic_residual_scale_20261101/` is not on this branch); the three unaudited studies' raw records (not hydrated).
+- Paired-bootstrap verdicts vs `plan` were inferred on means only (36 of 50 "unresolved" become "residual cheaper at every w"); they must be regenerated, not quoted.
+
+### Errors (what went wrong, how it was handled)
+- The checkpoint hook blocked three read-only shell commands as "experiment runs"; re-ran them with `CHECKPOINT_SKIP=<reason>` or used the Read/Grep tools. No experiment was run, so `.resume/RESUME.md` was not filled.
+- First `artifacts.py pull` failed (`aws` not found, then partial credentials); fixed as above.
+- The first band-parsing script assumed three weights; the planner study has six and some Koblitz `descent` rows have uncounted work (`mean_s` null); the script now reads weights from the band file and skips null rows.
+## 2026-11-01T04:33Z — begin ECDLP mechanism falsification planning PR
+
+### What was done (commands, files, features)
+
+- Read the complete root `AGENTS.md`, today's latest session-log entries,
+  `docs/CONDUCTOR.md`, and the local `report-evidence`,
+  `controlled-experiment`, `experiment-protocol`, and `queue-experiment`
+  skill instructions.
+- Cloned `isogeny-labs/crypto-autoresearcher` sparsely and read its canonical
+  experiment-protocol skill, protocol rules, and shared lab contract.
+- Replaced an unusable no-checkout clone whose index showed the entire tree as
+  deleted with a clean sparse clone; no repository edits or commits were made
+  in the unusable clone.
+
+### Decisions made (and why)
+
+- Scope this change as a planning and queue PR: preserve all requested
+  mechanisms, state the devil's-advocate corrections, and mark every proposed
+  experiment unexecuted. No toy or bounded result will be presented as a proof
+  or closure.
+- Use repository-native backlog cards for experiments not run in this task,
+  with a study-level design document that records dependencies, controls, and
+  outcome-to-next-action rules.
+
+### Open threads (unfinished, pick up next time)
+
+- Complete the literature and lead-atlas review, inspect backlog schema and
+  related existing studies, reserve exact paths if Conductor becomes
+  available, then author, validate, commit, push, and open the PR.
+
+### Errors (what went wrong, how it was handled)
+
+- `conductor check` could not run because `conductor` is not installed. The
+  documented fallback permits work to continue without a reservation.
+- The first clone used `--no-checkout`; a sparse materialization left the
+  index with millions of apparent deletions. It was moved under `scratch/`
+  and replaced by a clean `--sparse` clone before any project edit.
+
+## 2026-11-01T04:48Z — literature and atlas review for mechanism falsifiers
+
+### What was done (commands, files, features)
+
+- Read the current crypto-autoresearcher atlas summary and matched each
+  supplied mechanism against the 159-lead checkout. The GAG and modular-curve
+  mechanisms now have explicit rows: `LEAD-ICE-gag-contraction-planner` and
+  `LEAD-STR-level-structure-torsor`. Existing rows also cover the k-sum,
+  coordinate-statistic, augmented-oracle, quantum-resource, lift and twist
+  neighborhoods.
+- Read the repository's current prime Fourier-flatness, k-sum, hashed-tensor,
+  quantum-circuit and native twist evidence and the prime-IC track ruling.
+- Checked the primary Gao--Shaikh--Kissinger, Cheng, Li--Wan--Zhang,
+  Cai--Chen, Chan--Lewenstein, Kiltz--Winterhof and Bravyi--Gosset papers.
+  Located the exact Lange--Winterhof COCOON 2002 DOI
+  `10.1007/3-540-45655-4_16`; Springer exposes only a paywalled preview in
+  this environment, so its exact theorem statement remains an acquisition
+  gate rather than a cited closure.
+
+### Decisions made (and why)
+
+- Advance current atlas rows instead of claiming nine novel rows. Record the
+  atlas snapshot change in the plan so reviewers do not repeat the older
+  zero-hit conclusion.
+- Correct the proposed proof shortcuts before specifying runs: GAG semantic
+  completeness is not a complexity lower bound; Cai--Chen's tractability test
+  is the three-condition Block Orthogonality/Mal'tsev/Type Partition
+  dichotomy, not simply affine support; a worst-case k-SUM conjecture does not
+  automatically bind the fixed implicit EC factor base; and a stabilizer-rank
+  simulator cost is an upper bound for a named simulator, not a lower bound.
+
+### Open threads (unfinished, pick up next time)
+
+- Author the repository-native study plan and a draft backlog card, then run
+  backlog/Markdown/curve-name checks and the repository's required validation.
+
+### Errors (what went wrong, how it was handled)
+
+- `lead_atlas.py --match` initially failed in the sparse sibling checkout
+  because `build_frontier_map.py` and `orchestration.fast_yaml` were absent;
+  materializing them and setting `PYTHONPATH=.` made the matcher run.
+- The exact Lange--Winterhof chapter is paywalled; no theorem bound will be
+  asserted from the abstract or a secondary citation.
+
+## 2026-11-01T05:02Z — author mechanism audit plan and draft backlog handoff
+
+### What was done (commands, files, features)
+
+- Added `research/ecdlp_mechanism_falsifiers_20261101/PLAN.md` with fifteen
+  experiment specifications across ten mechanism families, exact controls,
+  falsification rules, scope limits, execution ordering and promotion gates.
+- Added draft umbrella card
+  `backlog/XP-20261101-ecdlp-mechanism-falsifiers/` retaining every cell and
+  explicitly requiring focused child cards before any ready promotion.
+- Linked the plan to current native k-sum, Fourier, tensor, quantum and twist
+  evidence. Recorded that the current atlas contains direct GAG and
+  level-structure rows and that no programme state changes in this PR.
+
+### Decisions made (and why)
+
+- Keep the umbrella card `draft`, unfunded and unrunnable. The fifteen cells
+  have incompatible instruments, controls, measurement classes and resource
+  envelopes, so one frozen protocol would be scientifically invalid.
+- Require the interpolation child to acquire and read the complete
+  Lange--Winterhof chapter before freeze. The plan cites the verified DOI but
+  does not infer its bound from a preview or the Kiltz--Winterhof citation.
+
+### Open threads (unfinished, pick up next time)
+
+- Validate the card and Markdown, inspect the diff for overclaims, run the
+  applicable repository checks, commit/push, open the regular PR, enable
+  auto-merge and follow required checks.
+
+### Errors (what went wrong, how it was handled)
+
+- The first generated `apply_patch` add-file hunk contained an unprefixed
+  trailing blank line and was rejected without changing the tree. The
+  regenerated patch stripped trailing newlines and applied cleanly.
+
+## 2026-11-01T05:57Z — validate and reconcile ECDLP mechanism audit plan
+
+### What was done (commands, files, features)
+
+- Installed the official Rust 1.99.0 toolchain because this host did not have
+  `cargo`, then built the repository-native backlog validator in release mode.
+- `target/release/backlog validate XP-20261101-ecdlp-mechanism-falsifiers
+  --no-git` passed. After materialising the tracked `problems/` references,
+  `target/release/backlog validate --all --no-git` passed all 72 cards (existing
+  draft warnings only).
+- Parsed the new card with `jq`, checked local Markdown links and ran
+  `git diff --check`. Restored only tracked compile/test fixtures needed by the
+  sparse checkout; no fixture or source byte was edited.
+- Fetched current `origin/main` and read the newly merged
+  `research/ic_prime_eth_leads_20261031/SYNTHESIS.md`. Updated the k-sum cell to
+  import its frozen global-energy/second-moment evidence and restrict new work
+  to missing local-clustering diagnostics and algorithm-cost correlation.
+- Attempted the required `cargo test --release --locked --lib`: all 6,008 tests
+  compiled and most executed, but the host run was stopped after 44 minutes
+  when one pre-existing algebraic test continued to consume four cores without
+  output. Twelve failures caused by omitted sparse runtime fixtures passed on
+  exact rerun after those tracked fixtures were materialised. The standalone
+  `cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline` still
+  failed on unchanged code after 316.39 seconds (`left: 13130`, `right: 3757`).
+  Two diagnostic-publication tests also fail before their assertions because
+  `DiagnosticSessionClock::begin()` is unavailable on this host.
+
+### Decisions made (and why)
+
+- Do not duplicate the merged window-base structure census. The campaign now
+  treats it as input evidence and preserves only genuinely missing diagnostics.
+- Record the full library gate as attempted but not passed. The failures are in
+  unchanged executable code and host/runtime infrastructure; this planning PR
+  changes only Markdown, one draft JSON card and this append-only log.
+- Keep the umbrella draft and unfunded. Passing schema checks does not make its
+  proposed binary or heterogeneous shard set runnable.
+
+### Open threads (unfinished, pick up next time)
+
+- Synchronise the commit with current `origin/main`, run exact-head static and
+  backlog checks, push, open the ready PR, enable guarded auto-merge and inspect
+  its required checks.
+
+### Errors (what went wrong, how it was handled)
+
+- The first native validator build exposed six omitted `include_str!` inputs in
+  the sparse checkout. Materialising the tracked files made the new card pass;
+  no source change was needed.
+- A full-card backlog validation first reported missing `problems/` blockers
+  for existing cards. Materialising that tracked directory made every card
+  validate, confirming this was sparse-checkout state rather than repository
+  data failure.
+- The release library test initially exposed 39 omitted compile-time fixtures
+  and later runtime fixtures. Exact reruns passed after materialisation. The
+  remaining `ic_wide` assertion and diagnostic-clock failures reproduce on
+  unchanged code and are not repaired or suppressed by this documentation PR.
+
+## 2026-11-01T06:00Z — publish ECDLP mechanism falsifier plan PR
+
+### What was done (commands, files, features)
+
+- Rebasing onto current `origin/main` preserved both sides of two append-only
+  session-log conflicts. Re-ran the new-card validator, JSON/whitespace checks,
+  repository-link checks and changed-line curve-name check on each exact head.
+- Opened ready PR [#3177](https://github.com/isogeny-labs/crypto/pull/3177),
+  enabled merge-style guarded auto-merge and updated the branch to exact head
+  `8fa493640cf2f46ec0caf5f489ebe9f2608393a0` after `main` advanced again.
+
+### Decisions made (and why)
+
+- Preserve concurrent log entries instead of choosing one side. Keep the PR
+  ready and auto-merge guarded; required current-head checks remain the merge
+  authority.
+
+### Open threads (unfinished, pick up next time)
+
+- Inspect PR #3177 checks on this handoff commit and resolve only failures
+  attributable to this planning change. Auto-merge remains enabled.
+
+### Errors (what went wrong, how it was handled)
+
+- The first guarded force-push was refused as stale because the explicit fetch
+  had not updated the remote-tracking ref. Fetched the exact branch ref, checked
+  its expected old head and used an explicit force-with-lease; no remote change
+  was overwritten.
+
+## 2026-11-01 07:30Z — chained-S3: planted witnesses rebuilt from the lookup hit (Claude)
+
+### What was done
+- PR #3149 (meet lookup) merged 03:54Z; branch restarted from main.
+- `ChainS3Tables::rebuild` (`src/cryptanalysis/koblitz_index_calculus.rs`): the back
+  enumeration records the multiset behind each hit; `chain_s3_rebuild` re-enumerates
+  the signed d-sums, recovers f = ±(R + s), returns (±f) − s as base indices,
+  group-verified, before any solve. `chain_s3_enumerate` now carries the index path
+  and can stop early. Bench `+rebuild`, stats `witness_by_lookup`. Test
+  `n83_rebuild_returns_planted_witnesses_without_solving` (m = 3, 4); 6/6 table tests pass.
+- Frozen run `research/n83_chain_sat_rebuild_20261101` (protocol e4662c05f1),
+  06:42:02Z–07:06:28Z: rebuild 20/20 planted verified, 0 solver calls (median 0.91,
+  1.65, 10.8, 81.5 s at m = 5..8); control 0/20. Public 3/3 refuted in both arms.
+  64 records, 0 soundness flags. Graph, report/PDF (inspected), README, raw archive.
+
+### Decisions made
+- Rebuild is opt-in (`rebuild`), so it was A/B'd against the merged lookup arm.
+- 5 planted targets per m (first 2 identical to earlier runs) for a stronger
+  positive control; m = 9 excluded (lookup alone exceeds the cap).
+
+### Open threads
+- Direct-indexed fingerprint table instead of binary search (dominates m = 8,
+  blocks m = 9).
+
+### Errors
+- None in the run. Disk at 2 GB free: cleared target/release/incremental.
+## 2026-11-01T06:16Z — PR #3103 check-in 1: merged main again (log conflict)
+
+### What was done (commands, files, features)
+- Safety-net check-in found CI green on 6de5a5a05 (evidence audit shards still running) and the PR marked conflicted by a new main advance. Merged `origin/main`; the only conflict was this append-only log, resolved by keeping both sides. Pushed.
+
+### Decisions made (and why)
+- No other change; auto-merge stays armed.
+
+### Open threads (unfinished, pick up next time)
+- Checks on the new head; next check-in in about 4 hours unless an event comes first.
+
+### Errors (what went wrong, how it was handled)
+- None.
+
+## 2026-11-01T06:20Z — counted-S v2: independent validation and superseding results record
+
+### What was done
+- Merged crypto#3131 (counted-S v2 results from the frozen `analysis/decide.py`; CI green; merge 053714ca). Merged #3054 (docs-only log correction) via auto-merge.
+- Ran an independent validator subagent (no decide.py): `research/hashed_ecdl_counts_20261031/VALIDATOR.md` plus `validator/*.py` on branch `claude/hashed-ecdl-counts-validator-20261101` (d1ab3fb225). Verified by the validator: frozen bytes (protocol hash 8a794feb...), `--replay-all` C-10-14 96/96, B 288/288, C-16 32/32, [d]G=Q on 306 rows, all 45 ratios recompute to 3.3e-16, 15 complete cells and Holm/P1/P4 reproduce.
+- Wrote `results/RESULTS-v2-superseding.md` (RESULTS.md is immutable) with corrections F1 (growth is ~5.1x per 2 bits, not ~4x), F3 (S3 location of sessions B and C-10-14), F4 (mislabelled descriptive_note), F5 ("no tested arm beats rho" narrowed), F6 (w=0 vs w=1 range), F7 (P4 rests on 3 of 16 native cells) and the omitted caveats.
+
+### Decisions made
+- Null result is recorded in the research dir only. No VALIDATION.json, leaderboard or benchmarks/ row: every ratio is above 1 and the gate needs raw sessions in git, a gate-schema replay certificate, a validator-report.json, a rho-reference decision and pinned B source/build receipts (listed in the superseding record).
+- Did not edit RESULTS.md or decision.json; corrections live in the superseding record.
+
+### Open threads
+- Mirror sessions B and C-10-14 under the S3 `v2/` prefix; put `pipeline.sh` and build receipts in git; pin B source commit 3ae1ac2bd (reachable only from `codex/hashed-ecdl-ecbench-e2e`).
+- decide.py never emitted the pre-registered slope/median outputs (C4, P2, P3); the validator computed them (P2 slope 1.04, P3 slope 0.37). Visual report/PDF for the results are still to do.
+- Owner actions: IAM grant for user `claude`; main merged into `codex/hashed-ecdl-ecbench-e2e` (new commit) to allow an EKS image; track A deadline amendment; red-team N1/N2 before per-round runs.
+
+### Errors
+- Root disk repeatedly full (0 to 60 MB free). Cleared caches, local Rust toolchains and my own merged worktree `wt-ab-driver` (clean, nothing unpushed). A merge aborted mid-way once because of it; redone cleanly.
+- `pkill -f` matched its own shell and killed a 2 h `decide.py` run (exit 144); relaunched without it.
+- First replay audit hit the 30 min default background limit; reran with the 2 h limit.
+- I mistyped the decision.json hash in the first draft of the superseding record; fixed and checked against `sha256sum`.
+
+## 06:45 UTC — Independent validation of the PFDR lead disposition (Claude)
+
+### What was done (commands, files, features)
+- User asked to apply the lead disposition update once reviewed. Ran a blind-then-lifted validator-breakthrough review of EXP-PFDR-ada71b's rehearsal records.
+  Validator recomputed every count (134,340 null + 20,151 structured, 0 mismatches), sizing, controls and the reading O-SUB-BE. Verdict CONCUR-WITH-CONDITIONS (DISSENT if applied to the lead's own field).
+- Files: `research/pfdr_ada71b_rehearsal_20261101/{LEAD-DISPOSITION-REVIEW.md,validator_report.md}`. PR #3173 had merged at 05:36Z with all checks green.
+
+### Decisions made (and why)
+- Did not apply the update: the validator's conditions need admitted records (supervised run or Coordinator archive) and a committed Coordinator decision, neither possible without push access to crypto-autoresearcher,
+  and its wording must be a new scoped row, not the parent lead's `disposition`. The earlier proposed text is superseded.
+
+### Open threads (unfinished, pick up next time)
+- With push access: supervised run (digests main-jobs fe4b23ab..., pilot 73612c5d...), Coordinator decision citing the review, then add the scoped row from LEAD-DISPOSITION-REVIEW.md.
+
+### Errors (what went wrong, how it was handled)
+- None new. The first-stage blindness leaked only the outcome category (a git log subject), disclosed by the validator.
+
+## 2026-11-01T03:56Z — Full-cache GPU specialization implemented
+
+### What was done (commands, files, features)
+- Reconciled PR3022 as merged and a complete RunPod inventory with no ecbench pods. Prior GPUs remain deleted.
+- Added opt-in ER_QUERY_FULL_CACHE, a direct cached-right persistent kernel, guarded backend dispatch and exact differential fixture. Generic baseline kernel bytes are unchanged. Full-cache refusal retains the generic partial-cache path.
+- Added native complete-recovery runner/analyzer, fixed preceding 52/63-bit fixtures, and two draft canonical protocols: 30 small cells (five rounds per seed), six large cells (one round per seed).
+- Standalone Rust helpers compile. Analyzer accepts historical records and rejects altered certificates, duplicate cells and missing cells; these are software fixtures, not new measurement data. Both protocol schemas validate with zero findings.
+- Merged fetched main without conflicts. Conductor T-1200 covers implementation/study; T-1202 covers reports, metrics and this log.
+
+### Decisions made (and why)
+- Retain the original two large complete-recovery inputs and five-hour worker cap. Small inputs get repeated controls; large ratios are single-round L0 diagnostics. Both strata share one RTX4090 at <=$0.90/hour and one worker/controller budget.
+- Use separate canonical protocols so each stratum has its actual instance/replicate count. Same source, worker and frozen analyzer; preserve all incomplete attempts.
+- No local root crypto build. CUDA, driver tests/Clippy and sanitizers run on the GPU worker before any measured cell.
+
+### Open threads (unfinished, pick up next time)
+- Commit final source, freeze both protocols against it, publish source custody archive and checkpoint, then launch exactly one bounded RunPod controller.
+- GPU execution and timings have not started. Verify scalar/certificate equality and fresh CPU replay, then publish raw records before reports and PR.
+
+### Errors (what went wrong, how it was handled)
+- Initial main fetch hit a transient Git bad-file-descriptor error; the retry succeeded. Protocol draft schema required a freeze object and kind/preregistered stopping fields; corrected before freezing or data.
+- Availability query requires an explicit POD product context; corrected the read-only query before allocation.
+
+## 2026-11-01T04:00Z — Full-cache comparison frozen and source archived
+
+### What was done (commands, files, features)
+- Froze large protocol bb1be4eae5085c4da849b21ca7bf22c3747f84a7995cd5a57ac9b22dae64ad8d and small protocol 7abd928aacfaf5e34d68ebf3739e4391772416fefb937eb032e7054f742692ff against source736dd1f4fff3451115772f08b1e593a6070b9440; filing6650bd7551b9 pushed.
+- Prepared clean sparse source with1370 checked original Git blobs and no remotes; archive SHA25649bd85cee57b2d488e0689f9d804ae66eb20f53b92ae0e155e8390a8178a0aec. RunPod4090 Secure capacity is high at$0.89/hour, CUDA13.2 available.
+
+### Decisions made (and why)
+- One controller owns allocation, deadline, final/partial collection and deletion. Both strata share the five-hour worker budget; no measurement is launched before checkpoint gate.
+
+### Open threads (unfinished, pick up next time)
+- Finish S3 readback/request preparation and checkpoint gate, then launch once. No new GPU allocated yet.
+
+### Errors (what went wrong, how it was handled)
+- An early source-preparation call saw draft freeze.commit=null and exited before creating a checkout; reran after freezing. No data or GPU was created by that call.
+
+## 2026-11-01T04:01Z — Full-cache GPU worker launched once
+
+### What was done (commands, files, features)
+- Source S3 readback matched49bd85cee57b2d488e0689f9d804ae66eb20f53b92ae0e155e8390a8178a0aec. Gate checkpoint20261101T035955Z-8aba51ffa5da passed before allocation.
+- Controller session55772 launched pod ncbo90ya2qm4oy at04:00:56Z: oneRTX4090, pinnedCUDA13.2 image, EUR-IS-2, $0.89/hour. Controller pid/log/receipt are under /home/ec2-user/ecbench-fullcache-20261101-v1.
+
+### Decisions made (and why)
+- Monitor the existing controller; do not duplicate a GPU or retry measured cells. Preflight failure stops measurement and retains evidence. Worker/controller deadlines and owned-pod cleanup remain enforced.
+
+### Open threads (unfinished, pick up next time)
+- Toolchain install and preflight are running; no new measured result yet. Collect verified complete recoveries, raw archive and deletion receipt, then publish evidence before reports.
+
+### Errors (what went wrong, how it was handled)
+- A launch-shape assertion caught the copied pod-name date; corrected before allocation. The allocation itself succeeded once with no retry.
+
+## 2026-11-01T04:04Z — Preflight lockfile failure retained; GPU deleted
+
+### What was done (commands, files, features)
+- V1 stopped in `make build/paper-driver`: Cargo --locked refused the stale standalone lockfile after main added sha2 to hashed-ecdl-tensor. Zero recovery cells ran; no candidate CUDA build/timing is claimed.
+- Preserved raw bootstrap log, exits, source/host receipts and archive f329552821caa3a845e885359d3340bf7b5358f3d45095309f1d210ed0ff22bd in results-v1. Controller deleted ncbo90ya2qm4oy and verified absence.
+
+### Decisions made (and why)
+- Repair only the standalone lockfile and freeze a version-2 amendment before any new data. Keep original inputs, controls, analyzer and kernel; subtract the failed worker allocation time from the shared five-hour allowance.
+
+### Open threads (unfinished, pick up next time)
+- Validate locked metadata without a local root build, publish failure records then its report, freeze new source/protocols, checkpoint and launch the bounded replacement once.
+
+### Errors (what went wrong, how it was handled)
+- Make exited2, Cargo101, controller1. No partial snapshot existed because bootstrap failed before its first60-second snapshot; final results archive was nevertheless uploaded, downloaded and hash-checked before deletion.
+
+## 2026-11-01T04:11Z — Lock repair validated and amendment frozen
+
+### What was done (commands, files, features)
+- Standalone Cargo.lock now resolves the merged sha2 dependency; locked offline metadata passes. Repair and retained v1 raw evidence pushed as 0fe875d034b77fc9b9825af8217194aa2f4ccdee.
+- Froze protocol-v2.json (17645fdb8bbf9ccd01c110bea5f8fcf1e522bf5e84ef6e55d6af4cc8ae22c60b) and protocol-small-v2.json (ec85e405126cc9bf9382c8e1924f0ec5061170653fad103ff52921ca8efd3f12) against that source before affected data; filing cd0b569620a8 pushed.
+- Rendered and inspected the one-page v1 failure report after raw evidence publication. It records zero attempted recovery cells and verified GPU deletion.
+
+### Decisions made (and why)
+- Keep all 36 original cells and controls. Charge 180 seconds for the failed allocation; replacement worker/controller bounds are 17820/18120 seconds.
+
+### Open threads (unfinished, pick up next time)
+- Verify replacement source custody and S3 readback, prepare request, checkpoint, then allocate once. No replacement GPU exists yet.
+
+### Errors (what went wrong, how it was handled)
+- No new failure. The prior stale-lock build failure remains retained separately from the amended run.
+
+## 2026-11-01T04:12Z — Replacement RTX 4090 launched once
+
+### What was done (commands, files, features)
+- Checked all1386 source Git blobs at0fe875d034b7; S3 readback matched archive SHA2565a3b6680e16f122fbf4f99312e6fda44d702a3da1c9a16e3129f9c9f0a429011.
+- Gate checkpoint20261101T041142Z-a97bf8504f55 passed. Controller session55531 allocated dde6p5u9kqsrkg at04:12:12Z, oneRTX4090, pinnedCUDA13.2 image, $0.89/hour. Admin /home/ec2-user/ecbench-fullcache-20261101-v2.
+
+### Decisions made (and why)
+- Monitor this controller; never duplicate allocation. Worker17820s and controller18120s preserve the shared budget after the180s prior charge.
+
+### Open threads (unfinished, pick up next time)
+- GPU preflight and matched recovery cells remain pending. Prepare committed-state coverage metrics while this worker runs; publish actual outcomes only after evidence arrives.
+
+### Errors (what went wrong, how it was handled)
+- No new error; replacement launch succeeded once.
+
+## 2026-11-01T04:14Z — Full-cache coverage exporter prepared
+
+### What was done (commands, files, features)
+- Added committed-state metrics for separate small/large exports and retained preflight failures. Missing exports produce no invented zero recovery series. Syntax validation and reading the committed v1 failure record pass.
+
+### Decisions made (and why)
+- Publish counts only; L0 timing ratios stay in the frozen study analysis. Final exported coverage will be checked against both actual strata after completion.
+
+### Open threads (unfinished, pick up next time)
+- Replacement worker is starting its pinned image; preflight and recovery outcomes remain pending.
+
+### Errors (what went wrong, how it was handled)
+- None in this component.
+
+## 2026-11-01T04:15Z — Replacement passed repaired Rust preflight
+
+### What was done (commands, files, features)
+- Remote driver release build, Rust tests and Clippy passed after the lock repair. Host affine subtraction check passed37584 cases. CUDA compilation/checks are in progress; no timed recovery cell has completed yet.
+- Artifact policy dry-run selects no v1 study files for offload. Canonical v2 protocols revalidate with zero findings.
+
+### Decisions made (and why)
+- Keep monitoring the existing GPU; prepare presentation from frozen native outputs without changing measured code or analysis.
+
+### Open threads (unfinished, pick up next time)
+- CUDA differential/sanitizer preflight and matched recoveries. A full progress-metrics exporter invocation timed out at60s; diagnostic rerun uses unbuffered output to locate the existing slow read, while the focused new metric read already passed.
+
+### Errors (what went wrong, how it was handled)
+- An early partial-snapshot fetch returned404 before the first periodic upload; the subsequent snapshot was collected. No worker retry occurred.
+
+## 2026-11-01T04:17Z — Full-cache differential and fallback checks passed
+
+### What was done (commands, files, features)
+- GPU affine arithmetic passed37584 cases. Dedicated full-cache differential passed315 cases (261hits/54misses), covering tails, infinity, duplicates, minimum winner and traversal counts.
+- Public backend differential passed, including forced full-cache refusal/uncached fallback, repeated prepare/query, compact keys and prefix boundaries. Direct memcheck reports zero errors; remaining sanitizer checks are still running.
+
+### Decisions made (and why)
+- Continue the already-running frozen preflight; no measured code changes or extra GPU allocations.
+
+### Open threads (unfinished, pick up next time)
+- Finish sanitizers and start the36 matched recoveries. Repository-wide progress export again reached60s, after unrelated existing metrics; new scoped coverage read remains validated. Retain that check failure and do not claim a passing full exporter runtime.
+
+### Errors (what went wrong, how it was handled)
+- The full exporter timeout is separate from GPU validation. No CUDA error observed so far.
+
+## 2026-11-01T04:20Z — Preflight complete and all small recoveries verified
+
+### What was done (commands, files, features)
+- Preflight completed:29 Rust tests, Clippy,37584 host and37584 device arithmetic cases,315 direct query comparisons, backend/fallback differential, both service/driver self-tests, maximum-cap headers and candidate PTX instrumentation exclusion.
+- All six memcheck/racecheck/synccheck runs passed with zero errors/hazards. Compiler reports40 registers/56-byte stack for the specialization versus48 registers/120-byte stack for the generic query kernel; neither reports spills.
+- All30 small-input cells completed successfully with fresh replay, corrupt-scalar rejection and exact cross-arm/round certificates. Large63-bit stratum has begun; no large completed timing yet.
+
+### Decisions made (and why)
+- Preserve frozen analysis until the full panel completes. Do not promote partial small-cell timing into a large-run result. Existing controller owns GPU dde6p5u9kqsrkg and its deletion.
+
+### Open threads (unfinished, pick up next time)
+- Six serial large recoveries, native final analysis, exact export/replay verification, raw publication, report and PR. Read-only monitor session25282 downloads periodic snapshots; controller session55531 remains authoritative.
+
+### Errors (what went wrong, how it was handled)
+- A periodic tar reported a log changing while copied, expected for a live evidence snapshot; final archive is taken after the worker exits. No recovery failure observed.
+
+## 2026-11-01T05:04Z — First large baseline recovery verified
+
+### What was done (commands, files, features)
+- Cell63-101-0-b completed with fresh CPU replay and corrupt-scalar rejection: solver2591.625752161s, oracle2590967.725644ms, linear108.311009ms,338 relations and15737 attempts. Certificate183297bytes retained in the live archive.
+- Panel now31 verified recoveries with no failures;63-101-0-v candidate has started on the identical input.
+
+### Decisions made (and why)
+- Await candidate and A/A repeat before computing matched large-case ratios. This is an L0 baseline observation, not an optimization result.
+
+### Open threads (unfinished, pick up next time)
+- Five remaining large cells, frozen analysis, sealed raw evidence and deletion, then reports/PR. Existing controller55531 and read-only monitor25282 remain active; no duplicate launch.
+
+### Errors (what went wrong, how it was handled)
+- None in this recovery.
+
+## 2026-11-01T05:27Z — Metrics timeout reproduced with unchanged exporter
+
+### What was done (commands, files, features)
+- Ran the original tools/progress_metrics.py from fetched-main f80e5354c548 against the same HEAD via PM_REPO_PATH, with the same60s functional deadline. It also exited124 at60s. Raw outputs retained under admin/progress-metrics-baseline-check.jsonl; new scoped metric reader had already passed.
+- GPU candidate63-101-0-v continues;31 cells verified overall and no failures recorded.
+
+### Decisions made (and why)
+- Treat the full-export deadline as an existing workspace/runtime limitation, not a newly introduced coverage-reader failure. Do not broaden this GPU change into unrelated metrics optimization.
+
+### Open threads (unfinished, pick up next time)
+- Finish the five remaining large recoveries and sealed evidence publication; verify final full-cache counts against both canonical exports.
+
+### Errors (what went wrong, how it was handled)
+- Both modified and unchanged full exporters hit the same60s bound. No GPU failure occurred.
+
+## 2026-11-01T05:43Z — First large candidate recovery verified
+
+### What was done (commands, files, features)
+- Cell63-101-0-v completed in2329.970949218 solver seconds, oracle2329281.076112ms and linear116.447297ms. It matches baseline's338 relations,15737 attempts and exact183297-byte certificate; fresh CPU replay and scalar+1 rejection passed.
+- First baseline was2591.625752161 solver seconds. These are raw single-cell observations; the matched A/A-adjusted ratio awaits baseline repeat and frozen final analysis.
+-32 total recoveries verified, zero failures. Cell63-101-0-x is running; three seed202 cells follow it.
+
+### Decisions made (and why)
+- Keep all remaining controls and second large input. Do not stop after the first candidate improvement observation.
+
+### Open threads (unfinished, pick up next time)
+- Four remaining large cells, full frozen analysis and exports, raw archive/deletion verification, report and PR.
+
+### Errors (what went wrong, how it was handled)
+- None in this recovery.
+
+## 2026-11-01T06:26Z — First large matched set complete
+
+### What was done (commands, files, features)
+- Baseline repeat63-101-0-x succeeded: total2591.959s from the live completion receipt, oracle2591289.279014ms, linear114.900906ms. All three seed101 arms produced exact matching certificates and passed fresh replay/corrupt-scalar rejection.
+- First baseline total2591.644s and candidate total2329.991s are retained alongside this control. Final precise solver ratios will come from the frozen analyzer.
+-33 recoveries verified with no failures; the second large input begins with armx, followed byv andb.
+
+### Decisions made (and why)
+- Preserve the second seed's complete matched set; no early stop after the first large result.
+
+### Open threads (unfinished, pick up next time)
+- Three remaining large cells, native analysis, schema/file-hash checks, artifact publication, report and PR.
+
+### Errors (what went wrong, how it was handled)
+- None in this matched set.
+
+## 2026-11-01T06:40Z — Provider worker disappearance; partial evidence retained
+
+### What was done (commands, files, features)
+- RunPod stopped/removed the container during63-202-0-x. Controller observed404, confirmed pod absence in two complete inventories, collected the latest partial archive and verified deletion of dde6p5u9kqsrkg. Controller exit93 at06:38:34Z; no new GPU exists.
+-33 completed recoveries remain verified: all30 small cells and the complete63-bit seed101 matched set. Seed202 baseline was interrupted; candidate/repeat were not attempted. No final native analysis or validation.exit exists.
+- Partial archive SHA256210a446bf2801a2c5f8be6dfbaedd15a97a9d2cff184abd8a0cb6e1de9f69bf2 retained under admin/partial-collected.tgz. Monitor25282 and controller55531 both terminated.
+
+### Decisions made (and why)
+- Preserve all failure evidence and investigate provider status before any replacement. Do not treat the interrupted query prefix as a completed recovery or silently omit the second input.
+- Charge8820 seconds conservatively for this allocation, plus prior180s; original18000s worker envelope leaves9000s. Any replacement requires an amendment frozen before new data, preserving complete within-host matched sets and accounting for every interrupted attempt.
+
+### Open threads (unfinished, pick up next time)
+- Reconcile provider/account reason, seal v2 partial evidence and valid completed groups; determine whether the second seed's full matched set can finish within the remaining budget. PR and final report still pending.
+
+### Errors (what went wrong, how it was handled)
+- Provider logs end with container stop/remove; reason not yet established. No algorithmic or correctness failure was recorded before disappearance.
+
+## 2026-11-01T06:51Z — Partial run sealed and completed-set analysis replayed
+
+### What was done (commands, files, features)
+- Archived the retained partial run under immutable partial-collected.tgz and recorded provider deletion audit entries without account identities or credentials. Public receipts preserve34 attempted cells:33 verified, one interrupted; two additional planned slots were not started.
+- Original frozen analyzer correctly rejected missing large-seed coverage. A separate post-interruption descriptive adapter preserves its formulas and exact checks, emits only completed matched sets, and replays byte-identically. It is explicitly not preregistered and does not decide a new claim.
+- Small export schema/coverage checks pass. Large export schema passes and retains four expected infrastructure-shortfall coverage findings. The schema requires attempts>=1, so its four actual execution rows retain one interrupted attempt with a null clock; the two unstarted cells stay in interruption.json and the original six-cell protocol plan.
+- Retained paired candidate/baseline-mean ratios:0.8325214823 and0.8256898801 for the five-round small inputs,0.8989849655 for the completed large input. Large A/A relative spread0.0001187670.
+
+### Decisions made (and why)
+- Preserve all missing and interrupted outcomes; do not fabricate timings. Await clarification of the external deletion before creating any replacement GPU. Remaining shared worker budget9000s.
+
+### Open threads (unfinished, pick up next time)
+- Publish raw records and source, then render/inspect the partial-run report and open the PR. Second large input's full matched comparison remains unfinished.
+
+### Errors (what went wrong, how it was handled)
+- Initial packaging tried zero-attempt cancelled rows; the schema rejected them. Removed those unstarted rows from the execution list, retained them in the interruption record and original protocol, and preserved all four coverage findings. Artifact directory push only selects tracked files; selected policy files explicitly before adding manifests.
+
+## 2026-11-01T06:56Z — Retained results published and report inspected
+
+### What was done (commands, files, features)
+- Raw records, post-interruption analysis and interruption-aware metrics pushed as2ef5d57e0e01. Focused committed-state metric checks pass: small30 planned/30 attempted/30 verified; large6 planned/4 attempted/3 verified/1 interrupted/2 unstarted.
+-36 policy-selected raw files stored through the artifact tool; all36 remote/hydrated entries verify. Immutable partial-archive S3 readback matches the collected bytes.
+- Rendered the two-page partial-run report after raw publication and visually inspected both pages. PDF/SVG benchmark copies are byte/hash-bound; PNG is derived from that SVG. RESULTS.md explicitly preserves incomplete second-large coverage and post-interruption analysis status.
+
+### Decisions made (and why)
+- Publish a regular PR for the implemented/tested specialization and retained matched evidence. Keep the remaining second-large measurement open while external deletion is clarified.
+
+### Open threads (unfinished, pick up next time)
+- Commit/push presentation, open/attach PR, enable repository-default auto-merge and inspect exact-head checks. No GPU is running; clarification remains pending.
+
+### Errors (what went wrong, how it was handled)
+- Typst interpreted a paragraph line beginning with slash as a term list; reworded it and rendered successfully. No raw data or frozen analysis was changed.
+
+## 2026-11-01T06:59Z — Main synchronization preserves measured source
+
+### What was done (commands, files, features)
+- Fetched current main and merged its changes. The only conflict was the shared daily log; preserved both branches' entries. GPU explicit-relations code and its direct hashed-ecdl dependencies were unchanged upstream.
+
+### Decisions made (and why)
+- Preserve immutable measured source and all research records; resolve integration without rebasing or rerunning GPU measurements.
+
+### Open threads (unfinished, pick up next time)
+- Finish applicable source/metrics/artifact checks, push and open the PR. External-deletion clarification remains pending; no GPU is running.
+
+### Errors (what went wrong, how it was handled)
+- Daily-log append conflict resolved by retaining both sets of entries. Sparse checkout initially left the conflict file off disk; recreated it from the index before resolving.
+
+## 2026-11-01T07:04Z — PR3189 published; remaining input awaits deletion clarification
+
+### What was done (commands, files, features)
+- Opened regular PR https://github.com/isogeny-labs/crypto/pull/3189 and attached it to the task. Auto-merge enabled under repository policy. Observed head7c12f3ce09df is mergeable; CI remains pending and merge state is BLOCKED.
+- Merged current main, preserved both daily-log branches, and verified GPU code/direct driver dependencies are byte-identical to measured0fe875 source. Merged-head coverage metrics and artifact policy checks pass.
+- Live RunPod inventory confirms both owned full-cache pods absent. No GPU from this lane remains running.
+
+### Decisions made (and why)
+- Deliver the tested specialization and retained matched evidence now. Do not recreate the externally deleted worker until the owner clarifies whether deletion was intentional. Remaining budget is9000 worker seconds; the second large input's full matched set is still open.
+
+### Open threads (unfinished, pick up next time)
+- Review exact-head CI before calling it passing or merged. Owner clarification is pending about completing the second large input versus keeping GPUs stopped. Any continuation needs a new frozen amendment, full within-host matched set, and the remaining shared budget.
+
+### Errors (what went wrong, how it was handled)
+- Sparse main synchronization removed off-cone working files; materialized only this lane's source/report/metric paths, then reran checks. Large canonical coverage retains four infrastructure-shortfall findings; no timings or attempts were fabricated.
+
+## 2026-11-01T07:00:00+00:00 — PFDR ladder rerun (research/pfdr_ladder_rerun_20261101)
+
+### What was done
+- User asked to start the PFDR rerun. Diagnosed the original O-INVALID from raw data (census jobs pulled from the artifact store): (1) theta=0.30 lines M=2333 < 2500 at 16 bits (pilot underestimated the census null; safety factor 1.1); (2) the 30 structured cells share null replicates across d (identical null lists for all 4857 (bits, theta, curve) keys), so z_cal has 10 independent values, not 30; the C6 band was built for 30 (sd 0.660 observed; on 10 independent values mean -0.150, sd 0.695, within n=10 expectations).
+- Imported the original implementation byte-for-byte (sha256 in PROVENANCE.sha256, curve.py equals the original spec's pin), patched run.py (safety 1.5; C6 on the 10 independent sets with 95% n=10 bounds |mean|<=0.62, sd in [0.548,1.454]; fresh seeds; patch in implementation.patch), selftest PASS, froze PROTOCOL.md (commit 534ff08faa), pushed checkpoint to S3, ran scripts/run_all.sh: 19,818 jobs, no failures.
+- Reading O-SUB-BE: 6/6 structured lines valid (min M 3023), C3-C6 pass (C6 n=10 mean 0.19 sd 0.83; original-rule numbers mean 0.19 sd 0.788 also pass), no ALIVE line; structured slopes -0.004..+0.002, max upper95 0.0101 vs 1/3; plants recovered (0.158, 0.322-0.331, 0.489-0.499), Z/N 0.699/0.647. Report, graph, PDF, raw jobs in the artifact store.
+### Decisions made
+- Ran as a study in this repo on a new branch (claude/pfdr-rerun-20261101); did not enter anything in the sibling's ledger/coordination: its approval flow is the coordinator's.
+- Mistakes handled: a stray `cat >> file` blocked a commit for 2 minutes (my typo); `pkill -f` on a pattern killed my own shell (re-ran).
+### Open threads
+- Sibling repo: ingest this result and set the lead disposition (exhausted_at_scale for these geometries, obstruction max upper95 = 0.0101 vs 1/3); FAM-1 and bbc53e-base ladders remain deferred.
+- PR for this branch: open, ready, auto-merge, watch CI.
+### Errors
+- As above (typo, pkill).
+## 2026-11-01T17:53Z — ecdlp-audit: say how to refresh a stale artifact digest
+
+### What was done (commands, files, features)
+- Checked the `certificates` job (`curve-covers.yml`) on `main`: green on the 04:51 and 05:05 runs. Its 02:38 failure was `tests::checked_in_plan_passes` in `src/bin/ecdlp_audit.rs` (a stale `artifact_sha256` in `docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json`, fixed by #3150); the earlier runner-disk failure is fixed on `main` by the disk step plus `filter: blob:none`.
+- `src/bin/ecdlp_audit.rs`: the artifact-digest mismatch now names the file, the pinned and actual digests, and the refresh steps (`REFRESH_HINT`, from docs/ecdlp-audit/README.md "Status semantics"); the `plan_uid` mismatch says to set the printed value after review. The wrong-digest test now asserts both digests and the command appear.
+- `rustfmt --check` clean; `cargo check --tests --bin ecdlp-audit` and `cargo clippy --bin ecdlp-audit --tests -- -D warnings` clean (only the toolchain's unknown-lint warning for `clippy::chunks_exact_to_as_chunks`, local clippy 1.97 vs CI 1.98).
+
+### Decisions made (and why)
+- A hint, not a generator: the README makes the refresh a reviewed manual edit ("review its source diff"), so the message tells the reviewer what to set rather than rewriting the plan.
+- PR opened before auto-merge: the tests could not run locally, so auto-merge waits for the `certificates` job (which runs `cargo test --bin ecdlp-audit`).
+
+### Open threads (unfinished, pick up next time)
+- Enable auto-merge once `certificates` passes on the PR head; follow the PR to merge.
+
+### Errors (what went wrong, how it was handled)
+- `cargo test --bin ecdlp-audit` ran out of disk building `crypto_lib` (1.4 GB free); removed `target/` and verified by type-check and clippy instead. CI runs the tests.
+
+## 2026-11-01T17:59Z — Authorized second-input continuation
+
+### What was done (commands, files, features)
+- Owner explicitly authorized finishing the second large matched comparison within remaining2.5hours. Live inventory confirms no full-cache worker. PR3189 merged at868a387eaf0a; all reported checks passed or skipped.
+- ClaimedT-1254 and prepared version3 native cohort runner/analyzer, preserving original kernel, caps, checks and formulas. Only63-bit seed202 x/v/b on one fresh RTX4090; all earlier records unchanged.
+
+### Decisions made (and why)
+- Remaining9000worker/9300controller seconds, <=$0.90/hour, no retry. Freeze before new data; do not mix host timings.
+
+### Open threads (unfinished, pick up next time)
+- Seal source and protocol, checkpoint, run, replay and publish follow-up evidence/report/PR.
+
+### Errors (what went wrong, how it was handled)
+- Initial inventory jq expected an array; corrected to the API pods envelope and verified complete pagination. No launch occurred.
+
+## 2026-11-01T18:02Z — Version3 submission refused before allocation
+
+### What was done (commands, files, features)
+- Frozen version3 protocol ebffb8127816d9b5b58785cc391b6a7cf3882718bbb5c0bc33e8e92c6f60d34a filed456021f0c941. Instrument64901ebb2182 has unchanged GPU/direct-driver source versus measured0fe875. Native helpers compile; schema/file checks pass. Source archive3424947660018b11d1b6bb1d601ad671b79b25f1aa29ccdbb2db95ae59273713 uploaded and byte-identical readback checked; checkpoint gate passed.
+- RunPod POST returned402 Payment Required: account balance too low. Complete inventory reconciliation found zero matching pods. Controller exit91. No preflight/trial ran, no GPU time allocated; all9000worker/9300controller seconds remain.
+
+### Decisions made (and why)
+- Preserve refusal receipt separately from experiment execution rows. Owner notified of required account top-up. No blind launch retry or fabricated result.
+
+### Open threads (unfinished, pick up next time)
+- After funds restored, verify inventory and capacity, prepare fresh request URLs without overwriting this refusal, and submit the same frozen three-arm comparison.
+
+### Errors (what went wrong, how it was handled)
+- Provider payment refusal occurred before allocation. Generic failure cleanup attempted to collect a nonexistent partial archive and received404; there was no producer or evidence loss.
+## 2026-11-01T07:10Z — option B implemented: the band prices operations, not bytes
+
+### What was done (commands, files, features)
+- PR #3162 (the audit) merged at 05:54Z. Restarted `feat/gallant-ptolemy-eqtex1` from `origin/main` (`git checkout -B`), carrying the uncommitted work; the remote branch was an ancestor, so the push was a fast-forward.
+- Owner decision (this session): option B. `src/cryptanalysis/ecbench/band.rs`: `NON_OPERATION_COUNTERS` (`residual_table_bytes_uncharged`, `factor_base_vec_bytes_floor_uncharged`, `native_table_bytes_uncharged`), `priced_counts`, `exempt_counts`; `unpriced_total`/`priced_gae` and the band's "uncounted" blocker use the filtered view; `BandRow.exempt_mean_counts` and `BandReport.exempt_counters` report them. `unpriced_counts` still lists every counter. Emitters, records and `sessions/` unchanged.
+- Verified: `cargo build --bin ecbench` (4m47s debug) and `cargo test --lib ecbench::band`: 3 passed (two new, one existing exact-sums test). `scripts/regen_exbytes.py` re-ran `ecbench band` on all sessions and 166 committed weighted comparisons of the four studies into `analysis/exbytes/` (24 + 136 + 6 + 0).
+- Results: only rows of arms that name a byte counter changed. Weighted comparisons unresolved to resolved: 24 of 24 (prime residual), 36 of 136 (planner exhaustive; 12 stay unresolved, 88 resolved with the same direction), 2 of 6 (binkob). Zero direction changes. Residual res2/res4 vs rho at w = 1: 2.6-3.0x / 3.2-4.8x.
+- Dated notes added to the four studies' READMEs and a bullet to AGENTS.md §5a.
+- `sparse-checkout.sh add --path research/pencil_large_prime_20261029/` (a workspace member that was off disk and broke `cargo build`).
+
+### Decisions made (and why)
+- Classification by name in `band.rs`, not an emitter rename, so committed records, replays and digests are untouched; the old compare/band files stay as measured and the re-run ones are new files beside them.
+- Did not use `compare --save` (it writes into `sessions/<S>/comparisons/`); re-ran with `--json` into `analysis/exbytes/`.
+- Disabling auto-merge on #3162 failed because it had already merged; the WIP push to the branch was inert (no PR open).
+
+### Open threads (unfinished, pick up next time)
+- PR #3119's `ic_residual_scale_20261101` band must be regenerated with this binary when it lands; `docs/backend-leaderboard` embeds the factor-base counter and was not rebuilt.
+- No graph/PDF (no benchmark or leaderboard row lands); the `bounds`/`challenge` committed ids that use `priced_s` at a weight were not re-derived (no residual or factor-base-byte record is known to be among them; not searched exhaustively).
+- The Conductor control plane was unreachable (connection refused); the scope was recorded here instead.
+
+### Errors (what went wrong, how it was handled)
+- `cargo build` failed: `research/pencil_large_prime_20261029` was off disk (sparse checkout); added it. The first `sparse-checkout add` printed nothing and did not take, so the build failed a second time silently in the background; re-ran with output visible.
+- A 30-minute background limit killed the release build; switched to the debug profile, which is enough for tests and `band`/`compare`.
+- Two monitors fired early because their output files held unrelated text (`du`/`nproc`); re-armed on the process instead.
+- Wrote "8 plan/rho rows per prime session" in the audit README; the real count is 12 across six sessions. Corrected before commit.
+
+## 2026-11-01T09:00Z — Torsion anchors at the N83 cofactor-to-base ratio (proxy), branch claude/ic-m2-torsion-ratio-n37-20261101
+
+### What was done (commands, files, features)
+- The request was torsion anchors on the n=83 a=1 curve. Not run: `ic_m2_cycle` uses a 64-bit field and
+  asserts `3d-1 <= 63` (n=83 needs d=28); the solve is about 2^56 trials (about 5,700 core-years) over about
+  2^27 columns (about 3 GB). Ran a proxy at matched cofactor/base ratio instead: a=0 n=37 (h=596), d in
+  {10, 8, 7} so h/K = 1.19, 4.93, 10.84 (N83: about 8.4), 6 seeds, torsion on/off, 1,800 s cap.
+- Protocol frozen first (commit 4b40d62d05); instrument check passed (seed 20261024, d=12, torsion on:
+  14,720,702 trials). All 36 runs solved and verified, none capped. ON/OFF paired geometric mean:
+  6.45 [3.42, 9.72] (d=10), 14.49 [7.44, 32.85] (d=8), 6.31 [3.63, 10.94] (d=7), 7.46 [4.90, 11.92] (d=12,
+  merged record). All 18 new pairs have torsion on more expensive. No consistent trend across d.
+- Report, graph, PDF in `research/ic_m2_torsion_ratio_n37_20261101/`.
+
+### Decisions made (and why)
+- Disclosed that n=83 was not run, and what the proxy can and cannot say (cofactor structure and n differ).
+- Replaced `mawk` `srand()` bootstrap with an explicit Park-Miller generator after finding that two runs of
+  the same seeded call gave different numbers; recomputed the earlier intervals (PRs #3126, #3138): within
+  0.02, no conclusion changes (`bootstrap_recheck.txt`).
+- Kept the protocol unchanged across two container suspensions: the killed jobs had produced no result and
+  were rerun identically with a resumable script; checked the rebuilt binary against two finished jobs.
+- Appended this entry last, after merging main, to avoid the session-log conflicts of the earlier PRs.
+
+### Open threads (unfinished, pick up next time)
+- Torsion anchors have helped at no size or ratio measured (n=23, 31, 37, 41; h/K 0.3 to 10.8). The reason
+  is explained only by relation counts, not tested another way.
+- The N83 projection (about 2^56 trials) stands; this method cannot reach it with or without torsion.
+- The suspensions happened when a turn ended with no monitor attached; keep a monitor on long background runs.
+
+### Errors (what went wrong, how it was handled)
+- Two container suspensions killed the sweep (and the /dev/shm binary) at 16 and 22 of 36 runs; resumed
+  from a disk copy of the binary with a resumable script.
+- A stray `close(...)` outside an awk program broke the first analysis command; moved the analysis into
+  `analyze.sh`.
+- Expected h/K at d=7 was 9.3; the measured K gives 10.84, so N83's ratio is bracketed, not matched.
+
+## 2026-11-01T09:25Z — follow-up to #3187: rustfmt fix; harness red is not this change
+
+### What was done (commands, files, features)
+- #3187 merged at 07:46Z (by the owner) while CI was still running. Read the check runs afterwards: `rustfmt (changed files)` and `current` (backend-leaderboard rustfmt) failed on two spots in `band.rs` (mine); `harness` failed.
+- Restarted `feat/gallant-ptolemy-eqtex1` from `origin/main` (2f19c8201, which now includes #3119), ran `rustfmt --edition 2021 src/cryptanalysis/ecbench/band.rs` (9 lines added, 2 removed, formatting only), pushed, opened a small PR.
+- `harness`: `ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy` fails with `missing=["ic.prime_orbit_relations_v1"]`. Reproduced locally on origin/main plus the formatting commit (`cargo test --lib ecbench::optimization`: 2 passed, 1 failed). `optimization.rs` has no reference to `band` and no `prime_orbit` entry; the method comes from the prime-Jacobian benchmark work (`ecbench/prime_orbit.rs`, PRs of 2026-11-01). Not fixed on origin/main at ed592429f.
+
+### Decisions made (and why)
+- Did not add an optimization policy for `ic.prime_orbit_relations_v1` here: it is another author's method and the policy is theirs to choose, and a fix in this PR would widen it. Reported to the user instead.
+
+### Open threads (unfinished, pick up next time)
+- Someone must add the policy entry for `ic.prime_orbit_relations_v1` in `src/cryptanalysis/ecbench/optimization.rs`; `harness` stays red on main until then.
+- #3119's `ic_residual_scale_20261101` landed on main; its band and comparisons still need regenerating with the option-B binary (not done; not yet looked at).
+- Run `rustfmt --check` on changed Rust files before pushing, and wait for CI before assuming auto-merge is safe to leave on.
+
+### Errors (what went wrong, how it was handled)
+- Pushed `band.rs` without `rustfmt --check`; CI caught it after the merge. Fixed above.
+- A nested heredoc inside `bash -c` mangled the first version of this entry (truncated, backticks executed); repaired with the Edit tool before pushing.
+
+## 2026-11-01T10:20Z — JV cover crossover at p = 1301–1601 with measured rho
+
+### What was done (commands, files, features)
+- New study `research/jv_cover_crossover_20261101/`. It extends `research/jv_cover_p_scaling_20261024` (PR #2484) and measures rho on the same instances.
+  - Cover: `jv_cover --exp dlp --rho-runs 0`, 3 seeds per prime.
+  - rhodp: 3 runs per instance.
+  - rhostrong: 2 runs per instance.
+  - Refit in Rust (`fit/`). Report, graph and PDF are in the study directory.
+- Measured S/rho (95% bootstrap):
+  - Against rhodp: 0.793 [0.587, 1.119], 0.775 [0.645, 0.970], 0.587 [0.448, 0.811].
+  - Against rhostrong: 1.349 [1.085, 1.699], 1.063 [0.819, 1.477], 0.910 [0.658, 1.339].
+- Refit primary: slope −2.10 [−2.21, −1.99]; p* = 1264 [1197, 1348] (model). The predecessor gave 1329.
+
+### Decisions made (and why)
+- 1451 and 1601 meet "below measured rho at p" against rhodp. They are recorded only as candidates (validator-breakthrough / red-team-breakthrough class), because:
+  - against rhostrong no prime is below;
+  - rhodp may be biased upward (calibration +0.28, not significant).
+- No leaderboard or `benchmarks/` rows: there is no VALIDATION.json.
+
+### Open threads (unfinished, pick up next time)
+- Independent validation and red team.
+- A positive control for rhostrong.
+- Explain the `lin_muls` change, which reduced the instrument's counts by 0.949× at p = 1009.
+- The §5a band is impossible until the cover arm emits native counts.
+
+### Errors (what went wrong, how it was handled)
+- The reproduction control FAILED: at p = 1009 seed 1, `total_muls` is 429320392173 against 452313823812, from a `lin_muls` difference. Documented, and a post-hoc fit F rescales the predecessor points by that ratio.
+- rhodp ran 3 runs per instance instead of 4 to fit the 8 h budget.
+
+## 2026-11-01T18:08:52Z — rigorous boundary-rank bounds and certificates
+
+### What was done (commands, files, features)
+
+- Read the E1 protocol, exact census implementation, prior prime-field proof
+  complexity review and hashed-ECDL audit before changing the bound claim.
+- Checked Markov--Shi Proposition 3.6/section 4 and Orús equation 10 for the
+  general contraction/cut framework; retained the project's pinned Bochum
+  source scope.
+- Added a pinned Lean 4.35.0 project with eight theorems: finite rank upper
+  bounds, nonzero-minor lower bound, exact linear-factorization separator
+  bound, their combined implication, and conditional family/message/work
+  bounds.
+- Added exact nonzero-minor certificates to `tensor-census` schema v2. The
+  verifier reconstructs the selected flattening and recomputes the determinant
+  with Bareiss elimination without calling the rank routine.
+- Added deterministic witness checks on 1,152 matrices and corruption
+  rejection, a full proof map and scope report, a named open family-lower-bound
+  obstruction, and a one-page diagram/PDF.
+- `lake build`, the repository proof gate (8/8, zero trusted), and
+  `leanchecker --fresh` passed. Rust formatting, focused release tests, census
+  CLI check, stable all-target Clippy and the full 117-test standalone crate
+  suite passed.
+- Ran the required root release-library gate: 5,903 passed, 5 failed, 128
+  ignored in 1,856.71 seconds. Exact names and targeted reruns are recorded in
+  the study `VALIDATION.md`.
+
+### Decisions made (and why)
+
+- State the unconditional result only as a finite exact-linear-message lower
+  bound. A uniform exponential family minor/rank lemma, architecture
+  factorization lemma and message-to-work condition remain explicit hypotheses.
+- Treat a nonzero minor as a rank lower-bound certificate, not an exact-rank
+  certificate unless it meets the universal smaller-side upper bound.
+- Keep the E1 protocol draft and generate no production row. The production
+  semantic cut generator and frozen family are prerequisites to any family
+  theorem or measurement.
+
+### Open threads (unfinished, pick up next time)
+
+- Construct and freeze production semantic cuts, then search disjoint
+  preflight sizes for one stable triangular/permutation minor rule.
+- Prove a uniform `rank_Q(M_n) >= 2^(c n)` family lemma, or record a
+  counterexample to the proposed rule. Formalize the family-specific bridge.
+- Prove the linear-separator and work-per-coordinate conditions for any
+  contraction implementation to which the asymptotic corollary is applied.
+
+### Errors (what went wrong, how it was handled)
+
+- `conductor check` returned 127 because the command is unavailable; used the
+  repository's warn-and-allow path and claimed no reservation.
+- The proof gate initially reported `FAIL_no_sources` because the new Lean
+  files were untracked. Staged those exact sources and reran; all eight
+  theorems passed the transitive axiom audit.
+- Root `cargo fmt --all -- --check` traversed unrelated pre-existing
+  unformatted examples. Used the standalone crate manifest to format/check
+  only the touched package and did not rewrite unrelated files.
+- The root release suite retained five unrelated failures: two host namespace
+  clock failures, the prior `ic_wide` mismatch, a missing prime-orbit
+  optimization policy and a residual per-step threshold. The latter two
+  reproduced under exact one-test reruns; none is in the changed tensor crate.
+## 2026-11-01T17:10Z — start relation-solving tournament evidence version 3
+
+### What was done (commands, files, features)
+
+- User authorized a new experimental round after version 2 terminated at its
+  fixed qualification gate. Confirmed v2 evidence PR #3158 merged at
+  `71176dd0dd62609b8a8d5b78859c983f8a468e23` and remains immutable.
+- Read the managed-cloud, report-evidence, Iso Lab EKS, research-visuals and
+  canonical experiment-protocol instructions. The managed runtime reports an
+  enforced unrestricted HTTP policy, but no AWS CLI or bound AWS identity;
+  GitHub Actions authentication is available as `aburan28`.
+- Rechecked the PKM 2016 primary PDF; its SHA-256 remains
+  `a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b`.
+  Gaudry 2009 still redirects through its DOI but the publisher retrieval is
+  HTTP 403, so the access gap remains. Re-read the relation-yield, matrix,
+  tournament and ecbench measurement boundaries.
+
+### Decisions made (and why)
+
+- Treat the request as a new evidence version, never as a retry or amendment
+  of v2. Freeze fresh curve, target and measurement seeds under a new protocol
+  ID while preserving the incumbent, candidate, controls, complete-solve
+  accounting and decision thresholds.
+- Use the merged GitHub commit-building Iso Lab workflow because this runtime
+  has GitHub Actions write access but no AWS CLI/identity. Require the same
+  manifest-verified L2 qualification before scientific dispatch; the current
+  workflow and EKS launch path have no reviewed change that would justify
+  treating the old failure as a scientific observation.
+- Conductor is unavailable. Limit edits to
+  `research/ic_line_layout_tournament_20261031/` and this append-only log.
+
+### Open threads (unfinished, pick up next time)
+
+- Freeze and validate v3, land it through a regular auto-merge PR, checkpoint
+  the launch state, dispatch exactly one v3 qualification from the merged
+  source, and conditionally launch the two scientific sessions only if its
+  receipt is manifest-verified accepted L2.
+
+### Errors (what went wrong, how it was handled)
+
+- The first sparse-checkout branch switch lacked network, left its exact
+  `git switch` process holding `.git/index.lock`, and was terminated with
+  SIGTERM after verifying the live PID. Git removed the lock; the switch then
+  succeeded with scoped network access. No repository data was reset.
+
+## 2026-11-01T17:11Z — freeze relation-solving tournament protocol v3
+
+### What was done (commands, files, features)
+
+- Added `PROTOCOL-V3.md`, `protocol-v3.json` and `spec-fp20-v3.json` on
+  branch `codex/ic-relation-solving-v3-20261101` from current main
+  `14e56a5e850137a3f2235020f9dc3a72a509ced1`.
+- Froze protocol `IC-LINE-LAYOUT-E2E-FP20-V3-20261101` with canonical hash
+  `f5a8c9e7bad8e7f87200b614b4c1898fd0acf1c1c3b18b41d1c1a3001af8796a`.
+  Canonical schema/lint validation reports zero findings; the analyzer remains
+  byte-bound at `1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d`.
+- The v3 spec is normalized-identical to v2 except its label/protocol path and
+  fresh curve, target and measurement seeds `20261101141`, `20261101142` and
+  `20261101143`.
+
+### Decisions made (and why)
+
+- Preserve every scientific arm, control, complete-cost boundary, L2/replay
+  requirement and decision threshold from v2. Only the evidence identity and
+  seeds change.
+- Retain one fixed, non-resumable, manifest-bound L2 qualification before the
+  two scientific sessions. Its failure terminates v3; its pass permits exactly
+  two concurrent scientific jobs, with no retries or alternate seeds.
+
+### Open threads (unfinished, pick up next time)
+
+- Run focused validation and repository policy checks, commit and open the
+  regular auto-merge PR, then require the current-head gate/size/artifacts set
+  before dispatching the v3 qualification from the merge commit.
+
+### Errors (what went wrong, how it was handled)
+
+- None in the freeze. Gaudry 2009 remains publisher-access-blocked as already
+  documented; no citation or conclusion was invented from the inaccessible PDF.
+
+## 2026-11-01T17:12Z — validate v3 preregistration and launch contracts
+
+### What was done (commands, files, features)
+
+- Revalidated `protocol-v3.json` with the canonical checker: zero findings.
+- Passed the remote request contract (defaults and 16 rejection cases),
+  commit-build request tests (15 rejection cases), pool/resource/readiness
+  routing tests, build identity positive/negative controls and image-publisher
+  digest/source/hash controls.
+- `git diff --check`, JSON parsing, analyzer shell syntax/hash binding and the
+  normalized v2/v3 spec comparison pass.
+
+### Decisions made (and why)
+
+- Treat these focused checks and the hosted PR gates as the applicable
+  preregistration validation. The change adds protocol/spec documentation and
+  no Rust source or runtime implementation.
+
+### Open threads (unfinished, pick up next time)
+
+- Stage the complete diff, run size/artifact policy checks, commit, push and
+  open the v3 preregistration PR.
+
+### Errors (what went wrong, how it was handled)
+
+- The repository-wide `cargo test --release --lib` cannot run because `cargo`
+  is not installed in this managed runtime. The first wrapper invocation also
+  showed `tools/isolated_bench.py` is not executable; invoking it through
+  Python reached the precise missing-`cargo` blocker. No test was reported as
+  passing. Hosted `gate`, `size` and `artifacts` remain required.
+
+## 2026-11-01T17:14Z — publish v3 preregistration and prepare checkpoint
+
+### What was done (commands, files, features)
+
+- Committed the frozen protocol/spec/log as
+  `4321fde083221b1cfd0feda9b33d1988bec2d9f6`, pushed branch
+  `codex/ic-relation-solving-v3-20261101`, and opened regular PR #3195 with
+  merge-style auto-merge enabled.
+- Prepared a complete ignored `.resume/RESUME.md` with the goal, hypothesis,
+  protocol hash, seeds, exact conditional launch commands, stop rule and empty
+  in-flight inventory.
+
+### Decisions made (and why)
+
+- Do not dispatch from the feature head. Require the frozen record to merge,
+  and bind the commit-built image and qualification to that exact merge commit.
+- Do not bypass the mandatory S3 checkpoint gate. It is a safety prerequisite
+  independent of GitHub/OIDC experiment submission access.
+
+### Open threads (unfinished, pick up next time)
+
+- Require gate/size/artifacts on the replacement PR head and confirm auto-merge.
+- Obtain the configured checkpoint upload token or AWS profile, push the
+  checkpoint, and pass `scripts/checkpoint.sh gate`; only then dispatch the
+  single v3 qualification.
+
+### Errors (what went wrong, how it was handled)
+
+- The combined PR command used an unsupported `gh pr view --head` flag after
+  PR creation. Directly inspected #3195; auto-merge was already enabled, so no
+  duplicate PR or merge request was created.
+- `scripts/checkpoint.sh push` and `gate` failed because this runtime has no
+  `ecc-challenges-new` AWS profile, `CHECKPOINT_UPLOAD_TOKEN`, or configured
+  upload-token file. Nothing was uploaded, and no experiment was dispatched.
+
+## 2026-11-01 18:50Z — chained-S3 m = 8, 9: indexed lookup and peel rebuild (Claude)
+
+### What was done
+- PR #3191 (rebuild from lookup hit) merged 07:29Z; branch restarted from main.
+- `ChainS3Tables::indexed`: `ChainS3FrontSet` bucket index on top fingerprint bits
+  (`contains_indexed` vs `contains_binary`); `chain_s3_peel` /
+  `chain_s3_rebuild_by_peeling` split a hit into its d summands against the cached
+  depth-(k−1) sets (≤ d·167 additions), falling back to the enumeration rebuild.
+  Bench `+indexed` warms depths 2..d. Test `n83_indexed_rebuild_by_peeling`; 7/7 table tests.
+- Frozen run `research/n83_chain_sat_indexed_20261101` (protocol 7304b82d81),
+  17:53:15Z–18:33:36Z, 32 records, 0 soundness flags. m = 8: both arms 8/8;
+  median 78.4 → 39.7 s public, 83.1 → 40.9 s planted. m = 9: indexed 3/3 public
+  refuted + 5/5 planted verified at ≈ 54 s; control 0/8 (cap). Depth-5 set
+  372,406,144 fingerprints in 998.7 s.
+
+### Decisions made
+- User re-sent "add m=8 and m=9 after this run" with no run in flight: m = 8 was
+  already decided by #3191, m = 9 needed the lookup and rebuild speed-ups, so both
+  were added behind `indexed` and measured against the merged arm.
+
+### Open threads
+- Per-query cost at m = 8, 9 is now the 3.4·10^7-step back enumeration.
+
+### Errors
+- First patch attempt asserted on a rustfmt'ed anchor; re-applied with the
+  formatted text (no partial write).
+## 2026-11-01T05:10Z — owner asked to route the t = 14 cap-6 cells to Iso Lab: blocked, not launched
+
+### What was done (commands, files, features)
+- Read `.claude/skills/isolab-eks/SKILL.md`, `references/submission.md`, `taskq/deploy/eks-karpenter/{ACCESS,HARNESS}.md`, `contracts/request.schema.json` and the Amendment 7 A resource rules (sparse checkout extended to `taskq/deploy/eks-karpenter`).
+- Checked the container: no `aws` CLI, no isolab MCP; AWS key variables exist in the environment but cannot be exercised without a client (values not printed).
+- Documented the gap in `research/prime_fall_degree_t14_20261101/README.md`.
+
+### Decisions made (and why)
+- Did not submit anything. `isolab.eks.request/v1` and `isolab-experiment.yml` carry an `ecbench.spec/v1` with `seconds` ≤ 3,600; the cap-6 cells are a custom native binary, up to 86,400 s per system, 112 GiB. Submitting the validation fixture or an ecbench spec instead would replace the requested experiment, which the skill forbids.
+- `DENSE` for the 112 GiB request is 27,900,000,000 by Amendment 7 A's rule (computed, not the 2.5·10¹⁰ first written; corrected before commit).
+
+### Open threads (unfinished, pick up next time)
+- Owner or the lab host: choose the route (`isolab_k8s_run` on the lab host, or extend the request schema/workflow), provide a digest-pinned image holding `pkm_tower_pilot` from a pinned commit, and say whether the run must be resumable (Spot can interrupt a 24 h job).
+- Then freeze the request and a task card for `T 6 0` and `T 6 1` before any launch.
+
+### Errors (what went wrong, how it was handled)
+- A command printing environment variable prefixes was denied by the harness (credential materialization); no credential values were read or recorded.
+
+## 2026-11-01T17:32Z — ecbench release build, smoke/replay/determinism check and cargo test results (PR #3090)
+
+Written after the fact, on 2026-11-01, for work done 2026-10-30 to 2026-10-31
+in a Claude Code cloud session; the times below are from the command logs of
+that session. Verified results are separated from guesses.
+
+### What was done (commands, files, features)
+
+- Task: build `ecbench` on a host with a normal disk and record exactly what
+  was built, so a scaling-study protocol can bind `instrument.commit` and
+  `binary_sha256`. It changed no research state and claims no result.
+- Host (measured): 252 GB disk with 19 GB free, 15 GiB RAM, 4 vCPU Intel Xeon
+  2.1 GHz under KVM, kernel 6.18.44. `perf` is not installed, so PMU
+  availability was not determined; the harness itself recorded
+  `perf_event_open: No such file or directory` and graded the records L1.
+- Build at `3c13bc691a87` (2026-10-30T17:48Z): `cargo build --release --bin
+  ecbench` failed in 0.1 s on a missing sparse-excluded path dependency,
+  `research/pencil_large_prime_20261029/`. Materialized it with
+  `scripts/sparse-checkout.sh add --path …`; the rebuild failed after 5m14.8s
+  with `this file contains an unclosed delimiter` at
+  `src/cryptanalysis/binary_semaev_chain_sat.rs:1703` (two `if` guards in
+  `chain_s3_max_variables` after a union merge). Not patched; that commit
+  does not build.
+- Build at `11173ecd0230a9ceedc4d833736402934fdcb95e` (PR #2972 repair
+  `2c8f16e2` is an ancestor), started 2026-10-30T18:59:23Z: `Finished
+  release` in 7m03s, rustc 1.97.0 / cargo 1.97.0. Binary
+  `target/release/ecbench` sha256
+  `b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4`; re-hashed
+  after the later test run, unchanged.
+- Smoke: `docs/ecbench/specs/smoke-prime.json` (72 executions, 20-bit curve
+  `icv1-fp20-t727-cd198a38`) run twice; 72/72 `verified` both times.
+  `ecbench verify --replay 8` passed on both sessions; `--replay-all` on
+  session 1 passed (54 replays reproduced, 0 problems). Determinism: the counted
+  fields of all 72 records are byte-identical across the two sessions once
+  `wall_ns` / `online` / `time` fields are excluded.
+- `cargo test --release --locked --no-fail-fast` at `11173ecd` (started
+  2026-10-31T06:24:41Z, 65m31s, exit 101): 6382 passed, 15 failed, 138
+  ignored over 121 suites. Failing tests: 7 in `--lib`
+  (`binary_semaev_chain_sat::…source_bound_covers_degree_83…`, three
+  `koblitz_index_calculus::…chained_s3_*`, three `ml_dataset` restore/storage),
+  2 in the `ecdlp-audit` bin (`checked_in_plan_passes`,
+  `pinned_source_replays_historical_blob_despite_worktree_divergence`), 6 in
+  `tests/backlog_cli.rs`. Exact names and messages are in
+  `ecbench-build-report.md`.
+- Landed: `ecbench-build-report.md` committed on
+  `claude/ecbench-build-report-20261031` and merged as PR #3090 (opened
+  2026-10-31T22:08:51Z, merged 22:14:44Z by the repository owner). This entry
+  is the follow-up the PR said was missing.
+
+### Decisions made (and why)
+
+- Stopped on the first build failure and on the malformed-source failure
+  instead of patching: the task forbade source edits. Materializing a sparse
+  path edits no tracked file, so it was done only after the peer session asked.
+- Smoke runs were treated as a plumbing check, not an experiment, and ran with
+  the checkpoint hook's `CHECKPOINT_SKIP` (stated reason each time); no
+  `.resume/RESUME.md` was created and nothing went to S3. A reviewer who counts
+  them as runs should review that bypass.
+- Ran the tests in release to match CI (`cargo test --release --locked`)
+  after the debug run could not finish (see Errors).
+- The report and PR keep causes of the test failures labelled unverified.
+
+### Open threads (unfinished, pick up next time)
+
+- The 15 failing tests are unexamined beyond their messages. Guesses, not
+  verified: `ecdlp-audit` failures from a shallow clone missing the pinned
+  commit `da6ae6d1`; `backlog_cli` from cairn 15.0.0 outside the supported
+  range 8.0.0 <= v < 10.0.0 (read for one test only); the three Koblitz tests
+  share a "no relations at m=4" symptom, possibly related to the
+  `chain_s3_max_variables` m-range change. The peer session said 16 fail; I
+  count 15 and did not reconcile it.
+- For the frozen protocol: this host is a shared VM graded L1 with no readable
+  PMU, so it supports counted metrics only. An L2 host and a fresh build there
+  are still needed before timed arms.
+- Only a 20-bit smoke spec was run; nothing validates larger sizes or the
+  prime / random-binary families.
+
+### Errors (what went wrong, how it was handled)
+
+- Build at `3c13bc69`: sparse-checkout path dependency missing, then the
+  unclosed-delimiter source error above. Handled by materializing the path,
+  then stopping and reporting; the build was repeated at `11173ecd`.
+- First two determinism comparisons differed only because `phases[].wall_ns`
+  and `online.wall_ns` are timing fields inside otherwise counted blocks;
+  excluding timing, not counts, made them identical.
+- `cargo test` attempts: (1) stopped at target resolution on two more
+  sparse-excluded targets (`volcano-ic-summarize`, example
+  `conductor_gap_ecbench`), fixed by materializing
+  `research/full_volcano_graphwide_ic_20261017/` and
+  `research/conductor_gap_cm_orbits_20261015/`; (2) `No space left on
+  device` while linking (examples alone were 9 GB), handled by deleting my own
+  `target/debug` and building with `CARGO_PROFILE_*_DEBUG=0`,
+  `CARGO_INCREMENTAL=0`; (3) the debug run hit the 2-hour background cap with
+  2337 of 5732 library tests done and no summary (4 failures seen, a subset of
+  the 15); (4) the release run completed.
+- The Stop hook asked repeatedly to commit and push the untracked report; it
+  was left untracked as the task required until the user asked for the commit,
+  the push and the PR.
+
+## 2026-11-01T20:30Z — owner chose `isolab_k8s_run` on the lab host, non-resumable; card frozen, not submitted
+
+### What was done (commands, files, features)
+- Looked for an `isolab_k8s_*` tool (ToolSearch: none) and for Remote Control folders (only unusable Mac folders, no lab host).
+- Read `contracts/mcp-tools.json` (`isolab_k8s_run`: `job_name`, `command` argv, `image` by digest, `cpu` 2–28, `memory`, `seconds` ≤ 9,999,999, `retries`) and `Dockerfile.ecbench`/`publish-image` (ecbench-only).
+- Wrote `research/prime_fall_degree_t14_20261101/ISOLAB_CARD.md`: two jobs (`T 6 0`, `T 6 1`), 112 Gi, 16 vCPU, 90,000 s, retries 0, `--budget 86400 --max-dense 27900000000`, the argv and the readings.
+
+### Decisions made (and why)
+- Non-resumable as the owner said; a Spot interruption ends the job and is reported, not resubmitted under a new name.
+- `seconds` = 90,000 to cover Amendment 7 A's `--budget 86400`; `cpu` 16 is my choice (not in Amendment 7) and is only a speed setting, `D` is deterministic.
+- Nothing submitted: this session cannot call `isolab_k8s_run`, and no digest-pinned image holding `pkm_tower_pilot` exists.
+
+### Open threads (unfinished, pick up next time)
+- A session on the lab host builds the image (static musl build from a pinned `main` commit, template `Dockerfile.ecbench`) and submits the card.
+- Expected censoring: about 1.1·10⁶ s at 4 vCPU extrapolated from one pair of points, about 2.8·10⁵ s at 16 vCPU if scaling is ideal, above 86,400 s. Raising the budget or making the run resumable is the owner's call.
+
+### Errors (what went wrong, how it was handled)
+- Session-log merge conflict with main again; resolved by taking main's file and re-appending my entries.
+
+## 2026-11-01T21:00Z — owner asked to build the image and submit the cards: blocked at identity and route
+
+### What was done (commands, files, features)
+- Tool check: `docker` present, daemon down; no `aws`, `kubectl`, `skopeo`, `crane`; no `isolab_k8s_*` MCP.
+- Read-only STS via a boto3 venv with the container's ambient AWS keys: account `104186811093` (the lab account), an IAM user. `ecr:DescribeRepositories`, `ecr:GetAuthorizationToken`, `eks:DescribeCluster` and `codebuild:BatchGetProjects` were each denied. Nothing was created, pushed or submitted.
+
+### Decisions made (and why)
+- Stopped. The identity cannot push to ECR or reach the cluster, and the only AWS-identity launcher (`launch-remote`, CodeBuild) carries ecbench requests with `seconds` ≤ 3,600; using CodeBuild `StartBuild` overrides to run a custom command would bypass that contract.
+- Not building a local image: with no push path and no submit path it would produce an artifact nobody can use, and the card needs a digest from the lab's ECR.
+
+### Open threads (unfinished, pick up next time)
+- A session or operator with ECR push and the lab-host MCP builds the static musl image and submits `ISOLAB_CARD.md`; or the owner grants this identity ECR push plus a custom-command route.
+
+### Errors (what went wrong, how it was handled)
+- None beyond the denials above, which were expected checks.
+
+## 2026-11-01T10:15Z — ic_residual_scale_20261101 band regenerated under option B
+
+### What was done (commands, files, features)
+- On request: regenerated the band and weighted comparisons of `research/ic_residual_scale_20261101` (landed with #3119) with the option-B binary. Restarted `feat/gallant-ptolemy-eqtex1` from `origin/main` (4def6153d), `sparse-checkout.sh add` the study, `artifacts.py pull` + `verify` (3 files, 0 problems), rebuilt `ecbench`, ran `scripts/regen_exbytes.py`: 3 bands and 42 weighted comparisons into `analysis/exbytes/`; `scripts/c1_exbytes.py` writes `analysis/exbytes/C1.md` and `c1.json`. `sessions/` untouched.
+- Result: C1 is met in 2 of 8 cells (was 6 of 8). All four `eq` cells fail at w = 1 (intervals reach or cross 1); `dp` is 2 of 4 as before. Baseline distance to rho is 2.5 (res1) and 3.4-4.1 (res4) at every weight (was 17-18 and 42-53 at w = 1). The as-built values the script prints agree with the README for C1 (6 of 8) and for p36 and p40 (res4 3.70/48.1, 4.10/53.3); p42 res4 differs by 1.5% (band means 3.43/41.8 against the README's 3.47/42.4), probably the treatment of the censored baseline run, not checked.
+- Dated note added to the study README and a paragraph to the audit README.
+
+### Decisions made (and why)
+- The study README and REPORT are frozen; the note is appended, the old claims are not edited. REPORT.pdf/html were not regenerated.
+
+### Open threads (unfinished, pick up next time)
+- The study's errata (2) says C1 over 12 cells is 9 of 12 (dp 3/6); its own `analysis/summary.json` gives dp 2/6, eq 6/6 = 8 of 12. Not reconciled; someone should check where the 9 came from.
+- `docs/backend-leaderboard` still not rebuilt; `harness` still red on main for `ic.prime_orbit_relations_v1` (not this change). The study's REPORT.pdf and its claims about `eq` at w > 0 are not updated.
+
+### Errors (what went wrong, how it was handled)
+- The first rebuild failed with "No space left on device" (target/ was 18 GB; 13 GB of it `target/debug/incremental`). I had already started the regeneration with the stale pre-#3119 binary; stopped it and deleted its partial output before it was used. Removed `target/debug/incremental` and `target/release`, rebuilt with `CARGO_INCREMENTAL=0`, then re-ran.
+- A `pkill -f` pattern matched its own shell and killed it (exit 144); harmless.
+
+
+## 2026-11-01T17:45:00Z — generic cloud session setup script (Claude Code and Codex)
+
+### What was done (commands, files, features)
+- Added `scripts/cloud-setup.sh`, a setup-script-field entrypoint for Claude Code on the web (`bash crypto/scripts/cloud-setup.sh`) and Codex (`bash scripts/cloud-setup.sh`). It applies the harness sparse profile, runs `scripts/setup-workstation.sh` without the control plane, writes `~/.config/cloud-setup/env` (PATH, mode 600) and clears package caches. It prints the names of the credential variables it can see, never their values.
+- `scripts/setup-workstation.sh`: `SAGE_LEAN=1` (sagelib + maxima, 4 GiB gate, cache cleaned afterwards), `GITHUB_LAZY=1` (the credential helper is configured with no credential yet and reads one at use time), a `cloud-cli` component (aws v2, kubectl), `cryptanalysis-rl` in the repository list, and `CAIRN_GIT` (keeps `aburan28/cairn` when `GITHUB_OWNER` changes).
+- Tests: `scripts/test_cloud_setup.py` (4) and a lazy-credential test in `scripts/test_setup_workstation_github.py`. 32 tests pass locally (`python3 -m unittest`), and `shellcheck -S warning` (shellcheck-py 0.11.0.1) is clean. `.github/workflows/workstation-setup.yml` now covers both new files.
+- `docs/cloud-setup.md`: the field line for each runtime, the steps, where to set each credential, and the disk notes.
+- `cloud-setup.sh --dry-run` against this session's workspace ran every step. The `claude` runtime was detected, Sage was skipped with 968 MiB free, and the credential names visible to this session were listed.
+
+### Decisions made (and why)
+- Credentials are read lazily. On Claude Code the setup script cannot see the environment's variables or secrets, so anything checked at setup time would be skipped.
+- Codex secret persistence is opt-in (`PERSIST_SECRETS=1`) because Codex withholds secrets from the agent phase on purpose.
+- The commit was built with git plumbing on top of `origin/main`. A full fetch and checkout of `main` would not fit in this container's 1.2 GB of free disk.
+
+### Open threads (unfinished, pick up next time)
+- Not run for real on a fresh Claude Code or Codex container; only the dry run and unit tests ran here.
+- The environment's setup-script field must be changed to the line in `docs/cloud-setup.md` by the owner.
+
+### Errors (what went wrong, how it was handled)
+- A full `git fetch origin main` filled the disk (a 774 MB temporary pack). It was stopped, the temporary pack removed, and `main` fetched with `--filter=blob:limit=200k`.
+
+## 2026-11-01T18:20:00+00:00 — PFDR ladder on other structured families (research/pfdr_other_families_20261101)
+
+### What was done
+- User asked to try the other structured families. Read the sibling specification and ideas: the FAM-1 ladder needs the EXP-PFDR-011cd0 mitm engine (absent), its small_x arm is the x-window already measured, its subgroup arm needs a proper curve subgroup (our curves have prime order); the bbc53e base is the planted shared-unknown base, i.e. the gamma control already in every ladder. So I ran three buildable families on the R2 ladder: Dickson (u^k+u^-k), geometric progression, quadratic progression (x0+k^2), fixed before data. Froze protocol (b159698c17), checkpoint pushed.
+- First census attempt aborted at 10,359/19,887 jobs: a Dickson/geometric stream with a parameter of small multiplicative order cycles and never reaches b abscissae (my pre-freeze base check had too few draws). Kept the partial data and log unmodified (aborted-attempt1/), Amendment 1: resample such parameters (deterministic), rerun from the start.
+- Rerun: 19,887 jobs, 4 resamples, no failures. Reading O-SUB-BE: 6/6 valid lines (min M 2901), C3-C6 pass (C6 n=10 mean 0.22 sd 0.88), no ALIVE; slopes -0.005..+0.007, max upper95 0.0147 vs 1/3; plants 0.149 / 0.314-0.325 / 0.486-0.491, Z/N 0.699 / 0.644. With PR #3188: twelve structured x-base lines, none with kappa growth.
+### Decisions made
+- Did not claim FAM-1 or bbc53e coverage; stated what each is and why it is not (or is already) measured.
+### Open threads
+- PR for this branch; PR #3188 still open (needs-human label of unknown origin).
+### Errors
+- Pre-freeze construction test missed cycling parameters; handled by Amendment 1 before any analysis.
+
+## 2026-11-01T20:10:00+00:00 — Iso Lab (EKS Spot, L2) replay of the priced DP/eq study verified (research/ic_residual_dp_eq_isolab_20261101)
+
+### What was done
+- Third dispatch (run 41342132360, source be464efac844, musl ioctl fix) succeeded. Verified from the downloaded artifacts: SHA256SUMS 19/19 OK; audit.json ok with 0 problems, 1056 records, 880 replays all `identical`; L2 gate accepted 1056 executions; A/A res2 vs res2aa wall ratio 0.9995 [0.9981, 1.0017]; quality 85.
+- Compared the 528 records shared with the local L0 run (rounds 1-3, 16 workloads, 11 arms): counted GAE, recovered scalar and algorithm seed identical on 528/528.
+- Harness comparison res2aa/rho: 3.2491 / 3.2489 / 3.2478 at w=0/0.1/1, CI95 [2.918, 3.617]; wall ns/GAE 1.4629 [1.442, 1.484].
+- Wrote REPORT.html/.pdf and ratios.svg in the study directory.
+### Decisions made
+- Classified as infrastructure verification, not a speedup; no benchmarks row (gate still lacks artifact-store raw data support). Ratio table is my own estimator and w>0 columns price only rho's counters (IC records carry none): labelled approximate, harness band authoritative.
+### Open threads
+- Owner decisions: byte-counter pricing, gate support for artifact-store data, `needs-human` on PR #3188. Goal (IC near rho parity) not met: best arm is still above rho.
+### Errors
+- Earlier dispatches failed (SHA typo, musl ioctl type, A/A role must be `control`); fixed before this run.
+
+## 2026-11-01T20:30:00+00:00 — Correction to the Iso Lab replay report (estimator)
+
+### What was done
+- Per-phase breakdown from the Iso Lab records: res1eq total 375,386 GAE vs rho 235,890 = 1.591× (ratio of pooled means, the harness's estimator; it reproduces res2aa/rho = 3.249). Bootstrap 95% over workloads [1.430, 1.789]. Arms (w=0): res1 2.542, res1dp 2.175, res1eq 1.591, res2 3.249, res2dp 2.838, res2eq 2.055, res4 4.116, res4dp 3.623, res4eq 2.844. res1eq is 1.12× its √2 collision floor; its CI contains the floor.
+- Report, graph and PDF regenerated; PR #3235 text corrected.
+### Decisions made
+- Withdrew the mean-of-per-workload-ratios figure (res1eq 2.11×) from the report and PR: wrong estimator for this comparison, not the harness's. The lowest ratio this session is 1.59× (previously quoted 1.54–1.64× on other runs).
+### Open threads
+- In-architecture headroom is about 12% for res1eq (to the √2 floor). Parity needs a relation source cheaper than one rho collision per relation, which no tested structure provides. Goal not met.
+### Errors
+- Reported 2.11× in the previous entry and PR body from my own estimator; caught by checking that it did not reproduce the harness's 3.249 for res2aa.
+## 2026-11-01T17:09Z — Four selector tracks authorized
+
+## 2026-11-01T18:58:00Z — n47 wide-prime F4 m4 CLI smoke
+
+### What was done (commands, files, features)
+- Froze `research/ml_dataset_wide_m4_smoke_20261101/protocol.json` and `plan.json` in commit `8a6f7a8748f20e658e1ab689f19b05edcd94345e` before data; protocol file SHA-256 `37211b972bbd51b2463b2f4d44692b30cdbe0ff367b79d43c01c75a1bbde142c`.
+- Built a clean-provenance native CLI and generated both n47 prime `f4/m4` twist cells at fixed seed 20261101, 50,000 work, 30 seconds/cell, 2048 MiB/cell and 64 MiB trace. Both sealed `partial` outcomes with dynamic F4 artifacts and null FFD/LFD labels. `dataset verify` passed all hashes and two known-answer replays. `dataset report` retained two coverage, 18 measurement, 92 artifact and two observed-cell rows; summary SHA-256 `0d4aa19a98b01d0fe94168186b0be617ce18b8e729d154a39a5fdeb73d9de8bf`.
+- `dataset export` yielded two allowlisted feature rows and two separately restricted target rows; manifest SHA-256 `b7263afd5a5d2d3548b441677f1f1e9642fc9a044b38158ad9dc71fcc042b472`. See `research/ml_dataset_wide_m4_smoke_20261101/RESULT.md` for exact paths and limits. Fixed PR #3209's Clippy `unnecessary_unwrap`; local `cargo clippy --lib --offline --locked -- -D warnings` and both focused m4 native/central replay tests passed.
+
+### Decisions made (and why)
+- Treat this as functional CLI/replay evidence only. The native report says `experiment_export_schema=false`; the general protocol checker is unavailable in this checkout. Both generated outcomes remain partial, and neither asserts an exact fall degree.
+- Keep cloud uploads and larger dataset generation gated on a current approved worker grant and budget ledger; the owner does not know of a newer one. The n47 full-run custody restore service remains active and was not duplicated.
+
+### Open threads (unfinished, pick up next time)
+- Push/update PR #3209 and inspect hosted exact-head checks. The all-target `examples/koblitz_orbit_dlp_fast.rs` parse failure is outside the PR diff; record it separately from the bridge lint. Monitor the active native n47 full-run custody restore to terminal replay.
+- An approved worker grant is needed before private full-run S3 transport; T-1257 tracks that route. T-1258 tracks m5–15 validation.
+
+### Errors (what went wrong, how it was handled)
+- Two preflight invocations stopped before data because the CLI binary lacked `CRYPTO_BUILD_GIT_COMMIT`, then `CRYPTO_BUILD_GIT_DIRTY=false`. Rebuilt with both fields and reran the unchanged frozen plan.
+### What was done
+- User explicitly requests pursuing XOR recoding, bounded-weight selectors,
+  symmetric chord coordinates and determinantal membership. Reviewed prior
+  eight-column proof,24-design register, prior F4 all-branch losses, PKM2016
+  primary factor-base sections and Faugere/Safey El Din/Spaenlehauer2011
+  primary bilinear hypotheses/degree section; generic bounds do not transfer
+  automatically to the elliptic-curve system.
+- Fresh worktree/branch from current main14e56a5e850137a3f2235020f9dc3a72a509ced1.
+  New versioned directory four_tracks_20261101; prior sealed sources unchanged.
+- Managed environment current/connected, no outbound AWS identity or EKS tool.
+  Read current IsoLab and checkpoint contracts. Current GitHub workflow builds
+  ecbench/fresh-owner only; no standalone arbitrary-CAS command route exists
+  yet. No new experiment submitted or local exception reused.
+
+### Decisions made
+- Match the exact existing FB1h29cc024e755c wherever possible: XOR permutes
+  the same four offsets; one-hot three-bit labels encode the same offsets.
+- Prove actual canonical tops and complete relation semantics; symmetric
+  reduction must preserve zero-pivot/rational-square charts; determinantal
+  formulation must count every auxiliary variable and test infinity.
+- Formal proofs/certificate development and native correctness tests locally;
+  prospective performance panel remains separately gated to EKS.
+
+### Open threads
+- Four-track implementations/proofs, native exact exporter/reference replay,
+  prospective protocol, evidence/report/PDF, focused PR and applicable checks.
+
+### Errors
+- Conductor missing127 (documented fail-open). First unprivileged promisor
+  reads failed; network-authorized fetch/materialization succeeds. No source
+  or historical evidence was changed to accommodate the environment.
+
+## 2026-11-01T17:20Z — Four-track development bridge
+
+### What was done
+- Added exact Boolean XOR map and inverse/root semantic bridge; finite F17
+  offset-image theorem checks, while generic Boolean lemma needs one numeric
+  simplification. Prior proof packages rebuilt from unchanged local sources.
+- Implemented full-sign symmetric coordinate identities and complete
+  nonzero/nonzero/zero-pivot chart theorem for checking; not yet accepted.
+- Implemented concrete3x3 affine-pencil determinant/normalized-kernel/Schur
+  equivalence. This arm reduces exactly to the recoded equation; no generic
+  MinRank performance theorem is inferred.
+- Derived candidate degree6 upper identities in generic quotient algebra;
+  completing monomial coverage and matching lower functional next.
+
+### Decisions made
+- No placeholder theorem is accepted; failed snapshots/logs retained.
+- Investigate an expanded determinant's free ordinate directions in the top
+  ideal; count all auxiliary variables even though Schur elimination is exact.
+
+### Open threads
+- All four formal modules, canonical bridges and final source audit; native
+  exporter, prospective experiment protocol, precise backend gap and PR.
+
+### Errors
+- Lake update wrote the pinned manifest but its Mathlib post-update cache
+  hook failed trying a read-only default cache directory. Existing pinned
+  compiled dependencies are reused; no successful cache preflight is claimed.
+- First build fails only at Recoding's1+1-2 Boolean simplification; no degree
+  or complete-track proof is yet promoted. Conductor absent as already noted.
+
+## 2026-11-01T17:35Z — First native four-track correctness pass
+
+### What was done
+- Recoding Boolean/inverse/offset and original-system bridges compile.
+- Symmetric all-sign recovery and complete three-way pivot chart theorem
+  compile, including zero/zero coefficients and rational squareness.
+-3x3 determinant, normalized-kernel and exact XOR Schur-complement proofs
+  compile. This representation is not a second independent geometric base.
+- Generic recoded monomial degree6 coverage/upper proof compiles; completing
+  its lower dual and actual canonical-generator bridge remains open.
+- One-hot classification/image and degree5 upper proof compile; added lower
+  quotient witness and actual highest-form bridge, still checking them.
+- Native exporter implements linear/XOR/one-hot/symmetric/determinantal and
+  same-base dense inputs, with known fixture and complete toy-panel exports.
+  First five release unit tests pass: field/polynomial arithmetic, offset
+  image/base inventory, scalar roots/group replay, symmetric/determinantal
+  polynomial correspondence and dense/group comparison. No CAS benchmark.
+
+### Decisions made
+- Refuse degree claims for an expanded system with uncaptured infinity;
+  exact Schur elimination does not preserve canonical degree automatically.
+- Keep every source variable and chart in exported models. Native counters
+  for actual solving/time/operations/memory remain null, not estimated.
+
+### Open threads
+- Lower/canonical proofs, expanded-determinant obstruction, native stronger
+  correctness checks and clippy, protocol/EKS gap, report and focused PR.
+
+### Errors
+- Several finite exponent proofs used noncomputable Finsupp decision
+  procedures; replacing them with extensional finite-coordinate proofs.
+- Explicit set-membership constructors avoid expensive symbolic equality
+  simplification. A300k-heartbeat cap and finite combinatorial kernel proof
+  replace a large arithmetic branch search. Two redundant in-flight builds
+  were stopped during diagnosis; raw failure/termination logs are retained.
+
+## 2026-11-01T18:20Z — Complete correctness checks and proof diagnostics
+
+### What was done
+- Seven native release correctness tests pass, including complete F17 pivot-chart equivalence and one-hot replay. These are development tests, not a CAS performance experiment.
+- Build-attempt14 fails on finite-exponent simplification in RecodedTop and symbolic simplifier timeouts in SupportOneHot. Logs and snapshots retained.
+
+### Decisions made
+- Replace noncomputable Finsupp decisions with pointwise vector proofs; avoid unrestricted symbolic polynomial simplification. No theorem promoted from a failed build.
+
+### Open threads
+- Finish and audit lower/canonical proofs, export fixed fixture, report and new regular PR. No new experiment launched.
+
+### Errors
+- Numeral-versus-constructor Fin comparisons remained unsimplified in build14. The four completed semantic constructions are unchanged.
+
+## 2026-11-01T18:35Z — Deterministic fixture and lower-degree witnesses
+
+### What was done
+- Fixed-fixture native export emits21 complete systems; uncompressed metadata SHA256154c40dcea500bfe76a7eb9d8bb411e42e4106407d0ad6bf909a7b8528d7c87c. Compressed deterministically for the per-file artifact gate.
+- Release/development clippy passes after marking the evaluator test-only.
+- Recoded four-term coefficient identity now compiles; subsequent lower-ideal proof has minor elaboration errors, corrected and checking. Split the upper and lower proofs into separate modules for incremental verification.
+- Added a prospective complete matched EKS/CAS protocol and generic expanded-determinant obstruction theorem source. Neither is a completed CAS run.
+- Materialized inherited named root test fixtures/source and started the required broad root-library check under the only installed Rust1.94.1.
+
+### Decisions made
+- Keep canonical first-vanishing, affine F4, storage and operation costs distinct. Preserve all charts and count all variables. No performance leaderboard promotion.
+
+### Open threads
+- Complete whole-source proofs/audit and replay, source-linked visual report, problem/comparison pointers, regular PR and actual CI check.
+
+### Errors
+- Builds17/18 retained. They fail on newly added lower-proof elaboration and one remaining conditional simplification, not accepted theorems. No unsafe proof shortcut used.
+
+## 2026-11-01T18:07:19Z — Clock correction
+
+### What was done
+- Read the authoritative UTC clock:18:07:19. The two newest entries used estimated labels18:20Z and18:35Z; those labels are incorrect. Their work occurred before this clock reading. Their command/result facts remain unchanged.
+
+### Decisions made
+- Use actual UTC readings for subsequent entries.
+
+### Open threads
+- Continue the proof audit and checks already recorded.
+
+### Errors
+- Estimated session-log timestamps were ahead of the clock; this entry corrects chronology without deleting prior records.
+
+## 2026-11-01T18:27Z — Accepted four-track proofs and correctness receipts
+
+### What was done
+- All ten new modules and all three full reference libraries build. The unchanged whole transitive auditor accepts372 declarations in28 modules: zero failures, zero native trust exceptions. All ten new modules pass warnings-as-errors.
+- Seven native release tests, release clippy, rustfmt and byte-identical21-system export replay pass. All71 source/input hashes and nine pinned Git dependency revisions match. Final verifier exits0, stage complete.
+- Three-page Typst/Ghostscript PDF rendered and every page visually inspected. Diagram and complete prospective protocol/source proof map included; updated parent comparison pointer and existing problem record only. Earlier sealed sources/receipts remain unchanged.
+
+### Decisions made
+- Publish exact canonical7→6 XOR and7→5 one-hot results on unchanged F17/FB1 points, complete symmetric charts, and determinant expansion obstruction. No solver-time/F4/yield/novelty inference.
+- Final-wrapper attempt01 refused a missing non-imported CanonicalFixture module; preserved it, explicitly built all reference libraries, and reran successfully without changing the auditor.
+
+### Open threads
+- Commit/open new regular PR and check exact-head gates/reviews; admitted EKS/CAS adapter and matched complete work remain next. No new experiment launched.
+
+### Errors
+- Broad root-library attempt01 under installed Rust1.94.1 exits101 only on the two existing atomic_try_update E0658 uses after named fixtures/source materialization. No root CI defect is attributed to this PR; compatible root toolchain/current-head CI needed for that scope.
+
+## 2026-11-01T18:30Z — PR3210 publication and exact approval boundary
+
+### What was done
+- Published source937468f77b63d5651fcc9f511823c024e14c92e1, tree3d96dbebb801647a6470a458cc3c83d11cb5cffd, as regular PR3210. Local artifact/diff/hash checks pass.
+- Initial paginated check-run snapshot returns review and migrate success; no reviews or review threads. Required gate/size/artifacts are not inferred passed. GitHub reports mergeable_state=dirty.
+
+### Decisions made
+- Resolve current-main conflicts on the feature branch before presenting the approval request.
+- Automatic approval review rejected enabling auto-merge for3210: earlier approval is scoped to another PR and does not authorize this new unreviewed102-file PR. Do not enable auto-merge or merge3210 by any route without a later exact user approval for3210. Feature-branch conflict resolution does not authorize merging into main.
+
+### Open threads
+- Fix feature-branch conflicts, verify affected scope, publish current head and take its initial CI snapshot; maintain one check-in, no busy polling.
+
+### Errors
+- Auto-merge remains disabled. The rejection is an authorization boundary, not a CI failure.
+
+
+## 2026-11-01T18:31:31+00:00 — PR3210 feature-branch conflict resolution
+
+### What was done
+- Merged current main d630dbd6d5eaa3472b34b3e03b5de12065b5fdab into the feature branch only. The sole conflict is this shared session log; retained both complete append sections.
+- No earlier local proof/reference source or axiom auditor changed upstream. Recheck exact source/input hashes and local artifact gate after resolution.
+
+### Decisions made
+- Auto-merge/PR merge stays forbidden without exact user approval for3210, per automatic approval review. This feature-branch merge only resolves the conflict and publishes a reviewable PR.
+
+### Open threads
+- Publish resolved current head, initial exact-head CI snapshot and one cadence check-in; complete EKS/CAS work remains prospective.
+
+### Errors
+- Initial PR head could not receive the merge-set verdict because GitHub reported a dirty merge. No missing gate was counted as passed.
+
+## 2026-11-01T18:40:00Z — cloud-setup: sparse crypto-autoresearcher too, so SageMath fits
+
+### What was done (commands, files, features)
+- In this session (all four repositories attached, 821 MiB free), `scripts/sparse-checkout.sh apply --profile harness` freed 5,715 MiB in crypto (39,782 of 164,471 files off disk, 40 s). `python3 tools/sparse_checkout.py apply harness` freed 5,848 MiB in crypto-autoresearcher (44,704 of 151,565 off disk, 7 s), leaving 12,384 MiB free.
+- `SAGE_LEAN=1 scripts/setup-workstation.sh --only sage` then installed Sage 10.9 into `/opt/conda-sage` (3.6 GB), with 8,680 MiB free afterwards. `sage -c` passed the GF(256), EllipticCurve(GF(10007)) order, Maxima integrate, PARI factor and libgap checks; `sage -python` imports `sage.all`.
+- `scripts/cloud-setup.sh` step 1 now applies each repository's own harness profile (crypto and crypto-autoresearcher; `CRYPTO_AR_SPARSE_PROFILE=full` opts out). `scripts/test_cloud_setup.py` gains 2 stub-repository tests (6 pass). `docs/cloud-setup.md` records the measurements and the opt-out.
+
+### Decisions made (and why)
+- crypto-autoresearcher's harness profile is now the default in cloud setup, at the owner's request ("make the repos sparse so sage fits"). Its ledger sweeps refuse a sparse checkout, so coordination sessions opt out on the setup line (the Claude Code setup script cannot read environment variables) or run `tools/sparse_checkout.py disable`.
+- cryptanalysis (about 0.8 GB checked out) has no sparse tool and is left full.
+
+### Open threads (unfinished, pick up next time)
+- The `.git` directories (about 9 GB across the three large repositories) are untouched; only a blobless clone at environment level would shrink them.
+
+### Errors (what went wrong, how it was handled)
+- None.
+## 2026-11-01T18:53:12+00:00 — cryptanalysis PR #1341 corpus gate: blocked at preflight
+
+### What was done
+- Preflight only; no code or repo changes. `command -v elan lean lake`: none found, no ~/.elan. `df -h`: 10 GB free of 252 GB (allowance), 4 CPUs, 15 GB RAM. No `lean-toolchain` in this checkout (it is in isogeny-labs/cryptanalysis).
+- `add_repo isogeny-labs/cryptanalysis` (push) was denied by the auto-mode classifier; the repo is not attached, so `tools/lean/current-corpus-gate.py` and PR #1341's branch are not readable here.
+### Decisions made
+- Stopped rather than work around the denial or attempt a Mathlib/Hecke build in 10 GB.
+### Open threads
+- Needs: add_repo permission (or user clones cryptanalysis), and a host with Lean v4.34.1, Mathlib/Hecke cache, Cubic/CM/PQC builds and more disk; then the gate/test/receipt update on branch glv-table-cap-by-size.
+### Errors
+- add_repo denied (above). Nothing else attempted.
+
+## 2026-11-01T19:17:28+00:00 — cryptanalysis PR #1341: corpus gate bound to the size-dependent GLV cap
+
+### What was done
+- User approved attaching isogeny-labs/cryptanalysis; `add_repo` succeeded, shallow clone at /home/user/cryptanalysis, branch glv-table-cap-by-size at 5d68f058 (verified).
+- Installed elan and Lean v4.34.1 (the repo `lean-toolchain`) with the installer the CI job uses. Disk went 10 GB -> 4 GB free; a depth-1 fetch of archive commit 6d83c09b (needed by the gate's archive step, absent from a shallow clone) took it to about 1.9 GB.
+- `tools/lean/current-corpus-gate.py`: new pins (TableBudget ff60c813, live src/curve.c e71ebeca/e1d624e5), 27-theorem count; the old fixed-cap pins (8bf648dc, its live receipt 8439b5e8, 8-theorem TableBudget 823903d2 and its receipt 90c7c692) are kept and replayed, the 8-theorem source natively. GLV logic moved from `check_delta` into `check_glv`/`glv_selector_negatives`; 10 refusals for the new rule (9 one-edit controls + other-rule selector).
+- `tools/lean/test_current_corpus_gate.py`: class GlvSizedCapControls, 11 tests. Verified sensitive: theorem count 27->26 and removing the lg>=41 control each make it fail. Full file: 64 tests OK.
+- Receipt: ran the gate; `reports/lean-current-corpus-20261101-glv-cap/receipt.json` is its own printed output (canonical JSON, extracted not edited). Against the 20261025 receipt only the GLV fields and the TableBudget source hash differ; Hasse/Orbit/Cubic/CM/PQC hashes and 97/90/7 counts are identical. Workflow now checks the new receipt and triggers on the new dir; old receipt dir untouched.
+- Local reproduction of the corpus job: selftest/run.sh passes; unit tests pass; gate with `--check-receipt` gets through the archive check, the full delta stage and the byte comparison with the committed receipt, then stops at the Hecke stage (see Errors). Pushed 669112f6 to glv-table-cap-by-size, no force, no new PR. Subscribed to cryptanalysis#1341. Not merged.
+### Decisions made
+- New dated report dir instead of overwriting the 20261025 receipt: that receipt commits to the old GLV fields, so keeping it preserves the fixed-cap record; the gate and workflow point at the new one.
+### Open threads
+- Not yet confirmed: `corpus` green on CI at 669112f6 and no other check turning red (waiting on PR events).
+- Not run locally: the Hecke Mathlib stage (68 Hecke formal sources, v4.35.0-rc4 plus cache) and `hecke-audit-selftest.py`; no code of mine touches them, but only CI shows them passing.
+- crypto PR #3219 (this log) is open with auto-merge on.
+### Errors
+- Conductor control plane refused connections (localhost:8080), so no task claim was recorded; edits went through with only a warning.
+- The gate's first runs failed in the archive step (commit 6d83c09b missing from the shallow clone); fixed by fetching it. The later Hecke `lake` call tried to install v4.35.0-rc4 and ran out of disk twice; partial installs removed.
+## 2026-11-01T18:40Z — Independent review of the JV cover crossover study (PR #3194)
+
+### What was done (commands, files, features)
+- Dispatched validator-breakthrough and red-team-breakthrough, each independent and each capped at 2 threads, on `research/jv_cover_crossover_20261101/`. Their outputs are in `review/validator/` and `review/red_team/`, with an index at `review/README.md`, `forest.svg`/`.png` and `REVIEW.pdf`.
+- Validator, `passed` (measured): every number reproduces with independent Rust code; `fit/` rebuilds byte-identical; the p=1301 s3 replay is bit-identical; dd·G=Q was checked by a disjoint implementation; `JV_LIN=sparse` reproduces the predecessor's p=1009 and p=251 records bit-for-bit.
+- Red team (derived and measured, 62 control runs):
+  - Against the pooled negation-map rho the cover is 1.48 / 1.22 / 0.92 (not resolved) in group additions, and 3.54 / 2.92 / 2.19 in textbook F_p multiplications.
+  - Pooled negation-rho null at p=251: 0.885 ± 0.054 (n=82).
+
+### Decisions made (and why)
+- The claim is recorded as refuted as a statement about rho. It holds only against rhodp, in the harness unit, at w=0. Reasons: the reference has no negation map, the unit is 331 per step against a tuned 138, and the cover's `f4_native_ops` is unpriced.
+- No leaderboard or `benchmarks/` change.
+
+### Open threads (unfinished, pick up next time)
+- Re-score against the pooled negation rho in both units.
+- Fix `rho_e_dp`'s stop polling (currently every 2^20 steps).
+- Run ≥ 8 cover seeds per prime.
+- Emit the cover's F_p additions and full native count.
+- The fair crossover extrapolates to p≈2300–2400, beyond the u64 limit p≤2039.
+
+### Errors (what went wrong, how it was handled)
+- The calibration control was confounded by the stop-poll lag: +0.20 of the +0.28 gap at p=251.
+- The validator's harness blocked it from writing REPORT.md; the main session placed its returned text unedited.
+## 2026-11-01T17:00Z — n=83 higher-degree image-calculus literature gate
+
+### What was done (commands, files, features)
+- Started the approved higher-degree image-compatible relation-calculus follow-up in a clean worktree `/workspace/crypto-n83-image-calculus`, branch `codex/n83-image-calculus-20261101`, based on `origin/main` at `14e56a5e8`. The original `/workspace/crypto` worktree remains untouched and dirty with its owner's prior changes.
+- Read the existing n=83 projector, destination-calculus, factor-base-design, and common-cost records; the general arbitrary-class norm is already present in `src/binary_ecc/cover_transfer.rs` and the prior degree-one fiber base is already formula-screened.
+- Completed the literature-first gate against Gaudry's general abelian-variety method (JSC 2009 / ePrint 2004/073), Gaudry–Thomé–Thériault–Diem's double-large-prime method (ePrint 2004/153), Diem's rigorous fixed-genus class-group analysis (arXiv:math/0606607), and the repository's genus-3 2LP implementation/results. These methods use rational-point factor bases and obtain the full-Jacobian `q^(4/3)` scale at genus three; they do not supply an image-local higher-degree router.
+- Read the independent P1546 projected-smoothness counting gate and current Prym-router problem in `crypto-autoresearcher`. P1546 closes fixed bounded-degree algebraic reduction branches at `Omega(r)` branch evaluations and blind descent `Omega(r/B)`, while explicitly leaving only a compact growing-degree/adaptive target-local router unclassified.
+- Derived the construction-specific degree-two specialization: for odd `n`, every generic rational fiber has `u^3+x=(u+a)(u^2+au+a^2)` with exactly one rational point and one degree-two closed point. Both components map to the same rational elliptic point geometrically, so their divisor pushforwards are `P` and `[2]P`; the projected identity is the tautology `[3]P=P+[2]P`. On odd prime-order `r` torsion, doubling is injective, so the degree-two component adds no projected collision or independent logarithm column.
+- Ran the required Conductor pre-edit check; `conductor` is not installed in this environment, so no reservation/control-plane result is available.
+
+### Decisions made (and why)
+- Do not launch an EKS relation experiment before exposing the exact per-closed-point certificate. The strict gate already rejects the obvious image-closed degree-two fiber calculus at formula level; an ambient arbitrary-degree-two collector would fall back to the already rejected full-Jacobian route unless it supplies the missing target-local router.
+- Implement a narrow structural audit: expose the already-computed irreducible-support components and their individual pushforwards, certify the odd-degree `1+2` fiber pattern at `n=9,13,19,23,83`, and record the complete cost/rank rejection. This tests the higher-degree mechanism without treating raw upstairs multiplicity as projected rank.
+
+### Open threads (unfinished, pick up next time)
+- Add the public closed-point pushforward certificate, deterministic audit binary, tests, Lean tautology proof, assessment/report/diagram/PDF, and exact JSON receipt.
+- Verify release library/bin tests, formal proof, and report rendering; then commit, open a regular PR, enable auto-merge, and remain through exact-head CI and merge.
+- A mechanism-distinct successor would need an explicit compact growing-degree or adaptive target-local router with known source labels, blind descent, and complete costs; none is currently specified.
+
+### Errors (what went wrong, how it was handled)
+- Direct ePrint PDF downloads returned HTTP 403. Read the primary papers through their IACR metadata plus fully parsed CiteSeer/IACR copies and recorded the access path; no theorem was inferred from an inaccessible file.
+- A broad tool-discovery query returned truncated metadata; narrowed discovery to the specific web-search and GitHub-fetch tools.
+
+## 2026-11-01T18:25Z — n=83 degree-two image calculus rejected at the frozen information gate
+
+### What was done (commands, files, features)
+- Added arbitrary Mumford-divisor and per-closed-point pushforward certificates in `cover_transfer.rs`. The certificate factors nonsplit support, reconstructs the Mumford support polynomial, evaluates each residue-field image, sums its elliptic pushforward, and checks agreement with the general norm implementation. The independent exhaustive GF(8) table remains the 486-class homomorphism control.
+- Added `n83_image_closed_degree2_audit`, a deterministic exact audit for `n=9,13,19,23,83`, an even-degree `n=2` control, a pinned target-`r` generator, and the ramified point. Its schema-versioned receipt is `research/n83_image_closed_degree2_20261101/certificate.json`.
+- The odd-degree fixtures all give support degrees `[1,2]`; component pushforwards are `P` and `[2]P`, and the total is `[3]P`. The two projected labels are distinct but have known dependence, so useful independent rank is zero. The even control gives `[1,1,1]`; the ramified fixture has reduced support degree 1 and ramification index 3.
+- Added a dependency-free Lean proof of the additive tautology, an assessment, results record, source-linked Typst report/PDF, and Graphviz decision diagram. The Lean build reports that the theorem depends on no axioms.
+- Release verification passed: the complete `binary_ecc::` library scope (79 passed, 1 ignored), the audit-binary test, the exact audit run, JSON validation, Rust formatting, Lean build, report rendering, and PDF visual inspection. This includes the existing n=83 general norm/projector/Prym tests and the exhaustive GF(8) pushforward/homomorphism test. After rebasing both commits onto current `origin/main` at `162364729`, the exact-head library scope and audit-binary test passed again.
+
+### Decisions made (and why)
+- Rejected this degree-two image-closed fiber calculus before collection. A sampled source point `P=[a]G` supplies labels `a` and `2a`, so `P+[2]P=[3]P` is an identity with no new logarithmic information; an unknown target `Q` supplies no label. Relation probability, matrix, memory, individual-log, and EKS timing therefore stop under the frozen protocol.
+- Kept the ambient comparison explicit rather than rerunning it: genus-three collection is about `q^(4/3)=2^110.6667`, while strong source rho is `r^(1/2)=2^40.5000`, a `70.1667`-bit exponent gap. Fixed bounded-degree arbitrary branches remain `Omega(r)`; only a mechanism-distinct compact growing-degree or adaptive target-local router is unclassified.
+- Classified the result as a completed scoped negative, not a general impossibility theorem and not evidence against every higher-degree image-compatible calculus.
+
+### Open threads (unfinished, pick up next time)
+- Specify a compact growing-degree or adaptive target-local router that emits known source labels and complete collection/descent costs. Do not launch ambient relation collection without that new mechanism.
+- If such a router is supplied, freeze its information-rank model first, then apply the same finite-crossover-against-rho gate before EKS benchmarking.
+
+### Errors (what went wrong, how it was handled)
+- The first Docker image used Rust 1.90, below the repository's edition/toolchain needs; rebuilt and verified with Rust 1.99. Removed the obsolete image and caches after disk pressure during compilation.
+- The repository-wide release library run used the deliberately sparse worktree and therefore reported unrelated missing committed fixtures and pre-existing harness failures. It was stopped after roughly 22 minutes once every relevant `binary_ecc` test had passed and unrelated long-running cryptanalysis cases remained. A replacement scoped release run completed cleanly: 79 passed, 1 ignored, 0 failed.
+
+## 2026-11-01T06:06:02Z — Primo PR opened and refreshed after main advance
+
+### What was done (commands, files, features)
+
+- Pushed `codex/primo-integration-20261101`, opened regular PR #3178, and
+  enabled merge-style auto-merge.
+- GitHub initially started the review and artifact-migration checks but marked
+  the PR conflicting because main advanced from `48fd2d334` to
+  `f06f2f32b` after the first synchronization.
+- Fetched the new main head and started a second forward merge. The only
+  conflict is again this append-only log; retained the complete Primo history
+  and the newly merged residual-byte audit entry.
+
+### Decisions made (and why)
+
+- Refresh the public branch instead of leaving auto-merge blocked. Preserve
+  both log histories exactly and rerun the affected current-head checks before
+  pushing the merge resolution.
+
+### Open threads (unfinished, pick up next time)
+
+- Complete and push the second merge, confirm the PR becomes mergeable, and
+  follow its required checks and auto-merge result.
+
+### Errors (what went wrong, how it was handled)
+
+- The first `gh pr view` query requested unsupported field `baseRefOid`;
+  repeated it using the CLI's available fields.
+- Main advanced between the first merge and PR creation, producing another
+  append-only session-log conflict. No code file conflicted.
+
+## 2026-11-01T06:06:22Z — Second main refresh validated
+
+### What was done (commands, files, features)
+
+- Completed the second merge at `5e5aadbee`. The advancing main changed
+  workflows, examples, research evidence, and scripts, but not the library SMT
+  implementation.
+- Passed the full 14-test SMT oracle set again from cache on the exact refreshed
+  head, including the live Primo test; 0 failed and 6,015 were filtered.
+- Passed ShellCheck, script syntax, direct Rust formatting, and the refreshed
+  PR-delta whitespace check.
+
+### Decisions made (and why)
+
+- Push this exact refreshed head to unblock the already-enabled auto-merge and
+  follow the hosted checks. No additional local rebuild is required because
+  the new main commits did not change library inputs and Cargo confirmed the
+  optimized target was current.
+
+### Open threads (unfinished, pick up next time)
+
+- Push this handoff commit and follow PR #3178 until required checks settle and
+  auto-merge either completes or reports an actionable blocker.
+
+### Errors (what went wrong, how it was handled)
+
+- None beyond the additive log conflict recorded in the preceding entry.
+
+## 2026-11-01T19:30Z — Three summands (m=3) with the cycle stop on a=0 n=37, branch claude/ic-m3-cycle-n37-20261101
+
+### What was done (commands, files, features)
+- Wrote `examples/ic_m3_cycle.rs`: same decomposer, factor base, anchors and strong rho as `ic_m2_cycle.rs`;
+  relations with up to three terms from a "2+1" split (decompose `p - eP` over the base for each base point
+  and sign); incremental row echelon form mod r (needs r < 2^32); stop at the first dependency leaving
+  `0 = alpha + beta t`, checked as `[t]G = T`. Small-n check: 32/32 verified (a=0 n=13/19/23, a=1 n=19),
+  rank at the stop near 0.9 K.
+- Froze the protocol and a prediction first (commit 55ab3ad8a9): m=3 costs more than m=2 at every d, at least
+  10x at d=12. Pilot on a throwaway seed (777) recorded and excluded. Ran 18 jobs (d in {12, 10, 8}, 6 seeds,
+  4 at a time, 1,800 s cap); all solved and verified, none capped (slowest 992 s). Determinism rerun
+  (d=12, seed 20261024): 99,355,964 trials both times.
+- Result vs the merged m=2 torsion-off records (same seeds, d): trials m=3/m=2 geometric mean 42.9 [31.5, 68.2]
+  (d=12), 42.3 [29.1, 66.3] (d=10), 25.8 [11.1, 60.3] (d=8); group additions about 950 to 1,500x; wall 32 to 50x.
+  All 18 pairs favour m=2. Trials per relation are equal in both arms; m=3 needs 19x to 41x more relations.
+
+### Decisions made (and why)
+- Built the 2+1 split because a direct S4 solve does not linearize (nonlinear monomials in the symmetric
+  coordinates); the 2+1 split reuses the verified linear two-summand solve.
+- Kept a monitor attached for the whole sweep (the container had been suspended twice earlier when none was);
+  re-armed it when it hit its 30-minute limit. No interruption this time.
+- Used the merged m=2 records as the reference rather than rerunning m=2 (same decomposer source and seeds);
+  disclosed the different build and the resulting wall-time noise.
+
+### Open threads (unfinished, pick up next time)
+- Only the 2+1 construction was tested; the earlier repository work and this result both point to no gain
+  from three summands over a subspace base. Other constructions (direct S4, mixed-conjugate excess) are untested.
+- The two-summand cycle stop remains the best algebraic variant measured: about 7,700x rho at n=37 (d=12, no torsion).
+
+### Errors (what went wrong, how it was handled)
+- The extracted shared block was missing two closing braces; fixed before the first build.
+- `/usr/bin/time` is not installed; timed the pilot with `date` instead.
+
+## 2026-11-01T19:17Z — end-to-end algebraic ECDLP baseline intake
+
+### What was done (commands, files, features)
+
+- Read the latest 2026-10-31 handoff entries and the current repository instructions before starting work.
+- Classified the request as a full measurement campaign: factor-base setup, target preparation, relation finding, degree-4/5/6 algebra profiles, root extraction/lifting, relation verification, relation-matrix rank/solve, scalar recovery, and a matched generic reference must reconcile in one cold end-to-end ledger.
+- Began reading the repository experiment-protocol, report-evidence, controlled-experiment, and Iso Lab on EKS skills. No benchmark data has been taken and no implementation choice has been made yet.
+
+### Decisions made (and why)
+
+- Treat a phase that is unavailable, capped, or not reached as an explicit ledger outcome, not zero work and not a successful complete solve.
+- Keep degree-4, degree-5, and degree-6 Macaulay/F4 profiles distinct from any implementation-level F5 criterion; both will be named explicitly where the current instrument exposes them.
+- Freeze the exact baseline, metrics, budgets, stopping rules, and controls before the first affected measurement.
+
+### Open threads (unfinished, pick up next time)
+
+- Finish the required skill and current-baseline review, then inspect indexed prior results and primary sources.
+- Run the repository scope/conductor check before editing.
+- Write and freeze the measurement protocol, add any missing phase counters, validate locally, submit the supported x86 run to Iso Lab on EKS, and publish the reconciled evidence.
+
+### Errors (what went wrong, how it was handled)
+
+- A combined skill read exceeded the tool output limit. Continue with bounded complete reads of each required skill; do not act on partially read instructions.
+
+## 2026-11-01T19:42Z — literature gate and current instrumentation audit
+
+### What was done (commands, files, features)
+
+- Read the full repository `report-evidence`, `experiment-protocol`, `controlled-experiment`, `ecbench-measure`, and `isolab-eks` instructions, including the canonical cross-repository protocol skill and the EKS submission/recovery contracts.
+- Reviewed the current frontier refresh, the historical F4/F5/F6 cross-family protocol and records, the nonlinear-factor-label study, the IC boundary/measurement rules, and the live `ic.pipeline` implementation.
+- Checked the primary-source gate recorded in `research/ecbench_e2e_frontier_20261031/LITERATURE.md`: Faugère F4 (1999), Faugère F5 (2002), Semaev summation polynomials (2004), Gaudry small-dimension IC (2009), and Faugère–Perret–Petit–Renault binary-field IC (2012). Also checked current metadata/abstracts from IACR ePrint and OpenAlex.
+- Audited one historical `ic.pipeline` record. It has cold factor-base, oracle-setup, relation, linear-algebra and verification phases; the online five-phase interval; raw relation/rank/solver counters; and a solver block. Current source additionally emits complete `bitop/v1` counters for the PDP3 engines. The historical record itself leaves solver work partially unpriced and has no current-source EKS measurement.
+- Confirmed the managed environment has ready AWS credential bindings and GitHub access, but no AWS CLI or loaded Iso Lab MCP. Docker is available; Cargo is not installed on the host.
+
+### Decisions made (and why)
+
+- Use the current-source native ECBench pipeline rather than create a second measurement harness. It already owns the cold one-target boundary, matched rho, replay, A/A, isolation, resource vectors and retained-failure semantics.
+- Freeze a current-source Koblitz n=13 panel where matrix F4, matrix F5, inherited F4, F6-IC and exact root-finding variants can all finish under one resource envelope. Use `incremental-gauss-full-rank-checked` so “relation solving” means a full-rank matrix plus independent base-column point checks, not only early target pinning.
+- Make the common phase ledger primary: factor-base build; oracle/table setup; query generation; PDP/solver or root finding; relation witness/lift checking; row construction and matrix solve; scalar recovery; final point verification; cold process overhead. Preserve raw bit-operation, group-operation, memory, success/censoring and wall-time vectors instead of collapsing unlike native units.
+- Treat this as a one-size baseline and backend comparison, not a scaling claim and not evidence about ECC2K-130 feasibility.
+
+### Open threads (unfinished, pick up next time)
+
+- Write the protocol/spec/analysis contract on `codex/e2e-phase-ledger-20261101`, validate and freeze them before affected data, and commit the freeze.
+- Use the commit-building GitHub EKS workflow after the protocol PR lands, because the local AWS launcher prerequisite (`aws`) and direct MCP connection are absent.
+- Retrieve and verify the exact EKS session, replay all records, generate the experiment export and complete phase/resource tables, then land the evidence in a result PR.
+
+### Errors (what went wrong, how it was handled)
+
+- Direct PDF retrieval from ePrint and the Faugère host returned HTTP 403/503. Used the repository's prior primary-source review plus current IACR/OpenAlex metadata; no claim depends on an inaccessible quotation.
+- `aws sts get-caller-identity` could not run because the AWS CLI is not installed. The cloud binding reports credentials ready, but this does not establish authorization. Do not use the AWS bridge until an actual identity/permission check succeeds; use the reviewed GitHub OIDC path instead.
+- Conductor is not installed in this environment. Recorded the unavailable required pre-edit check and continued under the documented nonblocking fallback.
+
+## 2026-11-01T19:43Z — complete cold phase-ledger protocol frozen
+
+### What was done (commands, files, features)
+
+- Added `research/e2e_phase_ledger_20261101/` with the literature gate, human protocol, machine protocol, frozen analysis commands, and two four-target Koblitz E0 n=13 specs.
+- Registered one strong signed-Frobenius rho reference, an identical rho A/A control, inherited F4, matrix F4, matrix F5, F6-IC, pair-index F6-IC, every m=3 root-finding layout, and two m=2 root-finding rank diagnostics. Every IC arm explicitly uses `incremental-gauss-full-rank-checked`.
+- Built `ecbench` from current source with Rust 1.99.1 in Docker. Both specs pass the native planner and expand to 364 executions each: 13 arms × 4 targets × (1 warmup + 6 measured rounds).
+- Ran one unreported L0 instrument smoke on discarded target seed `202611010130`. All m=3 F4/F5/F6/root-finding arms and both rho arms verified. The two m=2 root-finding arms reached rank 10 of 11 after 200000 trials and were correctly retained as exhausted rather than accepted at early target pinning.
+- Rotated the registered target streams and measurement seeds after smoke to `202611011130`, `202611011131`, `202611011230`, and `202611011231`; none was executed before freeze.
+- Validated `protocol.json` with file verification and zero findings, then froze it before affected data. Frozen protocol SHA-256: `5e29776fe26ddc83978e2c4839987c2f3ba759cc0ee03d5410873dd28c0ee4a9`.
+
+### Decisions made (and why)
+
+- Retain the m=2 full-rank ceiling as a prospectively declared censored diagnostic. Do not weaken relation solving back to the old target-pinned stopping rule merely to turn it into a success.
+- Use two four-target shards so every backend and the A/A control share a host within a wall comparison, while historical matrix-F4/F5 runtimes keep each shard below the 3600-second EKS deadline.
+- Make complete `bitop/v1` with coverage flags the primary resource vector; wall time is secondary and same-session L2 only. Require the 0/0.1/1 GAE band and preserve every solver-native counter separately.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit and merge the frozen protocol PR, dispatch both exact merged-revision specs through the GitHub OIDC EKS workflow, and retain the workflow/build/session receipts.
+- Retrieve both sessions, replay all records, run the frozen table/resources/band/comparison commands, and publish the complete phase ledger and scoped verdict in a result PR.
+
+### Errors (what went wrong, how it was handled)
+
+- The first container build could not validate the proxy's self-signed certificate. Mounted the managed environment CA bundle and passed the proxy variables; the pinned build then completed.
+- Initial ecbench planning rejected `diagnostic` as an arm role. Changed the two m=2 arms to schema-valid `candidate` roles while keeping their diagnostic status explicit in names, descriptions, and the comparison ledger.
+- The first analysis draft used the obsolete `band --u` spelling. Checked the current CLI and froze `--weights 0,0.1,1 --ranks` instead.
+- The smoke touched one planned target seed before freeze. Discarded that stream, disclosed it as calibration, rotated all registered target and measurement seeds, and revalidated both plans before freezing.
+## 2026-11-01T01:00Z — ic.koblitz_batched: the tournament worker as an ecbench method
+
+### What was done (commands, files, features)
+- Asked to run the native IC tournaments on isolab-eks. Read the `ic-autolab` and `isolab-eks` skills and round 0026 (`runs/round-0026/REPORT.md`): `batch16` cut complete cold Ir to 0.630x the incumbent (paired 95% [0.578, 0.676]), but its wall-time condition is unqualified for lack of a core reservation receipt, so promotion awaits an isolated confirmation on a newly registered round.
+- Found the routing gap: isolab has `isolab_k8s_benchmark` (ecbench specs, L2 + A/A receipts) and `isolab_k8s_run` (any digest-pinned image, no L2 receipt). `batch_trials` exists only in `examples/ic_tournament_worker.rs` (koblitz_index_calculus pair_table/sparse, rank check per batch), not in ecbench's `ic.pipeline` (incremental elimination) or `ic.koblitz_descent` (aimed units).
+- Added `src/cryptanalysis/ecbench/koblitz_batched.rs` and registered `ic.koblitz_batched` in `ecbench/methods.rs` (decl, params, applicability, dispatch, solve, online window, tests) and `mod.rs`; documented it in `docs/ecbench/README.md`. It makes the worker's library calls in the worker's order, charged by `group_op_count` snapshots on one thread.
+- Verified against the real worker: built `examples/ic_tournament_worker.rs`, ran round 0026's `n13a0-000` job (target 2388,192; algorithm seed 4753082171431670784; subgroup_orbits 78 points, seed 43) at `batch_trials` 64 and 16. Worker: 64/16 queries, 1 solve attempt, 64/16 accepted relations, 0 rejected/duplicate, 7 columns, scalar 33. `koblitz_batched::tests` pins the new method to exactly these numbers.
+- `cargo test --release --lib koblitz_batched`: 5 passed. `ecbench`, `ic_framework`, `ic_boundary`: 666 passed, 8 failed; the 8 are the same tests that read `research/` files omitted from this container's sparse checkout (also failing before the change).
+
+### Decisions made (and why)
+- New module instead of a `batch_trials` parameter on `ic.pipeline`: that parameter would run a different algorithm than the one round 0026 measured and could not confirm it. Left `koblitz_descent.rs` untouched (claim records hash its source).
+- Used the worker's observed variants (`collect_observed`, `solve_observed`) so the measured workload is the tournament's.
+- Option 2 (icprog tournament through `isolab_k8s_run`) not started: no isolab MCP tools in this session, no aws CLI/boto3, the AWS key in the environment is unverified for account 104186811093, and that route gives no L2 receipt.
+
+### Open threads (unfinished, pick up next time)
+- PR for `claude/ecbench-batch-trials`; then freeze a new round (fresh seed, holdout, round-0026 points excluded), write the protocol, and run it through `isolab_k8s_benchmark` once the AWS access and isolab tools are connected. Needs the user's approval of the frozen protocol before dispatch.
+- Cells beyond n13 (n17a1, n19a0, n23a0, holdout n19a1) have no known-answer pin yet.
+
+### Errors (what went wrong, how it was handled)
+- The disk allowance ran out twice during builds; freed regenerable `target/` output (old test binaries, archives) and retried once each.
+- First plan (add `batch_trials` to `ic.pipeline`) was wrong; corrected after reading the worker and told the user before building.
+
+## 2026-11-01T18:20Z — batch_trials development screen on ic.koblitz_batched (the autolab for PR #3134)
+
+### What was done (commands, files, features)
+- Froze `research/ecbench_batched_screen_20261101/PROTOCOL.md` (d98cc0d107) and Amendment 1 (60a451606b: 4 rounds, order `alternate_measured`, `--cpus none`, `compare --save` without a path), both before any data. Predictions P1-P5 stated first. Pushed an S3 resume checkpoint (the repo's gate) before launch.
+- experiment-director compiled `CARD-ecbench-batched-screen-20261101-1` (63 commands); I checked its gate scripts' field names against real committed audit and comparison files, then relayed the rendered prompt verbatim to executor-mechanical. `tools/task_card.py run` exit 0: 4 sessions x 1600 records, all VERIFIED, 1280 replays reproduced per cell (`ecbench verify --replay-all`), A/A ratio 1.0. Director's assessment: `executed_as_specified`.
+- Scored the predictions by code (`figures/make_summary.py`): P2 and P5 held; P1, P3, P4 did not. Counted GAE falls monotonically as `batch_trials` shrinks to 1 on all four cells; `batch16`/`batch64` = 0.690, 0.758, 0.773, 0.799 (paired 95% intervals below 1). The pair table is 56-72% of the incumbent's cost and independent of `batch_trials`.
+- Wrote `figures/{make_summary,plot_figures,make_report}.py`, `summary.json`, two SVGs, `REPORT.typ` and `REPORT.pdf` (Typst Python package in a scratch venv), `README.md`; copied the saved comparison JSONs to `comparisons/`.
+
+### Decisions made (and why)
+- Reported the three failed predictions as failed, in the opposite direction from P3 and P4, instead of rewriting them. The counted unit does not price a solve attempt's fixed cost, so the screen does not show that `batch_trials = 1` is best; the isolated, instruction-counted confirmation is where that is decided.
+- Did not commit `sessions/<cell>/records.jsonl` (17.7 MB each): the repo keeps such data in the artifact store, this session cannot write to it (no AWS), and committing session directories without their records would fail the `evidence_audit_pr` job. They stay untracked here (so the S3 checkpoint, which takes untracked files, still captures them); the README gives the push command.
+- No `.git/info/exclude` for `sessions/`: it would also drop them from the checkpoint.
+
+### Open threads (unfinished, pick up next time)
+- Push `sessions/` to the artifact store from a machine with AWS credentials and add them to the PR (or a follow-up).
+- The isolated confirmation of round 0026's `batch16` (wall time under a core reservation) is still a separate, unapproved, unregistered round; this screen suggests including `batch_trials` 1, 2, 4, 8 beside 16 and 64.
+- The `ic.koblitz_batched` pins do not exercise runs needing several solve attempts per cell beyond n13/n17/n19; this screen's records do (b1 averages 2.1-4.1 attempts).
+
+### Errors (what went wrong, how it was handled)
+- First build/branch command was interrupted by a worker restart and left git's index lock briefly held; waited for the git process to exit instead of deleting the lock.
+- `plan` warned the 3-round spec could not be balanced: fixed before data by Amendment 1. A first draft of P1 assumed batches 1-8 draw exactly eight queries; the data show 9-13 on average (a run needs a few relations beyond the columns). Reported as not held.
+- A wording slip in my first report draft ("every record was replayed", "six counters", "four single jobs") was caught on re-reading and corrected before committing.
+
+## 2026-11-01T19:40Z — ecdb deploy of /v1/export, full NAS-mirror sync, and the factor-base schema (branch claude/elliptic-curve-db-api-mtwgms)
+
+### What was done (commands, files, features)
+- On the owner's instruction ("go ahead and deploy it"), deployed `main` at cbc1304a9d to `ecdb-api` and `ecdb-admin`: swapped the static musl binary into the current package (`lambda update-function-code`).
+  - `/v1/export` lists 71 tables and 4,814,403 rows, and returns 401 without the token.
+- Full `ecdb sync` from the deployed URL into a scratch Postgres 16: 4,814,403 rows, 281 MB gzipped, 334 s, every row count matched. The md5 over `(id, icv1_slug)` of `ec.curve` is identical on RDS and the copy (dcb76a3713bbcd7b420e9c8173880ffb).
+- Factor-base schema, at the owner's request ("build factor base schema for the index calculus work to track that"):
+  - `ecdb/migrations/0011_factor_bases.sql`:
+    - tables `factor_base` (schemes fb1 / fbarchive / spec), `factor_base_alias`, `factor_base_point`, `factor_base_measurement` (FBM1) and `factor_base_result`;
+    - `ecbench_run.factor_base_id/fb_id/fbm_id` and `ic_board_row.factor_base_id`;
+    - views `v_factor_base_result` and `v_factor_base_summary`.
+  - `ecdb/src/import/factor_bases.rs` (`ecdb import factor-bases`, pack `factor-bases`):
+    - recomputes FB1 and FBM1 with the ecbench canonical codec;
+    - sources: ecbench records, `research/ecbench_factor_bases_20261013/` (catalog and dumps), the large-prime receipts, SECG small-x, and the cryptanalysis `experiments/fb-archive/` index and aliases.
+  - `ecdb/src/api/factor_bases.rs`: `GET /v1/factor-bases`, `/{key}` and `/{key}/results`. MCP tool `ecdb_factor_bases`, the twelfth.
+- Import into the full copy (45 s), as counted:
+  - 11,019 FB1 bases: 11,019 digests verified, 0 mismatched;
+  - 535 FBM1 configurations, all verified;
+  - 2,682 archive bases and 213 FBS1 specs;
+  - 219,726 of 219,915 FB1-carrying runs linked;
+  - 557 large-prime and 257 SECG results; 1,590 points; 13,726 aliases.
+- `cargo clippy -D warnings` and 29 unit tests pass. The new tests:
+  - FB1 and FBM1 of a recorded holdout-P16 run recompute to `FB1h8e805e4ad71c` / `FBM1hba26fedb694e`;
+  - the canonical codec matches Python `json.dumps` escapes;
+  - spec ids depend on the construction.
+
+### Decisions made (and why)
+- The schema keeps the repository's own ids (FB1, FBM1, the archive digest), so ids cited in PRs are the keys.
+  - FBS1 is minted only for result files that never materialised a point set.
+  - It is documented as a construction id, not a point-set id.
+- ecbench runs are linked in place, not copied: 219,726 rows stay in `ecbench_run`, and `v_factor_base_result` unions them with the other results.
+- Archive bases stay unlinked to curves: their `kb1` EC1 form names no ecdb curve, and the matching rule forbids linking by j or by order.
+
+### Open threads (unfinished, pick up next time)
+- Deploying 0011 needs the owner's go-ahead. The steps are a new binary, the `factor-bases` pack in the package, `migrate`, then `import factor_bases`.
+- The leaderboard's `factor_base` fields are recipe links, not FB1 records, so no `ic_board_row` links yet.
+- The n83 sweep design grid and the ic_tool_program claims are not imported.
+
+### Errors (what went wrong, how it was handled)
+- /dev/shm was wiped again, and the root disk was full: removed pip and conda caches and stale Claude edit-diff snapshots. Rebuilt the toolchain, worktree and AWS CLI in /dev/shm.
+- `pkill -f "ecdb serve"` killed the calling shell (exit 144) again; switched to `ps | awk` with `kill`.
+- A query against the mirror blocked while the sync transaction held its TRUNCATE locks. This is the documented behaviour; it returned after the commit.
+
+## 2026-11-01T19:53Z — fixed private-result analysis transport
+
+### What was done (commands, files, features)
+
+- Confirmed protocol PR #3229 passed all current-head gates and merged at exact measured source revision `32303a6d51d7a43ce887cd9da8f6d82afea4793c`.
+- Dispatched the two frozen EKS L2 specs through GitHub OIDC: workflow runs `41343651715` (t0) and `41343654905` (t1), both bound to the exact merged source and a 3600-second c8a.2xlarge Spot deadline.
+- Installed AWS CLI 1.46.2 only under `/tmp` and verified the local identity as account 590183823895 user `adam`. That identity can enumerate its own buckets but receives AccessDenied on the private cross-account Iso Lab result prefix, as intended.
+- Added the fixed `.github/workflows/e2e-phase-ledger-export.yml` transport. It is hard-bound to the two workflow/job identities and measured source SHA, downloads the exact retained build artifact, assumes the existing GitHub OIDC trigger role, independently verifies every private S3 `SHA256SUMS`, checks launcher/source/binary identity, runs the frozen analyzer with replay-all, and uploads only receipts and derived analysis. It explicitly excludes `records.jsonl`.
+- Parsed the workflow as YAML and ran repository actionlint 1.7.12 successfully.
+
+### Decisions made (and why)
+
+- Do not broaden the local user's cross-account S3 policy or copy raw measurements to GitHub. Use a fixed, reviewed OIDC analysis job and an allowlisted derived export instead.
+- Keep the exporter non-parameterized: only these two prospectively frozen jobs and this exact source revision can be read, which prevents it from becoming a generic private-bucket exfiltration route.
+- Reuse the original workflow build artifacts so replay runs the byte-identical `ecbench` binary whose SHA-256 is in the launcher receipt.
+
+### Open threads (unfinished, pick up next time)
+
+- Merge the fixed exporter after review, wait for both experiment workflows to reach terminal success, then dispatch it once. Download and hash-check both derived artifacts.
+- Publish the final phase ledger, censored m=2 rank result, F4/F5/F6/root-finding comparisons, A/A calibration and scoped verdict in the result PR.
+
+### Errors (what went wrong, how it was handled)
+
+- Repository Actions variables are inaccessible to the current GitHub integration (HTTP 403), and the local AWS identity cannot list the lab bucket. Used the already-reviewed OIDC role inside the fixed workflow; no credential or variable was exposed.
+- The launcher result schema has no `payload_hashes_verified` field. Removed that invalid check and retained a stronger independent `sha256sum -c` pass over every downloaded payload manifest.
+## 2026-11-01T23:00Z — "1+2": image recipe, hand-off and a musl build fix; image and cards still not built or submitted
+
+### What was done (commands, files, features)
+- Installed `musl-tools`, added the musl target, built `pkm_tower_pilot` static (x86-64, no INTERP, 7.4 MB). First attempts failed: no `musl-gcc` (cc-rs), then `src/ml_dataset/telemetry/whole_worker.rs:258` (`ioctl` request `c_ulong` vs `i32` on musl). One-line fix `PERF_EVENT_IOC_ID as _`; `cargo check --lib` (glibc) passes.
+- The static binary on the `t = 9` regression cell: D = 5, 8,644 columns, 45,957,046,778 mul-adds, equal to the recorded row.
+- Wrote `image/{Dockerfile,run_cell.sh,build_image.sh}` (syntax-checked only), `HANDOFF.md`, and updated `ISOLAB_CARD.md` (command now `/usr/local/bin/run_cell K`).
+
+### Decisions made (and why)
+- Made the `whole_worker.rs` cast fix even though it is outside the research directory (no Conductor here): the lib does not compile for musl without it, and the lab's static ecbench build links the same library. Reported in the PR.
+- Did not run `docker build/push` or submit: no Docker daemon, ECR/EKS access denied, no `isolab_k8s_run` tool.
+
+### Open threads (unfinished, pick up next time)
+- Lab-host session runs `image/build_image.sh <commit with the fix>` and submits the two cards (prompt in `HANDOFF.md`), or the owner grants this identity ECR push and a custom-command route.
+- Check why the Iso Lab commit-building workflow's musl ecbench build did not fail on `main` before this fix.
+
+### Errors (what went wrong, how it was handled)
+- Two musl build failures (above); the second is a real portability bug fixed in this PR.

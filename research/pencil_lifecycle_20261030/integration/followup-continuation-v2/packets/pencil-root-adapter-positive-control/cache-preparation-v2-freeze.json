@@ -1,0 +1,31 @@
+{
+  "schema": "bounded-cache-preparation/v2",
+  "status": "prospective_not_executed",
+  "workspace": "/var/tmp/pencil-root-positive-1nchhc1e",
+  "lock_path": "/var/tmp/pencil-root-positive-1nchhc1e/source/Cargo.lock",
+  "lock_sha256": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6",
+  "cache_source": "/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release",
+  "limits": {
+    "outer_term_seconds": 175,
+    "outer_kill_grace_seconds": 5,
+    "inner_work_seconds": 160,
+    "address_space_bytes": 2147483648,
+    "cache_logical_bytes": 3221225472,
+    "vendor_expanded_bytes": 2147483648,
+    "maximum_files": 100000
+  },
+  "files": {
+    "cache-preparation-v2.py": "7c3d811925c0323e428324b90db38eb5c2e907147c48e221cf0f623541f6f992",
+    "CACHE-PREPARATION-AMENDMENT.md": "b0618f1499aeb68cbaba93de61ba9f0161153602dc3db095d69c8dc20c30b997",
+    "registry-archives.json": "87f9efd55a5f5aaf6cfac4b0aaee8d06313723f88b5014b11fe6a6eba92640a3"
+  },
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "175s",
+    "python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/cache-preparation-v2.py"
+  ]
+}

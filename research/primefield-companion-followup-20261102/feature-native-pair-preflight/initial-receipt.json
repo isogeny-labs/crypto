@@ -1,0 +1,53 @@
+{
+  "recorded_at": "2026-11-03T22:17:02.512217+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-pair-preflight/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/runner"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "test-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "--test",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-pair-preflight/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/tests"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/tests",
+        "preflight_tests::",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "describe",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-pair-preflight-20261103/runner",
+        "--describe"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "cryptographic_preflight_calls": 0,
+  "comparative_rows": 0,
+  "binaries": {
+    "runner": "bd85e1b0b8ab381cf8ae4ccb0822043f6e349ffa6b2d38caa6677aec76beb92a",
+    "tests": "a77cb207f69c16aa5df110edb1a801d36eea35de319ffe8f70be4ad1cbceed8f"
+  }
+}

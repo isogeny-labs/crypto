@@ -17,7 +17,8 @@ from research.n83_crossfamily_current_20261025 import source_bundle
 
 HERE = Path(__file__).resolve().parent
 BUCKET = 'aburan28-n83-tier1-20261016-590183823895'
-SECURITY_GROUP = 'sg-030ffadf6a62d2ce2'
+SECURITY_GROUP = 'sg-031c140ef9d078b3d'
+S3_REGION = 'us-east-1'
 INSTANCE_PROFILE = 'n83-online-screen-ssm-20261019'
 PROJECT_TAG = 'N83HighKCurrent'
 
@@ -218,7 +219,7 @@ def main():
     import boto3
     ec2 = boto3.client('ec2', region_name=plan['region'])
     iam = boto3.client('iam')
-    s3 = boto3.client('s3', region_name=plan['region'])
+    s3 = boto3.client('s3', region_name=S3_REGION)
     preflight_aws(ec2, iam, s3, plan)
     run_id = utcnow().strftime('%Y%m%dT%H%M%SZ') + uuid.uuid4().hex[:8]
     prefix = f'n83-highk-current/{plan["source_head_sha"]}/{run_id}'

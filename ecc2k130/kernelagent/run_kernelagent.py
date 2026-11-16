@@ -94,7 +94,17 @@ def register_fireworks(model_hint: str | None) -> str:
             return "fireworks"
 
         def get_max_tokens_limit(self, model_name: str) -> int:
-            return 32000
+            return 64000
+
+        def _build_api_params(self, model_name, messages, **kwargs):
+            params = super()._build_api_params(model_name, messages, **kwargs)
+            # GLM 5.3 is thinking-only: with a small cap it spends the whole
+            # budget reasoning and returns content=None. Give it room to finish
+            # the thought and still emit the answer.
+            if params.get("max_tokens"):
+                params["max_tokens"] = max(params["max_tokens"], 64000)
+            params.setdefault("reasoning_effort", os.environ.get("FIREWORKS_REASONING", "low"))
+            return params
 
     model = model_hint
     if not model:
@@ -158,8 +168,13 @@ def main() -> int:
     with contextlib.redirect_stdout(Tee()):
         rc = auto_agent.main(argv)
     text = buf.getvalue()
-    start = text.rfind('\n{\n  "route"')
-    summary = json.loads(text[start:]) if start >= 0 else {"success": False, "raw_tail": text[-4000:]}
+    start = text.rfind('{\n  "route"')
+    summary = {"success": False, "raw_tail": text[-4000:]}
+    if start >= 0:
+        try:
+            summary, _ = json.JSONDecoder().raw_decode(text[start:])
+        except ValueError:
+            pass
     code = summary.pop("kernel_code", None)
     (out / "kernelagent.json").write_text(json.dumps(summary, indent=2, default=str))
     if code:

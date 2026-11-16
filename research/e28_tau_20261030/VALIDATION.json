@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "gate_status": "REFUSED: E28's index-calculus cost is a model (Stage A2), not a measured end-to-end S; validator-report.json has status fail for that reason. The replay of the measured parts is verified (replay-certificate.json). Not for a leaderboard row.",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "ad4512c9a9652009e807ad6237914ffbae2cb3c4c86c9d5c2017d68b66c44339"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "544f67c784c8af78081b7d4722687d9c542f8e60134e61263b3b626475880583"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by §9.26: on each Stage A curve the 16 <±psi> walks (psi the GLS endomorphism, psi^2 = -1; seeds 1000*seed + k, k < 16), priced in E25's arithmetic (walk (i), the registered comparison) and in E27's (walk (iii): Karatsuba F_p4 products, norm inversions of a 16-walk pool batched); the [d]G = Q check excluded (E25's convention). Strongest available: the validator's own arithmetic shows j in F_p2 but not in F_p, Aut(E) = ±1 and psi^2(G) = -G on all 40 Stage 0 curves (replay/curve_check.json), so <±psi> is the largest fold, and walk (iii) is the cheapest arithmetic built for it (the same walks as (i), checked seed by seed). The band below uses walk (iii); the IC side is MODELLED: S_model = R C + R g + 16 LA (R the tau-psi arm's measured residuals to its logarithm, C the median of 3 measured weighted-D4 solve calls, g the measured generation per target, LA the measured Wiedemann mod-n multiplications), native operations = E19's Macaulay entries per residual at the same p (borrowed). gae_band values: medians over the 10 Stage A curves.",
+  "unit": "F_p multiplications; LA at 16 F_p multiplications per mod-n multiplication; native operations priced at w * 97 F_p multiplications (GAE = E25's affine addition)",
+  "binary_or_process": "e28_tau, binary 789dc2ff6 (validator rebuild sha256 8514e21fb31d316d2de796ac67f7b5ef435959583f4fc5f14ede61e99abab6f3): one process per curve measures the stream (R, g), LA, the 3 control calls (C) and both walk sets; the composition into S_model is arithmetic on those measurements, not a run",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 2951407992538.201,
+    "rho": 773914.5625
+   },
+   "0.1": {
+    "ic": 3290773639647.638,
+    "rho": 833063.040625
+   },
+   "1": {
+    "ic": 6345064463632.571,
+    "rho": 1365399.34375
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

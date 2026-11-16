@@ -1,0 +1,16 @@
+/var/tmp/pencil-branch-count-20261101-v1/CountHelpers.lean:35:14: error: Type mismatch
+  constraint_bound r ?m.46 ?m.47
+has type
+  (constraint r ?m.46 ?m.47).2 ≤ 1
+but is expected to have type
+  (anchor r s root a b).2 ≤ 1
+/var/tmp/pencil-branch-count-20261101-v1/CountHelpers.lean:39:28: error: don't know how to synthesize placeholder for argument `a`
+context:
+n : ℕ
+r : UInt64
+s : Anchored n
+root : Fin n
+cu cv : Int8
+a b : UInt64
+h✝ : cu + cv = 0
+⊢ UInt64

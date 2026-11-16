@@ -1,0 +1,49 @@
+{
+  "classification": "bounded correctness checks and state-invariant derivation",
+  "comparative_panel": false,
+  "protocol_preregistered": false,
+  "checks": {
+    "split_windows": {
+      "curve": [
+        509,
+        2,
+        10
+      ],
+      "r": 479,
+      "fixture": "feature-native-recovery/targets.tsv",
+      "cuts": [
+        1,
+        2,
+        14,
+        15
+      ],
+      "total_length": 18
+    },
+    "small_curves": [
+      [
+        5,
+        2,
+        1,
+        7,
+        0,
+        1
+      ],
+      [
+        7,
+        0,
+        3,
+        13,
+        1,
+        2
+      ]
+    ],
+    "negative": [
+      "empty prefix",
+      "invalid point",
+      "zero or exhausted allowance",
+      "mutated recovery value"
+    ]
+  },
+  "counter_scope": "test-only actual phase() calls and emitted extension metadata; not runtime",
+  "cohort_preserved": 4563
+}

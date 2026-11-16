@@ -1,0 +1,834 @@
+{
+  "schema": "local-translation-source-plan/v1",
+  "created": "2026-11-15T21:04:29.665224+00:00",
+  "formal": {
+    "project": "research/local_translation_audit_20261115/lean",
+    "theorem": "LocalTranslationAudit.actual_local_translation_certificate",
+    "statement": "theorem actual_local_translation_certificate : (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (hΔ : W.Δ≠0), (∀ (P Q : W.Point) (f : W.FunctionField), localFunctionValuation W P (fieldTranslation W hΔ Q f)=localFunctionValuation W (P+Q) f) ∧ (∀ (P Q : W.Point) (f : W.FunctionField), pointOrder W (fieldTranslation W hΔ Q f) P=pointOrder W f (P+Q)) ∧ (∀ (P Q : W.Point) (r : RegularRing W (P+Q)), (regularTranslationEquiv W hΔ P Q r : W.FunctionField)=fieldTranslation W hΔ Q r) ∧ (∀ (P Q : W.Point) (r : RegularRing W P), ((regularTranslationEquiv W hΔ P Q).symm r : W.FunctionField)=fieldTranslation W hΔ (-Q) r) ∧ (∀ (P Q : W.Point) (r : RegularRing W (P+Q)), regularEvaluation W P (regularTranslation W hΔ P Q r)=regularEvaluation W (P+Q) r) ∧ (∀ (Q : W.Point) (f : W.FunctionField) (hf : f≠0), functionDivisor W (fieldTranslation W hΔ Q f) (translation_nonzero W hΔ Q hf)= divisorTranslation W (-Q) (functionDivisor W f hf)) ∧ (∀ (Q : W.Point) (D : W.Point →₀ ℤ) (f : W.FunctionFieldˣ), Disjoint D.support (functionDivisor W (translatedUnit W hΔ Q f) (translatedUnit W hΔ Q f).ne_zero).support ↔ Disjoint (divisorTranslation W Q D).support (functionDivisor W f f.ne_zero).support) ∧ (∀ (Q : W.Point) (D : W.Point →₀ ℤ) (f : W.FunctionFieldˣ) (hd : Disjoint (divisorTranslation W Q D).support (functionDivisor W f f.ne_zero).support), evaluateDivisor W D (translatedUnit W hΔ Q f) ((translation_disjoint_support W hΔ Q D f).mpr hd)= evaluateDivisor W (divisorTranslation W Q D) f hd)) ∧ CharP SignClosure 5 ∧ signCurve.Δ≠0 ∧ signPoint≠0 ∧ (3 : ℕ) • signPoint=0 ∧ signPoint≠-signPoint ∧ signFunction≠0 ∧ pointOrder signCurve signFunction signPoint=3 ∧ pointOrder signCurve signFunction (-signPoint)=0 ∧ pointOrder signCurve (fieldTranslation signCurve sign_delta signPoint signFunction) 0=3 ∧ functionDivisor signCurve (fieldTranslation signCurve sign_delta signPoint signFunction) (translation_nonzero signCurve sign_delta signPoint sign_function_nonzero)≠ divisorTranslation signCurve signPoint (functionDivisor signCurve signFunction sign_function_nonzero)",
+    "decl_sha256": "77d0bb9d6c1b5941dec62869d0023c6bb2917322004d870fc762d26ffcc50dc0",
+    "scope": "Actual elliptic translation pullback compatibility on every nonsingular general Weierstrass model over an algebraically closed coefficient field, every characteristic including 2/3. Actual shifted curve relation and actual generic translation formulas derive coordinate differences, infinity cancellation, strict maximal-ideal bounds and exact translated actual point-uniformizer value exp(-1), using actual nonsingularity in the zero-y-derivative branch. Actual coordinate substitution into actual infinity regular ring and actual residue diagram prove actual localization denominator units; actual point-local localization map commutes with full-field translation and residue. Actual unit value and official actual DVR uniformizer-times-unit factorization derive infinity normalized valuation equality on every full-field function. Previously proved actual field composition derives all-point normalized valuation/order compatibility, including every exceptional point. Actual regular-ring RingEquiv/bijectivity/explicit negative-point inverse and actual residue naturality derived, not premises. Actual principal divisor of field pullback Q equals actual point pushforward negative Q. Actual local-unit character transport, actual support-disjointness iff and actual guarded divisor evaluation transport derived. Product helper outside-unit default is not claimed to be a meromorphic residue. Actual ACF5/CharP5/nonsingular scalar extension of credited F5 curve y²=x³+1, actual nonzero order-three point P distinct from negative P, actual nonzero tangent with divisor3P-3O: actual order P=3,negative P=0,pullback at infinity=3, disproving positive-Q divisor pushforward identity. Known source methods/finite control credited, no qualified source refutation/new population/novelty. Nine new concrete modules/96 frozen modules/zero copies/105 old formal files/all124 old pins checked before-after21 states and gate. Fourteen failed states/seven successes retained; early latest-only Lake roots could reuse old oleans, corrected17 with complete-root actual rebuild; automatic exact root coverage from18, full nine-root final21 and whole source gate required. Default200000-heartbeat failures from missing evaluation imports retained; fixed imports/concrete regular-ring domains/transparent actual field-ring interfaces, no limits or global flags. Fresh Galbraith correctedch7 PDF10-11 printed132-133 fulltext and individual visual (Lemmas7.4.7/7.4.10-14/7.4.16; beginning7.5.1 only); rereadch9 PDF3-4 text with previous visuals credited and explicit Q/O exclusions. Copyright local only; official DVR/adic and prior actual point-local, residue and FF translation proofs credited. Four correct KB calls and Conductor127 before approach/code, bounded fallback/no absence claim. Separate Scheme.localRing/line-bundle comparison, general base-field descent, reciprocity, isogeny/Lang/Jacobian, canonical Weil/Tate/MOV/FR and full14 remain open. Same host/prover/procedural written-header check, not independent parser/compiler/physical-host assurance; signed standing unverified. No holes/custom axioms/native proof evaluation/raised limits/new global flags/waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeCertificate.lean",
+        "bytes": 4496,
+        "sha256": "d03f869d2acde28ff8d02d011cd4073afb7db656ff2ae5bf893b44f01d6b7ad7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeControls.lean",
+        "bytes": 4445,
+        "sha256": "875fc10520cae10f9903588da8d345fb110032c70a1a06866ff56940286b6a3a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeField.lean",
+        "bytes": 2669,
+        "sha256": "920636c22c6379526b0e4fc98baa3cfdfb5a81e20e06ccbd53b3c893ec606302"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeFunctions.lean",
+        "bytes": 1098,
+        "sha256": "69cbe26c9a84e11f4237e7ba5ac0eb950261c922c3cacac3b9836cbfb7611be5"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeInfinity.lean",
+        "bytes": 1023,
+        "sha256": "9496f761da59e3bbc4f0b3538fc946539e5e7ef68b21f0241ec632ca409a2704"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeMiller.lean",
+        "bytes": 2183,
+        "sha256": "9d98e2999bb57b6bbd4572783c7cf9a0c9b4d765cd0d33074abc988df4b4f5d2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangeNorm.lean",
+        "bytes": 2816,
+        "sha256": "1ec5a84b4db059ab68b14d3eaacb2a89314c98e70ccea96a1598c2283153545f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/BasechangePoints.lean",
+        "bytes": 1543,
+        "sha256": "e02e30cd0f8030f18fb1edde095e7464d1bd18f676d5957cd7f28013376af6b0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ConstantDivisors.lean",
+        "bytes": 1879,
+        "sha256": "6824027e72964a8c468d1a6e32f0a099d3fe41501cbdecf4510ad8824966896d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ConstantKernel.lean",
+        "bytes": 3505,
+        "sha256": "a66048dd185a17e3f9b49a0e0870260fe06ce8bf79c1fc491ec684c26d980c26"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DivisorDegree.lean",
+        "bytes": 2090,
+        "sha256": "90f0b79b8973002613252cab0ca8b39125044daeb90135a7a06165d8929460ab"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/DivisorEvaluation.lean",
+        "bytes": 5560,
+        "sha256": "c90deb637a9a759baf1e6a2001d68421f3e90a4ccbe2cb6efcd459346dc4846c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationCertificate.lean",
+        "bytes": 7034,
+        "sha256": "03990d735d85ebb550c63c6ffe9a43ec0e37929d4dabc804e7978aef68182da2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationConstants.lean",
+        "bytes": 2828,
+        "sha256": "d07c7bf7023772cd01bbce604181d9f47736b12cafa4f04b5b22ddc9277fd14a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationControls.lean",
+        "bytes": 6387,
+        "sha256": "3b3568c38442fadad79af99fd274b498a79815495440cf8a9d455a312e747677"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationFormulas.lean",
+        "bytes": 4359,
+        "sha256": "09bc4b486a4ebdb43f0c38b7c2b8dd4c5ca4021f5347efc8ac9b5ef71d39783e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteRegular.lean",
+        "bytes": 4512,
+        "sha256": "11c97bd093f400e524480215b835b1c2bb0afb5dc8fe7626458d5ac4853feb5b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/FunctionEvaluation.lean",
+        "bytes": 3332,
+        "sha256": "1c6c52d8e1b1047ad5af676df020eee4f00aa0382d44c3fa4f462014b42a9312"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricCertificate.lean",
+        "bytes": 3257,
+        "sha256": "06619bf9d34c7ad63c4cbaa24ae0364a74138ee0f214fd112a476a887a27eae0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricControls.lean",
+        "bytes": 3994,
+        "sha256": "3a486893f0333ccc42aa363070992cd430948e8c804b144de097eb79616cda0e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricDegree.lean",
+        "bytes": 1765,
+        "sha256": "d6cf4517944b22254bb4549919de849da9f212daf85651c1144cf522f678507f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricFibers.lean",
+        "bytes": 1309,
+        "sha256": "39a7e06a20c0529ba59de470aae19dd32c8e08e9f7cf84f48af542daeb27d219"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricMiller.lean",
+        "bytes": 3786,
+        "sha256": "516ea587329e75fe95eb9dd5c903a4a58065726709acacaaa77e2074a9381d63"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/InfinityEvaluation.lean",
+        "bytes": 2135,
+        "sha256": "32790f41b39dd1bffe5c2af23dcdcaf198f44d58f37ec2a1ffbda4e372e0b764"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalNegation.lean",
+        "bytes": 3344,
+        "sha256": "389e1937500b192442e9f8dd858fd0f16c250a4112dc9beb1cbe6d0e7799a7e3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationCertificate.lean",
+        "bytes": 2363,
+        "sha256": "634c422e8e6c752872b7a960545711bd2cc0c204e063dcd64a92f0546935b555"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationControls.lean",
+        "bytes": 2673,
+        "sha256": "d879a00357297322c628f90d29489694be39f15104c978c48cc0ff8f23eaf604"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationCoordinate.lean",
+        "bytes": 4229,
+        "sha256": "7757296d2542df2aadcb26c84754163f9c9cb184214305d49a5fa969813790f1"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationDivisor.lean",
+        "bytes": 2042,
+        "sha256": "eae68fd2af513043179747ff6c8db825ebb71bb2bdaf57fbade4c4b47c17dc84"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationField.lean",
+        "bytes": 2834,
+        "sha256": "b4e670cf28477dc9ca7e9152019ac047935dfada79bb56b151ff1f663464ad4c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationNorm.lean",
+        "bytes": 1963,
+        "sha256": "d58625b3365f957f323a5b0893f593cfcb3b555e9523b3ef7aa018a5f79232b9"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NegationValuation.lean",
+        "bytes": 3340,
+        "sha256": "8ab265d21e0bbef2e6d32a3651310c4055585b369f5a97ddf2cd7d2ab8ff167e"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/NormalizedUniqueness.lean",
+        "bytes": 2812,
+        "sha256": "91f8ada30670005c05bced0979b820104a287fe584eac94828dcea53e8f2eaea"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/OrderBounds.lean",
+        "bytes": 2249,
+        "sha256": "ec6e5cfd59ae338ff4333043c9180a77083e0fbe829ce120b8c22e359b9be667"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PointResidue.lean",
+        "bytes": 3333,
+        "sha256": "cb3bea09d4a62c9beb55262a28782341dd6ae6d26c68baa4c9fa8419de113d8d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/SplitPolynomialDivisors.lean",
+        "bytes": 3773,
+        "sha256": "b7123a14082b947c5ca9835226de09d149b9848ceb7f3149e10864dd33833495"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/UnitEvaluation.lean",
+        "bytes": 2888,
+        "sha256": "81231451b2309aead4581f4e8b5f02d552136963be9b71a8cddd2a941886e145"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lakefile.toml",
+        "bytes": 1819,
+        "sha256": "1b1e48d961a39b99376fe8c91c3615e9b3ff3d19adc668b84e3edb3a8c42f4e6"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/finite_point_evaluation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCertificate.lean",
+        "bytes": 2313,
+        "sha256": "2d4ae70691f817f1554baf35a2aa8ae47a7f4e16897077785d793433162a4f74"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardControls.lean",
+        "bytes": 2095,
+        "sha256": "96f2f3b92bc1721cd38ab6c9577c61f30bf100ae880e17988ebfac787ebb87b4"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCriterion.lean",
+        "bytes": 3133,
+        "sha256": "04c8f87a64a53c8e3005c4f9f82c194cbdd570720051064f2804c25e4ab5e52a"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardMaximal.lean",
+        "bytes": 3841,
+        "sha256": "9c7574e36b61c61d509e188b2c61996f948a1fa2f3c9a7b9bda8a7b11e49c32a"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardQuotient.lean",
+        "bytes": 3843,
+        "sha256": "848e0dc8e421fa1e10d7626947812f39dfdce41f3063897cb2f09bb315a5d0e3"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardReduction.lean",
+        "bytes": 3883,
+        "sha256": "a445f056f22c19ec71bef988329d306edb05aced3bd48e59d36c6e007d8dd28e"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardRegular.lean",
+        "bytes": 3815,
+        "sha256": "ed525803c0c986e04ca834547f3dc1e7d3d4c2fa5fdf7e76b0f3f400959fdeba"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/PicardSimplePole.lean",
+        "bytes": 2820,
+        "sha256": "9b105e496631a69cf2f1257f47a591b1ab1a9886d3d989fcc2b71c2438cf7a92"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3855,
+        "sha256": "1cb2762973a33160fe149a565575e9e82a18adc7d9db9af4d79a400f7ba37635"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lakefile.toml",
+        "bytes": 421,
+        "sha256": "af07c233c593116e9c7403db6eae93b7ca0686c99b315019529120ebe923e06e"
+      },
+      {
+        "path": "research/elliptic_picard_bridge_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationAction.lean",
+        "bytes": 4546,
+        "sha256": "9b493a8522646d8dde14fcfa08900608276b7055b592832e870927550cbcb875"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationCertificate.lean",
+        "bytes": 3804,
+        "sha256": "a07ae87f8c6daa4f94ddb2cce2520ee4940d1aa86f1bde2162c6ef4cb19f1a34"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationCoordinate.lean",
+        "bytes": 5119,
+        "sha256": "3dc238d7a308870bb43af588054d607b81d86079b3c522ea6c8088469ca3ebce"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationDivisors.lean",
+        "bytes": 4603,
+        "sha256": "8d3c610b5b1c004a6554f0544989f3b0a93d61e196a94e9f1630b947ccd84dd7"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationExample.lean",
+        "bytes": 4140,
+        "sha256": "f07f0797f67481945c1e0471110307806aab3495e471141e6c5d2fb5bc1da863"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationExampleField.lean",
+        "bytes": 6465,
+        "sha256": "962220d21638df384e8dc2212c4c7bbbc691e517a4d42509fc6b5c2e9896cd79"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationGeneration.lean",
+        "bytes": 1645,
+        "sha256": "5109dccc3ab70a15a73f9e4746fce8535ce8845287adc0c5f05df08cccbae8cd"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationGeneric.lean",
+        "bytes": 4091,
+        "sha256": "56898fc8e1161d67da000434cb37120b73e48058e7e93bd66b2c65d3327b2ae6"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationNaturality.lean",
+        "bytes": 4173,
+        "sha256": "fada47e8e5329a34f3873e054e60f3ae158b4463253d9c60b0a2ed052afbe40c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationPicard.lean",
+        "bytes": 3305,
+        "sha256": "55642c487e83c031245ed28c221cff1405996c077a8290e3f648ae73cd6f427c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationReciprocal.lean",
+        "bytes": 1456,
+        "sha256": "c655b6a79791682a29a11bcaa613694acea1751149b35ce993fcdd39c95a1496"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/TranslationTranscendence.lean",
+        "bytes": 3760,
+        "sha256": "e58f562dcc65c72f9cc684e7a06b6b4446ea617566055b5c59d364e5c9db0e17"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4144,
+        "sha256": "8b0997e4d2209b72f3a1ca3c679eba4f56b23d4abcf381469fb27459344dda3c"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lakefile.toml",
+        "bytes": 556,
+        "sha256": "6d95f754870438183edcdc3cac19269fcb1fc92cd9a3eca3b42627a249503ff4"
+      },
+      {
+        "path": "research/elliptic_translation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/LocalTranslationCertificate.lean",
+        "bytes": 3769,
+        "sha256": "c1e8c7e681be72be71e781f7dbcdfb039a622683d8a888c5ab05641bb93c9c20"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationEvaluation.lean",
+        "bytes": 4262,
+        "sha256": "cd2eb5ca1dd3336b7ed6b2e0fb20e1bbd2b7195d340f0501e6642f85a1e2b89a"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationExpansion.lean",
+        "bytes": 5328,
+        "sha256": "d6aa8a63c5ad5f30a1729dec99af82da397b2ffd0dbf6643cffb9abc910fa5e7"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationInfinity.lean",
+        "bytes": 6531,
+        "sha256": "d6fe54ad1bc4398c795f2116a8f2ed5803764187a74de2cd0f9890b4a7bc6af6"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationIntegral.lean",
+        "bytes": 6057,
+        "sha256": "bdb852d02c3e96b0518a31d903b2a4d6f81b742827498231deee2c574c9ada0f"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationLocal.lean",
+        "bytes": 6850,
+        "sha256": "035f7bb97404bb3da3bec9d9e2152804c3a27cb93dfaca16d76ad9c7b1832c7f"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationSign.lean",
+        "bytes": 4629,
+        "sha256": "4e860160923efcbd8923e9fa34ce42a0575a1937c260a41724cd58ab75967f2e"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationTransport.lean",
+        "bytes": 4838,
+        "sha256": "29c8ee927a8e5b63825862134dff03334e4d5b4760902a6af9c2e9b64f5f6c08"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/TranslationValuation.lean",
+        "bytes": 4492,
+        "sha256": "195c44f048a50b7d10bea418360be952119d46bdccdd820978e0f007e1432fbe"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4428,
+        "sha256": "cd7e02f27ca7bb073688db80a0fc7a5a74cda21f48bba8b5bb227bd76afdec8d"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lakefile.toml",
+        "bytes": 466,
+        "sha256": "09adc3c18cdb3857bdf559fa7c762b3db3a6a34a3c3ffd6f9da1a4cf70629c6b"
+      },
+      {
+        "path": "research/local_translation_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "BasechangeCertificate",
+    "BasechangeControls",
+    "BasechangeField",
+    "BasechangeFunctions",
+    "BasechangeInfinity",
+    "BasechangeMiller",
+    "BasechangeNorm",
+    "BasechangePoints",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "ConstantDivisors",
+    "ConstantKernel",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "DivisorDegree",
+    "DivisorEvaluation",
+    "EvaluationCertificate",
+    "EvaluationConstants",
+    "EvaluationControls",
+    "EvaluationFormulas",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteRegular",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "FunctionEvaluation",
+    "GeometricCertificate",
+    "GeometricControls",
+    "GeometricDegree",
+    "GeometricFibers",
+    "GeometricMiller",
+    "GuardControls",
+    "InfinityEvaluation",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalNegation",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "LocalTranslationCertificate",
+    "MillerFunctions",
+    "MillerStep",
+    "NegationCertificate",
+    "NegationControls",
+    "NegationCoordinate",
+    "NegationDivisor",
+    "NegationField",
+    "NegationNorm",
+    "NegationValuation",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "NormalizedUniqueness",
+    "OrderBounds",
+    "OriginEvaluation",
+    "PicardCertificate",
+    "PicardControls",
+    "PicardCriterion",
+    "PicardMaximal",
+    "PicardQuotient",
+    "PicardReduction",
+    "PicardRegular",
+    "PicardSimplePole",
+    "PointDivisor",
+    "PointLocalization",
+    "PointResidue",
+    "PolynomialValues",
+    "RationalControls",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "SplitPolynomialDivisors",
+    "TranslationAction",
+    "TranslationCertificate",
+    "TranslationCoordinate",
+    "TranslationDivisors",
+    "TranslationEvaluation",
+    "TranslationExample",
+    "TranslationExampleField",
+    "TranslationExpansion",
+    "TranslationGeneration",
+    "TranslationGeneric",
+    "TranslationInfinity",
+    "TranslationIntegral",
+    "TranslationLocal",
+    "TranslationNaturality",
+    "TranslationPicard",
+    "TranslationReciprocal",
+    "TranslationSign",
+    "TranslationTranscendence",
+    "TranslationTransport",
+    "TranslationValuation",
+    "UnitEvaluation",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/local_translation_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 41704,
+      "sha256": "b184de3dd12d56f0668f8a261865e260c910ed1ccde716503d9c239e3cb58bd5"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "56dc7b0cd319244288c5ac723b558ca9eee07923b7c395ad1bcc8324232f9969"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/attempts.json",
+      "bytes": 228,
+      "sha256": "eb6e9c9f51748c383439b8f2c2ca64872fd69516c0ec2284d8122db499cc31de"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 9468,
+      "sha256": "9f990d7e015699a29eae1f2c96eafa68f8bd5c3a5e19a879910cfd9daa5981e8"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/gate.json",
+      "bytes": 1638,
+      "sha256": "10a6d7edd3588fe981ad2c2379293a08c00deaacfdc0616d849a7186b79ca0e1"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/source-review.json",
+      "bytes": 2747,
+      "sha256": "f7cf7eb0808c857007b5d362173188b4955b3efad034cfdc463c66eda6e540f1"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/evidence/binding-check.json",
+      "bytes": 8339,
+      "sha256": "018484e2333feda28e1b80efa7798eb70e0d92548999423f4ff33531c994db2e"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/proof-map.json",
+      "bytes": 15979,
+      "sha256": "9e76f51761812e5194438b34a196bec8569a3f41654260bd4ab7cc8a7ed8248a"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/render_report.py",
+      "bytes": 7250,
+      "sha256": "eddd6c82bcd21061fb7a1a2ae6db543f71ec72cb11dc9d0fe1e666039740d96b"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/export_binding_input.py",
+      "bytes": 1757,
+      "sha256": "5e7203a3292a151ba0f3bd24ab6ab3f5bcb94915f2c34b2e97120d5260f2f071"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/PROTOCOL.md",
+      "bytes": 4463,
+      "sha256": "efc0419cc160119af7aef862daca59e6962ff136c4c1902ab283c2c1cfbb3f94"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/preflight.json",
+      "bytes": 3471,
+      "sha256": "d12cef1ae5101024ce6c433fc6ae53b6d781e2f1fbfc47f43a737f87bc324f85"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/reports/layout.json",
+      "bytes": 245,
+      "sha256": "f84b0d5ae4a8c484d00e9577b26003f2a3c31cdd88c932ee92badc57f6002613"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/reports/local-translation.svg",
+      "bytes": 1448,
+      "sha256": "f10be21e7b6bea99803ba63dfa53435856ce9eccc0c7ceb23620d29af69f80f7"
+    },
+    {
+      "path": "research/local_translation_audit_20261115/reports/report.pdf",
+      "bytes": 47202,
+      "sha256": "54442d2133e0b9a91d6fb1da4342a407e706d00d6f56c5cce1c73ad7ab7965a2"
+    },
+    {
+      "path": "research/elliptic_translation_audit_20261115/sources.json",
+      "bytes": 36027,
+      "sha256": "be13a170aa149ce6f551edc863fd7f0f96df893fefb03b76f49f133b5522b194"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 78,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_shifted_curve_and_infinity_cancellation": true,
+    "actual_localization_and_field_residue_diagrams": true,
+    "actual_uniformizer_units_derive_normalized_valuation": true,
+    "actual_all_point_valuation_order_residue_derived": true,
+    "actual_regular_ring_RingEquiv_explicit_inverse": true,
+    "actual_principal_divisor_negative_Q_identity": true,
+    "actual_guarded_divisor_evaluation_and_support_iff": true,
+    "actual_ACF5_char5_nonsingular_order3_sign_counter": true,
+    "supplied_local_preservation_or_valuation_residue_invariance_or_ramification_premise": false,
+    "early_latest_only_Lake_roots_defect_preserved": true,
+    "complete_root_rebuild_fixed_state": 17,
+    "automatic_root_coverage_from_state": 18,
+    "final21_all9roots": true,
+    "whole_current_source_gate": true,
+    "separate_Scheme_localRing_comparison": false,
+    "general_basefield_descent": false,
+    "Weil_reciprocity": false,
+    "canonical_pairing_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

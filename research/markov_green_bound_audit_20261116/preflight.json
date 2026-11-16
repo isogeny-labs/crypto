@@ -1,0 +1,159 @@
+{
+  "schema": "markov-green-preflight/v1",
+  "build_snapshots": 9,
+  "failed_states": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08"
+  ],
+  "successful_states": [
+    "09"
+  ],
+  "gate": {
+    "declarations": 78,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 7,
+    "new_concrete_modules": 6,
+    "official_import_bridge_modules": 1,
+    "count_includes_generated_equation_declarations": true,
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "markov-green-builds/09/build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "markov-green-gate01/research_markov_green_bound_audit_20261116_lean/build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "markov-green-gate01/research_markov_green_bound_audit_20261116_lean/source-build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ]
+    },
+    "auditor_advisories": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ],
+    "archive": {
+      "path": "research/markov_green_bound_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 2427,
+      "sha256": "f8c386c41bda920530d593a0a64849c97da87cfca235718ce13556277480913f"
+    },
+    "inventory": [
+      {
+        "member": "cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "audit.log",
+        "bytes": 7345,
+        "sha256": "c5c9272fb1975dd87e5852a5d356392d3b5c035b6d41eb21203b157778e6ea55"
+      },
+      {
+        "member": "build.log",
+        "bytes": 7304,
+        "sha256": "bd2c6c610e4bcfad55fbcdaac6c01080855da3c87daf1d544196c345c68375ba"
+      },
+      {
+        "member": "status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      },
+      {
+        "member": "source-build.log",
+        "bytes": 7304,
+        "sha256": "49d075e3b328faffbbfcf917af9e5f5cddc8f162466cea63ec6ac89d9021bee9"
+      }
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "logical_archive_name": "attempts.tar.xz",
+    "compressed_bytes": 172612,
+    "logical_sha256": "7cc3fa60cc2e6151da0e03cfcdc3a4ec9111a1ab0e7218c1d48ef869567867ac",
+    "physical_files": [
+      {
+        "path": "research/markov_green_bound_audit_20261116/evidence/attempts.tar.xz.part01",
+        "bytes": 64000,
+        "sha256": "0742ce40569524dec56a8af8e97b13db621f9a3495c97fb1d1ca750cf16162c7"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/evidence/attempts.tar.xz.part02",
+        "bytes": 64000,
+        "sha256": "b80e096d4acf8ef825b141a5b0bd1d5b3238940deba0eeed25f48deeff6c9954"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/evidence/attempts.tar.xz.part03",
+        "bytes": 44612,
+        "sha256": "29f47c221a7e671600abcf27fbc5c24329804f0b5c15f6c0424f66f204705689"
+      }
+    ],
+    "files": 295,
+    "unique_objects": 126,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json",
+    "multipart": true,
+    "parts": 3,
+    "physical_part_limit": 65536,
+    "copyright_or_regenerable_PNG_included": false
+  },
+  "dependency_plans": 1,
+  "old_formal_files": 34,
+  "static_hash_dependency_pins": 36,
+  "published_preservation_entries": 6127,
+  "all_checked_entries": 6163,
+  "frozen_plans": 48,
+  "copied_modules": 0,
+  "hydrated_modules": 0,
+  "manifest_packages": 14,
+  "all6163pins_checked_every_state_and_gate": true,
+  "exact_source_roots_from01": true,
+  "all_failed_states_retained": true,
+  "known_source_methods_credited": true,
+  "actual_general_PMF_entry_bridge": true,
+  "actual_power_stochasticity": true,
+  "actual_Green_includes_identity": true,
+  "actual_finite_maxima": true,
+  "sharper_row_bound": true,
+  "qualified_general_source_Lemma3_3": true,
+  "uniform_stationarity_column_equivalence": true,
+  "actual_positive_biased11_guard_deletion_counter": true,
+  "actual_uniform_allT_Green_formula": true,
+  "actual_prime_state_family": true,
+  "actual_IsLittleO_envelope_error": true,
+  "envelope_all_powers": true,
+  "actual_both_Green_limits_one": true,
+  "literal_printed_equality_limit_eight_refuted": true,
+  "vanishing_remainder_equality_refuted": true,
+  "healthy_source_bound_and_zero_singleton_controls": true,
+  "transparent_pinned_proposition_bundles": true,
+  "source_qualified_finite_bound_refuted": false,
+  "collision_asymptotic_order_refuted": false,
+  "qualified_adding_constant_refuted": false,
+  "general_Markov_collision_integer_block_repair": false,
+  "practical_hash_or_scalar_runtime": false,
+  "full14complete": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

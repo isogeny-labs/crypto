@@ -82,6 +82,80 @@ fn brute(
     );
     out
 }
+
+fn counted_query(
+    prepared: &Prepared,
+    target: &Point,
+    counter: &mut Counter,
+) -> (BigUint, u64, (u64, u64, u64, u64)) {
+    let before = counter.statistics.clone();
+    let mut meter = Meter::new(Limits {
+        steps: 500_000_000,
+        ..Limits::default()
+    });
+    let count = prepared.count(target, counter, &mut meter).unwrap();
+    let after = &counter.statistics;
+    (
+        count,
+        meter.used,
+        (
+            after.contractions - before.contractions,
+            after.edge_assignments - before.edge_assignments,
+            after.functional_assignments - before.functional_assignments,
+            after.functional_pruned_blocks - before.functional_pruned_blocks,
+        ),
+    )
+}
+
+#[test]
+fn target_history_does_not_change_online_count_work() {
+    let mut setup = Meter::new(Limits::default());
+    let (curve, fibres) = fixture(&mut setup);
+    let message = Arc::new(
+        MembershipMessage::from_fibres(&curve, &fibres, &mut Seeded(1), &mut setup).unwrap(),
+    );
+    let prepared = Prepared::new(&curve, &fibres, 2, Some(message), &mut setup).unwrap();
+    let targets = group(&curve, &mut setup);
+
+    let mut fresh_a = Counter::default();
+    let a_reference = counted_query(&prepared, &targets[0], &mut fresh_a);
+    let mut fresh_b = Counter::default();
+    let b_reference = counted_query(&prepared, &targets[1], &mut fresh_b);
+
+    let mut reused = Counter::default();
+    let a_first = counted_query(&prepared, &targets[0], &mut reused);
+    let b_after_a = counted_query(&prepared, &targets[1], &mut reused);
+    let a_after_b = counted_query(&prepared, &targets[0], &mut reused);
+
+    assert_eq!(a_first, a_reference);
+    assert_eq!(b_after_a, b_reference);
+    assert_eq!(a_after_b, a_reference);
+    assert_eq!(reused.statistics.contractions, 3);
+    println!(
+        "{}",
+        serde_json::json!({
+            "schema": "target-history-control/v1",
+            "setup_steps": setup.used,
+            "graph_edges": prepared.network().edge_count(),
+            "graph_vertices": prepared.network().vertex_count(),
+            "target_a": {
+                "count": a_reference.0.to_string(),
+                "charged_steps": a_reference.1,
+                "counter_delta": a_reference.2,
+                "fresh_equals_first_reuse": a_first == a_reference,
+                "fresh_equals_after_other_target": a_after_b == a_reference
+            },
+            "target_b": {
+                "count": b_reference.0.to_string(),
+                "charged_steps": b_reference.1,
+                "counter_delta": b_reference.2,
+                "fresh_equals_after_target_a": b_after_a == b_reference
+            },
+            "claim_scope": "current exact Counter retains no target-dependent online state"
+        })
+    );
+}
+
 #[test]
 fn exact_counts_and_prefix_witnesses_match_all_subgroup_targets_with_and_without_messages() {
     let mut meter = Meter::new(Limits::default());

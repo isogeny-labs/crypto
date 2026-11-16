@@ -1,0 +1,220 @@
+{
+  "branch": "aburan28/vigilant-babbage-26wqzs",
+  "closed_utc": "2026-11-12T02:42:38+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase3/run_phase3.sh",
+        "target/release/ecbench",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase3/runs"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.receipt.json: lost to a container restart (loss record benchmarks/losses/20261112-card-fp31-phase3-icyield-20261112-1-01-run-phase3.json); 37 of 96 cells finished and were kept",
+      "started_utc": "2026-11-12T01:04:39+00:00",
+      "wall_s": null
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase3/run_phase3.sh",
+        "target/release/ecbench",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase3/runs"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.receipt.json (run by tools/task_card.py with BENCHREC in the command env); started_utc of the first step from its pid file, later steps derived as the previous start plus its seconds",
+      "started_utc": "2026-11-12T01:45:21+00:00",
+      "wall_s": 3276.62
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "ic-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase3/runs",
+        "--m",
+        "3",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase3/analysis_m3.json",
+        "--perms",
+        "20000"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.receipt.json (run by tools/task_card.py with BENCHREC in the command env); started_utc of the first step from its pid file, later steps derived as the previous start plus its seconds",
+      "started_utc": "2026-11-12T02:39:57.620000+00:00",
+      "wall_s": 0.039
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "ic-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase3/runs",
+        "--m",
+        "2",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase3/analysis_m2.json",
+        "--perms",
+        "20000"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-2.receipt.json (run by tools/task_card.py with BENCHREC in the command env); started_utc of the first step from its pid file, later steps derived as the previous start plus its seconds",
+      "started_utc": "2026-11-12T02:39:57.659000+00:00",
+      "wall_s": 0.025
+    }
+  ],
+  "commit": "58e501e346844ce62850c578e3b4ad0258e1dcb1",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T01:03:09+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0103Z-fp31-ic-yield-across-classes",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 48,
+      "name": "m3_class_yield_over_predicted_mean",
+      "note": "relations/attempts divided by predicted yield; class pooled; range over 48 classes",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9375,
+        1.0324
+      ],
+      "unit": "ratio",
+      "value": 0.9821
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 48,
+      "name": "m2_class_yield_over_predicted_mean",
+      "note": "relations/attempts divided by predicted yield; class pooled; range over 48 classes",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9437,
+        1.0228
+      ],
+      "unit": "ratio",
+      "value": 0.9971
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 48,
+      "name": "m3_t1_cross_class_kw_p",
+      "note": "p-value; alpha 0.05/14",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.58113
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 48,
+      "name": "m2_t1_cross_class_kw_p",
+      "note": "p-value; alpha 0.05/14",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.63994
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "m3_planted_ratio",
+      "note": "planted +20% arm pc/main, mean of per-class medians; window [1.12,1.28]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.1978
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "m2_planted_ratio",
+      "note": "planted +20% arm pc/main, mean of per-class medians; window [1.12,1.28]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.2004
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "relations_total",
+      "note": "m=3 260773 + m=2 265338",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 526111.0
+    }
+  ],
+  "problem": "ecdlp-ic-yield-isogeny-class-invariance",
+  "raw": [
+    {
+      "bytes": 7976995,
+      "path": "research/fp31_whole_field_census_20261111/phase3/runs_phase3.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c39693521ac8cc35733bc95a658d0ac67e7d0dff57f1788187b746b2f58a0c7",
+      "sha256": "7c39693521ac8cc35733bc95a658d0ac67e7d0dff57f1788187b746b2f58a0c7",
+      "uploaded": false
+    },
+    {
+      "bytes": 24260,
+      "path": "research/fp31_whole_field_census_20261111/phase3/analysis_m3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/77/776c66e0ebf6b714865975949ccc80dd37ec143abcd6197b1ca35221d7f588f7",
+      "sha256": "776c66e0ebf6b714865975949ccc80dd37ec143abcd6197b1ca35221d7f588f7",
+      "uploaded": false
+    },
+    {
+      "bytes": 24512,
+      "path": "research/fp31_whole_field_census_20261111/phase3/analysis_m2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3a/3a3b270db0aad36008d4fdfaab46c3fa0f45b7a4249546e18e5797874e0309e2",
+      "sha256": "3a3b270db0aad36008d4fdfaab46c3fa0f45b7a4249546e18e5797874e0309e2",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/fp31_whole_field_census_20261111/phase3/REPORT_PHASE3.pdf",
+    "png": [],
+    "svg": [
+      "research/fp31_whole_field_census_20261111/phase3/figures/class_yield.svg",
+      "research/fp31_whole_field_census_20261111/phase3/figures/controls_within.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fp31-ic-yield-across-classes",
+  "status": "measured",
+  "summary": "IC relation yield (prime-abscissa FB, mitm m=3 and m=2) across 48 prime-order isogeny classes of F_(2^31-1): null supported for both m (14 tests, all p > 0.05/14; planted +20% reads 1.198/1.200). Local L1/L2; raw not uploaded (no AWS).",
+  "validation": null
+}
