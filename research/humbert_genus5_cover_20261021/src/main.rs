@@ -17,6 +17,7 @@ mod ghsmagic;
 mod la;
 mod lpsummary;
 mod poly;
+mod relfast;
 
 use cover::*;
 use curve::{invr, mulr, pollard_rho, random_point, Rng};
@@ -343,16 +344,33 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let la_solver = std::env::var("HUMBERT_LA_SOLVER").unwrap_or_else(|_| "w2".to_string());
     assert!(["w2", "w1", "l1"].contains(&la_solver.as_str()), "HUMBERT_LA_SOLVER must be w2, w1 or l1");
     let mut precheck_extensions = 0u64;
+    // HUMBERT_CLIQUE_SAFE=1 (dlpx): clique removal never removes a tree whose removal
+    // would leave a base column without a row (src/filter.rs safe_cliques)
+    let clique_safe = std::env::var("HUMBERT_CLIQUE_SAFE").map(|v| v == "1").unwrap_or(false);
+    let mut filt_cliques_skipped = 0u64;
+    // With the safe rule the covered base columns can only grow as relations are added
+    // (the singleton-pruned core of a larger row set contains the smaller one's, and safe
+    // clique removal keeps every column the core covers), so the precheck cannot feed
+    // back on itself. As a backstop (dlpx with HUMBERT_CLIQUE_SAFE only), after
+    // HUMBERT_PRECHECK_CAP (default 1000) extensions the precheck stops and the run falls
+    // back to the solve-and-reject path (target += ncols / 20 per rejected solve).
+    let precheck_cap: u64 = if clique_safe && dlp_mode == 3 { std::env::var("HUMBERT_PRECHECK_CAP").ok().and_then(|v| v.parse().ok()).unwrap_or(1000) } else { u64::MAX };
+    let mut precheck_capped = false;
     let mut t_rel = 0.0;
     let mut t_la = 0.0;
     let mut la_mulmods = 0u64;
     let mut la_rounds = 0;
+    // HUMBERT_REL_FAST=1: the same hyperplane candidates and relations with faster
+    // arithmetic (src/relfast.rs); its tables count toward the relation phase
+    let rel_fast = if relfast::enabled() { Some(relfast::RelFast::new(&s, &nodes)) } else { None };
     let sol;
     loop {
         let tr = Instant::now();
         while rows.len() < target {
             let rel = if use_quadrics {
                 quadric_relation(&s, &fb, &nodes, &mut rng, &mut qst)
+            } else if let Some(rf) = &rel_fast {
+                relfast::hyperplane_relation(&s, &fb, rf, &mut rng, &mut st)
             } else {
                 hyperplane_relation(&s, &fb, &nodes, &mut rng, &mut st)
             };
@@ -476,7 +494,11 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         // the raw rows with the surviving large primes as extra columns
         let tf = Instant::now();
         let built: Option<(Vec<Vec<(usize, u64)>>, usize)> = if dlp_mode > 0 {
-            let f = filter::build_x(&raw_rows, &|k| k < nx && !is_small[k], ncols, dlp_mode >= 2, r, if dlp_mode == 3 { Some(5) } else { None });
+            // base columns of the matrix: small x except the pinned one, c and D_oo
+            let is_base = |k: usize| if k < nx { is_small[k] && k != pinned } else { k == big_c || k == big_inf };
+            let safe: Option<&dyn Fn(usize) -> bool> = if clique_safe { Some(&is_base) } else { None };
+            let f = filter::build_xs(&raw_rows, &|k| k < nx && !is_small[k], ncols, dlp_mode >= 2, r, if dlp_mode == 3 { Some(5) } else { None }, safe);
+            filt_cliques_skipped = f.cliques_skipped;
             let lp_index: std::collections::HashMap<usize, usize> = f.lp_cols.iter().enumerate().map(|(i, &k)| (k, ncols + i)).collect();
             let m: Vec<Vec<(usize, u64)>> = f
                 .rows
@@ -520,7 +542,11 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         la_cols = mcols;
         la_rows = mat.len();
         la_nnz = mat.iter().map(|x| x.len() as u64).sum();
-        if la_precheck && mcols > DENSE_MAX {
+        if precheck_extensions >= precheck_cap && !precheck_capped {
+            precheck_capped = true;
+            eprintln!("[precheck] cap of {precheck_cap} extensions reached: falling back to solve-and-reject");
+        }
+        if la_precheck && mcols > DENSE_MAX && !precheck_capped {
             // columns in no relation are certain extra corank: collect more relations
             // before paying for a Wiedemann solve that is bound to be rejected
             let mut used = vec![false; mcols];
@@ -723,23 +749,33 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         pollard_rho(&ce, &gen, &q, r, &mut rng)
     };
     let rho_ok = rho.log == Some(x_true);
+    // HUMBERT_LA_THREADS set: record it; unset: the line is unchanged
+    let la_threads_field = la::la_threads().map(|t| format!("\"la_threads\":{t},")).unwrap_or_default();
     let sec_per_step = rho.seconds / rho.steps as f64;
     let expected_rho_steps = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
-    println!(
+    // HUMBERT_CLIQUE_SAFE only: extra fields, so the default output line is unchanged
+    let clique_extra = if clique_safe { format!(",\"clique_safe\":true,\"filter_cliques_skipped\":{filt_cliques_skipped},\"precheck_capped\":{precheck_capped}") } else { String::new() };
+    let mut line = format!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
 \"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"dlp\":{dlp},\"dlp_cycles\":{dlp_cycles},\"dlp_reductions\":{dlp_reductions},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
-\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\"la_cols\":{la_cols},\"la_rows\":{la_rows},\"la_nnz\":{la_nnz},\"dlp_mode\":{dlp_mode},\"filter_pruned_rows\":{filt_pruned},\"filter_merges\":{filt_merges},\"filter_nnz_before_merge\":{filt_nnz_pre},\"filter_lp_cols\":{filt_lp_cols},\"la_solver\":\"{la_solver}\",\"excess_frac\":{excess_frac},\"filter_cliques\":{filt_cliques},\"filter_clique_rows\":{filt_clique_rows},\"filter_excess_before\":{filt_excess_before},\"e2e_ok\":{e2e_ok},\"t_reduce\":{t_reduce:.4},\"t_filter\":{t_filter:.4},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\"la_cols\":{la_cols},\"la_rows\":{la_rows},\"la_nnz\":{la_nnz},\"dlp_mode\":{dlp_mode},\"filter_pruned_rows\":{filt_pruned},\"filter_merges\":{filt_merges},\"filter_nnz_before_merge\":{filt_nnz_pre},\"filter_lp_cols\":{filt_lp_cols},\"la_solver\":\"{la_solver}\",{la_threads_field}\"excess_frac\":{excess_frac},\"filter_cliques\":{filt_cliques},\"filter_clique_rows\":{filt_clique_rows},\"filter_excess_before\":{filt_excess_before},\"e2e_ok\":{e2e_ok},\"t_reduce\":{t_reduce:.4},\"t_filter\":{t_filter:.4},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
 \"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
 \"t_setup\":{t_setup:.4},\"t_relations\":{t_rel:.4},\"t_linear_algebra\":{t_la:.4},\"t_descent\":{t_desc:.4},\"t_ic_total\":{t_ic:.4},\
 \"k4_muls_relations\":{},\"k4_muls_descent\":{},\"peak_rss_kb\":{rss_ic},\
 \"rho_skipped\":{skip_rho},\"rho_solved\":{rho_ok},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected_rho_steps:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\
-\"ic_over_rho_time\":{:.4},\"ic_time_in_rho_steps\":{:.1}}}",
+\"ic_over_rho_time\":{:.4},\"ic_time_in_rho_steps\":{:.1}{clique_extra}}}",
         s.order, s.d_count, lp_alpha.unwrap_or(1.0), partials.len(), st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if la_cols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
         k4_after_rel - k4_after_setup, k4_after_desc - k4_after_rel,
         rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, if skip_rho { 0.0 } else { t_ic / rho.seconds }, if skip_rho { 0.0 } else { t_ic / sec_per_step }
     );
+    if let Some(rf) = &rel_fast {
+        // extra fields only with the flag: the default output line is unchanged
+        line.pop();
+        line.push_str(&format!(",\"rel_fast\":true,\"rel_fast_fp_mulmods\":{}}}", rf.fp_muls.get()));
+    }
+    println!("{line}");
 }
 
 #[cfg(test)]
