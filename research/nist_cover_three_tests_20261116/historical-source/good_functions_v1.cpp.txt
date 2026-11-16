@@ -1,0 +1,68 @@
+#include "target_weil_arithmetic.hpp"
+using Triple=std::array<int,3>;
+using Values8=std::array<T24,8>;
+struct GoodPoint {Line point;Values8 basis;int receipt_index=0;};
+struct Echelon {
+    int width;
+    std::map<int,TVector> rows;
+    explicit Echelon(int n):width(n){}
+    bool insert(TVector row){
+        require(int(row.size())==width,"good-function matrix width");
+        for(auto& [pivot,r]:rows){T24 c=row[pivot];if(c!=T24(0))for(int j=pivot;j<width;++j)if(r[j]!=T24(0))row[j]=row[j]-c*r[j];}
+        int pivot=0;while(pivot<width&&row[pivot]==T24(0))++pivot;if(pivot==width)return false;
+        T24 inv=row[pivot].inv();for(int j=pivot;j<width;++j)row[j]=row[j]*inv;rows.emplace(pivot,row);return true;
+    }
+    TSpace kernel()const{
+        TSpace out;
+        for(int free=0;free<width;++free)if(!rows.count(free)){TVector v(size_t(width),T24(0));v[free]=T24(1);
+            for(auto it=rows.rbegin();it!=rows.rend();++it){T24 sum;for(int j=it->first+1;j<width;++j)if(v[j]!=T24(0)&&it->second[j]!=T24(0))sum=sum+it->second[j]*v[j];v[it->first]=-sum;}
+            out.push_back(v);
+        }return out;
+    }
+};
+T24 good_dot(const TVector& a,const TVector& b){require(a.size()==b.size(),"good-function evaluation shape");T24 value;for(size_t i=0;i<a.size();++i)if(a[i]!=T24(0)&&b[i]!=T24(0))value=value+a[i]*b[i];return value;}
+Matrix3<T24> good_matrix(const Json& j){require(j.arr.size()==3,"good-function matrix3 shape");Matrix3<T24> out{};for(int i=0;i<3;++i)out[i]=read_line(j.arr[i]);return out;}
+T24 good_fp(const Json& j){return T24(F(Poly<Z>{Z(mpz_class(j.scalar))}));}
+TVector symmetric_values(const std::vector<Triple>& monomials,const Values8& a,const Values8& b,const Values8& c){
+    TVector values;values.reserve(monomials.size());
+    for(auto triple:monomials){T24 value;do{value=value+a[triple[0]]*b[triple[1]]*c[triple[2]];}while(std::next_permutation(triple.begin(),triple.end()));values.push_back(value);}
+    return values;
+}
+void emit_good_vector(const TVector& v){std::cout<<'[';for(size_t i=0;i<v.size();++i){if(i)std::cout<<',';emit_t24(v[i]);}std::cout<<']';}
+void emit_pairs(const std::vector<std::array<int,2>>& pairs){std::cout<<'[';for(size_t i=0;i<pairs.size();++i)std::cout<<(i?",":"")<<'['<<pairs[i][0]<<','<<pairs[i][1]<<']';std::cout<<']';}
+
+int main(int argc,char** argv){try{
+    require(argc==3,"usage: good_functions actual-study kernel-index");std::string root=argv[1];int kernel_id=std::stoi(argv[2]);require(kernel_id==3,"frozen kernel3 good-function input");
+    auto selected=read_json(root+"/selected-kernel.json");require(selected.at("kernel").integer()==kernel_id,"actual recorded input binding");
+    initialize_cover(read_json(root+"/inputs/p192-d7-prym.json"));Level2Input source_input;TargetWeil target(root);
+    auto descent=read_json(root+"/evidence/descent-v1/result.json"),receipt=read_json(root+"/evidence/destination-relations-v2/result.json");auto change=good_matrix(descent.at("change_of_coordinates"));
+    require(target.infinity2[0]==T24(1),"good-function infinity chart");T24 slope=target.infinity2[1];
+    require(target.f.partial(1).eval(target.infinity2)==T24(0)&&target.f.partial(2).eval(target.infinity2)!=T24(0),"bitangent infinity local parameter");
+    Form X=linear({T24(1),T24(0),T24(0)}),Y=linear({T24(0),T24(1),T24(0)}),line=linear({-slope,T24(1),T24(0)}),u=X*line*line,v=Y*line*line;
+    require(u.eval(target.infinity2)==T24(0)&&u.partial(1).eval(target.infinity2)==T24(0)&&v.eval(target.infinity2)==T24(0)&&v.partial(1).eval(target.infinity2)==T24(0),"cubic basis double vanishing at infinity2");
+    std::vector<GoodPoint> points;int excluded_points=0,index=0;
+    for(auto& row:receipt.at("points").arr){Line base{good_fp(row.at("x")),good_fp(row.at("y")),T24(1)},old{};
+        for(int i=0;i<3;++i)for(int j=0;j<3;++j)old[i]=old[i]+change[i][j]*base[j];
+        require(target.f.eval(old)==T24(0),"recorded point on Riemann quartic");
+        if(old[2]==T24(0)){++excluded_points;++index;continue;}
+        T24 x=old[0]/old[2],y=old[1]/old[2],l=y-slope*x,l2=l*l;
+        points.push_back({Line{x,y,T24(1)},Values8{T24(1),x,x*x,y,y*y,x*y,x*l2,y*l2},index});++index;
+    }
+    require(points.size()>=64,"fixed-window good-function support bound");int n=int(points.size());std::vector<Triple> monomials;
+    for(int i=0;i<8;++i)for(int j=i;j<8;++j)for(int k=j;k<8;++k)monomials.push_back({i,j,k});require(monomials.size()==120,"120 symmetric triple products");
+    Echelon constraints(120);std::vector<std::array<int,2>> training,heldout;std::set<std::array<int,2>> used;int training_attempts=0,training_excluded=0;
+    for(int attempt=0;attempt<512&&constraints.rows.size()<112;++attempt){++training_attempts;int i=attempt%n,j=(17*attempt+1+attempt/n)%n;if(i==j){++training_excluded;continue;}auto pair=std::array<int,2>{i,j};used.insert(pair);training.push_back(pair);constraints.insert(symmetric_values(monomials,points[i].basis,points[i].basis,points[j].basis));}
+    require(constraints.rows.size()==112,"good-function diagonal rank112");auto functions=constraints.kernel();require(functions.size()==8,"eight good-function kernel vectors");std::cerr<<"good-function diagonal rank112 reached\n";
+    int heldout_attempts=0,heldout_excluded=0;
+    for(int attempt=0;attempt<512&&heldout.size()<128;++attempt){++heldout_attempts;int i=(11*attempt+7)%n,j=(37*attempt+19)%n;auto pair=std::array<int,2>{i,j};if(i==j||used.count(pair)){++heldout_excluded;continue;}used.insert(pair);heldout.push_back(pair);auto values=symmetric_values(monomials,points[i].basis,points[i].basis,points[j].basis);for(auto& f:functions)require(good_dot(f,values)==T24(0),"good-function heldout diagonal vanishing");}
+    require(heldout.size()==128,"128 heldout diagonal pairs within bound");std::cerr<<"heldout diagonal checks passed\n";
+    Echelon generic_rank(8);std::vector<Triple> triples;TSpace generic_values;int generic_attempts=0,generic_excluded=0;
+    for(int attempt=0;attempt<64&&generic_rank.rows.size()<8;++attempt){++generic_attempts;int i=attempt%n,j=(attempt+17)%n,k=(attempt+41)%n;if(i==j||i==k||j==k){++generic_excluded;continue;}Matrix3<T24> canonical{points[i].point,points[j].point,points[k].point};T24 omega=determinant3(canonical);if(omega==T24(0)){++generic_excluded;continue;}auto values=symmetric_values(monomials,points[i].basis,points[j].basis,points[k].basis);TVector out;for(auto& f:functions)out.push_back(good_dot(f,values)/(omega*omega));generic_rank.insert(out);triples.push_back({i,j,k});generic_values.push_back(out);}
+    require(generic_rank.rows.size()==8,"good-function generic evaluation rank8");
+    auto heldout_value=symmetric_values(monomials,points[heldout[0][0]].basis,points[heldout[0][0]].basis,points[heldout[0][1]].basis);
+    rejects([&]{auto bad=functions[0];bad[0]=bad[0]+T24(1);require(good_dot(bad,heldout_value)==T24(0),"changed constant good-function coefficient");},"changed good-function coefficient");
+    std::cout<<"{\"scope\":\"P192-d7-kernel3-target-good-functions\",\"kernel\":3,\"RR_basis_dimension\":8,\"symmetric_products\":120,\"diagonal_rank\":112,\"good_functions\":8,\"heldout_pairs\":128,\"generic_rank\":8,\"excluded_points\":"<<excluded_points<<",\"training_attempts\":"<<training_attempts<<",\"training_excluded\":"<<training_excluded<<",\"heldout_attempts\":"<<heldout_attempts<<",\"heldout_excluded\":"<<heldout_excluded<<",\"generic_attempts\":"<<generic_attempts<<",\"generic_excluded\":"<<generic_excluded<<",\"rejected_controls\":1,\"divisor_map_constructed\":false,\"standing\":\"producer-unverified\",\"infinity2_slope\":";emit_t24(slope);
+    std::cout<<",\"point_receipt_indices\":[";for(size_t i=0;i<points.size();++i)std::cout<<(i?",":"")<<points[i].receipt_index;std::cout<<"],\"training_pairs\":";emit_pairs(training);std::cout<<",\"heldout_pair_indices\":";emit_pairs(heldout);
+    std::cout<<",\"symmetric_triples\":[";for(size_t i=0;i<monomials.size();++i)std::cout<<(i?",":"")<<'['<<monomials[i][0]<<','<<monomials[i][1]<<','<<monomials[i][2]<<']';std::cout<<"],\"function_coefficients\":[";for(size_t i=0;i<functions.size();++i){if(i)std::cout<<',';emit_good_vector(functions[i]);}
+    std::cout<<"],\"generic_triples\":[";for(size_t i=0;i<triples.size();++i)std::cout<<(i?",":"")<<'['<<triples[i][0]<<','<<triples[i][1]<<','<<triples[i][2]<<']';std::cout<<"],\"generic_values\":[";for(size_t i=0;i<generic_values.size();++i){if(i)std::cout<<',';emit_good_vector(generic_values[i]);}std::cout<<"]}\n";
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}
