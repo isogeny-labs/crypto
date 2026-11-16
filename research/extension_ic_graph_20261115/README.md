@@ -78,6 +78,16 @@ Observed LA primitive bitops fall903928056050to661359105264, including6171
 known gate events; other phases match. Native bookkeeping remains incomplete,
 with no full-cost ratio or parity assertion. [pcc:unverified]
 
+The [homogeneous-basis reuse replay](runpod-homogeneous-quotient-20261116-38/report.pdf)
+checks all six saved37graph matrices. Both modes pay the homogeneous
+checkpoint; reuse substitutes its checked one-dimensional kernel before a
+two-column affine target solve. Independent state/counter/kernel/projection
+checks match every target. For85%/32component products21503906→10728194,
+with1080050new word events charged. This is a saved-matrix component,
+without repricing37end-to-end; native gaps keep totals/bands/ratios null.
+All307source/portable custody hashes pass and the owned Runpod CPU is deleted.
+PCC-20261116-2ed91b remains unverified. [pcc:unverified]
+
 The [factor-base/checkpoint sweep](runpod-factor-base-balance-20261116-37/report.pdf)
 runs original IC and six graph configurations on a fresh p1009seed359
 Runpod fixture. All seven recover10013957165807875; the copied qualifier

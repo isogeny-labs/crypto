@@ -1,3 +1,54 @@
+# Current checkpoint:38COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.
+UserRustscience/allfuturemeasurementsRunpod; no subagents/stopgoal.
+ALLownedpaidpods32–38DELETED; no scientificjob/compileractive. Privateauthpointer
+/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/envresponses.
+
+38source05e224b7d3b365c38142da44615d927ef019961c before solePOST20219:15:57Z.
+Siximmutable37graphmatrixpairs, bothchargeoriginalhomogeneouscheckpoint;
+baselinefullaffineRREFvscheckedcodim1kernel+rowprojection+2columnsolve.
+Allrecover10013957165807875. Independentcolumn-keyed/u128/Fermatoraclechecks
+ALLaffineprefixstatesandALLsemanticcounters,homstate/rank/counters,unique
+kernel,everyprojectedrow,target,newknownwordeventconservationandpricesPASS.
+Productbaseline→reuse:16383236→8172740,16389886→8176423,21503906→10728194,
+21170395→10553767,28506830→14222697,28427218→14196730. Newwordevents
+904649/904649/1080050/1093244/1792010/1937091charged.85/32observedincomplete
+887810478528→442994121632. Allnativegapsstillunrankable/fulltotals/band/ratios
+null/no newDLP/no37end-to-endrepricing/composition/parity. No36zeroskipstacking.
+Oneworker6pairs0warm/retry/excluded,worker/copiedqualifier0,5.027swholepracticality.
+PCC-20261116-2ed91bUNVERIFIED.26qualifier/23driver tests/strictClippy/build/
+actualwrappertransport/capturecontrolsPASS.307committedsource/portablehash
+PASS; all6inputcmp37exact. InitialClippy/sourcecheckissuesretained/fixedprecall.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-homogeneous-quotient-20261116-38/
+returned/task/run:1270892Braw/4050969Bexport/6originalsLOCALhashbound,
+10221BsummaryGitpacket. Originalsource307blobsreconstructedpostcallPASS.
+Ownh5315kmxrjchl8CPU4/8/.12h/pinnedimage/actualCPU25 v2DELETE204/GET404
+19:17:15Zaftercollection;privateguardmarker/900s guardinert. FinalONEPAGEPDF
+VIEWED/unclipped/exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS.
+Packetresearch/.../runpod-homogeneous-quotient-20261116-38;benchmarks/
+20261116-runpod-homogeneous-quotient. No raw/qualifier/summaryrewritten.
+LessonsO-b90531ea2d12/T-a860388fa213/O-ca41826b2ee4. L-7abc30ad110b nowadopted
+2distincttransportconfirmations; instructionfoldedinto report-evidenceSKILL.
+
+NEXTcommit/push38finishedpacket/PCC/lesson/journal/resume/studyREADME/skill,
+thenPRactual38afterlint0. Source307manifesthistorical05;studyREADMEchanged
+POSTCALLforreportlink,originalsourceblobsPASS. Don'trerun/reprice38.
+NEXTTECHNICAL implementoptionalproductionbasisreuse,thenfreshmatchedfullpipeline
+Runpodmeasurement(no subtracting38from37). Rootcode currentlyUNCHANGEDby38;
+helpernative_analysis/src/homogeneous_quotient.rs canmove/sharedpathinto
+src/cryptanalysis;newRelationSystem/CountedRelationSystemreadonlypivotgetter,
+retainactualhomcheckpointRREF,checkedkernel,chargekernel/projectionincrements,
+solve2cols+actualellipticreplay. Preserveolddefaults/API/streams/certificates.
+Need explicitnewcounter/rankscope/qualifier ratherthanpretending2columnlegacy
+productsareoldfullmatrixcounts. Freshsource/spec/binariesbeforefuture39call.
+No39implementation/protocol/callselectedyet;avoidlengthydesignloops,startcode.
+
+37published92c2dc008/PRupdated, all7knownscalar; priorrecordsbelowunchanged.
+Latest92cCIworkflow/statusEMPTY19:03;requiredgatesunconfirmed/no manualmerge.
+NewpublicationpermitsCIread. Keepgoalactive and<=60seccommentary/concreteactions.
+
 # Current checkpoint:38SOURCE READY; ownedRunpodCPUready/notdispatched
 
 GoalACTIVE/RustgraphIC+cheapextension-field relationfinderresearchtowardrho parity.
