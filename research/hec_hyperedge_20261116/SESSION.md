@@ -17,3 +17,6 @@ Frozen4e0d00f0bc22/checkpoint20261116T044956Z executed once, all6cells completed
 
 ## Next verification decision
 Freeze independent first-prefix replay before implementing it: retain original output; add firstcompletion arithmetic state and independent original-order rank checks at first and preceding signclass. Require every original summary field byte-identical. This is a second correctness/cost-count gate, not a new arm or timing rerun. Needed to avoid attributing overcollection cost to firstcompletion or assuming full finalrank already held at firstcompletion.
+
+## Completed first-prefix replay and report
+Frozen8887a6af9e70/checkpoint045238Z replay executed once, exit0/emptystderr, every original summary/footer byte-identical (compare0). Independent first/preceding ranks pass5completing policies. g3H14needs30036eliminationmultiplications at1447classes, rank214/off201; g4H10LP4needs9578at2139, rank65/off56. These omit inversions, all generation and target/setup work; no speed ratio. Both pages of REPORT.pdf rendered and visually inspected. Complete12policy table retains every noncompletion. Next gate: complete supplied-target solves with descent kept as catalogue equations, avoiding an untested small-anchor support assumption. Full tenfold goal remains active; no PR merge.
