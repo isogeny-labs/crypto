@@ -11,3 +11,9 @@ Build/hash/freeze/checkpoint, execute once, independently check ranks and raw gr
 
 ## Errors
 None yet in current study.
+
+## Completed original rank screen
+Frozen4e0d00f0bc22/checkpoint20261116T044956Z executed once, all6cells completed, exit0/emptystderr. Independent full/offranks agree everypolicy. g3p503H14:maxLP3reaches13retainedrank atclass1447; maxLP2rank0after8008. g4p127H10:maxLP4reaches9at2139; maxLP2/3rank0after4032. g4H16:maxLP3/4reach15at3304/1504,2LPends13after16384. g2unchanged control matches historicalH8rank0/224classes andH12firstcompletion714. Work counts are full fixed streams, not firstcompletioncost. Final stronger arms reach full catalogue rankFB-1, exposing larger-matrix cost; no new complexity or speedclaim.
+
+## Next verification decision
+Freeze independent first-prefix replay before implementing it: retain original output; add firstcompletion arithmetic state and independent original-order rank checks at first and preceding signclass. Require every original summary field byte-identical. This is a second correctness/cost-count gate, not a new arm or timing rerun. Needed to avoid attributing overcollection cost to firstcompletion or assuming full finalrank already held at firstcompletion.
