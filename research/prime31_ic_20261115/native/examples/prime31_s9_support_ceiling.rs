@@ -48,7 +48,8 @@ fn choose(n: usize, k: usize) -> u128 {
 fn first_rational_points(ar: &mut Arithmetic, base: usize) -> Vec<(u64, u64)> {
     let mut points = Vec::with_capacity(base);
     for x in 0..PRIME31.p {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             // A point of order two cannot occur on this odd prime-order curve.
             assert_ne!(y, 0);
             points.push((x, y.min(PRIME31.p - y)));
