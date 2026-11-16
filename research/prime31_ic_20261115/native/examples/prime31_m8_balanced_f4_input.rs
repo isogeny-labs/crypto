@@ -336,8 +336,9 @@ fn main()->Result<(),String>{
         // An oversize/censored result is NOT a refutation or a relation.
         let first=*transcript.witnesses.first().ok_or("missing fixed m8 witness")?;
         let pts=witness_points(first[2],first[3],&fb,&ar)?;
-        let triple=ar.add(e,ar.add(e,Some(pts[0]),Some(pts[1])),
-            Some(pts[2])).ok_or("left three-sum is identity")?;
+        let first_pair=ar.add(e,Some(pts[0]),Some(pts[1]));
+        let triple=ar.add(e,first_pair,Some(pts[2]))
+            .ok_or("left three-sum is identity")?;
         let base_r=minimal_s4_ring(fb.terminal);
         let split_r=split_s4_ring(fb.terminal);
         base_r.check();
