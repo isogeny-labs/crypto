@@ -1,0 +1,13 @@
+warning: method `retained_indices` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-normalized-transport/../feature-native-division/lib.rs:62:9
+   |
+37 | impl Division {
+   | ------------- method in this implementation
+...
+62 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

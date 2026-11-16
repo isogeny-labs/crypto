@@ -1,11 +1,15 @@
 {
   "schema": "ecbench.frontier-campaign/v1",
   "date": "2026-10-31",
-  "source_commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
-  "binary_sha256": "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b",
+  "source_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "binary_sha256": "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d",
+  "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:b8c20f9c151360b78f505360e8d47068c4068f00a8f6faa7ebd3086fa0a791c6",
+  "publication_receipt": "execution/publication.json",
   "backend": "isolab-eks-spot",
   "measurement_class": "measurement",
-  "state": "blocked_no_authenticated_eks_route",
+  "state": "blocked_checkpoint_and_protocol_revision",
+  "protocol_status": "draft",
+  "draft_warning": "The listed nine jobs plan on the exact current binary but do not yet cover every current parameterized implementation or fit the 3600-second queue envelope; they must be expanded and sharded before freeze.",
   "fixed_requirements": {
     "one_target_scope": true,
     "targets_per_cell": 8,

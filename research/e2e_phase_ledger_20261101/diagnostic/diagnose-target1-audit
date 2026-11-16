@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# Hash-check and sanitize the fixed target-1 native-audit failure.
+set -euo pipefail
+[[ $# == 8 ]] || {
+  echo 'Usage: diagnose-target1-audit JOB LAUNCHER REQUEST_SHA SOURCE_SHA BINARY_SHA WORKFLOW_RUN JOB_UID POD_UID' >&2
+  exit 2
+}
+
+job=$1
+launcher=$2
+request_sha=$3
+source_sha=$4
+binary_sha=$5
+workflow_run=$6
+job_uid=$7
+pod_uid=$8
+: "${ISOLAB_BUCKET:?}" "${CODEBUILD_BUILD_ID:?}"
+aws_bin=${AWS_BIN:-aws}
+
+[[ "$job" =~ ^gh-[0-9]+-[1-9][0-9]*$ ]]
+[[ "$launcher" =~ ^[a-f0-9-]{36}$ ]]
+[[ "$request_sha" =~ ^[a-f0-9]{64}$ ]]
+[[ "$source_sha" =~ ^[a-f0-9]{40}$ ]]
+[[ "$binary_sha" =~ ^[a-f0-9]{64}$ ]]
+[[ "$workflow_run" =~ ^[0-9]+$ ]]
+[[ "$job_uid" =~ ^[a-f0-9-]{36}$ ]]
+[[ "$pod_uid" =~ ^[a-f0-9-]{36}$ ]]
+diagnostic_id=${CODEBUILD_BUILD_ID##*:}
+[[ "$diagnostic_id" =~ ^[a-f0-9-]{36}$ ]]
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+launcher_dir="$tmp/launcher"
+pod_dir="$tmp/pod"
+mkdir -p "$launcher_dir" "$pod_dir"
+launcher_prefix="runs/$job/launcher/$launcher"
+pod_prefix="runs/$job/$pod_uid"
+
+for name in request.json result.json status.json objects.json; do
+  "$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$launcher_prefix/$name" \
+    "$launcher_dir/$name" --only-show-errors
+done
+
+[[ $(sha256sum "$launcher_dir/request.json" | cut -d ' ' -f1) == "$request_sha" ]]
+jq -e --arg job "$job" --arg source "$source_sha" --arg binary "$binary_sha" '
+  .schema=="isolab.eks.request/v1" and .job.job_name==$job
+  and .job.build.source_revision==$source
+  and .job.build.ecbench_sha256==$binary
+  and .provenance.source_revision==$source
+' "$launcher_dir/request.json" >/dev/null
+jq -e --arg job "$job" --arg launcher "$launcher" --arg request "$request_sha" \
+  --arg source "$source_sha" --arg binary "$binary_sha" --arg job_uid "$job_uid" '
+  .schema=="isolab.eks.result/v1" and .state=="failed" and .exit_code==23
+  and .job_name==$job and .job_uid==$job_uid and .results_uri==""
+  and .launcher==("isolab-experiment-launcher:"+$launcher)
+  and .request_sha256==$request and .build.source_revision==$source
+  and .build.ecbench_sha256==$binary
+' "$launcher_dir/result.json" >/dev/null
+jq -e --arg job "$job" --arg job_uid "$job_uid" --arg pod "$pod_uid" '
+  .job.job_name==$job and .job.uid==$job_uid and .job.state=="failed"
+  and any(.pods[]; .uid==$pod
+    and any(.status.containerStatuses[]?; .state.terminated.exitCode==41))
+' "$launcher_dir/status.json" >/dev/null
+
+names=(SHA256SUMS job-exit.json build-info.json binary.sha256 input-spec.json audit.json)
+names_json=$(printf '%s\n' "${names[@]}" | jq -Rsc 'split("\n")[:-1]')
+jq -e --arg prefix "$pod_prefix/" --argjson names "$names_json" '
+  . as $root
+  | (.objects|type)=="array"
+    and all($names[]; . as $name | any($root.objects[]; .Key==($prefix+$name)))
+' "$launcher_dir/objects.json" >/dev/null
+for name in "${names[@]}"; do
+  "$aws_bin" s3 cp "s3://$ISOLAB_BUCKET/$pod_prefix/$name" \
+    "$pod_dir/$name" --only-show-errors
+done
+
+verify_manifest_entry() {
+  local name=$1 expected actual count
+  count=$(awk -v wanted="$name" '$2==wanted {n++} END {print n+0}' "$pod_dir/SHA256SUMS")
+  [[ "$count" == 1 ]]
+  expected=$(awk -v wanted="$name" '$2==wanted {print $1}' "$pod_dir/SHA256SUMS")
+  [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
+  actual=$(sha256sum "$pod_dir/$name" | cut -d ' ' -f1)
+  [[ "$actual" == "$expected" ]]
+}
+for name in job-exit.json build-info.json binary.sha256 input-spec.json audit.json; do
+  verify_manifest_entry "$name"
+done
+
+jq -e --arg job "$job" --arg pod "$pod_uid" '
+  .job_name==$job and .pod_uid==$pod and .exit_code==41
+' "$pod_dir/job-exit.json" >/dev/null
+jq -e --arg source "$source_sha" --arg binary "$binary_sha" '
+  .source_revision==$source and .ecbench_sha256==$binary
+' "$pod_dir/build-info.json" >/dev/null
+read -r retained_binary retained_path < "$pod_dir/binary.sha256"
+[[ "$retained_binary" == "$binary_sha" && "$retained_path" == /usr/local/bin/ecbench ]]
+jq -e --slurpfile request "$launcher_dir/request.json" \
+  '. == $request[0].job.spec' "$pod_dir/input-spec.json" >/dev/null
+
+jq '
+  {
+    ok: (.ok==true),
+    regraded: (.regraded==true),
+    records_bound: (.records_bound==true),
+    records_positive: (try ((.records|type)=="number" and .records>0) catch false),
+    verified_records_equal_records:
+      (try ((.records|type)=="number" and (.verified_records|type)=="number"
+        and .verified_records==.records) catch false),
+    replay_count_positive:
+      (try ((.replays|type)=="array" and (.replays|length)>0) catch false),
+    all_replays_reproduced:
+      (try ((.replays|type)=="array" and all(.replays[]; .reproduced==true)) catch false)
+  } as $checks
+  | {
+      audit: {
+        ok: (.ok==true),
+        regraded: (.regraded==true),
+        records_bound: (.records_bound==true),
+        records: (if (.records|type)=="number" then .records else null end),
+        verified_records:
+          (if (.verified_records|type)=="number" then .verified_records else null end),
+        replay_count: (if (.replays|type)=="array" then (.replays|length) else null end),
+        reproduced:
+          (if (.replays|type)=="array"
+           then ([.replays[]|select(.reproduced==true)]|length) else null end),
+        problem_count:
+          (if (.problems|type)=="array" then (.problems|length) else null end)
+      },
+      gate_predicates: $checks,
+      failed_predicates: [$checks|to_entries[]|select(.value!=true)|.key]
+    }
+' "$pod_dir/audit.json" > "$tmp/audit-summary.json"
+
+audit_sha=$(sha256sum "$pod_dir/audit.json" | cut -d ' ' -f1)
+jq -n --argjson workflow "$workflow_run" --arg job "$job" \
+  --arg launcher "$launcher" --arg diagnostic "$diagnostic_id" \
+  --arg request "$request_sha" --arg source "$source_sha" \
+  --arg binary "$binary_sha" --arg job_uid "$job_uid" --arg pod "$pod_uid" \
+  --arg audit_sha "$audit_sha" --slurpfile summary "$tmp/audit-summary.json" '
+  {schema:"isolab.eks.audit-receipt-diagnosis/v1",workflow_run:$workflow,
+   job_name:$job,job_uid:$job_uid,pod_uid:$pod,launcher_id:$launcher,
+   diagnostic_launcher_id:$diagnostic,request_sha256:$request,
+   source_revision:$source,ecbench_sha256:$binary,pod_exit_code:41,
+   classification:"native_audit_gate_exact_predicates",
+   manifest_verified:true,audit_sha256:$audit_sha,
+   audit:$summary[0].audit,gate_predicates:$summary[0].gate_predicates,
+   failed_predicates:$summary[0].failed_predicates,
+   experiment_retry:false,
+   scope:"hash-verified audit gate booleans, counts and predicate names only; raw records, problem text, timing values, stdout and stderr remain private"}
+' > "$tmp/diagnosis.json"
+jq -e '
+  .schema=="isolab.eks.audit-receipt-diagnosis/v1"
+  and .manifest_verified==true and .pod_exit_code==41
+  and (.failed_predicates|type)=="array" and (.failed_predicates|length)>0
+  and .experiment_retry==false
+' "$tmp/diagnosis.json" >/dev/null
+
+output_key="runs/$job/launcher/$diagnostic_id/audit-summary.json"
+"$aws_bin" s3 cp "$tmp/diagnosis.json" "s3://$ISOLAB_BUCKET/$output_key" \
+  --only-show-errors
+printf '%s\n' "$output_key"

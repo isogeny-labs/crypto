@@ -1,0 +1,66 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Random-binary n=31 matrix F4/F5 frontier, target block 1/2",
+  "description": "Matrix F4 and matrix F5 on the same binary-subspace system against matched negation rho. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 31,
+        "seed": 59297,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610360310,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "rho-neg-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "matrix-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=11",
+          "oracle": "pdp3-binary:m=3,engine=matrix-f4,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "matrix-f5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=11",
+          "oracle": "pdp3-binary:m=3,engine=matrix-f5,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610370310,
+    "isolation_required": "L2",
+    "timeout_seconds": 21
+  }
+}

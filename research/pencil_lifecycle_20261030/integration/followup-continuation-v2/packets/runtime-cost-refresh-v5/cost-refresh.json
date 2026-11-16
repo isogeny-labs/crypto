@@ -1,0 +1,178 @@
+{
+  "schema": "runtime.cost-refresh/v1",
+  "recorded_utc": "2026-11-03T20:09:56.122411+00:00",
+  "coordination_task": "T-1484",
+  "coordination_scope": "migration:pencil-runtime-budget-20261103",
+  "decision": "finite_estimated_envelope_available_for_prospective_review",
+  "execution_admitted": false,
+  "daily_allowance_usd": "200.00",
+  "daily_budgets_nonadditive": true,
+  "monthly_allowance_usd": "1000.00",
+  "daily_spend_selected_usd": "131.13",
+  "daily_reported_headroom_usd": "68.87",
+  "monthly_spend_usd": "350.379",
+  "monthly_reported_headroom_usd": "649.621",
+  "budget_observations": [
+    {
+      "Name": "isolab-daily-cost-100",
+      "Filters": null,
+      "Types": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "Limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "131.13",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:48:04.319000+00:00"
+    },
+    {
+      "Name": "isolab-monthly-account-cost",
+      "Filters": null,
+      "Types": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "Limit": {
+        "Amount": "1000.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "350.379",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:56:13.130000+00:00"
+    },
+    {
+      "Name": "spot-experiments-daily-25",
+      "Filters": null,
+      "Types": null,
+      "Limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "48.79",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:56:27.624000+00:00"
+    }
+  ],
+  "prior_total_reservation_usd": "58.00",
+  "shared_reserve_retained_usd": "55.00",
+  "prior_attempt_reservations_retained_usd": "3.00",
+  "proposed_extra_attempt_usd": "1.00",
+  "proposed_total_reservation_usd": "59.00",
+  "estimated_daily_unreserved_usd": "9.87",
+  "estimated_monthly_unreserved_usd": "590.621",
+  "campaign_seconds": 25200,
+  "prior_conservative_worker_debit_seconds": 2400,
+  "proposed_extra_worker_debit_seconds": 600,
+  "remaining_after_proposal_seconds": 22200,
+  "attempt_count": 1,
+  "qualification_service_seconds": 300,
+  "cpu_quota": 2,
+  "memory_bytes": 2147483648,
+  "retained_disk_bytes": 4294967296,
+  "new_provisioned_resources": 0,
+  "deadline_utc": "2026-11-04T06:00:00Z",
+  "known_regional_hourly_rates_usd": {
+    "active_EC2_request_caps": "1.776640",
+    "gp3": "0.5184444444444444444444444444",
+    "standard_snapshot_full_volume_upper": "0.4718055555555555555555555556",
+    "EKS_standard_control_plane_extended_allowance": "0.60",
+    "NAT_hourly": "0.045"
+  },
+  "current_daily_update_to_deadline_hours": "10.19880027777777777777777778",
+  "current_known_window_estimate_usd": "34.79718467974722222222222223",
+  "current_margin_within_existing55_usd": "20.20281532025277777777777777",
+  "full_host_300seconds_upper_usd": "0.141120",
+  "existing4GiB_storage_current_observation_to_deadline_usd": "0.004370849082098765432098765431",
+  "accounting_rule": "Carry original55 shared reserve once. Do not add a second forward/elapsed shared reserve or sum old and refreshed reported spending. Keep all3 old attempt allocations and add1. Fullhost attempt allowance overlaps standing-footprint coverage conservatively; it is not claimed as disjoint billed usage. No old debit released.",
+  "coordinator_confirmation": "Root confirms no newly known competing paidresource/worker commitment from this team since priorreservation. Existinghost ordinarysource checks, artifact I/O and three recorded private phases only; no EKS submission/build/new instances/volumes/IAM. Latest9.9MB proofarchive repair uses existingstore and prior shared I/O margin.",
+  "competing_commitment_scope": "Team confirmation plus unchanged regional resource snapshot and connector Jobs. No accountwide reservation census: Conductor CLI listing capped at200 older rows.",
+  "unknowns": [
+    "AWS billing delayed; LastUpdatedTime is not completeness watermark",
+    "Other-region and unrelated-team future commitments not enumerated",
+    "S3,requests,transfer,NATbytes,publicIPv4 and other service consumption not measured completely",
+    "55USD remains an estimated conservative reserve, not guaranteed accountwide spend ceiling"
+  ],
+  "sources": [
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html",
+    "https://aws.amazon.com/eks/pricing/",
+    "https://aws.amazon.com/vpc/pricing/",
+    "https://aws.amazon.com/ebs/pricing/"
+  ],
+  "prior_bindings": {
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v4/reservation.draft.json": "b0b9ea05c4bbbf19cab832e10540cd5895ade158eed4b994381892d864ecdce1",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-dollar-reservation/allocation.json": "8af065fd291eb95d3aae5945857d123c40c2aacf201d266103fb052aa303ab2c"
+  },
+  "observations": {
+    "price-host.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "budgets.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "budgets.receipt.json": "80556cb35f4c95016902b0e70cb73e5a6cef7acf610d2eaae23f8fd91b8dbb6c",
+    "price-host.receipt.json": "5b87e10bf092e1bedd021622ede241fd26f1027de1735b3622b0d1f2824da519",
+    "spot.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spot.receipt.json": "bf5fc9f29894494e9e8b656520e9809477f09daf45734f5f596fd94fcfea1955",
+    "snapshots.stdout": "ddb7595f548f5d34fe730e8f3d1477d76b38b0b8eb1fcd6e0231ddde1955b145",
+    "cluster-detail.receipt.json": "71b7d097c5b33d63430cb78d7e5c90490ab4455e950294a79d4044910b3091a0",
+    "cluster-detail.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spotrequests.receipt.json": "ccfc1005f4908b8303f68aeff9d8bda37487f7470642e122e516aa45ec8f7ac4",
+    "nat.stdout": "f41fef4c616bf7bcce08bfa8ed5eb78409355b4b5e961e4ee4deddb541892747",
+    "spotrequests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "caller.stdout": "9b2a64ba6f1c325c1b9d28fa581636350fb27bc1e381c85994333969fa07747f",
+    "volumes.stdout": "45cd3e4e6a45e6d6264b861d707b3836ef479976ef8d984a040827c00745656b",
+    "price-gp3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "price-gp3.receipt.json": "16e9704f08e1b101cb4ae0604f81d19dccf4740a60cfed81445a08fd78a1a75a",
+    "instances.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "instances.receipt.json": "b0e2f3272ec74ebb9965676e8e360ac06479714b458e2e2dab30dd20ce0c409e",
+    "clusters.stdout": "e6402ede3a5894459e0e1244eea58cd00ac9c56257291d95e745fdf477e2d9d5",
+    "instances.stdout": "ff4867fd5d6e3f9f65ab90a6769c807fbdafc00da20dacda297f37d199d8217f",
+    "snapshots.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "snapshots.receipt.json": "1f1704e7d98bc63bb6def86f8e6e003b36f3559d4f74fa7083a675f406c29474",
+    "nat.receipt.json": "d8c4aee04ea310dbb444a337faf90bbcbe4e80b87514352143c135b93e4a5be2",
+    "nat.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "caller.receipt.json": "3a55a8f1be14b51d8fc7613357038f568b2f7d5e18cae539aa441d5e141aad28",
+    "caller.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "volumes.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "volumes.receipt.json": "6311cb6266367a4c306c0f56cb4f2eb65ee22547d2f76acb3cbed7321d55789e",
+    "cluster-detail.stdout": "7931a5f9b63207954ba69cc394284054e63d43b2682cba76337c637330311512",
+    "spotrequests.stdout": "9e9c41220a1387cab9f748b380d2a73fba0788640f65636297c5725a6e14a086",
+    "price-gp3.stdout": "dab247ebcd600f0e1544b2c5f22204b7b2f0536bb44ae48983c18a58393aa45f",
+    "spot.stdout": "d02bca5b6a191d38114dfb0a31b60963b8a7c101a26bced4298b622fa16c66a4",
+    "clusters.receipt.json": "644cd75b5334e9e8963edb2abfdf0fd26a9b1ed16d7b6217b596167c8837ddca",
+    "clusters.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "budgets.stdout": "ff4e434ebc811978e2eff4ab32ca530fc0ed7a4d1b60ec1e213eab9b25c47bb3",
+    "price-host.stdout": "f160fb07bb7948c3a8cb34c8db23ad9471ff6b1e0add47dbe7a1b47e80223221"
+  },
+  "overview_sha256": "0e476e74fecc5f5acc2f76be819b4d2a6db9d432583e2193fca6b4bc838132dc",
+  "candidate_owner_prefix": "24806e07"
+}

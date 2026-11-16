@@ -1,0 +1,17 @@
+# independent_falls.py sha256 d81f6ab7431f6c8d578dfac1e6b19fae15f914855ffc6d9ac418066c2a25b9c1; Python 3.13.18
+INDEPENDENT field equations only n=2: d_F(S_fe) = 4
+INDEPENDENT field equations only n=3: d_F(S_fe) = 4
+INDEPENDENT field equations only n=4: d_F(S_fe) = 4
+INDEPENDENT field equations only n=5: d_F(S_fe) = 4
+INDEPENDENT n=1 {X^2, X^2+1}: d_F(inside) = 2  d'_F = 1
+INDEPENDENT n=1 {X^3, X^3+1}: d_F(inside) = 3  d'_F = 1
+INDEPENDENT n=1 {X^4, X^4+1}: d_F(inside) = 4  d'_F = 1
+INDEPENDENT n=1 {X^5, X^5+1}: d_F(inside) = 5  d'_F = 1
+INDEPENDENT n=1 {X^6, X^6+1}: d_F(inside) = 6  d'_F = 1
+INDEPENDENT n=1 {X^7, X^7+1}: d_F(inside) = 7  d'_F = 1
+INDEPENDENT n=1 {X^8, X^8+1}: d_F(inside) = 8  d'_F = 1
+INDEPENDENT {XYW+XY+W; XZW+XW+1} n=4: d_F(inside)=4 d'_F=1 gap=3
+SELFTEST {YZ+1; XZ+X+1} n=3: d_F(inside)=3 d'_F=1 expected (3, 1) -> PASS
+SELFTEST {X^2Y; XY+X} n=2: d_F(inside)=3 d'_F=2 expected (3, 2) -> PASS
+SELFTEST {XY+Z; XZ+Y} n=3: d_F(inside)=3 d'_F=2 expected (3, 2) -> PASS
+SELFTEST {X; X+1} n=1: d_F(inside)=1 d'_F=1 expected (1, 1) -> PASS

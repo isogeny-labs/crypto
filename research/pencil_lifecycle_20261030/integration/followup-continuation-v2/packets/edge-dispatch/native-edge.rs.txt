@@ -1,0 +1,58 @@
+        } else {
+            1
+        }
+    }
+    /// Edge su*xu+sv*xv=a+b*k, all coefficients reduced modulo the subgroup order.
+    pub fn edge(&mut self, u: usize, su: i8, v: usize, sv: i8, a: u64, b: u64) -> Option<u64> {
+        let (ru, pu) = self.find(u);
+        let (rv, pv) = self.find(v);
+        let cu = su * pu.s;
+        let cv = sv * pv.s;
+        let a = self.ring.sub(
+            self.ring.sub(a, self.ring.signed(su, pu.a)),
+            self.ring.signed(sv, pv.a),
+        );
+        let b = self.ring.sub(
+            self.ring.sub(b, self.ring.signed(su, pu.b)),
+            self.ring.signed(sv, pv.b),
+        );
+        if ru == rv {
+            self.cycles += 1;
+            if cu + cv == 0 {
+                return self.constraint(self.ring.neg(a), self.ring.neg(b));
+            }
+            self.negative_cycles += 1;
+            let ci = self.ring.inv(if cu == 1 { 2 } else { self.ring.r - 2 });
+            return self.anchor(ru, self.ring.mul(a, ci), self.ring.mul(b, ci));
+        }
+        // ru = s*rv + aa+bb*k.
+        let s = -cu * cv;
+        let aa = self.ring.signed(cu, a);
+        let bb = self.ring.signed(cu, b);
+        let (child, parent, pot) = if self.size[ru] <= self.size[rv] {
+            (ru, rv, Potential { s, a: aa, b: bb })
+        } else {
+            (
+                rv,
+                ru,
+                Potential {
+                    s,
+                    a: self.ring.signed(-s, aa),
+                    b: self.ring.signed(-s, bb),
+                },
+            )
+        };
+        let child_fixed = self.fixed[child];
+        let parent_fixed = self.fixed[parent];
+        self.parent[child] = parent;
+        self.pot[child] = pot;
+        self.size[parent] += self.size[child];
+        if let Some((x, y)) = child_fixed {
+            let a = self.ring.signed(pot.s, self.ring.sub(x, pot.a));
+            let b = self.ring.signed(pot.s, self.ring.sub(y, pot.b));
+            if parent_fixed.is_some() {
+                return self.anchor(parent, a, b);
+            }
+            self.fixed[parent] = Some((a, b));
+        }
+        None

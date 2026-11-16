@@ -1,0 +1,21 @@
+/var/tmp/graph-cycle-constraint-20261101/Cycles.lean:32:57: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/graph-cycle-constraint-20261101/Cycles.lean:32:57: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/graph-cycle-constraint-20261101/Cycles.lean:53:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (c = 1)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/graph-cycle-constraint-20261101/Cycles.lean:55:1: error: unsolved goals
+case inl
+K : Type u_1
+inst✝ : Field K
+⊢ sorry () = 2
+/var/tmp/graph-cycle-constraint-20261101/Cycles.lean:56:3: error: Tactic `split_ifs` failed: no if-then-else conditions to split
+
+case inr
+K : Type u_1
+inst✝ : Field K
+⊢ sorry = 2 * -1

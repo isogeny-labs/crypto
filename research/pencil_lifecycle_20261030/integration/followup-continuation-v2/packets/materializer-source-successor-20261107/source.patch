@@ -1,0 +1,57 @@
+--- research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-native-limit-admission-v2-20261105/materialize.py
++++ research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-source-successor-20261107/materialize.py
+@@ -10,10 +10,31 @@
+ # Physical RAM remains bounded by the verified 4 GiB cgroup; no separate RLIMIT_AS.
+ def stop(sig,frame):raise RuntimeError('signal '+str(sig))
+ for sig in [signal.SIGTERM,signal.SIGINT]:signal.signal(sig,stop)
+-def checkpoint():
++CLEANUP_HASH=hashlib.sha256();CLEANUP_BYTES=0
++def record_cleanup(cleanup):
++ global CLEANUP_BYTES
++ # Retain complete final receipt compatibility even if the journal write fails.
++ R.setdefault('child_cleanup',[]).append(cleanup)
++ raw=(json.dumps(cleanup,separators=(',',':'))+'\n').encode()
++ with (OUT/'child-cleanup.jsonl').open('xb' if CLEANUP_BYTES==0 else 'ab') as stream:
++  assert stream.write(raw)==len(raw),'short cleanup journal write'
++  stream.flush();os.fsync(stream.fileno())
++ if CLEANUP_BYTES==0:
++  fd=os.open(OUT,os.O_RDONLY|os.O_DIRECTORY)
++  try:os.fsync(fd)
++  finally:os.close(fd)
++ CLEANUP_HASH.update(raw);CLEANUP_BYTES+=len(raw)
++ R['child_cleanup_journal']={'path':'child-cleanup.jsonl','bytes':CLEANUP_BYTES,
++  'sha256':CLEANUP_HASH.hexdigest(),'records':len(R['child_cleanup'])}
++def checkpoint(final=False):
+  if not OWN:return
+  R['elapsed_seconds']=time.monotonic()-START
+- tmp=OUT/'receipt.tmp';tmp.write_text(json.dumps(R,indent=2)+'\n')
++ snapshot=dict(R)
++ if not final:
++  snapshot.pop('child_cleanup',None)
++  snapshot['child_cleanup_storage']='journal-prefix/v1'
++ else:snapshot['child_cleanup_storage']='inline-final-and-journal-prefix/v1'
++ tmp=OUT/'receipt.tmp';tmp.write_text(json.dumps(snapshot,indent=2)+'\n')
+  with tmp.open('rb') as f:os.fsync(f.fileno())
+  os.replace(tmp,OUT/'receipt.json');fd=os.open(OUT,os.O_RDONLY|os.O_DIRECTORY);os.fsync(fd);os.close(fd)
+ def guard():
+@@ -47,7 +68,7 @@
+   assert ACTIVE.returncode==0,err.decode(errors='replace')[:2000];return out
+  finally:
+   owned=ACTIVE;ACTIVE=None
+-  cleanup=cleanup_owned_group(owned);R.setdefault('child_cleanup',[]).append(cleanup);checkpoint()
++  cleanup=cleanup_owned_group(owned);record_cleanup(cleanup);checkpoint()
+   assert not cleanup['errors'],'owned subprocess cleanup incomplete'
+ try:
+  assert F['revision']==REV and F['absolute_deadline']=='2026-11-06T04:00:00+00:00'
+@@ -195,7 +216,9 @@
+ finally:
+  if ACTIVE is not None:
+   owned=ACTIVE;ACTIVE=None
+-  R.setdefault('child_cleanup',[]).append(cleanup_owned_group(owned));R['status']='failed'
++  R['status']='failed'
++  try:record_cleanup(cleanup_owned_group(owned))
++  except BaseException as e:R['errors'].append({'cleanup_journal_error':repr(e)})
+  if time.monotonic()>=END:R['status']='failed'
+- checkpoint()
++ checkpoint(final=True)
+ raise SystemExit(0 if R['status']=='passed' else 1)

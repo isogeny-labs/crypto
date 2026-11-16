@@ -1,0 +1,132 @@
+{
+  "holdout_spec_sha256": {
+    "holdout-k24": "9b8553bd0d2ac2b6c391893b3f878727293be694e50c844ed059f11c54f1b0fc"
+  },
+  "round": 20,
+  "rule": "lowest mean S at w = 0 among candidates whose every run verified; a challenger only if below inc at w = 0",
+  "schema": "ic_autolab.selection/v1",
+  "selected": "2026-11-04T07:22:47Z",
+  "sizes": {
+    "24": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+        "family": "wsum-b8",
+        "n": 3,
+        "name": "wsum-b8-n3",
+        "oracle": "wsum:coef=8,free=1"
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "s": [
+            3.5613264011282526,
+            3.782122898204196,
+            5.769291371887673
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b16",
+            "n": 3,
+            "name": "wsum-b16-n3",
+            "oracle": "wsum:coef=16,free=1"
+          },
+          "s": [
+            13.31750890141557,
+            13.352413754008316,
+            13.666557427343056
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b24",
+            "n": 3,
+            "name": "wsum-b24-n3",
+            "oracle": "wsum:coef=24,free=1"
+          },
+          "s": [
+            61.209940130902055,
+            63.22340808179872,
+            81.34461963986867
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b30",
+            "n": 3,
+            "name": "wsum-b30-n3",
+            "oracle": "wsum:coef=30,free=1"
+          },
+          "s": [
+            148.818358132562,
+            155.96426357400858,
+            220.27741254702823
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum5f",
+            "n": 8,
+            "name": "ksum5f-n8",
+            "oracle": "ksum:m=5,free=1"
+          },
+          "s": [
+            9.97962448136911,
+            11.46325549976198,
+            24.815934665297796
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=20,scan_cap=320",
+            "family": "ksum3f",
+            "n": 20,
+            "name": "ksum3f-n20",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "s": [
+            7.358308029238091,
+            7.954055491072095,
+            13.315782647578141
+          ],
+          "status": "verified"
+        }
+      ],
+      "inc_s": [
+        4.089667966245376,
+        4.302327334295152,
+        6.216261646743142
+      ],
+      "rho_s": [
+        1.1616825198956673,
+        1.2661661912231583,
+        2.2065192331705776
+      ],
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+        "family": "wsum-b8",
+        "n": 3,
+        "name": "wsum-b8-n3",
+        "oracle": "wsum:coef=8,free=1"
+      },
+      "session_id": "ECBS1h043885e414d6",
+      "status": "challenger"
+    }
+  },
+  "track": "generic"
+}

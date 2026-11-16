@@ -1,0 +1,108 @@
+{
+  "schema": "pkm.native-retry-result/v1",
+  "recorded_utc": "2026-10-30T09:48:19.074984+00:00",
+  "source_merge": "4e063aa5bb048bd474c967d7c000aee741d51967",
+  "execution_source_head": "7396d55f4f93719e88fae3f81b1a49e3f5e209f5",
+  "executed_recipe": "detached-retry-command.sh",
+  "records": {
+    "backlog-build": {
+      "exit": 0,
+      "started": "2026-10-30T09:07:25Z",
+      "finished": "2026-10-30T09:07:33Z"
+    },
+    "backlog-validate": {
+      "exit": 0,
+      "started": "2026-10-30T09:07:34Z",
+      "finished": "2026-10-30T09:07:34Z"
+    },
+    "cli-build": {
+      "exit": 0,
+      "started": "2026-10-30T09:07:13Z",
+      "finished": "2026-10-30T09:07:23Z"
+    },
+    "cli-gate": {
+      "exit": 1,
+      "started": "2026-10-30T09:07:23Z",
+      "finished": "2026-10-30T09:07:25Z"
+    },
+    "clippy": {
+      "exit": 0,
+      "started": "2026-10-30T09:03:37Z",
+      "finished": "2026-10-30T09:07:13Z"
+    },
+    "library-build": {
+      "exit": 101,
+      "started": "2026-10-30T09:07:34Z",
+      "finished": "2026-10-30T09:12:15Z"
+    },
+    "native-tests": {
+      "exit": 0,
+      "started": "2026-10-30T08:37:23Z",
+      "finished": "2026-10-30T09:03:37Z"
+    },
+    "rustfmt": {
+      "exit": 0,
+      "started": "2026-10-30T09:07:13Z",
+      "finished": "2026-10-30T09:07:13Z"
+    },
+    "supervisor": {
+      "exit": 101,
+      "started": null,
+      "finished": "2026-10-30T09:12:15Z"
+    }
+  },
+  "example_tests": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "suites": {
+      "pkm_oracle_program": 12,
+      "pkm_symmetric_complete": 4,
+      "hecke_target_router": 4
+    }
+  },
+  "library_status": "build failed for two tracked compile-time APS fixtures missing from sparse checkout; suite not run",
+  "fixture_restoration": "Exact tracked Git blobs restored with git sparse-checkout add; no tracked bytes changed.",
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "goal_complete": false,
+  "log_hashes": {
+    "retry1-native-tests.log": {
+      "bytes": 2258,
+      "sha256": "c51c58319b53f54829303966602d0b965e1382c0ec628f5780225f8e1305fc87"
+    },
+    "retry1-clippy.log": {
+      "bytes": 531,
+      "sha256": "3ed71bdb9d08d2c8099c94d9df6ae8575749219fd19f258be0ff366e9a31ae99"
+    },
+    "retry1-rustfmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retry1-cli-build.log": {
+      "bytes": 109,
+      "sha256": "5208231dc49f8520beea4f193d3b43deaa6ff519d3a61f78b56a00d3aeccee0f"
+    },
+    "retry1-cli-gate.log": {
+      "bytes": 251,
+      "sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33"
+    },
+    "retry1-backlog-build.log": {
+      "bytes": 109,
+      "sha256": "01e1f4df864e8fad9723ecb192274887ea06ac7ddd2ae6b1483e26b7cb07b151"
+    },
+    "retry1-backlog-validate.log": {
+      "bytes": 44,
+      "sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e"
+    },
+    "retry1-library-build.log": {
+      "bytes": 951,
+      "sha256": "3184898ef4c6fcc213b1c58a7880b65f610ef877561acfe08e7f4d27b8f6f091"
+    },
+    "retry1-supervisor.log": {
+      "bytes": 150,
+      "sha256": "35571b1c02e0c841ac1422a7908787c9830ed0b0b94907d47ba4e86adce4c73d"
+    }
+  },
+  "not_validation_of_refreshed_cargo_configuration": true
+}

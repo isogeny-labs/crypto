@@ -1,0 +1,63 @@
+{
+  "schema": "software.runtime-qualification-postreview/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "decision": "accept_recorded_failure_and_scoped_cleanup_observation",
+  "qualification_complete": false,
+  "scientific_execution": false,
+  "automatic_retry_approved": false,
+  "owner": "4bf12f23-9aa5-42aa-8056-4fcfe21f116d",
+  "artifacts": {
+    "completion.json": "7a8b3359aa56ae38e219185fb1178028f9400ec3b37b69d5ae3f0c6708b61dbf",
+    "native-binding.json": "f252e9cf5465638c79caffde233f19fdd88a462e05148e3736041d8ca3b91798",
+    "native-endpoint.json": "1e675cf5adbc55346d5c5f65d15d4109f46f26e85f4c4801782687d6194114f3",
+    "native-worker-result.json": "8a28d0a6729c027645c02b26fb7e8f37f2028b559706625229f155b2578c59f2",
+    "native-receipt.json": "d2ef44b416486d0924fb41979771360a3e90c2cb47600cd7c6bb2f75fa2276f2",
+    "qualifier-receipt.stdout": "fb31d284257a099bd74f13d6b3033e23a9bbdfdfe1ff0588512d9400df282f50",
+    "qualifier-receipt.stderr": "c0eda8e792b06ab4531f47cc421ca68489490dd5a9aa7c1eeae93b4d3193ef44",
+    "readonly-extraction.json": "606d7edcc21990fd7010ebded2cb625cbd28e16ecb07f05d07c6463072af89d3",
+    "native-capture.json": "0bd10531e223832501aab7d362d6f26a987c5006c5edfd55e54307fb5506eb1f",
+    "unit.stdout": "dbd2b630f468edf83388f88020f27e0d9748cba0840e1aa7e3553fb684302dc0",
+    "loops.stdout": "3f1d39e826503300542203478b61c9393220197f672114f5813fa484380802ed",
+    "disk-stat.stdout": "1582da011f4a3b7793930c1a7e18562e664b1e0302a06d163b7bc2f39c90d6d7",
+    "disk-stat-after.stdout": "1582da011f4a3b7793930c1a7e18562e664b1e0302a06d163b7bc2f39c90d6d7",
+    "publication.json": "602931e981c9793a08eacaabc6b1be2e2bbb3ab075878436c0e37141d2a4978d",
+    "journal.stdout": "0129e3fecac8074fd90cccef2bef7fed359f4d3b780d33c72ec67ed55f99485a"
+  },
+  "checks": {
+    "canonical_inputs": true,
+    "published_files": {
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v3/supervise.py": true,
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v3/qualification-binding.json": true,
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v3/qualifier-binding.json": true,
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v3/independent-review.json": true,
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v3/launch.sh": true
+    },
+    "native_binding_matches_published": true,
+    "endpoint_join": true,
+    "invocation_join": true,
+    "disk_stat_unchanged": true,
+    "no_associated_loops": true
+  },
+  "observations": {
+    "outer_exit": 1,
+    "outer_elapsed_seconds": 30.240972875006264,
+    "inner_elapsed_seconds": 0.13587612597621046,
+    "passed_cases": [],
+    "inner_failure": "FileNotFoundError: [Errno 2] No usable temporary directory found in ['/tmp', '/var/tmp', '/usr/tmp', '/']",
+    "cleanup_complete_as_reported": true,
+    "unit_state": "loaded/failed, MainPID0, empty ControlGroup",
+    "cgroup_absent_as_recorded": true,
+    "worker_mount_flags": [
+      false,
+      false,
+      false
+    ],
+    "current_disk_sha256_from_worker": "632154889dbf88e99e8009c27ad3dc2dfc8603538ce2a02f04108c0df6a25a18",
+    "disk_content_rehashed_by_reviewer": false
+  },
+  "source_diagnosis": "Qualifier command(inspect=True) uses tempfile.TemporaryFile without dir=; supervisor ProtectSystem=strict only permits private owner root and retained disk path, and child environment sets no TMPDIR. This explains recorded missing writable default temp directory. Source review missed this integration dependency.",
+  "scope": "Failed qualification before any Q0-Q4 case passed, with no preexec ancestry/pids observations. Original failure remains; stopped process/cgroup and detached loop observations support cleanup at recorded time, not successful qualification.",
+  "reviewer_extracted_or_reran": false,
+  "next_step": "New source correction using a temp directory inside owned receipts/disk, meaningful unavailable-default-temp control, independent source review and separately accounted admission before any next attempt."
+}

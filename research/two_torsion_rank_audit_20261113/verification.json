@@ -1,0 +1,71 @@
+{
+  "schema": "actual-two-torsion-verification/v1",
+  "source_commit": "dc6d9324419762747bea6eb9af4cdaada7289088",
+  "claim_id": "PCC-20261113-3aa5ac",
+  "declaration_sha256": "8850158a1229885fb24d7535a487923a2470d24d6140242ef6cac059b5f64400",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 11,
+  "gate_declarations": 67,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 57,
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-3aa5ac",
+    "claim_sha256": "37ced98e5b502c864a66cfaea68f06666e9628f90d4d502abf179237fc49f2fc",
+    "commit": "dc6d9324419762747bea6eb9af4cdaada7289088",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/two_torsion_rank_audit_20261113/lean (RankCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-13T23:40:16Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-3aa5ac",
+    "claim_sha256": "37ced98e5b502c864a66cfaea68f06666e9628f90d4d502abf179237fc49f2fc",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47542,
+    "sha256": "27bde5bd5f6f487041d8fd090a5e254c9109dec69bd7cf94e43f2ee39bcab8e7",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 67,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_r2_geometry": true,
+    "actual_binary_basis": true,
+    "actual_char2_cardinality_classification": true,
+    "actual_char2_field_inclusion_counter": true,
+    "source_corpus_full_hypotheses_read": true,
+    "qualified_source_or_node_refuted": false,
+    "generic_odd_prime_Frobenius_geometry_proved": false,
+    "group_scheme_formalization_claimed": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

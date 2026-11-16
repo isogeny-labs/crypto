@@ -1,0 +1,54 @@
+{
+  "id": "structured-duals-20261116-v97b",
+  "hypothesis": "Rationaltrace-dualsP/QwithPconstantzero createconsistentcellsrank36/37,insteadof53;measureglobalfractionandquerycoverage honestly.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.structured_duals_20261116_v97b.worker",
+    "structured-duals-20261116-v97b",
+    "raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/separator_images_20261116_v91/kernel.py",
+    "research/disjoint_separator_20261116_v92/kernel.py",
+    "research/linearized_bridge_20261116_v90c/subspace.py",
+    "research/polynomial_bridge_20261116_v90b/codec.py",
+    "research/affine_dual_cells_20261116_v97/kernel.py",
+    "research/affine_dual_cells_20261116_v97/checker.py",
+    "research/structured_duals_20261116_v97b/PROOF_AND_REVIEW.md",
+    "research/structured_duals_20261116_v97b/worker.py",
+    "research/structured_duals_20261116_v97b/common.py"
+  ],
+  "input_paths": [
+    "research/structured_duals_20261116_v97b/DATA.json"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+    "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+    "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+    "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+    "research/affine_dual_cells_20261116_v97/kernel.py": "403c724b2b41da82fced49fb4ab1527e6406dd92b01919c825466d087aa3423e",
+    "research/affine_dual_cells_20261116_v97/checker.py": "e11a5031f3a1676fffe5b150ea34c400691433f24ad25f5f95243ba0290704f4",
+    "research/structured_duals_20261116_v97b/PROOF_AND_REVIEW.md": "5ac2f2b716e216308115f2f3bf4c73534317f584e3eee446a6ce174d74ac16cd",
+    "research/structured_duals_20261116_v97b/worker.py": "0c737045c49da12b584b1f2d5bd4faaadbdeed822ff1d59d7630da40c237cfef",
+    "research/structured_duals_20261116_v97b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/structured_duals_20261116_v97b/DATA.json": "801da1dad9d949815d02a275bdd6bfa426afe67a2f65528920571de0e762d632"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [
+    "affine-dual-oracles-20261116-v97"
+  ],
+  "artifact_paths": [
+    "research/structured_duals_20261116_v97b/raw.json"
+  ]
+}
