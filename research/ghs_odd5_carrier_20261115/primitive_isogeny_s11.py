@@ -48,12 +48,16 @@ Q = f(P)
 assert not Q.is_zero() and r * Q == f.codomain()(0)
 reverse = None
 reverse_iso = None
+reverse_sign = None
 for candidate in f.codomain().isogenies_prime_degree(23):
     if candidate.codomain().j_invariant() != E.j_invariant():
         continue
     iso = candidate.codomain().isomorphism_to(E)
-    if iso(candidate(Q)) == 23 * P:
-        reverse, reverse_iso = candidate, iso
+    for sign in (1, -1):
+        if sign * iso(candidate(Q)) == 23 * P:
+            reverse, reverse_iso, reverse_sign = candidate, iso, sign
+            break
+    if reverse is not None:
         break
 assert reverse is not None
 
@@ -77,9 +81,10 @@ out = {
     "reverse_codomain_ainvs": [digits(c) for c in reverse.codomain().ainvs()],
     "reverse_kernel_polynomial": [digits(c) for c in reverse.kernel_polynomial().list()],
     "reverse_isomorphism_maps": [str(x) for x in reverse_iso.rational_maps()],
+    "reverse_isomorphism_sign": reverse_sign,
     "P": point_record(P),
     "Q": point_record(Q),
-    "reverse_Q": point_record(reverse_iso(reverse(Q))),
+    "reverse_Q": point_record(reverse_sign * reverse_iso(reverse(Q))),
     "subgroup_checks": {"rP_zero": True, "Q_nonzero": True, "rQ_zero": True, "reverse_Q_eq_23P": True},
 }
 (HERE / "primitive_isogeny_s11.json").write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")
