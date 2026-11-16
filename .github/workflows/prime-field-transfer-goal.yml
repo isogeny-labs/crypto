@@ -1,0 +1,28 @@
+name: Prime-field transfer goal correctness
+on:
+  pull_request:
+    paths:
+      - 'research/prime_field_transfer_goal_20261116/**'
+      - '.github/workflows/prime-field-transfer-goal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native development dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgmp-dev libssl-dev
+      - name: Reproduce fixed native controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/component_candidate.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/component-candidate
+          /tmp/component-candidate > /tmp/component-native.jsonl
+          cmp /tmp/component-native.jsonl "$study/receipts/round-01/native-01.jsonl"
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/target_precision.cpp" -o /tmp/target-precision
+          /tmp/target-precision > /tmp/component-precision.jsonl
+          cmp /tmp/component-precision.jsonl "$study/receipts/round-01/target-precision-01.jsonl"
