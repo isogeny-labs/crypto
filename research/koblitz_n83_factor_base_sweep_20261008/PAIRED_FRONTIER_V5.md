@@ -59,6 +59,18 @@ domain and an ordered first-pair constraint in the same encoding. That path is
 bound to its retained full-D18 input and source gates; it does not establish a
 general adapter for the v2–v4 base recipes or make a v5 suffix case executed.
 
+A later [K2048 five-summand gate](verification/k2048-sorted-unpinned-20261114/RESULT.md)
+also composed a signed-Frobenius root domain with all-summand x ordering on
+one retained primary base. Its constructed positive passed original-XCNF,
+archive, group, and relation-row replay; the unpinned search ended
+`INDETERMINATE` at 1,000,001 conflicts, and the natural arm was withheld by
+its frozen protocol. The external CryptoMiniSat build, exact formula, and
+search envelope were recorded for that experiment, not bound to a V5 ordinal
+or generalized over the V5 base and solver axes. It is evidence for one
+composed circuit and a censored solver gate, not a completed V5 runtime cell.
+The saved catalog and all `unavailable_adapter` dispositions remain unchanged;
+there is no new graphable runtime result in this crosswalk correction.
+
 The finite grid is complete only over its **declared** base recipes, pair shapes,
 five symmetry switches, and solver axes. It does not enumerate arbitrary new
 field bases, higher-order base mixtures, alternative implementations, or

@@ -1,0 +1,5 @@
+# Quartic Frobenius stratum review
+
+The unexecuted stratumH=X5+cX equalsX(X+a)^4 for uniquea=c^(2^81). Its support onlow18V is exactlyc in span(1,alpha4,...,alpha68), dimension18with no reduction. This imposes51coordinates only inside the69dimdegreeboundambient, not51independent selectors ontheglobal73bitnormfamily. In thefull83dimspacecodimensionis65. c0iszero-rootmultiplicity5;cnonzerohasonezero/fourequalrootsand5distinctsourceorderings. q0onlywithinthissupportedstratum followsfromthezeroconstantproduct.
+
+Affineintersectionis valid onlyafterliteralaffineadmissionofoneactualfixedcellandtheSAMEglobalparameterordering. Fourzerocoefficientconditionsande4spanconditionsarelinearthen, andeliminationmustprovidecontradictionorrank/nullspace witnesses. Noactualmatrix/rank/intersectionororiginalcurve-liftadmissionhasbeencomputed. Source/countkernelissues,zero/torsion,repeatedabscissaordinatebranchesandglobalhcoverageareexplicitlyretained. This is a sound changedboundedhypothesis,notaprovedglobalcompression,noveltyor speedup.

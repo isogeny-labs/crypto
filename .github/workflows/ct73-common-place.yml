@@ -1,6 +1,7 @@
 name: CT73 shared specialization and independent orientation audit
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct73/**'
       - '.github/workflows/ct73-common-place.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct73-orientation:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

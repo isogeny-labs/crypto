@@ -1,0 +1,11 @@
+digraph compiled_path_stop {
+  graph [rankdir=LR, bgcolor="white", pad="0.14", nodesep="0.25", ranksep="0.42"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, penwidth=1.3];
+  edge [color="#8b98a8", penwidth=1.2];
+  admission [label="No-work admission\nPASS · 422 s", color="#398c62", fillcolor="#eaf7ef"];
+  container [label="Build container\nsource clean", color="#456b8b", fillcolor="#ecf4fb"];
+  path [label="Compiled repo path\nabsent in container", color="#a56e33", fillcolor="#fff1df"];
+  stop [label="Producer exit 1\nNotFound", color="#a56e33", fillcolor="#fff1df"];
+  output [label="No stage output\ncontainer removed", color="#398c62", fillcolor="#eaf7ef"];
+  admission -> container -> path -> stop -> output;
+}
