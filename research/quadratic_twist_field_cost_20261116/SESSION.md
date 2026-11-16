@@ -78,3 +78,17 @@ Initial isolation helper import failed (missing result_switches); fetched same-o
 
 ###02:40 timing protocol preflight failure and recovery
 Initial schema25boolean flag fields corrected tostrings; then canonical comparison still referenced removed producerA/B names. Shell metadata commands lacked fail-fast and mistakenly published UNFROZEN9f04f33a before correction, and started isolated timing attempt. Detected the actual producer process, terminated that specific current run via outer timeoutPID (exit143); partial freshcasesA/logs retained, NO timing result accepted. This was an actual orchestration defect, not an accepted frozen run. Added explicit frozen-status AND official canonical validation guards to runner; no arithmetic predicate changed. Fresh source checkpoint/build and corrected canonical freeze required before new isolated run02; prior failed sources/data untouched. [pcc:unverified]
+
+## Finished integrated iteration and preserved evidence
+
+### What was done
+Completed original36-stage native census, corrected25-stage isolated/interleaved replication and separate two-stage native cross-cap interpretation, all scientific processes ended by02:53:01UTC. All16semantic plus3newtiming corruptions reject; canonical exports/filechecks0. Four-page report rendered/inspected; local62149path archive actually restored/hash-checked/repacked exact (RESULTS gives receipts). All12269 matched algebraic source recoveries retain original scalar with actual witnesspeak4→3; cap4 initialrank18/30versus6–12/30 acrossALL455policies. [pcc:unverified]
+
+### Decisions made
+Report engineering degree/admission/map-request improvements at their actual scope; allfourarms use auxiliary twist. Unisolated original/four-field clocks downgraded to diagnostics. Corrected isolated timing retains losses, A/A, paired Student-t4/Holm and host limitations, no uniform/global speedfactor. LocalPCCmeasurement claim UNVERIFIED/no signedverdict; rootledger unchanged. All raw assets remainlocal; PRkeepopen/autooff, oneautomationpaused. [pcc:unverified]
+
+### Open threads
+Reduce extension-field kernel cost under complete source transport/branches/publiclogs. KB/atlas/primaryliterature first before next encoding; tracequeued. No new scientific launch in finishedwindow. Full calibration/review/integration remain open; no overallcompletionclaim. [pcc:unverified]
+
+### Errors
+Corrected timing guard detected in source after an unfrozen attempt; outerdriver143didNOTstopchildA, which completed0 and is retainedUNACCEPTED. Childfinished and officialwrapper releasedlock/restoredaffinity before validrun02, actualprocessstatechecked. Initialschema25flagtypes and2stalecomparisonarms, missingstandardRustimports/helper, nonexistentreportcwd, missingexport --protocol and readonlyfontcachefallback all retained/corrected without weakened scientific predicates. Primaryarchive cut before finalnarratives/thisentry, documented supplementalmetadata follows. [pcc:unverified]
