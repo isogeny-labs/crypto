@@ -1,3 +1,30 @@
+# Current checkpoint (07:07Z, 16 November)
+
+Stage22STILLRUNNING session72120, source23b4c1a70923c40aa2501e538bca0f159c941d69.
+Run /workspace/ic-local-runs/local-cover-comparison-20261116-22; source/specfrozen.
+BothIC&graphwarmupsvalid, firstrhowarmuprunning; no measuredcomparisonyet.
+Originalcall07:04:40Z;whole3600s =>~08:04:40Zbound,worker900s. NEVERrestart
+wrapper ifsessionlost: checkexitfile/worker.pid/ps. DO NOTcompile/sourceedit/
+changeparameters/terminateearly/launchanothertrial. Afteractualexit original
+copiedanalyzer,rawflow/preposthashes,report/copies/publication/updatePR.
+NextCI/review>=07:57absentevent; latest23b07:06:58 workflows/status/reviews/threads
+empty, appreview/migratesuccess, REQUIREDgate/size/artifactsUNCONFIRMED. No merge.
+GoalACTIVE/localworks; no stopgoal. Stage21pass publisheda36packet/720artifact,
+Stage20censorunchanged. ReadonlyJV12twoLPcofactorpointer NOTimplemented/selected.
+
+# Current checkpoint (07:05Z, 16 November)
+
+STAGE22 RUNNING, session72120, source23b4c1a70923c40aa2501e538bca0f159c941d69
+publishedbefore solewrappercall. Run=/workspace/ic-local-runs/local-cover-comparison-20261116-22.
+72manifestPASS, sourceclean/noLIVEcompiler.36freshcoldprocessesplanned,
+6warm30measure;IC/graph/rho6armsreverseodd, p1009seed257 incidence/sharebothIC.
+CPU0/8GiB/900perworker/3600whole/no retry. No fullcomparisonyet. DO NOT compile,
+changeparameters/source, launchmoretrials or analyzeearly as final. Checkexitfile
+and actualprocess beforeanyrepeat ifsessionlost. No stoppingearly. Afterexit
+ORIGINALcopiedanalyzer/rawflow/preposthashes/report/publish. Singletonparityfalse.
+21PASSa36fullpacket;20censorunchanged. GoalACTIVE/localworks, no exogenousblocker.
+PR4288body21passneeds22running. CI/reviewnext07:07absentevent, nogatesconfirmed.
+
 # Current checkpoint (07:04Z, 16 November)
 
 Stage21completePASS/fullpacketpublisheda36d41e26, artifact7201ffintegrated.
