@@ -44,3 +44,16 @@ Let c be the number of connected components without any ground. Over an odd prim
 Proof: ker(B^T) has dimension c, and the sum functional on it has rank delta; its intersection with the (F-1)-dimensional sum-zero space has dimension c-delta. The signed rank follows by rank-nullity. For F=0 both ranks are zero. The control independently compares this graph prediction to dense modular elimination. With all component sizes less than ell, delta is 1 iff c>0. This is standard incidence/rank algebra, not a novel claim.
 
 If D is known nonzero of prime order ell>F, any closed component would imply size(component)*D=0 by summing its fibre equations, a contradiction. Hence c=0 and rank F-1 in this special subgroup setting. The control does not assume that its [n]P inputs satisfy this order condition. This detects the exact missing hypothesis in transferring the oriented rank argument into the actual signed catalogue.
+
+## Constructive elimination to an arbitrary anchor subset (post-control derivation)
+
+The graph law also gives the anchor-supported intersection without a full catalogue matrix. Let B be the signed F-by-m fibre matrix and I its zero-sum row-coefficient space. Let O be off-anchor columns. Build the same grounded graph using ONLY O; denote its ungrounded components by C_1..C_k, their sizes by s_j, and let delta_O be the rank (zero or one) of the size functional over the coefficient field. Then
+
+    dim( row(I B) intersect anchor-supported vectors )
+      = (k-delta_O) - (c-delta),
+
+where c,delta are the full-graph quantities above. Proof: admissible coefficients are I intersect ker(B_O^T), dimension k-delta_O. The full-map kernel is I intersect ker(B^T), dimension c-delta, and lies inside the admissible space. Rank-nullity gives the result. This is an intersection of row spaces, not a claim that restricting a row to anchor coordinates preserves a principal relation.
+
+A constructive basis requires no modular elimination on all m columns. For each off-graph ungrounded component form w_j=sum_{i in C_j} B_i restricted to anchors. If some s_r!=0 modulo ell, emit w_j-(s_j/s_r)w_r for every j!=r. If every s_j=0, emit all w_j. This spans every anchor-supported difference relation; dependencies of dimension c-delta may remain and can be eliminated in the small anchor space. Columns on grounded components force their coefficient to zero. The formula holds with branch columns omitted and any odd coefficient prime, including component sizes divisible by that prime.
+
+Work includes enumerating every fibre, graph construction and component reduction, and writing the anchor rows. It does not make the catalogue scan free or guarantee k-delta_O positive. If k=0 then no anchor relation survives at all. This directly supplies the structural test the successor needs; it has NOT been independently exercised by the frozen curve gate, which predates this post-control derivation. A new frozen gate must compare its outputs to full/off Gaussian ranks before using it in a supplied-target solver or drawing a performance conclusion.

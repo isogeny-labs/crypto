@@ -25,3 +25,17 @@ Current PR CI exposed one missing producer-evidence tag in its artifact-link par
 
 ### Errors
 Initial force-add of ignored Cargo.lock lacked --sparse; corrected in de08f9286c6f before execution and a new S3 checkpoint passed. No scientific error or rerun. The direct-profile record is separately remotely validated. No novelty inference from unavailable primary PDF.
+
+## Post-control algebraic successor
+
+### What was done
+Derived constructive anchor intersection from the off-anchor grounded graph: rank=(k-delta_O)-(c-delta), with explicit component-sum basis and size-weight correction. Added proof and basis to THEORY.md and marked them post-control/unexecuted in RESULTS/PDF. Re-rendered and inspected both final pages. Preserved original pre-run THEORY bytes separately in THEORY-FROZEN.md; FREEZE.sha256 identifies the original THEORY at commit de08f9286c6f, not the post-control appended document.
+
+### Decisions made
+Next gate must independently compare anchor rows, full/off ranks and containment before solver integration. k may be zero; no performance claim. No rerun of the frozen curve gate.
+
+### Open threads
+General closed-component and characteristic-divisibility cases, and constructive anchor elimination, need a separate frozen check. Full scan/setup costs still need a sound case against Compact. Goal active.
+
+### Errors
+PR evidence-tag correction passes local lint-prose with zero findings. Historical open-record CI issue remains separate. No new scientific failure.
