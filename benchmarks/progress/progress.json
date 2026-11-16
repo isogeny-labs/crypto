@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+  "latest_record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 5,
-    "measured": 203,
+    "measured": 204,
     "open": 0
   },
   "repo": "crypto",
@@ -2725,6 +2725,167 @@
       ],
       "problem": "ecdlp:ic_prime_tableb_ksum",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.0081874165,
+      "latest": 0.0081874165,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_aa_cold_process_wall_median",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.0081874165
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0082765415,
+      "latest": 0.0082765415,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_cold_process_wall_median",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.0082765415
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.0245038903885784,
+      "latest": 1.0245038903885784,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_batch_m3_aa_cold_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 1.0245038903885784
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.20775943179984308,
+      "latest": 0.20775943179984308,
+      "latest_derived": {},
+      "metric": "local_l0_batch_m3_over_f6_ic_cold_wall_sum_ratio",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.20775943179984308
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.039482,
+      "latest": 0.039482,
+      "latest_derived": {},
+      "metric": "local_l0_f6_ic_cold_process_wall_median",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.039482
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0077941045,
+      "latest": 0.0077941045,
+      "latest_derived": {},
+      "metric": "local_l0_rho_strong_cold_process_wall_median",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.0077941045
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.008273875,
+      "latest": 0.008273875,
+      "latest_derived": {},
+      "metric": "local_l0_rootfind_m3_cold_process_wall_median",
+      "points": [
+        {
+          "commit": "02113398fc2c",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 32,
+          "record": "20261116T0413Z-rootfind-k13-f6-local-custody-rerun",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Source-bound exploratory K13 L0 panel: 200 verified records and 160 replays; batch/F6 paired complete-cold sum ratio 0.2078 on seen fresh targets, without isolated or independent-host admission.",
+          "value": 0.008273875
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "wall_s"
     },
     {
       "better": "lower",
