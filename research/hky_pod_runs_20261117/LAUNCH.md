@@ -68,3 +68,10 @@ Checks and predictions written before the sweep's new cells:
 - m = 9 and m = 8 at depth 2/3 were censored by `--hky-max-cols 3000000` (3,981,645 columns at (9,2) D = 8;
   3,947,416 at (8,3) D = 7). Reruns `sweep2` on `msweep-m9` (16:28) and `msweep-m8` (16:34) with a 12,000,000 cap,
   output tag `-cols12M`. `msweep_job.sh` now takes the cap and a tag as arguments.
+
+## 17:02 UTC
+
+- `msweep-b` finished (m = 7, 8, 9 at the 3,000,000 cap) and was terminated (`edjws4kb7e711m`, GET 404); its records are
+  `results/b_*.jsonl`. `msweep-m6` (`gzyyvzfhwssxi2`) was terminated as a duplicate of the m = 6 run on `msweep-a`.
+- `msweep-m8` `sweep2` finished: (8,3) closed without 1 at D = 7 (3,947,416 columns, 184 s and 181 s); D = 8 has
+  13,962,982 columns, over the 12M cap. `sweep3` started 17:02 with `"8" "3" 20000000` (depth 3 and 4, cap 20M).
