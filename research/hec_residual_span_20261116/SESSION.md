@@ -2744,3 +2744,10 @@ What was done: prepared44freshcalls using path-imported qualified cubic collecto
 Decisions made: compare retained six-arm shared-preparation vectors rather than rerun controls; bothfields separate, integer/map/memorycost notfieldpriced. One600CPUprocess afterGitfreeze; retainregressions, no10x/wall/newmathclaim fromcounts.
 Open threads: execute frozen count gate and classify completefieldcost relativequadratic andbestpriorcontrols; laterwallgate only ifwarranted.
 Errors: inherited unused-import/helper warnings only. Priorresultpush timedout, retrysucceeded d197a87417c; no scientificrerun. No S3/cloud/merge.
+
+## Cubic complete-cost result rejects general improvement
+
+What was done: freeze410f3d9c91b hashespass,44freshcalls exit0/allnativeanswers/replayReport/repeated16vectors/lookups exact.264percontrol/perfield comparisons retained. Quadratic/cubicbase ratiosg2.034585-.180697,g3.254272-.496789,g4.849455-1.320552;subgroupg2.002239-.646612,g3.166300-.475418,g4.599864-1.537037.
+Decisions made: cubic schedule loses bothfields on allg2/g3; retainnegative result and quadraticstrongcontrol, no wallgate justified on this schedule. Oneg4fixture isolated gain notgeneric10x. Futureselectiveternarystrategy needsnewcostcase/protocol; rawanchor/rowgain failscompletecosttest.
+Open threads: mathematical useful-rank/LPstructure construction with credible fullcostcase; objective active/unachieved, noindependentreview.
+Errors: bookkeeping Rubyfilter_map unsupported by systemRuby; replaced withmap/compact, no scientificrerun. No S3/cloud/merge.
