@@ -2331,3 +2331,10 @@ What was done: compileall1316 mixedline symplectic subspaces withrank/isotropy/F
 Decisions made: abstractnormalizedeigenbasis only, notactualMumfordpoints/geometrickernelideal; noextensionfield/quotient/speedclaim. Gateexactordernothardcoded, Gitfreeze beforeone120CPU.
 Open threads: deriveactualpointfield/representation requirements anddecideboundedquotientconstructionroute; full10xscopeunchanged.
 Errors: none, unusedhelperwarning; ownT7093confirmed/checkallow/attachownconflict. No scientificexecutionyet/S3/cloud/merge.
+
+## All1316abstractkernels qualified, field658/inputconstruction exposed
+
+What was done: pushedfreeze222e527102c, hashespass, onceexit0;1316module matrices rank3/Gramzero/Frobeniusstable/sigmanonstable. Eigenorders329/94/658/329, allkernelsfullpointfield658. Degree286191179; nonzeropointorbits434948or435607, exactfixedpointinversionchecked.
+Decisions made: abstractnormalizedbasis notMumfordtorsion/geometrickernelideal. Rationalkerneldefinition staysFp; knownrational-equation algorithm avoidsfullpointfield butneedsunsuppliedequations. Do notlaunch286mpointenumerationwithoutconstructivecostcase; no upperbound-as-lowerbound/speedclaim. PrimaryLubiczRobertTheorem1.1/Milioinputboundary readandlinked.
+Open threads: boundedbridgeabstractmixedlines->geometrickerneldata/rationalequations, allinput/theta/pairing/quotient/transportcosts; original10xscopeandindependentvalidation intact.
+Errors: none,no retry/S3/cloud/merge.
