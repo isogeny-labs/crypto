@@ -45,6 +45,7 @@ IDs. One unchanged ID must be exact on every one of 28 rows and decode all
 | [`mechanism.png`](mechanism.png) | Compact raster rendering | `9d9cf5d3b39e01ec00a0c5785de65f7d48479b71c5feef65752cb3a018e72585` |
 | [`H114MultiradixCarryCohomology.lean`](H114MultiradixCarryCohomology.lean) | Generic paths, ranges, braid, CRT and conditional decoder | `6bbc556a0cebeafcd493d829180f2c41ad5fdcb9657faed5ae7aaa70c2734eba` |
 | [`proof-gate-v1/`](proof-gate-v1/) | 46 declarations, zero failing, zero trusted-native | retained raw receipt |
+| [`h114_multiradix_lab.rs`](h114_multiradix_lab.rs) | Native producer, controls, structural tests and conditional decoder | `795a80d7cd527ac878e54087664aaa1ccf6c46322f7952c7dd213df0a8b90d57` |
 
 The authoritative freeze is the Git tree recorded by the first commit that
 adds this directory; the table hashes are convenience receipts, not a
@@ -64,6 +65,22 @@ pushed source revision, immutable image digest, uploaded checkpoint, and the
 frozen EKS Spot budget/deadline. If that infrastructure gate is unavailable,
 the absence of data is reported as a blocked measurement rather than silently
 replaced with local results.
+
+The source can be checked without scoring the frozen candidate:
+
+```text
+rustc --edition=2021 -D warnings h114_multiradix_lab.rs -o h114_multiradix_lab
+./h114_multiradix_lab --self-test
+./h114_multiradix_lab --structural-test
+```
+
+`--self-test` checks SHA-256, all 11,520 unique predicate IDs, CRT residues,
+online/cached winding agreement, every canonical path on the first curve, and
+the first-curve torsion-section zero control. `--structural-test` checks all
+2,274 nonidentity points across the seven curves, including 13,644 lifted path
+evaluations and 2,274 exact braid residuals. Neither mode scores a candidate.
+The `--quick` and full modes do score candidates and remain behind the
+measurement gate.
 
 ## Interpretation boundary
 
