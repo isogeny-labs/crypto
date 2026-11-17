@@ -303,6 +303,7 @@ impl SystemSolver for F4F2 {
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let verdict = if st.timed_out || st.oversize {
             SolverVerdict::BudgetExceeded
@@ -661,6 +662,7 @@ impl SystemSolver for HybridF4 {
             solving_degree: None,
             timed_out: st.exhausted,
             extra,
+            ..Default::default()
         };
         let verdict = if st.exhausted {
             SolverVerdict::BudgetExceeded
@@ -781,6 +783,7 @@ impl SystemSolver for CrossbredF2 {
             solving_degree: None,
             timed_out: matches!(verdict, SolverVerdict::BudgetExceeded),
             extra,
+            ..Default::default()
         };
         (verdict, cost)
     }
@@ -1104,6 +1107,7 @@ fn fes_finish(
         solving_degree: None,
         timed_out: false,
         extra,
+        ..Default::default()
     };
     (verdict, cost)
 }
@@ -1510,6 +1514,7 @@ impl SystemSolver for FesWide {
             solving_degree: None,
             timed_out: false,
             extra,
+            ..Default::default()
         };
         if points.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1566,6 +1571,7 @@ impl SystemSolver for BuchbergerF2 {
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let done = |mut cost: SolverCost, word_ops: u64| {
             cost.extra.insert("bitop_word_ops".into(), word_ops);
@@ -1650,6 +1656,7 @@ impl SystemSolver for XlF2 {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1807,6 +1814,7 @@ impl SystemSolver for SatCdcl {
             solving_degree: None,
             timed_out: matches!(verdict, SolveResult::Unknown),
             extra,
+            ..Default::default()
         };
         match verdict {
             SolveResult::Sat => (SolverVerdict::Solved(vec![enc.model_assignment()]), cost),
@@ -1920,6 +1928,7 @@ fn solve_primo(
                     solving_degree: None,
                     timed_out,
                     extra,
+                    ..Default::default()
                 },
             );
         }
@@ -1969,6 +1978,7 @@ fn solve_primo(
             solving_degree: None,
             timed_out: false,
             extra,
+            ..Default::default()
         },
     )
 }
@@ -2090,6 +2100,7 @@ impl SystemSolver for Exhaustive {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)

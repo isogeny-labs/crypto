@@ -1,0 +1,66 @@
+name: Prime31 public RR9 B8 Macaulay certificate (pinned Rust)
+
+on:
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_PUBLIC_MACAULAY_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-public-macaulay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rr9-public-macaulay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out PR exact source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check out immutable merged native Rust base
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only the candidate public Macaulay Rust example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original arithmetic tests and exact-source public Macaulay controls
+        run: |
+          cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_public_macaulay
+      - name: Capture raw candidate and soundness evidence
+        run: |
+          cargo +1.100.0 run --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_public_macaulay > prime31-rr9-public-macaulay.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("prime31-rr9-public-macaulay.json").read_text())
+          assert d["schema"]=="prime31.rr9.public-macaulay.v1"
+          assert (d["p"],d["n"])==(2147483647,2147446831)
+          assert d["formal_signed_supports_used_only_by_test_oracle"]==256
+          assert d["positive"]["macaulay"]["unit_certificate"] is False
+          assert d["positive"]["macaulay"]["columns"]==792
+          assert len(d["negatives"])==2
+          for item in d["negatives"]:
+              m=item["macaulay"]
+              assert m["columns"]==792 and m["rows_generated"]==960
+              if m["unit_certificate"]:
+                  assert m["replay"]["identity_replayed"]
+          assert d["not_an_extractor"] and d["complete_unknown_ecdlp_solves"]==0
+          print("public-only RR9 B8 Macaulay diagnostics recorded; no ECDLP speedup claimed")
+          PY
+      - name: Retain raw coefficient-ideal and unit witness JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-public-macaulay-b8
+          path: prime31-rr9-public-macaulay.json
+          if-no-files-found: warn
+          retention-days: 30

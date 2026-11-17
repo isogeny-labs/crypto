@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T09:24:52Z",
+ "id": "PCC-20261117-3252c2",
+ "kind": "statement",
+ "producer": {
+  "commit": "6f1815b9f90b71f407f68e77901d3cc6f12cb8f9",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/canonical-main-intake-14/ACTUAL_FROZEN_INPUTS_AFTER_C5_INTAKE.json",
+    "sha256": "5e1aab7c5a7c32f3e89db18ca1e87734fdd75e05fc0c0d5e9729a30e97e5033f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/evidence/first-arithmetic-F-09/19-first-frozen-arithmetic.stdout",
+    "sha256": "8456908b5b33d32c2170afe54d8a779da8d91af8913bf34fe63bfbc81f3fa11e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/canonical-main-intake-14/EXACT_C5_METADATA_INTAKE_SUMMARY.json",
+    "sha256": "2c4c3240bfc605a84b367d833e9b3f41c2cb8909764bdf3f04267c03c5247b1b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Canonicalc5 intake preserves the actual unit14 result without rerunning arithmetic. All35 F manifest/lock files and11 primary sources remain full-byte equal to publicf3586783, and original42435B stdout SHA8456908b5b33d32c2170afe54d8a779da8d91af8913bf34fe63bfbc81f3fa11e is unchanged. Recorded17 witnesses/34 pairs/17 conjugacies/2 declared closed quadratic orbits/two109/113 generators/10 scalar cases/3 malformed constructors/2 wrong-sign controls pass, with both declared dual orientations/recovery and predictedkappa100. All24 recorded phase expectations match. Mainc5 exact4157 metadata files/3395 claims/1357 ledger rows checked, existing151 missing-type diagnostics unchanged. The old complete sourcefork265b97ca and all15 full containers remain publicly recoverable, with exact lengths/hashes/OIDs and no raw primary deletion. Current ledger is appended from canonical base; old raw claims/ledger retained without rechaining, trust/keyring/policy/verifiers unchanged by us. Same-engine finite unsigned evidence, not full replay/Lean/performance."
+}
