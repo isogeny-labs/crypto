@@ -898,6 +898,18 @@ mod complete_b31_1024_tests {
         None
     }
 
+    #[test]
+    fn cold_bsgs_fallback_complete_corner_cases() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).expect("actual prime-order source curve");
+        for k in [0u64, 1, PRIME31.n - 1, PRIME31.n / 2, 123_456_789] {
+            let q = ar.scalar(PRIME31, k, Some(PRIME31.g));
+            let recovered = fallback_bsgs(&mut ar, q).expect("generic subgroup fallback failed");
+            assert_eq!(recovered, k, "failed complete fallback for k={k}");
+            assert_eq!(ar.scalar(PRIME31, recovered, Some(PRIME31.g)), q);
+        }
+    }
+
     fn public_relation(
         ar: &mut Arithmetic, half: &FourSet, pts: &[Point],
         q: Point, batch: &mut BatchStats,
