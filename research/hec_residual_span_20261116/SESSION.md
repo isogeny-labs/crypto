@@ -1623,3 +1623,10 @@ What was done: compiled actual p601c7 conditional Frobenius, rank1 nilpotent pre
 Decisions made: predict6stable Lagrangians for every nondegenerate sigma-invariant form; no arbitrary pairing selection. Mathematical proof via R=im(pi+1), allstable Lagrangians containR. Assertions [pcc:unverified].
 Open threads: push freeze then once-only120CPU invocation; polarized quotient classification remains separate.
 Errors: copied unused helper warnings only; no scientific execution.
+
+## Ramified genus2 l5 gate completed
+
+What was done: freeze2bc699d39dc single invocation exits0, input hashes match;806planes,56stable,20compatible nondegenerate forms, each156Lagrangians and6stable containing rank1 image; (pi+1)^2=0. All producer assertions [pcc:unverified].
+Decisions made: sixkernel admission supported without choosing arbitrary pairing; one proposed cyclotomic sqrt5 self-loop, remaining5need quotient classification and lost orbit compression costs.
+Open threads: polarized quotient classes/maps and complete-cost case; p251l19 independent count and genus3 independent review.
+Errors: none, no rerun/S3/cloud.
