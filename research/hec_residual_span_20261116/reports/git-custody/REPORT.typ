@@ -236,3 +236,29 @@ Allninecandidate/nativeanswers verifyagainst originalpublicsource andtarget. At 
 These are exactrepresentation/solvercontrols for a classicalmulti-orbit method. Column and trialratios are not completecostratios. Genericnativecontrols have differentmargins/endomorphisminformation; the expandedreference shares the same knowledge. The present gate repeatedly solves bothsystems and performs heavyqualification, so its work counters are not productioncosts.
 
 Next: retain onlyorbitstates in the production solver, define a sharedsource/subgroupmetadata contract, and prospectively compare full preparation/collection/LA/verification against an equally normalized reference. Includeor justify qualificationcosts explicitly. No genericcurve/newexponent/fastestexternal or tenfoldcompleteclaim follows from this gate. The earlierfixedg4wallresult remains scoped; the broadergoal remains unachieved. Multi/THEORY.md, PROTOCOL.md, RESULTS.md and allrawhashes preserve the boundary under authorizedGitcustody.
+
+#pagebreak()
+= Standard-input runtime: strongest local control sets the limit
+Execution checkpoint714fa3e242b · 7,200 calls · exit0 · Git custody
+
+The extracted API accepts curve, public source, public target, subgroup order, seed and mode. It receives no cofactor, source-point index, expected scalar or known logarithm table. Eighteen correctness fixtures cover two public sources and three targets in each genus. Folded and equal-information Expanded agree with the qualified reference without the earlier known-point normalization row.
+
+#table(columns:3,inset:6pt,align:center,
+[Genus],[Native / Folded],[Expanded / Folded],
+[2],[2.210917–2.938682],[1.489349–1.742197],
+[3],[3.418988–7.363810],[1.196560–1.333478],
+[4],[7.985306–10.619135],[1.326390–1.413756])
+
+Ranges cover six separate source/target workloads per genus; they are not pooled throughput. Expanded is the fastest control in all eighteen workloads. Only two genus-4 cases exceed tenfold against default native. The slower PlainPrefix arm is retained, but does not set the headline comparison.
+
+== Complete per-call algorithm setup, explicit input contract
+Five batches of sixteen fresh calls per workload and arm, with rotating order, yield 7,200 calls. Timed work includes factor-base construction, action/certificate construction, orbit maps, relation collection, linear algebra, final original-source verification and deallocation. No cross-call or cross-target setup cache is used. The process is warm; algorithm state is cold.
+
+Common public curve/order/source compatibility qualification and target construction are outside every arm equally. This is a provided-valid-public-instance comparison, not parameter discovery from an unqualified curve. Heavy algebraic qualification remains in the separate correctness gate; its cost is not claimed eliminated.
+
+== Result and scientific boundary
+All 7,200 calls verify. All ninety batch-spread gates and eighteen native A/A gates pass. The registered tenfold gate against the fastest completing control fails: representation folding contributes only 1.20–1.74 times in this panel. Classical automorphism information also benefits the expanded control.
+
+Measurements are shared Apple M4 Pro L0 wall times. Local gates do not establish independent admission, primary operation-count qualification, strongest external performance or a general mathematical breakthrough. The broader tenfold objective remains open. A next mechanism must improve relation generation or elimination beyond column storage.
+
+Production-cost/PROTOCOL.md, RESULTS.md, CONTROL.tsv, WORKLOADS.tsv, SUMMARY.tsv and OUTPUT.sha256 retain the prospective design, full raw calls and all negative outcomes. Git custody is authorized while S3 is unavailable; no upload is claimed.
