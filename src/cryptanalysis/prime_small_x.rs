@@ -109,13 +109,17 @@ pub trait PrimeField: Clone + Send + Sync {
 pub struct P192Field {
     ar: P192Arithmetic,
     p: BigUint,
+    p_minus_2: BigUint,
 }
 
 impl P192Field {
     pub fn new() -> Self {
+        let p = p192_prime();
+        let p_minus_2 = &p - BigUint::from(2u8);
         Self {
             ar: P192Arithmetic::new(),
-            p: p192_prime(),
+            p,
+            p_minus_2,
         }
     }
 }
@@ -161,7 +165,7 @@ impl PrimeField for P192Field {
         if self.is_zero(a) {
             return None;
         }
-        let e = &self.p - BigUint::from(2u8);
+        let e = self.p_minus_2.clone();
         Some(self.pow(a, &e))
     }
     fn key(&self, a: Fp) -> Key {
@@ -206,10 +210,19 @@ impl PrimeField for SmallPrime {
             .ok_or_else(|| "element is not canonical".into())
     }
     fn add(&mut self, a: u64, b: u64) -> u64 {
-        (a + b) % self.p
+        let s = a + b;
+        if s >= self.p {
+            s - self.p
+        } else {
+            s
+        }
     }
     fn sub(&mut self, a: u64, b: u64) -> u64 {
-        (a + self.p - b) % self.p
+        if a >= b {
+            a - b
+        } else {
+            a + self.p - b
+        }
     }
     fn mul(&mut self, a: u64, b: u64) -> u64 {
         ((a as u128 * b as u128) % self.p as u128) as u64
@@ -411,23 +424,160 @@ impl<const L: usize> Curve<MontField<L>> {
     }
 }
 
+/// A point in Jacobian coordinates `(X : Y : Z)`, representing the affine
+/// point `(X/Z², Y/Z³)`; `Z = 0` is the point at infinity.
+///
+/// Scalar multiplication in these coordinates pays one field inversion for
+/// the whole ladder instead of one per group operation, which is the
+/// difference between ~`c·bits` and ~`c·bits²` field multiplications on an
+/// affine implementation.
+#[derive(Clone, Copy)]
+struct Jac<E> {
+    x: E,
+    y: E,
+    z: E,
+}
+
 impl<F: PrimeField> Curve<F> {
-    /// `[k]P` for `k ≥ 1`; `None` for the point at infinity.
-    pub fn mul_big(&self, f: &mut F, p: &Pt<F::E>, k: &BigUint) -> Option<Pt<F::E>> {
-        let mut acc: Option<Pt<F::E>> = None;
-        for i in (0..k.bits()).rev() {
-            acc = match acc {
-                Some(a) => self.add_points(f, &a, &a),
-                None => None,
+    fn jac_infinity(&self, f: &mut F) -> Jac<F::E> {
+        Jac {
+            x: f.one(),
+            y: f.one(),
+            z: f.zero(),
+        }
+    }
+
+    /// `2P` in Jacobian coordinates (dbl-2007-bl, general `a`).
+    fn jac_double(&self, f: &mut F, p: Jac<F::E>, a_minus_three: bool) -> Jac<F::E> {
+        if f.is_zero(p.z) || f.is_zero(p.y) {
+            return self.jac_infinity(f);
+        }
+        let xx = f.sqr(p.x);
+        let yy = f.sqr(p.y);
+        let yyyy = f.sqr(yy);
+        let zz = f.sqr(p.z);
+        let x_plus_yy = f.add(p.x, yy);
+        // S = 4·X·YY, as 2·((X+YY)² − XX − YYYY); small scalars are
+        // additions so no Montgomery conversion enters the doubling.
+        let up = f.sqr(x_plus_yy);
+        let t = f.sub(up, xx);
+        let t = f.sub(t, yyyy);
+        let s = f.add(t, t);
+        let m = if a_minus_three {
+            // a = -3: M = 3(X - Z²)(X + Z²) = 3(X² - Z⁴).
+            let zz2 = f.sqr(zz);
+            let t = f.sub(xx, zz2);
+            let t2 = f.add(t, t);
+            f.add(t2, t)
+        } else {
+            let zz2 = f.sqr(zz);
+            let two_xx = f.add(xx, xx);
+            let three_xx = f.add(two_xx, xx);
+            let az = f.mul(self.a, zz2);
+            f.add(three_xx, az)
+        };
+        let m2 = f.sqr(m);
+        let two_s = f.add(s, s);
+        let x3 = f.sub(m2, two_s);
+        let y2 = f.add(yyyy, yyyy);
+        let y4 = f.add(y2, y2);
+        let y8 = f.add(y4, y4);
+        let ds = f.sub(s, x3);
+        let md = f.mul(m, ds);
+        let y3 = f.sub(md, y8);
+        let y_plus_z = f.add(p.y, p.z);
+        let yz = f.sqr(y_plus_z);
+        let yz = f.sub(yz, yy);
+        let z3 = f.sub(yz, zz);
+        Jac {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// `P + Q` with `Q` affine (madd-2007-bl in the third coordinate).
+    fn jac_add_affine(
+        &self,
+        f: &mut F,
+        p: Jac<F::E>,
+        q: &Pt<F::E>,
+        a_minus_three: bool,
+    ) -> Jac<F::E> {
+        if f.is_zero(p.z) {
+            return Jac {
+                x: q.x,
+                y: q.y,
+                z: f.one(),
             };
-            if k.bit(i) {
-                acc = match acc {
-                    Some(a) => self.add_points(f, &a, p),
-                    None => Some(*p),
-                };
+        }
+        let z1z1 = f.sqr(p.z);
+        let u2 = f.mul(q.x, z1z1);
+        let pz = f.mul(p.z, z1z1);
+        let s2 = f.mul(q.y, pz);
+        let h = f.sub(u2, p.x);
+        let r = f.sub(s2, p.y);
+        if f.is_zero(h) {
+            return if f.is_zero(r) {
+                self.jac_double(f, p, a_minus_three)
+            } else {
+                self.jac_infinity(f)
+            };
+        }
+        let hh = f.sqr(h);
+        let hhh = f.mul(h, hh);
+        let v = f.mul(p.x, hh);
+        let r2 = f.sqr(r);
+        let t = f.sub(r2, hhh);
+        let two_v = f.add(v, v);
+        let x3 = f.sub(t, two_v);
+        let rv = f.sub(v, x3);
+        let rm = f.mul(r, rv);
+        let ph = f.mul(p.y, hhh);
+        let y3 = f.sub(rm, ph);
+        let z3 = f.mul(p.z, h);
+        Jac {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    fn jac_to_affine(&self, f: &mut F, p: Jac<F::E>) -> Option<Pt<F::E>> {
+        if f.is_zero(p.z) {
+            return None;
+        }
+        let zinv = f.inv(p.z)?;
+        let zinv2 = f.sqr(zinv);
+        let zinv3 = f.mul(zinv2, zinv);
+        Some(Pt {
+            x: f.mul(p.x, zinv2),
+            y: f.mul(p.y, zinv3),
+        })
+    }
+
+    /// `[k]P` for `k ≥ 1`; `None` for the point at infinity.
+    ///
+    /// Left-to-right double-and-add over Jacobian coordinates: `2·bits`
+    /// doublings and at most `bits` mixed additions, then a single
+    /// inversion.  The affine ladder this replaces inverted once per
+    /// addition, which dominated every prime-field relation probe.
+    pub fn mul_big(&self, f: &mut F, p: &Pt<F::E>, k: &BigUint) -> Option<Pt<F::E>> {
+        let bits = k.bits() as usize;
+        if bits == 0 {
+            return None;
+        }
+        let three = f.embed_u64(3);
+        let minus_three = f.neg(three);
+        let a_minus_three = self.a == minus_three;
+        let mut acc = self.jac_infinity(f);
+        for i in (0..bits).rev() {
+            acc = self.jac_double(f, acc, a_minus_three);
+            if k.bit(i as u64) {
+                acc = self.jac_add_affine(f, acc, p, a_minus_three);
             }
         }
-        acc
+        self.jac_to_affine(f, acc)
     }
 
     /// A uniform element of the subgroup of order [`Curve::order`] other
@@ -630,57 +780,60 @@ pub fn pair_sum_keys<F: PrimeField>(c: &Curve<F>, base: &[Pt<F::E>]) -> Vec<F::K
     let n = base.len();
     let mut keys: Vec<F::K> = (0..n)
         .into_par_iter()
-        .map(|i| {
-            let mut f = c.field.clone();
-            let mut out: Vec<F::K> = Vec::with_capacity(2 * (n - i) + 1);
-            let a = base[i];
-            // Doubling: x(2a) = λ² − 2x with λ = (3x² + a)/(2y).
-            let x2 = f.sqr(a.x);
-            let three = f.embed_u64(3);
-            let num = f.mul(x2, three);
-            let num = f.add(num, c.a);
-            let two = f.embed_u64(2);
-            let den = f.mul(two, a.y);
-            let inv = f.inv(den).expect("an on-curve point has y != 0 here");
-            let l = f.mul(num, inv);
-            let l2 = f.sqr(l);
-            let t = f.sub(l2, a.x);
-            let x3 = f.sub(t, a.x);
-            out.push(f.key(x3));
-            // a ± b for j > i, with one inversion for the whole row.
-            let rest = &base[i + 1..];
-            if !rest.is_empty() {
-                let dens: Vec<F::E> = rest.iter().map(|b| f.sub(a.x, b.x)).collect();
-                let mut prefix = Vec::with_capacity(dens.len());
-                let mut acc = f.one();
-                for d in &dens {
-                    acc = f.mul(acc, *d);
-                    prefix.push(acc);
-                }
-                let mut inv_acc = f.inv(acc).expect("abscissae are distinct");
-                let mut invs = vec![f.zero(); dens.len()];
-                for k in (0..dens.len()).rev() {
-                    let before = if k == 0 { f.one() } else { prefix[k - 1] };
-                    invs[k] = f.mul(inv_acc, before);
-                    inv_acc = f.mul(inv_acc, dens[k]);
-                }
-                for (k, b) in rest.iter().enumerate() {
-                    let sx = f.add(a.x, b.x);
-                    for sign_plus in [false, true] {
-                        let ny = if sign_plus {
-                            f.add(a.y, b.y)
-                        } else {
-                            f.sub(a.y, b.y)
-                        };
-                        let lam = f.mul(ny, invs[k]);
-                        let l2 = f.sqr(lam);
-                        let x3 = f.sub(l2, sx);
-                        out.push(f.key(x3));
+        .map_init(
+            || c.field.clone(),
+            |f, i| {
+                let f = f;
+                let mut out: Vec<F::K> = Vec::with_capacity(2 * (n - i) + 1);
+                let a = base[i];
+                // Doubling: x(2a) = λ² − 2x with λ = (3x² + a)/(2y).
+                let x2 = f.sqr(a.x);
+                let three = f.embed_u64(3);
+                let num = f.mul(x2, three);
+                let num = f.add(num, c.a);
+                let two = f.embed_u64(2);
+                let den = f.mul(two, a.y);
+                let inv = f.inv(den).expect("an on-curve point has y != 0 here");
+                let l = f.mul(num, inv);
+                let l2 = f.sqr(l);
+                let t = f.sub(l2, a.x);
+                let x3 = f.sub(t, a.x);
+                out.push(f.key(x3));
+                // a ± b for j > i, with one inversion for the whole row.
+                let rest = &base[i + 1..];
+                if !rest.is_empty() {
+                    let dens: Vec<F::E> = rest.iter().map(|b| f.sub(a.x, b.x)).collect();
+                    let mut prefix = Vec::with_capacity(dens.len());
+                    let mut acc = f.one();
+                    for d in &dens {
+                        acc = f.mul(acc, *d);
+                        prefix.push(acc);
+                    }
+                    let mut inv_acc = f.inv(acc).expect("abscissae are distinct");
+                    let mut invs = vec![f.zero(); dens.len()];
+                    for k in (0..dens.len()).rev() {
+                        let before = if k == 0 { f.one() } else { prefix[k - 1] };
+                        invs[k] = f.mul(inv_acc, before);
+                        inv_acc = f.mul(inv_acc, dens[k]);
+                    }
+                    for (k, b) in rest.iter().enumerate() {
+                        let sx = f.add(a.x, b.x);
+                        for sign_plus in [false, true] {
+                            let ny = if sign_plus {
+                                f.add(a.y, b.y)
+                            } else {
+                                f.sub(a.y, b.y)
+                            };
+                            let lam = f.mul(ny, invs[k]);
+                            let l2 = f.sqr(lam);
+                            let x3 = f.sub(l2, sx);
+                            out.push(f.key(x3));
+                        }
                     }
                 }
-            }
-            out
-        })
+                out
+            },
+        )
         .flatten()
         .collect();
     keys.par_sort_unstable();
@@ -801,21 +954,19 @@ pub fn exact_ic_probe_with_arity<F: PrimeField>(
         .collect();
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations = Vec::new();
-    let nonzero_scalar = |rng: &mut StdRng| {
-        let bits = c.order.bits() as usize;
-        let mut bytes = vec![0u8; bits.div_ceil(8)];
-        let top_mask = if bits.is_multiple_of(8) {
-            u8::MAX
-        } else {
-            (1u8 << (bits % 8)) - 1
-        };
-        loop {
-            rng.fill(bytes.as_mut_slice());
-            *bytes.last_mut().expect("nonzero subgroup order") &= top_mask;
-            let a = BigUint::from_bytes_le(&bytes);
-            if !a.is_zero() && a < c.order {
-                break a;
-            }
+    let bits = c.order.bits() as usize;
+    let top_mask = if bits.is_multiple_of(8) {
+        u8::MAX
+    } else {
+        (1u8 << (bits % 8)) - 1
+    };
+    let mut scalar_bytes = vec![0u8; bits.div_ceil(8)];
+    let mut nonzero_scalar = |rng: &mut StdRng| loop {
+        rng.fill(scalar_bytes.as_mut_slice());
+        *scalar_bytes.last_mut().expect("nonzero subgroup order") &= top_mask;
+        let a = BigUint::from_bytes_le(&scalar_bytes);
+        if !a.is_zero() && a < c.order {
+            break a;
         }
     };
     for candidate in 0..setup_candidates {
