@@ -2464,3 +2464,10 @@ What was done: read actual FLINT3.6 header and primary implementation; compiled 
 Decisions made: chi10-only denominators avoid source numerator-domain mistake; source automorphism predicts vanishing psi4,psi6,chi12 as a consistency control. Numerical functions not normalized Igusa or algebraic certificates. No timing claim, one120CPU invocation after Git freeze.
 Open threads: execute, inspect actual separation/control outcomes; exact algebraic bounds/reduction and maps before collection comparison.
 Errors: no compile warnings; private pinned runtime reused to avoid known Homebrew install-name mismatch. Existing own reservation check allows, attach same-task conflict unchanged.
+
+## Complex genus-two quotient functions distinguish all pairs
+
+What was done: freezefe767fa8aec input hashes passed, one C invocation exit0. All five descriptors pass both precisions, positive periods,10even/6odd theta controls, chi10 exclusion, finite functions, precision overlap and exact reload. All10pairs disjoint in at least one invariant; six quotient pairs distinguished.
+Decisions made: strengthens complex-candidate distinction conditional CM interpretation; not algebraic recovery or finite-field curves. Before expensive CM reconstruction, measure exact source smoothness saturation ceiling on original target subgroup to test relevance to10x.
+Open threads: source complete-subgroup smoothness census; subsequent mechanism must address actual remaining dominant cost, not assume distinct quotients imply speedup.
+Errors: none in frozen C execution; no S3/cloud/merge.
