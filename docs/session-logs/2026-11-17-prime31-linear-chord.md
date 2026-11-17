@@ -40,3 +40,22 @@
 
 ### Errors (what went wrong, how it was handled)
 - Independent affine identity treatment was incorrect. Failure was caught by its Rust unit test before any benchmark; patched the group identity case and retained the original evidence. No new ECDLP timing or speedup was available from this failed CI.
+
+
+## 2026-11-17 03:30 UTC — Rust complete-cold panel finished, frozen speed gate failed [pcc:unverified]
+
+### What was done (commands, files, features)
+- Exact-source CI [#44010498590](https://github.com/isogeny-labs/crypto/actions/runs/44010498590) passed 40 library, 23 APS and 1 independent-affine-audit tests, then 24 fresh public Q × five cold solvers. The separate Rust auditor replayed 120/120 recovered affine scalar equations, checked all signed APS congruences, compared 48 paired APS attempt sequences and independently recomputed totals and speed decision.
+- Frozen full-cold totals: old APS 81,680,616 ns; linear-chord APS 81,006,788 ns; candidate repeat 81,015,446 ns; unfolded rho32 85,208,157 ns; rho64 83,519,404 ns. **Only 13/24** linear-chord wins; candidate/old = **0.991750454**, candidate A/A drift 0.01069%. Frozen 5% + 18/24 gate **FAILED**. S3 oracle itself regressed from 42,964,022 to 43,787,310 ns; setup varied down from 29,777,554 to 28,376,568 ns. No mathematical-oracle advantage credited.
+- Raw JSON and source hashes are in GitHub [artifact #14295409872](https://github.com/isogeny-labs/crypto/actions/runs/44010498590/artifacts/14295409872) (30-day retention). The permanent Git report is `APS_LINEAR_CHORD_24Q_RESULT_20261117.md`; independent Rust audit aggregate JSON is `APS_LINEAR_CHORD_24Q_AUDIT_20261117.json`; PR #4486 updated. The run is complete at producer-CI level only, [pcc:unverified].
+
+### Decisions made (and why)
+- Deprioritize linear-difference batch inversions: the hypothesized one field multiplication per pair saving did not yield preregistered cold benefit and was not manifested in faster S3-oracle totals. Don't select only favorable target orderings or alter frozen thresholds.
+- Keep new identity-regression Rust tests and full comparative harness, but promote no fastest-ECDLP or non-generic claim. Treat unfolded rho32/rho64 as controls, not tuned WZ reference.
+
+### Open threads (unfinished, pick up next time)
+- Pursue genuinely nonenumerative public-R RR9/S9 extraction at B4/B8, then B31 complete log recoveries and costed external comparison. Archive raw artifact before 30-day expiry if permanent raw custody is required.
+- Investigate #4468 WZ exact-source comparator and perform independent PCC-signed result validation before leaderboard promotion.
+
+### Errors (what went wrong, how it was handled)
+- Expected speed gate failed despite all complete logarithms being correct; negative conclusion is reported without retuning. Independent PCC and strongest tuned WZ/external IC remain missing.
