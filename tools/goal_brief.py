@@ -121,7 +121,10 @@ def main() -> int:
         "## Protocol",
         "Work the first unchecked item in docs/ACTIVE.md; if there is none, pick the",
         "open thread above that is most recent and not owned by another live session",
-        "(check `conductor check`). State the choice in one line, then start.",
+        "(check `conductor check`). State the choice in one line. First step,",
+        "before any other work: add or mark the task's line in docs/ACTIVE.md,",
+        "commit it alone, push, and open a draft PR named after the task",
+        "(AGENTS.md, \"First step of every task\"). Mark the PR ready when done.",
     ]
     if len(lines) > args.max_lines:
         lines = lines[: args.max_lines - 1] + [f"... (truncated at {args.max_lines} lines; rerun with --max-lines)"]

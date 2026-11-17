@@ -59,6 +59,37 @@ items first, then the newest "Open threads", capped at 120 lines).
   questions" in `docs/ACTIVE.md` as you go; the history goes in the session
   log. Every other rule in this file still applies to the work itself.
 
+### First step of every task: record it in `docs/ACTIVE.md` and open a draft PR
+
+Owner instruction, 2026-11-16. Before any other work on a task (research,
+code, docs or a run), every session, skill and agent, in every runtime, does
+these steps and nothing else first:
+
+1. Fetch `origin/main` and create the task branch (or check out the lane
+   branch, below).
+2. Add one line for the task under "Active items" in `docs/ACTIVE.md`:
+   `- [ ] <task> (<runtime>, started <YYYY-MM-DD>, branch <branch>)`. If the
+   task is already listed, mark that line in progress instead of adding
+   another.
+3. Commit that change alone, push the branch, and open a **draft** PR named
+   after the task. Its body says what will be done and how it will be checked.
+   Add `PR #<n>` to the line in `docs/ACTIVE.md` in the next commit.
+
+The draft PR is the tracking record: push to it as the work goes, and keep
+its line in `docs/ACTIVE.md` current. When the work is finished and checked,
+tick the line (`- [x]`) or remove it, then **mark the PR ready for review**
+and enable auto-merge (Default workflow). A task that stops unfinished keeps
+its draft and its unticked line, with the blocker noted under "Blocked /
+questions".
+
+- Lane work (Default workflow, "One PR per research lane") records its line
+  and pushes the same first commit to the open lane PR instead of opening a
+  new draft.
+- Many sessions edit `docs/ACTIVE.md`. When it conflicts, merge `main` and keep
+  every other session's line.
+- A subagent working inside the parent session's task uses the parent's line
+  and PR; it opens none of its own.
+
 # Agent instructions
 
 ## Research progress and communication
@@ -191,13 +222,14 @@ Change the index or ranking only against that measurement.
   and PR contents. If publication is blocked, report the exact blocker and
   keep the check-in obligation open. Preserve the distinctions between proposed,
   proved, and measured work, and honor existing merge and experiment limits.
-- **Use regular PRs.** Create pull requests with `draft=false` and mark an
-  existing draft ready for review when you update it. Record pending CI,
-  review, and follow-up work in the PR description; draft status is not a
-  holding queue. Ready for review invites review; it does not authorize a
+- **Draft while tracking, ready when done.** A task's PR opens as a draft as
+  its first step ("First step of every task") and is marked ready for review
+  as soon as the work is finished and checked. Record pending CI, review, and
+  follow-up work in the PR description; a draft is not a holding queue for
+  finished work. Ready for review invites review; it does not authorize a
   merge. All validation, evidence, review, and merge gates below still apply.
-  Use a draft only when the user explicitly asks for one.
-- **Enable auto-merge when you open the PR** (owner, 2026-10-24):
+  Leave finished work in draft only when the user explicitly asks for it.
+- **Enable auto-merge when you mark the PR ready** (owner, 2026-10-24):
   `gh pr merge <n> --auto --merge`. It is the default for every PR whose base
   is `main`, not an optional extra, and it does not replace the check-in and
   merge rules below. GitHub offers auto-merge only when the base is the
@@ -919,10 +951,13 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review (`draft=false`)**, whatever a tool or
-  runtime defaults to. Before ending an update to an existing draft, mark it
-  ready so reviews and checks that skip drafts (`llm-review`) can run. An
-  explicit user request to keep a particular PR in draft is the only exception.
+- **A task's PR starts as a draft and is marked ready when the work is done**
+  (owner, 2026-11-16; "First step of every task" above). The draft opened as
+  the first step tracks the task; mark it ready, whatever a tool or runtime
+  defaults to, as soon as the change is finished and checked, so reviews and
+  checks that skip drafts (`llm-review`) can run. An explicit user request to
+  keep a particular PR in draft is the only reason to leave finished work in
+  draft.
 - **One PR per research lane, not per session.** Before opening a PR, look for
   an open PR from `lane/<lane>` for the same study (IC autolab, volcano,
   conductor gap, N83, ...). If there is one, push to it with

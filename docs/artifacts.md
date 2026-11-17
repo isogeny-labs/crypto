@@ -95,7 +95,28 @@ removing an object is a decision for the bucket's owner.
 
 ### Diagnosing failed downloads
 
-S3 downloads use `s3api get-object` for the exact content-addressed key, without
+While the S3 store is unavailable, `pull` defaults to the verified local cache,
+checked-in recovery entries under `.artifacts/recovery/`, and full Git history
+when the configured remote is `s3://`. Existing CI pull commands therefore do
+not contact S3. File and HTTP remotes retain their existing behavior. Select
+this mode explicitly with `pull --source git`; after store recovery, opt back
+into remote reads with `pull --source remote` or `ARTIFACTS_PULL_SOURCE=remote`.
+
+Git recovery accepts only the manifest's exact SHA-256 and size. It follows
+merge ancestry that ordinary path-history simplification can hide, and may
+fetch historical blobs from the checkout's existing Git promisor remote in
+a partial clone. It needs full commit history (`fetch-depth: 0` in Actions).
+Artifacts never committed to Git need an exact verified recovery copy; a
+missing copy remains a failure, without an S3 retry or a skipped check.
+
+The recovery index maps SHA-256 digests either to historical Git blob IDs or
+to compressed payloads in the same directory. Decompression is bounded by
+the expected manifest size, and the normal cache verification checks the
+uncompressed bytes before installation. The current backend report is
+retained as a compressed copy of the verified local cache; its archived
+revision refers to an existing Git blob. Manifest digests are unchanged.
+
+Explicit S3 downloads use `s3api get-object` for the exact content-addressed key, without
 the high-level `s3 cp` HEAD preflight. The cache still verifies the manifest's
 SHA-256 and byte count before installing any bytes; failed downloads remove
 their partial output.

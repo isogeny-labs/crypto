@@ -1,0 +1,44 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T05:33:50Z",
+ "id": "PCC-20261117-feaf31",
+ "kind": "statement",
+ "producer": {
+  "commit": "94479f7e3eb9de9ae59b764d2b2b50b3238f0a44",
+  "model": "",
+  "session": "codex-nagao-e2e-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/PLAN.md",
+    "sha256": "cee3e2d0a2d94b6ff93f7337cb14d731702bda05d9bb534de1c0ea63808259f6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/validation/worker-tests-final.log",
+    "sha256": "ea2228c00456e506ef5d9a9c678cc2b11efb16ea16d3d766cdf6a9a977950217"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/validation/qualifier-tests.log",
+    "sha256": "5cb70936116cf626ae0d99b1656c0a42bf3d2943e3eb69a2043b8ba8d2277218"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/validation/clippy-3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "extension-ic/nagao-e2e",
+ "statement": "Preregister the fixed p1009 seed389 known-answer full scalar recovery comparison: graph IC with six versus five Nagao variables and the best previously observed registered plain batch16 native rho, all cold per-target state. Twenty-four finite calls comprise warmups, A/A controls and five paired measured rounds; complete worker-process wall is primary, with independent endpoint/collection/kernel/descent replay, unchanged native isolation and null ranking after admission failure. Pre-data scoped native tests and strict scoped Clippy are recorded; no full-pipeline result exists yet."
+}

@@ -1,7 +1,33 @@
 {
   "branch": "lane/vieta-speed-20261117",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speed-20261117/run/preflight-isolation.jsonl",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "1200",
+        "bash",
+        "research/vieta_coset_rust_20261115/speed-20261117/run/bin/run-panel.sh",
+        "preflight",
+        "research/vieta_coset_rust_20261115/speed-20261117/run/preflight",
+        "research/vieta_coset_rust_20261115/speed-20261117/run/bin/qualifier"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T04:23:52+00:00",
+      "wall_s": 521.52
+    }
+  ],
   "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
   "commit_dirty": false,
   "created_utc": "2026-11-17T04:18:39+00:00",
