@@ -12,7 +12,7 @@ use super::workload::{CurveFacts, WideInstance};
 use crate::cryptanalysis::ic_boundary::{BinaryInstance, GroupOps};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_fast::FastPoint;
-use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, RhoScalar};
+use crate::cryptanalysis::koblitz_strong_rho::{NarrowRhoScalar, RawPointG, RhoScalar};
 
 type Key = (bool, u128, u128);
 type Counts = BTreeMap<String, u64>;
@@ -217,7 +217,7 @@ pub fn solve_wide(
 
 /// The same collector at either width. No planted scalar or factor-base logs.
 #[allow(clippy::too_many_arguments)]
-fn run<G: ClawGroup>(
+fn run<G: ClawGroup<K = u128>>(
     g: &G,
     cofactor: G::S,
     lift: impl Fn(u64) -> Vec<G::P>,
@@ -226,7 +226,10 @@ fn run<G: ClawGroup>(
     curve: &CurveFacts,
     target: G::P,
     seed: u64,
-) -> Result<SolveReport, String> {
+) -> Result<SolveReport, String>
+where
+    G::S: NarrowRhoScalar,
+{
     let shape = Shape::parse(method)?;
     let started = Instant::now();
     let (r, n) = (g.r(), g.n());
@@ -459,7 +462,7 @@ fn run<G: ClawGroup>(
                 measurement::mark(Phase::TargetDescent);
                 rank.insert(row, &mut c)?;
                 if let Some(d) = rank.pinned(columns.len()) {
-                    recovered = Some(d.to_u128());
+                    recovered = Some(super::exact_scalar::ExactScalar::from(d.to_u128()));
                     break 'queries;
                 }
                 break;
@@ -535,7 +538,7 @@ mod tests {
             let target = g.mul(&mut GroupOps::default(), i.generator, scalar);
             let direct = solve_narrow(&method("direct", 2, 512), i, &facts, target, 7351).unwrap();
             let orbit = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
-            assert_eq!(direct.recovered, Some(u128::from(scalar)));
+            assert_eq!(direct.recovered, Some(u128::from(scalar).into()));
             assert_eq!(orbit.recovered, direct.recovered);
             assert_eq!(direct.factor_base, orbit.factor_base);
             let replay = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
@@ -587,7 +590,7 @@ mod tests {
             7351,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(123));
+        assert_eq!(rep.recovered, Some(123u64.into()));
     }
 
     #[test]

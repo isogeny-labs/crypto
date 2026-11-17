@@ -1,0 +1,10 @@
+[package]
+name="hec-c4-gaussian"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="c4-gaussian"
+path="../main.rs"

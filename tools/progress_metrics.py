@@ -1043,6 +1043,49 @@ def trace_local_runtime(ref, since):
                  source=source)
 
 
+def relation_fusion_observations(ref, since):
+    """Export raw declared-call observations, without computing ratios."""
+    path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("outcomes", []):
+            if row.get("status") != "complete":
+                continue
+            key = f"p{row['prime']}.n{row['n']}.{row['kind']}.{row['kernel']}"
+            emit(f"relation.fusion.scan.{key}.parent_ns", row["parent_ns"], date=date,
+                 problem="complete-certificate-replay", unit="ns", better="neutral",
+                 label="Single declared call including controller replay; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
+def relation_fusion_repeated(ref, since):
+    """Export recorded component medians with their actual admission status."""
+    path = "research/relation_fusion_20261117/MATCHED_ANALYSIS_85.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.repeated.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call median; contended85, no timing admission; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
+def relation_fusion_root_dag(ref, since):
+    """Export the recorded96 medians; no admitted improvement is implied."""
+    path = "research/relation_fusion_20261117/ROOT_DAG_ANALYSIS_96.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.root_dag.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call96 median; no gain admitted beyond A/A; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1087,6 +1130,9 @@ def main():
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
+    relation_fusion_observations(a.ref, a.since)
+    relation_fusion_repeated(a.ref, a.since)
+    relation_fusion_root_dag(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
