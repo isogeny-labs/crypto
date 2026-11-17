@@ -128,6 +128,6 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130 research/p192_extension_cover_20261012
       - name: Custody of every pin, then each replay in its isolated view
         run: node .github/scripts/run-frozen-workflow-replays.mjs
