@@ -480,7 +480,7 @@ mod batch_complement_tests {
     const HOLDOUT_SEED: u64 = 0x5339_4248_4f4c_4431;
 
     #[derive(Default, Clone, Copy, Debug)]
-    struct BatchStats {
+    pub(super) struct BatchStats {
         windows: u64,
         processed: u64,
         regular: u64,
@@ -595,7 +595,7 @@ mod batch_complement_tests {
         answers
     }
 
-    fn recover_batched(
+    pub(super) fn recover_batched(
         ar: &mut Arithmetic,
         half: &FourSet,
         pts: &[Point],
@@ -768,6 +768,306 @@ mod batch_complement_tests {
             "sign_independent_algebraic_extractor":false,
             "complete_unknown_ecdlp_logs":0,
             "pcc":"unverified"
+        }));
+    }
+}
+
+
+// End-to-end *index-calculus-style* correctness/cost control, not a new
+// algebraic/non-generic relation extractor. Reuses the signed 4A index and
+// Montgomery-batched complement implementation above, not a new group law.
+// Protocol: DICKSON31_COMPLETE_RANK_1024_PROTOCOL_20261117.md (PR #4623).
+#[cfg(test)]
+mod complete_b31_1024_tests {
+    use super::*;
+    use super::batch_complement_tests::{recover_batched, BatchStats};
+
+    const RELATION_SEED: u64 = 0x4241_5345_3331_5f31;
+    const CORPUS_SEED: u64 = 0x4d49_5834_5033_3131;
+    const MAX_SOURCES: usize = 128;
+    const TARGETS: usize = 1024;
+    const MAX_PUBLIC_SHIFT: u64 = 8;
+    const DIM: usize = B31;
+    type Row = [u64; DIM + 1];
+
+    #[inline]
+    fn nmul(x: u64, y: u64) -> u64 {
+        ((x as u128 * y as u128) % PRIME31.n as u128) as u64
+    }
+    #[inline]
+    fn nadd(x: u64, y: u64) -> u64 {
+        let t = x + y;
+        if t >= PRIME31.n { t - PRIME31.n } else { t }
+    }
+    #[inline]
+    fn nsub(x: u64, y: u64) -> u64 {
+        if x >= y { x - y } else { x + PRIME31.n - y }
+    }
+    fn npow(mut x: u64, mut e: u64) -> u64 {
+        let mut z = 1u64;
+        while e > 0 {
+            if e & 1 != 0 { z = nmul(z, x); }
+            x = nmul(x, x);
+            e >>= 1;
+        }
+        z
+    }
+
+    // No secret scalar, root oracle or support list reaches relation search.
+    // Signed token 2i/2i+1 maps to +/-P_i; all eight terms are charged.
+    fn signed_row(word: Word8, rhs: u64) -> Row {
+        let mut row = [0u64; DIM + 1];
+        for token in word {
+            let i = (token / 2) as usize;
+            assert!(i < DIM);
+            row[i] = if token & 1 == 0 {
+                nadd(row[i], 1)
+            } else {
+                nsub(row[i], 1)
+            };
+        }
+        row[DIM] = rhs % PRIME31.n;
+        row
+    }
+
+    #[derive(Default)]
+    struct ModRank {
+        pivots: [Option<Row>; DIM],
+        count: usize,
+        dependent: usize,
+    }
+    impl ModRank {
+        fn insert(&mut self, mut row: Row) {
+            for i in 0..DIM {
+                if row[i] == 0 { continue; }
+                if let Some(pivot) = self.pivots[i] {
+                    let scale = row[i];
+                    for j in i..=DIM { row[j] = nsub(row[j], nmul(scale, pivot[j])); }
+                } else {
+                    let recip = npow(row[i], PRIME31.n - 2);
+                    for v in &mut row[i..] { *v = nmul(*v, recip); }
+                    assert_eq!(row[i], 1);
+                    self.pivots[i] = Some(row);
+                    self.count += 1;
+                    return;
+                }
+            }
+            assert_eq!(row[DIM], 0, "inconsistent authentic curve relation");
+            self.dependent += 1;
+        }
+        fn solve(&self) -> Option<[u64; DIM]> {
+            if self.count != DIM { return None; }
+            let mut logs = [0u64; DIM];
+            for i in (0..DIM).rev() {
+                let row = self.pivots[i]?;
+                let mut rhs = row[DIM];
+                for j in i + 1..DIM { rhs = nsub(rhs, nmul(row[j], logs[j])); }
+                logs[i] = rhs;
+            }
+            Some(logs)
+        }
+    }
+
+    fn evaluate_row(row: &Row, logs: &[u64; DIM]) -> u64 {
+        let mut sum = 0;
+        for i in 0..DIM { sum = nadd(sum, nmul(row[i], logs[i])); }
+        sum
+    }
+
+    // Guaranteed full-group fallback for any unresolved target. It is generic,
+    // charged and separately labelled, never counted as index calculus.
+    fn fallback_bsgs(ar: &mut Arithmetic, q: Point) -> Option<u64> {
+        const M: u64 = 46_341; // ceil sqrt(2147446831)
+        let mut table = HashMap::<Point, u64>::with_capacity(M as usize);
+        let mut baby = None;
+        for j in 0..M {
+            table.entry(baby).or_insert(j);
+            baby = ar.add(PRIME31, baby, Some(PRIME31.g));
+        }
+        let minus_mg = ar.neg(PRIME31, ar.scalar(PRIME31, M, Some(PRIME31.g)));
+        let mut giant = q;
+        for i in 0..=(PRIME31.n / M + 1) {
+            if let Some(&j) = table.get(&giant) {
+                let k = (i * M + j) % PRIME31.n;
+                if ar.scalar(PRIME31, k, Some(PRIME31.g)) == q { return Some(k); }
+            }
+            giant = ar.add(PRIME31, giant, minus_mg);
+        }
+        None
+    }
+
+    fn public_relation(
+        ar: &mut Arithmetic, half: &FourSet, pts: &[Point],
+        q: Point, batch: &mut BatchStats,
+        attempts: &mut usize, negatives: &mut usize
+    ) -> Option<(Word8, u64)> {
+        for shift in 0..=MAX_PUBLIC_SHIFT {
+            let moved = ar.scalar(PRIME31, shift, Some(PRIME31.g));
+            let residual = ar.add(PRIME31, q, moved);
+            *attempts += 1;
+            let (maybe, probes) = recover_batched(ar, half, pts, residual, batch);
+            if let Some(word) = maybe { return Some((word, shift)); }
+            *negatives += 1;
+            assert_eq!(probes, half.ordered.len(), "negative exhaustive lookup");
+        }
+        None
+    }
+
+    #[test]
+    fn complete_prime31_dickson31_rank_1024q() {
+        let complete_start = Instant::now();
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).expect("valid original cofactor-one group");
+        let base = Base::build(PRIME31, 6, &mut ar).expect("original Dickson depth-six");
+        assert_eq!(base.points.len(), 31);
+        let pts = tokens(&ar, &base.points);
+        let half = FourSet::build(&mut ar, &pts);
+        assert_eq!(half.index.len(), 618_885);
+        let common_build_ns = complete_start.elapsed().as_nanos();
+
+        let mut stats = BatchStats::default();
+        let mut attempts = 0usize;
+        let mut negatives = 0usize;
+        let mut relation_seed = RELATION_SEED;
+        let mut rank = ModRank::default();
+        let mut collected = Vec::<Row>::new();
+        let basis_start = Instant::now();
+        let mut used_sources = 0usize;
+        let mut setup_unresolved = 0usize;
+        for _ in 0..MAX_SOURCES {
+            if rank.count == DIM { break; }
+            used_sources += 1;
+            // The source scalar a is public and used only for the RHS.
+            let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
+            let q = ar.scalar(PRIME31, a, Some(PRIME31.g));
+            if let Some((w, shift)) = public_relation(
+                &mut ar, &half, &pts, q, &mut stats, &mut attempts, &mut negatives
+            ) {
+                let row = signed_row(w, nadd(a, shift));
+                rank.insert(row);
+                collected.push(row);
+            } else {
+                setup_unresolved += 1;
+            }
+        }
+        assert_eq!(rank.count, DIM, "128 public source controls did not span all 31 columns");
+        let logs = rank.solve().expect("non-invertible rank-31 basis");
+        for (i, &ell) in logs.iter().enumerate() {
+            assert_eq!(
+                ar.scalar(PRIME31, ell, Some(PRIME31.g)),
+                Some(base.points[i]),
+                "learned factor-base log failed original curve replay"
+            );
+        }
+        for row in &collected {
+            assert_eq!(evaluate_row(row, &logs), row[DIM], "setup equation replay");
+        }
+        let rank_learning_ns = basis_start.elapsed().as_nanos();
+
+        let controls_start = Instant::now();
+        let mut extra_verified = 0usize;
+        for _ in 0..16 {
+            let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
+            let q = ar.scalar(PRIME31, a, Some(PRIME31.g));
+            if let Some((word, shift)) = public_relation(
+                &mut ar, &half, &pts, q, &mut stats, &mut attempts, &mut negatives
+            ) {
+                let row = signed_row(word, nadd(a, shift));
+                assert_eq!(evaluate_row(&row, &logs), row[DIM]);
+                extra_verified += 1;
+            } else {
+                panic!("independent known-source control unrepresented within cap");
+            }
+        }
+        let verification_controls_ns = controls_start.elapsed().as_nanos();
+
+        // Caller-only corpus: no k supplied to public_relation or rank learning.
+        let corpus_start = Instant::now();
+        let mut corpus_seed = CORPUS_SEED;
+        let mut seen = HashSet::new();
+        let mut targets = Vec::with_capacity(TARGETS);
+        for _ in 0..TARGETS {
+            let k = loop {
+                let v = 1 + splitmix64(&mut corpus_seed) % (PRIME31.n - 1);
+                if seen.insert(v) { break v; }
+            };
+            targets.push((ar.scalar(PRIME31, k, Some(PRIME31.g)), k));
+        }
+        let harness_generation_ns_excluded = corpus_start.elapsed().as_nanos();
+        assert_eq!(seen.len(), TARGETS);
+
+        let target_start = Instant::now();
+        let mut b31_solves = 0usize;
+        let mut bsgs_fallbacks = 0usize;
+        let mut first_shift = [0usize; 10];
+        let mut target_attempts = 0usize;
+        let mut target_negatives = 0usize;
+        let mut exact_point_checks = 0usize;
+        let mut returned = Vec::with_capacity(TARGETS);
+        for &(q, caller_k) in &targets {
+            let recovered = if let Some((word, shift)) = public_relation(
+                &mut ar, &half, &pts, q, &mut stats, &mut target_attempts, &mut target_negatives
+            ) {
+                let mut rlog = 0u64;
+                for token in word {
+                    let i = (token / 2) as usize;
+                    rlog = if token & 1 == 0 {
+                        nadd(rlog, logs[i])
+                    } else {
+                        nsub(rlog, logs[i])
+                    };
+                }
+                b31_solves += 1;
+                first_shift[shift as usize] += 1;
+                nsub(rlog, shift)
+            } else {
+                bsgs_fallbacks += 1;
+                fallback_bsgs(&mut ar, q).expect("complete subgroup fallback failed")
+            };
+            assert_eq!(ar.scalar(PRIME31, recovered, Some(PRIME31.g)), q);
+            exact_point_checks += 1;
+            // Caller knows this, candidate (including fallback) did not receive it.
+            assert_eq!(recovered, caller_k);
+            returned.push(recovered);
+        }
+        let target_solve_verify_ns = target_start.elapsed().as_nanos();
+        assert_eq!(returned.len(), TARGETS);
+        assert_eq!(b31_solves + bsgs_fallbacks, TARGETS);
+
+        println!("DICKSON31_COMPLETE_1024_JSON={}", json!({
+            "schema":"prime31.dickson31.complete_rank1024.v1",
+            "validation":"producer CI [pcc:unverified]",
+            "field_p": PRIME31.p, "order_n": PRIME31.n,
+            "curve_a": PRIME31.a, "curve_b": PRIME31.b,
+            "base_size":DIM, "half_set":half.index.len(),
+            "basis_rows":collected.len(), "basis_rank":rank.count,
+            "basis_dependent_rows":rank.dependent,
+            "basis_source_points":used_sources, "basis_unresolved_shift_cap":setup_unresolved,
+            "additional_independent_source_equations_verified":extra_verified,
+            "known_source_relation_attempts_including_16_controls":attempts,
+            "known_source_exhaustive_negative_attempts":negatives,
+            "target_corpus_splitmix_seed":format!("{CORPUS_SEED:#018x}"),
+            "distinct_public_targets":seen.len(),
+            "complete_unknown_logs":returned.len(), "b31_index_calculus_style_logs":b31_solves,
+            "generic_bsgs_fallback_logs":bsgs_fallbacks,
+            "target_relation_attempts":target_attempts, "target_exhaustive_negatives":target_negatives,
+            "target_first_hit_shift_histogram":first_shift,
+            "original_curve_scalar_replays":exact_point_checks+DIM,
+            "common_original_curve_base_and_half_table_setup_ns":common_build_ns.to_string(),
+            "public_basis_learning_and_replay_ns":rank_learning_ns.to_string(),
+            "extra_known_source_validation_ns":verification_controls_ns.to_string(),
+            "heldout_caller_corpus_generation_ns_excluded_from_solver":harness_generation_ns_excluded.to_string(),
+            "unknown_target_solve_and_verify_ns":target_solve_verify_ns.to_string(),
+            "charged_total_setup_basis_controls_queries_and_verification_ns":(
+                common_build_ns + rank_learning_ns + verification_controls_ns + target_solve_verify_ns
+            ).to_string(),
+            "fully_charged_batch_complement_diagnostic":format!("{stats:?}"),
+            "four_set_index_capacity_entries":half.index.capacity(),
+            "four_set_ordered_capacity_entries":half.ordered.capacity(),
+            "uses_generic_signed_four_plus_four_lookup":true,
+            "genuinely_sign_independent_extractor":false,
+            "beats_shared_precompute_bsgs_claim":false,
+            "independent_signed_pcc":false
         }));
     }
 }
