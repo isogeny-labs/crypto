@@ -1,0 +1,9 @@
+# Two-quadratic graph IC48 source checkpoint
+
+Goal active. Merged PR4508contains46/47results and grounded core48. New continuation PR4537tracks full two-quadratic admission/collector/qualifier in Rust; tracking rule adopted from current main. Frozen46/47calls remain consumed, original proof subjects unchanged, all owned runners through47deleted. [pcc:unverified]
+
+New production entrypoint run_extension_quadratic_pair_dlp_on combines bounded quartic splitting, checked principal classes, grounded signed witnesses, exact integer cancellation, sparse rank and existing full-only Nagao/protected affine solve. Separate qualifier checks complete sources/graph/rank/affine data and candidate/split-RNG/cohort replay.36worker/143qualifier serialized controls, optimized builds/strictClippy and transport simulation pass; PCC-20261117-92f18d remains UNVERIFIED. [pcc:unverified]
+
+Amendment43/quadratic-pair-plan.json register original IC, current quadratic table collector and new grounded pair collector, fixed-order cold exposed p1009/seed389public fixture. Publish/check source/binaries/report/protocol and immutable remote ref before allocation. Runpod4CPU8GiB≤0.40USD/hour, absolute6000second lifetime, live detached guardian required before sole dispatch. Collect/hash/private-scan/delete before interpretation. No48paid allocation/scientific call exists at this source checkpoint. [pcc:unverified]
+
+Complete native counts, fresh/scaling targets, strongest matched rho qualification and signed execution admission remain. Main-prefix journal reconciliation preserved full blocks and unchanged ledger; do not rewrite old proof subjects. Base dependency/artifact/CI limitations are inherited, with no all-green claim. Continue authorized research while resolving independent blockers. [pcc:unverified]

@@ -1,0 +1,9 @@
+# Exclusive C4 phase attribution
+
+Instrumentation-only replay of the exact72calls in c4-solves at4ed203d724b. Copy setup/walk/pencil/main with only exclusive phase labels/output added; all native arithmetic modules are the retained counted implementation. Separate counter wrapper preserves enable/disable behavior and adds phases. No new source/target/model/seed, budget change, selection or algorithmic optimization.
+
+Gates: every scalar/outcome/repetition/first-prefix gate from original; every16componentphase sum equals its modulus total; CONTROL.tsv byte-identical to retained c4-solves/CONTROL.tsv; every phase vector repeats exactly. Sum exclusive labels, not inclusive timers. Setup labels source_validation/eigenvalue/catalogue/partition; source_normalization; pencil anchor/scan/residual/elimination/verification; walk setup/walk/smoothness/row/elimination/verification andorbit_rows; entry retains first Fp initialization. A phase may have no counted operations. Complete scan is charged before first accepted bucket. Externally supplied N/ell contract and counter limits unchanged.
+
+One execution600CPUseconds,no outputoverwrite/retry. Save stdout/stderr/phase outputs/exit/hashmanifest under Git custody during S3 outage. Freeze/push sources/dependencies/original output hashes/binary before execution. Report modulus-separated REDC/inversion shares; no arbitrary cross-modulus cost, new speedup, wall/priority/leaderboard claim. Conditional Amdahl bounds assume all other counted work unchanged; never a universal bound on new mathematical algorithms. This stage diagnoses the improved pencil baseline for the requested broader10xobjective.
+
+Sources reused: c4-solves/PROTOCOL.md andRESULTS.md; phases/native/src/counted.rs earlier exclusive-counter instrument. No new mathematical method or novelty claim. Shared Cantor arithmetic/extension counts remain disclosed.

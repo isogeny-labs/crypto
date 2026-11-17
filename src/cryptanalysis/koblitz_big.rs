@@ -464,10 +464,8 @@ impl RhoScalar for U192 {
             None => self.to_big().to_f64().expect("a 192-bit value is finite"),
         }
     }
-    /// The value as a `u128`; panics above `2^128` rather than truncate.
-    fn to_u128(self) -> u128 {
-        self.checked_u128()
-            .expect("a U192 scalar above 2^128 has no u128 form")
+    fn checked_u128(self) -> Option<u128> {
+        U192::checked_u128(self)
     }
     fn to_biguint(self) -> BigUint {
         self.to_big()

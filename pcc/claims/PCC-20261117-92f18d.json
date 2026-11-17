@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:53:17Z",
+ "id": "PCC-20261117-92f18d",
+ "kind": "execution",
+ "producer": {
+  "commit": "8478ebfe4cea21b8f927fd88eadb26ff6ff29b24",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/pair48/worker-tests-final.log",
+    "sha256": "4b25ff066c57ca5b0241617f0dcaae87212e4988cf81bfbc49de31d48a471afb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/pair48/checker-tests-v5.log",
+    "sha256": "14e9af629410785843e1a678de2617b604359cd2f09d5b3bd6daa03778b40b5e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/pair48/transport.log",
+    "sha256": "31b3686506b4def6800227a41a7ff81fbc33ab96bfb9a083fb5de3117cc28929"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/pair48/worker-clippy-v2.status",
+    "sha256": "d6155cc5a9b2f75c8b5737c0c96131cc128b26421509d4b68ad05d66e3728e40"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/pair48/checker-clippy-v2.status",
+    "sha256": "4cc5f3bf068eedb614e0dade7eb431cf31304577db9a55f60f26ad8307b66610"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Quadratic-pair full collector/qualifier native source controls: 36 serialized worker tests, 143 serialized qualifier tests, strict worker/checker Clippy and both optimized builds pass. Three-arm transport simulation passes including first-arm failure and repeated-call refusal. Source/finite algebra controls only; no new natural-yield or performance call."
+}

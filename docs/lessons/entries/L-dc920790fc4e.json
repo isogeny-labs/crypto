@@ -1,0 +1,15 @@
+{
+  "action": "check which bits the tamper flipped; a flip outside the decoded variables still projects to a valid relation, so count only decoded-variable flips as exercising rejection, and require at least one per arm",
+  "created": "2026-11-17T08:46:13Z",
+  "evidence": [
+    "research/groebner_solver_shootout_20261116/run-local/cells.json tamper: bits 27, 17 and 22 (U bits, >= 15) were not roots of the system but projected to oracle relations; only bits 6, 11 and 7 tested rejection"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "controlled-experiment"
+  ],
+  "trigger": "when a tamper control flips a random bit of a Boolean root and the verifier decodes the relation from only some of the variables (e.g. the X blocks of a chained-S3 Semaev system, not the U intermediates)",
+  "why": ""
+}
