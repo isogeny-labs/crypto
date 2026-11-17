@@ -27,6 +27,20 @@ jobs:
         with:
           persist-credentials: false
           filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            /build.rs
+            /src/
+            /crates/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /research/pencil_large_prime_20261029/
+            /research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag
+            /research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+            /examples/prime31_batched_ic_same_1024q.rs
       - name: Checkout frozen original native arithmetic
         uses: actions/checkout@v4
         with:
