@@ -45,3 +45,17 @@ Checks and predictions written before the sweep's new cells:
 - Calibration against certified values (lfd-summation-systems `experiments/ic-bounds-split-m`): (m, k) = (4,2) 6, (5,2) 6, (4,3) 7, (6,2) 7; (5,3) lower bound 8. Local run of this binary before launch: (4,2) 6, (4,3) 7, (5,2) 6, (5,3) no 1 through degree 7 (censored at 8 by a 200 s budget), (7,2) no 1 through degree 7.
 - New cells: (7,2), (8,2), (9,2) and depth 3 for m >= 5. No prediction is stated for their values; the only reading rule is that "1 enters at c" is an exact value for this instrument and a censored closure is a lower bound of the censored degree.
 - This instrument has no closure verification pass of the kind the lfd-summation-systems engine has; values new to this sweep are single-instrument and `[pcc:unverified]`.
+
+## Changes after launch (16:15 to 16:30 UTC)
+
+- **More pods for the m-sweep** (owner asked whether a GPU could speed it up; the sparse engine has no GPU path, so
+  the sweep was spread over more CPU pods instead): `msweep-m6` `gzyyvzfhwssxi2`, `msweep-m8` `t4rz3s0otppli2`,
+  `msweep-m9` `kb81a8op5pd0ah`: cpu3m (cpu5m at 32 vCPU was sold out), 32 vCPU, 256 GB, US$1.76/h each, cap 28,800 s,
+  worst case US$14.08 each; started 16:25 UTC with `msweep_job.sh "<m>" "2"`. `msweep-a` and `msweep-b` continue with
+  their lists, so m = 6, 8, 9 may be computed twice on different hosts.
+- **Error, depth 13/14:** stages B and C of `cpu_job.sh` exited at once with 127: the image has no `/usr/bin/time`.
+  No closure was run. Restarted 16:26 UTC as job `bc` (`cpu_job_bc.sh`, no `time`; peak RSS sampled from
+  `/proc/<pid>/status` each minute; t = 14 budget 72,000 s to stay under the pod cap).
+- **Error, GPU job 2:** `tools/profile.sh ncu` exited 2, "needs gawk"; the triad could not be scored because the GPU
+  calibration has no class `triad`. Job `gpu3` (`gpu_job3.sh`) installs gawk and scores the triad as `fma_f64` at
+  24 bytes per operation. Its last line archives the wrong directory; the files are fetched one by one.
