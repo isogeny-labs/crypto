@@ -1,0 +1,140 @@
+name: Prime31 1024-Q batched table IC versus shared BSGS
+
+on:
+  pull_request:
+    paths:
+      - 'examples/prime31_batched_ic_same_1024q.rs'
+      - 'research/prime31_ic_20261115/batched_frontier/**'
+      - '.github/workflows/prime31-batched-ic-shared-frontier.yml'
+  push:
+    branches: [automation/prime31-batched-ic-shared-frontier-20261117]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-cohort-frontier:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: '2'
+      RAYON_NUM_THREADS: '1'
+      IC_MULTI_TIMING: '1'
+    steps:
+      - name: Checkout proposed Rust and original native corpus source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+      - name: Checkout frozen original native arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Rebuild source-identical original native BSGS and public corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/
+          python3 - <<'PY'
+          from pathlib import Path
+          original=Path('aps-pinned/research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs').read_text()
+          needle='fn main()->Result<(),String> {'
+          assert original.count(needle)==1 and original.count('fn jac_mixed(')==1
+          assert original.count('fn normalize_jac_batch(')==1
+          suffix=Path('research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag').read_text()
+          assert suffix.count('fn main() -> Result<(), String>')==1
+          amended=original.replace(needle, 'fn original_aps_main_unused()->Result<(),String> {',1)
+          Path('aps-pinned/research/prime31_ic_20261115/native/examples/prime31_shared_bsgs_1024q.rs').write_text(amended+'\n'+suffix)
+          print('Original Jac arithmetic unchanged; only existing main renamed to append unchanged BSGS source')
+          PY
+      - name: Test original Rust and new native-width solver
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_base_amortized_ic
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_shared_bsgs_1024q
+          cargo +1.100.0 test --locked --release --example prime31_batched_ic_same_1024q
+      - name: Run exact original 1024-Q corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_base_amortized_ic \
+            > prime31-original-1024.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('prime31-original-1024.json'))
+          assert x['completed_unknown_target_logs']==1024 and x['base_log_point_replays']==61
+          print('original native public known-answer corpus verified: 1024/1024')
+          PY
+      - name: Matched reference three-arm fully charged shared baby-step giant-step
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_shared_bsgs_1024q \
+            -- prime31-original-1024.json > prime31-shared-bsgs-1024.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('prime31-shared-bsgs-1024.json'))
+          assert x['target_count']==1024 and x['fixed_m_arms']==[46341,262144,1048576]
+          assert all(a['complete_logs']==1024 for a in x['arms'])
+          print('all 1024 BSGS controls verified in all 3 frozen arms')
+          PY
+      - name: Fully charged batched table index calculus on identical original Q
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --example prime31_batched_ic_same_1024q \
+            -- prime31-original-1024.json > prime31-batched-ic-1024.json
+      - name: Compare complete only, preserve failures otherwise
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          q=json.load(open('prime31-original-1024.json'))
+          ic=json.load(open('prime31-batched-ic-1024.json'))
+          b=json.load(open('prime31-shared-bsgs-1024.json'))
+          assert ic['schema']=='prime31.batched_ic_shared_frontier.v1'
+          assert ic['complete_logs']==1024 and ic['status']=='complete'
+          assert all(t['verified'] and t['public_Q']==list(q['targets'][i]['solver']['public_q']) for i,t in enumerate(ic['cases']))
+          arms={str(a['m']):float(a['fully_charged_complete_batch_ns'])/1e6 for a in b['arms']}
+          assert len(arms)==3 and all(a['complete_logs']==1024 for a in b['arms'])
+          best=min(arms.values())
+          result={'schema':'prime31.batched_ic_shared_frontier.summary.v1',
+                  'candidate_ms':ic['charged_total_ms'],'candidate_setup_ms':ic['charged_setup_ms'],
+                  'candidate_complete':ic['complete_logs'],'candidate_rss_hwm_kib':ic['vm_hwm_kib'],
+                  'reference_bsgs_ms':arms,'best_reference_ms':best,
+                  'ratio_candidate_over_best_bsgs':ic['charged_total_ms']/best,
+                  'advantage_observed':ic['charged_total_ms']<best,
+                  'candidate_is_nongeneric':False,'standing':'pcc:unverified'}
+          with open('prime31-frontier-summary.json','w') as f:json.dump(result,f,indent=2)
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve exact raw evidence (including partial failures)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-batched-ic-shared-bsgs-1024-q
+          path: |
+            prime31-original-1024.json
+            prime31-shared-bsgs-1024.json
+            prime31-batched-ic-1024.json
+            prime31-frontier-summary.json
+          retention-days: 30
+          if-no-files-found: warn
