@@ -2009,3 +2009,10 @@ What was done: compiled unchanged216mutation-qualified coverpacket/verifier full
 Decisions made:24calls/12targets exactpacket/producer-control replay,repeats,permoduluscomparisons versus triangular/botharms; Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified].
 Open threads: execute afterpush, compareavoidedcharactersum with additionalproof costs.
 Errors: onlyunusedwarnings,noscienceyet.
+
+## Complete eigen-cover cost screened
+
+What was done: freeze211c0536b61 once-onlyexit0;24completecalls/12targets bytepackets/producer-controlvectors/repeats pass. Atp601basecandidate/triangular0.856-0.985, subgroup35.026-70.910. All4denseproof/selfchecks/verifier charged. Assertions [pcc:unverified].
+Decisions made: reject firstdensecover implementation foracceleration; retainmathematicalcover and216mutation-qualified verifier. Nextneed sparse triangular contradictionprovenance and supportverification, notfreeomission.
+Open threads: prospectivesparse4component proof gate/fullcost; originalgenus2+10x,independentreview/publicationartifacts andgenus3/4extensions.
+Errors: noexecutionerrors; negativeoutcome retained,no retry/S3/cloud.
