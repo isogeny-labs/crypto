@@ -3129,6 +3129,34 @@ mod tests {
     }
 
     #[test]
+    fn ic_solve_table_agrees_with_sweep() {
+        // The pair-table 2-decomposition solver recovers the same log as the
+        // sweep `ic_solve(summands = 2)` on the same instance (both decide the
+        // identical decomposable set R = ±F_i ± F_j), and collects the same
+        // number of relations.  Pins the correctness measured in
+        // research/prime_ic_collection_frontier_20261117/.
+        for bits in [16u32, 20, 24] {
+            let (fc, g) = ladder(bits);
+            let mut rng = StdRng::seed_from_u64(101 + bits as u64);
+            let k = rng.gen_range(1..fc.n);
+            let q = fc.mul(Some(g), k).unwrap();
+            let (x_sweep, rep_sweep) = ic_solve(&fc, g, q, 120, 16, 2, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("sweep ic bits={bits}"));
+            let (x_table, rep_table) = ic_solve_table(&fc, g, q, 120, 16, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("table ic bits={bits}"));
+            assert_eq!(x_sweep, k, "sweep wrong log bits={bits}");
+            assert_eq!(x_table, k, "table wrong log bits={bits}");
+            assert_eq!(x_sweep, x_table, "sweep/table logs differ bits={bits}");
+            assert_eq!(rep_sweep.relations, rep_table.relations);
+            // Same seed, same walk rule, same decomposable set: identical target stream.
+            assert_eq!(
+                rep_sweep.targets, rep_table.targets,
+                "sweep/table walked different target counts bits={bits}"
+            );
+        }
+    }
+
+    #[test]
     fn fast_relations_match_the_s3_sweep() {
         // Every 2-decomposition the direct subtraction finds satisfies
         // S₃(x_R, x_i, x_j) = 0, and the staged BigUint driver's relation
