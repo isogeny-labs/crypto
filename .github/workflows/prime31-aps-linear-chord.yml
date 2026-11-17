@@ -5,6 +5,7 @@ on:
     branches: [research/prime31-aps-linear-chord-20261117]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
       - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-linear-chord.yml
   pull_request:
@@ -40,6 +41,7 @@ jobs:
           set -euo pipefail
           src=research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
           cp "$src" "aps-pinned/$src"
+          cp research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs aps-pinned/research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
           sha256sum "$src" "aps-pinned/$src" > prime31-linear-chord-source-hashes.txt
           test "$(sha256sum "$src" | cut -d' ' -f1)" = "$(sha256sum "aps-pinned/$src" | cut -d' ' -f1)"
       - name: Install pinned Rust 1.100.0
@@ -49,6 +51,7 @@ jobs:
           set -euo pipefail
           cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
           cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_linear_chord_audit
       - name: Five full-cold Rust solver arms for 24 fresh public Q
         run: |
           set -euo pipefail
