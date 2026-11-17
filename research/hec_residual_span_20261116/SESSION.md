@@ -1462,3 +1462,10 @@ What was done:7d8f6edb2d4single invocation exits0;48calls exactrepeats,12freshwo
 Decisions made: unchangedcandidatefails10xcase; original6fixtureproduction success notfreshcostclaim. Equalexplicitpublicsourcenormalization,allsetup/16candidateanchors/labels/constraints/finalchecks charged; no arbitrarymodulusweighting.
 Open threads: newcomplete-costmechanism; eageranchorsengineeringnotdemonstrated10x. Originalgenus2+goalopen,genus3/4unqualified.
 Errors: no runtimeassertionfailures,retries,S3/cloud; oneincomplete scientificarmretained.
+
+## Lazy orbit deferred-action producer frozen
+
+What was done: compiled18inputgate combining dynamicorbitdiscovery,ringlabels,CRTconstraints,lazyanchors; producer takes nofullFB/character/action/rootrecords. Allgeneratedrowsgroupchecked,driverindependentlyevaluateslabels atreferenceaction. Hashesfrozen.
+Decisions made: sourceCpromise explicit; structuralintegrationgateonly, priorcoldfailuresretained. No nonunitdivisionforpointlabels,existingCRT handlesconstraints.
+Open threads: execute once, retainallstalls; coldcost remainsrequired.
+Errors: unusedimportedringmethods warnings suppressedlocally; rebuildclean. NewT7080leaseclaimedviaCLI afterreleasingoldtask;connectorreportsownreservationasduplicate.
