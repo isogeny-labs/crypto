@@ -759,3 +759,17 @@ Freeze/push/run6orientations×2reps; retainambiguities/failure. Independentlyaud
 
 ### Errors
 None. KBrevisionchangedto9b2119e8fbac482b98b50521c0d604bbduringsearch; newGaussian/eigenspacequeriesproducednoload-bearingexactlead, notabsenceproof.
+
+## Gaussian C4 gate passed all selected orientations
+
+### What was done
+Atf887eea349donce-onlygateexits0,threecurves×twoorientations×tworepetitions; onecandidateeach, fullnormpolynomials/C1/catalogueactions/scalars/repeatsmatch. DerivedG1: p101(-583,9817),p149(1937,21473),p197(3421,37525); corepREDC1318/1944/2568. Ratiosversusoldeigenphase20.435–37.352dependingfield/source. Local observations only. [pcc:unverified]
+
+### Decisions made
+Recordsetupcomponentresult,notintegrated10xgain. No source/F/lambda passedtocore; allordinary/twistedcounts included. RetainHdetgeneralproofgapandoutsidecorequalificationcosts. UpdateopenPR4527scope; no merge.
+
+### Open threads
+IndependentGaussianarithmeticaudit,determinantlemma,thenintegratedcoldsolvecomparisonwithallsourcevalidation/finalchecksretained. Generalgenus2+10xobjectiveactive.
+
+### Errors
+None; allambiguity/certificategatespasswithoutretry.
