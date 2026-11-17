@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T11:07:13Z",
+ "id": "PCC-20261117-6befb0",
+ "kind": "statement",
+ "producer": {
+  "commit": "fe5d0da839e0f9496f7b0326feebbedb9b80cc64",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/first-frozen-15B-success-02/ACTUAL_FIRST15B_SUCCESS.json",
+    "sha256": "b56bc761e5c6cb0e6c878a9113f7806a657e29058dfb9977adba9d589a690a4a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/first-frozen-15B-success-02/23-first-frozen-arithmetic.stdout",
+    "sha256": "394c8e2ad568fd6919650a46c59b324aeeda7bc005d49add2ff10592db3add32"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/first-frozen-15B-success-02/WHOLE_PACKET_INVENTORY.json",
+    "sha256": "b84aafe7d2eaca0c60221c243b4c96d091d3e8483c7495dc4e7e60654dbf3d57"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Frozen inverse15B fe5d0da passes all30 phase expectations and the unchanged strict protocol:64 cubic and8 noncubic inverse pairs,2 zero rejections,8 sign and3 constructor controls,17 forward+17 dual class/route equalities, forward routes9 LowerDegree/8 Quadratic including2 declared closed orbits. All1054 observed map inverse calls take the guarded cubic path with zero general calls; each pair satisfies the exact5/2 wrapper multiplication-count identities. One new test passes,14 inherited compiled/filtered. Full26368B stdout394c8e2a and73-member1755772B complete archive6521ebf1 are retained; every member byte/mode compared. This is finite same-engine correctness and source-boundary counts, without runtime or complete prime-field cost inference."
+}
