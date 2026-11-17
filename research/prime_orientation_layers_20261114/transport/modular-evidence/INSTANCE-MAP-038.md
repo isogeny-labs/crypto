@@ -1,0 +1,8 @@
+# General-a full crossing instance
+
+1. Structure: actual dense kernel/chart, existing Graded/Content laws and same constructed m=4profile. Actual ports at arbitrary a with u<=a, retained t nonzero/grid/v2i<u, crossing bit equality.
+2. Laws AS STATED: NonscalarOrigin.kernel_diagonal_zero, PairedOrigin.actual_nonmatching_profile_gain (no a parameter), Graded.C/mul/mono, actual_base_graded/actual_correction_graded/actual_node_constant and diagonalJet_valuation. Dense matching_gain168. No generic valuation/profile/series induction re-proved.
+3. Actual objects: dense diagonal0; nonmatching entry old completed W because origin entry0; matching distinct entry receives168 gain. Nonmatching actual normalized old chart assembled with arbitrary a, not falsely instantiated from old Ports(u+1) endpoint.
+4. Chain: named base/correction grades -> actual profile margin -> exact normalized scalar -> Graded(u-i-1); actual constant0 plus graded positive coefficients -> Content(u-i). Cases diagonal/matching/nonmatching -> all crossing entries; multiply fixed diagonalJet back -> absolute weight; mask noncrossings0 -> matrix bound. Explicit source root a=2u endpoint included.
+5. Missing actual equalities/endpoints only. Generalization changes actual a argument, keeps profile theorem as stated. No originI, matrix rank, compact modes, original tensor or runtime conclusion.
+6. Inheritance: old profile margin already proved; all generic coefficient/content laws reused. Dense origin unit157 remains separate, its inverse support and actual node normalization must be proved before carrying the gain to identity-origin J. [pcc:unverified]

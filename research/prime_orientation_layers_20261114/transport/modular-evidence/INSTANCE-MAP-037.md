@@ -1,0 +1,8 @@
+# General-a dense matching full chart instance
+
+1. Structure: existing Content/VBound on actual rational polynomials, normalizedNodeEntry and actual dense kernel at arbitrary Ports a. Fixed nonzero diagonalJet from old source, not a local node derivative.
+2. Theorem AS STATED: OrientationNodePolynomial.content_cancel_near_one D R (u-i), actual_node_integral, diagonalJet_ne_zero/valuation. Actual dense matching_cancellation152 and denominator/ratio/slope160 provide precise premises. No new generic series induction or valuation law.
+3. Actual R=C(diagonalJet^-1)*chart(a,t,Kxy) for distinct same-low-u-residue x,y. D=1+C(2^(a+1)/(t-delta))*X. Source t!=0,t in grid,v2(t)=i<u<=a. Arbitrary natural m; no exact delta=+-2^u hypothesis.
+4. Chain: actual matching_entry -> difference of old normalized entries -> Content0; actual160slope -> Content1(D-1); actual152cancellation evaluated through polynomial chart -> D*R=C(delta/(t-delta))*old normalized diagonal*C(Uxy); actual160ratio,old diagonal Content0 and actual odd U -> Content(u-i) product; apply existing near-one cancellation. Multiply fixed c_i back for absolute jetWeight+u-i bound.
+5. Missing only actual equality/premise/endpoint instances. Polynomial.funext/field normalization connects named actual cancellation to chart product, as old paired instance; no supplied chart identity/inverse witness. Includes positive anchor zeros without dividing by diagonal polynomial.
+6. Inheritance: Content mul/C/sub from old laws; normalization from actual Jet, actual delta ratios from160. Same original auxiliary completed W/grid, not an elliptic norm W-jet map or recursion/runtime theorem. [pcc:unverified]
