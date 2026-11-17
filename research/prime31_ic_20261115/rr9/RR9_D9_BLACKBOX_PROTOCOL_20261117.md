@@ -26,3 +26,15 @@
 **Sources/previous leads:** native #4548/#4549 D5/D6; #4550 D9 separator; #4581 seven-equation quotient; #4575 B8 MITM; B31 4+4 oracle and S9_B31_FOUR_PLUS_FOUR_ORACLE_ARITHMETIC_RESULT_20261116.md; autoresearcher #3301/#3305; cryptanalysis #1536. Wiedemann and rank preconditioning are standard prior art, see Dumas–Kaltofen–Thomé 2015 arXiv:1507.01083, Eberly 2016 arXiv:1607.04514, Dumas–Kaltofen 2014 arXiv:1401.4567. Amadori–Pintore–Sala 2018 DOI:10.1016/j.ffa.2018.01.009 is relevant prime-field IC prior art. Research-KB tool/CLI unavailable here; bounded source fallback, no novelty claim.
 
 **Stop/go:** If no valid full-rank negative certificate within frozen cap, record the null/censored result and prioritize rank-guided sparse F4 or quotient extraction (not blind dense degree ≥10). No leaderboard promotion without independent PCC and complete-solve cost.
+
+
+## 19:20 UTC evidence-driven extension (not in original preregistration)
+
+Source-pinned GitHub Actions run 44156703850 completed **both** originally registered negative cases at D9 with BM complexity 11440, nonzero terminal coefficients and approximately 20.7 seconds per case, without any curve, seed, protocol or outcome changes. The producer-level summary alone is not a replayable algebraic certificate. Before implementing this follow-on, register a **constructive unit-certificate extension** on the **same** two negatives (not a new search or performance comparison):
+
+- From the full BM recurrence C(z)=z^N+c1 z^(N−1)+...+cN, with cN≠0, derive an inverse action on the constant monomial e0:
+  x=−cN^(−1)·(A^(N−1)+c1 A^(N−2)+...+c_(N−1) I)e0,
+  where A=Mᵀ D M and N=11440.
+- Compute w=D M x, and **replay the full polynomial identity Mᵀ w=e0** using the original public RR9 quadrics and all 27,456 degree≤7 multipliers, independently of the Krylov moment test. In affine form this is explicit 1=Σ_i w_i m_i q_i, a degree≤9 Bézout certificate for each negative public target.
+- Record every coefficient of w in frozen Macaulay row ordering as a CI artifact, with exact source pinned. A separate independent reviewer can rebuild M from public R,H_B, multiply Mᵀ w and check e0 without trusting BM, field arithmetic counters or negative-support enumeration.
+- If inverse construction or certificate replay fails, fail CI and preserve the error; do not report a negative certificate based solely on rank flags. Allow up to 1500 seconds per frozen negative as originally declared. Not a complete ECDLP solve or a new algorithmic exponent.
