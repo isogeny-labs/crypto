@@ -171,3 +171,17 @@ Run extraction correctness, then freeze complete cold comparison against current
 
 ### Errors
 No scientific runtime executed yet.
+
+## Pencil runtime equivalence passes; cold comparison frozen
+
+### What was done
+All18 extractioncasesmatch firstanchor/t/rowcount/scalar exactly at ae79d25c585,EXIT0. Prepared7200call5arm coldcomparison and Rustsummary withfixed18workloads/5batches16reps/rotatingorder; PencilversusFolded/Expanded/Native/AA.
+
+### Decisions made
+Providedvalidinstancecontract/excludedcommonqualification explicit. Requireallcorrect/all90spreads/all18AA; tenfoldagainstfastestcontrolall18. No baselinecherry-picking/rerun. Gitrecordunderresearchscope, rawreceiptspushed; noS3claim.
+
+### Open threads
+Once-onlycoldexecutionafterpushedfreeze, then retainallresults. Broadobjectiveopen.
+
+### Errors
+Unusedenum/reportwarningsretained; stripdisabled. No scientifictimingexecutedyet.
