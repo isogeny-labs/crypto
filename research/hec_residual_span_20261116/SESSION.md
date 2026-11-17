@@ -2205,3 +2205,10 @@ What was done: PR4561mergedexternallywhilepreparing, newbranchresearch/hec-targe
 Decisions made: retaincorrectbootstrapalternative, allineligiblequery/fallbackcosts included,no uniform10xclaim. No mergebythissession. OriginalPRclosedbyexternalmerge, successor containsnewtestonly.
 Open threads: mathematical useful-rank/cost mechanism+independenttargets, originalgenus2+10x/review/publication/genus3/4coverage.
 Errors: origin/main trackingrefwasstale;rebasedontoverifiedFETCH_HEADmain ratherthanassumetrackingupdated. No scientificfailure/retry/S3/cloud.
+
+## Homogeneous complete-component witness gate frozen
+
+What was done: compiled overflow-checked Rust gate, homogeneous T-kD row-span queries for all48 branches on original12 targets; n5/7/9 module scope controls and annihilator/projection proof. Successor branch rebased onto fetched main after external PR4582 merge.
+Decisions made: Git replaces unavailable S3 custody; source/protocol/native/binary hashes pushed before one120CPU invocation; unresolved branches retained. Existing own T-7093 reservation confirmed by CLI, check allow, attachment returned own-scope conflict. No merge or auto-merge.
+Open threads: execute once after checkpoint push; retain complete raw output and qualify evidence. No cost or genus3/4 curve conclusion from module controls.
+Errors: attach service rejected existing own reservation; CLI confirmed task already claimed. Build only unused-function warnings.
