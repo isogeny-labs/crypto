@@ -17,3 +17,7 @@ Restore approved checkpoint access; execute original unchanged gate once. If suc
 
 ## Errors
 Initial old-task claim rejected403retry-budget-exhausted; no modification to that directory. New study has separate successfully claimed scope. No compiler errors, warnings, scientific runtime errors or gate waiver. Unrelated .resume/RESUME.md left unchanged.
+
+## Git custody adaptation before execution
+
+Owner authorizes Git custody while S3 is unavailable. New T-6982 scoped lease covers both study directories. Preserved original freezes, source, binaries, protocols and S3 runners. Added prospective custody amendment and alternative runner requiring pushed exact HEAD, clean scientific paths, hash verification, no overwrite, 180s watchdog, raw outputs/exit/commit/timestamp receipts. Original quadratic success and committed/pushed outputs still precede extension. No science executed before this amendment checkpoint. Unrelated resume edit excluded. Prior PR4357merged; continuation on a new feature branch.
