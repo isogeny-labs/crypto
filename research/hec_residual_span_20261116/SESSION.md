@@ -2821,3 +2821,10 @@ What was done: freeze9f5b0800e17 hashespass/exit0;22audit+44freshcalls/nativeans
 Decisions made: strongestsubgroupREDCcontrolnowforest, noall16dominance/runtime/newmath/10xclaim. SparsepayloadsmaterializednotfullylazyDAG; inheritedearlystopbasegainnotforestphaseattribution. Keepallpriorcontrols/rawregressions.
 Open threads: fullruntimeandmathematical10xcase/baseworkstillrequired;independentreviewopen/goalactiveunachieved.
 Errors: no scientificfailure, inheritedunusedhelpers/importwarnings. No S3/cloud/merge/unchangedrerun.
+
+## Cumulative integrated count envelope and identity Frobenius screen
+
+What was done: derived264exactpricecutoffs usingactualintegratedrawtotals/12controlarms/22fixtures, no multiplicationofcomponentratios. R(r)weightedaverageofperfieldratios; bufferedcontrol/forestupperrange1.146-4.246 impliesno10atanypositivepricewithinREDC-onlyproxy onall22. OlderuncachedfullFasthas4fixturesbothfields>=10,butstrongercontrolsremovegeneral10claim. DerivedidentityFrobeniuscoefficientbound m*max|a_i|>=min(k,ell-k) oncurrentFp-rationalsources, screenedprimaryGLV/tracezerosources/KB.
+Decisions made: do notpromoteoldbaselinecomponentgain orconvenientfieldprice tomathematical/runtime10x. PurepFrobeniusnotgenericnontrivialGLVoperator; needexplicitnontrivialaction/transport/costproof fornewcandidate. No scientificrun, deterministicbookkeepingonly.
+Open threads: newconstructionagainststrongforestcontrol withgenericapplicability/fullruntimecase;objectiveactiveunachieved/independentreviewopen.
+Errors: noneinnewbookkeeping. No S3/cloud/merge orunchangedmeasurementrerun.
