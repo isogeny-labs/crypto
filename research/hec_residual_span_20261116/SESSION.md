@@ -283,3 +283,17 @@ Executeintegrationgateafterpushedfreeze; broadobjectiveopen.
 
 ### Errors
 No320gatefailure/retry. Localcompileunusedimports/fieldswarningsretained; noarithmeticsourcechangesoutsidepreparation.
+
+## Equal sharedsetup integration passes
+
+### What was done
+At pushedacec58a785a,54reference/optimizedprefix tuplesmatch and108optimizedcallsverify/EXIT0; repeats/fullREDCidentitiespass. Allrawhashesverify. EqualoptimizedFolded/PencilbaseREDCrangesg2 1.128701–1.843650,g3 2.390212–8.812722,g4 2.573906–6.592814. Inverse/subgroupcountsunchanged. PostrunRustanalysesretained.
+
+### Decisions made
+Classicalsharedsetupimprovementvalidbutnottenfoldsolve/breakthroughclaim. Allcontrolsoptimizedequally. Additions/storage/omittedinteger/memoryworkexplicit. Previouswallfailureunchanged. Nextmustchange remainingtarget-bearingrelation/anchorcostwithrankproof.
+
+### Open threads
+Broad10xgenus2+objectiveopen; currentevidence stillshortespeciallyg2. PR4490shoulddescribefinalsharedsetupscopeclearly.
+
+### Errors
+No320model/integrationgatefailuresorretries. Compileunusedimports/fieldswarningsretained; originalimplementationsunchanged.
