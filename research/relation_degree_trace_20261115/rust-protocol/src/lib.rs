@@ -212,16 +212,16 @@ fn nearest_rank(n: usize, numerator: usize, denominator: usize) -> usize {
 /// Shared indices in each draw preserve pairing across controls AND scopes.
 fn intervals<const K: usize>(values: &[[f64; K]]) -> [Statistics; K] {
     let n = values.len();
-    assert!(n > 0 && n <= 21 && n % 2 == 1);
+    assert!(n > 0 && n <= 25 && n % 2 == 1);
     let mut state = SEED;
     let mut draws: [Vec<f64>; K] = std::array::from_fn(|_| Vec::with_capacity(DRAWS));
-    let mut sample = [[0.; K]; 21];
+    let mut sample = [[0.; K]; 25];
     for _ in 0..DRAWS {
         for slot in &mut sample[..n] {
             *slot = values[index(&mut state, n)];
         }
         for (k, distribution) in draws.iter_mut().enumerate() {
-            let mut column = [0.; 21];
+            let mut column = [0.; 25];
             for (slot, row) in column[..n].iter_mut().zip(&sample[..n]) {
                 *slot = row[k];
             }
@@ -256,6 +256,20 @@ pub fn paired_statistics<const K: usize>(values: &[[f64; K]]) -> Result<[Statist
         return Err("paired calculator requires7/21 complete positive finite rows".into());
     }
     Ok(intervals(values))
+}
+/// Explicit four-route 24-balanced-plus-one-block adapter. Legacy7/21 admission is unchanged.
+pub fn paired_statistics_25<const K: usize>(values: &[[f64; K]]) -> Result<[Statistics; K], String> {
+    if K == 0 || values.len()!=25 || values.iter().flatten().any(|x|!x.is_finite() || *x<=0.) {
+        return Err("balanced calculator requires25 positive finite rows".into());
+    }
+    Ok(intervals(values))
+}
+#[cfg(test)]
+#[test]
+fn explicit_balanced_adapter_keeps_legacy_roster(){
+    let rows=[[2.0];25];assert!(paired_statistics(&rows).is_err());
+    let stats=paired_statistics_25(&rows).unwrap();assert_eq!(stats[0].median_paired_ratio,2.0);assert_eq!(stats[0].adjusted_lower_1_over_720,2.0);
+    assert!(paired_statistics_25(&[[2.0];21]).is_err());
 }
 /// Numerical A/A gate for captured calls. Full transcript/provenance validation
 /// is separate; this helper grants no execution or mathematical standing.
