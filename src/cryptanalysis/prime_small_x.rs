@@ -875,12 +875,16 @@ impl<F: PrimeField> Curve<F> {
     }
 
     /// A uniform group element other than `O`, from `rng`.
-    pub fn random_point(&self, f: &mut F, rng: &mut StdRng, exp: &BigUint) -> Pt<F::E> {
+    pub fn random_point(&self, f: &mut F, rng: &mut StdRng, _exp: &BigUint) -> Pt<F::E> {
         loop {
             let x = f.random(rng);
             let r = self.rhs(f, x);
-            if self.is_square(f, r, exp) {
-                let y = self.sqrt(f, r).expect("square has a root");
+            // `sqrt` verifies `r·r == v`, so it is already the square test;
+            // running `is_square` first would exponentiate twice per draw.
+            if f.is_zero(r) {
+                continue;
+            }
+            if let Some(y) = self.sqrt(f, r) {
                 return Pt { x, y };
             }
         }
@@ -901,7 +905,6 @@ pub fn small_x_base_with_extent<F: PrimeField>(
     size: usize,
 ) -> Result<(Vec<Pt<F::E>>, u64), String> {
     let mut f = c.field.clone();
-    let exp = c.euler_exponent(&f);
     let h = BigUint::from(c.cofactor);
     let mut out: Vec<Pt<F::E>> = Vec::with_capacity(size);
     let mut seen: std::collections::HashSet<F::K> = std::collections::HashSet::new();
@@ -913,8 +916,11 @@ pub fn small_x_base_with_extent<F: PrimeField>(
         }
         let xe = f.embed_u64(x);
         let r = c.rhs(&mut f, xe);
-        if c.is_square(&mut f, r, &exp) {
-            let y = c.sqrt(&mut f, r).ok_or("square without a root")?;
+        if !f.is_zero(r) {
+            let Some(y) = c.sqrt(&mut f, r) else {
+                x += 1;
+                continue;
+            };
             let p = Pt { x: xe, y };
             largest = x;
             let q = if c.cofactor == 1 {
