@@ -1,0 +1,121 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-phase-pr/research/hec_residual_span_20261116/counted/native)
+   Compiling hec-shared-setup-solvers v0.1.0 (/Volumes/SSD990-2/hec-phase-pr/research/hec_residual_span_20261116/shared-setup/build)
+warning: unused import: `instance::factor_base`
+ --> ../pencil.rs:7:5
+  |
+7 |     instance::factor_base,
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `instance::factor_base`
+ --> ../walk.rs:7:5
+  |
+7 |     instance::factor_base,
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `Mode` is never used
+  --> ../../pencil-runtime/core.rs:12:10
+   |
+12 | pub enum Mode {
+   |          ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `trials`, `m`, `unknowns`, and `state_len` are never read
+  --> ../../pencil-runtime/core.rs:20:9
+   |
+18 | pub struct Report {
+   |            ------ fields in this struct
+19 |     pub k: Option<u64>,
+20 |     pub trials: u64,
+   |         ^^^^^^
+21 |     pub relations: usize,
+22 |     pub m: usize,
+   |         ^
+23 |     pub unknowns: usize,
+   |         ^^^^^^^^
+24 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variant `Plain` is never constructed
+  --> ../../production/core.rs:16:5
+   |
+13 | pub enum Mode {
+   |          ---- variant in this enum
+...
+16 |     Plain,
+   |     ^^^^^
+   |
+   = note: `Mode` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `m`, `unknowns`, and `state_len` are never read
+  --> ../../production/core.rs:23:9
+   |
+19 | pub struct Report {
+   |            ------ fields in this struct
+...
+23 |     pub m: usize,
+   |         ^
+24 |     pub unknowns: usize,
+   |         ^^^^^^^^
+25 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: enum `Mode` is never used
+  --> ../pencil.rs:14:10
+   |
+14 | pub enum Mode {
+   |          ^^^^
+
+warning: fields `trials`, `m`, `unknowns`, and `state_len` are never read
+  --> ../pencil.rs:22:9
+   |
+20 | pub struct Report {
+   |            ------ fields in this struct
+21 |     pub k: Option<u64>,
+22 |     pub trials: u64,
+   |         ^^^^^^
+23 |     pub relations: usize,
+24 |     pub m: usize,
+   |         ^
+25 |     pub unknowns: usize,
+   |         ^^^^^^^^
+26 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variant `Plain` is never constructed
+  --> ../walk.rs:18:5
+   |
+15 | pub enum Mode {
+   |          ---- variant in this enum
+...
+18 |     Plain,
+   |     ^^^^^
+   |
+   = note: `Mode` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `m`, `unknowns`, and `state_len` are never read
+  --> ../walk.rs:25:9
+   |
+21 | pub struct Report {
+   |            ------ fields in this struct
+...
+25 |     pub m: usize,
+   |         ^
+26 |     pub unknowns: usize,
+   |         ^^^^^^^^
+27 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `hec-shared-setup-solvers` (bin "shared-setup-solvers") generated 10 warnings (run `cargo fix --bin "shared-setup-solvers" -p hec-shared-setup-solvers` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 1.78s
