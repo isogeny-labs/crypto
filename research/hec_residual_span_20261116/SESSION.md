@@ -2618,3 +2618,10 @@ What was done: freeze57ba63dd5bd hashes passed; all11initialnative equations/sub
 Decisions made: recent 'original' means originalwithinlaterbinomialpanel, notinitialnative; prominent PRclarification required. No binomialshortverification/CM/phasebound transposed to initialmixed-termfamilies. Not a proof of absence of all automorphisms/models. Restore initial T1same-instance production2LPbaseline priority; existing large_prime.rs correctnesscontrol reused, not called absent/new.
 Open threads: arbitrary-public-target 2LPcontrol on originalfamilies with small-base history/weighted cycles/allcosts and targetverification, primary GTTD review before implementation. Baseline work notmathematicalbreakthrough; full10xgenus2+goal open.
 Errors: sparse paths handled via trackedgitblobs; initialbroad 'original' wording corrected without rewriting frozenevidence. No S3/cloud/merge.
+
+## Original-family public-target weighted2LPcontrol frozen
+
+What was done: read primary2005three-author paper sections2.3/3.1(weighted cycles can leave unaryLP), inspected existing internally-targeted dense correctness baseline. Implemented arbitrary publicsource/target API, conservative uniqueell-component Hasse premise, small-only step history and exact sparseLPfirst elimination with signed multiplicities. First128admitted rows independently dense-replayed/native-decomposed; all finalanswers nativeverified. Compiled22newtarget calls covering all11initialequation/subgroup identities, plus same-input fullbase controls.
+Decisions made: known2LPbaseline restoration, no novelty/speed/10xclaim; targetk never enters solver. No per-place order/projection discovery under provedell²>Hasseupper validinstance restriction. One600CPU process/per-solver200000trials after Gitfreeze; all failed/censored cases retained.
+Open threads: execute correctness across originalfamilies; only then separately freeze completecost protocol with diagnostics/qualification boundaries explicit.
+Errors: compilation passes without warnings. Existing own scope check allows, attach same reservation. No S3/cloud/merge.
