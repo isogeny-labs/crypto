@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Derive and check the six-section elliptic relation operator with pole/alias handling (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117, PR #4526; in progress)
+
 - [x] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117, PR #4522 tracking only; proposal in lane/curve25519-exponent)
 
 <!-- One line per task, added as the task's first step with its draft PR:
