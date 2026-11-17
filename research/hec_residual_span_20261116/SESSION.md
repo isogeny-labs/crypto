@@ -983,3 +983,17 @@ Cheaper all-cost arithmetic or a justified independent-relation-yield mechanism 
 
 ### Errors
 No execution failure/retry. No field or wall benchmark performed. Own T7044 lease held throughout edits.
+
+## Written circuit directly qualified and ledger corrected
+
+### What was done
+Frozen09e26f0ee7e direct multivariate expansion passed all4 written identities against original tensors. Derived a19-product shared schedule. Corrected the prior reconstruction count from10 to7: one lead product and two for each remaining output. Retained all raw check records.
+
+### Decisions made
+No performance or tenfold claim from this symbolic check. Candidate general first-chart schedule totals26 products/squares before oracle/recovery/setup; it is an upper schedule, not a lower bound. Full scope stays active and no full collector is admitted by this estimate alone.
+
+### Open threads
+Assess broader relation-yield mechanisms or a stronger complete cost case rather than accumulating unmeasured local optimizations. Genus3/4 obligations remain.
+
+### Errors
+Prior prose overcounted reconstruction by3 products; corrected explicitly. Scientific records are unaffected. No producer retries, S3 access or cloud spend.
