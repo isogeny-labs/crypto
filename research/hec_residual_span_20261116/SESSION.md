@@ -1511,3 +1511,10 @@ What was done:compiled strict-vs-consensus modes,same12oldcoldinputs,48alternati
 Decisions made: explicitchangedvalidationcontract justifiedbyconditionalproof,notposthocolddataomission; base/ellseparate,noCPU/10xclaim.
 Open threads: executesinglematchedgateandpricefullconsensuspipeline.
 Errors: none, nosciencebeforepushedfreeze.
+
+## Consensus producer costs and sparse-bootstrap bound completed
+
+What was done:6967ac38dacsingle invocation exits0;48calls exactrepeats,strict48modulusvectorsreplayolddata,all12bothmodescomplete,alllabels/finalscalarsverify. No multiactionstopobserved. Base strict/consensus1.230-1.590; strongcontrol/consensus0.795-1.264(2wins),ellunchanged. Derived exact first-admission unionbound A sum binom(Mj,g)#C/(N-1),currentg2<=8640#C/(N-1),fixedbudgetprobabilitydecays.
+Decisions made: proof-backedvalidationoptimizationqualifiedbutnot10x; nofurtherfixed-small-poolcampaign withoutscaledrank/costcase. Forfixedanchors/restarts,necessarypoolscalesq^(1-1/g),notgeneralsolverlowerbound.
+Open threads: multivariablesymbolicinactivation/component-awareproduction withscalingandcost; originalgenus2+goalunresolved.
+Errors: none,no scientificretry/S3/cloud.
