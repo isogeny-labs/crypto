@@ -1,0 +1,14 @@
+[package]
+name = "chained-richelot-chart-trace-audit-11"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "audit_trace"
+path = "src/main.rs"
+
+[profile.release]
+codegen-units = 1
