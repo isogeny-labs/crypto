@@ -2184,3 +2184,10 @@ What was done: coldprefixvalidation/publicroot/batchedinverses/point-addanchor s
 Decisions made: compareoptimisticprefix to10percent retainedcompletecontrols, no fullsolve/gain inference orunavoidablefreshfallbackdoublecount. Gitfreeze beforeone120CPU. Assertions [pcc:unverified]. Sources priororbit-pair algebra/gain-graph/nativebatchcost.
 Open threads: executeafterpush, testwhetherany10xhybridretainingthisprefixhascostroom.
 Errors: onlyunusedwarning,noscienceyet.
+
+## Paid orbit-pair prefix qualified, 10xcostcase rejected
+
+What was done: freeze16c4cd22c5e once-onlyexit0;24prefixcalls/12targets repeat/nativeprincipal gates pass,10firstgroundings/2none.9of12have10P>fullarm0baseB, alsoarm1; e.g4496vs5280complete. Assertions [pcc:unverified].
+Decisions made: rejectuniform10xhybridretainingthisexactprefix beforecompletion/proofcost; remaining3prefixesnotfullwins. No universalbound orfreshfallbackdoublecount.
+Open threads: materiallydifferentbootstrap/relationmechanism withpubliccostcase, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
