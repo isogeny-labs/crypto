@@ -41,6 +41,7 @@ jobs:
           # Avoid the multi-GB unrelated root workspace and damaged sat.rs.
           sparse-checkout: |
             research/prime31_ic_20261115/native
+            src/cryptanalysis
       - name: Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Install example on original native crate without changing arithmetic
