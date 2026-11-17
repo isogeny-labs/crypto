@@ -3038,3 +3038,10 @@ What was done: freezef1a3d00562f hashespass/exit0;node/cusp/tacnodecontrols pass
 Decisions made: finiteconstraintsnotimposed, notcompletecanonicalbasis. Prior genus3+infinitydelta22predictfinite delta11;do notassume residualdiscriminantrootsareordinarynodeswithoutverification.
 Open threads: residuefieldfinite-nodechecks, remainingadjointconditions, canonicalrelations/nonhypermodel thencompleteoriginaltargettransport.Full10xgenus2+goalactiveunachieved.
 Errors: no scientificfailure;unusedcopiedhelpers/importcompilewarnings.Gitcustody/noS3/no merge.
+
+## Finite Smith adjoints and canonical equation gate frozen
+
+What was done: compiled residuefieldfactor/node/Hessian checks,14adjointfiniteconstraints, exactdegree2/3/4relationkernels via uniformpseudoreduction, native3patchJacobianunitidealchecks andpoint/imagecontrols.
+Decisions made: retainhyperellipticoutcomes;noclaimuntilgate;curve-modelchecksnotfulltargetdivisortransport. Gitfreeze precedes sole600CPU run.
+Open threads: execute finite/canonicalgate;thenfulloriginaltargettransportandmatchedcostcase.Full10xgenus2+goalactive.
+Errors: prefreeze duplicatehelpername fixed, factorcontrolchosenirreducible t²-2, secondTderivativecorrectedtotakebeforeresidue reduction;unusedcopiedhelperwarnings.No scientificexecution yet.
