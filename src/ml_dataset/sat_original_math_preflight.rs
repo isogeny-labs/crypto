@@ -154,8 +154,10 @@ pub(super) fn plan(
     if groups.len() > 64 {
         return Err(Error::Shape);
     }
-    let mut s = Scalars::default();
-    s.factors = groups.len() as u64;
+    let mut s = Scalars {
+        factors: groups.len() as u64,
+        ..Scalars::default()
+    };
     certificate(&public["curve"]["order_certificate"], config.twist, &mut s)?;
     s.scalar(r)?;
     s.scalar(r)?; // original generator and target, once

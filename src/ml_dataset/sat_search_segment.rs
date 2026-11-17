@@ -4,7 +4,7 @@
 //! This checks custody joins and a model relation; not CDCL transition semantics.
 use crate::cryptanalysis::binary_semaev_chain_sat::provenance::{
     checked_model::{self, Progress, VerificationAdmission},
-    Admission, CheckedMap, Quote,
+    CheckedMap, Quote,
 };
 use crate::cryptanalysis::sat::SolverEvent;
 

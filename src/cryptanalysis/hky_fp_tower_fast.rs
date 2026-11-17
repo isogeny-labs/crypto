@@ -1122,10 +1122,7 @@ pub fn closure_fast(
     let mul_ns = AtomicU64::new(0);
     stats.setup_s = started.elapsed().as_secs_f64();
     let mut seq = Scratch::new(max_n);
-    'outer: loop {
-        let Some(b) = queue.iter().position(|q| !q.is_empty()) else {
-            break;
-        };
+    'outer: while let Some(b) = queue.iter().position(|q| !q.is_empty()) {
         if started.elapsed() > limits.budget {
             stats.multiply_cpu_s = mul_ns.load(AtOrd::Relaxed) as f64 * 1e-9;
             return censored("budget", rows_reduced, entries, muladds, stats);

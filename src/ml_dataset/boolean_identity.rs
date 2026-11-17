@@ -692,7 +692,7 @@ mod tests {
                 target.sort();
                 assert!(check(&wire(
                     2,
-                    &[generator.clone()],
+                    std::slice::from_ref(&generator),
                     &target,
                     &[(0, multiplier.clone())]
                 ))
@@ -707,7 +707,7 @@ mod tests {
                 assert_eq!(
                     check(&wire(
                         2,
-                        &[generator.clone()],
+                        std::slice::from_ref(&generator),
                         &mutated,
                         &[(0, multiplier.clone())]
                     ))

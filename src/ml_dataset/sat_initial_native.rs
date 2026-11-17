@@ -1052,8 +1052,7 @@ mod tests {
         // Exercise the real capture serializer at its maximum sequence. These
         // are serialization extrema, not claimed valid native solver states.
         let digest = "f".repeat(64);
-        let events = vec![
-            SolverEvent::Snapshot {
+        let events = [SolverEvent::Snapshot {
                 version: u32::MAX,
                 variables: u32::MAX,
                 trail_limits: Vec::new(),
@@ -1069,8 +1068,7 @@ mod tests {
                 row_id: usize::MAX,
                 mask: vec![u64::MAX; 3],
                 rhs: false,
-            },
-        ];
+            }];
         for count in [0, 1, 3] {
             let record = Batch {
                 schema: "ml-dataset.sat-initial-batch/v3",

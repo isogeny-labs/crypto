@@ -462,7 +462,7 @@ mod owned_tests {
             let output = solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained = solvers::WorkerResidualCustody::default();
             let outcome = crate::ml_dataset::finish_retained_worker_output(
-                &root,
+                root,
                 &mut artifacts,
                 output,
                 Ok(()),
@@ -471,7 +471,7 @@ mod owned_tests {
             .unwrap();
             artifacts.push(
                 crate::ml_dataset::storage::write_json(
-                    &root,
+                    root,
                     "result.json",
                     "solver-outcome",
                     &outcome,
@@ -489,8 +489,8 @@ mod owned_tests {
             };
             let c = caps();
             let checked = super::super::affine_central::verify_affine_row(
-                &root,
-                &config,
+                root,
+                config,
                 &outcome,
                 &artifacts,
                 policy,
@@ -529,7 +529,7 @@ mod owned_tests {
             let output = solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained = solvers::WorkerResidualCustody::default();
             let outcome = crate::ml_dataset::finish_retained_worker_output(
-                &root,
+                root,
                 &mut artifacts,
                 output,
                 Ok(()),
@@ -538,7 +538,7 @@ mod owned_tests {
             .unwrap();
             artifacts.push(
                 crate::ml_dataset::storage::write_json(
-                    &root,
+                    root,
                     "result.json",
                     "solver-outcome",
                     &outcome,
@@ -607,7 +607,7 @@ mod owned_tests {
             let output = solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained = solvers::WorkerResidualCustody::default();
             let outcome = crate::ml_dataset::finish_retained_worker_output(
-                &root,
+                root,
                 &mut artifacts,
                 output,
                 Ok(()),
@@ -616,7 +616,7 @@ mod owned_tests {
             .unwrap();
             artifacts.push(
                 crate::ml_dataset::storage::write_json(
-                    &root,
+                    root,
                     "result.json",
                     "solver-outcome",
                     &outcome,
@@ -634,8 +634,8 @@ mod owned_tests {
             };
             let c = caps();
             let checked = super::super::affine_central::verify_affine_row(
-                &root,
-                &config,
+                root,
+                config,
                 &outcome,
                 &artifacts,
                 policy,
@@ -648,7 +648,7 @@ mod owned_tests {
             match checked {
                 Ok(super::super::affine_central::RowOutcome::Verified(mut v)) => {
                     let before = v.usage();
-                    v.revalidate(&root, &config, &outcome, &artifacts).unwrap();
+                    v.revalidate(root, config, &outcome, &artifacts).unwrap();
                     assert!(v.usage().0 > before.0);
                     let first = v.project_identity().unwrap();
                     let projection_usage = v.usage();
@@ -666,9 +666,9 @@ mod owned_tests {
                     let mut bytes = std::fs::read(&path).unwrap();
                     bytes.push(b' ');
                     std::fs::write(&path, bytes).unwrap();
-                    assert!(v.revalidate(&root, &config, &outcome, &artifacts).is_err());
+                    assert!(v.revalidate(root, config, &outcome, &artifacts).is_err());
                     let failed = v.usage();
-                    assert!(v.revalidate(&root, &config, &outcome, &artifacts).is_err());
+                    assert!(v.revalidate(root, config, &outcome, &artifacts).is_err());
                     assert_eq!(v.usage(), failed);
                 }
                 _ => panic!("actual original/receipt/source-bound replay required"),

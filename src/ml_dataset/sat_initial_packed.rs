@@ -154,7 +154,6 @@ impl fmt::Display for Text<'_> {
         for e in self.0.events {
             encode(e, &mut state, &mut emit)?;
         }
-        drop(emit);
         if used != 0 {
             let s = [
                 ABC[(buf[0] >> 2) as usize],

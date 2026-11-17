@@ -237,7 +237,7 @@ pub(super) fn checkpoint_parts(
         let mut bridge = Bridge {
             budget,
             sink,
-            limits: limits,
+            limits,
             pattern,
             snapshot,
             expected: &expected,

@@ -3313,7 +3313,7 @@ mod bound_signed_publisher_tests {
             assert!(original
                 .signed
                 .iter()
-                .any(|&(x, y)| p["x"] == x.to_string() && p["y"] == y.to_string()));
+                .any(|&(x, y)| p["x"] == x && p["y"] == y));
             sum = group.add(&sum, &point);
         }
         assert_eq!(sum, group.point(&value["target"]).unwrap());
@@ -9141,7 +9141,6 @@ mod parent_retention_admission_tests {
             ),
             (before.0 + 7, before.1 + 11, before.2 + 13)
         );
-        drop(parent);
         assert!(matches!(ParentRetention::begin(&mut b), Err(Stop::Phase)));
         assert_eq!(b.check(Instant::now()), Err(Stop::Observer));
     }
@@ -11874,7 +11873,6 @@ pub(super) fn run_verified_worker_entry(
     if let Some(artifact) = delivery.artifact.take() {
         accept_receipt(artifact);
     }
-    drop(accept_receipt);
     let receipt_rejected = !rejected_roots.is_empty();
     let ledger = budget.saved_ledger();
     let completed = ledger.phase == Phase::Complete

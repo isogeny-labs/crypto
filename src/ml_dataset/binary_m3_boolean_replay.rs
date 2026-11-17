@@ -26,6 +26,7 @@ pub(super) enum Assessment {
 }
 #[derive(serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[allow(clippy::enum_variant_names)] // variant names are the serialized wire values
 pub(super) enum Unknown {
     ReplayBudget,
     ReplayDeadline,
@@ -221,7 +222,7 @@ pub(super) fn verify_optional(
     input_bytes: Option<&[u8]>,
     terminal: Option<&SavedResult>,
     admission: &mut ReplayAdmission,
-    mut projection: Option<&mut Option<Projection>>,
+    projection: Option<&mut Option<Projection>>,
 ) -> Result<Assessment, String> {
     let anchor_root = root(artifacts, Slot::BooleanAnchor)?;
     let check_root = root(artifacts, Slot::BooleanCheck)?;
@@ -1139,7 +1140,7 @@ mod tests {
             native_operation_witness: false,
             producer_execution_verified: false,
         };
-        let feature = PublicEquations::from_admitted(&math, &config, &vec![0u8; 23]).unwrap();
+        let feature = PublicEquations::from_admitted(&math, &config, &[0u8; 23]).unwrap();
         let before = bounded_projection_json(&feature, 32768).unwrap();
         record.receipt = Some(serde_json::json!({"wire_hex":"bbbb","row_index":7,"watermark":99}));
         record.target = Some(vec![vec![1, 2]]);

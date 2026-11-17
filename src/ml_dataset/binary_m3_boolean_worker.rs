@@ -116,7 +116,7 @@ impl<'a> Owned<'a> {
             // preserving existing EventIndex/MatrixResult replay equalities.
             let tail = events.retained_wire.len();
             let retained = events.acknowledged_prefix_len.checked_add(tail);
-            if bounded_report_shape(input.report.as_ref()) && retained.is_some() {
+            if let Some(retained) = retained.filter(|_| bounded_report_shape(input.report.as_ref())) {
                 let view = MatrixResult {
                     schema: "crypto.ml-dataset.binary-m3-matrix-result/v4",
                     input_sha256: input.input_sha256,
@@ -125,7 +125,7 @@ impl<'a> Owned<'a> {
                     adapter_stop: input.adapter_stop,
                     ledger: input.ledger.saved_ledger(),
                     event_accounting: &events.accounting,
-                    retained_event_bytes: retained.unwrap(),
+                    retained_event_bytes: retained,
                     acknowledged_event_prefix_bytes: events.acknowledged_prefix_len,
                     unacknowledged_event_tail_bytes: tail,
                     source_completion_claimed: false,

@@ -852,10 +852,7 @@ fn x_key(x: &F2mElement) -> WordMask {
 fn word_basis(values: impl IntoIterator<Item = WordMask>, n: u32) -> Vec<F2mElement> {
     let mut pivots: Vec<Option<WordMask>> = vec![None; n as usize];
     for mut v in values {
-        loop {
-            let Some(word) = (0..3).rev().find(|&i| v[i] != 0) else {
-                break;
-            };
+        while let Some(word) = (0..3).rev().find(|&i| v[i] != 0) {
             let bit = word * 64 + 63 - v[word].leading_zeros() as usize;
             if let Some(p) = pivots[bit] {
                 for i in 0..3 {

@@ -1331,6 +1331,7 @@ impl Solver {
         if self.native_admission.is_some() {
             self.native_failure
                 .get_or_insert(NativeAdmissionFailure::UncoveredPath);
+            #[allow(clippy::reversed_empty_ranges)] // deliberately empty: no variables were added
             return 1..=0;
         }
         if self.observing() && count != 0 {
@@ -7879,7 +7880,7 @@ mod tests {
     }
 }
 
-/// CDCL SAT solver.
+// CDCL SAT solver.
 
 /// Partial native admission increment. Not sufficient for owned binary SAT:
 /// observers, XOR, conflict analysis and incremental theories fail closed.

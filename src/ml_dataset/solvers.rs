@@ -5024,7 +5024,7 @@ mod tests {
 
     use super::*;
 
-    use super::*;
+    
 
     #[test]
     fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {
@@ -9516,7 +9516,7 @@ impl OwnedReplayCustody {
         outcome: &Value,
         artifacts: &[super::types::Artifact],
     ) -> OwnedReplayVerdict {
-        self.owner.revalidate(dir, config, outcome, artifacts);
+        let _ = self.owner.revalidate(dir, config, outcome, artifacts);
         self.verdict()
     }
     pub(super) fn project_identity(&mut self) -> Result<Value, String> {

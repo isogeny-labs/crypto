@@ -78,8 +78,8 @@ impl WithLedger<'_> {
             super::super::super::Phase::Complete => ledger::Phase::Complete,
         };
         // A successful initial checkpoint cannot conceal an earlier stop.
-        if b.stopped.is_some() {
-            return Err(b.stopped.unwrap());
+        if let Some(stopped) = b.stopped {
+            return Err(stopped);
         }
         self.pending = Some(ledger::Checkpoint {
             schema: ledger::SCHEMA.into(),
