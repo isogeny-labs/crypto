@@ -26,3 +26,27 @@ about 30 s (t = 12) to 2 min (t = 13).
 
 Refuted if the t = 12 closure takes more than 1,700 s or fewer than 850 s on this machine at a
 comparable load, or if `M` is outside 2.0e12 .. 3.7e12.
+
+## Outcome at t = 12, and the revised prediction for t = 13
+
+Appended 2026-11-17 08:36 UTC, after the t = 12 run (`raw/t12/`) and while the t = 13 run
+(started 08:33:18 UTC) was in its first minutes; nothing of its c = 6 closure was known.
+
+| quantity (closure c = 6, t = 12) | predicted | band | measured | verdict |
+|:--|--:|:--|--:|:--|
+| answer | 1 enters at c = 6, 190,051 columns | | 1 enters at c = 6, 190,051 columns; falls 4, 5, 6 | as predicted (and as the reference found on the pods) |
+| multiply-adds M | 2.81e12 | 2.0e12 .. 3.7e12 | 3,690,966,694,706 | inside, at the upper edge (31 % above the centre) |
+| wall of the closure | 1,210 s | 850 .. 1,700 s | 1,722 s (load 3.6 to 4.0, one neighbour) | **outside the band by 1.3 %: the prediction is refuted on time** |
+| stored words | 3.4e8 | | 352,689,051 (339,806,373 entries) | 4 % above |
+| peak resident memory | not predicted | | 3.2 GB | |
+
+κ at t = 12 is 0.00214, not 0.00163, and the rate is 0.467 ns per multiply-add, not 0.43. The
+constant-κ model is too optimistic. Revised (**estimate**):
+
+- least squares on the three points in logs: `M ∝ n₊^3.22`, which gives 1.75e13 at t = 13;
+- the last step alone (t = 11 → 12) has exponent 3.52, which gives 2.16e13;
+- at 0.47 to 0.50 ns per multiply-add: **8,200 s to 10,800 s** for the c = 6 closure at t = 13
+  on this machine, about 9.3e8 stored words, about 9 GB resident.
+
+Refuted if the closure takes more than 13,000 s or fewer than 6,500 s, or if 1 does not enter at
+c = 6.
