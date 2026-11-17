@@ -577,3 +577,17 @@ Useorder4classonlywithnewexactN/projection/eigenactioncontract,neveroldpi=P(sigm
 
 ### Errors
 No qualification/replayfailuresorretries; earlierstablepathunavailable,Homebrew1.93.1recorded. No timingcomparisonsacrosstoolchains.
+
+## Strong order-four search frozen
+
+### What was done
+Derived exact Hasse/trace-coefficient order interval and unique-multiple certificate from verified point-order LCM. A third-extension count plus certified N recovers c4 without fourth-extension enumeration. Fixed p101/149/197,64coefficients each,first fully eligible actual-cofactor≤4 model per field. Prior six full-count records calibrate reconstruction; point budget eight and BSGS200000 fixed.
+
+### Decisions made
+Every rejection/uncertified field retained; no targets, speed selection or grid extension. Absolute/group certificates still separate; no old binomial Frobenius identity. Compile/freeze/push before once-only600srun; independent modular replay afterwards.
+
+### Open threads
+Execute search and classify coverage; broad10xobjectiveopen.
+
+### Errors
+Pre-freeze review caught that small calibration intervals need not have a unique multiple even with known N; corrected calibration to check containment/formula and explicit positive/negative uniqueness controls rather than assert a false uniqueness premise. No scientific run or retry yet.
