@@ -151,9 +151,11 @@ pub enum NativeKernels {
     BothUpdatesLead,
     BothUpdatesFused,
     BothUpdatesFrontier,
+    FrontierPackedProducts,
+    FrontierPackedBatch,
 }
 impl NativeKernels {
-    fn bits(self) -> u8 {
+    fn bits(self) -> u16 {
         match self {
             Self::Legacy => 0,
             Self::Ordered => 1,
@@ -164,6 +166,8 @@ impl NativeKernels {
             Self::BothUpdatesLead => 23,
             Self::BothUpdatesFused => 39,
             Self::BothUpdatesFrontier => 103,
+            Self::FrontierPackedProducts => 231,
+            Self::FrontierPackedBatch => 487,
         }
     }
 }
@@ -202,11 +206,92 @@ pub fn produce_native_for_rust(
         constructor: produced.constructor,
     })
 }
+
+/// Full native construction and complete wire for the separate packed checker.
+/// This remains unverified bytes; no accepted basis is exposed by this API.
+/// Native checks and every ideal-equality/Buchberger obligation are retained.
+pub fn produce_native_for_packed(
+    system: &System,
+    kind: &str,
+    kernels: NativeKernels,
+) -> Result<(Vec<u8>, serde_json::Value), String> {
+    if ![2147483647, 9007199254740881].contains(&system.prime) {
+        return Err("packed wire supports only the two fixed primes".into());
+    }
+    let produced = with_native_kernel_bits(kernels.bits(), || {
+        native_product_impl(system, kind, CompletionExports::RustConsumer)
+    })?;
+    let wire = serde_json::to_vec(&produced.witness).map_err(|e| e.to_string())?;
+    if wire.len() > 16 * 1024 * 1024 {
+        return Err("packed serialized proof byte cap".into());
+    }
+    Ok((wire, produced.constructor))
+}
+
+/// Construct the same full grevlex output using direct cubics and a
+/// provenance-carrying Buchberger engine. No resultant, FGLM or reference
+/// answer is used. The returned complete wire is still unverified bytes.
+pub fn produce_cubic_for_packed(system: &System, kernels: NativeKernels) -> Result<Vec<u8>, String> {
+    with_native_kernel_bits(kernels.bits(), || cubic_for_packed_impl(system))
+}
+/// Explicit v2 compact certificate with local root-resultant provenance.
+pub fn produce_compact_dag_for_packed(
+    system: &System,
+    kernels: NativeKernels,
+) -> Result<(Vec<u8>, serde_json::Value), String> {
+    if ![2147483647, 9007199254740881].contains(&system.prime) {
+        return Err("packed wire supports only the two fixed primes".into());
+    }
+    with_native_kernel_bits(kernels.bits(), || {
+        let input = system.decode()?;
+        let output = quotient::compact::solve_sparse_dag_product(&input, system.variables.len(), system.prime)?;
+        let witness = complete_impl(system,
+            output.certificate.definitions.iter().map(member).collect(),
+            output.certificate.basis.iter().map(member).collect(),
+            true, CompletionExports::PackedDag)?;
+        let wire = serde_json::to_vec(&witness).map_err(|e| e.to_string())?;
+        if wire.len() > 16 * 1024 * 1024 { return Err("packed serialized proof byte cap".into()); }
+        Ok((wire, serde_json::to_value(output.info).map_err(|e| e.to_string())?))
+    })
+}
+fn cubic_for_packed_impl(system: &System) -> Result<Vec<u8>, String> {
+    let input = system.decode()?;
+    let n = system.variables.len();
+    let p = system.prime;
+    if ![2147483647,9007199254740881].contains(&p)
+        || !(3..=quotient::MAX_VARIABLES).contains(&n)
+        || input.len()<4 || input.len()>32
+        || input.iter().any(|f| f.len()>32 || degree(f)>4)
+    {return Err("cubic constructor field/input budget".into());}
+    let pairs=cheap::consequences(&input[..4],n,p);
+    if pairs.len()!=2 {return Err("cubic constructor needs two recognized initial pairs".into());}
+    let definitions:Vec<_>=pairs.into_iter().map(|r|r.cubic_syzygy).collect();
+    let mut augmented=input.clone();augmented.extend(definitions.iter().map(|r|r.poly.clone()));
+    let basis=reference_criteria(&augmented,n,p)?;
+    let witness=complete_impl(system,definitions.iter().map(member).collect(),basis.iter().map(member).collect(),true,CompletionExports::RustConsumer)?;
+    let wire=serde_json::to_vec(&witness).map_err(|e|e.to_string())?;
+    if wire.len()>16*1024*1024 {return Err("cubic constructor wire byte cap".into());}
+    Ok(wire)
+}
+/// Version2 original-generator DAG basis, with full native construction checks.
+/// Bytes remain unverified until a separate explicit DAG consumer accepts them.
+pub fn produce_cubic_dag_for_packed(system:&System,kernels:NativeKernels)->Result<Vec<u8>,String> {
+    let output=with_native_kernel_bits(kernels.bits(),||super::dag::solve(&system.decode()?,system.variables.len(),system.prime))?;
+    let witness=complete_impl(system,output.definitions.iter().map(member).collect(),output.basis.iter().map(member).collect(),true,CompletionExports::PackedDag)?;
+    let wire=serde_json::to_vec(&witness).map_err(|e|e.to_string())?;
+    if wire.len()>16*1024*1024 {return Err("dag complete wire byte cap".into());}Ok(wire)
+}
+pub fn produce_cubic_dag_pruned_for_packed(system:&System,kernels:NativeKernels)->Result<(Vec<u8>,Value),String> {
+    let (output,trace)=with_native_kernel_bits(kernels.bits(),||super::dag::solve_pruned(&system.decode()?,system.variables.len(),system.prime))?;
+    let witness=complete_impl(system,output.definitions.iter().map(member).collect(),output.basis.iter().map(member).collect(),true,CompletionExports::PackedDag)?;
+    let wire=serde_json::to_vec(&witness).map_err(|e|e.to_string())?;if wire.len()>16*1024*1024 {return Err("pruned dag wire byte cap".into());}Ok((wire,trace))
+}
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum CompletionExports {
     Both,
     Final,
     RustConsumer,
+    PackedDag,
 }
 // Only this private native factory may select Final/RustConsumer. Every branch
 // obtains its rows from a constructor with its complete native checks intact.
@@ -302,7 +387,7 @@ fn complete_impl(
     let n = system.variables.len();
     let p = system.prime;
     if !(3..=quotient::MAX_VARIABLES).contains(&n)
-        || definitions.len() > n
+        || definitions.len() > if exports == CompletionExports::PackedDag {512} else {n}
         || basis.is_empty()
         || basis.len() > 256
     {
@@ -321,7 +406,7 @@ fn complete_impl(
         }
     }
     let mut witness = Witness {
-        version: 1,
+        version: if exports == CompletionExports::PackedDag {2} else {1},
         definitions,
         basis,
         input_reductions: vec![Vec::new(); input.len()],
@@ -355,7 +440,7 @@ fn complete_impl(
         let target = s_polynomial(&reducers[row.left], &reducers[row.right], p).poly;
         row.proof = quotient_witness(target, &reducers, p)?;
     }
-    if exports != CompletionExports::RustConsumer {
+    if !matches!(exports,CompletionExports::RustConsumer|CompletionExports::PackedDag) {
         singular_script(system, &witness)?;
     }
     Ok(witness)
@@ -492,14 +577,30 @@ fn identity(script: &mut String, target: &str, rhs: &str) {
 /// Validate shape/coverage/order, then export arithmetic checks, without solving.
 /// Successful execution must separately report CERTIFICATE_REPLAY_OK.
 pub fn singular_script(system: &System, witness: &Witness) -> Result<String, String> {
+    singular_script_impl(system, witness, false,false)
+}
+/// Two fixed prime residue rings, including the 53-bit GMP coefficient backend.
+/// This checks identities only; it makes no standard-basis solver speed claim.
+pub fn singular_script_residue(system: &System, witness: &Witness) -> Result<String, String> {
+    if ![2147483647, 9007199254740881].contains(&system.prime) {
+        return Err("residue checker supports only the two fixed primes".into());
+    }
+    singular_script_impl(system, witness, true,false)
+}
+/// Explicit version2 shared-row DAG replay, same full identity obligations.
+pub fn singular_script_dag(system:&System,witness:&Witness)->Result<String,String> {
+    if ![2147483647,9007199254740881].contains(&system.prime) {return Err("dag residue prime roster".into());}
+    singular_script_impl(system,witness,true,true)
+}
+fn singular_script_impl(system: &System, witness: &Witness, residue: bool,dag:bool) -> Result<String, String> {
     let n = system.variables.len();
     let p = system.prime;
     if !(3..=quotient::MAX_VARIABLES).contains(&n)
-        || p > i32::MAX as u64
+        || (!residue && p > i32::MAX as u64)
         || p < 3
         || !prime(p)
-        || witness.version != 1
-        || witness.definitions.len() > n
+        || witness.version != if dag {2} else {1}
+        || witness.definitions.len() > if dag {512} else {n}
         || witness.basis.is_empty()
         || witness.basis.len() > 256
     {
@@ -516,8 +617,13 @@ pub fn singular_script(system: &System, witness: &Witness) -> Result<String, Str
     }
     let input_count = generators.len();
     let mut names: Vec<_> = (0..input_count).map(|i| format!("o{i}")).collect();
+    let coefficients = if residue && p > i32::MAX as u64 {
+        format!("(integer,{p})")
+    } else {
+        p.to_string()
+    };
     let mut script = format!(
-        "ring r={p},({}),dp;\n",
+        "ring r={coefficients},({}),dp;\n",
         (0..n)
             .map(|i| format!("x{i}"))
             .collect::<Vec<_>>()

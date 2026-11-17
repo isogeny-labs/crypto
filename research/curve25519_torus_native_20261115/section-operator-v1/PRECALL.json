@@ -1,0 +1,72 @@
+{
+  "schema": "native.precall/v1",
+  "created_at": "2026-11-17T06:55:13.487735+00:00",
+  "binary": "/workspace/curve25519-native-binaries/section-operator-control-v1",
+  "binary_sha256": "0eb6ccd2128f0780ac3c2f2c8e2c5c30d0dc2afa834208892cc8544b0c3c3cc6",
+  "qualifier_sha256": "71746f9dfe7bdde6c6e0b5ee6bc2f1a7c400fa523fb6267de7c9234d4da03bb9",
+  "inputs": [
+    {
+      "path": "tools/torus-section-operator/Cargo.toml",
+      "bytes": 227,
+      "sha256": "08c89bc89a60c0627840a9b6739d31c125be32985af536b185c7fb4d938053ca",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-section-operator/Cargo.lock",
+      "bytes": 5956,
+      "sha256": "deb61c00ac654d5c947456a253fbc480cc1c573f66ebe2b4d523e8169955301b",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-section-operator/src/lib.rs",
+      "bytes": 12490,
+      "sha256": "000f70ade553cd41eb0ffbf5158aae490041687e4c0c757c6dcd02f5b7c44e42",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-section-operator/src/main.rs",
+      "bytes": 2639,
+      "sha256": "eb19c92a0a1205f930848650d5839c10a5ae4b8abe826f8041f3d88c0b02deee",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-section-operator/src/controls.rs",
+      "bytes": 11159,
+      "sha256": "2061fa1ed0fc8c6f5bc1481b8b667cba08174ba4a1a8485f0df55b4ff631ec86",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-s4/Cargo.toml",
+      "bytes": 276,
+      "sha256": "f91d0d01a8d17f13d3c5fd357ab782caf638c3ecf024987634838253c50472cb",
+      "compiled": true
+    },
+    {
+      "path": "tools/torus-s4/src/lib.rs",
+      "bytes": 19346,
+      "sha256": "403d139bf632604eb3e993de945384d7c7cadef350ecd8f63315a28538b24070",
+      "compiled": true
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/section-operator-v1/PROTOCOL.md",
+      "bytes": 5817,
+      "sha256": "2c7b1666238bab187e0876d5e755634636f26fd452e354e025ab2a548886c8a6",
+      "compiled": false
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/section-operator-v1/DERIVATION.md",
+      "bytes": 4976,
+      "sha256": "acb0ebb01263bbdc58ba5b705a9535659ca035b998754e707e641e053fab3d27",
+      "compiled": false
+    }
+  ],
+  "command": [
+    "/workspace/curve25519-native-binaries/section-operator-control-v1",
+    "--controls",
+    "/workspace/curve25519-section-operator-v1/raw-controls.json"
+  ],
+  "source_state": "to be committed before dispatch; committed identity will be retained separately",
+  "planned_comparisons": 600,
+  "no_overwrite": true,
+  "scope": "fixed development comparisons, not a solver/scaling experiment"
+}

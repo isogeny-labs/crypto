@@ -282,7 +282,7 @@ fn report(
     let total = phases.iter().map(|p| p.gae).sum();
     let recovered = recovered.and_then(|k| k.to_u128());
     SolveReport {
-        recovered,
+        recovered: recovered.map(Into::into),
         exhausted: recovered.is_none(),
         phases,
         total_gae: total,
@@ -471,7 +471,7 @@ mod tests {
         let spec = CurveSpec::HecThread { p: 41, genus: 2 };
         let (w, inst) = Workload::build(&spec, 5, 0, TargetKind::Planted).expect("workload");
         assert_eq!(w.curve.family, "hyperelliptic");
-        assert_eq!(w.curve.r, 1321);
+        assert_eq!(w.curve.r, 1321u64.into());
         let ic = method(
             "hec.ic_fb_walk",
             &[
@@ -484,7 +484,7 @@ mod tests {
         for m in [&ic, &rho] {
             let a = ecbench_solve(m, &inst, &w.curve, &w.target, 11).expect("solves");
             let k = a.recovered.expect("recovered");
-            assert_eq!(inst.mul_generator_hex(k).as_ref(), Some(&w.target));
+            assert_eq!(inst.mul_generator_exact(k).as_ref(), Some(&w.target));
             assert_eq!(Some(k), w.planted);
             let b = ecbench_solve(m, &inst, &w.curve, &w.target, 11).expect("solves");
             assert_eq!(a.phases, b.phases, "{}", m.id);
@@ -531,7 +531,7 @@ mod tests {
         use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
         let spec = CurveSpec::HecThread { p: 41, genus: 2 };
         let (w, _) = Workload::build(&spec, 0, 0, TargetKind::PlantedHecThread).unwrap();
-        assert_eq!(w.planted, Some(447));
+        assert_eq!(w.planted, Some(447u64.into()));
         assert_eq!(w.kind(), TargetKind::PlantedHecThread);
         assert!(Workload::build(&spec, 0, 0, TargetKind::Public).is_err());
         let prime = CurveSpec::PrimeSearch {

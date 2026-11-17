@@ -156,8 +156,15 @@ mod tests {
         assert_eq!(file.schema, SCHEMA);
         // Explicit compile-time inputs also let sparse CI restore exactly the
         // source files this catalog binds, without loading research archives.
+        let catalog = include_str!("../../../docs/curves/cover-catalog.json");
+        let rows = crate::cryptanalysis::cover_catalog::restrict(
+            include_str!("../../../docs/curves/registry.json"),
+            catalog,
+        )
+        .unwrap();
         let inputs = [
-            ("docs/curves/registry.json", include_str!("../../../docs/curves/registry.json")),
+            ("docs/curves/registry.json (rows named by docs/curves/cover-catalog.json)", rows.as_str()),
+            ("docs/curves/cover-catalog.json", catalog),
             ("docs/curves/factor-hints.txt", include_str!("../../../docs/curves/factor-hints.txt")),
             ("docs/curves/trait-sources.json", include_str!("../../../docs/curves/trait-sources.json")),
             (
@@ -180,7 +187,11 @@ mod tests {
                 .digest()
             })
             .collect();
-        assert_eq!(file.registry_sha256, digests[0].sha256);
+        assert_eq!(
+            file.catalog,
+            crate::cryptanalysis::cover_catalog::MANIFEST_PATH
+        );
+        assert_eq!(file.catalog_rows_sha256, digests[0].sha256);
         assert_eq!(file.inputs, digests);
     }
 
