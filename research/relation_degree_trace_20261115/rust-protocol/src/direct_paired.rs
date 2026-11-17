@@ -302,6 +302,13 @@ fn pins(c: &Config, config: &Path) -> Result<Value> {
         ("singular", c.singular.clone()),
         ("msolve", c.msolve.clone()),
         ("isolation", c.isolation.clone()),
+        (
+            "isolation_dependency",
+            c.isolation
+                .parent()
+                .ok_or("isolation parent")?
+                .join("result_switches.py"),
+        ),
         ("protocol", c.protocol.clone()),
     ] {
         p.insert(name.into(), json!({"path":path,"sha256":file_hash(&path)?}));
