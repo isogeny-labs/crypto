@@ -2250,6 +2250,7 @@ fn measure_hky(
             "interreduce": o.interreduce, "interreduce_min": o.interreduce_min,
             "interreduce_block": o.interreduce_block, "rebucket": o.rebucket,
             "par_second": o.par_second, "bitmap": o.bitmap, "fault": o.fault,
+            "deg_weight": o.deg_weight,
             "dense": [o.dense_num, o.dense_den], "stats": fast_stats});
     } else if fast {
         // Only rows of the fast instrument carry its options and timers.
@@ -3063,6 +3064,7 @@ fn parse_args() -> Args {
             "--hky3-rebucket" => a.hky3.rebucket = v == "on",
             "--hky3-par-second" => a.hky3.par_second = v == "on",
             "--hky3-bitmap" => a.hky3.bitmap = v == "on",
+            "--hky3-deg-weight" => a.hky3.deg_weight = v.parse().expect("--hky3-deg-weight"),
             "--hky3-fault" => a.hky3.fault = v.parse().expect("--hky3-fault"),
             "--hky3-trace" => a.hky3.trace = Some(v.clone()),
             "--hky3-dense" => {

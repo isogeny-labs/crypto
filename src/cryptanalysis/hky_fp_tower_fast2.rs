@@ -96,6 +96,11 @@ pub struct Fast2Options {
     /// 2: the delayed reduction subtracts `p² − 1`. 3: the interreduction
     /// drops the last term of every row it rewrites.
     pub fault: u8,
+    /// Queue priority: products of a source row with `nnz` terms and leading
+    /// degree `d` wait in bucket `1 + ⌊log₂ nnz⌋ + deg_weight · d`; the lowest
+    /// bucket is served first, last in first out. 0 is v1's sparsest-first;
+    /// 64 or more is lowest degree first, sparsest first among equals.
+    pub deg_weight: usize,
     /// Append one JSON line per batch and per interreduction to this file.
     pub trace: Option<String>,
 }
@@ -105,7 +110,7 @@ impl Default for Fast2Options {
         Fast2Options {
             symmetry: None,
             batch_min: 32,
-            batch_max: 1024,
+            batch_max: 256,
             target_pivots: 32,
             interreduce: 0.25,
             interreduce_min: 256,
@@ -116,6 +121,7 @@ impl Default for Fast2Options {
             dense_num: 1,
             dense_den: 3,
             fault: 0,
+            deg_weight: 1,
             trace: None,
         }
     }
@@ -394,6 +400,7 @@ struct ItemOut {
     src_deg: u8,
     src_age: u64,
     src_nnz: u64,
+    max_task: u64,
 }
 
 struct Pool(Vec<Mutex<Scratch>>);
@@ -500,8 +507,9 @@ pub fn closure_fast2(
             rows: Vec::new(),
         })
         .collect();
-    const BUCKETS: usize = 66;
-    let mut queue: Vec<Vec<Item>> = (0..BUCKETS).map(|_| Vec::new()).collect();
+    let n_buckets: usize = 66 + opts.deg_weight * (c as usize + 1);
+    let bucket_of = |nnz: usize, d: u32| (sparse_bucket(nnz, 1) + opts.deg_weight * d as usize).min(n_buckets - 1);
+    let mut queue: Vec<Vec<Item>> = (0..n_buckets).map(|_| Vec::new()).collect();
     for (g, &sign) in live.iter().zip(&signs) {
         if HkyRing::degree(g) <= c {
             let (q, r) = space.gen_row(g, sign);
@@ -558,6 +566,7 @@ pub fn closure_fast2(
                     src_deg: 0,
                     src_age: 0,
                     src_nnz: 0,
+                    max_task: 0,
                 };
                 let mut formed: Vec<(u8, Row)> = Vec::new();
                 match item {
@@ -574,17 +583,25 @@ pub fn closure_fast2(
                     }
                 }
                 o.formed = formed.len() as u32;
-                pool.with(|s| {
-                    for (q, r) in formed {
-                        o.prod_nnz += r.len() as u64;
-                        let (red, rd) = ech_ref[q as usize].reduce(&cx, &r, s);
-                        o.ops += rd.ops;
-                        o.nred += u64::from(rd.nred);
-                        if !red.is_empty() {
-                            o.cands.push((q, red));
-                        }
+                // The projections of one product (two when the variable is
+                // swapped by the symmetry) are separate tasks.
+                let red1 =
+                    |(q, r): &(u8, Row)| pool.with(|s| ech_ref[*q as usize].reduce(&cx, r, s));
+                let done: Vec<(Row, Red)> = if formed.len() == 2 {
+                    let (a, b) = rayon::join(|| red1(&formed[0]), || red1(&formed[1]));
+                    vec![a, b]
+                } else {
+                    formed.iter().map(red1).collect()
+                };
+                for ((q, r), (red, rd)) in formed.iter().zip(done) {
+                    o.prod_nnz += r.len() as u64;
+                    o.ops += rd.ops;
+                    o.max_task = o.max_task.max(rd.ops);
+                    o.nred += u64::from(rd.nred);
+                    if !red.is_empty() {
+                        o.cands.push((*q, red));
                     }
-                });
+                }
                 o
             })
             .collect();
@@ -604,7 +621,7 @@ pub fn closure_fast2(
         let mut cands: Vec<(u8, Row)> = Vec::new();
         for o in outs {
             b_ops += o.ops;
-            b_max = b_max.max(o.ops);
+            b_max = b_max.max(o.max_task);
             b_nred += o.nred;
             b_formed += u64::from(o.formed);
             b_nnz += o.prod_nnz;
@@ -728,7 +745,7 @@ pub fn closure_fast2(
             stats.stored_words += stored.words() as u64;
             let d = u32::from(space.parts[qi].deg[lead as usize]);
             if d < c {
-                let bucket = sparse_bucket(stored.nnz(), 1);
+                let bucket = bucket_of(stored.nnz(), d);
                 for v in 0..nv {
                     if applies(v) {
                         queue[bucket].push(Item::Prod {
@@ -833,13 +850,14 @@ pub fn closure_fast2(
             stats.interreduce_muladds += ir_ops;
             stats.interreductions += 1;
             if opts.rebucket {
-                let old: Vec<Vec<Item>> = std::mem::replace(&mut queue, (0..BUCKETS).map(|_| Vec::new()).collect());
+                let old: Vec<Vec<Item>> = std::mem::replace(&mut queue, (0..n_buckets).map(|_| Vec::new()).collect());
                 for (bi, items) in old.into_iter().enumerate() {
                     for it in items {
                         let nb = match &it {
                             Item::Row(..) => bi,
                             Item::Prod { part, row, .. } => {
-                                sparse_bucket(ech[*part as usize].rows[*row as usize].nnz(), 1)
+                                let r = &ech[*part as usize].rows[*row as usize];
+                                bucket_of(r.nnz(), u32::from(space.parts[*part as usize].deg[lead_of(r) as usize]))
                             }
                         };
                         queue[nb].push(it);
@@ -1083,6 +1101,7 @@ mod tests {
                                     dense_num: 1,
                                     dense_den: 8,
                                     fault: 0,
+                                    deg_weight: [0, 1, 64][(bmin + block) % 3],
                                     trace: None,
                                 };
                                 out.push((format!("{o:?}"), o));
