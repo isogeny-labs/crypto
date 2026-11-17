@@ -70,3 +70,7 @@ Freeze `44693a66ca8` qualifies both original F61 maps on a restricted nonsingula
 ### Exact discriminant and branch data
 
 Freeze `9949caac151` verifies disc(P)=delta4*I² as exact polynomials on all six maps, squarefree/disjoint critical and paired-branch values, and pole genericity. Both F61 quartics have irreducible specializations (t=4,11); 120 native discriminant checks pass. Combined with previously checked smooth rational points, the recorded deduction establishes geometric connectedness and genus3 of their normalized sign-triple covers via tame ramification12. This is not a computed smooth/canonical model or a nonhyperellipticity/transport/speed certificate; independent review remains open. Raw square_index names a square factor, not a computed integral-basis index. See `native-smith-branch/RESULTS.md` and `CONNECTEDNESS.md`.
+
+### Native infinity resolution and adjoints
+
+Freeze `f1a3d00562f` resolves both F61 degree10 models at infinity by exact native blowups. Both multiplicity sequences are (6,2,2,2,2,2,2,2), giving delta22. The degree7 infinity adjoint subsystem has rank22 and dimension14 on each map; every printed basis vector passes all115 recorded constraints. Node/cusp/tacnode controls pass. Finite singularity constraints remain pending, so this is not yet a complete canonical basis or smooth quartic model. Raw equations and bases: `native-smith-infinity/CONTROL.txt`. No speed claim.

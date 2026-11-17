@@ -3031,3 +3031,10 @@ What was done: compiled exact local degree10 blowups/repeated-tangent completene
 Decisions made: fail unsupported tangent cases;noactualpath/delta/dimensionexpected;finiteconstraintsstillpending. Gitfreeze precedes sole600CPU invocation.
 Open threads: runlocalresolution;thencombinefiniteadjoints/canonicalmodel/completeoriginaltargettransport.Full10xgoalactive.
 Errors: unused copied helper/import warnings only;no scientificexecution yet.
+
+## Smith infinity resolved and14dimensional adjoint subsystem verified
+
+What was done: freezef1a3d00562f hashespass/exit0;node/cusp/tacnodecontrols pass. Bothmaps multiplicities6+seven2s resolvecompletely,delta22;115constraintsrank22and14adjointbasisvectorspermapallchecked. Localpolynomials/slopes/basesretained.
+Decisions made: finiteconstraintsnotimposed, notcompletecanonicalbasis. Prior genus3+infinitydelta22predictfinite delta11;do notassume residualdiscriminantrootsareordinarynodeswithoutverification.
+Open threads: residuefieldfinite-nodechecks, remainingadjointconditions, canonicalrelations/nonhypermodel thencompleteoriginaltargettransport.Full10xgenus2+goalactiveunachieved.
+Errors: no scientificfailure;unusedcopiedhelpers/importcompilewarnings.Gitcustody/noS3/no merge.
