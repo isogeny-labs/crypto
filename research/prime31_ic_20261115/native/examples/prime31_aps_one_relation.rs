@@ -1854,10 +1854,16 @@ fn algebraic_mode_factorized_index_variant_y(
             if !use_public_y {stats.s3_sqrt+=1;}
         }
     }
+    // The public partition sizes do not change during a solver call.
+    // Reuse the three S3 batch-inversion scratch arrays across each left x;
+    // this changes allocation lifetime, not field operations or source order.
+    let mut denoms=Vec::with_capacity(parts[1].len());
+    let mut prefix=Vec::with_capacity(parts[1].len()+1);
+    let mut inverses=vec![0u64;parts[1].len()];
     for (i,left) in parts[0].iter().enumerate(){
         let x=left.pt.0;
-        let mut denoms=Vec::with_capacity(parts[1].len());
-        let mut prefix=Vec::with_capacity(parts[1].len()+1);
+        denoms.clear();
+        prefix.clear();
         prefix.push(1u64);
         for right in &parts[1]{
             let z=right.pt.0;
@@ -1877,7 +1883,6 @@ fn algebraic_mode_factorized_index_variant_y(
         let mut total_inverse=pownp_mode::<true>(
             *prefix.last().ok_or("factorized S3: empty prefix")?,P-2);
         stats.batch_inversions+=1;
-        let mut inverses=vec![0u64;denoms.len()];
         for j in (0..denoms.len()).rev(){
             inverses[j]=mulp_mersenne(total_inverse,prefix[j]);
             total_inverse=mulp_mersenne(total_inverse,denoms[j]);
