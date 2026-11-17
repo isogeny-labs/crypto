@@ -11,11 +11,13 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, usable rank, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
+Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
 
-- [ ] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, started 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
+- [ ] Independently audit the general Boolean tensor contraction theorem D.1 used by the conditional prime-field result, beginning with the recursive description and precision invariants. See [the assessed leads and proof dependencies](leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md) (next after PR #4627).
+
+- [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
