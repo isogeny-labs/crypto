@@ -2303,3 +2303,10 @@ What was done: derived classnumber1 viaMinkowski<5 andresiduedegrees, totpositiv
 Decisions made: theorem conditionalonexistingcyclotomic/Tate/Frobeniuspremises, [pcc:unverified], no softwarepolarizationproof/quotient/speedclaim. MilneANT Minkowski/units andAV Tate/polarization primarybackground; own specialization, KBunrelatedhitsnotproof. Gitfreeze beforeone120CPU.
 Open threads: factorallindexexceptions thenadmitexplicitstableisotropykernel/quotientconstruction onlywhere justified; original10x/genus2/4goalsstayopen.
 Errors: none, releaseoverflowcheckedbuildpass. No scientificexecutionyet/S3/cloud/merge.
+
+## Regular-prime criterion arithmetic passed, allfiniteexceptions identified
+
+What was done: pushedfreezec9f4f728ef1, inputhashespass, onceexit0; indicesfactor13²97²113³251 and421³659²14489 withallranks/degrees; Minkowski/unit/signature supportingchecks pass.
+Decisions made: conditionaltheorem independentlyunreviewed, no quotient/speedclaim. Dimensionobstruction removes13/97; characteristicprimesexcluded;251/659/14489 needreciprocalisotropyclassification, notgcd-onlyadmission. [pcc:unverified].
+Open threads: classifyremaining3exceptionalprimekernels, explicitquotient andcost onlyif warranted; original10x/genus2/4scope intact.
+Errors: none,no retry/S3/cloud/merge.
