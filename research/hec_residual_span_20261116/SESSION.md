@@ -2660,3 +2660,10 @@ What was done: freeze6e193495ac9 hashes pass, one correctnessrun exit0,22/22nati
 Decisions made: no anchor/matrixsize/speedratio inference; genus4doesNOTfit128here. Keepallnonsplit/skips andoldbinomialfailures. Derived two-leading-coefficient quadratic-tail kernel fornextprospectiveequivalencegate, notimplemented/measuredyet; classicalVieta/shortenedsieve, no novelty/10xclaim.
 Open threads: prospective cheap-tail equivalence andcompletecost comparison withoriginal2LPwalk/fullbasecontrols, commoncatalogueoptimizationonlyifshared; fullgenus2+objectiveactive/unachieved.
 Errors: none in scientificrun; inheritedunusedhelperswarnings only. No retry/S3/cloud/merge; sharednativeindependentreviewgap explicit.
+
+## Generic cheap quadratic-tail equivalence frozen
+
+What was done: implemented exact leadingtwoHcoefficients/knownrootsums, linear/constanttailcases andknownordinate reuse, fullHonlydiagnostics. Compiledall22samefixtures, exactoldcompleteReportcomparison andallpriornorm/brute/principal/densechecks;9synthetichighcoefficientcomponentcases prospective.
+Decisions made: unchangedanchor/sample/LPstatepolicy, noperformanceinference. Structuralfirstsquarefreet qualification insyntheticcasesnotoutcome-selection. One600CPUprocess after Gitfreeze.
+Open threads: executeexactequivalence, thencompletecostgatewithdiagnosticsoff.
+Errors: pre-freeze Rubygeneratorheredocdelimiter failed and left no runnablemanifest; correctedwriter/rebuilt, no scientificrun orfreeze repeated. Inheritedunusedhelperswarnings only. No S3/cloud/merge.
