@@ -66,6 +66,11 @@ jobs:
               assert p["confluent_hermite_double_control"]
               assert p["confluent_hermite_repeated_true_det"]==0
               assert p["confluent_hermite_repeated_false_det"]!=0
+              higher=p["confluent_hermite_higher_controls"]
+              assert len(higher)==3
+              assert [h["multiplicity"] for h in higher]==[3,4,8]
+              assert all(h["true_det"]==0 and h["wrong_det"]!=0
+                         and h["curve_witness_outside_determinant"] for h in higher)
               assert len(p["cases"])==32
               assert all(c["positive_det"]==0 and c["negative_det"]!=0
                          and c["no_repeated_or_infinite_points"] for c in p["cases"])
