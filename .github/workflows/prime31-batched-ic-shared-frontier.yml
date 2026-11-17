@@ -68,6 +68,7 @@ jobs:
           set -euo pipefail
           cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
             aps-pinned/research/prime31_ic_20261115/native/examples/
+          mkdir -p primefast-pinned/examples
           cp examples/prime31_batched_ic_same_1024q.rs primefast-pinned/examples/
           python3 - <<'PY'
           from pathlib import Path
