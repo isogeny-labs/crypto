@@ -1,0 +1,59 @@
+{
+  "branch": "lane/vieta-speedup-20261117",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/isolation.jsonl",
+        "--label",
+        "vieta-selection",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "900",
+        "bash",
+        "research/vieta_coset_rust_20261115/speedup-20261117/selection-native.sh",
+        "/workspace/scratch/vieta-speedup-binaries/629a8d5c5311041d8833574c6bd9166e83577db380bb63e100a5203ce9d753cf"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T07:58:05+00:00",
+      "wall_s": 385.215
+    }
+  ],
+  "commit": "6a1540d0d80227cfea558aab0f3a5dcbaffff394",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T07:57:57+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0757Z-vieta-shared-field-selection",
+  "metrics": [],
+  "problem": "vieta-component-speedup",
+  "raw": [],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-shared-field-selection",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

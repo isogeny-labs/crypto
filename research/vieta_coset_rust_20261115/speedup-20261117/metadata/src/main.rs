@@ -79,7 +79,7 @@ fn main() {
     );
     let source = &p["arms"][0]["instrument"]["commit"];
     let arms:Vec<_>=p["arms"].as_array().unwrap().iter().map(|x|json!({"id":x["id"],"role":x["role"],"binary_sha256":x["instrument"]["binary_sha256"],"commit":x["instrument"]["commit"]})).collect();
-    let analysis = Path::new(ROOT).join("native/src/analysis.rs");
+    let analysis = Path::new(ROOT).join(p["analysis_plan"]["script"]["path"].as_str().unwrap());
     let hostpin = pin(&host, "host");
     files.push(hostpin.clone());
     let actual = runs.len();
