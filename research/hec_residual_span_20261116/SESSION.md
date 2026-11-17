@@ -1207,3 +1207,17 @@ Neednewproducer/setupgeometryorstrongcompletecostmechanism,notfurtherposthoccore
 
 ### Errors
 Postsummaryinitiallycomparedrepetitionidentifieritself; correctedcomparisonofoutcome/countfieldswithoutproducer retry. Initialunusedrankmethodwarning suppressedlocallybeforerun. NoS3/cloud.
+
+## Affine promotion bootstrap window independently checked
+
+### What was done
+Frozenb99946ccdd1 exposesfirstgroundedLPaffineexpressionson6core0streams.177originalJacobianidentitychecksand416prefixchecks pass.5of6streams have5–26explicitnonzerotargettermexpressionsbeforekuniqueness; p601/source1hasnonebeforek. Allcontrolsretained. [pcc:unverified]
+
+### Decisions made
+Validbootstrapopportunity,notindependentrow/costgain. Exactgenus2threepointinterpolationleavesquadraticresidualandatmost2newLPs; nextboundedgatecouldtestnewlabelrankwithoutsequentialanchors. Triggerdoesnotcoverfullpanel; no allgenus10xclaim. Diagnosticallvertexscansnotfreeproductionevents.
+
+### Open threads
+Prospectiveinterpolation/rankgateandcompleteadaptiveproducercostcase;homogeneousharvestingorcorelabelsubstitutionnotexcluded. g3/g4needseparateconstructionandgoalactive.
+
+### Errors
+No scientificfailure/retry/S3/cloud. Explicitnonzerotargettermisnotassumedindependentbecausecorelabelconstraints cancancelit.
