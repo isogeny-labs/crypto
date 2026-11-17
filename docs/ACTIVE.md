@@ -16,6 +16,7 @@ _(none pinned — set one with `/goal <text>`)_
 ## Active items (top = next)
 
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency, MatrixRuntime)
+- [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
