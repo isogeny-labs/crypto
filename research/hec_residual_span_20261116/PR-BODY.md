@@ -54,3 +54,7 @@ Originalg3trigonalmapconstruction: [all3fieldsadmittwoverifiedrationalmaps](rese
 ### Smith affine construction gate
 
 Six normalized maps now have exact norm and affine-equation checks under Git custody (freeze `57bf3b5d8be`). All 1,346 parameter checks and 208 quotient fibre points pass. Both maps over F61 pass the rational correspondence square test with 16 rho witnesses; both maps over F211 and both over F401 have nonsquare norm scalars, retained as obstructions. Smooth normalization and Jacobian/target transport remain open; this stage makes no speed claim. See `research/hec_residual_span_20261116/native-smith-affine/RESULTS.md`.
+
+### Extension transport boundary
+
+`SMITH-TWIST-TRANSPORT.md` derives that the four nonsquare Smith maps carry the original odd-order subgroup into Frobenius's minus eigenspace over Fp². The ordinary rational trace kills these images; Frobenius-polynomial projection cannot turn them into nonzero Fp-rational images. An extension solver could preserve k but needs a dedicated anti-invariant relation and complete cost case. Generic quartic cost with Q=p² supplies no exponent improvement against the original genus-three heuristic. This is a conditional mathematical deduction, not a measured speedup or a universal exclusion.

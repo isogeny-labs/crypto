@@ -2975,3 +2975,10 @@ What was done: freeze57bf3b5d8be hashes pass, sole invocation exit0; six exact n
 Decisions made: only both p61 maps pass square test; both p211 and both p401 maps have nonsquare norm scalar. Preserve obstructions, no twist substitution or speed claim. Git custody used, no S3 polling.
 Open threads: smooth normalization/nonhyperellipticity/Jacobian action and target transport for p61; other genera and full speed objective remain open.
 Errors: no runtime failure; unused compile helper warning only.
+
+## Smith extension transport eigenspace gate derived
+
+What was done: checked primary Proposition4/Remark4/equation11 and derived nonsquare-route Frobenius anti-invariance, odd-order injection through degree8, trace annihilation and Frobenius-polynomial descent exclusion. Added SMITH-TWIST-TRANSPORT.md.
+Decisions made: extension transport preserves k but belongs to ker(pi+1); Fp rational-point solver cannot accept it. Unrestricted quartic soft-O(p²) extension substitution gives no exponent improvement against soft-O(p^(4/3)); not a lower bound or exclusion of a purpose-built anti-invariant method.
+Open threads: canonical normalization/explicit map for rational p61 route; anti-invariant relation/cost mechanism prerequisite for p211/p401 extension work; full10x genus2+ goal active.
+Errors: no scientific execution this stage; existing own T7093 scope remains held, attach reports self-overlap.
