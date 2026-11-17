@@ -105,3 +105,9 @@ At pushed68078797efc, EXIT0. g2F101c2m35to7orbitvariables/ell7481/h1; g3F113c2m3
 ## Standard-input orbit-only runtime frozen
 
 NewT-7003lease. Extractedcore(C,D,T,ell,seed,mode)withno h/sourcepoint/knownscalar parameters. Foldedbranchstoresonlyrwalkcounts/orbitrows; Expandedsharesactiondata/explicitconstraints, Plainprefixfullsystemandnativecontrolsretained. BothreferenceandproductionomitknownhY_srowprospectively; walkRHSimpliesnormalizationtoarbitrarypublicD. Sourcevariants1/17and3targetsper3models=18fixtures, all4runtimearmsplusqualifiedperprefix/densereference. Newqualifiedcopyfrommulti dropsnormalizationonlyinbothsystems; sourceBSGSonlyfixturecompatibility, notlogoracle. Runtimeproofcontractvsheavyqualificationexplicit; validscalarcompatiblepublicinstanceassumed. Build/shellpass, source/native/binaryfreezeandGitcheckpointbeforeexecution. No timingsyet.
+
+## Standard-input production gate passes; cold comparison frozen
+
+At pushed4d7829bf85c,18source/targetfixtures(source1/17across3genera)passqualifiedreferenceand4runtimearms. Folded/Expandedscalar/trial/relationprefixesmatchexactlywithoutknownpointnormalization. Foldedstate7/5/7androwbound8/6/8verified. APIonlyC,D,T,ell,seed; h/sourceindex/expectedscalarabsent. Plainprefix/nativecontrolsallcomplete. Fullsource/table/groupqualificationoutsideentrypointsexplicitlyretained.
+
+Prospectiveproduction-costprotocol7200calls(5batches16freshcalls18one-targetworkloads5arms), equalinformationExpanded, competitivePlainPrefix/Native/AA, allsetup/LA/finalverifyincludedfromprovidedvalidpublicinstance. Commoncurve/order/sourcequalificationoutsidemeasurementforeacharmequally, notbare-curveparameterdiscoverycost. Freezeall90spreads1.25/18AA0.90–1.10/alltargetsbestcontrol>=10gate; no slowerbaselineselection. RecordT-7004claim, source/build/hash/Gitcheckpointbeforeonce-onlyexecution. Priorrecordsandtimeout/failuresremainunchanged.
