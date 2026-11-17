@@ -143,3 +143,17 @@ Run gate after release build/source checkpoint; performance and stronger reuse m
 
 ### Errors
 No runtime experiment executed yet.
+
+## Classical pencil gate passes all fixed targets
+
+### What was done
+Executed once at pushedc11cfde61ba. EXIT0; all18 original-source scalar checks pass. All31008 bucket/direct-division comparisons agree. All892 accepted rows pass polynomial reconstruction and original Jacobian relation checks. Final coefficient ranks8/6/8; first determining anchorsg2=2,g3=7–8,g4=4–7. Allrawhashesverify.
+
+### Decisions made
+Useful rank exists on this fixed panel; keep classical sieve as completing baseline. No timing claim from diagnostic executable. Production extraction must avoid exhaustive reference division and charge complete anchor scan/setup/LA/finalverify, comparing currentFolded andExpanded. Shared239 and repeated241 are ordered rejection counts, not overlapping exhaustive categories.
+
+### Open threads
+Extract standard-input runtime and freeze equivalence/cold-comparison protocol. Novel mechanism and broader10goal remain open. An existing interpolation module points to research/hec_relation_math_20261114/DERIVATION.md; that path is absent in this sparse checkout, so no claims were taken from it.
+
+### Errors
+Release debug stripping warns missingLLVMlibrary; executable completed, warning retained, no timing claim. Disable strip explicitly on next build. No reruns or anchor-budget changes.
