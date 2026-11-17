@@ -1,0 +1,62 @@
+"""Frozen source, whole evidence and new canonical claim intake only."""
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,importlib.util,json,lzma,os,re,shutil,subprocess,sys
+old=Path('/workspace/crypto');r=Path('/workspace/crypto-chained-main-validated');rel=Path('research/chained_jacobian_transfers_20261110');p=r/rel;i=p/'current-main-intake-20261116-02'
+pre=subprocess.run(['python3','tools/pcc/pcc.py','ledger','verify','--base','HEAD'],cwd=r,capture_output=True,text=True);assert pre.returncode==0,(pre.stdout,pre.stderr)
+assert len((r/'pcc/ledger.jsonl').read_text().splitlines())==1216
+source_ref='eb3e882c3c8a1525ba57100f1469f6a50cd92809';base=subprocess.check_output(['git','rev-parse','HEAD'],cwd=r,text=True).strip()
+assert base=='90ea6cb42434698be3fac9d2d012a579f298b961'
+paths=Path('/workspace/scratch/ct583-completed-finite-and-Euclid-source-paths.txt').read_text().splitlines()
+keep=[x for x in paths if any(s in x for s in ['/evidence/finite-cubic-norm-','/evidence/native-norm-Euclidean-','/report-finite-cubic-norm-08/','/report-native-norm-Euclidean-09/','/FINITE_CUBIC_NORM_08.md','/NATIVE_NORM_EUCLIDEAN_09.md','/lean/CubicFiniteNorm22308.lean','/lean/CubicNativeNormEuclid22309.lean','.github/workflows/chained-transfer-finite-cubic-norm-proof-08.yml','.github/workflows/chained-transfer-native-norm-euclid-proof-09.yml'])]
+tree=subprocess.check_output(['git','ls-tree','-r',source_ref,'--']+keep,cwd=old,text=True)
+oid={x.split('\t',1)[1]:x.split()[2]for x in tree.splitlines()};rows=[]
+for path in keep:
+ src=old/path;data=src.read_bytes()
+ blob=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+ assert blob==oid[path],(path,blob,oid[path])
+ dst=r/path;assert not dst.exists(),path;dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes(data);os.chmod(dst,0o755 if src.stat().st_mode&0o111 else 0o644)
+ rows.append(dict(path=path,bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),original_source_git_blob=blob))
+for wf in ['chained-transfer-finite-cubic-norm-proof-08.yml','chained-transfer-native-norm-euclid-proof-09.yml']:
+ dst=r/'.github/workflows'/wf;s=dst.read_text();fr=i/'frozen-original-workflows';fr.mkdir(exist_ok=True);shutil.copyfile(dst,fr/(wf+'.txt'))
+ assert s.count('b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929')==1
+ s=s.replace('b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929','cae6856e24a91aeb7b123eb189cd40e3bd2672fb9b75f7d0b213b46b9cdbfe6d')
+ s=s.replace('original dual gates09','current Root and original Consumer gates09').replace('original proof gates08','current Root and original Consumer gates08')
+ s=s.replace('original-dual-proof-gates:','current-root-original-consumer-proof-gates:').replace('Root435','CurrentRoot435').replace('entire-original-Root-tools','entire-current-Root-tools').replace('both original gate bytes','current Root and original Consumer gate bytes').replace('both original gates','current Root and original Consumer gates').replace('both unchanged original gates','current Root and original Consumer gates')
+ dst.write_text(s)
+for name in ['AuditAxioms.lean','proof-gate.sh','trusted-native.txt']:
+ for tag,repo,ref in [('original-Root',old,source_ref),('current-Root',r,base)]:
+  data=subprocess.check_output(['git','show',ref+':tools/lean/'+name],cwd=repo);d=i/'whole-proof-dependencies'/tag;d.mkdir(parents=True,exist_ok=True);(d/(name+'.txt'if name=='AuditAxioms.lean'else name)).write_bytes(data)
+shutil.copyfile('/workspace/scratch/ct586-entire-current-proof-dependency-diff.txt',i/'entire-current-proof-dependency-diff.txt')
+# Keep lossless original fork preflight and merged-head public CI evidence as entire objects.
+for source,target in [('evidence/actual-main-ledger-fork-preflight-53','whole-legacy-ledger-fork-preflight'),('evidence/actual-merged-head-entire-CI-and-distinct-failures-55','whole-actual-merged-head-CI'),('evidence/queue-actual-owner-merge-and-main-intake-57','whole-current-queue-custody'),('evidence/native-norm-Euclidean-normal-source-tag-08','whole-actual-Euclid-tag-and-post-tag-correction')]:
+ shutil.copytree(old/rel/source,i/target)
+for name in ['ct584-main-conductor-check.exit','ct584-main-conductor-check.stdout.txt','ct584-main-conductor-check.stderr.txt','ct581-queue-prose-lint.exit','ct581-queue-prose-lint.stdout.txt','ct581-queue-prose-lint.stderr.txt']:
+ shutil.copyfile('/workspace/scratch/'+name,i/name)
+bindings=[]
+for path in ['evidence/finite-cubic-norm-final-04/exact-twenty-complete-statement-bindings.json','evidence/native-norm-Euclidean-complete-types-final-05/exact-seventeen-complete-statement-bindings.json']:
+ bindings+=json.loads((p/path).read_text())
+assert len(bindings)==37
+raw=i/'whole-legacy-PCC-records';raw.mkdir()
+for row in bindings:
+ claim=row['claim'];shutil.copyfile(old/claim,raw/Path(claim).name)
+# Original reports also name these complete data observations; retain them as historical records.
+for suffix in ['121d9f','35c3a5','2a3c54','b525a5','9efd72','e9d4fe','e0cb48','576848','9e7844','e5bbb1','7faa57']:
+ fs=list((old/'pcc/claims').glob('*-'+suffix+'.json'));assert len(fs)==1;shutil.copyfile(fs[0],raw/fs[0].name)
+spec=importlib.util.spec_from_file_location('current_pcc',r/'tools/pcc/pcc.py');m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m)
+new=[]
+for row in bindings:
+ proof=row['proof'];f=r/proof['path'];assert f.is_file()
+ found=m.lean_find_declaration([f],row['theorem']);assert found and found[1]==row['normalized_statement'],row['theorem']
+ statement=row['normalized_statement'];assert hashlib.sha256(statement.encode()).hexdigest()==proof['decl_sha256']
+ a=['python3','tools/pcc/pcc.py','claim','new','--kind','theorem','--claim-type','interpretive','--scope','Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.','--statement',statement,'--proof','lean:'+json.dumps(proof,separators=(',',':'))]
+ out=subprocess.run(a,cwd=r,text=True,capture_output=True)
+ (i/('new-claim-'+row['theorem']+'.stdout.txt')).write_text(out.stdout);(i/('new-claim-'+row['theorem']+'.stderr.txt')).write_text(out.stderr);assert out.returncode==0,(out.stdout,out.stderr)
+ new.append(dict(legacy=row['claim'],canonical_new=out.stdout.strip(),theorem=row['theorem'],normalized_statement=statement,proof=proof))
+(i/'exact-thirty-seven-new-canonical-bindings.json').write_text(json.dumps(new,indent=2)+'\n')
+(i/'ACTUAL_FROZEN_SOURCE_INTAKE.json').write_text(json.dumps(dict(time=datetime.now(timezone.utc).isoformat(),base=base,original_source_ref=source_ref,all_frozen_source_rows=rows,exact_original_files=len(rows),original_file_bytes=sum(x['bytes']for x in rows),new_canonical_complete_bindings=37,proof_dependency_change='gate script bytes unchanged/mode644; auditor one comment changed, new workflows pin currentcae6856e; frozen originals retained',scope='Archival byte-identical source/evidence intake; no new Lean declaration. Six-field stronger instance gate recorded incomplete; no shared field/compiler/Jacobian/runtime/cost theorem or legacy ledger reconciliation.',ledger='Base1216 whole entries/keyring verified0 before any claim. Only current canonical CLI appended new entries; legacy and rejected001 forks retained whole and unmodified.'),indent=2)+'\n')
+shutil.copyfile(__file__,i/'entire-original-source-intake-caller.py.txt')
+queue=json.loads(json.loads((old/rel/'evidence/queue-actual-owner-merge-and-main-intake-57/ct582_queue_after.json.xz').read_bytes()if False else b'{}')if False else '{}')if False else None
+shutil.copyfile('/workspace/scratch/ct581-current-research-queue-body.md',p/'QUEUE.md')
+post=subprocess.run(['python3','tools/pcc/pcc.py','ledger','verify','--base','HEAD'],cwd=r,capture_output=True,text=True);(i/'actual-post-intake-prefix.stdout.txt').write_text(post.stdout);(i/'actual-post-intake-prefix.stderr.txt').write_text(post.stderr);assert post.returncode==0,(post.stdout,post.stderr)
+print('intake',len(rows),'bytes',sum(x['bytes']for x in rows),'newcanonical',len(new),flush=True)

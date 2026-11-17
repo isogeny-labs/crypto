@@ -1,0 +1,12 @@
+{
+  "time": "2026-11-16T22:02:54.253173+00:00",
+  "branch": "lane/chained-transfers",
+  "base": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "working_ledger_rows": 38,
+  "working_ledger_bytes": 15266,
+  "working_keyring_exists": false,
+  "original_prefix_exit": "1",
+  "cause": "Initial ENOSPC followed by sparse reapply removed the base ledger/keyring. Specific-path repair restored claim sources/tool but not base ledger/keyring; new claims started a fresh chain. No main-prefix check had been run before those claims. Later original gate caught missing/different keyring and noncanonical37-row history.",
+  "correction": "Prior canonical labels and934bce canonical-prefix interpretation are rejected for this intake. Source274/Git bytes/proofs/current replays/type extraction remain valid at their actual scope. No signed or main-prefix pass.",
+  "next": "Freeze this entire failed intake/ledger/claims/index under a separate archive branch. A distinct fully materialized-metadata checkout from exact main gets a base byte/prefix0 check BEFORE any new claim. Never rechain, delete or reset this failed fork."
+}

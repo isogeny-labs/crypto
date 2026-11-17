@@ -1,0 +1,76 @@
+{
+  "schema": "finite-cyclotomic-verification/v1",
+  "source_commit": "346e07ee23604a52edc702cda6ebbd5c57bd71f5",
+  "claim_id": "PCC-20261115-b5d0f3",
+  "declaration_sha256": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 8,
+  "gate_declarations": 23,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 88,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-b5d0f3",
+    "claim_sha256": "ac1bbef8fed0f190b71e5d7251ee218164e45fd0fea89d8ff04d685d5303154e",
+    "commit": "346e07ee23604a52edc702cda6ebbd5c57bd71f5",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/finite_cyclotomic_degree_audit_20261115/lean (CyclotomicCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T02:29:20Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-b5d0f3",
+    "claim_sha256": "ac1bbef8fed0f190b71e5d7251ee218164e45fd0fea89d8ff04d685d5303154e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46709,
+    "sha256": "16ae67189d1ae5c41c9ae1499180ccef3f614229a1cb046ea467077bbcbc0c14",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 23,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_general_cyclotomic_adjoin_degree_proved": true,
+    "actual_primitive_root_and_simple_extension_finiteness_derived": true,
+    "actual_all_root_rationality_in_finite_extensions_proved": true,
+    "actual_characteristic_p_guard_counterfamily_proved": true,
+    "r1_r2_actual_degree1_proved": true,
+    "full_geometric_elliptic_torsion_field_proved": false,
+    "general_nonprime_supersingular_at_most6_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

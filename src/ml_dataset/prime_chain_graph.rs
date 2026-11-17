@@ -743,6 +743,8 @@ mod tests {
 
     fn input(n: u32, m: usize, twist: bool) -> (Value, Value, Value) {
         let config = CaseConfig {
+                        channels: None,
+            factor_base_policy: None,
             family: "prime".into(),
             n,
             m,
@@ -755,6 +757,7 @@ mod tests {
             degree_bound: 2,
             work_limit: 0,
             solver: "f4".into(),
+            factor_base_policy: None,
         };
         let mut case = curves::generate(&config).unwrap();
         case.private_witness = Value::Null;

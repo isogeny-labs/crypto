@@ -1,0 +1,168 @@
+{
+  "schema": "native-point-hash.orchestration-qualification/v1",
+  "standing": "Unregistered producer development observations; no signed PCC or independent audit verdict.",
+  "recorded_at": "2026-11-05T17:38:18.314422+00:00",
+  "dependency_base_commit": "8c90746a23b2943a94f75558033958f31f91199e",
+  "source_manifest": {
+    "path": "research/native_point_hashing_20261105/pilot-v1/source.sha256",
+    "sha256": "1ee3ea00d368339009cb9ad546c5de30d07cdfac2d8e655e03cfb4fee1a0096c",
+    "scope": "new example/module, named native/word/statistics sources and input/protocol bytes; remaining tracked library dependencies unchanged from base commit"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "nonsecret_build_env": {
+    "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+    "PATH_prefix": "/home/agent/.cargo/bin"
+  },
+  "checks": [
+    {
+      "name": "native example development controls",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/tests.qualified.log",
+      "sha256": "ee8f56c50898750d7075b4b87f89e22368751a06d9dec3d952c661a310c65141"
+    },
+    {
+      "name": "strict release lint",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/clippy.qualified.log",
+      "sha256": "61ecc5ed790243f6ab36ca6e4c618aa9dcfdf4133b21baca6994d65dbdb3cc8e"
+    },
+    {
+      "name": "release example build",
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/build.qualified.log",
+      "sha256": "99160771dbe483d488e31470e428b71f84f0f095b8a22f1ff549edbca6d443f0"
+    },
+    {
+      "name": "changed-file format",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/native_point_hash_study.rs",
+        "examples/native_point_hash_study/pilot.rs"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/fmt.qualified.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "native blocked-card validation",
+      "argv": [
+        "cargo",
+        "run",
+        "--locked",
+        "--release",
+        "--bin",
+        "backlog",
+        "--",
+        "--root",
+        "/workspace/crypto-ecbench-hashed",
+        "validate",
+        "XP-20261105-native-point-hashing",
+        "--no-git"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/backlog.qualified.log",
+      "sha256": "9996e99684295b4f11af2f1254ac6d8e19ad687839a5643712c8a393a28075dc"
+    },
+    {
+      "name": "canonical draft protocol validator",
+      "argv": [
+        "python3",
+        "/workspace/crypto-autoresearcher/tools/experiment_protocol.py",
+        "validate",
+        "research/native_point_hashing_20261105/pilot-v1/protocol.json"
+      ],
+      "exit_code": 0,
+      "log_member": "orchestration-development/protocol.qualified.log",
+      "sha256": "13d324b2ff50846cc09909638ceac3fe38f4fcdb0c31549aad2b30f3ae6ee866"
+    }
+  ],
+  "unit_controls_passed": 15,
+  "local_binary_sha256": "55519467302784bb9b779d884523264feb77ecb1a1b7c5d2c058ace623a0840c",
+  "input_recipe": {
+    "path": "research/native_point_hashing_20261105/pilot-v1/pilot-plan.json",
+    "file_sha256": "b879734d0a51e140df59753d9179790fbbd71cce60c832dd054f03fd711ece09",
+    "logical_plan_sha256": "dbd6104f0a124920690d86fc9e2bd27d867d2b01c35f2749e6991388def46529",
+    "contexts": 32,
+    "planned_attempts": 2368
+  },
+  "real_cli_development_control": {
+    "profile": "development_f17",
+    "flow": {
+      "attempted": 76,
+      "failed": 0,
+      "finished": 76,
+      "inflight": 0,
+      "not_attempted": 0,
+      "passed": 76,
+      "planned": 76
+    },
+    "control_coverage": {
+      "contexts_checked": 2,
+      "negative_queries": 0,
+      "negative_unavailable_full_sumset_contexts": 2,
+      "positive_queries": 2,
+      "positive_unavailable_empty_base_contexts": 0
+    },
+    "all_native_batch_clocks_absent": true,
+    "commands_member": "orchestration-development/cli-qualified-commands.json",
+    "analysis_member": "orchestration-development/cli-control-qualified-analysis.json",
+    "scope": "fixed public F17 lifecycle/answer controls; not the 12/16-bit experiment"
+  },
+  "archive": {
+    "path": "research/native_point_hashing_20261105/pilot-v1/orchestration-development.tar.xz",
+    "sha256": "808ae3f1c8a1d23efd4b37c10daa2eabae2cf0a600494f0f5036f199081a51f3",
+    "bytes": 50028,
+    "files": 661,
+    "internal_manifest": "orchestration-development/SHA256SUMS",
+    "preservation": "All members checked byte-for-byte before first commit; old archives untouched."
+  },
+  "canonical_tool": {
+    "path": "/workspace/crypto-autoresearcher/tools/experiment_protocol.py",
+    "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "fetched_origin_main": "4c2a5fc99cd82b85f57cb778663a9df74a19321b",
+    "tool_schema_skill_match_current_main": true
+  },
+  "canonical_protocol_status": "draft/unfrozen; valid is not ready",
+  "production_oracle_batches_run": 0,
+  "production_timing_runs": 0,
+  "cloud_jobs_submitted": 0,
+  "unresolved": [
+    "Complete native/field/hash/allocation inventory and pricing",
+    "Native L2/host/resource/image integration",
+    "External references and masked canonical export",
+    "Test-specific power and current preflight runtime calibration",
+    "Independent audit and signed PCC standing",
+    "Merged exact-source qualification, current account/lane budget and authenticated S3/execution",
+    "Four remaining component studies and full native ECBench confirmation"
+  ]
+}

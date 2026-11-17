@@ -1,0 +1,14 @@
+{
+  "action": "Retain phase and term-count diagnostics; test polynomial-only containment checks and breadth-first coordinate propagation under unchanged caps, preserving all final membership and S-pair checks",
+  "created": "2026-11-15T21:37:48Z",
+  "evidence": [
+    "research/relation_degree_trace_20261115/integration-development/rust-post-call-03.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "codex"
+  ],
+  "trigger": "A certified polynomial constructor exhausts its proof-term cap even though polynomial outputs stay small and propagation order permits long dependency chains",
+  "why": "Certificate expansion can depend on derivation depth independently of polynomial degree; a shorter dependency path can make an otherwise capped fixed case complete"
+}

@@ -1,0 +1,44 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+error[E0599]: no method named `gcd_monic` found for struct `Poly` in the current scope
+  --> implicit.rs:18:120
+   |
+18 | ...ap(|j|mul(j as u64,q[j],r)).collect();let g=p.gcd_monic(q,&derivative,2*q.len()).map_err(|_|Error::Arithmetic)?.polynomial;let(sf...
+   |                                                  ^^^^^^^^^ method not found in `Poly`
+   |
+  ::: polynomial.rs:5:1
+   |
+ 5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+   | --------------- method `gcd_monic` not found for this struct
+
+error[E0599]: no method named `gcd_monic` found for struct `Poly` in the current scope
+  --> implicit.rs:20:14
+   |
+20 |  let out=d.p.gcd_monic(&d.q,&value,2*d.q.len()+2).map_err(|_|Error::Arithmetic)?.polynomial;
+   |              ^^^^^^^^^ method not found in `Poly`
+   |
+  ::: polynomial.rs:5:1
+   |
+ 5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+   | --------------- method `gcd_monic` not found for this struct
+
+error[E0599]: no method named `gcd_monic` found for mutable reference `&mut Poly` in the current scope
+ --> checks.rs:2:162
+  |
+2 | ...(|j|mul(j as u64,q[j],r)).collect();let g=p.gcd_monic(q,&d,2*q.len()).unwrap().polynomial;p.divrem(q,&g).unwrap().0}
+  |                                                ^^^^^^^^^ method not found in `&mut Poly`
+
+error[E0599]: no method named `gcd_monic` found for struct `Poly` in the current scope
+ --> checks.rs:6:224
+  |
+6 | ...))%r;let squarefree=sf(&mut p,&q,r);let want=p.gcd_monic(&squarefree,&dense,2*r as usize).unwrap().polynomial;assert_eq!(got.0,wan...
+  |                                                   ^^^^^^^^^ method not found in `Poly`
+  |
+ ::: polynomial.rs:5:1
+  |
+5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+  | --------------- method `gcd_monic` not found for this struct
+
+error: aborting due to 4 previous errors; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0599`.

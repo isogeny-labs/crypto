@@ -1,0 +1,61 @@
+{
+  "schema": "owned-lift-registration-correction/v1",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/home/ec2-user/ml-dataset-resume-20261029/original-owned-search-lift-proposal-20261107/registration.patch"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "error: patch failed: src/ml_dataset/sat_original_owner.rs:961\nerror: src/ml_dataset/sat_original_owner.rs: patch does not apply\n"
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/home/ec2-user/ml-dataset-resume-20261029/owned-lift-registration-correction-20261107/registration.patch"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "/home/ec2-user/ml-dataset-resume-20261029/owned-lift-registration-correction-20261107/registration.patch"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "original_patch_failed": true,
+  "corrected_patch_applies": true,
+  "patched_files_equal_expected": true,
+  "compiled": false,
+  "frozen_source_mutated": false,
+  "corrected_patch_sha256": "eef1f66c79cd4ded8bdd777ec7c7ce6de214680303a74148a52a20089762298d",
+  "inputs": [
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/ml_dataset/sat_original_owner.rs",
+      "sha256": "ced7d5501eae838509feeb0bc11515506dcfcc7aef5368ba040fc6cf938c533b",
+      "bytes": 38231,
+      "relative_path": "src/ml_dataset/sat_original_owner.rs"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-native-recovery-20261107/source/src/cryptanalysis/binary_semaev_chain_provenance.rs",
+      "sha256": "8f6db226f3fa6c4583e8a53fe4bf0fb25d3d7031cd1d307634de3dc17cdfe06d",
+      "bytes": 37219,
+      "relative_path": "src/cryptanalysis/binary_semaev_chain_provenance.rs"
+    }
+  ],
+  "outputs": {
+    "src/ml_dataset/sat_original_owner.rs": "b700c674264c562251149f65211c2b8aa70d3bf3b94ecce38f78317cda02c109",
+    "src/cryptanalysis/binary_semaev_chain_provenance.rs": "0e25d0e930d0434edf9f791a8ccc8e406bc9906c3bb8da02387d216bdef1fd0d"
+  }
+}

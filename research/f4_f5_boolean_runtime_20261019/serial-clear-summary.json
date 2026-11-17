@@ -1,0 +1,1164 @@
+{
+  "host": {
+    "binary_sha256": "aca412b2dcd213d723b7b9d69bc2f341618a77f07a68698952ed28801bf0d5a4  target/release/examples/f4_f5_boolean_perf\n6dc41e3be4a6e0ecddcbb5e7715a46c7caf32d0114ce3a4a194a7d30ee3538fb  target/release/isolated_bench\n",
+    "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+    "cpu_manifest": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  8\nOn-line CPU(s) list:                     0-7\nVendor ID:                               GenuineIntel\nBIOS Vendor ID:                          Intel(R) Corporation\nModel name:                              Intel(R) Xeon(R) Platinum 8488C\nBIOS Model name:                         Intel(R) Xeon(R) Platinum 8488C\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      4\nSocket(s):                               1\nStepping:                                8\nBogoMIPS:                                4800.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq monitor ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 wbnoinvd ida arat avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq rdpid cldemote movdiri movdir64b md_clear serialize amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               192 KiB (4 instances)\nL1i cache:                               128 KiB (4 instances)\nL2 cache:                                8 MiB (4 instances)\nL3 cache:                                105 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-7\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n",
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+    "reserved_cpus": "one=3,7\nfour=3,7,2,6\n",
+    "source_sha256": "04305eb8b539d88e341bab20d4022625bc774b46347fba8a9b37ccb1844e1251  src/cryptanalysis/gf2_elim.rs\nf5f20eb0c107269b575f0501a575940c19e3dea360b967b2127f833424930034  examples/f4_f5_boolean_perf.rs\n"
+  },
+  "matrices": [
+    {
+      "aa_ratios": [
+        1.009634710906078,
+        0.9957904024457577,
+        0.9914929964344167,
+        1.00328025877328,
+        0.9946188040999461
+      ],
+      "after": {
+        "max_ms": 7.223279,
+        "max_ns": 7223279.0,
+        "median_ms": 7.181748,
+        "median_ns": 7181748.0,
+        "min_ms": 7.122142,
+        "min_ns": 7122142.0,
+        "n": 5,
+        "samples_ns": [
+          7162824.0,
+          7188728.0,
+          7223279.0,
+          7122142.0,
+          7181748.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 7.501467,
+        "max_ns": 7501467.0,
+        "median_ms": 7.483316,
+        "median_ns": 7483316.0,
+        "min_ms": 7.421483,
+        "min_ns": 7421483.0,
+        "n": 5,
+        "samples_ns": [
+          7501467.0,
+          7421483.0,
+          7483316.0,
+          7490160.0,
+          7447346.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.0053811959000539256,
+        "ci95": [
+          1.032377772535002,
+          1.05167237609135
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0472778613574758,
+          1.032377772535002,
+          1.0359998554673022,
+          1.05167237609135,
+          1.036982361397253
+        ],
+        "reference_over_candidate": 1.036982361397253
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n17-s230-w1-0-a-0",
+          "paired/matrix-f4-n17-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-1-a-0",
+          "paired/matrix-f4-n17-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-2-a-0",
+          "paired/matrix-f4-n17-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-3-a-0",
+          "paired/matrix-f4-n17-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w1-4-a-0",
+          "paired/matrix-f4-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5438747
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9935804255919187,
+        1.0146946517809365,
+        1.001194831039371,
+        0.9915623536357461,
+        1.0256411473444675
+      ],
+      "after": {
+        "max_ms": 58.328009,
+        "max_ns": 58328009.0,
+        "median_ms": 57.737603,
+        "median_ns": 57737603.0,
+        "min_ms": 56.874687,
+        "min_ns": 56874687.0,
+        "n": 5,
+        "samples_ns": [
+          56874687.0,
+          57301214.0,
+          57737603.0,
+          58328009.0,
+          57835876.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 62.290674,
+        "max_ns": 62290674.0,
+        "median_ms": 61.374253,
+        "median_ns": 61374253.0,
+        "min_ms": 61.288365,
+        "min_ns": 61288365.0,
+        "n": 5,
+        "samples_ns": [
+          61343128.0,
+          61714501.0,
+          62290674.0,
+          61374253.0,
+          61288365.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.008437646364253926,
+        "ci95": [
+          1.0522260926135847,
+          1.07885798445772
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0785664279787597,
+          1.0770190837492553,
+          1.07885798445772,
+          1.0522260926135847,
+          1.0596945916406626
+        ],
+        "reference_over_candidate": 1.0770190837492553
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s230-w1-0-a-0",
+          "paired/matrix-f4-n23-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-1-a-1",
+          "paired/matrix-f4-n23-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-2-a-0",
+          "paired/matrix-f4-n23-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-3-a-0",
+          "paired/matrix-f4-n23-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w1-4-a-0",
+          "paired/matrix-f4-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        90002176
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9892067048099885,
+        0.9992560035162668,
+        0.9915716902898921,
+        0.9993327231088984,
+        1.0003058972135666
+      ],
+      "after": {
+        "max_ms": 58.454487,
+        "max_ns": 58454487.0,
+        "median_ms": 57.971244,
+        "median_ns": 57971244.0,
+        "min_ms": 57.562788,
+        "min_ns": 57562788.0,
+        "n": 5,
+        "samples_ns": [
+          57562788.0,
+          57971244.0,
+          57657823.0,
+          58454487.0,
+          58192007.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 62.242458,
+        "max_ns": 62242458.0,
+        "median_ms": 62.00683,
+        "median_ns": 62006830.0,
+        "min_ms": 61.687894,
+        "min_ns": 61687894.0,
+        "n": 5,
+        "samples_ns": [
+          62006830.0,
+          61687894.0,
+          61878064.0,
+          62242458.0,
+          62224037.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.0007439964837332447,
+        "ci95": [
+          1.0641119586807555,
+          1.0772033835470234
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0772033835470234,
+          1.0641119586807555,
+          1.0731945949468122,
+          1.0648020570260073,
+          1.0692883818219228
+        ],
+        "reference_over_candidate": 1.0692883818219228
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 231,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s231-w1-0-a-0",
+          "paired/matrix-f4-n23-s231-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-1-a-0",
+          "paired/matrix-f4-n23-s231-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-2-a-0",
+          "paired/matrix-f4-n23-s231-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-3-a-0",
+          "paired/matrix-f4-n23-s231-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s231-w1-4-a-0",
+          "paired/matrix-f4-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "93f3fddaaa82b484d44188a72ed81f7757d00b3b84dd66fbef5a6b99d3e297c8",
+        "e328c866f65be47c3b45c412d6ff5d4ccdb38306e32567666c2174fb7e711f9a",
+        11415172693370771636,
+        5289,
+        89507694
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0038130710270725,
+        1.0337115321758958,
+        1.0179160039692392,
+        0.9933943230512268,
+        1.0079450891816366
+      ],
+      "after": {
+        "max_ms": 58.421062,
+        "max_ns": 58421062.0,
+        "median_ms": 57.538018,
+        "median_ns": 57538018.0,
+        "min_ms": 56.617836,
+        "min_ns": 56617836.0,
+        "n": 5,
+        "samples_ns": [
+          58110344.0,
+          57389101.0,
+          57538018.0,
+          56617836.0,
+          58421062.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 62.228805,
+        "max_ns": 62228805.0,
+        "median_ms": 61.465982,
+        "median_ns": 61465982.0,
+        "min_ms": 60.775261,
+        "min_ns": 60775261.0,
+        "n": 5,
+        "samples_ns": [
+          61165661.0,
+          61465982.0,
+          60775261.0,
+          61556915.0,
+          62228805.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.007945089181636611,
+        "ci95": [
+          1.0525778508556067,
+          1.0872353899220026
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0525778508556067,
+          1.0710392901955372,
+          1.0562626783564217,
+          1.0872353899220026,
+          1.065177572430984
+        ],
+        "reference_over_candidate": 1.065177572430984
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 232,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s232-w1-0-a-0",
+          "paired/matrix-f4-n23-s232-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-1-a-0",
+          "paired/matrix-f4-n23-s232-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-2-a-0",
+          "paired/matrix-f4-n23-s232-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-3-a-1",
+          "paired/matrix-f4-n23-s232-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s232-w1-4-a-0",
+          "paired/matrix-f4-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "3e893a57df88197ae495f40c23c42aca9cbed5f8d82bd2caed6a98671577cce1",
+        "833b251b808477a488329ac4438cbf86ecca3e058a22ebda5eb22d9de9b96c94",
+        578512194706274304,
+        5289,
+        89752480
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9945926239165189,
+        0.9989874625812286,
+        1.0147141382233418,
+        0.9952884481697023,
+        1.0037921732866395
+      ],
+      "after": {
+        "max_ms": 7.814362,
+        "max_ns": 7814362.0,
+        "median_ms": 7.78681,
+        "median_ns": 7786810.0,
+        "min_ms": 7.73885,
+        "min_ns": 7738850.0,
+        "n": 5,
+        "samples_ns": [
+          7765802.0,
+          7804634.0,
+          7814362.0,
+          7786810.0,
+          7738850.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 8.032921,
+        "max_ns": 8032921.0,
+        "median_ms": 8.017483,
+        "median_ns": 8017483.0,
+        "min_ms": 7.978967,
+        "min_ns": 7978967.0,
+        "n": 5,
+        "samples_ns": [
+          7978967.0,
+          7982901.0,
+          8032921.0,
+          8025649.0,
+          8017483.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.0047115518302977,
+        "ci95": [
+          1.0228411735899468,
+          1.0360044451048929
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0274491932707015,
+          1.0228411735899468,
+          1.0279688860075844,
+          1.0306722521802896,
+          1.0360044451048929
+        ],
+        "reference_over_candidate": 1.0279688860075844
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n17-s230-w1-0-a-0",
+          "paired/matrix-f5-n17-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-1-a-0",
+          "paired/matrix-f5-n17-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-2-a-0",
+          "paired/matrix-f5-n17-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-3-a-0",
+          "paired/matrix-f5-n17-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w1-4-a-0",
+          "paired/matrix-f5-n17-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5034019
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        0.9830765175404432,
+        1.00495418570632,
+        0.9862637566722262,
+        1.0047968195985515,
+        1.0102972228694047
+      ],
+      "after": {
+        "max_ms": 61.983029,
+        "max_ns": 61983029.0,
+        "median_ms": 61.255963,
+        "median_ns": 61255963.0,
+        "min_ms": 61.2033,
+        "min_ns": 61203300.0,
+        "n": 5,
+        "samples_ns": [
+          61251801.0,
+          61203300.0,
+          61255963.0,
+          61644226.0,
+          61983029.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 65.877635,
+        "max_ns": 65877635.0,
+        "median_ms": 65.628726,
+        "median_ns": 65628726.0,
+        "min_ms": 65.224087,
+        "min_ns": 65224087.0,
+        "n": 5,
+        "samples_ns": [
+          65246319.0,
+          65877635.0,
+          65727266.0,
+          65628726.0,
+          65224087.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.01029722286940471,
+        "ci95": [
+          1.0522894420019389,
+          1.0763739046750747
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02059444573880942,
+        "paired_samples": 5,
+        "ratios": [
+          1.0652147028297176,
+          1.0763739046750747,
+          1.0729937589912675,
+          1.064637035105283,
+          1.0522894420019389
+        ],
+        "reference_over_candidate": 1.0652147028297176
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s230-w1-0-a-0",
+          "paired/matrix-f5-n23-s230-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-1-a-0",
+          "paired/matrix-f5-n23-s230-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-2-a-1",
+          "paired/matrix-f5-n23-s230-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-3-a-0",
+          "paired/matrix-f5-n23-s230-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w1-4-a-0",
+          "paired/matrix-f5-n23-s230-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        83289643
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0110757976222635,
+        1.0304741574800929,
+        1.0125797969571588,
+        0.9917606894062754,
+        1.0070855741267069
+      ],
+      "after": {
+        "max_ms": 62.377319,
+        "max_ns": 62377319.0,
+        "median_ms": 61.387542,
+        "median_ns": 61387542.0,
+        "min_ms": 60.938622,
+        "min_ns": 60938622.0,
+        "n": 5,
+        "samples_ns": [
+          61448369.0,
+          61387542.0,
+          62377319.0,
+          60938622.0,
+          61002567.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 66.35677,
+        "max_ns": 66356770.0,
+        "median_ms": 65.378378,
+        "median_ns": 65378378.0,
+        "min_ms": 64.588681,
+        "min_ns": 64588681.0,
+        "n": 5,
+        "samples_ns": [
+          66356770.0,
+          65941885.0,
+          64588681.0,
+          65378378.0,
+          65063698.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.011075797622263517,
+        "ci95": [
+          1.0354513793707614,
+          1.0798784586129535
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.022151595244527034,
+        "paired_samples": 5,
+        "ratios": [
+          1.0798784586129535,
+          1.074190020509373,
+          1.0354513793707614,
+          1.0728561929083333,
+          1.066573116505081
+        ],
+        "reference_over_candidate": 1.0728561929083333
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 231,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s231-w1-0-a-0",
+          "paired/matrix-f5-n23-s231-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-1-a-0",
+          "paired/matrix-f5-n23-s231-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-2-a-0",
+          "paired/matrix-f5-n23-s231-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-3-a-0",
+          "paired/matrix-f5-n23-s231-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s231-w1-4-a-0",
+          "paired/matrix-f5-n23-s231-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "93f3fddaaa82b484d44188a72ed81f7757d00b3b84dd66fbef5a6b99d3e297c8",
+        "e328c866f65be47c3b45c412d6ff5d4ccdb38306e32567666c2174fb7e711f9a",
+        11415172693370771636,
+        5289,
+        82962324
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.0058739595276665,
+        0.9905064950225467,
+        1.0006026124553353,
+        0.9979624369191624,
+        1.0020633682019573
+      ],
+      "after": {
+        "max_ms": 61.696983,
+        "max_ns": 61696983.0,
+        "median_ms": 61.327384,
+        "median_ns": 61327384.0,
+        "min_ms": 60.810682,
+        "min_ns": 60810682.0,
+        "n": 5,
+        "samples_ns": [
+          61696983.0,
+          61327384.0,
+          61187442.0,
+          60810682.0,
+          61421910.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 65.656836,
+        "max_ns": 65656836.0,
+        "median_ms": 65.158375,
+        "median_ns": 65158375.0,
+        "min_ms": 64.407713,
+        "min_ns": 64407713.0,
+        "n": 5,
+        "samples_ns": [
+          64407713.0,
+          65158375.0,
+          64834193.0,
+          65656836.0,
+          65229620.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.002063368201957294,
+        "ci95": [
+          1.0439361840432295,
+          1.0796924790286022
+        ],
+        "decision": "faster",
+        "effect_threshold": 0.02,
+        "paired_samples": 5,
+        "ratios": [
+          1.0439361840432295,
+          1.0624678691659177,
+          1.0595996642579044,
+          1.0796924790286022,
+          1.0619926993478386
+        ],
+        "reference_over_candidate": 1.0619926993478386
+      },
+      "interpretation": "incremental one-worker matrix dispatch",
+      "n": 23,
+      "seed": 232,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s232-w1-0-a-0",
+          "paired/matrix-f5-n23-s232-w1-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-1-a-0",
+          "paired/matrix-f5-n23-s232-w1-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-2-a-0",
+          "paired/matrix-f5-n23-s232-w1-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-3-a-0",
+          "paired/matrix-f5-n23-s232-w1-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s232-w1-4-a-0",
+          "paired/matrix-f5-n23-s232-w1-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "3e893a57df88197ae495f40c23c42aca9cbed5f8d82bd2caed6a98671577cce1",
+        "833b251b808477a488329ac4438cbf86ecca3e058a22ebda5eb22d9de9b96c94",
+        578512194706274304,
+        5289,
+        83070788
+      ],
+      "workers": 1
+    },
+    {
+      "aa_ratios": [
+        1.075970295718888,
+        1.1293237681074417,
+        1.07435407510035,
+        0.9043781287561531,
+        1.0225471892878808
+      ],
+      "after": {
+        "max_ms": 10.062153,
+        "max_ns": 10062153.0,
+        "median_ms": 9.878646,
+        "median_ns": 9878646.0,
+        "min_ms": 9.687971,
+        "min_ns": 9687971.0,
+        "n": 5,
+        "samples_ns": [
+          9929369.0,
+          9878646.0,
+          9810935.0,
+          10062153.0,
+          9687971.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 8.42937,
+        "max_ns": 8429370.0,
+        "median_ms": 8.335703,
+        "median_ns": 8335703.0,
+        "min_ms": 8.17284,
+        "min_ns": 8172840.0,
+        "n": 5,
+        "samples_ns": [
+          8429370.0,
+          8313722.0,
+          8342798.0,
+          8335703.0,
+          8172840.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.07597029571888791,
+        "ci95": [
+          0.828421412395538,
+          0.8503570760585001
+        ],
+        "decision": "slower",
+        "effect_threshold": 0.15194059143777583,
+        "paired_samples": 5,
+        "ratios": [
+          0.8489330993741898,
+          0.8415851727048423,
+          0.8503570760585001,
+          0.828421412395538,
+          0.8436069843726823
+        ],
+        "reference_over_candidate": 0.8436069843726823
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n17-s230-w4-0-a-0",
+          "paired/matrix-f4-n17-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-1-a-0",
+          "paired/matrix-f4-n17-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-2-a-0",
+          "paired/matrix-f4-n17-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-3-a-0",
+          "paired/matrix-f4-n17-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n17-s230-w4-4-a-0",
+          "paired/matrix-f4-n17-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5438747
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.0063072870778957,
+        0.9525853945565894,
+        0.9389688887121548,
+        0.9945100994832737,
+        0.944215642265493
+      ],
+      "after": {
+        "max_ms": 65.132779,
+        "max_ns": 65132779.0,
+        "median_ms": 64.784855,
+        "median_ns": 64784855.0,
+        "min_ms": 63.266518,
+        "min_ns": 63266518.0,
+        "n": 5,
+        "samples_ns": [
+          64784855.0,
+          64985027.0,
+          64521377.0,
+          63266518.0,
+          65132779.0
+        ]
+      },
+      "arm": "matrix-f4",
+      "before": {
+        "max_ms": 66.812735,
+        "max_ns": 66812735.0,
+        "median_ms": 65.169745,
+        "median_ns": 65169745.0,
+        "min_ms": 64.453774,
+        "min_ns": 64453774.0,
+        "n": 5,
+        "samples_ns": [
+          65559383.0,
+          66812735.0,
+          64811476.0,
+          65169745.0,
+          64453774.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.047414605443410585,
+        "ci95": [
+          0.9895750648072301,
+          1.0300826892354025
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.09482921088682117,
+        "paired_samples": 5,
+        "ratios": [
+          1.0119553867952626,
+          1.0281250633318963,
+          1.004496168765896,
+          1.0300826892354025,
+          0.9895750648072301
+        ],
+        "reference_over_candidate": 1.0119553867952626
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f4-n23-s230-w4-0-a-0",
+          "paired/matrix-f4-n23-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-1-a-0",
+          "paired/matrix-f4-n23-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-2-a-0",
+          "paired/matrix-f4-n23-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-3-a-0",
+          "paired/matrix-f4-n23-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f4-n23-s230-w4-4-a-0",
+          "paired/matrix-f4-n23-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        90002176
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.1680645414075828,
+        1.0955047121156136,
+        1.0840359373892343,
+        1.0267759614070118,
+        1.0715715745211292
+      ],
+      "after": {
+        "max_ms": 9.873749,
+        "max_ns": 9873749.0,
+        "median_ms": 8.455091,
+        "median_ns": 8455091.0,
+        "min_ms": 8.433372,
+        "min_ns": 8433372.0,
+        "n": 5,
+        "samples_ns": [
+          8433372.0,
+          8453757.0,
+          8455091.0,
+          9389768.0,
+          9873749.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 9.922189,
+        "max_ns": 9922189.0,
+        "median_ms": 9.237348,
+        "median_ns": 9237348.0,
+        "min_ms": 8.613058,
+        "min_ns": 8613058.0,
+        "n": 5,
+        "samples_ns": [
+          9266557.0,
+          8834856.0,
+          9237348.0,
+          8613058.0,
+          9922189.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.08403593738923432,
+        "ci95": [
+          0.9172812363415156,
+          1.098796187337639
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.16807187477846863,
+        "paired_samples": 5,
+        "ratios": [
+          1.098796187337639,
+          1.0450804299200935,
+          1.0925190515394807,
+          0.9172812363415156,
+          1.0049059379573049
+        ],
+        "reference_over_candidate": 1.0450804299200935
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "n": 17,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n17-s230-w4-0-a-1",
+          "paired/matrix-f5-n17-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-1-a-0",
+          "paired/matrix-f5-n17-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-2-a-0",
+          "paired/matrix-f5-n17-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-3-a-0",
+          "paired/matrix-f5-n17-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n17-s230-w4-4-a-0",
+          "paired/matrix-f5-n17-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "ab68d13ea995d0d78264233e472fac15f9beeb65c64cff1a3129567a228b2204",
+        "f97181f387bca981402ae4896c822420440e15b8c87cfd2077ce1aafbd6c47a7",
+        8210223413033996912,
+        2056,
+        5034019
+      ],
+      "workers": 4
+    },
+    {
+      "aa_ratios": [
+        1.0040713914782355,
+        0.9485758554099752,
+        0.9639940338499027,
+        1.0252902053770747,
+        0.9427379889330523
+      ],
+      "after": {
+        "max_ms": 67.132621,
+        "max_ns": 67132621.0,
+        "median_ms": 63.691338,
+        "median_ns": 63691338.0,
+        "min_ms": 60.311528,
+        "min_ns": 60311528.0,
+        "n": 5,
+        "samples_ns": [
+          60311528.0,
+          63691338.0,
+          65391903.0,
+          67132621.0,
+          61888951.0
+        ]
+      },
+      "arm": "matrix-f5",
+      "before": {
+        "max_ms": 65.087383,
+        "max_ns": 65087383.0,
+        "median_ms": 64.360813,
+        "median_ns": 64360813.0,
+        "min_ms": 62.370718,
+        "min_ns": 62370718.0,
+        "n": 5,
+        "samples_ns": [
+          65087383.0,
+          64360813.0,
+          62370718.0,
+          64689510.0,
+          62387413.0
+        ]
+      },
+      "comparison": {
+        "aa_absolute_noise": 0.036005966150097324,
+        "ci95": [
+          0.9537987906545555,
+          1.0791864367953006
+        ],
+        "decision": "neutral",
+        "effect_threshold": 0.07201193230019465,
+        "paired_samples": 5,
+        "ratios": [
+          1.0791864367953006,
+          1.0105112409477095,
+          0.9537987906545555,
+          0.9636076923020777,
+          1.0080541355435158
+        ],
+        "reference_over_candidate": 1.0080541355435158
+      },
+      "interpretation": "unchanged-path negative control; no algorithmic gain inferred",
+      "n": 23,
+      "seed": 230,
+      "sources": [
+        [
+          "paired/matrix-f5-n23-s230-w4-0-a-0",
+          "paired/matrix-f5-n23-s230-w4-0-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-1-a-0",
+          "paired/matrix-f5-n23-s230-w4-1-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-2-a-0",
+          "paired/matrix-f5-n23-s230-w4-2-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-3-a-0",
+          "paired/matrix-f5-n23-s230-w4-3-b-0"
+        ],
+        [
+          "paired/matrix-f5-n23-s230-w4-4-a-0",
+          "paired/matrix-f5-n23-s230-w4-4-b-0"
+        ]
+      ],
+      "verified_output": [
+        "a0a37969916d31483a539b73a8af9517307abecedc3c96643200f807786445a5",
+        "02848175d80bd284ab41ce72b6481831c32a7ec0d8dacf0f9eac0181c4a0eb65",
+        17122191889986202511,
+        5289,
+        83289643
+      ],
+      "workers": 4
+    }
+  ],
+  "rejected_attempts": [
+    {
+      "name": "controls/matrix-f4-n23-s230-w1-0-a-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "paired/matrix-f4-n23-s230-w1-1-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "controls/matrix-f4-n23-s232-w1-2-a-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "paired/matrix-f4-n23-s232-w1-3-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "paired/matrix-f5-n23-s230-w1-2-a-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "controls/matrix-f5-n23-s230-w1-4-a-0",
+      "reason": "failed or contended isolation"
+    },
+    {
+      "name": "paired/matrix-f5-n17-s230-w4-0-a-0",
+      "reason": "exit 1"
+    },
+    {
+      "name": "controls/matrix-f5-n17-s230-w4-4-a-0",
+      "reason": "failed or contended isolation"
+    }
+  ],
+  "schema": "boolean-serial-clear/v1",
+  "scope": "Same-binary opt-in serial row clearing, all other switches fixed. One-worker matrix calls only; four-worker unchanged-path controls. No complete-root or decomposition speed claim."
+}

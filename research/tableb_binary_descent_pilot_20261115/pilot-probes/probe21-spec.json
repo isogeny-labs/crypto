@@ -1,0 +1,110 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "tableb_binary_descent_pilot_20261115 n21 (pilot, not data)",
+ "description": "Pilot: descent-algebraic m=3 vs ksum5 vs tuned pair-table incumbent. Public synthetic curve; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 21,
+    "modulus": 2097157,
+    "a": 1,
+    "b": 1797947,
+    "group_order": 2094562,
+    "r": 1047281,
+    "gx": 232919,
+    "gy": 1480205
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261115821,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc-n62",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=62,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "desc3-D6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=6",
+     "oracle": "descent-algebraic:m=3",
+     "solver": "f4-f2",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "desc3-D7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=7",
+     "oracle": "descent-algebraic:m=3",
+     "solver": "f4-f2",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "desc3-D8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "descent-algebraic:m=3",
+     "solver": "f4-f2",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261115921,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

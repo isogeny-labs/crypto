@@ -5,8 +5,8 @@
 - 16:07:43Z "Pod was terminated in response to imminent node shutdown"
   (Spot interruption); container exit 143; Job failed (backoffLimit 0).
 - The exit handler uploaded 25 files; `sha256sum -c SHA256SUMS` passes locally.
-  Six m = 2 negative-control records are complete (k0n23, k1n29, k0n31 × both
-  engines); the seventh (k0n37, chain-s3-orbit) was in flight (empty stubs).
+  Six m = 2 negative-control records are complete (icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5 × both
+  engines); the seventh (icv1-f2m37-tm534059-32aad96b, chain-s3-orbit) was in flight (empty stubs).
 - Defect: `job-exit.json` says exit_code 0 because job-lib.sh traps EXIT but not
   TERM; Kubernetes records the true 143. Not fixed in the frozen image; the
   retry's records are read with the pod status beside them.

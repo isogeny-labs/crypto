@@ -1,0 +1,81 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "commit": {
+      "sha": "52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+      "message": "Move PR data files to the artifact store",
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+      "diff": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"fixed-twisted-pair-expected-native-02.json.xz\": {\"sha256\": \"9a7dd1f35ae6f87a0c412d7de5cded1730417978c3820e1092ce1dc4858ceb70\", \"bytes\": 507420},\n+  \"fixed-twisted-pair-whole-native-02.txt.xz\": {\"sha256\": \"bdf6d6df5f6311040d9d2d92c940475ad060df25add8182a47775de59b77567b\", \"bytes\": 274196},\n+  \"observer-partial-old-whole-parity-04.json.xz\": {\"sha256\": \"6ec50264ca07ef781e4acbbf62ce5e71fbc2684c3ffc2c4968792c169297e4e9\", \"bytes\": 109900},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"ef28548f97e0b18f7f1cab5ac8425b4c300d718fbd7a57bf345e88907c92bf3d\", \"bytes\": 542076},\n+  \"whole-members.json\": {\"sha256\": \"6fc557c56897ebdc990ffb774404445f1a0d5eaba03547a1b039da7c29adff8d\", \"bytes\": 2943125},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\": {\"sha256\": \"8e3b52c2f98aef83f8e728faa736658bbcca74352a6463313cc4d83b465a4b13\", \"bytes\": 83886080},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\": {\"sha256\": \"7139fa7325360fdd1a46f9853aaee0d1ddcdbcdd62e052c65f00f7a91247c917\", \"bytes\": 66181064}\n+ }\n+}\n@@ -1,2 +1,12 @@\n # Original rejected archive is reconstructed from the exact ordered parts; no single-object publication is claimed.\n whole-twisted-pair-census-and-closed-captures.tar.xz\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/fixed-twisted-pair-expected-native-02.json.xz\n+/fixed-twisted-pair-whole-native-02.txt.xz\n+/observer-partial-old-whole-parity-04.json.xz\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\n+# <<< artifacts\n\n\n\n\n\n\n",
+      "files": [
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/.artifacts.json",
+          "patch": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"fixed-twisted-pair-expected-native-02.json.xz\": {\"sha256\": \"9a7dd1f35ae6f87a0c412d7de5cded1730417978c3820e1092ce1dc4858ceb70\", \"bytes\": 507420},\n+  \"fixed-twisted-pair-whole-native-02.txt.xz\": {\"sha256\": \"bdf6d6df5f6311040d9d2d92c940475ad060df25add8182a47775de59b77567b\", \"bytes\": 274196},\n+  \"observer-partial-old-whole-parity-04.json.xz\": {\"sha256\": \"6ec50264ca07ef781e4acbbf62ce5e71fbc2684c3ffc2c4968792c169297e4e9\", \"bytes\": 109900},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"ef28548f97e0b18f7f1cab5ac8425b4c300d718fbd7a57bf345e88907c92bf3d\", \"bytes\": 542076},\n+  \"whole-members.json\": {\"sha256\": \"6fc557c56897ebdc990ffb774404445f1a0d5eaba03547a1b039da7c29adff8d\", \"bytes\": 2943125},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\": {\"sha256\": \"8e3b52c2f98aef83f8e728faa736658bbcca74352a6463313cc4d83b465a4b13\", \"bytes\": 83886080},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\": {\"sha256\": \"7139fa7325360fdd1a46f9853aaee0d1ddcdbcdd62e052c65f00f7a91247c917\", \"bytes\": 66181064}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/.gitignore",
+          "patch": "@@ -1,2 +1,12 @@\n # Original rejected archive is reconstructed from the exact ordered parts; no single-object publication is claimed.\n whole-twisted-pair-census-and-closed-captures.tar.xz\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/fixed-twisted-pair-expected-native-02.json.xz\n+/fixed-twisted-pair-whole-native-02.txt.xz\n+/observer-partial-old-whole-parity-04.json.xz\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/fixed-twisted-pair-expected-native-02.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/fixed-twisted-pair-whole-native-02.txt.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/observer-partial-old-whole-parity-04.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/whole-current-inputs.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/whole-members.json",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-twisted-pair-census-handoff-19/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001",
+          "patch": null
+        }
+      ],
+      "repository_full_name": "isogeny-labs/crypto",
+      "comments": null,
+      "author": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "committer": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "created_at": "2026-11-14T23:14:37Z",
+      "git_author_email": null,
+      "display_url": "https://github.com/isogeny-labs/crypto/commit/52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+      "display_title": "Move PR data files to the artifact store"
+    },
+    "url": "https://github.com/isogeny-labs/crypto/commit/52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+    "title": "Move PR data files to the artifact store",
+    "diff": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"fixed-twisted-pair-expected-native-02.json.xz\": {\"sha256\": \"9a7dd1f35ae6f87a0c412d7de5cded1730417978c3820e1092ce1dc4858ceb70\", \"bytes\": 507420},\n+  \"fixed-twisted-pair-whole-native-02.txt.xz\": {\"sha256\": \"bdf6d6df5f6311040d9d2d92c940475ad060df25add8182a47775de59b77567b\", \"bytes\": 274196},\n+  \"observer-partial-old-whole-parity-04.json.xz\": {\"sha256\": \"6ec50264ca07ef781e4acbbf62ce5e71fbc2684c3ffc2c4968792c169297e4e9\", \"bytes\": 109900},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"ef28548f97e0b18f7f1cab5ac8425b4c300d718fbd7a57bf345e88907c92bf3d\", \"bytes\": 542076},\n+  \"whole-members.json\": {\"sha256\": \"6fc557c56897ebdc990ffb774404445f1a0d5eaba03547a1b039da7c29adff8d\", \"bytes\": 2943125},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\": {\"sha256\": \"8e3b52c2f98aef83f8e728faa736658bbcca74352a6463313cc4d83b465a4b13\", \"bytes\": 83886080},\n+  \"whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\": {\"sha256\": \"7139fa7325360fdd1a46f9853aaee0d1ddcdbcdd62e052c65f00f7a91247c917\", \"bytes\": 66181064}\n+ }\n+}\n@@ -1,2 +1,12 @@\n # Original rejected archive is reconstructed from the exact ordered parts; no single-object publication is claimed.\n whole-twisted-pair-census-and-closed-captures.tar.xz\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/fixed-twisted-pair-expected-native-02.json.xz\n+/fixed-twisted-pair-whole-native-02.txt.xz\n+/observer-partial-old-whole-parity-04.json.xz\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0000\n+/whole-twisted-pair-census-and-closed-captures.tar.xz.part-0001\n+# <<< artifacts\n\n\n\n\n\n\n",
+    "display_url": "https://github.com/isogeny-labs/crypto/commit/52a6443b5ba8f43c68d4881586b13a64e1e149bf",
+    "display_title": "Move PR data files to the artifact store"
+  },
+  "isError": false
+}

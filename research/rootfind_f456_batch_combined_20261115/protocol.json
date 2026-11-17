@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ROOTFIND-F456-BATCH-COMBINED-K13-20261115",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-15",
   "repository": "crypto",
   "study_dir": "research/rootfind_f456_batch_combined_20261115",
@@ -720,7 +720,7 @@
   "analysis_plan": {
     "script": {
       "path": "research/rootfind_f456_batch_combined_20261115/analyze.py",
-      "sha256": "89fb800fea4a0adc6c9a9a4844e41becf84288dc016b8857f6768c0971f4199a"
+      "sha256": "96164aebfb626d9add02d0dfb1cecbd0f86644f3e6c229bc2336d60178825bc2"
     },
     "inputs": [
       "sessions/K13/records.jsonl",
@@ -802,13 +802,27 @@
       "supersedes_fields": [
         "analysis_plan.script.sha256"
       ]
+    },
+    {
+      "id": "A2-ANALYSIS-CUSTODY",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "A pre-data synthetic control showed that the fixed-wall analyzer could report a complete passing panel with zero per-record work rows, and source inspection showed comparison-specific bootstrap seeds despite the protocol's single frozen seed.",
+      "changes": [
+        "Require exactly one ecbench work result for each of the 560 unique execution record IDs before the panel can be complete; retain Err work results as incomplete secondary work, not invalid wall timing.",
+        "Use the frozen bootstrap seed 202611151603 for A/A and each of the five comparisons, with unchanged target-cluster resampling and percentile endpoints.",
+        "Show nonnegative NUMA node zero in analysis output; keep all other fixed-panel inputs, metrics, decision thresholds and stopping rules unchanged."
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256"
+      ]
     }
   ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "441c2fd187f759d3e5cccaf78c89ede1057ab0d92bd9a44cbd8055ba6b0c228a",
-    "commit": "70b8e1718f0a65335141124a380639d25ff2f50b",
-    "frozen_at": "2026-11-16T02:39:02Z",
+    "protocol_sha256": "b4631c0451d9647c3dfaa5d20ae6d56eeb37e1ab833d5ce22653a64991d8be2e",
+    "commit": "eaa7fd79d18b576076363cef16c16669dae99d6c",
+    "frozen_at": "2026-11-16T03:24:28Z",
     "filed_before_affected_data": true
   }
 }

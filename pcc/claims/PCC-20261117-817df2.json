@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:58:11Z",
+ "id": "PCC-20261117-817df2",
+ "kind": "statement",
+ "producer": {
+  "commit": "5d675946850a9dd8a37503bf53baf820ccaa20ee",
+  "model": "",
+  "session": "codex-rho-parity-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/rho-parity/validation/tests-1.log",
+    "sha256": "6e999e8972ec94d44c40c3abaa7b92e5a7a24a6db66cf32d90306fc7cae2d19d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/rho-parity/validation/paired-1.jsonl",
+    "sha256": "15f6a49b4ca2f5e4c20c54cca740f51d2cd6242cee4ba35bba5d7385d485bb54"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/rho-parity/validation/summary-1.json",
+    "sha256": "a79c9798a789de41cebe420a75af2be323398105c747461697a908ba28f27323"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "extension-ic/nagao-unit-elimination",
+ "statement": "Producer development checks: ten native tests passed; all 24 paired records have identical complete coordinate sets and materialized cofactor/full-row geometry across six-variable and unit-eliminated solvers, exact repeated primitive tallies and zero foreign-thread hooks. The six fixed-case observed materializer subtotals sum to 4800849304 versus 3471593796; these are incomplete diagnostic counts, with no admitted wall, full-DLP, or rho-parity ranking."
+}

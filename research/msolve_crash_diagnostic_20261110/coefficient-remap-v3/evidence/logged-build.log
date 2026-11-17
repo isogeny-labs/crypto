@@ -1,0 +1,16 @@
+patching file src/neogb/la_ff_32.c
+In file included from src/msolve/msolve.c:22,
+                 from src/msolve/libmsolve.c:35,
+                 from src/msolve/main.c:21:
+In function ‘duplicate_linear_data’,
+    inlined from ‘duplicate_data_mthread_trace’ at src/msolve/duplicate.c:224:3:
+src/msolve/duplicate.c:17:19: warning: argument 1 range [18446744071562067968, 18446744073709551615] exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
+   17 |     bsquvars[i] = calloc(nvars - 1, sizeof(uint64_t));
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from src/msolve/../neogb/data.h:27,
+                 from src/msolve/msolve-data.h:25,
+                 from src/msolve/libmsolve.c:25:
+/usr/include/stdlib.h: In function ‘duplicate_data_mthread_trace’:
+/usr/include/stdlib.h:675:14: note: in a call to allocation function ‘calloc’ declared here
+  675 | extern void *calloc (size_t __nmemb, size_t __size)
+      |              ^~~~~~

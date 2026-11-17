@@ -1,0 +1,102 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h5e866a7c08042f35",
+  "statement": {
+    "name": "Computed anchor completion ring rearrangement",
+    "source": "OrientationAnchor.completed_identity ring substep only; substitute F=1+z*q and C=p*z. Does not encode mask, monic division or 2-adic bounds.",
+    "variables": [
+      "c",
+      "p",
+      "z",
+      "q"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "c"
+            },
+            {
+              "op": "var",
+              "args": "p"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 1
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "z"
+                    },
+                    {
+                      "op": "var",
+                      "args": "q"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "c"
+              },
+              {
+                "op": "var",
+                "args": "p"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "var",
+          "args": "p"
+        },
+        {
+          "op": "var",
+          "args": "z"
+        },
+        {
+          "op": "var",
+          "args": "c"
+        },
+        {
+          "op": "var",
+          "args": "q"
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261114,
+  "value_digest": "4233316c47bb9282e5761ae87d1593b015f14a7e43993f941f51d86397514045",
+  "independence": "Unsigned producer literal certificate. Fixed ring substep only; Lean separately checks the quantified construction. No measured runtime or solver.",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "sha256": "6660e37bf7d99e7570d4618370da0890778ede11956fa8d39577dc4ec16a4195"
+  }
+}

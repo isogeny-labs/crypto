@@ -1,0 +1,8 @@
+good_functions.cpp: In function ‘int main(int, char**)’:
+good_functions.cpp:52:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   52 |     for(int i=0;i<8;++i)for(int j=i;j<8;++j)for(int k=j;k<8;++k)monomials.push_back({i,j,k});require(monomials.size()==120,"120 symmetric triple products");
+      |     ^~~
+good_functions.cpp:52:94: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   52 |     for(int i=0;i<8;++i)for(int j=i;j<8;++j)for(int k=j;k<8;++k)monomials.push_back({i,j,k});require(monomials.size()==120,"120 symmetric triple products");
+      |                                                                                              ^~~~~~~
+cc1plus: all warnings being treated as errors

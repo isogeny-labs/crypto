@@ -1,0 +1,103 @@
+{
+  "schema": "frobenius-degree-verification/v1",
+  "source_commit": "aa432228308200dba460d68904f60490dfd7ea51",
+  "claim_id": "PCC-20261116-d7ba18",
+  "declaration_sha256": "52f31a64335a62261ce11693e1f77758132f340070790511323aa014809d17be",
+  "all_source_and_artifact_pins_match": true,
+  "preservation_entries": 6660,
+  "initial_plans": 53,
+  "formal_source_files": 264,
+  "artifact_pins": 21,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-d7ba18",
+    "claim_sha256": "ec7075fdb8cc39050a84d2b3175b8640ca61804733bbf579997cbcba99d8eee0",
+    "commit": "aa432228308200dba460d68904f60490dfd7ea51",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/elliptic_frobenius_degree_audit_20261116/lean (FrobeniusDegreeCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T17:35:17Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-d7ba18",
+    "claim_sha256": "ec7075fdb8cc39050a84d2b3175b8640ca61804733bbf579997cbcba99d8eee0",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "known_source_theorem": true,
+  "Scheme_isogeny_API_comparison": false,
+  "corrected_general_factorization_proved": false,
+  "assurance": {
+    "schema": "frobenius-degree-preflight/v1",
+    "build_snapshots": 5,
+    "failed_states": [
+      "01",
+      "02",
+      "03"
+    ],
+    "successful_states": [
+      "04",
+      "05"
+    ],
+    "published_preservation_entries": 6614,
+    "additional_dependency_entries": 46,
+    "all_checked_entries": 6660,
+    "frozen_plans": 53,
+    "manifest_packages": 26,
+    "copied_import_modules": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "registered_roots_from01": true,
+    "actual_rational_Frobenius_image": true,
+    "reduced_rational_function_degree": true,
+    "compatible_intermediate_field_two_towers": true,
+    "actual_quadratic_elliptic_function_field": true,
+    "actual_Frobenius_image_finite_degree_q": true,
+    "actual_geometric_kernel_cardinality_one": true,
+    "actual_geometric_point_bijection": true,
+    "actual_image_purely_inseparable_and_nonseparable": true,
+    "explicit_wrong_kernel_degree_reading_negation": true,
+    "actual_binary_ternary_controls": true,
+    "healthy_identity_degree_one": true,
+    "corrected_general_factorization_proved": false,
+    "general_Weil_nondegeneracy_proved": false,
+    "Scheme_isogeny_API_comparison": false,
+    "geometric_kernels_not_scheme_kernels": true,
+    "novelty_claim": false,
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "native_experiments": 0,
+    "gate_declarations": 19,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_source_modules": 210,
+    "actually_imported_custom_modules": 192,
+    "actually_imported_frozen_modules": 186,
+    "additional_frozen_pinned_modules": 18,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "new_source_warnings": 0
+  }
+}

@@ -1,0 +1,36 @@
+import OrientationProduct
+open Finset Polynomial
+namespace OrientationBaseDraft
+
+theorem mersenne_choose_mod_two (b k : ℕ) (hk : k < 2^b) :
+    (Nat.choose (2^b-1) k) % 2 = 1 := by
+  induction b generalizing k with
+  | zero => have h : k=0 := by simpa using hk; simp [h]
+  | succ b ih =>
+    have hp : 0 < 2^b := by positivity
+    have hmod : (2^(b+1)-1) % 2 = 1 := by rw [pow_succ]; omega
+    have hdiv : (2^(b+1)-1) / 2 = 2^b-1 := by rw [pow_succ]; omega
+    have hkdiv : k/2 < 2^b := by rw [pow_succ] at hk; omega
+    have hc : Nat.choose 1 (k%2)=1 := by
+      rcases Nat.mod_two_eq_zero_or_one k with h | h <;> simp [h]
+    have hl := Nat.Choose.choose_modEq_choose_mod_mul_choose_div_nat
+      (p:=2) (n:=2^(b+1)-1) (k:=k)
+    change _ % 2 = _ % 2 at hl
+    simpa only [hmod,hdiv,hc,one_mul,ih (k/2) hkdiv] using hl
+
+theorem mersenne_factorial_valuation (b k : ℕ) (hk : k < 2^b) :
+    padicValNat 2 (Nat.factorial k) + padicValNat 2 (Nat.factorial (2^b-1-k)) =
+      padicValNat 2 (Nat.factorial (2^b-1)) := by
+  have hkle : k ≤ 2^b-1 := by omega
+  have hchoose : Nat.choose (2^b-1) k ≠ 0 := Nat.choose_ne_zero hkle
+  have hodd : ¬ 2 ∣ Nat.choose (2^b-1) k := by
+    intro hd
+    have hz := Nat.mod_eq_zero_of_dvd hd
+    rw [mersenne_choose_mod_two b k hk] at hz
+    omega
+  have hv : padicValNat 2 (Nat.choose (2^b-1) k) = 0 := padicValNat.eq_zero_of_not_dvd hodd
+  have h := congrArg (padicValNat 2) (Nat.choose_mul_factorial_mul_factorial hkle)
+  rw [padicValNat.mul (Nat.mul_ne_zero hchoose (Nat.factorial_ne_zero _)) (Nat.factorial_ne_zero _),
+    padicValNat.mul hchoose (Nat.factorial_ne_zero _), hv, zero_add] at h
+  exact h
+end OrientationBaseDraft

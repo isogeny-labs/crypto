@@ -1,0 +1,105 @@
+{
+  "data": "pcc/claims/PCC-20261116-2aa7f3.json",
+  "bindings": [
+    {
+      "theorem": "CubicNormWordBridge01.canonical_product_bound",
+      "claim": "pcc/claims/PCC-20261116-85c5ed.json",
+      "normalized_statement": "theorem canonical_product_bound (a b : Fin 223) : a.val*b.val \u2264 49284",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.canonical_product_bound",
+        "decl_sha256": "8b7af3872cf1339e767cd2073dd3d8391646ae2983e3d006f7cc6c4f74988c8a"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_coordinates",
+      "claim": "pcc/claims/PCC-20261116-cac48b.json",
+      "normalized_statement": "theorem word_square_coordinates (a b c : Fin 223) : decode (wordSquare223 (UInt64.ofNat a.val) (UInt64.ofNat b.val) (UInt64.ofNat c.val)) = CubicNormDescent.originalSquare223 a b c",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_coordinates",
+        "decl_sha256": "875d875f8ddead2d1c4b1e338e142a6b295f3aa1874f8b5faa0fca61e6995b7b"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_ne12",
+      "claim": "pcc/claims/PCC-20261116-8562c0.json",
+      "normalized_statement": "theorem word_square_ne12 (a b c : Fin 223) : decode (wordSquare223 (UInt64.ofNat a.val) (UInt64.ofNat b.val) (UInt64.ofNat c.val)) \u2260 (12,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_ne12",
+        "decl_sha256": "ad839cf70579c9b31da865fca1feef1dba618781f3b699640c4e5b9657bc4c7c"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_ne24",
+      "claim": "pcc/claims/PCC-20261116-a0b77a.json",
+      "normalized_statement": "theorem word_square_ne24 (a b c : Fin 223) : decode (wordSquare223 (UInt64.ofNat a.val) (UInt64.ofNat b.val) (UInt64.ofNat c.val)) \u2260 (24,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_ne24",
+        "decl_sha256": "7db050618599e33c53decbfacb76b5d14784cd66a93b2a6f6f180283bba5d376"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_control",
+      "claim": "pcc/claims/PCC-20261116-e1bc13.json",
+      "normalized_statement": "theorem word_square_control : decode (wordSquare223 2 0 0) = (4,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_control",
+        "decl_sha256": "24274f1c0b0e3be439aeac6b307ce6c5402c7b58a3a58de70c51e7727e95997e"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_canonical",
+      "claim": "pcc/claims/PCC-20261116-917b70.json",
+      "normalized_statement": "theorem word_square_canonical (a b c : UInt64) : let w",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_canonical",
+        "decl_sha256": "ffc990df57c7f884a7ba7c676124962dc80b8e48620f90f73b3cc94ca3aec8e4"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_exact_values",
+      "claim": "pcc/claims/PCC-20261116-538763.json",
+      "normalized_statement": "theorem word_square_exact_values (a b c : Fin 223) : let w",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_exact_values",
+        "decl_sha256": "c21ea47a62bb94a7f109b713bcbea8b4522bf4dceb39925c6dfa7ba7f3476778"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_raw_ne12",
+      "claim": "pcc/claims/PCC-20261116-98294c.json",
+      "normalized_statement": "theorem word_square_raw_ne12 (a b c : Fin 223) : wordSquare223 (UInt64.ofNat a.val) (UInt64.ofNat b.val) (UInt64.ofNat c.val) \u2260 (12,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_raw_ne12",
+        "decl_sha256": "6968345c9e9705b0b8b0740327e6b350731e041616e3c2b48d0f299a00dbc058"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_raw_ne24",
+      "claim": "pcc/claims/PCC-20261116-6b7a31.json",
+      "normalized_statement": "theorem word_square_raw_ne24 (a b c : Fin 223) : wordSquare223 (UInt64.ofNat a.val) (UInt64.ofNat b.val) (UInt64.ofNat c.val) \u2260 (24,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_raw_ne24",
+        "decl_sha256": "fc055cb3557699535ad03b129da12b8cb5ad573e5a6b8d6a90bc06aea978ee62"
+      }
+    },
+    {
+      "theorem": "CubicNormWordBridge01.word_square_raw_control",
+      "claim": "pcc/claims/PCC-20261116-b6e337.json",
+      "normalized_statement": "theorem word_square_raw_control : wordSquare223 2 0 0 = (4,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/CubicNormWordBridge01.lean",
+        "theorem": "CubicNormWordBridge01.word_square_raw_control",
+        "decl_sha256": "9bcb25ff72fca2936bf9b540d3abf471a9b86ffc2140df360b266bdf7dcb8250"
+      }
+    }
+  ]
+}

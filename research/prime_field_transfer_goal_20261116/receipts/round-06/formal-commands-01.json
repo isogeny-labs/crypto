@@ -1,0 +1,80 @@
+{
+  "recorded_at": "2026-11-16T12:05:05.486Z",
+  "attempts": [
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "Round06AssemblyV1.lean"
+      ],
+      "workdir": "research/prime_field_transfer_goal_20261116/lean",
+      "exit": 143,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/assembly-01.log",
+      "status": "Stopped unnecessary dependency clone; original pinned cache reused."
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "/workspace/prime-transfer-round06/research/prime_field_transfer_goal_20261116/lean/Round06AssemblyV1.lean"
+      ],
+      "workdir": "/workspace/ecdlp-transfer",
+      "exit": 1,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/assembly-02.log",
+      "source": "research/prime_field_transfer_goal_20261116/receipts/round-06/assembly-02-source.txt"
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "/workspace/prime-transfer-round06/research/prime_field_transfer_goal_20261116/lean/Round06AssemblyV2.lean"
+      ],
+      "workdir": "/workspace/ecdlp-transfer",
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/assembly-03.log"
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/tmp/prime-transfer-round06-lean-01/SplitPrime199V1.olean",
+        "/workspace/prime-transfer-round06/research/prime_field_transfer_goal_20261116/lean/SplitPrime199V1.lean"
+      ],
+      "workdir": "/workspace/ecdlp-transfer",
+      "exit": 1,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/endpoints-01.log",
+      "status": "Input lies outside Lean root; infrastructure invocation error."
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/tmp/prime-transfer-round06-lean-01/SplitPrime199V1.olean",
+        "SplitPrime199V1.lean"
+      ],
+      "workdir": "research/prime_field_transfer_goal_20261116/lean",
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/endpoints-02.log"
+    },
+    {
+      "command": [
+        "tools/lean/proof-gate.sh",
+        "--out",
+        "research/prime_field_transfer_goal_20261116/receipts/round-06/gate-01",
+        "research/prime_field_transfer_goal_20261116/lean"
+      ],
+      "env": {
+        "USE_FRO_CACHE": "1"
+      },
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/gate-01.log"
+    }
+  ]
+}

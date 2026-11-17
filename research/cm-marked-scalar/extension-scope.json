@@ -1,0 +1,13 @@
+{
+ "id":"CM-NATIVE-ORIENTED-EXTENSION-V1",
+ "primary_target":"P-192",
+ "targets":["P-192","P-224","P-256"],
+ "construction":"Extract an oriented odd-prime kernel by signed Frobenius gcd in the full torsion algebra; construct normalized Velu maps and their opposite-root returns; carry the endpoint isomorphism; verify global composition and a+b modulo n labels.",
+ "fixed_edges":{"P-192":{"degree":5,"root_rule":"smallest nonzero distinct characteristic root"},"P-224":{"degree":11,"root":10},"P-256":{"degree":11,"root":2}},
+ "marked_order_rule":"First s in [3,5,7,11,13,17,19,23,29,31] dividing n-1 with nonidentity projection of 1-rho; if none, preserve failure and retain the initial scalar label.",
+ "checks":["exact curve parameters and prime subgroup","both signed kernel identities","both full map identities","full closed rational-function scalar identity","closing differential","CRT, norm and label","O,G,2G,17G,-G point actions","negative certificate controls"],
+ "cost_scope":"Exact native schedules under schedule-scope.json; no latency inference. Preserve expensive quotient degree and distinguish subgroup evaluator from global quotient.",
+ "limits":{"processes":1,"threads":1,"memory_gib":2,"construction_seconds_per_curve":120,"build_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+ "failure_policy":"Retain failed source, stderr and exact timeout status before an amended implementation. Do not silently switch an edge or scalar after results.",
+ "timing":"No new timing permission or resource-policy change is implied. Native timing remains subject to a separately frozen and admitted protocol."
+}

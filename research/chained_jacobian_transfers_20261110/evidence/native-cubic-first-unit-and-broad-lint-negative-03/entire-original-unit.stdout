@@ -1,0 +1,24 @@
+
+running 3 tests
+test tests::all_frozen_inputs_match_original_and_both_inverse_identities ... development_inverse	input=[1, 0, 0]	output=[1, 0, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[1, 0, 0]
+development_inverse	input=[2, 0, 0]	output=[112, 0, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[8, 0, 0]
+development_inverse	input=[222, 0, 0]	output=[222, 0, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[222, 0, 0]
+development_inverse	input=[0, 1, 0]	output=[0, 0, 149]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[3, 0, 0]
+development_inverse	input=[0, 0, 1]	output=[0, 149, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[9, 0, 0]
+development_inverse	input=[1, 1, 0]	output=[56, 167, 56]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[4, 0, 0]
+development_inverse	input=[1, 0, 1]	output=[67, 201, 156]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[10, 0, 0]
+development_inverse	input=[0, 1, 1]	output=[167, 56, 93]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[12, 0, 0]
+development_inverse	input=[1, 1, 1]	output=[111, 112, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[4, 0, 0]
+development_inverse	input=[2, 3, 4]	output=[138, 14, 149]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[3, 0, 0]
+development_inverse	input=[222, 222, 222]	output=[112, 111, 0]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[219, 0, 0]
+development_inverse	input=[222, 1, 0]	output=[112, 112, 112]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[2, 0, 0]
+development_inverse	input=[0, 222, 1]	output=[112, 112, 186]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[6, 0, 0]
+development_inverse	input=[17, 42, 99]	output=[203, 131, 147]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[219, 0, 0]
+development_inverse	input=[221, 222, 220]	output=[184, 195, 184]	reference=(23, 1, 8)	candidate=(16, 1, 3)	norm=[23, 0, 0]
+ok
+test tests::rejects_invalid_domain_without_replacing_original_behavior ... expected_original_zero_inverse_panic follows
+ok
+test tests::wrong_cofactor_sign_control_is_detected ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

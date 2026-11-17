@@ -1,0 +1,65 @@
+{
+  "schema": "pencil.cache-snapshot-result/v1",
+  "attempt": "root-cache-snapshot-renewal-20261111",
+  "status": "passed",
+  "terminal": {
+    "exit_code": 0,
+    "systemd_result": "success",
+    "exec_main_status": 0,
+    "invocation_id": "8ef6339e743a4d2685d5af1d460f9fc4",
+    "cgroup_empty_or_absent": true,
+    "compiler_invoked": false,
+    "root_exec_session_id": 95957
+  },
+  "timing_seconds": {
+    "native": 3.1129651480005123,
+    "controller": 3.461129906005226,
+    "caller": 3.629120421013795,
+    "charged": 60
+  },
+  "limits": {
+    "cpu": 1,
+    "memory_bytes": 1073741824,
+    "memory_swap_bytes": 0,
+    "tasks_max": 32,
+    "deadline_utc": "2026-11-11T12:00:00Z",
+    "automatic_retry": false
+  },
+  "campaign_accounting_seconds": {
+    "total": 129600,
+    "prior_charged": 3720,
+    "attempt_charge": 60,
+    "charged_after": 3780,
+    "remaining_after": 125820
+  },
+  "cache_manifest": {
+    "schema": "root-current-cache/v1",
+    "sha256": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850",
+    "manifest_bytes": 593986,
+    "file_count": 2165,
+    "directory_count": 415,
+    "aggregate_file_bytes": 2618767578,
+    "initial_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
+  },
+  "comparison_to_initial_target_only_manifest": {
+    "added": 33,
+    "changed": 1395,
+    "missing": 1,
+    "unchanged": 737,
+    "attribution": "Comparison to initial target-only manifest; additions in other mutable roots are not attributed solely to the failed compiler."
+  },
+  "publication": {
+    "pre_execution_source_commit": "36b55a2fb224720fd043b5728cb15c84f79646d1",
+    "pre_execution_remote_head": "36b55a2fb224720fd043b5728cb15c84f79646d1",
+    "caller_observation_commit": "e5e262cafa7f05c1c5fa7769d999447fc4bc69d5",
+    "caller_observation_remote_head": "e5e262cafa7f05c1c5fa7769d999447fc4bc69d5"
+  },
+  "artifact_scope": {
+    "exact_small_receipts_preserved": true,
+    "exact_current_cache_manifest_preserved": true,
+    "cache_body_bytes_in_packet": 0,
+    "cache_body_uploaded_by_this_packet": false,
+    "dollar_cost": null,
+    "dollar_cost_reason": "No dollar-cost value is present in the preserved receipts."
+  }
+}

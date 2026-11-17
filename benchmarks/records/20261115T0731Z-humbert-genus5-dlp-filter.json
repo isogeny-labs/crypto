@@ -1,0 +1,173 @@
+{
+  "branch": "leads-ff",
+  "closed_utc": "2026-11-15T09:39:42+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "for k in 3 4 5: HUMBERT_LA_PRECHECK=1 HUMBERT_SKIP_RHO=1 research/humbert_genus5_cover_20261021/dlp_filter_20261115/bin/humbert-v4 attack 24001 1 5 <arm (5+k)%6> >> research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign/results/v4.jsonl (rows tagged resumed:true)"
+      ],
+      "cwd": "research/humbert_genus5_cover_20261021/dlp_filter_20261115",
+      "exit": 0,
+      "note": "added by hand: resume of the last instance's 3 missing arms, same binary (sha256 checked), protocol order; the 117 rows before it came from the killed launcher, recorded as censored in 20261116T0532Z-humbert-genus5-dlp-filter-killed-launch.json",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "05713d335bf414d5cc50bfe7bb460e2927e226b1",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T07:31:19+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-humbert-genus5-dlp-filter"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0731Z-humbert-genus5-dlp-filter",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "mm_dlpf50_over_dlp50_max",
+      "note": "F1 counted, max over 20 instances (holds)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.773
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "mm_dlpf50_over_dlpm50_max",
+      "note": "F2 counted, max over 20 instances (holds)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.688
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "mm_dlpf50_over_lp50_median_q24001",
+      "note": "counted; dlpf LA still 1.6x lp at every q",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.627
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "lp50_over_dlpf50_t_ic_median_q24001",
+      "note": "F3 paired wall time L0, 4/5 faster (holds, margin shrinking 1.31->1.02 over q)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.89,
+        1.07
+      ],
+      "unit": "ratio",
+      "value": 1.02
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "dlpf50_ic_over_rho_exp_median_q24001",
+      "note": "F4 L0; best other (lp50) 1.23, inside A/A spread 0.962-1.002",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.21
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 5,
+      "name": "aa_dlpf50_median_q24001",
+      "note": "A/A noise floor L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.962,
+        1.002
+      ],
+      "unit": "ratio",
+      "value": 0.968
+    }
+  ],
+  "problem": "ic:humbert-genus5-toy",
+  "raw": [
+    {
+      "bytes": 196716,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign/results/v4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f167b49e6b44ae539ecd1c3fc1c5485470cc214ef04e188f932f7a66cc05492",
+      "sha256": "3f167b49e6b44ae539ecd1c3fc1c5485470cc214ef04e188f932f7a66cc05492",
+      "uploaded": false
+    },
+    {
+      "bytes": 8641,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign/results/v4.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/8523956230bb9f3e5a5a94fc59e9a0aa04fc0a4d5ed39d2cc96eb5c44bcdb747",
+      "sha256": "8523956230bb9f3e5a5a94fc59e9a0aa04fc0a4d5ed39d2cc96eb5c44bcdb747",
+      "uploaded": false
+    },
+    {
+      "bytes": 2122,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/results/instances_v4.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/21/21b0b770f23f7dbcd4bc6c59226ab033421669a8d8f2bd5e46f8774ddc7da462",
+      "sha256": "21b0b770f23f7dbcd4bc6c59226ab033421669a8d8f2bd5e46f8774ddc7da462",
+      "uploaded": false
+    },
+    {
+      "bytes": 707,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/results/summary_v4.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/18/18c3703e312d9f5731fce0ee674dc3f5426c0c212e9c12ee74835a89c97df5b1",
+      "sha256": "18c3703e312d9f5731fce0ee674dc3f5426c0c212e9c12ee74835a89c97df5b1",
+      "uploaded": false
+    },
+    {
+      "bytes": 1818,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/results/phases_v4.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/18/18569ebda29148ad37283da73b36e557de4ea0bbe0451bdac64d05964706047d",
+      "sha256": "18569ebda29148ad37283da73b36e557de4ea0bbe0451bdac64d05964706047d",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-humbert-genus5-dlp-filter/humbert-genus5-dlp-filter.pdf",
+    "png": [
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_gap_to_rho.png",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_matrix.png",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_mulmods.png",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_ratios.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_gap_to_rho.svg",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_matrix.svg",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_mulmods.svg",
+      "benchmarks/20261115-humbert-genus5-dlp-filter/filter_ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "humbert-genus5-dlp-filter",
+  "status": "measured",
+  "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+  "validation": null
+}

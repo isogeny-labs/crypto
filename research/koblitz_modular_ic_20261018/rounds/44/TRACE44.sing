@@ -1,0 +1,22 @@
+proc traceAudit44(int caseid,number mx,number my,poly kernelLocal44,int d){
+ if(deg(kernelLocal44)!=5 || leadcoef(kernelLocal44)!=1 || gcd(kernelLocal44,diff(kernelLocal44,X))!=1){ERROR("POINT44_KERNEL_SHAPE");}
+ ideal base=std(ideal(kernelLocal44,Z,T));if(vdim(base)!=5){ERROR("POINT44_BASE_DIM");}
+ poly xf=X;poly fd;int k;for(k=1;k<=5*d;k++){xf=reduce(xf^2,base);if(k==d){fd=xf;}}if(xf!=X || gcd(fd-X,kernelLocal44)!=1){ERROR("POINT44_KERNEL_RABIN");}
+ list triple=triple30(mx,my);number B=1/triple[1];list k7s=kernels30(B,7);poly k7=choose30(B,k7s,triple[2]);
+ number c2=number((jet(k7,2)+jet(k7,1))/X^2);number c1=number((jet(k7,1)+jet(k7,0))/X);number c0=number(subst(k7,X,0));
+ poly rr=X;poly x2=reduce(rr^2+B*inv44(rr^2,base),base);poly v=reduce(rr+x2,base);poly u=reduce(rr*inv44(v,base),base);poly iu=inv44(u,base);
+ poly bb=reduce(v^3*inv44(rr^2,base),base);poly cc=reduce(x2*inv44(rr,base),base);poly aa=reduce(1+cc,base);
+ if(reduce(u*aa+1,base)!=0 || reduce(bb*u^3+rr,base)!=0){ERROR("POINT44_NORMALIZATION");}
+ poly g2=reduce((rr+c2)*iu^2,base);poly g1=reduce((rr^2+c1)*iu^4,base);poly g0=reduce((rr^3+c2*rr^2+c1*rr+c0)*iu^6,base);
+
+ poly ai=inv44(aa,base);poly C=reduce((bb+g2)*ai^2,base);poly delta=reduce(bb*ai^2+rr,base);
+ if(reduce(C+delta+c2,base)!=0 || reduce(delta+bb*ai^2+bb*ai^3,base)!=0 || reduce(aa^3*C+aa^3*c2+aa*bb+bb,base)!=0){ERROR("TRACE44_DECOMPOSITION");}
+ poly directTerm=C;poly twistTerm=delta;poly directTrace=0;poly twistTrace=0;
+ for(k=0;k<5*d;k++){directTrace=reduce(directTrace+directTerm,base);twistTrace=reduce(twistTrace+twistTerm,base);directTerm=reduce(directTerm^2,base);twistTerm=reduce(twistTerm^2,base);}
+ number baseTerm=c2;number baseTrace=0;for(k=0;k<d;k++){baseTrace=baseTrace+baseTerm;baseTerm=baseTerm^2;}
+ if((directTrace!=0 && directTrace!=1)||(twistTrace!=0 && twistTrace!=1)||(baseTrace!=0 && baseTrace!=1)){ERROR("TRACE44_TRACE_BITS");}
+ if(reduce(directTrace+twistTrace+baseTrace,base)!=0){ERROR("TRACE44_ADDITIVITY");}
+ print("TRACE44_RESULT case="+string(caseid)+" base_degree="+string(d)+" absolute_kernel_degree="+string(5*d)+" source_orientation_trace="+string(directTrace)+" Tate_twist_trace="+string(twistTrace)+" seven_kernel_trace="+string(baseTrace)+" exact_decomposition=checked both_trace_routes=equal");
+ print("TRACE44_C");C;print("TRACE44_delta");delta;print("TRACE44_c2");c2;
+ return(1);
+}

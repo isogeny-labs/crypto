@@ -1,0 +1,13 @@
+// In the original binary polynomial source ring, before changing rings.
+list encoded44;intvec bounds44=0,0,0,0;int encI44;int encJ44;int encV44;poly encP44;list terms44;intvec ex44;
+for(encI44=1;encI44<=13;encI44++){
+ if(encI44<=5){encP44=original[encI44];}else{encP44=registered[encI44-5];}
+ terms44=list();poly rebuilt44=0;
+ for(encJ44=1;encJ44<=size(encP44);encJ44++){
+  if(leadcoef(encP44[encJ44])!=1){ERROR("ENC44_NONBINARY");}
+  ex44=leadexp(encP44[encJ44]);terms44[encJ44]=ex44;
+  rebuilt44=rebuilt44+n^ex44[1]*l^ex44[2]*b^ex44[3]*c^ex44[4];
+  for(encV44=1;encV44<=4;encV44++){if(ex44[encV44]>bounds44[encV44]){bounds44[encV44]=ex44[encV44];}}
+ }
+ if(rebuilt44!=encP44){ERROR("ENC44_SOURCE_RECONSTRUCTION");}encoded44[encI44]=terms44;
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "pencil.serial-reconciliation/v1",
+  "observed_utc": "2026-11-10T23:49:46.876227+00:00",
+  "original_materializer": {
+    "terminal": {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/terminal.json",
+      "sha256": "59d4b238d027646c7bb1367e00a7541760ae34c72c013593f7a62b076e8e042f",
+      "bytes": 895
+    },
+    "post_stop": {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/post-stop.txt",
+      "sha256": "5956a39f74db1b91792748561b28c2ac627162a61fdc7ff20824ff352f7c1acb",
+      "bytes": 65
+    }
+  },
+  "latest_helper_completion": {
+    "path": "/home/ec2-user/pencil-native-branch-helper-20261109.outer/completion.json",
+    "sha256": "63ecd6af78823ff690ff995d15c6a9c3527e2e40580333211706c56e5b6b95c5",
+    "bytes": 4980
+  },
+  "latest_helper_status": "failed",
+  "latest_helper_phase_terminal_custody": true,
+  "active_units_readback": "  UNIT LOAD ACTIVE SUB DESCRIPTION\n0 loaded units listed.\n",
+  "boot_id": "31b37cfb-1562-42ff-8b0f-fadc5cec5a12",
+  "prior_cast_workspace_present": false,
+  "prior_cast_outer_present": false,
+  "all_pencil_units": [
+    {
+      "unit": "pencil-branch-coefficient-20261109-compiler.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/timeout --signal=TERM --kill-after=5s 1780s /usr/bin/python3 /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-coefficient-replay-20261109/replay.py compiler 362856bff8013d6d91e2c17a6af906650273b60e4fc048efd59a283eefb154c5"
+    },
+    {
+      "unit": "pencil-branch-coefficient-v2-20261109-compiler.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/timeout --signal=TERM --kill-after=5s 1780s /usr/bin/python3 /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-coefficient-replay-v2-20261109/replay.py compiler 4974f9673e7b5a4cd76ad558e798625ba144e1e6231838f03b6fa9fcab128861"
+    },
+    {
+      "unit": "pencil-branch-helper-20261109-compiler.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/timeout --signal=TERM --kill-after=5s 580s /usr/bin/python3 /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-replay-20261109/replay.py compiler 73e8ac05216643331d21dff877677b2a605a5731920546100046a01080891eca"
+    },
+    {
+      "unit": "pencil-root-durable-t1958-20261109.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/python3 -B /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py"
+    },
+    {
+      "unit": "pencil-root-durable-t1970-20261109.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/python3 -B /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-worker.py"
+    },
+    {
+      "unit": "pencil-root-durable-t1992-20261109.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/python3 -B /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py"
+    },
+    {
+      "unit": "pencil-root-durable-v4-20261109.service",
+      "load": "loaded",
+      "active": "failed",
+      "sub": "failed",
+      "description": "/usr/bin/python3 -B /home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/durable-worker.py"
+    }
+  ],
+  "all_pencil_units_terminal_states": true
+}

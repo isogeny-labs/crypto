@@ -1,0 +1,14 @@
+{
+  "schema": "rootfinding_next_experiment_v1",
+  "id": "exact-incidence-schur-audit-next-20261115-v2",
+  "status": "unexecuted_design",
+  "hypothesis": "Guarded regular-double-source elimination exposes smaller exact irreducible blocks or a small Schur boundary that reduces charged solve work while preserving the complete affine k-family.",
+  "input_rule": "Freeze original n83-d18-m5-T001-offset0, first h=0x4208336d0d441df79c400 and a=1; compare both rational ordinates y_a=0,1, recording each guard and common-factor exception. Derive exact canonical ANF incidence for the original 339/332 chain if its encoder is available. Do not substitute Jacobian incidence.",
+  "comparators": ["complete dense Gaussian affine-family solver", "exact incidence component/SCC solver with all residual rows", "guarded Schur solver with complete fallback"],
+  "metrics": ["canonical nonzeros and density", "matching size, unmatched variables and unmatched rows", "largest SCC and all block dimensions", "Schur fill-in", "rank and affine nullity", "particular/kernel replay", "rank of neighboring-parameter matrix differences", "setup/solve/extraction/verification/serialization time", "peak RSS and process-tree memory if available"],
+  "tiny_oracles": "Exhaust every assignment for frozen <=12-bit affine systems and small nonlinear systems over GF2,GF3,GF4,GF8,GF9. Include X^p+Y derivative-zero dependence, singular pivots, zero equations, contradictory residual rows, free variables, repeated source coordinates, and domain-normal-form cancellation.",
+  "admission": "Independent source/proof review and immutable hashes before execution. Exact affine-family equality, not merely equal particular solutions. An absent original encoder narrows that audit only and does not prevent derived matrix comparisons.",
+  "caps": {"worker_seconds": 90, "memory_limit_mb": 4096, "cores": 1, "maximum_experiments": 3, "maximum_enumerated_affine_nullity": 12},
+  "falsification": "One dominant irreducible block with large fill and no paid cost reduction refutes permutation-only speedup for this fixture. Full-rank neighboring differences refute a cheap low-rank update assumption. Either yields a new specialization/basis hypothesis rather than an identical retry.",
+  "scope": "Conditional norm-parameter family only. No global original-root or genuine F4/F5/F6 gain claim; requested field coverage and full release gate remain outstanding. The graph proof applies to all finite fields; binary chart formulas require separate odd-characteristic derivation."
+}

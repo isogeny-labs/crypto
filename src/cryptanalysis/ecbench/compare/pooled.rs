@@ -324,7 +324,7 @@ pub fn compare_pooled_loaded(
             .map(|r| {
                 (
                     r.workload.workload_id.as_str(),
-                    (r.workload.curve.r as f64).sqrt(),
+                    (r.workload.curve.r.to_f64()).sqrt(),
                 )
             })
             .collect();
@@ -485,7 +485,7 @@ pub fn compare_pooled_loaded(
 
 /// `√r` of a run's curve: the scale from `S` to total cost.
 fn sqrt_r_of(r: &Record) -> f64 {
-    (r.workload.curve.r as f64).sqrt()
+    (r.workload.curve.r.to_f64()).sqrt()
 }
 
 /// The pooled calibrated block under the rule of the module documentation;

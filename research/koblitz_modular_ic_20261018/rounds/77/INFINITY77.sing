@@ -1,0 +1,15 @@
+proc require77(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+ring infinity77=2,(t,U),dp;short=0;
+poly equation77=U^2+U+t+t^3;
+ideal I77=std(ideal(equation77));
+poly B77=1+(1+t)*U;
+poly conjugate77=subst(B77,U,U+1);
+poly shifted77=B77+t^3;
+poly shiftedConjugate77=conjugate77+t^3;
+require77(diff(equation77,U)==1,"INF77_ETALE_DERIVATIVE");
+require77(subst(equation77,t,0)==U*(U+1) && subst(B77,t,0)==U+1,"INF77_TWO_DISTINCT_INFINITY_ROOTS");
+require77(reduce(B77*conjugate77+t^5,I77)==0,"INF77_B_NORM_T5");
+require77(reduce(shifted77*shiftedConjugate77+t^3*(1+t)^3,I77)==0,"INF77_SHIFTED_B_NORM");
+require77(reduce(B77*conjugate77+t^4,I77)!=0,"INF77_WRONG_NORM_REJECTED");
+print("INF77_RESULT etale=1 roots=2 norm_B=t5 norm_B_plus_t3=t3_times_1_plus_t_cubed wrong_t4_rejected=1");
+print("INFINITY77_ALL_CHECKS_PASS");quit;

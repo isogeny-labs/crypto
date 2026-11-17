@@ -1,0 +1,106 @@
+proc require91(int ok,string tag){if(!ok){print("RR91_FATAL "+tag);exit;}}
+string saved91=read("rr-pid50.sing");
+int start91=find(saved91,"ring inverseBaseCertificate50=");
+require91(start91>0,"RR91_PID_HEADER");
+execute(saved91[start91,size(saved91)-start91+1]);
+setring inverseBaseCertificate50;
+matrix B0=matrix(basis50);
+matrix S0=sourceLift50;
+poly F0=commonDenominator50;
+require91(nrows(B0)==32 && ncols(B0)==32 && normalizationIndex50==376,"RR91_PID_DONOR_SHAPE");
+execute(read("relative-infinity50.sing"));
+ring field91=(2,u),(l,v),dp;
+map relativeMap91=relativeInfinity50,l,v,u;
+ideal I91=std(relativeMap91(relativeInfinityIdeal50));
+require91(vdim(I91)==32,"RR91_SOURCE_FIELD_DIMENSION");
+qring Q91=I91;
+map pidMap91=inverseBaseCertificate50,u;
+matrix B91=pidMap91(B0);
+matrix S91=pidMap91(S0);
+poly F91=pidMap91(F0);
+matrix unit91[32][32];int index91;
+for(index91=1;index91<=32;index91++){unit91[index91,index91]=1;}
+require91(B91*S91==F91*unit91,"RR91_SOURCE_EMBEDDING_PRODUCT");
+poly E91=v^2+u^2*v+u+u^3;
+poly h91=u+v;
+poly N91=v+u*v+u^2;
+poly g91=1+u+u^2+v;
+poly D91=u^2*g91;
+poly A91=l+(1+u)^2*g91;
+poly forwardZ91=lift(h91,1)[1,1];
+poly forwardV91=reduce(N91*forwardZ91^2,std(0));
+poly forwardT91=reduce(A91*lift(D91,1)[1,1],std(0));
+poly inverseK91=u+v+u^2;
+poly inverseG91=u*inverseK91^2+u+inverseK91^2;
+poly inverseZ91=lift(inverseK91,1)[1,1];
+poly inverseV91=reduce(inverseZ91+1/u,std(0));
+poly inverseT91=reduce(inverseG91*(l+(inverseK91+1)^2)*inverseZ91^4/u,std(0));
+link out91="ASCII:w transport91.sing";open(out91);
+write(out91,"matrix forwardC91[32][32];matrix forwardW91[32][32];intvec forwardM91;matrix reverseC91[32][32];matrix reverseW91[32][32];intvec reverseM91;");
+int direction91;int column91;int row91;int power91;int selected91;int good91;int position91;
+intvec exponent91;
+poly mappedZ91;poly mappedV91;poly mappedT91;poly clear91;
+poly mappedF91;poly inverseF91;poly mappedNumerator91;poly current91;poly remaining91;poly reconstructed91;
+ideal tPowers91;ideal basisTerms91;
+vector powerVector91;matrix powerMatrix91[32][1];matrix coordinates91[32][1];matrix corrupted91[32][1];
+for(direction91=1;direction91<=2;direction91++){
+ if(direction91==1){mappedZ91=forwardZ91;mappedV91=forwardV91;mappedT91=forwardT91;clear91=h91;}
+ else{mappedZ91=inverseZ91;mappedV91=inverseV91;mappedT91=inverseT91;clear91=inverseK91;}
+ mappedF91=reduce(subst(F91,u,mappedZ91),std(0));
+ require91(mappedF91!=0,"RR91_TRANSFORMED_COMMON_DENOMINATOR_ZERO");
+ inverseF91=lift(mappedF91,1)[1,1];
+ require91(reduce(mappedF91*inverseF91,std(0))==1,"RR91_TRANSFORMED_COMMON_DENOMINATOR_INVERSE");
+ tPowers91[1]=1;
+ for(row91=2;row91<=16;row91++){tPowers91[row91]=reduce(tPowers91[row91-1]*mappedT91,std(0));}
+ for(row91=1;row91<=32;row91++){
+  basisTerms91[row91]=tPowers91[((row91-1)%16)+1];
+  if(row91>16){basisTerms91[row91]=reduce(basisTerms91[row91]*mappedV91,std(0));}
+ }
+ print("RR91_STAGE direction="+string(direction91)+" field_maps_ready=true columns=32 max_pole_power=61");
+ for(column91=1;column91<=32;column91++){
+  mappedNumerator91=0;
+  for(row91=1;row91<=32;row91++){
+   if(B91[row91,column91]!=0){
+    mappedNumerator91=reduce(mappedNumerator91+reduce(subst(B91[row91,column91],u,mappedZ91),std(0))*basisTerms91[row91],std(0));
+   }
+  }
+  current91=reduce(mappedNumerator91*inverseF91,std(0));
+  selected91=-1;
+  for(power91=0;power91<=61;power91++){
+   remaining91=reduce(current91,std(0));powerVector91=0;reconstructed91=0;
+   while(remaining91!=0){
+    exponent91=leadexp(remaining91);
+    require91(exponent91[1]<16 && exponent91[2]<2,"RR91_NONSTANDARD_FIELD_REMAINDER");
+    position91=exponent91[1]+16*exponent91[2]+1;
+    powerVector91=powerVector91+leadcoef(remaining91)*gen(position91);
+    reconstructed91=reconstructed91+leadcoef(remaining91)*l^exponent91[1]*v^exponent91[2];
+    remaining91=remaining91-lead(remaining91);
+   }
+   require91(reduce(reconstructed91+current91,std(0))==0,"RR91_POWER_VECTOR_RECONSTRUCTION");
+   for(row91=1;row91<=32;row91++){powerMatrix91[row91,1]=powerVector91[row91];}
+   require91(nrows(powerMatrix91)==32 && ncols(powerMatrix91)==1,"RR91_POWER_MATRIX_SHAPE");
+   coordinates91=S91*powerMatrix91;
+   require91(B91*coordinates91==F91*powerMatrix91,"RR91_FULL_MODULE_PRODUCT");
+   good91=1;
+   for(row91=1;row91<=32;row91++){
+    if(coordinates91[row91,1]!=leadcoef(coordinates91[row91,1]) || denominator(leadcoef(coordinates91[row91,1]))!=1){good91=0;}
+   }
+   if(good91==1){selected91=power91;power91=62;}
+   else{current91=reduce(current91*clear91,std(0));}
+  }
+  require91(selected91>=0,"RR91_POLE_BOUND_EXHAUSTED_DIRECTION_"+string(direction91)+"_COLUMN_"+string(column91));
+  corrupted91=coordinates91;corrupted91[1,1]=corrupted91[1,1]+1;
+  require91(B91*corrupted91!=F91*powerMatrix91,"RR91_CORRUPTED_COEFFICIENT_ACCEPTED");
+  if(direction91==1){write(out91,"forwardM91["+string(column91)+"]="+string(selected91)+";");}
+  else{write(out91,"reverseM91["+string(column91)+"]="+string(selected91)+";");}
+  for(row91=1;row91<=32;row91++){
+   if(direction91==1){write(out91,"forwardC91["+string(row91)+","+string(column91)+"]="+string(coordinates91[row91,1])+";forwardW91["+string(row91)+","+string(column91)+"]="+string(powerVector91[row91])+";");}
+   else{write(out91,"reverseC91["+string(row91)+","+string(column91)+"]="+string(coordinates91[row91,1])+";reverseW91["+string(row91)+","+string(column91)+"]="+string(powerVector91[row91])+";");}
+  }
+  print("RR91_COLUMN direction="+string(direction91)+" column="+string(column91)+" pole_power="+string(selected91)+" full_module_product=1");
+ }
+}
+close(out91);
+print("RR91_RESULT directions=2 columns_per_direction=32 full_products=64 certificate_exported=1");
+print("TRANSPORT91_ALL_CHECKS_PASS");
+quit;

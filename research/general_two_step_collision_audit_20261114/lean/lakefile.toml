@@ -1,0 +1,15 @@
+name = "general_two_step_collision_audit"
+version = "0.1.0"
+defaultTargets = ["GeneralTwoStepCollisionAudit"]
+
+[[require]]
+name = "static_hash_collision_audit"
+path = "../../static_hash_collision_audit_20261114/lean"
+
+[[require]]
+name = "two_step_collision_audit"
+path = "../../two_step_collision_audit_20261114/lean"
+
+[[lean_lib]]
+name = "GeneralTwoStepCollisionAudit"
+roots = ["QueryGeometry", "PairLabelEquiv", "ExpectedCollision", "CollisionProbability", "GeneralCollisionCertificate"]

@@ -1178,7 +1178,13 @@ mod tests {
         let m = methods::resolve(m).unwrap();
         methods::applicable(&m, &inst, &w.curve).unwrap();
         let rep = methods::solve(&m, &inst, &w.curve, &w.target, seed).unwrap();
-        (rep, w.planted.unwrap())
+        (
+            rep,
+            w.planted
+                .unwrap()
+                .checked_u128()
+                .expect("legacy hyperelliptic fixture"),
+        )
     }
 
     #[test]

@@ -613,7 +613,7 @@ fn every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum() {
             problems.push(format!("{tag}: refused at plan time: {e}"));
             continue;
         }
-        let k = 1 + 4242 % (facts.r - 1);
+        let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
         let Some(target) = inst.mul_generator_hex(k) else {
             problems.push(format!("{tag}: no target for k = {k}"));
             continue;
@@ -807,8 +807,13 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
             if applicable(&m, &inst, &facts).is_err() {
                 continue;
             }
-            for k in [1u128, 2, facts.r / 2, facts.r - 1] {
-                if k == 0 || k >= facts.r {
+            for k in [
+                1u128,
+                2,
+                facts.r.checked_u128().unwrap() / 2,
+                facts.r.checked_u128().unwrap() - 1,
+            ] {
+                if k == 0 || k >= facts.r.checked_u128().unwrap() {
                     continue;
                 }
                 let Some(target) = inst.mul_generator_hex(k) else {
@@ -864,7 +869,7 @@ fn run_report(id: &str, fx: Fx, params: P) -> SolveReport {
     })
     .unwrap();
     applicable(&m, &inst, &facts).unwrap();
-    let k = 1 + 4242 % (facts.r - 1);
+    let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
     let target = inst.mul_generator_hex(k).unwrap();
     let mut rep = solve(&m, &inst, &facts, &target, 6).unwrap();
     rep.solve_wall_ns = 0;

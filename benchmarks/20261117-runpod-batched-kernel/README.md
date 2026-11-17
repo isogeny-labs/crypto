@@ -1,0 +1,3 @@
+# Batch-counted sparse IC component
+
+Exact qualified summary and final native PDF/SVG/PNG copies from research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45. All eight kernels replay at rank508and every non-wall batch/scalar output matches. Batch Lanczos elapsed38.861/45.972ms versus scalar55.866/68.049ms; RREF19.515/19.735ms remains faster in this single cold trial. Observed incomplete primitive subtotals are unchanged by batching. Complete totals/ratios null; no full-pipeline, external-fastest or leaderboard promotion. Original custody and verified paid-runner deletion are in the research packet. [pcc:unverified]

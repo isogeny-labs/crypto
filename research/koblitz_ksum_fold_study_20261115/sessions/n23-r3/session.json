@@ -1,0 +1,58 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h3978b6fbe105",
+  "label": "Frobenius-folded k-sum vs lazy orbit-member IC: Koblitz a=1 n=23 replicate 3",
+  "spec_id": "ECS1h74bd74a69f44",
+  "spec_sha256": "74bd74a69f4419b10ab8d006c36f224ef8d0ccc4033c31d8d1fa2f7350ecff36",
+  "env_class_id": "ECBENV3hb516f42f4ab3",
+  "host_sha256": "9cf284ee13c3b6208b70f5480f43ae97c2970d55efb55cca0e38a8ee972941c0",
+  "plan_sha256": "86f4917e4eb9f9a525d28b4b3c7dfec32a40d1bb13f46fd68751f629a981b08f",
+  "binary_sha256": "6c60b4c931294bf770039a5b47800e39c424eb2e7f4876b426cd084f7c364d77",
+  "git_commit": "9fa38942e40f8583fe24acf15f830dbf1b77ea6f",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794781585141,
+  "finished_unix_ms": 1794781601595,
+  "status": "complete",
+  "executions_planned": 2112,
+  "records_written": 2112,
+  "records_sha256": "2e2be058d8bab12666d3d972ade62e34df127b00fbe049b1a0b93fe99f75f014",
+  "status_counts": {
+    "error": 576,
+    "verified": 1536
+  },
+  "last_seq": 2111
+}

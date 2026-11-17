@@ -1,0 +1,380 @@
+[
+  {
+    "theorem": "OrientationFullChart.mapped_integral_content",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem mapped_integral_content (P : Polynomial LocalIntegral.integralRing) : Content 0 (P.map LocalIntegral.integralRing.subtype)",
+    "decl_sha256": "576f4211a62bdf5edd851d4f5ac6a861f710fd6b9e33f68b6501bc5128820daa",
+    "claim_id": "PCC-20261114-af93f8"
+  },
+  {
+    "theorem": "OrientationFullChart.chartRatio_value",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chartRatio_value (a : \u2115) (m s : Nodes a) : ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):\u211a) = (2:\u211a)^(a+1)/(node a m-node a s)",
+    "decl_sha256": "822f7fcbe86a7423a6865c989abaf2e0e76d2ae8d2a28017c5cd4fcbf218aef0",
+    "claim_id": "PCC-20261114-76fb2a"
+  },
+  {
+    "theorem": "OrientationFullChart.mapped_localBase_factor",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem mapped_localBase_factor (a : \u2115) (m s : Nodes a) (hsm : s \u2260 m) : (LocalCharts.localBase a m s).map LocalIntegral.integralRing.subtype = C ((LocalIntegral.rhoUnit a m:LocalIntegral.integralRing):\u211a)* (C ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):\u211a)*X)* (restPolynomial a m s).map LocalIntegral.integralRing.subtype",
+    "decl_sha256": "c2297d57d2b473e46f65a3c6cb9b86a610d28d83f66bc94e0218f539050439cb",
+    "claim_id": "PCC-20261114-b69747"
+  },
+  {
+    "theorem": "OrientationFullChart.indexed_crossing_base_content",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem indexed_crossing_base_content (a i : \u2115) (m s : Nodes a) (hsm : s \u2260 m) (hv : padicValRat 2 (node a m-node a s) \u2264 (i:\u2124)) : Content ((a:\u2124)+1-i) ((base (grid a) (node a s)).comp (C (node a m)+C ((2:\u211a)^(a+1))*X))",
+    "decl_sha256": "0f62e02971ab27708c7dbbc06be8c127b45ee7cab72a389ad758f7498f68df24",
+    "claim_id": "PCC-20261114-2437b7"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_crossing_base_content",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_crossing_base_content (a u i x y : \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : Content ((a:\u2124)+1-i) (chart a (pole i) (base (grid a) (delta x y)))",
+    "decl_sha256": "8abf65c1127982891c374a8fab47410cea1b8be2463a657704c0bfc1ab688474",
+    "claim_id": "PCC-20261114-a999ef"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_completed_crossing_jetWeight",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_completed_crossing_jetWeight (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : Content (jetWeight a u i m) (chart a (pole i) (completed (grid a) u x y m))",
+    "decl_sha256": "7cb9171d7797ffed51c0edc871050ea729fdee02e6a474a9282ce2242b1eef7e",
+    "claim_id": "PCC-20261114-5218f9"
+  },
+  {
+    "theorem": "OrientationFullChart.normalized_crossing_chart_integral",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem normalized_crossing_chart_integral (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : Content 0 (C ((diagonalJet a u i m)\u207b\u00b9)* chart a (pole i) (completed (grid a) u x y m))",
+    "decl_sha256": "5d0bd2dce147e57d2ef5bd517fae0374e0d8980d123b01c7944262bf84506ea9",
+    "claim_id": "PCC-20261114-374d21"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_grid_slope_even",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_grid_slope_even (a : \u2115) (m j : Nodes a) : VBound 1 ((LocalIntegral.chartRatio a m j:LocalIntegral.integralRing):\u211a)",
+    "decl_sha256": "95932e7cf9b418c9ee9486da78c6137511358d0ef6f8cfc84231d007db74d818",
+    "claim_id": "PCC-20261114-cbc29a"
+  },
+  {
+    "theorem": "OrientationFullChart.mapped_rest_product",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem mapped_rest_product (a : \u2115) (m s : Nodes a) : (restPolynomial a m s).map LocalIntegral.integralRing.subtype = \u220f j \u2208 (univ.erase m).erase s, (1+C ((LocalIntegral.chartRatio a m j:LocalIntegral.integralRing):\u211a)*X)",
+    "decl_sha256": "9c21d4de83a80009b855e671fcf7435c62c31ab81df47a8731ad0dd0ae869563",
+    "claim_id": "PCC-20261114-513afc"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_rest_weighted",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_rest_weighted (a : \u2115) (m s : Nodes a) : WeightedPolynomial ((restPolynomial a m s).map LocalIntegral.integralRing.subtype)",
+    "decl_sha256": "43bd1569b0230327e3d9d0aef5199221c95ffc3283d5312f921567074630aa1d",
+    "claim_id": "PCC-20261114-94dde2"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_rest_constant",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_rest_constant (a : \u2115) (m s : Nodes a) : ((restPolynomial a m s).map LocalIntegral.integralRing.subtype).coeff 0 = 1",
+    "decl_sha256": "ccf54591111d5532669beb8af36bb55252d54368fed9e4823fc3314b3f3a078a",
+    "claim_id": "PCC-20261114-6c1693"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_anchor_chart_slope_even",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_anchor_chart_slope_even (a i j : \u2115) (hi : i < a) (hj : j < a) : VBound 1 (chartAnchorSlope a i j)",
+    "decl_sha256": "7d8b119766063578bb15a4eeb67807bcfb8efb437d96898aee7f4d3b0f3ca81b",
+    "claim_id": "PCC-20261114-459fda"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_chart_unit_weighted",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_chart_unit_weighted (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) : WeightedPolynomial (chartUnit a u i x y m)",
+    "decl_sha256": "755d2428f3f19bd8279ac25e10abd63b4f8268f099f400f956d32a0df179c77c",
+    "claim_id": "PCC-20261114-631bab"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_chart_unit_constant",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_chart_unit_constant (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) : (chartUnit a u i x y m).coeff 0=1",
+    "decl_sha256": "e3562fb638df4a9b3ac9de3bbf6321549596b9a61dbe65ae70b9f4006c1f60c5",
+    "claim_id": "PCC-20261114-19b347"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_factor_chart_unit",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_factor_chart_unit (a u i x y j : \u2115) (hj : j \u2208 mask u x y) : chart a (pole i) (factor (delta x y) j) = C ((factor (delta x y) j).eval (poleQ i))*(1+C (chartAnchorSlope a i j)*X)",
+    "decl_sha256": "76b4e61ced729514cfbed3bd93df835c74a00525b695e27bc64767899f4b2441",
+    "claim_id": "PCC-20261114-58682b"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_correction_chart_unit",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_correction_chart_unit (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) : chart a (pole i) (correction u x y m) = C ((correction u x y m).eval (poleQ i))*chartUnit a u i x y m",
+    "decl_sha256": "6ff3d118b559482fc13e44be6ebd726393c66d5a2d32067a1afbd17d6c61530c",
+    "claim_id": "PCC-20261114-1403eb"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_completed_chart_unit",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_completed_chart_unit (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : \u2203 U : \u211a[X],WeightedPolynomial U \u2227 U.coeff 0=1 \u2227 chart a (pole i) (completed (grid a) u x y M) = C (firstJet a u i x y M)*X*U",
+    "decl_sha256": "12f5311a25089339ad403c39cca212feaac98f1fb330c925453d6fc59f52272c",
+    "claim_id": "PCC-20261114-4e9529"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_first_ratio_integral",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_first_ratio_integral (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : VBound 0 (firstJet a u i x y M/diagonalJet a u i M)",
+    "decl_sha256": "c99845f16d826546fbfd26ecb718536fd7478c13aa002389400c41a06e945c31",
+    "claim_id": "PCC-20261114-61a520"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_normalized_coefficient_weight",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_normalized_coefficient_weight (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) (n : \u2115) : VBound (n:\u2124) ((normalizedEntry a u i x y M).coeff (n+1))",
+    "decl_sha256": "bf97cab55aa83a16f6f9899bdb0aca5b8df39f63ad265618b0b834df80f82753",
+    "claim_id": "PCC-20261114-0be10e"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_normalized_constant",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_normalized_constant (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : (normalizedEntry a u i x y M).coeff 0=0",
+    "decl_sha256": "3bce6621755ac46072dd2857917c8f4bb2bc1540c302c808fcc30b7707211402",
+    "claim_id": "PCC-20261114-e0888e"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_normalized_first",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_normalized_first (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) : (normalizedEntry a u i x y M).coeff 1 = firstJet a u i x y M/diagonalJet a u i M",
+    "decl_sha256": "436bb89ec1525c04180ea9dea125d7eea960e310f051fc121040c9118b9a8311",
+    "claim_id": "PCC-20261114-f95165"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_whole_chart_first_layer",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_whole_chart_first_layer (a u i x y : \u2115) (M : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) : Content 1 (normalizedEntry a u i x y M-C (firstJet a u i x y M/diagonalJet a u i M)*X)",
+    "decl_sha256": "1227b17c6887bccef06b6c9bf1d4873eee91e7c65a9153ac522c31fc8d8922f2",
+    "claim_id": "PCC-20261114-3aaa1c"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_chart_to_first",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_chart_to_first (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (x y : Ports a) : Content 1 (normalizedChartMatrix a u i M x y-C (normalizedCrossing a u i M x y)*X)",
+    "decl_sha256": "e778aee605b3aad3ad38c2d0412aa8655b522457f765586d0561cc0b0fa1d727",
+    "claim_id": "PCC-20261114-927e4f"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_chart_leading_product",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_chart_leading_product (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hM : \u2200 j < u,0 < M j) (x y : Ports a) : Content 1 (normalizedChartMatrix a u i M x y-C ((leftFactor a u*rightFactor a u) x y)*X)",
+    "decl_sha256": "d110bca097166026d604ef865ce410fdae273412a5b1bbbf784e5c4d522aef1f",
+    "claim_id": "PCC-20261114-62c6a9"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_product",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_product (a u : \u2115) (x y : Ports a) : (chartLeft a u*chartRight a u) x y=C ((leftFactor a u*rightFactor a u) x y)*X",
+    "decl_sha256": "8f4e8c23e8329cf7305ca25839f2ddd6dd7f117205f6caf46318ac434c548b19",
+    "claim_id": "PCC-20261114-c972bb"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_left_integral",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_left_integral (a u : \u2115) (x : Ports a) (r : Labels u) : Content 0 (chartLeft a u x r)",
+    "decl_sha256": "2bd6c2f20354495dd804b7d63e7ef1bd034364ee7ef78fd02e7c5b2f4dd1b413",
+    "claim_id": "PCC-20261114-b35517"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_right_integral",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_right_integral (a u : \u2115) (r : Labels u) (y : Ports a) : Content 0 (chartRight a u r y)",
+    "decl_sha256": "ba5dd6223fc1b80d46beb07a6e8fafdaa601a5edf2786dedd5a203ecbd0e05e6",
+    "claim_id": "PCC-20261114-90034d"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_chart_leading_factorization",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_chart_leading_factorization (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hM : \u2200 j < u,0 < M j) (x y : Ports a) : Content 1 (normalizedChartMatrix a u i M x y-(chartLeft a u*chartRight a u) x y)",
+    "decl_sha256": "31bde0088aa539003efc83f4b2ec3874172b2ee8fe363400f6bd9e225be86588",
+    "claim_id": "PCC-20261114-141d98"
+  },
+  {
+    "theorem": "OrientationFullChart.crossing_chart_scale",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem crossing_chart_scale (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hia : i \u2264 a) (x y : Ports a) : crossingChartMatrix a u i M x y=C (diagonalJet a u i M)*normalizedChartMatrix a u i M x y",
+    "decl_sha256": "b0918cc42e3e84c40234aa02fa0c3344390dc436965793cb6421ff5cd104c5b0",
+    "claim_id": "PCC-20261114-b6477f"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_weighted_product",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_weighted_product (a u i : \u2115) (M : \u2115 \u2192 \u2115) (x y : Ports a) : (chartWeightedLeft a u i M*chartRight a u) x y= C (diagonalJet a u i M)*(chartLeft a u*chartRight a u) x y",
+    "decl_sha256": "a34a9cb23d3f6f4b0bd25b7898c77e62f782a6c4139ee3a1ec5909859f060d4e",
+    "claim_id": "PCC-20261114-3907a0"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_weighted_left_bound",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_weighted_left_bound (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (x : Ports a) (r : Labels u) : Content (jetWeight a u i M) (chartWeightedLeft a u i M x r)",
+    "decl_sha256": "c3781980d4d767592f29d01c66efbd449b1072e4c65eb5e235f4bcebd65fc4a4",
+    "claim_id": "PCC-20261114-864d69"
+  },
+  {
+    "theorem": "OrientationFullChart.actual_weighted_chart_leading_factorization",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem actual_weighted_chart_leading_factorization (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hM : \u2200 j < u,0 < M j) (x y : Ports a) : Content (jetWeight a u i M+1) (crossingChartMatrix a u i M x y-(chartWeightedLeft a u i M*chartRight a u) x y)",
+    "decl_sha256": "41094fff8ec2a45beff9ddbe7e4ed8a006a619e253aa3a2b4d07a391c6815c4e",
+    "claim_id": "PCC-20261114-dc6a99"
+  },
+  {
+    "theorem": "OrientationFullChart.chart_weighted_left_integral",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationFullChart.lean",
+    "statement": "theorem chart_weighted_left_integral (a u i : \u2115) (M : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hw : 0 \u2264 jetWeight a u i M) (x : Ports a) (r : Labels u) : Content 0 (chartWeightedLeft a u i M x r)",
+    "decl_sha256": "fb94c354dc750ba61062bcc87b0a121982b39f1b2c31f4499e94cafd8c7ad9a3",
+    "claim_id": "PCC-20261114-c18fea"
+  },
+  {
+    "theorem": "AnchorBudget.terminal_fibonacci_bound",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem terminal_fibonacci_bound (ms : List \u2115) (r : \u2115) (h : Feasible 0 (ms ++ [r])) : Nat.fib (2 * ms.length + 1) * r \u2264 (ms ++ [r]).sum \u2227 Nat.fib (2 * ms.length + 2) * r \u2264 penalty (ms ++ [r])",
+    "decl_sha256": "354269d1b419aa9228f1f9538331fbf242e5768c0c74ccd8a094cfcef6247a4c",
+    "claim_id": "PCC-20261114-53ca83"
+  },
+  {
+    "theorem": "OrientationActualBudget.anchors_length",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem anchors_length (m : \u2115 \u2192 \u2115) (u : \u2115) : (anchors m u).length = u",
+    "decl_sha256": "dd1242febb2005993c924fd834873dc25fa63e57c0b12409cfaa7b6bf601c4b0",
+    "claim_id": "PCC-20261114-2768a8"
+  },
+  {
+    "theorem": "OrientationActualBudget.anchors_append",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem anchors_append (m : \u2115 \u2192 \u2115) (u : \u2115) : anchors m (u+1) = anchors m u ++ [m u]",
+    "decl_sha256": "5984f0bb3829c47b6b734927fe49e92442e43b4244f5be4ea485d86b8521c805",
+    "claim_id": "PCC-20261114-a9a4ac"
+  },
+  {
+    "theorem": "OrientationActualBudget.anchors_cons",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem anchors_cons (m : \u2115 \u2192 \u2115) (u : \u2115) : anchors m (u+1) = m 0 :: anchors (fun j => m (j+1)) u",
+    "decl_sha256": "94bab9157b7f9f8fc7a29fcedb2ff157b558f8bd4a627e143bc76f8bb7f862ff",
+    "claim_id": "PCC-20261114-aa287b"
+  },
+  {
+    "theorem": "OrientationActualBudget.anchors_mass",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem anchors_mass (m : \u2115 \u2192 \u2115) (u : \u2115) : (anchors m u).sum = \u2211 j \u2208 range u, m j",
+    "decl_sha256": "06f0f6e0da6e74a0794b514aa407021568e4aa9f9260aa7bc8f9a316a7249fa0",
+    "claim_id": "PCC-20261114-6fa1e8"
+  },
+  {
+    "theorem": "OrientationActualBudget.penalty_append_single",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem penalty_append_single (ms : List \u2115) (r : \u2115) : penalty (ms ++ [r]) = penalty ms + (ms.length+1)*r",
+    "decl_sha256": "4f4a52732556c7ba84e5be10492b79e465d3a361c73b2ddafedd17fd3489f914",
+    "claim_id": "PCC-20261114-62fea7"
+  },
+  {
+    "theorem": "OrientationActualBudget.anchors_penalty",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem anchors_penalty (m : \u2115 \u2192 \u2115) (u : \u2115) : penalty (anchors m u) = \u2211 j \u2208 range u, (j+1)*m j",
+    "decl_sha256": "a8de51f7314a312bad206bf04f5f34963393f9f6bc1aec158b7da1cb741c68a3",
+    "claim_id": "PCC-20261114-fce545"
+  },
+  {
+    "theorem": "OrientationActualBudget.head_penalty",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem head_penalty (m : \u2115 \u2192 \u2115) (u : \u2115) : penalty (anchors (fun j => m (j+1)) u) = \u2211 j \u2208 range (u+1), j*m j",
+    "decl_sha256": "f69c9b1ef9dc1ec79f53f1b0c2eea7779e66216c6bb1773cba7083e965de0930",
+    "claim_id": "PCC-20261114-404908"
+  },
+  {
+    "theorem": "OrientationActualBudget.schedule_shift",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem schedule_shift (m : \u2115 \u2192 \u2115) (u i : \u2115) : schedule (u+1) (i+1) m = schedule u i (fun j => m (j+1))",
+    "decl_sha256": "1499e1398d94bd9ba0957442f5b875fd27a12d6853966995e226b19d90bca821",
+    "claim_id": "PCC-20261114-8ea887"
+  },
+  {
+    "theorem": "OrientationActualBudget.actual_schedule_feasible",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem actual_schedule_feasible (m : \u2115 \u2192 \u2115) (u : \u2115) (hm : \u2200 i < u, 0 \u2264 schedule u i m) : Feasible 0 (anchors m u)",
+    "decl_sha256": "5b3f59130d0e981fb425d1026df442c2de5981f079c7a2f7e5ff8ece1859412b",
+    "claim_id": "PCC-20261114-d08950"
+  },
+  {
+    "theorem": "OrientationActualBudget.actual_terminal_mass_bound",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem actual_terminal_mass_bound (m : \u2115 \u2192 \u2115) (u : \u2115) (hm : \u2200 i < u+1, 0 \u2264 schedule (u+1) i m) : Nat.fib (2*u+1)*m u \u2264 \u2211 j \u2208 range (u+1), m j",
+    "decl_sha256": "0f8a10921aa2093212205aceab21748f63acc12a032688cd4a716473ee372e19",
+    "claim_id": "PCC-20261114-aefa16"
+  },
+  {
+    "theorem": "OrientationActualBudget.actual_terminal_degree_cap",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem actual_terminal_degree_cap (m : \u2115 \u2192 \u2115) (u K L : \u2115) (hm : \u2200 i < u+1, 0 \u2264 schedule (u+1) i m) (hdegree : \u2211 j \u2208 range (u+1), m j \u2264 K*L) : Nat.fib (2*u+1)*m u \u2264 K*L",
+    "decl_sha256": "aab7ba9178d1f38ca9c78c45a5294c9652304084f9bd9d4c65b62457e35cd688",
+    "claim_id": "PCC-20261114-ca335e"
+  },
+  {
+    "theorem": "OrientationActualBudget.selected_factor_degree",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem selected_factor_degree (u x y j : \u2115) (hj : j \u2208 mask u x y) : (factor (delta x y) j).natDegree = 1",
+    "decl_sha256": "34b86f86a06c96e64caf11ed08c1892935392ba8540316f3154c8dc857341edd",
+    "claim_id": "PCC-20261114-bc63cc"
+  },
+  {
+    "theorem": "OrientationActualBudget.selected_factor_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem selected_factor_ne_zero (u x y j : \u2115) (hj : j \u2208 mask u x y) : factor (delta x y) j \u2260 0",
+    "decl_sha256": "e5dbea691fbc1f263b7d8cb02011f9888a8c0ab203c10e44c82f00c7920da484",
+    "claim_id": "PCC-20261114-2278f4"
+  },
+  {
+    "theorem": "OrientationActualBudget.correction_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem correction_ne_zero (u x y : \u2115) (m : \u2115 \u2192 \u2115) : correction u x y m \u2260 0",
+    "decl_sha256": "cd91609484efa287a820ba1e565da87acdb85a80245fb9bf166886aca6714dcd",
+    "claim_id": "PCC-20261114-7702d3"
+  },
+  {
+    "theorem": "OrientationActualBudget.correction_degree_exact",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem correction_degree_exact (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (correction u x y m).natDegree = \u2211 j \u2208 mask u x y, m j",
+    "decl_sha256": "47aff9600265a247ffc2a8aa85656fd76a8a059090f8963c28e9399910c684f6",
+    "claim_id": "PCC-20261114-19da8a"
+  },
+  {
+    "theorem": "OrientationActualBudget.diagonal_correction_degree",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem diagonal_correction_degree (u x : \u2115) (m : \u2115 \u2192 \u2115) : (correction u x x m).natDegree = mass u m",
+    "decl_sha256": "5535ffab1477dbd2e19b3b27fa372c2cc4a9a8f7240f86d3c8f020b807be7942",
+    "claim_id": "PCC-20261114-e112f2"
+  },
+  {
+    "theorem": "OrientationActualBudget.base_degree_exact",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem base_degree_exact (S : Finset \u211a) (d : \u211a) (h0 : 0 \u2208 S) (hd : d \u2208 S) : (base S d).natDegree = S.card-1",
+    "decl_sha256": "7af9957e3d39994a7ba4fd3b81db1c94679525bb97a60f01418578f605279aaf",
+    "claim_id": "PCC-20261114-9f5c34"
+  },
+  {
+    "theorem": "OrientationActualBudget.base_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem base_ne_zero (S : Finset \u211a) (d : \u211a) (h0 : 0 \u2208 S) : base S d \u2260 0",
+    "decl_sha256": "735da3485efe28bcaa3866fcdc0776fa09f0241db1ada958cefa3983881ff285",
+    "claim_id": "PCC-20261114-c985f7"
+  },
+  {
+    "theorem": "OrientationActualBudget.completed_diagonal_degree",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem completed_diagonal_degree (S : Finset \u211a) (u x : \u2115) (m : \u2115 \u2192 \u2115) (h0 : 0 \u2208 S) : (completed S u x x m).natDegree = S.card-1+mass u m",
+    "decl_sha256": "02ba85c4a74f269ffd86c7d669b71c3bf351d289497020a6840c5549bd35a681",
+    "claim_id": "PCC-20261114-b4a0e7"
+  },
+  {
+    "theorem": "OrientationActualBudget.actual_terminal_polynomial_budget",
+    "source": "research/prime_orientation_layers_20261114/completion/lean/OrientationBudget.lean",
+    "statement": "theorem actual_terminal_polynomial_budget (a u x K : \u2115) (m : \u2115 \u2192 \u2115) (hm : \u2200 i < u+1, 0 \u2264 schedule (u+1) i m) (hdegree : (completed (grid a) (u+1) x x m).natDegree \u2264 (2*2^a-1)+K*2^a) : Nat.fib (2*u+1)*m u \u2264 K*2^a",
+    "decl_sha256": "cfc7677d371b9fe17f8febd4b4003f7936bcf2ace5341b80295670fd3a49d0f9",
+    "claim_id": "PCC-20261114-2d4b00"
+  }
+]

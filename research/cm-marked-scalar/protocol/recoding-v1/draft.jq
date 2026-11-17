@@ -1,0 +1,68 @@
+.protocol_id="CM-MODULAR-RECODING-V1" | .version=1 | .created="2026-11-08" |
+.question="Can bounded modular representatives lower exact explicit group-operation counts for the fixed marked action, with identical optimization available to direct multiplication?" |
+.claims=[
+ {id:"C-correct",text:"Translated direct and fused point actions equal the fixed mu action.",class:"exact_computation",decided_by:[]},
+ {id:"C-count",text:"The translated fused route has a lower minimum D+A than identically optimized direct multiplication within the frozen finite design.",class:"comparative",decided_by:["C-route"],if_supported:"A source-specific exact group-count improvement; no runtime implication.",if_not_supported:"Preserve the loss or tie and all plans."},
+ {id:"C-direct",text:"Translation lowers the direct count relative to its zero-shift control.",class:"comparative",decided_by:["C-direct-translate"]}
+] |
+.arms[0].instrument as $instrument |
+.arms=[
+ {id:"direct-translated",role:"reference",description:"Best direct signed-window plan within the same representative scan.",instrument:$instrument},
+ {id:"fused-translated",role:"candidate",description:"Complete width2 multiplication by ell followed by the translated correcting scalar; both tables charged.",instrument:$instrument},
+ {id:"direct-centered",role:"baseline",description:"Centered direct scalar, optimized over the same six widths.",instrument:$instrument},
+ {id:"fused-centered",role:"baseline",description:"Centered correcting scalar plus the complete small-scalar step.",instrument:$instrument}
+] |
+.arms[].instrument.build=[["make","-B","-j1","-C","research/cm-marked-scalar","recoding-binary"]] |
+.arms[].instrument.flags={backend:"OpenSSL 3.5.8",language:"C++17",claim:"Exact group schedules; no clock",table_points:"Accumulated across both fused scalar calls"} |
+.controls={
+ aa:{present:false,comparison:null,not_applicable_reason:"Exact deterministic finite enumeration without a timing metric; reconstruct every scalar and qualify actual API counts."},
+ positive:{present:false,arm:null,expected_detection:null,not_applicable_reason:"Separate native qualification checks 1500 boundary scalar/point/window cases against OpenSSL and analytic counters; all 200 selected-plan point cases must also pass."},
+ negative:{present:false,arm:null,null_population:null,not_applicable_reason:"Every zero-shift row is an unchanged-method negative control; centered paths remain baseline arms. No stochastic null population is inferred."}
+} |
+.variable_ledger={
+ independent:[{name:"method",levels:["direct","fused"]},{name:"representative search",levels:["zero shift","all integer shifts -256..256"]}],
+ factors:[
+  {name:"curves and scalars",treatment:"fixed",value:["P-192","P-224","P-256","P-384","P-521"],how:"Same seven JSON inputs; hashes in execution.placement.input_files. P-192 primary."},
+  {name:"shift",treatment:"crossed",value:"Every integer -256..256 from each centered scalar",how:"Complete census; no adaptive bound after observations."},
+  {name:"window",treatment:"crossed",value:[2,3,4,5,6,7],how:"Every width retained; small-scalar ell uses width2."},
+  {name:"addition weight",treatment:"crossed",value:[1,2,3,4],how:"Primary D+A; secondary D+tau*A, tau2..4. Tie key score,N,D,A,abs(j),j,width. Proxies, not runtime weights."},
+  {name:"instrument",treatment:"fixed",value:"One native binary and backend",how:"Published source and binary digests; identical evaluator implementation for every arm."},
+  {name:"point dependence",treatment:"fixed",value:"Nonzero order-n point for schedules; identity as a correctness control",how:"Analytic API counts checked against actual point operations; no input logarithm supplied to evaluator."},
+  {name:"host and threads",treatment:"measured",value:"One local process/thread, 2GiB address-space ceiling",how:"Development count diagnostic; no clock metric or latency inference."}
+ ],
+ comparisons:[
+  {id:"C-route",arms:["direct-translated","fused-translated"],differs_in:["method"],design:"one_factor"},
+  {id:"C-direct-translate",arms:["direct-centered","direct-translated"],differs_in:["representative search"],design:"one_factor"},
+  {id:"C-fused-translate",arms:["fused-centered","fused-translated"],differs_in:["representative search"],design:"one_factor"}
+ ],aa_not_applicable:"Exact deterministic census without a timing metric.",crosses_map:true
+} |
+.randomization={
+ arm_order:"fixed",arm_order_reason:"No hardware-dependent metric; all methods use the full identical deterministic design.",
+ seed_derivation:{method:"explicit_list",seeds:[20261108],nonce:null,note:"No random sampling; seed is a design identifier only."},
+ instance_sampling:{rule:"Five curves, two centered scalars, six widths, 513 shifts: 30780 schedules.",independent_of_arm:true},
+ blinding:{analysis_labels_masked:false,how:"Mechanical exact minimum and tie rule fixed before data.",unmasked_at:null}
+} |
+.sample_size={instances:5,replicates:1,warmups:0,
+ power:{method:"exact",alpha:0.05,tests_in_family:5,correction:"none",rank_test_n:null,min_attainable_two_sided_p:null,passes:true,note:"Complete finite census, no stochastic or population inference. Strict integer inequality decides each curve separately. No significance or statistical-power claim."},
+ preflight_runtime:{fixed_seconds:null,per_sample_seconds:null,threads:1,estimated_total_seconds:null,measured_on:"No timing pilot. Single scan and qualification each have a 120-second hard deadline; retain timeout."}
+} |
+.metrics={
+ primary:[{id:"D_plus_A",name:"Explicit group doubles plus additions",unit:"group API calls",kind:"exact",definition:"D+A including odd tables and complete small-scalar ell step for fused. Minimum over frozen shifts and widths.",source:"scan.csv doubles+adds; plans.json",aggregation:"min",resolution:"one call",uncertainty:"none_exact"}],
+ secondary:[{id:"D_A_N_tables",name:"Named group counter vector",unit:"calls and table points",kind:"exact",definition:"Doubles, additions, negations and cumulative table points; D+tau*A, tau2..4, is sensitivity only.",source:"scan.csv and plans.json",aggregation:"per_row",resolution:"one call or point",uncertainty:"none_exact"}]
+} |
+.measurement={isolation_required:"none",warmups:0,order:"sequential",clock:"none",counters:["doubles","adds","negations","table_points"],record:["binary_sha256","protocol_sha256","input hashes","all census rows","qualification receipts"],timed_primary_justification:null} |
+.execution.backend="local" | .execution.queue=null |
+.execution.placement={threads:1,memory_limit_kib:2097152,max_cloud_cost_usd:0,shift_min:-256,shift_max:256,widths:[2,3,4,5,6,7],weights:[1,2,3,4],input_files:[]} |
+.execution.measurement_class="search" | .execution.timeout_seconds=120 | .execution.retries.max_attempts=1 |
+.stopping_rules=[
+ {rule:"Exactly 30780 schedules then all 200 selected-plan point checks. No changed scalar, extra shifts or alternative score after data.",kind:"fixed_n",preregistered:true},
+ {rule:"Wrong digit/point/count, hash mismatch, missing or duplicate row, incomplete archive or timeout invalidates and is retained.",kind:"invalidation",preregistered:true}
+] |
+.decision_rule={text:"Per curve compare minimum translated fused and translated direct D+A. Strictly smaller: supported_within_scope; equal: tied; larger: candidate_higher_count. Preserve centered controls and all sensitivity weights. No runtime implication.",comparison_ids:["C-route","C-direct-translate","C-fused-translate"],threshold:"Strict integer inequality at addition weight1",statistic:"Exact minimum; tie by score,N,D,A,abs(j),j,width",interval:"None: complete finite census",multiple_comparison_correction:"none",effect_size_measure:"Absolute count difference and ratio, with all components",verdict_vocabulary:["supported_within_scope","tied","candidate_higher_count","invalid_measurement"]} |
+.analysis_plan={script:{path:"research/cm-marked-scalar/recoding.cpp",sha256:null},inputs:["scan.csv","plans.json","selected-plan qualification"],outputs:["Per-curve comparison","Raw census archive","Experiment export","Descriptive report"],blinded:false,frozen_before_data:true} |
+.literature=[{ref:"https://arxiv.org/abs/1110.0966",provenance:"retrieved",claim:"Signed expansions and digit-set optimality are established background. No novelty or runtime-optimality claim.",verified_by:"Author abstract checked 2026-11-08"}] |
+.reporting.graphs=["Centered and translated direct/fused count minima per curve"] |
+.inadmissible=["Different mu or point per arm","Optimizing candidate only","Dropping small-scalar or table costs","Treating weights as latency","Ignoring plan generation in future first-use accounting","Changing design after data","Claiming global quotient evaluation from subgroup recoding"] |
+.invalidation_rules=["Any wrong scalar/point/count, incomplete census, missing hash or invalid archive prevents the affected count claim.","Original runtime objective requires a separately admitted cold timing comparison."] |
+.amendments=[] |
+.freeze={status:"draft",protocol_sha256:null,commit:null,frozen_at:null,filed_before_affected_data:null}

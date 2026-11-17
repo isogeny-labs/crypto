@@ -1,0 +1,25 @@
+{
+  "schema": "compact-native-build/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "class": "actual-root development correctness, not benchmark",
+  "executables": {
+    "worker": {
+      "path": "/workspace/relation-native-qualifiers/compact-worker-96f0c814d-01",
+      "sha256": "4377360b85319884221fe8a0efaf17d4671ba8322342056ca494f11202a63d22",
+      "bytes": 17921192
+    },
+    "api": {
+      "path": "/workspace/relation-native-qualifiers/compact-api-96f0c814d-01",
+      "sha256": "594abe4c41ed2c80281171531b2da194039540d4607769ddad1234fd314ffb22",
+      "bytes": 19015056
+    },
+    "cli": {
+      "path": "/workspace/relation-native-qualifiers/compact-cli-96f0c814d-01",
+      "sha256": "cce8e010638c7ab748de2714a66440af86c0a7e1d712c34b76db6d07ff402e95",
+      "bytes": 2172624
+    }
+  },
+  "transform": "separate copies, strip debug, read-only before hash",
+  "build_command": "cargo test --locked --no-run --test native_api --test root_worker --manifest-path research/relation_degree_trace_20261115/rust-integration/Cargo.toml --target-dir target --message-format=json",
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)"
+}

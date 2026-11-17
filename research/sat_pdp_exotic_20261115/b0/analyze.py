@@ -18,14 +18,27 @@ ARMS = ["native", "native-aa", "cms", "cadical", "chain-p12", "lin", "lin-nolex"
 
 
 def load():
+    """Rows per rung. Several files may hold the same rung (AM2: a partial first run
+    kept beside the restarted run); rows with the same (l, idx) are merged by arm,
+    the first file's record of an arm winning. Targets are seeded, so the same idx
+    is the same target; the merge asserts that."""
     out = {}
     for fn in sorted(os.listdir(ROWS)):
         if not fn.endswith(".jsonl"):
             continue
-        rows = [json.loads(x) for x in open(os.path.join(ROWS, fn)) if x.strip()]
-        if rows:
-            out[rows[0]["l"]] = rows
-    return out
+        for x in open(os.path.join(ROWS, fn)):
+            if not x.strip():
+                continue
+            r = json.loads(x)
+            by_idx = out.setdefault(r["l"], {})
+            if r["idx"] in by_idx:
+                prev = by_idx[r["idx"]]
+                assert prev["x_r"] == r["x_r"], f"target mismatch at l={r['l']} idx={r['idx']}"
+                for arm, v in r["arms"].items():
+                    prev["arms"].setdefault(arm, v)
+            else:
+                by_idx[r["idx"]] = r
+    return {l: [by_idx[i] for i in sorted(by_idx)] for l, by_idx in out.items()}
 
 
 def rung_summary(rows):

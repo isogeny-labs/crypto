@@ -1,0 +1,1057 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "msolve-crash-diagnostic-20261110-v1",
+  "created": "2026-11-10T17:25:43.375074+00:00",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "7bf6fb556462fe34ecea980d3872ba9ce278be9fabdb4f2d3e49c67bc6d1e734",
+    "protocol_id": "msolve-crash-diagnostic-20261110",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "f79068d307a34332433e912a7133187f17a373da",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "49390d7400dde4fb249beb741dedc6f48d6e3289b35d6fd03cb60d703ada2708",
+    "class_id": "local-shared-msolve-diagnostic",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "original-l2-ordinary",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l2-saturation",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l2-ordinary",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l2-saturation",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l1-ordinary",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l1-saturation",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l1-ordinary",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l1-saturation",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "original-l2-ordinary",
+      "arm": "original-l2-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l2-ordinary.argv",
+          "sha256": "ce32b10b20bc188684471d0354abd14845b9df3e77e1464670d6cd8685b839d7",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.end",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.exit",
+          "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.start",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:24:59Z",
+      "finished_at": "2026-11-10T17:24:59Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l2-saturation",
+      "arm": "original-l2-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timed_out",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l2-saturation.argv",
+          "sha256": "0b87ca4aba63dba8665ed222d6b67e76e203051297c7212109e63c2068b6433f",
+          "bytes": 132,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.end",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.start",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:24:59Z",
+      "finished_at": "2026-11-10T17:25:04Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l2-ordinary",
+      "arm": "sanitized-l2-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.argv",
+          "sha256": "1cc83798553f79bdc5d2c8cca76c8949dc6ab97589aaa7c3444d66a12c4b8d97",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.end",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.start",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.stderr",
+          "sha256": "951f7b756d01e313093ffb4645140e8078593d2348ef42912738230b4bc6cfcd",
+          "bytes": 948,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:04Z",
+      "finished_at": "2026-11-10T17:25:04Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l2-saturation",
+      "arm": "sanitized-l2-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.argv",
+          "sha256": "9721da5d647d6605d24ed81a524c917e22a278e22ef2bef46119b101526d7da5",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.end",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.start",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.stderr",
+          "sha256": "9765e4b2c53ae34124f0d7c1887bd4eda0846b9713fc3459840720ab97f99e1f",
+          "bytes": 890,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:04Z",
+      "finished_at": "2026-11-10T17:25:05Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l1-ordinary",
+      "arm": "original-l1-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "dimension": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "pass",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l1-ordinary.argv",
+          "sha256": "c7cad9138d59d5d3a397ca7583060b51fb1f16af8faa051699cb9728f8bf2534",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.end",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.out",
+          "sha256": "1ac5710f628f5ec9478d4de8c196e05624bf42bd6d09f4372022f24f6794541e",
+          "bytes": 270,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.start",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:05Z",
+      "finished_at": "2026-11-10T17:25:05Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l1-saturation",
+      "arm": "original-l1-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timed_out",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l1-saturation.argv",
+          "sha256": "5d93b4beef49115cbf9bad9a3703ec13e3cda931f72c3ae576aab236034ec5d0",
+          "bytes": 132,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.start",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:05Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l1-ordinary",
+      "arm": "sanitized-l1-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.argv",
+          "sha256": "9fea45ef6e60f9a4564d59e033cb76f744f06da7704bada84e60ebdc740e8830",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.start",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.stderr",
+          "sha256": "d506319131bc68bbfadc04b1bcf86dd481428d408860686ffe8a75bf4d3cb05e",
+          "bytes": 948,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:10Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l1-saturation",
+      "arm": "sanitized-l1-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.argv",
+          "sha256": "8fce2270a1949c9153019dd0d591e9f3a6062d71e955bbdbf840103c8dfb55fd",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.start",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.stderr",
+          "sha256": "05e5a5e0d9a7a9e69de0ff76004670129ef4b28cde7cd63673fca5a5d09cca19",
+          "bytes": 890,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:10Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    }
+  ],
+  "flow": {
+    "planned": 8,
+    "attempted": 8,
+    "completed": 8,
+    "excluded": {}
+  },
+  "files": [
+    {
+      "path": "evidence/analysis.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.jsonl",
+      "sha256": "315cfbeae39640bfb686c5669b35686c7b6bda79a6819558d90fb480494eba42",
+      "bytes": 92,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.stderr",
+      "sha256": "4e8f16700c95d25acdd10e43c80b54130cda59284bf17fea54cfc1e0de190caa",
+      "bytes": 102,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build-02.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build-02.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.jsonl",
+      "sha256": "66354c704bba13f25a49e544741278300aa90c81320629e92cd11a08dfe914be",
+      "bytes": 61,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.json",
+      "sha256": "c6fde35236a6efd4d22ec8f3d3a79334de3c55fb4cbe6e3f61df2d15997f801b",
+      "bytes": 247,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.log",
+      "sha256": "ca06ffb3afb4ab9043503c5ae6ce1ee37e23b2bd6aa221861710c8099d61efd9",
+      "bytes": 106,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "e9666904331252c05ae1585db948325b101e8f90f813fe7a93c737137ce1042b",
+      "bytes": 363,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.argv",
+      "sha256": "171385afd277ef5753a659c076a8e9f7606a26c3efec73dc75ad53cc83fe5f6e",
+      "bytes": 113,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.end",
+      "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.exit",
+      "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.start",
+      "sha256": "29c536078f767550c12ca39997810b633197ffeb9ef20849c23c9adb5ac6580a",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.argv",
+      "sha256": "ce2b8d9dfa62956110ee6cbc0b9e0af0db9c655b8a4167d276e5a5612871c4be",
+      "bytes": 120,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.end",
+      "sha256": "49f58c85ef977074ad2585214474b15cd30df9e9a55da8aba41375f9025436fb",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.start",
+      "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "e4d98c69f767646b1ad015dcac6fd61b6ffe76e48548e7feb86627ed545190be",
+      "bytes": 500,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/ordinary.ms",
+      "sha256": "940be6ee58679144408ba008d350282f4b68a0ba7477bbdc1bec0d64068e131a",
+      "bytes": 28,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/saturation.ms",
+      "sha256": "5ecba116ff9e4bbd08cd59cba53fe4c7a346f0468476fd29f00f3b383e5647d0",
+      "bytes": 31,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "bf448ad46980e63a2d1111d807b9f8ea528e26973b5c7bd41d9b5a6ca806870a",
+      "bytes": 3166,
+      "kind": "raw"
+    },
+    {
+      "path": "native/polynomial.hpp",
+      "sha256": "6e299d2f8f1032d1bdb1f4459a46ec3e32cc1f88a30fa105f08b082607b9b59b",
+      "bytes": 5491,
+      "kind": "raw"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "db0b647e47b4333d79b36ba82fa9f0638892aba685cf9b53a0e5d934c14bfea3",
+      "bytes": 16021,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "5109bfb15bafd468cff51ecf52754d5e10882defcc0ea044f0921edfad58d535",
+      "bytes": 1986,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "3cc5a0dc7efdf5edd8874f7cd76bd86a29010fa1eebe3db39b11acc8190c65cc",
+      "bytes": 1664,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "8fd28ef5b7e52b35112a36bf6174ed5a2e18b77b6639c95f045402f8331dd31b"
+    },
+    "frozen_before_data": true,
+    "blinded": false,
+    "outputs": [
+      {
+        "path": "evidence/analysis.jsonl",
+        "sha256": "76a63f77f7e6bddd842d42826635f1996e96a1958adf81cadcc12afebe5a7375"
+      }
+    ]
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "All frozen source/input/binary checks passed before2calls. Ordinary exited139 with segmentationfault; saturation reached60second timeout and exited124. Both outputfiles empty; frozen analyzer emitted2not_validated rows.",
+      "by": "producer"
+    },
+    {
+      "kind": "observation",
+      "text": "V1ordinary101callpassed; v1saturation101dispatchrejected; v1samplemetadata/check-exportfailure retained separately. V2frozen before its data; no retries or parser/output changes.",
+      "by": "producer"
+    }
+  ],
+  "reviews_dir": "reviews",
+  "extensions": {
+    "prior_calls": 2,
+    "new_calls": 8,
+    "all_results_retained": true,
+    "paid_compute": 0,
+    "timeout_per_call": 5,
+    "sanitized_first_error": "hash.c409 signed1<<31 in allfourcells; no proof that this causes original l2crash or saturation timeout.",
+    "known_answer_scope": "original l1ordinary passes; other7not_validated; no exclusions."
+  }
+}

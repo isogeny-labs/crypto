@@ -1,0 +1,54 @@
+import NonmonicExact
+set_option autoImplicit false
+noncomputable section
+namespace Pegcd
+open Polynomial
+variable {K : Type*} [Field K]
+structure State (K : Type*) [Field K] where
+ r0 : K[X]
+ r1 : K[X]
+ s0 : K[X]
+ s1 : K[X]
+ t0 : K[X]
+ t1 : K[X]
+def initial (a b : K[X]) : State K := ⟨a,b,1,0,0,1⟩
+def step (z : State K) (q r : K[X]) : State K :=
+ ⟨z.r1,r,z.s1,z.s0-q*z.s1,z.t1,z.t0-q*z.t1⟩
+def Valid (a b : K[X]) (z : State K) : Prop :=
+ z.r0=z.s0*a+z.t0*b ∧ z.r1=z.s1*a+z.t1*b ∧
+ ∀h, (h∣z.r0 ∧ h∣z.r1) ↔ (h∣a ∧ h∣b)
+theorem initial_valid (a b : K[X]) : Valid a b (initial a b) := by
+ simp [Valid,initial]
+theorem step_valid (a b : K[X]) (z : State K) (q r : K[X])
+ (he : z.r0=q*z.r1+r) (hv : Valid a b z) : Valid a b (step z q r) := by
+ obtain ⟨h0,h1,hd⟩ := hv
+ have hr : r=z.r0-q*z.r1 := by rw [he]; ring
+ refine ⟨h1,?_,?_⟩
+ · change r = (z.s0-q*z.s1)*a+(z.t0-q*z.t1)*b
+   rw [hr,h0,h1]; ring
+ · intro h
+   change (h∣z.r1 ∧ h∣r) ↔ _
+   rw [← hd h]
+   constructor
+   · rintro ⟨hx,hy⟩
+     refine ⟨?_,hx⟩
+     rw [he]
+     exact dvd_add (dvd_mul_of_dvd_right hx _) hy
+   · rintro ⟨hx,hy⟩
+     exact ⟨hy,hr ▸ dvd_sub hx (dvd_mul_of_dvd_right hy q)⟩
+inductive Trace : State K → State K → Prop
+ | refl (z) : Trace z z
+ | next (z q r out) : z.r1≠0 → z.r0=q*z.r1+r → Trace (step z q r) out → Trace z out
+theorem trace_valid (a b : K[X]) (z out : State K) (ht : Trace z out) (hv : Valid a b z) :
+ Valid a b out := by
+ induction ht with
+ | refl => exact hv
+ | next z q r out hn he ht ih => exact ih (step_valid a b z q r he hv)
+theorem endpoint (a b : K[X]) (z : State K) (hv : Valid a b z) (hz : z.r1=0) :
+ z.r0=z.s0*a+z.t0*b ∧ z.r0∣a ∧ z.r0∣b ∧ ∀h, (h∣a ∧ h∣b) ↔ h∣z.r0 := by
+ refine ⟨hv.1,?_,?_,?_⟩
+ · exact ((hv.2.2 z.r0).mp ⟨dvd_refl _,hz ▸ dvd_zero _⟩).1
+ · exact ((hv.2.2 z.r0).mp ⟨dvd_refl _,hz ▸ dvd_zero _⟩).2
+ · intro h
+   simpa [hz] using (hv.2.2 h).symm
+end Pegcd

@@ -1,0 +1,13 @@
+fetch 0
+warning: lazy fetching disabled; some objects may not be available
+fatal: could not fetch fd48440eba7eed3f8dfa1e5f22c13cf8b8ca0a91 from promisor remote
+Traceback (most recent call last):
+  File "/workspace/scratch/ct99_handoff26_fast_forward_01.py", line 25, in <module>
+    changed=set(subprocess.check_output(['git','diff','--name-only',source,bot],cwd=r,text=True).splitlines());assert changed==expected and len(changed)==replays+2
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'diff', '--name-only', '99cb2b204da7adc85345d3a7e052a9b95f09a1b5', 'b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8']' returned non-zero exit status 128.

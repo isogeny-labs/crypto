@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.2,ranksep=0.29];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ a [label="Finite fields F -> K; extension B/K; compatible embeddings\nq = |F|; k = [K:F]; actual |K| = q^k"];
+ b [label="Actual scalar endomorphisms\nK-Frobenius restricted to F\nequals F-Frobenius to power k"];
+ c [label="Actual Point.map functor\nMap of a power equals\niteration of the actual point map"];
+ d [label="Actual point descent\nP comes from W(K) iff k iterations\nof F-Frobenius fix P",fillcolor="#dcf1e2"];
+ e [label="Entire actual r-torsion set\nContained in the K-point image iff\nthe k-fold point iterate is identity",fillcolor="#dcf1e2"];
+ f [label="Remaining qualified BK obligations\nActual torsion rank / determinant / Weil necessity",fillcolor="#eeeeee"];
+ {rank=same;b;c}
+ a -> b; a -> c; b -> d; c -> d; d -> e; e -> f [style=dashed];
+}

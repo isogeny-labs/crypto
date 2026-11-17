@@ -55,24 +55,9 @@
 //! - **RFC 7253** — The OCB Authenticated-Encryption Algorithm.
 
 use crate::symmetric::aes::{decrypt_block, encrypt_block, AesKey};
+use crate::symmetric::gf128::double_be as double;
 
 const BLOCK: usize = 16;
-
-/// `double(X)` in GF(2^128) with reduction `x^128 + x^7 + x^2 + x + 1`.
-/// Big-endian byte convention (same as CMAC's `dbl`).
-fn double(x: &[u8; 16]) -> [u8; 16] {
-    let mut out = [0u8; 16];
-    let mut carry = 0u8;
-    for i in (0..16).rev() {
-        let new_carry = x[i] >> 7;
-        out[i] = (x[i] << 1) | carry;
-        carry = new_carry;
-    }
-    if (x[0] >> 7) & 1 == 1 {
-        out[15] ^= 0x87;
-    }
-    out
-}
 
 fn xor16(a: &[u8; 16], b: &[u8; 16]) -> [u8; 16] {
     let mut out = [0u8; 16];

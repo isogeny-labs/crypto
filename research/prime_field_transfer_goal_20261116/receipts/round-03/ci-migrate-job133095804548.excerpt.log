@@ -1,0 +1,56 @@
+efail[0m
+2026-11-16T04:42:32.8493490Z [36;1mcd candidate[0m
+2026-11-16T04:42:32.8493702Z [36;1mbase=$(git merge-base "$BASE_SHA" HEAD)[0m
+2026-11-16T04:42:32.8494067Z [36;1mpython3 ../workflow-tools/.github/scripts/artifact_prefetch.py "$base" HEAD[0m
+2026-11-16T04:42:32.8536828Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:42:32.8537042Z env:
+2026-11-16T04:42:32.8537244Z   BASE_SHA: 88112c5a930009c883059c1c2e3c6c92c4b23f18
+2026-11-16T04:42:32.8537485Z ##[endgroup]
+2026-11-16T04:42:33.1781884Z {"batches": 1, "changed_blobs": 93, "missing_blobs": 93}
+2026-11-16T04:42:33.1889407Z ##[group]Run set -euo pipefail
+2026-11-16T04:42:33.1889690Z [36;1mset -euo pipefail[0m
+2026-11-16T04:42:33.1889980Z [36;1mtest -n "$AWS_ACCESS_KEY_ID" && test -n "$AWS_SECRET_ACCESS_KEY"[0m
+2026-11-16T04:42:33.1890286Z [36;1mcd candidate[0m
+2026-11-16T04:42:33.1890507Z [36;1mbase=$(git merge-base "$BASE_SHA" HEAD)[0m
+2026-11-16T04:42:33.1891099Z [36;1mpython3 ../trusted/tools/artifacts/artifacts.py migrate "$base" HEAD[0m
+2026-11-16T04:42:33.1891431Z [36;1mgit diff --cached --check[0m
+2026-11-16T04:42:33.1936404Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:42:33.1936615Z env:
+2026-11-16T04:42:33.1936924Z   AWS_ACCESS_KEY_ID: ***
+2026-11-16T04:42:33.1937202Z   AWS_SECRET_ACCESS_KEY: ***
+2026-11-16T04:42:33.1937418Z   AWS_REGION: us-west-2
+2026-11-16T04:42:33.1937636Z   BASE_SHA: 88112c5a930009c883059c1c2e3c6c92c4b23f18
+2026-11-16T04:42:33.1937874Z ##[endgroup]
+2026-11-16T04:42:34.0499171Z artifacts migrate: no changed data files
+2026-11-16T04:42:34.1147090Z ##[group]Run set -euo pipefail
+2026-11-16T04:42:34.1147378Z [36;1mset -euo pipefail[0m
+2026-11-16T04:42:34.1147581Z [36;1mcd candidate[0m
+2026-11-16T04:42:34.1147800Z [36;1mif git diff --cached --quiet; then[0m
+2026-11-16T04:42:34.1148147Z [36;1m  echo "No changed data files require migration." >> "$GITHUB_STEP_SUMMARY"[0m
+2026-11-16T04:42:34.1148460Z [36;1m  exit 0[0m
+2026-11-16T04:42:34.1148638Z [36;1mfi[0m
+2026-11-16T04:42:34.1148840Z [36;1mgit -c user.name='github-actions[bot]' \[0m
+2026-11-16T04:42:34.1149184Z [36;1m    -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \[0m
+2026-11-16T04:42:34.1149561Z [36;1m    commit -m 'Move PR data files to the artifact store'[0m
+2026-11-16T04:42:34.1149915Z [36;1m# A newer human push makes this non-fast-forward push fail. Never[0m
+2026-11-16T04:42:34.1150249Z [36;1m# force-push or rewrite a shared PR branch.[0m
+2026-11-16T04:42:34.1150528Z [36;1mgit push origin "HEAD:refs/heads/$HEAD_REF"[0m
+2026-11-16T04:42:34.1151115Z [36;1mecho "Uploaded and replayed changed data; committed manifests and removals." >> "$GITHUB_STEP_SUMMARY"[0m
+2026-11-16T04:42:34.1194828Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:42:34.1195043Z env:
+2026-11-16T04:42:34.1195228Z   HEAD_REF: lane/prime-field-transfer
+2026-11-16T04:42:34.1195451Z ##[endgroup]
+2026-11-16T04:42:34.1849574Z Post job cleanup.
+2026-11-16T04:42:34.2544996Z [command]/usr/bin/git version
+2026-11-16T04:42:34.2582869Z git version 2.56.1
+2026-11-16T04:42:34.2612785Z Temporarily overriding HOME='/home/runner/work/_temp/0b5d376a-bac6-4beb-9c67-fbfbbaa1fafa' before making global git config changes
+2026-11-16T04:42:34.2613853Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T04:42:34.2617960Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto/candidate
+2026-11-16T04:42:34.2651918Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T04:42:34.2682731Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T04:42:34.7648076Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T04:42:34.7674180Z http.https://github.com/.extraheader
+2026-11-16T04:42:34.7683699Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-16T04:42:34.8181806Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T04:42:34.8903872Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T04:42:34.8937987Z [command

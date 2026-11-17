@@ -10,6 +10,7 @@ on:
       - src/cryptanalysis/f4_fp_tower.rs
       - src/cryptanalysis/sig_fp_tower.rs
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - .github/workflows/prime31-oriented-pair-f4.yml
       - research/prime31_ic_20261115/native/**
@@ -22,6 +23,7 @@ permissions:
 
 jobs:
   oriented-pair-development:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:

@@ -40,6 +40,8 @@ mod pdp3_koblitz;
 mod pdp_split_oracle;
 #[path = "ecbench/pkm_tower.rs"]
 mod pkm_tower;
+#[path = "ecbench/retained_chain_study.rs"]
+mod retained_chain_study;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -68,6 +70,15 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Run the frozen retained-chain probe or complete toy relation pipeline.
+    /// Counters are raw observations; this command does not admit timings.
+    RetainedChainStudy {
+        #[arg(long)]
+        phase: String,
+        /// Must be a new directory; historical evidence is never overwritten.
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Check pinned diagnostic metadata without launching work.
     DiagnosticPreflight {
         #[arg(long)]
@@ -960,9 +971,36 @@ enum DbCmd {
     },
 }
 
+fn sixsum_oracle<'i>(
+    name: &str,
+    _summands: u32,
+    instance: &'i crypto_lib::cryptanalysis::ic_boundary::BinaryInstance,
+) -> Option<
+    Box<
+        dyn crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<
+                crypto_lib::cryptanalysis::ic_boundary::BinaryGroup<'i>,
+            > + 'i,
+    >,
+> {
+    (name == "sixsum-extract").then(|| {
+        Box::new(
+            crypto_lib::cryptanalysis::koblitz_sixsum_extract::SixSumOracle::new(
+                crypto_lib::cryptanalysis::koblitz_sixsum_extract::Kernel::FourSum,
+                instance,
+            ),
+        )
+            as Box<
+                dyn crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<
+                        crypto_lib::cryptanalysis::ic_boundary::BinaryGroup<'i>,
+                    > + 'i,
+            >
+    })
+}
+
 /// Every plug-in this binary links: `pdp3_koblitz`'s, then
 /// `pdp_split_oracle`'s (the `pdp-split` oracle and the `koblitz-closure`
-/// base).  Names do not overlap, so the order only fixes lookup.
+/// base), then the higher-arity pair-table oracle.  Names do not overlap,
+/// so the order only fixes lookup.
 fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
     crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
         base: |name, instance| {
@@ -973,6 +1011,7 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
         oracle: |name, summands, instance| {
             (pdp3_koblitz::plugins().oracle)(name, summands, instance)
                 .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
+                .or_else(|| sixsum_oracle(name, summands, instance))
                 .or_else(|| structured_s4::oracle(name, summands, instance))
         },
     }
@@ -1192,6 +1231,7 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,
             request_sha256,
@@ -1294,7 +1334,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     let f = |s: &str| s.parse::<f64>().unwrap_or(f64::NAN);
                     log2_r.insert(
                         r.workload.curve.slug.clone(),
-                        (r.workload.curve.r as f64).log2(),
+                        (r.workload.curve.r.to_f64()).log2(),
                     );
                     by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
                         .or_default()
@@ -1682,7 +1722,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "  workload {} {} r=2^{:.2} A={} registered={} ec1={}",
                         w.workload_id,
                         w.curve.slug,
-                        (w.curve.r as f64).log2(),
+                        (w.curve.r.to_f64()).log2(),
                         w.curve.automorphisms_available,
                         w.curve.registered,
                         w.curve.ec1.as_deref().unwrap_or("-")
@@ -2134,7 +2174,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "| {} | {} | {:.2} | {} | {} | {} |",
                         w.workload_id,
                         w.slug,
-                        (w.r as f64).log2(),
+                        (w.r.to_f64()).log2(),
                         o(w.a_mean_s),
                         o(w.b_mean_s),
                         o(w.ratio_b_over_a)
@@ -2873,7 +2913,7 @@ fn audit_ir_one(
         "params": input.method.params,
         "curve": w.curve.slug,
         "family": w.curve.family,
-        "log2_r": (w.curve.r as f64).log2(),
+        "log2_r": (w.curve.r.to_f64()).log2(),
         "recovered": report.recovered.map(|x| x.to_string()),
         "solve_ir": ir.solve_ir,
         "bitops": block.bitops,
@@ -3104,7 +3144,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                             .collect();
                         methods::pooled_row_flags(
                             &r.workload.curve.family,
-                            (r.workload.curve.r as f64).log2(),
+                            (r.workload.curve.r.to_f64()).log2(),
                             &arm.method.family,
                             &runs,
                         )
@@ -3116,7 +3156,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                     arm.name,
                     arm.method.id,
                     slug,
-                    any.map(|r| (r.workload.curve.r as f64).log2())
+                    any.map(|r| (r.workload.curve.r.to_f64()).log2())
                         .unwrap_or(f64::NAN),
                     ok.len(),
                     mine.len(),

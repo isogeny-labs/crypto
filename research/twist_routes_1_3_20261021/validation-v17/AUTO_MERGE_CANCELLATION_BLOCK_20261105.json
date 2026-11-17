@@ -1,0 +1,22 @@
+{
+  "schema": "twist.publication-approval-block/v1",
+  "observed_at": "2026-11-05T07:44:34.162Z",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/2380",
+  "observed_pr_state": "OPEN",
+  "observed_auto_merge_enabled": true,
+  "desired_action": "Disable existing automatic merge only; keep PR open and regular",
+  "command": [
+    "gh",
+    "pr",
+    "merge",
+    "2380",
+    "--repo",
+    "isogeny-labs/crypto",
+    "--disable-auto"
+  ],
+  "process_executed": false,
+  "automatic_approval_review_rejections": 2,
+  "reason": "Automatic approval review considers the gh pr merge command capable of merging, despite --disable-auto and the installed read-only help documenting cancellation. No workaround or alternative mutation attempted after the second rejection.",
+  "approval_required": "Explicit permission to disable auto-merge; no merge authorization requested or inferred.",
+  "source_and_scientific_publication": "Completed and pushed separately; unaffected by this cancellation block."
+}

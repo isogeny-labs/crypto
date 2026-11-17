@@ -1,0 +1,1 @@
+New unexecuted worker adds pathlib.Path before actual input loading. It reuses the frozen generic importer and exact common-kernel mapping; original failures and all partial tiny controls remain unchanged. New static global-name preflight checks every worker module before preregistration. Full actual profile and numeric controls remain unexecuted.

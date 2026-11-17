@@ -1,0 +1,61 @@
+#include "primitive_field_arithmetic.hpp"
+#include <cctype>
+using PBMonomial=std::array<int,2>;
+T24 pb_small_power(T24 a,int n){T24 out(1);for(int i=0;i<n;++i)out=out*a;return out;}
+struct PB2 {
+    std::map<PBMonomial,T24> terms;
+    PB2()=default;
+    explicit PB2(const T24& c){if(c!=T24(0))terms.emplace(PBMonomial{},c);}
+    static PB2 variable(int i){PB2 p;PBMonomial e{};e.at(size_t(i))=1;p.terms.emplace(e,T24(1));return p;}
+    void add(PBMonomial e,const T24& c){if(c==T24(0))return;auto at=terms.find(e);if(at==terms.end())terms.emplace(e,c);else{at->second=at->second+c;if(at->second==T24(0))terms.erase(at);}}
+    PB2 scale(const T24& c)const{PB2 p;for(auto& [e,v]:terms)p.add(e,v*c);return p;}
+    PB2 operator+(const PB2& b)const{PB2 p=*this;for(auto& [e,c]:b.terms)p.add(e,c);return p;}
+    PB2 operator-()const{return scale(T24(-1));}
+    PB2 operator-(const PB2& b)const{return *this+(-b);}
+    PB2 operator*(const PB2& b)const{PB2 p;for(auto& [e,c]:terms)for(auto& [f,d]:b.terms)p.add({e[0]+f[0],e[1]+f[1]},c*d);return p;}
+    bool operator==(const PB2& b)const{return terms==b.terms;}
+    PB2 power(int n)const{PB2 out(T24(1));for(int i=0;i<n;++i)out=out*(*this);return out;}
+    T24 constant()const{require(terms.empty()||(terms.size()==1&&terms.begin()->first==PBMonomial{}),"constant coefficient expression");return terms.empty()?T24(0):terms.begin()->second;}
+    PB2 monic()const{require(!terms.empty(),"nonzero backend basis row");return scale(terms.rbegin()->second.inv());}
+    T24 eval(const T24& x,const T24& y)const{T24 out;for(auto& [e,c]:terms)out=out+c*pb_small_power(x,e[0])*pb_small_power(y,e[1]);return out;}
+};
+struct PBParsed {PB2 value;int g_degree=0;};
+struct PBParser {
+    const std::string& text;
+    T24 generator;
+    size_t offset=0;
+    explicit PBParser(const std::string& s,const T24& g):text(s),generator(g){}
+    void space(){while(offset<text.size()&&std::isspace(static_cast<unsigned char>(text[offset])))++offset;}
+    bool take(char c){space();if(offset<text.size()&&text[offset]==c){++offset;return true;}return false;}
+    std::string integer(){space();size_t start=offset;while(offset<text.size()&&std::isdigit(static_cast<unsigned char>(text[offset])))++offset;require(offset>start,"backend integer literal");return text.substr(start,offset-start);}
+    PBParsed primary(){space();if(take('(')){auto p=expression();require(take(')'),"backend expression closing parenthesis");return p;}
+        require(offset<text.size(),"backend expression token");char c=text[offset];if(std::isdigit(static_cast<unsigned char>(c))){auto n=integer();return {PB2(T24(F(PBPoly{Z(mpz_class(n))}))),0};}
+        ++offset;if(c=='x')return {PB2::variable(0),0};if(c=='y')return {PB2::variable(1),0};if(c=='g')return {PB2(generator),1};throw std::runtime_error("unsupported backend expression token");
+    }
+    PBParsed power(){auto p=primary();if(take('^')){auto token=integer();int n=std::stoi(token);require(n>=0&&n<=128,"backend exponent limit");p.value=p.value.power(n);p.g_degree*=n;}return p;}
+    PBParsed unary(){if(take('+'))return unary();if(take('-')){auto p=unary();p.value=-p.value;return p;}return power();}
+    PBParsed product(){auto p=unary();for(;;){if(take('*')){auto q=unary();p.value=p.value*q.value;p.g_degree+=q.g_degree;}else if(take('/')){auto q=unary();p.value=p.value.scale(q.value.constant().inv());p.g_degree+=q.g_degree;}else if(take('%')){require(mpz_class(integer())==prime,"backend explicit modulus matches actual prime");}else break;}return p;}
+    PBParsed expression(){auto p=product();for(;;){if(take('+')){auto q=product();p.value=p.value+q.value;p.g_degree=std::max(p.g_degree,q.g_degree);}else if(take('-')){auto q=product();p.value=p.value-q.value;p.g_degree=std::max(p.g_degree,q.g_degree);}else break;}return p;}
+    void end(){space();require(offset==text.size(),"complete backend expression consumption");}
+    std::vector<PB2> list(){require(take('['),"backend polynomial list");std::vector<PB2> out;if(!take(']')){do{out.push_back(expression().value);}while(take(','));require(take(']'),"backend polynomial list closing bracket");}end();return out;}
+};
+PB2 pb2_monomial(const PBMonomial& e,const T24& c){PB2 p;p.add(e,c);return p;}
+PB2 pb2_reduce(PB2 p,const std::vector<PB2>& basis){PB2 remainder;int steps=0;while(!p.terms.empty()){require(++steps<=1024,"native control normal-form step limit");auto[e,c]=*p.terms.rbegin();bool reduced=false;
+        for(auto& g:basis){require(!g.terms.empty(),"nonzero normal-form divisor");auto[f,d]=*g.terms.rbegin();if(e[0]>=f[0]&&e[1]>=f[1]){p=p-pb2_monomial({e[0]-f[0],e[1]-f[1]},c/d)*g;reduced=true;break;}}
+        if(!reduced){remainder.add(e,c);p.terms.erase(e);}
+    }return remainder;}
+std::string pb_record(const std::string& content,const std::string& tag){auto marker=tag+',';size_t at=content.find(marker);require(at!=std::string::npos,"missing backend record "+tag);require(content.find(marker,at+marker.size())==std::string::npos,"unique backend record "+tag);at+=marker.size();auto end=content.find('\n',at);return content.substr(at,end==std::string::npos?std::string::npos:end-at);}
+void pb_emit_bivariate(const PB2& p){std::cout<<'[';bool first=true;for(auto& [e,c]:p.terms){if(!first)std::cout<<',';first=false;std::cout<<"{\"exponents\":["<<e[0]<<','<<e[1]<<"],\"coefficient\":";emit_t24(c);std::cout<<'}';}std::cout<<']';}
+int main(int argc,char** argv){try{
+    require(argc==3,"usage: primitive_giac_check kernel3-study backend-stderr.txt");std::string root=argv[1];initialize_cover(read_json(root+"/inputs/p192-d7-prym.json"));Level2Input input;PrimitiveBasis pb;std::ifstream file(argv[2]);require(bool(file),"read backend control receipt");std::string content((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
+    require(pb_record(content,"PB_TYPE")=="16","actual typed GF generator");auto reduced_text=pb_record(content,"PB_REDUCTION");PBParser reduced_parser(reduced_text,pb.beta);auto reduced=reduced_parser.expression();reduced_parser.end();require(reduced.g_degree<24&&reduced.value.constant()==pb.powers[24],"backend generator power reduction in exact original field");
+    auto basis_text=pb_record(content,"PB_BASIS");PBParser parser(basis_text,pb.beta);auto basis=parser.list();require(basis.size()==2,"two backend control basis rows");for(auto& p:basis)p=p.monic();auto x=PB2::variable(0),y=PB2::variable(1);auto a=pb.control_a(),b=pb.control_b();require(a!=b&&a!=T24(0)&&b!=T24(0),"distinct nonzero prescribed field roots");
+    std::vector<PB2> original{x+y-PB2(a+b),x*y-PB2(a*b)},expected{original[0],y*y-y.scale(a+b)+PB2(a*b)};
+    require(expected[1]==y*original[0]-original[1],"native exact ideal-conversion identity");std::vector<bool> matched(2,false);for(auto& row:basis){int j=0;while(j<2&&(matched[j]||!(row==expected[j])))++j;require(j<2,"native exact reduced lex basis equality");matched[j]=true;}
+    int root_checks=0;for(auto& p:basis){require(p.eval(a,b)==T24(0)&&p.eval(b,a)==T24(0),"both actual full-field prescribed roots");root_checks+=2;}
+    bool nonroot=false;for(auto& p:basis)if(p.eval(T24(0),T24(0))!=T24(0))nonroot=true;require(nonroot,"actual full-field nonroot rejection");
+    for(auto& p:original){require(pb2_reduce(p,basis).terms.empty(),"native input ideal normal form");}
+    auto e=basis[0].terms.rbegin()->first,f=basis[1].terms.rbegin()->first;PBMonomial lcm{std::max(e[0],f[0]),std::max(e[1],f[1])};auto spair=pb2_monomial({lcm[0]-e[0],lcm[1]-e[1]},T24(1))*basis[0]-pb2_monomial({lcm[0]-f[0],lcm[1]-f[1]},T24(1))*basis[1];require(pb2_reduce(spair,basis).terms.empty(),"native S-pair criterion");
+    rejects([&]{auto bad=basis[0]+PB2(T24(1));require(bad.eval(a,b)==T24(0),"changed backend constant coefficient");},"changed backend constant coefficient");
+    std::cout<<"{\"scope\":\"P192-exact-Fp24-native-Giac-control-replay\",\"standing\":\"producer-unverified\",\"working_degree\":24,\"typed_generator_checks\":1,\"field_reduction_checks\":1,\"prescribed_root_checks\":"<<root_checks<<",\"nonroot_rejections\":1,\"reduced_basis_equalities\":2,\"input_normal_forms\":2,\"S_pair_checks\":1,\"corruption_controls\":1,\"actual_divisor_inverse_solved\":false,\"normalized_basis\":[";pb_emit_bivariate(basis[0]);std::cout<<',';pb_emit_bivariate(basis[1]);std::cout<<"]}\n";
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}

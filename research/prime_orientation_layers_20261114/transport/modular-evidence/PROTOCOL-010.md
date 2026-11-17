@@ -1,0 +1,9 @@
+# Actual support beyond the zeroth k1 layer
+
+Accepted072360 binds actual scalar word coefficients to concrete retained-polynomial/nilpotent quotients and immutable normal coordinates. Accepted074367 constructs actual left1/right first-coefficient1 witnesses at every b0 label for k1, so exact jointly active support is2^u under u<=a,i<=a and arbitrary Nat multiplicities. These are separately scoped local compilations outside shared Transport audit/fresh. [pcc:unverified]
+
+First discriminating successor: for every actual k>0 and b0 label, prove or refute the same matching-port right coefficient1 identity. Prediction: normalized numerator constant0 and denominator constant1 mean the geometric-series first-jet coefficient survives; construct the actual recurrence proof, not an assumed density formula. Preserve k0 separately (no labels) and arbitrary multiplicities. If disproved, retain exact counterexample and determine which coefficient identity fails. [pcc:unverified]
+
+Then analyze b>0 by actual H/Z coefficients and two-adic valuations. Do not infer all-active higher support from zeroth witnesses or any-factor first-jet rank. Check symmetry/cancellation controls with explicit exact identities; no timing/scaling/native/paid/cloud/attack campaign. Every2^u*k declared label remains charged until proved support/weight improvements yield a valid representation. [pcc:unverified]
+
+Bind any improvement to actual mode weights, source/target sides, valid matrix factorization, packet entry and child edge/degree bounds. Concrete right-factor creation coordinates do not supply full extension-valued packet descriptions, binary irreducible selection, interpolation or full bit runtime. Charge all preparation/control/index/array/trace/memory/public relation/finder/extraction/retry costs. Preserve all frozen artifacts, claims and ledger histories; watcher remains paused. [pcc:unverified]

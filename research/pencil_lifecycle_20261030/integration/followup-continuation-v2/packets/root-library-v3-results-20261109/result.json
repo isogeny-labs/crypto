@@ -1,0 +1,73 @@
+{
+  "schema": "root-library.failed-attempt-archive/v1",
+  "run": "t1992-root-library-20261109",
+  "status": "failed",
+  "completion_seal_status": "passed",
+  "supervisor_status": "pending_seal",
+  "supervisor_seal_status": "pending",
+  "compiler_invoked": true,
+  "compiler_command_completed_successfully": false,
+  "controls_invoked": false,
+  "full_suite_invoked": false,
+  "test_inventory_invoked": false,
+  "commands_recorded": 1,
+  "compile_elapsed_seconds": 630.008571627026,
+  "compile_reaped_exit": -9,
+  "worker_elapsed_seconds": 960.1883315590094,
+  "attempt_elapsed_seconds": 991.7126608029939,
+  "outer_elapsed_seconds": 991.8418800240033,
+  "charged_seconds": 1800,
+  "campaign_cumulative_charged_seconds": 12660,
+  "worker_errors": [
+    {
+      "repr": "AssertionError('supervisor permit expired')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py\", line 131, in <module>\n    output=command('compile',base+['--no-run','--message-format=json'])\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py\", line 79, in command\n    guard()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py\", line 25, in guard\n    if PERMIT_REQUIRED:check_permit()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py\", line 23, in check_permit\n    assert time.time()<permit['expires_unix'],'supervisor permit expired'\nAssertionError: supervisor permit expired\n"
+    }
+  ],
+  "supervisor_errors": [
+    {
+      "repr": "AssertionError('unit did not succeed')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-launcher.py\", line 134, in <module>\n    assert owned and R['terminal'].get('ExecMainStatus')=='0' and R['terminal'].get('Result')=='success','unit did not succeed'\nAssertionError: unit did not succeed\n"
+    }
+  ],
+  "retained_last_permit_expiry_utc": "2026-11-09T18:55:16.053503+00:00",
+  "causal_attribution": "Worker reports supervisor permit expired; final permit snapshot does not identify which earlier permit bytes were read at the failure. Stale read, renewal lag and other timing mechanisms are unresolved by these receipts.",
+  "compile_json_reason_counts": {
+    "compiler-artifact": 259,
+    "build-script-executed": 29
+  },
+  "native_worker_controls": {
+    "cpu.max": "200000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "pids.max": "512"
+  },
+  "invocation_id": "15d1304b26834459b62bd6adf6039d07",
+  "owner_join_verified": true,
+  "cleanup_complete": true,
+  "terminal": {
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "1",
+    "ControlGroup": "",
+    "CPUUsageNSec": "654025737000",
+    "Id": "pencil-root-durable-t1992-20261109.service",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "15d1304b26834459b62bd6adf6039d07"
+  },
+  "cgroup_absent_at_review": true,
+  "publication": {
+    "commit": "df85767861d8558043bf64c596a291c159674ca7",
+    "remote": "df85767861d8558043bf64c596a291c159674ca7",
+    "admission_sha256": "e06e5d7a9aec662c98b7cc7d011387f8aafe0414b4ec58e5cc07f4f9f27248ca",
+    "utc": "2026-11-09T18:38:34.814264+00:00"
+  },
+  "runtime_rerun": false,
+  "archive_sha256": "1aef27e95cdd068a7f9f9a3f53ac07c822f15b1e83932ca7929bce3531405a28",
+  "archive_bytes": 51812,
+  "archived_files": 17,
+  "scope": "Failed compile-stage attempt; no four-control or full-suite result."
+}

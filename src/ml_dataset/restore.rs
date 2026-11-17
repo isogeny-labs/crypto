@@ -554,6 +554,8 @@ mod tests {
                 "filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = super::super::DatasetPlan {
+                                channels: None,
+                factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![7],
                 arities: vec![2],
@@ -569,6 +571,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: Vec::new(),
             };
             let binding = json!({"schema":"crypto.ml-dataset.run/v1",
                 "plan_sha256":super::super::digest(&serde_json::to_vec(&plan).unwrap()),

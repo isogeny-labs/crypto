@@ -1,0 +1,69 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T17:07:29Z",
+ "id": "PCC-20261115-9ff011",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6f1bd2d9c2c7426f3c8d64b12b73bfd30bcc24c5",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "76f719b53a1889b6e0f85036e1c04e7bd1f50e69248b9ec2369808e658de47ae",
+   "kind": "lean",
+   "project": "research/p256_genus_dlp_20261115/minimal_transport/lean",
+   "theorem": "P256MinimalTransport.coefficient_norm_floor"
+  },
+  {
+   "decl_sha256": "12eda3086601d7e79cc8786c8546043bfc8dd43a79ef07382c00e6eab9bc841f",
+   "kind": "lean",
+   "project": "research/p256_genus_dlp_20261115/minimal_transport/lean",
+   "theorem": "P256MinimalTransport.polarization_coefficient_floor"
+  },
+  {
+   "decl_sha256": "9d686f082f5c34c9551586abfec04d16da09326e017166a3200a70e3f52008e5",
+   "kind": "lean",
+   "project": "research/p256_genus_dlp_20261115/minimal_transport/lean",
+   "theorem": "P256MinimalTransport.minimal_vector_coefficient_bound"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/lean/P256MinimalTransport.lean",
+    "sha256": "f5baa176380434805617f77bda8dca3548ec6b39333160f71a9d466442a58b84"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/lean/lake-manifest.json",
+    "sha256": "604e2c4ca186aff18d1cb4626bc931e7b4310f18bf90635da8caa73561c1bed3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/instance-proof-summary.txt",
+    "sha256": "b55ec655e823c621b9d9d5f230953b0a4bce4c8afc40ad773e7c7d4d574f45b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/instance-proof-gate/research_p256_genus_dlp_20261115_minimal_transport_lean/build.log",
+    "sha256": "eaa25178c929754659722b82419706809dfa6dcfaf153f07ae6a6f8c73a29f21"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/identities.json",
+    "sha256": "0d1cbeaba68c7810dd741651da4a200c00af7236d03aebdd4b82a1dde545016f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/minimal_transport",
+ "statement": "For the fixed existing P-256 order and cubic eigenvalue, every nonzero integer coefficient pair satisfying the finite eigenline congruence has Eisenstein norm at least n. An explicitly assumed polarization coefficient 2Q is at least2n. A norm-n vector in the opposite-sign sector has both magnitudes below2^128. These integer endpoints are compiled/kernel-audited; the full Jacobian bridge, existence proof and native map qualification are separate obligations."
+}
