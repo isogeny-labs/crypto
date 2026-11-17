@@ -437,3 +437,17 @@ Executeonlyfinalpushedcheckpointonce. Broadgoalopen.
 
 ### Errors
 No scientificexecution/retry; changeispre-executioncomparatorstrengthening.
+
+## Onlineweighted LP gate passes; arithmetic route not supported
+
+### What was done
+At pushed92a556e0a02all1528onlineLP/full/dense/graphprefixchecks passEXIT0. LPwidth≤2,allk/rankmatches andoriginalcontrols pass. First-determinationREDc ratiosonlineLPvscontrols notconsistent: genus2Scratch/Online0.44–1.56,FullIncremental/Online0.78–1.97. Incompleteg4casekeptseparate. Rawhashesverify.
+
+### Decisions made
+Correctengineeringcomponentbutno10xroute. Do notheadlinelatepost-successwork, restart-onlybaseline,cyclecounts orunequalinformation. Fullincrementaloriginalcolumnorderalsochangespivotcomparison;notexternalfastest. Memorycellsnotbytes/end-to-endcost.
+
+### Open threads
+Neednewusefulrelationarrivalmechanism/strongcomplete-costcase,broadgoalopen. PR4504externallymerged2026-11-17T04:31:41Z at5256b62864bb444f489624aa155837942a6da082;deliveronlyonlineworkinsuccessor.
+
+### Errors
+No scientificfailures/retries. Initialunexecutedcheckpointamendedprospectivelywithstrongercontrol;onlyfinalrunexecuted.
