@@ -3,8 +3,8 @@
 Worktree /workspace/crypto-chained-balanced-main; current task branch
 work/chained-cubic-inverse15-source. Open lane crypto#4544 was ready with normal
 MERGE auto enabled, headDA (14 result plus tracking) at the last state-only read.
-Do not push it if closed. This result checkpoint still needs ordinary lane
-publication/readback; never call a checkpoint branch a completed PR check-in.
+Do not push it if closed. Regular lane result57199d2 is now published with exact body and all440 filenames
+checked. Publication receipt is in actual-result-queue-and-PR-publication-04/.
 [pcc:unverified]
 
 First sourceA14e707ea was public before calls; only Lean root-path setup failed,
@@ -40,8 +40,10 @@ input subtrees equal c5base; no baseline CI rerun or gate waiver. Next unchanged
 CI read>=2026-11-17T14:40:07Z; a new substantive push resets first read50min.
 [pcc:unverified]
 
-NEXT: publish this result normally to open4544 and verify body/files/readback;
-update issue3904 from exact JSON proposal with fresh equality/readback; tick15,
+NEXT: result57199d2 is in open4544 and queue3904 is updated/readbackexact9679 chars.
+Git CLI authentication was rejected; use existing authorized GitHub Git-data
+connector with expected-SHA fast-forwards and exact object/tree comparisons.
+Preserve local metadatafeb933d2 and subsequent receipt commits.15 is ticked;
 track complete prime-field cost accounting first in ACTIVE-only commit to the
 same open lane before new research. Preserve all original criteria/losses and
 freeze before native calls. Continue nontrivial chained Jacobian/prime-field
