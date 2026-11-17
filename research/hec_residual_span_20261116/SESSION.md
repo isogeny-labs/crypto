@@ -1939,3 +1939,10 @@ What was done: residual/LP prior-art screen found prior classical span identity 
 Decisions made: engineering preparation for useful mathematical baseline, fullcost charged;12targets/24calls exactrepeats, Gitfreeze before once-only120CPU. Assertions [pcc:unverified]. Sources checked(KB): revision9b2119e8fbac482b98b50521c0d604bb, source:4548c0e85d47f9299ddc900c047c266d crypto:docs/ic/ECDLP_RESEARCH_TECHNIQUES.md;source:ac5467325172604dcf4e5a9a4117e449 crypto:research/notes/index-calculus/RESEARCH_GLV_INDEX_CALCULUS.md; priorv2/cyclotomic results read locally, no novelty claim.
 Open threads: run after push, derive completecost and remainingfloor; originalgenus2+10x unchanged.
 Errors: no compileerrors,no scientific executionyet.
+
+## Indexed packet complete gate qualified
+
+What was done: freeze4c71783dc31 once-onlyexit0;24calls/12targets bytepackets/fulltraces/allproducer-verifier-controlvectors replay,84mutations each verifier, phases/repeats pass. p601complete old/new2.185-2.467base,4.733-6.729subgroup. Assertions [pcc:unverified].
+Decisions made: retainengineering index; mixed vs retainedcontrols (p601arm0base0.811-1.501,subgroup0.868-1.106), no10x. Priornonsplitspan identity/ranknegative alreadycovers naive reuse.
+Open threads: mathematical mechanism reducing jointcollection/proof work from correctedbaseline, require usefulsubgrouprank/coldcost; genus3/4fullcoverage,independentreview/publication artifacts.
+Errors: none in execution,no retry/S3/cloud.
