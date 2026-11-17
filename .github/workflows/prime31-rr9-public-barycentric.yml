@@ -1,0 +1,88 @@
+name: Prime31 RR9 B8 public barycentric chart (Rust 1.100)
+on:
+  push:
+    branches:
+      - research/prime31-rr9-barycentric-public-20261117
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_public.rs'
+      - '.github/workflows/prime31-rr9-public-barycentric.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_public.rs'
+      - '.github/workflows/prime31-rr9-public-barycentric.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-b8-barycentric:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact proposed Rust example files
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_public.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable original prime31 native Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact proposed coefficient and barycentric examples
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_public.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original native library and public algebraic example test
+        run: |
+          cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 300 cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_barycentric_public
+          cargo +1.100.0 build --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_barycentric_public
+      - name: Capture full-cost bounded B8 public chart and independent negatives
+        run: |
+          timeout -k 10 300 bash -c '
+            ulimit -v 1048576
+            exec "$1"
+          ' _ prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_barycentric_public > prime31-rr9-barycentric-public.json
+          jq -e '
+            .schema == "prime31.rr9.public-barycentric-b8.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .base_x == [0,1,2,3,5,6,8,9] and
+            .positive_residual == [1911579686,548820096] and
+            .positive_chart_count == 1 and
+            .positive_original_curve_replay == true and
+            .positive_four_by_three_system_rank == 3 and
+            .negatives[0].charts == 0 and
+            .negatives[1].charts == 0 and
+            .sign_masks_enumerated_per_residual == 256 and
+            .method_is_support_enumeration == true and
+            .nonenumerative_extraction == false and
+            .full_b31_unknown_ecdlp_solves == 0 and
+            .pcc == "unverified"
+          ' prime31-rr9-barycentric-public.json
+      - name: Retain exact-source bounded Rust evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-barycentric-public
+          path: prime31-rr9-barycentric-public.json
+          if-no-files-found: warn
+          retention-days: 30

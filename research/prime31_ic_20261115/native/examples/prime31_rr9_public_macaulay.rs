@@ -633,3 +633,12 @@ pub fn projective_degree_nine_witness_controls() -> Value {
         "pcc":"unverified"
     })
 }
+
+
+// Public-only but explicitly sign-enumerative B8 barycentric extractor (#4556).
+// Shares the original prime31 arithmetic, factor polynomial and independent
+// point-group replay. This is an exact algebraic control, NOT a non-generic
+// asymptotic acceleration or a full B31 discrete-logarithm solver.
+#[path = "prime31_rr9_barycentric_core.rs"]
+mod barycentric_core;
+pub fn public_b8_barycentric_controls() -> Value { barycentric_core::run() }
