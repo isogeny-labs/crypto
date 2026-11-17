@@ -1371,3 +1371,10 @@ What was done: one invocation at a41ba58e57b exits0,20calls/1600outputs exact ac
 Decisions made: no arbitrary pricing of inversions versus REDC, no tenfold/full-runtime claim. Full-burst four-point variant not justified as replacement on these panels; retain useful-rank/early-stop limits.
 Open threads: different mechanism with original genus2+target fidelity and complete cost case; tenfold goal unresolved. Keep exact circuits available without advancing unchanged combination to expensive full-cost trials.
 Errors: none; no retry/S3/cloud.
+
+## Mixed-orbit harvesting frozen
+
+What was done: derived new two-promoted+one-core family with orbit support multiplicities different from retained one-promoted+two-core. Compiled200trial gate on same5triggerpoints with signed affine labels and three solvers; native/import/input/binary freeze.
+Decisions made: quotient scalar-copy triples by fixing singleton, no duplicate orbit-rank accounting. Structural useful-rank qualification before shared arithmetic/cost. Push before run.
+Open threads: once-only gate and comparison with original40trial family; complete genus2+objective open.
+Errors: none; T7071claimed, no science run yet.
