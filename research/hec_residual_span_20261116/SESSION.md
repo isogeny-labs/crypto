@@ -1672,3 +1672,10 @@ What was done: freeze02eb85bf333 single invocation exits0; spaces12+12 combinedr
 Decisions made: mapcandidate finitequalification, not exhaustive morphism proof; no exceptionalpoints dropped.
 Open threads: imagequartic interpolation/exactsubstitution then quotientcurve/targetrecovery and fullcost.
 Errors: none, no rerun/S3/cloud.
+
+## Imagequartic exact composition gate frozen
+
+What was done: compiled fixedmap interpolation from128x4catalogue sumimages,35quarticcoefficients; exactdegree20composition/sourcequarticdivision and originfirstpartials checks.
+Decisions made: require nullity1,>=70distinctimages, zeroexactremainder; no substitution of finitevanishing for polynomialidentity. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU invocation, generalmodelnormalization remains.
+Errors: none in compile; no science yet.
