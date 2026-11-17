@@ -1,0 +1,101 @@
+total_wall := Realtime();
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..8]]>;
+E := EllipticCurve([K|1,0,0,0,fromint(155)]);
+G := E![fromint(478),fromint(460),1];
+Q := E![fromint(328),fromint(58),1];
+assert #E eq 548 and Order(G) eq 137 and Q eq 7*G;
+print "source_setup_wall", Realtime(total_wall);
+cover_wall := Realtime();
+C,h := WeilDescent(E,k,fromint(392) : HyperellipticImage := false);
+dO := h(E!0);
+D := h(G)-dO;
+T := h(Q)-dO;
+phi := CanonicalMap(C);
+Qcanon,hyp := CanonicalImage(C,phi);
+assert not hyp and IsNonsingular(Qcanon);
+psi := Restriction(phi,C,Qcanon);
+DD := Pushforward(psi,D);
+TT := Pushforward(psi,T);
+print "cover_map_wall", Realtime(cover_wall);
+basechange_wall := Realtime();
+L<s> := GF(64);
+Embed(k,L);
+Q64 := BaseChange(Qcanon,L);
+R64 := CoordinateRing(Ambient(Q64));
+print "basechange_field", #L, "degree", Degree(Q64);
+function LiftEffective(V)
+    I := Ideal(V);
+    pols := Basis(I);
+    print "ideal_basis", #pols;
+    lifted := [R64!f : f in pols];
+    return Divisor(Q64,ideal<R64 | lifted>);
+end function;
+Dp,Dm := SignDecomposition(DD);
+Tp,Tm := SignDecomposition(TT);
+DD64 := LiftEffective(Dp)-LiftEffective(Dm);
+TT64 := LiftEffective(Tp)-LiftEffective(Tm);
+print "lifted_degree", Degree(DD64), Degree(TT64);
+z0 := IsPrincipal(DD64);
+zr := IsPrincipal(137*DD64);
+z7 := IsPrincipal(TT64-7*DD64);
+print "lifted_orders", z0,zr,z7;
+print "basechange_wall", Realtime(basechange_wall);
+
+assert not z0 and zr and z7;
+P0 := RationalPoints(Q64)[1];
+D0 := Divisor(P0);
+assert Degree(D0) eq 1;
+SetVerbose("CurveIndexcal",1);
+tic := Cputime();
+index_wall := Realtime();
+answer := IndexCalculus(DD64,TT64,D0,137,47,100);
+print "index_answer", answer, "index_cpu", Cputime(tic), "index_wall", Realtime(index_wall);
+assert answer*G eq Q;
+print "source_verified", answer*G eq Q;
+print "attack_total_wall", Realtime(total_wall);
+
+function StepState(P, aa, bb)
+    if P eq E!0 then
+        cls := 0;
+    else
+        bits := Eltseq(P[1]);
+        value := &+[2^(i-1)*(Integers()!bits[i]) : i in [1..#bits]];
+        cls := value mod 3;
+    end if;
+    if cls eq 0 then return P+G, (aa+1) mod 137, bb; end if;
+    if cls eq 1 then return P+Q, aa, (bb+1) mod 137; end if;
+    return 2*P, (2*aa) mod 137, (2*bb) mod 137;
+end function;
+rho_wall := Realtime();
+rho_evals := 0;
+for trial in [0..511] do
+    solved := -1;
+    for restart in [0..99] do
+        aa := (17*trial+31*restart+1) mod 137;
+        bb := (29*trial+37*restart+3) mod 137;
+        startP := aa*G+bb*Q;
+        tort,ta,tb := StepState(startP,aa,bb);
+        h1,ha,hb := StepState(tort,ta,tb);
+        hare,ha,hb := StepState(h1,ha,hb);
+        rho_evals +:= 3;
+        for iteration in [1..10000] do
+            if tort eq hare then
+                den := (hb-tb) mod 137;
+                if den ne 0 then
+                    solved := ((ta-ha)*InverseMod(den,137)) mod 137;
+                end if;
+                break;
+            end if;
+            tort,ta,tb := StepState(tort,ta,tb);
+            h1,ha,hb := StepState(hare,ha,hb);
+            hare,ha,hb := StepState(h1,ha,hb);
+            rho_evals +:= 3;
+        end for;
+        if solved ne -1 then break; end if;
+    end for;
+    assert solved ne -1 and solved*G eq Q;
+end for;
+print "rho_trials", 512, "rho_evals", rho_evals, "rho_total_wall", Realtime(rho_wall);

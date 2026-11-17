@@ -1,0 +1,423 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-RADIX-CENSUS-20261030",
+  "version": 2,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "RADIX_PRESENTATION_DESIGN.md",
+    "format": "RADIX_CENSUS_FORMAT.json"
+  },
+  "question": "Which radix regroupings of the identical prime candidate domain can lower the original m2 highest-form vanishing degree?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "Enumerate every partition of27; compute exact Hilbert data when socle<=40 and rigorous lower bounds otherwise, preserving all records and native byte replay.",
+      "decided_by": [
+        "C-completion"
+      ]
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No affine FFD/LFD, higher-m degree, runtime improvement or new point-base claim.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "producer",
+      "role": "candidate",
+      "description": "One native producer invocation emits the entire3010-partition census",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_radix_census"
+          ]
+        ],
+        "binary_sha256": "792a2a77755917de5c8e281cfcf1222451f15949628ccdb0a1674ef8709e73fd",
+        "threads": 1
+      },
+      "parameters": {
+        "phase": "producer",
+        "partitions": 3010,
+        "n": 83,
+        "m": 2,
+        "candidate_x_count": 134217728,
+        "target_kind": "original_natural"
+      }
+    },
+    {
+      "id": "replay",
+      "role": "reference",
+      "description": "One fresh native replay invocation reconstructs and byte-compares the same3010 records; not an independent algorithm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_radix_census"
+          ]
+        ],
+        "binary_sha256": "792a2a77755917de5c8e281cfcf1222451f15949628ccdb0a1674ef8709e73fd",
+        "threads": 1
+      },
+      "parameters": {
+        "phase": "replay",
+        "partitions": 3010,
+        "n": 83,
+        "m": 2,
+        "candidate_x_count": 134217728,
+        "target_kind": "original_natural"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "The all-binary partition is an embedded recorded42 baseline, not a separate execution arm. Small explicit matrices and hand-enumerated quotient tests passed."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Preproduction explicit F2/F3 controls retain39 nonmaximal maps; source mutation and four invalid digit-input tests reject invalid inputs. No statistical null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "digit_partition",
+        "levels": [
+          "all3010 nondecreasing partitions of27"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One native exact integer census/replayer; pinned commit/binary; one thread"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "Original prime m2 natural source, exact input/base hashes, candidate interval [0,2^27)"
+      },
+      {
+        "name": "presentation",
+        "treatment": "crossed",
+        "how": "All3010 radix partitions; variable count and constraint degrees are explicitly part of the encoding factor"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing shared host, CPU/kernel metadata; no timing claim."
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "Same120s phase caps and1GiB address space;300s worker;zero retries."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Keep exact and bounded degree fields distinct; no candidate omission"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "producer",
+          "replay"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Both phases succeed for the identical3010 partition records and exact original source; no statistical comparison."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Historical input seed only;this certificate stage makes no new draws."
+    },
+    "instance_sampling": {
+      "rule": "Exhaust all nondecreasing integer partitions of27; same input domain, no target sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Two execution phases, each covering the identical3010 partitions. Partitions are record-level census inputs, not separate balanced experimental arms. No statistics."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 300,
+      "measured_on": "Budget cap only; development fixtures do not estimate full census cost."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "partition_records",
+        "name": "partition_records",
+        "unit": "records",
+        "kind": "counted",
+        "definition": "Number of complete census records generated or successfully byte-replayed in the phase; expected3010.",
+        "source": "census/summary.json.partitions plus successful phase status",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "partition_records"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-host/bounded-native",
+    "placement": {
+      "cpus": 2,
+      "memory": "3Gi",
+      "spot": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All3010 partition records and full native replay; preserve partial/failed outputs."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "120s each phase,1GiB address space,300s worker,zero retries; all outputs retained."
+    }
+  ],
+  "invalidation_rules": [
+    "Any source/base/input or native replay mismatch invalidates affected result.",
+    "Missing cases cannot establish census completion.",
+    "A lower bound is not an exact value; these are highest-form vanishing degrees, not affine FFD/LFD."
+  ],
+  "decision_rule": {
+    "text": "Record census_verified only after3010 records and exact replay. Report exact improvement only if an exact value is below42; report exclusion only when exact value or certified bound is at least42; otherwise unresolved.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Per-partition exact value or certified lower bound",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "census_verified",
+      "invalid",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/prime_radix_census.rs",
+      "sha256": "9d71568c09d13c4524400c8929c424a667bbda91322bd00e46d3bc2fbfef4cbe"
+    },
+    "inputs": [
+      "Prepared3010 partitions",
+      "Original source and fixed point-base identity"
+    ],
+    "outputs": [
+      "census/cases/*.json",
+      "census/summary.json",
+      "census/binding.json",
+      "census/manifest.json",
+      "terminal.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact values and labelled lower bounds by socle degree; preserve failed and missing coverage."
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/pdf/2211.13548",
+      "provenance": "retrieved",
+      "claim": "Theorem3.1: monomial complete intersections have SLP when characteristic exceeds socle degree.",
+      "verified_by": "Primary PDF pages6-7 read2026-10-30; large-characteristic statement and proof checked; small native matrices retained."
+    }
+  ],
+  "extensions": {
+    "prepared_index_sha256": "1a0feee47d6543a835e2b94c5fdce0984d9a8d042e7193fa2686cd2a66670514",
+    "input_sha256": "61cdf99f79a86384946fe895759c6bbd1f76dae40290eae1df51ce75c454b7c5",
+    "source_sha256": "1854f4af091455bedcd285398155c6b6487aa61c206c987039ad5cf3c1632032",
+    "stage_manifest_sha256": "972f77f5df9e6725cd30ebaa1aaee4bea6d4123e67f346261f8391047e15a512",
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:25163e42d64075e44ddfa2e1a2d55cdc53d25357ff036c152a6ebff1d417e3e9",
+    "phase_timeout_seconds": 120,
+    "worker_timeout_seconds": 300,
+    "address_space_bytes": 1073741824,
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-radix-census-20261030-r2/raw/",
+    "source_files": [
+      {
+        "path": "Cargo.lock",
+        "sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5"
+      },
+      {
+        "path": "Cargo.toml",
+        "sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf"
+      },
+      {
+        "path": "RADIX_CENSUS_FORMAT.json",
+        "sha256": "66a7bb0ec90f014362d0d69527fb1c22b6ba2428c4f27a19a1db7662d2b818ee"
+      },
+      {
+        "path": "RADIX_PRESENTATION_DESIGN.md",
+        "sha256": "675e4395960fefc1cf8c84dc1bbc81bf8e9c6c07aaea3d61838355057457b138"
+      },
+      {
+        "path": "radix-census-journal.sh",
+        "sha256": "b334829e7531b591b00a6bd35230af3a82746da47f7d3b3b0f93a960a9d5058a"
+      },
+      {
+        "path": "run-radix-census.sh",
+        "sha256": "d4a99d9ad6d7c62b9e8a4103f52812824027447209b9b8c567a3fa49d07ffd19"
+      },
+      {
+        "path": "src/bin/prime_radix_census.rs",
+        "sha256": "9d71568c09d13c4524400c8929c424a667bbda91322bd00e46d3bc2fbfef4cbe"
+      },
+      {
+        "path": "src/radix_control_donor.rs",
+        "sha256": "428331fd2258fd2565ada483bc49677c7ec27dba285ad4bcd046655e03a75f77"
+      },
+      {
+        "path": "src/radix_hilbert_donor.rs",
+        "sha256": "3d4695dcc245fd58728128ae9b5c554f69d0fbd600ddb1eeea7a2a6a1e0c9503"
+      }
+    ],
+    "execution_unit": "Whole census phase; individual partitions remain separately indexed in raw records",
+    "prior_protocol_accounting_issue": "v1 intended3010 total records but schema derives6020 arm-instance slots; no invented executions or omitted candidate records"
+  },
+  "amendments": [
+    {
+      "id": "A-execution-unit-and-host",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Correct the detected phase/record accounting mismatch before arithmetic data; use bounded existing host only after original EKS attempt is terminal.",
+      "changes": [
+        "Two whole-census phases, one instance per phase;3010 partitions per phase",
+        "Original all-binary baseline is an embedded partition, not an unequal execution arm",
+        "Fresh local output and S3prefix after terminal EKS attempt",
+        "Same input/source/binary, candidate coverage,120s phase and1GiB limits"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "994b14318ad32876c7c4a9ebb79a9e3e6fcaed539cd1d518d138195f67dc354d",
+    "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+    "frozen_at": "2026-10-30T22:00:14Z",
+    "filed_before_affected_data": true
+  }
+}

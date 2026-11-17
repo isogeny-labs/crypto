@@ -1,0 +1,11 @@
+# Public closed fibers in the existing target Jacobian arithmetic
+
+2026-11-16,frozen before target-class data. Exact inputs:kernel3 base-field quartic,its retained226-point pool,backmap PCC-20261116-00cca4,and closed public fibers PCC-20261116-73bb6a. Continue Khuri--Makdisi's existing large-model backend quartic_km_v3.cpp unchanged. No paid/performance trial;fixed-input native functional qualification.
+
+The existing representation is Class.w=H0(3D0-D_eff),with deg(D0)=deg(D_eff)=12 and dimension22. For every degree6 public fiber D,choose the same auxiliary effective degree6 divisor R from the last six eligible retained rational points,scanning backward. Eligibility requires exclusion from the85 evaluation points,the reference pole line,and every public fiber's x-support. Retain selected/excluded indices. Impose the six closed-fiber residue conditions and six auxiliary point conditions on the34-dimensional degree9 section space. Require coefficient kernel and evaluated row-space dimensions22. This encodes [D+R-D0].
+
+Subtract the encoded reference fiber D_S+R to obtain [D_(P+S)-D_S]. The auxiliary divisor cancels. This uses the checked general equality/preimage method;the rejected intersection zero shortcut stays excluded. Generated helper headers may use pragma-once guards and omit only the duplicate rejects function template from destination_relations.cpp. All mathematical sources/formulas remain unchanged and generated headers are hashed before execution.
+
+Require the zero public class,nonzero G/2G/Q classes,F(2G)=F(G)+F(G),cancellation,and F(Q)=[37]F(G). The scalar37 is used only by the known-answer checker,not the public-fiber/class constructor. Re-evaluate original fiber/image equations and derive the four norm compositions[6] from their closed divisor representatives. Check every exported target-space coefficient fixed by prime Frobenius. Alter one evaluation coordinate and require rejection of section-space membership.
+
+Retain the four class spaces,the computed scalar-multiple witness,auxiliary/evaluation indices,dimensions and exact addflip count. This is an executed public transfer/homomorphism fixture,not scalar recovery from index calculus. No target[r] multiplication is asserted unless executed. The generic full-J(H) kernel isogeny and projected individual descent/scalar recovery remain original requirements.

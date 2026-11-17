@@ -1,0 +1,176 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
+**Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
+prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
+then the newest session-log open threads. With no other instruction, take the
+first unchecked item (else the newest unowned open thread) and start. `/goal`
+re-reads the brief; `/goal <text>` pins a new goal.
+
+Run authorized x86 CPU experiments and crypto benchmarks through
+[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+(owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
+submit from the agent, and verify source/image identity and S3 hashes. L2
+benchmarks require native L2/replay/A/A admission. Requested resume uses the
+separate CRIU/EBS contract. The
+experiment director freezes this route in the task card; the executor runs it
+unchanged. Preserve explicitly requested environments and keep local development
+checks local. Loading instructions alone does not authorize an experiment.
+
+**First step of every task** (owner, 2026-11-16): before any other work, add
+the task to "Active items" in `docs/ACTIVE.md`, commit that alone, push, and
+open a **draft** PR named after the task (lane work pushes to the lane PR
+instead). Keep the line current; when the work is finished and checked, tick
+it and mark the PR ready for review, whatever the runtime defaults to. Rule:
+AGENTS.md, "First step of every task". Enable auto-merge when you mark it ready (`gh pr merge <n> --auto
+--merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
+This and the repository's other rules are in
+[`AGENTS.md`](AGENTS.md) ("Default workflow").
+
+**Success criterion** (owner, 2026-10-15): every verified, measured
+improvement over the current index-calculus baseline is a success. Beating
+Pollard rho is the long-term goal, reached iteratively, not by one
+breakthrough. Report each row's gap to the matched rho as the distance
+remaining, not as a pass/fail gate. Relabelling and accounting changes are
+not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
+iterative improvement of the index-calculus baseline".
+Claim tiers T0–T3 (below rho, smaller exponent, subexponential; transfers
+to hyperelliptic or other groups count when fully charged; cold, public
+targets, preregistered):
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md).
+
+Look up curve facts in the curve database before computing them or
+scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from
+secret `ecdb/api` first). Rules and the guide: AGENTS.md, "Querying the curve
+database (ecdb)", and [`ecdb/docs/AGENTS.md`](ecdb/docs/AGENTS.md).
+
+Before surveying for ECDLP leads or proposing one, read the lead atlas in the
+sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
+`python3 tools/lead_atlas.py --brief`, printed at session start). It records
+what has already been tried here and in the sibling repositories, and whether
+anything changed since its last review (AGENTS.md "Pointers").
+
+**Knowledge base first.** The shared `research-kb` MCP server indexes this
+repository, crypto-autoresearcher, cryptanalysis, crypto-lean, the archives
+and the paper collection (about 22k sources, 151k passages, 1.7k Lean
+declarations). Before a research task, a lead proposal, a factor-base or
+solver choice, a novelty or “not tried” claim, or a subagent handoff: run
+`kb_status`, two to four `search_knowledge` queries including the negative
+form, `search_theorems` for Lean claims, and `get_source`/`get_context` on the
+best hits. Record the `source_id` and `repo:path` under “Sources checked”.
+Full rule: AGENTS.md “Knowledge base first”; skill `research-kb`.
+
+Every experiment run, every PR that lands a result, and every research search
+leaves a report, a graph, and a PDF: follow the `research-visuals` skill
+(`.claude/skills/research-visuals/SKILL.md`; AGENTS.md "Research searches must
+leave visual reports"). Performance measurements and speedups also copy their
+PDFs, SVG graphs and PNG renders into `benchmarks/<YYYYMMDD>-<slug>/` with a row
+in `benchmarks/README.md`, in the same PR (AGENTS.md "Performance results also
+land in `benchmarks/`").
+
+Every big improvement also updates the index-calculus leaderboard in the same
+PR: regenerate `docs/ic-leaderboard.html`, `docs/ic/LEADERBOARD.md` and
+`docs/ic/leaderboard.json` with `python3 scripts/build_ic_leaderboard.py`, and
+the lab browser with it. That holds for a phase or component speed-up too, as
+its own section outside tables A–C (AGENTS.md "Standing workflow rules" and
+§7b).
+
+<!-- conductor:begin -->
+Validation gate (owner, 2026-10-19): no row reaches the IC leaderboard or
+`benchmarks/README.md` without a replay certificate, a validator report and a
+matched rho reference (with the §5a band), named by the evidence directory's
+`VALIDATION.json`; pre-gate rows render as "unvalidated (pre-gate)". Rule:
+[`AGENTS.md`](AGENTS.md), "Standing workflow rules"; schema:
+[`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md).
+
+Sabotage is assumed (owner, 2026-11-04): every producer, this session included,
+may be sabotaging the work. Cite a result by its pcc claim id and standing, or
+label it an unverified assertion. CI runs `python3 tools/pcc/pcc.py canary` and
+`ledger verify`. Rule: [`AGENTS.md`](AGENTS.md), "Sabotage is assumed: proof-carrying claims".
+
+Before making code changes, obtain or attach to a Conductor task. Run
+`conductor check --summary "…" --scope path:…` first — if someone already holds
+those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
+and the active task card. Report scope expansion before editing outside the reserved paths.
+Do not publish chat transcripts or secrets as task metadata.
+<!-- conductor:end -->
+
+In Claude Code on the web, `.claude/hooks/session-start.sh` installs Conductor
+and cairn and starts a control plane when the session starts. Elsewhere
+Conductor is not preinstalled: [`docs/CONDUCTOR.md`](docs/CONDUCTOR.md) says how
+to install it and connect a session to a control plane. Until then the hooks
+warn and let edits through.
+
+The session that opens a PR stays with it until it is merged or closed: it
+checks in on CI, reviews and merge state, fixes the failures and feedback its
+change causes, and merges once green and authorized (a non-required check
+queued 24 hours without starting does not block the merge). Any runtime may do this,
+Claude Opus and Fable included. Check in through PR-activity subscriptions or
+safety-net check-ins (about 50 minutes, then about 4 hours; stop after 3 quiet
+check-ins), and never busy-poll, sleep in a loop, or re-read job logs faster
+than that cadence. AGENTS.md, "Default workflow: open the PR, check in, and
+land it".
+
+Model tiers (owner, 2026-10-17): frontier/core models reason and decide;
+`experiment-director` (Sonnet) writes a frozen command card, the main session
+relays it verbatim to `executor-mechanical` (Haiku), and the director assesses
+the run. AGENTS.md, "Model tiers". After a relay the main session records what
+it cost: `python3 tools/token_usage.py session --units <cards> --unit-name card`
+(tokens and list-price cost per agent and tier, cache hit ratio, cost per card;
+`autofix-queue.yml` records each attempt the same way). Metrics and the
+transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.md).
+
+Every cross-method ECDLP comparison prices the unpriced native work of
+every arm, rho references included, at 0, 0.1 and 1 GAE per operation and
+ranks two arms only where the order holds across that band (AGENTS.md §5a).
+
+**Resume checkpoints** (owner, 2026-10-24): before any experiment run, fill
+`.resume/RESUME.md` (`scripts/checkpoint.sh init`) so a fresh session could
+resume the effort from it alone. The hooks push it to S3 with the specs,
+leads and unpushed work, and refuse run launchers until that succeeds.
+AGENTS.md, "Resume checkpoints in S3 before every run".
+
+**Benchmark records** (owner, 2026-11-04): every benchmark run leaves a
+`bench.record/v1` record in Git (`python3 tools/benchrec.py init|run|add-raw|
+metric|close`), its raw data in S3 by SHA-256, and a regenerated progress
+report in `benchmarks/progress/`, in the same PR. The hooks refuse unrecorded
+benchmark launchers and unrecorded pushes; the `bench-records` check fails
+the PR. AGENTS.md, "Benchmark records: data in S3, metadata in Git, one
+progress report"; [docs/benchmark-records.md](docs/benchmark-records.md).
+
+**Continuous learning** (owner, 2026-11-15): every skill and agent reads
+`python3 tools/lessons.py brief --scope <name>` before acting, records an
+evidenced outcome and lesson tests after, and folds adopted lessons back into
+its own instructions by PR. Ledger: `docs/lessons/`. Rule: AGENTS.md
+"Continuous learning loop".
+
+## Persistent scientific research loop
+
+Read and follow [AGENTS.md](AGENTS.md#persistent-scientific-research-loop).
+That section governs hypothesis testing, recovery from obstacles, continued
+iteration, checkpoints and evidence required before stopping in this runtime.

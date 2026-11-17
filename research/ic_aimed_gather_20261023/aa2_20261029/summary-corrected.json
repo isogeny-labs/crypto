@@ -1,0 +1,172 @@
+{
+  "schema": "ic_aimed_gather.bootstrap_correction/v2",
+  "generator": "LCG s -> (s*1103515245 + 12345) mod 2^31, stepped exactly; index floor(s*n / 2^31); 2000 resamples; percentile indices 50 and 1949",
+  "stratified_generator": "the same exact LCG with index s mod n (the first correction): every resample draws n/2 odd and n/2 even rounds",
+  "as_run_generator": "the same LCG stepped in jq doubles (rounded past 2^53), as ../summarise.sh and summarise.sh ran it",
+  "sessions": {
+    "2026-10-23": {
+      "ab_collect": {
+        "median": 1.1113287936761795,
+        "n": 30,
+        "above_one": 28,
+        "ci95": {
+          "lo": 1.0820591396318928,
+          "hi": 1.149245063619933
+        },
+        "ci95_stratified": {
+          "lo": 1.0820591396318928,
+          "hi": 1.1465597428375427
+        },
+        "ci95_as_run": {
+          "lo": 1.0647831016579432,
+          "hi": 1.1603953138001177
+        },
+        "as_run_odd_round_share": 0.9957666666666667
+      },
+      "aa_collect": {
+        "median": 0.9976659804558075,
+        "n": 5,
+        "above_one": 2,
+        "ci95": {
+          "lo": 0.9444588298520109,
+          "hi": 1.0873582038536536
+        },
+        "ci95_stratified": {
+          "lo": 0.9444588298520109,
+          "hi": 1.0873582038536536
+        },
+        "ci95_as_run": {
+          "lo": 0.9444588298520109,
+          "hi": 1.0873582038536536
+        },
+        "as_run_odd_round_share": 0.604
+      },
+      "ab_total": {
+        "median": 1.0372200949688133,
+        "n": 30,
+        "above_one": 26,
+        "ci95": {
+          "lo": 1.0179062487910673,
+          "hi": 1.0797665853623717
+        },
+        "ci95_stratified": {
+          "lo": 1.0179062487910673,
+          "hi": 1.0797665853623717
+        },
+        "ci95_as_run": {
+          "lo": 1.0179062487910673,
+          "hi": 1.0684941771115628
+        },
+        "as_run_odd_round_share": 0.9957666666666667
+      },
+      "aa_total": {
+        "median": 0.9927136917805259,
+        "n": 5,
+        "above_one": 1,
+        "ci95": {
+          "lo": 0.9525616744947626,
+          "hi": 1.1209627232568113
+        },
+        "ci95_stratified": {
+          "lo": 0.9525616744947626,
+          "hi": 1.1209627232568113
+        },
+        "ci95_as_run": {
+          "lo": 0.9525616744947626,
+          "hi": 1.1209627232568113
+        },
+        "as_run_odd_round_share": 0.604
+      },
+      "established_collect": false,
+      "established_total": false,
+      "established_collect_as_run": false,
+      "established_total_as_run": false,
+      "established_collect_stratified": false,
+      "established_total_stratified": false,
+      "margin_collect": -0.005299064221760741,
+      "margin_total": -0.10305647446574406
+    },
+    "2026-10-29": {
+      "ab_collect": {
+        "median": 1.0930878076239279,
+        "n": 42,
+        "above_one": 38,
+        "ci95": {
+          "lo": 1.0677202965483465,
+          "hi": 1.136470650831469
+        },
+        "ci95_stratified": {
+          "lo": 1.0677202965483465,
+          "hi": 1.1358003284871343
+        },
+        "ci95_as_run": {
+          "lo": 1.08982882862411,
+          "hi": 1.159729344106197
+        },
+        "as_run_odd_round_share": 0.9958571428571429
+      },
+      "aa_collect": {
+        "median": 0.9994237085117715,
+        "n": 42,
+        "above_one": 20,
+        "ci95": {
+          "lo": 0.9768797674101188,
+          "hi": 1.0257671548659621
+        },
+        "ci95_stratified": {
+          "lo": 0.9768797674101188,
+          "hi": 1.0254125781305254
+        },
+        "ci95_as_run": {
+          "lo": 0.977119451944687,
+          "hi": 1.029653172613389
+        },
+        "as_run_odd_round_share": 0.9958571428571429
+      },
+      "ab_total": {
+        "median": 1.0416402202042518,
+        "n": 42,
+        "above_one": 29,
+        "ci95": {
+          "lo": 1.0203546825625656,
+          "hi": 1.0824004507031781
+        },
+        "ci95_stratified": {
+          "lo": 1.0203546825625656,
+          "hi": 1.0824004507031781
+        },
+        "ci95_as_run": {
+          "lo": 1.0205226011426607,
+          "hi": 1.1158916983778722
+        },
+        "as_run_odd_round_share": 0.9958571428571429
+      },
+      "aa_total": {
+        "median": 0.9845863968143238,
+        "n": 42,
+        "above_one": 20,
+        "ci95": {
+          "lo": 0.945934974308728,
+          "hi": 1.014948939884482
+        },
+        "ci95_stratified": {
+          "lo": 0.945934974308728,
+          "hi": 1.0156315954002633
+        },
+        "ci95_as_run": {
+          "lo": 0.9409078755594028,
+          "hi": 1.0354154980568127
+        },
+        "as_run_odd_round_share": 0.9958571428571429
+      },
+      "established_collect": true,
+      "established_total": true,
+      "established_collect_as_run": true,
+      "established_total_as_run": false,
+      "established_collect_stratified": true,
+      "established_total_stratified": true,
+      "margin_collect": 0.0419531416823844,
+      "margin_total": 0.0054057426780835804
+    }
+  }
+}

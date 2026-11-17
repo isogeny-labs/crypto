@@ -1,0 +1,29 @@
+Complete advanced-base root regression, 2026-10-30 05:44 UTC
+
+Command: cargo test --locked --release --lib
+Directory: /workspace/crypto
+Tested source: 9f0835c26e1b2102c421674ed120e2c2e7f91485
+Started: 2026-10-30T04:43:47Z
+Finished: 2026-10-30T05:43:26Z
+Actual wrapper exit: 0
+Full parent summary:
+test result: ok. 5430 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 3042.95s
+
+The final isogeny-walk case completed successfully. No live test remains.
+Raw output: /tmp/crypto-root-advanced-base-20261030.log
+Bytes: 487256
+SHA-256: 5c3d6749f34fc9b1c350fe11ab3d0743ba7f9e1276d45bfe33b4bab34990eb16
+Metadata/actual exit: /tmp/crypto-root-advanced-base-20261030.{meta,exit}
+Runtime raw evidence: NOT_UPLOADED; local output and receipts only.
+
+This result covers the advanced base's ecdl-tensor-ic dependency changes.
+Its separate standard suite also passed34tests with actual recheck exit0.
+The hashed-tensor crate still matches all26 tracked actual merged-peer files
+in sources-merged-peer.sha256. Both native40core/5runner/3panel-unit/3JSON and
+binding20unit/19FFI/14docs checks and lint/MSRV/docs remain valid for that
+unchanged source. Subsequent changes are documentation/receipts only.
+Earlier incomplete/failure receipts and earlier complete revision-specific
+passes are retained; no history is relabelled or broadened.
+No assertion, test, check or ignored-test policy was changed to obtain green.
+General theorem/complexity audit stays open. This is development validation,
+not a benchmark, scientific experiment or deployed-curve campaign.

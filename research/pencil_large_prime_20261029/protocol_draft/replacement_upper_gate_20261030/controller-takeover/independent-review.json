@@ -1,0 +1,196 @@
+{
+  "schema": "pencil-c1-controller-takeover-independent-review/v1",
+  "created_utc": "2026-10-30T06:22:19Z",
+  "review_kind": "read_only_source_and_aws_api_review",
+  "status": "conditionally_ready_after_exact_prior_controller_terminal_confirmation",
+  "scientific_executions": 0,
+  "cloud_mutations": 0,
+  "review_scope": "One same-request controller-owner takeover after the first CodeBuild is terminal, retaining the existing scientific worker, request, deadline, state, checkpoint lineage, and single scientific submission.",
+  "original_controller": {
+    "project": "isolab-recovery-controller",
+    "build_id": "isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0",
+    "started_utc": "2026-10-30T05:41:40.774Z",
+    "project_timeout_minutes": 45,
+    "projected_timeout_utc": "2026-10-30T06:26:40Z",
+    "concurrent_build_limit": 1,
+    "accepted_terminal_statuses": [
+      "SUCCEEDED",
+      "FAILED",
+      "STOPPED",
+      "TIMED_OUT",
+      "FAULT"
+    ]
+  },
+  "request": {
+    "run_name": "pencil-p186379-20261030-c1",
+    "raw_file_sha256": "e49b94e02639a57b5af1b71b6b0a415a852190156a4beef9583e88d205866c0d",
+    "controller_request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+    "object_key": "inputs/recovery-requests/92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907.json",
+    "deadline_unix_seconds": 1793347824,
+    "deadline_utc": "2026-10-30T08:10:24Z",
+    "max_restores": 1,
+    "checkpoint_interval_seconds": 300,
+    "memory": "8Gi"
+  },
+  "authorization": {
+    "authorization_start_unix_seconds": 1793337474,
+    "authorization_start_utc": "2026-10-30T05:17:54Z",
+    "outer_expiry_unix_seconds": 1793359074,
+    "outer_expiry_utc": "2026-10-30T11:17:54Z",
+    "cumulative_active_worker_seconds": 21600,
+    "maximum_active_scientific_payloads": 1,
+    "automatic_scientific_retry_admitted": false,
+    "remaining_cohort_admitted": false,
+    "timing_qualified": false
+  },
+  "controller_invariants": {
+    "source_archive_sha256": "0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a",
+    "source_version": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+    "approved_client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+    "runtime_image_digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+    "scientific_image_digest": "sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+    "scientific_source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+    "source_files": [
+      {
+        "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs",
+        "sha256": "ec633a6af0e9475731f0b7f9757828bfdd6b6baab6918ec6d082803a6cd0ec91"
+      },
+      {
+        "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/main.rs",
+        "sha256": "1460d79c9697f750a4a51b36830acfbc48a221cc3139bae7d861b96840bc9be5"
+      },
+      {
+        "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/model.rs",
+        "sha256": "fd104ff4c54cf35b6f6b23ea08b38c480e032f60e6e7db2e54f981a9ff483f45"
+      },
+      {
+        "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs",
+        "sha256": "7cae58e46359ff72955ee52ac3e87c82987c68f20ffdf8778492e0e0a606f939"
+      },
+      {
+        "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/io.rs",
+        "sha256": "115b5c03eaa4035e33cfe7c44b6d8117afdedca6cf0291741b05e0874d01a08f"
+      }
+    ]
+  },
+  "source_findings": {
+    "takeover_entry": "cloud::begin loads the existing ConfigMap and exact request-bound State before considering a new state",
+    "terminal_owner_gate": "State::claim changes owner_build only when batch-get-builds reports the prior owner in an accepted terminal status",
+    "cas_boundary": "Stored::save uses Kubernetes replace with the existing resourceVersion",
+    "request_binding": "State::bind_request requires the durable request hash and parsed request to equal the supplied immutable request",
+    "worker_attempt_semantics": "State.attempt equals State.restores and increments only in begin_restore; controller-owner takeover does not increment either field",
+    "running_worker_semantics": "A takeover in running, checkpointing, or verifying_computation reconciles the existing Pod and supervisor instead of provisioning a replacement attempt",
+    "terminal_state_semantics": "An already terminal durable State is published and returned without restarting scientific work",
+    "missing_state_semantics": "A deleted or missing durable ConfigMap is not acceptable for this takeover; the permanent request tombstone prevents treating the run as a new computation"
+  },
+  "preconditions": {
+    "prior_build_terminal": true,
+    "prior_build_terminal_status_must_be_rechecked_at_takeover": true,
+    "same_controller_request_sha256": true,
+    "same_run_name": true,
+    "durable_owner_build_equals_original_build": true,
+    "durable_attempt": 0,
+    "durable_restores": 0,
+    "allowed_durable_phases": [
+      "running",
+      "checkpointing",
+      "verifying_computation"
+    ],
+    "current_instance": "i-04d58c2b309fb6549",
+    "current_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+    "current_instance_state_required": "running",
+    "durable_state_and_configmap_required": true,
+    "request_deadline_must_remain_live": true
+  },
+  "controller_attempt_accounting": {
+    "first_codebuild_controller_attempt": 1,
+    "takeover_codebuild_controller_attempt": 2,
+    "maximum_infrastructure_controller_attempts": 2,
+    "additional_controller_after_takeover_authorized": false,
+    "scientific_submission_count_after_takeover": 1,
+    "worker_attempt_after_takeover": 0,
+    "restores_after_takeover": 0,
+    "note": "The source does not persist a controller-build attempt counter; the maximum of two is enforced by the external receipt and authorization boundary. State.attempt is the worker restore count, not the CodeBuild controller count."
+  },
+  "takeover_start_build": {
+    "idempotency_token": "e6ab86492b6d69d5b84826aa221d864558441c9c327a77cfe95afbb54c0f9a30",
+    "idempotency_token_preimage": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907:controller-takeover:1",
+    "project_name": "isolab-recovery-controller",
+    "environment_variable": {
+      "name": "ISOLAB_RECOVERY_REQUEST_KEY",
+      "value": "inputs/recovery-requests/92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907.json",
+      "type": "PLAINTEXT"
+    },
+    "must_not_use_native_submit_again": true,
+    "reason_not_to_use_submit": "A second submit emits another scientific submission receipt and reuses the original request idempotency token. The takeover is an infrastructure controller-owner transition under the original submission."
+  },
+  "per_build_timeout_review": {
+    "aws_api_field": "timeoutInMinutesOverride",
+    "aws_cli_field": "--timeout-in-minutes-override",
+    "aws_documented_range_minutes": {
+      "minimum": 5,
+      "maximum": 2160
+    },
+    "queue_api_field": "queuedTimeoutInMinutesOverride",
+    "queue_cli_field": "--queued-timeout-in-minutes-override",
+    "queue_timeout_minutes": 15,
+    "operational_reserve_seconds": 900,
+    "calculation_basis": {
+      "kind": "projected_original_build_timeout",
+      "now_unix_seconds": 1793341600,
+      "now_utc": "2026-10-30T06:26:40Z",
+      "G_unix_seconds": 1793347824,
+      "D_unix_seconds": 1793359074,
+      "formula_need": "ceil((G + reserve - now) / 60)",
+      "NEED_minutes": 119,
+      "formula_max": "floor((D - now - queue_minutes*60) / 60)",
+      "MAX_minutes": 276,
+      "selected_timeout_minutes": 120,
+      "selected_timeout_within_max": true,
+      "nominal_build_timeout_utc": "2026-10-30T08:26:40Z",
+      "nominal_queue_plus_build_latest_utc": "2026-10-30T08:41:40Z"
+    },
+    "actual_start_requirement": "Recompute NEED and MAX immediately before StartBuild using the actual current UTC time; reject if max(5, NEED) exceeds MAX.",
+    "scope_conclusion": "The per-build timeout and queue overrides affect only this CodeBuild invocation. They do not update the project, IAM, RBAC, package, controller source, request, worker, G, D, scientific budget, or restore limit.",
+    "aws_primary_documentation": [
+      "https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html",
+      "https://docs.aws.amazon.com/cli/latest/reference/codebuild/start-build.html"
+    ]
+  },
+  "required_takeover_receipt_fields": [
+    "original submission receipt and digest",
+    "raw request digest and controller request identity",
+    "original build id and exact terminal status observation",
+    "new build id and takeover idempotency token",
+    "controller source version and source archive digest",
+    "approved client, runtime image, scientific image, source revision and ecbench digests",
+    "pre-takeover phase, attempt, restores, current instance and current Pod UID",
+    "timeoutInMinutesOverride, queuedTimeoutInMinutesOverride, actual calculation time, NEED, MAX, G, D and reserve",
+    "infrastructure_attempt 2 of 2",
+    "scientific_submission_count 1",
+    "worker_restart false",
+    "restore_started false",
+    "new_experiment false"
+  ],
+  "stop_conditions": [
+    "prior CodeBuild is not conclusively terminal",
+    "durable request, run name or owner differs",
+    "durable attempt or restores is nonzero",
+    "durable phase is fencing or restoring",
+    "worker instance is not running or its identity differs",
+    "Pod UID differs",
+    "durable State or its ConfigMap is missing",
+    "request deadline has expired",
+    "another controller takeover already consumed infrastructure attempt 2",
+    "recomputed timeout no longer fits inside the outer window with the queue allowance"
+  ],
+  "limitations": [
+    "The takeover changes the controller owner only; it does not prove that the existing worker will never fail later.",
+    "A later worker failure can enter the request's already admitted fencing and one-restore path. If no later restore is acceptable, the operator must stop instead of permitting that transition.",
+    "The CodeBuild timeout is not a scientific runtime estimate and does not extend the worker past G.",
+    "The projected NEED and MAX values must not substitute for the mandatory calculation at the actual StartBuild time.",
+    "No third controller attempt is authorized if the takeover build later terminates before durable completion."
+  ],
+  "verdict": "same_request_controller_takeover_is_source_supported_and_scope_valid_only_under_the_listed_terminal_state_identity_attempt_and_timeout_preconditions"
+}

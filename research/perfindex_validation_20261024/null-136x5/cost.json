@@ -1,0 +1,68 @@
+{
+ "invocations": 2040,
+ "invocation_seconds": 1118.22,
+ "wall_seconds": 1120.36,
+ "timed_sample_wall_seconds": 588.644,
+ "timed_sample_cpu_seconds": 583.327,
+ "overhead_fraction": 0.4736,
+ "peak_rss_kb": 112956,
+ "by_area_seconds": {
+  "bool_gb": 277.21,
+  "dlp": 80.12,
+  "field_ec": 116.98,
+  "fp_gb": 114.97,
+  "gf2_la": 166.81,
+  "pdp": 117.8,
+  "relation": 79.84,
+  "sat": 164.48
+ },
+ "by_round_seconds": {
+  "0": 222.86,
+  "1": 223.13,
+  "2": 225.81,
+  "3": 224.33,
+  "4": 222.09
+ },
+ "costliest_kernels": [
+  {
+   "id": "relation/koblitz_descent_k0n53_m2_x4",
+   "seconds": 26.24
+  },
+  {
+   "id": "sat/koblitz_bool_native_m2_n19_x2",
+   "seconds": 24.2
+  },
+  {
+   "id": "bool_gb/wide_mixed_m4_n15",
+   "seconds": 21.63
+  },
+  {
+   "id": "bool_gb/wide_found_m5_n15",
+   "seconds": 21.54
+  },
+  {
+   "id": "bool_gb/solve_matrixf5_m2_n17",
+   "seconds": 20.52
+  },
+  {
+   "id": "bool_gb/fes_gray_random_n28",
+   "seconds": 20.28
+  },
+  {
+   "id": "dlp/bsgs_fast_toy40_w4_interval38_x8",
+   "seconds": 20.2
+  },
+  {
+   "id": "bool_gb/solve_matrixf4_m2_n17",
+   "seconds": 19.96
+  },
+  {
+   "id": "bool_gb/fes_wide_random_n30",
+   "seconds": 19.37
+  },
+  {
+   "id": "sat/semaev_s4_n15l5_unsat_x1",
+   "seconds": 18.99
+  }
+ ]
+}

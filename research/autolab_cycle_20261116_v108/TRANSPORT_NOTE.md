@@ -1,0 +1,1 @@
+The first clean replay rejected the CSV hash because text-mode reads normalized CRLF to LF. The transport was changed to decode original UTF8 bytes without newline normalization. Original CSV, raw evidence, hashes and algorithms are unchanged. Failed and corrected replay receipts are both preserved.

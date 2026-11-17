@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:03:22Z",
+ "id": "PCC-20261116-ba8a27",
+ "kind": "statement",
+ "producer": {
+  "commit": "014e55bc258c4a7ff27e24f0d88e43a1a745f003",
+  "model": "",
+  "session": "codex-20261116-nist-kummer-lift"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/TWIST_PROTOCOL.md",
+    "sha256": "62d2c4317eb2beda28c24628c60e60c9719b099ae327b3259748de2902d1d8e9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/KERNEL_CONTINUATION_PROTOCOL.md",
+    "sha256": "683fb18fb4205df0b5f2f8d98e3df8dbd21a468a745ce16c0e194729fc0fce94"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/resume-recorded-kernel.sh",
+    "sha256": "e63ced1a3a3f6ea64ec0beedbdc78f21aaf343b78dc6f563a8c192290a60aad3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel3-resume-v1.tar.gz",
+    "sha256": "0467ebe1f8ecfa93c45cda13dcca67f255211819c99cb638b718790ff4bcb748"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel3-resume-v1/MANIFEST.sha256",
+    "sha256": "d2a32552ce3d023a45e1a5adae90161b84837c78b1ec3f6e19217f470aec3a1c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel3-resume-v1/COMPLETE.txt",
+    "sha256": "147856fa177840a3450222636bd3230bd38c75fcddd2fee64cbcb5dd2cea0392"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel3-resume-v1/EXIT_STATUS.txt",
+    "sha256": "aad28253153ff015bc8cda46f16395a36f1b87de6a24fe1a0194e1d39b96c541"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel3-resume-v1/retained-predecessors.sha256",
+    "sha256": "5493d189e0f7cdb9e5c913348ffa1a1c4d058572a0a6d13c1363f5136b46db80"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Recorded P-192 d7 kernel3 resumed construction completes with exit0 from retained byte-identical theta/Riemann predecessors through Fp curve descent, target geometry/functions and conditional differential comparison. All four quadratic forms share one nonzero Fp scalar of character +1. This passes the current same-field differential compatibility test under its normalization argument, but no executable source divisor-class map or DLP recovery is yet supplied. Producer-unverified."
+}

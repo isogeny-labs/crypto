@@ -1,0 +1,67 @@
+// Append to the unchanged polynomial-ring prefix of cm22-incidence.sing.
+// All arithmetic, ideal certificates and Frobenius ranks are native Singular.
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registeredUnits=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+ring ss=(2,a),(n,l),lp;
+LIB "linalg.lib";
+minpoly=a5+a3+1;
+number bb=a+1;
+map specialize=r,n,l,bb,1;
+ideal originalSS=specialize(original);
+ideal unitsSS=specialize(registeredUnits);
+ideal J=std(ideal(l4+bb*l+bb^2,n4+bb^3*n+bb^4*(l+1)));
+print("BEGIN_SS5_FIBER");
+print("ORIGINAL_GENERATORS");originalSS;
+print("TRIANGULAR_GROEBNER_BASIS");J;
+print("ORIGINAL_TO_TRIANGULAR_LIFT");
+matrix forwardLift=lift(originalSS,J);forwardLift;
+print("FORWARD_RESIDUAL");matrix forwardResidual=matrix(J)-matrix(originalSS)*forwardLift;forwardResidual;
+print("TRIANGULAR_TO_ORIGINAL_LIFT");
+matrix backwardLift=lift(J,originalSS);backwardLift;
+print("BACKWARD_RESIDUAL");matrix backwardResidual=matrix(originalSS)-matrix(J)*backwardLift;backwardResidual;
+print("ORIGINAL_DIMENSION");vdim(std(originalSS));
+print("TRIANGULAR_DIMENSION");vdim(J);
+print("ORIGINAL_UNITS");unitsSS;
+int k;poly unitProduct=1;
+for(k=1;k<=size(unitsSS);k++){
+  unitProduct=reduce(unitProduct*unitsSS[k],J);
+  print("UNIT_"+string(k));std(J+ideal(unitsSS[k]));
+}
+print("UNIT_PRODUCT_CHECK");std(J+ideal(unitProduct));
+print("LAMBDA_UNIT_CHECK");std(J+ideal(l));
+print("NU_UNIT_CHECK");std(J+ideal(n));
+poly L=l4+bb*l+bb^2;
+poly C=n4+bb^3*n+bb^4*(l+1);
+matrix jac[2][2]=diff(L,l),diff(L,n),diff(C,l),diff(C,n);
+print("RELATIVE_JACOBIAN");jac;
+print("JACOBIAN_DETERMINANT");det(jac);
+print("JACOBIAN_RESIDUAL");det(jac)-bb^4;
+print("JACOBIAN_UNIT_CHECK");std(J+ideal(det(jac)));
+matrix frob[16][16];
+int i;int j;int col;int row;int squaring;poly remainder;intvec powers;
+for(j=0;j<4;j++){
+  for(i=0;i<4;i++){
+    col=1+i+4*j;
+    remainder=l^i*n^j;
+    for(squaring=1;squaring<=5;squaring++){remainder=reduce(remainder^2,J);}
+    while(remainder!=0){
+      powers=leadexp(remainder);
+      row=1+powers[2]+4*powers[1];
+      frob[row,col]=leadcoef(remainder);
+      remainder=remainder-lead(remainder);
+    }
+  }
+}
+print("FROBENIUS_Q32");frob;
+matrix ident[16][16];for(k=1;k<=16;k++){ident[k,k]=1;}
+print("FROBENIUS_MINUS_I_RANK");mat_rk(frob-ident);
+print("FROBENIUS_SQUARED_MINUS_I_RANK");mat_rk(frob*frob-ident);
+print("FROBENIUS_FOURTH_RESIDUAL");frob*frob*frob*frob-ident;
+if(size(ideal(forwardResidual))!=0 || size(ideal(backwardResidual))!=0){ERROR("nonzero ideal-equivalence residual");}
+if(vdim(J)!=16 || vdim(std(originalSS))!=16){ERROR("unexpected fiber dimension");}
+if(std(J+ideal(unitProduct))[1]!=1){ERROR("registered unit vanished");}
+if(det(jac)-bb^4!=0){ERROR("Jacobian mismatch");}
+if(mat_rk(frob-ident)!=12 || mat_rk(frob*frob-ident)!=8 || size(ideal(frob*frob*frob*frob-ident))!=0){ERROR("Frobenius hypothesis failed");}
+print("SS5_FIBER_ALL_CHECKS_PASS");
+print("END_SS5_FIBER");
+quit;

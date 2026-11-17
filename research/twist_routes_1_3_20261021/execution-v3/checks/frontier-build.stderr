@@ -1,0 +1,175 @@
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `PathBuf`
+  --> src/bin/twist-incidence-frontier.rs:11:18
+   |
+11 |     path::{Path, PathBuf},
+   |                  ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: function `sha224` is never used
+   --> src/bin/../../../../../src/hash/sha256.rs:147:8
+    |
+147 | pub fn sha224(data: &[u8]) -> [u8; 28] {
+    |        ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: struct `Sha256` is never constructed
+   --> src/bin/../../../../../src/hash/sha256.rs:172:12
+    |
+172 | pub struct Sha256 {
+    |            ^^^^^^
+
+warning: associated items `new`, `update`, and `finalize` are never used
+   --> src/bin/../../../../../src/hash/sha256.rs:186:12
+    |
+185 | impl Sha256 {
+    | ----------- associated items in this implementation
+186 |     pub fn new() -> Self {
+    |            ^^^
+...
+195 |     pub fn update(&mut self, mut data: &[u8]) {
+    |            ^^^^^^
+...
+214 |     pub fn finalize(mut self) -> [u8; 32] {
+    |            ^^^^^^^^
+
+warning: function `compress_blocks` is never used
+   --> src/bin/../../../../../src/hash/sha256.rs:230:4
+    |
+230 | fn compress_blocks(state: &mut [u32; 8], blocks: &[u8]) {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `available` is never used
+   --> src/bin/../../../../../src/hash/sha256.rs:256:19
+    |
+256 |     pub(super) fn available() -> bool {
+    |                   ^^^^^^^^^
+
+warning: function `compress` is never used
+   --> src/bin/../../../../../src/hash/sha256.rs:268:26
+    |
+268 |     pub(super) unsafe fn compress(state: &mut [u32; 8], blocks: &[u8]) {
+    |                          ^^^^^^^^
+
+warning: function `reference_calls` is never used
+ --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:6:8
+  |
+6 | pub fn reference_calls() -> u64 {
+  |        ^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `pm`, `trace`, `rational`, and `points` are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:82:12
+    |
+ 81 | impl Quad {
+    | --------- associated items in this implementation
+ 82 |     pub fn new(p: u64, a: u64, b: u64) -> Self {
+    |            ^^^
+...
+183 |     pub fn pm(self, mut x: P, mut n: u128) -> P {
+    |            ^^
+...
+195 |     pub fn trace(self, x: P) -> P {
+    |            ^^^^^
+...
+199 |     pub fn rational(self) -> Vec<P> {
+    |            ^^^^^^^^
+...
+213 |     pub fn points(self) -> Vec<P> {
+    |            ^^^^^^
+
+warning: struct `S` is never constructed
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:245:12
+    |
+245 | pub struct S(pub [u64; 6]);
+    |            ^
+
+warning: constant `Z` is never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:246:11
+    |
+246 | pub const Z: S = S([0; 6]);
+    |           ^
+
+warning: constant `ONE` is never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:247:11
+    |
+247 | pub const ONE: S = S([1, 0, 0, 0, 0, 0]);
+    |           ^^^
+
+warning: type alias `SP` is never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:248:10
+    |
+248 | pub type SP = Option<(S, S)>;
+    |          ^^
+
+warning: struct `Sext` is never constructed
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:250:12
+    |
+250 | pub struct Sext {
+    |            ^^^^
+
+warning: multiple associated items are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:257:12
+    |
+256 | impl Sext {
+    | --------- associated items in this implementation
+257 |     pub fn new(e: Quad) -> Self {
+    |            ^^^
+...
+267 |     pub fn c(self, x: u64) -> S {
+    |            ^
+...
+271 |     pub fn add(self, x: S, y: S) -> S {
+    |            ^^^
+...
+279 |     pub fn neg(self, x: S) -> S {
+    |            ^^^
+...
+283 |     pub fn sub(self, x: S, y: S) -> S {
+    |            ^^^
+...
+287 |     fn m3(self, x: &[u64], y: &[u64]) -> [u64; 3] {
+    |        ^^
+...
+300 |     pub fn mul(self, x: S, y: S) -> S {
+    |            ^^^
+...
+313 |     pub fn pow(self, mut x: S, mut n: u128) -> S {
+    |            ^^^
+...
+325 |     pub fn inv(self, x: S) -> S {
+    |            ^^^
+...
+335 |     pub fn div(self, x: S, y: S) -> S {
+    |            ^^^
+...
+339 |     pub fn sqrt(self, x: S) -> Option<S> {
+    |            ^^^^
+...
+349 |     fn sqrt_degree(self, x: S, degree: u32) -> Option<S> {
+    |        ^^^^^^^^^^^
+...
+393 |     pub fn lift(self, q: Q) -> S {
+    |            ^^^^
+...
+397 |     pub fn fp(self, s: S) -> Option<u64> {
+    |            ^^
+...
+405 |     pub fn pn(self, x: SP) -> SP {
+    |            ^^
+...
+409 |     pub fn on(self, x: SP, a: S, b: S) -> bool {
+    |            ^^
+...
+415 |     pub fn pa(self, x: SP, y: SP, a: S) -> SP {
+    |            ^^
+...
+434 |     pub fn pm(self, mut x: SP, mut n: u128, a: S) -> SP {
+    |            ^^
+...
+446 |     pub fn frob(self, x: SP) -> SP {
+    |            ^^^^
+
+warning: `twist-route-experiments` (bin "twist-incidence-frontier") generated 15 warnings (run `cargo fix --bin "twist-incidence-frontier"` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 4.15s

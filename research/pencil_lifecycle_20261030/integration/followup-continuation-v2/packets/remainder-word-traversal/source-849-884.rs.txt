@@ -1,0 +1,36 @@
+fn pdiv(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly) {
+    geometry_events::record(0, 0, 0, 1);
+    assert!(!b.is_empty());
+    let mut r = trim(geometry_events::copied(a));
+    let mut q = geometry_events::initialized(vec![0; a.len().saturating_sub(b.len()) + 1]);
+    let il = if geometry_events::last_is(b, 1) {
+        1
+    } else {
+        f.inv(*geometry_events::last(b).unwrap())
+    };
+    while {
+        geometry_events::record(0, 0, 0, 1);
+        !r.is_empty() && {
+            geometry_events::record(0, 0, 0, 1);
+            r.len() >= b.len()
+        }
+    } {
+        let j = r.len() - b.len();
+        let c = if il == 1 {
+            *geometry_events::last(&r).unwrap()
+        } else {
+            f.mul(*geometry_events::last(&r).unwrap(), il)
+        };
+        geometry_events::record(0, 1, 0, 0);
+        q[j] = c;
+        for (k, &x) in b.iter().enumerate() {
+            geometry_events::record(2, 0, 0, 0);
+            r[j + k] = f.sub(r[j + k], f.mul(c, x));
+        }
+        r = trim(r);
+    }
+    (trim(q), r)
+}
+fn prem(f: &Field, a: &[u64], b: &[u64]) -> Poly {
+    pdiv(f, a, b).1
+}

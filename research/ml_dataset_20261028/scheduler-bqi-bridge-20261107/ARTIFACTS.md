@@ -1,0 +1,1 @@
+MANIFEST.json preserves original proposal hashes. The tests executable is stored in the private software-evidence archive identified by s3.receipt.json, under proposal/tests; it is omitted from Git. REVIEW.md is a later independent source-review addition. Reproduction commands are in README.md.

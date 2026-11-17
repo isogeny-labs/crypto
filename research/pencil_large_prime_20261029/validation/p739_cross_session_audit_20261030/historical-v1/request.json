@@ -1,0 +1,40 @@
+{
+  "schema": "p739-cross-session-audit-request/v1",
+  "expected_records": 1080,
+  "expected_replay_candidates": 900,
+  "expected_binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+  "expected_git_commit": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
+  "computation": {
+    "spec": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/session/spec.json", "sha256": "1fb4cc7155a66d31fd05846ac1f98b3275c57dcca9becf614f07d791b9367fff"},
+    "plan": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/session/plan.json", "sha256": "d2ec87b752dbbf8d9e2cdbda88542266f9163684ae504aa94487e49a90247712"},
+    "records": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/session/records.jsonl", "sha256": "5fdb83991cadbceed7f4bc8f5adacf6ea8c9a48c292ae3f43b83bfe774daaa4c"},
+    "session": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/session/session.json", "sha256": "9e3738252623fac35ced514aae1090d8afd7f4917f6c66768d0ed64f060876ec"},
+    "host": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/session/host.json", "sha256": "73f0ef4468188e0ad573ecd73b0f62a74341519a7755e48cf25b83e455536d5d"},
+    "audit": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation/compute/audit.json", "sha256": "1ca83b0869dff64952b8aa85652c142bf7ab96eacd691d5f8dc191a782e2d0ba"}
+  },
+  "fresh": {
+    "spec": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/spec.json", "sha256": "ec7a5cf7f65a256fabb4abb01289edd974fb358b8f008f354f0d37d935c817ab"},
+    "plan": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/plan.json", "sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776"},
+    "records": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/records.jsonl", "sha256": "9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7"},
+    "session": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/session.json", "sha256": "0aee60f33827791b35338bfd3804ac560440647059838d6f02068109bbd3b762"},
+    "host": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/session/host.json", "sha256": "a193ff57a89be2a92f3c24bc4031ca3c8824335f7daf05acc75b42fc240e3893"},
+    "audit": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/audit.json", "sha256": "f810db8ad80f1195bbfd965d506bfa4b668505051c6a7f9991904f95414dd2d8"}
+  },
+  "computation_provenance": {
+    "archive": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation.tar", "sha256": "6c06a0027abebb6c3e9e15725cda8342e407d4942ebb010b1f230eac975eedec"},
+    "archive_head_receipt": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/computation-download.json", "sha256": "93aab6c094a46ac65175d70bcb94c1f0df83c91a04bc25673b64271c6e5b4c6d"}
+  },
+  "fresh_provenance": {
+    "locators": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh-locators.jsonl", "sha256": "5003245b47618af4b313109e653f52133ca3b28004d0dba24e24d76cbbecccf9"},
+    "object_versions": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh-object-versions.json", "sha256": "230412f672639eb2ec6565451877b4123b846beed4061ad218519f28ce81687a"},
+    "audit_head_receipt": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh-download-receipts/audit.json.json", "sha256": "a19abfe7907a1f7bdac373fa69834c2609a5ada2a6683e7569217d2f5a16392e"},
+    "sha256_manifest": {"path": "/home/ec2-user/pencil-actual-results-20261030-a1/fresh/SHA256SUMS", "sha256": "ff9923ca6af8a4e066761a76dc65007a2288b8dc40c8966463e786eea138d533"},
+    "expected_bucket": "isolab-results-104186811093-us-east-2",
+    "expected_key": "runs/pencil-p739-20261030-a1-epoch-1/1af573c8-a09c-4dcb-89a4-1af63e1d13e0/audit.json",
+    "expected_version_id": "tVGrPMtyzglfsi9hmkjxJsslb2rYkyXY"
+  },
+  "reference_sources": [
+    {"path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/ecbench/audit.rs", "sha256": "4bf1d7b984fba92b3ce2feca119baa1f7b30c9f47fd5b70e9b7844836148c83b"},
+    {"path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/ecbench/record.rs", "sha256": "5ebb2ecd907d4e388004e5b3db05614bbdd6c0c0e080bba9ccc7d302e621f407"}
+  ]
+}

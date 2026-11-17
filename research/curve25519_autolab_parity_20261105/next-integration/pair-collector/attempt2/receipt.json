@@ -1,0 +1,80 @@
+{
+  "status": "unsigned_producer_observation",
+  "scope": "standalone native development tests",
+  "build_exit": 0,
+  "tests_exit": 0,
+  "dependencies": {
+    "num_bigint": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_bigint-81de55576f38f61f.rlib",
+      "sha256": "c1e88018c8e61d61aa45ba5460a7917da807cc214df9444ae0af23cce5a62274"
+    },
+    "num_traits": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_traits-b3c4044e620ded21.rlib",
+      "sha256": "4731e0d5f6469c613ce8d01aa3957902520b9385f2b06ac56871d179e10e50bc"
+    },
+    "num_integer": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_integer-16881460656efab2.rlib",
+      "sha256": "547334f262bf47c272c417799deebd5fdf2c7f157be56853a739b595ba832fc2"
+    },
+    "serde": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+      "sha256": "cbac69b55153b66829730eadf96cebdab42790a455f762d476b44f4113f14168"
+    },
+    "serde_json": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+      "sha256": "688d29f94eb42520a78a31271704f90a8b370dbce6f8c65551fc1cf41b002019"
+    },
+    "hex": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libhex-06ecfa8b1b55f264.rlib",
+      "sha256": "a606b3dc553060ec919d70496df47f29396985f9daf1d1892ed27f3ae083d8e1"
+    },
+    "rand": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/librand-98bec4b7760c7532.rlib",
+      "sha256": "81082d3eb55bbbe4ea27717ef9f0e6c083f997d16964b5af7d574a26900f5c5b"
+    }
+  },
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "argv": [
+    "rustc",
+    "--edition=2021",
+    "--test",
+    "-O",
+    "/tmp/curve25519-pair-collector-attempt2/harness.rs",
+    "-L",
+    "dependency=/tmp/curve25519-autolab-target/release/deps",
+    "-o",
+    "/tmp/curve25519-pair-collector-attempt2/tests",
+    "--extern",
+    "num_bigint=/tmp/curve25519-autolab-target/release/deps/libnum_bigint-81de55576f38f61f.rlib",
+    "--extern",
+    "num_traits=/tmp/curve25519-autolab-target/release/deps/libnum_traits-b3c4044e620ded21.rlib",
+    "--extern",
+    "num_integer=/tmp/curve25519-autolab-target/release/deps/libnum_integer-16881460656efab2.rlib",
+    "--extern",
+    "serde=/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+    "--extern",
+    "serde_json=/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+    "--extern",
+    "hex=/tmp/curve25519-autolab-target/release/deps/libhex-06ecfa8b1b55f264.rlib",
+    "--extern",
+    "rand=/tmp/curve25519-autolab-target/release/deps/librand-98bec4b7760c7532.rlib"
+  ],
+  "files": {
+    "tests.log": {
+      "sha256": "5a3dec22a1558a1d0d41036f4d64c05443e13d83b713fa0f3d97ddc83cc66154",
+      "bytes": 627
+    },
+    "tests": {
+      "sha256": "52bec3ce66fb56c45ef34bf22729b7d49d6112bc2cf09158f18939054e576fb2",
+      "bytes": 8959088
+    },
+    "build.log": {
+      "sha256": "79c1e9e92def295b5fe3803b9c807ad0d209002434f5d40ee1257485558c44ed",
+      "bytes": 6501
+    },
+    "harness.rs": {
+      "sha256": "9448649918f1c3449851783b4b343e245f22d26247525a63cf150d3dfaba15a7",
+      "bytes": 1237
+    }
+  }
+}

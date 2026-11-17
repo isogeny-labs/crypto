@@ -1,0 +1,163 @@
+# Red-team derived numbers (Rust, rt_sieve_review; inputs: committed records at main aa1c89ab2a)
+
+## A1. Elasticity d ln Q / d ln B: line move (within instance, arms H,T,U vs P; 144 pairs) vs natural variation (cross-section of P, prime-demeaned; 48 instances)
+Bootstrap 5000 resamples of instances within primes (an instance carries its 3 move pairs). 'move, with intercept' tests for an effect of moving beyond B (intercept delta = ln ratio at equal B).
+| quantity | move e (through 0) [95%] | move e, OLS slope | move intercept delta [95%] | natural e (P cross-section) [95%] | move - natural [95%] |
+|--|--|--|--|--|--|
+| total_muls (S, search charged) | -5.19 [-5.99, -4.36] | -7.04 | +0.209 [-0.087, +0.488] | -6.08 [-8.64, -3.43] | +0.89 [-1.70, +3.62] |
+| route_muls (S, search removed) | -5.57 [-6.38, -4.71] | -6.95 | +0.156 [-0.141, +0.438] | -6.08 [-8.69, -3.41] | +0.52 [-2.14, +3.38] |
+| route_plus (S+, search removed) | -6.78 [-7.05, -6.47] | -7.14 | +0.040 [-0.056, +0.121] | -6.94 [-7.71, -6.19] | +0.16 [-0.62, +0.99] |
+| relations | 1.20 [1.15, 1.24] | 1.15 | +0.005 [-0.012, +0.024] | 1.08 [0.98, 1.19] | +0.12 [-0.01, +0.23] |
+| lines (sieve families) | -6.86 [-6.99, -6.71] | -6.87 | +0.001 [-0.048, +0.054] | -6.85 [-7.37, -6.35] | -0.01 [-0.46, +0.46] |
+| rels_per_line | 8.05 [7.92, 8.19] | 8.02 | +0.004 [-0.043, +0.048] | 7.93 [7.46, 8.41] | +0.12 [-0.31, +0.56] |
+| sieve_steps per family | 0.00 [0.00, 0.00] | 0.00 | +0.000 [+0.000, +0.000] | 0.00 [-0.00, 0.00] | -0.00 [-0.00, +0.00] |
+| enum_muls | -8.08 [-8.22, -7.94] | -8.06 | -0.002 [-0.051, +0.049] | -8.00 [-8.52, -7.53] | -0.08 [-0.51, +0.38] |
+| enum_adds | -7.91 [-8.06, -7.77] | -7.89 | -0.002 [-0.050, +0.050] | -7.84 [-8.37, -7.37] | -0.07 [-0.51, +0.41] |
+| sieve_muls | -5.89 [-6.03, -5.75] | -5.89 | +0.001 [-0.050, +0.053] | -5.87 [-6.40, -5.36] | -0.02 [-0.49, +0.46] |
+| sieve_adds+lookups | -6.81 [-6.95, -6.66] | -6.82 | +0.001 [-0.051, +0.053] | -6.80 [-7.32, -6.29] | -0.00 [-0.48, +0.47] |
+| relation phase muls (enum+sieve) | -7.03 [-7.18, -6.90] | -7.19 | +0.018 [-0.031, +0.069] | -7.07 [-7.57, -6.59] | +0.04 [-0.42, +0.48] |
+| descent tests (residuals) | -5.90 [-8.10, -3.63] | -8.32 | +0.273 [-0.503, +1.061] | -5.66 [-13.14, 1.56] | -0.24 [-7.17, +7.37] |
+| descent cost per test (c_cov) | 0.01 [0.00, 0.01] | 0.01 | +0.000 [-0.001, +0.001] | 0.01 [-0.01, 0.02] | -0.00 [-0.01, +0.01] |
+| descent_muls | -5.89 [-8.05, -3.66] | -8.31 | +0.273 [-0.511, +1.068] | -5.65 [-12.95, 1.65] | -0.24 [-7.11, +7.36] |
+| la_muls | 2.00 [1.99, 2.01] | 2.00 | +0.000 [-0.003, +0.003] | 1.99 [1.96, 2.02] | +0.01 [-0.02, +0.04] |
+| route muls without descent | -5.42 [-5.56, -5.28] | -6.31 | +0.100 [+0.041, +0.158] | -6.02 [-6.43, -5.62] | +0.60 [+0.18, +0.99] |
+
+## A2. Decay with p: gamma_eff = mean ln(route ratio) / mean ln(B_P/B_arm) per prime; phase-mixture prediction
+Phase model (p-independent): route_arm/route_P = sum_ph share_ph,P * (B_arm/B_P)^e_ph, e_ph = the pooled move elasticities of A1 (enum, sieve, descent, LA; 'other' fixed). In-sample consistency check, not a prediction.
+| arm | p | mean B_arm/B_P | S ratio (search charged) | route-only ratio | (B_P/B_arm)^5 (rule) | phase-mixture model | gamma_eff [95%] | model gamma_eff |
+|--|--|--|--|--|--|--|--|--|
+| H | 1009 | 1.1057 | 0.495 | 0.472 | 0.605 | 0.547 | 7.46 [5.91, 9.06] | 6.00 |
+| H | 1511 | 1.0932 | 0.644 | 0.612 | 0.641 | 0.614 | 5.51 [4.03, 7.18] | 5.48 |
+| H | 1823 | 1.0830 | 0.759 | 0.724 | 0.671 | 0.661 | 4.05 [1.53, 6.39] | 5.19 |
+| T | 1009 | 1.1402 | 0.487 | 0.475 | 0.519 | 0.461 | 5.68 [3.73, 7.13] | 5.90 |
+| T | 1511 | 1.1260 | 0.569 | 0.543 | 0.553 | 0.531 | 5.15 [3.80, 6.36] | 5.33 |
+| T | 1823 | 1.1127 | 0.635 | 0.601 | 0.586 | 0.585 | 4.77 [3.54, 6.01] | 5.02 |
+| U | 1009 | 1.1234 | 0.550 | 0.538 | 0.559 | 0.501 | 5.33 [3.04, 7.44] | 5.94 |
+| U | 1511 | 1.1075 | 0.611 | 0.585 | 0.600 | 0.575 | 5.25 [3.74, 7.03] | 5.42 |
+| U | 1823 | 1.0927 | 0.642 | 0.609 | 0.642 | 0.634 | 5.60 [4.31, 6.92] | 5.13 |
+gamma_eff(1009) - gamma_eff(1823), arm H: mean of bootstrap 3.49 [0.67, 6.45] (independent resamples per prime)
+gamma_eff(1009) - gamma_eff(1823), arm T: mean of bootstrap 0.89 [-1.36, 2.86] (independent resamples per prime)
+gamma_eff(1009) - gamma_eff(1823), arm U: mean of bootstrap -0.28 [-2.88, 2.18] (independent resamples per prime)
+Arm H: slope of ln(S ratio) on ln p = 0.711 [0.261, 1.170]; the frozen rule's model (rule.txt J at n=4096, w=0) has slope 0.248.
+
+## A3. Run-to-run noise of the paired log ratio (sd over 16 seeds) and seeds needed for a +-5% per-prime interval (n = (1.96 sd / ln 1.05)^2)
+| arm | p | sd ln S ratio | sd ln descent_muls ratio | sd ln (route without descent) ratio | seeds for +-5% on S | seeds for +-5% on route w/o descent |
+|--|--|--|--|--|--|--|
+| H | 1009 | 0.399 | 0.933 | 0.233 | 258 | 88 |
+| H | 1511 | 0.248 | 0.948 | 0.139 | 99 | 32 |
+| H | 1823 | 0.431 | 1.172 | 0.131 | 300 | 28 |
+| T | 1009 | 0.597 | 1.231 | 0.226 | 577 | 83 |
+| T | 1511 | 0.298 | 1.138 | 0.112 | 144 | 21 |
+| T | 1823 | 0.332 | 1.028 | 0.157 | 179 | 40 |
+| U | 1009 | 0.592 | 1.152 | 0.236 | 566 | 90 |
+| U | 1511 | 0.333 | 0.982 | 0.127 | 180 | 27 |
+| U | 1823 | 0.266 | 0.679 | 0.138 | 115 | 31 |
+
+## A4. Charging completeness (derived re-pricings of the committed records; geometric mean of arm/P over 16 seeds per prime, pooled 48, bootstrap 95%)
+walk lookups = fb_line.lookups - q in table mode (the chi-table build's q lookups index directly); each walk lookup executes `chi[(x0 * p + x1)]`, one integer multiply and one add, uncounted.
+| variant | arm | p=1009 | p=1511 | p=1823 | pooled [95%] |
+|--|--|--|--|--|--|
+| S as reported | H | 0.495 | 0.644 | 0.759 | 0.623 [0.562, 0.688] |
+| S as reported | T | 0.487 | 0.569 | 0.635 | 0.560 [0.500, 0.633] |
+| S as reported | U | 0.550 | 0.611 | 0.642 | 0.600 [0.535, 0.672] |
+| S, index multiply priced as one F_p mult | H | 0.495 | 0.644 | 0.759 | 0.623 [0.563, 0.688] |
+| S, index multiply priced as one F_p mult | T | 0.652 | 1.079 | 1.434 | 1.003 [0.906, 1.113] |
+| S, index multiply priced as one F_p mult | U | 0.561 | 0.626 | 0.658 | 0.614 [0.548, 0.690] |
+| S+ as reported | H | 0.489 | 0.553 | 0.617 | 0.550 [0.519, 0.584] |
+| S+ as reported | T | 0.574 | 0.830 | 1.073 | 0.800 [0.749, 0.853] |
+| S+ as reported | U | 0.483 | 0.525 | 0.570 | 0.525 [0.491, 0.560] |
+| S+, index arithmetic as 2 native ops per walk lookup | H | 0.489 | 0.553 | 0.617 | 0.550 [0.518, 0.584] |
+| S+, index arithmetic as 2 native ops per walk lookup | T | 0.673 | 1.076 | 1.447 | 1.016 [0.955, 1.083] |
+| S+, index arithmetic as 2 native ops per walk lookup | U | 0.490 | 0.532 | 0.577 | 0.532 [0.499, 0.569] |
+| band w=0.1 as reported | H | 0.486 | 0.527 | 0.575 | 0.528 [0.498, 0.559] |
+| band w=0.1 as reported | T | 0.608 | 0.915 | 1.207 | 0.876 [0.828, 0.927] |
+| band w=0.1 as reported | U | 0.448 | 0.499 | 0.550 | 0.497 [0.470, 0.526] |
+| band w=0.1, +2 index ops per walk lookup | H | 0.486 | 0.527 | 0.575 | 0.528 [0.499, 0.559] |
+| band w=0.1, +2 index ops per walk lookup | T | 0.751 | 1.240 | 1.696 | 1.164 [1.103, 1.231] |
+| band w=0.1, +2 index ops per walk lookup | U | 0.457 | 0.509 | 0.560 | 0.507 [0.479, 0.536] |
+| band w=1, +2 index ops per walk lookup | H | 0.486 | 0.526 | 0.573 | 0.527 [0.497, 0.558] |
+| band w=1, +2 index ops per walk lookup | T | 0.754 | 1.246 | 1.705 | 1.170 [1.106, 1.237] |
+| band w=1, +2 index ops per walk lookup | U | 0.455 | 0.508 | 0.559 | 0.506 [0.478, 0.536] |
+| S, mod-l LA op at 31 F_p mults (ic_acct1 bitop/v1) instead of 16 | H | 0.521 | 0.685 | 0.797 | 0.658 [0.597, 0.721] |
+| S, mod-l LA op at 31 F_p mults (ic_acct1 bitop/v1) instead of 16 | T | 0.518 | 0.622 | 0.691 | 0.606 [0.545, 0.677] |
+| S, mod-l LA op at 31 F_p mults (ic_acct1 bitop/v1) instead of 16 | U | 0.577 | 0.658 | 0.692 | 0.641 [0.575, 0.715] |
+| S+, LA op at 31 | H | 0.497 | 0.565 | 0.630 | 0.561 [0.530, 0.594] |
+| S+, LA op at 31 | T | 0.582 | 0.838 | 1.076 | 0.807 [0.758, 0.860] |
+| S+, LA op at 31 | U | 0.492 | 0.539 | 0.585 | 0.537 [0.503, 0.572] |
+| S+, unemitted descent+LA additions imputed (1 per descent mult, 1 per LA op) | H | 0.477 | 0.557 | 0.631 | 0.551 [0.515, 0.591] |
+| S+, unemitted descent+LA additions imputed (1 per descent mult, 1 per LA op) | T | 0.565 | 0.807 | 1.036 | 0.779 [0.720, 0.842] |
+| S+, unemitted descent+LA additions imputed (1 per descent mult, 1 per LA op) | U | 0.497 | 0.529 | 0.567 | 0.530 [0.488, 0.574] |
+| bitop/v1 proxy (model): muls + 15.2 la_ops + 0.096 (all emitted adds + imputed descent adds) + 0.043 lookups | H | 0.518 | 0.649 | 0.749 | 0.632 [0.581, 0.686] |
+| bitop/v1 proxy (model): muls + 15.2 la_ops + 0.096 (all emitted adds + imputed descent adds) + 0.043 lookups | T | 0.597 | 0.839 | 1.040 | 0.805 [0.735, 0.881] |
+| bitop/v1 proxy (model): muls + 15.2 la_ops + 0.096 (all emitted adds + imputed descent adds) + 0.043 lookups | U | 0.568 | 0.626 | 0.662 | 0.618 [0.561, 0.680] |
+
+Paired U/H (same 48 instances), geometric mean and 95% bootstrap, per unit:
+  S (S as reported): U/H pooled 0.963 [0.883, 1.051]; per prime 1.112 / 0.949 / 0.846
+  S+ (S+ as reported): U/H pooled 0.954 [0.921, 0.987]; per prime 0.989 / 0.949 / 0.924
+  band w=0.1 (band w=0.1 as reported): U/H pooled 0.942 [0.922, 0.962]; per prime 0.921 / 0.948 / 0.957
+  bitop proxy (bitop/v1 proxy (model): muls + 15.2 la_ops + 0.096 (all emitted adds + imputed descent adds) + 0.043 lookups): U/H pooled 0.978 [0.914, 1.051]; per prime 1.096 / 0.965 / 0.884
+
+bitop/v1 proxy composition (share of the proxy total, mean over seeds) and the ceiling of each lever (total / (total - component)):
+  P p=1009: LA 7.6% (ceiling x1.08), descent 36.9%, emitted adds 17.1% (L8 ceiling x1.21), lookups 0.2%, enum+sieve muls 38.0%, other 0.2%
+  P p=1511: LA 12.0% (ceiling x1.14), descent 26.0%, emitted adds 20.8% (L8 ceiling x1.26), lookups 0.3%, enum+sieve muls 40.8%, other 0.3%
+  P p=1823: LA 15.5% (ceiling x1.18), descent 25.3%, emitted adds 21.0% (L8 ceiling x1.27), lookups 0.3%, enum+sieve muls 37.7%, other 0.3%
+  U p=1009: LA 16.4% (ceiling x1.20), descent 37.5%, emitted adds 13.5% (L8 ceiling x1.16), lookups 0.3%, enum+sieve muls 29.6%, other 2.7%
+  U p=1511: LA 23.5% (ceiling x1.31), descent 24.0%, emitted adds 16.2% (L8 ceiling x1.19), lookups 0.3%, enum+sieve muls 31.9%, other 4.2%
+  U p=1823: LA 27.1% (ceiling x1.37), descent 20.1%, emitted adds 17.1% (L8 ceiling x1.21), lookups 0.3%, enum+sieve muls 30.7%, other 4.7%
+
+LA (mod l) share of total_muls at 16 vs at 31 F_p mults per op (mean over seeds), and LA growth arm/P:
+  p=1009: P share 4.4% (at 16) / 8.1% (at 31); U share at 31 17.3%; U/P la_ops 1.262
+  p=1511: P share 8.7% (at 16) / 15.6% (at 31); U share at 31 29.1%; U/P la_ops 1.226
+  p=1823: P share 11.7% (at 16) / 20.3% (at 31); U share at 31 33.8%; U/P la_ops 1.193
+
+## A5. The n-rule re-run under other gamma (Horner, w = 0; C_P from arm P = V2): optimum n and J; J at the frozen n_H = 4096
+  gamma 4: optimum n = 2048 J = 0.7157; J(4096) = 0.7166 (regret 0.1%)
+  gamma 5: optimum n = 4096 J = 0.6554; J(4096) = 0.6554 (regret 0.0%)
+  gamma 5.4: optimum n = 4096 J = 0.6324; J(4096) = 0.6324 (regret 0.0%)
+  gamma 5.9: optimum n = 4096 J = 0.6049; J(4096) = 0.6049 (regret 0.0%)
+  gamma 6.5: optimum n = 4096 J = 0.5736; J(4096) = 0.5736 (regret 0.0%)
+  gamma 7.5: optimum n = 4096 J = 0.5250; J(4096) = 0.5250 (regret 0.0%)
+
+## A6. The exploratory pilot (research/jv_cover_fbline_20261102/review/red_team/sieve_transfer_pilot_p1511.jsonl, n = 4096) against frozen arm H, p = 1511, seeds 17-24
+  seed 17: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.748 frozen 0.748
+  seed 18: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.860 frozen 0.860
+  seed 19: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.775 frozen 0.775
+  seed 20: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.431 frozen 0.431
+  seed 21: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.774 frozen 0.774
+  seed 22: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.577 frozen 0.577
+  seed 23: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.802 frozen 0.802
+  seed 24: same b_best true, same route muls true; pilot search muls 1.0663e8 vs frozen 1.0663e8; ratio pilot 0.767 frozen 0.767
+  geo-mean ratio seeds 17-24: pilot 0.702, frozen 0.702; frozen seeds 25-32 (fresh): 0.591
+
+## B1. Reference runs: new matched n = 16 mean 0.8056 sd 0.4834; #3278 n = 126 mean 0.9324 sd 0.4341; theory 0.88796
+pooled 142: mean 0.9181 (theory +3.4%); matched/pooled 0.877
+normal approximation: se of the mean difference 0.117; 80%-power detectable shift (2.8 se) = 0.327 = 36% of the pooled mean
+
+Power of the frozen rule to reject homogeneity when the matched instances' true mean is c x the pooled one (simulation: 16 draws from the #3278 empirical distribution x c vs 126 bootstrap draws; 1000 permutations per test; 400 simulations per c):
+  c = 0.6: P(reject homogeneity) = 0.99
+  c = 0.7: P(reject homogeneity) = 0.84
+  c = 0.8: P(reject homogeneity) = 0.45
+  c = 0.9: P(reject homogeneity) = 0.20
+  c = 1: P(reject homogeneity) = 0.06
+  c = 1.15: P(reject homogeneity) = 0.29
+  c = 1.3: P(reject homogeneity) = 0.65
+  c = 1.5: P(reject homogeneity) = 0.92
+
+## B2. Rho per-step costs (new runs, means): harness F_p mults/step 330.9; tuned 137.7; F_q3 mul 4.818/step, sq 1.004/step, inv 0.0645/step; fp_adds/step 45.1; native/step 17.0
+batched-inversion share of the tuned price (inv x 62 / tuned): 2.9%; a minimal F_q3 product (5-6 F_q products, s in F_p) at 18 F_p mults instead of TUNED's 24 would give 102.8 F_p mults/step (x1.34 cheaper than tuned)
+post-collision distinguished-point overhead (batch x 2^dp / sqrt l): dp 16 0.00061 vs dp 15 0.00030 of sqrt(l) (difference 0.00030, i.e. 0.03% of the 0.918 mean)
+
+## C. Line-search arms against study B's pooled rho, computed directly from the arm records at p = 1511 (no product of ratios)
+reference (study B fit.json, pooled 142): s_harness 0.9180, s_tuned 0.3820, native/sqrt l 15.567, fp_adds/sqrt l 41.447. Interval: bootstrap over cover seeds only (reference fixed).
+bitop proxy: field_add = 0.096 field_mul, word_op = 0.043, modr_mul(62 bit) = 31.2 field_mul at b = 11; rho extra (adds + native) = 0.0141 GAE per sqrt(l)
+| arm | seeds | S/rho U1 | S/rho U2 | S+/rho U1 (rho unpriced) | S+/rho U2 (rho unpriced) | S+/rhoS+ U1 | S+/rhoS+ U2 | band A U2 w=1 | band B U2 w=1 | bitop proxy / rho harness (U1-like) | bitop proxy / rho tuned (U2-like) |
+|--|--|--|--|--|--|--|--|--|--|--|--|
+| P | 17-24 | 0.0065 [0.0056, 0.0079] | 0.0156 [0.0133, 0.0190] | 0.0268 [0.0250, 0.0287] | 0.0645 [0.0601, 0.0689] | 0.0226 [0.0211, 0.0241] | 0.0445 [0.0414, 0.0475] | 0.1226 [0.1141, 0.1314] | 0.0110 [0.0103, 0.0118] | 0.0091 [0.0080, 0.0106] | 0.0213 [0.0189, 0.0249] |
+| P | 17-32 | 0.0065 [0.0060, 0.0073] | 0.0157 [0.0144, 0.0176] | 0.0268 [0.0252, 0.0284] | 0.0644 [0.0607, 0.0682] | 0.0226 [0.0213, 0.0239] | 0.0444 [0.0418, 0.0470] | 0.1223 [0.1153, 0.1297] | 0.0110 [0.0104, 0.0116] | 0.0091 [0.0085, 0.0099] | 0.0214 [0.0199, 0.0234] |
+| H | 17-24 | 0.0045 [0.0042, 0.0049] | 0.0109 [0.0101, 0.0118] | 0.0150 [0.0146, 0.0154] | 0.0360 [0.0352, 0.0369] | 0.0126 [0.0123, 0.0129] | 0.0248 [0.0242, 0.0255] | 0.0691 [0.0673, 0.0710] | 0.0066 [0.0065, 0.0068] | 0.0062 [0.0059, 0.0066] | 0.0147 [0.0138, 0.0156] |
+| H | 17-32 | 0.0042 [0.0038, 0.0046] | 0.0101 [0.0092, 0.0111] | 0.0148 [0.0142, 0.0154] | 0.0356 [0.0342, 0.0370] | 0.0125 [0.0120, 0.0130] | 0.0245 [0.0235, 0.0255] | 0.0681 [0.0652, 0.0710] | 0.0067 [0.0065, 0.0069] | 0.0059 [0.0055, 0.0063] | 0.0139 [0.0129, 0.0149] |
+| T | 17-24 | 0.0040 [0.0033, 0.0049] | 0.0097 [0.0079, 0.0119] | 0.0229 [0.0219, 0.0239] | 0.0550 [0.0527, 0.0575] | 0.0193 [0.0185, 0.0202] | 0.0379 [0.0364, 0.0396] | 0.1125 [0.1076, 0.1178] | 0.0685 [0.0683, 0.0687] | 0.0080 [0.0072, 0.0090] | 0.0189 [0.0169, 0.0212] |
+| T | 17-32 | 0.0037 [0.0034, 0.0042] | 0.0089 [0.0081, 0.0100] | 0.0222 [0.0217, 0.0229] | 0.0534 [0.0521, 0.0550] | 0.0187 [0.0182, 0.0193] | 0.0368 [0.0359, 0.0379] | 0.1093 [0.1064, 0.1125] | 0.0683 [0.0682, 0.0685] | 0.0076 [0.0072, 0.0082] | 0.0180 [0.0170, 0.0192] |
+| U | 17-24 | 0.0042 [0.0035, 0.0051] | 0.0101 [0.0083, 0.0123] | 0.0142 [0.0132, 0.0153] | 0.0341 [0.0318, 0.0367] | 0.0119 [0.0111, 0.0129] | 0.0235 [0.0219, 0.0253] | 0.0656 [0.0607, 0.0712] | 0.0079 [0.0077, 0.0081] | 0.0059 [0.0051, 0.0069] | 0.0139 [0.0120, 0.0163] |
+| U | 17-32 | 0.0040 [0.0036, 0.0045] | 0.0096 [0.0086, 0.0108] | 0.0141 [0.0135, 0.0147] | 0.0338 [0.0324, 0.0353] | 0.0118 [0.0114, 0.0124] | 0.0233 [0.0223, 0.0243] | 0.0649 [0.0620, 0.0681] | 0.0080 [0.0078, 0.0081] | 0.0057 [0.0053, 0.0062] | 0.0134 [0.0124, 0.0147] |
+LEADS.md products for comparison: H S/rho U1 0.0065 x 0.644 = 0.0042, U2 ~0.010; U S+/rho U1 0.027 x 0.525 = 0.014, U2 0.065 x 0.525 = 0.034.

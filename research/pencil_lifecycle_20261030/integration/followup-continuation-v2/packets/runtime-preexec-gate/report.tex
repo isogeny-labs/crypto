@@ -1,0 +1,17 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\setlength{\parskip}{7pt}
+\begin{document}
+\section*{Single-process pre-exec PID gate proposal}
+Implemented a narrow C source gate for the accepted prospective software boundary: observe effective kernel pids.max before the tested ecbench or owner executable begins. The original pre-container-start claim is not made. Source review is pending; no compilation, native test or container command occurred.
+
+The gate requires PID1 and UID/GID1000; exact private unified cgroup mapping; a read-only cgroup2 filesystem; pids.max1, pids.current1 and cgroup.procs containing only namespacePID1. It reads actual kernel files through bound directory descriptors. It emits one bounded typed pre-exec receipt and execve-replaces itself in the same PID. No fork, thread creation, shell or arbitrary target interface exists in its source.
+
+Three cases are fixed. Q1/Q2 invoke the exact diagnostic CLI with the frozen good/wrong request hash. Q3 invokes owner --check with the frozen wrong owner hash. A gate failure exits126; exec failure127. Those codes cannot satisfy the original payload expectations0,2,125. The supervisor must validate the gate receipt separately before checking payload output and terminal code.
+
+The gate is a separately bound read-only executable qualification fixture. It is not copied into the runtime image or scientific timing payload. The integration delta changes the active entrypoint, adds one explicit read-only mount and parses the first stdout receipt; existing limits and cleanup remain. Actual final tested binaries and arguments are unchanged.
+
+CONTROLS.md freezes parser and host-negative software checks for later review. Final binary hash remains null. Independent source review precedes compile/tests; effective cgroup layout and actual mount behavior remain unqualified. The kernel observation is before payload exec and does not assert continuous enforcement against administrative mutation.
+
+Files: gate.c, PLAN.md, CONTROLS.md, INTEGRATION.md and status.json. No scientific budget, controller permissions, publication or image content change is included.
+\end{document}

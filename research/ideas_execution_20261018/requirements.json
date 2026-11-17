@@ -1,0 +1,1160 @@
+{
+  "schema": "ideas-execution-requirements-v1",
+  "created_at_utc": "2026-10-18",
+  "scope": "All twenty user ideas and accepted roadmap acceptance criteria",
+  "authority": "Advisory source-bound preparation; no scientific run, official ledger record or approval",
+  "repository_revisions": {
+    "crypto": "e063d98475589d9aba7ae265a8cba830927e3156",
+    "cryptanalysis": "0ea8931d21d567f83de47c30bdaac0585f479c11",
+    "crypto-autoresearcher": "f279a4918cdc41885682b40de1b8e5150035242b"
+  },
+  "items": [
+    {
+      "item": 1,
+      "title": "F_p2 FourQ / GLS paired ladder",
+      "original_requirement": "Paired ecbench ladder on random F_p2 curves with 2-torsion symmetrisation, Q-curve endomorphism folding, double large primes; extrapolate the gap to p=2^127-1.",
+      "acceptance_criteria": [
+        "Four or more sizes with matched rho, verified same-instance answers, cold and online costs, peak memory.",
+        "Independent torsion/folding/2LP ablations; prove factor-base invariance before folding.",
+        "FourQ extrapolation explicitly family-specific, modeled, and separate from toy measurements."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/ic_framework/prime_tower.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/ecbench/methods.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/gaudry_cubic.rs"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "No exact quadratic-extension IC/ecbench ladder identified in the inspected method registry; GLV example operates on F_p3 and cannot discharge this item.",
+        "Implement F_p2 sampler/oracle, subgroup/curve identities and matched rho registration, transported endomorphism action and base invariance certificates; freeze complete ladder."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "Existing Q-curve note must be read before asserting folding gains. Absence in inspected paths is not a corpus-wide absence proof."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "F_{p²} curves: FourQ and the GLS class. This is the only deployed family where index calculus ties rho asymptotically, since Gaudry's k = 2 attack costs Õ(p) against rho's Õ(p). The program's whole thesis is iterating constants, and FourQ appears only in dashboards. Falsifier: a paired ecbench ladder on random curves over F_{p²} with 2-torsion symmetrisation, Q-curve endomorphism folding and double large primes, then extrapolate the gap row to p = 2¹²⁷ − 1."
+    },
+    {
+      "item": 2,
+      "title": "Deployed binary sizes cost table",
+      "original_requirement": "Evaluate n=131,233,283,409,571 under D=4 model and determine whether the gap changes sign, with full pipeline cost and memory.",
+      "acceptance_criteria": [
+        "Optimize factor-base dimension and arity; include relation probability/extraction, sparse linear algebra, memory, matched ordinary/Koblitz rho.",
+        "Compare D=4,5,6 and guess-then-degree4; identify calibration and extrapolation assumptions.",
+        "Separate measured unit calibration from modeled cost tables."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "research/notes/ecc2k130/descent_degree_cost_20260930.py"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-SEMBIN-992e73/specification.yaml"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-SEMBIN-992e73/code/curve_table.py"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-SEMBIN-81dc96/code/joint_balance.py"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-NISTBIN-451dfa/specification.yaml"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "crypto-autoresearcher",
+          "argv": [
+            "python3",
+            "experiments/EXP-SEMBIN-992e73/code/curve_table.py"
+          ],
+          "purpose": "Existing cost derivation; stdout JSON, requires original frozen raw-result and source inputs.",
+          "kind": "modeled_calculation",
+          "launch_qualification": "992e73 is specified/unapproved; original derivation already archived. Do not promote it or overwrite it."
+        }
+      ],
+      "remaining_gaps": [
+        "Root is implementing a separate native-cost calculation; its execution evidence must be linked separately.",
+        "Existing historical Semaev model is not interchangeable with a fixed-m4 model; ordinary and Koblitz calibrated units remain separate."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "Existing 992e73 calls the frozen joint-balance module, checks n250/300/302/400/571 before named Certicom/FIPS outputs; it does not instantiate deployed curves."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Re-aim the binary program at the deployed sizes. Under the \"D constant at 4\" model the m = 4 cost scales like 2^{n/4} times a polynomial, against rho's 2^{n/2}. The committed gap of about 8 bits at n = 131 flips sign somewhere above it, and sect233, sect283, sect409 and sect571 are never priced. This is one calculation, and it decides whether the big-memory cells in item 7 are worth the machine."
+    },
+    {
+      "item": 3,
+      "title": "Dinur / Lokshtanov Boolean solver paradigm",
+      "original_requirement": "Implement published polynomial-method / beyond-brute-force family on n<=41 descended systems, fit effective exponent c against threshold c<1/2-1/m.",
+      "acceptance_criteria": [
+        "Published algorithm identity and applicability verified from primary source before implementation.",
+        "Natural, planted positive and certified negative controls where available; count actual Boolean variables including auxiliaries.",
+        "Correctness-checked operation/memory scaling; c fit with uncertainty and total oracle-call accounting."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/descend.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/solve.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/sumpoly.py"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-ECDLP-97a533/specification.yaml"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Dinur/Lokshtanov backend not in inspected ENGINES dispatch; implement actual published method, not brute-force renamed.",
+        "Primary algorithm literature verification and domain restrictions unresolved in this preparation.",
+        "Existing instance generator plants decompositions; extend frozen target-law corpus for natural/negative arms before complete comparison."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Dinur's polynomial method and the Lokshtanov et al. beyond-brute-force family for Boolean systems. The corpus cites Dinur only for time-space tradeoffs. The required exponent is c < 1/2 − 1/m and the published c ≈ 0.69 does not reach it, but the descended systems are Frobenius-linear in most monomials and their effective exponent is unmeasured. Run it on the n ≤ 41 systems and fit c. Expected negative, cheap, and it closes a whole paradigm."
+    },
+    {
+      "item": 4,
+      "title": "Four m-sum variety presentations",
+      "original_requirement": "At (m,ell)=(3,4),(4,3), measure solving degree across Semaev y elimination, unprojected addition, binary Edwards and theta/Mobius presentations, on one curve/base.",
+      "acceptance_criteria": [
+        "Equivalent transported factor base and exact same target law across four presentations.",
+        "Exhaustive toy solution correspondence with exceptional/denominator strata handled.",
+        "Degree, variable count, Macaulay size and complete solve cost reported; presentation reduction is not automatically a gain."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/descend.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/symmodel.py"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/binary_semaev_chain_sat.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/binary_semaev_s4.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/jv_quintic_edwards.rs"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Unprojected addition, binary Edwards and theta/Mobius descended encodings plus equivalence maps need implementation.",
+        "jv_quintic_edwards is prime extension-field work, not the required binary presentation comparison.",
+        "koblitz_presentation_sweep varies curve and factor-base representation, not these four equations."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Presentation search for the m-sum variety in the binary descent. Semaev's elimination of y is one presentation. The unprojected addition law, binary Edwards, theta coordinates on E^{m−1} and Möbius frames are others, and the descended degree depends on the choice. The Edwards rejection in the ledger was prime-field yield only, and your own notes say other quotient presentations are not ruled out. Falsifier: D at (3,4) and (4,3) across four presentations with one base."
+    },
+    {
+      "item": 5,
+      "title": "Six block-aware elimination orders",
+      "original_requirement": "Run six monomial/variable/block orders on fixed descent cells; measure D and Macaulay size.",
+      "acceptance_criteria": [
+        "Natural, reversed, interleaved, two block-elimination directions and weighted grevlex on byte-identical systems.",
+        "Exact solution/consequence agreement, D, rows, columns, nnz, peak RSS, counted work and time.",
+        "Order implementation respects actual monomial-order semantics; variable permutations alone are labeled as such."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_f5b.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_basis.py"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/pq_groebner_f2.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/groebner_f4.rs"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Boolean engines hard-code leading-bit/rank assumptions; six-order adapter and order-aware monomial indexing are absent from inspected CLI.",
+        "Need immutable order-independent system export and full certificate checks for every order."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Monomial, variable and block elimination orders tuned to the descent block structure. Your literature frontier found no prior work, and the engines run fixed grevlex. Six orders on fixed cells, measuring D and Macaulay size."
+    },
+    {
+      "item": 6,
+      "title": "Signature solvers plus trace replay",
+      "original_requirement": "Build/complete signature F5 or GVW and Joux-Vitse trace replay on Boolean descended systems, particularly degree4 m4 cells.",
+      "acceptance_criteria": [
+        "Compare existing Python/native/M4RI F5 with row filter and external F4/F5 on same inputs/host.",
+        "Independent generator/S-pair/root/group-law certificates; charge learning, divergence/fallback, reductions to zero and memory.",
+        "Replay across distinct targets of same shape, separating reuse and cold total cost."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_f5b.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_f5b_native.cpp"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_f5b_m4ri.cpp"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/matrix_f5_f2.rs"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-CERTBIN-4e92d7/specification.yaml"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-CERTBIN-4e92d7/impl/driver.py"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-CERTBIN-4e92d7/runs/RUN-CERTBIN-3b7e05/run-report.md"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "cryptanalysis",
+          "argv": [
+            "python3",
+            "experiments/pdp-scaling/solve.py",
+            "--engine",
+            "boolean-f5b",
+            "--n",
+            "17",
+            "--m",
+            "4",
+            "--l",
+            "3",
+            "--seed",
+            "1",
+            "--timeout",
+            "3600"
+          ],
+          "purpose": "Existing F5 cell with native independent output verification; example cell is a diagnostic, not full requested grid.",
+          "kind": "scientific_diagnostic"
+        }
+      ],
+      "remaining_gaps": [
+        "Prior CERTBIN replay run exists: inspect receipt and coverage before selecting distinct rerun trials.",
+        "Complete m4 degree4 comparison including external fastest baseline and charged trace learning/fallback still needs a frozen trial grid.",
+        "Native F5 caps at12variables; m4 ell4 needs backend extension or other existing engine."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "Signature solvers already exist; original not-built premise is not current."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "A signature-based F5 or GVW engine plus Joux–Vitse trace replay. The framework doc calls it \"the obvious next engine\" and it was never built. Reductions to zero matter exactly at degree 4, where the m = 4 route lives."
+    },
+    {
+      "item": 7,
+      "title": "Out-of-core / distributed Boolean F4",
+      "original_requirement": "Complete next m4 cells beyond n<=15 ell<=5 memory wall with distributed/out-of-core Boolean F4 or GPU-HBM Macaulay reduction.",
+      "acceptance_criteria": [
+        "Profile construction, symbolic preprocessing, elimination and fill-in separately.",
+        "Complete m4 ell6,7 and guess-count ell8,9 frontier cells; preserve older degree7 closures as separate requested trials.",
+        "Small controls agree exactly; checkpoint/restart, peak memory, disk/network traffic and full resource accounting."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/sparse_macaulay.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/pq_f4_f2.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/inherited_f4.rs"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/boolean_f5b_m4ri.cpp"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "cloud/fleet.py"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Host has16GiB and no GPU; cited18-50GB cells exceed available RAM without an implementation change.",
+        "Implement serializable elimination checkpoint, row/block streaming, bounded resident storage and distributed/GPU kernel; ordinary sparse in-memory elimination is not out-of-core.",
+        "Local RUNPOD_API_KEY missing; remote credential availability is not known from local environment."
+      ],
+      "dependencies": [
+        5,
+        6
+      ],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Distributed or out-of-core Boolean F4. The entire binary verdict rests on extrapolating D from n ≤ 15 and ℓ ≤ 5, and the next cells died at 18 to 50 GB. The blocker is memory engineering, not mathematics. A multi-node block reduction or a GPU-HBM Macaulay pass is the single highest-leverage measurement in the program."
+    },
+    {
+      "item": 8,
+      "title": "Learned WDSat / XOR-CDCL branching",
+      "original_requirement": "Run learned branching and learned cubing/cube-and-conquer on Semaev CNFs using WDSat m3 oracle up to n41.",
+      "acceptance_criteria": [
+        "Static vertex-cover/standard heuristic/random cube/deterministic cube controls before learned policy.",
+        "Unseen curves, systems and sizes; charge training/inference/cube communication; report solved fraction and tail cost including censored runs.",
+        "Independently check every SAT assignment and every claimed UNSAT/cube-coverage certificate."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/solve.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/symmodel.py"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/koblitz_sat_ablation.rs"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "cryptanalysis",
+          "argv": [
+            "python3",
+            "experiments/pdp-scaling/solve.py",
+            "--engine",
+            "wdsat",
+            "--n",
+            "41",
+            "--m",
+            "3",
+            "--l",
+            "6",
+            "--seed",
+            "1",
+            "--timeout",
+            "1800"
+          ],
+          "purpose": "Existing upstream WDSat comparator; requires WDSAT_SRC.",
+          "kind": "scientific_diagnostic"
+        }
+      ],
+      "remaining_gaps": [
+        "WDSAT_SRC checkout/build and learned solver integration need binding.",
+        "Direct S4 descent has degree6; upstream WDSat ANF reader known wrong atdegree>=4, so use its m3 symmetric degree<=3 model only.",
+        "No trained policy, learning backend or prospective heldout corpus is provided by inspected wrapper; torch not installed."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Learned branching for WDSat and XOR-CDCL on Semaev CNFs. Zero hits for NeuroSAT-style work. WDSat is your best m = 3 oracle up to n = 41 and runs a static vertex-cover order. Cube-and-conquer with learned cubing was declined without a run."
+    },
+    {
+      "item": 9,
+      "title": "Learned F4 column / pivot policy",
+      "original_requirement": "Train F4 column and pivot policies with trace transfer per shape, on Boolean systems at memory frontier.",
+      "acceptance_criteria": [
+        "Only correctness-preserving choices exposed; deterministic inexpensive heuristics are controls.",
+        "Heldout targets and shapes, explicit transfer tests; full cost/inference/fallback and peak memory.",
+        "Independent row-space/result certificates and total cost rather than in-sample reward."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/pq_f4_f2.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/sparse_macaulay.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/matrix_f5_f2.rs"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-RELN-715aa1/specification.yaml"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "RELN715aa1 approves Stage0 derivation only and is not authority to run learned solver trials.",
+        "Need policy hook, trace exporter, action legality/certificates and heldout training/evaluation implementation; no such complete adapter bound."
+      ],
+      "dependencies": [
+        5,
+        6,
+        7
+      ],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Learned F4 column and pivot policy, with per-shape trace transfer. The gbrl work did PPO on toy Buchberger over F_p and never touched F4, Boolean systems, or the memory wall. The roadmap item never became a hypothesis."
+    },
+    {
+      "item": 10,
+      "title": "Program search over kernel and base predicate",
+      "original_requirement": "Run AlphaEvolve-style restricted program search over decomposition kernel and factor-base predicate, optimizing oracle cost under frozen replay/counting fitness.",
+      "acceptance_criteria": [
+        "Restricted candidate language, compiler/cache/setup charges, immutable independent holdouts.",
+        "Kernel semantics certified; predicate size, yield and subgroup constraints matched.",
+        "Complete pipeline cost and failed candidate records; yield conservation remains in accounting."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/ic_framework/stages.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/koblitz_factor_base_search.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/koblitz_relation_solver.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Existing autolab infrastructure is a reusable evaluator, not a bound AlphaEvolve kernel/predicate search implementation.",
+        "Need candidate grammar, fitness process, replay equivalence, heldout corpus, cold/online costs and independent acceptance gate."
+      ],
+      "dependencies": [
+        16
+      ],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Program search over the decomposition kernel and factor-base predicate. Frozen specs, replay certificates and a counted unit are exactly what an AlphaEvolve-style loop needs as a fitness function. The factor-base lab note mentions it and nothing ran. Aim it at oracle cost, not yield, since mean yield is conserved."
+    },
+    {
+      "item": 11,
+      "title": "Learned necessary-condition prefilter / bucket gain",
+      "original_requirement": "Learn an x_R prefilter beyond exact trace baseline on subspace bases; also execute actual open problem91d4f6 with subgroup single-bucket gain.",
+      "acceptance_criteria": [
+        "11a natural target law, certified decomposability labels; hold out curves,bases,sizes,charge feature/inference; classifier accuracy does not prove a necessary condition.",
+        "11b measure G(M)=M max_c,d pi_c(d) on prime-order subgroup with SHA null; separate full-group trace/halving positive controls.",
+        "No average-agreement surrogate for max bucket gain; explicit false-negative handling and proof obligations for safe rejection."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "knowledge/open-problems/KN-OPEN-91d4f6.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_03_trace_theory.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_03_tracezero_freerel.rs"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/target_fiber.py"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "91d4f6 is approximate subgroup bucket gain, not learned decomposability. Both original learned classifier and correct open problem remain requested.",
+        "Trace is constant on odd-prime subgroup, so claimed50% rejection applies only different full-curve/abscissa law.",
+        "Need generator/labels, learning model, conformal/uncertainty handling and prospective rejection certificate before oracle use."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "Trace integration already observed0/29624subgroup-target rejections in prior item16; keep this domain correction in protocol."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "A learned necessary-condition prefilter on x_R for subspace bases. This is open problem 91d4f6 and the first proposed ML-lab experiment, unrun. The trace-zero filter refutes half of targets at degree 2. Any classifier beating that baseline has found a new algebraic invariant, and Theorem 13.1 excludes only fiber invariants. Cheap.",
+      "historical_source_references_unresolved": [
+        {
+          "repository": "crypto-autoresearcher",
+          "id": "EXP-SEMBIN-3d9a71",
+          "origin": "knowledge/open-problems/KN-OPEN-91d4f6.md",
+          "observation": "The knowledge entry references this draft experiment, but its specification path is not present in current HEAD. Do not report it as an executable current source."
+        }
+      ]
+    },
+    {
+      "item": 12,
+      "title": "Conformal solving-degree / resource surrogate",
+      "original_requirement": "Fit solving-degree surface over n,ell,m,presentation,order using all prior toy cells and conformal bounds to choose expensive measurements.",
+      "acceptance_criteria": [
+        "Deduplicate complete source receipts; retain timeout/OOM as censored outcomes.",
+        "Predict degree,memory,completion cost separately; compare simple deterministic baselines.",
+        "Freeze holdout/prospective cells and report coverage only under justified sampling/exchangeability."
+      ],
+      "source_bindings": [
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/results"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "experiments/pdp-scaling/fit.py"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/ic_descent_degrees.rs"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "Existing heterogeneous result schemas need receipt-aware extraction and degree-definition reconciliation.",
+        "No trained surrogate/conformal calibration or prospective sampling/coverage protocol bound; do not use extrapolation coverage as a theorem."
+      ],
+      "dependencies": [
+        4,
+        5
+      ],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "A surrogate for the solving-degree surface over n, ℓ, m, presentation and order, fitted with conformal bounds on the hundreds of toy cells already measured, to decide which expensive runs to buy."
+    },
+    {
+      "item": 13,
+      "title": "Distributed ECC2K-130 rho and negation shortfall",
+      "original_requirement": "Complete ECC2K130 distributed rho campaign; simultaneously run specified negation-map shortfall hypothesis.",
+      "acceptance_criteria": [
+        "Reproduce device throughput, DP ingestion, restart,duplicate suppression, collision recovery and independent challenge verification.",
+        "Freeze explicit negation shortfall paired test and include orbit/canonicalization costs.",
+        "Expected GPU-years are resource forecast; challenge complete only with verified solution."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "ecc2k130/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": ".github/workflows/launch-ecc2k130-fleet.yml"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": ".github/workflows/cloud-ecc2k130.yml"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "scripts/cloud_launch.sh"
+        },
+        {
+          "repository": "cryptanalysis",
+          "path": "cloud/fleet.py"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "cryptanalysis",
+          "argv": [
+            "gh",
+            "workflow",
+            "run",
+            "cloud-ecc2k130.yml",
+            "--repo",
+            "aburan28/cryptanalysis",
+            "--ref",
+            "claude/cryptanalysis-repo-setup-p59kek",
+            "-f",
+            "action=doctor"
+          ],
+          "purpose": "Existing status-only remote environment diagnostic; provider credentials stay in GitHub secrets.",
+          "kind": "infrastructure_status"
+        }
+      ],
+      "remaining_gaps": [
+        "No GPU on host; local provider token absent. Remote actions access/readiness needs actual response.",
+        "Exact shortfall hypothesisID not supplied by user and not identified by indexed-title search; bind before claiming its experiment.",
+        "EC2 launch workflow scales billable fleet without automatic termination; lifecycle/checkpoint/stop accounting must be explicit."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Finish ECC2K-130 with distributed rho. Your own figure is about ten GPU-years at the measured per-card rate. It is the reference every leaderboard row is priced against and nobody has completed it. Run the negation-map shortfall hypothesis at the same time. It is specified and has never run."
+    },
+    {
+      "item": 14,
+      "title": "Prime-field arity m>=4 cost cells",
+      "original_requirement": "Run genuine prime-field aritym>=4 cells beginning S5, including small-root reach against required delta~1/5.",
+      "acceptance_criteria": [
+        "Immutable full systems with factor-base constraints and charged construction.",
+        "Verified decompositions or bounded failures; solver/lattice dimensions,root bound,memory,yield,full cost.",
+        "Separate small-root reach delta from required regime; no single univariate-specialization substitute."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/semaev_higher.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/semaev_higher_demo.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/lit2026_w10_coppersmith_bound.rs"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-ALPF-016/specification.yaml"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-PFGB-d630f6/specification.yaml"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "crypto",
+          "argv": [
+            "cargo",
+            "run",
+            "--release",
+            "--example",
+            "semaev_higher_demo"
+          ],
+          "purpose": "Existing S3-S6 univariate-specialization construction sanity check only.",
+          "kind": "construction_diagnostic"
+        }
+      ],
+      "remaining_gaps": [
+        "Existing S5/S6 univariate specialization is not full multivariate small-root oracle or matched aritycost cell.",
+        "Need S5 full factor-base-constrained system exporter and correctly attributed polynomial/lattice solve plus natural yield.",
+        "ALPF016 contains m4 experiment title; inspect exact contract/receipts to avoid asserting no data points from global absence."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Prime-field arity m ≥ 4 cost cells. The first arity that can beat rho has zero data points."
+    },
+    {
+      "item": 15,
+      "title": "Stack D4 with double large primes at k4",
+      "original_requirement": "Execute D4 plus double large primes at k=4, with the complete factorial comparison and all costs.",
+      "acceptance_criteria": [
+        "Same input trial streams; neither/D4/2LP/both arms, setup and phase costs.",
+        "Count partial relations,graph processing,dependencies,filtering and final algebra; verified logarithms.",
+        "Report combined measured gain or regression; do not multiply separate constants/exponents."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_01_d4_2lp.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve2_04_d4_2lp_fix.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261014/01-d4-2lp/PROTOCOL.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261014/01-d4-2lp/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261014/01-d4-2lp/ecbench/spec-d4-2lp.json"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/examples/ic_improve_01_d4_2lp",
+            "train",
+            "--p",
+            "521",
+            "--seed",
+            "4",
+            "--json",
+            "FRESH/train.jsonl"
+          ],
+          "purpose": "One original training cell. Full training: p in {101,181,269,397,521,769,1033}, seeds 4 and 5; full test: those primes plus 1301, seeds 1 through 3.",
+          "kind": "scientific_trial",
+          "full_parameters": {
+            "training_primes": [
+              101,
+              181,
+              269,
+              397,
+              521,
+              769,
+              1033
+            ],
+            "training_seeds": [
+              4,
+              5
+            ],
+            "test_primes": [
+              101,
+              181,
+              269,
+              397,
+              521,
+              769,
+              1033,
+              1301
+            ],
+            "test_seeds": [
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/ecbench",
+            "verify",
+            "--dir",
+            "research/ic_improve_20261014/01-d4-2lp/ecbench/session-20261014-d4-2lp",
+            "--replay",
+            "12",
+            "--out",
+            "FRESH/replay.json"
+          ],
+          "purpose": "Replay the existing session into a fresh audit artifact without overwriting the prior receipt.",
+          "kind": "independent_replay"
+        }
+      ],
+      "remaining_gaps": [
+        "The original stacked study already ran: its source README reports whole-cost ratio 1.025 [1.016, 1.037] over 24 test curves. This is prior evidence, not a new run in this campaign.",
+        "Reproduce the full original protocol only into fresh outputs after checking prior and off-main coverage. A complete neither/D4/2LP/both factorial may require an additional baseline arm.",
+        "Read the round-2 fix and production protocol before selecting the current incumbent."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "The source README reports 36 verified ecbench runs and 12 reproduced replays; the oracle was unpriced, so these ecbench comparisons were explicitly diagnostic."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Stack D₄ with double large primes at k = 4. The 18× constant and the exponent gain were never run together."
+    },
+    {
+      "item": 16,
+      "title": "Integrate equivariant F4, trace filter, free relations",
+      "original_requirement": "Integrate equivariant F4, the trace-zero filter and free relations into the incumbent oracle, with separate switches and combinations, and measure the complete pipeline in ecbench.",
+      "acceptance_criteria": [
+        "Register incumbent and candidate with standalone and factorial ablations on the same targets and cost interval.",
+        "Check correctness and independent replay; report complete setup and online costs. A reproducible end-to-end gain needs its own complete pipeline evidence.",
+        "Preserve the failed equivariant step gate and subgroup-vacuous trace rule. A new presentation or integration gets a distinct prospective protocol."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_02_equivariant_oracle.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_02_fall_rows_pipeline.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/ic_improve_03_tracezero_freerel.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261014/02-equivariant-oracle/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261014/03-tracezero-freerel/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/ic_improve_20261015/02-freerel-production/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/ecbench/methods.rs"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/examples/ic_improve_02_equivariant_oracle",
+            "--mode",
+            "oracle",
+            "--n",
+            "5,7,11,13",
+            "--targets",
+            "12"
+          ],
+          "purpose": "Existing48-target oraclepanel, stdoutJSONL; L0shared-host timings not isolated evidence.",
+          "kind": "scientific_trial"
+        },
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/examples/ic_improve_02_equivariant_oracle",
+            "--mode",
+            "step",
+            "--n",
+            "7,11,13",
+            "--targets",
+            "8",
+            "--check",
+            "--posctl"
+          ],
+          "purpose": "Existing small steppanel with exact span andpositive controls.",
+          "kind": "scientific_trial"
+        }
+      ],
+      "remaining_gaps": [
+        "The production system has a fixed target and is not Frobenius-symmetric. The proposed equivariant hook applies at zero current nodes; the prior step gate failed on 37 of 37 targets.",
+        "The trace filter is vacuous on odd-order subgroup targets. Preserve the requested no-op ablation; do not claim a 50% rejection gain for that target law.",
+        "Free relations are already the default for the u64 production example. ecbench registration and complete cold accounting remain separate from this standalone implementation. Use the round-2 tuned-K incumbent."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "The prior equivariant barrel oracle improved at n=11 and 13; ordinary degree-fall transfer to the production system regressed.",
+        "The round-1 free-relations pooled ratio 0.957 was qualified by round-2 tuned-K evidence. At the same tuned K, n=41 and n=53 intervals include 1.",
+        "The production flag KIC_FREE_RELATIONS=0 restores the previous u64 path; an explicit enable is refused above n=63."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Wire the equivariant F4 pass, the trace-zero prefilter and the free relations into the incumbent oracle and measure them in ecbench."
+    },
+    {
+      "item": 17,
+      "title": "Cyclotomic-sparse n23 to n83",
+      "original_requirement": "Complete the cyclotomic-sparse n=23 experiment, including the solving-degree clause, and retain an executable path toward n=83.",
+      "acceptance_criteria": [
+        "Audit and reuse completed n=23 yield/cost evidence; separately complete the requested solver-degree comparison at n=23.",
+        "Match columns and base size, check subgroup validity, natural yield, certificates, oracle work and useful rank.",
+        "Provide an explicit multiword n=83 construction and solver continuation; an exponential exact-log table is not the requested n=83 method."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "examples/cyclotomic_falsifier_yield.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "examples/a2_cyclotomic_base.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/cyclotomic_factor_base.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/cyclotomic_falsifier_20261015/PROTOCOL.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/cyclotomic_falsifier_20261015/README.md"
+        }
+      ],
+      "source_supported_commands": [
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/examples/cyclotomic_falsifier_yield",
+            "--a",
+            "1",
+            "--n",
+            "23",
+            "--nulls",
+            "1999",
+            "--seed",
+            "20261015",
+            "--alpha",
+            "0.05",
+            "--family",
+            "15",
+            "--out",
+            "FRESH/yield-a1-n23.json"
+          ],
+          "purpose": "Original yield cell; the complete original yield panel also includes a=0,n=23 and a=1,n=11.",
+          "kind": "scientific_trial"
+        },
+        {
+          "repo": "crypto",
+          "argv": [
+            "target/release/examples/a2_cyclotomic_base",
+            "--out",
+            "FRESH/a2-n23",
+            "--targets",
+            "16",
+            "--yield-targets",
+            "64",
+            "--seed",
+            "20261012",
+            "--cell-timeout-secs",
+            "150",
+            "--wdsat-timeout-secs",
+            "20",
+            "--node-budget",
+            "1024",
+            "--macaulay-extra",
+            "1",
+            "--engine",
+            "inherited",
+            "--cells",
+            "n23",
+            "--label",
+            "execution-20261018"
+          ],
+          "purpose": "Source-supported original n=23 solver package. Each child retains timeout and partial records; n=11 solver cells are excluded by the explicit scope while census code still runs its declared census. WDSAT_BINARY or WDSAT_SRC enables its separate SAT leg.",
+          "kind": "scientific_trial",
+          "launch_qualification": "This command repeats the prior bounded solver scope; a timeout does not discharge the requested degree measurement."
+        }
+      ],
+      "remaining_gaps": [
+        "The n=23 yield leg already completed: all 10 coverage and 5 energy tests were inside the 1999-draw null distribution. This does not discharge the solving-degree clause.",
+        "The prior n=23 solver cells timed out. The original parameters and degree/memory outputs remain required.",
+        "CyclotomicField and the plugin use a single word; n=83 needs a multiword construction and algebraic membership method. An exact log table would require about 2^81 entries."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [
+        "The source README explicitly says n=83 was not run and the n=23 solver clause remains untested. At n=11, the recorded F4 maximum degree was 4 versus 3 for the ONB control."
+      ],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Cyclotomic-sparse bases at n = 23 with the n = 83 ladder in view. Still backlog."
+    },
+    {
+      "item": 18,
+      "title": "Execute all eighteen frozen ECDLP contracts",
+      "original_requirement": "Execute the original eighteen frozen ECDLP contracts without changing their frozen specifications; repair only actual launcher/input blockers.",
+      "acceptance_criteria": [
+        "Bind the exact eighteen contract IDs and the historical audit revision.",
+        "Every original trial is covered by a completed retained run or a precise blocker with an owner and acceptance criteria. Check prior and off-main work before launch.",
+        "Do not substitute unrelated portfolio work, fabricate approval, change frozen bytes or suppress failed runs."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "ledger/.index/experiments.jsonl"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "tools/newest_experiments.py"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "docs/track-record-review-20261006.md"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "docs/sparse-checkout.md"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "The original audit names no eighteen IDs or historical revision. The current ECDLP index contains 341 records, including 235 approved records, so it does not uniquely identify the requested eighteen.",
+        "A candidate index is retained in preparation. Selecting an arbitrary eighteen or dispatching unrelated ready work would change the request.",
+        "Once IDs are bound, inspect each with --experiment ID, materialize its declared inputs and runs, and use its existing launcher with ownership and hold checks."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "The 18 frozen ECDLP contracts that were never executed."
+    },
+    {
+      "item": 19,
+      "title": "Publish negatives and formalize two theorems",
+      "original_requirement": "Write the negative-results ECDLP manuscript covering the six named results and formalize the two requested theorems in Lean.",
+      "acceptance_criteria": [
+        "Link every claim to its exact proof, counterexample or experiment and hypotheses. Separate conditional barriers from bounded experimental negatives.",
+        "Place the manuscript under papers/, with bibliography, reproducibility bundle and explicit review/submission status.",
+        "Faithfully state the two Lean theorems, audit axioms and check the build. Claim publication or submission only with its actual receipt."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "papers/README.md"
+        },
+        {
+          "repository": "crypto",
+          "path": "papers/paper.mk"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/conductor_gap_cm_pairs_20261010/lean/GenericInvariance.lean"
+        },
+        {
+          "repository": "crypto",
+          "path": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-SEMBIN-db9bc3/specification.yaml"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-SEMBIN-d9767f/specification.yaml"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "A current proof inventory and novelty audit must bind exact sources for all six named negative results before a synthesis claim.",
+        "No manuscript or Lean proof of the two requested theorems is delivered by this preparation. The existing GenericInvariance.lean is an adjacent reference.",
+        "Lean/toolchain and renderer availability remain to be confirmed. Reviewed theorem assumptions are part of the acceptance criteria."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Publish the negative results. Nagao's Lemma 4 is false, Semaev 2015's Assumption 1 fails off the diagonal, the compact-orbit pipeline is provably generic, yield is conserved, the monodromy is C₂^{m−2}, and isogeny oracles are generic. The publication list has no ECDLP entry. Formalising the two theorems in Lean would make them citable."
+    },
+    {
+      "item": 20,
+      "title": "Classical pre/post processing for quantum ECDLP",
+      "original_requirement": "Execute the quantum ECDLP resource-estimate track, including classical setup and postprocessing, coherent computation, recovery and verification.",
+      "acceptance_criteria": [
+        "Use common algorithm and architecture assumptions for qubits, depth, gates, classical work, memory and reuse.",
+        "Reproduce primary-source formulas and compare complete algorithms without mixing headline estimates.",
+        "Produce a draft with explicit model scope and uncertainty; quantum conclusions remain separate from classical ECDLP measurements."
+      ],
+      "source_bindings": [
+        {
+          "repository": "crypto",
+          "path": "src/cryptanalysis/quantum_estimator.rs"
+        },
+        {
+          "repository": "crypto",
+          "path": "quantum_circuit_secp256k1/README.md"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "experiments/EXP-ICEX-a54be2/specification.yaml"
+        },
+        {
+          "repository": "crypto-autoresearcher",
+          "path": "ledger/proposals/IDEA-20260815-f4c398.yaml"
+        }
+      ],
+      "source_supported_commands": [],
+      "remaining_gaps": [
+        "quantum_estimator.rs traces abstract ECPM circuit construction; it does not implement a complete Shor resource model with classical pre- and postprocessing.",
+        "Bind the exact algorithm, primary sources, assumptions and stages. The related ICEX-a54be2 draft has its own literature gate and is not an approved instance of this requested task.",
+        "No complete common-assumption resource pipeline or draft is provided by this preparation."
+      ],
+      "dependencies": [],
+      "existing_evidence_notes": [],
+      "preparation_status": "source_bound",
+      "scientific_completion_status": "not_claimed_by_this_preparation",
+      "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+      "original_audit_text": "Adjacent and off-thesis: classical pre- and post-processing for quantum ECDLP. The resource-estimate goal is a draft only."
+    }
+  ],
+  "global_reporting_requirements": [
+    "Preserve the original workloads, controls, seeds, stopping rules and acceptance criteria. A smaller diagnostic never completes the original requirement.",
+    "Retain exact commands, revisions, environment, seeds, stdout/stderr, exit status, time, peak RSS, validity and certificate checks.",
+    "A performance claim needs independent verification and the fastest available external tool on the same inputs and host.",
+    "Every research run leaves a source-linked report, graph or diagram and PDF. Performance results also copy their visual record into benchmarks/.",
+    "No official status promotion, publication claim or experiment approval without the actual native gates and receipts."
+  ],
+  "preparation_blockers": [
+    {
+      "kind": "tool_access",
+      "tool": "conductor",
+      "observed_command": "conductor check --summary ... --scope path:research/ideas_execution_20261018/...",
+      "exit_code": 127,
+      "stderr": "/bin/bash: line 1: conductor: command not found"
+    },
+    {
+      "kind": "tool_access",
+      "tool": "search_knowledge/get_context",
+      "observation": "Neither function present in session ALL_TOOLS; primary on-disk records/index were used, never treating retrieval absence as evidence of mathematical absence."
+    }
+  ]
+}

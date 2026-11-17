@@ -1,0 +1,64 @@
+import WeightedExtract
+set_option autoImplicit false
+namespace SameUZeroSlope
+open Polynomial MixedCancellation SameUMixed
+variable {K : Type*} [Field K]
+theorem equal_slope_classification (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2) (hs : s1=s2) :
+ (s1=s2 ∧ t1=t2) ∨ (s1= -s2 ∧ t1= -t2) := by
+ have hh := factor_identity f q r s1 t1 s2 t2 h1 h2
+ rw [hs,sub_self,zero_mul,C_0,zero_mul] at hh
+ rcases mul_eq_zero.mp hh with he|hi
+ · have he := sub_eq_zero.mp he
+   have ht := congrArg (fun p : K[X] => p.coeff 0) he
+   exact Or.inl ⟨hs,by simpa [ordinate] using ht⟩
+ · have hsi := congrArg (fun p : K[X] => p.coeff 1) hi
+   have hti := congrArg (fun p : K[X] => p.coeff 0) hi
+   right
+   constructor
+   · have he : s2+s2=0 := by simpa [ordinate] using hsi
+     exact hs.trans (eq_neg_of_add_eq_zero_left he)
+   · have he : t1+t2=0 := by simpa [ordinate] using hti
+     exact eq_neg_of_add_eq_zero_left he
+
+noncomputable def crossQ (a b : D2 K) := a.q*(b.z*b.z)
+noncomputable def crossR (a b : D2 K) := a.r*((b.z*b.z)*(b.z*b.z))
+noncomputable def crossS (a b : D2 K) := (a.s*((b.z*b.z)*b.z))*b.w
+noncomputable def crossT (a b : D2 K) := (a.t*(((b.z*b.z)*(b.z*b.z))*b.z))*b.w
+
+theorem cross_scales (a b : D2 K) (haz : a.z≠0) (haw : a.w≠0)
+ (hbz : b.z≠0) (hbw : b.w≠0) :
+ crossQ a b=(a.z*b.z)^2*nq a ∧ crossR a b=(a.z*b.z)^4*nr a ∧
+ crossS a b=((a.z*b.z)^3*(a.w*b.w))*ns a ∧
+ crossT a b=((a.z*b.z)^5*(a.w*b.w))*nt a := by
+ dsimp [crossQ,crossR,crossS,crossT,nq,nr,ns,nt]
+ constructor
+ · field_simp; ring
+ constructor
+ · field_simp; ring
+ constructor <;> field_simp <;> ring
+
+theorem source_zero_slope_excluded (f : K[X]) (a b : D2 K)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (ha : validTwo f a) (hb : validTwo f b)
+ (hq : crossQ a b=crossQ b a) (hr : crossR a b=crossR b a)
+ (hni : ¬(crossS a b= -crossS b a ∧ crossT a b= -crossT b a))
+ (hne : ¬(crossS a b=crossS b a ∧ crossT a b=crossT b a)) : sourceK a b≠0 := by
+ obtain ⟨qa,ra,sa,ta⟩ := cross_scales a b haz haw hbz hbw
+ obtain ⟨qb,rb,sb,tb⟩ := cross_scales b a hbz hbw haz haw
+ rw [mul_comm b.z a.z,mul_comm b.w a.w] at qb rb sb tb
+ have hz : a.z*b.z≠0 := mul_ne_zero haz hbz
+ have hw : a.w*b.w≠0 := mul_ne_zero haw hbw
+ have hqn : nq a=nq b := mul_left_cancel₀ (pow_ne_zero 2 hz) (qa.symm.trans (hq.trans qb))
+ have hrn : nr a=nr b := mul_left_cancel₀ (pow_ne_zero 4 hz) (ra.symm.trans (hr.trans rb))
+ have hb' : support (nq a) (nr a) ∣ f-(ordinate (ns b) (nt b))^2 := by
+  rw [hqn,hrn]; exact hb
+ intro hk
+ have hsn : ns a=ns b := sub_eq_zero.mp ((mul_eq_zero.mp ((source_k_scale a b haz haw hbz hbw).symm.trans hk)).resolve_left (mul_ne_zero (pow_ne_zero 3 hz) hw))
+ rcases equal_slope_classification f (nq a) (nr a) (ns a) (nt a) (ns b) (nt b) ha hb' hsn with he|hi
+ · apply hne
+   rw [sa,sb,ta,tb,he.1,he.2]; exact ⟨rfl,rfl⟩
+ · apply hni
+   rw [sa,sb,ta,tb,hi.1,hi.2,mul_neg,mul_neg]; exact ⟨rfl,rfl⟩
+end SameUZeroSlope

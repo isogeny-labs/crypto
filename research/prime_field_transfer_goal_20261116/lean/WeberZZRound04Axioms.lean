@@ -1,0 +1,12 @@
+import WeberRootBoundaryV3
+import WeberResiduesV2
+
+#print axioms WeberRootBoundaryV3.beta_two_identity
+#print axioms WeberRootBoundaryV3.beta_two_root
+#print axioms WeberRootBoundaryV3.beta_two_cleared_identity
+#print axioms WeberRootBoundaryV3.beta_four_identity
+#print axioms WeberRootBoundaryV3.beta_four_root
+#print axioms WeberRootBoundaryV3.beta_four_cleared_identity
+#print axioms WeberResiduesV2.auxiliary_irreducible
+#print axioms WeberResiduesV2.source_factorization
+#print axioms WeberResiduesV2.target_factorization

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:16:57Z",
+ "id": "PCC-20261116-e4ac3b",
+ "kind": "statement",
+ "producer": {
+  "commit": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
+  "model": "",
+  "session": "codex-20261116-nist-three"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-kernel-check/actual-cover-torsion.json",
+    "sha256": "698ed3dc7194fe4e93d8e31854ca37e2413448774a52e7fcb767a5ba5d51b15a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-kernel-check/actual-cover-torsion-summary.txt",
+    "sha256": "695aec26034a10968deeb9857120d068a3b0e1822f373a57ec63e0a536325158"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/final-kernel-check/controls.txt",
+    "sha256": "ecdaf609635a81d33da22fedb4a17472450a95f5d276bc8602aeba214f4bbe22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/kernel_point_replay.cpp",
+    "sha256": "79a3420552cf7eb9677f33868def1b4b36566e9b57da19b0fb69e163658b4fb6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native P-192 d7 genus3 divisor replay realizes six order3 generators spanning729 distinct classes, verifies their actual Frobenius action, and realizes eight27-element stable kernels with isotropy transported from aligned canonical product pairings through the degree2 maps. Two nonzero rational Prym3 classes have zero elliptic norm. Nine input controls reject, including a non-isotropic kernel. Producer checks only; no direct genus3 Weil pairing, quotient, dual, DLP solver or performance comparison."
+}

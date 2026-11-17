@@ -1,0 +1,7 @@
+# Prospective counted-edge software proof plan
+
+T-1430. New composition only; preserve earlier native-node, owner/cardinality, return and counter packets. Prove owner and exact root cardinalities from input certificates through both source-order edge branches, then compose two counted finds, dispatcher safety and four exact counters. Incoming relation truth, canonical prime words, forest and explicit machine bounds remain assumptions. No output owner/cardinality premise.
+
+Each Lean invocation:120 seconds,1 thread,4096 MiB; maximum20 development invocations and four final control/readback invocations. Preserve all native failures and source versions. Reuse hash-bound installed toolchain/dependency caches, not a clean dependency rebuild. Control same-root/no merge, both union orientations/tie, root-cardinality consequences, branch counters and explicit wrap boundary; deliberate false theorem must fail. Separate named axiom readback and malformed-inventory checks. Exact source-fidelity and independent replay review required before publication claim. No cohort, native collector, cloud or timing measurement.
+
+Before final readback: expand imported dependency inventory recursively, following bound cache symlinks and including sidecars, instead of inherited top-level .lean/.olean-only scan. Source theorem bytes remain unchanged. One final explicit readback under same120s/4096MiB/one-thread bound; preserve earlier receipts with their narrower inventory.

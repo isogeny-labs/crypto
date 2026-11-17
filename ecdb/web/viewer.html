@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECDB viewer</title>
+<style>
+/* Layout: one column, a sticky token bar, then catalogue counts, curve search, curve detail and graph. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --fg: #17202b; --muted: #5b6878; --line: #d9dee5;
+  --accent: #1f5fa8; --accent-2: #8a4fbf; --accent-3: #1b8a6b; --bad: #b4232c;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f141a; --panel: #161d26; --fg: #e3e8ef; --muted: #93a1b2; --line: #2a3442;
+          --accent: #6aa6ea; --accent-2: #b98ae6; --accent-3: #4fc4a0; --bad: #ef6b72; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--sans); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 16px max(16px, env(safe-area-inset-right)) 48px max(16px, env(safe-area-inset-left)); display: grid; gap: 16px; }
+header.bar { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+header.bar .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+h1 { font-size: 18px; margin: 0 12px 0 0; font-weight: 650; letter-spacing: .01em; }
+h2 { font-size: 15px; margin: 0 0 4px; font-weight: 600; }
+.note { color: var(--muted); font-size: 12.5px; margin: 0 0 10px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+input, select, button { font: inherit; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; min-width: 0; }
+button { cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:focus-visible, input:focus-visible, select:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+#token { flex: 1 1 260px; font-family: var(--mono); }
+.status { font-size: 12.5px; color: var(--muted); }
+.status.err { color: var(--bad); }
+.counts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.count { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.count .k { font-size: 12px; color: var(--muted); }
+.count .v { font-size: 20px; font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+#q { flex: 1 1 240px; }
+.tbl { overflow: auto; max-height: 460px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; background: var(--panel); text-align: left; font-weight: 600; border-bottom: 1px solid var(--line); padding: 6px 8px; white-space: nowrap; }
+td { border-bottom: 1px solid var(--line); padding: 5px 8px; white-space: nowrap; max-width: 28ch; overflow: hidden; text-overflow: ellipsis; }
+tbody tr { cursor: pointer; }
+tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+td.mono, .mono { font-family: var(--mono); font-size: 12.5px; }
+.split { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; font-size: 13px; }
+dt { color: var(--muted); }
+dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: 12.5px; }
+details { margin-top: 10px; }
+pre { max-height: 360px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; font: 12px/1.45 var(--mono); }
+#graph { position: relative; min-height: 380px; }
+#graph svg { width: 100%; height: 380px; display: block; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.15); max-width: 320px; overflow-wrap: anywhere; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.empty { color: var(--muted); font-size: 13px; padding: 18px 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <h1>ECDB viewer</h1>
+    <label for="token" class="status">Read token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="Paste the ecdb read token">
+    <button id="connect" class="primary">Connect</button>
+    <span id="status" class="status">Not connected. The token stays in this browser tab only.</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>Catalogue</h2>
+    <p class="note">Row counts from <span class="mono">/v1/meta</span>, live from the database.</p>
+    <div id="counts" class="counts"><div class="empty">Connect to load the counts.</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Curves</h2>
+    <p class="note">Search by name, ICV1 slug, EC1 alias or OID. Click a curve to open its document and isogeny graph.</p>
+    <div class="row">
+      <input id="q" type="search" placeholder="secp256k1, sect163k1, icv1-fp61…" aria-label="Search curves">
+      <select id="family" aria-label="Family"><option value="">All families</option></select>
+      <select id="field" aria-label="Field kind"><option value="">All fields</option><option value="prime">Prime</option><option value="binary">Binary</option><option value="prime_power">Extension (p^k)</option></select>
+      <label class="status"><input id="isoOnly" type="checkbox"> Has isogenies</label>
+      <button id="search">Search</button>
+      <span id="total" class="status"></span>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>ICV1 slug</th><th>Names</th><th>Family</th><th>Field</th><th>Field bits</th><th>Subgroup bits</th><th>Cofactor</th><th>j-invariant</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="8" class="empty">Connect to search.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="row" style="margin-top:10px"><button id="prev">Previous</button><button id="next">Next</button></div>
+  </section>
+
+  <section class="split">
+    <div class="card">
+      <h2 id="docTitle">Curve</h2>
+      <p class="note">From <span class="mono">/v1/curves/{ref}</span>. Unknown values are shown as —.</p>
+      <dl id="doc"><dt>Curve</dt><dd>Pick a curve above.</dd></dl>
+      <details><summary>Full JSON document</summary><pre id="raw"></pre></details>
+    </div>
+    <div class="card">
+      <h2>Isogeny graph</h2>
+      <p class="note">Recorded isogenies around the curve, from <span class="mono">/v1/curves/{ref}/graph</span>. Click a neighbour to move to it.</p>
+      <div class="row">
+        <label class="status" for="depth">Depth</label>
+        <select id="depth"><option>1</option><option selected>2</option><option>3</option></select>
+        <label class="status" for="ell">Degree ℓ</label>
+        <input id="ell" type="number" min="2" placeholder="any" style="width:90px">
+        <span id="gstat" class="status"></span>
+      </div>
+      <div id="graph"><div class="empty">Pick a curve to draw its graph.</div></div>
+      <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>selected curve</span><span><i class="sw" style="background:var(--accent-3)"></i>neighbour</span><span>Dashed: ascending or descending in a volcano</span></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en') : String(n));
+  const show = (v) => (v === null || v === undefined || v === '' ? '—' : Array.isArray(v) ? (v.length ? v.join(', ') : '—') : typeof v === 'object' ? JSON.stringify(v) : String(v));
+  const state = { token: '', offset: 0, limit: 50, current: null };
+  try { state.token = sessionStorage.getItem('ecdb_token') || ''; } catch (e) {}
+  $('token').value = state.token;
+
+  function setStatus(msg, err) { $('status').textContent = msg; $('status').className = 'status' + (err ? ' err' : ''); }
+
+  async function api(path) {
+    const r = await fetch(path, { headers: { authorization: 'Bearer ' + state.token } });
+    if (r.status === 401 || r.status === 403) throw new Error('The token was refused. Check that it is the read token.');
+    if (!r.ok) {
+      let m = r.status + ' ' + r.statusText;
+      try { const j = await r.json(); m = j.error || j.message || m; } catch (e) {}
+      throw new Error(m);
+    }
+    return r.json();
+  }
+
+  async function connect() {
+    state.token = $('token').value.trim();
+    try { sessionStorage.setItem('ecdb_token', state.token); } catch (e) {}
+    if (!state.token) return setStatus('Paste a read token first.', true);
+    setStatus('Connecting…');
+    try {
+      const meta = await api('/v1/meta');
+      setStatus('Connected. Schema version ' + show(meta.schema_version) + '.');
+      drawCounts(meta.counts || {});
+      loadFamilies();
+      await search(0);
+    } catch (e) { setStatus(e.message, true); }
+  }
+
+  function drawCounts(counts) {
+    const box = $('counts'); box.replaceChildren();
+    Object.entries(counts).forEach(([k, v]) => {
+      if (v && typeof v === 'object') {
+        Object.entries(v).forEach(([kk, vv]) => tile(`${k.replace(/_/g, ' ')}: ${kk}`, vv));
+      } else tile(k.replace(/_/g, ' '), v);
+    });
+    function tile(k, v) {
+      const d = document.createElement('div'); d.className = 'count';
+      const a = document.createElement('div'); a.className = 'k'; a.textContent = k;
+      const b = document.createElement('div'); b.className = 'v'; b.textContent = v === null ? '—' : fmt(v);
+      d.append(a, b); box.appendChild(d);
+    }
+  }
+
+  async function loadFamilies() {
+    try {
+      const r = await fetch('/v1/sql', { method: 'POST', headers: { authorization: 'Bearer ' + state.token, 'content-type': 'application/json' },
+        body: JSON.stringify({ sql: 'SELECT family, count(*) FROM ec.curve WHERE family IS NOT NULL GROUP BY 1 ORDER BY 2 DESC', limit: 200 }) });
+      if (!r.ok) return;
+      const j = await r.json(); const sel = $('family');
+      (j.rows || []).forEach(([f, n]) => { if (![...sel.options].some((o) => o.value === f)) sel.add(new Option(`${f} (${fmt(Number(n))})`, f)); });
+    } catch (e) {}
+  }
+
+  async function search(offset) {
+    if (!state.token) return setStatus('Connect first.', true);
+    state.offset = Math.max(0, offset);
+    const p = new URLSearchParams({ limit: state.limit, offset: state.offset });
+    const q = $('q').value.trim(); if (q) p.set('q', q);
+    if ($('family').value) p.set('family', $('family').value);
+    if ($('field').value) p.set('field_kind', $('field').value);
+    if ($('isoOnly').checked) p.set('has_isogenies', 'true');
+    const tb = $('rows');
+    tb.replaceChildren(rowMsg('Searching…'));
+    try {
+      const res = await api('/v1/curves?' + p);
+      const items = res.items || [];
+      $('total').textContent = `${fmt(res.total ?? items.length)} curves, showing ${items.length ? state.offset + 1 : 0}–${state.offset + items.length}`;
+      tb.replaceChildren();
+      if (!items.length) return tb.appendChild(rowMsg('No curves match.'));
+      items.forEach((c) => {
+        const tr = document.createElement('tr'); tr.tabIndex = 0;
+        [[c.icv1_slug, 'mono'], [c.standard_names], [c.family], [c.field_kind], [c.field_bits], [c.subgroup_bits], [c.cofactor], [c.j_invariant, 'mono']].forEach(([v, cls]) => {
+          const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = show(v); td.title = show(v); tr.appendChild(td);
+        });
+        const open = () => { tb.querySelectorAll('tr.sel').forEach((x) => x.classList.remove('sel')); tr.classList.add('sel'); openCurve(c.icv1_slug || c.id); };
+        tr.addEventListener('click', open);
+        tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(); });
+        tb.appendChild(tr);
+      });
+      $('prev').disabled = state.offset === 0;
+      $('next').disabled = state.offset + items.length >= (res.total ?? 0);
+    } catch (e) { tb.replaceChildren(rowMsg(e.message)); }
+  }
+  function rowMsg(m) { const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 8; td.className = 'empty'; td.textContent = m; tr.appendChild(td); return tr; }
+
+  async function openCurve(ref) {
+    state.current = ref;
+    $('docTitle').textContent = 'Curve ' + ref;
+    const dl = $('doc'); dl.replaceChildren(); $('raw').textContent = '';
+    try {
+      const doc = await api('/v1/curves/' + encodeURIComponent(ref));
+      $('raw').textContent = JSON.stringify(doc, null, 2);
+      const flat = doc.curve && typeof doc.curve === 'object' ? { ...doc, ...doc.curve } : doc;
+      const keys = ['icv1_slug', 'standard_names', 'family', 'equation', 'field_kind', 'characteristic', 'field_degree', 'field_bits', 'order', 'subgroup_order', 'cofactor', 'trace', 'j_invariant', 'cm_discriminant', 'end_discriminant', 'embedding_degree', 'is_supersingular', 'is_anomalous'];
+      let n = 0;
+      keys.forEach((k) => { if (k in flat) { add(k, flat[k]); n++; } });
+      if (!n) Object.entries(flat).filter(([, v]) => v === null || typeof v !== 'object').slice(0, 20).forEach(([k, v]) => add(k, v));
+      function add(k, v) { const dt = document.createElement('dt'); dt.textContent = k.replace(/_/g, ' '); const dd = document.createElement('dd'); dd.textContent = show(v); dl.append(dt, dd); }
+    } catch (e) { const dd = document.createElement('dd'); dd.textContent = e.message; dl.append(document.createElement('dt'), dd); }
+    drawGraph();
+  }
+
+  async function drawGraph() {
+    const box = $('graph'); const ref = state.current; if (!ref) return;
+    const p = new URLSearchParams({ depth: $('depth').value }); if ($('ell').value) p.set('ell', $('ell').value);
+    $('gstat').textContent = 'Loading…';
+    let g;
+    try { g = await api('/v1/curves/' + encodeURIComponent(ref) + '/graph?' + p); }
+    catch (e) { $('gstat').textContent = e.message; return; }
+    const nodes = (g.nodes || []).map((n) => ({ ...n, x: 0, y: 0, vx: 0, vy: 0 }));
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const edges = (g.edges || []).filter((e) => byId.has(e.source_curve_id) && byId.has(e.target_curve_id));
+    $('gstat').textContent = `${nodes.length} curves, ${edges.length} isogenies`;
+    box.replaceChildren();
+    if (nodes.length <= 1) { const d = document.createElement('div'); d.className = 'empty'; d.textContent = 'No recorded isogenies around this curve. ECDB stores isogenies for the census (p < 2^10), the ℓ-neighbours of crypto curves and the certified walks.'; box.appendChild(d); return; }
+    const W = box.clientWidth || 600, H = 380;
+    nodes.forEach((n, i) => { const a = (2 * Math.PI * i) / nodes.length; n.x = W / 2 + Math.cos(a) * 120; n.y = H / 2 + Math.sin(a) * 120; });
+    for (let it = 0; it < 300; it++) {
+      for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j]; let dx = a.x - b.x, dy = a.y - b.y; const d2 = Math.max(dx * dx + dy * dy, 25);
+        const f = 1600 / d2; dx *= f / Math.sqrt(d2); dy *= f / Math.sqrt(d2); a.vx += dx; a.vy += dy; b.vx -= dx; b.vy -= dy;
+      }
+      edges.forEach((e) => { const a = byId.get(e.source_curve_id), b = byId.get(e.target_curve_id); const dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 1; const f = (d - 70) * 0.02; a.vx += (dx / d) * f; a.vy += (dy / d) * f; b.vx -= (dx / d) * f; b.vy -= (dy / d) * f; });
+      nodes.forEach((n) => { n.vx += (W / 2 - n.x) * 0.004; n.vy += (H / 2 - n.y) * 0.004; n.x += n.vx * 0.5; n.y += n.vy * 0.5; n.vx *= 0.6; n.vy *= 0.6; });
+    }
+    const xs = nodes.map((n) => n.x), ys = nodes.map((n) => n.y);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const k = Math.min((W - 40) / Math.max(1, x1 - x0), (H - 40) / Math.max(1, y1 - y0), 2);
+    const px = (n) => 20 + (n.x - x0) * k + ((W - 40) - (x1 - x0) * k) / 2, py = (n) => 20 + (n.y - y0) * k + ((H - 40) - (y1 - y0) * k) / 2;
+    const NS = 'http://www.w3.org/2000/svg'; const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true;
+    const showTip = (ev, lines) => { tip.replaceChildren(...lines.map((l) => { const d = document.createElement('div'); d.textContent = l; return d; })); tip.hidden = false; const b = box.getBoundingClientRect(); tip.style.left = Math.min(b.width - 240, ev.clientX - b.left + 12) + 'px'; tip.style.top = (ev.clientY - b.top + 12) + 'px'; };
+    edges.forEach((e) => {
+      const a = byId.get(e.source_curve_id), b = byId.get(e.target_curve_id); const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', px(a)); l.setAttribute('y1', py(a)); l.setAttribute('x2', px(b)); l.setAttribute('y2', py(b));
+      l.setAttribute('stroke', 'var(--muted)'); l.setAttribute('stroke-width', '1.6'); l.setAttribute('stroke-linecap', 'round');
+      if (e.direction === 'ascending' || e.direction === 'descending') l.setAttribute('stroke-dasharray', '4 3');
+      l.addEventListener('pointermove', (ev) => showTip(ev, [`Degree ${show(e.degree)} isogeny (ℓ = ${show(e.ell)})`, `Direction: ${show(e.direction)}`, `Status: ${show(e.status)}`, `Isogeny id ${show(e.isogeny_id)}`]));
+      l.addEventListener('pointerleave', () => { tip.hidden = true; });
+      svg.appendChild(l);
+    });
+    nodes.forEach((n) => {
+      const c = document.createElementNS(NS, 'circle'); const root = n.id === g.root;
+      c.setAttribute('cx', px(n)); c.setAttribute('cy', py(n)); c.setAttribute('r', root ? 8 : 5.5);
+      c.setAttribute('fill', root ? 'var(--accent)' : 'var(--accent-3)'); c.setAttribute('stroke', 'var(--panel)'); c.setAttribute('stroke-width', '1.5'); c.style.cursor = 'pointer';
+      c.addEventListener('pointermove', (ev) => showTip(ev, [show(n.icv1_slug), `j = ${show(n.j_invariant)}`, `trace ${show(n.trace)}`, `End disc. ${show(n.end_discriminant)}`, `levels ${show(n.levels)}`]));
+      c.addEventListener('pointerleave', () => { tip.hidden = true; });
+      c.addEventListener('click', () => { if (!root) openCurve(n.icv1_slug || n.id); });
+      svg.appendChild(c);
+    });
+    box.append(svg, tip);
+  }
+
+  $('connect').addEventListener('click', connect);
+  $('token').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
+  $('search').addEventListener('click', () => search(0));
+  $('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') search(0); });
+  ['family', 'field', 'isoOnly'].forEach((id) => $(id).addEventListener('change', () => search(0)));
+  $('prev').addEventListener('click', () => search(state.offset - state.limit));
+  $('next').addEventListener('click', () => search(state.offset + state.limit));
+  ['depth', 'ell'].forEach((id) => $(id).addEventListener('change', drawGraph));
+  if (state.token) connect();
+})();
+</script>
+</body>
+</html>

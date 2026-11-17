@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1ha5252733c95a",
+  "label": "prime k-sum table: train panel, 24-bit a=-3 curve",
+  "spec_id": "ECS1h1e13f1597f80",
+  "spec_sha256": "1e13f1597f80055d2286df06ce819072df83fa8f5291e532220fe27171d4b449",
+  "env_class_id": "ECBENV3hdc5819863612",
+  "host_sha256": "5f16fa0a8d6af9b40e816b4c5763494fca7064e5c1148036e97bd97459c26c0a",
+  "plan_sha256": "500b261933e132f33e891c0e4e1165bdd3eea67381253ec8b665f7ee87acb536",
+  "binary_sha256": "d37fab7dfd0ac7d33b700c40b7fed1876ebfd9f59a690731d0df51d68483f5fe",
+  "git_commit": "667799c6a621a67779e98b79940f3c571f935120",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/claude-501/ksum.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/Volumes/SSD990/crypto/target-ksum/release/ecbench"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "c6c12d5fc5f9ad157bf781e3376914c6cf704991630e629712739fe6b45fb760",
+  "child_env": {
+    "HOME": "/Users/adamburan",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/Users/adamburan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.bun/bin:/Users/adamburan/bin:/Users/adamburan/.opencode/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.atuin/bin:/Users/adamburan/.pyenv/shims:/Users/adamburan/.pyenv/bin:/Users/adamburan/.elan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.local/share/solana/install/active_release/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/go/bin:/Users/adamburan/.cargo/bin:/Users/adamburan/.docker/bin:/Users/adamburan/go/bin:/Users/adamburan/istio-1.24.0/bin:/Users/adamburan/.local/bin:/Users/adamburan/.lmstudio/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793206176360,
+  "finished_unix_ms": 1793206178914,
+  "status": "complete",
+  "executions_planned": 44,
+  "records_written": 44,
+  "records_sha256": "f941116985ea3d6e1f63b71b0b051ccfb416d9098ba03b5440139e34b3424c38",
+  "status_counts": {
+    "verified": 44
+  },
+  "last_seq": 43
+}

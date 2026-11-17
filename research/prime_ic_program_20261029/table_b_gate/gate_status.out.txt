@@ -1,0 +1,33 @@
+## 1. validation_gate.check_evidence_dir (empty list = valid)
+docs/ic/runs: valid
+research/ic_validation_gate_20261024/B: valid
+benchmarks/20261029-prime-fb-size-20bit: valid
+research/prime_base_oracle_tuning_20261029: valid
+
+## 2. Table B prime rows: recomputed standing vs committed docs/ic/leaderboard.json
+icv1-fp10-t5-192cb216: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp12-t19-d4a315df: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp14-tm43-158b6914: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp16-t351-d433f24e: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp18-t175-45770ebc: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp20-t1293-3c2999ba: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp22-tm1267-a5acaf6d: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+icv1-fp24-t1577-77336155: recomputed='validated' committed='validated' evidence_dir=docs/ic/runs reasons=[] sweep=validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial in_pre_gate=False
+
+## 3. sweep-A band recompute for the prime rows (x reference at w = 0 / 0.1 / 1)
+icv1-fp10-t5-192cb216: board x_ref=6.338 band=6.263 / 6.242 / 6.109 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp12-t19-d4a315df: board x_ref=5.47 band=5.308 / 5.208 / 4.658 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp14-tm43-158b6914: board x_ref=6.429 band=6.273 / 6.272 / 6.263 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp16-t351-d433f24e: board x_ref=6.715 band=6.313 / 6.487 / 7.433 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp18-t175-45770ebc: board x_ref=5.819 band=5.653 / 5.756 / 6.276 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp20-t1293-3c2999ba: board x_ref=8.3 band=8.103 / 8.345 / 9.505 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp22-tm1267-a5acaf6d: board x_ref=10.5 band=10.24 / 10.66 / 12.64 pricing_ok=False protocol_frozen_ok=partial
+icv1-fp24-t1577-77336155: board x_ref=13.46 band=13.02 / 13.59 / 16.3 pricing_ok=False protocol_frozen_ok=partial
+
+## 4. audit_runs.digest_check on the 20-bit holdout session (no replay; no binary)
+research/prime_base_oracle_tuning_20261029/sessions/holdout-P20: ['records.jsonl is missing']
+session_id=ECBS1h685271327a8a env_class_id=ECBENV3hc4d998f5ae3f binary_sha256=bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9 git_commit=None records_on_disk=False
+
+## 5. fb-size replay certificate: independence block and promotion blockers
+{'same_binary_as_measurement': True, 'same_host_class_as_measurement': True, 'independent_implementation': False, 'independent_scalar_check': True}
+promotion_blockers: ['PROTOCOL.md section 13 requires a second-host replay (ecbench-independent-runner) before a leaderboard promotion; none exists. This validation does not meet that requirement and does not authorize promotion.']

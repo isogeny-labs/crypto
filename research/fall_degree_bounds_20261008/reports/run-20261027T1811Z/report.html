@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Fall degree E12b r2 run report</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.4;color:#111;margin:0}
+h1{font-size:17px}h2{font-size:13px;margin-top:16px}table{border-collapse:collapse;margin:6px 0}
+td,th{border:1px solid #bbb;padding:2px 6px;text-align:left}th{background:#f2f2f2}code{font-size:10px}
+.c{color:#c53030;font-weight:bold}img{width:100%}</style></head><body>
+<h1>Fall-degree bounds: E12b (ℓ against n at m = 3), relaunch r2. Run report</h1>
+<p><b>Outcome: inconclusive.</b> Three of four cells completed. The fourth (3:24:7) was cut off by a Spot reclaim after one draw.
+The one relaunch Amendment 11 allows is now used, so no registered reading is recorded.</p>
+<p><b>What ran.</b> Amendment 11 (E12b) of <code>research/fall_degree_bounds_20261008/PREREGISTRATION.md</code>, registered before any E12 draw.
+Engine <code>examples/hky_par.rs</code> at source commit <code>371035216942</code>, built on the instance from the S3 archive
+<code>fd-src-371035216942.tgz</code> (sha256 <code>4ae808ac…</code>). Launch card <code>e12/launch3.card.yaml</code> (receipt <code>e12/launch_receipt3/</code>).
+Job <code>20261027-181036-fd-e12b-ell-20261027-r2-409f97</code>: ephemeral Spot m7i.4xlarge (16 vCPU, 61 GB), us-east-1c, lab account.
+Draw rule: <code>ladder_sample</code> with seed 20261012, the first 4 draws with no solutions, <code>cmax = 4</code>.
+No isolation level was earned, so wall times are indications only and are not scored.</p>
+<p><b>Gates, all passed on this instance's binary.</b> 0: the three counter tests pass. 1: <code>e7/validate.sh</code> passes.
+2–3: <code>newcells</code> reproduces <code>e6/B_5-10-2.rerun</code>, <code>e6/B_3-18-6</code>, <code>e8/E8_4-8-2</code> and <code>e8/E8_5-8-2</code> (empty diffs).
+Lean: <code>lake build</code> of <code>FallDegree</code> passed (<code>out/lean/status</code>: <code>exit=0</code>).</p>
+<p><b>Interruption.</b> The command exited 143 at 19:06:09 UTC while running 3:24:7 draw 1. The runner logged “interrupted (spot reclaim)”.
+r1 (<code>e12/run-b1</code>) had stopped at the same point.</p>
+<h2>Graph</h2>
+<img src="e12b_r2_fall_degree.png">
+<p>Recorded <code>d_F</code> of the 13 r2 draws (red) against ℓ, with the four committed E10 draws of 3:21:7 (ℓ = 7, N = 42, on the diagonal) in grey for context.
+A hollow “≥5” marker is a draw whose degree-4 closure stopped without reaching 1. Source: <code>plot_e12b.py</code>.</p>
+<h2>Measured values (per draw)</h2>
+<table><tr><th>cell m:n:ℓ</th><th>N</th><th>status</th><th>d_F per draw</th><th>closure dim / columns at degrees 2, 3, 4</th><th>s per draw (16 threads)</th></tr>
+<tr><td>3:30:4</td><td>42</td><td>completed</td><td>4, 4, 4, 4</td><td>71/904; 3,197/12,384; 124,314/124,314</td><td>184–234</td></tr>
+<tr><td>3:27:5</td><td>42</td><td>completed</td><td>4, 4, 4, 4</td><td>68/904; 2,912/12,384; 124,314/124,314</td><td>160–167</td></tr>
+<tr><td>3:24:6</td><td>42</td><td>completed</td><td>4, 4, 4, 4</td><td>65/904; 2,628/12,384; 124,314/124,314</td><td>131–137</td></tr>
+<tr><td>3:24:7</td><td>45</td><td class="c">not completed (1 of 4)</td><td class="c">≥5</td><td>68/1,036; 2,842/15,226; 157,926/164,221</td><td>298</td></tr></table>
+<p><b>Reproduction.</b> r2 equals r1 on every non-timing field for all 13 draws: <code>d_F</code>, per-degree dimensions and rounds, <code>v_basis</code>, <code>x_r</code> and solution counts.
+Raw records: <code>e12/run-b2/out/E_*.jsonl</code>, with gate, build and Lean logs and <code>host.txt</code> beside them.</p>
+<h2>Against the registered rules (Amendment 11)</h2>
+<ul><li><b>“n-driven”</b> (3:30:4 and 3:27:5 both have median ≥ 5): <b>excluded</b>. Both medians are 4.</li>
+<li><b>“Consistent with H_ℓ”</b> (the ℓ ≤ 6 cells ≤ 4, and 3:24:7 at median ≥ 5): the first part holds. 3:24:7 is not completed, and its one finished draw is censored at ≥ 5.
+The amendment does not say whether one draw makes a median, so the choice between this reading and “mixed” is <b>left open</b>.
+Only a registered amendment or a completed 3:24:7 cell decides it.</li></ul>
+<p><b>Unregistered observation, not a reading.</b> At fixed N = 42, the degree-4 closure reaches the full space (124,314 columns) at ℓ = 4, 5 and 6.
+The single ℓ = 7 draw (N = 45) stops 6,295 columns short, as the diagonal cell 3:21:7 does. Toy size only; no exponent and no security claim.</p>
+</body></html>

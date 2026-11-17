@@ -1,0 +1,134 @@
+{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Modify",
+                "LogicalResourceId": "Project",
+                "PhysicalResourceId": "isolab-recovery-controller",
+                "ResourceType": "AWS::CodeBuild::Project",
+                "Replacement": "Conditional",
+                "Scope": [
+                    "Properties"
+                ],
+                "Details": [
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "Source",
+                            "RequiresRecreation": "Conditionally"
+                        },
+                        "Evaluation": "Dynamic",
+                        "ChangeSource": "DirectModification"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "SourceVersion",
+                            "RequiresRecreation": "Conditionally"
+                        },
+                        "Evaluation": "Dynamic",
+                        "ChangeSource": "DirectModification"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "SourceVersion",
+                            "RequiresRecreation": "Conditionally"
+                        },
+                        "Evaluation": "Static",
+                        "ChangeSource": "ParameterReference",
+                        "CausingEntity": "LauncherVersion"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "Source",
+                            "RequiresRecreation": "Conditionally"
+                        },
+                        "Evaluation": "Static",
+                        "ChangeSource": "ParameterReference",
+                        "CausingEntity": "LauncherKey"
+                    }
+                ]
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Modify",
+                "LogicalResourceId": "TriggerPolicy",
+                "PhysicalResourceId": "isola-Trigg-eZXkKAgyTPPI",
+                "ResourceType": "AWS::IAM::Policy",
+                "Replacement": "False",
+                "Scope": [
+                    "Properties"
+                ],
+                "Details": [
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "PolicyDocument",
+                            "RequiresRecreation": "Never"
+                        },
+                        "Evaluation": "Dynamic",
+                        "ChangeSource": "ResourceAttribute",
+                        "CausingEntity": "Project.Arn"
+                    }
+                ]
+            }
+        }
+    ],
+    "ChangeSetName": "pencil-source-20261029T2340Z",
+    "ChangeSetId": "arn:aws:cloudformation:us-east-2:104186811093:changeSet/pencil-source-20261029T2340Z/7a351943-9891-4488-b85d-3df5dc174b01",
+    "StackId": "arn:aws:cloudformation:us-east-2:104186811093:stack/isolab-recovery-controller/79087900-cd67-11f1-a438-06eb04ac751d",
+    "StackName": "isolab-recovery-controller",
+    "Description": "Approved package source key/version update only; preserve existing infrastructure and role bindings",
+    "Parameters": [
+        {
+            "ParameterKey": "ClusterSecurityGroup",
+            "ParameterValue": "sg-02a621bab6b0d9e64"
+        },
+        {
+            "ParameterKey": "PrivateSubnets",
+            "ParameterValue": "subnet-0ed67dc1e1b83132d,subnet-0fef4d36a1f2a37ff,subnet-023ccd74a57eb5a51"
+        },
+        {
+            "ParameterKey": "VpcId",
+            "ParameterValue": "vpc-04bee1e26f609d01c"
+        },
+        {
+            "ParameterKey": "LauncherVersion",
+            "ParameterValue": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg"
+        },
+        {
+            "ParameterKey": "LauncherKey",
+            "ParameterValue": "inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip"
+        },
+        {
+            "ParameterKey": "TriggerRoleName",
+            "ParameterValue": "isolab-remote-launcher-GitHubRole-FaCZneVBkF6D"
+        }
+    ],
+    "CreationTime": "2026-10-29T23:40:12.532000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [
+        "CAPABILITY_NAMED_IAM"
+    ],
+    "Tags": null,
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null,
+    "DeploymentConfig": {
+        "Mode": "STANDARD",
+        "DisableRollback": false
+    }
+}

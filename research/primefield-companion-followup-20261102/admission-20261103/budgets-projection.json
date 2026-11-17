@@ -1,0 +1,119 @@
+{
+  "schema": "primefield-admission-projection/v1",
+  "projected_at": "2026-11-03T22:13:11.847800+00:00",
+  "source_capture": "2026-11-03T22:06/22:07Z; recovered saved capture, not refreshed",
+  "source_sha256": "9716fe213e4517615ba179eac6cdf42faeabfcf0c34a7482dce5ac7e49a6ba95",
+  "records": [
+    {
+      "BudgetName": "isolab-daily-cost-100",
+      "BudgetLimit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "CalculatedSpend": {
+        "ActualSpend": {
+          "Amount": "131.13",
+          "Unit": "USD"
+        }
+      },
+      "TimeUnit": "DAILY",
+      "LastUpdatedTime": "2026-11-03T19:48:04.319000+00:00",
+      "CostFilters": null,
+      "CostTypes": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "FilterExpression": null
+    },
+    {
+      "BudgetName": "isolab-monthly-account-cost",
+      "BudgetLimit": {
+        "Amount": "1000.0",
+        "Unit": "USD"
+      },
+      "CalculatedSpend": {
+        "ActualSpend": {
+          "Amount": "350.379",
+          "Unit": "USD"
+        }
+      },
+      "TimeUnit": "MONTHLY",
+      "LastUpdatedTime": "2026-11-03T19:56:13.130000+00:00",
+      "CostFilters": null,
+      "CostTypes": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "FilterExpression": null
+    },
+    {
+      "BudgetName": "spot-experiments-daily-25",
+      "BudgetLimit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "CalculatedSpend": {
+        "ActualSpend": {
+          "Amount": "48.79",
+          "Unit": "USD"
+        }
+      },
+      "TimeUnit": "DAILY",
+      "LastUpdatedTime": "2026-11-03T19:56:27.624000+00:00",
+      "CostFilters": null,
+      "CostTypes": null,
+      "FilterExpression": {
+        "And": [
+          {
+            "Or": [
+              {
+                "Tags": {
+                  "Key": "SpotSystem",
+                  "Values": [
+                    "spot-experiments"
+                  ]
+                }
+              },
+              {
+                "Tags": {
+                  "Key": "project",
+                  "Values": [
+                    "isolab"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "Not": {
+              "Tags": {
+                "Key": "workload",
+                "Values": [
+                  "github-actions"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

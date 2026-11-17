@@ -1,0 +1,76 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Structured S4 complete-DLP smoke n=7",
+  "description": "Pursuit PROTOCOL Amendment 4; complete pipeline with incompletely priced native construction and splitting; L0 smoke.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 7
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202610230101
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "ic-direct",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "structured-s4-base-v1:dimension=2,family=geometric,seed=17",
+          "oracle": "structured-s4-oracle-v1:m=3,form=direct,degree=2,preclose=0,node_budget=20000,max_solutions=4096,max_cols=30000",
+          "max_trials": "100000"
+        }
+      }
+    },
+    {
+      "name": "ic-symmetric",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "structured-s4-base-v1:dimension=2,family=geometric,seed=17",
+          "oracle": "structured-s4-oracle-v1:m=3,form=symmetric,degree=2,preclose=1,node_budget=20000,max_solutions=4096,max_cols=30000",
+          "max_trials": "100000"
+        }
+      }
+    },
+    {
+      "name": "ic-pair-table",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "structured-s4-base-v1:dimension=2,family=geometric,seed=17",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "100000"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610230102,
+    "isolation_required": "L0",
+    "timeout_seconds": 900
+  }
+}

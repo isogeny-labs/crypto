@@ -1,0 +1,59 @@
+{
+  "kind": "prepared-generator-study-development-build/v1",
+  "status": "prepared-not-run-on-actual-cohort",
+  "source_base": "aefabc8be8df6d220a19a0716db3ee900ff96046",
+  "scope": "local development only",
+  "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+  "architecture": "x86_64",
+  "native_prefix": "/workspace/tools/sage_skeleton_env",
+  "dependencies": [
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libpari-gmp-tls.so.2.17.3",
+      "sha256": "415ae1211996efbcd5f0b38013ba03360556e1cc04336dbd5b4db804d3b8059b"
+    },
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libgmp.so.10.5.0",
+      "sha256": "71a072c91addce36c8abd431c35a0662f942bd373b04305f06d4878066323f87"
+    },
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libcrypto.so.3",
+      "sha256": "e5d4fdb07d258de9d336e2efb9595b14c6e7678fdbe457fda8870449b8803acd"
+    }
+  ],
+  "command": "GB_NATIVE_PREFIX=/workspace/tools/sage_skeleton_env GB_BUILD=/workspace/nist-generator-controls-build-002 sh research/nist_skip_criterion_20261025/generator_b_20261029/build-controls.sh",
+  "cwd": "/workspace/crypto-pr",
+  "exit_status": 0,
+  "build_directory": "/workspace/nist-generator-controls-build-002",
+  "producer_source_sha256": "2217a6f61c3b96dda629055a70c14b8763a1d10eb6404ec9348176c0a25c8fac",
+  "verifier_source_sha256": "8bde41aff257e76b1f27e1ede2bb9619a81b146ee6fd3194d678d6c4cc3d841d",
+  "fixture_source_sha256": "8967c1aa88841350d74f9762f12f71fb7b6ac9e80b78a24202d76574eaa5ee8a",
+  "production_flow": {
+    "planned": 1,
+    "attempted": 0,
+    "completed": 0,
+    "curve_choices_excluded": 0
+  },
+  "synthetic_integration": {
+    "completed": 1,
+    "input_class": "synthetic-development",
+    "independent_gmp_receipt": "controls/synthetic-verification.json",
+    "negative_controls": "controls/negative-controls.json",
+    "corruption_controls_passed": 9,
+    "headline_summary_independently_checked": true
+  },
+  "performance_or_security_claim": false,
+  "checkpoint_access": {
+    "environment_spec": "58",
+    "observations_current": true,
+    "secrets": 0,
+    "outbound_identities": 0,
+    "upload_completed": false
+  },
+  "metadata_preparation_errors": [
+    {
+      "id": "001",
+      "kind": "tool restriction",
+      "reason": "Node spawnSync returned EPERM for c++ --version despite captured status 0. Recorded version through direct shell command; no numerical computation affected."
+    }
+  ]
+}

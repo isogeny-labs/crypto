@@ -1,0 +1,65 @@
+//! Fast prime-field power-sum conversion and consecutive-sign recovery.
+#[path="../feature-native-half-gcd/polynomial.rs"]mod polynomial;
+#[path="../feature-native-inert-seed/lib.rs"]mod seed;
+#[path="../feature-native-standalone-source/lib.rs"]mod source;
+#[path="../feature-orbit-local-terms/local.rs"]mod group;
+#[derive(Debug,PartialEq)]pub enum Error{Domain,Limit,Sign,Source,Unresolved,Verification}
+#[derive(Debug,PartialEq)]pub struct Moments{pub count:u64,pub first:u64,pub singleton:Option<u64>}
+fn mul(a:u64,b:u64,r:u64)->u64{((a as u128*b as u128)%r as u128)as u64}
+fn pow(mut a:u64,mut n:u64,r:u64)->u64{let mut v=1;while n>0{if n&1!=0{v=mul(v,a,r)}a=mul(a,a,r);n>>=1}v}
+#[derive(Debug)]pub struct Conversion{pub coefficients:Vec<u64>,pub doublings:usize,pub karatsuba_calls:usize,pub reciprocal_steps:usize}
+/// Caller-certified prime, moments[0]=n<r, then n canonical power sums.
+/// The caller establishes that these are the intended roots' moments.
+/// Returns a monic degree-n polynomial, including repeated and zero roots.
+pub fn from_moments(r:u64,moments:&[u64],max_degree:usize)->Result<Conversion,Error>{
+ if r<5||r>u64::MAX/2||r%2==0||moments.is_empty(){return Err(Error::Domain)}
+ let count=moments[0];if count>=r{return Err(Error::Domain)}if count as u128>max_degree as u128{return Err(Error::Limit)}
+ let n=usize::try_from(count).map_err(|_|Error::Limit)?;let length=n.checked_add(1).ok_or(Error::Limit)?;
+ if moments.len()!=length||moments.iter().any(|&v|v>=r){return Err(Error::Domain)}
+ let mut inv=vec![0;length];if n>0{inv[1]=1}for j in 2..=n{inv[j]=r-mul(r/j as u64,inv[(r%j as u64)as usize],r)}
+ let mut h=vec![0;length];for j in 1..=n{h[j]=mul((r-moments[j])%r,inv[j],r)}
+ let mut p=polynomial::Poly::new(r).map_err(|_|Error::Domain)?;
+ let(mut q,mut precision,mut doublings)=(vec![1],1usize,0usize);
+ while precision<length{
+  let next=precision.saturating_mul(2).min(length);
+  let derivative:Vec<_>=(1..q.len()).map(|j|mul(j as u64,q[j],r)).collect();
+  let reciprocal=p.inv_series(&q,next-1).map_err(|_|Error::Domain)?;
+  let logarithmic_derivative=p.mul_low(&derivative,&reciprocal,next-1);
+  let mut correction=vec![0;next];correction[0]=1;
+  for j in 1..next{let log=mul(logarithmic_derivative.get(j-1).copied().unwrap_or(0),inv[j],r);correction[j]=(h[j]+r-log)%r}
+  q=p.mul_low(&q,&correction,next);q.resize(next,0);precision=next;doublings+=1;
+ }
+ // Deliberately retain the prescribed length: zero roots lower reversed degree.
+ q.resize(length,0);q.reverse();
+ Ok(Conversion{coefficients:q,doublings,karatsuba_calls:p.karatsuba_calls,reciprocal_steps:p.newton_steps})
+}
+fn as_error(e:seed::Error)->Error{match e{seed::Error::Limit=>Error::Limit,seed::Error::Sign=>Error::Sign,_=>Error::Domain}}
+pub struct Consecutive{r:u64,seed:seed::Consecutive}
+impl Consecutive{
+ pub fn new(r:u64,max_width:usize,max_points:usize,max_cm_attempts:u64)->Result<Self,Error>{Ok(Self{r,seed:seed::Consecutive::new(r,max_width,max_points,max_cm_attempts).map_err(as_error)?})}
+ pub fn roots(&self,signs:[i8;3],max_degree:usize)->Result<RootSet,Error>{
+  let n=self.seed.moments(signs,0,0).map_err(as_error)?[0];if n as u128>max_degree as u128{return Err(Error::Limit)}
+  let n=usize::try_from(n).map_err(|_|Error::Limit)?;let moments=self.seed.moments(signs,n,max_degree).map_err(as_error)?;
+  let c=from_moments(self.r,&moments,max_degree)?;Ok(RootSet{r:self.r,coefficients:c.coefficients,poly:polynomial::Poly::new(self.r).map_err(|_|Error::Domain)?})
+ }
+}
+include!("roots.rs");
+include!("recovery.rs");
+#[cfg(test)]mod fast_tests{
+ use super::*;
+ fn moments(roots:&[u64],r:u64)->Vec<u64>{let mut out=vec![0;roots.len()+1];for &x in roots{let mut v=1;for a in &mut out{*a=(*a+v)%r;v=mul(v,x,r)}}out}
+ fn product(roots:&[u64],r:u64)->Vec<u64>{let mut p=vec![1];for &x in roots{let mut q=vec![0;p.len()+1];for(j,&v)in p.iter().enumerate(){q[j]=(q[j]+mul(v,(r-x)%r,r))%r;q[j+1]=(q[j+1]+v)%r}p=q}p}
+ fn quadratic(mu:&[u64],r:u64)->Vec<u64>{let n=mu.len()-1;let mut q=vec![0;n+1];q[0]=1;for j in 1..=n{let mut s=0;for i in 1..=j{s=(s+mul(mu[i],q[j-i],r))%r}q[j]=mul((r-s)%r,pow(j as u64,r-2,r),r)}q.reverse();q}
+ #[test]fn exact_root_multisets_and_boundaries(){let mut cases=0;for r in [5,7,13,17,31,101]{for n in 0..r as usize{for mode in 0..3{let roots:Vec<_>=(0..n).map(|i|match mode{0=>i as u64,1=>((i/2)as u64)%r,_=>((i*i+3*i)as u64)%r}).collect();let mu=moments(&roots,r);let c=from_moments(r,&mu,n).unwrap();assert_eq!(c.coefficients,product(&roots,r));assert_eq!(c.coefficients,quadratic(&mu,r));cases+=1}}}
+  assert!(matches!(from_moments(7,&[],3),Err(Error::Domain)));assert!(matches!(from_moments(7,&[2,0],3),Err(Error::Domain)));assert!(matches!(from_moments(7,&[1,7],3),Err(Error::Domain)));assert!(matches!(from_moments(7,&[7],8),Err(Error::Domain)));assert!(matches!(from_moments(8,&[0],0),Err(Error::Domain)));assert!(matches!(from_moments(7,&[3,0,0,0],2),Err(Error::Limit)));println!("exact_multiset_cases={cases}");
+ }
+ #[test]fn larger_degree_polynomial_equality(){let r=65537;for n in [127,128,129,511,512,513,1024]{let roots:Vec<_>=(0..n).map(|i|((i*i+7*i)as u64)%r).collect();let mu=moments(&roots,r);let c=from_moments(r,&mu,n).unwrap();assert_eq!(c.coefficients,product(&roots,r));assert_eq!(c.coefficients,quadratic(&mu,r));assert!(c.karatsuba_calls>0&&c.reciprocal_steps>0);println!("degree={n} doublings={} karatsuba_calls={} reciprocal_steps={}",c.doublings,c.karatsuba_calls,c.reciprocal_steps)}}
+ #[test]fn triple_roots_and_frozen_recovery(){let mut classes=0;for r in [7,11,13,17,19,23,31,43,47,101,479]{let a=Consecutive::new(r,256,512,64).unwrap();let b=seed::Consecutive::new(r,256,512,64).unwrap();for s in [-1,1]{for t in [-1,1]{for u in [-1,1]{let signs=[s,t,u];assert_eq!(a.roots(signs,128).unwrap().polynomial(),b.roots(signs,128).unwrap().polynomial());classes+=1}}}}
+  let a=RecoverySource::new(509,2,10,479,[3,68],64,256,512,64,64,16).unwrap();let b=seed::RecoverySource::new(509,2,10,479,[3,68],64,256,512,64,64,16).unwrap();let mut cases=0;
+  for line in include_str!("../feature-native-monomial-recovery/recovery.tsv").lines().skip(1){let v:Vec<i64>=line.split('\t').map(|v|v.parse().unwrap()).collect();let target=if v[1]<0{None}else{Some([v[1]as u64,v[2]as u64])};let x=a.recover(target).unwrap();let y=b.recover(target).unwrap();assert_eq!(x.value,v[0]as u64);assert_eq!((x.value,&x.signs,x.initial_degree),(y.value,&y.signs,y.initial_degree));assert!(!a.verify((x.value+1)%479,target));cases+=1}
+  let mut t=a.curve.plus(Some(a.base),Some(a.base)).unwrap();t.y=(509-t.y)%509;assert_eq!(a.recover(Some([t.x,t.y])).unwrap().value,477);assert!(matches!(a.recover(Some([509,68])),Err(Error::Source)));
+  let capped=RecoverySource::new(509,2,10,479,[3,68],64,256,512,64,16,16).unwrap();assert!(matches!(capped.recover(Some([3,68])),Err(Error::Limit)));
+  let short=RecoverySource::new(509,2,10,479,[3,68],64,256,512,64,64,2).unwrap();assert!(matches!(short.recover(Some([3,68])),Err(Error::Unresolved)));
+  assert_eq!(cases,20);println!("triple_class_equalities={classes} frozen_recoveries={cases} transcripts_equal=true");
+ }
+}

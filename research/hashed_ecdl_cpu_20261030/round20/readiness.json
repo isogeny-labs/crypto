@@ -1,0 +1,36 @@
+{
+  "schema": "cpu-panel-preparation/v1",
+  "created": "2026-10-30T21:55:37Z",
+  "status": "prepared_not_frozen",
+  "executed": false,
+  "uploaded": false,
+  "submitted": false,
+  "planned_executions": 180,
+  "planned_measured": 162,
+  "planned_warmups": 18,
+  "candidate": {
+    "repository_commit": "fab61dde9ada8fafcaa4d15af735f3b422e886d0",
+    "integrated": true,
+    "binary": "candidate",
+    "binary_sha256": "332430e3d711b96d57568243942f7ac27be8fbf0c712417fe9eb6fefe03dade9",
+    "source_manifest_sha256": "b94eb330ebee6d248da6e011e4289fb529f7d7cec3a20bf16c253d99c5507748"
+  },
+  "previous": {
+    "repository_commit": "a6117b9ec7743d879223806b1cc28556ba83903e",
+    "integrated": true,
+    "binary": "previous",
+    "binary_sha256": "ee641162129944ac3955a9455d2c89007b3280c484e50715da20da0da6f1d5a2",
+    "source_manifest_sha256": "f06442a5dc1ed99630f109c8416221f75bfeee5d672afe1da8ea92ecffa97d75"
+  },
+  "source_contrasts": {
+    "candidate_vs_previous": "batch endpoint products only",
+    "previous_vs_pre_streaming": "streamed incidence only"
+  },
+  "remaining": [
+    "Native experiment.protocol/v1 schema and semantic validation",
+    "Commit pre-data frozen protocol and analysis binding",
+    "Extend and test native exporter for round20",
+    "Separate execution admission and eligible placement"
+  ],
+  "acceptance": "L0 diagnostics cannot establish the 10x goal; preserve isolated timed-primary and AA requirements"
+}

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T05:34:18Z",
+ "id": "PCC-20261117-904885",
+ "kind": "statement",
+ "producer": {
+  "commit": "94479f7e3eb9de9ae59b764d2b2b50b3238f0a44",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/source-fork-before-e742-intake-06/ACTUAL_STRICT_SOURCE_CHECKS_AND_COMMIT_RESOURCE_RECOVERY.json",
+    "sha256": "13ecadaf60cc31900fe3baee7c0f6c4ba7b9370bb6984afde974062f1b5b35c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/source-fork-before-e742-intake-06/ACTUAL_MISSING_EXPANDED_INDEX_BLOBS.json",
+    "sha256": "2841265357a37bd3136dc31fe316d50a63cbac26156b0d7aa10a8eb532e7ce09"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/source-fork-before-e742-intake-06/guarded-commit-trace.json",
+    "sha256": "308a73932f4ccdf98a6f9da68d2e17710907e1c74928aa958d17ada12930615e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The canonical source13 staging comparison initially detected two ignored Cargo.lock omissions. A command wrapper incorrectly continued to a commit attempt; it was interrupted before HEAD changed. Exact original locks were forced into the new index, then separately awaited source comparison against public0bc and cached whitespace checks both exited0. Lessons465 and autonomy200 record checks return0 errors; PR prose lint0. Four ordinary commit attempts stopped on missing unrelated expanded-index blobs or explicit interruption/12-second metadata timeout. The index contains507 missing sibling blobs,433 workflows. No active Git hooks exist, only samples. The next recovery is a standard commit-tree of the exact fully checked tree with a compare-and-swap local fast-forward, followed by normal GitHub CI/merge requirements; no gate, hook, trust or published-history change."
+}

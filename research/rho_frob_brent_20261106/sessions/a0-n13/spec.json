@@ -1,0 +1,48 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Brent detection in the fully priced Frobenius rho: Koblitz a=0 n=13",
+  "description": "Frozen in research/rho_frob_brent_20261106/PROTOCOL.md before its data. Only the walk policy differs between rho-frob and rho-frob-v2. Engineering; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202610181002,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "rho-frob-v2",
+      "role": "candidate",
+      "method": {
+        "id": "rho.signed_frobenius_v2_full"
+      }
+    },
+    {
+      "name": "rho-frob-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610182002,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

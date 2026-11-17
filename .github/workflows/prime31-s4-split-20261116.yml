@@ -1,0 +1,124 @@
+name: Prime31 S4 versus S3-chain Rust development gate
+
+on:
+  push:
+    branches: [research/prime31-s4-split-20261116, research/prime31-aps-walk-source-20261116]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-s4-split-20261116.yml
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-s4-split-20261116.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  split-s4:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install recorded Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Focused reused F4 library tests
+        run: cargo +1.100.0 test --locked --release --lib --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+      - name: Compare exact S4 with three S3-chain projected ideals on prime31
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --split-s4-f4
+      - name: Target-dependent prime31 m8 chained-S3 actual F4 versus frozen S4
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --m8-s3chain-f4
+      - name: Prime31 m8 rational-base quotient equivalence gate (Rust only)
+        timeout-minutes: 3
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_quotient_bridge
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_quotient_bridge
+      - name: Frozen prime31 two-anchor target-dependent m6 Rust F4 resource gate
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --anchor2-m6-f4
+      - name: Independent generic-only signed m6 support counter for 16 public prime31 targets
+        timeout-minutes: 4
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_anchor2_m6_support_validator
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_anchor2_m6_support_validator
+      - name: Prime31 symmetric m8 finite-root and signed-infinity exactness (Rust)
+        timeout-minutes: 3
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
+      - name: Exhaustive B8 symmetric m8 finite-root and infinity gate (Rust)
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate -- --exhaustive-b8
+      - name: Rust APS one-relation solver algebraic correctness tests
+        timeout-minutes: 2
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+      - name: Cold Rust APS single-relation solver on ordinary prime31
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --one
+      - name: Same-source Rust APS algebraic versus independent direct group join
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compare
+      - name: Same twelve held-out prime31 Q across five Rust APS partition sizes
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-sweep
+      - name: Fresh 24-target Rust APS paired size confirmation with A/A
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-confirm
+      - name: Fresh 24-target APS walk versus independent labels (Rust only)
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --walk-confirm
+      - name: Fresh 24-target Rust APS original vs Mersenne multiplier complete cold paired gate
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --mersenne-confirm
+      - name: Complete optimized Rust APS walk-Mersenne single prime31 public log
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --walk-mersenne-one
+      - name: Preregistered 24 fresh prime31 unequal APS cold solvers with repeat A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --unequal-confirm
+      - name: Preregistered fresh 24-Q Rust unequal-384 confirmation with A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --unequal-384-confirm
+      - name: Fresh 24-Q prime31 APS x-only S3 discriminant fibre comparison with A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --xfibre-confirm
+      - name: Fresh 24-Q exact-source affine versus Jacobian batched APS cold solver A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --jacbatch-confirm
+      - name: Preregistered 24 fresh-Q prime31 S3 factorized-coordinate root speed and exact transcript gate
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --factorized-s3-confirm
+      - name: Independent prospectively seeded 24-Q factorized S3 Rust confirmation
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --factorized-s3-fresh
+      - name: Prospective 32-Q post-Jacobian APS profile sweep with incumbent A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --post-jac-profile
+      - name: Fresh 24 Q packed open-addressed x APS versus HashMap compact and BSGS cold
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --packed-x-index-confirm
+      - name: Preregistered fresh 24 Q compact unique-x index APS versus old APS and cold BSGS
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compact-x-index-confirm
+      - name: Matched 24 Q fully cold factorized APS versus batched Jacobian BSGS with A/A
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-vs-bsgs-cold
+      - name: Preregistered 24-Q fully cold prime31 APS joint public jump batch vs packed source and BSGS
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --joint-jumps-confirm
+      - name: Twelve held-out complete prime31 Rust APS logarithms
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts

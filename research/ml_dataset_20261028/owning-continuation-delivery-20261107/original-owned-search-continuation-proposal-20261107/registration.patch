@@ -1,0 +1,24 @@
+--- a/src/ml_dataset/sat_original_owner.rs
++++ b/src/ml_dataset/sat_original_owner.rs
+@@ -971,6 +971,9 @@
+ #[path = "original_boolean_rows.rs"]
+ pub(in crate::ml_dataset::solvers) mod boolean_rows;
+ 
++#[path="original_boolean_search.rs"]
++pub(in crate::ml_dataset::solvers) mod boolean_search;
++
+ #[path = "affine_row_central.rs"]
+ pub(in crate::ml_dataset::solvers) mod affine_central;
+ #[path = "original_affine_rows.rs"]
+--- a/src/cryptanalysis/binary_semaev_chain_provenance.rs
++++ b/src/cryptanalysis/binary_semaev_chain_provenance.rs
+@@ -1167,6 +1167,9 @@
+ #[path = "checked_binary_sat_model.rs"]
+ pub mod checked_model;
+ 
++#[path="checked_binary_search_lift.rs"]
++pub mod signed_lift;
++
+ #[cfg(all(test, sat_qualification_child))]
+ #[path = "sat_qualification_reference.rs"]
+ pub mod qualification_reference;

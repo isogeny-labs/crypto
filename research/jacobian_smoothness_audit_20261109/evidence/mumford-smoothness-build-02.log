@@ -1,0 +1,18 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:90:67: error: unsolved goals
+a b c d : K
+q : K[X] := C (c ^ 2) - (X ^ 3 - C a * X ^ 2 + C (a ^ 2 - b) * X + C (-a ^ 3 + 2 * a * b))
+r : K[X] := C (residueX a b c d) * X + C (residueC a b c d)
+⊢ C c * C d * X * 2 + C c ^ 2 * X ^ 2 + C d ^ 2 + C 1 * X - X ^ 5 =
+    C c * C d * X * 2 + C c ^ 2 * X ^ 2 + C d ^ 2 + X - X ^ 5
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:112:15: error: unsolved goals
+case linear
+a b : K
+⊢ C b ^ 2 = C a ^ 5 - C a ↔ b ^ 2 = a ^ 5 - a
+'MumfordSmoothnessAudit.candidate_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.valid_cardinality' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

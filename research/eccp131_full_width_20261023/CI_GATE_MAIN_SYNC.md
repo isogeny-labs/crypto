@@ -1,0 +1,5 @@
+# Validation-gate source after concurrent main synchronization
+
+23 October 2026. PR #2437's branch acquired a concurrent merge from `origin/main` at `324f3677b0`, which was preserved by merging that branch into the transfer-audit worktree. Main changed `.github/workflows/validation-gate.yml` after the earlier [sparse-checkout repair report](CI_GATE.md): the current workflow frees preinstalled SDKs, checks out the full working tree at depth one, fetches the base tip, and runs the gate against that tip. This is the source now present in the merged PR branch; the earlier report remains evidence for its historical head and does not describe the current workflow.
+
+The full-width study's `MANIFEST.sha256` had pinned the previous workflow bytes, so the concurrent merge caused one expected digest mismatch. This note and the manifest update bind the current workflow content. `python3 scripts/validation_gate.py check --base origin/main` passed after the merge. The current-head hosted workflow remains the delivery gate; a local check does not substitute for it.

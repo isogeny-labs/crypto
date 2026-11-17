@@ -1,0 +1,260 @@
+name: Koblitz unknown-scalar panel
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - "research/weil_factor_composition_20260914/validation/dependencies.lock.txt"
+      - "Cargo.toml"
+      - "examples/koblitz_unknown_scalar_panel.rs"
+      - "examples/koblitz_public_factor_base_discovery.rs"
+      - "scripts/run_koblitz_unknown_scalar_panel.py"
+      - "scripts/test_koblitz_unknown_scalar_panel.py"
+      - "scripts/koblitz_stage23_terminal_evidence.py"
+      - "scripts/package_koblitz_stage23_terminal_evidence.py"
+      - "scripts/test_koblitz_stage23_terminal_evidence.py"
+      - "scripts/verify_koblitz_stage23_terminal_evidence.py"
+      - "scripts/koblitz_stage24_math_replay.py"
+      - "scripts/test_koblitz_stage24_math_replay.py"
+      - "scripts/run_koblitz_relation_yield_bridge.py"
+      - "scripts/process_meter.py"
+      - "src/cryptanalysis/koblitz_index_calculus.rs"
+      - "src/cryptanalysis/koblitz_pdp_phase_a.rs"
+      - "src/cryptanalysis/sat.rs"
+      - "src/cryptanalysis/semaev_sat.rs"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-23-unknown-scalar-protocol.json"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE23_UNKNOWN_SCALAR.md"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE23_RESULTS_20260910.md"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE23_TERMINAL_EVIDENCE.md"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE24_INDEPENDENT_MATH_REPLAY.md"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-23-terminal-evidence-protocol.json"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-23-unknown-scalar-production-successor-03-terminal-evidence-20260910.tar.gz"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-23-unknown-scalar-production-successor-03-terminal-evidence-20260910.tar.gz.sha256"
+      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-24-independent-math-replay-20260910/**"
+      - ".github/workflows/koblitz-unknown-scalar-panel.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  smoke-and-custody:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-unknown-scalar-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-unknown-scalar-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    # Debug info is not needed by any step here; without it the two debug
+    # builds (current and historical Stage-23 tree) fit a hosted runner's disk.
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_INCREMENTAL: "0"
+    steps:
+      # The full checkout plus a debug build of the crate no longer fits a
+      # hosted runner's disk (rustc exits 101 mid-build); free the unused SDKs.
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/sat_factor_base_review_20260908/continuation-05-sota-gates
+      - uses: dtolnay/rust-toolchain@stable
+      # This job builds current-source operational smoke. Its smoke profile
+      # binds the committed workspace lock; production keeps its archived lock.
+      # Do not replace Cargo.lock with a historical experiment dependency graph.
+      # Current-code validation uses the PR checkout's own Cargo.lock. The
+      # Stage-23 historical producer is checked independently from its sealed
+      # source closure and the archived Stage-20 lock below.
+      - name: Test Python control plane
+        run: python3 scripts/test_koblitz_unknown_scalar_panel.py
+      - name: Test compact terminal-evidence verifier
+        run: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_koblitz_stage23_terminal_evidence.py -q
+      - name: Check reviewed verifier pins and exercise compressed evidence
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import subprocess
+          import tarfile
+
+          stage = Path("research/sat_factor_base_review_20260908/continuation-05-sota-gates")
+          name = "stage-23-unknown-scalar-production-successor-03-terminal-evidence-20260910.tar.gz"
+          archive = stage / name
+          archive_sha256 = "7886a767b0fe0f3372bd034429e3616632c40ea1781de835602fa08b72e9dd44"
+          wrapper_sha256 = "c3a2431c7d6c99d0e9efcf13b441d00e86937220bd9a883faa42c47f12026da9"
+          core_sha256 = "93118d2e45700c81a19361f47dba57cf13e93e5314dfbc6036cfba33bb54682c"
+          bundle_seal_sha256 = "d2b096d39b9158e8da844d89c58732b83dfb9a38ebe08df4f1229a88a581ca5c"
+          bundle_manifest_sha256 = "0dc95216c59a5cd8f9aea6346c4336711f0fd4ef7b1c75481da9944118e5af48"
+          expected_checksum = f"{archive_sha256}  {name}\n"
+          assert (stage / f"{name}.sha256").read_text() == expected_checksum
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == archive_sha256
+          assert hashlib.sha256(Path("scripts/verify_koblitz_stage23_terminal_evidence.py").read_bytes()).hexdigest() == wrapper_sha256
+          assert hashlib.sha256(Path("scripts/koblitz_stage23_terminal_evidence.py").read_bytes()).hexdigest() == core_sha256
+          destination = Path(os.environ["RUNNER_TEMP"]) / "stage23-terminal-evidence"
+          destination.mkdir()
+          expected_root = "koblitz-stage23-unknown-scalar-production-successor-03-terminal-evidence-20260910"
+          with tarfile.open(archive, "r:gz") as packet:
+              members = packet.getmembers()
+              seen = set()
+              for member in members:
+                  path = PurePosixPath(member.name)
+                  assert not path.is_absolute() and ".." not in path.parts
+                  assert member.name == path.as_posix()
+                  assert member.name not in seen
+                  seen.add(member.name)
+                  assert path.parts and path.parts[0] == expected_root
+                  assert member.isfile() or member.isdir()
+              packet.extractall(destination, filter="data")
+          bundle_root = destination / expected_root
+          assert hashlib.sha256((bundle_root / "bundle-seal.json").read_bytes()).hexdigest() == bundle_seal_sha256
+          assert hashlib.sha256((bundle_root / "bundle-manifest.json").read_bytes()).hexdigest() == bundle_manifest_sha256
+          manifest = json.loads((bundle_root / "bundle-manifest.json").read_text())
+          closure = manifest["source_closure"]
+          assert closure["commit"] == "54c582009762603a3311c218e4f67f0c4cf32825"
+          assert closure["committed_tree_sha256"] == "aa7f8bb466bd19a0f41d92a6bb6204865e160fa68c425aa5091f65b67a3c76a8"
+          source_root = bundle_root / "source-tree"
+          source_hashes = {
+              "Cargo.toml": "43611c79a8692d99fc3146caf339ec72b4b93bf0ee1e2a8d50656558fa8beaa5",
+              "examples/koblitz_unknown_scalar_panel.rs": "9719ef7b1c457abf0563686881209cf5484d419a67dcdec47827b00293884ba3",
+              "src/cryptanalysis/koblitz_index_calculus.rs": "4dc220b31eb92a6895fc9c8f162b3b088ed1e49b4da23174e254dae2c4c7b2c0",
+          }
+          for relative, expected in source_hashes.items():
+              assert hashlib.sha256((source_root / relative).read_bytes()).hexdigest() == expected, relative
+          archived_lock = source_root / "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock"
+          assert hashlib.sha256(archived_lock.read_bytes()).hexdigest() == "712af6d0d82e4bb7fe5a36e2c419b2a7dabcbbfd71ba2e1af18e6a547436ab21"
+          result = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_koblitz_stage23_terminal_evidence.py",
+                  str(bundle_root),
+              ],
+              check=True,
+              text=True,
+              capture_output=True,
+              env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+          )
+          verification = json.loads(result.stdout)
+          assert verification["status"] == "compact_terminal_evidence_structurally_verified"
+          assert verification["task_count"] == 14
+          assert verification["completed_rows"] == verification["row_count"] == 5
+          assert verification["bundled_verifier_sources_executed"] is False
+          assert verification["scientific_measurement_admitted"] is False
+          assert verification["independent_mathematical_payload_replay_completed"] is False
+          assert verification["external_portable_verification_satisfied"] is False
+          assert verification["independent_external_reproduction_satisfied"] is False
+          assert verification["full_cost_gate_passed"] is False
+          assert verification["koblitz_index_calculus_sota"] is False
+          PY
+      - name: Test arbitrary-target Rust producer
+        run: cargo test --locked --example koblitz_unknown_scalar_panel
+      - name: Build and test producer from sealed historical source closure
+        run: |
+          bundle="$RUNNER_TEMP/stage23-terminal-evidence/koblitz-stage23-unknown-scalar-production-successor-03-terminal-evidence-20260910"
+          source_root="$bundle/source-tree"
+          historical_lock="$source_root/research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock"
+          printf '%s  %s\n' \
+            '43611c79a8692d99fc3146caf339ec72b4b93bf0ee1e2a8d50656558fa8beaa5' "$source_root/Cargo.toml" \
+            '9719ef7b1c457abf0563686881209cf5484d419a67dcdec47827b00293884ba3' "$source_root/examples/koblitz_unknown_scalar_panel.rs" \
+            '4dc220b31eb92a6895fc9c8f162b3b088ed1e49b4da23174e254dae2c4c7b2c0' "$source_root/src/cryptanalysis/koblitz_index_calculus.rs" \
+            '712af6d0d82e4bb7fe5a36e2c419b2a7dabcbbfd71ba2e1af18e6a547436ab21' "$historical_lock" \
+            | sha256sum --check
+          cp "$historical_lock" "$source_root/Cargo.lock"
+          CARGO_TARGET_DIR="$RUNNER_TEMP/stage23-historical-target" cargo test --locked --manifest-path "$source_root/Cargo.toml" --example koblitz_unknown_scalar_panel
+      - name: Replay retained production mathematics independently
+        run: |
+          if python3 -O -B scripts/koblitz_stage24_math_replay.py --help; then
+            echo "optimized Python unexpectedly enabled a PASS-capable replay"
+            exit 1
+          fi
+          cp -R \
+            research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-24-independent-math-replay-20260910/blake3-helper \
+            "$RUNNER_TEMP/stage24-blake3-helper"
+          # Its archived lock includes cc 1.4.5, which the current smoke build
+          # need not download. Populate that exact dependency before offline build.
+          cargo fetch --locked \
+            --manifest-path "$RUNNER_TEMP/stage24-blake3-helper/Cargo.toml"
+          cargo build --offline --locked --release \
+            --manifest-path "$RUNNER_TEMP/stage24-blake3-helper/Cargo.toml"
+          bundle="$RUNNER_TEMP/stage23-terminal-evidence/koblitz-stage23-unknown-scalar-production-successor-03-terminal-evidence-20260910"
+          helper="$RUNNER_TEMP/stage24-blake3-helper/target/release/stage24-independent-blake3"
+          python3 -B scripts/koblitz_stage24_math_replay.py \
+            --bundle "$bundle" \
+            --blake3-helper "$helper" \
+            > "$RUNNER_TEMP/stage24-replay.json"
+          python3 -B scripts/test_koblitz_stage24_math_replay.py \
+            --bundle "$bundle" \
+            --blake3-helper "$helper" \
+            --expected-result \
+              research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-24-independent-math-replay-20260910/replay-result.json
+      - name: Run and verify full outer-metered smoke
+        run: |
+          mkdir -p "$RUNNER_TEMP/stage23-run-outer"
+          python3 scripts/run_koblitz_unknown_scalar_panel.py plan \
+            --profile smoke \
+            --allow-dirty \
+            --output "$RUNNER_TEMP/stage23-run" \
+            > "$RUNNER_TEMP/stage23-plan.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+
+          root = Path(os.environ["RUNNER_TEMP"])
+          plan = json.loads((root / "stage23-plan.json").read_text())
+          subprocess.run(plan["outer_command"], check=True)
+          metrics = json.loads((root / "stage23-run-outer/driver.metrics.json").read_text())
+          if metrics["returncode"] != 0 or metrics["timed_out"] or metrics["orphan_group_terminated"]:
+              print((root / "stage23-run-outer/driver.stderr").read_text())
+              raise SystemExit("Stage-23 outer smoke failed")
+          PY
+          python3 scripts/run_koblitz_unknown_scalar_panel.py verify \
+            --run-root "$RUNNER_TEMP/stage23-run" \
+            --outer-metrics "$RUNNER_TEMP/stage23-run-outer/driver.metrics.json" \
+            --output "$RUNNER_TEMP/stage23-verification"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"])
+          summary = json.loads((root / "stage23-run/run-summary.json").read_text())
+          verification = json.loads((root / "stage23-verification/verification.json").read_text())
+          assert summary["status"] == "complete_verified_panel"
+          assert summary["completed_rows"] == summary["expected_rows"] == 2
+          assert all(row["row_complete"] for row in summary["rows"])
+          assert all(row["recovered_scalars_match"] for row in summary["rows"])
+          assert verification["scientific_measurement_admitted"] is False
+          assert verification["measurement_admission_status"] == "operational_smoke_only"
+          assert verification["full_cost_gate_passed"] is False
+          assert verification["koblitz_index_calculus_sota"] is False
+          PY

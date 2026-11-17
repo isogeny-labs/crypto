@@ -1,0 +1,74 @@
+⚠ [1223/1223] Replayed TernaryPacket
+warning: TernaryPacket.lean:41:21: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: TernaryPacket.lean:41:21: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:44:29: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: TernaryPacket.lean:44:29: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:47:33: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+warning: TernaryPacket.lean:47:29: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:47:33: Unused tactic linter: `abel` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:66:30: This simp argument is unused:
+  d10
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [pairAction, d20, d21, d11, d12, d22, show (2 : Digit) + 1 = 0 from by decide, rot, invRot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: TernaryPacket.lean:83:47: This simp argument is unused:
+  d10
+
+Hint: Omit it from the simp argument list.
+  [apply] simp_all [row, col, tagAction, pairAction, d20, d21, d11, d12, d22, show (2 : Digit) + 1 = 0 from by decide,
+    dn1, dn2, rot, invRot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: TernaryPacket.lean:84:74: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+warning: TernaryPacket.lean:84:70: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:84:74: Unused tactic linter: `abel` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: TernaryPacket.lean:128:8: This simp argument is unused:
+  Nat.card_fun
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Digit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: TernaryPacket.lean:206:0: 'TernaryPacket.rot_thrice' depends on axioms: [propext]
+info: TernaryPacket.lean:207:0: 'TernaryPacket.rot_invRot' depends on axioms: [propext]
+info: TernaryPacket.lean:208:0: 'TernaryPacket.invRot_rot' depends on axioms: [propext]
+info: TernaryPacket.lean:209:0: 'TernaryPacket.pairAction_zero' depends on axioms: [propext, Quot.sound]
+info: TernaryPacket.lean:210:0: 'TernaryPacket.tagAction_zero' depends on axioms: [propext, Quot.sound]
+info: TernaryPacket.lean:211:0: 'TernaryPacket.pairAction_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:212:0: 'TernaryPacket.tagAction_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:213:0: 'TernaryPacket.digit_locality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:214:0: 'TernaryPacket.slotAction_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:215:0: 'TernaryPacket.slotAction_translate' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:216:0: 'TernaryPacket.orbit_fiber_uniform' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:217:0: 'TernaryPacket.slot_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:218:0: 'TernaryPacket.orbit_fiber_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:219:0: 'TernaryPacket.slot_locality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:220:0: 'TernaryPacket.rot_fixed_iff' depends on axioms: [propext]
+info: TernaryPacket.lean:221:0: 'TernaryPacket.invRot_fixed_iff' depends on axioms: [propext]
+info: TernaryPacket.lean:222:0: 'TernaryPacket.tagAction_one_fixed_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:223:0: 'TernaryPacket.noThreeTorsion67' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:224:0: 'TernaryPacket.rot_fixed_iff67' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TernaryPacket.lean:225:0: 'TernaryPacket.tagAction_one_fixed_iff67' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1223 jobs).

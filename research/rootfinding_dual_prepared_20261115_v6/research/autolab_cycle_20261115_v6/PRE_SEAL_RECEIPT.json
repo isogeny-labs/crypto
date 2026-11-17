@@ -1,0 +1,77 @@
+{
+  "schema": "sealed-ledger-parent/v1",
+  "sealed_path": "lab/ledger_sealed_20261115_v6",
+  "journal_sha256": "df261d96d89b8e4ead44caa1c6a91a8321bfc929572ae6c06843328790aa1f3a",
+  "journal_bytes": 74624292,
+  "state_sha256": "2ce2e748d2428b39640df391b21182f3a6c3b4819f2e0a1ad606e33c4ff921af",
+  "program_sha256": "2d2cf94c4ac6881301885e59b8464975a5056cef39e60fdc546af8b336e2a30b",
+  "journal_records": 151,
+  "terminal_record_sha256": "3777ca68018f6b255cbffae67cadb2ac93b23d97388e7b8145a77b82ddac73ad",
+  "terminal_state_equal": true,
+  "all_attempts_preserved": true,
+  "attempt_count": 32,
+  "experiment_status": {
+    "binary-trace-support-20261113-v1": "passed",
+    "cubic-cached-controls-20261115-v4": "passed",
+    "cubic-cached-profile-20261115-v4": "passed",
+    "exact-btf-20261115-v3": "passed",
+    "expanded-bernstein-controls-20261113-v1": "passed",
+    "expanded-bernstein-profile-20261113-v1": "passed",
+    "extension-correlations-20261112-v1": "passed",
+    "extension-oracle-20261111-v1": "passed",
+    "joint-frobenius-20261112-v1": "passed",
+    "lifted-4d-controls-20261112-v1": "passed",
+    "lifted-4d-profile-20261112-v1": "passed",
+    "masked-union-controls-20261111-v1": "passed",
+    "masked-union-profile-20261111-v1": "passed",
+    "metric-bench-20261110-v1": "passed",
+    "metric-controls-20261110-v1": "passed",
+    "odd-regular-controls-20261115-v4": "passed",
+    "paired-factor-20261115-v1": "passed",
+    "quartic-cell-controls-20261114-v1": "passed",
+    "quartic-cell-profile-20261114-v1": "passed",
+    "quartic-support-oracle-20261114-v1": "passed",
+    "quintic-boolean-cell-20261115-v5": "error",
+    "regular-block-controls-20261115-v2": "passed",
+    "regular-block-profile-20261115-v2": "passed",
+    "regular-ore-controls-20261115-v3": "passed",
+    "regular-ore-profile-20261115-v3": "passed",
+    "source-bernstein-controls-20261112-v1": "passed",
+    "two-candidate-controls-20261115-v1": "inconclusive",
+    "two-candidate-profile-20261115-v1": "pending",
+    "two-candidate-repair-controls-20261115-v2": "passed",
+    "width5-controls-20261112-v1": "passed",
+    "width5-profile-20261112-v1": "passed",
+    "width5-wide16-controls-20261112-v1": "passed",
+    "width5-wide16-profile-20261112-v1": "passed"
+  },
+  "prior_parent": {
+    "sealed_path": "lab/ledger_sealed_20261109_v2",
+    "journal_sha256": "9252070d7ab65a82c41eb0c8b968ca3256c92c54ef323d3f7f4a13ab0662a785",
+    "state_sha256": "b55876c594271ea35955692eb37ae9a0e1e37dfcc0a2fff31b2e8692bd4bfe4d",
+    "journal_records": 16,
+    "terminal_record_sha256": "ddfa5635c84549080ec8d8289b965518292a809c14656e92fe3fb98b18807978",
+    "terminal_state_equal": true,
+    "all_attempts_preserved": true,
+    "validation": {
+      "integrity": "passed",
+      "journal_records": 16,
+      "problems": [],
+      "release_gate": {
+        "approved": false,
+        "evaluation": "external_gate_required"
+      }
+    }
+  },
+  "validation": {
+    "integrity": "passed",
+    "journal_records": 151,
+    "problems": [],
+    "release_gate": {
+      "approved": false,
+      "evaluation": "external_gate_required"
+    }
+  },
+  "program_before_seal": "PROGRAM_BEFORE_SEAL.json",
+  "fingerprint_guard": "New registrations must reject fingerprints found in this sealed epoch as well as the active ledger."
+}

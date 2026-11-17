@@ -1,0 +1,16 @@
+TwistKernelSymmetry.lean:17:39: error: failed to synthesize
+  Decidable (∀ (v : V), iterate 8 v = (3 * v.fst, 3 * v.snd))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+TwistKernelSymmetry.lean:20:27: error: failed to synthesize
+  Decidable (∀ (v : V), iterate 48 v = v)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+TwistKernelSymmetry.lean:23:52: error: failed to synthesize
+  Decidable (∀ (v : V), v ≠ (0, 0) → ∀ (k : Fin 48), k ≠ 0 → iterate (↑k) v ≠ v)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+TwistKernelSymmetry.lean:32:61: error: failed to synthesize
+  Decidable (∀ (v : V), v ≠ (0, 0) → sameLine v (iterate 8 v) ∧ ∀ (k : Fin 8), k ≠ 0 → ¬sameLine v (iterate (↑k) v))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.

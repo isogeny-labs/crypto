@@ -1,0 +1,20 @@
+{
+  "status": "rejected metadata attempt",
+  "source": "f4c3ddb",
+  "output_sha256": "c47bcf698e0ebed1643ef28dfd21b1e4aded8ab9b09aa96be48c2ad8c995e96e",
+  "reason": "Independent structural comparison caught one-ULP changes in existing floating-point metadata during default serde_json parsing.",
+  "examples": [
+    {
+      "round": "round-0018",
+      "expected": 1.1689673958113487,
+      "actual": 1.168967395811349
+    },
+    {
+      "round": "round-0018b",
+      "expected": 1.4054841639993305,
+      "actual": 1.4054841639993303
+    }
+  ],
+  "fix": "Enable serde_json float_roundtrip and regenerate from the unchanged frozen browser; retain exact old-value equality checks.",
+  "scientific_records_changed": false
+}

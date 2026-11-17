@@ -1,0 +1,91 @@
+# ecdb on a NAS or any Docker host on your LAN: a local Postgres 16, the
+# ecdb HTTP API and MCP endpoint on port 8080, and a one-shot `sync` that
+# copies the deployed catalogue into the local database. See README.md.
+#
+#   cp .env.example .env            # then set the passwords and ECDB_TOKEN
+#   docker compose up -d --build    # Postgres + API (empty catalogue)
+#   docker compose run --rm sync    # copy the deployed ecdb into it
+name: ecdb
+
+x-ecdb-image: &ecdb-image
+  image: ecdb:local
+  build:
+    context: ../../..          # repository root: the image carries docs/curves for `ecdb import`
+    dockerfile: ecdb/Dockerfile
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ecdb
+      POSTGRES_USER: ecdb_admin
+      POSTGRES_PASSWORD: ${ECDB_ADMIN_PASSWORD:?set ECDB_ADMIN_PASSWORD in .env}
+    volumes:
+      - ${ECDB_DATA_DIR:-./pgdata}:/var/lib/postgresql/data
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecdb_admin -d ecdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    # Postgres is reachable only from the other containers. To query it from
+    # the LAN (psql, DBeaver), publish it:
+    # ports: ["5432:5432"]
+
+  # Migrations and the read-only API login; runs to completion on every `up`.
+  bootstrap:
+    <<: *ecdb-image
+    command: ["bootstrap"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://ecdb_admin:${ECDB_ADMIN_PASSWORD}@db:5432/ecdb
+      ECDB_PG_TLS: disable
+      ECDB_API_PASSWORD: ${ECDB_API_PASSWORD:?set ECDB_API_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *ecdb-image
+    command: ["serve"]
+    restart: unless-stopped
+    ports:
+      - "${ECDB_PORT:-8080}:8080"
+    environment:
+      # The API connects as ecdb_api (member of ecdb_reader): it cannot write,
+      # and POST /v1/sql runs as ecdb_reader.
+      DATABASE_URL: postgres://ecdb_api:${ECDB_API_PASSWORD}@db:5432/ecdb
+      ECDB_PG_TLS: disable
+      ECDB_SQL_ROLE: ecdb_reader
+      ECDB_LISTEN: 0.0.0.0:8080
+      ECDB_POOL_SIZE: "8"
+      # Empty: reads are open to anyone who can reach the port.
+      ECDB_READ_TOKEN: ${ECDB_LAN_TOKEN:-}
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    healthcheck:
+      # bash's /dev/tcp: the image has no curl.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /healthz HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"ok\":true' <&3"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Copy the deployed catalogue (or ECDB_URL) into the local database.
+  # Not started by `up`; run it with `docker compose run --rm sync`.
+  sync:
+    <<: *ecdb-image
+    command: ["sync"]
+    profiles: ["sync"]
+    restart: "no"
+    environment:
+      # Superuser: the load switches foreign-key triggers off.
+      DATABASE_URL: postgres://ecdb_admin:${ECDB_ADMIN_PASSWORD}@db:5432/ecdb
+      ECDB_PG_TLS: disable
+      ECDB_URL: ${ECDB_URL:-https://l6zg6lz4dr45t75p5qn5aocnme0pckrm.lambda-url.us-west-2.on.aws}
+      ECDB_TOKEN: ${ECDB_TOKEN:?set ECDB_TOKEN (the deployed API read token) in .env}
+      ECDB_SYNC_REPLACE: ${ECDB_SYNC_REPLACE:-false}
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully

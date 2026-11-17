@@ -1,0 +1,17 @@
+{
+  "schema": "artifact-path-validation/v1",
+  "scope": "manifest entry names, digests and byte lengths; tracked manifest parent containment",
+  "pre_patch": "Parent traversal accepted in disposable file:// remote reproduction; existing artifact tests did not cover it.",
+  "tests": [
+    "reject parent traversal, nested path, backslash path, empty and dot names",
+    "reject boolean/negative sizes, malformed digest and non-object entry",
+    "reject symlinked manifest parent outside checkout",
+    "retain ordinary verified local-store hydration and tracked-file preservation controls"
+  ],
+  "existing_entry_inventory": 8204,
+  "existing_invalid_names": 0,
+  "existing_invalid_metadata": 0,
+  "frozen_artifacts_changed": false,
+  "source_sha256": "73ec12992cef4b9442e0a1d87750f1ddd102bbf4a4b4064c33bc7030eb049f2e",
+  "artifact_tests_passed": 46
+}

@@ -1,0 +1,39 @@
+import ZeroSlope
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace IndependentZeroSlope
+open Polynomial MixedCancellation SameUMixed SameUZeroSlope
+def a : D2 ℚ := ⟨0,0,24,0,2,3⟩
+def b : D2 ℚ := ⟨0,0,108,0,3,2⟩
+theorem va : validTwo (X^5:ℚ[X]) a := by
+ norm_num [validTwo,nq,nr,ns,nt,a]
+ refine ⟨X^3-1,?_⟩
+ simp only [MixedCancellation.support,ordinate,C_0,C_1];ring
+theorem vb : validTwo (X^5:ℚ[X]) b := by
+ norm_num [validTwo,nq,nr,ns,nt,b]
+ refine ⟨X^3-(C 2)^2,?_⟩
+ norm_num [MixedCancellation.support,ordinate] <;> ring
+example : sourceK a b≠0 := by
+ exact source_zero_slope_excluded (X^5:ℚ[X]) a b
+  (by norm_num [a]) (by norm_num [a]) (by norm_num [b]) (by norm_num [b])
+  va vb (by norm_num [a,b,crossQ]) (by norm_num [a,b,crossR])
+  (by norm_num [a,b,crossS,crossT]) (by norm_num [a,b,crossS,crossT])
+example : sourceK a b = -1296 := by norm_num [sourceK,a,b]
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+def c : D2 (ZMod 2) := ⟨0,0,0,0,1,1⟩
+def d : D2 (ZMod 2) := ⟨0,0,1,0,1,1⟩
+theorem vc : validTwo (X^5:(ZMod 2)[X]) c := by
+ norm_num [validTwo,nq,nr,ns,nt,c]
+ refine ⟨X^3,?_⟩
+ simp [MixedCancellation.support,ordinate] <;> ring
+theorem vd : validTwo (X^5:(ZMod 2)[X]) d := by
+ norm_num [validTwo,nq,nr,ns,nt,d]
+ refine ⟨X^3-1,?_⟩
+ simp [MixedCancellation.support,ordinate] <;> ring
+example : sourceK c d≠0 := by
+ exact source_zero_slope_excluded (X^5:(ZMod 2)[X]) c d
+  (by norm_num [c]) (by norm_num [c]) (by norm_num [d]) (by norm_num [d])
+  vc vd (by norm_num [c,d,crossQ]) (by norm_num [c,d,crossR])
+  (by norm_num [c,d,crossS,crossT]) (by norm_num [c,d,crossS,crossT])
+end IndependentZeroSlope

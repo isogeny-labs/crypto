@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-11-05T19:51:49.821108+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-multiseed-factor/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-multiseed-factor-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-multiseed-factor-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 14,
+  "binary_sha256": "b2eeef132835694860c9cdbd156cda1ba7a561e1cca1c8c8fadcbbf9042882c8",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

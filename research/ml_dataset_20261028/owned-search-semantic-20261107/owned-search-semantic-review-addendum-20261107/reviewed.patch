@@ -1,0 +1,20 @@
+--- previous-reviewed/replay_capture.py
++++ final/replay_capture.py
+@@ -54,6 +54,8 @@
+             'scope':'committed basis identities relative to captured normalized equations and branch constraints',
+             'rows':rows,'verified_rows':sum(r['status']=='verified' for r in rows),'lineages':lineages,
+             'work':work,'allocation_units':allocated,'limits':vars(limits),
++            'work_scope':'lineage plus row replay; capture decoding has separate limits',
++            'allocation_scope':'row replay only; selected decoding has separate retention budget',
+             'original_descent_verified':False,'signed_lifts_replayed':False,
+             'complete_search_replayed':False,'groebner_basis_complete':False,
+             'first_fall_degree':None,'last_fall_degree':None,'degree_of_regularity':None}
+@@ -85,7 +87,7 @@
+         try:extracted=inspect_selected(iterator)
+         finally:iterator.close()
+         result=replay_snapshots([{'retained':extracted['retained']}],limits,wire_variables=a.variables)
+-        result['wire_variables_argument']=a.variables;result['wire']=extracted['wire'];result['capture_chain_verified']=False
++        result['retention']=extracted['retention'];result['wire_variables_argument']=a.variables;result['wire']=extracted['wire'];result['capture_chain_verified']=False
+         result['source_identity_matches_supplied_hashes']=False
+     print(json.dumps(result,sort_keys=True))
+     return 0 if result['status']=='verified_selected_rows' else 2

@@ -1,0 +1,60 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t535-c83443b0 | 19.89 | pair-table-b128 | 36/36 | 20.170 | 20.735 | 25.819 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | rho-lanes16 | 36/36 | 1.398 | 1.520 | 2.620 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | rho-neg | 36/36 | 1.138 | 1.235 | 2.106 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b128 | 36/36 | 13.952 | 15.427 | 28.709 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b16 | 36/36 | 6.110 | 6.648 | 11.494 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b2 | 36/36 | 3.732 | 4.008 | 6.493 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b32 | 36/36 | 7.687 | 8.400 | 14.813 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b4 | 36/36 | 4.539 | 4.899 | 8.140 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b64 | 36/36 | 11.133 | 12.241 | 22.215 | — |
+| icv1-fp20-t535-c83443b0 | 19.89 | sweep-b8 | 36/36 | 4.889 | 5.291 | 8.905 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs rho-lanes16 | rho-lanes16 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs rho-neg | rho-neg < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b128 | unresolved inside the band |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b16 | sweep-b16 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b2 | sweep-b2 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b32 | sweep-b32 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b4 | sweep-b4 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b64 | sweep-b64 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | pair-table-b128 vs sweep-b8 | sweep-b8 < pair-table-b128 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs rho-neg | rho-neg < rho-lanes16 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b128 | rho-lanes16 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b16 | rho-lanes16 < sweep-b16 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b2 | rho-lanes16 < sweep-b2 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b32 | rho-lanes16 < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b4 | rho-lanes16 < sweep-b4 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b64 | rho-lanes16 < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | rho-lanes16 vs sweep-b8 | rho-lanes16 < sweep-b8 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b128 | rho-neg < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b16 | rho-neg < sweep-b16 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b2 | rho-neg < sweep-b2 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b32 | rho-neg < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b4 | rho-neg < sweep-b4 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b64 | rho-neg < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | rho-neg vs sweep-b8 | rho-neg < sweep-b8 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b16 | sweep-b16 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b2 | sweep-b2 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b32 | sweep-b32 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b4 | sweep-b4 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b64 | sweep-b64 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b128 vs sweep-b8 | sweep-b8 < sweep-b128 |
+| icv1-fp20-t535-c83443b0 | sweep-b16 vs sweep-b2 | sweep-b2 < sweep-b16 |
+| icv1-fp20-t535-c83443b0 | sweep-b16 vs sweep-b32 | sweep-b16 < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | sweep-b16 vs sweep-b4 | sweep-b4 < sweep-b16 |
+| icv1-fp20-t535-c83443b0 | sweep-b16 vs sweep-b64 | sweep-b16 < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | sweep-b16 vs sweep-b8 | sweep-b8 < sweep-b16 |
+| icv1-fp20-t535-c83443b0 | sweep-b2 vs sweep-b32 | sweep-b2 < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | sweep-b2 vs sweep-b4 | sweep-b2 < sweep-b4 |
+| icv1-fp20-t535-c83443b0 | sweep-b2 vs sweep-b64 | sweep-b2 < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | sweep-b2 vs sweep-b8 | sweep-b2 < sweep-b8 |
+| icv1-fp20-t535-c83443b0 | sweep-b32 vs sweep-b4 | sweep-b4 < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | sweep-b32 vs sweep-b64 | sweep-b32 < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | sweep-b32 vs sweep-b8 | sweep-b8 < sweep-b32 |
+| icv1-fp20-t535-c83443b0 | sweep-b4 vs sweep-b64 | sweep-b4 < sweep-b64 |
+| icv1-fp20-t535-c83443b0 | sweep-b4 vs sweep-b8 | sweep-b4 < sweep-b8 |
+| icv1-fp20-t535-c83443b0 | sweep-b64 vs sweep-b8 | sweep-b8 < sweep-b64 |

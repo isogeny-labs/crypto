@@ -1,0 +1,98 @@
+name: ECC2K-130 symbolic DAG DIMACS Linux v2 held replay
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/**'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+jobs:
+  exact-head-hash-and-archive-replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile and verify inherited and v2 frozen bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          python3 -m py_compile research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/{ci_replay,run,v2_child,selftest,held_cap_control}.py
+          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/ci_replay.py
+      - name: Prove both entrypoints remain nonmeasuring on this exact checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/v2_child.py --gate-only
+          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/run.py \
+            --gate-only --expected-head "${{ github.event.pull_request.head.sha }}"
+          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/selftest.py
+      - name: Control uncapped supervisor Git and GitHub API reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin main
+          git merge-base --is-ancestor c739ccf69972c0c0c7c79323d42548a5d319cdcc origin/main
+          test "$(gh pr view 804 --repo aburan28/crypto --json headRefOid --jq .headRefOid)" = "ca5cdef8b24c6118b5c1c9bb2b8faa8d1774533b"
+          test "$(gh pr view 831 --repo aburan28/crypto --json headRefOid --jq .headRefOid)" = "2f0489cf638168dd8a62b719f9c60fd1ea203bee"
+          test "$(gh pr view "${{ github.event.pull_request.number }}" --repo aburan28/crypto --json headRefOid --jq .headRefOid)" = "${{ github.event.pull_request.head.sha }}"
+          test "$(gh api repos/aburan28/crypto/actions/runs/${{ github.run_id }} --jq .head_sha)" = "${{ github.event.pull_request.head.sha }}"
+          workflow_id="$(gh api repos/aburan28/crypto/actions/runs/${{ github.run_id }} --jq .workflow_id)"
+          gh api --paginate --jq '.workflow_runs[] | @json' \
+            "repos/aburan28/crypto/actions/workflows/$workflow_id/runs?event=pull_request&per_page=100" \
+            > "$RUNNER_TEMP/dag-linux-v2-supervisor-runs-${{ github.run_id }}.jsonl"
+          python3 -c 'import json, os, sys; assert int(os.environ["GITHUB_RUN_ID"]) in [json.loads(line)["id"] for line in sys.stdin if line.strip()]' \
+            < "$RUNNER_TEMP/dag-linux-v2-supervisor-runs-${{ github.run_id }}.jsonl"
+      - name: Control harmless gh, Git and preparation gate under toy RLIMIT_AS
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/held_cap_control.py \
+            --expected-head "${{ github.event.pull_request.head.sha }}" \
+            --out "$RUNNER_TEMP/dag-linux-v2-held-cap-${{ github.run_id }}.json"
+      - name: Preserve harmless held cap control
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dag-linux-v2-held-cap-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            ${{ runner.temp }}/dag-linux-v2-held-cap-${{ github.run_id }}.json
+            ${{ runner.temp }}/dag-linux-v2-supervisor-runs-${{ github.run_id }}.jsonl

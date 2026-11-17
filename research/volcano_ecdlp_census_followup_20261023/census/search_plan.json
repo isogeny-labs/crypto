@@ -1,0 +1,21 @@
+{
+  "schema": "volcano-census.search-plan/v1",
+  "study": "volcano_ecdlp_census_followup_20261023",
+  "recorded_before": "any V5 or V6 search (written and committed first)",
+  "b": 26,
+  "min_n": 262144,
+  "max_cofactor": 64,
+  "seed_streams": {"V5": "20261401 + i", "V6": "20261501 + i"},
+  "forbidden_seeds": [7],
+  "forbidden_note": "seed 7 was used in a feasibility run before this plan; it is never used here",
+  "max_seeds_per_volcano": 400,
+  "search_tool": "volcano-rho (census min-n-patched build): --bits 26 --depth D [--crater split|--j0] --ell L --seed S --min-n 262144 --max-cofactor 64 --trials 1 --per-level 1 --controls 0",
+  "walk_tool": "ca volcano --p P --a A --b B --ell L --seed 20261023 --trials 1 --per-level 0 --controls 0 --radius 40 --max-vertices 20000",
+  "ca_seed": 20261023,
+  "rule": "for i = 0,1,2,...: run the search with seed = stream + i; walk the hit whole with ca; take the FIRST hit that satisfies the volcano's criteria; every rejected seed (also a seed with no curve, or a failed walk) and its reason is logged in census/search_log.jsonl. Size and shape rules only; no outcome is read.",
+  "criteria": {
+    "common": "walk complete (no vertex with level -1, vertices = sum of per_level, vertices < max-vertices), n = largest prime factor of #E with n >= 2^18, cofactor <= 64, n not divisible by ell",
+    "V5": "ell=2, depth=6, j=0 crater (--j0; inert, one vertex), p = 1 mod 8, 3 | n-1 (rho.cubic needs it; the tool cannot filter on it, so it is tested on every hit and rejects are logged), per_level = [1,1,2,4,8,16,32] (64 vertices), special_j_skipped = number of level-1 vertices (the single up-edge back to j=0 each) and nothing else",
+    "V6": "ell=3, depth=4, crater split, special_j_skipped = 0, vertices <= 2000 (decided on the ca walk)"
+  }
+}

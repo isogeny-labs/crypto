@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-30T09:14:49.299343+00:00",
+  "reason": "Disk exhausted during first lib-test link; no tests ran. Exact compiler log/status preserved. Incomplete linker temporary output alone removed after live-FD/inode guard.",
+  "recovered_build": "cargo +1.98.0 test --release --lib --no-run actually exits0 in595.604seconds at source94dc37298a093a94ad82622cffb49a1ebdae472b. This is compile/link success, not a complete test run.",
+  "archives": [
+    "/workspace/build-cache-archives/root-0ec-current-manifest-unit-executable-20261030.json",
+    "/workspace/build-cache-archives/unused-lean434-static-libraries-20261030/receipt.json",
+    "/workspace/build-cache-archives/completed-build-and-catalog-cache-20261030/receipt.json"
+  ],
+  "preservation": "Every completed cache byte archived with SHA/size/round-trip before unlink; no raw science, Git object or pinned production executable deleted.",
+  "correction": "The archived isogeny_algos rlibs were still needed through volcano-cli and Cargo rebuilt them. This is not described as unused in the corrected receipt.",
+  "restore_requirement": "Restore the four original Lean4.34.1 static libraries from their verified archives before later local native linking with that toolchain, and before final workspace handoff."
+}

@@ -1,0 +1,80 @@
+{
+  "checks": {
+    "fresh_cache_store_vectors": true,
+    "hmac_verify_tag": "verified",
+    "local_vectors": true,
+    "pull_bytes": true,
+    "remote_verify_download": "evidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/message.bin: cache ok, remote bytes ok\nevidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/key.bin: cache ok, remote bytes ok"
+  },
+  "cleanup": {
+    "ic/v1/acceptance/hash-mac-20261022T085018Z-ef998eaf/sha256/6f/6ff2276892fec3508a6d7ed94d96ac830a9673b2d4d301de22f4ff4e85660fa7": {
+      "delete_exit": 0,
+      "head_after_delete_404": true,
+      "head_after_delete_exit": 254
+    },
+    "ic/v1/acceptance/hash-mac-20261022T085018Z-ef998eaf/sha256/cc/cc6d5896d770101ef0280c943a2d3c3f24cd5b11464a5186daf7a238477162ac": {
+      "delete_exit": 0,
+      "head_after_delete_404": true,
+      "head_after_delete_exit": 254
+    }
+  },
+  "date_utc": "2026-10-22T08:50:18.496396+00:00",
+  "objects": [
+    {
+      "bytes": 8,
+      "head_bytes": 8,
+      "head_checksum_sha256": "zG1YltdwEB7wKAyUOi08PyTNWxFGSlGG2veiOEdxYqw=",
+      "head_digest": null,
+      "label": "message",
+      "name": "evidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/message.bin",
+      "object_key": "ic/v1/acceptance/hash-mac-20261022T085018Z-ef998eaf/sha256/cc/cc6d5896d770101ef0280c943a2d3c3f24cd5b11464a5186daf7a238477162ac",
+      "push": {
+        "bytes": 8,
+        "cached": true,
+        "name": "evidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/message.bin",
+        "replaced": false,
+        "sha256": "cc6d5896d770101ef0280c943a2d3c3f24cd5b11464a5186daf7a238477162ac",
+        "uploaded": true
+      },
+      "sha256": "cc6d5896d770101ef0280c943a2d3c3f24cd5b11464a5186daf7a238477162ac"
+    },
+    {
+      "bytes": 20,
+      "head_bytes": 20,
+      "head_checksum_sha256": "b/InaJL+w1CKbX7ZTZasgwqWc7LU0wHeIvT/ToVmD6c=",
+      "head_digest": null,
+      "label": "key",
+      "name": "evidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/key.bin",
+      "object_key": "ic/v1/acceptance/hash-mac-20261022T085018Z-ef998eaf/sha256/6f/6ff2276892fec3508a6d7ed94d96ac830a9673b2d4d301de22f4ff4e85660fa7",
+      "push": {
+        "bytes": 20,
+        "cached": true,
+        "name": "evidence/hash-mac/hash-mac-20261022T085018Z-ef998eaf/key.bin",
+        "replaced": false,
+        "sha256": "6ff2276892fec3508a6d7ed94d96ac830a9673b2d4d301de22f4ff4e85660fa7",
+        "uploaded": true
+      },
+      "sha256": "6ff2276892fec3508a6d7ed94d96ac830a9673b2d4d301de22f4ff4e85660fa7"
+    }
+  ],
+  "public_vectors": {
+    "expected": {
+      "hmac-sha256": "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7",
+      "sha256": "cc6d5896d770101ef0280c943a2d3c3f24cd5b11464a5186daf7a238477162ac",
+      "sha3-256": "ba7fa19f75a7b0a8e489699a1d327409344ead867ca466c55a077aa3512da881",
+      "shake256-32": "ae05e4ef2116385a89e04d1ea931eec51562fd58b408ef1db0b396db03188d10"
+    },
+    "key_hex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+    "message_hex": "4869205468657265"
+  },
+  "region": "us-east-2",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/hash-mac-20261022T085018Z-ef998eaf",
+  "run_id": "hash-mac-20261022T085018Z-ef998eaf",
+  "schema": "crypto.hash-mac-file-s3-acceptance/v1",
+  "source_parent_commit": "389a87e65951844554f212cd7455eaa5e7ebf7ad",
+  "validation": {
+    "independent_reference": "Python hashlib and hmac",
+    "release_binary": "22 passed; 0 failed",
+    "release_library": "4488 passed; 0 failed; 119 ignored; four test threads"
+  }
+}

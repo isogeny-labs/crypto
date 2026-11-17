@@ -1,0 +1,201 @@
+{
+  "cost_comparison_status": "uncalibrated_field_degree_and_memory_operations",
+  "ghs": {
+    "factor_base_size": 8,
+    "image_generator": {
+      "u": [
+        "0x4",
+        "0x0",
+        "0x1"
+      ],
+      "v": [
+        "0x3",
+        "0x5"
+      ]
+    },
+    "image_target": {
+      "u": [
+        "0x4",
+        "0x0",
+        "0x1"
+      ],
+      "v": [
+        "0x7",
+        "0x4"
+      ]
+    },
+    "map": {
+      "absolute_degree": 6,
+      "base_degree": 3,
+      "base_modulus_low_terms": [
+        0,
+        1
+      ],
+      "beta": "0x24",
+      "cover_degree": 2,
+      "f": [
+        "0x0",
+        "0x7",
+        "0x7",
+        "0x3",
+        "0x0",
+        "0x3"
+      ],
+      "genus": 2,
+      "h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "lambda": "0x22",
+      "mu": "0xf",
+      "schema": "ghs-quadratic-map/v1",
+      "source_map": "trace_K/k(conorm_C/E(P-O))",
+      "subfield_embedding_basis": [
+        "0x1",
+        "0xe",
+        "0x17"
+      ],
+      "trace_a": "0x0",
+      "trace_beta": "0x18"
+    },
+    "matrix_entry_operations": 60,
+    "matrix_rank": 7,
+    "matrix_rows": 7,
+    "phases": {
+      "factor_base": {
+        "field_operations": {
+          "f2m3_add": 2378,
+          "f2m3_inverse_informational": 192,
+          "f2m3_mul": 2354,
+          "f2m3_square": 448
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 385292
+      },
+      "map": {
+        "field_operations": {
+          "f2m3_add": 87,
+          "f2m3_inverse_informational": 6,
+          "f2m3_mul": 73,
+          "f2m3_square": 12,
+          "f2m6_add": 556,
+          "f2m6_inverse_informational": 26,
+          "f2m6_mul": 526,
+          "f2m6_square": 122
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 119500
+      },
+      "relations_and_linear_algebra": {
+        "field_operations": {
+          "f2m3_add": 5117,
+          "f2m3_inverse_informational": 206,
+          "f2m3_mul": 4275,
+          "f2m3_square": 314
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 701541
+      },
+      "target_descent_and_replay": {
+        "field_operations": {
+          "f2m3_add": 184,
+          "f2m3_inverse_informational": 9,
+          "f2m3_mul": 164,
+          "f2m3_square": 15,
+          "f2m6_add": 29,
+          "f2m6_inverse_informational": 5,
+          "f2m6_mul": 25,
+          "f2m6_square": 19
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 35083
+      }
+    },
+    "relation_counts": {
+      "attempts": 18,
+      "jacobian_additions": 18,
+      "nonsmooth": 8,
+      "smooth": 10
+    },
+    "status": "verified",
+    "target_descent": {
+      "jacobian_additions": 0,
+      "offset": 0,
+      "scalar": 18,
+      "smooth": 1
+    }
+  },
+  "ghs_error": null,
+  "ghs_status": "verified",
+  "limits": {
+    "relations": 20000,
+    "target_descent": 20000
+  },
+  "rho": {
+    "cost": {
+      "field_operations": {
+        "f2m6_add": 128,
+        "f2m6_inverse_informational": 19,
+        "f2m6_mul": 95,
+        "f2m6_square": 68
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 24958
+    },
+    "result": {
+      "elliptic_additions": 7,
+      "elliptic_doublings": 3,
+      "hash_lookups": 10,
+      "restarts": 1,
+      "scalar": 18,
+      "steps": 2
+    }
+  },
+  "same_source_target": true,
+  "schema": "ghs-quadratic-attack/v1",
+  "setup_phases": {
+    "construction": {
+      "field_operations": {
+        "f2m3_add": 26,
+        "f2m3_inverse_informational": 3,
+        "f2m3_mul": 26,
+        "f2m3_square": 6,
+        "f2m6_add": 94,
+        "f2m6_inverse_informational": 4,
+        "f2m6_mul": 51,
+        "f2m6_square": 179
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 128250
+    },
+    "source_order_enumeration": {
+      "field_operations": {
+        "f2m6_add": 12288,
+        "f2m6_mul": 12288,
+        "f2m6_square": 8192
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 2154084
+    }
+  },
+  "source": {
+    "a": "0",
+    "absolute_degree": 6,
+    "b": "32",
+    "generator": [
+      6,
+      25,
+      0
+    ],
+    "group_order": 76,
+    "modulus": "0x43",
+    "subgroup_order": 19,
+    "target": [
+      6,
+      31,
+      0
+    ],
+    "target_scalar_for_replay": 18
+  }
+}

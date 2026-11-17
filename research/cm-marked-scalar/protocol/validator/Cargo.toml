@@ -1,0 +1,12 @@
+[package]
+name = "cm-protocol-validator"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[[bin]]
+name = "cm-protocol-validator"
+path = "../validate.rs"
+[dependencies]
+jsonschema = "=0.59.0"
+serde_json = { version = "=1.0.154", features = ["float_roundtrip"] }

@@ -1,0 +1,105 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.three_leads_plain_v1",
+    "params": {
+     "trial_cap": "128700"
+    }
+   },
+   "name": "rho_plain",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "rho.three_leads_negation_v1",
+    "params": {
+     "trial_cap": "128700"
+    }
+   },
+   "name": "rho_neg",
+   "role": "reference"
+  },
+  {
+   "method": {
+    "id": "rho.three_leads_jacobian_v1",
+    "params": {
+     "trial_cap": "128700"
+    }
+   },
+   "name": "jac_rho",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.three_leads_genus2_v2",
+    "params": {
+     "independent": "0",
+     "trial_cap": "128700",
+     "unique_relations": "1"
+    }
+   },
+   "name": "genus_ic",
+   "role": "candidate"
+  }
+ ],
+ "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+ "label": "three-leads-order-genus-16",
+ "measurement": {
+  "isolation_required": "L2",
+  "order": "shuffle",
+  "rounds": 1,
+  "seed": 2026101801,
+  "timeout_seconds": 1200,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 493102,
+    "b": 193650,
+    "family": "scholten",
+    "group_order": 546352,
+    "gx": 433246,
+    "gy": 59741,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 739,
+    "parameter": 0,
+    "r": 34147
+   },
+   {
+    "a": 1004627,
+    "b": 306850,
+    "family": "scholten",
+    "group_order": 1324768,
+    "gx": 692857,
+    "gy": 520834,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 1151,
+    "parameter": 0,
+    "r": 41399
+   },
+   {
+    "a": 1057042,
+    "b": 1047437,
+    "family": "scholten",
+    "group_order": 1408864,
+    "gx": 1094473,
+    "gy": 367088,
+    "kind": "three_leads",
+    "modulus": 1,
+    "n": 2,
+    "p": 1187,
+    "parameter": 0,
+    "r": 44027
+   }
+  ],
+  "target_seed": 202610181260,
+  "targets_per_curve": 60
+ }
+}

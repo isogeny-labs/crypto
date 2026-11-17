@@ -1,0 +1,39 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "1e430584a7443f1d97b2e1ce9a0d2630947eef9217c5a6b28b35f13bac405b34"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "fcbf5c173551c9a2be374119eb68501c3b34aaf1eb226d5d9be81bc30fa787d2"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "rho-neg = rho.negation, the role-'reference' (matched rho) arm PROTOCOL v2 section 3 keeps from v1, run in the same ecbench main session as ic-mitm on every curve-model and target; H5's section 5a band is against it",
+  "unit": "S = counted GAE / sqrt(r) (ecbench.gae), priced at w GAE per unpriced native operation",
+  "binary_or_process": "ecbench, binary sha256 7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f, in every record of both arms; one main session per class (spec, or spec-r2 for l2-s1002)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "prime-field curves with a != 0 and b != 0 mod p on all 7,760 curve-models (j != 0, 1728, recomputed by the validator), so Aut(E) = {+1, -1}; a prime field gives no Frobenius orbit on E(F_p); records say automorphisms_available = automorphisms_used = 2",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 54.3531,
+    "rho": 1.16862
+   },
+   "0.1": {
+    "ic": 64.7501,
+    "rho": 1.27283
+   },
+   "1": {
+    "ic": 158.394,
+    "rho": 2.2171
+   }
+  },
+  "gae_band_statistic": "median over the 7,760 curve-models of the per-curve-model mean S over its 8 measured targets (ic = ic-mitm, rho = rho-neg, main sessions), recomputed by the validator from the records; per-curve-model IC/rho min 17.38, 18.88, 25.79 at w = 0, 0.1, 1",
+  "order_holds_across_band": true,
+  "order_basis": "rho-neg below ic-mitm on every one of the 7,760 curve-models at each of w = 0, 0.1 and 1"
+ }
+}

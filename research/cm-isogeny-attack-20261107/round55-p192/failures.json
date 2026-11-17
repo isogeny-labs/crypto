@@ -1,0 +1,22 @@
+{
+  "arithmetic_replay_failures": [],
+  "expected_mutation_rejections": [
+    "mutation-P192.log",
+    "mutation-numerator.log"
+  ],
+  "broad_library_check": "timeout120s, exit124, compilation only",
+  "source_access": {
+    "Cheon_author_pdf": "web open timed out",
+    "PKC2012_pdf": "web open403",
+    "KB": "MCP tools not loaded and migrated wrapper absent"
+  },
+  "coordination": "waited for T1905; clear readback and T1906 reservation obtained before shared writes",
+  "migration": "approved receipt read via scoped sudo; Diem deadline-expired and not relaunched; no external jobs submitted or modified",
+  "implementation": "archived Python source retained; supported native Rust verification path added",
+  "publication_tooling": {
+    "pcc_lint_initial": "IndexError resolving repo from /tmp script with no --repo",
+    "resolution": "explicit --repo; no claim or ledger written by failed invocation",
+    "pcc_lint_followup": "two missing unsigned tags corrected; final lint0",
+    "nonlogin_shell_PATH": "cargo absent from default PATH; both failed command logs preserved; explicit toolchain PATH restored; final native and fresh-copy output match"
+  }
+}

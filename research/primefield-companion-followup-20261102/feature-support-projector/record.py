@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib
+p=Path(__file__).resolve().parent;root=p.parents[2];sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();v=p/'validation01'
+rows=json.loads((p/'copied-sources.json').read_text())['files']
+for row in rows:assert sha(p/row['file'])==row['sha256']==sha(p.parent/'feature-implicit-oriented-circuit'/row['file'])
+deps=[(root/x).resolve() for x in Path('/tmp/t1933-v1-check.d').read_text().splitlines()[0].split(': ',1)[1].split()]
+assert not(v/'check.stderr').read_bytes();out=(v/'check.stdout').read_text();assert 'extracted_and_verified=18' in out and 'transcript_annihilators=144' in out and 'pairs_before_refusal=14621' in out
+receipt={'scope':'Bounded deterministic projector extraction, public singleton recovery, exact uncertainty controls; no timing claim','build_exit':0,'check_exit':0,'limits_seconds':{'compile':90,'focused':60},'commands':['rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info research/primefield-companion-followup-20261102/feature-support-projector/driver.rs -o /tmp/t1933-v1-check','/tmp/t1933-v1-check'],'binary_sha256':sha(Path('/tmp/t1933-v1-check')),'copied_sources':len(rows),'dependencies':{str(f.relative_to(root)):sha(f) for f in deps},'logs':{f.name:sha(f) for f in v.iterdir() if f.suffix in ['.stdout','.stderr']},'small_caps':{'terms':128,'stored_node_coefficient_slots':500000,'monomial_pairs':2000000,'output_degree':64,'nodes':100000},'large_caps':{'terms':64,'stored_node_coefficient_slots':100000,'monomial_pairs':2000000,'output_degree':8,'nodes':100000},'large_outcome':{'status':'refused','reason':'terms','pairs':14621,'stored':5724,'max_terms':64},'public_runtime_supplied_image':False}
+(v/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('copied',len(rows),'dependencies',len(deps))

@@ -1,0 +1,15 @@
+# Genuine four-cell local custody regression proposal
+
+UNEXECUTED. Requires composed target custody CLI/correction and exact source-bound release binary. Original immutable run: /var/tmp/boolean-cli-training-acceptance-20261102-v1/run. Frozen fixture contains156 files/880602 bytes and the actual PASS analysis digest. No Generate command or new scientific data is produced.
+
+Ten commands: Create on copied run, chunk Verify, valid Restore requiring actual four-cell native known-answer replay, two producer-only mutation chunk Verifies, five exact-error mutation Restores (producer source/binary plus top-three binding digests). Producer-only controls alter solely the manifest scalar while all member records/chunks remain unchanged, compute/save new manifest SHA, pass chunk verification, then require producer-mismatch rejection. All original/copy/baseline bytes and exact native outputs remain inspectable. No helper-only test substitutes for restored native replay.
+
+These historical cells carry v1 explicitly unsupported SAT requests. No new SAT replay grant is required or inferred for this legacy regression; success without a v2policy is itself compatibility coverage. Separate v2SAT custody controls must supply their explicit admitted invocation. No cloud/backend command appears here.
+
+Before execution root supplies a trusted exact-source compile attestation with exit_code0,source_unchanged=true,binary_sha256,source_manifest_sha256 and a ready JSON with schema custody-four-cell-ready/v1,statusPASS,binary,binary_sha256,source_root,source_manifest,source_manifest_sha256,compile_receipt,compile_receipt_sha256,driver_sha256,fixture_sha256. Paths are absolute. The attestation must derive from the actual composed binary gate, not the earlier SAT-only binary. Driver verifies every manifest source hash before/after commands. It does not build or write readiness itself.
+
+Invoke python3 accept.py /absolute/reviewed-ready.json once only after source review and exact-source compile. The exclusive fixed output path prevents repetition; reconcile any prior partial attempt. Per-command240s and1800s total scheduling allowance; no retries. Input copies only, create_new receipts, failed outputs/destinations preserved. Original source fixture is read-only. Ready still pending; AST parse only. No execution/build/remote requests occurred while preparing this proposal.
+
+V2 preserves V1 and retains final snapshot/check exceptions in the terminal result instead of allowing a changed/missing source to mask that receipt. Still unexecuted.
+
+V3 corrects the CLI root from `ml-dataset` to `dataset`, using a shared argv builder checked against retained release help for Create, Verify and Restore. These three command forms cover all ten scheduled calls. The new exclusive output path ends `-v3`; V2 and its failed attempt are preserved. No budget, timeout, replay requirement, expected rejection, input fixture or readiness requirement is weakened. The helper rejects commands outside the three permitted local custody commands. Help-only subprocesses executed; native acceptance remains unexecuted.

@@ -1,0 +1,139 @@
+{
+  "schema": "native-point-hash.development-qualification/v1",
+  "standing": "unverified producer development observations; no signed PCC verdict",
+  "recorded_at": "2026-11-05T06:59:16.110475+00:00",
+  "dependency_base_commit": "c936441dff86551b3dcbb8b9179dce83526cf118",
+  "source_manifest": {
+    "path": "research/native_point_hashing_20261105/source.sha256",
+    "sha256": "ea1c100ac91757e2ad8925c53a8ddfdbde7ffff41cef5bb391d797f0861ed251",
+    "scope": "new example and named direct arithmetic/native sources; remaining tracked dependencies unchanged from base commit"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "checks": [
+    {
+      "name": "example tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study"
+      ],
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      },
+      "exit_code": 0,
+      "log": "research/native_point_hashing_20261105/development/batch-driver-tests.final.log",
+      "sha256": "6d17e6a222a135d33bdd6ef781b14eb4a649eb7e036339c23339c38cd9c62eb2",
+      "log_member": "development/batch-driver-tests.final.log"
+    },
+    {
+      "name": "strict release lint",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      },
+      "exit_code": 0,
+      "log": "research/native_point_hashing_20261105/development/batch-driver-clippy.final.log",
+      "sha256": "b9015ebe124f9bf5c823ee1f7a013b093e8d15e819a2da31c2245afe7c9c8000",
+      "log_member": "development/batch-driver-clippy.final.log"
+    },
+    {
+      "name": "changed-file format",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "examples/native_point_hash_study.rs"
+      ],
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      },
+      "exit_code": 0,
+      "log": "research/native_point_hashing_20261105/development/batch-driver-fmt.final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_member": "development/batch-driver-fmt.final.log"
+    },
+    {
+      "name": "release example build",
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--example",
+        "native_point_hash_study"
+      ],
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      },
+      "exit_code": 0,
+      "log": "research/native_point_hashing_20261105/development/batch-driver-build.final.log",
+      "sha256": "0dfa3c128d06c79b524326a30f4e1807e389acc94257ef3cde5b00eb05451dc7",
+      "log_member": "development/batch-driver-build.final.log"
+    }
+  ],
+  "control_curve": {
+    "p": 17,
+    "a": 2,
+    "b": 2,
+    "order": 19,
+    "generator": [
+      5,
+      1
+    ]
+  },
+  "tests_passed": 8,
+  "scientific_experiments_run": false,
+  "clock_mode_exercised": false,
+  "initial_source_sha256": null,
+  "initial_source_note": "Not captured before lint fix and additional controls; final manifest does not identify initial receipts.",
+  "retained_initial_logs": [
+    {
+      "path": "research/native_point_hashing_20261105/development/batch-driver-clippy.initial.log",
+      "sha256": "ef871afe5b37adf4238aeb4facd6bba01e46a12e4b257c5a105f678d39d308ac",
+      "log_member": "development/batch-driver-clippy.initial.log"
+    },
+    {
+      "path": "research/native_point_hashing_20261105/development/batch-driver-tests.initial.log",
+      "sha256": "1dc978db05f32ab745a36003bc995a6a283d226bccf5022a32346ec1ff357bbb",
+      "log_member": "development/batch-driver-tests.initial.log"
+    }
+  ],
+  "unresolved": [
+    "full timed-batch orchestration and manifest",
+    "canonical frozen protocol and analysis",
+    "complete native/hash/allocation inventory and pricing",
+    "independent audit and PCC standing",
+    "current account/lane headroom",
+    "authenticated checkpoint readback and native image/execution admission",
+    "four remaining component studies and full ECBench confirmation"
+  ],
+  "local_binary": {
+    "sha256": "3ad758faefdf2a3802c30adb70859b7aecee690f3d09a248bc948a3775e56ad6",
+    "path": "/tmp/hashed-ecbench-target/release/examples/native_point_hash_study",
+    "image_admission": "none; local development build only"
+  },
+  "log_archive": {
+    "path": "research/native_point_hashing_20261105/development.tar.xz",
+    "sha256": "f53ac8f68e3cdf417df84b155fa773508426e7b5d5af0ce4f9de2d2d03a6f34e",
+    "layout": "development/<log name>; per-member SHA-256 values are in checks and retained_initial_logs",
+    "preservation": "lossless bytes; packaged before first commit"
+  }
+}

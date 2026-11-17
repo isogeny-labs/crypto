@@ -1,0 +1,39 @@
+{
+  "schema": "pr-maintenance/v1",
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "origin_pr": 2445,
+  "origin_head": "52321cbe0a8bd884a9edbaccdeaea67444c3ffb8",
+  "base": "e6d85d82b7f08a02ccecc91f754fb2dc9b835b00",
+  "reason": "AGENTS.md limits a PR head to 30 checks; the complete rollout starts 40. Split existing workflow edits by touched area while retaining all checks.",
+  "scope": [
+    {
+      "path": ".github/workflows/aps-single-relation.yml",
+      "blob": "105da68c3a9359e973b00e12ef158551aadcaf49"
+    },
+    {
+      "path": ".github/workflows/transfer-audit.yml",
+      "blob": "65e542aa09f98875dcd753f43b3e9e3e939c6c58"
+    },
+    {
+      "path": ".github/workflows/phase-paired-native.yml",
+      "blob": "d7ed49382bb9a7f08e41c3d6b4a9aa8724eb7bbb"
+    },
+    {
+      "path": ".github/workflows/bielliptic-quartic.yml",
+      "blob": "5d45ce1e3dddc7fb55b20a088f9cbcf38945170c"
+    },
+    {
+      "path": ".github/workflows/representation-join-native.yml",
+      "blob": "ebb84e7918f94acc0b34c81848c0fdff730a99d3"
+    }
+  ],
+  "behavior": "Existing PR-triggered native jobs skip explicitly draft PRs and start on ready_for_review. Existing software commands, permissions, runner choices, time limits and all other events are byte-preserved.",
+  "validation": {
+    "prior": "Both YAML validation workflows passed on the source head; the same phase-paired, bielliptic and representation workflows passed there. APS and transfer checks were still running when observed.",
+    "current": "Fresh checks and actual check count required before merge.",
+    "benchmark_inputs": "No record/raw/report/gate/progress input changes; prior 37-record gate pass reused only for identical inputs."
+  },
+  "no_scientific_execution": true,
+  "conductor": "Execution runtime unavailable; documented warn-and-continue fallback. No reservation claimed."
+}

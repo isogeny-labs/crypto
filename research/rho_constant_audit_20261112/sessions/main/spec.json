@@ -1,0 +1,16 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Finite SafeCurves rho-count audit: fixed generic roster",
+  "description": "Predeclared finite count population. All cold group operations included; no wall-time, asymptotic optimality or security claim. A/A is deterministic paired-seed control.",
+  "workloads": {
+    "curves": [{"kind":"prime_roster","bits":14},{"kind":"prime_roster","bits":16},{"kind":"prime_roster","bits":18},{"kind":"prime_roster","bits":20}],
+    "targets_per_curve": 16,
+    "target_seed": 20261112011
+  },
+  "arms": [
+    {"name":"rho-neg","role":"reference","method":{"id":"rho.negation","params":{"cap_multiple":"64"}}},
+    {"name":"rho-plain","role":"baseline","method":{"id":"rho.plain","params":{"cap_multiple":"64"}}},
+    {"name":"rho-neg-aa","role":"control","method":{"id":"rho.negation","params":{"cap_multiple":"64"}}}
+  ],
+  "measurement":{"rounds":3,"warmup":1,"order":"alternate","seed":20261112012,"isolation_required":"L0","timeout_seconds":15}
+}

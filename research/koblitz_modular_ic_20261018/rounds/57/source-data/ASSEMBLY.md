@@ -1,0 +1,1 @@
+Literal original/twist exponent transcription only. Native MATCH57 verifies every original basis numerator against the R27artifact and all68descent identities. Laurent helper is the retained native R27sourceprefix,with no producer rerun.

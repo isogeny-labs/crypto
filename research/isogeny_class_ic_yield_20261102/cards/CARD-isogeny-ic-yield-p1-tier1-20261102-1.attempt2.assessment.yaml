@@ -1,0 +1,19 @@
+# Assessment of attempt 2 (detached relaunch per LAUNCH_NOTE.md). The write-once file
+# CARD-isogeny-ic-yield-p1-tier1-20261102-1.assessment.yaml assesses attempt 1 and is unchanged.
+card_id: CARD-isogeny-ic-yield-p1-tier1-20261102-1
+attempt: 2
+relay_verbatim: not_checked   # no executor report file exists for this detached run (the tool wrote the launch log; check-relay needs --report); not a deviation
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt cards/CARD-isogeny-ic-yield-p1-tier1-20261102-1.receipt.json (sha256 4d7767ff88c3daf961c0f8a8f909652c7284d25fc5a9481a72ea724179a7b393): status completed, one command (tier1), exit_code 0, attempts 1, timed_out false, 6883.41 s (card limit 21600 s), commit d6153ce46eed4986d63d0a3d6405de7ed1b36101 equal to worktree HEAD /home/user/crypto-p1run, card_sha256 ae351c29564581153ceb13d2511ae8816e570e4b8f02433e88df039b2e6bc3a0 equal to the file on disk; python3 tools/task_card.py lint prints CARD OK."
+  - "Argv and env in the receipt are the card's: run_full.sh tier1; no other command ran. launch.log shows the detached launch printing the receipt summary, status completed."
+  - "Output digests in the receipt equal the files on disk: runs/tier1_rows.jsonl b62828f910767a051c18a134ceadbf962448c75411968c6016fbc8e6404dd99b (14017 lines), runs/tier1.log f1c8e4d874b145276c0fb6c5f21ad768aff9ea14d961870d12d162be51007c28 (14017 lines). The gzipped copies committed in /home/user/crypto (c3e73b45ab) decompress to the same two digests."
+  - "Row count: tier1_rows.jsonl is 1 header (schema p1.header/v1, n_jobs 14016, binary_sha256 c230a300...4d87 = card bind, targets_sha256 95a71df2... and tower_sha256 b82248b8... = card binds, workers 2, seed 20261102, args as in run_full.sh tier1) plus 14016 p1.row/v1 rows = the expected 14016 steps. The log ends with '[14016/14016]' and 'done 14016 jobs in 6883.4s'. 14016 distinct (arm, config, kind, tau, rep) keys, 0 duplicates."
+  - "Row statuses (counted by key, rows not read whole): solved 13008, no status 1008. No cap_time, no cap, no other status. Per (config, kind): m2t3 null 5568, planted 1320 solved + 72 no status, ladder 48; m3t2 null 5568, planted 456 solved + 936 no status, ladder 48. Header n_jobs matches."
+  - "The 1008 rows without status are error rows, all with the same text 'planted instance not formed: factor base on this curve has fewer abscissae than m' (kind planted; m2t3 72, m3t2 936). PROTOCOL.md section 7 anticipates this for m3t2 ('arms with >= 3 factor-base abscissae; others logged as not formed'); for m2t3 the section 7 table lists no such caveat, yet 72 planted rows are not formed (example row: arm rnd24, factor_base_abscissae_on_curve 1). analyze.rs skips rows with an error key. Reported as a fact, not interpreted. tier1.log has 0 lines matching error, panic or fail."
+  - "stdout and stderr files are empty (sha256 e3b0c442... = empty); the run's stderr goes to tier1.log by run_full.sh."
+  - "Write scope: git status --porcelain in /home/user/crypto-p1run lists, besides the pre-existing ' M .resume/RESUME.md' (present in the receipt's dirty_before and dirty_after), only paths under research/isogeny_class_ic_yield_20261102/cards/ and p1_eccp131/runs/ plus LAUNCH_NOTE.md (inside the experiment directory, untracked before the run, listed in dirty_before). Nothing new outside write_scope appeared between dirty_before and dirty_after."
+  - "must_not_exist (p1_eccp131/runs) held at launch: attempt-1 partials are under cards/_failed/CARD-isogeny-ic-yield-p1-tier1-20261102-1-attempt1/ (tier1.log, tier1_rows.jsonl.gz) and are not in the output."
+interpretation: not_assessed

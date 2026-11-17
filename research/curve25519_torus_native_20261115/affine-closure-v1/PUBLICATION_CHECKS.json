@@ -1,0 +1,49 @@
+{
+  "schema": "torus.affine-publication-checks/v1",
+  "at": "2026-11-16T22:52:50.271966+00:00",
+  "standing": "producer unsigned/unverified",
+  "local_parent": "1d3a8879144aed8942132488e7609a28be33ca68",
+  "sources64": "sha256sum --check passed; no qualified Rust/fixture changes",
+  "new_attestation_subjects_matched": 44,
+  "published_ledger_rows": 1219,
+  "local_ledger_rows": 1223,
+  "chain_errors": [],
+  "journal": "published parent bytes remain prefix; latest entry pending preservation-consistent integration",
+  "lessons": "242 entries verify against HEAD,0errors",
+  "report": "both final pages inspected, no overfull boxes",
+  "prose_lint": "0 findings on all new Markdown",
+  "artifact_preflight": "exactly one selected146256-byte core archive; migration pending trusted receipt, NOT passing artifact policy yet",
+  "subjects": {
+    "research/curve25519_torus_native_20261115/affine-closure-v1/native-v1.tar.xz": {
+      "bytes": 146256,
+      "sha256": "ef5b561a184672f36ac9c2e12963f23d14d56aa731ea6e3d79f68968b3e2a875"
+    },
+    "research/curve25519_torus_native_20261115/affine-closure-v1/file-interface-shell-v1.tar.xz": {
+      "bytes": 1576,
+      "sha256": "78b380884607cba91d7fccb14c713f0cddcdd06fe4d1406f50c2bf7bd08841b9"
+    },
+    "research/curve25519_torus_native_20261115/reports/affine-closure-v1/report.pdf": {
+      "bytes": 163640,
+      "sha256": "0f1898ca046bcf222c4faf4a51b9ee0b3589d8bdde11788cacd2ed6cb9333b1b"
+    }
+  },
+  "whitespace": {
+    "initial": {
+      "path": "research/curve25519_torus_native_20261115/affine-closure-v1/development/whitespace-initial.log.xz",
+      "raw_bytes": 714,
+      "raw_sha256": "bd769503215059a3b3fc4a1685eeaf2f7dfa274ea960e4e2fe5245e8cb4941d1",
+      "compressed_sha256": "ac41d14960bf6c666d2cf323e0086ce3b896d06eed3fc250689b31e328f42b5d",
+      "advisory_count": 7
+    },
+    "final": {
+      "path": "research/curve25519_torus_native_20261115/affine-closure-v1/development/whitespace-final.log.xz",
+      "raw_bytes": 224,
+      "raw_sha256": "47a940fe3abecfda28f4974b346cd307f8c28d1cec2482f9d933fd9b3c57afa8",
+      "compressed_sha256": "8a037f9484e31986317d6db955b36286de1f711806c34ad94b6f3eb5a756c8c7",
+      "advisory_count": 2
+    }
+  },
+  "whole_diff_check": "NOT passing: two preserved EOF advisories in pinned native log and pinned report Markdown",
+  "test_lesson_receipt": "T-7e873edd5652 local evidence mirrored byte-identically in COPILOT_REQUEST.md; public comment6931501434",
+  "no_native_rerun_for_metadata": true
+}

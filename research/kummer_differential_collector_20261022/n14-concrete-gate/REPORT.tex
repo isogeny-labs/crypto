@@ -1,0 +1,56 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\title{KUMMER-N14: Concrete Model Extension}
+\author{Source-bound finite-state packet}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent The frozen 1,029-state rule was applied to each of 18 remaining
+odd-prime models. All three cached theta xADD outputs at each state were
+compared to independent Jacobian arithmetic. This is a finite sample, not
+an all-state bound or target cohort.
+
+\begin{center}\small
+\begin{tabular}{r r r r r r r}
+\toprule
+Bits & States & xADD calls & xADD errors & Lift correct & Lift no divisor & Lift M/A/I\\
+\midrule
+20 & 3,087 & 9,261 & 0 & 3,070 & 17 & 1,073,281 / 866,417 / 58,586\\
+24 & 3,087 & 9,261 & 0 & 3,078 & 9 & 1,073,664 / 866,784 / 58,608\\
+28 & 3,087 & 9,261 & 0 & 3,078 & 9 & 1,073,592 / 866,700 / 58,608\\
+32 & 3,087 & 9,261 & 0 & 3,078 & 9 & 1,073,592 / 866,700 / 58,608\\
+36 & 3,087 & 9,261 & 0 & 3,078 & 9 & 1,073,592 / 866,700 / 58,608\\
+40 & 3,087 & 9,261 & 0 & 3,078 & 9 & 1,073,592 / 866,700 / 58,608\\
+\midrule
+Total & 18,522 & 55,566 & 0 & 18,460 & 62 & 6,441,313 / 5,200,001 / 351,626\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent All selected theta inverse constants and all four coordinates of
+$K(0)$ and $K(G)$ were nonzero in the 18 frozen models. The final 62
+no-divisor lifts split into 56 general-conversion nulls, five zero $\Delta$
+denominators, and one zero $b_1$ coefficient. The source fallback did not
+enumerate a Jacobian candidate in this sample. Every model has nulls at
+$k=0,1,r-1$; two 20-bit models have eight further sampled nulls. Exact
+scalar IDs and complete operation counters are in the raw CSV.
+
+\noindent The M/A/I counts include the signed-recovery module after one-time
+cached inverse setup. They exclude labels, collector work, relation
+processing, final target verification, and elapsed time. Rho was not run;
+no matched cost ratio follows. All-state exceptions and the full 1,260-target
+cohort remain open. The native validator recomputes row continuity, counts,
+costs, and source and artifact hashes.
+
+\newpage
+\begin{center}
+\includegraphics[width=\linewidth]{research/kummer_differential_collector_20261022/n14-concrete-gate/status-graph.png}\\
+\small Final no-divisor counts by model. KUMMER-N14, 2026-10-25.
+\end{center}
+\noindent Evidence: \texttt{results/states.csv}, \texttt{results/summary.json},
+\texttt{SHA256SUMS}, and the adjacent artifact manifests. The graph and PDF
+display finite observations only.
+\end{document}

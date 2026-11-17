@@ -1,0 +1,46 @@
+ok 1 - 21 frozen seed/root/primality and independent multiplier fixtures
+ok 2 - counter encoding, leading-zero seeds, 160-bit wrap and field separation
+ok 3 - frozen cohort SHA-256 and production field lookup
+ok 4 - bounded exhaustive toy oracle and complete producer A/A bytes
+ok 5 - positive
+# refusal changed-seed: seed derivation
+ok 6 - changed-seed
+# refusal changed-c: expanded coefficient
+ok 7 - changed-c
+# refusal changed-b: coefficient root
+ok 8 - changed-b
+# refusal changed-n: full point count
+ok 9 - changed-n
+# refusal changed-status: order rejection/acceptance disposition
+ok 10 - changed-status
+# refusal index-gap: field/index gap or reorder
+ok 11 - index-gap
+# refusal wrong-field: field/index gap or reorder
+ok 12 - wrong-field
+# refusal changed-point: point equation
+ok 13 - changed-point
+# refusal changed-split: splitting profile
+ok 14 - changed-split
+# refusal changed-ramified: splitting profile
+ok 15 - changed-ramified
+# refusal wrong-ordinal: accepted field/ordinal/index
+ok 16 - wrong-ordinal
+# refusal accepted-binding: accepted/attempt binding
+ok 17 - accepted-binding
+# refusal reordered-attempts: field/index gap or reorder
+ok 18 - reordered-attempts
+# refusal duplicate-attempt: field/index gap or reorder
+ok 19 - duplicate-attempt
+# refusal missing-middle-acceptance: accepted field/ordinal/index
+ok 20 - missing-middle-acceptance
+# refusal extra-acceptance: extra/unmatched accepted row
+ok 21 - extra-acceptance
+# refusal attempt-after-target: records beyond target-th accepted curve
+ok 22 - attempt-after-target
+# refusal trailing-empty-cell: empty cell
+ok 23 - trailing-empty-cell
+# refusal noncanonical-counter: noncanonical decimal
+ok 24 - noncanonical-counter
+# refusal prime-labelled-early-abort: early-abort composite order
+ok 25 - prime-labelled-early-abort
+TEST FAILURE: composite control exists

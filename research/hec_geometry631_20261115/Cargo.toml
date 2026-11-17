@@ -1,0 +1,14 @@
+[package]
+name="hec-geometry631"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+num-bigint="0.4"
+[[bin]]
+name="geometry631"
+path="main.rs"
+[[bin]]
+name="collect-geometry631"
+path="collect.rs"

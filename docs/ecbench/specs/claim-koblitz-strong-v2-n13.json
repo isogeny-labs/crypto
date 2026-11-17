@@ -1,0 +1,103 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "vs_rho shape (accounting v2 references): root-finding vs inherited-F4 decomposition on public targets, E_0 m=13",
+  "description": "claim-koblitz-rootfind-n13.json with the references on the accounting v2 ids (README section 7): rho.signed_frobenius_strong_v2, whose lanes, distinguished-point bits and jump table scale with r so its fixed set-up is a small share where r allows and its share is reported (detail.setup_share, and the table flags a row above 10 per cent), beside the frozen strong reference and the tuned rho.signed_frobenius_v2 with Brent cycle detection. At this size the frozen reference is mostly set-up; read each candidate against all three. Same candidates, same caveats; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610121301,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-frob-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_v2"
+      }
+    },
+    {
+      "name": "rho-strong-frozen",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "ic-f4-m3",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-rootfind-m3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=3,engine=rootfind",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-f4-m2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=2,engine=inherited-f4,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-rootfind-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp3-koblitz:m=2,engine=rootfind",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610121302,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

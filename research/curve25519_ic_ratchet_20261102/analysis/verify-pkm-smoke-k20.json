@@ -1,0 +1,72 @@
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1hb191356d799d",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+  },
+  "records": 8,
+  "verified_records": 8,
+  "planned_executions": 8,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 4,
+      "record_id": "ECR1h31d4ad352b17",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 5,
+      "record_id": "ECR1had4c66c0e57d",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 6,
+      "record_id": "ECR1h955496fbaf57",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 7,
+      "record_id": "ECR1h7f94e877f0a1",
+      "reproduced": true,
+      "detail": "identical"
+    }
+  ],
+  "replay_selection": "sample",
+  "replay_seed": 7871761998715437245,
+  "replay_candidates": 4,
+  "files": {
+    "host.json": "85a8150eec2df2c8a6b5c8ce77dbe97de57d206c56a897f5edf61f49aded893e",
+    "plan.json": "9c02f1314930a1d6922e5f54f285a6d2fafb0ed166ad361c492100918761227b",
+    "records.jsonl": "61dff43d81eb1cf08e5309d671efd17d9e9de06a18de39de8444712f18863f53",
+    "session.json": "6bed87715744b6eb659a2ef58359c5b059bbae9ddb851dc3759701703cf6ce3e",
+    "spec.json": "91f51b60837aa73b6565b4d263371ed775dc9d7a8fd0cc7ea2776bebea562af9"
+  },
+  "auditor_binary_sha256": "585a5cbadf912d6183ee88248db573928957a30e890ff442478e2ea78b684b82",
+  "auditor_env_class_id": "ECBENV3h71838c0bca16",
+  "auditor_hardware_class_id": "ECBHW1h275ec6c42a12",
+  "audited_unix_ms": 1793584462404
+}

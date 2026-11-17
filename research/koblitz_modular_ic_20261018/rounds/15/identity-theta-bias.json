@@ -1,0 +1,141 @@
+{
+  "id": "IDC1hbf62c6a51fb73b4c",
+  "independence": "native issuer;128 extra points and source-bound Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound15.lean",
+    "sha256": "3c9f8c746befaf4547bfd3e4a42337e0ba1b3b32a9abc626b66307e91648eb53"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610211500,
+  "statement": {
+    "degree_bound": 2,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "c",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": "d",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "b",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "c",
+                  "op": "var"
+                },
+                {
+                  "args": "d",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "theta-bias",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": "d",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "c",
+              "op": "var"
+            },
+            {
+              "args": "b",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound15.theta_bias_residual",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ]
+  },
+  "value_digest": "99cd4d68fe0ef967e4bc9eee95c07b663f96deb1944bd576efe55ed6d4d74fae"
+}

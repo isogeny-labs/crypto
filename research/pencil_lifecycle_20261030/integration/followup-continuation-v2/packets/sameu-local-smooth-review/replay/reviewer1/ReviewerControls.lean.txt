@@ -1,0 +1,15 @@
+import LocalSmooth
+open Polynomial SameULocal
+-- Independent nonzero repeated root: X5-5X+4 has square factor at x=1.
+example : WeightedDoubling.value (4:ℚ) (-5) 0 0 1=0 ∧
+ WeightedDoubling.deriv (-5:ℚ) 0 0 1=0 := by
+ apply square_factor_value_derivative (4:ℚ) (-5) 0 0 1
+ refine ⟨X^3+C 2*X^2+C 3*X+C 4,?_⟩
+ norm_num [WeightedDoubling.curve]
+ <;> ring
+example : ¬LocalNonsingular (4:ℚ) (-5) 0 0 1 := by
+ norm_num [LocalNonsingular,WeightedDoubling.value,WeightedDoubling.deriv]
+-- Local nonsingularity permits a simple zero of f, and does not require f(x)!=0.
+example : WeightedDoubling.value (0:ℚ) (-1) 0 0 0=0 ∧
+ LocalNonsingular (0:ℚ) (-1) 0 0 0 := by
+ norm_num [LocalNonsingular,WeightedDoubling.value,WeightedDoubling.deriv]

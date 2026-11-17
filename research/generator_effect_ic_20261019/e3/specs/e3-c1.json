@@ -1,0 +1,211 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E3 (PROTOCOL frozen in ede431274), curve e3-c1",
+ "description": "research/generator_effect_ic_20261019/E3-PROTOCOL.md: pkm-semaev (Semaev S4 on the prime-kummer tower, F4) capped, its grid reference and known-log:scalars=random with mitm:m=3 to full solve, rho-neg; equal B per tower height t.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 9061313,
+    "a": 9061310,
+    "b": 1749481,
+    "group_order": 9059959,
+    "r": 9059959,
+    "gx": 0,
+    "gy": 3566041
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "sem-chain-t2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=2",
+     "oracle": "pkm-semaev:m=3,crosscheck=1",
+     "max_trials": "400"
+    }
+   }
+  },
+  {
+   "name": "sem-full-t2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=2",
+     "oracle": "pkm-semaev:m=3,mode=full,crosscheck=1",
+     "max_trials": "400"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=2",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=2,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-chain-t3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=3",
+     "oracle": "pkm-semaev:m=3,crosscheck=1",
+     "max_trials": "100"
+    }
+   }
+  },
+  {
+   "name": "sem-full-t3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=3",
+     "oracle": "pkm-semaev:m=3,mode=full,crosscheck=1",
+     "max_trials": "100"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=3",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t3",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=4,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-chain-t4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=4",
+     "oracle": "pkm-semaev:m=3,crosscheck=1",
+     "max_trials": "10"
+    }
+   }
+  },
+  {
+   "name": "sem-full-t4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=4",
+     "oracle": "pkm-semaev:m=3,mode=full,crosscheck=1",
+     "max_trials": "10"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=4",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=9,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-chain-t5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=5",
+     "oracle": "pkm-semaev:m=3,crosscheck=1",
+     "max_trials": "1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=5",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=19,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

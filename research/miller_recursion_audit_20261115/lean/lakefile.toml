@@ -1,0 +1,12 @@
+name = "miller_recursion_audit"
+version = "0.1.0"
+defaultTargets = ["MillerRecursionAudit"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
+
+[[lean_lib]]
+name = "MillerRecursionAudit"
+roots = ["ChartAdicValuation", "ChartAlgebra", "ChartCertificate", "ChartFractionField", "ChartLocalization", "DVRIdentification", "DiscreteValuation", "FieldValuation", "FiniteControls", "FiniteDVR", "FiniteFractionField", "FinitePointCertificate", "FiniteValuation", "GuardControls", "LineEvaluation", "LineIdeals", "LineMultiplicity", "LocalComparison", "LocalOriginEvaluation", "MillerFunctions", "NormDegree", "Normalization", "OriginEvaluation", "PointDivisor", "PointLocalization", "ResidueNormalization", "ValuationCertificate", "LocalOrderAlgebra", "MillerStep", "AllMiller", "InfinityMonic", "RecursionControls", "RecursionCertificate"]

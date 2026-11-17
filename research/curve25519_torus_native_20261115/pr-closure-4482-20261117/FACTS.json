@@ -1,0 +1,82 @@
+{
+  "schema": "curve25519.pr-closure-facts/v1",
+  "scope": "publication-to-merge only; no original-session/science attribution",
+  "pr": 4482,
+  "created_at": "2026-11-17T02:09:58Z",
+  "merged_at": "2026-11-17T04:02:29Z",
+  "merged_by": "aburan28",
+  "final_head": "002826cd32f52fafef61b77b5d62d2163d39dabc",
+  "merge": "6b8ffab660499fa6d2e1b211c626034b78405916",
+  "actual_merge_parents": [
+    "3823467a2401c230081520d5ad09a9f6ee6978a7",
+    "002826cd32f52fafef61b77b5d62d2163d39dabc"
+  ],
+  "merge_tree_equals_head": true,
+  "ten_claim_blobs_and_subject_paths_checked": 110,
+  "changed_frozen_paths_vs_last_session_head": {
+    "002826cd32f52fafef61b77b5d62d2163d39dabc": [],
+    "6b8ffab660499fa6d2e1b211c626034b78405916": [],
+    "de03bcd0fdd988619f3aabed19053ce9b67ebcbc": []
+  },
+  "published_ledger_rows": 1289,
+  "entire_published_ledger_identical_all_refs": true,
+  "check_count": 30,
+  "named_merge_set": [
+    {
+      "name": "size",
+      "id": 133808576776,
+      "conclusion": "success",
+      "started_at": "2026-11-17T04:02:29Z",
+      "completed_at": "2026-11-17T04:09:26Z",
+      "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/44014353154/job/133808576776"
+    },
+    {
+      "name": "gate",
+      "id": 133808574980,
+      "conclusion": "failure",
+      "started_at": "2026-11-17T04:02:28Z",
+      "completed_at": "2026-11-17T04:07:42Z",
+      "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/44014352750/job/133808574980"
+    },
+    {
+      "name": "artifacts",
+      "id": 133808574349,
+      "conclusion": "failure",
+      "started_at": "2026-11-17T04:02:29Z",
+      "completed_at": "2026-11-17T04:09:13Z",
+      "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/44014352616/job/133808574349"
+    }
+  ],
+  "all_green_at_merge_established": false,
+  "ci_timing_note": "Gate began04:02:28 before04:02:29 merge and failed later. Size/artifacts start in the SAME second as merge; do not infer intra-second ordering. No merge-authorization/bypass attribution.",
+  "job_step_metadata": {
+    "133808574980": {
+      "name": "gate",
+      "conclusion": "failure",
+      "failing_steps": [
+        "The gate's own tests, with a positive and a negative fixture"
+      ]
+    },
+    "133808574349": {
+      "name": "artifacts",
+      "conclusion": "failure",
+      "failing_steps": [
+        "Workflows that read moved data pull it"
+      ]
+    }
+  },
+  "underlying_failed_job_logs_not_read_in_this_closure": true,
+  "scientific_rowspace_source_absent_from_merged_pr": true,
+  "merge_issued_by_this_continuation": false,
+  "known_coverage_gaps": [
+    "Original prompt and human-message timestamps",
+    "Full-session duration/interventions/recovery attribution and costs"
+  ],
+  "empty_incident_metadata_is_not_zero_incidents": true,
+  "revert_check_due_after": "2026-12-01T04:02:29Z",
+  "raw_packet": {
+    "decoded_utf8_bytes": 173348,
+    "sha256": "63f27cbae3d9ff226e25825c9087c93def489d905d2d5fb76c6368c1d6e07bf1",
+    "note": "decoded API objects,not raw HTTP or signed execution receipt"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "round": 45,
+  "claim_class": [
+    "theorem",
+    "exact_computation"
+  ],
+  "target": "P192 two-coordinate marked-subgroup order5 actions",
+  "eigenvalues": "all four nonidentity powers of saved mu",
+  "searches": [
+    "exact global minimax abs(trace),abs(det)",
+    "exact smallest H with trace/determinant rectangle abs(trace)<=2H,abs(det)<=2H^2 feasible; necessary matrix-entry bound"
+  ],
+  "H_cap": 1180591620717411303424,
+  "construction": "Hensel lift simple roots of X^2-trace X+det modulo primes2,3,5,7,11,13,17,19,23,29,31, retaining prime powers between H/4 and4H; three nearest diagonal lifts",
+  "schedules": "uniform shared wNAF widths2..6 for two output rows; select D+A then D,A,width; charge precomputation and negated lookups separately",
+  "fixtures": [
+    0,
+    1,
+    2,
+    17,
+    20261107
+  ],
+  "canonicalization": "balanced matrix: three applications plus six additions and two negations to get fifth vector; companion: two applications plus three additions and one negation",
+  "caps": {
+    "seconds_per_command": 120,
+    "processes": 1,
+    "cloud_submissions": 0
+  },
+  "limits": [
+    "rectangle bound is necessary, not sufficient for matrix realization",
+    "finite balanced construction does not claim globally minimum matrix entries",
+    "no runtime or random-walk claim"
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 45,
+  "runs": [
+    {
+      "attempt": "collect11-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "490a0e7c445356256a36b848c228242a03ff3d39",
+      "source_sha256": "23c88ad6da4827d6ba7c428f2128677b2f481df490e49f6f4f492bc5011b2c3e",
+      "binary_sha256": "bacf53b55ce3f92d3a6013771e3df3a9e59cd4e2d166f19d624f4ee45b9749d6"
+    },
+    {
+      "attempt": "collect13-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "6b906724500f5a9e9b7cabb745d6d7f26a26cb0f",
+      "source_sha256": "d15216bca5a2b1d1f3726b42020c064c84d8b0d5d6a4bedce641790debf76e89",
+      "binary_sha256": "4f5bbf76b41a555957bffae14975ddc12d5b99ea293d5d7cd2ec8c8f4c545e3e"
+    },
+    {
+      "attempt": "collect9-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "490a0e7c445356256a36b848c228242a03ff3d39",
+      "source_sha256": "23c88ad6da4827d6ba7c428f2128677b2f481df490e49f6f4f492bc5011b2c3e",
+      "binary_sha256": "adbc55db0ec06804c43054063c3f51f73480866fe82a3192dc23b0238bc7ed5f"
+    },
+    {
+      "attempt": "control7-01",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "source_revision": "490a0e7c445356256a36b848c228242a03ff3d39",
+      "source_sha256": "23c88ad6da4827d6ba7c428f2128677b2f481df490e49f6f4f492bc5011b2c3e",
+      "binary_sha256": "ff8a44170e16e65024cb59ad9505f81d83921ef79259c2c49915712407545fe5"
+    },
+    {
+      "attempt": "lean45-01",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 4,
+      "audit_log": "AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead\nok    DeckEligibility45.mixed.eq_1  []\nok    DeckEligibility45.nonzero_requires_both  [propext]\nok    DeckEligibility45.scalar_fixed_zero  [propext]\nok    DeckEligibility45.sign_fixed_zero  [propext]\naudited 4 theorems in [DeckEligibility45]; 0 failing, 0 trusted (native_decide)\n"
+    }
+  ],
+  "collector_cases": [
+    {
+      "attempt": "collect11-01",
+      "status": "accepted",
+      "role": "discovery",
+      "extension_degree": 11,
+      "field": 2048,
+      "base_points": 1980,
+      "chart_base_points": 1980,
+      "lambda_candidates": 4055040,
+      "source_passes": 2860,
+      "rational_source_points": 2860,
+      "closed_points": 260,
+      "deck_orbits": 26,
+      "jacobian_rank2_points": 2860,
+      "points_sha256": "7fb1a0fd10b04ecb2b84c02a61ed5efaaeb62fe88bfce22a3ca45e4cf44eaa51",
+      "degree_partition": [
+        {
+          "degree": 11,
+          "closed_points": 260
+        }
+      ]
+    },
+    {
+      "attempt": "collect13-01",
+      "status": "accepted",
+      "role": "discovery",
+      "extension_degree": 13,
+      "field": 8192,
+      "base_points": 8060,
+      "chart_base_points": 8060,
+      "lambda_candidates": 66027520,
+      "source_passes": 7540,
+      "rational_source_points": 7540,
+      "closed_points": 580,
+      "deck_orbits": 58,
+      "jacobian_rank2_points": 7540,
+      "points_sha256": "e3109fe37b22fe5a0112157cd2e8e45bc13426b3de6690331ea127a9bd031aa6",
+      "degree_partition": [
+        {
+          "degree": 13,
+          "closed_points": 580
+        }
+      ]
+    },
+    {
+      "attempt": "collect9-01",
+      "status": "accepted",
+      "role": "discovery",
+      "extension_degree": 9,
+      "field": 512,
+      "base_points": 540,
+      "chart_base_points": 540,
+      "lambda_candidates": 276480,
+      "source_passes": 540,
+      "rational_source_points": 540,
+      "closed_points": 60,
+      "deck_orbits": 6,
+      "jacobian_rank2_points": 540,
+      "points_sha256": "91c1c854a083f20138a6f2897c50a83781b90fcac683b68a7845cbdd282ab989",
+      "degree_partition": [
+        {
+          "degree": 9,
+          "closed_points": 60
+        }
+      ]
+    },
+    {
+      "attempt": "control7-01",
+      "status": "accepted",
+      "role": "control",
+      "extension_degree": 7,
+      "field": 128,
+      "base_points": 140,
+      "chart_base_points": 140,
+      "lambda_candidates": 17920,
+      "source_passes": 420,
+      "rational_source_points": 420,
+      "closed_points": 60,
+      "deck_orbits": 6,
+      "jacobian_rank2_points": 420,
+      "points_sha256": "cf760f2506c175f220ffc9a864043cf4c5d2e7d8f5d321fa392d64f44fa19104",
+      "degree_partition": [
+        {
+          "degree": 7,
+          "closed_points": 60
+        }
+      ]
+    }
+  ],
+  "control7_export_byte_identical": true,
+  "donor_R39_manifest_verified": true,
+  "proper_geometry_formalized": false,
+  "Picard_classes_evaluated": false,
+  "target_images_evaluated": false,
+  "larger_n_transfer": false,
+  "independent_scientific_replay": false,
+  "independent_semantic_review": false
+}

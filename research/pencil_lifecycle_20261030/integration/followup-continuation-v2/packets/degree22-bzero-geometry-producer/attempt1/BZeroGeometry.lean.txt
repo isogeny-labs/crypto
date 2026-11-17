@@ -1,0 +1,61 @@
+import BZero
+set_option autoImplicit false
+set_option maxHeartbeats 1600000
+namespace BZeroGeometry
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+
+theorem support_split (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) :
+ support q r=(X-C (-t/s))*(X-C (t/s-q)) := by
+ have h := support_factor (t/s-q) q r (BZero.normalized_root q r s t hs hb)
+ have he : -q-(t/s-q)= -t/s := by ring
+ rw [he] at h
+ simpa only [mul_comm] using h
+
+theorem ordinates (q s t : K) (hs : s≠0) :
+ s*(-t/s)+t=0 ∧ s*(t/s-q)+t=2*t-q*s := by
+ constructor <;> field_simp <;> ring
+
+theorem square_root_derivative (f : K[X]) (x : K)
+ (h : (X-C x)^2 ∣ f) : f.eval x=0 ∧ f.derivative.eval x=0 := by
+ obtain ⟨g,rfl⟩ := h
+ constructor
+ · simp
+ · simp [derivative_mul,derivative_pow]
+
+theorem geometry (f : K[X]) (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) (hv : support q r ∣ f-(ordinate s t)^2) :
+ support q r=(X-C (-t/s))*(X-C (t/s-q)) ∧
+ (ordinate s t).eval (-t/s)=0 ∧ f.eval (-t/s)=0 ∧
+ f.eval (t/s-q)=(2*t-q*s)^2 := by
+ have hx := BZero.normalized_root q r s t hs hb
+ obtain ⟨hp,hw⟩ := extracted_valid f (t/s-q) q r s t hx hv
+ have he : -q-(t/s-q)= -t/s := by ring
+ rw [he] at hw
+ obtain ⟨v0,v1⟩ := ordinates q s t hs
+ obtain ⟨gw,ew⟩ := hw
+ obtain ⟨gp,ep⟩ := hp
+ have ew' := congrArg (Polynomial.eval (-t/s)) ew
+ have ep' := congrArg (Polynomial.eval (t/s-q)) ep
+ have fw : f.eval (-t/s)=0 := by simpa [v0] using ew'
+ have fp : f.eval (t/s-q)=(2*t-q*s)^2 := by
+  have hh : f.eval (t/s-q)-(2*t-q*s)^2=0 := by simpa [v1] using ep'
+  exact sub_eq_zero.mp hh
+ exact ⟨support_split q r s t hs hb,by simpa [ordinate] using v0,fw,fp⟩
+
+theorem smooth_geometry (f : K[X]) (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) (hv : support q r ∣ f-(ordinate s t)^2)
+ (hg : IsCoprime f f.derivative) :
+ 2*t-q*s≠0 ∧ (-t/s)≠(t/s-q) := by
+ have hy : 2*t-q*s≠0 := by
+  intro he
+  exact SameUGlobal.coprime_excludes_common_root f hg (t/s-q)
+   (square_root_derivative f _ (BZero.zero_y_square f q r s t hs hb hv he))
+ refine ⟨hy,?_⟩
+ intro he
+ obtain ⟨v0,v1⟩ := ordinates q s t hs
+ apply hy
+ rw [he] at v0
+ exact v1.symm.trans v0
+end BZeroGeometry

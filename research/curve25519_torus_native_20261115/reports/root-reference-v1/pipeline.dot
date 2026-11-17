@@ -1,0 +1,12 @@
+digraph Reference {
+ graph [rankdir=TB,bgcolor="white",fontname="Helvetica",ranksep=0.20];
+ node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+ edge [color="#4D607D"];
+ setup [label="PUBLIC BASE SETUP\nSpec only; construct full declared small base\nIdentity exclusions explicit; raw aliases remain distinct\nCaps:64 raw columns / 131072 signed halves"];
+ triples [label="ENUMERATE SIGNED HALF-TRIPLES\n8 * C(n,3); cubic uncapped loop family\nSetup charged in full to one target"];
+ family [label="PER-SUM REPRESENTATIVE FAMILY\nVandermonde minor vectors; retain column basis\nAt most20 original witnesses per elliptic sum\nClassical Fomin et al. Theorem 3"];
+ query [label="PUBLIC QUERY: Q ONLY\nRegenerate left halves; look up Q-left\nInspect at most 20 representatives; require disjoint raw masks"];
+ replay [label="RETURN ORIGINAL ROOT OR FINITE EXHAUSTION\nOriginal quadratic circuit + independent signed-row replay\nResource refusal is a different status"];
+ checks [label="FINITE NATIVE CONTROLS\n13 toy public targets yield roots; actual known-answer cases replay\nRFC u9:zero roots in declared actual six-column base\n185760 completion comparisons agree\nFirst-only witness loses 59384 toy lookups\nUnsigned; not a full-base solve or a gamma improvement"];
+ setup->triples;triples->family;family->query;query->replay;replay->checks;
+}

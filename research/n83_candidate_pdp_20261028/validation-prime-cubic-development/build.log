@@ -1,0 +1,46 @@
+   Compiling n83-candidate-pdp v0.1.0 (/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028)
+warning: struct `Limits` is never constructed
+ --> src/bin/../prime_cubic_bounded.rs:6:12
+  |
+6 | pub struct Limits {
+  |            ^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `value` and `read` are never used
+  --> src/bin/../prime_cubic_bounded.rs:13:8
+   |
+12 | impl Limits {
+   | ----------- associated items in this implementation
+13 |     fn value(&self) -> Value {
+   |        ^^^^^
+...
+17 |     pub fn read(v: &Value) -> Self {
+   |            ^^^^
+
+warning: function `pairs` is never used
+  --> src/bin/../prime_cubic_bounded.rs:22:4
+   |
+22 | fn pairs(row:&Row)->Vec<Value>{row.iter().map(|(&i,c)|json!([i,c.to_string()])).collect()}
+   |    ^^^^^
+
+warning: function `terms` is never used
+  --> src/bin/../prime_cubic_bounded.rs:23:4
+   |
+23 | fn terms(poly:&Polynomial)->Vec<Value>{poly.iter().map(|(m,c)|json!([m,c.to_string()])).collect()}
+   |    ^^^^^
+
+warning: function `compute` is never used
+  --> src/bin/../prime_cubic_bounded.rs:27:4
+   |
+27 | fn compute(m:usize,ell:usize,p:u128,limit:&Limits,emit:&mut impl FnMut(Value))->Value {
+   |    ^^^^^^^
+
+warning: function `execute` is never used
+  --> src/bin/../prime_cubic_bounded.rs:82:8
+   |
+82 | pub fn execute(m:usize,ell:usize,p:u128,limit:&Limits,out:&Path,replay:bool)->Value {
+   |        ^^^^^^^
+
+warning: `n83-candidate-pdp` (bin "prime_cubic") generated 6 warnings
+    Finished `release` profile [optimized] target(s) in 8.85s

@@ -1,0 +1,23 @@
+#[path = "../../../../../src/cryptanalysis/binary_semaev.rs"]
+pub mod binary_semaev;
+#[path = "../../../../../src/cryptanalysis/binary_semaev_chain_sat.rs"]
+pub mod binary_semaev_chain_sat;
+#[path = "../../../../../src/cryptanalysis/group_op_count.rs"]
+pub mod group_op_count;
+#[path = "../../../../../src/cryptanalysis/identity_certificate.rs"]
+pub mod identity_certificate;
+#[path = "../../../../../src/cryptanalysis/sat.rs"]
+pub mod sat;
+#[path = "../../../../../src/cryptanalysis/trace_zero_point_chain.rs"]
+pub mod trace_zero_point_chain;
+#[path = "../../../../../src/cryptanalysis/trace_zero_relations.rs"]
+pub mod trace_zero_relations;
+#[path = "../../../../../src/cryptanalysis/trace_zero_linearized.rs"]
+pub mod trace_zero_linearized;
+#[path = "../../../../../src/cryptanalysis/trace_zero_word_field.rs"]
+pub mod trace_zero_word_field;
+#[path = "../../../../../src/cryptanalysis/trace_zero_subspace_relations.rs"]
+pub mod trace_zero_subspace_relations;
+
+#[path = "../../../../trace_zero_kernel_20261116/compact_word_snapshot.rs"]
+pub mod trace_zero_compact_word_snapshot;

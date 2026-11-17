@@ -1,0 +1,78 @@
+{
+    "build": {
+        "id": "isolab-recovery-controller:d7207b02-3696-4245-82d8-85334a06f105",
+        "arn": "arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:d7207b02-3696-4245-82d8-85334a06f105",
+        "buildNumber": 16,
+        "startTime": "2026-10-22T05:42:22.550000+00:00",
+        "currentPhase": "QUEUED",
+        "buildStatus": "IN_PROGRESS",
+        "sourceVersion": "zRt.nWTruYAwQsLhxESieSWTuTFm.qjx",
+        "projectName": "isolab-recovery-controller",
+        "phases": [
+            {
+                "phaseType": "SUBMITTED",
+                "phaseStatus": "SUCCEEDED",
+                "startTime": "2026-10-22T05:42:22.550000+00:00",
+                "endTime": "2026-10-22T05:42:22.618000+00:00",
+                "durationInSeconds": 0
+            },
+            {
+                "phaseType": "QUEUED",
+                "startTime": "2026-10-22T05:42:22.618000+00:00"
+            }
+        ],
+        "source": {
+            "type": "S3",
+            "location": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/3fb8d9295a82035427089010b837a7ad7b4a81c7b74c27daa0032fc39d6f71b8.zip",
+            "buildspec": "resume/buildspec.yml",
+            "insecureSsl": false
+        },
+        "secondarySources": [],
+        "secondarySourceVersions": [],
+        "artifacts": {
+            "location": ""
+        },
+        "cache": {
+            "type": "NO_CACHE"
+        },
+        "environment": {
+            "type": "LINUX_CONTAINER",
+            "image": "aws/codebuild/standard:7.0",
+            "computeType": "BUILD_GENERAL1_SMALL",
+            "environmentVariables": [
+                {
+                    "name": "ISOLAB_RECOVERY_REQUEST_KEY",
+                    "value": "inputs/recovery-requests/ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55.json",
+                    "type": "PLAINTEXT"
+                }
+            ],
+            "privilegedMode": false,
+            "imagePullCredentialsType": "CODEBUILD"
+        },
+        "serviceRole": "arn:aws:iam::104186811093:role/isolab-recovery-controller-Role-L8mks6myTPFt",
+        "logs": {
+            "deepLink": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups",
+            "cloudWatchLogsArn": "arn:aws:logs:us-east-2:104186811093:log-group:null:log-stream:null",
+            "cloudWatchLogs": {
+                "status": "ENABLED",
+                "groupName": "/aws/codebuild/isolab-recovery-controller"
+            }
+        },
+        "timeoutInMinutes": 45,
+        "queuedTimeoutInMinutes": 10,
+        "buildComplete": false,
+        "initiator": "spot-experiments-WorkerRole-G1FZ84yk3gS6/i-059f24cf2ca3b3f7a",
+        "vpcConfig": {
+            "vpcId": "vpc-04bee1e26f609d01c",
+            "subnets": [
+                "subnet-0ed67dc1e1b83132d",
+                "subnet-0fef4d36a1f2a37ff",
+                "subnet-023ccd74a57eb5a51"
+            ],
+            "securityGroupIds": [
+                "sg-00970b3243dc64a9c"
+            ]
+        },
+        "encryptionKey": "arn:aws:kms:us-east-2:104186811093:alias/aws/s3"
+    }
+}

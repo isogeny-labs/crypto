@@ -1,0 +1,11 @@
+name = "local_algebra_length_audit"
+version = "0.1.0"
+defaultTargets = ["LocalAlgebraLengthAudit"]
+
+[[require]]
+name = "coordinate_length_audit"
+path = "../../coordinate_length_audit_20261114/lean"
+
+[[lean_lib]]
+name = "LocalAlgebraLengthAudit"
+roots = ["PowerBasisLength", "TruncatedLocal", "ResidueDegreeControl", "LocalLengthCertificate"]

@@ -1,0 +1,16 @@
+# Verbatim outputs of the auditor re-runs (2026-11-01). Scripts in this directory; run with python3 -B (no bytecode).
+diag_n3_p13.py (rerun in scratch): 11 149 1 / 13 181 3 / 17 277 1 ; raw_n3_p13_diag.json byte-identical to the author's.
+diag_n3_p13_fp2.gp (author's): pts 300 dim of kernel vanishing on V(F_169) sample = 1
+chk.gp (own, new sample, setrand(7)): pts 403 all-F13 0 ; rank over F169 of 3 kernel polys on sample: 2 ; kernel vec dim 1 ; f = combo of K with coeffs [2,12,1] ; ker vec [2,12,1]
+pl13.gp (random-plane section + Kronecker substitution, p=13): irreducible after 220 tries, deg 76  (controls p=11: 24 tries, p=17: 252 tries)
+pk2.gp / pk3.gp (same over F_169 / F_13^3): irreducible after 98 / 44 tries, deg 76
+extra.py (m=3 l=1 box4, exhaustive F_p points; seed 0 = Random(p), seed s = Random(5000*s+p)); entries (npts, kernel dim):
+ p=7  [(83,42),(35,90),(83,42),(65,60)]
+ p=11 [(149,1),(227,1),(175,1),(149,1)]
+ p=13 [(181,3),(101,45),(161,27),(193,27)]
+ p=17 [(277,1),(305,1),(193,1),(449,1)]
+ p=19 [(569,1),(199,1),(235,2),(275,2)]
+ p=23 [(211,1),(643,1),(851,1),(467,1)]
+deg.py: p=13 s=2,3 have rhs(xR)=0 (degenerate); p=19 s=2 (15,14,2) rhs=14, s=3 (2,15,10) rhs=9 (non-degenerate).
+indep.py (own point enumeration + PARI matrank, no n3lib.evalf/nullspace): 13/0 npts 181 kernel dim 3 ; 19/2 npts 235 dim 2 ; 19/3 npts 275 dim 2 ; 19/1 npts 199 dim 1
+N1 l3_validation.py rerun (outputs to scratch, 121 s wall, ~34 s CPU): JSON identical to crosscheck/l3_validation.json.

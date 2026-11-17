@@ -1,0 +1,23 @@
+# Shared Lean library for aburan28/crypto, aburan28/cryptanalysis and
+# aburan28/crypto-autoresearcher. Design: docs/DESIGN.md.
+#
+# The Mathlib PIN LIVES IN lake-manifest.json: `rev` below is the exact commit
+# the manifest resolves. lean-toolchain is copied from that Mathlib commit,
+# never hand-written; Lake builds every package on one toolchain.
+name = "CryptoLean"
+defaultTargets = ["CryptoLean", "CryptoLeanCore"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2"
+
+# Std-only layer: fast `decide` certificates, no Mathlib build cost.
+[[lean_lib]]
+name = "CryptoLeanCore"
+globs = ["CryptoLeanCore.*"]
+
+# Mathlib layer: statements about the real objects.
+[[lean_lib]]
+name = "CryptoLean"
+globs = ["CryptoLean.*"]

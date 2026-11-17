@@ -1,0 +1,231 @@
+{
+  "card_id": "CARD-BLINDSPOT-10-18-r2",
+  "card_path": "research/blindspots_20261018/10-kernel-program-search/card-18-r2.yaml",
+  "card_sha256": "1ca4aa568b02d0a22beb9eae4c6b95bd5a39b8133b1f10b9a1c0520304ec72fa",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-10/card-18-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-10/card-18-r2/b10",
+        "examples/blindspots_10_kernel_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.499,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.499,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-18-r2/b10",
+        "finalists",
+        "--n",
+        "41",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "finalists-n41",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6092cbe334c1a612b55d023d1f646927a0fb59dccf6e8bb5fca46d646967052b",
+      "stdout_tail": [
+        "{\"b\":{\"idx\":174,\"genes\":[21,1,1,0,1,1,0,4,1,0],\"name\":\"affine-aligned-s1|lift1|stop1|root0|q1|sqt1|pm0|ab4|bt1|gc0\",\"q01_train\":1.951113e2,\"start_q01\":3.663416e3,\"evaluations\":256,\"infinite_fitness\":2,\"families_visited\":19,\"curve\":[[1,3.663416e3],[2,3.663416e3],[4,8.903829e2],[8,8.886038e2],[16,6.132856e2],[32,3.026085e2],[64,2.967317e2],[128,2.964127e2],[256,1.951113e2]]},\"c\":{\"idx\":56,\"genes\":[21,1,0,1,1,1,1,4,2,0],\"name\":\"affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0\",\"q01_train\":3.895027e2,\"start_q01\":null,\"evaluations\":256,\"infinite_fitness\":82,\"families_visited\":24,\"curve\":[[1,null],[2,9.995369e3],[4,1.380888e3],[8,1.380888e3],[16,1.276567e3],[32,6.162674e2],[64,3.895027e2],[128,3.895027e2],[256,3.895027e2]]}}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-18-r2/b10",
+        "ablate",
+        "--n",
+        "41",
+        "--ell",
+        "9",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state",
+        "--out",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n41.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 214.014,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "ablate-n41",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n41.jsonl": "2967324864bf192cdb5e22e6367355f6f111862a2796f7c2250e0a82cf7d1682"
+      },
+      "seconds": 214.014,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ff590852da8d90844b22d5226881acefd16c5a1104216568b003a8262d6bcac9",
+      "stdout_tail": [
+        "ablate n=41 B-only-abort           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab4|bt0|gc0          q01=2.7510e3 phi=0.312",
+        "ablate n=41 B-revert-batch         affine-aligned-s1|lift1|stop1|root0|q1|sqt1|pm0|ab4|bt0|gc0 q01=3.1128e2 phi=0.333",
+        "ablate n=41 B-only-batch           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt1|gc0          q01=3.6596e3 phi=1.000",
+        "ablate n=41 C                      affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0 q01=6.2077e2 phi=0.333",
+        "ablate n=41 C-revert-fam           sub-low|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0          q01=1.2242e3 phi=0.333",
+        "ablate n=41 C-only-fam             affine-aligned-s1|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0 q01=1.5386e3 phi=1.000",
+        "ablate n=41 C-revert-lift          affine-aligned-s1|lift0|stop0|root1|q1|sqt1|pm1|ab4|bt2|gc0 q01=1.7795e3 phi=0.396",
+        "ablate n=41 C-only-lift            sub-low|lift1|stop0|root0|q0|sqt0|pm0|ab0|bt0|gc0          q01=8.9113e2 phi=1.000",
+        "ablate n=41 C-revert-root          affine-aligned-s1|lift1|stop0|root0|q1|sqt1|pm1|ab4|bt2|gc0 q01=4.2883e2 phi=0.333",
+        "ablate n=41 C-only-root            sub-low|lift0|stop0|root1|q0|sqt0|pm0|ab0|bt0|gc0          q01=5.7305e3 phi=1.000",
+        "ablate n=41 C-revert-quartic       affine-aligned-s1|lift1|stop0|root1|q0|sqt1|pm1|ab4|bt2|gc0 q01=6.2530e2 phi=0.333",
+        "ablate n=41 C-only-quartic         sub-low|lift0|stop0|root0|q1|sqt0|pm0|ab0|bt0|gc0          q01=3.6143e3 phi=1.000",
+        "ablate n=41 C-revert-sqtab         affine-aligned-s1|lift1|stop0|root1|q1|sqt0|pm1|ab4|bt2|gc0 q01=6.2281e2 phi=0.333",
+        "ablate n=41 C-only-sqtab           sub-low|lift0|stop0|root0|q0|sqt1|pm0|ab0|bt0|gc0          q01=3.6413e3 phi=1.000",
+        "ablate n=41 C-revert-pairs         affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm0|ab4|bt2|gc0 q01=5.8240e2 phi=0.333",
+        "ablate n=41 C-only-pairs           sub-low|lift0|stop0|root0|q0|sqt0|pm1|ab0|bt0|gc0          q01=7.3081e3 phi=1.000",
+        "ablate n=41 C-revert-abort         affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab0|bt2|gc0 q01=1.6256e3 phi=1.000",
+        "ablate n=41 C-only-abort           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab4|bt0|gc0          q01=2.7510e3 phi=0.312",
+        "ablate n=41 C-revert-batch         affine-aligned-s1|lift1|stop0|root1|q1|sqt1|pm1|ab4|bt0|gc0 q01=5.2371e2 phi=0.333",
+        "ablate n=41 C-only-batch           sub-low|lift0|stop0|root0|q0|sqt0|pm0|ab0|bt2|gc0          q01=4.7141e3 phi=1.000"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-10/card-18-r2/b10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-10/card-18-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "6694e876e022a0164980bd5b32c6a59cda491eeb",
+  "dirty_after": [
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n41.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n41.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n37.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/ablate-n37.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-17-r2.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,814 @@
+(00.000000) CRIU run id = 13cf8484-71bc-4237-99f9-5fabb254524e
+Warn  (criu/crtools.c:269): Stopped and detached shell job will get SIGHUP from OS.
+(00.000036) Version: 4.2.1 (gitid 0)
+(00.000041) Running on ecbench-periodic-20261022-b-a1 Linux 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64
+(00.000054) File /run/criu.kdat does not exist
+(00.000209) sockets: Probing sock diag modules
+(00.021774) sockets: Done probing
+(00.022232) PAGEMAP_SCAN is supported
+(00.022241) Pagemap is fully functional
+(00.022262) Found anon-shmem device at 1
+(00.022307) Hugetlb size 2 Mb is supported but cannot get dev's number
+(00.022317) Hugetlb size 1024 Mb is supported but cannot get dev's number
+(00.022319) Reset 19's dirty tracking
+(00.022336)  ... done
+(00.022346) Dirty track supported on kernel
+(00.022382) Found task size of 7ffffffff000
+(00.028056) net: Restoring netdev veth idx 10
+(00.028518) net: Dumping netns links
+(00.028529) net: 	LD: Got link 1, type 772
+(00.028530) net: 	LD: Got link 10, type 1
+(00.028604) Warn  (criu/kerndat.c:1642): CRIU was built without libnftables support
+(00.030244) vdso: Parsing at 7f5b2033d000 7f5b2033f000
+(00.030247) vdso: PT_LOAD p_vaddr: 0
+(00.030248) vdso: DT_HASH: 120
+(00.030249) vdso: DT_GNU_HASH: 170
+(00.030249) vdso: DT_STRTAB: 320
+(00.030249) vdso: DT_SYMTAB: 1d0
+(00.030250) vdso: DT_STRSZ: 83
+(00.030250) vdso: DT_SYMENT: 18
+(00.030251) vdso: nbucket 3 nchain e bucket 7f5b2033d128 chain 7f5b2033d134
+(00.030252) vdso: symbol __vdso_clock_gettime at address fd0
+(00.030252) vdso: symbol __vdso_getcpu at address 1050
+(00.030253) vdso: symbol __vdso_gettimeofday at address f90
+(00.030253) vdso: symbol __vdso_time at address fa0
+(00.030254) vdso: symbol __kernel_sigreturn at address 0
+(00.030255) vdso: symbol __kernel_rt_sigreturn at address 0
+(00.030255) vdso: symbol __vdso_clock_gettime64 at address 0
+(00.030255) vdso: rt [vdso] 7f5b2033d000-7f5b2033f000 [vvar] 7f5b20337000-7f5b2033d000
+(00.030378) vdso: Parsing at 7f5b200bc000 7f5b200be000
+(00.030381) vdso: PT_LOAD p_vaddr: 0
+(00.030382) vdso: DT_HASH: b4
+(00.030382) vdso: DT_GNU_HASH: f8
+(00.030383) vdso: DT_STRTAB: 208
+(00.030383) vdso: DT_SYMTAB: 148
+(00.030384) vdso: DT_STRSZ: ce
+(00.030384) vdso: DT_SYMENT: 10
+(00.030384) vdso: nbucket 3 nchain c bucket 7f5b200bc0bc chain 7f5b200bc0c8
+(00.030385) vdso: symbol __vdso_clock_gettime at address 1840
+(00.030386) vdso: symbol __vdso_getcpu at address 1900
+(00.030386) vdso: symbol __vdso_gettimeofday at address 17f0
+(00.030387) vdso: symbol __vdso_time at address 1800
+(00.030387) vdso: symbol __kernel_sigreturn at address 5a0
+(00.030388) vdso: symbol __kernel_rt_sigreturn at address 5b0
+(00.030388) vdso: symbol __vdso_clock_gettime64 at address 1850
+(00.030388) vdso: compat [vdso] 7f5b2033d000-7f5b2033f000 [vvar] 7f5b20337000-7f5b2033d000
+(00.030496) cpu: x86_family 26 x86_vendor_id AuthenticAMD x86_model_id AMD EPYC 9R45
+(00.030501) cpu: fpu: xfeatures_mask 0x2e5 xsave_size 2440 xsave_size_max 2440 xsaves_size 2440
+(00.030511) cpu: fpu: x87 floating point registers     xstate_offsets      0 / 0      xstate_sizes    160 / 160   
+(00.030512) cpu: fpu: AVX registers                    xstate_offsets    576 / 576    xstate_sizes    256 / 256   
+(00.030513) cpu: fpu: AVX-512 opmask                   xstate_offsets    832 / 832    xstate_sizes     64 / 64    
+(00.030514) cpu: fpu: AVX-512 Hi256                    xstate_offsets    896 / 896    xstate_sizes    512 / 512   
+(00.030514) cpu: fpu: AVX-512 ZMM_Hi256                xstate_offsets   1408 / 1408   xstate_sizes   1024 / 1024  
+(00.030515) cpu: fpu: Protection Keys User registers   xstate_offsets   2432 / 2432   xstate_sizes      8 / 8     
+(00.057582) Found mmap_min_addr 0x10000
+(00.057623) files stat: fs/nr_open 1073741816
+(00.057677) Warn  (criu/kerndat.c:1290): Can't keep kdat cache on non-tempfs
+(00.057685) rlimit: RLIMIT_NOFILE unlimited for self
+(00.057701) Dump CRIU run id = 565ab4e9-22bd-40ef-8253-1d231e5072bc
+(00.057711) cpu: fpu:1 fxsr:1 xsave:1 xsaveopt:1 xsavec:1 xgetbv1:1 xsaves:1
+(00.057732) kernel pid_max=4194304
+(00.057736) Reading image tree
+(00.057746) Add mnt ns 6 pid 531
+(00.057747) Add net ns 2 pid 531
+(00.057747) Add pid ns 1 pid 531
+(00.057751) pstree pid_max=10617
+(00.057754) Will restore in 0 namespaces
+(00.057754) NS mask to use 0
+(00.057775) Collecting 51/56 (flags 3)
+(00.057779) No memfd.img image
+(00.057780)  `- ... done
+(00.057782) Collecting 40/54 (flags 2)
+(00.057789) Collected [usr/local/bin/ecbench] ID 0x1
+(00.057791) Collected [usr/lib64/libc.so.6] ID 0x2
+(00.057791) Collected [usr/lib64/libm.so.6] ID 0x3
+(00.057792) Collected [usr/lib64/libgcc_s-14-20250110.so.1] ID 0x4
+(00.057793) Collected [usr/lib64/ld-linux-x86-64.so.2] ID 0x5
+(00.057794) Collected [dev/null] ID 0x6
+(00.057795) Collected [work/compute/run.stdout] ID 0x7
+(00.057796) Collected [work/compute/run.stderr] ID 0x8
+(00.057797) Collected [work/compute/session.lock] ID 0x9
+(00.057798) Collected [work/compute/session/records.jsonl] ID 0xa
+(00.057799) Collected pipe entry ID 0xb PIPE ID 0xae7a
+(00.057801) Collected pipe entry ID 0xc PIPE ID 0xae7b
+(00.057802) Collected [work/compute] ID 0xd
+(00.057803) Collected [.] ID 0xe
+(00.057803) Collected pipe entry ID 0xf PIPE ID 0xae79
+(00.057804) Collected pipe entry ID 0x10 PIPE ID 0xae7a
+(00.057805) Collected pipe entry ID 0x11 PIPE ID 0xae7b
+(00.057806) Collected [work/compute] ID 0x12
+(00.057807) Collected [.] ID 0x13
+(00.057808)  `- ... done
+(00.057808) Collecting 46/69 (flags 0)
+(00.057810) No remap-fpath.img image
+(00.057810)  `- ... done
+(00.057812) tty: Standard stream is not a terminal, may fail later
+(00.057820) No apparmor.img image
+(00.057822) No cgroup.img image
+(00.057826) Running pre-restore scripts
+(00.057840) No pidns-1.img image
+(00.057867) Forking task with 531 pid (flags 0x0)
+(00.057868) Creating process using clone3()
+(00.057902) PID: real 531 virt 531
+(00.057976)    531: timens: monotonic 168 918514690
+(00.057982)    531: timens: boottime 168 918508370
+(00.058000)    531: Calling restore_sid() for init
+(00.058002)    531: Restoring 531 to 531 sid
+(00.058013)    531: Collecting 44/37 (flags 2)
+(00.058017)    531: No tty-info.img image
+(00.058018)    531:  `- ... done
+(00.058019)    531: Collecting 45/51 (flags 0)
+(00.058021)    531: No tty-data.img image
+(00.058021)    531:  `- ... done
+(00.058021)    531: Restoring namespaces 531 flags 0x0
+(00.058025)    531: Preparing info about shared resources
+(00.058030)    531: Collecting 48/38 (flags 0)
+(00.058034)    531:  `- ... done
+(00.058035)    531: Collecting 42/27 (flags 0)
+(00.058038)    531: Collected pipe data for 0xae7a (chain 26)
+(00.058039)    531: Collected pipe data for 0xae7b (chain 27)
+(00.058040)    531: Collected pipe data for 0xae79 (chain 25)
+(00.058041)    531:  `- ... done
+(00.058041)    531: Collecting 43/27 (flags 0)
+(00.058043)    531: No fifo-data.img image
+(00.058043)    531:  `- ... done
+(00.058043)    531: Collecting 41/70 (flags 0)
+(00.058045)    531: No sk-queues.img image
+(00.058045)    531:  `- ... done
+(00.058061)    531: Found 58 VMAs in image
+(00.058062)    531: vma 0x5582f2e68000 0x5582f389a000
+(00.058063)    531: vma 0x5582f389a000 0x5582f4249000
+(00.058063)    531: vma 0x5582f4249000 0x5582f4270000
+(00.058064)    531: vma 0x5582f4270000 0x5582f4272000
+(00.058064)    531: vma 0x5582fc415000 0x5582fd6e7000
+(00.058065)    531: vma 0x7f88ec000000 0x7f88ec021000
+(00.058065)    531: vma 0x7f88ec021000 0x7f88f0000000
+(00.058065)    531: vma 0x7f88f0000000 0x7f88f0021000
+(00.058066)    531: vma 0x7f88f0021000 0x7f88f4000000
+(00.058066)    531: vma 0x7f88f4000000 0x7f88f4021000
+(00.058067)    531: vma 0x7f88f4021000 0x7f88f8000000
+(00.058067)    531: vma 0x7f88fc000000 0x7f88fc021000
+(00.058067)    531: vma 0x7f88fc021000 0x7f8900000000
+(00.058068)    531: vma 0x7f89012cf000 0x7f89012d0000
+(00.058068)    531: vma 0x7f89012d0000 0x7f89012d2000
+(00.058069)    531: vma 0x7f89012d2000 0x7f89012d3000
+(00.058069)    531: vma 0x7f89012d3000 0x7f89012d5000
+(00.058069)    531: vma 0x7f89012d5000 0x7f89012d6000
+(00.058070)    531: vma 0x7f89012d6000 0x7f89012d8000
+(00.058070)    531: vma 0x7f89012d8000 0x7f89012d9000
+(00.058074)    531: vma 0x7f89012d9000 0x7f89014d9000
+(00.058075)    531: vma 0x7f89014d9000 0x7f89014da000
+(00.058075)    531: vma 0x7f89014da000 0x7f89016da000
+(00.058075)    531: vma 0x7f89016da000 0x7f89016db000
+(00.058076)    531: vma 0x7f89016db000 0x7f89018db000
+(00.058076)    531: vma 0x7f89018db000 0x7f89018dc000
+(00.058077)    531: vma 0x7f89018dc000 0x7f89018de000
+(00.058077)    531: vma 0x7f89018de000 0x7f89018df000
+(00.058077)    531: vma 0x7f89018df000 0x7f8901adf000
+(00.058078)    531: vma 0x7f8901adf000 0x7f8901ae0000
+(00.058078)    531: vma 0x7f8901ae0000 0x7f8901ae2000
+(00.058078)    531: vma 0x7f8901ae2000 0x7f8901ae7000
+(00.058079)    531: vma 0x7f8901ae7000 0x7f8901b10000
+(00.058079)    531: vma 0x7f8901b10000 0x7f8901c86000
+(00.058080)    531: vma 0x7f8901c86000 0x7f8901cdf000
+(00.058080)    531: vma 0x7f8901cdf000 0x7f8901ce3000
+(00.058080)    531: vma 0x7f8901ce3000 0x7f8901ce5000
+(00.058081)    531: vma 0x7f8901ce5000 0x7f8901cf2000
+(00.058081)    531: vma 0x7f8901cf2000 0x7f8901cff000
+(00.058081)    531: vma 0x7f8901cff000 0x7f8901d6f000
+(00.058082)    531: vma 0x7f8901d6f000 0x7f8901dcb000
+(00.058082)    531: vma 0x7f8901dcb000 0x7f8901dcc000
+(00.058083)    531: vma 0x7f8901dcc000 0x7f8901dcd000
+(00.058083)    531: vma 0x7f8901dcd000 0x7f8901dd1000
+(00.058083)    531: vma 0x7f8901dd1000 0x7f8901df5000
+(00.058084)    531: vma 0x7f8901df5000 0x7f8901df9000
+(00.058084)    531: vma 0x7f8901df9000 0x7f8901dfa000
+(00.058085)    531: vma 0x7f8901dfa000 0x7f8901dfb000
+(00.058085)    531: vma 0x7f8901dfd000 0x7f8901dff000
+(00.058085)    531: vma 0x7f8901dff000 0x7f8901e05000
+(00.058086)    531: vma 0x7f8901e05000 0x7f8901e07000
+(00.058086)    531: vma 0x7f8901e07000 0x7f8901e09000
+(00.058087)    531: vma 0x7f8901e09000 0x7f8901e31000
+(00.058087)    531: vma 0x7f8901e31000 0x7f8901e3d000
+(00.058088)    531: vma 0x7f8901e3d000 0x7f8901e3f000
+(00.058088)    531: vma 0x7f8901e3f000 0x7f8901e41000
+(00.058089)    531: vma 0x7ffe57fe2000 0x7ffe58003000
+(00.058089)    531: vma 0xffffffffff600000 0xffffffffff601000
+(00.058092)    531: Collect fdinfo pid=531 fd=0 id=0x6
+(00.058093)    531: Collect fdinfo pid=531 fd=1 id=0x7
+(00.058094)    531: Collect fdinfo pid=531 fd=2 id=0x8
+(00.058094)    531: Collect fdinfo pid=531 fd=3 id=0x9
+(00.058095)    531: Collect fdinfo pid=531 fd=4 id=0xa
+(00.058096)    531: Collect fdinfo pid=531 fd=7 id=0xb
+(00.058097)    531: Collect fdinfo pid=531 fd=9 id=0xc
+(00.058108)    531: Found 34 VMAs in image
+(00.058108)    531: vma 0x55f94d909000 0x55f94e33b000
+(00.058109)    531: vma 0x55f94e33b000 0x55f94ecea000
+(00.058109)    531: vma 0x55f94ecea000 0x55f94ed11000
+(00.058109)    531: vma 0x55f94ed11000 0x55f94ed13000
+(00.058110)    531: vma 0x55f98a759000 0x55f98aaf5000
+(00.058110)    531: vma 0x7f5208747000 0x7f5208748000
+(00.058111)    531: vma 0x7f5208748000 0x7f520874a000
+(00.058111)    531: vma 0x7f520874a000 0x7f520874f000
+(00.058111)    531: vma 0x7f520874f000 0x7f5208778000
+(00.058112)    531: vma 0x7f5208778000 0x7f52088ee000
+(00.058112)    531: vma 0x7f52088ee000 0x7f5208947000
+(00.058113)    531: vma 0x7f5208947000 0x7f520894b000
+(00.058113)    531: vma 0x7f520894b000 0x7f520894d000
+(00.058113)    531: vma 0x7f520894d000 0x7f520895a000
+(00.058114)    531: vma 0x7f520895a000 0x7f5208967000
+(00.058114)    531: vma 0x7f5208967000 0x7f52089d7000
+(00.058114)    531: vma 0x7f52089d7000 0x7f5208a33000
+(00.058115)    531: vma 0x7f5208a33000 0x7f5208a34000
+(00.058115)    531: vma 0x7f5208a34000 0x7f5208a35000
+(00.058116)    531: vma 0x7f5208a35000 0x7f5208a39000
+(00.058116)    531: vma 0x7f5208a39000 0x7f5208a5d000
+(00.058116)    531: vma 0x7f5208a5d000 0x7f5208a61000
+(00.058117)    531: vma 0x7f5208a61000 0x7f5208a62000
+(00.058117)    531: vma 0x7f5208a62000 0x7f5208a63000
+(00.058118)    531: vma 0x7f5208a65000 0x7f5208a67000
+(00.058118)    531: vma 0x7f5208a67000 0x7f5208a6d000
+(00.058118)    531: vma 0x7f5208a6d000 0x7f5208a6f000
+(00.058119)    531: vma 0x7f5208a6f000 0x7f5208a71000
+(00.058119)    531: vma 0x7f5208a71000 0x7f5208a99000
+(00.058120)    531: vma 0x7f5208a99000 0x7f5208aa5000
+(00.058121)    531: vma 0x7f5208aa5000 0x7f5208aa7000
+(00.058121)    531: vma 0x7f5208aa7000 0x7f5208aa9000
+(00.058122)    531: vma 0x7ffc95394000 0x7ffc953b5000
+(00.058122)    531: vma 0xffffffffff600000 0xffffffffff601000
+(00.058124)    531: Collect fdinfo pid=10617 fd=0 id=0xf
+(00.058125)    531: Collect fdinfo pid=10617 fd=1 id=0x10
+(00.058125)    531: Collect fdinfo pid=10617 fd=2 id=0x11
+(00.058141)    531: skqueue: Preparing SCMs
+(00.058141)    531: Pipes:
+(00.058142)    531:  `- PIPE ID 0xae7a
+(00.058142)    531:   `- ID 0x3c227510 0xb
+(00.058143)    531:    `- FD 7 pid 531
+(00.058143)    531:   `- ID 0x3c227e00 0x10
+(00.058144)    531:    `- FD 1 pid 10617
+(00.058144)    531:     by 0xb
+(00.058145)    531:  `- PIPE ID 0xae7b
+(00.058145)    531:   `- ID 0x3c2276e0 0xc
+(00.058145)    531:    `- FD 9 pid 531
+(00.058146)    531:   `- ID 0x3c227fd0 0x11
+(00.058146)    531:    `- FD 2 pid 10617
+(00.058147)    531:     by 0xc
+(00.058147)    531:  `- PIPE ID 0xae79
+(00.058147)    531:   `- ID 0x3c227c30 0xf
+(00.058148)    531:    `- FD 0 pid 10617
+(00.058148)    531:     by 0xf
+(00.058149)    531: unix: ghost: Resolving addresses
+(00.058150)    531: File descs:
+(00.058150)    531:  `- type 1 ID 0x1
+(00.058151)    531:  `- type 1 ID 0x2
+(00.058151)    531:  `- type 1 ID 0x3
+(00.058151)    531:  `- type 1 ID 0x4
+(00.058152)    531:  `- type 1 ID 0x5
+(00.058152)    531:  `- type 1 ID 0x6
+(00.058152)    531:    `- FD 0 pid 531
+(00.058153)    531:  `- type 1 ID 0x7
+(00.058153)    531:    `- FD 1 pid 531
+(00.058154)    531:  `- type 1 ID 0x8
+(00.058154)    531:    `- FD 2 pid 531
+(00.058154)    531:  `- type 1 ID 0x9
+(00.058155)    531:    `- FD 3 pid 531
+(00.058155)    531:  `- type 1 ID 0xa
+(00.058155)    531:    `- FD 4 pid 531
+(00.058156)    531:  `- type 2 ID 0xb
+(00.058156)    531:    `- FD 7 pid 531
+(00.058156)    531:  `- type 2 ID 0xc
+(00.058157)    531:    `- FD 9 pid 531
+(00.058157)    531:  `- type 1 ID 0xd
+(00.058157)    531:  `- type 1 ID 0xe
+(00.058158)    531:  `- type 2 ID 0xf
+(00.058158)    531:    `- FD 0 pid 10617
+(00.058159)    531:  `- type 2 ID 0x10
+(00.058159)    531:    `- FD 1 pid 10617
+(00.058159)    531:  `- type 2 ID 0x11
+(00.058160)    531:    `- FD 2 pid 10617
+(00.058160)    531:  `- type 1 ID 0x12
+(00.058160)    531:  `- type 1 ID 0x13
+(00.058198)    531: No parent images directory provided
+(00.058203)    531: Opened local page read 1 (parent 0)
+(00.058209)    531: nr_restored_pages: 4918
+(00.058209)    531: nr_shared_pages:   0
+(00.058209)    531: nr_dropped_pages:  0
+(00.058210)    531: nr_enqueued:       33
+(00.058210)    531: nr_lazy:           0
+(00.058213)    531: Shrunk premap area to 0x7f5b0ce44000(0)
+(00.058214)    531: Restore on-core sigactions for 531
+(00.058227)    531: Restoring children in alien sessions:
+(00.058228)    531: Restoring children in our session:
+(00.058250)    531: Forking task with 10617 pid (flags 0x0)
+(00.058250)    531: Creating process using clone3()
+(00.058305)    531: Restoring 531 to 531 pgid
+(00.058315)    531: PID: real 10617 virt 10617
+(00.058337)  10617: No parent images directory provided
+(00.058346)  10617: Opened local page read 2 (parent 0)
+(00.058353)  10617: nr_restored_pages: 1000
+(00.058354)  10617: nr_shared_pages:   0
+(00.058354)  10617: nr_dropped_pages:  0
+(00.058355)  10617: nr_enqueued:       20
+(00.058355)  10617: nr_lazy:           0
+(00.058357)  10617: Shrunk premap area to 0x7f5b1e58a000(0)
+(00.058358)  10617: Restore on-core sigactions for 10617
+(00.058366)  10617: Restoring children in alien sessions:
+(00.058367)  10617: Restoring children in our session:
+(00.058373)  10617: Restoring 10617 to 10617 pgid
+(00.058374)  10617: 	will call setpgid, mine pgid is 531
+(00.058383)    531: Restoring resources
+(00.058385)  10617: Restoring resources
+(00.058387)    531: Opening fdinfo-s
+(00.058388)  10617: Opening fdinfo-s
+(00.058389)  10617: 		Creating pipe pipe_id=0xae79 id=0xf
+(00.058392)  10617: Restoring size 0x10000 for 0xae79
+(00.058392)    531: 		Create fd for 0
+(00.058395)  10617: 		Create fd for 0
+(00.058395)  10617: 		Creating pipe pipe_id=0xae7a id=0x10
+(00.058395)    531: File work/compute/run.stdout could only be validated with file size
+(00.058398)    531: 		Create fd for 1
+(00.058399)  10617: 		Creating pipe pipe_id=0xae7b id=0x11
+(00.058400)    531: File work/compute/run.stderr could only be validated with file size
+(00.058400)  10617: 		Creating pipe pipe_id=0xae7a id=0x10
+(00.058400)    531: 		Create fd for 2
+(00.058401)  10617: 		Creating pipe pipe_id=0xae7b id=0x11
+(00.058403)    531: File work/compute/session.lock could only be validated with file size
+(00.058403)    531: 		Create fd for 3
+(00.058406)    531: 		Create fd for 4
+(00.058406)    531: 		Creating pipe pipe_id=0xae7a id=0xb
+(00.058409)    531: Restoring size 0x10000 for 0xae7a
+(00.058410)    531: 		Send fd 6 to /crtools-fd-10617-13cf8484-71bc-4237-99f9-5fabb254524e
+(00.058416)    531: 		Create fd for 7
+(00.058416)  10617: 		Creating pipe pipe_id=0xae7a id=0x10
+(00.058417)    531: 		Creating pipe pipe_id=0xae7b id=0xc
+(00.058418)    531: Restoring size 0x10000 for 0xae7b
+(00.058419)    531: 		Send fd 6 to /crtools-fd-10617-13cf8484-71bc-4237-99f9-5fabb254524e
+(00.058419)  10617: Further fle=0x7f5b202e0c28, pid=10617
+(00.058420)  10617: 		Create fd for 1
+(00.058421)  10617: 		Creating pipe pipe_id=0xae7b id=0x11
+(00.058421)    531: 		Create fd for 9
+(00.058422)  10617: Further fle=0x7f5b202e0c68, pid=10617
+(00.058422)    531: (flock)flag: 2, type: 1, cmd: 2, pid: 531, fd: 3
+(00.058423)  10617: 		Create fd for 2
+(00.058424)  10617: Opening 0x0055f94d909000-0x0055f94e33b000 0000000000000000 (20000041) vma
+(00.058424)    531: Opening 0x005582f2e68000-0x005582f389a000 0000000000000000 (20000041) vma
+(00.058437)    531: Opening 0x005582f389a000-0x005582f4249000 0x00000000a31000 (41) vma
+(00.058438)    531: Opening 0x005582f4249000-0x005582f4270000 0x000000013df000 (41) vma
+(00.058439)    531: Opening 0x005582f4270000-0x005582f4272000 0x00000001405000 (41) vma
+(00.058439)  10617: Opening 0x0055f94e33b000-0x0055f94ecea000 0x00000000a31000 (41) vma
+(00.058439)    531: Opening 0x007f8901ae7000-0x007f8901b10000 0000000000000000 (20000041) vma
+(00.058439)  10617: Opening 0x0055f94ecea000-0x0055f94ed11000 0x000000013df000 (41) vma
+(00.058440)  10617: Opening 0x0055f94ed11000-0x0055f94ed13000 0x00000001405000 (41) vma
+(00.058441)  10617: Opening 0x007f520874f000-0x007f5208778000 0000000000000000 (20000041) vma
+(00.058447)    531: Opening 0x007f8901b10000-0x007f8901c86000 0x00000000029000 (20000041) vma
+(00.058448)    531: Opening 0x007f8901c86000-0x007f8901cdf000 0x0000000019f000 (20000041) vma
+(00.058448)  10617: Opening 0x007f5208778000-0x007f52088ee000 0x00000000029000 (20000041) vma
+(00.058448)    531: Opening 0x007f8901cdf000-0x007f8901ce3000 0x000000001f7000 (41) vma
+(00.058448)  10617: Opening 0x007f52088ee000-0x007f5208947000 0x0000000019f000 (20000041) vma
+(00.058449)    531: Opening 0x007f8901ce3000-0x007f8901ce5000 0x000000001fb000 (41) vma
+(00.058449)  10617: Opening 0x007f5208947000-0x007f520894b000 0x000000001f7000 (41) vma
+(00.058449)    531: Opening 0x007f8901cf2000-0x007f8901cff000 0000000000000000 (20000041) vma
+(00.058449)  10617: Opening 0x007f520894b000-0x007f520894d000 0x000000001fb000 (41) vma
+(00.058450)  10617: Opening 0x007f520895a000-0x007f5208967000 0000000000000000 (20000041) vma
+(00.058464)  10617: Opening 0x007f5208967000-0x007f52089d7000 0x0000000000d000 (20000041) vma
+(00.058465)  10617: Opening 0x007f52089d7000-0x007f5208a33000 0x0000000007d000 (20000041) vma
+(00.058465)    531: Opening 0x007f8901cff000-0x007f8901d6f000 0x0000000000d000 (20000041) vma
+(00.058465)  10617: Opening 0x007f5208a33000-0x007f5208a34000 0x000000000d8000 (41) vma
+(00.058466)    531: Opening 0x007f8901d6f000-0x007f8901dcb000 0x0000000007d000 (20000041) vma
+(00.058466)  10617: Opening 0x007f5208a34000-0x007f5208a35000 0x000000000d9000 (41) vma
+(00.058466)    531: Opening 0x007f8901dcb000-0x007f8901dcc000 0x000000000d8000 (41) vma
+(00.058466)  10617: Opening 0x007f5208a35000-0x007f5208a39000 0000000000000000 (20000041) vma
+(00.058467)    531: Opening 0x007f8901dcc000-0x007f8901dcd000 0x000000000d9000 (41) vma
+(00.058469)    531: Opening 0x007f8901dcd000-0x007f8901dd1000 0000000000000000 (20000041) vma
+(00.058479)  10617: Opening 0x007f5208a39000-0x007f5208a5d000 0x00000000004000 (20000041) vma
+(00.058480)  10617: Opening 0x007f5208a5d000-0x007f5208a61000 0x00000000028000 (20000041) vma
+(00.058480)  10617: Opening 0x007f5208a61000-0x007f5208a62000 0x0000000002c000 (41) vma
+(00.058480)  10617: Opening 0x007f5208a6f000-0x007f5208a71000 0000000000000000 (20000041) vma
+(00.058481)    531: Opening 0x007f8901dd1000-0x007f8901df5000 0x00000000004000 (20000041) vma
+(00.058481)    531: Opening 0x007f8901df5000-0x007f8901df9000 0x00000000028000 (20000041) vma
+(00.058482)    531: Opening 0x007f8901df9000-0x007f8901dfa000 0x0000000002c000 (41) vma
+(00.058482)    531: Opening 0x007f8901e07000-0x007f8901e09000 0000000000000000 (20000041) vma
+(00.058487)  10617: Opening 0x007f5208a71000-0x007f5208a99000 0x00000000002000 (20000041) vma
+(00.058488)  10617: Opening 0x007f5208a99000-0x007f5208aa5000 0x0000000002a000 (20000041) vma
+(00.058488)  10617: Opening 0x007f5208aa5000-0x007f5208aa7000 0x00000000036000 (41) vma
+(00.058488)    531: Opening 0x007f8901e09000-0x007f8901e31000 0x00000000002000 (20000041) vma
+(00.058489)  10617: Opening 0x007f5208aa7000-0x007f5208aa9000 0x00000000038000 (41) vma
+(00.058489)    531: Opening 0x007f8901e31000-0x007f8901e3d000 0x0000000002a000 (20000041) vma
+(00.058490)    531: Opening 0x007f8901e3d000-0x007f8901e3f000 0x00000000036000 (41) vma
+(00.058490)    531: Opening 0x007f8901e3f000-0x007f8901e41000 0x00000000038000 (41) vma
+(00.058501)  10617: `- render 14 iovs (0x55f94e33b000:4096...)
+(00.058503)  10617: Restore via sigreturn
+(00.058518)  10617: Parsed 400000-424000 vma
+(00.058519)  10617: Parsed 400000-4c8000 vma
+(00.058519)  10617: Parsed 400000-559000 vma
+(00.058520)  10617: Parsed 400000-55a000 vma
+(00.058520)  10617: Parsed 400000-562000 vma
+(00.058521)  10617: Parsed 400000-594000 vma
+(00.058521)  10617: Parsed 3c225000-3c246000 vma
+(00.058522)  10617: Parsed 7f5b200ae000-7f5b200b1000 vma
+(00.058522)  10617: Parsed 7f5b200ae000-7f5b200be000 vma
+(00.058523)  10617: Parsed 7f5b200ae000-7f5b200c0000 vma
+(00.058523)  10617: Parsed 7f5b200ae000-7f5b200d3000 vma
+(00.058524)  10617: Parsed 7f5b200ae000-7f5b200fc000 vma
+(00.058524)  10617: Parsed 7f5b200ae000-7f5b20272000 vma
+(00.058524)  10617: Parsed 7f5b200ae000-7f5b202cb000 vma
+(00.058525)  10617: Parsed 7f5b200ae000-7f5b202cf000 vma
+(00.058525)  10617: Parsed 7f5b200ae000-7f5b202d1000 vma
+(00.058526)  10617: Parsed 7f5b200ae000-7f5b202e0000 vma
+(00.058526)  10617: Parsed 7f5b200ae000-7f5b202e2000 vma
+(00.058527)  10617: Parsed 7f5b200ae000-7f5b202e4000 vma
+(00.058527)  10617: Parsed 7f5b200ae000-7f5b202e8000 vma
+(00.058528)  10617: Parsed 7f5b200ae000-7f5b202e9000 vma
+(00.058528)  10617: Parsed 7f5b200ae000-7f5b202ea000 vma
+(00.058528)  10617: Parsed 7f5b200ae000-7f5b202eb000 vma
+(00.058529)  10617: Parsed 7f5b200ae000-7f5b202ef000 vma
+(00.058529)  10617: Parsed 7f5b200ae000-7f5b202fd000 vma
+(00.058530)  10617: Parsed 7f5b200ae000-7f5b20303000 vma
+(00.058530)  10617: Parsed 7f5b200ae000-7f5b20304000 vma
+(00.058531)  10617: Parsed 7f5b200ae000-7f5b20307000 vma
+(00.058531)  10617: Parsed 7f5b200ae000-7f5b2030f000 vma
+(00.058532)  10617: Parsed 7f5b200ae000-7f5b2031f000 vma
+(00.058532)  10617: Parsed 7f5b200ae000-7f5b20328000 vma
+(00.058533)  10617: Parsed 7f5b200ae000-7f5b2032a000 vma
+(00.058533)  10617: Parsed 7f5b200ae000-7f5b2032b000 vma
+(00.058533)  10617: Parsed 7f5b200ae000-7f5b2032c000 vma
+(00.058534)  10617: Parsed 7f5b200ae000-7f5b20332000 vma
+(00.058534)  10617: Parsed 7f5b200ae000-7f5b20333000 vma
+(00.058535)  10617: Parsed 7f5b200ae000-7f5b20334000 vma
+(00.058535)  10617: Parsed 7f5b200ae000-7f5b20335000 vma
+(00.058536)  10617: Parsed 7f5b200ae000-7f5b20337000 vma
+(00.058536)  10617: Parsed 7f5b200ae000-7f5b2033b000 vma
+(00.058537)  10617: Parsed 7f5b200ae000-7f5b2033d000 vma
+(00.058537)  10617: Parsed 7f5b200ae000-7f5b2033f000 vma
+(00.058538)  10617: Parsed 7f5b200ae000-7f5b20341000 vma
+(00.058540)  10617: Parsed 7f5b200ae000-7f5b20369000 vma
+(00.058541)  10617: Parsed 7f5b200ae000-7f5b20375000 vma
+(00.058542)  10617: Parsed 7f5b200ae000-7f5b20377000 vma
+(00.058542)  10617: Parsed 7f5b200ae000-7f5b20379000 vma
+(00.058543)  10617: Parsed 7ffd587ec000-7ffd5880d000 vma
+(00.058543)  10617: Parsed ffffffffff600000-ffffffffff601000 vma
+(00.058544)    531: `- render 23 iovs (0x5582f389a000:4096...)
+(00.058545)  10617: 1 threads require 128K of memory
+(00.058545)    531: Restore via sigreturn
+(00.058545)  10617: Found bootstrap VMA hint at: 0x10000 (needs ~160K)
+(00.058576)  10617: 	call mremap(0x7f5b200ae000, 8192, 8192, MAYMOVE | FIXED, 0x2b000)
+(00.058580)  10617: 	call mremap(0x7f5b200be000, 8192, 8192, MAYMOVE | FIXED, 0x2d000)
+(00.058585)  10617: x86: xsave runtime structure
+(00.058586)  10617: x86: -----------------------
+(00.058586)  10617: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.058588)  10617: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.058589)  10617: x86: xstate_bv: 0x2a3
+(00.058589)  10617: x86: -----------------------
+(00.058590)  10617: Thread    0 stack  0x1d080 rt_sigframe  0x25080
+(00.058601)  10617: Going to chroot into /proc/self/fd/11
+(00.058604)  10617: Restoring umask to 22
+(00.058609)  10617: task_args: 0x2a000
+task_args->pid: 10617
+task_args->nr_threads: 1
+task_args->clone_restore_fn: 0x12240
+task_args->thread_args: 0x2a5c0
+(00.058611) pie: 10617: Switched to the restorer 10617
+(00.058654) pie: 10617: Mapping native vDSO at 0x30000
+(00.058656) pie: 10617: vdso: Using gettimeofday() on vdso at 0x36f90
+(00.058660) pie: 10617: 	mmap(0x55f94d909000 -> 0x55f94e33b000, 0x1 0x12 3)
+(00.058661) pie: 10617: 	mmap(0x55f94e33b000 -> 0x55f94ecea000, 0x7 0x12 3)
+(00.058663) pie: 10617: 	mmap(0x55f94ecea000 -> 0x55f94ed11000, 0x3 0x12 3)
+(00.058664) pie: 10617: 	mmap(0x55f94ed11000 -> 0x55f94ed13000, 0x3 0x12 3)
+(00.058666) pie: 10617: 	mmap(0x55f98a759000 -> 0x55f98aaf5000, 0x3 0x32 -1)
+(00.058668) pie: 10617: 	mmap(0x7f5208747000 -> 0x7f5208748000, 0x0 0x32 -1)
+(00.058669) pie: 10617: 	mmap(0x7f5208748000 -> 0x7f520874a000, 0x3 0x32 -1)
+(00.058670) pie: 10617: 	mmap(0x7f520874a000 -> 0x7f520874f000, 0x3 0x32 -1)
+(00.058671) pie: 10617: 	mmap(0x7f520874f000 -> 0x7f5208778000, 0x1 0x12 4)
+(00.058673) pie: 10617: 	mmap(0x7f5208778000 -> 0x7f52088ee000, 0x5 0x12 4)
+(00.058674) pie: 10617: 	mmap(0x7f52088ee000 -> 0x7f5208947000, 0x1 0x12 4)
+(00.058675) pie: 10617: 	mmap(0x7f5208947000 -> 0x7f520894b000, 0x3 0x12 4)
+(00.058676) pie: 10617: 	mmap(0x7f520894b000 -> 0x7f520894d000, 0x3 0x12 4)
+(00.058681) pie: 10617: 	mmap(0x7f520894d000 -> 0x7f520895a000, 0x3 0x32 -1)
+(00.058682) pie: 10617: 	mmap(0x7f520895a000 -> 0x7f5208967000, 0x1 0x12 5)
+(00.058684) pie: 10617: 	mmap(0x7f5208967000 -> 0x7f52089d7000, 0x5 0x12 5)
+(00.058685) pie: 10617: 	mmap(0x7f52089d7000 -> 0x7f5208a33000, 0x1 0x12 5)
+(00.058686) pie: 10617: 	mmap(0x7f5208a33000 -> 0x7f5208a34000, 0x3 0x12 5)
+(00.058687) pie: 10617: 	mmap(0x7f5208a34000 -> 0x7f5208a35000, 0x3 0x12 5)
+(00.058692) pie: 10617: 	mmap(0x7f5208a35000 -> 0x7f5208a39000, 0x1 0x12 6)
+(00.058693) pie: 10617: 	mmap(0x7f5208a39000 -> 0x7f5208a5d000, 0x5 0x12 6)
+(00.058694) pie: 10617: 	mmap(0x7f5208a5d000 -> 0x7f5208a61000, 0x1 0x12 6)
+(00.058695) pie: 10617: 	mmap(0x7f5208a61000 -> 0x7f5208a62000, 0x3 0x12 6)
+(00.058696) pie: 10617: 	mmap(0x7f5208a62000 -> 0x7f5208a63000, 0x3 0x32 -1)
+(00.058698) pie: 10617: 	mmap(0x7f5208a65000 -> 0x7f5208a67000, 0x3 0x32 -1)
+(00.058699) pie: 10617: 	mmap(0x7f5208a67000 -> 0x7f5208a6d000, 0x1 0x32 -1)
+(00.058700) pie: 10617: 	mmap(0x7f5208a6d000 -> 0x7f5208a6f000, 0x7 0x32 -1)
+(00.058701) pie: 10617: 	mmap(0x7f5208a6f000 -> 0x7f5208a71000, 0x1 0x12 7)
+(00.058703) pie: 10617: 	mmap(0x7f5208a71000 -> 0x7f5208a99000, 0x5 0x12 7)
+(00.058704) pie: 10617: 	mmap(0x7f5208a99000 -> 0x7f5208aa5000, 0x1 0x12 7)
+(00.058705) pie: 10617: 	mmap(0x7f5208aa5000 -> 0x7f5208aa7000, 0x3 0x12 7)
+(00.058706) pie: 10617: 	mmap(0x7f5208aa7000 -> 0x7f5208aa9000, 0x3 0x12 7)
+(00.058707) pie: 10617: 	mmap(0x7ffc95394000 -> 0x7ffc953b5000, 0x3 0x132 -1)
+(00.058710) pie: 10617: Preadv 0x55f94e33b000:4096... (14 iovs)
+(00.059460) pie: 10617: `- returned 4096000
+(00.059461) pie: 10617:    `- skip pagemap
+(00.059461) pie: 10617:    `- skip pagemap
+(00.059462) pie: 10617:    `- skip pagemap
+(00.059462) pie: 10617:    `- skip pagemap
+(00.059463) pie: 10617:    `- skip pagemap
+(00.059463) pie: 10617:    `- skip pagemap
+(00.059463) pie: 10617:    `- skip pagemap
+(00.059464) pie: 10617:    `- skip pagemap
+(00.059464) pie: 10617:    `- skip pagemap
+(00.059465) pie: 10617:    `- skip pagemap
+(00.059465) pie: 10617:    `- skip pagemap
+(00.059466) pie: 10617:    `- skip pagemap
+(00.059466) pie: 10617:    `- skip pagemap
+(00.059466) pie: 10617:    `- skip pagemap
+(00.059468) pie: 10617: vdso: Parsing at 0x7f5208a6d000 0x7f5208a6f000
+(00.059468) pie: 10617: vdso: PT_LOAD p_vaddr: 0x0
+(00.059469) pie: 10617: vdso: DT_HASH: 0x120
+(00.059469) pie: 10617: vdso: DT_GNU_HASH: 0x170
+(00.059470) pie: 10617: vdso: DT_STRTAB: 0x320
+(00.059470) pie: 10617: vdso: DT_SYMTAB: 0x1d0
+(00.059471) pie: 10617: vdso: DT_STRSZ: 0x83
+(00.059471) pie: 10617: vdso: DT_SYMENT: 0x18
+(00.059472) pie: 10617: vdso: nbucket 0x3 nchain 0xe bucket 0x7f5208a6d128 chain 0x7f5208a6d134
+(00.059473) pie: 10617: vdso: symbol __vdso_clock_gettime at address 0xfd0
+(00.059473) pie: 10617: vdso: symbol __vdso_getcpu at address 0x1050
+(00.059474) pie: 10617: vdso: symbol __vdso_gettimeofday at address 0xf90
+(00.059474) pie: 10617: vdso: symbol __vdso_time at address 0xfa0
+(00.059475) pie: 10617: vdso: symbol __kernel_sigreturn at address 0x0
+(00.059476) pie: 10617: vdso: symbol __kernel_rt_sigreturn at address 0x0
+(00.059476) pie: 10617: vdso: symbol __vdso_clock_gettime64 at address 0x0
+(00.059477) pie: 10617: vdso: image [vdso] 0x7f5208a6d000-0x7f5208a6f000 [vvar] 0x7f5208a67000-0x7f5208a6d000
+(00.059477) pie: 10617: vdso: Runtime vdso/vvar matches dumpee, remap inplace
+(00.059482) pie: 10617: vdso: Remap rt-vdso 0x36000 -> 0x7f5208a6d000
+(00.059485) pie: 10617: vdso: Remap rt-vvar 0x34000 -> 0x7f5208a6b000
+(00.059487) pie: 10617: vdso: Remap rt-vvar 0x30000 -> 0x7f5208a67000
+(00.059489) pie: 10617: vdso: Using gettimeofday() on vdso at 0x7f5208a6df90
+(00.059502) pie: 10617: Restoring scheduler params 0.0.0
+(00.059508) pie: 10617: rseq: rseq_abi_pointer = 0x7f520874b720 signature = 0x53053053
+(00.059511) pie: 10617: 10617: Restored
+(00.059528)    531: Parsed 400000-424000 vma
+(00.059529)    531: Parsed 400000-4c8000 vma
+(00.059530)    531: Parsed 400000-559000 vma
+(00.059530)    531: Parsed 400000-55a000 vma
+(00.059530)    531: Parsed 400000-562000 vma
+(00.059531)    531: Parsed 400000-594000 vma
+(00.059531)    531: Parsed 3c225000-3c246000 vma
+(00.059532)    531: Parsed 7f5b200aa000-7f5b200ae000 vma
+(00.059533)    531: Parsed 7f5b200b0000-7f5b200b1000 vma
+(00.059533)    531: Parsed 7f5b200b0000-7f5b200be000 vma
+(00.059534)    531: Parsed 7f5b200b0000-7f5b200c0000 vma
+(00.059534)    531: Parsed 7f5b200b0000-7f5b200d3000 vma
+(00.059535)    531: Parsed 7f5b200b0000-7f5b200fc000 vma
+(00.059535)    531: Parsed 7f5b200b0000-7f5b20272000 vma
+(00.059535)    531: Parsed 7f5b200b0000-7f5b202cb000 vma
+(00.059536)    531: Parsed 7f5b200b0000-7f5b202cf000 vma
+(00.059536)    531: Parsed 7f5b200b0000-7f5b202d1000 vma
+(00.059537)    531: Parsed 7f5b200b0000-7f5b202e0000 vma
+(00.059537)    531: Parsed 7f5b200b0000-7f5b202e2000 vma
+(00.059538)    531: Parsed 7f5b200b0000-7f5b202e4000 vma
+(00.059538)    531: Parsed 7f5b200b0000-7f5b202e8000 vma
+(00.059539)    531: Parsed 7f5b200b0000-7f5b202e9000 vma
+(00.059539)    531: Parsed 7f5b200b0000-7f5b202ea000 vma
+(00.059539)    531: Parsed 7f5b200b0000-7f5b202eb000 vma
+(00.059540)    531: Parsed 7f5b200b0000-7f5b202ef000 vma
+(00.059540)    531: Parsed 7f5b200b0000-7f5b202fd000 vma
+(00.059541)    531: Parsed 7f5b200b0000-7f5b20303000 vma
+(00.059541)    531: Parsed 7f5b200b0000-7f5b20304000 vma
+(00.059542)    531: Parsed 7f5b200b0000-7f5b20307000 vma
+(00.059542)    531: Parsed 7f5b200b0000-7f5b2030f000 vma
+(00.059543)    531: Parsed 7f5b200b0000-7f5b2031f000 vma
+(00.059543)    531: Parsed 7f5b200b0000-7f5b20328000 vma
+(00.059546)    531: Parsed 7f5b200b0000-7f5b2032a000 vma
+(00.059546)    531: Parsed 7f5b200b0000-7f5b2032b000 vma
+(00.059547)    531: Parsed 7f5b200b0000-7f5b2032c000 vma
+(00.059547)    531: Parsed 7f5b200b0000-7f5b20332000 vma
+(00.059548)    531: Parsed 7f5b200b0000-7f5b20333000 vma
+(00.059548)    531: Parsed 7f5b200b0000-7f5b20334000 vma
+(00.059548)    531: Parsed 7f5b200b0000-7f5b20335000 vma
+(00.059549)    531: Parsed 7f5b200b0000-7f5b20337000 vma
+(00.059549)    531: Parsed 7f5b200b0000-7f5b2033b000 vma
+(00.059550)    531: Parsed 7f5b200b0000-7f5b2033d000 vma
+(00.059550)    531: Parsed 7f5b200b0000-7f5b2033f000 vma
+(00.059551)    531: Parsed 7f5b200b0000-7f5b20341000 vma
+(00.059553)    531: Parsed 7f5b200b0000-7f5b20369000 vma
+(00.059553)    531: Parsed 7f5b200b0000-7f5b20375000 vma
+(00.059554)    531: Parsed 7f5b200b0000-7f5b20377000 vma
+(00.059554)    531: Parsed 7f5b200b0000-7f5b20379000 vma
+(00.059555)    531: Parsed 7ffd587ec000-7ffd5880d000 vma
+(00.059555)    531: Parsed ffffffffff600000-ffffffffff601000 vma
+(00.059557)    531: 5 threads require 336K of memory
+(00.059557)    531: Found bootstrap VMA hint at: 0x10000 (needs ~368K)
+(00.059607)    531: 	call mremap(0x7f5b200aa000, 16384, 16384, MAYMOVE | FIXED, 0x5d000)
+(00.059610)    531: 	call mremap(0x7f5b200be000, 8192, 8192, MAYMOVE | FIXED, 0x61000)
+(00.059615)    531: x86: xsave runtime structure
+(00.059615)    531: x86: -----------------------
+(00.059615)    531: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.059616)    531: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.059617)    531: x86: xstate_bv: 0x2a3
+(00.059617)    531: x86: -----------------------
+(00.059618)    531: Thread    0 stack  0x1d080 rt_sigframe  0x25080
+(00.059619)    531: x86: xsave runtime structure
+(00.059619)    531: x86: -----------------------
+(00.059620)    531: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.059620)    531: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.059621)    531: x86: xstate_bv: 0x2a3
+(00.059621)    531: x86: -----------------------
+(00.059622)    531: Thread    1 stack  0x298c0 rt_sigframe  0x318c0
+(00.059623)    531: x86: xsave runtime structure
+(00.059624)    531: x86: -----------------------
+(00.059624)    531: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.059624)    531: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.059625)    531: x86: xstate_bv: 0x2a3
+(00.059625)    531: x86: -----------------------
+(00.059626)    531: Thread    2 stack  0x36100 rt_sigframe  0x3e100
+(00.059627)    531: x86: xsave runtime structure
+(00.059627)    531: x86: -----------------------
+(00.059627)    531: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.059628)    531: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.059628)    531: x86: xstate_bv: 0x2a3
+(00.059629)    531: x86: -----------------------
+(00.059630)    531: Thread    3 stack  0x42940 rt_sigframe  0x4a940
+(00.059630)    531: x86: xsave runtime structure
+(00.059630)    531: x86: -----------------------
+(00.059631)    531: x86: cwd:0x37f swd:0 twd:0 fop:0 mxcsr:0x1fa0 mxcsr_mask:0x2ffff
+(00.059631)    531: x86: magic1:0x46505853 extended_size:2444 xstate_bv:0x2a3 xstate_size:2440
+(00.059632)    531: x86: xstate_bv: 0x2a3
+(00.059632)    531: x86: -----------------------
+(00.059633)    531: Thread    4 stack  0x4f180 rt_sigframe  0x57180
+(00.059641)    531: Going to chroot into /proc/self/fd/15
+(00.059643)    531: Restoring umask to 22
+(00.059649)    531: task_args: 0x5c000
+task_args->pid: 531
+task_args->nr_threads: 5
+task_args->clone_restore_fn: 0x12240
+task_args->thread_args: 0x5c5c0
+(00.059651) pie: 531: Switched to the restorer 531
+(00.059694) pie: 531: Mapping native vDSO at 0x64000
+(00.059697) pie: 531: vdso: Using gettimeofday() on vdso at 0x6af90
+(00.059700) pie: 531: 	mmap(0x5582f2e68000 -> 0x5582f389a000, 0x1 0x12 5)
+(00.059702) pie: 531: 	mmap(0x5582f389a000 -> 0x5582f4249000, 0x7 0x12 5)
+(00.059704) pie: 531: 	mmap(0x5582f4249000 -> 0x5582f4270000, 0x3 0x12 5)
+(00.059706) pie: 531: 	mmap(0x5582f4270000 -> 0x5582f4272000, 0x3 0x12 5)
+(00.059707) pie: 531: 	mmap(0x5582fc415000 -> 0x5582fd6e7000, 0x3 0x32 -1)
+(00.059709) pie: 531: 	mmap(0x7f88ec000000 -> 0x7f88ec021000, 0x3 0x4032 -1)
+(00.059710) pie: 531: 	mmap(0x7f88ec021000 -> 0x7f88f0000000, 0x0 0x4032 -1)
+(00.059711) pie: 531: 	mmap(0x7f88f0000000 -> 0x7f88f0021000, 0x3 0x4032 -1)
+(00.059712) pie: 531: 	mmap(0x7f88f0021000 -> 0x7f88f4000000, 0x0 0x4032 -1)
+(00.059713) pie: 531: 	mmap(0x7f88f4000000 -> 0x7f88f4021000, 0x3 0x4032 -1)
+(00.059714) pie: 531: 	mmap(0x7f88f4021000 -> 0x7f88f8000000, 0x0 0x4032 -1)
+(00.059715) pie: 531: 	mmap(0x7f88fc000000 -> 0x7f88fc021000, 0x3 0x4032 -1)
+(00.059717) pie: 531: 	mmap(0x7f88fc021000 -> 0x7f8900000000, 0x0 0x4032 -1)
+(00.059718) pie: 531: 	mmap(0x7f89012cf000 -> 0x7f89012d0000, 0x0 0x32 -1)
+(00.059719) pie: 531: 	mmap(0x7f89012d0000 -> 0x7f89012d2000, 0x3 0x32 -1)
+(00.059720) pie: 531: 	mmap(0x7f89012d2000 -> 0x7f89012d3000, 0x0 0x32 -1)
+(00.059725) pie: 531: 	mmap(0x7f89012d3000 -> 0x7f89012d5000, 0x3 0x32 -1)
+(00.059726) pie: 531: 	mmap(0x7f89012d5000 -> 0x7f89012d6000, 0x0 0x32 -1)
+(00.059727) pie: 531: 	mmap(0x7f89012d6000 -> 0x7f89012d8000, 0x3 0x32 -1)
+(00.059728) pie: 531: 	mmap(0x7f89012d8000 -> 0x7f89012d9000, 0x0 0x32 -1)
+(00.059729) pie: 531: 	mmap(0x7f89012d9000 -> 0x7f89014d9000, 0x3 0x32 -1)
+(00.059730) pie: 531: 	mmap(0x7f89014d9000 -> 0x7f89014da000, 0x0 0x32 -1)
+(00.059731) pie: 531: 	mmap(0x7f89014da000 -> 0x7f89016da000, 0x3 0x32 -1)
+(00.059732) pie: 531: 	mmap(0x7f89016da000 -> 0x7f89016db000, 0x0 0x32 -1)
+(00.059733) pie: 531: 	mmap(0x7f89016db000 -> 0x7f89018db000, 0x3 0x32 -1)
+(00.059735) pie: 531: 	mmap(0x7f89018db000 -> 0x7f89018dc000, 0x0 0x32 -1)
+(00.059735) pie: 531: 	mmap(0x7f89018dc000 -> 0x7f89018de000, 0x3 0x32 -1)
+(00.059736) pie: 531: 	mmap(0x7f89018de000 -> 0x7f89018df000, 0x0 0x32 -1)
+(00.059737) pie: 531: 	mmap(0x7f89018df000 -> 0x7f8901adf000, 0x3 0x32 -1)
+(00.059738) pie: 531: 	mmap(0x7f8901adf000 -> 0x7f8901ae0000, 0x0 0x32 -1)
+(00.059739) pie: 531: 	mmap(0x7f8901ae0000 -> 0x7f8901ae2000, 0x3 0x32 -1)
+(00.059741) pie: 531: 	mmap(0x7f8901ae2000 -> 0x7f8901ae7000, 0x3 0x32 -1)
+(00.059742) pie: 531: 	mmap(0x7f8901ae7000 -> 0x7f8901b10000, 0x1 0x12 6)
+(00.059743) pie: 531: 	mmap(0x7f8901b10000 -> 0x7f8901c86000, 0x5 0x12 6)
+(00.059745) pie: 531: 	mmap(0x7f8901c86000 -> 0x7f8901cdf000, 0x1 0x12 6)
+(00.059746) pie: 531: 	mmap(0x7f8901cdf000 -> 0x7f8901ce3000, 0x3 0x12 6)
+(00.059747) pie: 531: 	mmap(0x7f8901ce3000 -> 0x7f8901ce5000, 0x3 0x12 6)
+(00.059748) pie: 531: 	mmap(0x7f8901ce5000 -> 0x7f8901cf2000, 0x3 0x32 -1)
+(00.059749) pie: 531: 	mmap(0x7f8901cf2000 -> 0x7f8901cff000, 0x1 0x12 8)
+(00.059751) pie: 531: 	mmap(0x7f8901cff000 -> 0x7f8901d6f000, 0x5 0x12 8)
+(00.059752) pie: 531: 	mmap(0x7f8901d6f000 -> 0x7f8901dcb000, 0x1 0x12 8)
+(00.059753) pie: 531: 	mmap(0x7f8901dcb000 -> 0x7f8901dcc000, 0x3 0x12 8)
+(00.059754) pie: 531: 	mmap(0x7f8901dcc000 -> 0x7f8901dcd000, 0x3 0x12 8)
+(00.059756) pie: 531: 	mmap(0x7f8901dcd000 -> 0x7f8901dd1000, 0x1 0x12 10)
+(00.059757) pie: 531: 	mmap(0x7f8901dd1000 -> 0x7f8901df5000, 0x5 0x12 10)
+(00.059758) pie: 531: 	mmap(0x7f8901df5000 -> 0x7f8901df9000, 0x1 0x12 10)
+(00.059759) pie: 531: 	mmap(0x7f8901df9000 -> 0x7f8901dfa000, 0x3 0x12 10)
+(00.059761) pie: 531: 	mmap(0x7f8901dfa000 -> 0x7f8901dfb000, 0x3 0x32 -1)
+(00.059762) pie: 531: 	mmap(0x7f8901dfd000 -> 0x7f8901dff000, 0x3 0x32 -1)
+(00.059763) pie: 531: 	mmap(0x7f8901dff000 -> 0x7f8901e05000, 0x1 0x32 -1)
+(00.059764) pie: 531: 	mmap(0x7f8901e05000 -> 0x7f8901e07000, 0x7 0x32 -1)
+(00.059765) pie: 531: 	mmap(0x7f8901e07000 -> 0x7f8901e09000, 0x1 0x12 11)
+(00.059767) pie: 531: 	mmap(0x7f8901e09000 -> 0x7f8901e31000, 0x5 0x12 11)
+(00.059768) pie: 531: 	mmap(0x7f8901e31000 -> 0x7f8901e3d000, 0x1 0x12 11)
+(00.059769) pie: 531: 	mmap(0x7f8901e3d000 -> 0x7f8901e3f000, 0x3 0x12 11)
+(00.059773) pie: 531: 	mmap(0x7f8901e3f000 -> 0x7f8901e41000, 0x3 0x12 11)
+(00.059775) pie: 531: 	mmap(0x7ffe57fe2000 -> 0x7ffe58003000, 0x3 0x132 -1)
+(00.059776) pie: 531: Preadv 0x5582f389a000:4096... (23 iovs)
+(00.063372) pie: 531: `- returned 20144128
+(00.063374) pie: 531:    `- skip pagemap
+(00.063375) pie: 531:    `- skip pagemap
+(00.063375) pie: 531:    `- skip pagemap
+(00.063376) pie: 531:    `- skip pagemap
+(00.063376) pie: 531:    `- skip pagemap
+(00.063377) pie: 531:    `- skip pagemap
+(00.063377) pie: 531:    `- skip pagemap
+(00.063378) pie: 531:    `- skip pagemap
+(00.063378) pie: 531:    `- skip pagemap
+(00.063378) pie: 531:    `- skip pagemap
+(00.063379) pie: 531:    `- skip pagemap
+(00.063379) pie: 531:    `- skip pagemap
+(00.063380) pie: 531:    `- skip pagemap
+(00.063380) pie: 531:    `- skip pagemap
+(00.063380) pie: 531:    `- skip pagemap
+(00.063381) pie: 531:    `- skip pagemap
+(00.063381) pie: 531:    `- skip pagemap
+(00.063382) pie: 531:    `- skip pagemap
+(00.063382) pie: 531:    `- skip pagemap
+(00.063383) pie: 531:    `- skip pagemap
+(00.063383) pie: 531:    `- skip pagemap
+(00.063383) pie: 531:    `- skip pagemap
+(00.063384) pie: 531:    `- skip pagemap
+(00.063385) pie: 531: vdso: Parsing at 0x7f8901e05000 0x7f8901e07000
+(00.063386) pie: 531: vdso: PT_LOAD p_vaddr: 0x0
+(00.063386) pie: 531: vdso: DT_HASH: 0x120
+(00.063387) pie: 531: vdso: DT_GNU_HASH: 0x170
+(00.063387) pie: 531: vdso: DT_STRTAB: 0x320
+(00.063388) pie: 531: vdso: DT_SYMTAB: 0x1d0
+(00.063388) pie: 531: vdso: DT_STRSZ: 0x83
+(00.063389) pie: 531: vdso: DT_SYMENT: 0x18
+(00.063389) pie: 531: vdso: nbucket 0x3 nchain 0xe bucket 0x7f8901e05128 chain 0x7f8901e05134
+(00.063390) pie: 531: vdso: symbol __vdso_clock_gettime at address 0xfd0
+(00.063391) pie: 531: vdso: symbol __vdso_getcpu at address 0x1050
+(00.063392) pie: 531: vdso: symbol __vdso_gettimeofday at address 0xf90
+(00.063392) pie: 531: vdso: symbol __vdso_time at address 0xfa0
+(00.063393) pie: 531: vdso: symbol __kernel_sigreturn at address 0x0
+(00.063393) pie: 531: vdso: symbol __kernel_rt_sigreturn at address 0x0
+(00.063394) pie: 531: vdso: symbol __vdso_clock_gettime64 at address 0x0
+(00.063395) pie: 531: vdso: image [vdso] 0x7f8901e05000-0x7f8901e07000 [vvar] 0x7f8901dff000-0x7f8901e05000
+(00.063395) pie: 531: vdso: Runtime vdso/vvar matches dumpee, remap inplace
+(00.063399) pie: 531: vdso: Remap rt-vdso 0x6a000 -> 0x7f8901e05000
+(00.063403) pie: 531: vdso: Remap rt-vvar 0x68000 -> 0x7f8901e03000
+(00.063404) pie: 531: vdso: Remap rt-vvar 0x64000 -> 0x7f8901dff000
+(00.063407) pie: 531: vdso: Using gettimeofday() on vdso at 0x7f8901e05f90
+(00.063425) pie: 531: Restoring scheduler params 0.0.0
+(00.063430) pie: 531: rseq: rseq_abi_pointer = 0x7f8901ae3720 signature = 0x53053053
+(00.063431) pie: 531: Using clone3 to restore the process
+(00.063447) pie: 531: Using clone3 to restore the process
+(00.063450) pie: 532: Restoring scheduler params 0.0.0
+(00.063456) pie: 531: Using clone3 to restore the process
+(00.063455) pie: 532: rseq: rseq_abi_pointer = 0x7f8901adefe0 signature = 0x53053053
+(00.063457) pie: 532: 532: Restored
+(00.063461) pie: 10618: Restoring scheduler params 0.0.0
+(00.063467) pie: 10618: rseq: rseq_abi_pointer = 0x7f89018dafe0 signature = 0x53053053
+(00.063468) pie: 10618: 10618: Restored
+(00.063474) pie: 531: Using clone3 to restore the process
+(00.063482) pie: 10620: Restoring scheduler params 0.0.0
+(00.063483) pie: 531: 531: Restored
+(00.063484) pie: 10620: rseq: rseq_abi_pointer = 0x7f89014d8fe0 signature = 0x53053053
+(00.063485) pie: 10620: 10620: Restored
+(00.063491) pie: 10619: Restoring scheduler params 0.0.0
+(00.063497) pie: 10619: rseq: rseq_abi_pointer = 0x7f89016d9fe0 signature = 0x53053053
+(00.063498) pie: 10619: 10619: Restored
+(00.063528) Running post-restore scripts
+(00.063565) pidfile: Wrote pid 531 to /work/control/attempt-1/restored.pid (3 bytes)
+(00.063567) net: Unlock network
+(00.063620) pie: 10617: seccomp: Restoring mode 1 flags 0x1 on tid 10617 filter 0
+(00.063622) pie: 531: seccomp: Restoring mode 1 flags 0x1 on tid 531 filter 0
+(00.063622) pie: 532: seccomp: mode 0 on tid 532
+(00.063645) pie: 10619: seccomp: mode 0 on tid 10619
+(00.063649) pie: 531: seccomp: Restored mode 2 on tid 531
+(00.063649) pie: 10617: seccomp: Restored mode 2 on tid 10617
+(00.063676) pie: 10618: seccomp: mode 0 on tid 10618
+(00.063702) pie: 10620: seccomp: mode 0 on tid 10620
+(00.063836) 10617 was trapped
+(00.063840) 10620 was trapped
+(00.063845) 10617 was trapped
+(00.063847) 10617 (native) is going to execute the syscall 15, required is 15
+(00.063854) 10617 was stopped
+(00.063855) 10620 was trapped
+(00.063856) 10620 (native) is going to execute the syscall 15, required is 15
+(00.063861) 10620 was stopped
+(00.063861) 531 was trapped
+(00.063863) 10619 was trapped
+(00.063865) 10618 was trapped
+(00.063867) 531 was trapped
+(00.063868) 531 (native) is going to execute the syscall 15, required is 15
+(00.063873) 531 was stopped
+(00.063874) 10619 was trapped
+(00.063874) 10619 (native) is going to execute the syscall 15, required is 15
+(00.063879) 10619 was stopped
+(00.063880) 10618 was trapped
+(00.063880) 10618 (native) is going to execute the syscall 15, required is 15
+(00.063885) 10618 was stopped
+(00.063886) 532 was trapped
+(00.063890) 532 was trapped
+(00.063891) 532 (native) is going to execute the syscall 15, required is 15
+(00.063895) 532 was stopped
+(00.063905) 531 was trapped
+(00.063906) 531 (native) is going to execute the syscall 11, required is 11
+(00.063926) 531 was stopped
+(00.063934) 10617 was trapped
+(00.063935) 10617 (native) is going to execute the syscall 11, required is 11
+(00.063950) 10617 was stopped
+(00.063955) Run late stage hook from criu master for external devices
+(00.063956) Running pre-resume scripts
+(00.063968) Restore finished successfully. Tasks resumed.
+(00.063968) Writing stats
+(00.064596) Running post-resume scripts

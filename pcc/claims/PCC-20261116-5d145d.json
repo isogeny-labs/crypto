@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:45:52Z",
+ "id": "PCC-20261116-5d145d",
+ "kind": "statement",
+ "producer": {
+  "commit": "86740131f4abef05cb2a31253835d4cdf1322ea1",
+  "model": "Codex",
+  "session": "trace-runpod-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-2/completion.json",
+    "sha256": "662e4dcf8cff4d83973732f747c0daf9d71c73e7c4a5dc3e8d818baf105153cc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-2/summary.json",
+    "sha256": "2bf871500c22ceb9d0789cbb5bf2853ba3dd2db268371b24b8707fc7253610bb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-2/custody.json",
+    "sha256": "70bd4e8258fc851fc74567c49f6437bea4c09663bd88c0797b0c85850faf230f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-2/pre-call-binary.sha256",
+    "sha256": "b068eb9397a12870e55872bd6928e4983711db2d4bdfa504f80b4643577cac58"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-2/post-call-binary.sha256",
+    "sha256": "b068eb9397a12870e55872bd6928e4983711db2d4bdfa504f80b4643577cac58"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/analyze.cpp",
+    "sha256": "3657d2ecedae6a0b2854a936aafdfb9b5750df6c45062d8644cb10cd5e5b5b84"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/runpod/attempt-2",
+ "statement": "Second Runpod job completed exit0 with 6066 retained rows, 5055 measured rows and no incomplete JSON tail; native analysis reports 2610 cross-mechanism scalar and 3630 attempt-existence checks with no disagreement. Descriptive component and complete-target costs, failures/censoring and matched rho comparisons are in the attached native summary. Shared host, unsigned assertions; no L2, fastest-tool or tier claim."
+}

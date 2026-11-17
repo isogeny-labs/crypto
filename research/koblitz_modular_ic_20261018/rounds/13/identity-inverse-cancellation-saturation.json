@@ -1,0 +1,178 @@
+{
+  "id": "IDC1h3f1d0cdc4a16f845",
+  "independence": "native issuer plus128 extra checks;source-bound universal Lean identity",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound13.lean",
+    "sha256": "19954462f0ac4317d8985a75b4f123418d35b2bbe859347b1f3319c1c24e601c"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610201301,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": "h",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "out",
+                  "op": "var"
+                },
+                {
+                  "args": "z",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": "h",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "inverse-cancellation-saturation",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "h",
+                      "op": "var"
+                    },
+                    {
+                      "args": "out",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "a",
+                          "op": "var"
+                        },
+                        {
+                          "args": "b",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": "z",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "b",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "z",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "h",
+                          "op": "var"
+                        },
+                        {
+                          "args": "h",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound13.inverse_cancellation_saturation",
+    "variables": [
+      "h",
+      "out",
+      "a",
+      "b",
+      "z"
+    ]
+  },
+  "value_digest": "264988836763e0abd149f4914d95f89bfb0feb7ccbd2db292827501b03532b1a"
+}

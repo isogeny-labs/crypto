@@ -1,0 +1,1 @@
+Derive the base-polynomial multiplicity conclusion directly from the exact pinned source_norm_identity. Check signs, scales, nonzero factors and characteristic assumptions. Retain a worked rational instance and premise-removal counterexamples. Source-only note; no compiler, experiment or replacement of active replay. Independent review required.

@@ -1,0 +1,83 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-15-03
+experiment_id: BLINDSPOT-15
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Item 15, card 3: b = 18 on curves 2 and 3
+
+receipt: research/blindspots_20261018/15-genus3-la-exponent/raw/receipt-card-03.json
+binds:
+  - {path: examples/blindspots_15_genus3_la.rs, sha256: 73cfa4891f8eb4651b728e426aa4fd47f2180120b06c60081dab1b230ad5462b}
+  - {path: research/blindspots_20261018/15-genus3-la-exponent/orders.csv, sha256: d31864a01ff8aff7f1ef6e0a2649e52fa9a25dabec8852f3a9e4c5e4e6ddf235}
+  - {path: research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c2_r2.jsonl, sha256: e95ede20bc59c1e8401f62ec23fb9f79303917870d5796e828e543fbad42084b}
+  - {path: research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c3_r2.jsonl, sha256: bca73250bc482c8c66a5d61d877449eb6ef8c7b88b75b7ecfb84f9f57356c22c}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/15-genus3-la-exponent/raw", "target/blindspots-15/card-03"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-15/card-03/b15", "examples/blindspots_15_genus3_la.rs"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-build.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-build.stderr.log
+  - id: run-b18-c2-r2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-15/card-03/b15", "--bits", "18", "--curve", "2", "--kappa", "1.5763", "--cx", "8", "--streams", "r2", "--las", "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebw4x4*,lpsgebl4@8,lpsgebl4*,lpsgebl1@8,lpsgebw2!1@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_r2.jsonl"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-b18_c2_r2.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_r2.jsonl]
+  - id: run-b18-c2-aa
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-15/card-03/b15", "--bits", "18", "--curve", "2", "--kappa", "1.5763", "--cx", "8", "--streams", "aa", "--las", "lpsgebw2@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_aa.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-b18_c2_aa.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_aa.jsonl]
+  - id: run-b18-c3-r2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-15/card-03/b15", "--bits", "18", "--curve", "3", "--kappa", "1.5763", "--cx", "8", "--streams", "r2", "--las", "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebw4x4*,lpsgebl4@8,lpsgebl4*,lpsgebl1@8,lpsgebw2!1@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_r2.jsonl"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-b18_c3_r2.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_r2.jsonl]
+  - id: run-b18-c3-aa
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-15/card-03/b15", "--bits", "18", "--curve", "3", "--kappa", "1.5763", "--cx", "8", "--streams", "aa", "--las", "lpsgebw2@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_aa.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-b18_c3_aa.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_aa.jsonl]
+  - id: gate0-b18
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-15/card-03/b15", "gate", "r2:lpsgebw2@8", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c2_r2.jsonl", "research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c2_r2.jsonl", "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c3_r2.jsonl", "research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c3_r2.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-gate0-b18.txt
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/card-03-gate0-b18.txt]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-15/card-03/b15"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-15/card-03"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+
+bus_address: executor-mechanical-blindspot-15
+background: false
+write_scope:
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

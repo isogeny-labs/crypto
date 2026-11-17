@@ -1,0 +1,47 @@
+pub struct Divisor {
+    pub degree: usize,
+    pub u: [u64; 3],
+    pub v: [u64; 2],
+}
+impl Divisor {
+    pub const O: Self = Self {
+        degree: 0,
+        u: [1, 0, 0],
+        v: [0, 0],
+    };
+    fn from(u: &[u64], v: &[u64]) -> Self {
+        assert!(!u.is_empty() && u.len() <= 3 && v.len() < u.len());
+        let mut d = Self::O;
+        d.degree = u.len() - 1;
+        d.u = [0; 3];
+        geometry_events::record(0, u.len() + v.len(), 3, 0);
+        d.u[..u.len()].copy_from_slice(u);
+        d.v[..v.len()].copy_from_slice(v);
+        d
+    }
+    fn up(&self) -> Poly {
+        geometry_events::copied(&self.u[..=self.degree])
+    }
+    fn vp(&self) -> Poly {
+        trim(geometry_events::copied(&self.v[..self.degree]))
+    }
+}
+#[derive(Clone, Debug)]
+pub struct Jacobian {
+    pub f: Field,
+    pub polynomial: Poly,
+}
+impl Jacobian {
+    pub fn valid(&self, d: Divisor) -> bool {
+        d.degree <= 2
+            && d.u[d.degree] == 1
+            && prem(
+                &self.f,
+                &psub(&self.f, &self.polynomial, &pmul(&self.f, &d.vp(), &d.vp())),
+                &d.up(),
+            )
+            .is_empty()
+    }
+    pub fn neg(&self, d: Divisor) -> Divisor {
+        let mut out = d;
+        for x in &mut out.v[..d.degree] {
