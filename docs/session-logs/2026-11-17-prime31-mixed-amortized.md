@@ -34,3 +34,20 @@
 
 ### Errors
 - None from GitHub connector writes. CI pending; no local Rust toolchain.
+
+
+## 2026-11-17 ~05:31 UTC — first exact-source Rust CI failure and mathematics-preserving repair
+
+### What was done (commands, files, features)
+- Initial source-specific GitHub Actions [run 44024263180](https://github.com/isogeny-labs/crypto/actions/runs/44024263180) compiled full Rust 1.100.0 and passed **40/40 library tests** and **2/3 new Rust tests**. The new reuse-basis test failed at source line 444: the imported single-target `signed_row` helper encodes the coefficient `-b` as `n-b`, assuming nonzero b. Our setup intentionally passes `b=0` and thus the helper emitted integer `n=2147446831`, not canonical zero, although they are identical mod n. The assertion (and field canonical representation) rejected the row before solving any target. No measurement of 1024 target solves is claimed.
+- Patched only that target-independent zero-Q coefficient to `%= PRIME31.n`, verified it is exactly zero, then removed the zero column. Source commit `07ba1701111c0a3a2a4f729fd5e78d99516f6fe5`. Pre-registered setup/descent seeds, target list, caps and performance criteria remain unchanged.
+- Earlier workflow attempt `44024509598` started from a pre-fix head; its outcome must be associated with its own SHA rather than reported as the patched source. Sparse checkout speed repair was commit `6439a498b54fb6c637c1f0438838e1ef741a2346`.
+
+### Decisions made (and why)
+- Require canonical [0,n) representation for all RREF entries. Original `signed_row` mathematical relation is unchanged; a zero coefficient is the additive identity modulo prime order. Preserve the failed CI log as an explicit implementation defect fixed before any 1024-target measurement.
+
+### Open threads
+- Run and inspect new exact-source CI at commit `07ba170`, then only report actual 1024 complete solves and their end-to-end amortized cost when it passes.
+
+### Errors
+- 40 library tests PASS, 2/3 example tests PASS, 1 test failed because `n` vs `0` noncanonical encoding; 1024 measurement did not run. Fixed in PR #4513.
