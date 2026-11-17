@@ -2814,3 +2814,10 @@ What was done: inspected existingaffine-lp/genus2onecore priorart andgeneralized
 Decisions made: materializedsparsepayloadforest notfullydeferredDAG; classicaladaptationnotnovelty. Comparebothstrongstream/bufferedcontrols, retainallregressions. One600CPUprocessafterGitfreeze.
 Open threads: execute/measureforest;full10xgenus2+objectiveactiveunachieved.
 Errors: inheritedunusedhelper/importwarnings only;no scientificexecutionbeforefreeze.No S3/cloud/merge.
+
+## Generic affine forest qualifies and improves all subgroup REDC records
+
+What was done: freeze9f5b0800e17 hashespass/exit0;22audit+44freshcalls/nativeanswers, first128/determiningfullrawprefixFastagreement, allnorm/principalchecks, syntheticunbalancedcycle/unarycontrols pass.16offsubgroupfinalrejections/6unavailable. FULL16basevectors identicalstreamall22; subgroupstream/forestratiosg21.486-3.203,g31.301-1.612,g41.412-1.620;buffered/forestg21.296-4.246,g31.146-1.598,g41.533-2.180(all22improve).
+Decisions made: strongestsubgroupREDCcontrolnowforest, noall16dominance/runtime/newmath/10xclaim. SparsepayloadsmaterializednotfullylazyDAG; inheritedearlystopbasegainnotforestphaseattribution. Keepallpriorcontrols/rawregressions.
+Open threads: fullruntimeandmathematical10xcase/baseworkstillrequired;independentreviewopen/goalactiveunachieved.
+Errors: no scientificfailure, inheritedunusedhelpers/importwarnings. No S3/cloud/merge/unchangedrerun.
