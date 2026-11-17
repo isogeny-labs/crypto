@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Assemble P-192 quartic relation collection and OpenSSL cross-check pipeline (Codex, started 2026-11-17, branch lane/nist-relation-pipeline; in progress)
+- [ ] Assemble P-192 quartic relation collection and OpenSSL cross-check pipeline (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; in progress)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
