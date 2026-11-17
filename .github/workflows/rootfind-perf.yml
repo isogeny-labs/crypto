@@ -1,0 +1,92 @@
+name: Rootfinder host perf validation
+
+# Install the perf CLI in a fresh Linux runner, then benchmark the actual
+# headers. GitHub-hosted VMs may lack hardware PMU access; in that case
+# compilation and correctness still run, while counters are explicitly skipped.
+on:
+  pull_request:
+    paths:
+      - 'gpu/rootfind/**'
+      - '.github/workflows/rootfind-perf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-perf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            gpu/rootfind
+
+      - name: Install Linux perf
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends linux-tools-common linux-tools-generic
+          kernel_tools="linux-tools-$(uname -r)"
+          if apt-cache show "$kernel_tools" >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends "$kernel_tools"
+          fi
+          # Ubuntu's wrapper may not find tools matching the hosted VM kernel.
+          if ! perf --version >/dev/null 2>&1; then
+            perf_bin=$(find /usr/lib/linux-tools -type f -name perf -executable | sort -V | tail -n 1)
+            test -n "$perf_bin"
+            sudo ln -s "$perf_bin" /usr/local/bin/perf
+          fi
+          command -v perf
+          perf --version
+          echo "Kernel: $(uname -r)"
+          echo "perf_event_paranoid: $(cat /proc/sys/kernel/perf_event_paranoid)"
+          echo "Installed perf: $(perf --version)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build and verify shared rootfinder headers
+        run: |
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256
+
+      - name: Record before and after perf counters when accessible
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/rootfind-perf"
+          events=cycles,instructions,branches,branch-misses,cache-misses
+          if ! perf stat -e "$events" -- true > "$RUNNER_TEMP/rootfind-perf/pmu-probe.txt" 2>&1; then
+            {
+              echo "## PMU unavailable"
+              echo "perf is installed, and correctness passed, but this runner does"
+              echo "not expose hardware PMU events. Run this job on a self-hosted"
+              echo "PMU-enabled runner for cycle and instruction counters."
+              echo
+              echo 'Probe output:'
+              echo '~~~'
+              cat "$RUNNER_TEMP/rootfind-perf/pmu-probe.txt"
+              echo '~~~'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # taskset must use an allowed CPU in a restricted cpuset.
+          cpu=$(awk '/Cpus_allowed_list:/{split($2, a, /[,-]/);print a[1]}' /proc/self/status)
+          : "${cpu:=0}"
+          for bin in bench_host_inv bench_host_inv256; do
+            for arm in inv-before inv-after batch32-before batch32-after; do
+              name="${bin}-${arm}"
+              perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/${name}.txt" \
+                -- taskset -c "$cpu" "gpu/rootfind/$bin" "--perf-$arm"
+              cat "$RUNNER_TEMP/rootfind-perf/${name}.txt"
+            done
+          done
+          echo "Hardware PMU measurements saved as the rootfind-perf artifact." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-perf
+          path: ${{ runner.temp }}/rootfind-perf/
+          if-no-files-found: ignore
