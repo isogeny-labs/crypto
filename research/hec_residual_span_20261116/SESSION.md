@@ -1616,3 +1616,10 @@ What was done: pushed freezee630f68ba91 then single invocation exits0;14admissio
 Decisions made: bounded conditional self-isogeny argument supported by finite algebra checks; not independent Frobenius/polarization verification or a measured gain.
 Open threads: genus2p601l5 nilpotent polarization and p251l19 quotient classification; independent review of bounded genus3 obstruction.
 Errors: none in execution; no rerun/S3/cloud.
+
+## Ramified genus2 l5 gate frozen
+
+What was done: compiled actual p601c7 conditional Frobenius, rank1 nilpotent prediction; exhaustive806planes and all15625alternating forms.
+Decisions made: predict6stable Lagrangians for every nondegenerate sigma-invariant form; no arbitrary pairing selection. Mathematical proof via R=im(pi+1), allstable Lagrangians containR. Assertions [pcc:unverified].
+Open threads: push freeze then once-only120CPU invocation; polarized quotient classification remains separate.
+Errors: copied unused helper warnings only; no scientific execution.
