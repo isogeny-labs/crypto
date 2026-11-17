@@ -2345,3 +2345,10 @@ What was done: derived allmixedquotients orderindex659²/conductornorm659^4; con
 Decisions made: classcount geometricinterpretation independentlyunreviewed; no actualCMlattice/curve/transport constructed. Fixednormsearchbox failure retained; sourceCMtype/polarizedlattice/reduction required fornextbridge. PrimaryMarseglia1805.10223 ideal/polarizationframework read, KBWaterhouse/powersElliptic pointersnotproof.
 Open threads: executeafterGitfreeze, thenboundedpolarizedCMlattice reconstruction path; original10x/fullgenus2/4scope unchanged.
 Errors: copiedunusedhelpers warnings, no compilefailure/S3/cloud/merge.
+
+## Exceptional659 commonorder and conditional94class reduction qualified
+
+What was done: pushedfreeze42f24c21a0d, hashespass, oneexit0.1316stabilizers agreeorderindex434281, disc-3169799980853527, conductornorm188599986961; sourceunitaction94orbits/family. Fixedsearch findsalpha[-2,0,-3,-4,-4,-4] norm659; exactu numerator[738,470,228,98,197,370]/659 hasnormone andcrossfamilyslope555 bijection94.
+Decisions made: conditionalgeometricinterpretationpendingreview, exactarithmetic/groupactionqualified. EndorderdoesnotdeterminePPAV; no actualcurve/theta/map/speedclaim. This yieldscompactcandidateclassification insteadof286mpointenumeration.
+Open threads: explicitpolarizedsourceCMlattice/overlattice withFrobenius/Riemannform thenboundedreconstruction/reduction, original10x/genus2/4 andindependentvalidation.
+Errors: none,no retry/S3/cloud/merge.
