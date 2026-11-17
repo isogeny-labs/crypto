@@ -1469,3 +1469,10 @@ What was done: compiled18inputgate combining dynamicorbitdiscovery,ringlabels,CR
 Decisions made: sourceCpromise explicit; structuralintegrationgateonly, priorcoldfailuresretained. No nonunitdivisionforpointlabels,existingCRT handlesconstraints.
 Open threads: execute once, retainallstalls; coldcost remainsrequired.
 Errors: unusedimportedringmethods warnings suppressedlocally; rebuildclean. NewT7080leaseclaimedviaCLI afterreleasingoldtask;connectorreportsownreservationasduplicate.
+
+## Lazy cyclotomic producer qualified
+
+What was done:f3cb6e18a1esingle invocation exits0;17of18complete,223originalgrouplabelchecks andfinalaction/scalarverificationpass. Producer receivesnoFB/character/eigenvalue/supportrecords; lazydiscoveryandringconstraintslearn action. Original6complete,fresh11of12; samep601source1case1stalls2orbits0rows4survivors.
+Decisions made: removed eagerfullFB/actionprecomputation fromproducer,notpricedasfreegain. SourceCpromiseexplicit; classicalintegration,fullcostnext. Priornegativegates preserved.
+Open threads: coldcountercomparison withalllazy/ring/CRT/finalcosts; fixedseedstallneedsprospectivechargedfallback; originalgenus2+goalopen.
+Errors: noscientificerrors/retries,S3/cloud; incompletearmretained.
