@@ -1,0 +1,20 @@
+{
+  "schema": "n83.centered-witness-format/v1",
+  "coordinate_ring": "F_p[y_0,...,y_(ell-1)]/(y_j^2-(w_j/2)^2), with unrestricted U",
+  "files": {
+    "input.json": "Exact modulus, odd selector width, nonzero weights, target and source provenance",
+    "A0.poly,A1.poly,A2.poly": "P and its first two normal-form products by X=c+sum(y)",
+    "F0.poly,F1.poly,F2.poly": "Coefficient polynomials of 1,U,U^2 in the full remainder F",
+    "certificate.json": "Exact degrees, term counts, both projected U-polynomials, formula comparison, artifact hashes and scope",
+    "manifest.json": "Every payload path and SHA256; manifest excludes itself"
+  },
+  "poly_encoding": {
+    "magic": "N83CEN1 followed by newline (8 bytes)",
+    "header": "ell:u32le, degree:u32le, term_count:u64le, modulus:u128le",
+    "terms": "strictly increasing mask:u64le, nonzero coefficient:u128le; masks below 2^ell, coefficients below p",
+    "zero_polynomial": "zero terms, stored degree0; mathematical degree is null",
+    "distinction": "Centered quotient codec magic differs from historical idempotent polynomial codec"
+  },
+  "claim_scope": "Exact arithmetic certificate; reviewed filtered-space argument is a separate dependency. No exact LFD or regularity value is encoded.",
+  "preservation": "Fresh directories only; retain failures and every generated polynomial. No replacement of existing fixed-base or producer records."
+}

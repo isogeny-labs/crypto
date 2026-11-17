@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-16T00:22:16Z",
+ "id": "PCC-20261116-29f710",
+ "kind": "statement",
+ "producer": {
+  "commit": "fd6f5a9b0d3b6bf913ebdc761fe5bef7a7aff9a7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_kernel_20261116/checks/validation-tests.txt",
+    "sha256": "9ae9e34a6c0a8e006b2e3be146eb74b4d1bf4d5c9fdeebe4e2fdd1025c425012"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_kernel_20261116/checks/root-check.txt",
+    "sha256": "5e3ca4ed51ee2d009567f704be862e0ff61260d42790a09105c8f3cc78abd22b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned producer pre-primary checks, not a speed result.",
+ "statement": "Exact-modulus kernel passes23 focused release tests and root library check before primary data. Every product-basis monomial is compared with reference reduction at n83/n131; same-degree/different-modulus fallback, multiply-by-x maps, wide arithmetic, all65-case witness parity and existing small admission/group/projected checks pass."
+}

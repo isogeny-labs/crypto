@@ -1,0 +1,109 @@
+{
+  "schema": "quadratic-twist-uniform-runner-preflight/v1",
+  "input_head": "2f4981008fbf89fef106d5349782ce54e7983279",
+  "scope": "ordinary shell implementation and non-executing CLI validation",
+  "checks": {
+    "bash_syntax": {
+      "exit": 0
+    },
+    "help": {
+      "exit": 0
+    },
+    "no_arguments": {
+      "exit": 2,
+      "expected": 2
+    },
+    "shellcheck": {
+      "status": "unavailable",
+      "log": "not installed; not claimed"
+    },
+    "conductor": {
+      "exit": 127,
+      "lease_claimed": false
+    }
+  },
+  "checkpoint": {
+    "authorization": "approved-for-existing-branch-scope",
+    "scope": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__quadratic-twist-evidence-import/",
+    "secure_token_environment_present": false,
+    "secure_token_file_present": false,
+    "gate_invocations": 0,
+    "uploads": 0,
+    "reviewed_main": "6187036c049b6de2b1521b014f575952e4f1705c",
+    "reviewed_official_blob": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "tracked_input_gate_blob": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "old_cached_gate_used": false
+  },
+  "protected_paths": [
+    "src",
+    "Cargo.toml",
+    "Cargo.lock",
+    ".github/workflows",
+    "docs/curves",
+    "research/quadratic_twist_evidence_20261021/native",
+    "research/quadratic_twist_evidence_20261021/lean",
+    "research/quadratic_twist_evidence_20261021/lean-cm8",
+    "research/quadratic_twist_evidence_20261021/drafts",
+    "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261025_PROTOCOL.md",
+    "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261026_IMPLEMENTATION.md"
+  ],
+  "protected_tracked_delta": [],
+  "source_bindings": [
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/uniform-yield-v2.cpp",
+      "blob": "d5f974442d093561846459d14a297b5411730df2",
+      "sha256": "74984866c33050cd8a31f45a9fce2d3bffe2d8d6c0c60004c3951fee173fbb7b",
+      "bytes": 11870
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/uniform-yield-audit/main.rs",
+      "blob": "c91307a9d366e92e4fd348d6c00a6ed40de6f14a",
+      "sha256": "45b8bec12c83bba998ffe1d1210a175be61e2d7a95d53bc6e693a6984f8a155c",
+      "bytes": 45809
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/uniform-yield-audit/Cargo.toml",
+      "blob": "c552b30f56e1c2e27deb958e6c64427428818509",
+      "sha256": "e1c9584de719affc5876d3b1eeb0d612d48a96d7baa2b91dac827cdb4fdac2bb",
+      "bytes": 376
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/native/uniform-yield-audit/Cargo.lock",
+      "blob": "4647fc0824cf2fb06f7bd81b48a73bb9e686d1a4",
+      "sha256": "633827f36b8fc6aa89ee901d77dce54189e430945ef7cefad961c21115108b39",
+      "bytes": 3808
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261025_PROTOCOL.md",
+      "blob": "de0173ee70f9ecd446a677bd4610f06f407afc2a",
+      "sha256": "e88b819c247329655b95c92e3688acb7951034f08a03903ab2ba6504c1e0a181",
+      "bytes": 6753
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261026_IMPLEMENTATION.md",
+      "blob": "da0c84d8851505aa1d3c2a73ff4826f768799391",
+      "sha256": "4e8f5d11207174634d1b9a290a9a9492e90d543ad8ebdc101bd859fec7e6da36",
+      "bytes": 3383
+    }
+  ],
+  "execution": {
+    "study_producer": 0,
+    "study_audit": 0,
+    "corruption_controls": 0,
+    "backend_tests": 0,
+    "new_library_tests": 0,
+    "lean_elaborations": 0,
+    "new_theorems": 0,
+    "new_identities": 0,
+    "paid_resources": 0
+  },
+  "full_library": "previous incomplete/non-green receipt unchanged; no new full-suite claim",
+  "native_runner_runtime": "unverified; syntax/help checks only",
+  "remaining": [
+    "secure checkpoint token and current official tooling/branch-bound resume",
+    "native producer/audit/control execution",
+    "actual-state iid probability theorem",
+    "1921-model reconciliation and unchanged strict2287 assertion",
+    "full-library and broader completion gates"
+  ]
+}

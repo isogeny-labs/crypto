@@ -1,0 +1,5 @@
+# R133: lambda derivative support within the P11/P22 base fibers
+
+Use the actual R51 `G51` excerpt pinned by R130 and the checked R132 base fibers. At each of the two x-residue fields, specialize the seven coefficients of `C(x,y)=dG51/dlambda`, which equals the coefficient of lambda because G51 is additive in characteristic two. Compute `gcd(f51(x,y), C(x,y))` over the residue field, then gcd each R132 distinct-degree factor with C. The factors of this gcd are exactly the base points where the monogenic lambda polynomial has zero derivative. Check that the intersection degrees partition the seven y degrees and retain every residue factor as an exact coefficient array.
+
+This identifies the base places needing lambda normalization; it does not determine their lambda branches, ramification indices, N51 valuations, or the valuation of the lambda discriminant. A zero derivative only describes the specialized monogenic order. Require source hashes, exact recomputation, a changed-input rejection, and Lean degree arithmetic. Local deterministic exact work, zero cloud spend. Commit and push source/protocol before computing accepted data.

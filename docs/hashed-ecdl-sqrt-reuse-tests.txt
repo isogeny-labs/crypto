@@ -1,0 +1,931 @@
+Crypto square-root setup reuse correctness record, 2026-10-30
+Final algorithm source: c84df306cc583957f8351ff233c50ef422900697
+18-file native manifest SHA256:
+3b2893f8984ab4895c195e88f46bb172c006a2a29147cc17dbfe23166b95037c
+Linuxx86-64 development container, rustc1.99.1, floor1.78.0.
+Harness elapsed times are unpaired correctness diagnostics, not timing evidence.
+The final shared fragments match cryptanalysis b02b919d4eec0691dd00438d0e0d9ca7f26fedce.
+Raw sections below are verbatim with an added separator newline. Original raw
+byte counts and hashes exclude headings and separator. Existing evidence is frozen.
+
+=== cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml; exit0. 39core+5runner+3wire=47tests. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-native-tests.txt
+Raw bytes: 5223
+Raw SHA256: 03dd5f34b27cab96f505bffd1cf3dcda23773e4b17197cc886bb1a2db4ae4b0e
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 8.27s
+     Running unittests src/lib.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_tensor-3825d88d6fdc6fb0)
+
+running 39 tests
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test arithmetic::tests::reused_roots_preserve_failures_and_enforce_each_new_meter ... ok
+test arithmetic::tests::root_setup_is_lazy_reused_and_charged_only_when_performed ... ok
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test arithmetic::tests::reused_square_roots_match_independent_residue_tables_in_both_orders ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 94.08s
+
+     Running unittests src/bin/hashed-ecdl.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl-2c8de4135ca4b745)
+
+running 5 tests
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/strict_json.rs (crates/hashed-ecdl-tensor/target/release/deps/strict_json-169e5fa6a6824dcc)
+
+running 3 tests
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+
+=== cargo clippy --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets -- -D warnings; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-native-clippy.txt
+Raw bytes: 157
+Raw SHA256: 2897cd95d379186eac86fe77a66ff09e6d393d81c0da1b0a843c863bd765f660
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.93s
+
+
+=== cargo +1.78.0 check --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-native-msrv.txt
+Raw bytes: 224
+Raw SHA256: 5c40a76a5ebe7ae190d6a5de732c8771728d823edf34d00a1b75a3acdd6028f8
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s
+
+
+=== RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --no-deps; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-native-docs.txt
+Raw bytes: 357
+Raw SHA256: fd39f9e29e45ac280e6868bc6a9c1d4fd47dc9e37e81d9c06282bb371639656e
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+ Documenting hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.24s
+   Generated /workspace/crypto/crates/hashed-ecdl-tensor/target/doc/hashed_ecdl_tensor/index.html and 1 other file
+
+
+=== cargo fmt --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all -- --check; exit0 (empty output). ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-format.txt
+Raw bytes: 0
+Raw SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+
+=== cargo build --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-cli-build.txt
+Raw bytes: 62
+Raw SHA256: 92434e198f27984c035c376ec77a7cf9e6ebdde782f8ccb1336ae3329b66ddb7
+    Finished `release` profile [optimized] target(s) in 0.05s
+
+
+=== crates/hashed-ecdl-tensor/target/release/hashed-ecdl verify docs/hashed-ecdl-tensor-fixture.json; exit0. Frozen fixture SHA256:54f3a724feb70fc1cc7465371caf43a1c93578b168dec5487bed94729d42f63c. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-cli-replay.txt
+Raw bytes: 31
+Raw SHA256: 465d84eede04f4a119d38cc3c1c3c16576284ae826945533fc4d5470a4756641
+certificate verified: scalar 4
+
+
+=== node .github/scripts/ci-scope.mjs --materialize; exit0, before the fresh full-root run. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-root-materialize.txt
+Raw bytes: 37
+Raw SHA256: adbf5395d4e7cfe72e75781009b5d2023a66032d6585f21f575cc32b69968d3c
+materialized 191 compile-time inputs
+
+
+=== Mirrored cryptanalysis record, reproduced in full ===
+Hashed-ECDL square-root setup reuse: correctness record, 2026-10-30
+Repository: isogeny-labs/cryptanalysis
+Base: cf35a825b25c3f1ece5d7d36dd98d78ea66a4022
+Final17-file source manifest: docs/hashed-ecdl-sqrt-reuse-sources.sha256
+Manifest SHA256: 07014e0ba3f11e3624ec42d630f23b90d7e83159d477cfbb88a95ed80b6b4fdc
+Rust1.99.1, declared floor1.78.0, Linuxx86-64 development container.
+Commands below run from /workspace/cryptanalysis unless noted as crypto.
+Harness elapsed times are unpaired development diagnostics, not speed evidence.
+The final full panel's persisted terminal marker contains0.
+Each raw section is verbatim, followed by a separator newline. Hashes/lengths
+refer to the original raw bytes before adding the section heading/separator.
+No frozen receipt or earlier manifest was rewritten.
+
+=== Initial regression placement, exit101; no tests ran. Moved into the existing test module. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-test-startup.txt
+Raw bytes: 580
+Raw SHA256: 29a21180b82520e432e7b206ae4242ecc10e4bb6b1daf35fb1cfda36c59190d3
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+error[E0433]: cannot find type `Limits` in this scope
+   --> hashed-ecdl-tensor/src/reduction.rs:852:36
+    |
+852 |         let mut meter = Meter::new(Limits::default());
+    |                                    ^^^^^^ use of undeclared type `Limits`
+    |
+help: consider importing this struct
+    |
+  8 + use crate::Limits;
+    |
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `hashed-ecdl-tensor` (lib test) due to 1 previous error
+
+
+=== Before reuse, new factor-base regression: cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor --lib factor_base_enumeration_reuses_square_root_setup; exit101. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-before.txt
+Raw bytes: 1020
+Raw SHA256: 00c13afbc54de1e969611c9b12e2eb516e7c4f9429d1ce895ad327824f498794
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 4.21s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 1 test
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... FAILED
+
+failures:
+
+---- reduction::tests::factor_base_enumeration_reuses_square_root_setup stdout ----
+
+thread 'reduction::tests::factor_base_enumeration_reuses_square_root_setup' (76730) panicked at hashed-ecdl-tensor/src/reduction.rs:881:9:
+assertion `left == right` failed: one setup must serve the entire base
+  left: 18
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    reduction::tests::factor_base_enumeration_reuses_square_root_setup
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p hashed-ecdl-tensor --lib`
+
+
+=== After reuse, the same factor-base regression; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-targeted.txt
+Raw bytes: 459
+Raw SHA256: 8db219e06d60a67e7a2ef66b1c1d2edfa08d1fac0430b479349b7ad541e4451b
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 4.01s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 1 test
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.00s
+
+
+
+=== Before the three-mod-four shortcut, new budget regression: cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor --lib three_mod_four_roots_fit_a_single_exponentiation_budget; exit101. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-shortcut-before.txt
+Raw bytes: 1039
+Raw SHA256: 20ce97dbf591e92e9c00460f67e471e65731fc1b4e5bbb3245ee169816e47cea
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 4.25s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 1 test
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... FAILED
+
+failures:
+
+---- arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget stdout ----
+
+thread 'arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget' (78016) panicked at hashed-ecdl-tensor/src/arithmetic.rs:444:72:
+called `Result::unwrap()` on an `Err` value: Limit("modular exponentiation")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p hashed-ecdl-tensor --lib`
+
+
+=== Final mirrored shortcut, targeted crypto native regression; exit0. This is not the full binding panel below. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-shortcut-after.txt
+Raw bytes: 465
+Raw SHA256: 68cb027f466b4a93541ac1977a9e1e1e4e35f4934cc751a29a3741bbe1d7d964
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 5.89s
+     Running unittests src/lib.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_tensor-3825d88d6fdc6fb0)
+
+running 1 test
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 38 filtered out; finished in 0.00s
+
+
+
+=== FINAL: cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis; exit0. All93 tests accounted for (32core+5runner+3wire+20binding+19FFI+14docs). ===
+Local raw path: /tmp/hashed-ecdl-sqrt-final-binding-tests.txt
+Raw bytes: 8188
+Raw SHA256: 63f4ce6ef4f8087188bfb3faed6420db2bf7ba4afb4a8beee925e17dbf0bd8f9
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+   Compiling cryptanalysis v0.1.0 (/workspace/cryptanalysis/bindings/rust/cryptanalysis)
+    Finished `release` profile [optimized] target(s) in 8.25s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/cryptanalysis-aeb2519aac7fab62)
+
+running 20 tests
+test gpu::tests::cuda_backend_reports_cleanly ... ok
+test gpu::tests::options_round_trip_and_defaults ... ok
+test gpu::tests::max_ops_is_enforced ... ok
+test hashed_ecdl::tests::identity_and_bounds_are_explicit ... ok
+test hashed_ecdl::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test hashed_ecdl::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test hashed_ecdl::tests::overlapping_slots_keep_separate_columns ... ok
+test hashed_ecdl::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test gpu::tests::emulator_solves_curve ... ok
+test hashed_ecdl::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test hashed_ecdl::tests::validates_curve_and_canonical_points ... ok
+test tests::error_display_includes_status ... ok
+test tests::group_is_send_and_sync ... ok
+test hashed_ecdl::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test gpu::tests::emulator_solves_zp ... ok
+test tests::options_default_matches_c_defaults ... ok
+test tests::version_is_semver_like ... ok
+test tests::hashed_ecdl_agrees_with_independent_c_arithmetic ... ok
+test tests::tensor_curve_agrees_with_independent_c_arithmetic ... ok
+test hashed_ecdl::tests::solves_and_replays_seeded_known_answers ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ffi_parity.rs (bindings/rust/target/release/deps/ffi_parity-a0785a41fdcfb188)
+
+running 19 tests
+test curve_dispatch_and_glv ... ok
+test ec_curve_end_to_end ... ok
+test index_calculus_one_shot ... ok
+test index_calculus_context_reuse ... ok
+test number_theory_helpers ... ok
+test index_calculus_random_exponent_method ... ok
+test version_matches_header ... ok
+test group_usable_from_multiple_threads ... ok
+test zp_bsgs ... ok
+test zp_bsgs_interval_miss_is_not_found ... ok
+test zp_construction_and_accessors ... ok
+test zp_element_ops ... ok
+test zp_cheon ... ok
+test zp_grumpy_interval ... ok
+test zp_kangaroo_interval ... ok
+test zp_max_ops_limit ... ok
+test zp_rho_single_and_multi_thread ... ok
+test zp_dlog_every_solver ... ok
+test zp_precomp ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 32 tests
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test arithmetic::tests::reused_roots_preserve_failures_and_enforce_each_new_meter ... ok
+test arithmetic::tests::root_setup_is_lazy_reused_and_charged_only_when_performed ... ok
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test arithmetic::tests::reused_square_roots_match_independent_residue_tables_in_both_orders ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 73.79s
+
+     Running unittests src/bin/hashed-ecdl.rs (bindings/rust/target/release/deps/hashed_ecdl-1adba597a2b08e12)
+
+running 5 tests
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/strict_json.rs (bindings/rust/target/release/deps/strict_json-4061c2a98f2eb846)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cryptanalysis
+
+running 14 tests
+test cryptanalysis/src/group.rs - group::Group::zp (line 168) ... ok
+test cryptanalysis/src/group.rs - group::Group::ec_count_points (line 197) ... ok
+test cryptanalysis/src/gpu.rs - gpu::Group::gpu_rho (line 127) ... ok
+test cryptanalysis/src/group.rs - group::Group::dlog (line 476) ... ok
+test cryptanalysis/src/group.rs - group::cheon_best_divisor (line 636) ... ok
+test cryptanalysis/src/index_calculus.rs - index_calculus (line 7) ... ok
+test cryptanalysis/src/lib.rs - (line 11) ... ok
+test cryptanalysis/src/nt.rs - nt::factorize (line 61) ... ok
+test cryptanalysis/src/nt.rs - nt::invmod (line 48) ... ok
+test cryptanalysis/src/nt.rs - nt::is_prime (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::next_prime (line 18) ... ok
+test cryptanalysis/src/nt.rs - nt::powmod (line 38) ... ok
+test cryptanalysis/src/nt.rs - nt::primitive_root (line 28) ... ok
+test cryptanalysis/src/options.rs - options::Options (line 46) ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+
+=== FINAL: cargo clippy --locked --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --all-targets -- -D warnings; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-final-clippy.txt
+Raw bytes: 260
+Raw SHA256: 18b04d62fcc96e2970c9aafd79e3eae3fccf4cee03d282b470fdfce959444215
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+    Checking cryptanalysis v0.1.0 (/workspace/cryptanalysis/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.67s
+
+
+=== FINAL: cargo +1.78.0 check --locked --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --all-targets; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-final-msrv.txt
+Raw bytes: 260
+Raw SHA256: 288a6c5d13216005f6726c7c2ea547842ff2d5024c4759dcd6ce06d9234ed381
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+    Checking cryptanalysis v0.1.0 (/workspace/cryptanalysis/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.54s
+
+
+=== FINAL: RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --no-deps; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-final-docs.txt
+Raw bytes: 465
+Raw SHA256: 179b281c256d79353540f048c71459abf28bf26d6d112a7ceaf1b2e06634cacd
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+ Documenting hashed-ecdl-tensor v0.1.0 (/workspace/cryptanalysis/bindings/rust/hashed-ecdl-tensor)
+ Documenting cryptanalysis v0.1.0 (/workspace/cryptanalysis/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.05s
+   Generated /workspace/cryptanalysis/bindings/rust/target/doc/cryptanalysis/index.html and 2 other files
+
+
+=== FINAL: cargo fmt --manifest-path bindings/rust/Cargo.toml --all -- --check; exit0 (empty output). ===
+Local raw path: /tmp/hashed-ecdl-sqrt-binding-format.txt
+Raw bytes: 0
+Raw SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+
+=== FINAL: cargo build --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor --bin hashed-ecdl; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-binding-cli-build.txt
+Raw bytes: 62
+Raw SHA256: 222a02ed477d249a21359df8cae975864a62d848f4739cadc5b00b6190a963c6
+    Finished `release` profile [optimized] target(s) in 0.02s
+
+
+=== FINAL: bindings/rust/target/release/hashed-ecdl verify docs/hashed-ecdl-tensor-fixture.json; exit0. Existing fixture SHA256 54f3a724feb70fc1cc7465371caf43a1c93578b168dec5487bed94729d42f63c. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-binding-cli-replay.txt
+Raw bytes: 31
+Raw SHA256: 465d84eede04f4a119d38cc3c1c3c16576284ae826945533fc4d5470a4756641
+certificate verified: scalar 4
+
+
+=== Final shared-kernel comparison with crypto c84df306cc583957f8351ff233c50ef422900697; exit0. ===
+Local raw path: /tmp/hashed-ecdl-sqrt-kernel-parity.txt
+Raw bytes: 574
+Raw SHA256: 2162f5582a604c4c6ba7b0b8981c843b7ff2f21ba500d25b62e90a141b39d185
+New square-root/decoder/enumeration fragments match byte for byte. Whole crate trees intentionally differ after crypto main integration.
+square_root_and_context 4726 f0ea5dfb64c9dd96e9e024cefcd939815bbc58819fe8e2702fa61cf88db6dd5c
+curve_decode 203 52bca94761c7a5cc8c90555c027f73bcc75aeffe166e02ad146afa5b28d50cf9
+curve_decoder 176 6555667e272eb3d92f5089b8117674c53e3b79c4455744ec3b04f2363f3224a6
+point_decoder 1301 86f04424807f17ad947588c26a4105e70e89fd40e1aeb02c0ac4fc65f0577642
+factor_base_enumeration 1084 7524334a843deb358365823b26b8da94685b985f62ad30076c632b64de83c0c5
+
+
+Intermediate cache-only panel (before the later shortcut): exit0,92tests.
+/tmp/hashed-ecdl-sqrt-binding-tests.txt 8101 7b7b4c49be93478523c600ac163f23e841272613db3fc6e25933b50dc41e4ef6
+/tmp/hashed-ecdl-sqrt-clippy.txt 260 042d41d639b0d95594cdfd1195bb87ba4ac6047db29241b1e9bc625582324a74
+/tmp/hashed-ecdl-sqrt-msrv.txt 260 0b4e61de428811a5d0da34a4301fb6b644229fe153225198447488ccf5f05deb
+These intermediate raw files remain local NOT_UPLOADED; the final panel above supersedes their source snapshot.
+
+=== Fresh crypto root run: PASS ===
+Command: cargo test --release --lib (uncapped).
+Launch source:c84df306cc583957f8351ff233c50ef422900697
+Native18-file manifest SHA256:3b2893f8984ab4895c195e88f46bb172c006a2a29147cc17dbfe23166b95037c
+Executable:target/release/deps/crypto_lib-cd696b7f650051ce
+Executable bytes:296258584
+Executable SHA256:a364dd5587a3077f8de77dd13231bca8f689008cd930011eef2fa54e04f5d11e
+Raw path:/tmp/hashed-ecdl-sqrt-root-library.txt
+Raw bytes:487100
+Raw SHA256:1cccbc7bec2c043d4ca86f16a773447309497a8faf47c8c937169bd20748514d
+Terminal marker:/tmp/hashed-ecdl-sqrt-root-library.exitcode contains0.
+Actual tool session5160 completed with exit0.
+Verbatim COMPLETE PARENT result:
+test result: ok. 5430 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 1873.55s
+All5553 tests accounted for:5430 passed,0 failed,123 pre-existing ignored.
+Two passing one-test child summaries, each5552filtered, are not the parent
+result and were not used to establish the pass. No source, assertion, input,
+limit or gate changed during this run. The native source manifest still matches.
+Storage:NOT_UPLOADED. No configured artifact-store identity; the oversized raw
+trace remains local and is not committed. Its local path is not a durable
+remote artifact. This compact receipt preserves its digest and terminal result.
+
+=== Supplemental merge-preview validation (not published PR head) ===
+Cryptanalysis main-integration preview; correctness only, 2026-10-30
+PR1309 published head:b02b919d4eec0691dd00438d0e0d9ca7f26fedce
+Preview combines it with main:0fd71e100cef049176895395d7ecd0bda780f55b
+Merge-preview tree:7ad7a618ed3c942c7789f2a98be369b5a892b653
+Bindings/rust subtree:7a3b46b9d4be7fbf0637efdabfb941de4f7fb78d
+Only docs/session-logs/2026-10-30.md conflicts. This source export does not
+resolve or edit that conflicted file. Copilot is still pending; these are
+preview results, not current-head CI or a published resolution.
+Export path:/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust
+CARGO_TARGET_DIR:/workspace/cryptanalysis/bindings/rust/target
+The export uses unchanged original C src/include via symlinks at its root;
+git diff --exit-code cf35a825..0fd71e10 -- src include passed.
+Source manifest covers19 native Cargo/source/test files, SHA256:
+274eaa124553a9664cb49e58b36c3c801577020d349c4d78d4a3033b3311b0d5
+The square-root/decoder kernels still match crypto c84df306c byte for byte.
+
+=== First terminal-status anomaly, retained without calling it a full terminal success. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-attempt.txt
+Raw bytes:453
+Raw SHA256:95d1b583dec639692cf1d43e61895a892e76d042a83b8ef4753ee34428d93a0e
+Preview attempt1: complete release panel reports all106 tests passing; command-internal marker records cargo status0. Tool write_stdin session89847 nevertheless returned wrapper exit_code1. This mismatch is retained and is not treated as a fully confirmed terminal success. Repeat with a direct exec of cargo, separate output path; no source/test/limit changes.
+Raw bytes:9654
+Raw SHA256:f7ae40c302894d547a9b6f377cc86c38d8b372135527d99b59a59670cffdebfd
+
+
+=== Attempt1 raw release output: all106 passed; internal cargo marker0, tool wrapper exit1. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-tests.txt
+Raw bytes:9654
+Raw SHA256:f7ae40c302894d547a9b6f377cc86c38d8b372135527d99b59a59670cffdebfd
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/hashed-ecdl-tensor)
+   Compiling cryptanalysis-sys v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis-sys)
+   Compiling cryptanalysis v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis)
+    Finished `release` profile [optimized] target(s) in 32.90s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/cryptanalysis-aeb2519aac7fab62)
+
+running 20 tests
+test gpu::tests::cuda_backend_reports_cleanly ... ok
+test gpu::tests::emulator_solves_curve ... ok
+test gpu::tests::options_round_trip_and_defaults ... ok
+test gpu::tests::emulator_solves_zp ... ok
+test gpu::tests::max_ops_is_enforced ... ok
+test hashed_ecdl::tests::identity_and_bounds_are_explicit ... ok
+test hashed_ecdl::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test hashed_ecdl::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test hashed_ecdl::tests::overlapping_slots_keep_separate_columns ... ok
+test hashed_ecdl::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test hashed_ecdl::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test hashed_ecdl::tests::validates_curve_and_canonical_points ... ok
+test hashed_ecdl::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test tests::group_is_send_and_sync ... ok
+test tests::hashed_ecdl_agrees_with_independent_c_arithmetic ... ok
+test hashed_ecdl::tests::solves_and_replays_seeded_known_answers ... ok
+test tests::version_is_semver_like ... ok
+test tests::options_default_matches_c_defaults ... ok
+test tests::error_display_includes_status ... ok
+test tests::tensor_curve_agrees_with_independent_c_arithmetic ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ffi_parity.rs (bindings/rust/target/release/deps/ffi_parity-a0785a41fdcfb188)
+
+running 19 tests
+test curve_dispatch_and_glv ... ok
+test ec_curve_end_to_end ... ok
+test index_calculus_one_shot ... ok
+test number_theory_helpers ... ok
+test index_calculus_context_reuse ... ok
+test index_calculus_random_exponent_method ... ok
+test version_matches_header ... ok
+test zp_bsgs ... ok
+test zp_bsgs_interval_miss_is_not_found ... ok
+test zp_cheon ... ok
+test zp_construction_and_accessors ... ok
+test zp_dlog_every_solver ... ok
+test zp_element_ops ... ok
+test zp_grumpy_interval ... ok
+test zp_kangaroo_interval ... ok
+test zp_max_ops_limit ... ok
+test group_usable_from_multiple_threads ... ok
+test zp_rho_single_and_multi_thread ... ok
+test zp_precomp ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 42 tests
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test arithmetic::tests::reused_roots_preserve_failures_and_enforce_each_new_meter ... ok
+test arithmetic::tests::root_setup_is_lazy_reused_and_charged_only_when_performed ... ok
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test arithmetic::tests::reused_square_roots_match_independent_residue_tables_in_both_orders ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::dependency_pruning_handles_constant_failures_and_no_free_digits ... ok
+test contraction::tests::dependency_pruning_preserves_derived_pins_aliases_and_multiplicity ... ok
+test contraction::tests::dependency_pruning_skips_only_rejected_input_blocks ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 109.62s
+
+     Running unittests src/bin/hashed-ecdl.rs (bindings/rust/target/release/deps/hashed_ecdl-1adba597a2b08e12)
+
+running 5 tests
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/bin/hashed-ecdl-panel.rs (bindings/rust/target/release/deps/hashed_ecdl_panel-43cdc1b2578d76cd)
+
+running 3 tests
+test tests::panel_preserves_every_frozen_case_and_separates_answers ... ok
+test tests::oracle_checks_full_cardinality_and_all_native_multiples ... ok
+test tests::preparation_is_complete_and_existing_evidence_is_never_replaced ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/strict_json.rs (bindings/rust/target/release/deps/strict_json-0b75354c63b31515)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cryptanalysis
+
+running 14 tests
+test cryptanalysis/src/group.rs - group::Group::ec_count_points (line 197) ... ok
+test cryptanalysis/src/gpu.rs - gpu::Group::gpu_rho (line 127) ... ok
+test cryptanalysis/src/group.rs - group::Group::zp (line 168) ... ok
+test cryptanalysis/src/group.rs - group::Group::dlog (line 476) ... ok
+test cryptanalysis/src/group.rs - group::cheon_best_divisor (line 636) ... ok
+test cryptanalysis/src/lib.rs - (line 11) ... ok
+test cryptanalysis/src/nt.rs - nt::factorize (line 61) ... ok
+test cryptanalysis/src/index_calculus.rs - index_calculus (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::invmod (line 48) ... ok
+test cryptanalysis/src/nt.rs - nt::is_prime (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::next_prime (line 18) ... ok
+test cryptanalysis/src/nt.rs - nt::powmod (line 38) ... ok
+test cryptanalysis/src/nt.rs - nt::primitive_root (line 28) ... ok
+test cryptanalysis/src/options.rs - options::Options (line 46) ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+
+=== CONFIRMED direct exec of cargo test --locked --release --manifest-path EXPORT/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis; actual tool terminal exit0, session93490. All106 passed:42core+5runner+3panel+3JSON+20binding+19FFI+14docs. No source/test/limit changes between attempts. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-retry-tests.txt
+Raw bytes:9278
+Raw SHA256:d1ba1c496ddd0456800093bc3b2032f16ef3defa4f7f95aad18807d681ecbd84
+    Finished `release` profile [optimized] target(s) in 0.04s
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/cryptanalysis-aeb2519aac7fab62)
+
+running 20 tests
+test gpu::tests::max_ops_is_enforced ... ok
+test gpu::tests::options_round_trip_and_defaults ... ok
+test hashed_ecdl::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test hashed_ecdl::tests::identity_and_bounds_are_explicit ... ok
+test hashed_ecdl::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test gpu::tests::cuda_backend_reports_cleanly ... ok
+test gpu::tests::emulator_solves_curve ... ok
+test hashed_ecdl::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test hashed_ecdl::tests::overlapping_slots_keep_separate_columns ... ok
+test hashed_ecdl::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test gpu::tests::emulator_solves_zp ... ok
+test hashed_ecdl::tests::validates_curve_and_canonical_points ... ok
+test tests::error_display_includes_status ... ok
+test hashed_ecdl::tests::solves_and_replays_seeded_known_answers ... ok
+test tests::options_default_matches_c_defaults ... ok
+test tests::group_is_send_and_sync ... ok
+test hashed_ecdl::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test tests::tensor_curve_agrees_with_independent_c_arithmetic ... ok
+test tests::hashed_ecdl_agrees_with_independent_c_arithmetic ... ok
+test tests::version_is_semver_like ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ffi_parity.rs (bindings/rust/target/release/deps/ffi_parity-a0785a41fdcfb188)
+
+running 19 tests
+test index_calculus_context_reuse ... ok
+test index_calculus_one_shot ... ok
+test index_calculus_random_exponent_method ... ok
+test number_theory_helpers ... ok
+test version_matches_header ... ok
+test zp_bsgs ... ok
+test zp_bsgs_interval_miss_is_not_found ... ok
+test zp_cheon ... ok
+test zp_construction_and_accessors ... ok
+test ec_curve_end_to_end ... ok
+test curve_dispatch_and_glv ... ok
+test zp_element_ops ... ok
+test zp_dlog_every_solver ... ok
+test zp_kangaroo_interval ... ok
+test zp_grumpy_interval ... ok
+test group_usable_from_multiple_threads ... ok
+test zp_rho_single_and_multi_thread ... ok
+test zp_max_ops_limit ... ok
+test zp_precomp ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/lib.rs (bindings/rust/target/release/deps/hashed_ecdl_tensor-11962db036771e70)
+
+running 42 tests
+test arithmetic::tests::reused_roots_preserve_failures_and_enforce_each_new_meter ... ok
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test arithmetic::tests::root_setup_is_lazy_reused_and_charged_only_when_performed ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test arithmetic::tests::three_mod_four_roots_fit_a_single_exponentiation_budget ... ok
+test arithmetic::tests::reused_square_roots_match_independent_residue_tables_in_both_orders ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::dependency_pruning_handles_constant_failures_and_no_free_digits ... ok
+test contraction::tests::dependency_pruning_preserves_derived_pins_aliases_and_multiplicity ... ok
+test contraction::tests::dependency_pruning_skips_only_rejected_input_blocks ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test reduction::tests::factor_base_enumeration_reuses_square_root_setup ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 106.25s
+
+     Running unittests src/bin/hashed-ecdl.rs (bindings/rust/target/release/deps/hashed_ecdl-1adba597a2b08e12)
+
+running 5 tests
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/bin/hashed-ecdl-panel.rs (bindings/rust/target/release/deps/hashed_ecdl_panel-43cdc1b2578d76cd)
+
+running 3 tests
+test tests::oracle_checks_full_cardinality_and_all_native_multiples ... ok
+test tests::panel_preserves_every_frozen_case_and_separates_answers ... ok
+test tests::preparation_is_complete_and_existing_evidence_is_never_replaced ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/strict_json.rs (bindings/rust/target/release/deps/strict_json-0b75354c63b31515)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cryptanalysis
+
+running 14 tests
+test cryptanalysis/src/group.rs - group::Group::dlog (line 476) ... ok
+test cryptanalysis/src/gpu.rs - gpu::Group::gpu_rho (line 127) ... ok
+test cryptanalysis/src/group.rs - group::Group::ec_count_points (line 197) ... ok
+test cryptanalysis/src/group.rs - group::Group::zp (line 168) ... ok
+test cryptanalysis/src/group.rs - group::cheon_best_divisor (line 636) ... ok
+test cryptanalysis/src/lib.rs - (line 11) ... ok
+test cryptanalysis/src/index_calculus.rs - index_calculus (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::factorize (line 61) ... ok
+test cryptanalysis/src/nt.rs - nt::invmod (line 48) ... ok
+test cryptanalysis/src/nt.rs - nt::is_prime (line 7) ... ok
+test cryptanalysis/src/nt.rs - nt::next_prime (line 18) ... ok
+test cryptanalysis/src/nt.rs - nt::powmod (line 38) ... ok
+test cryptanalysis/src/nt.rs - nt::primitive_root (line 28) ... ok
+test cryptanalysis/src/options.rs - options::Options (line 46) ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+
+=== cargo clippy --locked --manifest-path EXPORT/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --all-targets -- -D warnings; exit0. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-clippy.txt
+Raw bytes:448
+Raw SHA256:224c82ac140273e3be8b901c7a63244b38027d6525dd2c9dcb5cac8b5c18a7fd
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/hashed-ecdl-tensor)
+   Compiling cryptanalysis-sys v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis-sys)
+    Checking cryptanalysis v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 25.56s
+
+
+=== cargo +1.78.0 check --locked --manifest-path EXPORT/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --all-targets; exit0. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-msrv.txt
+Raw bytes:448
+Raw SHA256:b9bfc3578cbde29e0ecad2f134d85f4aa1d33aa07617d65e353fd726fab0bd71
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/hashed-ecdl-tensor)
+   Compiling cryptanalysis-sys v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis-sys)
+    Checking cryptanalysis v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 29.60s
+
+
+=== RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path EXPORT/Cargo.toml -p hashed-ecdl-tensor -p cryptanalysis --no-deps; exit0. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-docs.txt
+Raw bytes:683
+Raw SHA256:ca68219c88d337dd24a45dc9f2792147806833d4c8d81f60e6df1743551c5e57
+   Compiling cryptanalysis-sys v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis-sys)
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/hashed-ecdl-tensor)
+ Documenting hashed-ecdl-tensor v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/hashed-ecdl-tensor)
+ Documenting cryptanalysis v0.1.0 (/workspace/scratch/hashed-ecdl-sqrt-cryptanalysis-main/bindings/rust/cryptanalysis)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 26.15s
+   Generated /workspace/cryptanalysis/bindings/rust/target/doc/cryptanalysis/index.html and 3 other files
+
+
+=== cargo fmt --manifest-path EXPORT/Cargo.toml --all -- --check; exit0, empty output. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-format.txt
+Raw bytes:0
+Raw SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+
+=== cargo build --locked --release --manifest-path EXPORT/Cargo.toml -p hashed-ecdl-tensor --bin hashed-ecdl; exit0. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-cli-build.txt
+Raw bytes:62
+Raw SHA256:9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08
+    Finished `release` profile [optimized] target(s) in 0.03s
+
+
+=== Rebuilt preview CLI verify original docs/hashed-ecdl-tensor-fixture.json; exit0, scalar4. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-cli-replay.txt
+Raw bytes:31
+Raw SHA256:465d84eede04f4a119d38cc3c1c3c16576284ae826945533fc4d5470a4756641
+certificate verified: scalar 4
+
+
+=== Native source manifest from the merge-preview export, not a replacement for frozen source manifests. ===
+/tmp/hashed-ecdl-sqrt-binding-merge-preview-sources.sha256
+Raw bytes:1631
+Raw SHA256:274eaa124553a9664cb49e58b36c3c801577020d349c4d78d4a3033b3311b0d5
+f467bbd37fd31e3d4382cf69723446517f475333af59eaa6ba990d16a70bd873  Cargo.lock
+6a0d91f6a4cbf6431a0f9e2dac0fcd854ed275a71360f0efbcbcb17e1eb96fc1  Cargo.toml
+52ff3f53bd158997d18a2b09c2670bc224d6e9322a4934ab9889a27c738a4963  src/arithmetic.rs
+8ca8e51aad7463497fef7519f014a31e93bf54386f64ec7c9abe10602ff75b2b  src/bin/hashed-ecdl-panel.rs
+68c067576d8018a961a67d699c1b4281604d938de6550a847a7898474156bb23  src/bin/hashed-ecdl.rs
+66317bed17ec3e5fa97c6a763cb02e21fe3aa1974b27ec92b32de7f90c27fe4e  src/contraction/coupled_controls.rs
+e50c2226d11bf623994daaafc40fea5e012afd6be0091551b9fe6fd5dc555963  src/contraction/deformation.rs
+127af2da46476506dc3d425b46ecf84eb3121c60dd4c70b282f9b6d9bce99880  src/contraction/packing.rs
+830b3a372469c966be4789302d9760461253bcb2c55a565a5916c9114fa60da2  src/contraction/recursive.rs
+8ad7339b241205d52ff62fb04042c3bc4098b79928589cbe28735dfdee1fed4c  src/contraction.rs
+d59110c49bda44b4a6ade2ae8b0e8fc8d2948f0155d6c9efb79ced10841784e8  src/curve.rs
+f701983587d30cc2cd1c3650784f3a39688d3eea1d1c9cb7b8c418f1c98236b8  src/encoding.rs
+2c0c5e01398b67123c5c3baf8d5e6b8fd09c381eb0222b1b9ad01cccbf08b2d8  src/lib.rs
+55accd8c18a9c94cdeee19568da1517b9fca7b0661044eef3b4dde8feaf388a0  src/network.rs
+752f5b533f376a12b74210f8213cc9e08029a62dc5adbe0f147086a09b536776  src/primality.rs
+b9a13bb8772284fa724f1664b8077d949610b16c1abefcf0deb8ba1c0fc8d3a7  src/reduction.rs
+70180a474b596a751f0be46becde69cabf26a4148e2bee0bc42bd897d62062d0  src/ring.rs
+b388798af39d58bef0e34b0d53a97be90f397fac49c8da200bd103e07738627c  src/serialization.rs
+beefce8fd1eb0a457683cbf4e1db89411a2c0c624633b32d01342e7b216498d5  tests/strict_json.rs
+
+End of supplemental preview record. Published-head validation remains separately identified above.

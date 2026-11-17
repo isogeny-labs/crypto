@@ -1,0 +1,58 @@
+{
+  "account_id": "104186811093",
+  "authorized_at_date": "2026-11-03",
+  "budget_thresholds_are_additive": false,
+  "changes": [
+    {
+      "before_limit": {
+        "Amount": "25.0",
+        "Unit": "USD"
+      },
+      "budget_name": "isolab-daily-cost-100",
+      "cost_filters": null,
+      "notification_configuration_preserved": true,
+      "notification_count": 2,
+      "observed_at_utc": "2026-11-03T17:41:11.509297+00:00",
+      "other_budget_configuration_preserved": true,
+      "time_unit": "DAILY",
+      "verified_after_limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      }
+    },
+    {
+      "before_limit": {
+        "Amount": "25.0",
+        "Unit": "USD"
+      },
+      "budget_name": "spot-experiments-daily-25",
+      "cost_filters": null,
+      "notification_configuration_preserved": true,
+      "notification_count": 2,
+      "observed_at_utc": "2026-11-03T17:41:18.525231+00:00",
+      "other_budget_configuration_preserved": true,
+      "time_unit": "DAILY",
+      "verified_after_limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      }
+    }
+  ],
+  "completed_at_utc": "2026-11-03T17:41:19.336880+00:00",
+  "cpu_ram_policy_changed": false,
+  "daily_allowance_usd": 200,
+  "monthly_budget": {
+    "budget_name": "isolab-monthly-account-cost",
+    "time_unit": "MONTHLY",
+    "unchanged": true,
+    "verified_limit": {
+      "Amount": "1000.0",
+      "Unit": "USD"
+    }
+  },
+  "new_workloads_submitted": false,
+  "owner_instruction": "open up the spend for isolab here to 200 per day",
+  "region": "us-east-2",
+  "schema": "isolab.budget-change/v1",
+  "verification_note": "The first verification compared the AWS-generated HealthStatus timestamp and stopped after the first successful update. Resumed by reading that budget without repeating its update; read-only health and billing fields are excluded from configuration comparison."
+}

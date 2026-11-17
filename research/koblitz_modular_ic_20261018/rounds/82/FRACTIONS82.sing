@@ -1,0 +1,29 @@
+LIB "primdec.lib";
+proc require82(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../50/runs/normal-relative-finite50-01/selected-prime50.sing"));
+execute(read("../../../50/runs/normal-relative-finite50-01/fractional-module50.sing"));
+require82(char(basering)==2 && nvars(basering)==3 && size(module50)==27,"CAND82_SOURCE_MODULE_SHAPE");
+ideal selectedStd82=std(selectedPrime50);
+require82(reduce(module50[27],selectedStd82)!=0,"CAND82_SOURCE_DENOMINATOR_ZERO");
+execute(read("../../../50/runs/normal-relative-finite50-01/normalization50.sing"));
+require82(char(basering)==2 && npars(basering)==0 && nvars(basering)==22 && size(norid)==400,"CAND82_CANDIDATE_SHAPE");
+require82(size(normap)==3 && normap[1]==x && normap[2]==y && normap[3]==p,"CAND82_LITERAL_SOURCE_MAP");
+ideal normalStd82=std(norid);
+map sourceMap82=selected50,normap;
+require82(size(reduce(sourceMap82(selectedPrime50),normalStd82))==0,"CAND82_SOURCE_IDEAL_NOT_CONTAINED");
+intvec index82=2,6,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25;
+poly denominator82=sourceMap82(module50[27]);
+require82(reduce(denominator82,normalStd82)!=0,"CAND82_CANDIDATE_DENOMINATOR_ZERO");
+int i82;int k82;poly numerator82;poly residual82;
+for(i82=1;i82<=19;i82++){
+ k82=index82[i82];
+ require82(string(var(i82))=="T("+string(k82)+")","CAND82_SURVIVING_VARIABLE_ORDER");
+ numerator82=sourceMap82(module50[k82]);
+ residual82=reduce(denominator82*var(i82)+numerator82,normalStd82);
+ require82(residual82==0,"CAND82_FRACTION_IDENTITY");
+ print("CAND82_FRACTION index="+string(k82)+" coordinate="+string(i82)+" residual_zero=1");
+}
+require82(reduce(denominator82*var(12)+sourceMap82(module50[17])+denominator82,normalStd82)!=0,"CAND82_CORRUPT_NUMERATOR_ACCEPTED");
+print("CAND82_RESULT source_fraction_relations=19 denominator_nonzero=1 source_containment=1 corrupted_control_rejected=1 candidate_only=1");
+print("CANDIDATE_FRACTIONS82_ALL_CHECKS_PASS");
+quit;

@@ -1,0 +1,268 @@
+[
+  {
+    "theorem": "OrientationNodeMoment.node_slope_even",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_slope_even (u i x y : \u2115) (t : \u2124) (hiu : i < u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : VBound 1 (slope u (rowResidue u x) y (t:\u211a))",
+    "decl_sha256": "127166d07629f874fc4ced793d27a9a257bec258753b59111d94967c605f6d2d",
+    "claim_id": "PCC-20261114-364596"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_comparison_reciprocal",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_comparison_reciprocal (u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i < u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : nodeComparisonRatio u x (rowResidue u x) y t m = nodeReciprocal u x y t m",
+    "decl_sha256": "cee2596622b5493c9e8c42384848a2e60bf3544d13686d510732c727ca64277e",
+    "claim_id": "PCC-20261114-4d0e2a"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_denominator_weighted",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_denominator_weighted (u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i < u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : WeightedPolynomial (nodeDenominator u x y t m)",
+    "decl_sha256": "d838687d1c44677bc3691da2befcfa34c48c7f20e005fa2ab6a502da6c6f2c42",
+    "claim_id": "PCC-20261114-5aabaa"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_denominator_constant",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_denominator_constant (u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : (nodeDenominator u x y t m).coeff 0=1",
+    "decl_sha256": "057f562f493ed3b30feea97464746d6655232f9bb1af1e98d12c411a2b62a513",
+    "claim_id": "PCC-20261114-5031ff"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_denominator_reciprocal",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_denominator_reciprocal (u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : nodeReciprocal u x y t m = ((nodeDenominator u x y t m).eval (rowQuotient u x:\u211a))\u207b\u00b9",
+    "decl_sha256": "02fa1d2a9181d167b2eecbbd4bddd1f512e44371d97477f3eed4a80a63f9e485",
+    "claim_id": "PCC-20261114-ee9fc3"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_denominator_row_class",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_denominator_row_class (u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : nodeDenominator u x y t m = nodeDenominator u (rowResidue u x) y t m",
+    "decl_sha256": "f3f8243be534846aa308973dc7dccef71a89242e5e3563a022be5d3431577e77",
+    "claim_id": "PCC-20261114-d979c7"
+  },
+  {
+    "theorem": "OrientationNodeMoment.actual_node_reciprocal_family",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_reciprocal_family (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m = ((chart a t (completed (grid a) u (rowResidue u x) y m)).coeff 1/diagonalJet a u i m)* nodeReciprocal u x y t m",
+    "decl_sha256": "a1d0cc16bc8d6db95204177b0dc8807ce4f126263d113af70bae3738706fb23c",
+    "claim_id": "PCC-20261114-f2cf83"
+  },
+  {
+    "theorem": "OrientationNodeMoment.actual_node_moment_error",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_moment_error (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : VBound (k:\u2124) ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m- ((chart a t (completed (grid a) u (rowResidue u x) y m)).coeff 1/diagonalJet a u i m)* (inverseTrunc (nodeDenominator u (rowResidue u x) y t m) k).eval (rowQuotient u x:\u211a))",
+    "decl_sha256": "c1227d717515a2dce878eb5cf3279b69cd7d2c5e2025dd04d6bff96b57fc53b1",
+    "claim_id": "PCC-20261114-174b70"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_moment_right_integral",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_moment_right_integral (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (rb : MomentLabels u k) (y : Ports a) : VBound 0 (nodeMomentRight a u i k hu t m rb y)",
+    "decl_sha256": "9abc95b265004c5951f8317d3eaad8cae5388eb5b718d2f8ebbd9cedf47a296b",
+    "claim_id": "PCC-20261114-a354ef"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_moment_product",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_moment_product (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (momentLeft a u k*nodeMomentRight a u i k hu t m) x y = nodeCrossingFirst a u i t m (OrientationRank.classPort a u hu \u27e8rowResidue u x.val,row_bound u x.val\u27e9) y * (inverseTrunc (nodeDenominator u (rowResidue u x.val) y.val t m) k).eval (rowQuotient u x.val:\u211a)",
+    "decl_sha256": "cc5e7aee81ef6e170d14c29936768990bdb21a11daf3b550f9d72ec87db04778",
+    "claim_id": "PCC-20261114-c37009"
+  },
+  {
+    "theorem": "OrientationNodeMoment.actual_node_moment_factorization",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_moment_factorization (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (x y : Ports a) : VBound (k:\u2124) (nodeCrossingFirst a u i t m x y- (momentLeft a u k*nodeMomentRight a u i k hu t m) x y)",
+    "decl_sha256": "7bf160cb7e46171d285972d94ea696c1b0818d1d8ddf3eca0b2f395d2a2a88fd",
+    "claim_id": "PCC-20261114-04c7cf"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_first_scale",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_first_scale (a u i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hia : i\u2264a) (x y : Ports a) : nodeActualFirst a u i t m x y=diagonalJet a u i m*nodeCrossingFirst a u i t m x y",
+    "decl_sha256": "af4ec2c5bd232e0ad966ef8d71e00501bb71f35e5035d121a7bf9085bf93f776",
+    "claim_id": "PCC-20261114-9ba22a"
+  },
+  {
+    "theorem": "OrientationNodeMoment.node_moment_weighted_product",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem node_moment_weighted_product (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (momentWeightedLeft a u i k m*nodeMomentRight a u i k hu t m) x y = diagonalJet a u i m*(momentLeft a u k*nodeMomentRight a u i k hu t m) x y",
+    "decl_sha256": "36a540b093617faca3707ecbbc48beefeb99e0ea88b7be648171fccf06a12a57",
+    "claim_id": "PCC-20261114-81f9fc"
+  },
+  {
+    "theorem": "OrientationNodeMoment.actual_node_weighted_moment_factorization",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_weighted_moment_factorization (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (x y : Ports a) : VBound (jetWeight a u i m+k) (nodeActualFirst a u i t m x y- (momentWeightedLeft a u i k m*nodeMomentRight a u i k hu t m) x y)",
+    "decl_sha256": "bae2f779a07233650b175fab618acb39a0a8d18b606e1387a342dffb6317e447",
+    "claim_id": "PCC-20261114-cc7e2b"
+  },
+  {
+    "theorem": "OrientationNodeMoment.actual_node_moment_profile",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_moment_profile (a u i k : \u2115) (hu : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) : (\u2200 (x : Ports a) (rb : MomentLabels u k), VBound (jetWeight a u i m+rb.2.val) (momentWeightedLeft a u i k m x rb)) \u2227 (\u2200 (rb : MomentLabels u k) (y : Ports a),VBound 0 (nodeMomentRight a u i k hu t m rb y)) \u2227 (\u2200 x y : Ports a,VBound (jetWeight a u i m+k) (nodeActualFirst a u i t m x y- (momentWeightedLeft a u i k m*nodeMomentRight a u i k hu t m) x y)) \u2227 Fintype.card (MomentLabels u k)=2^u*k",
+    "decl_sha256": "411fdfdd7bae0334f61ffec09d51cf6bf82505170c668ad82ae707c2c3b03e87",
+    "claim_id": "PCC-20261114-ae019d"
+  },
+  {
+    "theorem": "OrientationNodeMoment.positive_anchor_moment_right_zero",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem positive_anchor_moment_right_zero (a u i k : \u2115) (hu : u\u2264a) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hm : 0 < m i) (rb : MomentLabels u k) (y : Ports a) : nodeMomentRight a u i k hu ((2:\u2124)^i) m rb y=0",
+    "decl_sha256": "21b3c16a37ecb52bc48d8c1a03920d8047d0795a6cf836264f327ea487df8968",
+    "claim_id": "PCC-20261114-0302f6"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.content_neg",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem content_neg {k : \u2124} {P : \u211a[X]} (h : Content k P) : Content k (-P)",
+    "decl_sha256": "54329601b40dd7a43c5a80590562c5bd712d15e0af6b8e9906718a37a653c19a",
+    "claim_id": "PCC-20261114-01aaca"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.content_sub",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem content_sub {k : \u2124} {P Q : \u211a[X]} (hP : Content k P) (hQ : Content k Q) : Content k (P-Q)",
+    "decl_sha256": "722d7899505a530bc94694bd5c9bd52a37576fe7503babadfdd38da36f5d74b7",
+    "claim_id": "PCC-20261114-48420c"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.content_sum",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem content_sum {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 \u211a[X]) (k : \u2124) (h : \u2200 j \u2208 S,Content k (P j)) : Content k (\u2211 j \u2208 S,P j)",
+    "decl_sha256": "dfcff25a93435826511422b8b67ba8144e71f8e612f0217a9254a96a807f9e0c",
+    "claim_id": "PCC-20261114-f2a142"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.content_cancel_near_one",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem content_cancel_near_one (D R : \u211a[X]) (k : \u2115) (hD : Content 1 (D-1)) (hR : Content 0 R) (hDR : Content (k:\u2124) (D*R)) : Content (k:\u2124) R",
+    "decl_sha256": "f5d073d9936959849ff32f892224146769cbb7cc274461de3d1967c0ae6ad79a",
+    "claim_id": "PCC-20261114-71d0cd"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.geometric_inverse_identity",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem geometric_inverse_identity (D : \u211a[X]) (k : \u2115) : D*geometricInverse D k=1-(1-D)^k",
+    "decl_sha256": "133f55c96966a26e7be5332708054548cf7ba56da69bf642300b47aeeb243380",
+    "claim_id": "PCC-20261114-96776f"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.geometric_inverse_integral",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem geometric_inverse_integral (D : \u211a[X]) (k : \u2115) (hD : Content 1 (D-1)) : Content 0 (geometricInverse D k)",
+    "decl_sha256": "66dd4b57f99e8292d7faac42ac86ec3211ac8b29704ead865a4554a7768eb136",
+    "claim_id": "PCC-20261114-3a8033"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.geometric_polynomial_error",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem geometric_polynomial_error (D P N : \u211a[X]) (k : \u2115) (hD : Content 1 (D-1)) (hP : Content 0 P) (hN : Content 0 N) (hactual : D*P=N) : Content (k:\u2124) (P-N*geometricInverse D k)",
+    "decl_sha256": "d01b5f6343e2e58c07c14424e2b15c81a59544a137ddc90fcd70274017841b05",
+    "claim_id": "PCC-20261114-dffe01"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_correction_row_polynomial",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_correction_row_polynomial (u x y : \u2115) (m : \u2115 \u2192 \u2115) : correction u x y m = correction u (rowResidue u x) y m * C (correctionRatio u x (rowResidue u x) y m)",
+    "decl_sha256": "dcd1e7f3073fd00fb91084c4b41d417948a90536a0b2bd668eeb49dbe06ad520",
+    "claim_id": "PCC-20261114-f67f73"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_completed_row_polynomial",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_completed_row_polynomial (a u x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (hu : u\u2264a) : (X-C (delta x y))*completed (grid a) u x y m = C (correctionRatio u x (rowResidue u x) y m)* (X-C (delta (rowResidue u x) y))*completed (grid a) u (rowResidue u x) y m",
+    "decl_sha256": "2f55d8e421c85b8153d72e1217e365935110314c53c1982b32dc317a6d32a593",
+    "claim_id": "PCC-20261114-65cfea"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_node_integral",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_node_integral (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Content 0 (normalizedNodeEntry a u i x y t m)",
+    "decl_sha256": "02b460f158d0d7596e646b2494fbc14b847d59c875a6ade067e1fc3718fa64d4",
+    "claim_id": "PCC-20261114-8487d2"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.correction_ratio_one",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem correction_ratio_one (u x y : \u2115) (m : \u2115 \u2192 \u2115) : OneModTwo (correctionRatio u x (rowResidue u x) y m)",
+    "decl_sha256": "a4afa57a463d1859b98591c4fc9c579db7a0218888cc93e967caba7546590165",
+    "claim_id": "PCC-20261114-9e4f19"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.reciprocal_one",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem reciprocal_one {q : \u211a} (hq : OneModTwo q) : OneModTwo q\u207b\u00b9",
+    "decl_sha256": "2a481df41f9252231e3376b237a225c4d2dd1a68a7d79b95028a8b0ac8688742",
+    "claim_id": "PCC-20261114-d20870"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.chart_slope_even",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem chart_slope_even (a u i x y : \u2115) (t : \u2124) (hiu : i<u) (hu : u\u2264a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : VBound 1 (chartSlope a u x y t)",
+    "decl_sha256": "7fe0a100e0c52988814152359f0623828566191edc4228386bd91d0968e6490e",
+    "claim_id": "PCC-20261114-ac5979"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_row_denominator_near",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_row_denominator_near (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hu : u\u2264a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : Content 1 (rowDenominator a u x y t m-1)",
+    "decl_sha256": "234deec6febfe681cd99e85991d7bb9e48d666bbd491e921f055ac6a9ede6d70",
+    "claim_id": "PCC-20261114-1581e1"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_row_denominator_identity",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_row_denominator_identity (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (hu : u\u2264a) (hiu : i<u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : rowDenominator a u x y t m*normalizedNodeEntry a u i x y t m= rowNumerator a u i x y t m",
+    "decl_sha256": "fa27f251e5fe4869f7a76a057960ee456ca1becadf3e7f28ad9b54c6d8181122",
+    "claim_id": "PCC-20261114-b2de93"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_row_numerator_integral",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_row_numerator_integral (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Content 0 (rowNumerator a u i x y t m)",
+    "decl_sha256": "0841bd06ff8be8bbc2bc77a35e888e5b7d00665b8148b521ad945d0f608d81c2",
+    "claim_id": "PCC-20261114-4f30a6"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_whole_chart_precision",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_whole_chart_precision (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Content (k:\u2124) (normalizedNodeEntry a u i x y t m-actualChartApproximation a u i x y k t m)",
+    "decl_sha256": "a612cac350f170f1bd2de2bd9059e5192f9282972dfbb29fdaca588ffd7b9829",
+    "claim_id": "PCC-20261114-1802a0"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.normalized_node_scale",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem normalized_node_scale (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hia : i\u2264a) : C (diagonalJet a u i m)*normalizedNodeEntry a u i x y t m= chart a t (completed (grid a) u x y m)",
+    "decl_sha256": "b279fd5a7256beb676e77ee9b7dca13f1ef5b0b496323052805f9194c707dcb1",
+    "claim_id": "PCC-20261114-f981fb"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_weighted_whole_chart_precision",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_weighted_whole_chart_precision (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Content (jetWeight a u i m+k) (chart a t (completed (grid a) u x y m)- C (diagonalJet a u i m)*actualChartApproximation a u i x y k t m)",
+    "decl_sha256": "c3704a485a07ad76a13df35cc95bd29e4b6109de75213c1d857129c69a9116e4",
+    "claim_id": "PCC-20261114-96a569"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.geometric_inverse_degree",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem geometric_inverse_degree (D : \u211a[X]) (k : \u2115) (hD : D.natDegree\u22641) : (geometricInverse D k).natDegree\u2264k-1",
+    "decl_sha256": "e1b5f4cd1d05b394189bc9b47f41b4911a067fe014b88f4027c058faf4578262",
+    "claim_id": "PCC-20261114-90d770"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_row_denominator_degree",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_row_denominator_degree (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : (rowDenominator a u x y t m).natDegree\u22641",
+    "decl_sha256": "1d407b1d18b878c940b57cbd6b197af4355c6438c2edf4d36d689376ac1e49ad",
+    "claim_id": "PCC-20261114-f28903"
+  },
+  {
+    "theorem": "OrientationNodePolynomial.actual_approximation_degree",
+    "source": "research/prime_orientation_layers_20261114/higher/lean/OrientationHigher.lean",
+    "statement": "theorem actual_approximation_degree (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : (actualChartApproximation a u i x y k t m).natDegree\u2264 (normalizedNodeEntry a u i (rowResidue u x) y t m).natDegree+k",
+    "decl_sha256": "2265d3f0c360144892f815d93e68b3b16c46d329807bec5ad1726b9c9903a4f6",
+    "claim_id": "PCC-20261114-7649ed"
+  }
+]

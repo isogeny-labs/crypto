@@ -1,0 +1,13 @@
+impl BalancedCharacterImage{
+ fn new(modes:&RecoveryModes,b:u64,f:&[u64],slot_cap:usize,initial_character:u64,trace_trials:usize)->Result<Self,Error>{
+  let r=modes.r;let m=modes.m;let h=(r-1)/2;
+  if m<3||h%m as u64!=0||b==0||b>=r||f.len()!=3||f.iter().any(|&v|v>=r)||(initial_character!=1&&initial_character!=r-1)||trace_trials>64{return Err(Error::Domain)}
+  let l=usize::try_from(h/m as u64).map_err(|_|Error::Limit)?;let epsilon=mul(initial_character,pow(b,h,r),r);
+  let domains=character_domains(r,l,epsilon,m,slot_cap,trace_trials)?;let mut branches=Vec::new();
+  for g in domains{let ring=QuadRing::new(r,&g)?;let branch=CharacterBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?};branches.push(branch);}
+  let t0=pow(pow(b,m as u64,r),r-2,r);
+  let mut image=Self{r,m,t0,inv_t0:pow(t0,r-2,r),orientation:ReciprocalMode{r,n:l,h:Vec::new(),dn:Vec::new()},branches,zero:false,rounds:0,slot_cap};
+  // Unlike the old constructor, no mode0 equation was imposed before absorb.
+  image.absorb(modes,b,f,false)?;BALANCED_CHARACTER_COUNTS.with(|c|{let(a,b,d,e)=c.get();c.set((a+1,b,d,e))});Ok(image)
+ }
+}

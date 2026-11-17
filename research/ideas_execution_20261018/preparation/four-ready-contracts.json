@@ -1,0 +1,377 @@
+{
+  "original_eighteen_membership": "unknown; not a substitute",
+  "contracts": [
+    {
+      "experiment": "EXP-ECDLP-bfbe6f",
+      "goal": "GOAL-ECDLP-001",
+      "task": "TASK-20261012-e25b3e",
+      "write_scope": [
+        "experiments/EXP-ECDLP-bfbe6f/runs"
+      ],
+      "trial_plan": "experiments/EXP-ECDLP-bfbe6f/trial-plan.json",
+      "trial_plan_sha256": "e85296dde341106e92397df0e336234df62360359c6825a36761d9ea78c1cac5",
+      "trial": [
+        {
+          "argv": [
+            "python3",
+            "experiments/EXP-ECDLP-bfbe6f/implementation/run.py",
+            "--trial-plan",
+            "experiments/EXP-ECDLP-bfbe6f/trial-plan.json",
+            "--run-dir",
+            "{run_dir}"
+          ],
+          "artifacts": [
+            "manifest.yaml",
+            "raw-result.json"
+          ],
+          "check_argv": [
+            "python3",
+            "experiments/EXP-ECDLP-bfbe6f/implementation/check.py",
+            "{run_dir}"
+          ],
+          "depends_on": [],
+          "id": "s3-worksheet",
+          "memory_mb": 256,
+          "run_id": "RUN-ECDLP-8f5190"
+        }
+      ],
+      "source_sha256": {
+        "experiments/EXP-ECDLP-bfbe6f/implementation/check.py": "aa2c0c32acb8c2f73b322894e0ac1460d51cfcce22e553d8e8e9f0985c91fc53",
+        "experiments/EXP-ECDLP-bfbe6f/implementation/run.py": "e6912799585b2fb8d388935fb143bb497088918c52663680685c33e7d16c3751"
+      },
+      "inference_requirement": {
+        "policy": "executor-mechanical",
+        "requested_policy": "executor-mechanical",
+        "reasoning_effort": "high",
+        "fallback_allowed": false,
+        "degraded_allowed": false,
+        "independent_session_required": false
+      },
+      "commands": [
+        [
+          "python3",
+          "tools/research_dispatch.py",
+          "experiments/EXP-ECDLP-bfbe6f/queue.json",
+          "--ready-only",
+          "--claims",
+          "refs"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "claim",
+          "experiments/EXP-ECDLP-bfbe6f/queue.json",
+          "TASK-20261012-e25b3e",
+          "--ttl-minutes",
+          "10",
+          "--as",
+          "executor-ideas-20261018"
+        ],
+        [
+          "python3",
+          "tools/experiment_execution.py",
+          "run",
+          "--plan",
+          "experiments/EXP-ECDLP-bfbe6f/trial-plan.json",
+          "--owner",
+          "executor-ideas-20261018",
+          "--epoch",
+          "ACTUAL_CLAIM_EPOCH"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "release",
+          "experiments/EXP-ECDLP-bfbe6f/queue.json",
+          "TASK-20261012-e25b3e",
+          "--as",
+          "executor-ideas-20261018",
+          "--outcome",
+          "ACTUAL_OUTCOME",
+          "--note",
+          "ACTUAL_OBSERVATION"
+        ]
+      ],
+      "execution_qualification": "Run from crypto-autoresearcher only after actual readiness/live-ownership checks. Do not force a claim or invent its epoch. Resolve inference requirements through native runner; preserve any refusal. Release completed only with actual declared output coverage; preserve failed attempts. This preparation executed none of these commands."
+    },
+    {
+      "experiment": "EXP-ECDLP-5f4f14",
+      "goal": "GOAL-ECDLP-001",
+      "task": "TASK-20261012-d5e2f4",
+      "write_scope": [
+        "experiments/EXP-ECDLP-5f4f14/runs"
+      ],
+      "trial_plan": "experiments/EXP-ECDLP-5f4f14/trial-plan.json",
+      "trial_plan_sha256": "3c546c8ed2fe4a77df35c40ff9b2a742432574e3adb302f9d5997b0faaa657ba",
+      "trial": [
+        {
+          "argv": [
+            "python3",
+            "experiments/EXP-ECDLP-5f4f14/implementation/run.py",
+            "--trial-plan",
+            "experiments/EXP-ECDLP-5f4f14/trial-plan.json",
+            "--run-dir",
+            "{run_dir}"
+          ],
+          "artifacts": [
+            "manifest.yaml",
+            "raw-result.json"
+          ],
+          "check_argv": [
+            "python3",
+            "experiments/EXP-ECDLP-5f4f14/implementation/check.py",
+            "{run_dir}"
+          ],
+          "depends_on": [],
+          "id": "chord-slope",
+          "memory_mb": 256,
+          "run_id": "RUN-ECDLP-42444c"
+        }
+      ],
+      "source_sha256": {
+        "experiments/EXP-ECDLP-5f4f14/implementation/check.py": "b3c847abf4e6cad8d22c04867b0d428a9e2156ea8cd8acbd8a09d09cd7234ccc",
+        "experiments/EXP-ECDLP-5f4f14/implementation/run.py": "4ceec7e7e755f1760da31885440a07a61e8612aa4d08332cd832a06fdd6128ca"
+      },
+      "inference_requirement": {
+        "policy": "executor-mechanical",
+        "requested_policy": "executor-mechanical",
+        "reasoning_effort": "high",
+        "fallback_allowed": false,
+        "degraded_allowed": false,
+        "independent_session_required": false
+      },
+      "commands": [
+        [
+          "python3",
+          "tools/research_dispatch.py",
+          "experiments/EXP-ECDLP-5f4f14/queue.json",
+          "--ready-only",
+          "--claims",
+          "refs"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "claim",
+          "experiments/EXP-ECDLP-5f4f14/queue.json",
+          "TASK-20261012-d5e2f4",
+          "--ttl-minutes",
+          "10",
+          "--as",
+          "executor-ideas-20261018"
+        ],
+        [
+          "python3",
+          "tools/experiment_execution.py",
+          "run",
+          "--plan",
+          "experiments/EXP-ECDLP-5f4f14/trial-plan.json",
+          "--owner",
+          "executor-ideas-20261018",
+          "--epoch",
+          "ACTUAL_CLAIM_EPOCH"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "release",
+          "experiments/EXP-ECDLP-5f4f14/queue.json",
+          "TASK-20261012-d5e2f4",
+          "--as",
+          "executor-ideas-20261018",
+          "--outcome",
+          "ACTUAL_OUTCOME",
+          "--note",
+          "ACTUAL_OBSERVATION"
+        ]
+      ],
+      "execution_qualification": "Run from crypto-autoresearcher only after actual readiness/live-ownership checks. Do not force a claim or invent its epoch. Resolve inference requirements through native runner; preserve any refusal. Release completed only with actual declared output coverage; preserve failed attempts. This preparation executed none of these commands."
+    },
+    {
+      "experiment": "EXP-ECDLP-3c166b",
+      "goal": "GOAL-ECDLP-001",
+      "task": "TASK-20261012-5cb5e4",
+      "write_scope": [
+        "experiments/EXP-ECDLP-3c166b/runs"
+      ],
+      "trial_plan": "experiments/EXP-ECDLP-3c166b/trial-plan.json",
+      "trial_plan_sha256": "58162f9f8fd3e0233f14fe81603d1e0a4aca98091338b3089b3c2788d075b260",
+      "trial": [
+        {
+          "argv": [
+            "python3",
+            "experiments/EXP-ECDLP-3c166b/implementation/run.py",
+            "--trial-plan",
+            "experiments/EXP-ECDLP-3c166b/trial-plan.json",
+            "--run-dir",
+            "{run_dir}"
+          ],
+          "artifacts": [
+            "manifest.yaml",
+            "raw-result.json"
+          ],
+          "check_argv": [
+            "python3",
+            "experiments/EXP-ECDLP-3c166b/implementation/check.py",
+            "{run_dir}"
+          ],
+          "depends_on": [],
+          "id": "half-count",
+          "memory_mb": 256,
+          "run_id": "RUN-ECDLP-4a3ca0"
+        }
+      ],
+      "source_sha256": {
+        "experiments/EXP-ECDLP-3c166b/implementation/check.py": "05458edd24ae66f650c00277e4303febf2c19c678dd19acfc946bf29e074abc4",
+        "experiments/EXP-ECDLP-3c166b/implementation/run.py": "297bf0c6b3005c0b6791cb1d7cc5f8f8efb0ae831b1d3480b5a18d336cf3e8b1"
+      },
+      "inference_requirement": {
+        "policy": "executor-mechanical",
+        "requested_policy": "executor-mechanical",
+        "reasoning_effort": "high",
+        "fallback_allowed": false,
+        "degraded_allowed": false,
+        "independent_session_required": false
+      },
+      "commands": [
+        [
+          "python3",
+          "tools/research_dispatch.py",
+          "experiments/EXP-ECDLP-3c166b/queue.json",
+          "--ready-only",
+          "--claims",
+          "refs"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "claim",
+          "experiments/EXP-ECDLP-3c166b/queue.json",
+          "TASK-20261012-5cb5e4",
+          "--ttl-minutes",
+          "10",
+          "--as",
+          "executor-ideas-20261018"
+        ],
+        [
+          "python3",
+          "tools/experiment_execution.py",
+          "run",
+          "--plan",
+          "experiments/EXP-ECDLP-3c166b/trial-plan.json",
+          "--owner",
+          "executor-ideas-20261018",
+          "--epoch",
+          "ACTUAL_CLAIM_EPOCH"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "release",
+          "experiments/EXP-ECDLP-3c166b/queue.json",
+          "TASK-20261012-5cb5e4",
+          "--as",
+          "executor-ideas-20261018",
+          "--outcome",
+          "ACTUAL_OUTCOME",
+          "--note",
+          "ACTUAL_OBSERVATION"
+        ]
+      ],
+      "execution_qualification": "Run from crypto-autoresearcher only after actual readiness/live-ownership checks. Do not force a claim or invent its epoch. Resolve inference requirements through native runner; preserve any refusal. Release completed only with actual declared output coverage; preserve failed attempts. This preparation executed none of these commands."
+    },
+    {
+      "experiment": "EXP-ECDLP-20ac31",
+      "goal": "GOAL-ECDLP-001",
+      "task": "TASK-20261012-cf6c84",
+      "write_scope": [
+        "experiments/EXP-ECDLP-20ac31/runs"
+      ],
+      "trial_plan": "experiments/EXP-ECDLP-20ac31/trial-plan.json",
+      "trial_plan_sha256": "ff3d03823f5d974590bfe3fc82170308a6e9b5df86d3dc1091ea5f4f54841897",
+      "trial": [
+        {
+          "argv": [
+            "python3",
+            "experiments/EXP-ECDLP-20ac31/implementation/run.py",
+            "--trial-plan",
+            "experiments/EXP-ECDLP-20ac31/trial-plan.json",
+            "--run-dir",
+            "{run_dir}"
+          ],
+          "artifacts": [
+            "manifest.yaml",
+            "raw-result.json"
+          ],
+          "check_argv": [
+            "python3",
+            "experiments/EXP-ECDLP-20ac31/implementation/check.py",
+            "{run_dir}"
+          ],
+          "depends_on": [],
+          "id": "square-bias",
+          "memory_mb": 256,
+          "run_id": "RUN-ECDLP-08e0d9"
+        }
+      ],
+      "source_sha256": {
+        "experiments/EXP-ECDLP-20ac31/implementation/check.py": "d572a6e4ca7f1f227301f3fac73b02f005f5fe155ae62c9efa3bc2267d5cea92",
+        "experiments/EXP-ECDLP-20ac31/implementation/run.py": "4947c72c1deb16b8b30c668a226fbb68143424423cbda77d32b068f76c1a787a"
+      },
+      "inference_requirement": {
+        "policy": "executor-mechanical",
+        "requested_policy": "executor-mechanical",
+        "reasoning_effort": "high",
+        "fallback_allowed": false,
+        "degraded_allowed": false,
+        "independent_session_required": false
+      },
+      "commands": [
+        [
+          "python3",
+          "tools/research_dispatch.py",
+          "experiments/EXP-ECDLP-20ac31/queue.json",
+          "--ready-only",
+          "--claims",
+          "refs"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "claim",
+          "experiments/EXP-ECDLP-20ac31/queue.json",
+          "TASK-20261012-cf6c84",
+          "--ttl-minutes",
+          "10",
+          "--as",
+          "executor-ideas-20261018"
+        ],
+        [
+          "python3",
+          "tools/experiment_execution.py",
+          "run",
+          "--plan",
+          "experiments/EXP-ECDLP-20ac31/trial-plan.json",
+          "--owner",
+          "executor-ideas-20261018",
+          "--epoch",
+          "ACTUAL_CLAIM_EPOCH"
+        ],
+        [
+          "python3",
+          "tools/goal_lanes.py",
+          "release",
+          "experiments/EXP-ECDLP-20ac31/queue.json",
+          "TASK-20261012-cf6c84",
+          "--as",
+          "executor-ideas-20261018",
+          "--outcome",
+          "ACTUAL_OUTCOME",
+          "--note",
+          "ACTUAL_OBSERVATION"
+        ]
+      ],
+      "execution_qualification": "Run from crypto-autoresearcher only after actual readiness/live-ownership checks. Do not force a claim or invent its epoch. Resolve inference requirements through native runner; preserve any refusal. Release completed only with actual declared output coverage; preserve failed attempts. This preparation executed none of these commands."
+    }
+  ]
+}

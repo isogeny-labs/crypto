@@ -1,0 +1,418 @@
+{
+ "schema": "validator-report/v1",
+ "lead": "research/curve25519_t4_candidate_ecbench_20261104 (T13, Curve25519 k=20 miniature, t=4 candidate plain and trace=1 vs the T12 winner)",
+ "validated_at_utc": "2026-11-04T17:10:00Z",
+ "validator": "independent validator (Claude Sonnet 5.5, subagent); produced none of the lead's artifacts; no edit to README, data, protocol, scripts or results; no git mutation; no rerun of the experiment; scratch work only under the session scratchpad. Not a pcc verdict: no signed pcc claim exists for this lead, so every figure in the README stays '[pcc:unverified]' until CI signs one.",
+ "independent": true,
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_meaning": "Every count, band mean, pooled ratio, 95% interval, rank, rule verdict R1-R6, certificate and README number recomputes from the committed records with code that is not the producer's (including a second check against ecbench's own compare on each chunk). 160/160 discrete-log certificates verify with independent EC arithmetic. All 15 distinct replays I ran, five of them t4-trace runs, reproduce identically. No number and no R1-R6 verdict changes. The errata are scope, disclosure and wording items; the two that matter most are E1 (the unqualified 'new best algebraic arm') and E3 (counted ratio 0.474 against a measured wall ratio of 0.87 that the README does not mention).",
+ "commit_binding": {
+  "validated_from_commit": "612076d520c2df89b528744f762f767314034cab",
+  "commit_time_utc": "2026-11-04T16:51:07Z",
+  "head_at_write": "e81dad90ccd3f8b7f70611763eb0f7ce1050fef6 (merge; `git diff 612076d520 HEAD -- research/curve25519_t4_candidate_ecbench_20261104` is empty, so the lead tree is identical at both)",
+  "worktree_state": "`git status --short -- <lead dir>` empty before and after the work (the one modified file in the checkout, research/curve25519_ic_atlas_20261104/scripts/make_figures.py, is outside the lead). README.md git blob 469b2a5a52655afeabd19fb0f433a5ece3469920 == committed blob.",
+  "protocol_freeze_commit": "b86032edee0d11b15a0c3f2a9350540d074074a9",
+  "protocol_freeze_time_utc": "2026-11-04T07:13:55Z",
+  "frozen_files_identical_to_freeze_commit": {
+   "PROTOCOL.md": "344c6fc689ceeb4010509ab8dca6356080382fef06f1c5ee0c98e3071d26a9a9",
+   "ecbench/spec.json": "dcdd9abe5a7345889d6889a16ac2afb1f3303f70bb57d026a8195050ccc261d9",
+   "scripts/run.sh": "9cd3f99fc70fa738614ea43917c3c6e9cb4e406082a4f2959ff6fdc04ee3353c",
+   "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde (also byte-identical to the T12 copy)",
+   "scripts/pooled_compare.py": "061b11b0eec670ee6160b60d1b821bf52a7af277d2d4adf342d6afee57d4fdf9 (also byte-identical to the T12 copy)"
+  },
+  "timeline_utc": "freeze commit 07:13:55; chunk driver start 07:14:30 (driver.log); first session started_unix_ms 07:43:47 (c00; the driver waited about 29 min for the bench lock); last session ended 16:17:33; ALL_DONE 16:50; results commit 16:50:49; README replay-coverage commit 16:51:07. The freeze precedes the first session by about 30 min (29.9 min) and the driver start by 35 s.",
+  "instrument": "/home/user/ctarget/release/ecbench, sha256 54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b, ecbench 0.1.0; recomputed now == ecbench/binary.sha256 == session.json binary_sha256 in 16/16 chunks == record binary_sha256 in 160/160 records == auditor_binary_sha256 in 16/16 producer receipts == auditor binary of my own replay receipts. Build commit of this binary is not recorded anywhere in the artifact set (see E7)."
+ },
+ "requirements": [
+  {
+   "id": "V1",
+   "requirement": "Freeze order: protocol commit precedes first chunk session; chunk specs differ from spec.json only in per-chunk keys; scripts byte-identical to T12 copies",
+   "status": "pass",
+   "evidence": "git: b86032edee 07:13:55Z < driver start 07:14:30Z < first session 07:43:47Z (session.json started_unix_ms). All 16 chunks/specs/cNN.json == chunks/cNN/spec.json; each differs from ecbench/spec.json only in /description (+' [chunk c of 16, Addendum C]'), /workloads/targets_per_curve (16 -> 1), /workloads/target_seed (= 2026110441 + c) and /measurement/seed (= 2026110442 + c); c00 differs only in description and targets_per_curve because both seeds equal the base. cmp: scripts/chunked_run.py and scripts/pooled_compare.py are byte-identical to research/curve25519_t10_winner_ecbench_20261104/scripts/ and to the freeze commit blobs. Script: scratchpad/val/freeze.py"
+  },
+  {
+   "id": "V2",
+   "requirement": "Binary identity across sessions, records, receipts, and the binary on disk; SHA256SUMS re-verifies",
+   "status": "pass",
+   "evidence": "sha256sum of /home/user/ctarget/release/ecbench == 5473783...9641b == ecbench/binary.sha256; 16/16 session.json, 160/160 records, 16/16 producer receipts agree. `sha256sum -c ecbench/SHA256SUMS`: 36/36 OK. All 80 file hashes inside the 16 receipts (host, plan, records, session, spec per chunk) equal the files on disk; session.records_sha256, plan_sha256, host_sha256 equal the file hashes. interrupted/c07_0 (2 records, status 'running') uses the same binary and its two records equal the rerun's c07 counts, seeds and recovered scalars (deterministic), so the interrupted partial chunk is not cited and not cherry-picked. Script: binid.py"
+  },
+  {
+   "id": "V3",
+   "requirement": "Recompute band means S=(GAE+w*native)/sqrt(r) at w=0,0.1,1 with the native definition taken from the ecbench band source, and every pooled paired ratio with 95% interval quoted in the README",
+   "status": "pass",
+   "evidence": "Native definition read from src/cryptanalysis/ecbench/band.rs (unpriced_counts / unpriced_total / priced_gae; NON_OPERATION_COUNTERS none present; calibration_pinned_units empty or null so G-C=G and n_C=0) and re-implemented in exact rational arithmetic (total_gae is integral in 160/160 records). Band means agree with band_pooled.json to < 1e-9 relative in all 15 cells and with the README table to its printed digits. charged_sum and native_sum equal band_pooled.json exactly for all five arms. All 18 pooled ratios and 95% intervals (K=16 clusters, linearised t(15)=2.1314495456, log-scale interval from stats.rs) agree with ecbench/pooled_compare.jsonl to 3.7e-14 relative. Independent cross-check against ecbench's own `compare --json` band point ratios on each of the 16 chunks, 4 pairs, 3 weights: 192 ratios, max relative difference 4.3e-16. Scripts: recompute.py, cmpcheck.py"
+  },
+  {
+   "id": "V4",
+   "requirement": "Decide R1-R6 from the frozen rule text; R2 to full precision at both weights",
+   "status": "pass",
+   "evidence": "See 'predictions' below. R2 exact rational ratio: 7668465873/12814647097 = 0.5984141283762 at w=0.1 and 7663809066/12811674946 = 0.5981894715798 at w=1 (charged_sum/native_sum from band_pooled.json; Fraction arithmetic, no floats); both are <= 3/5 with margins 0.001586 and 0.001811 (0.26% and 0.30% relative); upper 95% bounds 0.70350 and 0.70324 are < 1."
+  },
+  {
+   "id": "V5",
+   "requirement": "R5: per (workload, round) total_gae, recovered scalar and algorithm_seed identical between t4 and t4-trace",
+   "status": "pass",
+   "evidence": "32/32 (workload, round) pairs: total_gae equal, recovered equal, algorithm_seed equal (in fact all five arms share one algorithm_seed per (workload, round)). The only relations-phase counter that differs among trials, relations, walk_steps, pkm_guess_branches_solved, pkm_consistent_systems, pkm_system_specialisations, target_guard_probes is pkm_system_specialisations, +8 on the trace arm in 32/32 runs = the 8 learned branch systems. w=0 pooled ratio 1.0 exactly with interval [1,1]. Script: certs.py"
+  },
+  {
+   "id": "V6",
+   "requirement": "Certificates: recovered*G == target for all records with own EC arithmetic",
+   "status": "pass",
+   "evidence": "160/160 records: d*G == target, 0 <= d < r, r*target = O, target on curve, with my own affine arithmetic over F_1048573 (y^2=x^3+63700x+872826, G=(349837,122)). Curve independently checked: p and r prime, brute-force point count 1,049,624 = 8r = group_order, r*G = O, (r-1)*G != O. No record has d*G == -target. 16 distinct workload ids/targets, target_seed = 2026110441 + chunk, target_index 0. Script: certs.py. Scope: the artifact set holds end-to-end DL certificates only; individual factor-base relations are not exported, so relation-level certificates are not available to check (the relations are counted, the answer is certified)."
+  },
+  {
+   "id": "V7",
+   "requirement": "Replays including t4-trace runs and a t4 plain run on scratch copies",
+   "status": "pass",
+   "evidence": "Binary 54737834...9641b on scratch copies of three committed chunks (originals unchanged; files re-hashed after). (a) c00: `verify --replay-all`: 10/10 reproduced, 0 problems (rho-neg x2, proj-a x2, winner x2, t4 plain x2, t4-trace x2), receipt sha256 84d3fe095ff2...45873. (b) c09: `--replay 0 --replay-seq 3 --replay-seq 4 --replay-seq 5`: t4 plain r0, t4-trace r0, t4-trace r1 all identical, 0 problems, receipt 5d3584a07d4c...2142e. (c) c13: `--replay-seq 5 --replay-seq 6`: t4-trace r1, t4 plain r1 identical, 0 problems, receipt 85b89a84e344...b70. Totals: 15 distinct runs replayed, 5 t4-trace and 4 t4 plain. Together with the producer's 16 (rho-neg 4, proj-a 3, t4 plain 5, winner 4), every arm is now covered. Replays use the same binary on the same host, so they establish determinism of the counted fields, not independence of the implementation. Producer receipts: 16/16 ok, 0 problems, all checks true, 16 replays identical."
+  },
+  {
+   "id": "V8",
+   "requirement": "README other numbers and claims",
+   "status": "pass_with_errata",
+   "evidence": "See 'readme_claims_checked' and errata E1-E8."
+  }
+ ],
+ "predictions": {
+  "R1": {
+   "verdict": "held",
+   "detail": "32/32 verified in all five arms (160/160 verified, matches_target true); 16/16 producer receipts ok:true, problems [], all checks true, every replay 'identical'; my 15 further replays also identical. The README's replay-coverage sentence (rho-neg 4, proj-a 3, t4 plain 5, winner 4, no t4-trace) is exact."
+  },
+  "R2": {
+   "verdict": "held",
+   "detail": "0.598414128 [0.509026, 0.703499] at w=0.1; 0.598189472 [0.508831, 0.703240] at w=1; 16/16 workloads; exact rational comparison to 3/5 in V4. Marginal: the margin to 0.6 is 0.26%/0.30%, the 95% interval contains 0.6, the point prediction 0.49 lies below the interval (miss as the README says), and the per-workload t4/winner ratios have median 0.626 and mean 0.616 at w=0.1 (the frozen rule, like ecbench compare, uses the ratio of totals, under which R2 holds). Sensitivity: charging each arm's seed search (4,003,130 vs 6,935,271 group ops) to the single target gives 0.5953 / 0.5978, still <= 0.6."
+  },
+  "R3": {
+   "verdict": "held",
+   "detail": "1.566814 [1.358560, 1.806991] at w=0; t4 cheaper on 2 of 16 workloads, winner cheaper on 14, no ties."
+  },
+  "R4": {
+   "verdict": "held",
+   "detail": "0.474028 [0.474017, 0.474039] at w=0.1; 0.473708 [0.473700, 0.473717] at w=1; 16/16 workloads."
+  },
+  "R5": {
+   "verdict": "held",
+   "detail": "V5. 32/32 pairs identical; w=0 ratio 1.0 exactly."
+  },
+  "R6": {
+   "verdict": "held",
+   "detail": "Own ranks over w in {0,0.1,1}: rho-neg < proj-a < each of the three PKM arms at all three weights (6/6 arm-vs-reference comparisons strict at every weight). The three PKM-vs-PKM pairs are 'unresolved inside the band', identical to band_pooled.txt. The t4 vs t4-trace verdict is 'unresolved' only because the two tie at w=0."
+  }
+ },
+ "recomputed": {
+  "sqrt_r": 362.2237,
+  "band_mean_S": {
+   "rho-neg": [
+    1.59986,
+    1.71628,
+    2.76403
+   ],
+   "proj-a": [
+    11.88109,
+    12.75278,
+    20.598
+   ],
+   "pkm-iso-t5-g4-s1307": [
+    28.49092,
+    110556.6294,
+    1105309.8755
+   ],
+   "pkm-iso-t4-g3-s1193": [
+    44.63997,
+    66158.649,
+    661184.7304
+   ],
+   "pkm-iso-t4-g3-s1193-trace": [
+    44.63997,
+    31361.0407,
+    313208.6478
+   ]
+  },
+  "pooled_ratios_B_over_A_w0_w01_w1": {
+   "t4 / winner": [
+    [
+     1.566814,
+     1.35856,
+     1.806991
+    ],
+    [
+     0.598414,
+     0.509026,
+     0.703499
+    ],
+    [
+     0.598189,
+     0.508831,
+     0.70324
+    ]
+   ],
+   "t4-trace / t4": [
+    [
+     1.0,
+     1.0,
+     1.0
+    ],
+    [
+     0.474028,
+     0.474017,
+     0.474039
+    ],
+    [
+     0.473708,
+     0.4737,
+     0.473717
+    ]
+   ],
+   "t4-trace / winner": [
+    [
+     1.566814,
+     1.35856,
+     1.806991
+    ],
+    [
+     0.283665,
+     0.241297,
+     0.333472
+    ],
+    [
+     0.283367,
+     0.241041,
+     0.333127
+    ]
+   ],
+   "t4 / proj-a": [
+    [
+     3.757229,
+     3.309614,
+     4.265382
+    ],
+    [
+     5187.782,
+     4524.815,
+     5947.887
+    ],
+    [
+     32099.45,
+     27755.05,
+     37123.88
+    ]
+   ],
+   "t4 / rho-neg": [
+    [
+     27.90245,
+     23.91121,
+     32.55991
+    ],
+    [
+     38547.79,
+     32797.49,
+     45306.28
+    ],
+    [
+     239209.97,
+     200753.39,
+     285033.35
+    ]
+   ],
+   "t4-trace / rho-neg": [
+    [
+     27.90245,
+     23.91121,
+     32.55991
+    ],
+    [
+     18272.72,
+     15547.05,
+     21476.26
+    ],
+    [
+     113315.73,
+     95098.92,
+     135022.1
+    ]
+   ],
+   "t4-trace / proj-a": [
+    [
+     3.757229,
+     3.309614,
+     4.265382
+    ],
+    [
+     2459.153,
+     2144.923,
+     2819.418
+    ],
+    [
+     15205.78,
+     13147.93,
+     17585.71
+    ]
+   ],
+   "winner / rho-neg (in-run, no interval computed)": [
+    17.8084,
+    64416.58,
+    399889.97
+   ],
+   "winner / proj-a (in-run, no interval computed)": [
+    2.398006,
+    8669.218,
+    53661.016
+   ]
+  },
+  "hand_charged_trace_learning": {
+   "pkm_trace_learn_muladds_per_run": "17592 in 32/32 trace runs (8 branches learned, 8 learn runs)",
+   "sum": 562944,
+   "S_trace_over_S_t4_w01": 0.474101,
+   "S_trace_over_S_t4_w1": 0.473782,
+   "unhandcharged": [
+    0.474028,
+    0.473708
+   ]
+  },
+  "trace_fallbacks": {
+   "fallbacks": 292,
+   "replays": 3462640,
+   "rate": 8.4329e-05,
+   "fallback_plain_muladds": 593589,
+   "identity": "solver.ops == pkm_trace_replay_muladds + pkm_trace_fallback_plain_muladds in 32/32 trace runs, so fallback work is inside S"
+  },
+  "solver_ops_trace_over_plain": 0.470285,
+  "wall_time_not_admissible_but_recorded": {
+   "sum_online_wall_s": {
+    "winner": 1577.7,
+    "t4": 1095.7,
+    "t4_trace": 952.3
+   },
+   "trace_over_plain": 0.8691,
+   "per_pair_trace_over_plain_min_median_max": [
+    0.79,
+    0.867,
+    0.943
+   ],
+   "solver_ns_per_counted_mul_add": {
+    "winner": 121.5,
+    "t4": 140.9,
+    "t4_trace": 259.9
+   },
+   "isolation": "PKM arms L0, rho-neg and proj-a L1; preflight not quiet (PSI cpu 31-68); sessions interleaved with L12/L13 under the bench lock"
+  }
+ },
+ "readme_claims_checked": {
+  "agree": [
+   "Band table (all 15 cells), sqrt r = 362.22, 32/32 verified per arm",
+   "Headline 0.2837 [0.2413, 0.3335] at w=0.1, 0.2834 at w=1, 16/16 workloads, 3.5x (1/0.28366 = 3.525)",
+   "0.598 [0.509, 0.704] vs model 0.49; 0.4740 vs L12's 0.474 (L12 README: 0.4742 / 0.4741 end to end); 1.567 [1.359, 1.807] vs model 1.47; model arithmetic E(4,3,1193)/E(5,4,1307) = 8*17592/52 / (22*52816/210) = 0.4891 and 8/52 : 22/210 = 1.469; measured/model = 1.224 ('22 %')",
+   "Distance tables: t4-trace vs rho-neg 27.9x [23.9, 32.6], 1.83e4 [1.55e4, 2.15e4], 1.13e5 [9.5e4, 1.35e5]; t4 vs rho-neg 27.9, 3.85e4, 2.39e5; t4 vs proj-a 3.76, 5.19e3, 3.21e4; t4-trace vs proj-a 2.46e3 ('about 2.5e3')",
+   "Hand-charged learning: 17,592 per run, 562,944 total, ratios 0.47410 / 0.47378",
+   "Fallbacks: 292 of 3,462,640 replays = 8.4e-5, in 32 runs, plain F4 work inside S",
+   "Seed search: census k=20 t=4, 2000 seeds, search_group_ops 4,003,130 (curve25519_isogeny_seed_20261103/analysis/summary.json); seed 1193 is the L10 argmax J/columns pick (8 columns, 52 covered) from the same census, chosen before the T13 targets exist",
+   "Distances to rho-neg and proj-a, 'the winner is cheaper on 14 of 16 workloads', 'R2 held at 0.598 against its 0.6 threshold; the point prediction 0.49 missed', 'no t4-trace run was replayed' (producer's 16)",
+   "Run record: c07 interrupted at 15:29:54Z and rerun, none cited; Conductor/AWS absent and local run disclosed; no wall-time claim made"
+  ],
+  "disagree": [
+   "none numerically; see errata E1-E8 for scope, disclosure and wording"
+  ]
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate (wording/scope)",
+   "location": "README.md, Reading, third bullet ('The new best algebraic arm at k = 20 is t = 4, G = 3, seed 1193 with trace replay') and the 'L13 shows the base, not the solver, sets the w = 0 floor' clause; Headline last-but-one bullet ('3.5x ... on the algebraic track')",
+   "issue": "An unqualified rank. (a) AGENTS.md section 5a ranks two arms only where the order holds across w in {0,0.1,1}; the band verdict for t4-trace vs the T12 winner is 'unresolved inside the band' (winner 28.49 vs 44.64 at w=0, 1.567x cheaper), so t4-trace is better only at w >= 0.1. (b) The validated L13 control measured arms on the same isogeny base that cost far less than t4-trace at w=0.1: mitm-iso-t5-s1307 S=32.33 and grid-iso-t5-s1307 S=2,462.7 against 31,361 here (L13 itself calls them the algebraic track). The statement is only true among pkm-semaev F4 arms. (c) L13's 'base, not the solver, sets the floor' was measured on the t=5, 22-column base; T13 has no mitm/grid control on the t=4 base, so applying it to t=4 is an inference.",
+   "fix": "Write 'the best pkm-semaev (F4) arm measured so far at w >= 0.1; at w = 0 the T12 winner is 1.567x cheaper (band: unresolved)', and say that L13's base-versus-solver control was run at t = 5 only."
+  },
+  {
+   "id": "E2",
+   "severity": "minor (disclosure)",
+   "location": "README.md Headline and Reading; PROTOCOL.md predictions note 'counted F4 work'",
+   "issue": "The 3.5x and 0.474 are ratios in the counted unit (F_p multiply-adds, elimination only, plus group operations). The recorded wall time of the same runs does not follow: sum of online.wall_ns trace/plain = 0.869 (per pair 0.79 to 0.94, 16 of 16 pairs above 0.79), i.e. 260 ns against 141 ns per counted mul-add, so about half of the counted saving is not visible in wall time. Wall time is inadmissible here (PKM arms L0, host PSI-busy, sessions queued behind L12/L13) and the README makes no wall claim, so nothing is overclaimed, but a reader cannot tell that the replay's own overhead is uncounted, which bears on the engineering-versus-relabelling class of AGENTS.md section 3 (that classification is not stated in the README either).",
+   "fix": "Add one sentence: 'In these L0/L1, PSI-busy sessions the trace arm's recorded wall time is 0.87x the plain arm's (counted ratio 0.474); wall time is not admissible and no wall claim is made; replay bookkeeping outside the mul-add count is unpriced.' State the section-3 class (engineering at w >= 0.1 in the counted unit, with that caveat)."
+  },
+  {
+   "id": "E3",
+   "severity": "minor (consistency)",
+   "location": "README.md Distance remaining, line after the table ('T12's winner was 6.06e4x behind rho-neg at w = 0.1') and Reading ('where T12's winner is 17.8x behind')",
+   "issue": "Mixed sources. 17.8x (w=0) is this run's matched winner/rho-neg (28.491/1.5999 = 17.81); 6.06e4 (w=0.1) is T12's own experiment (different 16 targets and rho runs; T12 README: 17.1x at w=0). The matched in-run value at w=0.1 is 6.44e4 (110,556.6/1.7163 = 64,417) and the cross-experiment pairing understates the in-run 3.5x gain as 3.3x. AGENTS.md forbids combining results from different experiments.",
+   "fix": "Use the in-run 6.44e4 at w=0.1 (and 4.0e5 at w=1), or label 6.06e4 explicitly as T12's separate run."
+  },
+  {
+   "id": "E4",
+   "severity": "minor (wording)",
+   "location": "README.md Run record and deviations, 'From 15:29Z the L13 chunks ran at the same time'",
+   "issue": "No two measured sessions overlapped. All 40 chunk sessions of T13, L12 and L13 are serialised by the bench lock (zero pairwise overlaps in started/finished_unix_ms) and alternate in time; L12 and L13 were interleaved with T13 from 08:10Z, not only from 15:29Z (c00 itself waited about 29 min for the lock). The host was nevertheless busy (preflight PSI 31 to 68 against a 5 limit in the sessions I inspected). The 09:13Z to 15:29Z gap with no activity is not mentioned.",
+   "fix": "Say 'T13, L12 and L13 chunk sessions alternated under one bench lock (no overlapping sessions) on a PSI-busy host; no activity between 09:13Z and 15:29Z'."
+  },
+  {
+   "id": "E5",
+   "severity": "minor (disclosure)",
+   "location": "ecbench/plan.txt and README.md Files",
+   "issue": "plan.txt is the plan of the unchunked spec.json (16 workloads from target_seed 2026110441). Only its first workload (W0e7d03744a71, c00) was executed; chunks c01-c15 use target_seed + c and have different workload ids (intersection of plan and executed ids = 1 of 16). The README does not say so.",
+   "fix": "Add to Files: 'plan.txt lists the unchunked spec; the executed workloads are those of chunks/cNN (target_seed = 2026110441 + N)'."
+  },
+  {
+   "id": "E6",
+   "severity": "minor (disclosure/rounding)",
+   "location": "README.md Costs not in the band, Seed search",
+   "issue": "(a) The t=5 search behind seed 1307 is called 'analogous' but not quantified: the census gives 6,935,271 group ops for k=20, t=5 (1.91e4 in S) against 4,003,130 (1.105e4 in S) for t=4. (b) 4,003,130/362.2237 = 11,051.6 rounds to 1.11e4, not 1.10e4 (1.10e4 follows from the rounded 4.00e6). (c) 'The order flips at w=0' holds for the amortised arms; charging each search to one target gives t4/winner = 0.579 at w=0, 0.595 at w=0.1 and 0.598 at w=1, so the t=4 arm is cheaper at every weight in that single-target accounting.",
+   "fix": "Quote 6.94e6 group ops (1.91e4 in S) for t=5, round 1.1052e4 properly, and state the single-target sensitivity."
+  },
+  {
+   "id": "E7",
+   "severity": "minor (reproducibility)",
+   "location": "ecbench/binary.sha256, ecbench/chunks/cNN/session.json, ecbench/SHA256SUMS",
+   "issue": "(a) Every session.json has git_commit null and git_dirty null; the build commit of binary 54737834...9641b is not recorded in this directory (the build report at the repo root, ecbench-build-report.md, is for a different binary, b38cffb4...). The binary is identified by hash only (shared with T12, L12, L13). (b) SHA256SUMS lists records.jsonl and the verify receipts but not session.json, host.json, plan.json, spec.json of each chunk, chunks/specs, plan.txt, band_pooled.txt, driver.log or README; the first five are bound through the receipts' file hashes (80/80 verified here), the rest are not bound by any hash.",
+   "fix": "Record the binary's build commit and toolchain next to binary.sha256, and extend SHA256SUMS to the omitted files (a change to the finished tree to be recorded as such)."
+  },
+  {
+   "id": "E8",
+   "severity": "info (policy)",
+   "location": "ecbench/chunks/c*/records.jsonl",
+   "issue": "16 data-suffixed files of about 104 KiB each are committed to Git with no .artifacts.json, above the 64 KiB data-file threshold of AGENTS.md section 13. Also not present in the lead directory: a research-visuals report/graph/PDF and a benchmark record (CLAUDE.md, owner rules of 2026-11-04). These were not part of this dispatch and are not decided here.",
+   "fix": "Follow the artifact-store policy for the records or record an explicit exception; add the visuals/benchmark record if the owner rules apply to this lead."
+  }
+ ],
+ "not_done": [
+  "No signed pcc claim was written or checked; the pcc standing of every number here is 'unverified' by the owner's 2026-11-04 rule until CI signs it.",
+  "No independent re-implementation of the ecbench record-generation path (F4, Semaev, isogeny tower) was done: the replays use the same binary, so they certify determinism of the counted fields and the end-to-end DL answers, not that the counted F4 work equals the work the solver does.",
+  "Wall time was not validated and no wall claim exists to validate; the factor-base and isogeny-tower construction (E' (579602, 419410), #E'=1049056) were not independently rebuilt.",
+  "Did not verify the 'hash_to_subgroup_v1' target law beyond membership of each target in the order-r subgroup and distinctness; did not rerun the experiment or the 15:27Z restart narrative (only driver.log is checked)."
+ ],
+ "raw_data": {
+  "records": "ecbench/chunks/c00..c15/records.jsonl (160 records, cat sha256 0c9ab6e7a06a3569e881499d9c13d9562e609edee5f2bb40e9dff8bb23ca22f0)",
+  "receipts": "ecbench/verify/c00..c15.json",
+  "my_replay_receipts_sha256": {
+   "c00_all (replay-all)": "84d3fe095ff23a1d533771a64b60a442a1648125199d838b730ffd2740d45873",
+   "c09_seq (seq 3,4,5)": "5d3584a07d4c4e072c7f00d62f8a69b5606948bd905bf24f33d8d3937a52142e",
+   "c13_seq (seq 5,6)": "85b89a84e344cab200d6348b82aca77e29c8047cf715c6daf5a0b7a40f5bb70e"
+  }
+ },
+ "artifact_hashes_at_validation": {
+  "README.md": "36bb83102697d915fa1f5af99efbe469dfa91cf750d35eb6fa5bf7f9b0ac062f",
+  "PROTOCOL.md": "344c6fc689ceeb4010509ab8dca6356080382fef06f1c5ee0c98e3071d26a9a9",
+  "ecbench/spec.json": "dcdd9abe5a7345889d6889a16ac2afb1f3303f70bb57d026a8195050ccc261d9",
+  "ecbench/binary.sha256": "384aba6056dd2056a4b9b64eb5a679a87fa40374082f3cd9950dcf4753bd7cac",
+  "ecbench/band_pooled.json": "da4cdbdc3cdeff34f1bdc841687600e2dabaa54ae49995eea03e92a0cbf1cbe4",
+  "ecbench/band_pooled.txt": "fb32013828403176e79881680927b72c5fc6fb8e1bc352f048241661bc361d30",
+  "ecbench/pooled_compare.jsonl": "d9f46eddc6db128839b4f390d6d45dfd7d939e68670827ed009404a0aeea1c9b",
+  "ecbench/SHA256SUMS": "68394d7b903c6974a66a11618e151caedbd05f4ae22086799a6262bdabad51d7",
+  "ecbench/plan.txt": "6a62566c11301d84dc5c06b0893d68f2c1b27685136d0ede2888fe7a359868ca",
+  "ecbench/chunks/driver.log": "9de2b107bb912d73df3778d81e731d6f2063d9811c9aa7405d19a21664dedf91",
+  "scripts/run.sh": "9cd3f99fc70fa738614ea43917c3c6e9cb4e406082a4f2959ff6fdc04ee3353c",
+  "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde",
+  "scripts/pooled_compare.py": "061b11b0eec670ee6160b60d1b821bf52a7af277d2d4adf342d6afee57d4fdf9"
+ },
+ "validator_scripts": {
+  "directory": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/val (session scratchpad, not committed)",
+  "sha256": {
+   "freeze.py": "519fe8c260954cfc31f1d5153425778e1f30612bf2fd4baeabb52e93114707f3",
+   "recompute.py": "b3e06dacc311e7120bcc963a648657ef5bc28cfe24e184ebb0262f7b3a2a6215",
+   "certs.py": "9fb4cfa5a53978f4aa9439fe36e6c53b7e6ab7d5450fa1be3bf6e9c885ce7a55",
+   "learn.py": "888c30b16efc3d74d7338156304bdb50ad6487031149dd079e00d62d60da1ba4",
+   "binid.py": "36e2492180bb55fd88bf930b565e502df582c7b70653e9421a3e32c917fad9da",
+   "cmpcheck.py": "3b0312a2b49ea1ef6262de7d81c88b8b32a4dc69ec123ada81e9a164c434d8af"
+  },
+  "note": "learn.py first run had a slice bug (name[:-9] for '_uncharged'); fixed to len('_uncharged') before any number from it was used."
+ },
+ "verdict_summary": "pass_with_errata / validated. R1-R6 all held as the README says; R2 is the marginal one (0.59841 and 0.59819 exact, both <= 0.6, interval contains 0.6). All numbers recompute. Errata E1 (scope of 'new best algebraic arm') and E2 (counted 0.474 vs recorded wall 0.87, undisclosed) should be fixed in the README before the result is cited beyond this directory; E3-E8 are consistency and disclosure items. Rho remains ahead: t4-trace is 1.83e4x behind rho-neg and 2.46e3x behind proj-a at w=0.1."
+}

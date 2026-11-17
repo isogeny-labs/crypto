@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R109-MARKED23-N51-X1-VALUATIONS",
+  "version":1,
+  "goal":"evaluate the actual N51 function on the four normalized x=1 branches",
+  "claims":[{"id":"n51_weighted","class":"exact_computation","statement":"source-bound rational series and F4 weighted initial sums certify valuations or exact cancellation gaps"}],
+  "arms":{"reference":"R102 coefficientwise bound and R107 branch weights","candidate":"full N51 rational coefficient composition","positive":["105 distinct source monomials","four branch weights","precision-aware leading sums"],"negative":["changed donor hash rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R51/R102/R107/R108 SHA-256 pins","F2[[s]]/s^128","F4 alpha^2+alpha+1"],"measured":["combined u-coefficient orders","weighted minima","leading F4 sums","known precision"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation"},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":4,"replicates":1,"power":"not applicable"},
+  "metrics":["coefficient order or lower bound","weighted minimum","leading F4 sum","fresh replay"],
+  "execution":{"backend":"source-bound Python exact Laurent series","source_gate":"committed source/protocol and donor hashes","queue":"one serial attempt","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"source pins, all coefficients, precision-aware claims, changed-hash control, byte-identical replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"series rational inversion and F4 Newton-weighted initial form","scope":"local N51 valuation where unique/nonzero; otherwise explicit gap"}
+}

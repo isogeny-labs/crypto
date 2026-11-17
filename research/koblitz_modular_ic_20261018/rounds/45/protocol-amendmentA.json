@@ -1,0 +1,39 @@
+{
+  "schema": "koblitz.prospective-protocol/v1",
+  "round": 45,
+  "claim_class": "exact_computation",
+  "claims": [
+    "full fixed-chart enumeration over F512/F2048",
+    "conditional sign/scalar necessary eligibility"
+  ],
+  "degrees": [
+    7,
+    9,
+    11,
+    13
+  ],
+  "moduli_hex": [
+    "83",
+    "211",
+    "805",
+    "201b"
+  ],
+  "control7": {
+    "points": 420,
+    "closed_points": 60,
+    "deck_orbits": 6,
+    "export_byte_equal_to": "../39/runs/collect39-01/points/closed-points.txt"
+  },
+  "native_virtual_MiB": 4096,
+  "native_wall_seconds": 1200,
+  "no_comparative_claims": true,
+  "canonical_protocol_tool_available": false,
+  "sources": {
+    "COLLECT45.rs": "d15216bca5a2b1d1f3726b42020c064c84d8b0d5d6a4bedce641790debf76e89",
+    "source-polynomials.txt": "c38fdc6ec1b63d3b1e3cc2e41cc812c9c8ffc0679a5445eea3ac191745f59720",
+    "REPLAY_COLLECT.sh": "a2c04a75657187c245fc91ffc8563c0a3f22973fb4e23e8f0779ef3a827e4596",
+    "lean/DeckEligibility45.lean": "0e1dd2a92c8d4eb458e6a82f8e148ff69be85199846c445e6608d82324e30187",
+    "REPLAY_LEAN.sh": "092e5667c802da0ec6970796c4ad1ef7e1337a4b9e148efa94a18863ce6e1549"
+  },
+  "amendment": "A before degree13 affected data; after degrees9/11"
+}

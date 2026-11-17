@@ -1,0 +1,23 @@
+Final report/delivery check 2026-11-15T06:49:55.643794+00:00
+Post-run host receipt; no isolated clock or retrospectively inferred experiment host claim.
+Visually inspected all three combined PDF pages; standalone rasters byte-match corresponding combined pages.
+$ rustc --version
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+exit=0
+$ cargo --version
+cargo 1.99.1 (5f94df478 2026-08-27)
+
+exit=0
+$ uname -srmo
+Linux 6.18.57 x86_64 GNU/Linux
+
+exit=0
+$ sha256sum research/trace_zero_linearized_20261115/native/target/release/trace-zero-linearized research/trace_zero_terminal_20261115/native/target/release/trace-zero-terminal
+1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589  research/trace_zero_linearized_20261115/native/target/release/trace-zero-linearized
+55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664  research/trace_zero_terminal_20261115/native/target/release/trace-zero-terminal
+
+exit=0
+$ git diff --check
+
+exit=0

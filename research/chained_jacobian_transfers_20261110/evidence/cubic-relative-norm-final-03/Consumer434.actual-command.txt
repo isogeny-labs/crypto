@@ -1,0 +1,5 @@
+cwd=/workspace/cryptanalysis
+toolchain=leanprover/lean4:v4.34.1
+workers=1
+memory=original defaults unchanged
+timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out /workspace/scratch/ct474-cubic-relative-norm-explicit-product-original-dual-gates/Consumer434 .resume/cubic-relative-norm-source-20261116-04/CubicRelativeNorm22304.lean

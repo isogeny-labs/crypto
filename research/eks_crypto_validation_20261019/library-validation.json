@@ -1,0 +1,46 @@
+{
+  "schema": "isolab.library-validation/v1",
+  "full_suite_green": false,
+  "full_runs": [
+    {
+      "passed": 4404,
+      "failed": 1,
+      "ignored": 118,
+      "failure": "pqc::sqisign::tests::the_toy_graph_sets_the_false_accept_rate"
+    },
+    {
+      "passed": 4404,
+      "failed": 1,
+      "ignored": 118,
+      "failure": "pqc::hawk::tests::naive_forgery_fails"
+    }
+  ],
+  "isolated_reruns": "both passed",
+  "library_or_test_code_changes": false,
+  "logs": [
+    {
+      "name": "cargo-test-real-crypto-initial-failure.log",
+      "sha256": "5532896c5a8ddcb58ca1b741d95a375fee9ade46f0efc385321255f4075f745f",
+      "bytes": 380220,
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/verification/cargo-test-real-crypto-initial-failure.log"
+    },
+    {
+      "name": "cargo-test-real-crypto-targeted.log",
+      "sha256": "4135e33ee7a5fc022206f1c53df0334c06a815a9865a05b7e03eb5cc1bbf89b1",
+      "bytes": 371,
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/verification/cargo-test-real-crypto-targeted.log"
+    },
+    {
+      "name": "cargo-test-real-crypto-rerun.log",
+      "sha256": "6876932f1052345a2bf745a874efd8997dc4abdd620e45e6471f19297d92e861",
+      "bytes": 380060,
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/verification/cargo-test-real-crypto-rerun.log"
+    },
+    {
+      "name": "cargo-test-real-crypto-hawk-targeted.log",
+      "sha256": "e0466d93bfc1a177d4d7bbb93cf4dfce382556ca3174d915fd76cc94daf5dc59",
+      "bytes": 347,
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/verification/cargo-test-real-crypto-hawk-targeted.log"
+    }
+  ]
+}

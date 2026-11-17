@@ -1,0 +1,168 @@
+# Curves
+
+**Start here for testing:** the [curve testbed](testbed/README.md) highlights
+recommended curves with standardized shapes, proved orders and exactly counted
+multi-level isogeny classes; the 61-bit Koblitz, binary and prime trio and a 61-bit large-prime-conductor-gap set are featured.
+
+The [SEC 2 v1.0/v2.0 curve inventory](../../research/sec2_curve_inventory_20261012/REPORT.md)
+lists all 33 historical SECG names, identifies the 20 retained in 2010, and
+links each exact curve to the complete trait, cover, and transfer-screening
+records. Its [PDF](../../research/sec2_curve_inventory_20261012/REPORT.pdf)
+and [machine-readable source crosscheck](../../research/sec2_curve_inventory_20261012/inventory.json)
+preserve version and evidence status.
+
+The [weak-curve family catalogue](weak-families/README.md) organizes 21
+published or verified families and structural conditions, with their recognition
+rules, construction domains and evidence. Its [searchable browser](weak-families/index.html)
+indexes 814 exact models and the complete 294-class ordinary p7 oracle.
+Model membership, class support, subgroup compatibility and measured cost
+have separate labels; [canonical JSON](weak-families/catalog.json) retains
+the source attribution and completeness boundary for each family.
+
+The [certified property browser](weak-families/properties.html) adds independently
+checked torsion, Frobenius conductor depth, exact or bounded ordinary 2-volcano
+levels, and three fields of definition for those 814 models. Its
+[property sidecar](weak-families/properties.json) retains the original family
+labels and records the arithmetic witnesses and selected-subgroup unknowns.
+
+[CM Jacobian certificates](JACOBIAN_CERTIFICATES.md) check principal
+polarizations on elliptic squares using exact Hermitian arithmetic and all
+ideal classes. The [versioned JSON](jacobian-certificates.json) and
+[SQLite import](jacobian-certificates.sql) support lookup by full curve UID
+when bound, and by order or certificate UID when unbound. Geometric
+endomorphism hypotheses remain explicitly conditional.
+
+[Automatic hyperelliptic cover checks](COVERS.md) attach replayable
+same-field cover certificates to each supported catalog model in
+[`covers.json`](covers.json). Each curve page in the lab browser displays
+the verified genus, map degree and field assumptions. Descent and DLP
+advantage remain unmeasured.
+
+[Jacobian transfer discovery](JACOBIAN_TRANSFERS.md) enumerates, for every
+registered curve, the known routes into a Jacobian (GHS descent per field
+factorisation, its isogeny extension, same-field covers, extension-field
+decomposition and cover descent), computes what is exact about each and
+prices the rest with one frozen formula cost model against Pollard rho, in
+[`jacobian-transfers.json`](jacobian-transfers.json). Rows are formulas and
+leads; `jacobian_transfers check` fails CI when a registered curve is
+unscreened.
+
+The [hyperelliptic infrastructure guide](HYPERELLIPTIC_INFRASTRUCTURE.md)
+documents the standalone construction, verification, arithmetic, and catalog
+commands; the one-infinity arithmetic boundary; bounded binary transfer; and
+the additive evidence schema. In particular, the prime even-sextic cover does
+not use the odd-degree one-infinity Jacobian implementation.
+
+For the exact polynomial-basis F8 genus-three fixture with `a=1`, `b=3`, the
+[machine-readable order certificate](fixed-f8-genus3-order-certificate.json)
+and its [implementation-separated native replay](../../src/bin/ecdlp_audit/fixed_f8_order.rs)
+derive `#Jac(H)(GF(8))=486` from exhaustive extension point counts. This is an
+order certificate only, not an independent check of the divisor arithmetic or
+transfer map.
+
+The current [cover-transfer assessment](cover-transfer-assessments.json),
+validated by its [v2 schema](cover-transfer-assessment.schema.json), classifies
+all 2,100 HC1/CV1 map rows (2,098 distinct cover models) and all 664 linked EC1
+representations. The map population is 160 binary cubic covers and 1,940
+odd-characteristic quadratic covers: 586 direct prime-field, 30
+normalized-target prime-field, and 1,324 extension-field covers. The EC1
+population is 134 binary and 530 odd-characteristic representations.
+Classification is not blanket support:
+the ledger assigns every declared claim an explicit `supported`, `refuted`,
+`unknown`, or `not_applicable` result and retains each unmet obligation. Its
+[source-linked report](../../research/cover_transfer_assessment_20261013/README.md)
+records the typed graph, costs, controls, exploration boundary, and open
+obligations. The current source constructor accepts all 2,100 inputs. The
+published `v0.1.0-main.1371` executable was directly replayed against its
+bundled 592-row registry; comparison of its pinned allowlist with the current
+profiles statically places 746 inputs inside and 1,354 outside its syntactic
+domain. No 2,100-command archived-binary batch receipt exists, so it is not a
+catalog-wide packaged artifact. Neither the catalog nor the assessment is a
+Jacobian index-calculus solver.
+
+The proposed
+[comprehensive private-key recovery audit](../../research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)
+places this cover ledger inside a wider program without weakening its claim
+boundaries. Cover existence, arithmetic, subgroup transfer, destination
+solving, and measured advantage remain separately gated; the
+[planning mock](../ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json) is explicitly
+non-authoritative.
+
+[IC curve records and cross-repo links](ic/README.md), including
+[typed links](ic/curve-links/README.md), retain the exact EC1 representations,
+optional trait statuses, and the factor-base/isogeny storage contract beside
+this ICV1 model registry.
+
+Curves isogenous to a registered prime-field curve are found and recorded
+by the native isogeny walker, `src/bin/isogeny_walk.rs`
+([`ic/README.md`](ic/README.md#walking-an-isogeny-class)): it writes each
+curve in the `ic/curves.yaml` format with its ICV1 slug, EC1 identity and
+traits, and each kernel-certified edge as an `IW1` route.
+
+Every curve this repository names is named by its **ICV1 slug**
+([`ICV1.md`](ICV1.md), `AGENTS.md` §11).  Each curve in the registry also
+carries the **EC1 identity** of each exact representation the repository
+records (subgroup and generator included), for comparisons joined across
+repositories ([`../curve-identities.md`](../curve-identities.md)). Those records use the
+encoding of crypto's existing producer, `examples/koblitz_curve_records.rs`, so a UID in the
+registry equals the one a thread's `curve_ids.json` carries; the builder fails if they ever differ.
+
+| file | what |
+|:--|:--|
+| [`ICV1.md`](ICV1.md) | the naming rule: the identity, the model JSON, the fields, the retired forms |
+| [`registry.json`](registry.json) | every curve named anywhere in the repository: slug, ICV1, parameters, every legacy spelling that denotes it, and its EC1 representations |
+| [`sources/specs.txt`](sources/specs.txt) | the constructor calls whose curves no tracked record states in full |
+| [`sources/generated.json`](sources/generated.json) | those curves rebuilt: model, subgroup, generator, legacy handle, ICV1 computed in Rust |
+| [`TRAITS.md`](TRAITS.md) | size-independent traits of every registered curve (CM field, conductor, subfield of definition, volcano depths and levels, `End(E)`, cofactors, embedding degree, DiSSECT families) and how to group curves or find similar ones with `curve_traits` |
+| [`traits.json`](traits.json) | those traits, one record per registry curve and per source curve, each value with its status, plus volcano levels, `End(E)` and the DiSSECT families; built by `cargo run --release --bin curve_traits -- build` |
+| [`trait-sources.json`](trait-sources.json) | the curves outside the registry that `curve_traits` also records (isogeny-walk route files, the IC crosswalk) |
+| [`factor-hints.txt`](factor-hints.txt) | primes PARI/GP found in composites the trait build's rho budget leaves, re-checked and used as trial divisors; regenerated by [`factor-hints.gp`](factor-hints.gp) |
+
+## Two identities, and which to use
+
+| | ICV1 slug | EC1 alias and curve UID |
+|:--|:--|:--|
+| identifies | the curve model: field, modulus, coefficients | one representation: the model plus its subgroup and generator |
+| written in | prose, tables, report `name` fields, file names | cross-repository comparisons, UI exports, candidate manifests |
+| example | `icv1-f2m41-tm2308219-7f48b14a` | `EC1N41Ck0h…` with `urn:ec-record:1:sha256:…` |
+| one per | model | representation; a model can have several |
+
+A slug in text says which curve; an EC1 UID in a record says which
+representation was measured.  Join on the EC1 UID, never on the slug's
+digest prefix or on a degree.
+
+## Regenerating
+
+```bash
+cargo build --release --example curve_id_generated
+./target/release/examples/curve_id_generated $(grep -v '^#' docs/curves/sources/specs.txt) \
+    > docs/curves/sources/generated.json
+python3 scripts/build_curve_registry.py
+python3 scripts/check_curve_names.py
+```
+
+The builder reads every tracked JSON file, so stage a new source file
+before rebuilding.  It fails when a name used in Markdown or HTML does not
+resolve to exactly one curve, when a Rust-computed ICV1 differs from the
+reference, or when a pin in `docs/ic/calibration.json` no longer resolves.
+
+## Resolving a name
+
+```bash
+python3 scripts/curve_id.py resolve 'K_0 / GF(2^41)'
+python3 scripts/curve_id.py koblitz 0 41
+```
+
+A legacy spelling resolves through one of two routes, and a curve's
+`sources` in the registry say which:
+
+- **by record** — a tracked report stores the curve's coefficients next to
+  the name it used, so the name denotes that model (`sources` lists the
+  report);
+- **by the constructor rule** — `K_a / GF(2^n)` written in prose denotes
+  the curve `KoblitzCurve::new(a, n)` builds, on the modulus
+  [`ICV1.md`](ICV1.md) states (`sources` reads `prose, by the constructor
+  rule: <file>`).  This is a versioned adapter, not an inference from the
+  degree: a note that meant another modulus (another repository's `K_0`
+  over `GF(2^13)` is on `x^13+x^5+x^2+x+1`, this one's on
+  `x^13+x^4+x^3+x+1`) is a different model, and must say so.

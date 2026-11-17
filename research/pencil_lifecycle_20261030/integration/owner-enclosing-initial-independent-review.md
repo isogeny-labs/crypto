@@ -1,0 +1,11 @@
+# Initial enclosing-evidence closure review
+
+Read-only2026-10-30. Delta4696880d66613946bc9cb61ee4769ce1cc50f0f90898560ef29774bdb7aba883 plus race-corrected supervisor c075337f5f7dabc49356b64d608d6381ead13174c402731c4e1a5a0aabb64e1e. No application/build/tests/solver/cloud.
+
+Required correction: close_enclosing_evidence validates ordered owner-begin/exec-observation/reap/sync clocks and origin<=reap, but omits owner-begin<=origin. Actual launch follows Owner::begin. A stale prep origin predating the owner can pass all current interval checks after consistent hash rebinding, inflating the enclosing duration beyond the actual owned interval. Require owner_begin.raw_ns<=origin<=reap. Do not require exec-observation<=origin: polling can observe exec after run_session began. Producer should also reject this mismatch before issuing an empty-findings session_binding. A mutation fixture should consistently rebind hashes to exercise this temporal guard rather than fail an unrelated digest check.
+
+Otherwise the delta correctly introduces a distinct estimand, run_session origin through actual owner post-reap evidence file/directory sync. It does not fabricate pre-exit durability, exact runner-exit time, active-worker total or completion of its own receipt-publication tail. Preparation and journal reads remain bounded/nofollow/duplicate-rejecting; native journal shape/order is revalidated. Exact preparation/journal/owner bytes and hash-derived clock identity are checked. Tail durability must precede observed reap; owner sync follows reap. No nested interval summation introduces double counting.
+
+Race-corrected supervisor now shares Owner.poll with checkpoint_completion and verifies expected PID before delegating. This removes the alternate waitpid reaper from the observed payload completion path. It preserves checkpoint success/failure status branches by source inspection; actual software behavior remains untested here.
+
+Caller authentication remains indispensable: expected request/binary arguments and byte checks do not prove the supplied receipt came from the deployed privileged owner, correct Pod/runtime or independently retained transport. Native closure is not signature validation, resource-budget admission or scientific correctness. Source acceptance is separate from proof that a real process/reap/sync/transport occurred.

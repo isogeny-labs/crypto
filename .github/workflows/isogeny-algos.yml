@@ -1,0 +1,76 @@
+name: isogeny_algos
+
+# The standalone isogeny-computation crate (its own workspace, no dependencies): formatting,
+# clippy with -D warnings, the full test suite (each algorithm against an independent
+# computation) and a smoke test of the isogeny-algos command line.
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'isogeny_algos/**'
+      - '.github/workflows/isogeny-algos.yml'
+      - 'research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  native:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|isogeny-algos.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|isogeny-algos.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /isogeny_algos/
+            /research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md
+      - uses: dtolnay/rust-toolchain@1.98
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: isogeny_algos
+      - name: Formatting and lint
+        run: |
+          cargo fmt --manifest-path isogeny_algos/Cargo.toml --check
+          cargo clippy --manifest-path isogeny_algos/Cargo.toml --locked --all-targets -- -D warnings
+      - name: Tests
+        run: cargo test --manifest-path isogeny_algos/Cargo.toml --locked --release
+      - name: Command-line smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --manifest-path isogeny_algos/Cargo.toml --locked --release --bin isogeny-algos
+          B=isogeny_algos/target/release/isogeny-algos
+          # P-256 with its published order: certified, and the ICV1 slug the curve registry lists
+          $B count --curve p256 --order 115792089210356248762697446949407573529996955224135760342422259061068512044369 | tee /tmp/p256.json
+          grep -q '"slug":"icv1-fp256-t89188191154553853111372247798585809583-f188c491"' /tmp/p256.json
+          grep -q '"status":"PASS"' /tmp/p256.json
+          # a wrong order must fail with exit code 1
+          set +e; $B count --curve p256 --order 1 > /dev/null; code=$?; set -e
+          test "$code" -eq 1
+          # one run per family: each must exit 0 with every check PASS
+          P=2305843009213693951
+          for args in \
+            "chain --p $P --a 4 --b 7 --ell 3 --n 3" \
+            "velu --p $P --a 7 --b 7 --ell 73 --kernel-x 2302858932999476951 --method sqrtvelu" \
+            "isogenies --p $P --a 7 --b 7 --ell 73 --method elkies1998" \
+            "dual --p $P --a 7 --b 7 --ell 73" \
+            "csidh --primes 3,5,7,11,13,17,19,23,29,31,37,59 --exps 1,-1,2,0,0,1,-3,0,1,0,0,2" \
+            "path --p 1000003 --j1 499965 --j2 620467 --method ghs" \
+            "klpt --p 1152921504606847067 --norm 1000003" \
+            "richelot --p 211 --roots 1,2,3,4,5,6 --lc 3"; do
+            $B $args > /tmp/family.json
+            grep -q '"status":"PASS"' /tmp/family.json
+          done

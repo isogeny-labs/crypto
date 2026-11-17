@@ -1,0 +1,52 @@
+{
+  "schema": "quotient-calibration.archive-publication/v1",
+  "checked_at_utc": "2026-10-26T14:37:18.456582+00:00",
+  "archive_sha256": "ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+  "archive_bytes": 67540,
+  "destination": "s3://setec-astronomy-artifacts/store/sha256/ae/ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+  "complete": true,
+  "operations": [
+    {
+      "arguments": [
+        "push",
+        "research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "  1/1 stored\nmoved 1 files (0.1 MB; 1 uploaded, 0 already stored) into 1 manifests; review with `git status` and commit\n"
+    },
+    {
+      "arguments": [
+        "verify",
+        "research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz",
+        "--remote"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "1 entries: 1 hydrated, 0 not pulled, 0 problems\n"
+    },
+    {
+      "arguments": [
+        "pull",
+        "research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "hydrated 1 files (0.1 MB); 0 already present\n"
+    },
+    {
+      "arguments": [
+        "verify",
+        "research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz",
+        "--remote"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "1 entries: 1 hydrated, 0 not pulled, 0 problems\n"
+    },
+    {
+      "fresh_cache_remote_readback_sha256": "ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+      "bytes": 67540
+    }
+  ]
+}

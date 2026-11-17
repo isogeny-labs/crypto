@@ -1,0 +1,35 @@
+{
+  "prospective_argv": [
+    "sudo",
+    "systemd-run",
+    "--unit=pencil-kummer-lock-v3-20261111",
+    "--property=User=ec2-user",
+    "--property=CPUQuota=100%",
+    "--property=MemoryMax=2G",
+    "--property=MemorySwapMax=0",
+    "--property=TasksMax=64",
+    "--property=RuntimeMaxSec=50",
+    "--property=TimeoutStopSec=5",
+    "--property=KillMode=control-group",
+    "--property=PrivateNetwork=yes",
+    "--property=ProtectSystem=strict",
+    "--property=ReadWritePaths=/var/tmp/pencil-kummer-lock-v3-20261111",
+    "--property=LimitFSIZE=16777216",
+    "--property=StandardOutput=append:/var/tmp/pencil-kummer-lock-v3-20261111/unit.stdout",
+    "--property=StandardError=append:/var/tmp/pencil-kummer-lock-v3-20261111/unit.stderr",
+    "--property=Type=exec",
+    "--property=RemainAfterExit=yes",
+    "/usr/bin/python3",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v3-20261111/generate_lock.py"
+  ],
+  "status": "not_released",
+  "note": "Concrete launch.py captures ownership, terminal and cgroup cleanup. Native50+5 seconds stays inside60second reservation; caller stops at52 seconds.",
+  "caller_argv": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=1",
+    "59",
+    "/usr/bin/python3",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v3-20261111/launch.py"
+  ]
+}

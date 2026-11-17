@@ -1,0 +1,85 @@
+{
+  "schema": "ci-correction-validation/v1",
+  "observed_utc": "2026-10-30T21:57:13.891543+00:00",
+  "pr": 3001,
+  "merged_head": "e4d868da67497d005254bbb77fb695b19328bb39",
+  "failures_caused_by_work": true,
+  "checks": [
+    {
+      "name": "driver-check",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--bin",
+        "volcano-ic-driver",
+        "-j",
+        "2"
+      ],
+      "native_exit_code": 0,
+      "tool_session": 75235,
+      "logs": {
+        "driver-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "driver-check.stderr": "e7e513ad96e3140a7b79295adc3890b94a650a332d96a51f4a72c2a801461208"
+      }
+    },
+    {
+      "name": "driver-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--bin",
+        "volcano-ic-driver",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "native_exit_code": 0,
+      "tool_session": 82947,
+      "logs": {
+        "driver-clippy.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "driver-clippy.stderr": "87f67217f2d367cea0823e1aed80b6ba49b31d7ec9423834ad937c50de9dcd55"
+      }
+    },
+    {
+      "name": "mcp-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "--release",
+        "--manifest-path",
+        "taskq/deploy/eks-karpenter/mcp/Cargo.toml"
+      ],
+      "native_exit_code": 0,
+      "tool_session": 62585,
+      "logs": {
+        "mcp-tests.stdout": "0ecca7dbdb75f1c9e77b4084dcde9a543752b3c474d95f76a280cb0aaf3b6415",
+        "mcp-tests.stderr": "35e13cbefd86b6cb697247e377d84d5e4f3b392f89038d39509f3bacd86b14ce"
+      }
+    }
+  ],
+  "source_hashes": {
+    "research/full_volcano_graphwide_ic_20261017/execution/driver.rs": "a36918a766ea5b47e2bfa408c80eed059035d33784b326be99dbd896f8ef2220",
+    "taskq/deploy/eks-karpenter/contracts/mcp-tools.json": "c0cef1a4742dd2f5f9d494d0179c1fa557817802478c22d094ba9ad4b10c2e3c",
+    "taskq/deploy/eks-karpenter/resume/request.schema.json": "cbf81ef7f9001a662385c3d412cfd82ea0b8abb61d4bf6676f8f1c2cc96ba3ed"
+  },
+  "generator_exit_code": 0,
+  "generator_toolchain": "1.99.1",
+  "generator_fixture_matches_ci_output": true,
+  "mcp_tests_passed": 7,
+  "full_ci_parity": "pending new PR checks",
+  "scientific_execution": false,
+  "earlier_generation_failures": [
+    "missing sparse MCP manifest",
+    "missing sparse include_str inputs"
+  ],
+  "comparison_setup_failure": "First cmp used wrong private filename; corrected comparison passed."
+}

@@ -1,0 +1,118 @@
+{
+  "schema": "prospective.build-command-plan/v1",
+  "execution_authorized": false,
+  "final_source_commit": null,
+  "final_source_manifest_sha256": null,
+  "final_protocol_sha256": null,
+  "final_worker_sha256": null,
+  "final_mapper_sha256": null,
+  "final_image_id": null,
+  "workspace": "/var/tmp/final-fd-candidate-T1558",
+  "source_root": "/var/tmp/final-fd-candidate-T1558/source",
+  "environment": {
+    "PATH": "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+    "CARGO_HOME": "/var/tmp/final-fd-candidate-T1558/cargo-home",
+    "CARGO_TARGET_DIR": "/var/tmp/final-fd-candidate-T1558/target",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_NET_OFFLINE": "true",
+    "LC_ALL": "C",
+    "RUSTFLAGS": "-C target-cpu=x86-64",
+    "CC_x86_64_unknown_linux_musl": "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+    "REALGCC": "/usr/bin/gcc",
+    "CRYPTO_BUILD_GIT_COMMIT": null,
+    "CRYPTO_BUILD_GIT_DIRTY": "0"
+  },
+  "stages": [
+    {
+      "id": "worker",
+      "max_seconds": 1020,
+      "cwd": "/var/tmp/final-fd-candidate-T1558/source",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "rustc",
+        "--locked",
+        "--offline",
+        "--release",
+        "--no-default-features",
+        "--target",
+        "x86_64-unknown-linux-musl",
+        "--bin",
+        "ecbench",
+        "-vv",
+        "--",
+        "--print",
+        "link-args",
+        "-Clink-arg=-Wl,-Map=/var/tmp/final-fd-candidate-T1558/ecbench.map"
+      ],
+      "execute_output": false
+    },
+    {
+      "id": "mappers",
+      "max_seconds": 120,
+      "cwd": "/var/tmp/final-fd-candidate-T1558/source",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--manifest-path",
+        "/var/tmp/final-fd-candidate-T1558/source/research/pencil_large_prime_20261029/native_price/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--bins"
+      ],
+      "outputs": [
+        "analyze_pair",
+        "analyze_cohort"
+      ],
+      "execute_output": false
+    },
+    {
+      "id": "terminal_readback",
+      "reserved_seconds": 60,
+      "argv_templates": [
+        [
+          "readelf",
+          "-h",
+          "/var/tmp/final-fd-candidate-T1558/target/x86_64-unknown-linux-musl/release/ecbench"
+        ],
+        [
+          "readelf",
+          "-l",
+          "/var/tmp/final-fd-candidate-T1558/target/x86_64-unknown-linux-musl/release/ecbench"
+        ],
+        [
+          "readelf",
+          "-d",
+          "/var/tmp/final-fd-candidate-T1558/target/x86_64-unknown-linux-musl/release/ecbench"
+        ]
+      ],
+      "hash_outputs": true
+    }
+  ],
+  "outer_timeout": [
+    "timeout",
+    "-k",
+    "5s",
+    "1195s",
+    "python3",
+    null
+  ],
+  "wrapper_status": "not implemented or admitted; exact resource/process wrapper review required",
+  "attempts": 1,
+  "retries": 0,
+  "hard_as_bytes": 8589934592,
+  "hard_perfile_bytes": 1073741824,
+  "required_enforced_cpu_quota": 2,
+  "required_aggregate_memory_bytes": 8589934592,
+  "resource_boundary_verified": false,
+  "sampled_aggregate_staging_threshold_bytes": 8589934592,
+  "hard_aggregate_disk_quota": false,
+  "logs_max_bytes": 16777216,
+  "sample_interval_seconds": 0.2,
+  "minimum_initial_free_bytes": 12884901888,
+  "stop_below_free_bytes": 4294967296,
+  "validated_progress_route_sha256": "87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae",
+  "final_root_integration_passed": false
+}

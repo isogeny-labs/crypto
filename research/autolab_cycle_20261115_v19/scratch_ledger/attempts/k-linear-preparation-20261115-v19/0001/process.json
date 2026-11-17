@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.k_linear_20261115_v19.worker",
+    "k-linear-preparation-20261115-v19"
+  ],
+  "effective_timeout_seconds": 90,
+  "ended_unix": 1794733552.549911,
+  "exit_code": 0,
+  "measurement_scope": "development diagnostic; isolation must be established separately",
+  "memory_limit_scope": "per-process address space inherited by descendants",
+  "peak_process_rss_kib": 153904,
+  "pid": 12652,
+  "process_group": 12652,
+  "started_unix": 1794733551.0207992,
+  "status": "ok",
+  "stderr": "",
+  "stdout": "{\"schema\":\"scientific_result_v1\",\"experiment_id\":\"k-linear-preparation-20261115-v19\",\"status\":\"passed\",\"summary\":\"Exact conditional k elimination:83fieldbits to35unknowns and45binary equations, with positive/singular/delta controls.\",\"evidence\":{\"controls\":{\"systems\":2176,\"literal_k_calls\":25088,\"nonempty\":296,\"h0_systems\":672,\"scope\":\"GF4/GF8 allh,r,w,k,A0/1; GF16h0/1 allr,w,k,A0/1\",\"all_sets_equal\":true},\"profile\":{\"planted-relaxation\":{\"cases\":8,\"consistent\":8,\"ranks\":[35,35,35,35,35,35,35,35],\"nullities\":[0,0,0,0,0,0,0,0]},\"random\":{\"cases\":16,\"consistent\":0,\"ranks\":[35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35],\"nullities\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},\"delta-zero\":{\"cases\":8,\"consistent\":0,\"ranks\":[35,35,35,35,35,35,35,35],\"nullities\":[0,0,0,0,0,0,0,0]}},\"error\":null,\"worker_seconds\":1.4884788839990506,\"peak_rss_kib\":153904,\"raw_sha256\":\"d13e1eda936bcf483739a4c24fb1fbb9d2a54fccdcd48c7d2e7f9c39bdcbf3b6\",\"raw_bytes\":70160,\"ephemeral_scratch\":true,\"external_reviewer\":false,\"complete_global_root_search\":false,\"original_root_count_exact\":null,\"qualified_speedup\":null,\"release_gate_claim\":false},\"next_actions\":[\"Use rank/compatibility evidence to design guarded r/wcells. k elimination leaves166outerr/wbits, support/centroid/ghost/globalfieldclosure and matched Groebner gate open.\"]}\n",
+  "stdout_sha256": "9f322f3625670f6ba14ed29083f0afcf8d3e3b61cba85166257ea531cf0ea2fd",
+  "system_seconds": 0.36739099999999997,
+  "user_seconds": 1.151551,
+  "wall_seconds": 1.5291101330003585
+}

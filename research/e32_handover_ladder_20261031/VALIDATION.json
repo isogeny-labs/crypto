@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "dc8371df2a23434092556124be9493828a6fb8aa17523e83617a7f984adf9b3a"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "3a2f97a9b8c8bd58d112847298d5ac90235e2e99ca51499176d7c5343a2c77ee"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by the protocol (note §9.34, pre-registered at 246460f094 before any E32 run): E27's walk (iii), the matched rho of the line since §9.25/§9.29: on each GLS curve (E25's generator, h = 16) the <±psi> walk, psi the GLS endomorphism (psi^2 = -1), a class {±P, ±psi P} of 4 points, Karatsuba F_p4 products and the norm inversions of a 16-walk lockstep pool batched by Montgomery's trick (fillers from 1,000,000*seed + 500,000), 16 walks per curve with seeds 1000*seed + k, cost per walk without the [d]G = Q check (E25's and E27's convention), rho = mean of the 16. Strongest available: on these curves j(E) lies in F_p2 but not in F_p and is neither 0 nor 1728 (validator's probe on all 34 instances, replay/j_invariant_probe.json), so Aut(E) = {±1} and psi is the only Frobenius-type endomorphism over F_p4: <±psi> is the largest fold, and walk (iii) is the cheapest arithmetic implemented for it (E27: 1.456-1.463x below walk (i)). Unpriced native work (AGENTS.md §5a): the IC leaves its Macaulay-matrix entry traffic (macaulay_entries) and its F_p additions and row scans unpriced, the walks each step's hash lookup/insert and partition hash (steps) and the batch bookkeeping. Band: S(g) = F_p multiplications + g * 97 * native operations, one per Macaulay entry or walk step, GAE = 97 F_p multiplications (E25's affine addition, the registered primary), g = 0, 0.1, 1. gae_band values: medians over the three curves of the ladder's top rung (p = 3089, log2 n = 42.37), IC arm B (solver A, Karatsuba) against walk (iii): median ratio D = 1542 (0), 4933 (0.1), 20106 (1 GAE). Walk (iii) is below the IC on every one of the 33 paired rows (p = 101-3089) at every weight; the per-curve ratio is 1.143e3-1.523e5 (0), so the order rho < IC holds across the band. p = 4337 (IC complete, walk pool OOM-killed) is unpaired and outside the band.",
+  "unit": "F_p multiplications, both arms counted by the same Fp4 counters of one build: an F_p4 product 13 (Karatsuba tower) on both sides; the IC's F_p4 inversion 40, the walk's 24 + its round's batch share; the solve's F_p multiplications counted directly, the Wiedemann matrix at 16 per multiplication mod n; walk set-up included, the walk's [d]G = Q check excluded (E25's convention)",
+  "binary_or_process": "One binary, examples/e32_ladder, built fresh by the validator from the recorded commit e757710521 with examples/e32_ladder.rs from 246460f094 (replay/build.json): mode `ic` runs run_k4_gls_pipeline_with (arm B, V4Solver::Chain, Karatsuba) and mode `walk` runs rho4_folded_batched (Gls fold, Karatsuba, pool 16) on the same instance (generate_gls_klein_instance(p, seed, 16): n, cofactor and the logarithm agree between the two records of every curve) with the same crypto_lib counters. The producer's records (pinned binaries from the same commit) and this replay agree on every non-timing leaf of every replayed run.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 194565885707,
+    "rho": 152375199.5
+   },
+   "0.1": {
+    "ic": 685274831415.8,
+    "rho": 167785363.975
+   },
+   "1": {
+    "ic": 5101655342795,
+    "rho": 306476844.25
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

@@ -1,0 +1,75 @@
+{
+  "recorded_at": "2026-10-30T07:20:40.600794+00:00",
+  "scope": "Dependency-free real Cargo control using the actual current ic_binary helper and opt-in module pattern. Not a replacement for the actual95contract tests in the repository workflow.",
+  "cases": [
+    {
+      "case": "clean-default-selected-bin",
+      "command": [
+        "test",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "clean-default-selected-bin.log"
+    },
+    {
+      "case": "normal-integration-builds-current-cli",
+      "command": [
+        "test",
+        "--test",
+        "ic_framework"
+      ],
+      "actual_exit": 0,
+      "log": "normal-integration-builds-current-cli.log"
+    },
+    {
+      "case": "production-build-for-opted-in-contracts",
+      "command": [
+        "build",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "production-build-for-opted-in-contracts.log"
+    },
+    {
+      "case": "explicit-current-cli-contracts",
+      "command": [
+        "test",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "explicit-current-cli-contracts.log"
+    },
+    {
+      "case": "opted-in-missing-binding-refuses-stale-sibling",
+      "command": [
+        "test",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 101,
+      "log": "opted-in-missing-binding-refuses-stale-sibling.log"
+    }
+  ],
+  "stale_executable_was_invoked": false,
+  "default_library_qualification": {
+    "full_test_source": "a275d15349598790d5052d42a905470698817b55",
+    "full_test_passed": 5448,
+    "full_test_failed": 0,
+    "full_test_ignored": 123,
+    "later_changes": "Only one unused empty root Cargo feature, CLI cfg(test) modules/helpers/workflow and developer docs/reports. Parsed Cargo settings/defaults/dependencies unchanged after removing new feature; no library/path-crate/alias source changed.",
+    "changed_Rust_Cargo_paths": [
+      "Cargo.toml",
+      "src/bin/ic.rs"
+    ],
+    "contract_test_assertion_bodies": "Framework and tensor test bodies byte-identical; executable selection helper alone changed."
+  }
+}

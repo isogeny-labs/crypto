@@ -1,0 +1,78 @@
+import FastCRTCertificates
+set_option autoImplicit false
+namespace FastCRT
+open Polynomial
+variable {K : Type*} [Field K]
+noncomputable def numerator (a b c d q r : K) : K[X] :=
+ C (slopeZero a b c d q r)+C (slopeOne a b c d)*X
+noncomputable def slope (qa ra sa ta qb rb sb tb : K) : K[X] :=
+ C ((norm (qa-qb) (ra-rb) qb rb)⁻¹)*
+ numerator (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb
+noncomputable def interpolant (qa ra sa ta qb rb sb tb : K) : K[X] :=
+ delta sa ta+slope qa ra sa ta qb rb sb tb*support qa ra
+
+theorem support_bezout (qa ra qb rb : K)
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0) :
+ IsCoprime (support qa ra) (support qb rb) := by
+ let H := adjugate (qa-qb) (ra-rb) qb
+ let I : K[X] := C ((norm (qa-qb) (ra-rb) qb rb)⁻¹)
+ have h := support_inverse_certificate qa ra qb rb
+ change (support qa ra-support qb rb)*H =
+ C (norm (qa-qb) (ra-rb) qb rb)-C ((qa-qb)^2)*support qb rb at h
+ refine ⟨I*H,I*(C ((qa-qb)^2)-H),?_⟩
+ calc
+  _=I*((support qa ra-support qb rb)*H+C ((qa-qb)^2)*support qb rb) := by ring
+  _=I*C (norm (qa-qb) (ra-rb) qb rb) := by rw [h]; ring
+  _=1 := by simp only [I,←map_mul,inv_mul_cancel₀ hn,map_one]
+
+theorem numerator_composition (qa ra sa ta qb rb sb tb : K) :
+ numerator (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb*support qa ra-
+ delta (sb-sa) (tb-ta)*C (norm (qa-qb) (ra-rb) qb rb) =
+ support qb rb*(delta (sb-sa) (tb-ta)*
+ (adjugate (qa-qb) (ra-rb) qb-C ((qa-qb)^2))+
+ C ((qa-qb)*(sb-sa))*support qa ra) := by
+ have h1 := support_inverse_certificate qa ra qb rb
+ have h2 := crt_slope_identity (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb
+ unfold numerator
+ linear_combination -(delta (sb-sa) (tb-ta))*h1 - support qa ra*h2
+
+theorem ordinate_congruences (qa ra sa ta qb rb sb tb : K)
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0) :
+ support qa ra ∣ interpolant qa ra sa ta qb rb sb tb-delta sa ta ∧
+ support qb rb ∣ interpolant qa ra sa ta qb rb sb tb-delta sb tb := by
+ constructor
+ · exact ⟨slope qa ra sa ta qb rb sb tb,by unfold interpolant;ring⟩
+ · let I : K[X] := C ((norm (qa-qb) (ra-rb) qb rb)⁻¹)
+   have hi : I*C (norm (qa-qb) (ra-rb) qb rb)=1 := by
+    simp only [I,←map_mul,inv_mul_cancel₀ hn,map_one]
+   refine ⟨I*(delta (sb-sa) (tb-ta)*(adjugate (qa-qb) (ra-rb) qb-C ((qa-qb)^2))+
+    C ((qa-qb)*(sb-sa))*support qa ra),?_⟩
+   calc
+    _=I*(numerator (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb*support qa ra-
+      delta (sb-sa) (tb-ta)*C (norm (qa-qb) (ra-rb) qb rb)) := by
+       unfold interpolant slope
+       change delta sa ta+I*numerator _ _ _ _ _ _*support qa ra-delta sb tb= _
+       have hd : delta (sb-sa) (tb-ta)=delta sb tb-delta sa ta := by
+        simp only [delta,map_sub];ring
+       rw [hd]
+       linear_combination (delta sb tb-delta sa ta)*hi
+    _=_ := by rw [numerator_composition];ring
+
+theorem residual_of_congruence (u v w f : K[X])
+ (hv : u ∣ f-v^2) (hc : u ∣ w-v) : u ∣ f-w^2 := by
+ obtain ⟨q,hq⟩ := hv
+ obtain ⟨t,ht⟩ := hc
+ have hw : w=v+u*t := by linear_combination ht
+ refine ⟨q-2*v*t-u*t^2,?_⟩
+ rw [hw]
+ linear_combination hq
+
+theorem product_residual (qa ra sa ta qb rb sb tb : K) (f : K[X])
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0)
+ (ha : support qa ra ∣ f-(delta sa ta)^2)
+ (hb : support qb rb ∣ f-(delta sb tb)^2) :
+ support qa ra*support qb rb ∣ f-(interpolant qa ra sa ta qb rb sb tb)^2 := by
+ obtain ⟨hca,hcb⟩ := ordinate_congruences qa ra sa ta qb rb sb tb hn
+ exact (support_bezout qa ra qb rb hn).mul_dvd
+  (residual_of_congruence _ _ _ _ ha hca) (residual_of_congruence _ _ _ _ hb hcb)
+end FastCRT

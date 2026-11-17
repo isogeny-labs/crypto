@@ -1,0 +1,284 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "double-base",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        20.686136613206394,
+        21.577210541907224,
+        29.596875900214716
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "full-rank",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        49.98494161515555,
+        59.1026614722449,
+        141.1621401860489
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "half-base",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        21.42824222127811,
+        25.409929749620414,
+        61.24511750470105
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        13.726853440840847,
+        15.582945379232081,
+        32.28777282475323
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "plan-aa",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        13.726853440840847,
+        15.582945379232081,
+        32.28777282475323
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "random-targets",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        615.6391076862984,
+        617.493766532846,
+        634.1856961517758
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "rho-neg",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.953885866165133,
+        1.0402649939103012,
+        1.8176771436168175
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "log2_r": 24.000437027707278,
+      "arm": "rootfind",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2341.2159340969056,
+        2576.223998047303,
+        4691.29657360088
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "full-rank",
+      "verdict": "double-base < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "half-base",
+      "verdict": "double-base < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "plan",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "plan-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "random-targets",
+      "verdict": "double-base < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "rho-neg",
+      "verdict": "rho-neg < double-base"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "double-base",
+      "b": "rootfind",
+      "verdict": "double-base < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "half-base",
+      "verdict": "half-base < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "plan",
+      "verdict": "plan < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "plan-aa",
+      "verdict": "plan-aa < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "random-targets",
+      "verdict": "full-rank < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "rho-neg",
+      "verdict": "rho-neg < full-rank"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "full-rank",
+      "b": "rootfind",
+      "verdict": "full-rank < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "half-base",
+      "b": "plan",
+      "verdict": "plan < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "half-base",
+      "b": "plan-aa",
+      "verdict": "plan-aa < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "half-base",
+      "b": "random-targets",
+      "verdict": "half-base < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "half-base",
+      "b": "rho-neg",
+      "verdict": "rho-neg < half-base"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "half-base",
+      "b": "rootfind",
+      "verdict": "half-base < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan",
+      "b": "plan-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan",
+      "b": "random-targets",
+      "verdict": "plan < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan",
+      "b": "rho-neg",
+      "verdict": "rho-neg < plan"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan",
+      "b": "rootfind",
+      "verdict": "plan < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan-aa",
+      "b": "random-targets",
+      "verdict": "plan-aa < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan-aa",
+      "b": "rho-neg",
+      "verdict": "rho-neg < plan-aa"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "plan-aa",
+      "b": "rootfind",
+      "verdict": "plan-aa < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "random-targets",
+      "b": "rho-neg",
+      "verdict": "rho-neg < random-targets"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "random-targets",
+      "b": "rootfind",
+      "verdict": "random-targets < rootfind"
+    },
+    {
+      "curve": "icv1-fp24-tm5099-a6f137c6",
+      "a": "rho-neg",
+      "b": "rootfind",
+      "verdict": "rho-neg < rootfind"
+    }
+  ]
+}

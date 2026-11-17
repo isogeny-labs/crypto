@@ -1,0 +1,57 @@
+{
+    "SpotInstanceRequests": [
+        {
+            "CreateTime": "2026-10-19T07:46:27+00:00",
+            "InstanceId": "i-047b3b07249920a57",
+            "LaunchSpecification": {
+                "BlockDeviceMappings": [
+                    {
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "VolumeSize": 80,
+                            "VolumeType": "gp3",
+                            "Encrypted": true
+                        },
+                        "DeviceName": "/dev/xvda"
+                    }
+                ],
+                "ImageId": "ami-0803a33fd43db1fbf",
+                "InstanceType": "c7i.2xlarge",
+                "KeyName": "n83-m5-20261019-5604fb5",
+                "NetworkInterfaces": [
+                    {
+                        "AssociatePublicIpAddress": true,
+                        "DeviceIndex": 0,
+                        "SubnetId": "subnet-07709db0a38a3857b"
+                    }
+                ],
+                "Placement": {
+                    "AvailabilityZone": "us-west-2b",
+                    "Tenancy": "default"
+                },
+                "SecurityGroups": [
+                    {
+                        "GroupId": "sg-0a7dc1512991bce1a",
+                        "GroupName": "n83-m5-20261019-5604fb5"
+                    }
+                ],
+                "Monitoring": {
+                    "Enabled": false
+                }
+            },
+            "LaunchedAvailabilityZone": "us-west-2b",
+            "ProductDescription": "Linux/UNIX",
+            "SpotInstanceRequestId": "sir-be1fmv8g",
+            "SpotPrice": "0.357000",
+            "State": "active",
+            "Status": {
+                "Code": "fulfilled",
+                "Message": "Your Spot request is fulfilled.",
+                "UpdateTime": "2026-10-19T08:47:37+00:00"
+            },
+            "Tags": [],
+            "Type": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    ]
+}

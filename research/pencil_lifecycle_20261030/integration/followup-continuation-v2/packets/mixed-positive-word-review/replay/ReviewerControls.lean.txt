@@ -1,0 +1,14 @@
+import WordPositive
+open PencilWordRefinement
+set_option autoImplicit false
+-- Lower prime boundary: cancellation precedes positive distinct composition.
+example : mixedClassifyWord 5 ⟨0,0,1,1⟩ ⟨4,0,0,0,1,1⟩=.cancellation ∧
+ positiveWordDispatch 5 0 0 0 0 ⟨0,0,1,1⟩ ⟨4,0,0,0,1,1⟩=none := by decide
+-- A common case is intentionally outside the restricted dispatcher, even though generic returns Some.
+example : positiveWordDispatch 5 0 0 0 0 ⟨0,1,1,1⟩ ⟨0,1,0,0,1,1⟩=none ∧
+ genericWordDispatch 5 ⟨0,1,1,1⟩ ⟨0,1,0,0,1,1⟩ 0 ≠ none := by decide
+-- Repeated support enters positive coincidence but is excluded by the distinct guard.
+example : mixedClassifyWord 5 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=.positiveCoincidence ∧
+ positiveWordDispatch 5 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=none := by decide
+-- Coefficient boundary is a rejected theorem premise, not an automatically normalized input.
+example : ¬ (5:UInt64).toNat < (5:UInt64).toNat := by decide

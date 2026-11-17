@@ -1,0 +1,161 @@
+{
+  "execution_cpu": 5,
+  "execution_sibling_cpu": 29,
+  "host_exclusivity": "unproven_container_allocation",
+  "housekeeping_cpus": [
+    2,
+    26
+  ],
+  "live_processes_after_nginx_stop": [
+    1,
+    41,
+    51,
+    8767,
+    8778,
+    8782
+  ],
+  "nginx_action": "stopped after unpinnable non-root nginx worker was observed",
+  "pod_id": "94uxi8f876o5gz",
+  "processes": [
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "start.sh",
+      "pid": 1,
+      "status": "pinned"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "nginx",
+      "pid": 19,
+      "status": "pinned"
+    },
+    {
+      "error": "[Errno 1] Operation not permitted",
+      "pid": 20,
+      "status": "failed"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "sshd",
+      "pid": 41,
+      "status": "pinned"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "sleep",
+      "pid": 51,
+      "status": "pinned"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "sshd",
+      "pid": 8741,
+      "status": "pinned"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "bash",
+      "pid": 8752,
+      "status": "pinned"
+    },
+    {
+      "after": [
+        2,
+        26
+      ],
+      "before": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "name": "python3",
+      "pid": 8753,
+      "status": "pinned"
+    }
+  ],
+  "schema": "rho-worker-pod-process-affinity-v1",
+  "timestamp_ns": 1792359338494868548
+}

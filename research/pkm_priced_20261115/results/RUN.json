@@ -1,0 +1,33 @@
+{
+  "schema": "pkm-priced.runpod-run/v1",
+  "attempts": [
+    {
+      "pod": "t62rszf6igjna6",
+      "outcome": "build failed: archive lacked path dependencies (tools/factor-base); no data",
+      "ran_s": "<60"
+    },
+    {
+      "pod": "l3vpfcaj1si5wy",
+      "outcome": "build failed: archive lacked include_str! data files under docs/ and research/; no data",
+      "ran_s": "<180"
+    },
+    {
+      "pod": "hf59kkl8qq5vjd",
+      "created_utc": "2026-11-15T07:37:16Z",
+      "deleted_utc": "2026-11-15T07:53:20Z",
+      "outcome": "complete; build exit 0; every step rc=0; SHA256SUMS verified"
+    }
+  ],
+  "cloud": "SECURE",
+  "data_center": "EUR-IS-1",
+  "cpu_flavor": "cpu5g",
+  "vcpu": 8,
+  "list_price_usd_per_hr": 0.368,
+  "est_cost_usd_all_attempts": 0.12,
+  "image": "rust:1.97-bookworm",
+  "source_revision": "b0e59c4717a3f389423c545779d0c1e27aed23bb",
+  "source_archive_sha256": "359cb4f85458d8a8574bbb2f23ce6c37b4f97daa6e1def617225c8b1a47a5097",
+  "source_archive_note": "git archive of the frozen commit restricted to Cargo files, src, examples, crates, all path dependencies, every declared target file, every include_str!/include_bytes! input and this study dir; cargo check --release --locked passed locally on the same archive before attempt 3",
+  "results_tgz_sha256": "8964b9baa1f4eab532fd662b284223761bee9c135e017f117745e86fa10394d0",
+  "results_s3": "s3://isolab-results-104186811093-us-east-2/runs/pkm-priced-runpod-20261115c/results/results.tgz"
+}

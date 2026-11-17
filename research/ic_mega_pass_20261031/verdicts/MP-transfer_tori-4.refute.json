@@ -1,0 +1,4 @@
+{"idea_id":"MP-transfer_tori-4","skeptic_lens":"mathematical refutation","verdict":"survives","confidence":0.93,
+"reason":"Identity is exact in char 2: (a+t)^2+(a+t^q)^2=s^2, (a+t)(a+t^q)=a^2+sa+N, so x=s^2/(a^2+sa+N); f(a)=a^2+sa is F_2-linear with kernel {0,s}, so f(V)+N is an affine subspace of dim l (or l-1 if s in V). Numeric check: random V,s,N over F_2^13 and F_2^17, l=3..6, 50 per cell: affine 200/200 and 200/200. Claimed conclusion (relabelling, no lever) cannot be refuted; x->1/x is a Mobius map preserving summation-polynomial multidegree up to clearing denominators. Non-genericity: no new structure; the torus base is a group-op-plus-membership (subspace) device, CGK bound unchanged. msolve solving-degree comparison not run (identity makes (a)=(b) by construction).",
+"fix":"Caveat: kernel {0,s} halves the base when s in V; choose V with s notin V. Classify: relabelling.",
+"collisions":["LEAD-ICB-nonlinear-frob-stable-bases","mu_263 corpus item"]}

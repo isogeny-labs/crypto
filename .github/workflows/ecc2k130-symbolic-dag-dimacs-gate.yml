@@ -1,0 +1,39 @@
+name: ECC2K-130 symbolic DAG DIMACS gate
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/**'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-gate.yml'
+      - 'research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-preflight-and-archive-replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile source and check frozen bytes
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m py_compile research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/{export,verify,bounded,produce,run,ci_replay}.py
+            python3 research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only symbolic_dag_dimacs_gate_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
+      - name: Replay committed archive when present
+        env:
+          FROZEN_VIEW_STEP: |
+            receipt=research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/evidence/receipt.json
+            if test -f "$receipt"; then
+              python3 research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/ci_replay.py --evidence "$receipt"
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only symbolic_dag_dimacs_gate_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

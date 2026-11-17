@@ -1,0 +1,142 @@
+{
+  "aws": {
+    "account": "104186811093",
+    "attached_policy_scope": "isolab-results-104186811093-us-east-2 inputs/runs only",
+    "caller_role": "arn:aws:iam::104186811093:role/spot-experiments-WorkerRole-G1FZ84yk3gS6",
+    "cluster_arn": "arn:aws:eks:us-east-2:104186811093:cluster/isolab",
+    "eks_access_entry": {
+      "associated_access_policies": [],
+      "kubernetes_groups": [
+        "isolab:submitters"
+      ],
+      "principal": "arn:aws:iam::104186811093:role/spot-experiments-WorkerRole-G1FZ84yk3gS6"
+    },
+    "proposed_unapplied_policy": {
+      "actions": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "resource": "arn:aws:s3:::setec-astronomy-artifacts/ml-dataset/20261028/*"
+    },
+    "region": "us-east-2",
+    "worker_attached_policy_arns": [
+      "arn:aws:iam::104186811093:policy/isolab-job-artifacts"
+    ],
+    "worker_dataset_roundtrip_verified": false,
+    "worker_inline_policy_names": [],
+    "worker_role": "arn:aws:iam::104186811093:role/isolab-job"
+  },
+  "budget": {
+    "current_grant_path": null,
+    "dry_run_status": "not_run_missing_authoritative_inputs",
+    "historical_horizon_expired": true,
+    "historical_reservation_utc": "2026-10-28T04:57:22.525522+00:00",
+    "historical_reserved_usd": "188.3888",
+    "historical_total_usd": "200.00",
+    "historical_unallocated_usd": "11.6112",
+    "native_admission_receipt": null,
+    "original_allocator_policy_path": null,
+    "original_authority_marker_path": null,
+    "original_ledger_path": null
+  },
+  "kubernetes_inventory": {
+    "active_job_names": [
+      "gh-41226686603-1",
+      "n83-fb-variants-r34-20261031-r1",
+      "semaev-n47-rand00-d5-blocked-retry01-20261031"
+    ],
+    "dataset_named_jobs_or_pods": 0,
+    "evidence": "read-only current-caller kubeconfig reconciliation; no Job/Pod mutation",
+    "inventory_scope": "isolab namespace only; all-namespaces list denied",
+    "jobs": 30,
+    "jobs_or_pods": 33,
+    "namespace": "isolab"
+  },
+  "mutations": {
+    "dataset_jobs": 0,
+    "iam": 0,
+    "kubernetes": 0,
+    "s3_dataset_objects": 0
+  },
+  "next_gate": "Locate and reconcile original allocator policy, ledger and authority marker; establish bounded node lifetime and exact price/resource envelope; preflight current-main binary; review scoped IAM/RBAC; only then run native reserve-launch --dry-run and inspect admitted field.",
+  "observed_utc": "2026-10-31T18:20:03Z",
+  "one_cell_candidate": {
+    "current_main_binary_sha256": null,
+    "finite_instance_lifetime_verified": false,
+    "image_digest": null,
+    "max_cases": 1,
+    "memory_mib": 2048,
+    "native_plan_binding_sha256": null,
+    "proposed_job_deadline_seconds": 600,
+    "seconds_per_case": 30,
+    "shard_count": 19,
+    "shard_index": 0,
+    "trace_mib": 64
+  },
+  "pricing": {
+    "ec2_on_demand": {
+      "instance_type": "c6a.2xlarge",
+      "publication_utc": "2026-10-29T17:56:34Z",
+      "region": "us-east-2",
+      "sku": "XZRBC9MJZPZWHBW8",
+      "source": "AWS Price List API AmazonEC2 Linux Shared Ohio Used",
+      "usd_per_hour": "0.3060000000"
+    },
+    "illustration_only": {
+      "admission_inference": false,
+      "assumed_node_hours": "24",
+      "historical_caps_put_attempts": 100000,
+      "historical_caps_read_attempts": 200000,
+      "historical_caps_unique_bytes": 21474836480,
+      "historical_unallocated_minus_known_components_usd": "3.19327876096",
+      "known_components_total_usd": "8.41792123904",
+      "missing_cost_components": [
+        "finite node lifetime",
+        "EBS",
+        "transfer/download",
+        "termination tail",
+        "current prior obligations"
+      ],
+      "node_usd": "7.344",
+      "one_month_storage_usd": "0.49392123904",
+      "put_usd": "0.500000",
+      "read_usd": "0.080000"
+    },
+    "s3": {
+      "put_usd_per_request": "0.0000050000",
+      "read_usd_per_request": "0.0000004000",
+      "source": "AWS Price List API AmazonS3 Ohio",
+      "standard_storage_usd_per_gb_month_first_50tb": "0.0230000000"
+    },
+    "spot_history": [
+      {
+        "az": "us-east-2c",
+        "quote_utc": "2026-10-31T17:00:00Z",
+        "usd_per_hour": "0.116900"
+      },
+      {
+        "az": "us-east-2b",
+        "quote_utc": "2026-10-31T16:00:00Z",
+        "usd_per_hour": "0.123100"
+      },
+      {
+        "az": "us-east-2a",
+        "quote_utc": "2026-10-31T13:00:00Z",
+        "usd_per_hour": "0.117000"
+      }
+    ]
+  },
+  "schema": "ml-dataset.cloud-admission-audit/v1",
+  "scope": "read_only_one_cell_preflight",
+  "source": {
+    "base_head": "cb053d8891501e44086022ce58bb41c6bd0791b3",
+    "budget_merge_commit": "cac5283a956a894dff07f2833d146fda292b328c",
+    "budget_pr": 2751,
+    "budget_pr_head": "a4cc63fe54d0bf3438ee49993946d06d23aa0f57",
+    "preflight_merge_commit": "34035549a912f3f3cda06d03498290621f2119e6",
+    "preflight_pr": 3037,
+    "preflight_pr_head": "102e93647770e50bd97f60f9d86f18f3396a0d54",
+    "repository": "isogeny-labs/crypto"
+  },
+  "status": "not_admitted"
+}

@@ -1,0 +1,54 @@
+✖ [3331/3331] Building CryptoLean.Group.SubsetFourier (4.0s)
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Combinatorics.Additive.Convolution` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/scratch/crypto-lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/scratch/crypto-lean/CryptoLean/Group/SubsetFourier.lean -o /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SubsetFourier.olean -i /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SubsetFourier.ilean -c /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SubsetFourier.c --setup /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SubsetFourier.setup.json --json
+warning: CryptoLean/Group/SubsetFourier.lean:20:0: automatically included section variable(s) unused in theorem `CryptoLean.SubsetFourier.charSum_trivial`:
+  [Fintype G]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype G] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: CryptoLean/Group/SubsetFourier.lean:29:56: unsolved goals
+G : Type u_1
+inst✝¹ : AddCommGroup G
+inst✝ : Fintype G
+S : Finset G
+ψ : AddChar G ℂ
+a✝² : ψ ∈ Finset.univ
+x : G
+a✝¹ : x ∈ S
+y : G
+a✝ : y ∈ S
+⊢ ψ y * (starRingEnd ℂ) (ψ x) = ψ x * (starRingEnd ℂ) (ψ y)
+error: CryptoLean/Group/SubsetFourier.lean:56:67: unsolved goals
+G : Type u_1
+inst✝¹ : AddCommGroup G
+inst✝ : Fintype G
+S : Finset G
+ψ : AddChar G ℂ
+a✝³ : ψ ∈ Finset.univ
+x : G
+a✝² : x ∈ S
+y : G
+a✝¹ : y ∈ S
+z : G
+a✝ : z ∈ S
+⊢ ψ z * ψ y * (starRingEnd ℂ) (ψ x) = ψ x * ψ y * (starRingEnd ℂ) (ψ z)
+error: CryptoLean/Group/SubsetFourier.lean:69:13: unsolved goals
+G : Type u_1
+inst✝¹ : AddCommGroup G
+inst✝ : Fintype G
+S : Finset G
+⊢ (∑ x ∈ S, ∑ x_1 ∈ S, if x + x_1 ∈ S then ↑(Fintype.card G) else 0) =
+    ∑ i ∈ S, ↑(Fintype.card G) * ↑{x ∈ S | i + x ∈ S}.card
+warning: CryptoLean/Group/SubsetFourier.lean:70:80: This simp argument is unused:
+  mul_ite
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [AddChar.sum_apply_eq_ite, sub_eq_zero, returnCount, Finset.mul_sum]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Some required targets logged failures:
+- CryptoLean.Group.SubsetFourier
+error: build failed

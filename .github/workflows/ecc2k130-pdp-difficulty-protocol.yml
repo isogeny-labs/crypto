@@ -1,0 +1,57 @@
+name: ECC2K-130 PDP difficulty input freeze
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - "research/notes/ecc2k130/pdp_difficulty_features_20261001/**"
+      - ".github/workflows/ecc2k130-pdp-difficulty-protocol.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/pdp_difficulty_features_20261001
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify frozen archives without scoring public-point features
+        run: |
+          python3 research/notes/ecc2k130/pdp_difficulty_features_20261001/check_config.py \
+            --out /tmp/ecc2k130-pdp-difficulty-input-check.json
+          cmp /tmp/ecc2k130-pdp-difficulty-input-check.json \
+            research/notes/ecc2k130/pdp_difficulty_features_20261001/INPUT_CHECK.json
+      - name: Check source-only toy algebra and deterministic statistics
+        run: python3 -m unittest discover -s research/notes/ecc2k130/pdp_difficulty_features_20261001 -p test_source.py -v
+      - name: Check frozen pre-outcome source and protocol bytes
+        run: |
+          python3 research/notes/ecc2k130/pdp_difficulty_features_20261001/source_preflight.py \
+            --out /tmp/ecc2k130-pdp-difficulty-source-check.json
+          cmp /tmp/ecc2k130-pdp-difficulty-source-check.json \
+            research/notes/ecc2k130/pdp_difficulty_features_20261001/SOURCE_CHECK.json

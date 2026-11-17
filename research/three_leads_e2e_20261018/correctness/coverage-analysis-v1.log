@@ -1,0 +1,11 @@
+   Compiling three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error: this file contains an unclosed delimiter
+  --> analysis.rs:15:177
+   |
+10 | ...tr){let out=Path::new(out);fs::create_dir_all(out).unwrap();let mut paths=vec![];files(Path::new(input),&mut paths);paths.sort();let mut records=v...
+   |       - unclosed delimiter
+...
+15 | ...v"),prices).unwrap();write(out.join("cost-summary.json"),&json!(summary));println!("{} records; {} target groups",records.len(),pairs.len());}
+   |                                                                                                                                                  ^
+
+error: could not compile `three-leads-study` (bin "three-leads-study") due to 1 previous error

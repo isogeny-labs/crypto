@@ -1,0 +1,14 @@
+{
+ "created_at": "2026-11-04T12:12:13Z",
+ "id": "PCC-20261104-c28f16",
+ "kind": "statement",
+ "producer": {
+  "commit": "269913312c752848beb7a4bc0ac17631bb126a69",
+  "model": "",
+  "session": "https://claude.ai/code/session_01AXUKfUwhrkCU1Jp7P4AXYb"
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "Curve25519-family miniature k = 20..32, generic-decomposition track at the baby-step giant-step boundary (C = 2 seeds plus known-log G jumps; classification pending an owner ruling), ecbench counted GAE, local route L1; no signed replay or recompute",
+ "statement": "ic_autolab round 33 (research/curve25519_autolab_20261104/round-033): wwalk with g=1 (every jump carries a known [gamma]G) and grow=2 (walk until collisions pin both seed logs; one probe hit then solves). k = 24, holdout ECBS1h05c72414c6d4: wwalk:x=0.9,g=1,grow=2 with stride-generator probes over wwalkg-x08-grow 0.721 [0.610, 0.853] at w = 0, 0.647 at w = 1; S 1.673 vs 2.321, rho-neg 1.171 (1.43x). k = 28, holdout ECBS1hba478ffc1d23: same arm over wwalkg-x08 0.795 [0.673, 0.940], 0.630 at w = 1; S 1.572 vs 1.977, rho-neg 1.052 (1.49x). k = 32, holdout ECBS1h8b22612ef731: wwalk:x=0.6,g=1,grow=2 with walk probes over wwalk-x10 0.715 [0.648, 0.788], 0.620 at w = 1; S 1.515 vs 2.120, rho-neg 0.975 (1.55x). Band sel < inc at each; k = 20 no challenger."
+}

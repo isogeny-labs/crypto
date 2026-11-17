@@ -1,0 +1,137 @@
+{
+  "packages": [
+    "",
+    "crates/hashed-ecdl-tensor",
+    "crates/ecdl-tensor-ic",
+    "research/pencil_large_prime_20261029",
+    "tools/factor-base",
+    "tools/volcano-cli",
+    "isogeny_algos",
+    "research/five_leads_e2e_20261019/native"
+  ],
+  "manifests": [
+    {
+      "package": "",
+      "manifest": "Cargo.toml",
+      "git_blob": "27bd18ea4dd995f969ddff7ef859c3b88612551c",
+      "sha256": "26d916b370a5669ff278cb65e0fb9aad03f3bf7ab2b0b3358a2d5c5b0c2db50c",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "crates/hashed-ecdl-tensor",
+      "manifest": "crates/hashed-ecdl-tensor/Cargo.toml",
+      "git_blob": "200a345ae1605680c3e6eb648e213d99f4ecba69",
+      "sha256": "4468c86b8a971e1ae62390a7b098e5da922d91c7a4a4b21741e19344a1d2e1bb",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "crates/ecdl-tensor-ic",
+      "manifest": "crates/ecdl-tensor-ic/Cargo.toml",
+      "git_blob": "1432eb911de5e565d9016290b455a9806e410f3b",
+      "sha256": "9e07d0abb3a40193427c14a4990c4ff9654155196009a840d1b983b1c6c6b6b0",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "research/pencil_large_prime_20261029",
+      "manifest": "research/pencil_large_prime_20261029/Cargo.toml",
+      "git_blob": "5bcec7fa7e4c51ec583708097059bd1d2c7040b7",
+      "sha256": "4b9c7c3b6f58fc1f4378806b9a60fd2e879dd19f905a3541e92b5916b80a6ed9",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "tools/factor-base",
+      "manifest": "tools/factor-base/Cargo.toml",
+      "git_blob": "3a8486e457b9927d768c8ccf5f6b5b8d2547a8b6",
+      "sha256": "0e66f1f9753c2440d75ff8459502c43bb16bc3456102fad0c2d859199ba1e00f",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "tools/volcano-cli",
+      "manifest": "tools/volcano-cli/Cargo.toml",
+      "git_blob": "91ba0744280e32915049e41c7e03fe921acb0a88",
+      "sha256": "5edd95d84ab81207dbff2086981f5a9cea980a0fc6d1ca81efbff34e98d46cae",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "isogeny_algos",
+      "manifest": "isogeny_algos/Cargo.toml",
+      "git_blob": "613687d3c41214a23318ead2fc5e1a1dba763a3a",
+      "sha256": "1f546fbad9ccae02f2347fa23b29a63d8b4850c81779084323648ee7168d710d",
+      "build_field": null,
+      "default_build_rs_present": false
+    },
+    {
+      "package": "research/five_leads_e2e_20261019/native",
+      "manifest": "research/five_leads_e2e_20261019/native/Cargo.toml",
+      "git_blob": "e0d681d920d03df17ce921eefb0de0ff04d512d5",
+      "sha256": "ff698c89bad7e55b86b7f130a4739ddc6192d647b5dea2e94e01c8eb1da27ec2",
+      "build_field": null,
+      "default_build_rs_present": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "",
+      "dependency": "hashed-ecdl-tensor",
+      "path": "crates/hashed-ecdl-tensor",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "",
+      "dependency": "ecdl-tensor-ic",
+      "path": "crates/ecdl-tensor-ic",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "",
+      "dependency": "pencil-symbolic-graph",
+      "path": "research/pencil_large_prime_20261029",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "",
+      "dependency": "factor-base",
+      "path": "tools/factor-base",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "",
+      "dependency": "volcano-cli",
+      "path": "tools/volcano-cli",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "",
+      "dependency": "isogeny_algos",
+      "path": "isogeny_algos",
+      "optional": false,
+      "context": "/dependencies"
+    },
+    {
+      "from": "research/pencil_large_prime_20261029",
+      "dependency": "five-leads-study",
+      "path": "research/five_leads_e2e_20261019/native",
+      "optional": true,
+      "context": "/dependencies"
+    },
+    {
+      "from": "tools/volcano-cli",
+      "dependency": "isogeny_algos",
+      "path": "isogeny_algos",
+      "optional": false,
+      "context": "/dependencies"
+    }
+  ],
+  "scope": "all local dependency tables including optional and target variants; workspace inheritance fails closed"
+}

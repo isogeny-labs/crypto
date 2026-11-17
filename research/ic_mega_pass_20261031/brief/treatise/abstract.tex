@@ -1,0 +1,68 @@
+Pollard rho remains the fastest known algorithm for the discrete logarithm
+on elliptic curves of cryptographic shape. Index calculus could in
+principle exploit more structure, but it has never beaten rho there. This
+treatise collects everything a four-month research programme
+(July--October 2026) learned about why. Every number is drawn from
+committed evidence and carries its boundary: oracle stage, complete solve,
+cold one-target cost, or online cost.
+
+\emph{Theory.} We give the Galois group of Semaev's summation cover. It is
+$(\ZZ/2)^{m-2}$ for every curve, field and characteristic, with arithmetic
+monodromy equal to geometric. We also give an exact factorisation law for
+its fibres over $\FF_q$. Two consequences follow:
+\begin{itemize}
+\item fibre statistics are constant on the factor-base locus;
+\item at fixed factor-base size the mean decomposition yield is fixed.
+\end{itemize}
+So levers that rely on curve-dependent monodromy or on raising mean
+yield at matched base size are closed without experiment. Coverage, oracle
+cost and solving difficulty remain free.
+
+On fall degrees, we prove for the binary Weil descent of $\Sem3$ that:
+\begin{itemize}
+\item the first fall degree is 2 for every $n$, including Semaev's chained
+  systems, where 4 was stated;
+\item the last fall degree is at most $k+2$, or $(t-1)k+t$ for chains.
+\end{itemize}
+We also certify that the last fall degree is at least 5 on named
+instances at $n=33$--$45$ and in the $m=t=3$ chain, with certificates that
+an independent program checks. Every F4 run on those systems therefore
+exceeds degree 4, and Semaev's Assumption~1 fails as stated. For an
+explicit-membership chain we prove $(d_{\rm ff},d_F)=(4,5)$ exactly at
+$B=3$ for every $p>3$, and $\max(5,B+1)\le d_F\le3B-4$ in general. For PKM
+Kummer towers we prove a constant first fall degree of 4 and show that the
+last fall degree depends on the presentation, not the ideal. Throughout,
+the first fall degree is a constant of the presentation and the last is
+not.
+
+\emph{Algorithms.} The programme engineered:
+\begin{itemize}
+\item root-finding and meet-in-the-middle decomposition oracles, two to
+  five orders of magnitude cheaper than Gröbner solves where they apply;
+\item inherited and gated F4 engines, and an $\FF_p$ F4 at msolve parity;
+\item compact Frobenius-orbit and known-logarithm-closed factor bases;
+\item FGHR's $D_4$ symmetry at $k=4$, cutting one decomposition
+  $370$--$481\times$;
+\item double-large-prime genus-3 index calculus after the cubic GHS
+  transfer, from $q^{1.91}$ to $q^{1.36}$;
+\item Diem's plane-quartic index calculus on the same family, at
+  exponent $\approx1$.
+\end{itemize}
+
+\emph{Frontier.} A priced campaign of 4{,}848 executions found no index
+calculus below rho on any prime or prime-degree binary curve at any
+weight of a pricing band applied to every arm. The distance at a matched
+reference is $4.7$--$18\times$ on Koblitz curves of 37--47 bits and
+$10.5$--$102\times$ on prime curves of 20--40 bits. Only in weak
+extension-field families does index calculus reach or cross rho:
+\begin{itemize}
+\item genus 3 via GHS: below the strongest rho at one size, unresolved
+  at the others;
+\item plane quartics: $0.005\times$ a negation rho at $q\approx2^{21}$;
+\item Joux--Vitse covers: $1.6$--$2.0\times$;
+\item $k=4$ in characteristic two: unsupported beyond $m=15$.
+\end{itemize}
+Every online win was retired by an equal-advice audit against
+Bernstein--Lange rho. We record the corrections that matching references,
+pricing native work and replaying records forced. Nothing here concerns a
+deployed curve or key recovery.

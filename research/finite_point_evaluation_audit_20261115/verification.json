@@ -1,0 +1,89 @@
+{
+  "schema": "actual-finite-point-evaluation-verification/v1",
+  "source_commit": "0cc02ac3d1a4954a0d99c7b2cb3c1336e14f3b3a",
+  "claim_id": "PCC-20261115-1a1570",
+  "declaration_sha256": "2cde7adfeb312bf57894458dffa98c17ef4ff2a0bbba2e8680f023d3f897f591",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 79,
+  "gate_declarations": 536,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 174,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-1a1570",
+    "claim_sha256": "640c8597420a7177657ca5f34f230541c743d7cd0f67d2ad0d4ec824a481d86e",
+    "commit": "0cc02ac3d1a4954a0d99c7b2cb3c1336e14f3b3a",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/finite_point_evaluation_audit_20261115/lean (EvaluationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T11:01:06Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-1a1570",
+    "claim_sha256": "640c8597420a7177657ca5f34f230541c743d7cd0f67d2ad0d4ec824a481d86e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47985,
+    "sha256": "f64886ff775a46ac3f709b9370c67b1155da77aed7828577f6f04f378626ab7f",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 536,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 67,
+    "new_modules": 9,
+    "actual_local_residue_and_regular_domain": true,
+    "actual_allpoint_unit_valuation_order_bridge": true,
+    "actual_coordinate_fraction_value_formula": true,
+    "actual_disjoint_support_to_unit_domain": true,
+    "actual_guarded_divisor_product_and_scalar_laws": true,
+    "actual_geometric_degreezero_choice_forward": true,
+    "actual_total_evaluation_inverse_pole_and_totalized_product_controls": true,
+    "actual_F3_unequal_overlapping_support_control": true,
+    "actual_hypotheses": "EveryFieldK/actualW/equation forfinitepointresidue; actualNS forfiniteDVRcomparison; actualnonzeroFFfunctions/actualdisjointsupportforunitvalue. GeometricchoiceadditionallyactualIsAlgClosedK/W\u0394neq0/degree0/disjointguards. Allcharacteristicsincluding2/3.",
+    "source_exercise_converse_or_allcurves": false,
+    "full_scheme_localRing_Divisor_API_comparison": false,
+    "full_finitepoint_divisor_basechange_or_galois_descent": false,
+    "binary_runtime_complexity": false,
+    "reciprocity": false,
+    "canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

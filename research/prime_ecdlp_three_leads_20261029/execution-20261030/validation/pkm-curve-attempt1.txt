@@ -1,0 +1,19 @@
+import ThreeLeads.PKMChainCoverage
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+
+namespace PKMChainCoverage
+open WeierstrassCurve.Affine
+variable {K : Type*} [Field K] {W : WeierstrassCurve.Affine K}
+
+theorem affine_pair_nonzero {x₀ y₀ x₁ y₁ : K}
+    (h₀ : W.Nonsingular x₀ y₀) (h₁ : W.Nonsingular x₁ y₁)
+    (hx : x₀ ≠ x₁) :
+    Point.some x₀ y₀ h₀ + Point.some x₁ y₁ h₁ ≠ 0 := by
+  intro hz
+  have heq : Point.some x₀ y₀ h₀ = -Point.some x₁ y₁ h₁ :=
+    eq_neg_of_add_eq_zero_left hz
+  rw [Point.neg_some] at heq
+  exact hx (Point.some.inj heq).1
+
+#print axioms affine_pair_nonzero
+end PKMChainCoverage

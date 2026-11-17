@@ -1,0 +1,7 @@
+# Fixed-label oriented CM lift reduction
+
+The two-page PDF and vector computation diagram derive a complete finite norm search in Z[pi] for the existing scalar label and selected signed eigenline. No minimizing search or comparative experiment is executed in this report. [The full derivation](../../CM_LIFT.md) supplies the domain, exceptional root case, completeness proof, source review and access gaps.
+
+The independent native GMP replay checks all five existing certificates; final v3 uses the other valid Frobenius root in each orientation corruption control. Five positive replays and fifteen negative controls pass. V1's missing Boost headers and v2's preliminary unsupported-root controls remain preserved. Install GMP C++ development headers, then build `make -B -j1 -C research/cm-marked-scalar lift-identity-binary` from the repository root; replay `/tmp/cm-marked-scalar-build/lift-identity research/cm-marked-scalar/fixtures-v2`. Bounds and exact source/input/binary hashes are in ../../qualification/lift-identity-v3/.
+
+Native Typst 0.13.1 renders flow.typ to flow.svg and report.typ to report.pdf. Both final PDF pages were opened and inspected. Previews are temporary; inspection.json and manifest.sha256 retain the source, output, log and inspection bindings. An optional pdfinfo invocation was unavailable on the host; two native Typst PNG pages establish the inspected page count. No previous report or sealed experiment output was changed.

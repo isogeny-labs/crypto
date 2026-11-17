@@ -1,0 +1,24 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=22mm]{geometry}
+\usepackage{longtable}
+\usepackage{amssymb}
+\begin{document}
+\section*{Exhaustive finite arithmetic gate for the weighted genus-2 law}
+The test enumerates every monic reduced Mumford pair satisfying
+\(u\mid(f-v^2)\) over each stated field for
+\(f=x^5+x+2\). The curve is smooth: a common root of
+\(f\) and \(f'=5x^4+1\) would be \(x=-5/2\),
+but \(f'(-5/2)=3141/16\ne0\) in either field.
+It compares every ordered pair with the repository's separate Cantor
+implementation under unit weights and non-unit weights \( (2,3),(3,5)\).
+This is a finite arithmetic test. It does not establish the universal
+Rust-to-formula theorem, smooth projective or Picard-class transport,
+nor a revised collector cost.
+\begin{longtable}{rrrrr}
+Field & Divisors & Ordered pairs & Weighted checks & Unresolved\\\hline
+$\mathbb{F}_{7}$ & 66 & 4356 & 8712 & 0\\
+$\mathbb{F}_{11}$ & 114 & 12996 & 25992 & 0\\
+\end{longtable}
+\paragraph{Branch counts.} The SVG and standardized CSV record every returned branch label.
+\paragraph{Reproduction.} Schema \texttt{projective-law-exhaustive-small-field/v1}; run the command recorded in \texttt{RESULT.json}, then \texttt{python3 render.py --check}. The JSON binds the exact Rust law, independent Cantor source, and raw test log by SHA-256.
+\end{document}

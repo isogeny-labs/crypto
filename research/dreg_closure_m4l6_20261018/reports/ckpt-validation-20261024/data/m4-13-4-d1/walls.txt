@@ -1,0 +1,5 @@
+Wall times read from the shell when these runs were made (not written by the program), 2026-10-24.
+All three ran on 4 shared cores while a cargo test build was compiling on the same host.
+plain:    wall 415 s (exit 0); the program's own secs for degree 4 is in plain.out
+segment1: `timeout 280` then SIGTERM; wall 308 s (280 s of work + the 27.2 s save in segment1.err); exit 143
+segment2: resumed from generation 6; wall 132 s (exit 0); resumed.out has the summed compute secs

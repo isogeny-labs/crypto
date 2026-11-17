@@ -1,0 +1,11 @@
+# Retained search continuation and report composition
+
+This exact overlay adds checkpoints after each successful classified model exclusion, a one-shot budget-admitted partial report, and the associated solver transport to the previously published source tree. Six source overlays compose against the hash-bound 1457-file base in owned-search-capture-composed-20261107. The original owner, source, deadline and resource limits remain in place. No raw Attempt rehydration API is added.
+
+The complete source is materialized by assemble.py from BASE_HASHES.json and ASSEMBLY.json. The sibling report owner.patch is deliberately not applied: its module declaration and field/default are already composed into the checkpoint owner. Only the solver patch is applied to the exact prior source and retained as a full hashed overlay. The final assembly includes the report module. Source parsing does not establish Rust typechecking.
+
+Validation packets retain 30 continuation controls (4 new), 7 publication controls, 2 borrowing controls, 11 report controls, and 28 capture/wire controls (17 new). These counts include donor checks and structural test seams, not independent full CLI runs. The capture checker also independently reads four existing native CLI prefixes without owned-search snapshots; it does not establish the complete new owner-to-emitter path.
+
+The partial report remains guarded if original admission fails. It contains no exact FFD/LFD/regularity value. Reservation counters are labeled as reservations, not retired instructions. Mid-search checkpoints occur between exclusions; incomplete native searches may still have only in-memory later state. Complete snapshots encode retained state and are not solver completion. Independent capture checking authenticates bytes relative to caller-supplied identities and checks owner binding derivation; mathematical replay, producer authenticity and S3 custody are separate obligations.
+
+Full assembled compiler/runtime checks, central mathematical replay/export and the requested native scientific corpus remain incomplete. Original pending build allowance, scientific budgets/deadlines and scientific S3 preservation requests are unchanged. This packet contains software and fixture evidence only.

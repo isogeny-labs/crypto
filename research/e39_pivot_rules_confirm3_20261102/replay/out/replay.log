@@ -1,0 +1,71 @@
+2026-11-02T23:58:44Z start pilot
+2026-11-02T23:58:44Z start e2e_e24_chain-fifo-static_p101s2
+2026-11-02T23:58:55Z end pilot exit 0
+2026-11-02T23:58:55Z start checks
+2026-11-02T23:59:07Z end e2e_e24_chain-fifo-static_p101s2 exit 0
+2026-11-02T23:59:07Z start e2e_gls_chain-lifo_p197s1
+2026-11-02T23:59:35Z end checks exit 0
+2026-11-02T23:59:35Z start stage_a
+2026-11-03T00:00:11Z end e2e_gls_chain-lifo_p197s1 exit 0
+2026-11-03T00:00:11Z start e2e_e24_chain-fifo-static_p197s2
+2026-11-03T00:00:32Z start walk_e24
+2026-11-03T00:00:54Z end walk_e24 exit 0
+2026-11-03T00:00:54Z start stage_w
+2026-11-03T00:01:04Z end stage_w exit 0
+2026-11-03T00:01:04Z finished walks
+2026-11-03T00:01:15Z end e2e_e24_chain-fifo-static_p197s2 exit 0
+2026-11-03T00:01:15Z start e2e_e24_chain-lifo_p269s1
+2026-11-03T00:03:22Z end e2e_e24_chain-lifo_p269s1 exit 0
+2026-11-03T00:03:22Z start e2e_gls_chain-fifo_p269s1
+2026-11-03T00:06:37Z end e2e_gls_chain-fifo_p269s1 exit 0
+2026-11-03T00:06:37Z start e2e_gls_chain-static_p197s2
+2026-11-03T00:07:40Z end e2e_gls_chain-static_p197s2 exit 0
+2026-11-03T00:07:40Z start e2e_e24_chain-counted_p149s1
+2026-11-03T00:08:17Z end stage_a exit 0
+2026-11-03T00:08:17Z finished checks
+2026-11-03T00:09:02Z end e2e_e24_chain-counted_p149s1 exit 0
+2026-11-03T00:09:02Z start e2e_e24_chain-fifo_149s1
+2026-11-03T00:09:02Z end e2e_e24_chain-fifo_149s1 exit 101
+2026-11-03T00:09:02Z finished e2e
+2026-11-03T00:09:06Z start id_macaulay
+2026-11-03T00:09:38Z end id_macaulay exit 0
+2026-11-03T00:09:38Z start id_chain
+2026-11-03T00:10:06Z end id_chain exit 0
+2026-11-03T00:10:06Z start id_chainsparsest
+2026-11-03T00:10:37Z end id_chainsparsest exit 0
+2026-11-03T00:10:37Z start id_chain_karatsuba
+2026-11-03T00:11:06Z end id_chain_karatsuba exit 0
+2026-11-03T00:11:06Z start id_est_karatsuba
+2026-11-03T00:11:33Z end id_est_karatsuba exit 0
+2026-11-03T00:11:33Z start id_chain-fifo_karatsuba
+2026-11-03T00:12:02Z end id_chain-fifo_karatsuba exit 0
+2026-11-03T00:12:02Z start id_chain-static_karatsuba
+2026-11-03T00:12:29Z end id_chain-static_karatsuba exit 0
+2026-11-03T00:12:29Z start id_chain-fifo-static_karatsuba
+2026-11-03T00:12:58Z end id_chain-fifo-static_karatsuba exit 0
+2026-11-03T00:12:58Z start id_v4_default
+2026-11-03T00:13:21Z end id_v4_default exit 0
+2026-11-03T00:13:21Z start id_e37salt_gls_chain-counted
+2026-11-03T00:13:46Z end id_e37salt_gls_chain-counted exit 0
+2026-11-03T00:13:46Z start id_e37salt_gls_chain-fifo
+2026-11-03T00:14:09Z end id_e37salt_gls_chain-fifo exit 0
+2026-11-03T00:14:09Z start id_e37salt_gls_chain-static
+2026-11-03T00:14:32Z end id_e37salt_gls_chain-static exit 0
+2026-11-03T00:14:32Z start id_e37salt_gls_chain-fifo-static
+2026-11-03T00:14:56Z end id_e37salt_gls_chain-fifo-static exit 0
+2026-11-03T00:14:56Z start id_e37salt_gls_chain-sparsest-est
+2026-11-03T00:15:20Z end id_e37salt_gls_chain-sparsest-est exit 0
+2026-11-03T00:15:20Z start id_e37salt_e24_chain-fifo
+2026-11-03T00:15:41Z end id_e37salt_e24_chain-fifo exit 0
+2026-11-03T00:15:41Z start id_e37_checks
+2026-11-03T00:16:41Z end id_e37_checks exit 0
+2026-11-03T00:16:41Z start id_e38_pilot
+2026-11-03T00:16:57Z end id_e38_pilot exit 0
+2026-11-03T00:16:57Z start id_e38_pilot_p2
+2026-11-03T00:17:13Z end id_e38_pilot_p2 exit 0
+2026-11-03T00:17:13Z finished identity
+2026-11-03T00:17:35Z note: e2e_e24_chain-fifo_149s1 was a validator-script naming bug (e2e_run's rest/ps not local, so the pair loop passed '149s1' without its 'p'; the binary rejected the solver name, exit 101, nothing measured); replay.sh fixed (local rest ps) and the pair's F run started under its correct name
+2026-11-03T00:17:46Z correction to the note above: the exit-101 panic was quartic_pipeline_v4 rejecting the malformed --sizes value ('ParseIntError' on 'chain-fifo_149s1'-derived arguments), not a solver name; a first rerun attempt was invoked with relative paths and did nothing (no output written); rerunning with absolute paths
+2026-11-03T00:17:46Z start e2e_e24_chain-fifo_p149s1
+2026-11-03T00:18:28Z end e2e_e24_chain-fifo_p149s1 exit 0
+2026-11-03T00:18:28Z finished e2e

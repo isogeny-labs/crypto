@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Trusted CRIU/EBS computation recovery with a separate fresh L2 benchmark epoch
+Parameters:
+  LauncherKey: {Type: String, AllowedPattern: 'inputs/recovery-controllers/[a-f0-9]{64}\.zip'}
+  LauncherVersion: {Type: String}
+  VpcId: {Type: 'AWS::EC2::VPC::Id'}
+  PrivateSubnets: {Type: 'List<AWS::EC2::Subnet::Id>'}
+  ClusterSecurityGroup: {Type: 'AWS::EC2::SecurityGroup::Id'}
+  TriggerRoleName: {Type: String}
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Iso Lab recovery controller outbound HTTPS
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - {IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0}
+  Ingress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ClusterSecurityGroup
+      SourceSecurityGroupId: !Ref SecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+  Logs:
+    Type: AWS::Logs::LogGroup
+    Properties: {LogGroupName: /aws/codebuild/isolab-recovery-controller, RetentionInDays: 14}
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: codebuild.amazonaws.com}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: {aws:SourceAccount: !Ref 'AWS::AccountId'}
+              ArnEquals:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/isolab-recovery-controller
+      Policies:
+        - PolicyName: recovery
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: eks:DescribeCluster
+                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/isolab
+              - Effect: Allow
+                Action: [s3:GetObject, s3:GetObjectVersion]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/inputs/recovery-controllers/*
+                  - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/inputs/recovery-requests/*
+                  - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/recovery/runs/*
+                  - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/runs/*
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/recovery/runs/*
+              - Effect: Allow
+                Action: [s3:GetBucketLocation, s3:GetBucketAcl]
+                Resource: !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}
+                Condition:
+                  StringLike: {s3:prefix: ['recovery/runs/*', 'runs/*', 'inputs/recovery-*']}
+              - Effect: Allow
+                Action: [codebuild:BatchGetBuilds, codebuild:RetryBuild]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/isolab-recovery-controller
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:build/isolab-recovery-controller:*
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt Logs.Arn
+              - Effect: Allow
+                Action: [ec2:DescribeInstances, ec2:DescribeSnapshots, ec2:DescribeNetworkInterfaces, ec2:DescribeSecurityGroups, ec2:DescribeSubnets, ec2:DescribeVpcs, ec2:DescribeDhcpOptions, ec2:CreateNetworkInterface, ec2:DeleteNetworkInterface]
+                Resource: '*'
+              - Effect: Allow
+                Action: ec2:CreateNetworkInterfacePermission
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+                Condition: {StringEquals: {ec2:AuthorizedService: codebuild.amazonaws.com}}
+  Access:
+    Type: AWS::EKS::AccessEntry
+    Properties:
+      ClusterName: isolab
+      PrincipalArn: !GetAtt Role.Arn
+      Type: STANDARD
+      KubernetesGroups: ['isolab:recovery', 'isolab:submitters']
+  Project:
+    Type: AWS::CodeBuild::Project
+    DependsOn: [Access, Ingress]
+    Properties:
+      Name: isolab-recovery-controller
+      Description: Reconcile trusted resumable computation, then one fresh ordinary L2 epoch
+      ServiceRole: !GetAtt Role.Arn
+      ConcurrentBuildLimit: 1
+      TimeoutInMinutes: 1500
+      QueuedTimeoutInMinutes: 10
+      AutoRetryLimit: 2
+      Artifacts: {Type: NO_ARTIFACTS}
+      Source:
+        Type: S3
+        Location: !Sub isolab-results-${AWS::AccountId}-${AWS::Region}/${LauncherKey}
+        BuildSpec: resume/buildspec.yml
+      SourceVersion: !Ref LauncherVersion
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        PrivilegedMode: false
+        EnvironmentVariables:
+          - {Name: ISOLAB_RECOVERY_REQUEST_KEY, Value: ''}
+      VpcConfig:
+        VpcId: !Ref VpcId
+        Subnets: !Ref PrivateSubnets
+        SecurityGroupIds: [!Ref SecurityGroup]
+      LogsConfig:
+        CloudWatchLogs: {Status: ENABLED, GroupName: !Ref Logs}
+  TriggerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: isolab-recovery-trigger
+      Roles: [!Ref TriggerRoleName]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: [codebuild:StartBuild, codebuild:BatchGetBuilds, codebuild:StopBuild]
+            Resource:
+              - !GetAtt Project.Arn
+              - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:build/isolab-recovery-controller:*
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource: !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/inputs/recovery-requests/*
+          - Effect: Allow
+            Action: [s3:GetObject, s3:GetObjectVersion]
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/inputs/recovery-runtime/*
+              - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/recovery/runs/*/state.json
+              - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/recovery/runs/*/benchmark-result.json
+              - !Sub arn:${AWS::Partition}:s3:::isolab-results-${AWS::AccountId}-${AWS::Region}/recovery/runs/*/computation-result.json
+Outputs:
+  ProjectName: {Value: !Ref Project}
+  ControllerRoleArn: {Value: !GetAtt Role.Arn}

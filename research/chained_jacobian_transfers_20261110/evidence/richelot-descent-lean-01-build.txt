@@ -1,0 +1,54 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/RichelotDescent.lean:20:30: error: `grind` failed
+case grind
+A : Type
+inst : IntModule A
+a : A
+n u v : Int
+hb : u * 2 + v * n = 1
+hn : n • a = 0
+hne : a ≠ 0
+hneg : -a = a
+h2 : 2 • a = 0
+h : ¬u • 0 + v • 0 = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 2 * u + v * n + -1 = 0
+    [prop] n • a = 0
+    [prop] ¬a = 0
+    [prop] -a = a
+    [prop] 2 • a = 0
+    [prop] ¬u • 0 + v • 0 = 0
+  [eqc] False propositions
+    [prop] a = 0
+    [prop] u • 0 + v • 0 = 0
+  [eqc] Equivalence classes
+    [eqc] {a, -a}
+    [eqc] {0, n • a, 2 • a}
+    [eqc] {0, 2 * u + v * n + -1}
+  [cutsat] Assignment satisfying linear constraints
+    [assign] n := 0
+    [assign] u := 0
+    [assign] v := 0
+  [linarith] Linarith assignment for `A`
+    [assign] a := 0
+  [ring] Ring `Int`
+    [basis] Basis
+      [_] v * n + 2 * u + -1 = 0
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        n • a
+  [issue] `grind linarith` term with unexpected instance
+        n • a
+  [issue] `grind linarith` term with unexpected instance
+        u • 0
+  [issue] `grind linarith` term with unexpected instance
+        v • 0
+'RichelotDescent.not_neg_fixed_of_bezout' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'RichelotDescent.sign_ambiguity_removed_by_odd_witness' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'RichelotDescent.quarter_order109' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RichelotDescent.quarter_order113' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

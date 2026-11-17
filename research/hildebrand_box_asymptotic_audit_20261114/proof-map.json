@@ -1,0 +1,41 @@
+{
+  "main": "HildebrandBoxAsymptoticAudit.corrected_box_asymptotic_certificate",
+  "binding": "ac4b0f9ca0aed6dcff2ab1d2c9f94db4b35439e81fd4401d449e0a85e544ce54",
+  "custom_imports": {
+    "BoxAsymptotic": "research/hildebrand_box_asymptotic_audit_20261114/lean/BoxAsymptotic.lean",
+    "BoxAsymptoticCertificate": "research/hildebrand_box_asymptotic_audit_20261114/lean/BoxAsymptoticCertificate.lean",
+    "CellProbability": "research/hildebrand_cell_audit_20261114/lean/CellProbability.lean",
+    "CenteredCell": "research/hildebrand_cell_audit_20261114/lean/CenteredCell.lean",
+    "DenominatorLimits": "research/hildebrand_box_asymptotic_audit_20261114/lean/DenominatorLimits.lean",
+    "FairKernel": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+    "GeneralSupports": "research/injective_box_audit_20261114/lean/GeneralSupports.lean",
+    "InjectiveSampling": "research/injective_box_audit_20261114/lean/InjectiveSampling.lean",
+    "IntegerCounts": "research/injective_box_audit_20261114/lean/IntegerCounts.lean",
+    "PrimeFieldBoxes": "research/injective_box_audit_20261114/lean/PrimeFieldBoxes.lean",
+    "SourceWidths": "research/hildebrand_box_asymptotic_audit_20261114/lean/SourceWidths.lean",
+    "UniformChoices": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+    "UniformEvents": "research/injective_box_audit_20261114/lean/UniformEvents.lean",
+    "WeightedKernel": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean"
+  },
+  "modules": [
+    {
+      "file": "DenominatorLimits.lean",
+      "role": "Derive actual descending-factorial cast/product identity, normalization and limit1."
+    },
+    {
+      "file": "SourceWidths.lean",
+      "role": "Literal source real-power width positivity, growth for d>=2, exact dth power and fixed k2 width/no-growth negative control."
+    },
+    {
+      "file": "BoxAsymptotic.lean",
+      "role": "Derive correction limit1, exact finite-ratio identity and source-bound threshold uniform in all integer cell shifts, nonzero indices and first points. Literal endpoints/decimal1.1 retained."
+    },
+    {
+      "file": "BoxAsymptoticCertificate.lean",
+      "role": "Closed binding of actual probability source, derived asymptotics, corrected counting lemma and preceding actual known k2/no-eventual-bound counter."
+    }
+  ],
+  "gate_declarations": 21,
+  "signed_standing": "not established",
+  "open": "Corrected counting lemma now proved; stronger expected random-support Theorem1 exponent and other fourteen-item gaps remain open. Qualified mixing theorems retained."
+}

@@ -1,0 +1,50 @@
+CARD SWB-RECOMPUTE-20  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark entries listed below (rows 19 and 64 are README rows; 1005, 1008, 1009 have no README row: use the directory README as the HEADLINE source). For these entries the evidence may sit in the benchmarks/<slug>/ directory itself and in the study directory named by the README link inside it; read both, and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-20.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 19 | 2026-10-17 | 20261017-gpu-nist-jac-seed
+MEASURED: `gpu/nist` rho walk-seeding / jump-table build (`EcCurve::double_scalar_mul`) switched from affine double-and-add to the inversion-free a=-3 Jacobian ladder (`n_double`/`n_madd`) with one final `to_affine`; `jmadd` dispatches the equal/inverse cases so the result is bit-identical when Q is a multiple of G (the walk's case, ~2% of seeds)
+HEADLINE: P-256 seeding 0.66 vs 11.53 ms/seed, 17.4x; field inversions per seed ~750 -> 1 (P-384 ~1150 -> 1, test-verified, not timed); 0 mismatches vs the affine ladder over 3000 random dependent seeds; setup-only (reseeds are rare vs walk steps)
+HOST (as reported): op-count reduction, wall-clock corroboration; 4 vCPU cloud VM, L0, no isolation/PMU
+STUDY DIRS: benchmarks/20261017-gpu-nist-jac-seed/REPORT.md; benchmarks/20261017-gpu-nist-jac-seed; benchmarks/20261017-gpu-nist-jac-seed/seeding.svg
+RAW CANDIDATES (largest first): benchmarks/20261017-gpu-nist-jac-seed/data.csv
+
+--- ROW 64 | 2026-10-15 | 20261015-ic-improve2-05-linear-harvest
+MEASURED: Koblitz IC Gröbner oracle (InheritedF4): harvest the root basis's multi-variable linear rows (discarded by `decisive_rows`) into linear elimination, gated on gens/var < 0.9607 (trained, frozen); paired against the incumbent on 9 pipeline cells, 96 held-out targets, A/A; end-to-end m=2 at (19,10), (23,12); now default on (`KIC_LINEAR_HARVEST=0` opts out)
+HEADLINE: ADVANCES where it fires: I/G 1.075 [1.023, 1.125] (19,7) m3, 1.073 [1.028, 1.119] (17,9) m2, 1.166 [1.092, 1.246] (23,12) m2; MATCHES elsewhere (identical counters); no cell regresses; every-node harvest 0.30–0.83× (regresses); 0/96 root-set failures; opt-out matches committed incumbent counters 60/60; e2e 12/12 logs verified, reductions −15%/−25%, CPU 1.065×/0.992×; unit tests 248/248 pass
+HOST (as reported): 4 vCPU shared, single thread, thread CPU, load 5–12
+STUDY DIRS: research/ic_improve_20261015/05-linear-harvest/README.md; research/ic_improve_20261015/05-linear-harvest; benchmarks/20261015-ic-improve2-05-linear-harvest
+RAW CANDIDATES (largest first): research/ic_improve_20261015/05-linear-harvest/runs/identity.jsonl, research/ic_improve_20261015/05-linear-harvest/runs/identity_optin.jsonl, research/ic_improve_20261015/05-linear-harvest/runs/test_a.jsonl, research/ic_improve_20261015/05-linear-harvest/runs/test_b.jsonl, research/ic_improve_20261015/05-linear-harvest/runs/unit_tests_default.log, research/ic_improve_20261015/05-linear-harvest/runs/unit_tests_optout.log
+
+--- ROW 1005 | 2026-10-12 | 20261012-f4-fp-vs-msolve
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: benchmarks/20261012-f4-fp-vs-msolve
+RAW CANDIDATES (largest first): 
+
+--- ROW 1008 | 2026-10-12 | 20261012-f4-f5-fused-readback
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: benchmarks/20261012-f4-f5-fused-readback
+RAW CANDIDATES (largest first): 
+
+--- ROW 1009 | 2026-10-12 | 20261012-f4-f5-dense-packing
+MEASURED: 
+HEADLINE: 
+HOST (as reported): 
+STUDY DIRS: benchmarks/20261012-f4-f5-dense-packing
+RAW CANDIDATES (largest first): 

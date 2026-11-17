@@ -1,0 +1,39 @@
+{
+  "schema": "crypto.isogeny-walk-exists-s3-acceptance/v1",
+  "date_utc": "2026-10-23",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-exists-prime271/20261023T024345Z-100e0afa",
+  "run_id": "custom-e193cd27a390fe52",
+  "checks": {
+    "before_publish": {
+      "bytes": null,
+      "exists": false,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-exists-prime271/20261023T024345Z-100e0afa/runs/custom-e193cd27a390fe52/complete.json",
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": null
+    },
+    "after_publish": {
+      "bytes": 1815,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-exists-prime271/20261023T024345Z-100e0afa/runs/custom-e193cd27a390fe52/complete.json",
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "526df8c747566adf2057ca3a90d86fbe373ed016cc1cd2c2e74729e4b81b0db6"
+    },
+    "published_objects": 4,
+    "deleted_objects": 4,
+    "after_cleanup": {
+      "bytes": null,
+      "exists": false,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-exists-prime271/20261023T024345Z-100e0afa/runs/custom-e193cd27a390fe52/complete.json",
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": null
+    },
+    "prefix_empty": true
+  },
+  "source_revision": "f7d31be30730348c8e4d9aade9113282b8a27eed",
+  "binary_sha256": "63087e0f28241f10b8bb875a9a086cd18b2fcec75bc81f5717baacf534d1b5c3",
+  "negative_checks": {
+    "unsafe_run_id_rejected": true,
+    "incomplete_shard_flags_rejected": true
+  },
+  "limit": "Checks existence of a completed marker for one public prime-field walk in one S3 account and region. It does not inspect object payloads; use fetch to check stored and decoded hashes."
+}

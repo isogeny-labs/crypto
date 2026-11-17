@@ -1,0 +1,67 @@
+{
+  "schema": "volcano-publication-resume-readback/v1",
+  "checked_utc": "2026-10-19T01:43:59.491840+00:00",
+  "pid": 196273,
+  "process_readback": "196273       1  196273 Ss   /workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver run /workspace/volcano_ic_repaired_survey_20261017 24823 153002 6442450944",
+  "native_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 2659
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 7411
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 2640
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 3920
+      },
+      {
+        "graph": "three",
+        "state": "running",
+        "vertices": 1
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 2646
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 5546
+      }
+    ]
+  },
+  "worker": {
+    "max_bytes": 6442450944,
+    "max_jobs": 24823,
+    "max_seconds": 153002,
+    "pid": 196273,
+    "started_ms": "1792374216472"
+  },
+  "audited_before_this_launch": 7943,
+  "audited_after_readback": 7945,
+  "new_audited_progress": true,
+  "actual_native_guard_end_ms": "1792527218472",
+  "original_deadline_ms": "1792527222570",
+  "actual_guard_admission_margin_ms": 4098,
+  "log_tail": [
+    "1792374217172 RUN mixed-v2655 attempt 1",
+    "1792374219678 audited mixed-v2655: {\"exhausted\":2,\"verified\":14}",
+    "1792374219898 RUN two-v2644 attempt 1",
+    "1792374222835 audited two-v2644: {\"exhausted\":4,\"verified\":12}",
+    "1792374223067 RUN three-v2640 attempt 1"
+  ],
+  "scope": "Actual PPID1/ownSID/non-zombie plus NEW audited progress after corrected launch; mathematical budgets unchanged. No host-survival guarantee."
+}

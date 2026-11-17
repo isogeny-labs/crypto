@@ -1,0 +1,39 @@
+{
+  "schema": "pencil-continuation-operational-source-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "status": "guard_margin_revision_required",
+  "scope": "Read-only current approved controller source and new draft request; no cloud action or launch",
+  "request_sha256": "b0c0fb5b059aca391cfd2e84e983de2e44ab7e4b8ae4ee383d74cbd0b2d46b31",
+  "client_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+  "sources": [
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs",
+      "sha256": "ec633a6af0e9475731f0b7f9757828bfdd6b6baab6918ec6d082803a6cd0ec91"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs",
+      "sha256": "7cae58e46359ff72955ee52ac3e87c82987c68f20ffdf8778492e0e0a606f939"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/io.rs",
+      "sha256": "115b5c03eaa4035e33cfe7c44b6d8117afdedca6cf0291741b05e0874d01a08f"
+    }
+  ],
+  "observations": [
+    "Current2G-C0+180=D arithmetic is exact; arithmetic alone does not establish its latency assumptions.",
+    "Computation supervisor checks G; blocking native verification/CRIU rely on Pod deadline fallback.",
+    "Fresh run-ecbench receives spec/source/binary only, not absoluteG; it has no start-after-G refusal.",
+    "cloud.rs benchmark670ff may invoke four sequential kube calls after the deadline check: save manifest,get job,save create_attempted,create job. Each kube wrapper timeout180s plus kill-after5s. Cached manifest uses three calls.",
+    "Fresh manifest remaining=G-now-120, Job termination grace60. Existing reserve180 did not explicitly account for cumulative call latency.",
+    "Computation success is reaped before replay; verified replay precedes fresh epoch. Old supervisor can retain allocation but is scientifically idle. Restore requires terminated previous instance.",
+    "Cross-run serialization still requires operational reconciliation and actual old-payload termination before admitting next request."
+  ],
+  "correction_to_intermediate_message": "External kube calls are bounded by their wrapper; initial unbounded description was corrected. Stored::save uses ConfigMap replace, not S3.",
+  "minimal_options": [
+    "Re-derive an earlier internal guard with a conservative allowance covering four185-second kube operations and60-second termination grace, plus explicit local/control-plane assumptions; no budget extension.",
+    "Independently reviewed submitter-authorized ordinary Job termination fence, retaining recovery restrictions; no IAM expansion inferred."
+  ],
+  "no_hard_realtime_claim": true,
+  "scientific_admission": false,
+  "launch_authorized": false
+}

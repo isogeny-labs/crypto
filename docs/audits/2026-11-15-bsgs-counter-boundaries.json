@@ -1,0 +1,50 @@
+{
+  "schema": "semantic-audit/software-controls/v1",
+  "base_commit": "bb70178877d9ad51c1433309b5ebb3e33b0f33df",
+  "source": "src/cryptanalysis/bsgs_fast.rs",
+  "before_sha256": "ce94b0afb8e57918cd0b298b59c8ba13faeb29a9fd560ce3246c5db724f74876",
+  "after_sha256": "ebe890abcbdcfb2e719eff99e046847f4f1efb0864f627ba2ad2a073a5f4a7bb",
+  "changes": [
+    "Use integer square root for planner and cost report, sharing one helper.",
+    "Preserve ordinary cost-sum rounding; normalize an overflowing unsigned counter sum in floating point."
+  ],
+  "original_controls": {
+    "maximum_width_sqrt": "exact extracted old helper exceeded 1-second limit; owned child terminated",
+    "loop_obstruction": "At u64::MAX every saturating product is <= input, so the upward adjustment condition stays true.",
+    "counter_sum": "Three u64::MAX counters wrap in release before conversion to f64; debug addition can panic."
+  },
+  "validation": {
+    "exact_source_extraction": "3 tests pass, including 20000 deterministic root inequalities using u128 squares",
+    "first_library_replay": "19 pass; before final cost-sum control",
+    "final_library_replay": "20 focused BSGS tests pass; 6529 other tests filtered; release profile",
+    "after_main_merge": "20 BSGS tests pass in release; 6540 unrelated tests filtered"
+  },
+  "setup_failures_retained": [
+    "Initial full-module compile omitted tracked research/chained_transfer_next_20261115/select_only.tsv in sparse checkout; materialized exact committed input.",
+    "Selected Rust 1.99.1 installation has no rustfmt binary; existing Homebrew rustfmt used on the one changed source file."
+  ],
+  "limits": [
+    "Planner controls allocate no baby table at maximum width.",
+    "No benchmark or end-to-end cost measurement.",
+    "Frozen experiment source and outputs unchanged."
+  ],
+  "benchmark_owner_sync": {
+    "owner_pr": "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3312",
+    "owner_merge": "76923ef45a6e734f7cda337dde387981940d2c5d",
+    "source_sha256": {
+      "tools/benchrec.py": "2613e5195187d579602c2fdbfff761af00e29e0a359b1f826e8b4cd4029e1ed7",
+      "tools/test_benchrec.py": "69b20a96b94639a4f2996fca2f22a785776aabace3c5c2ad3b255e1c5298e378"
+    },
+    "lock_changes": "only these two matching entries",
+    "report_outputs": "JSON, Markdown, SVG and PDF byte-identical before/after on current records",
+    "validation": "58 utility tests pass; parity 21 files; all 215 benchmark records pass after committed sparse inputs restored; main keyring aligned and 1179-entry ledger chain passes"
+  },
+  "reconciled_compile_fix": {
+    "path": "src/cryptanalysis/koblitz_index_calculus.rs",
+    "baseline_sha256": "fac83c5858f901abf32913e61db6c9d0e33c07384f97c4b789e041580e6dcb7b",
+    "after_sha256": "6f0d8af209a59b790cd0c371ae37e60b89a2c123471daffcf9fafe8624b3d952",
+    "original_failure": "E0308: cached packed lift returned Vec despite fixed array/count signature; both empty and successful branches retained old representation.",
+    "fix": "Return the packed empty tuple or two packed roots, preserving order.",
+    "validation": "New 0/1/2-count control and existing ordered-root comparison both pass; release library compiles with the complete change"
+  }
+}

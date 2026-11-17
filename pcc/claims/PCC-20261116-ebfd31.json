@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T01:46:43Z",
+ "id": "PCC-20261116-ebfd31",
+ "kind": "statement",
+ "producer": {
+  "commit": "187fc0ed13224cb29f704929bf4e08471f0be01e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/scaling-audit-control-v1/pre-call.json",
+    "sha256": "e3171602a7241601b21ec07a973c6aa48d89979c712571bc3c75a13122089f8d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/scaling-audit-control-v1/scaling-audit.json",
+    "sha256": "b7833908bb64ff89ab2830ef41e266a82c16522a9d8f46f759924dbde6e5adde"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/scaling-audit-control-v1/native-tests.log",
+    "sha256": "247f83eba85b245b64ae6ce2e05b920156e7c0b6658fafb3eb7cf0c929e4dea1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/scaling-audit-control-v1/source-v3-post-call.tar.gz",
+    "sha256": "4492bc1f31990ea1b89a31fca7f5d2f11682f4a603da49471ae5e70c2aabdff6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-scaling-arithmetic",
+ "statement": "The frozen Rust arithmetic-only audit evaluates the conditional saturated-yield exponent model at four registered numeric examples: (m,gamma,beta,exponent)=(4,1/2,2/9,4/9),(5,3/2,1/5,1/2),(6,3/2,1/6,5/12),(8,5/2,1/8,7/16). It checks the actual scalar-order floor sixth root is4398046511104, the current transport class lower bound is6482566348945103 and its fifth/sixth powers exceed that order. Two native controls pass, including an independent rational-grid comparison. The source archive is explicitly post-call; the immutable executable hash was captured before computation. No sampling, solver, timing experiment, admissible new base, actual decomposition-cost bound or attack exponent is established."
+}

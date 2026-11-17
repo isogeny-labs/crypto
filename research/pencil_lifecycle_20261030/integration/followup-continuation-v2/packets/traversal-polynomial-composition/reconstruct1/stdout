@@ -1,0 +1,80 @@
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:8:18: warning: This simp argument is unused:
+  coeff_C_mul_X_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [sourcePoly]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:11:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:22:5: warning: declaration uses `sorry`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:13:8: warning: declaration uses `sorry`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:15:2: warning: Variable name `hp` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hp
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:15:19: warning: Variable name `hb` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hb
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:15:39: warning: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:16:2: warning: Variable name `ha` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _ha
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:16:25: warning: Variable name `hbeta` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hbeta
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:16:51: warning: Variable name `hs` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hs
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:16:74: warning: Variable name `hs0` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hs0
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:23:1: warning: Unused tactic linter: `by_cases hi : i < n` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:24:1: warning: Unused tactic linter: `·
+  rw [if_pos hi]
+  simpa only [extend, dif_pos hi, decode] using
+    word_transform_coefficient hn p c a b s hp hb hc ha hbeta hs hs0 ⟨i, hi⟩` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:27:1: warning: Unused tactic linter: `·
+  rw [if_neg hi]
+  rw [←
+    eventPoly_composition (extend p c) (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (s.toNat : ZMod p.toNat) n hn]
+  exact (eventPoly_high _ _ _ _ n i (by omega)).symm` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:23:1: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:24:1: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Reconstruct.lean:27:1: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`

@@ -1,0 +1,58 @@
+{
+  "schema": "crypto.transfer-assessment/v3",
+  "case_id": "n83-image-closed-degree-two-fiber",
+  "status": "rejected_by_structural_and_cost_gates",
+  "source": {
+    "object": "E/GF(2^83)",
+    "curve": "y^2+xy=x^3+1",
+    "target_prime": "2417851639230796216685689"
+  },
+  "destination": {
+    "object": "J(C)",
+    "curve": "v^2+u^2v=u^7+u",
+    "dimension": 3
+  },
+  "transformation": {
+    "map": "phi(u,v)=(u^3,uv+1)",
+    "degree": 3,
+    "candidate": "degree-one plus degree-two closed components in rational fibers",
+    "pushforward": "per-component residue-field norm followed by elliptic projection"
+  },
+  "certificates": [
+    "odd-degree generic fiber support factors as degrees [1,2]",
+    "even-degree positive control factors as degrees [1,1,1]",
+    "each closed component pushes to its residue degree times P",
+    "the component images sum to the general pushforward and [3]P",
+    "the ramified reduced support remains distinct from its multiplicity-three fiber metadata",
+    "the pinned degree-two image is the nonzero label [2]P"
+  ],
+  "projected_relation": {
+    "identity": "[3]P=P+[2]P",
+    "new_information": false,
+    "useful_relation_probability": 0,
+    "independent_rank_per_identity": 0,
+    "reason": "source labels a and 2a are already known, while the same identity on an unknown target reveals no logarithm"
+  },
+  "complete_cost": {
+    "actual_order": "2417851639230796216685689",
+    "source_rho_exponent": "0.5*log2(r)",
+    "ordinary_ambient_genus3_collection_exponent": "(4/3)*83",
+    "ordinary_ambient_gap_bits": "approximately 70.17",
+    "fixed_bounded_degree_branch": "Omega(r) relation evaluations before linear algebra",
+    "finite_crossover_against_strong_source_rho": false,
+    "collector_admitted": false,
+    "eks_timing_admitted": false,
+    "speedup_claim": false
+  },
+  "controls": [
+    "n=2 split fiber",
+    "n=9,13,19,23,83 odd-degree fibers",
+    "n=83 exceptional ramified point",
+    "pinned order-r generator",
+    "general arbitrary-class Jacobian norm"
+  ],
+  "open_obligations": [
+    "a compact growing-degree or adaptive target-local router remains unclassified",
+    "any future router must name relation search, projected rank, matrix, memory, blind individual-log descent, verification, and a finite crossover"
+  ]
+}

@@ -1,0 +1,23 @@
+import WordGuard22
+set_option autoImplicit false
+open PencilWordRefinement
+instance (p : UInt64) (a : WeightedWord) : Decidable (a.canonical p) := by
+ unfold WeightedWord.canonical
+ infer_instance
+instance : Fact (Nat.Prime (5:UInt64).toNat) := ⟨by decide⟩
+instance : Fact (Nat.Prime (7:UInt64).toNat) := ⟨by decide⟩
+def nonunit : WeightedWord := ⟨4,0,1,4,2,3⟩
+def lower : WeightedWord := ⟨1,0,1,1,1,1⟩
+def zeroOrd : WeightedWord := ⟨4,0,0,0,2,3⟩
+def zeroWeight : WeightedWord := ⟨1,0,1,1,0,1⟩
+def bad : WeightedWord := ⟨8,0,1,1,1,1⟩
+example : nonunit.canonical 7 ∧ crossPreludeWord 7 nonunit nonunit=some .sameUDouble ∧
+ guardBWord 7 nonunit=0 := by decide
+example : nonunit.s≠0 := word_double_b_zero_forces_point_arm 7
+ (by decide) (by decide) nonunit nonunit (by decide) (by decide) (by decide) (by decide)
+example : lower.s≠0 := word_double_b_zero_forces_point_arm 5
+ (by decide) (by decide) lower lower (by decide) (by decide) (by decide) (by decide)
+example : crossPreludeWord 7 zeroOrd zeroOrd=some .sameUInverse ∧ guardBWord 7 zeroOrd=0 ∧ zeroOrd.s=0 := by decide
+example : crossPreludeWord 7 zeroWeight zeroWeight=some .sameUInverse ∧ guardBWord 7 zeroWeight=0 := by decide
+example : ¬bad.canonical 7 := by decide
+example : ¬(5≤(2:UInt64).toNat) := by decide

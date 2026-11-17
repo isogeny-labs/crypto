@@ -1,0 +1,27 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-profile-strata v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_profile_strata_20261116)
+warning: function `choose` is never used
+   --> main.rs:122:4
+    |
+122 | fn choose(n: usize, k: usize) -> usize {
+    |    ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `new`, `bytes`, and `factor_base` are never used
+   --> ../../crates/hec-native-ic/src/table_factor.rs:33:12
+    |
+ 32 | impl Tables {
+    | ----------- associated items in this implementation
+ 33 |     pub fn new(p: u64) -> Self {
+    |            ^^^
+...
+114 |     pub fn bytes(&self) -> usize {
+    |            ^^^^^
+...
+129 |     pub fn factor_base(&self, curve: &hec_native_ic::jac::Curve) -> Vec<(u64, u64)> {
+    |            ^^^^^^^^^^^
+
+warning: `hec-profile-strata` (bin "profile-strata") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 2.03s

@@ -1,0 +1,137 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-native-phase-20261019-controls",
+  "card_path": "/home/ec2-user/scratch/n83-native-phase-20261019/cards/controls.json",
+  "card_sha256": "b36686494313c32076de3d85771ef55122a60e61d484f5815a49d14d8530bb3d",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+        "cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.696222353,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "traced-small-field-positive-controls",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.696222353,
+      "stderr_sha256": "3a2e7154d9c71d58577a348f5811321af0b6371b7088a2c27870203c42c1dc8e",
+      "stderr_tail": [
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.531207,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":360,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":33.854929999999996,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":6,\"target\":[\"40\",\"19\"]},\"elapsed_ms\":0.003529,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"domain_clauses\":612,\"representatives\":2},\"elapsed_ms\":0.068287,\"phase\":\"closure_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{},\"elapsed_ms\":0.102249,\"phase\":\"index_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0},\"elapsed_ms\":0.119919,\"phase\":\"encoding_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0,\"variables\":952},\"elapsed_ms\":0.435782,\"phase\":\"circuit_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"clauses\":2824,\"domain_clauses\":612,\"identity_mask\":0,\"variables\":1282},\"elapsed_ms\":0.660304,\"phase\":\"domain_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.694554,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":517,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":74.524214,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":6,\"target\":[\"40\",\"19\"]},\"elapsed_ms\":0.002558,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"domain_clauses\":612,\"representatives\":2},\"elapsed_ms\":0.059341,\"phase\":\"closure_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{},\"elapsed_ms\":0.092236,\"phase\":\"index_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0},\"elapsed_ms\":0.10671,\"phase\":\"encoding_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0,\"variables\":952},\"elapsed_ms\":0.363365,\"phase\":\"circuit_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"clauses\":2843,\"domain_clauses\":612,\"identity_mask\":0,\"variables\":1288},\"elapsed_ms\":0.5568059999999999,\"phase\":\"domain_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.586275,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":6227,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":514.017403,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":5,\"target\":null},\"elapsed_ms\":0.002222,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":5,\"target\":null},\"elapsed_ms\":0.000375,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}"
+      ],
+      "stdout_sha256": "adce0014b9e20344f7c44b4e034d9bb98152cda00bc69ab7e921ebf61ade278c",
+      "stdout_tail": [
+        "",
+        "running 1 test",
+        "test cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits ... ok",
+        "",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4514 filtered out; finished in 0.68s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/ec2-user/crypto-n83-resume/tools/n83-sweep-runner/target/release/n83-sweep-runner",
+        "check-positive-trace",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/controls-test.stderr"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.027217087,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "check-positive-trace",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.027217087,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "cc0e8e375a228c51abf19e01a279c24a3eff24f81ffd4a1d9ccc88088d4d2638",
+      "stdout_tail": [
+        "{\"sat_returns\":4,\"scope\":\"existing original-group assertion test; no natural yield claim\",\"segments\":6,\"status\":\"PASS_TRACED_SMALL_FIELD_POSITIVE_BRANCHES\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/ec2-user/crypto-n83-resume/tools/n83-sweep-runner/target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/specs/witness.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 180.783776832,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "n83-fixed-witness-control",
+      "index": 3,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness/config.json": "6542cee130ee0db859785b316b95b122eb4ea52c27fddab37b162196cac18264",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness/inspect-final.json": "c2aa1fcd826bb7f1df956fc6847e764a12e7ea99e11d5b915249b2fb929b5314",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness/inspect-live.json": "ecc8afcbd3d2216c9bdab7cad00da7719d58aab42c4713ebab1eb2386265ad66",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/exec/witness/outer.json": "90b0c483d2d160e624638ac40ac1d6918e41eb8a5ea2181108b8d84a548c8517"
+      },
+      "seconds": 180.783776832,
+      "stderr_sha256": "e3de7bf28f3999210eab32feeb6086bdecaebb9f1a8a24ad5f77c51d0312306e",
+      "stderr_tail": [
+        "Error: Error(\"EOF while parsing a value\", line: 1, column: 0)"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "fc7d1a63f75add58b9eb619cad93c730d5b047c0",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 3"
+}

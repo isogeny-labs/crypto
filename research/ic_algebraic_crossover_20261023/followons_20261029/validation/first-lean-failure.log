@@ -1,0 +1,16 @@
+research/ic_algebraic_crossover_20261023/followons_20261029/ThreeLeads.lean:34:17: error: unsolved goals
+case cons
+F : Type
+inst✝ : CommRing F
+p : F × F
+xs : List (F × F)
+ih : (∀ (p : F × F), p ∈ xs → p.snd = 0) → combination xs = 0
+hz : ∀ (p_1 : F × F), p_1 ∈ p :: xs → p_1.snd = 0
+hp : p.snd = 0
+ht : ∀ (q : F × F), q ∈ xs → q.snd = 0
+⊢ p.fst * 0 + 0 = 0
+'ICThreeLeads.quadratic_resultant_bezout' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ICThreeLeads.complementary_quotient_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ICThreeLeads.complementary_cofactor_4232' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ICThreeLeads.certified_combination_vanishes' depends on axioms: [sorryAx]
+'ICThreeLeads.replayed_consequence_vanishes' depends on axioms: [sorryAx]

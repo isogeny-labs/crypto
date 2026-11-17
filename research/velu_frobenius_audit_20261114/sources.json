@@ -1,0 +1,254 @@
+{
+  "schema": "velu-frobenius-source-plan/v1",
+  "created": "2026-11-14T22:11:18.758077+00:00",
+  "formal": {
+    "project": "research/velu_frobenius_audit_20261114/lean",
+    "theorem": "VeluFrobeniusAudit.velu_frobenius_certificate",
+    "statement": "theorem velu_frobenius_certificate : (Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ baseCurve.Δ ≠ 0) ∧ (∀ (G : Type) [AddCommGroup G] (F : G →+ G) (P : G), (∀ Q ∈ AddSubgroup.zmultiples P, F Q ∈ AddSubgroup.zmultiples P) ↔ ∃ k : ℤ, k • P = F P) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra (ZMod 5) K] [CharP K 5] (a : K) (ha : a ^ 2 = 2), (3 : ℕ) • (rationalPoint : (baseCurve.baseChange K).Point) = 0 ∧ (3 : ℕ) • antiPoint a ha = 0 ∧ pointFrobenius baseCurve (rationalPoint : (baseCurve.baseChange K).Point) = rationalPoint ∧ pointFrobenius baseCurve (antiPoint a ha) = -antiPoint a ha ∧ addOrderOf (mixedPoint a ha) = 3 ∧ pointFrobenius baseCurve (mixedPoint a ha) ∉ AddSubgroup.zmultiples (mixedPoint a ha)) ∧ (Fintype.card F25 = 25 ∧ Module.finrank (ZMod 5) F25 = 2 ∧ (baseCurve.baseChange F25).Δ ≠ 0 ∧ ∃ P : (baseCurve.baseChange F25).Point, addOrderOf P = 3 ∧ pointFrobenius baseCurve P ∉ AddSubgroup.zmultiples P ∧ (¬∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = P)) ∧ (¬∀ P : (baseCurve.baseChange F25).Point, baseCurve.Δ ≠ 0 → addOrderOf P = 3 → ∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (∃ B : (baseCurve.baseChange F25).Point, addOrderOf B = 3 ∧ pointFrobenius baseCurve B = -B ∧ (∀ Q ∈ AddSubgroup.zmultiples B, pointFrobenius baseCurve Q ∈ AddSubgroup.zmultiples B) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = B))",
+    "decl_sha256": "762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7",
+    "scope": "Actual elliptic Frobenius qualification in the square-rootVelu irrational-generator discussion, published2020section4.14/printed49. For actual nonsingular E/F5:y²=x³+1 and actual K=GaloisField5,2 with cardinality25/extensiondegree2, constructa²2, actual A=(0,1) fixedcoordinateFrobenius andB=(1,a) antifixed, both actual3torsion. Actual P=A+B has exactorder3, is nonrational overF5 and its actualq=5Frobenius image liesoutsideactualcyclicsubgroup, hence nointegerscalar λ exists. Directnegation of the literal arbitraryirrational-point scalar assertion retains actualnonsingularcurve/prime3/copimechar5/finitequadraticextension domains. Generic actualadditive-subgroupstability iff existenceofintegerscalar on generator proved, and actualirrationalB exactorder3/nonrational/stablecyclic/FrobB=−B positivecontrol shows nonrationalgenerator neednotfail. ActualMathlibPoint group/coordinatefieldmap/3divisionquartic and actualGaloisField roots supply everybridge; no matrix-onlymodel or torsion/Frob conclusion premise. The publishedparagraph may intend an implicitlyrationalcyclickernel fromisogenycontext; that strongercontext is retained, notrefuted. MainTheorem4.11 rational-generator operationcount remainsunrefuted/notfullyLeanverified; arbitraryrational-kernel inputencoding/cost notverified. No canonicalisogeny/kernelGaloisdescent/fullruntime/Crefinement or ambiguous minimalxdegree/eigenvalueorderclaim. FullarXivv1 22pageprose read, publishedselectedTheorem4.11/Algorithm2/4.14 printed47–49/PDF10–12 textread/11–12visual, notfullpublisher20page read. Known cyclicFrobqualification credited, no noveltyclaim/canonicalcorpuspromotion. Priorproof/artifact/claim bytes unchanged. Standardfoundations/defaults/no holes/customaxioms/nativeproofeval/limits/newglobalflags/waivers/newcryptoexperiment/spend/upload. Nativewrittenheader parsing/hash procedural, not kernel parser/hash/physicalhostrefinement.",
+    "sources": [
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/ActualCounterpoint.lean",
+        "bytes": 4868,
+        "sha256": "e09104c05a6920276af3bbe31b4baa93a3a4fcfaa53d32f6dcb9f68249e14f44"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/ConcreteCounterpoint.lean",
+        "bytes": 5045,
+        "sha256": "88460e5563edd221dd00452652c37f9092a1f89e869a5fe32479e6eb1d570261"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/CyclicStability.lean",
+        "bytes": 2935,
+        "sha256": "036c8c1c55ebc6da9bc8802f321e366dd9410ffff3f6a42aa793b91419668ad2"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/VeluFrobeniusCertificate.lean",
+        "bytes": 2777,
+        "sha256": "964b2100e258d05e37423b173bef3506d3d4e55e537e6d4a0fcfce3815746a8f"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/lakefile.toml",
+        "bytes": 419,
+        "sha256": "496c3fd5a4a40beb8c9fb17f97ca3814cd59643b6f8e05e9c4b7b0dd1e966353"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3917,
+        "sha256": "956356155b752d98281c31d4e0294e38ddd431c165aeabdc0d0faa2c74ea5f06"
+      },
+      {
+        "path": "research/velu_frobenius_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualCounterpoint",
+    "ConcreteCounterpoint",
+    "CyclicStability",
+    "DivisionQuartic",
+    "FrobeniusPointDescent",
+    "RationalCounterexample",
+    "S3Completion",
+    "S3Roots",
+    "StructuralAudit",
+    "TorsionBoundaries",
+    "TriplePoint",
+    "VeluFrobeniusCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 13396,
+      "sha256": "f628fdc9493e516a111ec1ea732187de8588dfe16320fd975aef60b2fc6b9c5c"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "61dfed102836aa9497e744b1f517fcd5da307968bb6e818520d398d21f87999a"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/attempts.json",
+      "bytes": 223,
+      "sha256": "b7ec7f796493414420c524ae696af8fdf3ed4076203abdf0c84fb47e47f977a6"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 2348,
+      "sha256": "5da4c4ac42e1db45719edf8c76fc80ebaae2d3e314b36580f658e3621fc8a9b3"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/gate.json",
+      "bytes": 1211,
+      "sha256": "a8a1688bff6efcbe3cef5d6c5f11aad9512478848c48281bcd6b2c796ca85e39"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/source-review.json",
+      "bytes": 8201,
+      "sha256": "f9629ef66d5dfd8129fe86ef0a2fa1175d0e855f99901a6df24b3c892378addc"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/evidence/binding-check.json",
+      "bytes": 6055,
+      "sha256": "5f5ec70d9da18c75bbebab04362c1f6a86489558377fe6eb75076bd791ecd532"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/proof-map.json",
+      "bytes": 4601,
+      "sha256": "23af702d2c789a9aaf25f5e931bc1b587be73e7cb51aaade4b09c208ecd6e0e5"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/render_report.py",
+      "bytes": 7383,
+      "sha256": "bf623ecbb72b41ea1a6601cd93a7610ce87573a6464ef6a8dab572eaf0d8cc16"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/export_binding_input.py",
+      "bytes": 1723,
+      "sha256": "76dc8400bd15bfb5d16855de342925bbeb515fdcfcbdece386a3d54c02e7303b"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/reports/layout.json",
+      "bytes": 273,
+      "sha256": "331f7402074773f9d0c033fa643fcad5a2e1268fb0d3fd43626dd865c4ddd296"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/reports/report.pdf",
+      "bytes": 47684,
+      "sha256": "abc1f184e0487242e73973fdaf34c74f21131a60e96da63eca4e9f4f1cd6f3c5"
+    },
+    {
+      "path": "research/velu_frobenius_audit_20261114/reports/velu-frobenius.svg",
+      "bytes": 1402,
+      "sha256": "1a0110533c798e9e447d9379256865f2f5999557315be004601090ecebcaf03f"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 38,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Mathlib_Point_geometry_and_coordinate_Frobenius_proved": true,
+    "actual_F25_card25_extensiondegree2_proved": true,
+    "actual_prime3_point_outside_own_cyclic_Frobenius_proved": true,
+    "actual_base_nonrationality_and_no_scalar_proved": true,
+    "generic_actual_cyclic_stability_scalar_criterion_proved": true,
+    "stable_irrational_positive_control_proved": true,
+    "literal_unqualified_irrational_extension_refuted": true,
+    "qualified_rational_kernel_complexity_refuted": false,
+    "main_rational_generator_operation_count_verified": false,
+    "rational_kernel_input_sufficiency_verified": false,
+    "eigenvalue_order_minimal_x_degree_claim": false,
+    "whole_isogeny_algorithm_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

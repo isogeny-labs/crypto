@@ -1,0 +1,401 @@
+{
+ "additional_runs": [
+  {
+   "command": "ecbench verify --dir <copy of P28/counted/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp28-tm295-85243301": {
+     "A": 144293711,
+     "B": 130437226,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 156632471,
+     "p_le_2pow32_minus_1": true,
+     "r": 156632767,
+     "r_G_is_identity": true,
+     "trace": -295
+    },
+    "icv1-fp28-tm8273-f1778659": {
+     "A": 41977065,
+     "B": 25665657,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 241737017,
+     "p_le_2pow32_minus_1": true,
+     "r": 241745291,
+     "r_G_is_identity": true,
+     "trace": -8273
+    }
+   },
+   "descriptive_only": false,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:20:37Z",
+   "identical": 1152,
+   "job": "ic-dgbf-rho-p28-20261029-r2",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "b999dc23201c2654e3b4ca77a7253347bef8077102117b55cb1e025ade4fd300",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P28-counted.replay-receipt.json",
+    "sha256": "7d6ce73146c73f354a77fb834136bb6c6e5b915a16e60c692e9e5233c5243adf"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": false,
+   "run": "P28-counted",
+   "session_id": "ECBS1h0f1a92f97030",
+   "session_status": "complete",
+   "started": "2026-10-30T01:20:00Z",
+   "warmup_records_not_replayable_by_binary": 192
+  }
+ ],
+ "binary": {
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:32144a29e437376b9bf8b902aef4ba6b9cc723a15f01d296fb7b09eb131b817b",
+  "path": "/dev/shm/pf-bundle/ecbench (local copy of the image binary)",
+  "sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+  "source_revision": "3271a25d02dcef6da148293fb8f9e2149ce59858"
+ },
+ "descriptive_note": "P28 wall replay is descriptive only: it never stands in for the missing in-pod audit (RULING-P28 (a), 'No post-hoc cure'), and P28 stays undecidable",
+ "descriptive_runs": [
+  {
+   "command": "ecbench verify --dir <copy of P28/wall/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp28-tm295-85243301": {
+     "A": 144293711,
+     "B": 130437226,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 156632471,
+     "p_le_2pow32_minus_1": true,
+     "r": 156632767,
+     "r_G_is_identity": true,
+     "trace": -295
+    },
+    "icv1-fp28-tm8273-f1778659": {
+     "A": 41977065,
+     "B": 25665657,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 241737017,
+     "p_le_2pow32_minus_1": true,
+     "r": 241745291,
+     "r_G_is_identity": true,
+     "trace": -8273
+    }
+   },
+   "descriptive_only": true,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:21:01Z",
+   "identical": 1152,
+   "job": "ic-dgbf-p28-20261029",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "437110b1568d3961d94b6dc46b816d1d643057bff825a81707eef0099368e019",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P28-wall.replay-receipt.json",
+    "sha256": "dd3fe87ee58adb5a5ad715af11d29383a0a5bfa129c2c29eae67bb99495c3291"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": false,
+   "run": "P28-wall",
+   "session_id": "ECBS1hda340cde9714",
+   "session_status": "complete",
+   "started": "2026-10-30T01:20:00Z",
+   "warmup_records_not_replayable_by_binary": 192
+  }
+ ],
+ "first_attempt": "an earlier attempt that added --replay-seq for each warm-up seq was refused for those seqs ('not replayable (a warm-up, ...)'); its P24-wall summary is in code/out/replay/attempt1-with-warmup-seqs/; the 1152 measured replays of that attempt were identical",
+ "independent": true,
+ "method": "every measured deterministic run re-executed by `ecbench verify --replay-all` on a byte-identical copy of the session directory (copy checked against SHA256SUMS before and after); warm-ups are refused by the binary's replay modes and are covered by the validator's own scalar check, which verifies [recovered]G = Q on every record (warm-ups included) with its own short-Weierstrass arithmetic, the curve bound by its ICV1 j-invariant, p + 1 - t = r and [r]G = O",
+ "pod_host": "c8a.2xlarge, AMD EPYC 9R45 (session/host.json)",
+ "replay_host": [
+  "Linux 6.18.44-fc-v185 x86_64 GNU/Linux",
+  "model name\t: Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "4",
+  "MemTotal:       16477352 kB"
+ ],
+ "runs": [
+  {
+   "command": "ecbench verify --dir <copy of P32/wall/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp32-t89141-95879fe3": {
+     "A": 1862611062,
+     "B": 2023503821,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 3965125361,
+     "p_le_2pow32_minus_1": true,
+     "r": 3965036221,
+     "r_G_is_identity": true,
+     "trace": 89141
+    },
+    "icv1-fp32-tm68303-f902d2f0": {
+     "A": 1237827190,
+     "B": 199143157,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 3859428943,
+     "p_le_2pow32_minus_1": true,
+     "r": 3859497247,
+     "r_G_is_identity": true,
+     "trace": -68303
+    }
+   },
+   "descriptive_only": false,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:19:20Z",
+   "identical": 1152,
+   "job": "ic-dgbf-p32-20261029",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "02cb8847cc6493e84f934e5b144392a511f146b6768f875fbdd7e89d154877f2",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P32-wall.replay-receipt.json",
+    "sha256": "a0af6812b680771d3675bdf1b008c6f97e2cf35b568dd460472b6e78a6d842df"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": true,
+   "run": "P32-wall",
+   "session_id": "ECBS1h160d65b8abce",
+   "session_status": "complete",
+   "started": "2026-10-30T01:11:24Z",
+   "warmup_records_not_replayable_by_binary": 192
+  },
+  {
+   "command": "ecbench verify --dir <copy of P32/counted/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp32-t89141-95879fe3": {
+     "A": 1862611062,
+     "B": 2023503821,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 3965125361,
+     "p_le_2pow32_minus_1": true,
+     "r": 3965036221,
+     "r_G_is_identity": true,
+     "trace": 89141
+    },
+    "icv1-fp32-tm68303-f902d2f0": {
+     "A": 1237827190,
+     "B": 199143157,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 3859428943,
+     "p_le_2pow32_minus_1": true,
+     "r": 3859497247,
+     "r_G_is_identity": true,
+     "trace": -68303
+    }
+   },
+   "descriptive_only": false,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:15:34Z",
+   "identical": 1152,
+   "job": "ic-dgbf-rho-p32-20261029",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "dd64e1d28a8bb9db31a7bc5d8e18b3d8080f9adbae59fdcc609f7f6361b09416",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P32-counted.replay-receipt.json",
+    "sha256": "ffb4776d2510c79829b1374a02f8241571637c94be3b587d0a872a7bac52bce9"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": true,
+   "run": "P32-counted",
+   "session_id": "ECBS1ha649b5fc5bd2",
+   "session_status": "complete",
+   "started": "2026-10-30T01:11:24Z",
+   "warmup_records_not_replayable_by_binary": 192
+  },
+  {
+   "command": "ecbench verify --dir <copy of P24/wall/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp24-t217-e1fbffd2": {
+     "A": 4899382,
+     "B": 784252,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 12708767,
+     "p_le_2pow32_minus_1": true,
+     "r": 12708551,
+     "r_G_is_identity": true,
+     "trace": 217
+    },
+    "icv1-fp24-tm567-4accd0e8": {
+     "A": 9777597,
+     "B": 2514709,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 14940703,
+     "p_le_2pow32_minus_1": true,
+     "r": 14941271,
+     "r_G_is_identity": true,
+     "trace": -567
+    }
+   },
+   "descriptive_only": false,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:11:44Z",
+   "identical": 1152,
+   "job": "ic-dgbf-p24-20261029",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "90454b1d2f67ead04a5a7bb94c9214d4e7ffa55f000e337e3da0d2f0ff54dbf6",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P24-wall.replay-receipt.json",
+    "sha256": "8fb69da3a639718cb6fc49c11d97a07648f128c79c387c07e463144506afc580"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": true,
+   "run": "P24-wall",
+   "session_id": "ECBS1hfe8b9f2dbb0d",
+   "session_status": "complete",
+   "started": "2026-10-30T01:11:24Z",
+   "warmup_records_not_replayable_by_binary": 192
+  },
+  {
+   "command": "ecbench verify --dir <copy of P24/counted/eks-results/session> --replay-all --out <receipt>",
+   "curve_binding": {
+    "icv1-fp24-t217-e1fbffd2": {
+     "A": 4899382,
+     "B": 784252,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 12708767,
+     "p_le_2pow32_minus_1": true,
+     "r": 12708551,
+     "r_G_is_identity": true,
+     "trace": 217
+    },
+    "icv1-fp24-tm567-4accd0e8": {
+     "A": 9777597,
+     "B": 2514709,
+     "all_points_on_curve": true,
+     "hasse_r_eq_p_plus_1_minus_t": true,
+     "j_matches_icv1": true,
+     "p": 14940703,
+     "p_le_2pow32_minus_1": true,
+     "r": 14941271,
+     "r_G_is_identity": true,
+     "trace": -567
+    }
+   },
+   "descriptive_only": false,
+   "ecbench_sha256": "21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503",
+   "exit": 0,
+   "finished": "2026-10-30T01:11:40Z",
+   "identical": 1152,
+   "job": "ic-dgbf-rho-p24-20261029",
+   "ok": true,
+   "own_scalar_check": {
+    "matches_target_true": 1344,
+    "records": 1344,
+    "scalar_ok": 1344,
+    "status_verified": 1344,
+    "warmups": 192
+   },
+   "own_scalar_check_failures": 0,
+   "pod_env_class_id": "ECBENV3hc1c5e5126853",
+   "problems": 0,
+   "records_sha256": "87bebd5a443cc1fbb573996f81e1dff40f95ef14c1f452783ef0f10d2f284f0f",
+   "replay_candidates": 1152,
+   "replay_env_class_id": "ECBENV3h13e37662a118",
+   "replay_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "replay_receipt": {
+    "path": "code/out/replay/P24-counted.replay-receipt.json",
+    "sha256": "f7fda4df211ec43582811a47260d19fb245fcca2b12be6f641319df70e89d01e"
+   },
+   "replay_selection": "all",
+   "replays": 1152,
+   "required_by_handoff": true,
+   "run": "P24-counted",
+   "session_id": "ECBS1h88b693689020",
+   "session_status": "complete",
+   "started": "2026-10-30T01:11:24Z",
+   "warmup_records_not_replayable_by_binary": 192
+  }
+ ],
+ "scalars_verified": true,
+ "schema": "replay-certificate/v1 (docs/VALIDATION_GATE.md)",
+ "status": "verified",
+ "task_id": "TASK-20261029-654f73"
+}

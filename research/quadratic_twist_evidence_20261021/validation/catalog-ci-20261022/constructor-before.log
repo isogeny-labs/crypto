@@ -1,0 +1,24 @@
+   Compiling crypto v0.1.0 (/workspace/crypto-next)
+    Finished `release` profile [optimized] target(s) in 5m 28s
+     Running unittests src/bin/hyperelliptic_cover.rs (target/release/deps/hyperelliptic_cover-946262d25411d6ff)
+
+running 1 test
+test tests::every_current_catalog_model_reaches_the_standalone_constructor ... FAILED
+
+failures:
+
+---- tests::every_current_catalog_model_reaches_the_standalone_constructor stdout ----
+
+thread 'tests::every_current_catalog_model_reaches_the_standalone_constructor' (50894) panicked at src/bin/hyperelliptic_cover.rs:985:9:
+assertion `left == right` failed
+  left: 4493
+ right: 2572
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::every_current_catalog_model_reaches_the_standalone_constructor
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `--bin hyperelliptic-cover`

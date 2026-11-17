@@ -1,0 +1,85 @@
+{
+  "recorded_at": "2026-11-07T01:37:22.806527+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-torsion-validation/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests",
+        "tests::projected_split_windows",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "limits",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests",
+        "tests::limits_and_rejection",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "factors",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests",
+        "source::transport::factor_tests::omitted_direct_factors",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "closure",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests",
+        "source::transport::seed_tests::closure_and_mutation",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "subgroup",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-validation-20261107/tests",
+        "tests::subgroup_acceptance_matches_phase_and_affine",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 22,
+  "binary_sha256": "9970074fa55dcf517bd787434a675ed02b523f60fac9c441e6466237ad3603c4",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

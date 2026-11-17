@@ -1,0 +1,54 @@
+{
+  "schema": "f4-model-source-plan/v1",
+  "created": "2026-11-10T07:23:45.313163+00:00",
+  "status": "Preissue source plan. Individual Lean modules accepted; full gate running, native affected data not collected.",
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "F4ExpectedOutputsAudit.expected_output_audit_certificate",
+    "statement": "theorem expected_output_audit_certificate : (\u2200 (V A : Type*) [Field A] (D : \u2115) (F : Set (MvPolynomial V A)) (G : \u2115\u2192Set (MvPolynomial V A)),F4Run D F G \u2192 \u2200 t,G t\u2286Ideal.span F) \u2227 (\u00ac \u2200 (F : Set P) (h p : P), SaturationMember (Ideal.span F) h p \u2192 \u2203 (D t : \u2115) (G : \u2115\u2192Set P),F4Run D F G \u2227 p\u2208G t) \u2227 ordinaryRows=booleanGenerators (K",
+    "decl_sha256": "f868c7b674c87cbd060619ed651942ebc04006ef79ecb5155781bfca4877ac41",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/SubspaceCriterion.lean",
+        "bytes": 4756,
+        "sha256": "c43c2305db01cf4aa496bae58aea42a084a61f167a7cf4242de4277d0d2d2675"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4Containment.lean",
+        "bytes": 8482,
+        "sha256": "34353d9f95cc4a9e503a9c8dcaedcfb85ab9a3c510115821bb1325face972616"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4SaturationBoundary.lean",
+        "bytes": 5144,
+        "sha256": "e624147b691f93b0091cc4821662808945d759da06835dcedd79f2f0ff5f960b"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/F4ExpectedOutputs.lean",
+        "bytes": 2735,
+        "sha256": "0d9675fefed4287378df7394493af1416351d9169a06b62a525545c20f469ca3"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/SolvingDegreeBound.lean",
+        "bytes": 18489,
+        "sha256": "14956b5ef063b890d4397545e3cf2b8976a21b24db7687a8d7ad171dcc5ac48a"
+      }
+    ],
+    "scope": "Generic actual original F4Run ideal containment and direct negation of unrestricted saturation-member output claim; actual F101 registered Boolean ideal/output rows with explicit saturation witnesses, nonmembership and impossibility of ordinary F4Run containing saturated rows. No C execution/refinement/parser theorem."
+  },
+  "model_import_receipt": {
+    "path": "research/theorem_census_20261109/f4-model-imports.json",
+    "bytes": 1352,
+    "sha256": "a2b6dfcbd931fc37c1f687e6ed22900fa96018ffd88e3e580002f4d29097acb0"
+  },
+  "native_protocol": {
+    "path": "research/theorem_census_20261109/f4-saturation-v1/protocol.json",
+    "bytes": 14305,
+    "sha256": "abe3d754ec9efd9e425d8f181ddfdcee72a1bc5e6d71d2ea31b9cedfb4bdf191"
+  },
+  "literature": "Exact original04 F4Containment/SubspaceCriterion and byte-identical original08 dependency; msolve5e72b9d selection/symbolic preprocessing/f4/f4sat/CLI basis-output code; Mathlib Ideal.span/MvPolynomial/ZMod. KB/Conductor unavailable; bounded primary/repository/Mathlib fallback, no novelty claims.",
+  "native_status": "No affected calls before this source/protocol commit. Two fixed local known-answer calls authorized; no paid compute.",
+  "fresh_checker": "lean4checker unavailable; kernel builds plus whole transitive axiom gate required.",
+  "inherited_frozen_sources": "Unchanged; original imports exact, additive Lake roots.",
+  "elaboration": "No added elaboration/linter option, holes, custom axioms or native exceptions."
+}

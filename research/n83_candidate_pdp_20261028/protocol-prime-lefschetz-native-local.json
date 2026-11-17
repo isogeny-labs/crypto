@@ -1,0 +1,942 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-PRIME-LEFSCHETZ-20261030",
+  "version": 3,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "PRIME_LEFSCHETZ_ARGUMENT.md",
+    "controls": "LEFSCHETZ_CONTROLS.md",
+    "koszul_controls": "LEFSCHETZ_KOSZUL_CONTROLS.md"
+  },
+  "question": "Do the source-bound Lefschetz/regular-sequence certificates and explicit terminal witness give conditional exact highest-form FFD17 for all42 retained higher-m prime cases?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "theorem",
+      "text": "Conditional exact highest-form FFD17 follows from the external block SLP theorem,the written chain/Koszul argument,verified source identities and explicit upper witness;independent review/formalization pending.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No new LFD,solving degree,regularity,elite-base,security or speed claim. Arithmetic checks are not a formal proof.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "description": "original retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_source_audit",
+            "--bin",
+            "prime_lefschetz_native"
+          ]
+        ],
+        "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "description": "baseline retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_source_audit",
+            "--bin",
+            "prime_lefschetz_native"
+          ]
+        ],
+        "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "description": "spike40 retained prime m3-9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "prime_source_audit",
+            "--bin",
+            "prime_lefschetz_native"
+          ]
+        ],
+        "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Historical block/sector/Koszul controls retained. Native14tests including explicit8192term witness, structural dimensions, seven leading gates, binding and key checks passed before production; restored native test replay passed."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Native witness mutation, tied weights, wrong block/field, altered base/source/inverse and duplicate/missing key controls reject; all historical negatives retained. Signal-safe controller exit controls pass."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "dataset",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "Frozen native source auditor and native structural/witness certificate;sequential processes"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "All42 exact original input,source and base-manifest hashes"
+      },
+      {
+        "name": "dataset",
+        "treatment": "crossed",
+        "how": "Three arms,two target kinds,seven m;shared structural argument,not42 independent theorem proofs"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host;kernel/CPU recorded;exact binaries restored from S3;counted arithmetic only,no timingcomparison"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "Four120second phases,2GiB address space each,720second worker deadline,no retries"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Conditional exact17 only when all source,structural,witness and replay checks pass;failure invalidates affected result"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original",
+          "baseline",
+          "spike40"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All42source identities plus structural hypotheses,explicit upper witness and fresh replay;no statistical inference"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Historical input seed only;this certificate stage makes no new draws."
+    },
+    "instance_sampling": {
+      "rule": "Entire pre-existing42case panel;no sampling or target changes;original and paired planted targets differ.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 14,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "All42existing sources;shared deterministic structure. No statistical theorem inference from controls."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 720,
+      "measured_on": "Fixed resource cap,not a performance estimate"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "first_fall_degree",
+        "name": "first_fall_degree",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "17 conditional on the written proof and all source/witness/replay checks;otherwise no valid result",
+        "source": "results/summary.json first_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "first_fall_lower_bound",
+        "name": "first_fall_lower_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "17 from external SLP theorem plus written no-truncation/Koszul argument",
+        "source": "results/summary.json first_fall_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "first_fall_upper_bound",
+        "name": "first_fall_upper_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "17 from explicit source-bound nontrivial terminal witness",
+        "source": "results/summary.json first_fall_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "first_fall_degree",
+      "first_fall_lower_bound",
+      "first_fall_upper_bound"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "3Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 720,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All42cases; native audit, native certificate and fresh native replays; no omitted arm or target"
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Four120s phases,2GiB each,5s termination grace,720s worker,no retries;upload stagedinputs before compute and after every phase"
+    }
+  ],
+  "invalidation_rules": [
+    "Any source,field,weight,structural,witness or replay mismatch invalidates affected results",
+    "No inference from incomplete cases or failed phases",
+    "No empirical control establishes the universal proof by itself"
+  ],
+  "decision_rule": {
+    "text": "Record conditional exactFFD17 only after all native/source/structural/upper checks and fresh replay;independent scientific review and formalization pending.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "conditional_certificate",
+      "invalid",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/prime_lefschetz_native.rs",
+      "sha256": "f920bae5b5e8cf4d66e0f532719176435d61fccdd0e2f172d389b0f6d8d48325"
+    },
+    "inputs": [
+      "42unchanged input/source pairs",
+      "Native source audits",
+      "Source-matched prior upper summary",
+      "External SLP theorem and written argument"
+    ],
+    "outputs": [
+      "results/summary.json",
+      "results/structure.json",
+      "results/upper-witness.json",
+      "results/leading-mM.json",
+      "results/KEY.json",
+      "source-audit/summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-m source-matched lower/upper degree;all cases retained;proof boundary explicit"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "FFD is the highest-form nontrivial syzygy degree;LFD and regularity are distinct.",
+      "verified_by": "Definitions1.3–1.5 re-read before this design"
+    },
+    {
+      "ref": "https://arxiv.org/html/1604.06820",
+      "provenance": "retrieved",
+      "claim": "For characteristic greater than block socle degree,the coordinate sum is strong Lefschetz. The chain proof is study-specific.",
+      "verified_by": "Theorem2.7 and Section3 re-read;PRIME_LEFSCHETZ_ARGUMENT.md"
+    }
+  ],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-prime-m3-planted",
+        "arm": "original",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m3-planted",
+        "input_sha256": "a05b6f730ef96b3441edca028578f34dcba9fa91afc19ffa865aa8128dc2f82c",
+        "source_sha256": "27be4abb6ab8cef63b955e552a2d19d74032c4d15dfbd23f2915dfbfb0c08199",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m3-natural",
+        "arm": "original",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m3-natural",
+        "input_sha256": "33b2e31ed63e1b673272f9633bea30e2136ddd2528f58ac5e28bb9f7440f1f6b",
+        "source_sha256": "2f5f832a9c499a53b3120ecd37e2e1ea8bedbff9cddab71991f6cd970ad2b44e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m4-planted",
+        "arm": "original",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m4-planted",
+        "input_sha256": "8e3e4a1883c021c6f9e822595e95eaf8c59e246f01dd3db04d4c57046b1caf2b",
+        "source_sha256": "5500462b5949f7083e2eafdb8fb699107798600cefb7448beba031297e0abbe5",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m4-natural",
+        "arm": "original",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m4-natural",
+        "input_sha256": "c472d4468a3b09fadab51d5a6f632b749df24cfcd17dcdec1e19a8766d605b3a",
+        "source_sha256": "ec0367d23a91037fd0753bc35da44ebca812f6ddeda69fa1a891c4149f3157fe",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m5-planted",
+        "arm": "original",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m5-planted",
+        "input_sha256": "5b4fa54d80de9207a032ee24930c57e5271d98e87ae9dd41c53ba654fb320e76",
+        "source_sha256": "05de935a558cc3e36d4bf471d4763228839cb05297b38fea877c778769096274",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m5-natural",
+        "arm": "original",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m5-natural",
+        "input_sha256": "458098a7a0713f968e2bd425968833a61c98e7b528036eda3082e83421bbd346",
+        "source_sha256": "9c3097ce6e9a2b1276822a0301d4b9cc350c596a8c74d7479133ca5d9b912515",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m6-planted",
+        "arm": "original",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m6-planted",
+        "input_sha256": "3b4faef80d1b97a453fe88e29b75ba5b557724ae98522f5092b9db3c3fde6c20",
+        "source_sha256": "16ae1a490cac94d8d4536713ebd0a4c7ee5dca8703160ac1f2cfe378008aeb2a",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m6-natural",
+        "arm": "original",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m6-natural",
+        "input_sha256": "c5475b2fc46de01bb0b87295b0a67806b83a775c94ac75b9c5606b9c8a7bc9a4",
+        "source_sha256": "053953160626184642bf3371e4eb9f30ca719f29cc7f4c7b05c24f71df6b8ccc",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m7-planted",
+        "arm": "original",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m7-planted",
+        "input_sha256": "26aff5a053a2472c11cc6c86f81837df42842e92f6f5bca91ed86dbb5fa2ce0c",
+        "source_sha256": "dfd1c5e6773478bc4aa5ad6f5a791da6eb2d01a259689489d7d0826da3502dd5",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m7-natural",
+        "arm": "original",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m7-natural",
+        "input_sha256": "81d75b7979035f8527a22004a99ee9b2c8a673da8d097b2a8612e3ffb4da4aae",
+        "source_sha256": "e3a9c0185f144bfdf250e83f807c14926428aedcf8df2d14dbd568e72677de79",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m8-planted",
+        "arm": "original",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m8-planted",
+        "input_sha256": "f6aa5b143b79024593a8a888431c84a3bbcdd2c13a2148fd70fac464285d96e8",
+        "source_sha256": "c7a1c69bc6a0a08401e982d0d1ee2ceaf8c0a05c5dd8d90aef5958de57ef4175",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m8-natural",
+        "arm": "original",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m8-natural",
+        "input_sha256": "1dcd5c84aedc0d10cc8c70842af8b183f31ef6d2147daf829e3dab1d32649e69",
+        "source_sha256": "a3a9d628f1101a6eae9c61f01189d57ae87bb04ae5d6872415346b811bd2e043",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m9-planted",
+        "arm": "original",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m9-planted",
+        "input_sha256": "f511ae28b37f65a8ac0e62914b5e8a515eee5c13b648c071c4a0fbf53a321dd8",
+        "source_sha256": "5bdfda50136906cc01d253dfbd3c4f78f28c4b12b5525bded107caf26a423c39",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m9-natural",
+        "arm": "original",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m9-natural",
+        "input_sha256": "23b14a56ce0de393b66942088a1360a44fcfe325c9ea37da8b184e0eb4cf3d56",
+        "source_sha256": "58a9326de94939e0bbff8c20b1d2be59afbbbfb0cad26d1990582a7993611fff",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m3-planted",
+        "arm": "baseline",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m3-planted",
+        "input_sha256": "7d3bd9e64c9fe4a0ae1a625abf5469ecfbf6424796a25725caeac205e8a27898",
+        "source_sha256": "f40bd489ce13094d32580db240d45a94893fc7af699519613cdcd959ed8316ec",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m3-natural",
+        "arm": "baseline",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m3-natural",
+        "input_sha256": "1baf77204e5f15f8fb306c4b7b0cb5856ab6bf0b22ea56db7755d52332040772",
+        "source_sha256": "2f5f832a9c499a53b3120ecd37e2e1ea8bedbff9cddab71991f6cd970ad2b44e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m4-planted",
+        "arm": "baseline",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m4-planted",
+        "input_sha256": "e479bbfbd5f49ec47bb6a0e4b9877d6b87c80e92d5714fffeeb791d4335224c0",
+        "source_sha256": "8a1972dc6eb996b546cd5e4385515a63dbe5a03f382ea8bc28eb229363882a0e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m4-natural",
+        "arm": "baseline",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m4-natural",
+        "input_sha256": "88e52acbc38c9aa7384d13fce069eb8bfea861112bbaf58e92752abcbc9a2246",
+        "source_sha256": "ec0367d23a91037fd0753bc35da44ebca812f6ddeda69fa1a891c4149f3157fe",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m5-planted",
+        "arm": "baseline",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m5-planted",
+        "input_sha256": "a4275b5ae2076a6cca8a52a1bc5e2119e397c8af68d04844cd67981de0a36bb2",
+        "source_sha256": "9b38184b09d3f486cfbb3ccc8532280e268e1ae789a3ade5cc73f034243b616e",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m5-natural",
+        "arm": "baseline",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m5-natural",
+        "input_sha256": "bf61ae4fb04e35ff8090b9db5871c58483f25c7218283f240f3deda1857d6660",
+        "source_sha256": "9c3097ce6e9a2b1276822a0301d4b9cc350c596a8c74d7479133ca5d9b912515",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m6-planted",
+        "arm": "baseline",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m6-planted",
+        "input_sha256": "74b6ca75593a113fa16806bcc1dd31a016e0a4eb76211400bb5aaa1d49cfd638",
+        "source_sha256": "1876ca30660a959f45fe70fb3a6d53e3f7e2dc4f3d4266b008433970bc717a62",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m6-natural",
+        "arm": "baseline",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m6-natural",
+        "input_sha256": "309169920500270134ffcdf99e40040c89909e1e3106c080c1e188358d9a767b",
+        "source_sha256": "053953160626184642bf3371e4eb9f30ca719f29cc7f4c7b05c24f71df6b8ccc",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m7-planted",
+        "arm": "baseline",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m7-planted",
+        "input_sha256": "f8fb23d5ce5ef65900fcc268924a383bafe619f89ccbefe71ae640d94fe0a064",
+        "source_sha256": "295b9c8eaab2ab5e189a5c6b70724fce9acd86ce2ddc3c9a64613fcda64b3b7f",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m7-natural",
+        "arm": "baseline",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m7-natural",
+        "input_sha256": "3d6f5fb6c82bff2bec71a198c6fdd856f6f25152d8ca390e0b23198b756b1112",
+        "source_sha256": "e3a9c0185f144bfdf250e83f807c14926428aedcf8df2d14dbd568e72677de79",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m8-planted",
+        "arm": "baseline",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m8-planted",
+        "input_sha256": "6daf18ad43a623e280ce75d0ec959196b280859ade5eab37c0b5f98dc47491c4",
+        "source_sha256": "e9568bcb1ba820900aceb8af64c77371783046342544474730abd05dbb6a5fc8",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m8-natural",
+        "arm": "baseline",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m8-natural",
+        "input_sha256": "6a9c0efd7fe599929a0b78f9f9f33fb7de9c69f0040008bc296a1935d54a7432",
+        "source_sha256": "a3a9d628f1101a6eae9c61f01189d57ae87bb04ae5d6872415346b811bd2e043",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m9-planted",
+        "arm": "baseline",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m9-planted",
+        "input_sha256": "eebc3b060f0fc40c2cf2dc807d16627d4ad1dc94c961df3bc3c9568409cf6fc4",
+        "source_sha256": "09fef5bb51f9b6bba459b1846d2c9d74eb69addb3f789985a074cc8a0df48883",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m9-natural",
+        "arm": "baseline",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m9-natural",
+        "input_sha256": "cd9e5eb98d3b492cdbcac5dcb96098e97c2baf37035526428b10ca4f14a68619",
+        "source_sha256": "58a9326de94939e0bbff8c20b1d2be59afbbbfb0cad26d1990582a7993611fff",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "spike40-prime-m3-planted",
+        "arm": "spike40",
+        "id": "prime-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m3-planted",
+        "input_sha256": "ae03c4d9eadffc315a12bd3cba92a62cdd731470a0249af86b01d0b92baf7fbe",
+        "source_sha256": "7db6024d72b131f756251ec1fbc7c25fef13cb2648d08b887c564effa6283e2e",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m3-natural",
+        "arm": "spike40",
+        "id": "prime-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m3-natural",
+        "input_sha256": "0197b69534e43697725fa11576f621b894552d885e9d8239d2b1a56dfe7bbbf8",
+        "source_sha256": "e91d47366e7040501721a9afb3e7662dd3256e4fa43172eb995d0361a66461f5",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m4-planted",
+        "arm": "spike40",
+        "id": "prime-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m4-planted",
+        "input_sha256": "6a33d4dbe5adc351150d9275e0b48a47dde714478e1e578d4cd0c5ea1825c879",
+        "source_sha256": "1901eef02091d5828e86194b05acea42c9b2048f9e26ccd402e3621802077071",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m4-natural",
+        "arm": "spike40",
+        "id": "prime-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m4-natural",
+        "input_sha256": "4e0e02813a7008ff894cfc9ec93112dfc464895f98d2293aa7e060b6fa07ac46",
+        "source_sha256": "a7c833a350622ed52f5b963aabdea44932f081f396e7c425ee1fc84cb5691b46",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m5-planted",
+        "arm": "spike40",
+        "id": "prime-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m5-planted",
+        "input_sha256": "196e7e8ceaa096712e6dc67027e4676188fc564e00a3430fc6f72a63326f10ae",
+        "source_sha256": "d199fc1ac23a1c8d08dd60c4132ef8747b25a4b95879e874ca04468b642dd8b2",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m5-natural",
+        "arm": "spike40",
+        "id": "prime-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m5-natural",
+        "input_sha256": "4238cf1381718eb93673bdd85cd820770c2c2e3186ee752e5580c5a5d888eeb6",
+        "source_sha256": "1adcfe8535fa4ed84dd84f28147c23ce60e2a7b245bfe76a90e949eb4df94ef7",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m6-planted",
+        "arm": "spike40",
+        "id": "prime-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m6-planted",
+        "input_sha256": "8d2157ec8345be752ec0c6c2573655c9336cc33b2c803fd57901f513baa105a0",
+        "source_sha256": "a8f4d166420b03e48cee37404c739d88016060f3dec3a2b7a78545ff7275ecd6",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m6-natural",
+        "arm": "spike40",
+        "id": "prime-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m6-natural",
+        "input_sha256": "69db76db57439a251082f2a9fde7929f68814a40c17c869666bd4e05e9d799a1",
+        "source_sha256": "42c618ae0e1bbf2ea70d4638a775f148d090b3cfc495ff05b46969007bce612a",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m7-planted",
+        "arm": "spike40",
+        "id": "prime-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m7-planted",
+        "input_sha256": "b253f8ad424b1bdc9aa6b94b210f25cab92629403ab185f223fd3be69d786d37",
+        "source_sha256": "e6b98cf44b80db169851b8055bc98a7503267f1b9a749a5416acfdff7508203b",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m7-natural",
+        "arm": "spike40",
+        "id": "prime-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m7-natural",
+        "input_sha256": "9b27f5391a1c9ebe1e5ae5f00ae947802aae0dff1bac96d0732ad01161489dcc",
+        "source_sha256": "3eb92539f0c842f72b9cf911f00a4703ffd43216ef02bb222b97fddbf744e2a5",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m8-planted",
+        "arm": "spike40",
+        "id": "prime-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m8-planted",
+        "input_sha256": "b7ead54714ec5e6d3211d1e3e0cbf94bff677a58664c81e95319d86e3db3cea4",
+        "source_sha256": "6f49e7b207679a77c8eb7f280865053c6fdf49a48cca049006325232dfb62743",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m8-natural",
+        "arm": "spike40",
+        "id": "prime-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m8-natural",
+        "input_sha256": "4c7017b7864936d2899b07204f6652530510018fae9847c910d1f32754a97c3c",
+        "source_sha256": "53e9f1bb77763e14456a184932c1ffefafc65effd3e9666842d8172da772cfd0",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m9-planted",
+        "arm": "spike40",
+        "id": "prime-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m9-planted",
+        "input_sha256": "a339c93e6c18589436ed1d034f7a75f657adecbca8a45faec34f952f14ecdcdd",
+        "source_sha256": "8cc97fa93c25c696a0961d018e3cfe57b7a91528335df5ae5a8b5d31ff6f59f7",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m9-natural",
+        "arm": "spike40",
+        "id": "prime-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m9-natural",
+        "input_sha256": "5a70656034d0f5f0b0be21046a30fd2553b47bf863e9a8af073a80bc857c44e7",
+        "source_sha256": "8e3cc429c7a9cd49f58d6a651bd69de0d2ffee3878cbf629311d7bc5f869e036",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      }
+    ],
+    "file_layout": "NATIVE_LEFSCHETZ_FORMAT.json",
+    "source_files": [
+      {
+        "path": "Cargo.lock",
+        "sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5"
+      },
+      {
+        "path": "Cargo.toml",
+        "sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf"
+      },
+      {
+        "path": "NATIVE_LEFSCHETZ_FORMAT.json",
+        "sha256": "d9c6b52b4a6d03853a61881408d4d563d5808d75876437dada3283671f369fa7"
+      },
+      {
+        "path": "NATIVE_LEFSCHETZ_PLAN.md",
+        "sha256": "effae343aeea9b7ce6f29766b084556e38aac2570a12ed42b93fab3111db6065"
+      },
+      {
+        "path": "PRIME_LEFSCHETZ_ARGUMENT.md",
+        "sha256": "31a7eb352373149428e47afbe5c03b9243cf9375aaf06ca34c5fbcf9d6fefdab"
+      },
+      {
+        "path": "evidence/prime-terminal/summary.json",
+        "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+      },
+      {
+        "path": "lefschetz-journal.sh",
+        "sha256": "a2c244f4363e5204744bf44f1354e80490f44594b1db746227506c87b8321661"
+      },
+      {
+        "path": "run-prime-lefschetz-native.sh",
+        "sha256": "06a62d03fc0b9dc854f2a98f858ba554b7794faef5dfbb1e597324dbe2bab406"
+      },
+      {
+        "path": "src/bin/prime_lefschetz_native.rs",
+        "sha256": "f920bae5b5e8cf4d66e0f532719176435d61fccdd0e2f172d389b0f6d8d48325"
+      },
+      {
+        "path": "src/bin/prime_source_audit.rs",
+        "sha256": "143673e486769511947c63f9a810c149bb5826fbf89b927b566fa071de0cea15"
+      },
+      {
+        "path": "src/prime_first_fall_donor.rs",
+        "sha256": "f88e89504dfe6cdcff2691c4ad6bdd7fc2b046fdd776ed9f0757c0954848ae9d"
+      },
+      {
+        "path": "src/prime_linear_source_donor.rs",
+        "sha256": "ce6042fcecc4e3d997acaa48b9af1426622a08e0a76c875673ccf1923d6a7b2f"
+      },
+      {
+        "path": "src/prime_terminal_math.rs",
+        "sha256": "b1dc368a8b4fb07aeeb04cc1d4e7467fb916141f5c6b791ba9c95fdae70dc691"
+      },
+      {
+        "path": "test-lefschetz-journal.sh",
+        "sha256": "12546d8e00c2e0ccb6cba64c1f6a10b9448e418d56b843a4d2332106aecf23c0"
+      }
+    ],
+    "upper_summary_sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d",
+    "phase_timeout_seconds": 120,
+    "address_space_bytes": 2147483648,
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-prime-lefschetz-native-20261030-r3/raw/",
+    "backend_reason": "Explicit v3 amendment after terminal EKS r2 scheduling deadline. Existing host uses S3-restored exact native source and executables; no new input sampling or clock claim. Prior r2 remains failed, not retried under v2.",
+    "proof_boundary": "External SLP theorem,full written chain/Koszul proof and source-bound arithmetic;independent review/formalization pending",
+    "certificate_binary_sha256": "e7b68afbf6b273780456de7ce369c13e8dcf09ba30abbf73b485c471c6bd0152",
+    "previous_protocol_sha256": "fa97636060d9129a4137c9280e9fff119f81e7ce6fc915204c177854b971fc8a",
+    "native_eks_protocol_sha256": "a74055d42a694d1ee8d54e2bed1084a6350668fcb86a6db8c5975f020ae53c59",
+    "source_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2"
+  },
+  "amendments": [
+    {
+      "id": "A-native-eks",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Prior r1 interrupted after native audit. Replace Python certificate path and invalid signal journal; use native EKS image with exact staged inputs.",
+      "changes": [
+        "Native Rust certificate and replay",
+        "Signal-safe native shell worker",
+        "Digest-pinned EKS image and staged42inputs",
+        "Fresh r2 output; prior r1 retained"
+      ]
+    },
+    {
+      "id": "A-native-existing-host",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "EKS r2 reached DeadlineExceeded after repeated unscheduled-Pod observations;zero raw output objects. Retain r2 as an infrastructure failure. Continue exact counted source/certificate work in a separate native existing-host attempt;no performance comparison.",
+      "changes": [
+        "Existing-host backend after terminal EKS attempt",
+        "Same native binaries,source hashes,42inputs and resource limits",
+        "Fresh r3 output and full native/S3 replay",
+        "No clocks or backend speed comparison"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "355e8228ed4ad5c85cc210e18c35ec932338a3785fdb9b42024746dbb6671133",
+    "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+    "frozen_at": "2026-10-30T17:35:25Z",
+    "filed_before_affected_data": true
+  }
+}

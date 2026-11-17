@@ -1,0 +1,11 @@
+{
+ "id":"CM-NATIVE-ORIENTED-EXTENSION-V4",
+ "amends":"extension-scope-v3.json",
+ "reason":"P-192's explicit-group preflight succeeded in loading the curve but its first initial scalar projected trivially to the fixed odd-prime list. Retain that refusal. Use bounded congruent lifts of c to change the initial scalar while preserving the same kernel orientation.",
+ "fixed_edges":"Unchanged V2/V3: P-192 degree13 smallest distinct root; P-224 degree11/root10; P-256 degree11/root8.",
+ "initial_c_rule":"Try c=rho+j*ell for j in [0,-1,1,-2,2], and for each c try the unchanged odd-prime list in order. Stop at the first nonidentity projection. Full failure remains a failure, without another unchanged retry.",
+ "positive_control":"Native exact-integer comparison must reproduce all forward/dual polynomial coefficients and endpoint scales of the saved P-521 degree7/root6 closure. Its independently constructed V3 output already passed global and point qualification.",
+ "limits":{"processes":1,"threads":1,"memory_gib":2,"construction_seconds_per_curve":120,"build_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+ "filed_before_affected_construction":true,
+ "claims":"Exact construction and correctness; no timing or speed conclusion."
+}

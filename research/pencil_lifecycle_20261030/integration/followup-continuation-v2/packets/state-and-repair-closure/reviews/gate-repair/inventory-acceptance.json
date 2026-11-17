@@ -1,0 +1,76 @@
+[
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/success1.json",
+    "accepted": true,
+    "reasons": [],
+    "readbacks": [
+      "GraphFind.run_preserves",
+      "GraphFind.run_exists",
+      "FindControls.depth_two_run",
+      "FindControls.initial_forest",
+      "FindControls.initial_values",
+      "FindControls.compressed_parent",
+      "FindControls.compressed_value",
+      "FindControls.all_values_preserved",
+      "FindControls.root_fixed",
+      "FindControls.potential_reset_wrong"
+    ]
+  },
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/success2.json",
+    "accepted": true,
+    "reasons": [],
+    "readbacks": [
+      "GraphFind.run_preserves",
+      "GraphFind.run_exists",
+      "FindControls.depth_two_run",
+      "FindControls.initial_forest",
+      "FindControls.initial_values",
+      "FindControls.compressed_parent",
+      "FindControls.compressed_value",
+      "FindControls.all_values_preserved",
+      "FindControls.root_fixed",
+      "FindControls.potential_reset_wrong"
+    ]
+  },
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/false.json",
+    "accepted": false,
+    "reasons": [
+      "nonzero process",
+      "wrong module inventory",
+      "nonzero native result",
+      "missing/wrong/duplicate readbacks"
+    ],
+    "readbacks": []
+  },
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/missing.json",
+    "accepted": false,
+    "reasons": [
+      "nonzero process",
+      "wrong module inventory",
+      "nonzero native result",
+      "missing/wrong/duplicate readbacks"
+    ],
+    "readbacks": []
+  },
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/empty.json",
+    "accepted": false,
+    "reasons": [
+      "wrong module inventory",
+      "missing/wrong/duplicate readbacks"
+    ],
+    "readbacks": []
+  },
+  {
+    "source": "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback.json",
+    "accepted": false,
+    "reasons": [
+      "source mismatch Readback",
+      "missing/wrong/duplicate readbacks"
+    ],
+    "readbacks": []
+  }
+]

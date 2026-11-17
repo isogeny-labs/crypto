@@ -1,0 +1,37 @@
+{
+  "schema": "isolab.eks.mcp-verification/v1",
+  "observed_date": "2026-10-19",
+  "account": "104186811093",
+  "region": "us-east-2",
+  "cluster": "isolab",
+  "connector": "isolab-eks",
+  "source_main_rs_sha256": "e3cecb795ee1c4ef38b820ee503e77df6c2e6ee3a2b04f4675fcfcc6053cd6b9",
+  "installed_binary_sha256": "e8e76dcbb16b1305b9f7c3b867925bf20205cc1735e2c14e3d65ab4cbecf0138",
+  "installed_binary": "/home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp",
+  "registered_in_codex": true,
+  "discovered_tools": 6,
+  "unit_tests": {"passed": 5, "failed": 0},
+  "checks_passed": ["cargo fmt --check", "cargo clippy --all-targets -- -D warnings", "ShellCheck", "bash -n"],
+  "repository_library_tests": {"passed": 4405, "failed": 0, "existing_ignored": 118},
+  "stdio_smoke": {
+    "job_name": "mcp-plan-20261019-183708",
+    "state": "succeeded",
+    "node": "ip-10-84-85-169.us-east-2.compute.internal",
+    "pod_uid": "fe7619fb-a812-43b7-90bf-032a96a5db3b",
+    "plan_uri": "s3://isolab-results-104186811093-us-east-2/runs/mcp-plan-20261019-183708/fe7619fb-a812-43b7-90bf-032a96a5db3b/plan.json",
+    "downloaded_plan_sha256": "e37b221bfe4d4460099c3129dc42bc63cd217eff31cf38cee928c5da6b5a7e84",
+    "duplicate_submission": "rejected with AlreadyExists",
+    "failure_job": "mcp-plan-20261019-183708-fail",
+    "failure_exit_code": 7,
+    "cancelled_job": "mcp-plan-20261019-183708-cancel"
+  },
+  "codex_tool_call": {
+    "job_name": "codex-mcp-20261019-1839",
+    "job_uid": "a555d0af-649d-4473-8a9f-8834e4dce878",
+    "state": "succeeded",
+    "exit_code": 0,
+    "log": "Codex to MCP to EKS verified",
+    "node": "ip-10-84-168-127.us-east-2.compute.internal"
+  },
+  "scope": "Infrastructure and harness plumbing only; no timed cryptanalytic experiment or strict fidelity claim."
+}

@@ -1,0 +1,138 @@
+{
+  "schema": "twist.block-worker-instruction-probe/v1",
+  "fixed_workload": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+  "unit": "Callgrind simulated guest instructions Ir",
+  "scope": "serialized ideal to serialized basis in each worker process, summed across all branches",
+  "by_arm": [
+    {
+      "arm": "bits-control",
+      "engine": "msolve",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 25983653
+    },
+    {
+      "arm": "bits-control",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 21850152
+    },
+    {
+      "arm": "direct-aa",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2419805
+    },
+    {
+      "arm": "direct-chain",
+      "engine": "msolve",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 11030733
+    },
+    {
+      "arm": "direct-chain",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2423541
+    },
+    {
+      "arm": "factored-control",
+      "engine": "msolve",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 34379495
+    },
+    {
+      "arm": "factored-control",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 63425225
+    },
+    {
+      "arm": "first-pair-invariant",
+      "engine": "msolve",
+      "requested_branches": 2,
+      "completed_branches": 2,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 20283359
+    },
+    {
+      "arm": "first-pair-invariant",
+      "engine": "native",
+      "requested_branches": 2,
+      "completed_branches": 2,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2324142
+    },
+    {
+      "arm": "frobenius-block",
+      "engine": "msolve",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 10980407
+    },
+    {
+      "arm": "frobenius-block",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2416229
+    },
+    {
+      "arm": "hybrid-eight",
+      "engine": "msolve",
+      "requested_branches": 8,
+      "completed_branches": 8,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 78063100
+    },
+    {
+      "arm": "hybrid-eight",
+      "engine": "native",
+      "requested_branches": 8,
+      "completed_branches": 8,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 5784840
+    },
+    {
+      "arm": "ordinary-prefix-order",
+      "engine": "msolve",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 10976860
+    },
+    {
+      "arm": "ordinary-prefix-order",
+      "engine": "native",
+      "requested_branches": 1,
+      "completed_branches": 1,
+      "all_branches_completed": true,
+      "guest_instructions_Ir": 2422113
+    }
+  ],
+  "AA_relative_spread": 0.0015427351256755144,
+  "AA_within_preregistered_5_percent": true,
+  "worker_binary_sha256": "b9141c6d8f8dceef6e3c9d0a77e64816efc22204aa8768f0963e50c8b7081926",
+  "valgrind_launcher_sha256": "4652774bd116cb49951ef74115ad4237cad5021b2bd4d80002f09d986ec438b9",
+  "callgrind_tool_sha256": "340065228e4a322aacbc4e11fcd39162a3e20fba4b4aa965708e50012175a8c5",
+  "source_panel_sha256": "764ea00255c7063ba3bb873c2e722c4239cd0c48fe83c05b8ae535492d7784f0",
+  "construction_parent_orchestration_certification_lifting_and_DLP_costs_missing": true,
+  "wall_time_admitted": false,
+  "complete_cost_or_speedup_established": false,
+  "new_targets_generated": false
+}
