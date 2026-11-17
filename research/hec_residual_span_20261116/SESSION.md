@@ -1588,3 +1588,10 @@ What was done:1a1fea83255single invocation exits0;48callsexactrepeats,all12FIXED
 Decisions made: keepcommonengineeringfix,nofull10xclaim orrootstagegainpromotion. Preserveoldsourcesandallnegativegates; broadgenus2+goalopen.
 Open threads: mathematicallydifferentcomplete-costmechanism beyondunchangedlazy/consensusproducer; genus3/4fullqualificationstillmissing.
 Errors: copiedrawsummaryprintslegacyfresh_targets=12; thesearefixedoldinputs,correctedexplicitlyinRESULTSwithoutoverwritingraw. No scientificretry/S3/cloud.
+
+## Frobenius small-prime admission screen frozen
+
+What was done:literature-first Smith/Costaetalgraphscreen on5originalg2/g3models. CompiledcheckedintegerFrobeniusmatrix/norm/charpoly/order/pointcount/powerbasisindex plus75smallprimefinitealgebra/factordegree/dimensionchecks. Scalarandramifiedflagsretained. Hashesfrozen.
+Decisions made: rankdeficiencyonlyadmission,nokernel/nonhyperelliptic/speedclaim; goodprimesnotdeclaredselfloops,dimensionpassnotisotropy. Genus4outsidecyclotomicmodelpremise.
+Open threads: executeonceandinspectactualcandidateprimesbeforekernelcode.
+Errors: oldT7083retrybudgetexpired,newT7088claimed; no sciencebeforepushedfreeze.
