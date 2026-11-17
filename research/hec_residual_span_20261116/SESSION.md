@@ -2947,3 +2947,10 @@ What was done: freezeed08d38beb7 hashespass/exit0;15/135/2295allLagrangiansand15
 Decisions made: positivekerneladmissionnotrationaltrigonalmap/quotient/nonhyp/transport/speed. Source-specificlow2routepromisingforg3, notallgenus2+claim. NextderiveFpPlueckerpair-identificationconstraintsusingh=X^(p³)modirreduciblesextic/quadricdecomposability;all3rationalityoutcomesmustremain.
 Open threads: construct/verifyrationaldegree3mapsfororiginalg3kernels, thenexplicitquotient/descent/mapsifeligible;g2/g4/full10xgoalunachieved/independentreviewopen.
 Errors: no scientificfailure; prefreezeborrowfixalreadyrecorded. No S3/cloud/merge/unchangedrerun.
+
+## Original genus3 trigonal map rationality/construction frozen
+
+What was done: readSmithsection5Grassmannianprimarydetail, compiledFpsexticquotientpairconstraints usingh=X^(p³),7x6wedge matrix/nullspace/quadricallFpP1points, recoveractualcoprimeN/Ddegree3 anddirectpairidentities. Split/anisotropicFp101controlsandmutationvalidatorincluded. Fixedall3originalg3fields/nosourceorquotientsubstitution.
+Decisions made: rationalkernelnotmap; retainzerorationalmaps/degenerates/unsupportednullity, no claimsquotient/descent/nonhyperellipticity/transport/speed. One600CPUrunafterGitfreeze.
+Open threads: executemapgate; eligiblemapsnextneedexplicitRecillasquotient/rationaldescent/targethomomorphismproof;fullgoalactiveunachieved.
+Errors: noneincompile. No S3/cloud/merge/no scientificexecutionbeforefreeze.
