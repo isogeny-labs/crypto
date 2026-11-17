@@ -2226,3 +2226,10 @@ What was done: prospective17mutations/packet and fixed original12target protocol
 Decisions made: one120CPU invocation only after Gitfreeze push, noS3/cloud/merge. Originalfull10x scope intact; certificate alone cannot remove collectionfloor. KB source:4548c0e85d47f9299ddc900c047c266d background, local homogeneous/triangular records primary.
 Open threads: execute and inspect all12/204mutation gates, construction/verifier costs; then return to collection mechanism.
 Errors: moved Curve compileerror corrected with contextclone before freeze, no experiment executed; unused-helper warnings remain. Conductor check allow; own T7093 confirmed claimed despite attachment ownconflict.
+
+## Homogeneous packet binding passed, dense cost path rejected
+
+What was done: pushedfreeze26578b0a249, inputhashespass, once-onlyexit0;12packets/48components/204rejectedmutations/12nativechecks. Separateconstruction/verifier16vectors+REDCsummary retained. p601subgroupconstruction61416..153262, verification5516..11148. Assertions [pcc:unverified].
+Decisions made: correctnessformat retained, densefullcolumn construction rejected for speed; no totalcost claim, collectors disabled in these counters. Need usefulclosure rank gain, not moreorbitdefinitionrows. No retry/S3/cloud/merge.
+Open threads: relationgeneration/rank mechanism with failedattemptcosts, originalgenus2+10x, independentvalidation/fullgenus3/4 qualification. Existing triangular implementation remains cheaper construction baseline.
+Errors: none duringrun; prefreezeCurveclonecompilefix retained in priorentry.
