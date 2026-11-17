@@ -325,3 +325,17 @@ Implementequalpublicsource-normalizedsolvers, qualifyfirstprefix/scalar/complete
 
 ### Errors
 No scientificfailures/retries; priortimingunqualifiedunchanged. Elementarylemma isnotnewpriorityclaim.
+
+## Equalpublicsource normalization frozen
+
+### What was done
+Addedsharedchargedhelperusingreferenceoracle/publicsourcev/signedmultiplicities/fullandorbitrows/originalsourcegroupreconstruction; equationdY=1onlywhenfullysplit. AppliedsamehelperafterequalsetupinPencil/Folded/Expandedcopies. Prepared108solvegateall18workloads/repeats/flags andFoldedExpandedprefixequivalence.
+
+### Decisions made
+No sourcepointindex/cofactor/expectedscalar/logtableinfo. Sourcehelpercostincludingfailedattemptschargedallarms. Preserveanchor/walkseed/budgets; retainanyregressions. Fixedavailabilityexpectedfrompriorindependentgate:6g2yes,othersnone. NoPlainarmclaim.
+
+### Open threads
+Executeonceafterpushedfreezeandcompareequallynormalizedcontrols. Broadobjectiveopen.
+
+### Errors
+No runtimeexperimentyet. Unusedimport/enum/reportwarningsretained; originalfrozenimplementationsunchanged.
