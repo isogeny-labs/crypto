@@ -51,6 +51,14 @@ The authoritative freeze is the Git tree recorded by the first commit that
 adds this directory; the table hashes are convenience receipts, not a
 substitute for the tree object.
 
+The source-independent paired verifier is published in cryptanalysis draft
+PR #1736 at revision
+`f18430232e2814922d95f67e97abdda5d6ff44f6`. Its Rust source SHA-256 is
+`307589c02d437d7d13377c6fce194b441f37579d0b1879263fbe925591a26650`.
+It imports no producer code and independently recomputes the arithmetic,
+11,520 predicate IDs, scores, decoder certificates, digests, summary bindings,
+and five semantic/integrity tamper classes. Candidate data remain pending.
+
 ## Required controls
 
 The evaluation must retain random global sections, histogram-matched labels,
