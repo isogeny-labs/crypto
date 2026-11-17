@@ -97,3 +97,30 @@ Every scalar verifies against the original public source and target. This preven
 The useful-rank example now supports a complete relation-log/descent recovery path, not just a matrix rank observation. The short descent excludes none of the preceding setup. Its2016candidates and1881labels remain a substantial burden, while native scalar elimination uses fewer counted multiplications in every control. No measured or complete-cost tenfold premise has been established.
 
 A cheaper mathematical preparation mechanism or a useful earlier prefix is needed before a full-cost campaign is justified. Preserve this exhaustive implementation as the correctness reference. The fixed special curve, three known-answer controls and native rather than fastest-external comparison limit the claim. Genus2zero gain and the complete history of failures/amendments remain retained. Target/PROTOCOL.md and RESULTS.md contain exact source/custody and operation boundaries.
+
+#pagebreak()
+= Orbit-assisted preparation on the same curve
+Pushed execution checkpointc8c83542ad3 · exit0 · classical special-curve optimization
+
+The curve y²=x⁹+2 admits phi(x,y)=(zeta*x,y), with zeta⁹=1. For a degree-d Mumford divisor, its pushforward has u_phi(X)=zetaᵈu(X/zeta) and v_phi(X)=v(X/zeta). If phi(D)=lambda D on the verified prime-order subgroup, lambda⁹=1. The gate enumerates and checks all nine candidate roots, rather than taking subgroup stability or an eigenvalue as an input.
+
+== Exact eligibility and recoveries
+Preparation discovers zeta4, scalar ninth root3374after one small-base trial, and exactly one matching eigenvalue5387. The ninth automorphism power closes. The signed orbit covers all nine canonical rational points; every predicted projected point reconstructs in the original Jacobian. These are tested properties of this fixture, not generic hyperelliptic-curve assumptions.
+
+#table(columns:3,inset:5pt,align:center,
+[per-target stage],[relation-log solver],[orbit-assisted solver],
+[relation norm candidates],[2016],[0],
+[residual labels],[1881],[0],
+[Gaussian log multiplications],[1803],[0],
+[eigenvalue scalar checks],[not used],[9],
+[public targets verified],[3 / 3],[3 / 3])
+
+All recovery/descent/native-control fields replay byte-identically: targets37,2026and7001require11,9and2descent trials respectively. Preparation is rebuilt independently per single target, with no cross-target amortization. No diagnostic logtable, stored eigenvalue, expected coordinate vector, BSGS or subgroup-coordinate enumeration supplies the result.
+
+== Remaining preparation is not free
+The orbit arm still pays for primitive-root searches, nine eigenvalue scalar multiplications, automorphism validity/closure, complete orbit mapping, nine point reconstructions and target descent/verification. These costs may be substantial. Removal of2016norm candidates is a stage change, not a tenfold complete-cost ratio. A prospective full comparison must retain these costs and an automorphism-aware reference for a strongest-method claim.
+
+== Prior art and claim boundary
+Tsakou–Ionica2021, Index calculus attacks on hyperelliptic Jacobians with efficient endomorphisms, describes orbit representatives and eigenvalue-power weights. Guralnick–Howe2008Theorem1describes characteristic polynomials of hyperelliptic automorphisms. Primary text and exact KB receipts are in orbit/THEORY.md. The present prime-field one-orbit implementation is an adaptation of that established principle.
+
+Rational roots of unity, subgroup action and full catalogue coverage are necessary here. Generic curves lack this automorphism; larger fields can have multiple independent point orbits. This is not a mathematical novelty, generic genus2/3/4result, new exponent or complete tenfold speedup. The implementation gives a concrete cheaper preparation candidate for full accounting, while preserving all earlier negative controls and failures.
