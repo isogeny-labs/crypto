@@ -2828,3 +2828,10 @@ What was done: derived264exactpricecutoffs usingactualintegratedrawtotals/12cont
 Decisions made: do notpromoteoldbaselinecomponentgain orconvenientfieldprice tomathematical/runtime10x. PurepFrobeniusnotgenericnontrivialGLVoperator; needexplicitnontrivialaction/transport/costproof fornewcandidate. No scientificrun, deterministicbookkeepingonly.
 Open threads: newconstructionagainststrongforestcontrol withgenericapplicability/fullruntimecase;objectiveactiveunachieved/independentreviewopen.
 Errors: noneinnewbookkeeping. No S3/cloud/merge orunchangedmeasurementrerun.
+
+## Generic grounded-point collector feedback frozen
+
+What was done: screenedearlieronecorepromotioninterpolationrankgain, implementedgenericforest-grounded scanbasis atanchorboundaries withoutnewunknowns/numericlogs. AllrawpromotedLPcoefficients substitutedbeforeatmost2ungroundedrootassert. Addedsyntheticscanbasistrace[2,2,5,6,6,6]. Prepared22audit/44count/16negativecalls andpromotionstats.
+Decisions made: allgroundedpoints fixedpolicy, g>=3collisionheuristicmaybenefitbutg2nopoweradvantage;rankandcompletecostgatefalsifyyield-onlyreasoning. Classicalharvestingnotnovelty. One600CPUrun afterGitfreeze, allregressions/failuresretained.
+Open threads: executegenericfeedbackgateagainststrongstaticforest;10xgoalactiveunachieved.
+Errors: inheritedunusedsource/helperwarnings only;no scientificexecutionbeforefreeze. No S3/cloud/merge.
