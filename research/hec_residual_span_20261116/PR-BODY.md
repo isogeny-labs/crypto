@@ -74,3 +74,7 @@ Freeze `9949caac151` verifies disc(P)=delta4*I² as exact polynomials on all six
 ### Native infinity resolution and adjoints
 
 Freeze `f1a3d00562f` resolves both F61 degree10 models at infinity by exact native blowups. Both multiplicity sequences are (6,2,2,2,2,2,2,2), giving delta22. The degree7 infinity adjoint subsystem has rank22 and dimension14 on each map; every printed basis vector passes all115 recorded constraints. Node/cusp/tacnode controls pass. Finite singularity constraints remain pending, so this is not yet a complete canonical basis or smooth quartic model. Raw equations and bases: `native-smith-infinity/CONTROL.txt`. No speed claim.
+
+### Native smooth canonical quartics on the original F61 source
+
+Freeze `727541cc8d3` constructs both canonical quartic models. Residue-field checks certify11ordinary finite nodes per model, leaving3canonical sections after all adjoint conditions. Exact degree2/3/4 relation kernels are0/0/1. Native Jacobian ideals are unit on all six projective patches, certifying geometric smoothness. Both quartics have66rational points, matching H, and all55+54retained chart images are injective. Equations and sections: `native-smith-canonical/MODELS.json`; details: `RESULTS.md`. The known Smith construction is not a novelty/speed claim; complete original source/target divisor transport and matched costs remain open. The two maps share one kernel.

@@ -3045,3 +3045,10 @@ What was done: compiled residuefieldfactor/node/Hessian checks,14adjointfiniteco
 Decisions made: retainhyperellipticoutcomes;noclaimuntilgate;curve-modelchecksnotfulltargetdivisortransport. Gitfreeze precedes sole600CPU run.
 Open threads: execute finite/canonicalgate;thenfulloriginaltargettransportandmatchedcostcase.Full10xgenus2+goalactive.
 Errors: prefreeze duplicatehelpername fixed, factorcontrolchosenirreducible t²-2, secondTderivativecorrectedtotakebeforeresidue reduction;unusedcopiedhelperwarnings.No scientificexecution yet.
+
+## Original F61 Smith canonical quartics constructed and geometrically smooth
+
+What was done: freeze727541cc8d3 hashespass/exit0. Residuefields2,2,1,6and1,3,2,1,4certify11ordinaryfinitenodes each. Finiteadjointconstraintsrank11leave3sections. Exactrelationkernelsdegrees2/3/4 are0/0/1. SixnativeJacobianidealpatchesunit=>geometricallysmoothquartics;both66points matchH;55+54chartimagesinjective. MODELS.json retains equations/sections.
+Decisions made: actualnativecanonicalmodelprogress underpriorgenus/infinitydependencies,notnovelattack/fulltargettransport/speed. Two mapsonekernel;pointcountnotisogenyproof.
+Open threads: completeoriginalpublicsource/targetdivisortransportincludingexceptionalsupport, nativequarticclassarithmeticandmatchedcostcase;othergenera/full10xgoalactiveunachieved.Independentreviewopen.
+Errors: no scientificfailure;prefreezefixespreviouslyrecorded,unusedcopiedhelperwarningsonly.Gitcustody/noS3/no merge.
