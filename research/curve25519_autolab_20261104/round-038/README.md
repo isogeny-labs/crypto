@@ -2,7 +2,7 @@
 
 Protocol: [PROTOCOL.md](PROTOCOL.md), frozen 2026-11-17T06:12:48Z at git `27a54c948ecdf1975325a0cb07575d53f6b48508`; route `local`. Counted GAE only (deterministic, host independent); no wall-time claim; development loop, no validation-gate row. Loop home: [`../`](../README.md); ledger: [`../ledger.json`](../ledger.json).
 
-Claim record: none yet. Record one with `python3 tools/pcc/pcc.py claim new` before citing this round; until then its outcome is an unverified assertion [pcc:unverified].
+Claim record: `PCC-20261117-b88049` (measurement, data, standing unverified); the outcome stays an unverified assertion until validated.
 
 ## Outcome
 
