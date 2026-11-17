@@ -1953,3 +1953,10 @@ What was done: retainedraw supportaudit2..16nonzeroof7..35rows; derived exactres
 Decisions made: same12targets/24calls, bothverifiers84mutation gate, prunedpackets retained; nofieldarithmetic discountfor collection/construction, vector costsunpriced. Assertions [pcc:unverified]. Sourceschecked(KB): source:4548c0e85d47f9299ddc900c047c266d crypto:docs/ic/ECDLP_RESEARCH_TECHNIQUES.md,revision9b2119e8fbac482b98b50521c0d604bb, sparsecombination replay; localindexed builder/verifier read.
 Open threads: pushfreeze then one120CPU invocation, comparecomplete costs tobothcontrols, original10xgoalunchanged.
 Errors: none in compile,no scienceyet.
+
+## Witness-supported packet qualified
+
+What was done: freeze34645397fe6 once-onlyexit0;24completecalls/12targets fullprepruningpacket andproducer/constructionvectors replay, bothverifiers84mutations pass, native/phase/repeat controls unchanged. P601completebase7.1-10.1percent fewerREDC, subgroupunchanged. Assertions [pcc:unverified].
+Decisions made: retain soundzero-weight rowremoval, charge fullproofgeneration; nofuturewitness leakage asonline selection. Full10xgatefails,mixed vs sourcecontrols.
+Open threads: public-data onlineproductive-relation mechanism reducing proofgeneration/collection together; originalgenus2+goal, independentreview/publication artifacts.
+Errors: none in execution,no retry/S3/cloud.
