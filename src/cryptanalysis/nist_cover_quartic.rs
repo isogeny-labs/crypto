@@ -788,7 +788,10 @@ pub mod wide {
     use std::collections::HashMap;
 
     fn nullspace_fp(rows: &[Vec<u64>], n: usize, p: u64) -> Vec<Vec<u64>> {
-        let mut m: Vec<Vec<u64>> = rows.iter().map(|r| r.iter().map(|&x| x % p).collect()).collect();
+        let mut m: Vec<Vec<u64>> = rows
+            .iter()
+            .map(|r| r.iter().map(|&x| x % p).collect())
+            .collect();
         let mut piv: Vec<usize> = Vec::new();
         let mut r = 0;
         for c in 0..n {
@@ -859,6 +862,39 @@ pub mod wide {
 
     fn rational(h: &[Fp2; 3]) -> bool {
         h.iter().all(|z| z.b == 0)
+    }
+
+    /// The affine points of a reduced class `d` of `J_H` when `u` splits
+    /// into distinct linear factors over `F_p`: `(x, v(x))` for the roots `x`
+    /// of `u`. Polylog in `p` (factoring, not `smith_canonical::proots`, which
+    /// scans `0..p`). `None` if `u` has a repeated or nonlinear factor.
+    pub fn split64(d: &sc::Mumford, p: u64) -> Option<Vec<(u64, u64)>> {
+        let du = pdeg(&d.u);
+        if du <= 0 {
+            return Some(Vec::new());
+        }
+        let seed =
+            d.u.iter()
+                .fold(0x9E37_79B9_7F4A_7C15u64, |h, &c| h.rotate_left(13) ^ c);
+        let mut rng = sp::SplitMix64(seed);
+        let fs = sp::factor_squarefree(&d.u, p, &mut rng)?;
+        if fs.len() as isize != du || fs.iter().any(|f| pdeg(f) != 1) {
+            return None;
+        }
+        let mut out: Vec<(u64, u64)> = fs
+            .iter()
+            .map(|f| {
+                // monic linear factor x + c: root -c
+                let x = (p - f[0] % p) % p;
+                let mut y = 0u64;
+                for &c in d.v.iter().rev() {
+                    y = ad(mm(y, x, p), c, p);
+                }
+                (x, y)
+            })
+            .collect();
+        out.sort();
+        Some(out)
     }
 
     /// The transfer `J_H -> Pic^0(C)` at a wide prime.
@@ -932,9 +968,15 @@ pub mod wide {
                     continue;
                 }
                 let mut rows: Vec<Vec<u64>> = if rat {
-                    vec![v1.iter().map(|z| z.a).collect(), v2.iter().map(|z| z.a).collect()]
+                    vec![
+                        v1.iter().map(|z| z.a).collect(),
+                        v2.iter().map(|z| z.a).collect(),
+                    ]
                 } else {
-                    vec![v1.iter().map(|z| z.a).collect(), v1.iter().map(|z| z.b).collect()]
+                    vec![
+                        v1.iter().map(|z| z.a).collect(),
+                        v1.iter().map(|z| z.b).collect(),
+                    ]
                 };
                 rows.push(mon_vals(&k, &self.std2, &bf).iter().map(|z| z.a).collect());
                 let ns = nullspace_fp(&rows, 6, p);
@@ -966,7 +1008,11 @@ pub mod wide {
             r
         }
 
-        pub fn point_sum(&self, plus: &[(u64, u64)], minus: &[(u64, u64)]) -> Result<pq::PicClass, String> {
+        pub fn point_sum(
+            &self,
+            plus: &[(u64, u64)],
+            minus: &[(u64, u64)],
+        ) -> Result<pq::PicClass, String> {
             if plus.len() != minus.len() {
                 return Err("point_sum needs a divisor of degree 0".into());
             }
@@ -1019,7 +1065,9 @@ pub mod wide {
                 return Err("pool too small".into());
             }
             let p = self.w.tr.p;
-            let ok = |r: &[(u64, u64)]| r.len() == 3 && r.iter().all(|&(x, y)| self.e_class(x, y).is_ok());
+            let ok = |r: &[(u64, u64)]| {
+                r.len() == 3 && r.iter().all(|&(x, y)| self.e_class(x, y).is_ok())
+            };
             let rand_sum = |rng: &mut sp::SplitMix64| {
                 let mut plus = Vec::new();
                 let mut minus = Vec::new();
@@ -1038,7 +1086,7 @@ pub mod wide {
                 for _ in 0..20_000 {
                     let (m, plus, minus) = rand_sum(rng);
                     let s = jac.add(base, &m);
-                    if let Some(r) = jac.split(&s) {
+                    if let Some(r) = split64(&s, p) {
                         if ok(&r) {
                             return Some((r, plus, minus));
                         }
@@ -1316,13 +1364,55 @@ mod tests {
         let mut rng2 = super::sp::SplitMix64(43);
         let pool = t64.sample_pool(40, &mut rng2);
         assert!(pool.len() >= 8);
-        let w64 = t64.transfer_divisor(&chain.jac, &d, &pool, &mut rng2).unwrap();
-        assert_eq!(orig.key().0.map(|x| x as u64), w64.key().0, "same class of Pic^0(C)");
+        let w64 = t64
+            .transfer_divisor(&chain.jac, &d, &pool, &mut rng2)
+            .unwrap();
+        assert_eq!(
+            orig.key().0.map(|x| x as u64),
+            w64.key().0,
+            "same class of Pic^0(C)"
+        );
         // and the 64-bit class is a homomorphic image: [k] Psi(D) = Psi([k]D)
         let kk = 77u128;
         let dk = chain.jac.mul(&d, kk);
-        let w64k = t64.transfer_divisor(&chain.jac, &dk, &pool, &mut rng2).unwrap();
+        let w64k = t64
+            .transfer_divisor(&chain.jac, &dk, &pool, &mut rng2)
+            .unwrap();
         assert!(t64.c.eq(&t64.c.mul_scalar(&w64, kk), &w64k));
+    }
+
+    /// `wide::split64` (factoring) agrees with `HJac::split` (scan of
+    /// `F_p`) on random reduced classes at a toy prime.
+    #[test]
+    fn split64_matches_hjac_split_at_toy_prime() {
+        let p = 1009u64;
+        let (b, _) = find_prime_e(p).expect("curve");
+        let chain = Chain::build(p, p - 3, b, 400, true).expect("toy chain");
+        let jac = &chain.jac;
+        let pts = &chain.pts_over_u;
+        let mut rng = super::sp::SplitMix64(17);
+        let (mut agree, mut split) = (0, 0);
+        for _ in 0..400 {
+            let mut d = jac.zero();
+            for _ in 0..3 {
+                let a = pts[rng.below(pts.len() as u64) as usize];
+                d = jac.add(&d, &jac.point(a.0, a.1));
+            }
+            let mut ref_split = jac.split(&d);
+            if let Some(r) = ref_split.as_mut() {
+                r.sort();
+                // HJac::split does not reject repeated roots; split64 does.
+                let mut dd = r.clone();
+                dd.dedup_by_key(|q| q.0);
+                if dd.len() != r.len() {
+                    continue;
+                }
+                split += 1;
+            }
+            assert_eq!(wide::split64(&d, p), ref_split, "class {:?}", d.u);
+            agree += 1;
+        }
+        assert!(agree > 300 && split > 50, "agree {agree}, split {split}");
     }
 
     #[test]

@@ -1682,7 +1682,6 @@ pub fn next_smooth_quartic_with_point(q: u64, rng: &mut u64) -> ([u64; 15], Pt) 
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1724,7 +1723,11 @@ mod tests {
                     c64.sub(&a64, &b64).key().0,
                     "sub q={q}"
                 );
-                assert_eq!(key64_of_32(&c32.neg(&s32).key()), c64.neg(&s64).key().0, "neg q={q}");
+                assert_eq!(
+                    key64_of_32(&c32.neg(&s32).key()),
+                    c64.neg(&s64).key().0,
+                    "neg q={q}"
+                );
                 for k in [2u128, 3, 7, 1_000_003, 4_294_967_311] {
                     assert_eq!(
                         key64_of_32(&c32.mul_scalar(&s32, k).key()),
