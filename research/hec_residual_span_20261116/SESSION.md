@@ -185,3 +185,17 @@ Once-onlycoldexecutionafterpushedfreeze, then retainallresults. Broadobjectiveop
 
 ### Errors
 Unusedenum/reportwarningsretained; stripdisabled. No scientifictimingexecutedyet.
+
+## Pencil cold run retained unqualified
+
+### What was done
+At pushed545f32c721e,all7200callsverify/EXIT0. Rustsummary reports spread_pass=false,aa_pass=false,numerical_tenfold=false,local_qualified=false. Allrawhashes verify. Closedresearchscopedbench.record.json measuredunadmitted withall90metrics/rawhashes.
+
+### Decisions made
+No speedclaim fromthisrun, includinglargeNative ratios. NativeAA about0.43–1.58 demonstrates failednoisecontrol. No unchangedrerun/gaterelaxation/workloaddrop. Exactfirstprefix correctness remainsvalid. Next deterministicoperationaccounting before furtherwallmeasurement.
+
+### Open threads
+Countcompletecost acrossPencil/Folded/Expanded withprospectivecostdefinition. Sharedhosttimingcauseunestablished; broad10goalopen.
+
+### Errors
+Frozennoisegatesfail; retainedallrawandnegativequalification insteadofrerunning. No experimental sourcechanges.
