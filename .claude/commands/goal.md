@@ -15,10 +15,19 @@ Arguments: "$ARGUMENTS"
 2. Otherwise take the first unchecked item in `docs/ACTIVE.md`. If there is
    none, take the most recent open thread in the brief that no other live
    session owns (`conductor check --summary … --scope path:…`).
-3. State the choice and the first concrete step in at most three lines, then
-   start. Do not ask which item to take; ask only for a decision the brief
-   marks as the owner's.
-4. Follow every CLAUDE.md / AGENTS.md rule that applies to the work itself
+3. State the choice and the first concrete step in at most three lines.
+   Do not ask which item to take; ask only for a decision the brief marks as
+   the owner's.
+4. **First step, before any other work** (AGENTS.md, "First step of every
+   task"): fetch `origin/main`, create the task branch, mark or add the
+   task's line under "Active items" in `docs/ACTIVE.md`
+   (`- [ ] <task> (claude, started <date>, branch <branch>)`), commit that
+   alone, push, and open a **draft** PR named after the task (lane work pushes
+   to the lane PR instead). Add `PR #<n>` to the line. Then start the work.
+5. Follow every CLAUDE.md / AGENTS.md rule that applies to the work itself
    (literature and knowledge base first, conductor, checkpoints, records).
-5. As items finish, check them off in `docs/ACTIVE.md`, add follow-ups, and
-   append the session-log entry. Blocked items move to "Blocked / questions".
+6. Push to the draft PR as the work goes. When the task is finished and
+   checked, tick its line in `docs/ACTIVE.md`, add follow-ups, append the
+   session-log entry, then mark the PR ready for review and enable
+   auto-merge. Blocked items stay unticked with the blocker under
+   "Blocked / questions".
