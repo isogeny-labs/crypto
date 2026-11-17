@@ -2730,3 +2730,10 @@ What was done: inspected existing arbitrary-hyperedge batch filter; extended ret
 Decisions made: one600CPU correctness invocation only after Git source/protocol/binary freeze; every queried norm split brute-checked and every admitted principal identity native-checked. No field/time speed claim from auditing. Known higher-LP machinery, no novelty inference.
 Open threads: execute frozen qualification, retain unresolved/failure if any, then separately cost complete verified mechanism against shared preparation controls if justified.
 Errors: compile only inherited unused-import/helper warnings; no scientific execution before freeze. Check allowed own T-7093 scope; attach still reports same own reservation. No S3/cloud/merge.
+
+## Cubic residual pencil qualifies all22 public targets
+
+What was done: freeze7ba6689ba9e input checks pass, sole600CPU gate exit0; all22 native scalar recoveries correct, all queried split/norm checks and every accepted principal group identity pass. Dense-prefix comparisons pass; synthetic128 rows exercises width6/110expanded rows. Raw old/new anchor/query counts retained separately from costs.
+Decisions made: generic cubic-tail/weighted-LP path now qualified, not a10x/newmath/runtime result. Next audit=false complete-cost gate must replay qualified outcomes and compare all shared-preparation controls, reporting both fields/lookup/fill and later charged runtime.
+Open threads: prepare prospective full cost gate; mathematical10xgenus2+ objective remains active, independent arithmetic review pending.
+Errors: no scientific failure; inherited unused source/import warnings. No S3/cloud/merge; no unchanged rerun.
