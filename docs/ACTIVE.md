@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [x] Define a phased ecbench curve panel and promotion gates for 20-, 30-, 60-, and 80-bit studies (Codex, started 2026-11-17, branch codex/ecbench-phased-panel-20261117, PR #4557)
+- [x] Define a phased ecbench curve panel and promotion gates for 20-, 30-, 60-, and 80-bit studies (Codex, started 2026-11-17, branch codex/ecbench-phased-panel-20261117, PR #4574; coordination-only predecessor #4557)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
