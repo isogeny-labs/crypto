@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--revision", required=True)
 parser.add_argument("--pr", required=True)
 parser.add_argument("--out", type=Path, required=True)
+parser.add_argument("--path", action="append", dest="paths")
 args = parser.parse_args()
 assert not args.out.exists(), "new publication receipt required"
 study = "research/nist_cover_three_tests_20261116"
@@ -21,6 +22,8 @@ paths = [
     f"{study}/evidence/closed-transpose-v1/result.json",
     "pcc/claims/PCC-20261117-d7beff.json",
 ]
+if args.paths:
+    paths = args.paths
 records = []
 for path in paths:
     expected = subprocess.check_output(

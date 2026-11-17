@@ -8,6 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--receipt-name", default="maps-main-validation.json")
+parser.add_argument("--run", action="append", dest="runs")
 args = parser.parse_args()
 assert Path(args.receipt_name).name == args.receipt_name
 
@@ -45,6 +46,8 @@ runs = [
     "complete-maps-v1", "transpose-maps-v1", "closed-transpose-v1",
     "moving-transpose-v1", "pole-cases-v1", "complete-km-v3",
 ]
+if args.runs:
+    runs = args.runs
 study = root / "research/nist_cover_three_tests_20261116"
 receipts = []
 for name in runs:
