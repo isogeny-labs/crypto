@@ -1784,3 +1784,10 @@ What was done: freeze18d7f02a248 once-onlyexit0;24calls certificates/replay/phas
 Decisions made: no freeverifier claim; both orbitlookup and nativeactionbinding needchange, solverwitnessalone insufficient. Retain soundnessprototype andnegativecosts.
 Open threads: orbitindex verifier and independentlyqualifiedFrobenius/Bezoutaction proof withfullcost; changedproducer stillrequired.
 Errors: none,no rerun/S3/cloud.
+
+## Indexed verified orbit lookup frozen
+
+What was done: compiled countedcompleteorbitindex, ambiguouskeysinvalid, unchangedcurve/action/polynomial/witness checks;12positive/84mutationagreement withreference before24costcalls.
+Decisions made: includeindexbuild andallbindingcosts; compareoldcertificate/source separately, no componenttofullgain promotion. All assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation; actionproof remainsseparate.
+Errors: none in compile, no science yet; ownT7093scope retained.
