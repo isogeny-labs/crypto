@@ -49,12 +49,12 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle complete_prime31_dickson31_rank_1024q -- --nocapture 2>&1 | tee prime31-dickson31-complete-1024.log
+          timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle complete_b31_1024_tests -- --nocapture --test-threads=1 2>&1 | tee prime31-dickson31-complete-1024.log
       - name: Independent log gate (not independently signed PCC)
         if: success()
         shell: bash
         run: |
-          grep -Fq 'test result: ok. 1 passed;' prime31-dickson31-complete-1024.log
+          grep -Fq 'test result: ok. 2 passed;' prime31-dickson31-complete-1024.log
           grep -Fq 'DICKSON31_COMPLETE_1024_JSON=' prime31-dickson31-complete-1024.log
           grep -Fq '"basis_rank":31' prime31-dickson31-complete-1024.log
           grep -Fq '"complete_unknown_logs":1024' prime31-dickson31-complete-1024.log
