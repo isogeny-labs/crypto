@@ -2275,3 +2275,10 @@ What was done: pushedfreeze55f1b51497f, hashchecks pass, oneexit0;24prefixcalls 
 Decisions made: nofullcertificate/LPoptimizationforuniform10x withthisexactprefix; all12rankcoverage retained. CachedTSconstants possibleengineeringremedybutunmeasured; quadraticoraclealreadycalls sqrt onlyonce. No universal/wall/fullsolver bound. [pcc:unverified].
 Open threads: paidquery/splitreduction ormateriallydifferent usefularrival, independentvalidation/genus3/4 targetqualification andoriginal10xgoalactive.
 Errors: commentaryunderstatedp601countas3of4; exactrecordcorrects4of4. Nativefilesliveincounted/native viaholdoutpathattrs, initialdirectpathlookupmissed; no scientificrerun/S3/cloud/merge.
+
+## Exact singleton split/rest accounting frozen
+
+What was done: compiled snapshot-only attribution of unchanged singletonproducer, exactprior16vectors mandatory, everyquadraticsplit accumulated separately, remainder=total-split. Bothvectors/repeats/REDCidentity andallpriornative/rowchecks required.
+Decisions made: grantentiresplitfree tobound sqrt-onlysuccessor, notjustTSsetup; implementation-specific10REST>B comparedseparatelyall3controls. SameopenPR4587, Gitfreeze beforeone120CPU; no scientificexecutionyet.
+Open threads: executeanddeterminewhether query/anchor remainder alone exhausts10xbudget; fullgoal unchanged.
+Errors: no compileerror, unusedhelperwarning. OwnT7093lease confirmed/checkallow, attachownconflict. NoS3/cloud/merge.
