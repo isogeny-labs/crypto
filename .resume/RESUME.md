@@ -88219,3 +88219,5 @@ All49files currently uncommitted; source100for48intentionally changes only decla
 successor shared producer/export/worker paths. Never rewrite frozen48proof subjects.
 Next source49manifest/private/diff/ledger/PRpublish then Runpod49. No49pod/call yet;
 all owned through48deleted. GoalACTIVE, primarycomplete/fresh/signed parity unadmitted.
+
+2026-11-17 Codex Runpod49 continuation: all four Rust workers recover expected scalar; original qualifier1(timer equality)preserved; separate retained-data replay0/150controls. Screen observed subtotal6235988188572vs6441136952022unscreened, both above originalIC/table in incomplete unit. Results/report/custody under research/extension_ic_graph_20261115/runpod-discriminant-pair-20261117-49; detailed RESUME_RUN49.md. All owned pods through49deleted. Goal active; next bounded signed-forest recorded-source study, new natural-yield/timing only Runpod. Claims208002/bba5e6/611a9f/3319ad/5b5086UNVERIFIED. [pcc:unverified]
