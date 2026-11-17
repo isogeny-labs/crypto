@@ -38,6 +38,13 @@ authorized work through open dependencies.
 - Keep correctness checks. Flag invalid results and implementation defects without suppressing them or promoting them as successes. Do not report a planned or launched run as completed.
 - Leave the run's data as one `experiment.export/v1` beside the raw records (`experiment-protocol` skill), its `flow` block (planned, attempted, completed, excluded by rule) in the report, and cite any `review-run` record another runner filed; a row resumed after a Spot interruption keeps its counts and has no clock.
 
+For a native worker that opens its raw output with `create_new`, capture
+stdout in a separate file. Before dispatch, run a native transport-only
+control against the actual wrapper, preserving raw-file ownership and
+checking that a failed arm does not silently exclude later planned arms.
+Adopted lesson `L-7abc30ad110b` is supported by the distinct trial37 and
+trial38 transport receipts. [pcc:unverified]
+
 ## Separate measurement from interpretation
 
 - Lead with observed values, units, sample counts, uncertainty, comparison conditions, and evidence links. Report arithmetic ratios with their exact measured scope.

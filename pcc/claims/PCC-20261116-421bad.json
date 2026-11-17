@@ -1,0 +1,21 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T17:55:59Z",
+ "id": "PCC-20261116-421bad",
+ "kind": "statement",
+ "producer": {
+  "commit": "7f60931a3fede3e33974070a93717b28c73b8dd9",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "src/cryptanalysis/residual_walk.rs",
+   "sha256": "82ecb8c6c9f7362c4a12372fb9dba9aff308a9949cbd2a92cd530a959b8d356a"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "path:src/cryptanalysis/residual_walk.rs",
+ "statement": "Next-lead source review only: residual_walk::RelationSystem::insert_by already guards zero pivot coefficients during forward updates and uses a compact nonzero support for backward updates. Pivot normalization still sweeps all columns. A wholesale sparse rewrite would duplicate existing update optimizations; no new matrix replay, performance result or36protocol has been selected."
+}

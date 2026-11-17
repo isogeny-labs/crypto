@@ -1,0 +1,105 @@
+//! Selected compensated modes. Caller certifies prime r and exact-order zeta.
+#[path="metered-polynomial.rs"] mod polynomial;
+mod meter;
+include!("inverse-tail.rs");
+include!("meter-checks.rs");
+fn mul(a:u64,b:u64,r:u64)->u64{meter::hit(0);(a as u128*b as u128%r as u128)as u64}
+fn pow(mut a:u64,mut n:u64,r:u64)->u64{if n==r-2{meter::hit(3);}let mut v=1;while n>0{if n&1!=0{v=mul(v,a,r)}n>>=1;if n!=0{a=mul(a,a,r)}}v}
+fn eval(a:&[u64],x:u64,r:u64)->u64{a.iter().rev().fold(0,|v,&c|(mul(v,x,r)+c)%r)}
+#[derive(Debug,PartialEq)] pub enum Error{Domain,Limit,Arithmetic}
+pub struct Modes{r:u64,m:usize,zeta:u64,coeff:Vec<Vec<u64>>}
+impl Modes{
+ pub fn compile(r:u64,m:usize,zeta:u64,max_m:usize,max_coeff:usize)->Result<Self,Error>{
+  if r<7||r>u64::MAX/2||m<2||m as u64>=r||(r-1)%(m as u64)!=0||zeta==0||zeta>=r{return Err(Error::Domain)}
+  let h=(r-1)/2;let count=m.min(3);let max_len=(h/m as u64+1)as usize;
+  if m>max_m||max_len>max_coeff{return Err(Error::Limit)}
+  let mut z=1;for j in 1..=m{z=mul(z,zeta,r);if z==1&&j!=m{return Err(Error::Domain)}}if z!=1{return Err(Error::Domain)}
+  let mut p=polynomial::Poly::new(r).map_err(|_|Error::Domain)?;
+  // The two (-1)^m factors cancel: numerator roots are h-i.
+  let nr:Vec<_>=(0..m).map(|i|(h+r-i as u64)%r).collect();let dr:Vec<_>=(0..m).map(|i|r-1-i as u64).collect();
+  let num=p.product_tree(&nr).map_err(|_|Error::Arithmetic)?.polynomial().to_vec();let den=p.product_tree(&dr).map_err(|_|Error::Arithmetic)?.polynomial().to_vec();
+  let mut coeff=Vec::new();let mut start=if h%2==0{1}else{r-1};
+  for e in 0..count{if e>0{start=mul(mul(r-start,h-e as u64+1,r),pow(e as u64,r-2,r),r)}
+   let steps=((h-e as u64)/m as u64)as usize;let mut out=vec![start];
+   if steps>0{let points:Vec<_>=(0..steps).map(|j|e as u64+j as u64*m as u64).collect();let tree=p.product_tree(&points).map_err(|_|Error::Arithmetic)?;
+    let ns=p.values(&num,&tree).map_err(|_|Error::Arithmetic)?;let ds=p.values(&den,&tree).map_err(|_|Error::Arithmetic)?;
+    let mut prefix=vec![1;steps+1];for j in 0..steps{if ds[j]==0{return Err(Error::Arithmetic)}prefix[j+1]=mul(prefix[j],ds[j],r)}
+    let mut inv=pow(prefix[steps],r-2,r);if mul(inv,prefix[steps],r)!=1{return Err(Error::Arithmetic)}let mut ids=ds;
+    finish_batch_inverses(&mut ids,&prefix,inv,r)?;
+    for j in 0..steps{out.push(mul(mul(*out.last().unwrap(),ns[j],r),ids[j],r))}
+   }coeff.push(out);
+  }Ok(Self{r,m,zeta,coeff})
+ }
+ pub fn observed(&self,signs:&[u64])->Result<Vec<u64>,Error>{if signs.len()!=self.m||signs.iter().any(|&s|s!=0&&s!=1&&s!=self.r-1){return Err(Error::Domain)}
+  let h=(self.r-1)/2;Ok((0..self.coeff.len()).map(|e|{let root=pow(self.zeta,(e as u64+self.m as u64-h%self.m as u64)%self.m as u64,self.r);let(mut w,mut sum)=(1,0);for &s in signs{sum=(sum+mul(s,w,self.r))%self.r;w=mul(w,root,self.r)}sum}).collect())
+ }
+ pub fn phase(&self,v:u64,b:u64,f1:u64)->Result<Option<u64>,Error>{if v>=self.r||b==0||b>=self.r||f1>=self.r{return Err(Error::Domain)}let a=mul(self.m as u64,pow(b,(self.r-1)/2,self.r),self.r);let den=mul(a,eval(&self.coeff[1],v,self.r),self.r);if den==0{return Ok(None)}let x=mul(f1,pow(den,self.r-2,self.r),self.r);if pow(x,self.m as u64,self.r)!=v{return Err(Error::Arithmetic)}Ok(Some(x))}
+}
+// This standalone checker enumerates reference scalars only; Modes never does.
+fn algebra_checks(){
+ let(mut configs,mut values,mut phase_ok,mut phase_zero,mut odd,mut even,mut zero_modes,mut wrong_weight)=(0,0,0,0,0,0,0,0);
+ for r in [7,11,13,17,19,23,31,41,59,97,101]{for m in 2..=16.min((r-1)as usize){if(r-1)%m as u64!=0{continue}let zeta=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();let c=Modes::compile(r,m,zeta,16,60).unwrap();configs+=1;if((r-1)/m as u64)%2==0{even+=1}else{odd+=1}
+  let h=(r-1)/2;let mut dense=vec![1];for _ in 0..h{let mut next=vec![0;dense.len()+1];for(j,&a)in dense.iter().enumerate(){next[j]=(next[j]+r-a)%r;next[j+1]=(next[j+1]+a)%r}dense=next;}
+  for e in 0..m.min(3){assert_eq!(c.coeff[e],dense.iter().skip(e).step_by(m).copied().collect::<Vec<_>>())}
+  for b in 1..=3{let a=mul(m as u64,pow(b,h,r),r);for x in 0..r{let v=pow(x,m as u64,r);let mut z=1;let signs:Vec<_>=(0..m).map(|_|{let s=pow(mul(b,(x+r-z)%r,r),h,r);z=mul(z,zeta,r);s}).collect();let fs=c.observed(&signs).unwrap();
+   for e in 0..m.min(3){assert_eq!(fs[e],mul(mul(a,pow(x,e as u64,r),r),eval(&c.coeff[e],v,r),r));values+=1;if fs[e]==0{zero_modes+=1}}
+   match c.phase(v,b,fs[1]).unwrap(){Some(recovered)=>{assert_eq!(recovered,x);phase_ok+=1},None=>{assert_eq!(eval(&c.coeff[1],v,r),0);phase_zero+=1}}
+   if m>=3{assert_eq!(mul(mul(fs[1],fs[1],r),eval(&c.coeff[2],v,r),r),mul(mul(a,fs[2],r),pow(eval(&c.coeff[1],v,r),2,r),r))}
+   let unweighted=signs.iter().fold(0,|s,&t|(s+t)%r);if unweighted!=fs[0]{wrong_weight+=1}
+  }}
+ }}
+ for m in [64,128,256,512]{let r=65537;let c=Modes::compile(r,m,pow(3,(r-1)/m as u64,r),512,1024).unwrap();let h=(r-1)/2;let mut g=1;for n in 0..=h{if(n%m as u64)<3{assert_eq!(c.coeff[(n%m as u64)as usize][(n/m as u64)as usize],g)}if n<h{g=mul(mul(r-g,h-n,r),pow(n+1,r-2,r),r)}}}
+ assert_eq!(Modes::compile(13,3,3,2,10).err(),Some(Error::Limit));assert_eq!(Modes::compile(13,3,1,3,10).err(),Some(Error::Domain));
+ println!("configs={configs} even_d={even} odd_d={odd} mode_identities={values} phase_recovered={phase_ok} phase_zero_denominator={phase_zero} observed_zero_modes={zero_modes} wrong_uncompensated_weight_rejected={wrong_weight} large_compilers=4");
+}
+
+#[path="lib.rs"]mod source;
+#[path="../feature-orbit-local-terms/local.rs"]mod group;
+fn multiple(c:group::Curve,p:group::Point,mut n:u64)->Option<group::Point>{let(mut out,mut a)=(None,Some(p));while n>0{if n&1!=0{out=c.plus(out,a)}a=c.plus(a,a);n>>=1}out}
+impl Modes{
+ // Input observations are normalized at v=z/b^m. Return polynomial in z.
+ fn constraints(&self,b:u64,f:&[u64])->Vec<Vec<u64>>{
+  let r=self.r;let a=mul(self.m as u64,pow(b,(r-1)/2,r),r);let mut p=polynomial::Poly::new(r).unwrap();
+  let mut c0:Vec<_>=self.coeff[0].iter().map(|&x|mul(a,x,r)).collect();c0[0]=(c0[0]+r-f[0])%r;let mut all=vec![c0];
+  if self.m>=3{let left:Vec<_>=self.coeff[2].iter().map(|&x|mul(mul(f[1],f[1],r),x,r)).collect();let right:Vec<_>=p.mul(&self.coeff[1],&self.coeff[1]).iter().map(|&x|mul(mul(a,f[2],r),x,r)).collect();all.push(p.sub(&left,&right));}
+  let inv=pow(pow(b,self.m as u64,r),r-2,r);for c in &mut all{let mut scale=1;for v in c{*v=mul(*v,scale,r);scale=mul(scale,inv,r)}}all
+ }
+ fn recover(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64])->Result<(Option<u64>,usize,&'static str),Error>{
+  if radii.len()>4||radii.iter().any(|&b|b==0||b>=self.r){return Err(Error::Domain)}
+  source.sign(target.map(|p|[p.x,p.y])).map_err(|_|Error::Domain)?;let mut calls=1;
+  let r=self.r;let d=((r-1)/self.m as u64)as usize;let mut state=vec![0;d+2];state[1]=r-1;state[d+1]=1;let mut p=polynomial::Poly::new(r).unwrap();
+  for &b in radii{let mut zeta=1;let mut signs=Vec::new();for _ in 0..self.m{let offset=mul(b,zeta,r);let q=curve.plus(target,multiple(curve,base,(r-offset)%r));let s=source.sign(q.map(|p|[p.x,p.y])).map_err(|_|Error::Arithmetic)?;calls+=1;
+    if s==0{if multiple(curve,base,offset)!=target{return Err(Error::Arithmetic)}return Ok((Some(offset),calls,"endpoint"))}signs.push(if s<0{r-1}else{s as u64});zeta=mul(zeta,self.zeta,r);}
+   let f=self.observed(&signs)?;for constraint in self.constraints(b,&f){state=p.gcd_monic(&state,&constraint,d+1).map_err(|_|Error::Arithmetic)?.polynomial;}
+   if state.len()==2{let image=(r-state[0])%r;let v=mul(image,pow(pow(b,self.m as u64,r),r-2,r),r);
+    if let Some(x)=self.phase(v,b,f[1])?{let k=mul(b,x,r);if multiple(curve,base,k)!=target{return Err(Error::Arithmetic)}return Ok((Some(k),calls,"mode-phase"))}
+   }
+  }Ok((None,calls,"unresolved"))
+ }
+}
+fn previous_checks(){algebra_checks();let(mut cases,mut recovered,mut unresolved,mut calls,mut phases,mut endpoints)=(0,0,0,0,0,0);
+ for(p,a,b,r,base,m)in[(7,0,3,13,[1,2],3),(7,0,3,13,[1,2],6),(509,2,10,479,[3,68],2),(701,2,8,683,[2,106],11)]{
+  let c=group::Curve::new(p,a,b);let bp=group::Point{x:base[0],y:base[1]};let source=source::Source::new(p,a,b,r,base,64).unwrap();let z=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();let modes=Modes::compile(r,m,z,16,256).unwrap();
+  let scalars:Vec<u64>=if r==13{(0..r).collect()}else if r==479{include_str!("../feature-native-monomial-recovery/recovery.tsv").lines().skip(1).map(|l|l.split('\t').next().unwrap().parse().unwrap()).collect()}else{vec![0,1,2,3,7,11,17,31,47,83,127,191,257,341,509,681,682]};
+  let before=(cases,recovered,unresolved,phases,endpoints,calls);for k in scalars{let target=multiple(c,bp,k);let(out,n,route)=modes.recover(&source,c,bp,target,&[1,2,3,4]).unwrap();cases+=1;calls+=n;match out{Some(v)=>{assert_eq!(v,k);recovered+=1;if route=="mode-phase"{phases+=1}else{endpoints+=1}},None=>unresolved+=1}}
+  println!("fixture_p={p} r={r} m={m} cases={} recovered={} unresolved={} phase={} endpoints={} calls={}",cases-before.0,recovered-before.1,unresolved-before.2,phases-before.3,endpoints-before.4,calls-before.5);
+ }
+ println!("public_cases={cases} recovered={recovered} unresolved={unresolved} phase_routes={phases} endpoints={endpoints} source_calls={calls}");
+}
+
+include!("reference.rs");
+include!("orbit.rs");
+
+include!("signed.rs");
+include!("transport.rs");
+include!("signed-image.rs");
+include!("signed-adapter.rs");
+include!("image-checks.rs");
+include!("powered.rs");
+include!("powered-image.rs");
+include!("powered-adapter.rs");
+include!("powered-checks.rs");
+include!("seeded-image.rs");
+include!("seeded-adapter.rs");
+include!("seeded-checks.rs");
+fn main(){if std::env::args().any(|a|a=="--inherited"){inherited_checks()}else{seeded_checks();}}

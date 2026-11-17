@@ -1,0 +1,85 @@
+{
+  "schema": "miller-infinity-chart-verification/v1",
+  "source_commit": "67ae6eb81ab5dad6cb3860dd5fdc3a4b06cfd010",
+  "claim_id": "PCC-20261115-6a306d",
+  "declaration_sha256": "0bae769dea940a972891b819c4a49162b9aa2189ca7156fc5fa387f267ec81f5",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 19,
+  "gate_declarations": 129,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 290,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-6a306d",
+    "claim_sha256": "e66d6494650ae58d04dfb0d96c100cd1f09694830a4601ecae1a1cd6da20361e",
+    "commit": "67ae6eb81ab5dad6cb3860dd5fdc3a4b06cfd010",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/miller_infinity_chart_audit_20261115/lean (ChartCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T05:37:49Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-6a306d",
+    "claim_sha256": "e66d6494650ae58d04dfb0d96c100cd1f09694830a4601ecae1a1cd6da20361e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46953,
+    "sha256": "6af9b7a99ee6e797a8a716bf1ec696499f356a4a35a7f92f485e8f021315c92c",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 129,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 7,
+    "new_modules": 9,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_chart_origin_evaluation_unique_and_kernel_derived": true,
+    "actual_chart_localization_DVR_derived": true,
+    "actual_full_function_field_fraction_ring_proved": true,
+    "actual_localization_map_injective_and_surjective": true,
+    "actual_RingEquiv_commutes_with_function_field_inclusion": true,
+    "actual_official_normalized_adic_equals_norm_degree": true,
+    "actual_pole_orders_minus3_minus2": true,
+    "actual_local_residue_field_and_formula": true,
+    "actual_wrong_parameter_countercontrol": true,
+    "mathlib_projective_Scheme_localRing_comparison": false,
+    "full_finitepoint_principal_divisor_or_pairing": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

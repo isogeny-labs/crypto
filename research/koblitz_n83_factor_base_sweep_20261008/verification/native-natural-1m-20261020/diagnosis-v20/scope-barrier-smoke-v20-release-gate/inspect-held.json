@@ -1,0 +1,136 @@
+{
+  "host": {
+    "AutoRemove": false,
+    "Binds": null,
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceWriteIOps": [],
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": [],
+    "CapAdd": null,
+    "CapDrop": [
+      "ALL"
+    ],
+    "Cgroup": "",
+    "CgroupParent": "",
+    "CgroupnsMode": "private",
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "ContainerIDFile": "",
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpuShares": 0,
+    "CpusetCpus": "14",
+    "CpusetMems": "",
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "Devices": [],
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IOMaximumBandwidth": 0,
+    "IOMaximumIOps": 0,
+    "IpcMode": "private",
+    "Isolation": "",
+    "Links": null,
+    "LogConfig": {
+      "Config": {},
+      "Type": "json-file"
+    },
+    "MaskedPaths": [
+      "/proc/asound",
+      "/proc/acpi",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/sys/firmware",
+      "/sys/devices/virtual/powercap"
+    ],
+    "Memory": 8589934592,
+    "MemoryReservation": 0,
+    "MemorySwap": 8589934592,
+    "MemorySwappiness": null,
+    "Mounts": [
+      {
+        "Source": "/home/ec2-user/scratch/n83-natural-1m-20261020/scope-barrier-smoke-v20-release-gate",
+        "Target": "/out",
+        "Type": "bind"
+      }
+    ],
+    "NanoCpus": 1000000000,
+    "NetworkMode": "none",
+    "OomKillDisable": null,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "PidsLimit": 64,
+    "PortBindings": {},
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ],
+    "ReadonlyRootfs": true,
+    "RestartPolicy": {
+      "MaximumRetryCount": 0,
+      "Name": "no"
+    },
+    "Runtime": "runc",
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "ShmSize": 67108864,
+    "UTSMode": "",
+    "Ulimits": [
+      {
+        "Hard": 65536,
+        "Name": "nofile",
+        "Soft": 32768
+      }
+    ],
+    "UsernsMode": "",
+    "VolumeDriver": "",
+    "VolumesFrom": null
+  },
+  "id": "911633224cb76376ae4bc78b38c7df16e3292e9aba23709f13b9844853c8e7c1",
+  "image": "sha256:541096ae9b05d3b850341b78790e2ed31e94d5aa0ea086933c6ff0c09ffa2e63",
+  "mounts": [
+    {
+      "Destination": "/out",
+      "Mode": "",
+      "Propagation": "rprivate",
+      "RW": true,
+      "Source": "/home/ec2-user/scratch/n83-natural-1m-20261020/scope-barrier-smoke-v20-release-gate",
+      "Type": "bind"
+    }
+  ],
+  "state": {
+    "Dead": false,
+    "Error": "",
+    "ExitCode": 0,
+    "FinishedAt": "0001-01-01T00:00:00Z",
+    "OOMKilled": false,
+    "Paused": false,
+    "Pid": 865093,
+    "Restarting": false,
+    "Running": true,
+    "StartedAt": "2026-10-21T01:48:57.6484861Z",
+    "Status": "running"
+  }
+}

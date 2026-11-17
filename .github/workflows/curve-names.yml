@@ -7,8 +7,10 @@ name: curve-names
 # experiment.
 
 on:
-  # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  # Runs on pull requests that touch prose, the registry or these scripts,
+  # so a retired name or an unregistered slug is caught before it reaches
+  # main.  It is not in the merge set (gate, size, artifacts) unless branch
+  # protection lists it.  It also runs when the matching change is on main.
   push:
     branches: [main]
     paths:
@@ -16,6 +18,20 @@ on:
       - '**/*.html'
       - '**/*.sha256'
       - 'docs/curves/**'
+      - 'src/cryptanalysis/curve_aliases.json'
+      - 'src/cryptanalysis/ecbench/registry_index.txt'
+      - 'scripts/curve_id.py'
+      - 'scripts/check_curve_names.py'
+      - 'scripts/build_curve_registry.py'
+      - '.github/workflows/curve-names.yml'
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '**/*.html'
+      - '**/*.sha256'
+      - 'docs/curves/**'
+      - 'src/cryptanalysis/curve_aliases.json'
+      - 'src/cryptanalysis/ecbench/registry_index.txt'
       - 'scripts/curve_id.py'
       - 'scripts/check_curve_names.py'
       - 'scripts/build_curve_registry.py'
@@ -55,6 +71,7 @@ jobs:
             /docs/curves/registry.json
             /src/cryptanalysis/curve_id.rs
             /src/cryptanalysis/curve_aliases.json
+            /src/cryptanalysis/ecbench/registry_index.txt
             /.github/workflows/curve-names.yml
             /tools/artifacts/
             /.artifacts/

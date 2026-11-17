@@ -1,0 +1,866 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 1.351 | [1.063, 1.669] | 0.886 | 1.525 | 1.525 | 1.000 | yes | 5.595 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 1.521 | [1.117, 1.944] | 0.886 | 1.716 | 1.716 | 1.000 | yes | 6.750 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 1.631 | [1.214, 2.047] | 0.886 | 1.840 | 1.840 | 1.000 | yes | 5.796 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 1.512 | [1.222, 1.901] | 0.886 | 1.706 | 1.706 | 1.000 | yes | 7.186 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 1.498 | [1.009, 2.149] | 0.886 | 1.691 | 1.691 | 1.000 | yes | 6.940 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 1.242 | [0.926, 1.590] | 0.886 | 1.402 | 1.402 | 1.000 | yes | 4.619 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 1.219 | [0.913, 1.655] | 0.886 | 1.376 | 1.376 | 1.000 | yes | 4.818 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 1.344 | [1.086, 1.660] | 0.886 | 1.517 | 1.517 | 1.000 | yes | 4.064 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 1.528 | [1.138, 1.992] | 0.886 | 1.724 | 1.724 | 1.000 | yes | 5.164 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 1.178 | [0.859, 1.679] | 0.886 | 1.329 | 1.329 | 1.000 | yes | 5.570 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 0.952 | [0.688, 1.265] | 0.886 | 1.074 | 1.074 | 1.000 | yes | 7.388 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 1.108 | [0.761, 1.471] | 0.886 | 1.250 | 1.250 | 1.000 | yes | 7.409 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 1.312 | [0.993, 1.637] | 0.886 | 1.481 | 1.481 | 1.000 | yes | 7.344 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 1.053 | [0.791, 1.314] | 0.886 | 1.189 | 1.189 | 1.000 | yes | 8.656 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 1.527 | [1.173, 1.968] | 0.886 | 1.723 | 1.723 | 1.000 | yes | 8.213 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 1.251 | [0.910, 1.589] | 0.886 | 1.412 | 1.412 | 1.000 | yes | 7.607 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 1.579 | [0.977, 2.180] | 0.886 | 1.782 | 1.782 | 1.000 | yes | 5.901 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 1.205 | [0.868, 1.580] | 0.886 | 1.359 | 1.359 | 1.000 | yes | 4.964 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 0.967 | [0.754, 1.194] | 0.886 | 1.092 | 1.092 | 1.000 | yes | 6.029 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 1.096 | [0.830, 1.384] | 0.886 | 1.237 | 1.237 | 1.000 | yes | 6.173 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 1.414 | [1.085, 1.797] | 0.886 | 1.595 | 1.595 | 1.000 | yes | 5.066 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 1.475 | [1.070, 1.939] | 0.886 | 1.664 | 1.664 | 1.000 | yes | 5.381 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 1.204 | [0.847, 1.558] | 0.886 | 1.358 | 1.358 | 1.000 | yes | 4.344 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 1.050 | [0.752, 1.405] | 0.886 | 1.185 | 1.185 | 1.000 | yes | 5.239 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 1.226 | [1.024, 1.425] | 0.886 | 1.383 | 1.383 | 1.000 | yes | 6.082 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 1.232 | [0.814, 1.665] | 0.886 | 1.391 | 1.391 | 1.000 | yes | 7.315 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 1.503 | [0.883, 2.206] | 0.886 | 1.696 | 1.696 | 1.000 | yes | 6.119 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 1.425 | [1.009, 1.862] | 0.886 | 1.608 | 1.608 | 1.000 | yes | 6.691 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 1.382 | [0.965, 1.809] | 0.886 | 1.559 | 1.559 | 1.000 | yes | 4.240 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 1.472 | [1.074, 1.905] | 0.886 | 1.661 | 1.661 | 1.000 | yes | 5.722 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 1.565 | [1.135, 1.998] | 0.886 | 1.766 | 1.766 | 1.000 | yes | 9.026 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 1.134 | [0.811, 1.479] | 0.886 | 1.280 | 1.280 | 1.000 | yes | 7.011 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 1.480 | [0.982, 2.052] | 0.886 | 1.670 | 1.670 | 1.000 | yes | 5.963 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 1.309 | [0.881, 1.803] | 0.886 | 1.478 | 1.478 | 1.000 | yes | 8.657 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 1.535 | [1.145, 1.943] | 0.886 | 1.732 | 1.732 | 1.000 | yes | 6.095 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 1.558 | [0.790, 2.675] | 0.886 | 1.758 | 1.758 | 1.000 | yes | 5.119 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 0.862 | [0.641, 1.082] | 0.886 | 0.973 | 0.973 | 1.000 | yes | 7.305 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 1.275 | [1.019, 1.528] | 0.886 | 1.438 | 1.438 | 1.000 | yes | 7.538 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 1.348 | [1.033, 1.680] | 0.886 | 1.521 | 1.521 | 1.000 | yes | 7.229 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 1.813 | [1.613, 2.020] | 0.886 | 2.045 | 2.045 | 1.000 | yes | 5.798 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 0.802 | [0.502, 1.141] | 0.886 | 0.905 | 0.905 | 1.000 | yes | 6.526 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 1.219 | [1.016, 1.449] | 0.886 | 1.376 | 1.376 | 1.000 | yes | 4.495 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 1.215 | [0.909, 1.515] | 0.886 | 1.371 | 1.371 | 1.000 | yes | 3.961 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 1.053 | [0.727, 1.415] | 0.886 | 1.188 | 1.188 | 1.000 | yes | 4.194 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 1.232 | [0.855, 1.693] | 0.886 | 1.390 | 1.390 | 1.000 | yes | 4.838 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 0.948 | [0.640, 1.258] | 0.886 | 1.070 | 1.070 | 1.000 | yes | 6.631 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 1.105 | [0.890, 1.312] | 0.886 | 1.247 | 1.247 | 1.000 | yes | 6.327 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 1.513 | [1.167, 1.864] | 0.886 | 1.708 | 1.708 | 1.000 | yes | 6.961 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 1.583 | [1.044, 2.182] | 0.886 | 1.786 | 1.786 | 1.000 | yes | 3.898 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 1.225 | [0.795, 1.638] | 0.886 | 1.382 | 1.382 | 1.000 | yes | 3.695 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 1.323 | [0.958, 1.685] | 0.886 | 1.492 | 1.492 | 1.000 | yes | 3.817 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 1.187 | [0.798, 1.612] | 0.886 | 1.340 | 1.340 | 1.000 | yes | 4.724 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 1.074 | [0.720, 1.490] | 0.886 | 1.212 | 1.212 | 1.000 | yes | 5.027 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 1.587 | [1.070, 2.140] | 0.886 | 1.791 | 1.791 | 1.000 | yes | 4.069 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 1.208 | [0.894, 1.582] | 0.886 | 1.363 | 1.363 | 1.000 | yes | 4.178 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 1.297 | [1.022, 1.576] | 0.886 | 1.463 | 1.463 | 1.000 | yes | 5.067 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 1.304 | [0.944, 1.727] | 0.886 | 1.471 | 1.471 | 1.000 | yes | 4.466 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 1.411 | [1.056, 1.794] | 0.886 | 1.592 | 1.592 | 1.000 | yes | 3.913 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 1.342 | [1.123, 1.564] | 0.886 | 1.515 | 1.515 | 1.000 | yes | 4.239 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 1.175 | [0.822, 1.587] | 0.886 | 1.326 | 1.326 | 1.000 | yes | 4.439 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 1.025 | [0.745, 1.339] | 0.886 | 1.156 | 1.156 | 1.000 | yes | 7.008 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 1.060 | [0.714, 1.478] | 0.886 | 1.196 | 1.196 | 1.000 | yes | 7.053 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 1.424 | [0.950, 1.917] | 0.886 | 1.607 | 1.607 | 1.000 | yes | 7.930 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 1.412 | [0.945, 1.967] | 0.886 | 1.593 | 1.593 | 1.000 | yes | 8.205 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 1.237 | [0.897, 1.665] | 0.886 | 1.395 | 1.395 | 1.000 | yes | 5.288 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 1.910 | [1.399, 2.454] | 0.886 | 2.155 | 2.155 | 1.000 | yes | 9.165 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 1.380 | [1.191, 1.591] | 0.886 | 1.557 | 1.557 | 1.000 | yes | 9.617 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 1.268 | [0.832, 1.728] | 0.886 | 1.431 | 1.431 | 1.000 | yes | 6.085 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 1.342 | [0.948, 1.689] | 0.886 | 1.515 | 1.515 | 1.000 | yes | 5.644 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 1.036 | [0.745, 1.348] | 0.886 | 1.169 | 1.169 | 1.000 | yes | 4.098 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 1.221 | [0.971, 1.504] | 0.886 | 1.378 | 1.378 | 1.000 | yes | 4.483 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 1.496 | [1.146, 1.854] | 0.886 | 1.688 | 1.688 | 1.000 | yes | 4.563 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 1.291 | [0.890, 1.723] | 0.886 | 1.457 | 1.457 | 1.000 | yes | 3.660 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 1.175 | [0.776, 1.592] | 0.886 | 1.326 | 1.326 | 1.000 | yes | 4.319 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 1.605 | [1.210, 2.040] | 0.886 | 1.811 | 1.811 | 1.000 | yes | 4.360 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 1.120 | [0.701, 1.617] | 0.886 | 1.264 | 1.264 | 1.000 | yes | 5.227 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 1.463 | [1.023, 1.856] | 0.886 | 1.651 | 1.651 | 1.000 | yes | 5.473 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 1.236 | [0.972, 1.482] | 0.886 | 1.395 | 1.395 | 1.000 | yes | 4.135 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 1.543 | [1.189, 1.895] | 0.886 | 1.741 | 1.741 | 1.000 | yes | 4.310 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 1.581 | [1.347, 1.799] | 0.886 | 1.784 | 1.784 | 1.000 | yes | 5.844 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 1.541 | [1.077, 2.003] | 0.886 | 1.739 | 1.739 | 1.000 | yes | 7.838 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 1.347 | [0.905, 1.847] | 0.886 | 1.520 | 1.520 | 1.000 | yes | 4.248 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 1.133 | [0.816, 1.410] | 0.886 | 1.278 | 1.278 | 1.000 | yes | 4.760 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 1.238 | [0.881, 1.601] | 0.886 | 1.397 | 1.397 | 1.000 | yes | 5.066 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 1.830 | [1.404, 2.296] | 0.886 | 2.064 | 2.064 | 1.000 | yes | 4.179 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 1.343 | [0.840, 1.885] | 0.886 | 1.516 | 1.516 | 1.000 | yes | 5.942 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 1.162 | [0.907, 1.429] | 0.886 | 1.311 | 1.311 | 1.000 | yes | 5.291 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 1.324 | [0.956, 1.686] | 0.886 | 1.494 | 1.494 | 1.000 | yes | 4.470 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 1.547 | [1.099, 1.901] | 0.886 | 1.746 | 1.746 | 1.000 | yes | 3.857 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 1.081 | [0.850, 1.331] | 0.886 | 1.220 | 1.220 | 1.000 | yes | 4.367 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 1.015 | [0.761, 1.281] | 0.886 | 1.145 | 1.145 | 1.000 | yes | 5.024 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 1.381 | [1.012, 1.939] | 0.886 | 1.559 | 1.559 | 1.000 | yes | 5.898 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 1.138 | [0.915, 1.357] | 0.886 | 1.284 | 1.284 | 1.000 | yes | 4.337 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 1.515 | [1.049, 2.094] | 0.886 | 1.710 | 1.710 | 1.000 | yes | 5.096 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 1.237 | [0.890, 1.642] | 0.886 | 1.396 | 1.396 | 1.000 | yes | 6.243 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 1.261 | [1.069, 1.448] | 0.886 | 1.422 | 1.422 | 1.000 | yes | 4.239 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 1.276 | [1.028, 1.580] | 0.886 | 1.440 | 1.440 | 1.000 | yes | 6.068 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 1.094 | [0.800, 1.440] | 0.886 | 1.234 | 1.234 | 1.000 | yes | 5.923 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 1.462 | [1.066, 1.847] | 0.886 | 1.650 | 1.650 | 1.000 | yes | 4.775 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 1.217 | [0.970, 1.462] | 0.886 | 1.373 | 1.373 | 1.000 | yes | 4.574 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 1.523 | [1.094, 1.939] | 0.886 | 1.718 | 1.718 | 1.000 | yes | 3.860 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 1.253 | [0.956, 1.593] | 0.886 | 1.414 | 1.414 | 1.000 | yes | 3.598 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 1.501 | [1.113, 1.891] | 0.886 | 1.694 | 1.694 | 1.000 | yes | 3.387 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 1.212 | [1.010, 1.396] | 0.886 | 1.368 | 1.368 | 1.000 | yes | 3.337 | L1×5 L2×3 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 1.632 | [1.372, 1.926] | 0.886 | 1.842 | 1.842 | 1.000 | yes | 4.744 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 1.337 | [1.024, 1.665] | 0.886 | 1.508 | 1.508 | 1.000 | yes | 6.303 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 0.938 | [0.729, 1.147] | 0.886 | 1.058 | 1.058 | 1.000 | yes | 5.085 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 1.364 | [1.059, 1.676] | 0.886 | 1.539 | 1.539 | 1.000 | yes | 3.650 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 1.423 | [1.025, 1.804] | 0.886 | 1.606 | 1.606 | 1.000 | yes | 4.394 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 1.236 | [0.952, 1.494] | 0.886 | 1.394 | 1.394 | 1.000 | yes | 4.335 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 1.254 | [0.831, 1.728] | 0.886 | 1.415 | 1.415 | 1.000 | yes | 5.221 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 1.240 | [0.880, 1.623] | 0.886 | 1.399 | 1.399 | 1.000 | yes | 3.900 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 1.131 | [0.855, 1.449] | 0.886 | 1.276 | 1.276 | 1.000 | yes | 4.214 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 1.071 | [0.774, 1.391] | 0.886 | 1.208 | 1.208 | 1.000 | yes | 5.031 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 1.684 | [1.399, 1.962] | 0.886 | 1.900 | 1.900 | 1.000 | yes | 4.260 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 1.202 | [0.972, 1.456] | 0.886 | 1.356 | 1.356 | 1.000 | yes | 4.370 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 0.861 | [0.676, 1.122] | 0.886 | 0.971 | 0.971 | 1.000 | yes | 4.353 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 1.008 | [0.605, 1.485] | 0.886 | 1.137 | 1.137 | 1.000 | yes | 3.333 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 1.708 | [1.486, 1.991] | 0.886 | 1.928 | 1.928 | 1.000 | yes | 4.593 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 1.150 | [0.628, 1.746] | 0.886 | 1.297 | 1.297 | 1.000 | yes | 4.499 | L1×4 L2×4 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 1.395 | [1.021, 1.843] | 0.886 | 1.574 | 1.574 | 1.000 | yes | 5.192 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 2.135 | [1.710, 2.713] | 0.886 | 2.409 | 2.409 | 1.000 | yes | 4.792 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 1.545 | [1.000, 2.149] | 0.886 | 1.744 | 1.744 | 1.000 | yes | 9.529 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 1.455 | [0.974, 1.964] | 0.886 | 1.642 | 1.642 | 1.000 | yes | 7.400 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 1.147 | [0.672, 1.736] | 0.886 | 1.295 | 1.295 | 1.000 | yes | 7.162 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 1.109 | [0.731, 1.570] | 0.886 | 1.251 | 1.251 | 1.000 | yes | 5.712 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 1.326 | [0.951, 1.723] | 0.886 | 1.496 | 1.496 | 1.000 | yes | 4.532 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 1.548 | [1.340, 1.774] | 0.886 | 1.747 | 1.747 | 1.000 | yes | 4.397 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 1.143 | [0.781, 1.506] | 0.886 | 1.290 | 1.290 | 1.000 | yes | 4.183 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 0.945 | [0.732, 1.200] | 0.886 | 1.066 | 1.066 | 1.000 | yes | 5.237 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 1.087 | [0.805, 1.401] | 0.886 | 1.227 | 1.227 | 1.000 | yes | 3.618 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 1.382 | [1.058, 1.704] | 0.886 | 1.560 | 1.560 | 1.000 | yes | 5.084 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 1.310 | [0.971, 1.661] | 0.886 | 1.478 | 1.478 | 1.000 | yes | 4.995 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 1.253 | [0.922, 1.619] | 0.886 | 1.414 | 1.414 | 1.000 | yes | 4.795 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 1.344 | [0.969, 1.763] | 0.886 | 1.517 | 1.517 | 1.000 | yes | 3.915 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 1.232 | [0.928, 1.537] | 0.886 | 1.390 | 1.390 | 1.000 | yes | 4.396 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 1.277 | [0.864, 1.814] | 0.886 | 1.441 | 1.441 | 1.000 | yes | 6.637 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 0.988 | [0.780, 1.225] | 0.886 | 1.115 | 1.115 | 1.000 | yes | 7.285 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 1.153 | [0.764, 1.594] | 0.886 | 1.301 | 1.301 | 1.000 | yes | 3.856 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 1.456 | [1.194, 1.748] | 0.886 | 1.642 | 1.642 | 1.000 | yes | 4.964 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 1.331 | [1.113, 1.550] | 0.886 | 1.502 | 1.502 | 1.000 | yes | 4.678 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 1.044 | [0.748, 1.356] | 0.886 | 1.178 | 1.178 | 1.000 | yes | 4.757 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 1.326 | [0.961, 1.688] | 0.886 | 1.496 | 1.496 | 1.000 | yes | 6.017 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg | rho.negation | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 1.334 | [1.031, 1.642] | 0.886 | 1.506 | 1.506 | 1.000 | yes | 7.145 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 1.538 | [1.108, 2.011] | 1.253 | 1.227 | 1.736 | 1.138 | no | 5.993 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 1.456 | [1.284, 1.608] | 1.253 | 1.162 | 1.643 | 0.957 | no | 7.179 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 1.633 | [1.284, 2.102] | 1.253 | 1.303 | 1.843 | 1.001 | no | 6.897 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 1.773 | [1.337, 2.191] | 1.253 | 1.415 | 2.001 | 1.173 | no | 6.118 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 2.437 | [2.039, 2.860] | 1.253 | 1.944 | 2.750 | 1.626 | no | 7.465 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 1.408 | [1.008, 1.867] | 1.253 | 1.124 | 1.589 | 1.134 | no | 4.368 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 1.607 | [1.174, 2.076] | 1.253 | 1.282 | 1.814 | 1.318 | no | 5.762 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 1.426 | [1.136, 1.750] | 1.253 | 1.138 | 1.609 | 1.061 | no | 3.788 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 1.913 | [1.604, 2.217] | 1.253 | 1.526 | 2.159 | 1.252 | no | 4.862 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 1.700 | [1.200, 2.220] | 1.253 | 1.357 | 1.919 | 1.444 | no | 6.582 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 1.818 | [1.254, 2.475] | 1.253 | 1.450 | 2.051 | 1.909 | no | 5.977 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 1.674 | [1.260, 2.084] | 1.253 | 1.336 | 1.889 | 1.510 | no | 8.850 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 1.706 | [1.402, 1.987] | 1.253 | 1.361 | 1.925 | 1.300 | no | 7.474 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 1.741 | [1.358, 2.191] | 1.253 | 1.389 | 1.964 | 1.652 | no | 7.832 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 1.677 | [1.045, 2.616] | 1.253 | 1.338 | 1.892 | 1.098 | no | 8.405 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 1.270 | [1.019, 1.553] | 1.253 | 1.013 | 1.433 | 1.015 | no | 7.143 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 1.320 | [1.016, 1.625] | 1.253 | 1.053 | 1.490 | 0.836 | no | 5.978 | L1×6 L2×2 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 1.538 | [1.088, 1.945] | 1.253 | 1.227 | 1.735 | 1.277 | no | 4.802 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 1.593 | [1.058, 2.332] | 1.253 | 1.271 | 1.798 | 1.647 | no | 6.867 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 2.039 | [1.324, 2.819] | 1.253 | 1.627 | 2.301 | 1.860 | no | 6.732 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 1.533 | [1.382, 1.686] | 1.253 | 1.223 | 1.730 | 1.084 | no | 6.207 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 1.262 | [0.781, 1.773] | 1.253 | 1.007 | 1.424 | 0.856 | no | 4.791 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 1.144 | [0.778, 1.525] | 1.253 | 0.913 | 1.291 | 0.951 | no | 4.777 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 1.516 | [1.058, 2.013] | 1.253 | 1.210 | 1.711 | 1.444 | no | 4.895 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 1.831 | [1.374, 2.379] | 1.253 | 1.461 | 2.066 | 1.494 | no | 8.514 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 1.851 | [1.258, 2.395] | 1.253 | 1.477 | 2.088 | 1.502 | no | 7.002 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 2.013 | [1.627, 2.426] | 1.253 | 1.606 | 2.271 | 1.339 | no | 6.954 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 1.961 | [1.492, 2.453] | 1.253 | 1.564 | 2.212 | 1.376 | no | 6.429 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 1.979 | [1.517, 2.506] | 1.253 | 1.579 | 2.233 | 1.433 | no | 4.884 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 2.004 | [1.311, 2.643] | 1.253 | 1.599 | 2.261 | 1.361 | no | 5.509 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 1.918 | [1.305, 2.682] | 1.253 | 1.531 | 2.165 | 1.225 | no | 8.939 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 1.796 | [1.467, 2.108] | 1.253 | 1.433 | 2.027 | 1.583 | no | 7.566 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 1.610 | [1.371, 1.828] | 1.253 | 1.285 | 1.817 | 1.088 | no | 6.512 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 1.612 | [1.305, 1.924] | 1.253 | 1.286 | 1.819 | 1.231 | no | 8.961 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 1.905 | [1.587, 2.237] | 1.253 | 1.520 | 2.150 | 1.242 | no | 5.538 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 2.144 | [1.471, 2.892] | 1.253 | 1.710 | 2.419 | 1.376 | no | 5.587 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 1.403 | [1.053, 1.702] | 1.253 | 1.120 | 1.584 | 1.628 | no | 7.682 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 1.627 | [1.150, 2.109] | 1.253 | 1.298 | 1.836 | 1.276 | no | 6.891 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 2.135 | [1.748, 2.512] | 1.253 | 1.704 | 2.410 | 1.584 | no | 7.908 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 1.530 | [1.053, 2.007] | 1.253 | 1.220 | 1.726 | 0.844 | no | 7.262 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 1.850 | [1.387, 2.461] | 1.253 | 1.476 | 2.088 | 2.308 | no | 6.453 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 1.299 | [0.923, 1.690] | 1.253 | 1.036 | 1.465 | 1.065 | no | 4.932 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 1.882 | [1.341, 2.366] | 1.253 | 1.502 | 2.124 | 1.549 | no | 4.522 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 1.445 | [1.145, 1.831] | 1.253 | 1.153 | 1.631 | 1.372 | no | 4.326 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 1.929 | [1.466, 2.369] | 1.253 | 1.539 | 2.177 | 1.566 | no | 5.055 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 1.633 | [1.259, 2.087] | 1.253 | 1.303 | 1.842 | 1.722 | no | 6.212 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 1.368 | [1.059, 1.652] | 1.253 | 1.091 | 1.543 | 1.238 | no | 6.417 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 2.086 | [1.430, 2.812] | 1.253 | 1.665 | 2.354 | 1.379 | no | 7.953 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 2.128 | [1.620, 2.574] | 1.253 | 1.698 | 2.401 | 1.344 | no | 4.804 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 1.489 | [1.081, 2.002] | 1.253 | 1.188 | 1.680 | 1.216 | no | 4.637 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 1.544 | [1.220, 1.919] | 1.253 | 1.232 | 1.742 | 1.167 | no | 4.278 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 1.988 | [1.111, 2.928] | 1.253 | 1.586 | 2.243 | 1.674 | no | 4.846 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 1.229 | [0.940, 1.548] | 1.253 | 0.980 | 1.386 | 1.144 | no | 5.350 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 1.922 | [1.594, 2.256] | 1.253 | 1.534 | 2.169 | 1.211 | no | 4.375 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 1.399 | [0.975, 1.864] | 1.253 | 1.116 | 1.578 | 1.158 | no | 4.534 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 1.641 | [1.169, 2.125] | 1.253 | 1.309 | 1.851 | 1.265 | no | 5.072 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 1.738 | [1.306, 2.175] | 1.253 | 1.387 | 1.961 | 1.333 | no | 4.572 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 1.498 | [0.976, 2.014] | 1.253 | 1.195 | 1.690 | 1.062 | no | 4.683 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 1.406 | [1.024, 1.732] | 1.253 | 1.122 | 1.586 | 1.047 | no | 3.953 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 1.666 | [1.141, 2.180] | 1.253 | 1.329 | 1.880 | 1.418 | no | 5.278 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 1.853 | [1.397, 2.293] | 1.253 | 1.479 | 2.091 | 1.809 | no | 5.470 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 1.401 | [1.058, 1.817] | 1.253 | 1.118 | 1.580 | 1.321 | no | 6.298 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 1.400 | [0.964, 1.886] | 1.253 | 1.117 | 1.580 | 0.983 | no | 7.392 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 1.527 | [1.000, 2.003] | 1.253 | 1.219 | 1.724 | 1.082 | no | 8.959 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 1.672 | [1.441, 1.928] | 1.253 | 1.334 | 1.887 | 1.352 | no | 6.570 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 1.791 | [1.256, 2.309] | 1.253 | 1.429 | 2.021 | 0.938 | no | 8.440 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 1.467 | [1.103, 1.842] | 1.253 | 1.171 | 1.656 | 1.063 | no | 10.051 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 1.810 | [1.307, 2.458] | 1.253 | 1.444 | 2.043 | 1.427 | no | 8.730 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 1.563 | [1.112, 2.039] | 1.253 | 1.247 | 1.764 | 1.164 | no | 6.278 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 1.151 | [0.813, 1.525] | 1.253 | 0.919 | 1.299 | 1.112 | no | 5.127 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 1.368 | [1.032, 1.701] | 1.253 | 1.091 | 1.543 | 1.120 | no | 4.539 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 1.333 | [1.085, 1.610] | 1.253 | 1.064 | 1.504 | 0.891 | no | 3.985 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 1.803 | [1.299, 2.348] | 1.253 | 1.439 | 2.035 | 1.397 | no | 4.074 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 1.887 | [1.386, 2.479] | 1.253 | 1.506 | 2.130 | 1.606 | no | 4.557 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 1.458 | [0.773, 2.186] | 1.253 | 1.163 | 1.645 | 0.909 | no | 4.519 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 1.650 | [1.007, 2.383] | 1.253 | 1.317 | 1.862 | 1.473 | no | 5.197 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 1.448 | [1.080, 1.828] | 1.253 | 1.155 | 1.633 | 0.990 | no | 5.779 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 2.016 | [1.413, 2.654] | 1.253 | 1.608 | 2.275 | 1.631 | no | 4.927 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 1.848 | [1.262, 2.502] | 1.253 | 1.475 | 2.086 | 1.198 | no | 5.172 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 1.621 | [1.174, 2.034] | 1.253 | 1.293 | 1.829 | 1.025 | no | 4.849 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 1.741 | [1.504, 2.075] | 1.253 | 1.389 | 1.965 | 1.130 | no | 7.925 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 1.611 | [1.258, 1.952] | 1.253 | 1.285 | 1.818 | 1.196 | no | 4.852 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 1.404 | [1.189, 1.666] | 1.253 | 1.120 | 1.584 | 1.239 | no | 5.247 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 2.048 | [1.550, 2.577] | 1.253 | 1.634 | 2.311 | 1.654 | no | 4.647 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 1.538 | [1.179, 1.912] | 1.253 | 1.227 | 1.735 | 0.840 | no | 3.942 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 1.779 | [1.350, 2.184] | 1.253 | 1.420 | 2.008 | 1.325 | no | 5.035 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 1.628 | [1.400, 1.978] | 1.253 | 1.299 | 1.837 | 1.401 | no | 5.973 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 1.510 | [1.030, 2.031] | 1.253 | 1.205 | 1.704 | 1.141 | no | 4.513 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 1.333 | [1.173, 1.508] | 1.253 | 1.064 | 1.504 | 0.862 | no | 4.307 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 2.090 | [1.561, 2.602] | 1.253 | 1.668 | 2.359 | 1.934 | no | 4.641 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 1.879 | [1.451, 2.258] | 1.253 | 1.500 | 2.121 | 1.852 | no | 4.946 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 1.788 | [1.138, 2.531] | 1.253 | 1.427 | 2.017 | 1.294 | no | 4.488 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 1.705 | [1.374, 1.990] | 1.253 | 1.360 | 1.924 | 1.499 | no | 4.554 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 1.170 | [0.828, 1.553] | 1.253 | 0.934 | 1.320 | 0.772 | no | 4.530 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 1.777 | [1.356, 2.163] | 1.253 | 1.418 | 2.005 | 1.436 | no | 5.510 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 1.719 | [1.291, 2.282] | 1.253 | 1.372 | 1.940 | 1.364 | no | 4.761 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 1.420 | [1.146, 1.695] | 1.253 | 1.133 | 1.603 | 1.113 | no | 5.695 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 1.357 | [1.143, 1.628] | 1.253 | 1.083 | 1.532 | 1.241 | no | 6.526 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 1.982 | [1.659, 2.293] | 1.253 | 1.582 | 2.237 | 1.356 | no | 4.389 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 2.064 | [1.420, 2.591] | 1.253 | 1.647 | 2.329 | 1.696 | no | 5.280 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 1.223 | [0.947, 1.518] | 1.253 | 0.976 | 1.380 | 0.803 | no | 3.733 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 1.416 | [0.980, 1.831] | 1.253 | 1.130 | 1.598 | 1.130 | no | 4.199 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 1.202 | [0.962, 1.446] | 1.253 | 0.959 | 1.356 | 0.800 | no | 3.297 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 1.612 | [1.156, 2.055] | 1.253 | 1.286 | 1.819 | 1.330 | no | 4.264 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 1.666 | [1.121, 2.304] | 1.253 | 1.330 | 1.880 | 1.021 | no | 4.521 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 1.439 | [1.199, 1.735] | 1.253 | 1.149 | 1.624 | 1.077 | no | 6.995 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 2.005 | [1.628, 2.336] | 1.253 | 1.600 | 2.263 | 2.138 | no | 6.781 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 1.448 | [0.943, 1.990] | 1.253 | 1.155 | 1.633 | 1.061 | no | 3.887 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 1.505 | [1.113, 1.907] | 1.253 | 1.201 | 1.698 | 1.057 | no | 4.777 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 1.198 | [0.896, 1.513] | 1.253 | 0.956 | 1.352 | 0.970 | no | 4.838 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 1.405 | [1.021, 1.796] | 1.253 | 1.121 | 1.585 | 1.120 | no | 5.226 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 1.724 | [1.462, 1.954] | 1.253 | 1.376 | 1.945 | 1.391 | no | 3.454 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 1.555 | [1.088, 2.092] | 1.253 | 1.240 | 1.754 | 1.375 | no | 4.291 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 1.444 | [0.915, 2.000] | 1.253 | 1.153 | 1.630 | 1.349 | no | 4.122 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 1.338 | [0.997, 1.708] | 1.253 | 1.068 | 1.510 | 0.795 | no | 4.249 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 1.380 | [1.087, 1.680] | 1.253 | 1.101 | 1.557 | 1.148 | no | 4.695 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 1.316 | [0.976, 1.680] | 1.253 | 1.050 | 1.485 | 1.529 | no | 4.496 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 1.829 | [1.194, 2.767] | 1.253 | 1.459 | 2.063 | 1.814 | no | 3.678 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 1.867 | [1.406, 2.331] | 1.253 | 1.490 | 2.107 | 1.093 | no | 4.671 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 1.552 | [1.243, 1.875] | 1.253 | 1.239 | 1.752 | 1.350 | no | 5.220 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 1.445 | [1.112, 1.812] | 1.253 | 1.153 | 1.631 | 1.036 | no | 4.517 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 1.251 | [0.963, 1.557] | 1.253 | 0.998 | 1.411 | 0.586 | no | 4.182 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 1.476 | [1.025, 1.951] | 1.253 | 1.177 | 1.665 | 0.955 | no | 8.023 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 1.829 | [1.310, 2.305] | 1.253 | 1.459 | 2.063 | 1.256 | no | 7.641 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 1.818 | [1.569, 2.067] | 1.253 | 1.451 | 2.052 | 1.585 | no | 7.356 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 1.818 | [1.239, 2.415] | 1.253 | 1.450 | 2.051 | 1.639 | no | 5.711 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 1.929 | [1.448, 2.404] | 1.253 | 1.539 | 2.177 | 1.455 | no | 4.823 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 1.883 | [1.352, 2.416] | 1.253 | 1.503 | 2.125 | 1.217 | no | 4.398 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 1.979 | [1.571, 2.391] | 1.253 | 1.579 | 2.233 | 1.732 | no | 4.549 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 1.748 | [1.120, 2.572] | 1.253 | 1.395 | 1.972 | 1.850 | no | 5.326 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 1.337 | [0.994, 1.703] | 1.253 | 1.067 | 1.508 | 1.229 | no | 4.187 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 1.463 | [1.028, 1.919] | 1.253 | 1.167 | 1.651 | 1.058 | no | 4.169 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 2.022 | [1.695, 2.377] | 1.253 | 1.613 | 2.282 | 1.544 | no | 4.955 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 1.842 | [1.521, 2.163] | 1.253 | 1.470 | 2.078 | 1.470 | no | 5.216 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 2.082 | [1.434, 2.782] | 1.253 | 1.661 | 2.349 | 1.549 | no | 4.514 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 1.486 | [1.289, 1.677] | 1.253 | 1.186 | 1.677 | 1.206 | no | 3.898 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 1.568 | [1.195, 1.953] | 1.253 | 1.251 | 1.769 | 1.228 | no | 6.105 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 1.530 | [1.136, 1.977] | 1.253 | 1.221 | 1.726 | 1.549 | no | 6.661 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 1.598 | [1.196, 2.036] | 1.253 | 1.275 | 1.804 | 1.387 | no | 4.073 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 1.327 | [1.070, 1.562] | 1.253 | 1.059 | 1.498 | 0.912 | no | 4.745 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 1.705 | [1.275, 2.216] | 1.253 | 1.361 | 1.924 | 1.281 | no | 5.302 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 1.977 | [1.205, 2.826] | 1.253 | 1.578 | 2.231 | 1.893 | no | 5.987 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 1.380 | [0.857, 2.084] | 1.253 | 1.101 | 1.558 | 1.041 | no | 6.159 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-plain | rho.plain | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 1.694 | [1.373, 2.083] | 1.253 | 1.352 | 1.912 | 1.270 | no | 6.298 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 1.714 | [1.522, 1.877] | 1.500 | 1.142 | 1.934 | 1.268 | yes | 5.919 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 1.714 | [1.510, 1.884] | 1.500 | 1.142 | 1.934 | 1.127 | yes | 6.217 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 1.714 | [1.516, 1.878] | 1.500 | 1.142 | 1.934 | 1.051 | yes | 6.050 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 1.714 | [1.513, 1.883] | 1.500 | 1.142 | 1.934 | 1.134 | yes | 7.896 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 1.714 | [1.503, 1.884] | 1.500 | 1.142 | 1.934 | 1.144 | yes | 6.507 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 1.714 | [1.515, 1.888] | 1.500 | 1.142 | 1.934 | 1.380 | yes | 5.082 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 1.714 | [1.510, 1.883] | 1.500 | 1.142 | 1.934 | 1.405 | yes | 5.467 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 1.714 | [1.520, 1.883] | 1.500 | 1.142 | 1.934 | 1.275 | yes | 4.329 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 1.714 | [1.516, 1.878] | 1.500 | 1.142 | 1.934 | 1.122 | yes | 4.866 | L1×4 L2×4 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 1.714 | [1.508, 1.883] | 1.500 | 1.142 | 1.934 | 1.455 | yes | 6.772 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 1.714 | [1.506, 1.883] | 1.500 | 1.142 | 1.934 | 1.800 | yes | 7.288 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.546 | yes | 7.939 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 1.714 | [1.516, 1.884] | 1.500 | 1.142 | 1.934 | 1.306 | yes | 7.114 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 1.714 | [1.519, 1.884] | 1.500 | 1.142 | 1.934 | 1.627 | yes | 7.176 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 1.714 | [1.518, 1.883] | 1.500 | 1.142 | 1.934 | 1.122 | yes | 7.267 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.370 | yes | 6.002 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 1.714 | [1.517, 1.877] | 1.500 | 1.142 | 1.934 | 1.085 | yes | 5.499 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.423 | yes | 5.073 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 1.714 | [1.511, 1.877] | 1.500 | 1.142 | 1.934 | 1.772 | yes | 6.523 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 1.714 | [1.519, 1.882] | 1.500 | 1.142 | 1.934 | 1.563 | yes | 6.329 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 1.714 | [1.521, 1.878] | 1.500 | 1.142 | 1.934 | 1.212 | yes | 5.501 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 1.714 | [1.515, 1.884] | 1.500 | 1.142 | 1.934 | 1.162 | yes | 5.801 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 1.714 | [1.519, 1.878] | 1.500 | 1.142 | 1.934 | 1.424 | yes | 4.478 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 1.714 | [1.514, 1.877] | 1.500 | 1.142 | 1.934 | 1.632 | yes | 4.479 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 1.714 | [1.519, 1.884] | 1.500 | 1.142 | 1.934 | 1.398 | yes | 6.770 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.391 | yes | 7.221 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 1.714 | [1.521, 1.883] | 1.500 | 1.142 | 1.934 | 1.140 | yes | 6.511 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 1.714 | [1.511, 1.878] | 1.500 | 1.142 | 1.934 | 1.202 | yes | 5.849 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 1.714 | [1.512, 1.882] | 1.500 | 1.142 | 1.934 | 1.240 | yes | 5.059 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.164 | yes | 5.703 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 1.714 | [1.511, 1.883] | 1.500 | 1.142 | 1.934 | 1.095 | yes | 7.868 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 1.714 | [1.519, 1.884] | 1.500 | 1.142 | 1.934 | 1.511 | yes | 7.252 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 1.714 | [1.510, 1.883] | 1.500 | 1.142 | 1.934 | 1.158 | yes | 5.179 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 1.714 | [1.513, 1.883] | 1.500 | 1.142 | 1.934 | 1.309 | yes | 7.773 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 1.714 | [1.513, 1.878] | 1.500 | 1.142 | 1.934 | 1.117 | yes | 5.415 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 1.714 | [1.517, 1.883] | 1.500 | 1.142 | 1.934 | 1.100 | yes | 4.948 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 1.714 | [1.515, 1.889] | 1.500 | 1.142 | 1.934 | 1.988 | yes | 6.361 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 1.714 | [1.512, 1.883] | 1.500 | 1.142 | 1.934 | 1.344 | yes | 6.298 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 1.714 | [1.520, 1.883] | 1.500 | 1.142 | 1.934 | 1.271 | yes | 7.329 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 1.714 | [1.509, 1.883] | 1.500 | 1.142 | 1.934 | 0.945 | yes | 7.046 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 1.714 | [1.511, 1.882] | 1.500 | 1.142 | 1.934 | 2.137 | yes | 6.510 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 1.714 | [1.516, 1.884] | 1.500 | 1.142 | 1.934 | 1.406 | yes | 4.700 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 1.714 | [1.515, 1.883] | 1.500 | 1.142 | 1.934 | 1.411 | yes | 4.704 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 1.714 | [1.517, 1.883] | 1.500 | 1.142 | 1.934 | 1.627 | yes | 4.872 | L1×4 L2×4 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 1.714 | [1.513, 1.878] | 1.500 | 1.142 | 1.934 | 1.391 | yes | 4.397 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.808 | yes | 6.578 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 1.714 | [1.515, 1.884] | 1.500 | 1.142 | 1.934 | 1.551 | yes | 6.677 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 1.714 | [1.512, 1.884] | 1.500 | 1.142 | 1.934 | 1.132 | yes | 5.903 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 1.714 | [1.516, 1.884] | 1.500 | 1.142 | 1.934 | 1.083 | yes | 4.338 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.399 | yes | 4.464 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.296 | yes | 3.581 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 1.714 | [1.517, 1.883] | 1.500 | 1.142 | 1.934 | 1.443 | yes | 5.209 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 1.714 | [1.517, 1.878] | 1.500 | 1.142 | 1.934 | 1.596 | yes | 5.129 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 1.714 | [1.522, 1.884] | 1.500 | 1.142 | 1.934 | 1.080 | yes | 4.320 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 1.714 | [1.517, 1.877] | 1.500 | 1.142 | 1.934 | 1.419 | yes | 4.057 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 1.714 | [1.513, 1.884] | 1.500 | 1.142 | 1.934 | 1.321 | yes | 5.514 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 1.714 | [1.519, 1.883] | 1.500 | 1.142 | 1.934 | 1.314 | yes | 4.521 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 1.714 | [1.514, 1.882] | 1.500 | 1.142 | 1.934 | 1.215 | yes | 4.757 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 1.714 | [1.514, 1.884] | 1.500 | 1.142 | 1.934 | 1.277 | yes | 3.622 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 1.714 | [1.509, 1.883] | 1.500 | 1.142 | 1.934 | 1.459 | yes | 5.339 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.673 | yes | 6.207 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 1.714 | [1.519, 1.882] | 1.500 | 1.142 | 1.934 | 1.616 | yes | 6.355 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.204 | yes | 6.541 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 1.714 | [1.523, 1.878] | 1.500 | 1.142 | 1.934 | 1.214 | yes | 8.140 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 1.714 | [1.513, 1.882] | 1.500 | 1.142 | 1.934 | 1.386 | yes | 6.727 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 0.897 | yes | 7.820 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.242 | yes | 7.856 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 1.714 | [1.518, 1.884] | 1.500 | 1.142 | 1.934 | 1.351 | yes | 6.361 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 1.714 | [1.506, 1.877] | 1.500 | 1.142 | 1.934 | 1.277 | yes | 6.354 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 1.714 | [1.516, 1.882] | 1.500 | 1.142 | 1.934 | 1.655 | yes | 5.192 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 1.714 | [1.516, 1.878] | 1.500 | 1.142 | 1.934 | 1.404 | yes | 4.161 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.146 | yes | 5.003 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 1.714 | [1.508, 1.889] | 1.500 | 1.142 | 1.934 | 1.327 | yes | 3.983 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 1.714 | [1.515, 1.884] | 1.500 | 1.142 | 1.934 | 1.458 | yes | 4.007 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.068 | yes | 4.635 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 1.714 | [1.521, 1.883] | 1.500 | 1.142 | 1.934 | 1.530 | yes | 5.230 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 1.714 | [1.519, 1.885] | 1.500 | 1.142 | 1.934 | 1.172 | yes | 5.700 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 1.714 | [1.516, 1.882] | 1.500 | 1.142 | 1.934 | 1.386 | yes | 4.451 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.111 | yes | 4.474 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.084 | yes | 4.480 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 1.714 | [1.517, 1.883] | 1.500 | 1.142 | 1.934 | 1.112 | yes | 7.267 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 1.714 | [1.515, 1.884] | 1.500 | 1.142 | 1.934 | 1.272 | yes | 4.461 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.513 | yes | 4.094 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 1.714 | [1.510, 1.883] | 1.500 | 1.142 | 1.934 | 1.384 | yes | 4.401 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 1.714 | [1.510, 1.883] | 1.500 | 1.142 | 1.934 | 0.937 | yes | 4.188 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.276 | yes | 5.152 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 1.714 | [1.516, 1.877] | 1.500 | 1.142 | 1.934 | 1.475 | yes | 5.276 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.295 | yes | 4.132 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 1.714 | [1.516, 1.882] | 1.500 | 1.142 | 1.934 | 1.108 | yes | 3.587 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 1.714 | [1.514, 1.878] | 1.500 | 1.142 | 1.934 | 1.585 | yes | 4.445 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.689 | yes | 4.364 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 1.714 | [1.512, 1.877] | 1.500 | 1.142 | 1.934 | 1.241 | yes | 5.645 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 1.714 | [1.516, 1.878] | 1.500 | 1.142 | 1.934 | 1.506 | yes | 5.583 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 1.714 | [1.511, 1.877] | 1.500 | 1.142 | 1.934 | 1.131 | yes | 4.258 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 1.714 | [1.515, 1.877] | 1.500 | 1.142 | 1.934 | 1.385 | yes | 6.009 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.360 | yes | 4.487 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 1.714 | [1.511, 1.883] | 1.500 | 1.142 | 1.934 | 1.343 | yes | 5.513 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 1.714 | [1.522, 1.878] | 1.500 | 1.142 | 1.934 | 1.567 | yes | 6.422 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 1.714 | [1.509, 1.883] | 1.500 | 1.142 | 1.934 | 1.172 | yes | 4.573 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 1.714 | [1.505, 1.883] | 1.500 | 1.142 | 1.934 | 1.408 | yes | 4.983 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 1.714 | [1.513, 1.883] | 1.500 | 1.142 | 1.934 | 1.125 | yes | 3.758 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 1.714 | [1.515, 1.878] | 1.500 | 1.142 | 1.934 | 1.367 | yes | 4.284 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.141 | yes | 3.704 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 1.714 | [1.510, 1.884] | 1.500 | 1.142 | 1.934 | 1.414 | yes | 4.188 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 1.714 | [1.511, 1.883] | 1.500 | 1.142 | 1.934 | 1.050 | yes | 4.393 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 1.714 | [1.511, 1.883] | 1.500 | 1.142 | 1.934 | 1.282 | yes | 6.092 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 1.714 | [1.514, 1.888] | 1.500 | 1.142 | 1.934 | 1.827 | yes | 5.266 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 1.714 | [1.513, 1.883] | 1.500 | 1.142 | 1.934 | 1.256 | yes | 3.471 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 1.714 | [1.520, 1.878] | 1.500 | 1.142 | 1.934 | 1.204 | yes | 4.281 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 1.714 | [1.522, 1.883] | 1.500 | 1.142 | 1.934 | 1.387 | yes | 4.031 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 1.714 | [1.522, 1.877] | 1.500 | 1.142 | 1.934 | 1.366 | yes | 5.096 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 1.714 | [1.522, 1.884] | 1.500 | 1.142 | 1.934 | 1.382 | yes | 3.592 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 1.714 | [1.513, 1.890] | 1.500 | 1.142 | 1.934 | 1.515 | yes | 4.277 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.600 | yes | 3.776 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 1.714 | [1.511, 1.878] | 1.500 | 1.142 | 1.934 | 1.017 | yes | 5.030 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 1.714 | [1.513, 1.878] | 1.500 | 1.142 | 1.934 | 1.426 | yes | 4.317 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 1.714 | [1.519, 1.883] | 1.500 | 1.142 | 1.934 | 1.991 | yes | 4.119 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 1.714 | [1.512, 1.883] | 1.500 | 1.142 | 1.934 | 1.700 | yes | 3.764 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 1.714 | [1.516, 1.878] | 1.500 | 1.142 | 1.934 | 1.003 | yes | 4.055 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 1.714 | [1.511, 1.878] | 1.500 | 1.142 | 1.934 | 1.491 | yes | 5.256 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 1.714 | [1.510, 1.884] | 1.500 | 1.142 | 1.934 | 1.228 | yes | 5.039 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 0.803 | yes | 4.531 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.109 | yes | 6.942 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 1.714 | [1.520, 1.889] | 1.500 | 1.142 | 1.934 | 1.177 | yes | 7.839 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 1.714 | [1.514, 1.883] | 1.500 | 1.142 | 1.934 | 1.494 | yes | 6.129 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 1.714 | [1.513, 1.884] | 1.500 | 1.142 | 1.934 | 1.546 | yes | 5.171 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 1.714 | [1.516, 1.877] | 1.500 | 1.142 | 1.934 | 1.293 | yes | 4.780 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 1.714 | [1.508, 1.888] | 1.500 | 1.142 | 1.934 | 1.107 | yes | 4.265 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 1.714 | [1.509, 1.883] | 1.500 | 1.142 | 1.934 | 1.500 | yes | 4.354 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 1.714 | [1.511, 1.884] | 1.500 | 1.142 | 1.934 | 1.813 | yes | 4.673 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 1.714 | [1.522, 1.883] | 1.500 | 1.142 | 1.934 | 1.576 | yes | 4.863 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 1.714 | [1.516, 1.889] | 1.500 | 1.142 | 1.934 | 1.240 | yes | 4.851 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 1.714 | [1.511, 1.878] | 1.500 | 1.142 | 1.934 | 1.309 | yes | 3.858 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 1.714 | [1.515, 1.883] | 1.500 | 1.142 | 1.934 | 1.367 | yes | 4.985 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 1.714 | [1.520, 1.878] | 1.500 | 1.142 | 1.934 | 1.275 | yes | 3.968 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 1.714 | [1.519, 1.884] | 1.500 | 1.142 | 1.934 | 1.391 | yes | 4.054 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 1.714 | [1.503, 1.881] | 1.500 | 1.142 | 1.934 | 1.342 | yes | 6.164 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 1.714 | [1.513, 1.883] | 1.500 | 1.142 | 1.934 | 1.735 | yes | 6.629 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 1.714 | [1.508, 1.878] | 1.500 | 1.142 | 1.934 | 1.487 | yes | 3.554 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 1.714 | [1.516, 1.877] | 1.500 | 1.142 | 1.934 | 1.177 | yes | 4.345 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 1.714 | [1.516, 1.883] | 1.500 | 1.142 | 1.934 | 1.288 | yes | 4.819 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 1.714 | [1.506, 1.883] | 1.500 | 1.142 | 1.934 | 1.641 | yes | 5.134 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 1.714 | [1.512, 1.883] | 1.500 | 1.142 | 1.934 | 1.293 | yes | 4.801 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs | bsgs.textbook | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 1.714 | [1.514, 1.882] | 1.500 | 1.142 | 1.934 | 1.284 | yes | 7.096 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 1.215 | [1.024, 1.378] | 1.000 | 1.215 | 1.371 | 0.899 | yes | 5.713 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.799 | yes | 7.586 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 0.745 | yes | 5.625 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 1.215 | [1.015, 1.385] | 1.000 | 1.215 | 1.371 | 0.804 | yes | 6.961 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 1.215 | [1.005, 1.386] | 1.000 | 1.215 | 1.371 | 0.811 | yes | 5.545 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 1.215 | [1.017, 1.390] | 1.000 | 1.215 | 1.371 | 0.979 | yes | 6.985 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.997 | yes | 5.322 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 1.215 | [1.022, 1.384] | 1.000 | 1.215 | 1.371 | 0.904 | yes | 4.714 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 1.215 | [1.018, 1.380] | 1.000 | 1.215 | 1.371 | 0.795 | yes | 5.129 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 1.215 | [1.010, 1.384] | 1.000 | 1.215 | 1.371 | 1.032 | yes | 7.887 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 1.215 | [1.008, 1.385] | 1.000 | 1.215 | 1.371 | 1.276 | yes | 7.151 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 1.215 | [1.013, 1.385] | 1.000 | 1.215 | 1.371 | 1.097 | yes | 7.846 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 1.215 | [1.018, 1.386] | 1.000 | 1.215 | 1.371 | 0.926 | yes | 7.049 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 1.215 | [1.021, 1.385] | 1.000 | 1.215 | 1.371 | 1.154 | yes | 8.233 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 1.215 | [1.019, 1.385] | 1.000 | 1.215 | 1.371 | 0.796 | yes | 7.295 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.972 | yes | 6.737 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 0.770 | yes | 5.738 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 1.215 | [1.018, 1.385] | 1.000 | 1.215 | 1.371 | 1.009 | yes | 6.544 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 1.215 | [1.013, 1.379] | 1.000 | 1.215 | 1.371 | 1.256 | yes | 7.016 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 1.215 | [1.020, 1.384] | 1.000 | 1.215 | 1.371 | 1.109 | yes | 7.059 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 1.215 | [1.023, 1.380] | 1.000 | 1.215 | 1.371 | 0.860 | yes | 6.576 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 1.215 | [1.017, 1.386] | 1.000 | 1.215 | 1.371 | 0.824 | yes | 7.539 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 1.215 | [1.021, 1.380] | 1.000 | 1.215 | 1.371 | 1.010 | yes | 4.594 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 1.215 | [1.016, 1.379] | 1.000 | 1.215 | 1.371 | 1.158 | yes | 5.416 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 1.215 | [1.021, 1.386] | 1.000 | 1.215 | 1.371 | 0.992 | yes | 6.771 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 1.215 | [1.016, 1.385] | 1.000 | 1.215 | 1.371 | 0.986 | yes | 7.714 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 1.215 | [1.023, 1.385] | 1.000 | 1.215 | 1.371 | 0.808 | yes | 6.969 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 1.215 | [1.013, 1.380] | 1.000 | 1.215 | 1.371 | 0.853 | yes | 6.405 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 1.215 | [1.013, 1.383] | 1.000 | 1.215 | 1.371 | 0.880 | yes | 5.867 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 1.215 | [1.013, 1.386] | 1.000 | 1.215 | 1.371 | 0.826 | yes | 6.600 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 1.215 | [1.013, 1.384] | 1.000 | 1.215 | 1.371 | 0.776 | yes | 8.551 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 1.215 | [1.021, 1.385] | 1.000 | 1.215 | 1.371 | 1.071 | yes | 6.731 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 1.215 | [1.012, 1.384] | 1.000 | 1.215 | 1.371 | 0.821 | yes | 6.074 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 1.215 | [1.015, 1.385] | 1.000 | 1.215 | 1.371 | 0.928 | yes | 7.154 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 1.215 | [1.015, 1.380] | 1.000 | 1.215 | 1.371 | 0.792 | yes | 5.948 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 1.215 | [1.019, 1.384] | 1.000 | 1.215 | 1.371 | 0.780 | yes | 6.849 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 1.215 | [1.017, 1.390] | 1.000 | 1.215 | 1.371 | 1.410 | yes | 6.813 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 1.215 | [1.014, 1.385] | 1.000 | 1.215 | 1.371 | 0.953 | yes | 6.840 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 1.215 | [1.022, 1.385] | 1.000 | 1.215 | 1.371 | 0.901 | yes | 7.190 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 1.215 | [1.010, 1.385] | 1.000 | 1.215 | 1.371 | 0.671 | yes | 6.932 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 1.215 | [1.012, 1.384] | 1.000 | 1.215 | 1.371 | 1.516 | yes | 7.403 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 1.215 | [1.018, 1.385] | 1.000 | 1.215 | 1.371 | 0.997 | yes | 5.692 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 1.215 | [1.017, 1.385] | 1.000 | 1.215 | 1.371 | 1.000 | yes | 4.700 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 1.215 | [1.019, 1.384] | 1.000 | 1.215 | 1.371 | 1.154 | yes | 5.011 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 1.215 | [1.015, 1.380] | 1.000 | 1.215 | 1.371 | 0.986 | yes | 5.248 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 1.215 | [1.016, 1.385] | 1.000 | 1.215 | 1.371 | 1.282 | yes | 6.010 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 1.215 | [1.017, 1.386] | 1.000 | 1.215 | 1.371 | 1.100 | yes | 6.655 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 1.215 | [1.014, 1.386] | 1.000 | 1.215 | 1.371 | 0.803 | yes | 6.775 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 1.215 | [1.018, 1.385] | 1.000 | 1.215 | 1.371 | 0.768 | yes | 5.322 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.993 | yes | 5.621 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 1.215 | [1.013, 1.385] | 1.000 | 1.215 | 1.371 | 0.919 | yes | 4.482 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 1.215 | [1.019, 1.384] | 1.000 | 1.215 | 1.371 | 1.024 | yes | 5.192 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 1.215 | [1.019, 1.379] | 1.000 | 1.215 | 1.371 | 1.132 | yes | 5.358 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 1.215 | [1.024, 1.386] | 1.000 | 1.215 | 1.371 | 0.766 | yes | 4.455 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 1.215 | [1.019, 1.379] | 1.000 | 1.215 | 1.371 | 1.006 | yes | 5.345 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 1.215 | [1.015, 1.386] | 1.000 | 1.215 | 1.371 | 0.937 | yes | 4.966 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 1.215 | [1.020, 1.385] | 1.000 | 1.215 | 1.371 | 0.932 | yes | 5.698 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.862 | yes | 4.941 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 1.215 | [1.016, 1.386] | 1.000 | 1.215 | 1.371 | 0.905 | yes | 3.893 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 1.215 | [1.011, 1.385] | 1.000 | 1.215 | 1.371 | 1.034 | yes | 5.318 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 1.186 | yes | 7.745 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 1.215 | [1.020, 1.384] | 1.000 | 1.215 | 1.371 | 1.146 | yes | 6.819 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.854 | yes | 6.999 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 1.215 | [1.024, 1.380] | 1.000 | 1.215 | 1.371 | 0.861 | yes | 7.535 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 1.215 | [1.015, 1.384] | 1.000 | 1.215 | 1.371 | 0.983 | yes | 7.160 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 1.215 | [1.018, 1.385] | 1.000 | 1.215 | 1.371 | 0.636 | yes | 8.357 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 1.215 | [1.018, 1.385] | 1.000 | 1.215 | 1.371 | 0.881 | yes | 9.141 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 1.215 | [1.020, 1.385] | 1.000 | 1.215 | 1.371 | 0.958 | yes | 5.359 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 1.215 | [1.008, 1.379] | 1.000 | 1.215 | 1.371 | 0.905 | yes | 6.944 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 1.173 | yes | 6.772 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 1.215 | [1.018, 1.380] | 1.000 | 1.215 | 1.371 | 0.995 | yes | 5.176 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.812 | yes | 5.050 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 1.215 | [1.010, 1.391] | 1.000 | 1.215 | 1.371 | 0.941 | yes | 4.000 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 1.215 | [1.017, 1.386] | 1.000 | 1.215 | 1.371 | 1.034 | yes | 4.184 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.757 | yes | 4.591 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 1.215 | [1.023, 1.385] | 1.000 | 1.215 | 1.371 | 1.085 | yes | 6.263 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 1.215 | [1.021, 1.386] | 1.000 | 1.215 | 1.371 | 0.831 | yes | 6.625 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.983 | yes | 4.286 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.788 | yes | 5.283 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 1.215 | [1.013, 1.386] | 1.000 | 1.215 | 1.371 | 0.769 | yes | 5.268 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 1.215 | [1.019, 1.385] | 1.000 | 1.215 | 1.371 | 0.789 | yes | 7.581 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 1.215 | [1.017, 1.386] | 1.000 | 1.215 | 1.371 | 0.902 | yes | 5.453 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 1.073 | yes | 5.095 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.981 | yes | 6.070 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.664 | yes | 3.841 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.905 | yes | 6.164 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 1.046 | yes | 6.035 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.918 | yes | 5.127 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.786 | yes | 4.267 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 1.215 | [1.016, 1.379] | 1.000 | 1.215 | 1.371 | 1.124 | yes | 4.732 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 1.198 | yes | 5.337 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 1.215 | [1.014, 1.379] | 1.000 | 1.215 | 1.371 | 0.880 | yes | 5.128 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 1.215 | [1.017, 1.379] | 1.000 | 1.215 | 1.371 | 1.068 | yes | 6.799 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 1.215 | [1.013, 1.379] | 1.000 | 1.215 | 1.371 | 0.802 | yes | 4.043 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 1.215 | [1.017, 1.379] | 1.000 | 1.215 | 1.371 | 0.982 | yes | 6.026 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.964 | yes | 4.881 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.953 | yes | 5.579 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 1.215 | [1.024, 1.380] | 1.000 | 1.215 | 1.371 | 1.111 | yes | 6.385 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 1.215 | [1.010, 1.384] | 1.000 | 1.215 | 1.371 | 0.831 | yes | 4.317 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 1.215 | [1.006, 1.385] | 1.000 | 1.215 | 1.371 | 0.999 | yes | 5.695 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 1.215 | [1.015, 1.385] | 1.000 | 1.215 | 1.371 | 0.798 | yes | 4.190 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 1.215 | [1.017, 1.380] | 1.000 | 1.215 | 1.371 | 0.970 | yes | 4.497 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.809 | yes | 4.187 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 1.215 | [1.012, 1.386] | 1.000 | 1.215 | 1.371 | 1.003 | yes | 4.584 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 1.215 | [1.013, 1.384] | 1.000 | 1.215 | 1.371 | 0.745 | yes | 4.769 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 1.215 | [1.013, 1.385] | 1.000 | 1.215 | 1.371 | 0.909 | yes | 6.832 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 1.215 | [1.016, 1.390] | 1.000 | 1.215 | 1.371 | 1.296 | yes | 5.331 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 1.215 | [1.015, 1.385] | 1.000 | 1.215 | 1.371 | 0.891 | yes | 3.928 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 1.215 | [1.022, 1.380] | 1.000 | 1.215 | 1.371 | 0.854 | yes | 5.396 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 1.215 | [1.024, 1.385] | 1.000 | 1.215 | 1.371 | 0.983 | yes | 5.124 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 1.215 | [1.024, 1.379] | 1.000 | 1.215 | 1.371 | 0.969 | yes | 5.279 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 1.215 | [1.024, 1.385] | 1.000 | 1.215 | 1.371 | 0.980 | yes | 3.669 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 1.215 | [1.015, 1.392] | 1.000 | 1.215 | 1.371 | 1.075 | yes | 3.589 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 1.215 | [1.013, 1.386] | 1.000 | 1.215 | 1.371 | 1.135 | yes | 4.135 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 1.215 | [1.012, 1.380] | 1.000 | 1.215 | 1.371 | 0.722 | yes | 4.478 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 1.215 | [1.015, 1.380] | 1.000 | 1.215 | 1.371 | 1.011 | yes | 5.079 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 1.215 | [1.021, 1.385] | 1.000 | 1.215 | 1.371 | 1.412 | yes | 5.254 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 1.215 | [1.014, 1.384] | 1.000 | 1.215 | 1.371 | 1.206 | yes | 4.704 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 0.711 | yes | 5.959 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 1.215 | [1.012, 1.380] | 1.000 | 1.215 | 1.371 | 1.057 | yes | 4.625 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 0.871 | yes | 4.845 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 1.215 | [1.013, 1.385] | 1.000 | 1.215 | 1.371 | 0.569 | yes | 5.294 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 1.215 | [1.013, 1.385] | 1.000 | 1.215 | 1.371 | 0.787 | yes | 7.007 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 1.215 | [1.022, 1.391] | 1.000 | 1.215 | 1.371 | 0.835 | yes | 6.860 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 1.059 | yes | 6.138 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 1.215 | [1.015, 1.386] | 1.000 | 1.215 | 1.371 | 1.096 | yes | 6.016 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 0.917 | yes | 4.836 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 1.215 | [1.009, 1.390] | 1.000 | 1.215 | 1.371 | 0.785 | yes | 4.064 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 1.215 | [1.010, 1.384] | 1.000 | 1.215 | 1.371 | 1.063 | yes | 5.189 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 1.215 | [1.012, 1.385] | 1.000 | 1.215 | 1.371 | 1.286 | yes | 5.609 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 1.215 | [1.024, 1.384] | 1.000 | 1.215 | 1.371 | 1.118 | yes | 5.569 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 1.215 | [1.018, 1.391] | 1.000 | 1.215 | 1.371 | 0.879 | yes | 4.404 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 1.215 | [1.013, 1.379] | 1.000 | 1.215 | 1.371 | 0.928 | yes | 5.368 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 1.215 | [1.017, 1.384] | 1.000 | 1.215 | 1.371 | 0.970 | yes | 4.833 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 1.215 | [1.022, 1.380] | 1.000 | 1.215 | 1.371 | 0.904 | yes | 5.161 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 1.215 | [1.021, 1.386] | 1.000 | 1.215 | 1.371 | 0.986 | yes | 4.713 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 1.215 | [1.005, 1.383] | 1.000 | 1.215 | 1.371 | 0.952 | yes | 7.038 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 1.215 | [1.015, 1.385] | 1.000 | 1.215 | 1.371 | 1.230 | yes | 6.475 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 1.215 | [1.009, 1.380] | 1.000 | 1.215 | 1.371 | 1.054 | yes | 4.219 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 1.215 | [1.018, 1.379] | 1.000 | 1.215 | 1.371 | 0.835 | yes | 4.607 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 1.215 | [1.018, 1.384] | 1.000 | 1.215 | 1.371 | 0.913 | yes | 5.833 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 1.215 | [1.008, 1.384] | 1.000 | 1.215 | 1.371 | 1.164 | yes | 5.088 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 1.215 | [1.014, 1.385] | 1.000 | 1.215 | 1.371 | 0.917 | yes | 4.990 | L2×8 |
+| ECBS1hda8fe4667f3f | bsgs-neg | bsgs.negation | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 1.215 | [1.016, 1.384] | 1.000 | 1.215 | 1.371 | 0.911 | yes | 5.831 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 56.063 | [42.191, 69.475] | – | – | 63.261 | 41.488 | yes | 16.493 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 86.316 | [66.239, 107.846] | – | – | 97.397 | 56.753 | yes | 22.832 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 70.694 | [49.624, 91.904] | – | – | 79.769 | 43.355 | yes | 15.468 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 68.780 | [44.598, 95.905] | – | – | 77.610 | 45.498 | yes | 21.129 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 67.626 | [49.548, 85.326] | – | – | 76.307 | 45.136 | yes | 16.445 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 71.678 | [49.338, 95.306] | – | – | 80.880 | 57.709 | yes | 25.041 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 90.900 | [67.836, 115.232] | – | – | 102.569 | 74.545 | yes | 32.140 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 78.102 | [57.208, 101.237] | – | – | 88.129 | 58.096 | yes | 18.518 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 90.406 | [74.558, 106.219] | – | – | 102.012 | 59.166 | yes | 25.046 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 86.949 | [64.028, 108.933] | – | – | 98.112 | 73.839 | yes | 27.972 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 79.114 | [58.171, 95.531] | – | – | 89.270 | 83.083 | yes | 26.648 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 91.821 | [72.458, 110.257] | – | – | 103.608 | 82.856 | yes | 38.292 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 76.731 | [66.729, 86.956] | – | – | 86.581 | 58.479 | yes | 23.136 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 108.938 | [90.508, 128.299] | – | – | 122.924 | 103.414 | yes | 45.586 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 79.611 | [55.050, 102.970] | – | – | 89.831 | 52.139 | yes | 30.155 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 62.384 | [45.440, 83.552] | – | – | 70.392 | 49.869 | yes | 12.946 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 88.114 | [77.199, 100.301] | – | – | 99.426 | 55.808 | yes | 24.195 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 81.068 | [51.999, 113.619] | – | – | 91.476 | 67.303 | yes | 23.515 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 65.365 | [50.241, 79.272] | – | – | 73.757 | 67.570 | yes | 24.858 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 58.660 | [37.389, 81.458] | – | – | 66.191 | 53.511 | yes | 21.216 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 84.970 | [63.024, 107.411] | – | – | 95.879 | 60.104 | yes | 26.844 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 78.401 | [56.065, 98.138] | – | – | 88.466 | 53.167 | yes | 23.046 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 73.769 | [50.474, 100.593] | – | – | 83.239 | 61.293 | yes | 15.867 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 63.609 | [45.573, 82.025] | – | – | 71.775 | 60.583 | yes | 16.504 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 51.957 | [30.388, 73.906] | – | – | 58.627 | 42.392 | yes | 12.232 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 84.587 | [62.271, 108.963] | – | – | 95.446 | 68.640 | yes | 25.775 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 75.826 | [59.612, 92.819] | – | – | 85.560 | 50.441 | yes | 22.235 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 82.384 | [55.972, 107.607] | – | – | 92.960 | 57.797 | yes | 28.324 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 65.458 | [41.914, 93.028] | – | – | 73.861 | 47.378 | yes | 18.608 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 72.337 | [49.589, 95.469] | – | – | 81.623 | 49.143 | yes | 21.987 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 66.814 | [40.429, 92.924] | – | – | 75.391 | 42.682 | yes | 22.509 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 61.046 | [47.366, 74.519] | – | – | 68.883 | 53.817 | yes | 16.383 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 57.580 | [37.392, 84.704] | – | – | 64.972 | 38.897 | yes | 14.810 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 83.106 | [52.510, 122.816] | – | – | 93.775 | 63.465 | yes | 17.146 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 75.544 | [49.548, 101.336] | – | – | 85.243 | 49.225 | yes | 18.958 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 81.464 | [57.149, 107.621] | – | – | 91.923 | 52.292 | yes | 22.733 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 87.184 | [58.378, 114.180] | – | – | 98.377 | 101.125 | yes | 28.265 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 88.376 | [67.578, 109.314] | – | – | 99.722 | 69.330 | yes | 25.356 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 77.622 | [65.378, 88.937] | – | – | 87.587 | 57.572 | yes | 26.026 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 87.287 | [60.546, 114.953] | – | – | 98.493 | 48.157 | yes | 26.636 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 98.101 | [69.883, 124.793] | – | – | 110.695 | 122.350 | yes | 30.268 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 81.078 | [62.359, 99.554] | – | – | 91.487 | 66.498 | yes | 24.094 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 73.073 | [56.905, 87.976] | – | – | 82.454 | 60.145 | yes | 18.977 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 67.971 | [54.700, 79.532] | – | – | 76.698 | 64.533 | yes | 21.611 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 91.823 | [74.768, 108.463] | – | – | 103.611 | 74.529 | yes | 23.904 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 81.154 | [63.765, 97.556] | – | – | 91.572 | 85.614 | yes | 25.355 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 77.818 | [61.113, 91.772] | – | – | 87.808 | 70.442 | yes | 23.718 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 85.263 | [73.064, 100.065] | – | – | 96.210 | 56.339 | yes | 24.845 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 93.331 | [70.747, 114.079] | – | – | 105.313 | 58.957 | yes | 26.004 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 71.607 | [47.401, 96.660] | – | – | 80.800 | 58.477 | yes | 18.183 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 62.272 | [40.025, 89.156] | – | – | 70.266 | 47.085 | yes | 13.838 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 70.535 | [53.109, 89.422] | – | – | 79.591 | 59.402 | yes | 16.701 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 68.757 | [56.750, 81.757] | – | – | 77.584 | 64.029 | yes | 18.713 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 98.812 | [63.234, 133.508] | – | – | 111.498 | 62.250 | yes | 30.637 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 58.303 | [35.942, 82.461] | – | – | 65.787 | 48.264 | yes | 15.045 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 89.447 | [80.617, 98.756] | – | – | 100.930 | 68.967 | yes | 25.207 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 104.091 | [78.046, 134.634] | – | – | 117.454 | 79.821 | yes | 29.141 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 70.659 | [51.204, 88.302] | – | – | 79.730 | 50.094 | yes | 24.137 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 65.271 | [44.579, 85.494] | – | – | 73.650 | 48.622 | yes | 18.289 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 65.587 | [43.065, 86.985] | – | – | 74.007 | 55.823 | yes | 19.450 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 59.808 | [46.657, 71.238] | – | – | 67.486 | 58.369 | yes | 20.419 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 82.679 | [56.606, 111.520] | – | – | 93.294 | 77.972 | yes | 22.748 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 82.193 | [57.603, 109.929] | – | – | 92.745 | 57.724 | yes | 22.705 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 69.816 | [58.271, 82.167] | – | – | 78.778 | 49.462 | yes | 22.947 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 77.567 | [55.403, 104.052] | – | – | 87.525 | 62.724 | yes | 18.763 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 95.631 | [74.091, 114.650] | – | – | 107.908 | 50.076 | yes | 37.168 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 119.570 | [102.802, 136.960] | – | – | 134.921 | 86.631 | yes | 47.875 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 73.839 | [52.621, 97.910] | – | – | 83.318 | 58.217 | yes | 27.240 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 75.776 | [55.134, 92.992] | – | – | 85.504 | 56.453 | yes | 29.698 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 91.023 | [60.112, 122.679] | – | – | 102.709 | 87.881 | yes | 31.005 | L1×4 L2×4 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 62.027 | [38.305, 86.223] | – | – | 69.990 | 50.803 | yes | 18.823 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 91.846 | [60.860, 125.101] | – | – | 103.638 | 61.399 | yes | 25.593 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 69.022 | [50.486, 87.559] | – | – | 77.883 | 53.459 | yes | 17.379 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 70.695 | [46.878, 96.445] | – | – | 79.771 | 60.156 | yes | 17.006 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 43.671 | [23.981, 63.438] | – | – | 49.278 | 27.214 | yes | 8.336 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 129.171 | [96.223, 170.027] | – | – | 145.754 | 115.317 | yes | 37.086 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 89.581 | [72.033, 109.500] | – | – | 101.082 | 61.240 | yes | 25.174 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 72.894 | [54.524, 89.388] | – | – | 82.252 | 58.972 | yes | 21.446 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 75.770 | [56.148, 96.111] | – | – | 85.497 | 49.101 | yes | 22.867 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 68.065 | [57.812, 80.506] | – | – | 76.803 | 43.061 | yes | 16.771 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 77.419 | [54.413, 101.535] | – | – | 87.358 | 50.233 | yes | 24.250 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 65.757 | [44.914, 94.003] | – | – | 74.198 | 48.822 | yes | 14.682 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 73.895 | [50.991, 94.595] | – | – | 83.381 | 65.232 | yes | 21.337 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 98.394 | [77.651, 115.306] | – | – | 111.026 | 79.450 | yes | 29.736 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 89.177 | [72.316, 110.675] | – | – | 100.625 | 48.743 | yes | 24.719 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 88.261 | [67.300, 111.448] | – | – | 99.591 | 65.707 | yes | 22.855 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 70.924 | [54.221, 88.536] | – | – | 80.029 | 61.029 | yes | 19.521 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 75.709 | [60.235, 93.015] | – | – | 85.428 | 57.191 | yes | 21.357 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 70.193 | [50.255, 92.363] | – | – | 79.205 | 45.373 | yes | 15.948 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 83.112 | [58.051, 113.038] | – | – | 93.782 | 76.879 | yes | 20.794 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 77.579 | [59.877, 98.044] | – | – | 87.538 | 76.449 | yes | 23.955 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 61.540 | [40.576, 84.809] | – | – | 69.440 | 44.551 | yes | 13.121 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 97.163 | [75.161, 120.026] | – | – | 109.637 | 85.406 | yes | 36.358 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 70.888 | [55.960, 88.827] | – | – | 79.988 | 46.775 | yes | 16.905 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 70.730 | [47.434, 96.119] | – | – | 79.811 | 57.170 | yes | 23.512 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 80.701 | [53.984, 109.317] | – | – | 91.061 | 64.021 | yes | 20.803 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 61.610 | [41.642, 81.850] | – | – | 69.519 | 48.284 | yes | 20.949 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 94.841 | [74.155, 115.087] | – | – | 107.016 | 86.713 | yes | 34.134 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 92.317 | [70.993, 114.645] | – | – | 104.168 | 63.128 | yes | 28.680 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 73.647 | [60.929, 85.673] | – | – | 83.102 | 60.520 | yes | 21.045 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 83.780 | [74.149, 93.548] | – | – | 94.536 | 55.020 | yes | 21.650 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 85.891 | [62.661, 112.370] | – | – | 96.917 | 68.531 | yes | 21.422 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 48.324 | [37.702, 58.480] | – | – | 54.528 | 32.185 | yes | 13.361 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 86.964 | [54.753, 117.514] | – | – | 98.128 | 71.742 | yes | 24.797 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 77.886 | [62.376, 93.922] | – | – | 87.885 | 47.717 | yes | 20.610 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 51.079 | [37.481, 64.993] | – | – | 57.636 | 38.216 | yes | 14.490 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 88.044 | [69.658, 108.262] | – | – | 99.347 | 93.860 | yes | 28.608 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 86.702 | [57.312, 113.599] | – | – | 97.832 | 63.559 | yes | 27.001 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 101.447 | [65.500, 139.090] | – | – | 114.471 | 71.282 | yes | 31.825 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 83.166 | [59.051, 108.278] | – | – | 93.843 | 67.298 | yes | 22.165 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 78.051 | [56.783, 101.701] | – | – | 88.071 | 62.220 | yes | 18.339 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 79.426 | [59.006, 106.708] | – | – | 89.623 | 64.069 | yes | 18.647 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 65.234 | [39.995, 95.187] | – | – | 73.609 | 57.686 | yes | 14.315 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 73.150 | [58.191, 89.940] | – | – | 82.541 | 68.314 | yes | 16.671 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 93.499 | [64.426, 125.018] | – | – | 105.502 | 55.514 | yes | 22.036 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 88.355 | [65.617, 111.668] | – | – | 99.698 | 73.505 | yes | 28.889 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 88.410 | [67.977, 109.967] | – | – | 99.760 | 102.713 | yes | 22.902 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 106.436 | [88.844, 124.373] | – | – | 120.100 | 105.595 | yes | 29.267 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 74.009 | [52.337, 94.908] | – | – | 83.511 | 43.324 | yes | 19.613 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 84.210 | [53.308, 116.722] | – | – | 95.021 | 73.251 | yes | 23.888 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 101.933 | [79.478, 121.078] | – | – | 115.019 | 73.065 | yes | 30.979 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 70.606 | [46.393, 93.124] | – | – | 79.670 | 33.072 | yes | 22.855 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 82.322 | [61.209, 100.169] | – | – | 92.890 | 53.274 | yes | 27.887 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 84.838 | [56.969, 111.242] | – | – | 95.729 | 58.290 | yes | 27.187 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 83.159 | [55.706, 111.943] | – | – | 93.835 | 72.477 | yes | 26.616 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 82.452 | [56.802, 110.118] | – | – | 93.037 | 74.365 | yes | 22.782 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 67.730 | [51.258, 87.001] | – | – | 76.425 | 51.088 | yes | 18.496 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 72.404 | [51.264, 96.464] | – | – | 81.699 | 46.768 | yes | 16.310 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 65.622 | [52.590, 81.243] | – | – | 74.046 | 57.422 | yes | 14.320 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 90.508 | [73.093, 107.450] | – | – | 102.127 | 95.777 | yes | 26.271 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 77.643 | [48.848, 106.703] | – | – | 87.611 | 71.398 | yes | 23.689 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 75.053 | [49.190, 101.741] | – | – | 84.689 | 54.301 | yes | 25.260 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 87.197 | [65.964, 119.742] | – | – | 98.391 | 66.582 | yes | 18.912 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 59.438 | [41.189, 79.800] | – | – | 67.069 | 47.430 | yes | 15.869 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 69.940 | [58.695, 85.103] | – | – | 78.919 | 52.030 | yes | 16.281 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 93.417 | [77.817, 115.294] | – | – | 105.410 | 75.823 | yes | 22.268 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 95.500 | [58.753, 137.118] | – | – | 107.760 | 74.788 | yes | 24.668 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 66.497 | [54.260, 77.437] | – | – | 75.034 | 67.318 | yes | 18.929 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 84.972 | [70.194, 99.435] | – | – | 95.880 | 73.717 | yes | 23.340 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 64.446 | [50.992, 77.182] | – | – | 72.720 | 44.276 | yes | 14.787 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 92.732 | [74.471, 112.176] | – | – | 104.636 | 69.684 | yes | 25.263 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 93.702 | [72.084, 116.684] | – | – | 105.732 | 89.720 | yes | 27.344 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 76.499 | [58.052, 94.015] | – | – | 86.320 | 57.703 | yes | 21.783 | L2×8 |
+| ECBS1hda8fe4667f3f | ic | ic.pipeline | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 68.662 | [46.559, 90.868] | – | – | 77.476 | 51.462 | yes | 20.044 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cd978096 | 19.63 | 8/8 | 1.351 | [1.063, 1.669] | 0.886 | 1.525 | 1.525 | 1.000 | yes | 5.651 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-5cc67eaf | 19.63 | 8/8 | 1.521 | [1.117, 1.944] | 0.886 | 1.716 | 1.716 | 1.000 | yes | 5.560 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e01f79f5 | 19.63 | 8/8 | 1.631 | [1.214, 2.047] | 0.886 | 1.840 | 1.840 | 1.000 | yes | 7.430 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-feb380fe | 19.63 | 8/8 | 1.512 | [1.222, 1.901] | 0.886 | 1.706 | 1.706 | 1.000 | yes | 7.147 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b5ebe96e | 19.63 | 8/8 | 1.498 | [1.009, 2.149] | 0.886 | 1.691 | 1.691 | 1.000 | yes | 7.027 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-710a3fa9 | 19.63 | 8/8 | 1.242 | [0.926, 1.590] | 0.886 | 1.402 | 1.402 | 1.000 | yes | 5.497 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-a10e005e | 19.63 | 8/8 | 1.219 | [0.913, 1.655] | 0.886 | 1.376 | 1.376 | 1.000 | yes | 4.254 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b8f7412d | 19.63 | 8/8 | 1.344 | [1.086, 1.660] | 0.886 | 1.517 | 1.517 | 1.000 | yes | 3.965 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-f7b0189f | 19.63 | 8/8 | 1.528 | [1.138, 1.992] | 0.886 | 1.724 | 1.724 | 1.000 | yes | 4.487 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-3981a3a9 | 19.63 | 8/8 | 1.178 | [0.859, 1.679] | 0.886 | 1.329 | 1.329 | 1.000 | yes | 6.002 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-221d8902 | 19.63 | 8/8 | 0.952 | [0.688, 1.265] | 0.886 | 1.074 | 1.074 | 1.000 | yes | 5.828 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cc4f42c6 | 19.63 | 8/8 | 1.108 | [0.761, 1.471] | 0.886 | 1.250 | 1.250 | 1.000 | yes | 8.005 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ad7b1692 | 19.63 | 8/8 | 1.312 | [0.993, 1.637] | 0.886 | 1.481 | 1.481 | 1.000 | yes | 7.109 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-5b1ae01d | 19.63 | 8/8 | 1.053 | [0.791, 1.314] | 0.886 | 1.189 | 1.189 | 1.000 | yes | 8.455 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6c20a852 | 19.63 | 8/8 | 1.527 | [1.173, 1.968] | 0.886 | 1.723 | 1.723 | 1.000 | yes | 7.551 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e59b9e9e | 19.63 | 8/8 | 1.251 | [0.910, 1.589] | 0.886 | 1.412 | 1.412 | 1.000 | yes | 7.459 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b69cd7b5 | 19.63 | 8/8 | 1.579 | [0.977, 2.180] | 0.886 | 1.782 | 1.782 | 1.000 | yes | 5.079 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c975df53 | 19.63 | 8/8 | 1.205 | [0.868, 1.580] | 0.886 | 1.359 | 1.359 | 1.000 | yes | 4.890 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-64bf458f | 19.63 | 8/8 | 0.967 | [0.754, 1.194] | 0.886 | 1.092 | 1.092 | 1.000 | yes | 6.642 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-022662a0 | 19.63 | 8/8 | 1.096 | [0.830, 1.384] | 0.886 | 1.237 | 1.237 | 1.000 | yes | 5.603 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-4608122f | 19.63 | 8/8 | 1.414 | [1.085, 1.797] | 0.886 | 1.595 | 1.595 | 1.000 | yes | 5.155 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cc7c1288 | 19.63 | 8/8 | 1.475 | [1.070, 1.939] | 0.886 | 1.664 | 1.664 | 1.000 | yes | 5.280 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6dffde4b | 19.63 | 8/8 | 1.204 | [0.847, 1.558] | 0.886 | 1.358 | 1.358 | 1.000 | yes | 4.532 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-7e7abec6 | 19.63 | 8/8 | 1.050 | [0.752, 1.405] | 0.886 | 1.185 | 1.185 | 1.000 | yes | 5.374 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ced6ee17 | 19.63 | 8/8 | 1.226 | [1.024, 1.425] | 0.886 | 1.383 | 1.383 | 1.000 | yes | 6.564 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ef5423bf | 19.63 | 8/8 | 1.232 | [0.814, 1.665] | 0.886 | 1.391 | 1.391 | 1.000 | yes | 6.601 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-942eb41c | 19.63 | 8/8 | 1.503 | [0.883, 2.206] | 0.886 | 1.696 | 1.696 | 1.000 | yes | 5.888 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d3831b75 | 19.63 | 8/8 | 1.425 | [1.009, 1.862] | 0.886 | 1.608 | 1.608 | 1.000 | yes | 5.777 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-534fddeb | 19.63 | 8/8 | 1.382 | [0.965, 1.809] | 0.886 | 1.559 | 1.559 | 1.000 | yes | 5.291 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-81571c63 | 19.63 | 8/8 | 1.472 | [1.074, 1.905] | 0.886 | 1.661 | 1.661 | 1.000 | yes | 6.410 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b33d105c | 19.63 | 8/8 | 1.565 | [1.135, 1.998] | 0.886 | 1.766 | 1.766 | 1.000 | yes | 8.046 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6b65634c | 19.63 | 8/8 | 1.134 | [0.811, 1.479] | 0.886 | 1.280 | 1.280 | 1.000 | yes | 7.131 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ae33d593 | 19.63 | 8/8 | 1.480 | [0.982, 2.052] | 0.886 | 1.670 | 1.670 | 1.000 | yes | 5.706 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-fe25d0f4 | 19.63 | 8/8 | 1.309 | [0.881, 1.803] | 0.886 | 1.478 | 1.478 | 1.000 | yes | 7.772 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8a6d5a4c | 19.63 | 8/8 | 1.535 | [1.145, 1.943] | 0.886 | 1.732 | 1.732 | 1.000 | yes | 5.986 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-1f8d03b2 | 19.63 | 8/8 | 1.558 | [0.790, 2.675] | 0.886 | 1.758 | 1.758 | 1.000 | yes | 5.281 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8635e731 | 19.63 | 8/8 | 0.862 | [0.641, 1.082] | 0.886 | 0.973 | 0.973 | 1.000 | yes | 6.022 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-38fcc2d4 | 19.63 | 8/8 | 1.275 | [1.019, 1.528] | 0.886 | 1.438 | 1.438 | 1.000 | yes | 6.643 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b2891e08 | 19.63 | 8/8 | 1.348 | [1.033, 1.680] | 0.886 | 1.521 | 1.521 | 1.000 | yes | 7.574 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-750392d1 | 19.63 | 8/8 | 1.813 | [1.613, 2.020] | 0.886 | 2.045 | 2.045 | 1.000 | yes | 6.837 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-742030fb | 19.63 | 8/8 | 0.802 | [0.502, 1.141] | 0.886 | 0.905 | 0.905 | 1.000 | yes | 6.533 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c38ae3aa | 19.63 | 8/8 | 1.219 | [1.016, 1.449] | 0.886 | 1.376 | 1.376 | 1.000 | yes | 4.427 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-7eac3e31 | 19.63 | 8/8 | 1.215 | [0.909, 1.515] | 0.886 | 1.371 | 1.371 | 1.000 | yes | 4.175 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-a479144d | 19.63 | 8/8 | 1.053 | [0.727, 1.415] | 0.886 | 1.188 | 1.188 | 1.000 | yes | 5.076 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8784e88b | 19.63 | 8/8 | 1.232 | [0.855, 1.693] | 0.886 | 1.390 | 1.390 | 1.000 | yes | 4.283 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cc7d4c3f | 19.63 | 8/8 | 0.948 | [0.640, 1.258] | 0.886 | 1.070 | 1.070 | 1.000 | yes | 5.767 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-32f9c682 | 19.63 | 8/8 | 1.105 | [0.890, 1.312] | 0.886 | 1.247 | 1.247 | 1.000 | yes | 5.595 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6d3be06d | 19.63 | 8/8 | 1.513 | [1.167, 1.864] | 0.886 | 1.708 | 1.708 | 1.000 | yes | 6.953 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cf40446e | 19.63 | 8/8 | 1.583 | [1.044, 2.182] | 0.886 | 1.786 | 1.786 | 1.000 | yes | 4.681 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-778de837 | 19.63 | 8/8 | 1.225 | [0.795, 1.638] | 0.886 | 1.382 | 1.382 | 1.000 | yes | 4.072 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-0280cf40 | 19.63 | 8/8 | 1.323 | [0.958, 1.685] | 0.886 | 1.492 | 1.492 | 1.000 | yes | 3.977 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-bd26eff7 | 19.63 | 8/8 | 1.187 | [0.798, 1.612] | 0.886 | 1.340 | 1.340 | 1.000 | yes | 4.954 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-1940b956 | 19.63 | 8/8 | 1.074 | [0.720, 1.490] | 0.886 | 1.212 | 1.212 | 1.000 | yes | 5.666 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-491c5bf0 | 19.63 | 8/8 | 1.587 | [1.070, 2.140] | 0.886 | 1.791 | 1.791 | 1.000 | yes | 3.807 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-83914f7f | 19.63 | 8/8 | 1.208 | [0.894, 1.582] | 0.886 | 1.363 | 1.363 | 1.000 | yes | 4.422 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d44ddafb | 19.63 | 8/8 | 1.297 | [1.022, 1.576] | 0.886 | 1.463 | 1.463 | 1.000 | yes | 4.501 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b4bf77fa | 19.63 | 8/8 | 1.304 | [0.944, 1.727] | 0.886 | 1.471 | 1.471 | 1.000 | yes | 4.317 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8f723bc4 | 19.63 | 8/8 | 1.411 | [1.056, 1.794] | 0.886 | 1.592 | 1.592 | 1.000 | yes | 4.236 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-062736f8 | 19.63 | 8/8 | 1.342 | [1.123, 1.564] | 0.886 | 1.515 | 1.515 | 1.000 | yes | 3.795 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d8673f33 | 19.63 | 8/8 | 1.175 | [0.822, 1.587] | 0.886 | 1.326 | 1.326 | 1.000 | yes | 4.517 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-0391d308 | 19.63 | 8/8 | 1.025 | [0.745, 1.339] | 0.886 | 1.156 | 1.156 | 1.000 | yes | 5.505 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d0f248fb | 19.63 | 8/8 | 1.060 | [0.714, 1.478] | 0.886 | 1.196 | 1.196 | 1.000 | yes | 6.319 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b04a6b3f | 19.63 | 8/8 | 1.424 | [0.950, 1.917] | 0.886 | 1.607 | 1.607 | 1.000 | yes | 7.173 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-277d01f9 | 19.63 | 8/8 | 1.412 | [0.945, 1.967] | 0.886 | 1.593 | 1.593 | 1.000 | yes | 8.495 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-db40537c | 19.63 | 8/8 | 1.237 | [0.897, 1.665] | 0.886 | 1.395 | 1.395 | 1.000 | yes | 6.995 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-12efc10a | 19.63 | 8/8 | 1.910 | [1.399, 2.454] | 0.886 | 2.155 | 2.155 | 1.000 | yes | 9.149 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-0b49d982 | 19.63 | 8/8 | 1.380 | [1.191, 1.591] | 0.886 | 1.557 | 1.557 | 1.000 | yes | 8.847 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cd3c60c1 | 19.63 | 8/8 | 1.268 | [0.832, 1.728] | 0.886 | 1.431 | 1.431 | 1.000 | yes | 5.999 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ac85db19 | 19.63 | 8/8 | 1.342 | [0.948, 1.689] | 0.886 | 1.515 | 1.515 | 1.000 | yes | 5.415 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-0e951a46 | 19.63 | 8/8 | 1.036 | [0.745, 1.348] | 0.886 | 1.169 | 1.169 | 1.000 | yes | 5.156 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8a96ad7e | 19.63 | 8/8 | 1.221 | [0.971, 1.504] | 0.886 | 1.378 | 1.378 | 1.000 | yes | 4.470 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-de87633e | 19.63 | 8/8 | 1.496 | [1.146, 1.854] | 0.886 | 1.688 | 1.688 | 1.000 | yes | 4.984 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9801ece7 | 19.63 | 8/8 | 1.291 | [0.890, 1.723] | 0.886 | 1.457 | 1.457 | 1.000 | yes | 3.848 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-0bea8830 | 19.63 | 8/8 | 1.175 | [0.776, 1.592] | 0.886 | 1.326 | 1.326 | 1.000 | yes | 4.357 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b3a00d70 | 19.63 | 8/8 | 1.605 | [1.210, 2.040] | 0.886 | 1.811 | 1.811 | 1.000 | yes | 3.966 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cb7f3c7b | 19.63 | 8/8 | 1.120 | [0.701, 1.617] | 0.886 | 1.264 | 1.264 | 1.000 | yes | 5.151 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c0b59fd6 | 19.63 | 8/8 | 1.463 | [1.023, 1.856] | 0.886 | 1.651 | 1.651 | 1.000 | yes | 5.050 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ce5a3e01 | 19.63 | 8/8 | 1.236 | [0.972, 1.482] | 0.886 | 1.395 | 1.395 | 1.000 | yes | 4.366 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e657dd2b | 19.63 | 8/8 | 1.543 | [1.189, 1.895] | 0.886 | 1.741 | 1.741 | 1.000 | yes | 5.248 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c90413b5 | 19.63 | 8/8 | 1.581 | [1.347, 1.799] | 0.886 | 1.784 | 1.784 | 1.000 | yes | 4.905 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-219f1b74 | 19.63 | 8/8 | 1.541 | [1.077, 2.003] | 0.886 | 1.739 | 1.739 | 1.000 | yes | 7.602 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-026c5919 | 19.63 | 8/8 | 1.347 | [0.905, 1.847] | 0.886 | 1.520 | 1.520 | 1.000 | yes | 4.150 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c65d67ca | 19.63 | 8/8 | 1.133 | [0.816, 1.410] | 0.886 | 1.278 | 1.278 | 1.000 | yes | 4.939 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d0ccdbd6 | 19.63 | 8/8 | 1.238 | [0.881, 1.601] | 0.886 | 1.397 | 1.397 | 1.000 | yes | 3.997 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-62e646e7 | 19.63 | 8/8 | 1.830 | [1.404, 2.296] | 0.886 | 2.064 | 2.064 | 1.000 | yes | 3.502 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-4ff904e5 | 19.63 | 8/8 | 1.343 | [0.840, 1.885] | 0.886 | 1.516 | 1.516 | 1.000 | yes | 6.000 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-7cacc826 | 19.63 | 8/8 | 1.162 | [0.907, 1.429] | 0.886 | 1.311 | 1.311 | 1.000 | yes | 5.453 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8358f5de | 19.63 | 8/8 | 1.324 | [0.956, 1.686] | 0.886 | 1.494 | 1.494 | 1.000 | yes | 3.845 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-1956f030 | 19.63 | 8/8 | 1.547 | [1.099, 1.901] | 0.886 | 1.746 | 1.746 | 1.000 | yes | 4.083 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ea302f42 | 19.63 | 8/8 | 1.081 | [0.850, 1.331] | 0.886 | 1.220 | 1.220 | 1.000 | yes | 3.880 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e9fc3263 | 19.63 | 8/8 | 1.015 | [0.761, 1.281] | 0.886 | 1.145 | 1.145 | 1.000 | yes | 4.991 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-200243fb | 19.63 | 8/8 | 1.381 | [1.012, 1.939] | 0.886 | 1.559 | 1.559 | 1.000 | yes | 5.199 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ef56a7fd | 19.63 | 8/8 | 1.138 | [0.915, 1.357] | 0.886 | 1.284 | 1.284 | 1.000 | yes | 4.565 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-f130d67f | 19.63 | 8/8 | 1.515 | [1.049, 2.094] | 0.886 | 1.710 | 1.710 | 1.000 | yes | 4.931 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-7c084069 | 19.63 | 8/8 | 1.237 | [0.890, 1.642] | 0.886 | 1.396 | 1.396 | 1.000 | yes | 6.828 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ea2b2d5a | 19.63 | 8/8 | 1.261 | [1.069, 1.448] | 0.886 | 1.422 | 1.422 | 1.000 | yes | 4.927 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-bc47bede | 19.63 | 8/8 | 1.276 | [1.028, 1.580] | 0.886 | 1.440 | 1.440 | 1.000 | yes | 4.921 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-7e82f7ab | 19.63 | 8/8 | 1.094 | [0.800, 1.440] | 0.886 | 1.234 | 1.234 | 1.000 | yes | 6.672 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-f8cc71ab | 19.63 | 8/8 | 1.462 | [1.066, 1.847] | 0.886 | 1.650 | 1.650 | 1.000 | yes | 5.601 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9fbc3d41 | 19.63 | 8/8 | 1.217 | [0.970, 1.462] | 0.886 | 1.373 | 1.373 | 1.000 | yes | 4.283 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-31e87b8d | 19.63 | 8/8 | 1.523 | [1.094, 1.939] | 0.886 | 1.718 | 1.718 | 1.000 | yes | 3.903 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-902fe0a8 | 19.63 | 8/8 | 1.253 | [0.956, 1.593] | 0.886 | 1.414 | 1.414 | 1.000 | yes | 3.554 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-f71fddb4 | 19.63 | 8/8 | 1.501 | [1.113, 1.891] | 0.886 | 1.694 | 1.694 | 1.000 | yes | 3.422 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cafbc647 | 19.63 | 8/8 | 1.212 | [1.010, 1.396] | 0.886 | 1.368 | 1.368 | 1.000 | yes | 3.395 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-5baee3f3 | 19.63 | 8/8 | 1.632 | [1.372, 1.926] | 0.886 | 1.842 | 1.842 | 1.000 | yes | 4.149 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-88c73a79 | 19.63 | 8/8 | 1.337 | [1.024, 1.665] | 0.886 | 1.508 | 1.508 | 1.000 | yes | 6.745 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-5a5b3b37 | 19.63 | 8/8 | 0.938 | [0.729, 1.147] | 0.886 | 1.058 | 1.058 | 1.000 | yes | 4.821 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-fc990701 | 19.63 | 8/8 | 1.364 | [1.059, 1.676] | 0.886 | 1.539 | 1.539 | 1.000 | yes | 3.914 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6e3c96bd | 19.63 | 8/8 | 1.423 | [1.025, 1.804] | 0.886 | 1.606 | 1.606 | 1.000 | yes | 3.861 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-1bc66825 | 19.63 | 8/8 | 1.236 | [0.952, 1.494] | 0.886 | 1.394 | 1.394 | 1.000 | yes | 4.132 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d832e013 | 19.63 | 8/8 | 1.254 | [0.831, 1.728] | 0.886 | 1.415 | 1.415 | 1.000 | yes | 5.077 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9e684685 | 19.63 | 8/8 | 1.240 | [0.880, 1.623] | 0.886 | 1.399 | 1.399 | 1.000 | yes | 4.055 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-bfaa434a | 19.63 | 8/8 | 1.131 | [0.855, 1.449] | 0.886 | 1.276 | 1.276 | 1.000 | yes | 4.164 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e0860a69 | 19.63 | 8/8 | 1.071 | [0.774, 1.391] | 0.886 | 1.208 | 1.208 | 1.000 | yes | 4.123 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-f10d9ea2 | 19.63 | 8/8 | 1.684 | [1.399, 1.962] | 0.886 | 1.900 | 1.900 | 1.000 | yes | 4.653 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ff264169 | 19.63 | 8/8 | 1.202 | [0.972, 1.456] | 0.886 | 1.356 | 1.356 | 1.000 | yes | 4.393 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-846a321d | 19.63 | 8/8 | 0.861 | [0.676, 1.122] | 0.886 | 0.971 | 0.971 | 1.000 | yes | 3.780 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-bbd62ebc | 19.63 | 8/8 | 1.008 | [0.605, 1.485] | 0.886 | 1.137 | 1.137 | 1.000 | yes | 3.780 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-cc5cd1ae | 19.63 | 8/8 | 1.708 | [1.486, 1.991] | 0.886 | 1.928 | 1.928 | 1.000 | yes | 4.474 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9693ccbe | 19.63 | 8/8 | 1.150 | [0.628, 1.746] | 0.886 | 1.297 | 1.297 | 1.000 | yes | 4.817 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-564f3e3b | 19.63 | 8/8 | 1.395 | [1.021, 1.843] | 0.886 | 1.574 | 1.574 | 1.000 | yes | 4.664 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-66503998 | 19.63 | 8/8 | 2.135 | [1.710, 2.713] | 0.886 | 2.409 | 2.409 | 1.000 | yes | 4.738 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-2d0d5abe | 19.63 | 8/8 | 1.545 | [1.000, 2.149] | 0.886 | 1.744 | 1.744 | 1.000 | yes | 7.787 | L1×3 L2×5 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b7e7e96c | 19.63 | 8/8 | 1.455 | [0.974, 1.964] | 0.886 | 1.642 | 1.642 | 1.000 | yes | 7.567 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-4020e325 | 19.63 | 8/8 | 1.147 | [0.672, 1.736] | 0.886 | 1.295 | 1.295 | 1.000 | yes | 7.567 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-6fc4a5ef | 19.63 | 8/8 | 1.109 | [0.731, 1.570] | 0.886 | 1.251 | 1.251 | 1.000 | yes | 4.965 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ff7feaf8 | 19.63 | 8/8 | 1.326 | [0.951, 1.723] | 0.886 | 1.496 | 1.496 | 1.000 | yes | 4.659 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-005b5341 | 19.63 | 8/8 | 1.548 | [1.340, 1.774] | 0.886 | 1.747 | 1.747 | 1.000 | yes | 4.675 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-fb0dcee7 | 19.63 | 8/8 | 1.143 | [0.781, 1.506] | 0.886 | 1.290 | 1.290 | 1.000 | yes | 4.279 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9acb0e0e | 19.63 | 8/8 | 0.945 | [0.732, 1.200] | 0.886 | 1.066 | 1.066 | 1.000 | yes | 4.934 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-d9f45608 | 19.63 | 8/8 | 1.087 | [0.805, 1.401] | 0.886 | 1.227 | 1.227 | 1.000 | yes | 4.539 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8aca6671 | 19.63 | 8/8 | 1.382 | [1.058, 1.704] | 0.886 | 1.560 | 1.560 | 1.000 | yes | 4.524 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e2d42e1c | 19.63 | 8/8 | 1.310 | [0.971, 1.661] | 0.886 | 1.478 | 1.478 | 1.000 | yes | 4.067 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-83fb1b32 | 19.63 | 8/8 | 1.253 | [0.922, 1.619] | 0.886 | 1.414 | 1.414 | 1.000 | yes | 4.100 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-ce301a82 | 19.63 | 8/8 | 1.344 | [0.969, 1.763] | 0.886 | 1.517 | 1.517 | 1.000 | yes | 4.130 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-12df4d5d | 19.63 | 8/8 | 1.232 | [0.928, 1.537] | 0.886 | 1.390 | 1.390 | 1.000 | yes | 4.252 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-8f35240c | 19.63 | 8/8 | 1.277 | [0.864, 1.814] | 0.886 | 1.441 | 1.441 | 1.000 | yes | 6.849 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-658dcc26 | 19.63 | 8/8 | 0.988 | [0.780, 1.225] | 0.886 | 1.115 | 1.115 | 1.000 | yes | 7.355 | L1×1 L2×7 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-218bb76c | 19.63 | 8/8 | 1.153 | [0.764, 1.594] | 0.886 | 1.301 | 1.301 | 1.000 | yes | 4.092 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-fa4c81a0 | 19.63 | 8/8 | 1.456 | [1.194, 1.748] | 0.886 | 1.642 | 1.642 | 1.000 | yes | 4.959 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-c1029577 | 19.63 | 8/8 | 1.331 | [1.113, 1.550] | 0.886 | 1.502 | 1.502 | 1.000 | yes | 4.443 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-9753e7f6 | 19.63 | 8/8 | 1.044 | [0.748, 1.356] | 0.886 | 1.178 | 1.178 | 1.000 | yes | 6.136 | L2×8 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-e79b9cb6 | 19.63 | 8/8 | 1.326 | [0.961, 1.688] | 0.886 | 1.496 | 1.496 | 1.000 | yes | 4.877 | L1×2 L2×6 |
+| ECBS1hda8fe4667f3f | rho-neg-aa | rho.negation | icv1-fp26-tm1631-b72dd316 | 19.63 | 8/8 | 1.334 | [1.031, 1.642] | 0.886 | 1.506 | 1.506 | 1.000 | yes | 6.631 | L2×8 |

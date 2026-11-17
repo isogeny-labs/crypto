@@ -1,0 +1,11 @@
+name = "hasse_norm_recurrence_audit"
+version = "0.1.0"
+defaultTargets = ["HasseNormRecurrenceAudit"]
+
+[[require]]
+name = "hasse_trace_coefficient_audit"
+path = "../../hasse_trace_coefficient_audit_20261114/lean"
+
+[[lean_lib]]
+name = "HasseNormRecurrenceAudit"
+roots = ["SparseCoefficient", "NormRecurrence", "NormControls", "NormCertificate"]

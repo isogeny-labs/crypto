@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\title{R101: the marked-23 source-order fiber at $x=1$}
+\author{Koblitz modular IC research}
+\date{5 November 2026}
+\begin{document}
+\maketitle
+The SHA-256-bound R51 triangular source specializes to
+\[
+ f_{51}(1,y)=y^3(y+1)^4,\qquad
+ G_{51}(1,y,l)=l^{16}+l^8+1=(l^2+l+1)^8.
+\]
+Every one of the 28 rational lambda coefficients was accounted for.
+The lambda derivative vanishes identically at $x=1$. Singular checked
+both base-point lambda factorizations, full products, and changed-product
+controls. A fresh process rebound the original donor and reproduced all
+exports byte-for-byte. Independent GF(2) arithmetic and Lean 4.34.1
+checked the displayed identities and length arithmetic.
+
+\begin{center}
+\includegraphics[width=0.88\linewidth]{diagram.pdf}
+\end{center}
+
+For the two-variable monogenic order $\mathbf F_2[x,y,l]/(f_{51},G_{51})$,
+the $x=1$ fiber has two maximal ideals with $\mathbf F_4$ residue field.
+Their local $\mathbf F_2$ dimensions are 48 and 64, totaling 112. These
+are source-order lengths. The linear $N_{51}$ coordinate was not used;
+local normalization is required for branch counts and valuations.
+
+The first two preparations were retained as failures: a constant-term
+parser error and an incorrect expectation that the derivative would stay
+nonzero. The compatible independent verifier passed after its Python 3.9
+bit-count fix. The raw archive SHA-256 is
+\texttt{6d672fe4f5ea9dc4ff66d7334586959cb120bb09e7521332bfcc85e2}\linebreak
+\texttt{cc731c99}.
+\end{document}

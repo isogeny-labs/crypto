@@ -1,0 +1,20 @@
+import AffineUnique
+import StoredValid
+set_option autoImplicit false
+namespace DispatchAcceptance
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput AffineDispatch
+
+theorem every_execution_accepted (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b out : Stored)
+ (hp : 2<p.toNat) (hbnd : p.toNat<2^31) (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b)
+ (tag : Tag) (hr : Runs p f a b tag out) : StoredValidity.test p f out=true := by
+ exact StoredValidity.test_accepts_wellformed p f out (by omega) hbnd hf
+  (every_execution_preserves p f a b out hp hbnd hf hfd ha hb tag hr)
+
+theorem accepted_execution_exists (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b : Stored)
+ (hp : 2<p.toNat) (hbnd : p.toNat<2^31) (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b) :
+ ∃ out, Runs p f a b (classify p a b) out ∧ StoredValidity.test p f out=true := by
+ obtain ⟨out,hr,hw⟩:=total_preserving_execution p f a b hp hbnd hf hfd ha hb
+ exact ⟨out,hr,StoredValidity.test_accepts_wellformed p f out (by omega) hbnd hf hw⟩
+end DispatchAcceptance

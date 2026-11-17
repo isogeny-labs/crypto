@@ -94,7 +94,11 @@ use super::smith_prop24::{
 
 #[inline]
 fn md(a: u64, b: u64, p: u64) -> u64 {
-    a * b % p
+    if p < (1 << 32) {
+        a * b % p
+    } else {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
 }
 #[inline]
 fn ad(a: u64, b: u64, p: u64) -> u64 {
@@ -380,8 +384,8 @@ impl Trigonal {
     /// Build the data of §6.  `Err` when Proposition 4 fails (`s` has no
     /// square root in `F_p[t]`), or on degenerate input.
     pub fn new(f: &[u64], p: u64, n1: u64, n0: u64, d1: u64, d0: u64) -> Result<Trigonal, String> {
-        if p.is_multiple_of(2) || !(7..(1u64 << 31)).contains(&p) {
-            return Err(format!("p = {p} must be an odd prime in [7, 2^31)"));
+        if p.is_multiple_of(2) || !(7..(1u64 << 62)).contains(&p) {
+            return Err(format!("p = {p} must be an odd prime in [7, 2^62)"));
         }
         let mut f: Poly = f.iter().map(|&c| c % p).collect();
         trim(&mut f);

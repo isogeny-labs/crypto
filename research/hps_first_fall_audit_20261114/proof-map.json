@@ -1,0 +1,121 @@
+{
+  "main": "HPSFirstFallAudit.hps_first_fall_certificate",
+  "binding": "e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e",
+  "custom_imports": {
+    "HPSCertificate": "research/hps_first_fall_audit_20261114/lean/HPSCertificate.lean",
+    "TruncatedGrading": "research/hps_first_fall_audit_20261114/lean/TruncatedGrading.lean",
+    "RankCounterfamily": "research/hps_first_fall_audit_20261114/lean/RankCounterfamily.lean",
+    "Homology": "research/hps_first_fall_audit_20261114/lean/Homology.lean",
+    "GammaCounter": "research/hps_first_fall_audit_20261114/lean/GammaCounter.lean",
+    "FirstFall": "research/hps_first_fall_audit_20261114/lean/FirstFall.lean",
+    "GeneratorRank": "research/hps_first_fall_audit_20261114/lean/GeneratorRank.lean"
+  },
+  "claims": [
+    {
+      "declaration": "HPSFirstFallAudit.finite_pieces_independent",
+      "hypotheses": "ActualAdjoinRoot X^q powerbasis",
+      "conclusion": "Actualdegreepieces independent."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.finite_pieces_span",
+      "hypotheses": "Actualbasis/canonicalpowers",
+      "conclusion": "Degreepieces span actualalgebra."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.positivePart_pow_zero",
+      "hypotheses": "Actualpositive-degree sum",
+      "conclusion": "Everypositiveelement qnilpotent."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.homology_nontrivial_iff",
+      "hypotheses": "Actualannihilator quotient",
+      "conclusion": "Nonzero actualquotient iff actualnontrivialfall."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.monomial_first_fall",
+      "hypotheses": "0<d<q andq<=d(q-1)",
+      "conclusion": "Exactminimumfirstfall q."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.monomial_rank_one",
+      "hypotheses": "0<d<q",
+      "conclusion": "Exactminimalnumberoflineargenerators1."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.quadratic_counterfamily",
+      "hypotheses": "ActualFp forallprimep>=5/q=p/d2",
+      "conclusion": "Degree2/rank1/firstfallp violatesprintedbound."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.literal_rank_bound_false",
+      "hypotheses": "ActualF5quotient/1<d<5",
+      "conclusion": "Directrationaluniversalboundnegation."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.gamma_five_zero",
+      "hypotheses": "Actualqnomialcoefficients/actualintegerbi-infinitetsum",
+      "conclusion": "ExactGamma5(1,2,4,2)=0."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.literal_gamma_positivity_false",
+      "hypotheses": "qprime/npositive/2<=d<=n(q-1)",
+      "conclusion": "Directupstreampositivitynegation."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.monomial_sharp_repair",
+      "hypotheses": "AnyfieldK/q>=3/2<=d<q",
+      "conclusion": "Exactmonomialfirstfallq/rank1."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.three_positive_control",
+      "hypotheses": "ActualF3quotient/lambdax2",
+      "conclusion": "Printedbound3attained."
+    },
+    {
+      "declaration": "HPSFirstFallAudit.binary_invalid_domain_control",
+      "hypotheses": "ActualF2quotient",
+      "conclusion": "X2anddegree2piecezero;notvalidbinarycounterexample."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 45,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "general_field_rank_bound_refuted": true,
+    "actual_quotient_homology_minimum_rank_proved": true,
+    "source_gamma_biinfinite_sum_counter_proved": true,
+    "one_variable_sharp_repair_proved": true,
+    "q3_positive_and_q2_invalid_domain_controls_proved": true,
+    "binary_q2_bound_refuted": false,
+    "binary_m_squared_plus_one_bound_refuted": false,
+    "abstract_all_V_tensor_comparison_verified": false,
+    "full_Weil_descent_or_solving_degree_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

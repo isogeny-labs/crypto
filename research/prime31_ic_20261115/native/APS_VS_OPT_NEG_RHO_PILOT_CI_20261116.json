@@ -1,0 +1,3883 @@
+{
+  "all_96_complete": false,
+  "arm_names": [
+    "incumbent_joint_APS",
+    "rho32_dp4",
+    "rho64_dp5",
+    "rho32_dp4_AA"
+  ],
+  "cases": [
+    {
+      "caller_known_scalar_verifier_only": 1251542969,
+      "case": 0,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2741069,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 76,
+            "s3_pair_quadratics": 29184,
+            "s3_query_ns": 1417191,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1512099427,
+              "beta": 717860029,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1251542969,
+              "partition_indices": [
+                75,
+                334,
+                10107
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1040562,
+            "verification_group_additions": 50,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2743172,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2102010283,
+          805916219
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2102010283,
+        805916219
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61093967,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2793,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2793,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2102010283,
+          805916219
+        ],
+        "rejected_identity": 0,
+        "restarts": 1475,
+        "seed": "52484f5f43523031",
+        "short_cycles": 1459,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 16,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61229551,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2793,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2793,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2102010283,
+          805916219
+        ],
+        "rejected_identity": 0,
+        "restarts": 1475,
+        "seed": "52484f5f43523031",
+        "short_cycles": 1459,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 16,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 7652836,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1849,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1251542969,
+        "max_distinguished_records": 1849,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2102010283,
+          805916219
+        ],
+        "rejected_identity": 0,
+        "restarts": 1764,
+        "seed": "5248796b1c166004",
+        "short_cycles": 1748,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 16,
+        "useful_collisions": 1,
+        "walk_steps": 182848
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 966729305,
+      "case": 1,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3213964,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 111,
+            "s3_pair_quadratics": 42624,
+            "s3_query_ns": 1902413,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 387225065,
+              "beta": 959791436,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 966729305,
+              "partition_indices": [
+                110,
+                77,
+                6426
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1010807,
+            "verification_group_additions": 56,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3216067,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1824291773,
+          126064485
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1824291773,
+        126064485
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 8777626,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 2800,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 966729305,
+        "max_distinguished_records": 2800,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1824291773,
+          126064485
+        ],
+        "rejected_identity": 0,
+        "restarts": 1514,
+        "seed": "83fd056d92c0dd32",
+        "short_cycles": 1506,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 213280
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 8855104,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 2800,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 966729305,
+        "max_distinguished_records": 2800,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1824291773,
+          126064485
+        ],
+        "rejected_identity": 0,
+        "restarts": 1514,
+        "seed": "83fd056d92c0dd32",
+        "short_cycles": 1506,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 213280
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 3222347,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1130,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 966729305,
+        "max_distinguished_records": 1130,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1824291773,
+          126064485
+        ],
+        "rejected_identity": 0,
+        "restarts": 1162,
+        "seed": "83fd3359cd848d07",
+        "short_cycles": 1159,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 49792
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 669427892,
+      "case": 2,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2532625,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 77,
+            "s3_pair_quadratics": 29568,
+            "s3_query_ns": 1362127,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 2046209821,
+              "beta": 567760201,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 669427892,
+              "partition_indices": [
+                76,
+                118,
+                6435
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 879057,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2533907,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          328843398,
+          1905044324
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        328843398,
+        1905044324
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 883444,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 423,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 669427892,
+        "max_distinguished_records": 423,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          328843398,
+          1905044324
+        ],
+        "rejected_identity": 0,
+        "restarts": 220,
+        "seed": "f122db3ae077ea37",
+        "short_cycles": 218,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 2,
+        "useful_collisions": 1,
+        "walk_steps": 8192
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 882212,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 423,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 669427892,
+        "max_distinguished_records": 423,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          328843398,
+          1905044324
+        ],
+        "rejected_identity": 0,
+        "restarts": 220,
+        "seed": "f122db3ae077ea37",
+        "short_cycles": 218,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 2,
+        "useful_collisions": 1,
+        "walk_steps": 8192
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 4921352,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1556,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 669427892,
+        "max_distinguished_records": 1556,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          328843398,
+          1905044324
+        ],
+        "rejected_identity": 0,
+        "restarts": 1544,
+        "seed": "f122ed0ebf33ba02",
+        "short_cycles": 1538,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 6,
+        "useful_collisions": 1,
+        "walk_steps": 90816
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 639725854,
+      "case": 3,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2812678,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 95,
+            "s3_pair_quadratics": 36480,
+            "s3_query_ns": 1564383,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1902461426,
+              "beta": 1002037589,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 639725854,
+              "partition_indices": [
+                94,
+                229,
+                5369
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 958918,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2814852,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          309071309,
+          535850659
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        309071309,
+        535850659
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61562680,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3175,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3175,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          309071309,
+          535850659
+        ],
+        "rejected_identity": 0,
+        "restarts": 1651,
+        "seed": "275791c737eaf738",
+        "short_cycles": 1641,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 63242507,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3175,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3175,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          309071309,
+          535850659
+        ],
+        "rejected_identity": 0,
+        "restarts": 1651,
+        "seed": "275791c737eaf738",
+        "short_cycles": 1641,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 59381635,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2516,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "max_distinguished_records": 2516,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          309071309,
+          535850659
+        ],
+        "rejected_identity": 0,
+        "restarts": 2611,
+        "seed": "2757a7f368aea70d",
+        "short_cycles": 2602,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 9,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 2126996247,
+      "case": 4,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5961403,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 314,
+            "s3_pair_quadratics": 120576,
+            "s3_query_ns": 4836364,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1314651708,
+              "beta": 1161566983,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2126996247,
+              "partition_indices": [
+                313,
+                165,
+                2042
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 844615,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5963166,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          615407306,
+          527266130
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        615407306,
+        527266130
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 1789493,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1169,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2126996247,
+        "max_distinguished_records": 1169,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          615407306,
+          527266130
+        ],
+        "rejected_identity": 0,
+        "restarts": 584,
+        "seed": "149d67940519843d",
+        "short_cycles": 581,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 25152
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 1786708,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1169,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2126996247,
+        "max_distinguished_records": 1169,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          615407306,
+          527266130
+        ],
+        "rejected_identity": 0,
+        "restarts": 584,
+        "seed": "149d67940519843d",
+        "short_cycles": 581,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 25152
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 4009927,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1509,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 2126996247,
+        "max_distinguished_records": 1509,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          615407306,
+          527266130
+        ],
+        "rejected_identity": 0,
+        "restarts": 1533,
+        "seed": "149d51a05a5dd408",
+        "short_cycles": 1527,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 6,
+        "useful_collisions": 1,
+        "walk_steps": 67008
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 950991738,
+      "case": 5,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1541899,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 25,
+            "s3_pair_quadratics": 9600,
+            "s3_query_ns": 502619,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 466741019,
+              "beta": 14924774,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 950991738,
+              "partition_indices": [
+                24,
+                105,
+                9750
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 763103,
+            "verification_group_additions": 58,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1542890,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1459787012,
+          1190760248
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1459787012,
+        1190760248
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 60715991,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2968,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2968,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1459787012,
+          1190760248
+        ],
+        "rejected_identity": 0,
+        "restarts": 1518,
+        "seed": "4ac23da1548c913e",
+        "short_cycles": 1508,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61277129,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2968,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2968,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1459787012,
+          1190760248
+        ],
+        "rejected_identity": 0,
+        "restarts": 1518,
+        "seed": "4ac23da1548c913e",
+        "short_cycles": 1508,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 3030266,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1117,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 950991738,
+        "max_distinguished_records": 1117,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1459787012,
+          1190760248
+        ],
+        "rejected_identity": 0,
+        "restarts": 1102,
+        "seed": "4ac20b950bc8c10b",
+        "short_cycles": 1098,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 49408
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 133628076,
+      "case": 6,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2299733,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 70,
+            "s3_pair_quadratics": 26880,
+            "s3_query_ns": 1196117,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 493800992,
+              "beta": 284813817,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 133628076,
+              "partition_indices": [
+                69,
+                116,
+                11195
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 825246,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2300775,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1878625768,
+          971500640
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1878625768,
+        971500640
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61304179,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2522,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2522,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1878625768,
+          971500640
+        ],
+        "rejected_identity": 0,
+        "restarts": 1238,
+        "seed": "b877f26faa23be23",
+        "short_cycles": 1226,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 12,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61199762,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2522,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2522,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1878625768,
+          971500640
+        ],
+        "rejected_identity": 0,
+        "restarts": 1238,
+        "seed": "b877f26faa23be23",
+        "short_cycles": 1226,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 12,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 1454316,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 502,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 133628076,
+        "max_distinguished_records": 502,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1878625768,
+          971500640
+        ],
+        "rejected_identity": 0,
+        "restarts": 508,
+        "seed": "b877c45bf567ee16",
+        "short_cycles": 506,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 2,
+        "useful_collisions": 1,
+        "walk_steps": 17856
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 73963186,
+      "case": 7,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2596472,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 80,
+            "s3_pair_quadratics": 30720,
+            "s3_query_ns": 1361446,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1589985954,
+              "beta": 768958505,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 73963186,
+              "partition_indices": [
+                79,
+                312,
+                1156
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 955714,
+            "verification_group_additions": 41,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2597774,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          293848178,
+          1901443256
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        293848178,
+        1901443256
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61195085,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2834,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2834,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          293848178,
+          1901443256
+        ],
+        "rejected_identity": 0,
+        "restarts": 1349,
+        "seed": "e9bd483cf8564b24",
+        "short_cycles": 1340,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 9,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61366603,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2834,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2834,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          293848178,
+          1901443256
+        ],
+        "rejected_identity": 0,
+        "restarts": 1349,
+        "seed": "e9bd483cf8564b24",
+        "short_cycles": 1340,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 9,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 4689783,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1505,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 73963186,
+        "max_distinguished_records": 1505,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          293848178,
+          1901443256
+        ],
+        "rejected_identity": 0,
+        "restarts": 1499,
+        "seed": "e9bd7e08a7121b11",
+        "short_cycles": 1490,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 9,
+        "useful_collisions": 1,
+        "walk_steps": 91712
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 711554115,
+      "case": 8,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1677514,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 35,
+            "s3_pair_quadratics": 13440,
+            "s3_query_ns": 650993,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 789067144,
+              "beta": 894008585,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 711554115,
+              "partition_indices": [
+                34,
+                138,
+                3267
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 749793,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1678546,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          706050555,
+          146706794
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        706050555,
+        146706794
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61236466,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 1934,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 1934,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          706050555,
+          146706794
+        ],
+        "rejected_identity": 0,
+        "restarts": 1005,
+        "seed": "dfe21ec9cfc55829",
+        "short_cycles": 998,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61002894,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 1934,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 1934,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          706050555,
+          146706794
+        ],
+        "rejected_identity": 0,
+        "restarts": 1005,
+        "seed": "dfe21ec9cfc55829",
+        "short_cycles": 998,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 59393243,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2032,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "max_distinguished_records": 2032,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          706050555,
+          146706794
+        ],
+        "rejected_identity": 0,
+        "restarts": 2059,
+        "seed": "dfe228fd9081081c",
+        "short_cycles": 2051,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 883090486,
+      "case": 9,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1466285,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 10,
+            "s3_pair_quadratics": 3840,
+            "s3_query_ns": 293493,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 80145604,
+              "beta": 634996325,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 883090486,
+              "partition_indices": [
+                9,
+                266,
+                6412
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 891937,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1468058,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          444265648,
+          388224885
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        444265648,
+        388224885
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 60921000,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 1973,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 1973,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          444265648,
+          388224885
+        ],
+        "rejected_identity": 0,
+        "restarts": 941,
+        "seed": "0d17d4961d78652a",
+        "short_cycles": 934,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 60819597,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 1973,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 1973,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          444265648,
+          388224885
+        ],
+        "rejected_identity": 0,
+        "restarts": 941,
+        "seed": "0d17d4961d78652a",
+        "short_cycles": 934,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 58964426,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2388,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "max_distinguished_records": 2388,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          444265648,
+          388224885
+        ],
+        "rejected_identity": 0,
+        "restarts": 2257,
+        "seed": "0d17e2a2423c351f",
+        "short_cycles": 2248,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 9,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1343004490,
+      "case": 10,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2016676,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 58,
+            "s3_pair_quadratics": 22272,
+            "s3_query_ns": 997476,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1252971414,
+              "beta": 104625296,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1343004490,
+              "partition_indices": [
+                57,
+                107,
+                13581
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 742792,
+            "verification_group_additions": 50,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2017748,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2070875739,
+          484186483
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2070875739,
+        484186483
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 1935143,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1248,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1343004490,
+        "max_distinguished_records": 1248,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2070875739,
+          484186483
+        ],
+        "rejected_identity": 0,
+        "restarts": 603,
+        "seed": "635caaa36cef722f",
+        "short_cycles": 599,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 29408
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 1942844,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1248,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1343004490,
+        "max_distinguished_records": 1248,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2070875739,
+          484186483
+        ],
+        "rejected_identity": 0,
+        "restarts": 603,
+        "seed": "635caaa36cef722f",
+        "short_cycles": 599,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 29408
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5544374,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1790,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1343004490,
+        "max_distinguished_records": 1790,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2070875739,
+          484186483
+        ],
+        "rejected_identity": 0,
+        "restarts": 1743,
+        "seed": "635c9c9733ab221a",
+        "short_cycles": 1738,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 5,
+        "useful_collisions": 1,
+        "walk_steps": 113216
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 62365961,
+      "case": 11,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1524703,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 26,
+            "s3_pair_quadratics": 9984,
+            "s3_query_ns": 520295,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 775911074,
+              "beta": 2131818233,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 62365961,
+              "partition_indices": [
+                25,
+                59,
+                9013
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 722622,
+            "verification_group_additions": 43,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1525674,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1862706537,
+          452881597
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1862706537,
+        452881597
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 2742732,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1615,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 62365961,
+        "max_distinguished_records": 1615,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1862706537,
+          452881597
+        ],
+        "rejected_identity": 0,
+        "restarts": 813,
+        "seed": "50827f7042021f10",
+        "short_cycles": 810,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 48544
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 2739217,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1615,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 62365961,
+        "max_distinguished_records": 1615,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1862706537,
+          452881597
+        ],
+        "rejected_identity": 0,
+        "restarts": 813,
+        "seed": "50827f7042021f10",
+        "short_cycles": 810,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 48544
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 3157529,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1127,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 62365961,
+        "max_distinguished_records": 1127,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1862706537,
+          452881597
+        ],
+        "rejected_identity": 0,
+        "restarts": 1148,
+        "seed": "508249441d464f25",
+        "short_cycles": 1140,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 52800
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 2089587052,
+      "case": 12,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3272943,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 143,
+            "s3_pair_quadratics": 54912,
+            "s3_query_ns": 2268836,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1108841610,
+              "beta": 1554086430,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2089587052,
+              "partition_indices": [
+                142,
+                63,
+                2545
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 728400,
+            "verification_group_additions": 50,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3273944,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          795004518,
+          1081675281
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        795004518,
+        1081675281
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 2617934,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1773,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2089587052,
+        "max_distinguished_records": 1773,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          795004518,
+          1081675281
+        ],
+        "rejected_identity": 0,
+        "restarts": 868,
+        "seed": "8637353e91b12c15",
+        "short_cycles": 857,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 11,
+        "useful_collisions": 1,
+        "walk_steps": 41568
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 2621379,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1773,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2089587052,
+        "max_distinguished_records": 1773,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          795004518,
+          1081675281
+        ],
+        "rejected_identity": 0,
+        "restarts": 868,
+        "seed": "8637353e91b12c15",
+        "short_cycles": 857,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 11,
+        "useful_collisions": 1,
+        "walk_steps": 41568
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5972640,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1883,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 2089587052,
+        "max_distinguished_records": 1883,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          795004518,
+          1081675281
+        ],
+        "rejected_identity": 0,
+        "restarts": 1828,
+        "seed": "8637030acef57c20",
+        "short_cycles": 1821,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 1,
+        "walk_steps": 124288
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 963146455,
+      "case": 13,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1342197,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 11,
+            "s3_pair_quadratics": 4224,
+            "s3_query_ns": 301055,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 355889810,
+              "beta": 116765284,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 963146455,
+              "partition_indices": [
+                10,
+                233,
+                5525
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 762281,
+            "verification_group_additions": 55,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1343169,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2009621989,
+          877813957
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2009621989,
+        877813957
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61506835,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2852,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2852,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2009621989,
+          877813957
+        ],
+        "rejected_identity": 0,
+        "restarts": 1413,
+        "seed": "f47c8bcbe7243916",
+        "short_cycles": 1407,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 6,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61577492,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2852,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2852,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2009621989,
+          877813957
+        ],
+        "rejected_identity": 0,
+        "restarts": 1413,
+        "seed": "f47c8bcbe7243916",
+        "short_cycles": 1407,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 6,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5372945,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1736,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 963146455,
+        "max_distinguished_records": 1736,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2009621989,
+          877813957
+        ],
+        "rejected_identity": 0,
+        "restarts": 1777,
+        "seed": "f47cbdffb8606923",
+        "short_cycles": 1770,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 1,
+        "walk_steps": 104512
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 243471332,
+      "case": 14,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5812789,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 310,
+            "s3_pair_quadratics": 119040,
+            "s3_query_ns": 4802944,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 110664356,
+              "beta": 300491216,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 243471332,
+              "partition_indices": [
+                309,
+                281,
+                14885
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 727178,
+            "verification_group_additions": 43,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5813821,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1307901398,
+          480877065
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1307901398,
+        480877065
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61464201,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2764,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2764,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1307901398,
+          480877065
+        ],
+        "rejected_identity": 0,
+        "restarts": 1417,
+        "seed": "25a24198355ac61b",
+        "short_cycles": 1410,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61335446,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2764,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2764,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1307901398,
+          480877065
+        ],
+        "rejected_identity": 0,
+        "restarts": 1417,
+        "seed": "25a24198355ac61b",
+        "short_cycles": 1410,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5908304,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 2086,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 243471332,
+        "max_distinguished_records": 2086,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1307901398,
+          480877065
+        ],
+        "rejected_identity": 0,
+        "restarts": 2071,
+        "seed": "25a277ac6a1e962e",
+        "short_cycles": 2066,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 5,
+        "useful_collisions": 1,
+        "walk_steps": 111360
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 2053828974,
+      "case": 15,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2200173,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 69,
+            "s3_pair_quadratics": 26496,
+            "s3_query_ns": 1185471,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1924672319,
+              "beta": 1222301818,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2053828974,
+              "partition_indices": [
+                68,
+                371,
+                12950
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 737143,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2201144,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          626183533,
+          1536155118
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        626183533,
+        1536155118
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 1987432,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1253,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2053828974,
+        "max_distinguished_records": 1253,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          626183533,
+          1536155118
+        ],
+        "rejected_identity": 0,
+        "restarts": 644,
+        "seed": "1bd717a504c9d31c",
+        "short_cycles": 640,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 29248
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 1991248,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1253,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 2053828974,
+        "max_distinguished_records": 1253,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          626183533,
+          1536155118
+        ],
+        "rejected_identity": 0,
+        "restarts": 644,
+        "seed": "1bd717a504c9d31c",
+        "short_cycles": 640,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 29248
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 7492746,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 2242,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 2053828974,
+        "max_distinguished_records": 2242,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          626183533,
+          1536155118
+        ],
+        "rejected_identity": 0,
+        "restarts": 2195,
+        "seed": "1bd721915b8d8329",
+        "short_cycles": 2185,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 1,
+        "walk_steps": 162880
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1863430568,
+      "case": 16,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2603792,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 96,
+            "s3_pair_quadratics": 36864,
+            "s3_query_ns": 1581970,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1614142425,
+              "beta": 656220100,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1863430568,
+              "partition_indices": [
+                95,
+                236,
+                2674
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 744534,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2604784,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1496287547,
+          888771835
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1496287547,
+        888771835
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 60611543,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3133,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3133,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1496287547,
+          888771835
+        ],
+        "rejected_identity": 0,
+        "restarts": 1584,
+        "seed": "491cec725a7ce001",
+        "short_cycles": 1564,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 20,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 60378942,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3133,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3133,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1496287547,
+          888771835
+        ],
+        "rejected_identity": 0,
+        "restarts": 1584,
+        "seed": "491cec725a7ce001",
+        "short_cycles": 1564,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 20,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5150319,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1604,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1863430568,
+        "max_distinguished_records": 1604,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1496287547,
+          888771835
+        ],
+        "rejected_identity": 0,
+        "restarts": 1636,
+        "seed": "491cda460538b034",
+        "short_cycles": 1631,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 5,
+        "useful_collisions": 1,
+        "walk_steps": 102656
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 782005272,
+      "case": 17,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1267875,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 7,
+            "s3_pair_quadratics": 2688,
+            "s3_query_ns": 243268,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 663966816,
+              "beta": 733373302,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 782005272,
+              "partition_indices": [
+                6,
+                140,
+                8912
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 738846,
+            "verification_group_additions": 50,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1268937,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          516214172,
+          70141743
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        516214172,
+        70141743
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 1780128,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1110,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 782005272,
+        "max_distinguished_records": 1110,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          516214172,
+          70141743
+        ],
+        "rejected_identity": 0,
+        "restarts": 599,
+        "seed": "bf41a200a9938d02",
+        "short_cycles": 595,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 24544
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 1795182,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1110,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 782005272,
+        "max_distinguished_records": 1110,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          516214172,
+          70141743
+        ],
+        "rejected_identity": 0,
+        "restarts": 599,
+        "seed": "bf41a200a9938d02",
+        "short_cycles": 595,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 24544
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 3350210,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1197,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 782005272,
+        "max_distinguished_records": 1197,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          516214172,
+          70141743
+        ],
+        "rejected_identity": 0,
+        "restarts": 1200,
+        "seed": "bf419434f6d7dd37",
+        "short_cycles": 1197,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 57152
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1995685924,
+      "case": 18,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1923195,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 46,
+            "s3_pair_quadratics": 17664,
+            "s3_query_ns": 828822,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 175929702,
+              "beta": 104755287,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1995685924,
+              "partition_indices": [
+                45,
+                130,
+                15347
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 817224,
+            "verification_group_additions": 48,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1924186,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1948491463,
+          1746066318
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1948491463,
+        1746066318
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 2809413,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1684,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1995685924,
+        "max_distinguished_records": 1684,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1948491463,
+          1746066318
+        ],
+        "rejected_identity": 0,
+        "restarts": 867,
+        "seed": "ecf778cdff069a07",
+        "short_cycles": 856,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 11,
+        "useful_collisions": 1,
+        "walk_steps": 40640
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 2588349,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1684,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1995685924,
+        "max_distinguished_records": 1684,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1948491463,
+          1746066318
+        ],
+        "rejected_identity": 0,
+        "restarts": 867,
+        "seed": "ecf778cdff069a07",
+        "short_cycles": 856,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 11,
+        "useful_collisions": 1,
+        "walk_steps": 40640
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 2723504,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 981,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1995685924,
+        "max_distinguished_records": 981,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1948491463,
+          1746066318
+        ],
+        "rejected_identity": 0,
+        "restarts": 995,
+        "seed": "ecf74ef9a042ca32",
+        "short_cycles": 993,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 2,
+        "useful_collisions": 1,
+        "walk_steps": 42880
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1448024930,
+      "case": 19,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2032810,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 45,
+            "s3_pair_quadratics": 17280,
+            "s3_query_ns": 818466,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 535639294,
+              "beta": 1780000525,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1448024930,
+              "partition_indices": [
+                44,
+                344,
+                11725
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 937245,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2033992,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1997830924,
+          708359843
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1997830924,
+        708359843
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 62121263,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3367,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3367,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1997830924,
+          708359843
+        ],
+        "rejected_identity": 0,
+        "restarts": 1586,
+        "seed": "c23cce9aceb5a708",
+        "short_cycles": 1569,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 17,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 62273413,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 3367,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 3367,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1997830924,
+          708359843
+        ],
+        "rejected_identity": 0,
+        "restarts": 1586,
+        "seed": "c23cce9aceb5a708",
+        "short_cycles": 1569,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 17,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 2080181,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 695,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1448024930,
+        "max_distinguished_records": 695,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1997830924,
+          708359843
+        ],
+        "rejected_identity": 0,
+        "restarts": 734,
+        "seed": "c23cf8ae91f1f73d",
+        "short_cycles": 730,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 4,
+        "useful_collisions": 1,
+        "walk_steps": 30976
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 880921469,
+      "case": 20,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3018610,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 121,
+            "s3_pair_quadratics": 46464,
+            "s3_query_ns": 1958468,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1880633972,
+              "beta": 397882872,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 880921469,
+              "partition_indices": [
+                120,
+                347,
+                3023
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 777614,
+            "verification_group_additions": 50,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3019641,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2000805774,
+          929119442
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2000805774,
+        929119442
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 61320394,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2846,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2846,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2000805774,
+          929119442
+        ],
+        "rejected_identity": 0,
+        "restarts": 1422,
+        "seed": "306184a71c28b40d",
+        "short_cycles": 1412,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 61338611,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2846,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "max_distinguished_records": 2846,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2000805774,
+          929119442
+        ],
+        "rejected_identity": 0,
+        "restarts": 1422,
+        "seed": "306184a71c28b40d",
+        "short_cycles": 1412,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 1392403,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 486,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 880921469,
+        "max_distinguished_records": 486,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2000805774,
+          929119442
+        ],
+        "rejected_identity": 0,
+        "restarts": 456,
+        "seed": "3061b293436ce438",
+        "short_cycles": 453,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 3,
+        "useful_collisions": 1,
+        "walk_steps": 17664
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1589848152,
+      "case": 21,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2015494,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 49,
+            "s3_pair_quadratics": 18816,
+            "s3_query_ns": 870034,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 616093610,
+              "beta": 1422096421,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1589848152,
+              "partition_indices": [
+                48,
+                257,
+                14239
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 866309,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2017107,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          910316986,
+          1973914646
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        910316986,
+        1973914646
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 2605024,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1451,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1589848152,
+        "max_distinguished_records": 1451,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          910316986,
+          1973914646
+        ],
+        "rejected_identity": 0,
+        "restarts": 762,
+        "seed": "61975974725f410e",
+        "short_cycles": 754,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 45184
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 2578945,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1451,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1589848152,
+        "max_distinguished_records": 1451,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          910316986,
+          1973914646
+        ],
+        "rejected_identity": 0,
+        "restarts": 762,
+        "seed": "61975974725f410e",
+        "short_cycles": 754,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 45184
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 5128696,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1848,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1589848152,
+        "max_distinguished_records": 1848,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          910316986,
+          1973914646
+        ],
+        "rejected_identity": 0,
+        "restarts": 1690,
+        "seed": "61976f402d1b113b",
+        "short_cycles": 1683,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 7,
+        "useful_collisions": 1,
+        "walk_steps": 100416
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 223842896,
+      "case": 22,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1887761,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 40,
+            "s3_pair_quadratics": 15360,
+            "s3_query_ns": 742762,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1763667968,
+              "beta": 654952978,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 223842896,
+              "partition_indices": [
+                39,
+                343,
+                14576
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 864095,
+            "verification_group_additions": 43,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1889734,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1794727735,
+          1389998896
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1794727735,
+        1389998896
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 1727639,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1170,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 223842896,
+        "max_distinguished_records": 1170,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1794727735,
+          1389998896
+        ],
+        "rejected_identity": 0,
+        "restarts": 583,
+        "seed": "57dc2f0141f26e73",
+        "short_cycles": 575,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 23520
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 1747750,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1170,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 223842896,
+        "max_distinguished_records": 1170,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1794727735,
+          1389998896
+        ],
+        "rejected_identity": 0,
+        "restarts": 583,
+        "seed": "57dc2f0141f26e73",
+        "short_cycles": 575,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 8,
+        "useful_collisions": 1,
+        "walk_steps": 23520
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 59182144,
+        "complete_target_scalar_recovered": false,
+        "distinguished_records": 2050,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "max_distinguished_records": 2050,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1794727735,
+          1389998896
+        ],
+        "rejected_identity": 0,
+        "restarts": 2087,
+        "seed": "57dc19351eb63e46",
+        "short_cycles": 2077,
+        "standing": "[pcc:unverified]",
+        "status": "bounded_censoring",
+        "step_cap": 2000000,
+        "unusable_collisions": 10,
+        "useful_collisions": 0,
+        "walk_steps": 2000000
+      }
+    },
+    {
+      "caller_known_scalar_verifier_only": 1042019312,
+      "case": 23,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "incumbent_joint_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4662622,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 218,
+            "s3_pair_quadratics": 83712,
+            "s3_query_ns": 3428799,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1819864452,
+              "beta": 1264891185,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1042019312,
+              "partition_indices": [
+                217,
+                187,
+                14796
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 957055,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4663704,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          479592873,
+          342997277
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        479592873,
+        342997277
+      ],
+      "rho32_dp4": {
+        "cold_wall_ns": 2678415,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1704,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1042019312,
+        "max_distinguished_records": 1704,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          479592873,
+          342997277
+        ],
+        "rejected_identity": 0,
+        "restarts": 887,
+        "seed": "8501e5cf97617b74",
+        "short_cycles": 882,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 5,
+        "useful_collisions": 1,
+        "walk_steps": 42976
+      },
+      "rho32_dp4_AA": {
+        "cold_wall_ns": 2676212,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 1704,
+        "dp_bits": 4,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 32,
+        "log": 1042019312,
+        "max_distinguished_records": 1704,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          479592873,
+          342997277
+        ],
+        "rejected_identity": 0,
+        "restarts": 887,
+        "seed": "8501e5cf97617b74",
+        "short_cycles": 882,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 5,
+        "useful_collisions": 1,
+        "walk_steps": 42976
+      },
+      "rho64_dp5": {
+        "cold_wall_ns": 6605316,
+        "complete_target_scalar_recovered": true,
+        "distinguished_records": 2029,
+        "dp_bits": 5,
+        "jump_count": 16,
+        "known_answer_in_solver": false,
+        "lanes": 64,
+        "log": 1042019312,
+        "max_distinguished_records": 2029,
+        "method": "optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          479592873,
+          342997277
+        ],
+        "rejected_identity": 0,
+        "restarts": 1975,
+        "seed": "8501d3fbc8252b41",
+        "short_cycles": 1964,
+        "standing": "[pcc:unverified]",
+        "step_cap": 2000000,
+        "unusable_collisions": 11,
+        "useful_collisions": 1,
+        "walk_steps": 140608
+      }
+    }
+  ],
+  "cases_count": 24,
+  "classification": "published APS explicit S3 pair MITM vs optimized generic negation rho; not asymptotic IC",
+  "cofactor": 1,
+  "curve": "ordinary prime-order prime31",
+  "fully_cold_ns": [
+    "62456792",
+    "767388027",
+    "325781442",
+    "769247097"
+  ],
+  "n": 2147446831,
+  "p": 2147483647,
+  "paired_APS_wins_vs_rho32_rho64": [
+    5,
+    17
+  ],
+  "protocol": "APS_VS_OPTIMIZED_NEG_RHO_PROTOCOL_20261116.md",
+  "ratios_APS_over_rho32_rho64": [
+    0.08138880175674151,
+    0.19171378092187338
+  ],
+  "rho32_AA_drift": 0.0024167397020413706,
+  "rho_seed_base": "52484f5f43523031",
+  "scope": "source-specific unisolated development CI; external fastest rho and independent PCC untested",
+  "standing": "[pcc:unverified]",
+  "successful_complete_calls": [
+    24,
+    12,
+    20,
+    12
+  ],
+  "target_seed": "52484f5f4e455731"
+}

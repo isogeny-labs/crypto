@@ -1,0 +1,34 @@
+--- a/continuation.rs
++++ b/continuation.rs
+@@ -25,6 +25,8 @@
+ impl<T:Owner> Owner for Bridge<'_,'_,T>{fn reserve(&mut self,q:Charge)->Result<(),()>{self.meter.pay(q.work,q.bytes).map_err(|e|{self.failure=Some(e);})}fn check(&mut self)->Result<(),()>{self.meter.pay(0,0).map_err(|e|{self.failure=Some(e);})}}
+ /// Holds the SAME exclusively borrowed owner, source and absolute deadline for
+ /// all next/exclude calls. Local caps only restrict that owner's remaining grant.
++/// Callback output remains diagnostic even when its final admission fails.
++pub struct CandidateCall<V>{pub value:Option<V>,pub result:Result<(),Failure>}
+ pub struct Session<'a,T:Owner>{owner:&'a mut T,original:&'a [Polynomial],n:u32,limits:Limits,deadline:Instant,pub attempt:Attempt}
+ impl<'a,T:Owner> Session<'a,T>{
+  pub fn new(n:u32,g:&'a [Polynomial],limits:Limits,deadline:Instant,owner:&'a mut T)->Self{Self{owner,original:g,n,limits,deadline,attempt:Attempt{partitions:Vec::new(),queue:Vec::new(),active:None,outcome:Outcome::Unknown,failure:None,charge:Charge::default()}}}
+@@ -42,6 +44,22 @@
+   let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
+   let result=exclude(self.n,&mut self.attempt,record,&mut m);self.attempt.charge=m.charge;
+   if let Err(e)=result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}result
++ }
++ /// Lend the SAME owner and immutable pending candidate to the authentic
++ /// consumer. The callback admits its own progress/work and returns it by value.
++ /// Its costs belong to the parent ledger, not this wrapper's charge counter.
++ /// A failed final check preserves the returned value but poisons continuation.
++ pub fn with_candidate_owner<V>(&mut self,f:impl FnOnce(&[bool],Instant,&mut T)->V)->CandidateCall<V>{
++  if let Some(e)=self.attempt.failure{return CandidateCall{value:None,result:Err(e)}}
++  let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
++  let before=(||{m.pay(1,0)?;if self.attempt.outcome!=Outcome::CandidateRetained{return Err(Failure::State)}let id=self.attempt.active.ok_or(Failure::State)?;candidate(self.attempt.partitions.get(id).ok_or(Failure::State)?).ok_or(Failure::State)})();
++  let out=match before{
++   Err(e)=>CandidateCall{value:None,result:Err(e)},
++   Ok(model)=>{let value=f(model,m.deadline,&mut *m.owner);let result=m.pay(0,0);CandidateCall{value:Some(value),result}},
++  };
++  self.attempt.charge=m.charge;
++  if let Err(e)=out.result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}
++  out
+  }
+  pub fn into_attempt(self)->Attempt{self.attempt}
+ }

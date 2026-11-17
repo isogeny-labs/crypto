@@ -307,7 +307,14 @@ fn file_ref(root: &Path, relative: &str, role: &str, encoding: &str) -> Result<A
 }
 
 fn axes(config: &CaseConfig) -> Value {
-    json!({"family":config.family,"n":config.n,"twist":config.twist,"m":config.m,"solver":config.solver})
+    let mut axes = json!({"family":config.family,"n":config.n,"twist":config.twist,"m":config.m,"solver":config.solver});
+    if let Some(policy) = &config.factor_base_policy {
+        axes["factor_base_policy"] = json!(policy);
+        axes["factor_base_policy_sha256"] = json!(super::digest(
+            &serde_json::to_vec(policy).expect("typed recipe serialization")
+        ));
+    }
+    axes
 }
 
 fn increment(map: &mut BTreeMap<String, u64>, key: &str) -> Result<(), String> {
@@ -333,6 +340,8 @@ struct Counts {
     by_m: BTreeMap<String, u64>,
     by_solver: BTreeMap<String, u64>,
     by_status: BTreeMap<String, u64>,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    by_factor_base_policy_recipe: BTreeMap<String, u64>,
 }
 impl Counts {
     fn active(&mut self, config: &CaseConfig, status: &str) -> Result<(), String> {
@@ -341,6 +350,13 @@ impl Counts {
         increment(&mut self.by_twist, &config.twist.to_string())?;
         increment(&mut self.by_m, &config.m.to_string())?;
         increment(&mut self.by_solver, &config.solver)?;
+        if let Some(policy) = &config.factor_base_policy {
+            let hash = super::digest(&serde_json::to_vec(policy).map_err(|e| e.to_string())?);
+            increment(
+                &mut self.by_factor_base_policy_recipe,
+                &format!("{}:{hash}", policy.name()),
+            )?;
+        }
         increment(&mut self.by_status, status)
     }
 }
@@ -572,6 +588,22 @@ fn visit(
             "counters":manifest.outcome.get("counters"),"counter_scope":manifest.outcome.get("counter_scope"),
             "supervisor":manifest.outcome.get("supervisor"),"clock_valid_for_comparison":false,
             "interpreted_as_retired_instructions":false}))?;
+        if let (Some(_), Some(artifact)) = (
+            manifest.config.factor_base_policy.as_ref(),
+            manifest
+                .artifacts
+                .iter()
+                .find(|a| a.path == "factor-base.json"),
+        ) {
+            let base: Value = read_json(&dir, "factor-base.json")?;
+            streams.measurements.push(&format!("{attempt}/factor-base-construction"), &json!({
+                "schema":"crypto.ml-dataset.coverage-measurement/v1","attempt":attempt,"cell_index":index,
+                "manifest_bound":true,"kind":"factor_base_construction","source_artifact":artifact,
+                "policy":manifest.config.factor_base_policy,"status":base["construction_status"],
+                "coordinate_domain_complete":base["coordinate_domain_complete"],
+                "actual_points":base["points"].as_array().map(Vec::len),"counters":base["construction_counters"],
+                "clock_valid_for_comparison":false,"interpreted_as_retired_instructions":false}))?;
+        }
         streams.coverage.push(attempt,&json!({"schema":"crypto.ml-dataset.coverage-cell/v1","cell_index":index,
             "attempt":attempt,"attempt_kind":"active_sealed","status":status,"actual_axes":axes(&manifest.config),
             "manifest":manifest_ref,"member_artifacts":manifest.artifacts.len(),"member_artifact_bytes":bytes,
@@ -820,6 +852,7 @@ pub fn report_run(root: &Path, destination: &Path) -> Result<Value, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ml_dataset::types::FactorBasePolicy;
     use crate::ml_dataset::{curves, solvers, CellManifest, DatasetPlan};
 
     struct Fixture {
@@ -831,6 +864,9 @@ mod tests {
     }
     impl Fixture {
         fn new() -> Self {
+            Self::with_policies(Vec::new())
+        }
+        fn with_policies(policies: Vec<FactorBasePolicy>) -> Self {
             let root = std::env::temp_dir().join(format!(
                 "crypto-coverage-test-{}-{}",
                 std::process::id(),
@@ -845,7 +881,12 @@ mod tests {
             protocol["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,"filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                schema: if policies.is_empty() {
+                    "crypto.ml-dataset.plan/v1"
+                } else {
+                    "crypto.ml-dataset.plan/v2"
+                }
+                .into(),
                 field_sizes: vec![7],
                 arities: vec![2],
                 families: vec!["koblitz".into()],
@@ -860,6 +901,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: policies,
             };
             let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":super::super::digest(&serde_json::to_vec(&plan).unwrap()),
                 "source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64),"shard_index":0,"shard_count":1,
@@ -1482,6 +1524,9 @@ mod tests {
         assert_eq!(summary["counts"]["recorded_pdp_witness_verified_cells"], 0);
         assert_eq!(summary["partial"], true);
         assert_eq!(summary["certificate_replay_performed"], false);
+        assert!(summary["counts"]
+            .get("by_factor_base_policy_recipe")
+            .is_none());
         assert_eq!(jsonl(&out.join("coverage.jsonl")).len(), 3);
         let rows = jsonl(&out.join("measurements.jsonl"));
         let pmu = rows
@@ -1505,6 +1550,83 @@ mod tests {
         assert!(inventory
             .iter()
             .any(|row| row["artifact"]["path"] == "partial.bin" && row["manifest_bound"] == false));
+    }
+
+    #[test]
+    fn policy_recipe_coverage_separates_same_kind_parameters_on_both_twists() {
+        let policies = vec![
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 32,
+            },
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            },
+        ];
+        let f = Fixture::with_policies(policies.clone());
+        f.plan.validate().unwrap();
+        // Solver varies fastest, then policy, then twist. Keep one BSGS cell
+        // for each recipe/twist, with the same curve, generator and target key.
+        for index in [0, 2, 4, 6] {
+            assert_eq!(f.plan.cell(index).unwrap().solver, "bsgs");
+            f.sealed(index);
+        }
+        let out = f.root.join("policy-report");
+        let report = report_run(&f.source, &out).unwrap();
+        let summary = &report["summary"];
+        assert_eq!(summary["planned_method_cells"], 16);
+        assert_eq!(summary["observed_distinct_cell_identities"], 4);
+        assert_eq!(summary["assigned_cells_without_observed_local_attempt"], 12);
+        assert_eq!(summary["counts"]["active_sealed_cells"], 4);
+        assert_eq!(summary["counts"]["by_twist"]["false"], 2);
+        assert_eq!(summary["counts"]["by_twist"]["true"], 2);
+        let counts = summary["counts"]["by_factor_base_policy_recipe"]
+            .as_object()
+            .unwrap();
+        assert_eq!(counts.len(), 2);
+        for policy in &policies {
+            let hash = super::super::digest(&serde_json::to_vec(policy).unwrap());
+            assert_eq!(counts[&format!("{}:{hash}", policy.name())], 2);
+        }
+
+        let coverage = jsonl(&out.join("coverage.jsonl"));
+        assert_eq!(coverage.len(), 4);
+        for row in &coverage {
+            let config = f.plan.cell(row["cell_index"].as_u64().unwrap()).unwrap();
+            let policy = config.factor_base_policy.as_ref().unwrap();
+            assert_eq!(row["actual_axes"]["factor_base_policy"], json!(policy));
+            assert_eq!(
+                row["actual_axes"]["factor_base_policy_sha256"],
+                super::super::digest(&serde_json::to_vec(policy).unwrap())
+            );
+            assert_eq!(row["actual_axes"]["twist"], config.twist);
+            assert_eq!(row["certificate_replay_performed"], false);
+        }
+        let measurements = jsonl(&out.join("measurements.jsonl"));
+        let construction: Vec<_> = measurements
+            .iter()
+            .filter(|row| row["kind"] == "factor_base_construction")
+            .collect();
+        assert_eq!(construction.len(), 4);
+        for row in construction {
+            let index = row["cell_index"].as_u64().unwrap();
+            let config = f.plan.cell(index).unwrap();
+            let dir = f.source.join("cells").join(format!("{index:012}"));
+            let base: Value = read_json(&dir, "factor-base.json").unwrap();
+            assert_eq!(row["policy"], json!(config.factor_base_policy.unwrap()));
+            assert_eq!(row["status"], base["construction_status"]);
+            assert_eq!(row["counters"], base["construction_counters"]);
+            assert_eq!(
+                row["coordinate_domain_complete"],
+                base["coordinate_domain_complete"]
+            );
+            assert_eq!(
+                row["actual_points"],
+                base["points"].as_array().unwrap().len()
+            );
+            assert_eq!(row["manifest_bound"], true);
+            assert_eq!(row["interpreted_as_retired_instructions"], false);
+        }
+        assert_eq!(report_run(&f.source, &out).unwrap(), report);
     }
 
     #[test]

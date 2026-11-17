@@ -1,0 +1,107 @@
+{
+  "branch": "claude/ic-stride-renew-prime-20261029",
+  "closed_utc": "2026-11-05T18:11:48+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "(isolab-eks launch of the frozen task card)"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "provenance": "Documentary launcher reference (isolab-eks, CodeBuild isolab-experiment-launcher); this import did not execute it. Binary: ecbench sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c (isolab image, source be2969ce), one session per size; replayed by the same binary on another host",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "261dcf92de2af6246c55d87594373f12f4e0b239",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T18:11:48+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-srenew-deferred-guard"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1811Z-ic-srenew-deferred-guard",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w0",
+      "note": "counted S at w=0 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp24-tm241-91a7fdd0, icv1-fp24-tm2519-cce74591, icv1-fp32-tm103307-fa421912, icv1-fp32-tm24839-2a7bda13) [pcc:unverified]",
+      "reference": 1.1199550447376843,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 12.442428869357581
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w1",
+      "note": "counted S at w=1 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp24-tm241-91a7fdd0, icv1-fp24-tm2519-cce74591, icv1-fp32-tm103307-fa421912, icv1-fp32-tm24839-2a7bda13) [pcc:unverified]",
+      "reference": 2.142068192869672,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 20.616962352845267
+    }
+  ],
+  "problem": "archive:ic-srenew-deferred-guard",
+  "provenance": {
+    "kind": "retrospective_metadata_index",
+    "note": "Record written after the 2026-10-29 EKS sessions; raw files are pinned by the validator report and their artifact-store manifests."
+  },
+  "raw": [
+    {
+      "bytes": 21950103,
+      "path": "research/ic_srenew_deferred_guard_20261029/v3/P24/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1b5dedc100e0f53cc15cd5ab5d48b1aba5b5fcadcab68136861cea3da64bc2c",
+      "sha256": "d1b5dedc100e0f53cc15cd5ab5d48b1aba5b5fcadcab68136861cea3da64bc2c",
+      "uploaded": true
+    },
+    {
+      "bytes": 3172,
+      "path": "research/ic_srenew_deferred_guard_20261029/v3/P24/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e0c631be9e1826ab46d76b5380905061a394edb20176cca20243e736e716611",
+      "sha256": "9e0c631be9e1826ab46d76b5380905061a394edb20176cca20243e736e716611",
+      "uploaded": false
+    },
+    {
+      "bytes": 22201400,
+      "path": "research/ic_srenew_deferred_guard_20261029/v3/P32/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1fee33b067d434e936c61ae4d842eeae3621d32071b7a41b7a6e79f5b27acb82",
+      "sha256": "1fee33b067d434e936c61ae4d842eeae3621d32071b7a41b7a6e79f5b27acb82",
+      "uploaded": true
+    },
+    {
+      "bytes": 3176,
+      "path": "research/ic_srenew_deferred_guard_20261029/v3/P32/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/60/604d74e46e307372c962f459366fe846a1bcb2058b955c8024612106c34ccfdc",
+      "sha256": "604d74e46e307372c962f459366fe846a1bcb2058b955c8024612106c34ccfdc",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-ic-srenew-deferred-guard/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261029-ic-srenew-deferred-guard/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-srenew-deferred-guard",
+  "status": "measured",
+  "summary": "Retrospective index of the 2026-10-29 ic-srenew-deferred-guard EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
+  "validation": "benchmarks/20261029-ic-srenew-deferred-guard/VALIDATION.json"
+}

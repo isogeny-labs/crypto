@@ -1,0 +1,1524 @@
+{
+  "headline": [
+    {
+      "claimed": 119.898751015425,
+      "name": "cold_s.cur_mean",
+      "recomputed": 119.898751015425,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 107.41199558305004,
+      "name": "cold_s.padd_mean",
+      "recomputed": 107.41199558305004,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 12.486755432374958,
+      "name": "cold_s.paired_saving_mean",
+      "recomputed": 12.486755432374958,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.1162510328999549,
+      "name": "cold_s.ratio_cur_over_padd",
+      "recomputed": 1.1162510328999549,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 0.9983369384246205,
+      "name": "cold_s.aa_ratio_a_over_b",
+      "recomputed": 0.9983369384246205,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 69.6207482861,
+      "name": "rank_s.cur_mean",
+      "recomputed": 69.6207482861,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 57.09547786765,
+      "name": "rank_s.padd_mean",
+      "recomputed": 57.095477867650004,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 1.2193741235949398,
+      "name": "rank_s.ratio_cur_over_padd",
+      "recomputed": 1.2193741235949396,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 2.0353945341666666,
+      "name": "rho.mean_online_s",
+      "recomputed": 2.035394534166666,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 58.90688463724016,
+      "name": "rho.ratios.cur.ic_over_rho_online",
+      "recomputed": 58.906884637240175,
+      "rel_tol": 1e-9
+    },
+    {
+      "claimed": 52.77207626335048,
+      "name": "rho.ratios.padd.ic_over_rho_online",
+      "recomputed": 52.772076263350485,
+      "rel_tol": 1e-9
+    }
+  ],
+  "identity_checks": 40,
+  "independence": "native recomputation (examples/n83_panel_analyze.rs) written in a separate session from the producer's analyze.py; reads only the raw provider records",
+  "independent": true,
+  "not_recomputed": "bootstrap intervals (the producer's Python Mersenne-Twister resampling); the point estimates above are exact recomputations",
+  "provider_artifact": {
+    "id": 12223498464,
+    "run": 39296352594,
+    "zip_sha256": "41e1a7f4c7ee33c71902b39d21c52189abb0b5f2e7f9a15fbdf910b082bd9f19"
+  },
+  "raw_data": [
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_a/stdout.jsonl",
+      "sha256": "2b0225a2525c6cd8a128854e0822b306fe18c65d2a21f6f035da95f5eb26e9f9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_a/targets_result.jsonl",
+      "sha256": "19e3d73734227fdda7f7fb419319f9ed8603b43ba1bb398b70efacc760e450c2"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_a/usage.json",
+      "sha256": "f9efdb355bd1d3dc447b9b9e1e40c5ca8106e1bf82bb12a7652f44d6a01170db"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_b/stdout.jsonl",
+      "sha256": "f27a479c9036db60985532cece4179ab632a06abf6619ee40d946b5be28d2a86"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_b/targets_result.jsonl",
+      "sha256": "27fc3cd7800d933d8b12abce4a6efbf1de6ffcca4407c5f41c53d16aa6baaf41"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_cur_b/usage.json",
+      "sha256": "7f469e0241b37f01e079db7d7e4f0b6033f744e410bbfb0ad031547174dd772c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_padd/stdout.jsonl",
+      "sha256": "7675baa5ab61e014cfd789820dfe477816a678fc59d4341cfa4829ab7b2ee904"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_padd/targets_result.jsonl",
+      "sha256": "7157c3cea347c73b2ca7e95bca960451c0b569421ae6c2a6efcb66489bbb7bbf"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_padd/usage.json",
+      "sha256": "5747ba388c9f0b68178f41ca2f163b2b452d1765b7169e4eab089cf104262a94"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho0/receipt.json",
+      "sha256": "4845f72ce1ceb410ce3e9b3fa2e2b9a44cdc3d949e9744f13be902cc9ec67cd3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho0/stdout.jsonl",
+      "sha256": "4845f72ce1ceb410ce3e9b3fa2e2b9a44cdc3d949e9744f13be902cc9ec67cd3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho0/usage.json",
+      "sha256": "c25eeced26da143e02495b717a07ddfe562771e7a5ca69881d0ff46292301862"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho1/receipt.json",
+      "sha256": "680d62aefbb4a54fa676b4b0411d66d60488bc80258d2a46af798027a9149d0a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho1/stdout.jsonl",
+      "sha256": "680d62aefbb4a54fa676b4b0411d66d60488bc80258d2a46af798027a9149d0a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho1/usage.json",
+      "sha256": "fa7865d72b92b0b96850953e396c74a2f6cab84b4e34ae392d6e0bb6a39a75c4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho2/receipt.json",
+      "sha256": "720027a26120fd30fa91dda4c36019730ef414ab35c9eceb3f6a80bd44f684f4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho2/stdout.jsonl",
+      "sha256": "720027a26120fd30fa91dda4c36019730ef414ab35c9eceb3f6a80bd44f684f4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p10_rho2/usage.json",
+      "sha256": "d85309ee2fce1c51f39580773a6935c70399c700d9a66e9f13658191f4fe559d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_a/stdout.jsonl",
+      "sha256": "570d4186d25dcb9859d7f8e4c02dab82e0c7c7812866832b8b37f3642a1813a2"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_a/targets_result.jsonl",
+      "sha256": "58eb1800b87ed0d7a629bf90f9c713e1aa3d5d3e2b4eb4422147369c2f240163"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_a/usage.json",
+      "sha256": "5966c7d5caab07686a5b3e5ed23c17a2c8e636ec51f9fc0edf02c36e7dd164fb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_b/stdout.jsonl",
+      "sha256": "22cdb3ca030e0d4e06f026e729230adf26c0e984ddf6224b1be1e8bac574960c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_b/targets_result.jsonl",
+      "sha256": "f8bf1b5bdf0d91c0d3237c46d9935891566a2b6a2c74ccf4099070c32fdf61eb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_cur_b/usage.json",
+      "sha256": "002ae3ae42bcb6543bc63b159e5c166d852048d9ae869ba7dc158f1ca46e8cad"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_padd/stdout.jsonl",
+      "sha256": "b023e8f1fa4090f9d775bedf83acc9158539d6f108d8c109d31edec80fd69376"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_padd/targets_result.jsonl",
+      "sha256": "d5568cc31754b4023ff8ab00d648e322990811be0fa7b3d4e9036ab814969a0f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_padd/usage.json",
+      "sha256": "b91b0eaeb91b951b2761cde6551cbb63b26c5973881d4744dac99695cc3cb1b9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho0/receipt.json",
+      "sha256": "37fb96bc1ab3be1812d3acaa9c73b793e25b8269ff64289056221b48999de672"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho0/stdout.jsonl",
+      "sha256": "37fb96bc1ab3be1812d3acaa9c73b793e25b8269ff64289056221b48999de672"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho0/usage.json",
+      "sha256": "8b7cad2490d35b8c27fc0378d90495799d28c56e8f5513272abe14791479eb03"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho1/receipt.json",
+      "sha256": "5d9dfef41efc39606f372e317f270f80efc59ef210051788739612a899d759ad"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho1/stdout.jsonl",
+      "sha256": "5d9dfef41efc39606f372e317f270f80efc59ef210051788739612a899d759ad"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho1/usage.json",
+      "sha256": "53db3a7c9993405df5e34d4ab670aa6365fad95ef7b74145a178a1b6f06dfe39"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho2/receipt.json",
+      "sha256": "e3f4dca9ef973e9760768b295eb7c8cc5238e3c89a14536d0fcc6c3da5e78d62"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho2/stdout.jsonl",
+      "sha256": "e3f4dca9ef973e9760768b295eb7c8cc5238e3c89a14536d0fcc6c3da5e78d62"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p11_rho2/usage.json",
+      "sha256": "8841142acc78ca0e7cff8d83281d301a18eb733c3ee4f8c5851346314b7e596e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_a/stdout.jsonl",
+      "sha256": "dc1df52ec3f2e79be8e1cd2c8fac41d7ac6260f0f70252ecb3970dff0029b216"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_a/targets_result.jsonl",
+      "sha256": "8706f5f7fe399133ae8777b270ed43b228b7b19786cc52d39311b1bda5127b30"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_a/usage.json",
+      "sha256": "3f1007daac061f6822b488fa5811b292d2b0f34ef295be85ebd3a76d8c957cc5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_b/stdout.jsonl",
+      "sha256": "a722c984a95340fd4337c78a5b61fb6d199ceda24f5501f35efcb8d54e80f39d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_b/targets_result.jsonl",
+      "sha256": "8cbe759455a9b3d8aedd028eccfd3d83f3ed18379b6246eeedeca76a1c40228e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_cur_b/usage.json",
+      "sha256": "fed4696f3d6aaae34efe52bbdd839e28d8d0738562c4444613bdd8bb0f7475cc"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_padd/stdout.jsonl",
+      "sha256": "6ec3b13b150eecf25539afd29dd353a63eb8dc6d73c64230b070f160b7f1f5a6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_padd/targets_result.jsonl",
+      "sha256": "b1cdb2398289ec7a10a7eb897ab2e54b9f0e6bd63a52bc85258f56f08deaa727"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_padd/usage.json",
+      "sha256": "fc240ced5a9f1a8fd4e56b754de652558b2b17e50872694a188e144c9bca2d11"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho0/receipt.json",
+      "sha256": "0f9a785578660ba15cd1ae483e790feea52ab390e5ab10b238913c433cb335e1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho0/stdout.jsonl",
+      "sha256": "0f9a785578660ba15cd1ae483e790feea52ab390e5ab10b238913c433cb335e1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho0/usage.json",
+      "sha256": "120eef85f986c342a09907363163180d988994e62c00dcb633570c38102e808b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho1/receipt.json",
+      "sha256": "50a5c2cded93127530cc079ff35571e6102db93ee64365b0e3c62f0440c8bf58"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho1/stdout.jsonl",
+      "sha256": "50a5c2cded93127530cc079ff35571e6102db93ee64365b0e3c62f0440c8bf58"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho1/usage.json",
+      "sha256": "aacc678d512e0aadd2f5b8cbbfd72ec7f5648c40cfc3b34745f01a56b6da7f02"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho2/receipt.json",
+      "sha256": "57f7c1ac1de26c3a70d05b14547769bf118d1aa6970e5b128896d009d7fa3c61"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho2/stdout.jsonl",
+      "sha256": "57f7c1ac1de26c3a70d05b14547769bf118d1aa6970e5b128896d009d7fa3c61"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p12_rho2/usage.json",
+      "sha256": "d3e10c15593e8ad3a8b758c4f2562e3ea6308df952c4b9fc37e99dd918e1408e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_a/stdout.jsonl",
+      "sha256": "238a4891f3c90ad0bc7e50af389a47334c801bab7e79b3dd79cff7e7887e1b30"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_a/targets_result.jsonl",
+      "sha256": "f394339455a43619d93ce13f7f2a615dc0a0a6f2c59fef470dee119d916cd3b9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_a/usage.json",
+      "sha256": "9b81af43b2c5445e9e486435202e051cb1ce98e6872c4ae054937adf3b041644"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_b/stdout.jsonl",
+      "sha256": "9f6376cf4226c026897db635524a0cfe012508083ca5ca65c57cb6aa3aa46724"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_b/targets_result.jsonl",
+      "sha256": "3bd49576bc16509e322066aa8881ff1a5b42b890c6c6765b2e966d2e717b056a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_cur_b/usage.json",
+      "sha256": "49b5236012faca35721a8bc16df16cf1a2f4f42f2abd6c77dd93d68a8a8b6f0a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_padd/stdout.jsonl",
+      "sha256": "93b2a80baf2a8553281dc6144ef38e2c92a0d2b01487ddf1700791a6822931b6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_padd/targets_result.jsonl",
+      "sha256": "f7eb658bf9e3154a6a074c322d3100763d47f3a965a37e128d5ec7f80f3fe207"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_padd/usage.json",
+      "sha256": "893e709cf8d5ac5c88db197d2a4314c9f957c8dbee407d1226f0629e0465eda6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho0/receipt.json",
+      "sha256": "c538e3bcf413d18c9b6adca5e020aa7c4da711839b42fe15de130d3f4fb4567c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho0/stdout.jsonl",
+      "sha256": "c538e3bcf413d18c9b6adca5e020aa7c4da711839b42fe15de130d3f4fb4567c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho0/usage.json",
+      "sha256": "8ac385793372ca0f61f9f60157243b77ee5ecfa67b5f2d7a4d82fbc863dfda16"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho1/receipt.json",
+      "sha256": "390365489bf718eee81558c9ad274d3085f5139346cb7b8d0f4f48177f3cd3ae"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho1/stdout.jsonl",
+      "sha256": "390365489bf718eee81558c9ad274d3085f5139346cb7b8d0f4f48177f3cd3ae"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho1/usage.json",
+      "sha256": "d956f95aebce4df0dd97a8313aa7e0121fbab10050eb8b495e1bd50895a47b06"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho2/receipt.json",
+      "sha256": "4ab85c9d350556b3533bffcbf190039c15e98e7c2378bd9a661b16bca19e3d34"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho2/stdout.jsonl",
+      "sha256": "4ab85c9d350556b3533bffcbf190039c15e98e7c2378bd9a661b16bca19e3d34"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p13_rho2/usage.json",
+      "sha256": "67c2cf75b862415d02f94d70ab6779c4333fa81b30627f2e89b8817c718b296d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_a/stdout.jsonl",
+      "sha256": "5eff5004d88948e0578a8c786ad67e32f6d7a1b13e767836c00a4f37ebce1487"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_a/targets_result.jsonl",
+      "sha256": "6b073383b576de77a088a26a2747ddabb9575ea93a189722cd5eac30c9ff810f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_a/usage.json",
+      "sha256": "456d5a9be2e03f7c046661372933d2bcb1496dbfbcd5a6aab5e229b5998852be"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_b/stdout.jsonl",
+      "sha256": "4ffbb22dace429bb2f0749ea54acd1aec4e44c5be53a77d61651e8a5d3ca3eab"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_b/targets_result.jsonl",
+      "sha256": "f20aedb960924b811cc6b68e7212e3bd5b17bbee473662be7d7120e7a9c041a4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_cur_b/usage.json",
+      "sha256": "7aa6d66bc921e01688d7e1f77b76ca474ae2e6e225e0fb1e54e4bc8d8267e3d8"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_padd/stdout.jsonl",
+      "sha256": "dfa7678e3d2d3420fc53c70a2aac3dcb99bf29b1e8b7e10d0b88bbf27001e507"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_padd/targets_result.jsonl",
+      "sha256": "29ba267f0b6a5bacb9d925c45eca412de4f9f6418733dfa2864f98b86ba35a7d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_padd/usage.json",
+      "sha256": "23cdf9404b7cf60e00dab81e8a261348b0e7ba40d19a3d61dbf00134e9ba8441"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho0/receipt.json",
+      "sha256": "0c62b76c25078dc1bcfc656356ecab91d7bf688d71e2a5ec348e56c012a94644"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho0/stdout.jsonl",
+      "sha256": "0c62b76c25078dc1bcfc656356ecab91d7bf688d71e2a5ec348e56c012a94644"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho0/usage.json",
+      "sha256": "4b83288cd364d868e49e9de11eb3a04d8a335b775250db1d37cda7aacaa7a22c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho1/receipt.json",
+      "sha256": "493569589645e891ec27d9be50037e8d2e32d17c816f4596dac7c143b2337eb0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho1/stdout.jsonl",
+      "sha256": "493569589645e891ec27d9be50037e8d2e32d17c816f4596dac7c143b2337eb0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho1/usage.json",
+      "sha256": "f1d4cbfea8b61099852a92695846fbf953d4ee2c17e63b35d8599eede297fde1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho2/receipt.json",
+      "sha256": "cd04b8abd7bfdd7284afdfd92ec016b7da16091b467ecfb435589aa75415ca0f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho2/stdout.jsonl",
+      "sha256": "cd04b8abd7bfdd7284afdfd92ec016b7da16091b467ecfb435589aa75415ca0f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p14_rho2/usage.json",
+      "sha256": "88389a2b17cfb7b43a3d38a15c86236d63ceee77be10b91b944fd70b08ef931e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_a/stdout.jsonl",
+      "sha256": "f28bf51c4dc776afeee5879a2bb89fef2e00c59fb65d101388701273e6deac3f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_a/targets_result.jsonl",
+      "sha256": "4753eb2cf4f78aa7d15e975218215393e21c932b587013dbb63cbe4b09668934"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_a/usage.json",
+      "sha256": "dd07c8245280126698a5fcf742c49dbea4c61cb606ef5fd4b45bbcc8644514be"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_b/stdout.jsonl",
+      "sha256": "cd50a320d2e2d9d83fa9fa57f7103455c66f9d341a034b2c899f416ba9d9f59d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_b/targets_result.jsonl",
+      "sha256": "9221f0668d9e8ddff1f51fbf918ac422d4080a12a186e0de95d849073e847e60"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_cur_b/usage.json",
+      "sha256": "f6546222a45664f5b9b364a63c7c0393a5e3c70599af5d230c4f40a5af651297"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_padd/stdout.jsonl",
+      "sha256": "e0070bf388e6d677e702f7ac2dce59a6e9dc3ae80bdbbc23bdc15e57cc2a427c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_padd/targets_result.jsonl",
+      "sha256": "938db605434f1dc0cec46dddc0d2d0e65b3a31ce5ba031738eb0d674dfc93cb0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_padd/usage.json",
+      "sha256": "aae22e515c797f165e51fa69e8e3fea46bddc5b30c6cd723d2dbb41255b676d9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho0/receipt.json",
+      "sha256": "853505c452c4b1350a7e7946795d01b117a591c9db992fa24d7d136e17dbae53"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho0/stdout.jsonl",
+      "sha256": "853505c452c4b1350a7e7946795d01b117a591c9db992fa24d7d136e17dbae53"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho0/usage.json",
+      "sha256": "2f2a0502478a574b1bfdc183d9e82bfee5c5b44b0950e5fef68f0751a4371ed3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho1/receipt.json",
+      "sha256": "a1c30ab96c6557e0c32c71bf89a51ee786a094267748c7d73430c6352f71062e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho1/stdout.jsonl",
+      "sha256": "a1c30ab96c6557e0c32c71bf89a51ee786a094267748c7d73430c6352f71062e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho1/usage.json",
+      "sha256": "7942e275df650210848ff4146b7b8fbddb4974a01872ad193e2cf2ff5eae4335"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho2/receipt.json",
+      "sha256": "c5e3c4cdd29aec8140cd61310e73df9f0e75588331265a2e1f544e6f7fd5a34a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho2/stdout.jsonl",
+      "sha256": "c5e3c4cdd29aec8140cd61310e73df9f0e75588331265a2e1f544e6f7fd5a34a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p15_rho2/usage.json",
+      "sha256": "60fe999c5658fda295095007de641a7ec0fdba4425aed4be72268514744ccbae"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_a/stdout.jsonl",
+      "sha256": "7f1df8dc9f7b9c168ad646d897061b98d3f0d4efb51af255e14b897a7ad8214d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_a/targets_result.jsonl",
+      "sha256": "ad8ec455a8cc26fa48d0cac9763ec0dc5219081062b27c2852c3588a6b3b6e06"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_a/usage.json",
+      "sha256": "cb05adb047deb62292ac71aebdd0060b48d643bcd5e1f69ec059d4711938e3fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_b/stdout.jsonl",
+      "sha256": "d8ed3133e445913cd570a49048eee624f616d2d9a0779576011e50740e3c80a2"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_b/targets_result.jsonl",
+      "sha256": "93bdce891faa05441fbd9af15c408c0ae130e8964c59edd8b5b3ca01b3e71b09"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_cur_b/usage.json",
+      "sha256": "8842c79a99855823e17a23ad0f37c9bf731ed3a5ea8e4adfff2fac03de99e89f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_padd/stdout.jsonl",
+      "sha256": "b04674d6a1fc49b42d76c2cf79b018b2133bd47c88ce47266bb334d39a33afc4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_padd/targets_result.jsonl",
+      "sha256": "a4c7f9cc0c944ca81cd67d08aee380580993cfce95fc94689ce64e7ee54a8515"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_padd/usage.json",
+      "sha256": "0ae08cee7457ea6a531a67aea14ac73f18979bfe7f203adf96aee2ad083a0794"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho0/receipt.json",
+      "sha256": "fe19d52cff401fad08f3acf0a14951680bcd24d3e0fba33462b66c3d640c73b4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho0/stdout.jsonl",
+      "sha256": "fe19d52cff401fad08f3acf0a14951680bcd24d3e0fba33462b66c3d640c73b4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho0/usage.json",
+      "sha256": "246fc1e582e9da9242617096e2dfa296f746410fb7bb3f549f0b45cbfd957baa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho1/receipt.json",
+      "sha256": "fff7d500726adb5e41c34c83aad724c2fc63186225cbfa864dea007301a8b8d0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho1/stdout.jsonl",
+      "sha256": "fff7d500726adb5e41c34c83aad724c2fc63186225cbfa864dea007301a8b8d0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho1/usage.json",
+      "sha256": "1dde702ba405cfda3ef1b59797efe696857408a38450093c81aaefdd9117c4e6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho2/receipt.json",
+      "sha256": "16adfa052852549956010dec79df436e471c9534b5955ca88cad17cbe39da7fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho2/stdout.jsonl",
+      "sha256": "16adfa052852549956010dec79df436e471c9534b5955ca88cad17cbe39da7fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p16_rho2/usage.json",
+      "sha256": "59260c86218ed23989c4652a5b6aa2c5a136a310265c44cdc741fa7c7c5eb6b1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_a/stdout.jsonl",
+      "sha256": "d4b674361c6eacf89b158cb5765e8736eb857aa8d4916900e27aa602277dae9e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_a/targets_result.jsonl",
+      "sha256": "3b188bf76e18b42aba50ff2df34d9fabf59ac8e5eb3bd78f405c39cb2fbb65fe"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_a/usage.json",
+      "sha256": "474b34ec91825bbd5bcef9aef7743197d31b811db27bd1e6b9b4e36682c61b7f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_b/stdout.jsonl",
+      "sha256": "cda1b2cd9b293d3c6e1543fb917482d0f7fb6bd0743b8af8d5f55d3f079e4593"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_b/targets_result.jsonl",
+      "sha256": "7630f0d74bbff903ffb6a3c7f8eecc15db444a1b8e39c2a9497f2a0f5a67ae4c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_cur_b/usage.json",
+      "sha256": "02f7b44f2fcbd6f5df048d4edcdbb0861c30d91a6ae325934f1e7a49fe0870e8"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_padd/stdout.jsonl",
+      "sha256": "6629c50db19b109370e6e19af42146d9b9e27c5eed6b7deeab225c46c1d8e75b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_padd/targets_result.jsonl",
+      "sha256": "24c562141dde64d4cbb93187a09c393440541ca2fef81ed8411f7ca364b9907a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_padd/usage.json",
+      "sha256": "e5e129d7e43e1d9aeb2b3b3984321ad02f3e6b0651364ac684090ebf3030d793"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho0/receipt.json",
+      "sha256": "a93f5d5a8d19c10319d2b6ef7306533bffe5f72b85c67208d337e3a9f7bbd93a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho0/stdout.jsonl",
+      "sha256": "a93f5d5a8d19c10319d2b6ef7306533bffe5f72b85c67208d337e3a9f7bbd93a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho0/usage.json",
+      "sha256": "2d462b2ccb01fc5fd3938896a0a8025146944975e2e77fe34282dbb52f231057"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho1/receipt.json",
+      "sha256": "af57d8a832e4063cfd46a0d474207fc70ea93562d27f1eba66882678743a32a9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho1/stdout.jsonl",
+      "sha256": "af57d8a832e4063cfd46a0d474207fc70ea93562d27f1eba66882678743a32a9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho1/usage.json",
+      "sha256": "65bb4598748fc099b03e0a763a9a8efeccd4b04b7553e3eff4778f90cc434713"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho2/receipt.json",
+      "sha256": "45b3e418dd1d353bea7fe42ebe950addef135270cf818f8876342ff10073d980"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho2/stdout.jsonl",
+      "sha256": "45b3e418dd1d353bea7fe42ebe950addef135270cf818f8876342ff10073d980"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p17_rho2/usage.json",
+      "sha256": "b526332759ef2e67b586bf1d90cb35e3ccdf036262f2c338b44e2e1270755cc1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_a/stdout.jsonl",
+      "sha256": "fc398fc86659fb4028b9ba803b7b5c734873f3aaab986df9183687cfe51f10b4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_a/targets_result.jsonl",
+      "sha256": "730fb34a987c0dfabfc29a1396c20b317b52e50974c9856cae71461f11159a83"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_a/usage.json",
+      "sha256": "11e7d7fe3481f41fee3d109c399e13af93c4c1e9b1ec4537217cbcde1b3f7d38"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_b/stdout.jsonl",
+      "sha256": "4aa22a592c34b6446c52ccbf76b06c4b1af7ba756ee42025e61d98b64586bcfd"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_b/targets_result.jsonl",
+      "sha256": "4786ae2e87fe21939ca3fc9182dd72545a0e4cd87c899ecc369d69c1b36223f7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_cur_b/usage.json",
+      "sha256": "ef7aed709d88e72763a2e2c2451285df92986e3eeb7a41a54fc19dc5ffd711fb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_padd/stdout.jsonl",
+      "sha256": "1083e29ecdae5a95693eff976375164b3fadefbb7451cc0b7ddd147f26dab8af"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_padd/targets_result.jsonl",
+      "sha256": "5672abbacd868b5efa503b09eca10034e30d35a0b7956a235752e8b7fc3abd20"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_padd/usage.json",
+      "sha256": "dd8c2c1238388651b608ec862d224db1c302be8864c5c6d77fcf3d3f15109616"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho0/receipt.json",
+      "sha256": "5310ac50c1a28da3a293e5ccdd6f30a61fff1e75c6508d856311b245d2f715ce"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho0/stdout.jsonl",
+      "sha256": "5310ac50c1a28da3a293e5ccdd6f30a61fff1e75c6508d856311b245d2f715ce"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho0/usage.json",
+      "sha256": "778f54cdf996002d6a3364349cda11f8eb69e99d32d9ad1961822fd6deca7b66"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho1/receipt.json",
+      "sha256": "33cad398d1a5a74934e1de835f2a66b06fd549dbe906681a2888828eff75d768"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho1/stdout.jsonl",
+      "sha256": "33cad398d1a5a74934e1de835f2a66b06fd549dbe906681a2888828eff75d768"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho1/usage.json",
+      "sha256": "8c315cdcdbf801729ffd225c69c79f25288ecff84fcb9c30dc2e220996873ecd"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho2/receipt.json",
+      "sha256": "d1e1c0dc4fdbf59cd66eacc650ddb203f2d6b3d5578e97e6bd86edb6bc6cd398"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho2/stdout.jsonl",
+      "sha256": "d1e1c0dc4fdbf59cd66eacc650ddb203f2d6b3d5578e97e6bd86edb6bc6cd398"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p18_rho2/usage.json",
+      "sha256": "a79ddca116f05826077eaee854fa8f935ed3e5a48dfeb96603291377542c191f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_a/stdout.jsonl",
+      "sha256": "82daa727de089e035c1700d59bc517dd57e8fd9279603807441771405a75318d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_a/targets_result.jsonl",
+      "sha256": "e5daf97be2a55da1902e2fd684fdd87be6418c5fd7f28e4e82c151d0a14e7a5d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_a/usage.json",
+      "sha256": "2372d66def25f39979da9f86c417e92c9909eeb7fc8dd7605187f94ea7721374"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_b/stdout.jsonl",
+      "sha256": "5dc5134140a21efd429ddde7ebeaa4965a55d0c126d0a926e56eced0fd242458"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_b/targets_result.jsonl",
+      "sha256": "504073427aebc13978c8fda98c945699613b3da8ade5378e302ce1015bfedbfd"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_cur_b/usage.json",
+      "sha256": "ffc1c3595473df51cd76dac78be6f90410e71280d60a0eb7000bc2bb4b18244c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_padd/stdout.jsonl",
+      "sha256": "434c8bf542a7aa535f00c6815ab479affa885f4e321ae87e6183e072af0ae6c7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_padd/targets_result.jsonl",
+      "sha256": "472ecb72a2b326ac1cda3af3310f074eb933520cfeac3ad0b2b0f203ecd17968"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_padd/usage.json",
+      "sha256": "81aa1eaecf4f07124f171fa89a3298b5bfb311c58980ccb4e30fc50c7f2ef40d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho0/receipt.json",
+      "sha256": "2685eb314c6a1a25d2f22a811099a5c1c89ab0f53835331f27c437977b59c68b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho0/stdout.jsonl",
+      "sha256": "2685eb314c6a1a25d2f22a811099a5c1c89ab0f53835331f27c437977b59c68b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho0/usage.json",
+      "sha256": "8c22b1ee461d4e44a8f53e336b1093c5f5cb4434c39c17be79f6913ee8609d3d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho1/receipt.json",
+      "sha256": "9d67bf11701d9b3ba3a88ed84433137e3a7dc16003c0e17a1d3179f43133178f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho1/stdout.jsonl",
+      "sha256": "9d67bf11701d9b3ba3a88ed84433137e3a7dc16003c0e17a1d3179f43133178f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho1/usage.json",
+      "sha256": "14af3627fe3bd4d02654c7a3cd533819df9edd86b540c70581ee5d8794142249"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho2/receipt.json",
+      "sha256": "df9a88d3493143bc1cf6c94608c4f99120f035859a1f43c187a286119d10e3e6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho2/stdout.jsonl",
+      "sha256": "df9a88d3493143bc1cf6c94608c4f99120f035859a1f43c187a286119d10e3e6"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p19_rho2/usage.json",
+      "sha256": "d7f2773a580c3457b0cfccf9e4257af81ef703d42f3f5776f7ef3c3838132563"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_a/stdout.jsonl",
+      "sha256": "055096b16d87bd26d5de5d1f7623db403153dddbf01ff195cfd478e6ec95f24e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_a/targets_result.jsonl",
+      "sha256": "3ca1500464a86a913c030da9412039d97a963a231d4d135d00320318101b98fb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_a/usage.json",
+      "sha256": "221512df8f78f6757a68553224558b1abed4b6384f6394924c7cf91c546997e3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_b/stdout.jsonl",
+      "sha256": "3c51a93dc505ad0bb8df0866900b79863628cf445fc89641e510f32530f29eeb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_b/targets_result.jsonl",
+      "sha256": "0267a0dbd8d6376f24d2b140ecc787b310063b99e30169139ec66f99277f3450"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_cur_b/usage.json",
+      "sha256": "72e0760dcaa98663b827c29c7d081c53bfb9bd1858d42545355484635da4ce1b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_padd/stdout.jsonl",
+      "sha256": "52d05e7f2f1f6642123b8d7f262dcf5e2effd704e4c764668130c768d5937aba"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_padd/targets_result.jsonl",
+      "sha256": "c13b2dcce9c52199ad0efc21364e7d0d7f17a77dab024e37d80f851fd8e12aec"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_padd/usage.json",
+      "sha256": "842754105872fc58f76a2035aa377c739bbee46216be488a2300dde85744d9c4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho0/receipt.json",
+      "sha256": "66aacbe130604892ff53781b0f1e4936e07c0fc5caebdf348022994e91f042fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho0/stdout.jsonl",
+      "sha256": "66aacbe130604892ff53781b0f1e4936e07c0fc5caebdf348022994e91f042fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho0/usage.json",
+      "sha256": "f0044f2fe30b52d47a1cb004d9dbd17f1bfeabecaecae2dda9e11fb9719f301f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho1/receipt.json",
+      "sha256": "6e341021b902a354efc40614d6612790887c73db9e1725322ef58e697951371a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho1/stdout.jsonl",
+      "sha256": "6e341021b902a354efc40614d6612790887c73db9e1725322ef58e697951371a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho1/usage.json",
+      "sha256": "594f5362b97c106d6596bfd0ae4eda24f31df2f4fb99d981284daa57a5f8bc7c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho2/receipt.json",
+      "sha256": "346337ffc22a63735cebae34a276fca4aaf6c5d2fef7a24f03bc912d305ea1d1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho2/stdout.jsonl",
+      "sha256": "346337ffc22a63735cebae34a276fca4aaf6c5d2fef7a24f03bc912d305ea1d1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p1_rho2/usage.json",
+      "sha256": "9c33dd4426675dc7907f79b56157e18773b63c7a226231dd7c89ee536a87ee90"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_a/stdout.jsonl",
+      "sha256": "3794b297665fd700312e28446cd57b9a374848fb1deb30a413ec4d4c3fe5d6ad"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_a/targets_result.jsonl",
+      "sha256": "d2fdcf2859ed83e51ac32447d8d4765d7aa790a3f519adad5f97c99f1140d0ac"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_a/usage.json",
+      "sha256": "6031da52141de9e17561d00802c26e5798b1868a7a88832086171bd6898914ec"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_b/stdout.jsonl",
+      "sha256": "09ce8e8763b3a409b3cb0c79112991f2f2fe4cff6cf568e9fc196dc6b28aa287"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_b/targets_result.jsonl",
+      "sha256": "01d566870053d5f8a35d79d03ccd58f86ff44b8d6c1c3d755f8b29b4445b8972"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_cur_b/usage.json",
+      "sha256": "103c3cd73c7221909b81290c87b5e70a41bca013d76bfa021afa8a9650f94100"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_padd/stdout.jsonl",
+      "sha256": "a5995618e1f26fbdfa4dc34c7ce7bfa522ddaf4b8e4afbe4bbb0e2668ec3990a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_padd/targets_result.jsonl",
+      "sha256": "452c8f2b8e8236e4592ff9053a17c2a72f32ba6aee9a1d9c643c56d79e5ea862"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_padd/usage.json",
+      "sha256": "d91537d3f4d3cf4ea3d466c0c482bb818adc1b3c9162adf94707a4a0ca57292b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho0/receipt.json",
+      "sha256": "e796da87a642e6e4938f1010930c7646edcb3562d371f7b07430687200ad7987"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho0/stdout.jsonl",
+      "sha256": "e796da87a642e6e4938f1010930c7646edcb3562d371f7b07430687200ad7987"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho0/usage.json",
+      "sha256": "0abbd8178ab9123ab8fc0ab8e6ef8e627b710c40502ac787434915042a3455ca"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho1/receipt.json",
+      "sha256": "5f1bd6ccb11298bcece52955f0a7d3bd5860938ee83a834cfd9b2a73dbca0805"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho1/stdout.jsonl",
+      "sha256": "5f1bd6ccb11298bcece52955f0a7d3bd5860938ee83a834cfd9b2a73dbca0805"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho1/usage.json",
+      "sha256": "381135a1dddd07f4b417ff596bff257525332f8c06704a8d435793b705784371"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho2/receipt.json",
+      "sha256": "461151674d5c07ebaef56cccbe36d8774c8453df50ab74b0c703491c2e2ee047"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho2/stdout.jsonl",
+      "sha256": "461151674d5c07ebaef56cccbe36d8774c8453df50ab74b0c703491c2e2ee047"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p20_rho2/usage.json",
+      "sha256": "21e13cceb56341fd71f5ba5a842bf3b30303e3ddb7a05042d45a2f9e0d0e73d7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_a/stdout.jsonl",
+      "sha256": "3aad4d8652874bacfc7143b25a986ec3a3fc2ef8953b55583b70c75a30a0c92c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_a/targets_result.jsonl",
+      "sha256": "1c0054484c79dd5823b1e24507b6c7432958556b3b0b240c3e994dd329621889"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_a/usage.json",
+      "sha256": "ee470c64734d59d86913eba9c7d322a6bcfcacbbcb650620ea16a99564eabd7d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_b/stdout.jsonl",
+      "sha256": "2c44b9f7cf51c1ff39fc739da70735bae1ea198aa7694d207045f0083f814788"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_b/targets_result.jsonl",
+      "sha256": "4dce2cba083f3dfc4b377e43667dfd51c941fdcdc4db42fbc745d0e13ae6bab9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_cur_b/usage.json",
+      "sha256": "1233f5502f6a8fe92d70735be81785b5732d9eea5f674b61d50dde336e681680"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_padd/stdout.jsonl",
+      "sha256": "3b736fa10029fdeb1eb199ecd71797fa8a224deaa75b25dbef25037d4721d2f7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_padd/targets_result.jsonl",
+      "sha256": "a38658a40ac54789b8c6f01b0fdc5314ea711398ec1ebf673ab2f09cab0538f3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_padd/usage.json",
+      "sha256": "15742cbb58b6c8ae4f16f1df5750ecf381e4f29c17ea9ee2a2c7bbf67aeb93d4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho0/receipt.json",
+      "sha256": "87ded2471849fb16080e70520e1e15b892f5273c921e910e4ddf4fae8637300e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho0/stdout.jsonl",
+      "sha256": "87ded2471849fb16080e70520e1e15b892f5273c921e910e4ddf4fae8637300e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho0/usage.json",
+      "sha256": "4b050318beabe43f9cc2b07312c6ba01a3d67c1b7f31e4b5417c57c4586c80fb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho1/receipt.json",
+      "sha256": "fb6d40a54f95a2878444fa197e5b71c1806a4c761a23ee5ec7c52fd0b8b74134"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho1/stdout.jsonl",
+      "sha256": "fb6d40a54f95a2878444fa197e5b71c1806a4c761a23ee5ec7c52fd0b8b74134"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho1/usage.json",
+      "sha256": "56051df05fa925b07abdd6ddc08e7136a0473ea2befe68de4ef4dc1cbc161054"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho2/receipt.json",
+      "sha256": "d3cad672b7bc9822ad18d0060c59d366ea30355d121aaaca671e5807f2e1fa25"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho2/stdout.jsonl",
+      "sha256": "d3cad672b7bc9822ad18d0060c59d366ea30355d121aaaca671e5807f2e1fa25"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p2_rho2/usage.json",
+      "sha256": "2b9dbcfcaa46a70b6431412dd80f0a66110903dcd54a1021b65698f6e9fe525a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_a/stdout.jsonl",
+      "sha256": "fd6c1d0f3e111f12f649f7db48aad697e6643c112fd2e381fb202a60e8c90d51"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_a/targets_result.jsonl",
+      "sha256": "15bcc7178649e17945c9ad643d37422ae026cb1fe3cf1b8aea82447c7d069efb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_a/usage.json",
+      "sha256": "838da32f5df8dbee06e61cfce6f0035a1af96bacfe073c1223d52c97aeff4f31"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_b/stdout.jsonl",
+      "sha256": "c36bb8a21d95aeebcec999686511b23b8f1c3b1ab8f67a41c83dc644401dcf2a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_b/targets_result.jsonl",
+      "sha256": "6ae6597b1d6be3e563a1046355759b20b1e6af5d952882939d8db32552d32519"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_cur_b/usage.json",
+      "sha256": "260e219b19d4c9130862aa77607644648b615eb5d33caaf45ddb03fe217ca888"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_padd/stdout.jsonl",
+      "sha256": "f9a103af0b37b1fd21e04d58d6a4bbf965e690245702a29696a7e2f7b203a32f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_padd/targets_result.jsonl",
+      "sha256": "d30e1fc0ce079fad7773109cb85ab09452b24f2b1f4b9ff51d018e3cdf294f33"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_padd/usage.json",
+      "sha256": "93761fb5bdda230e89b697b76111d4c293fd2304fc45397556fa85210b5fbee5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho0/receipt.json",
+      "sha256": "52df7326f85f2c73a97bf6efcc97814a8e2f87e718b059f992a7e6c2a86db5fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho0/stdout.jsonl",
+      "sha256": "52df7326f85f2c73a97bf6efcc97814a8e2f87e718b059f992a7e6c2a86db5fa"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho0/usage.json",
+      "sha256": "ae6710b7c4cff3a9bc72c455f48d65346acdbee71687a4c71d23728c7d4cd707"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho1/receipt.json",
+      "sha256": "3a8a801ec0624c8f6d5af33b53aa9240c6ea0b7194fe0a518a442dc48d1c5683"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho1/stdout.jsonl",
+      "sha256": "3a8a801ec0624c8f6d5af33b53aa9240c6ea0b7194fe0a518a442dc48d1c5683"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho1/usage.json",
+      "sha256": "d7efec267e31a15b495b3b79c8ff7a51f1a8d06b10c003e2b01aca10f688bf6f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho2/receipt.json",
+      "sha256": "1b19c098374d45d12089506296bdc5bb0615bef2d6e9150c0ba13b2617b9672f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho2/stdout.jsonl",
+      "sha256": "1b19c098374d45d12089506296bdc5bb0615bef2d6e9150c0ba13b2617b9672f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p3_rho2/usage.json",
+      "sha256": "ee35255e41fbe4f2742de3de23aa50141e688a5f4eef0cfb27ef5a6641d36ef3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_a/stdout.jsonl",
+      "sha256": "05ecead7021ea2c0975f3747f908c4d2322fe115ed403947b4c827aabed6a112"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_a/targets_result.jsonl",
+      "sha256": "227c90306edf2d3d29aaca830cd922844348e58ce8c5c6a28a77d8f0211da7d9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_a/usage.json",
+      "sha256": "4cbe86fd5a830421eaf8c5e61dd37d02f5202666ac06c0404cd8f91094071570"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_b/stdout.jsonl",
+      "sha256": "9aaa411fde5ac2300011f86d5acf19c33f01a86e3b8aa100ac5c6a5aa715d584"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_b/targets_result.jsonl",
+      "sha256": "70674301de369e87a25e39f1691793fa5a3f460ad85696cdf2fe6246aa387f13"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_cur_b/usage.json",
+      "sha256": "8dd408f21e22816955fd62fa6baf8a189388fcaae2c2be9219bde54cd4490d82"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_padd/stdout.jsonl",
+      "sha256": "a68e981757321b906756e60c1c57be1a1fd86649a3b4034cbc3dc3d4fc315cce"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_padd/targets_result.jsonl",
+      "sha256": "6079b1d636473b7d0bd3c7f50bda5985306293987634341f87beb1427116b052"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_padd/usage.json",
+      "sha256": "49568b4a8aa5a46bcb708a4860f9adcb67de5f5bc666a70305aa5aac9e7668d5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho0/receipt.json",
+      "sha256": "aedebc012bad2a5fc4b0d06efc368ebfd2e6c49203dea6043c8ce0a7d443b5ee"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho0/stdout.jsonl",
+      "sha256": "aedebc012bad2a5fc4b0d06efc368ebfd2e6c49203dea6043c8ce0a7d443b5ee"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho0/usage.json",
+      "sha256": "8d23b599f276ab015cac157c297785ac9674ef10dfd6cc7b1257cd1812eee24c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho1/receipt.json",
+      "sha256": "0d12ece0e8a81b1c4f0f5e7b6777c2690d8a9c6f77d7d70d863c046ddf398da7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho1/stdout.jsonl",
+      "sha256": "0d12ece0e8a81b1c4f0f5e7b6777c2690d8a9c6f77d7d70d863c046ddf398da7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho1/usage.json",
+      "sha256": "0c0b484304310f1478e845b851a3fcc09b516640313f5f27a96f592743b220fc"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho2/receipt.json",
+      "sha256": "a0190c3995243778747399d549fea33863387ab9a19d6ea05474305110bdd2a5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho2/stdout.jsonl",
+      "sha256": "a0190c3995243778747399d549fea33863387ab9a19d6ea05474305110bdd2a5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p4_rho2/usage.json",
+      "sha256": "46f2106afeeef88e0725721a124ade55d3333e6f56e7ec459ad917cc7052e395"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_a/stdout.jsonl",
+      "sha256": "07225a3a39b91c2ff60b37a3a570f64010c42a8b6f9edad2818587092d5857b3"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_a/targets_result.jsonl",
+      "sha256": "ba3a1faa7f2a9d7577b3752acff968e11eee6527505b8475a56281fb2d2e0023"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_a/usage.json",
+      "sha256": "58528e9138a00386290b4e6b7875e1b631cfda8ee92a05ecf4efda7808f0e8cc"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_b/stdout.jsonl",
+      "sha256": "63982cce6b063e484568c74ae3e28e24b7e9d9d7356cbc33341445961efd0679"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_b/targets_result.jsonl",
+      "sha256": "5f49b4062f90294c47107b95367d38f7be66790dc3078fb266e0c0e945cd9a85"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_cur_b/usage.json",
+      "sha256": "d6605f531c569fa4a07ee20e3c80e9abd463183db4e12fefa4b14e3f6ee1a095"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_padd/stdout.jsonl",
+      "sha256": "3d4d878a941a4db1d65e06a2ce38d1abbe270251b7b3d409efe1d5ca88394ad5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_padd/targets_result.jsonl",
+      "sha256": "1476470fead149ae254ba103e1c5c8ddb2de4a9b797d92b08fcc124340391442"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_padd/usage.json",
+      "sha256": "1872e97d30fc7a2f81acfca28aa233061a1f1759c394d630e7325d979a1d78ce"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho0/receipt.json",
+      "sha256": "b54e99547d7bd7ed5dba580794c51b6f6327fcbe33b51456e70d860edfd2231a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho0/stdout.jsonl",
+      "sha256": "b54e99547d7bd7ed5dba580794c51b6f6327fcbe33b51456e70d860edfd2231a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho0/usage.json",
+      "sha256": "d1f07fdcf467601d2b34166792ea538378f15efd0c690ea7f7016a572f766577"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho1/receipt.json",
+      "sha256": "1d3ad80ea451568031061f1651ea17981a85ffe98f17cd4357f76a3a804503ee"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho1/stdout.jsonl",
+      "sha256": "1d3ad80ea451568031061f1651ea17981a85ffe98f17cd4357f76a3a804503ee"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho1/usage.json",
+      "sha256": "f6704d8323b388907058412d0807af86889968464526d4dc2dee4bc351fe0c26"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho2/receipt.json",
+      "sha256": "7e33907169f89214c899a1227f2b6541e059dd127d8322f72ddd69c0d8fd7f27"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho2/stdout.jsonl",
+      "sha256": "7e33907169f89214c899a1227f2b6541e059dd127d8322f72ddd69c0d8fd7f27"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p5_rho2/usage.json",
+      "sha256": "cae2a4674611dd17be48e07de3247c2a39a66cbcb5797ab477731c5c99b7d089"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_a/stdout.jsonl",
+      "sha256": "393c36a4505603f5e53d9367a7eff76b7fe0d017ddf754576b609b498f217c86"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_a/targets_result.jsonl",
+      "sha256": "8a73a29bfb8b113ef85bed6651e97d457d0df1ca7320b2f320b6e925bcd70d3e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_a/usage.json",
+      "sha256": "e5701d74e747d46cf543ed380f4fbc164f7561f2fe6f2d5f4edc6f6fe9cdc0b7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_b/stdout.jsonl",
+      "sha256": "9c0ba2fb951dcb10d5009926534e1ebee3904119c12ed03e8f0d85498fd41497"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_b/targets_result.jsonl",
+      "sha256": "f4aa54c6583e9610a9d05b1387927527921817e1a1700f8fa0f5b0394876d5f5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_cur_b/usage.json",
+      "sha256": "ccbfde4892b9758bed477e173f8aa2834c69fa36c2a5962f4f5516518868aa50"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_padd/stdout.jsonl",
+      "sha256": "ebad321fcb66c0500d89dfd96eab6d51d58a7753b8daa3801871845c7131592e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_padd/targets_result.jsonl",
+      "sha256": "6084fa55cd2c713ecd49a8ecccfa246194bffec3683077285e35d44e0b8a9496"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_padd/usage.json",
+      "sha256": "e009020223a66641fc28cbf67b9989872c4c52c02cf9f1f9c954789d94faf9a1"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho0/receipt.json",
+      "sha256": "bcc7bf108d54687f5e03edb9a7c3d833156a7a2241f9d3ed5ff7077adcc5931a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho0/stdout.jsonl",
+      "sha256": "bcc7bf108d54687f5e03edb9a7c3d833156a7a2241f9d3ed5ff7077adcc5931a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho0/usage.json",
+      "sha256": "88237ce54305a22710a38eafe24191ab15461e8751e9ed71f4d0d57536f5d745"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho1/receipt.json",
+      "sha256": "b2ff61a233152c4f842f18c6feee218405a9cbfbe2f284c214795295c9db5509"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho1/stdout.jsonl",
+      "sha256": "b2ff61a233152c4f842f18c6feee218405a9cbfbe2f284c214795295c9db5509"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho1/usage.json",
+      "sha256": "ea53aec0d0c7ff0174ce4189e40793f8ecdcc05a1c43e891e4e6f38c3e26d1ad"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho2/receipt.json",
+      "sha256": "1d18694f8e0142a61bd4c6c6365ea31eb360b76963828d03a250970626c8a476"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho2/stdout.jsonl",
+      "sha256": "1d18694f8e0142a61bd4c6c6365ea31eb360b76963828d03a250970626c8a476"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p6_rho2/usage.json",
+      "sha256": "9efe2253cc36d5abec79c91995ce3efd65e7509611f14ff8813a38666c21d5b0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_a/stdout.jsonl",
+      "sha256": "06817c7050730e1ee77a552411f9cb3d2711c70d06224a54ec536d93a220a615"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_a/targets_result.jsonl",
+      "sha256": "675609444058146cf62744bcccd17c43756300a141525ba595fcd8fd452ff245"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_a/usage.json",
+      "sha256": "c865260892c9c714705b320773ce467a725c2936bfdcf1f5baebf71512a0535c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_b/stdout.jsonl",
+      "sha256": "4aff18f13084beb9a1fc9f8ba6db1376c57e0cd56a406513e9683f7727a4226c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_b/targets_result.jsonl",
+      "sha256": "0a5f691a02de73da7e4ad7eb2395a913a3665542f5e63b7f5014944abc6098f9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_cur_b/usage.json",
+      "sha256": "4fae4acdc6ac9e212295ccc75df8a0d93c7ce04ce44a3766d4b442f108475729"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_padd/stdout.jsonl",
+      "sha256": "37711ed3699bc34d159ced5f0ea1ac47688c71821dc25bec30eaa67cceb0d513"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_padd/targets_result.jsonl",
+      "sha256": "49a36fc253045affb05dbb619287bf6d532144795b0b9d494d0b8958ccfcdab7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_padd/usage.json",
+      "sha256": "ad954c077d7e5988788d31573ce3ebeecec67cc14258a4f72cb69ac31f2dce51"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho0/receipt.json",
+      "sha256": "eceb4ef9efef81118714987840932c326f3b796653dcf1b8b60e7165972bb669"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho0/stdout.jsonl",
+      "sha256": "eceb4ef9efef81118714987840932c326f3b796653dcf1b8b60e7165972bb669"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho0/usage.json",
+      "sha256": "c1e306f17aeafaaf6bc5139f77c5024d7e9ef11293cd14da632bd0c70b06b7e5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho1/receipt.json",
+      "sha256": "fb88632cc83764016ad01d4e2120a1934a6f5f1d76def66bb96f8e8857c8a90a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho1/stdout.jsonl",
+      "sha256": "fb88632cc83764016ad01d4e2120a1934a6f5f1d76def66bb96f8e8857c8a90a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho1/usage.json",
+      "sha256": "18bdf3632cb2071dab94afe6b8caedba29aa80d104ff383a5f751a8e70b13dc0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho2/receipt.json",
+      "sha256": "6c2573a1ca066a4480a9f58eb3ae5e805a07bba30d794a2b9a97794194551eb9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho2/stdout.jsonl",
+      "sha256": "6c2573a1ca066a4480a9f58eb3ae5e805a07bba30d794a2b9a97794194551eb9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p7_rho2/usage.json",
+      "sha256": "d4afaf42726ae51944fc6051c00c114b222b0bd50c4c42bfc3b102073ca35442"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_a/stdout.jsonl",
+      "sha256": "c54f4dbd8e5511e50b69f847cbf2d38b46985c728a74946e66efda2cba0cab1c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_a/targets_result.jsonl",
+      "sha256": "d005910ff15dc563e85db4981ebda19f61c916aa4f4c028580b78c39aa575619"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_a/usage.json",
+      "sha256": "02352a0589ddde1de41c6ff5bc1be8e8249fc8ff87e7f80c579d93426514a8f4"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_b/stdout.jsonl",
+      "sha256": "5e54a86cdf9e6db1d3b48ba899e757171446ba36c43334c5cdd767497c71b64a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_b/targets_result.jsonl",
+      "sha256": "763665ae4d4e64b304e4859327aa5252860118d3231e8fc04799c54e19e43277"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_cur_b/usage.json",
+      "sha256": "2fcd4c4f29105f7b82b683550455daafa6ab8e4b97c36a8c7630fbd5d49c8ed9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_padd/stdout.jsonl",
+      "sha256": "78c24c14d7291a68516b50add7cfc14a31cec630929b78ed8bc8fc7ed9aa58c0"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_padd/targets_result.jsonl",
+      "sha256": "25c8385bd02b6624a4f73c0d9ae14f32f6ad0060bf9c63718dc0d96bda32133b"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_padd/usage.json",
+      "sha256": "845d62d1e277de85768b37ef2f12a468174e6f5b91ef327149516fc9f466085e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho0/receipt.json",
+      "sha256": "faf4b9b34748d05c0964a6c930624681383ef51bcac9f699536063ea3bd76271"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho0/stdout.jsonl",
+      "sha256": "faf4b9b34748d05c0964a6c930624681383ef51bcac9f699536063ea3bd76271"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho0/usage.json",
+      "sha256": "16c12f00238133739a5ddb555cb7164a5812ec0675b0bc6a35e805af36b73064"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho1/receipt.json",
+      "sha256": "936556255e4934a2ce23827bf94a8ccec149b404618d8f7b0d41e606c3348601"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho1/stdout.jsonl",
+      "sha256": "936556255e4934a2ce23827bf94a8ccec149b404618d8f7b0d41e606c3348601"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho1/usage.json",
+      "sha256": "0f7058669b700415275bfec5cd66e73c279b765979448a26fa36f1b422a36b52"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho2/receipt.json",
+      "sha256": "9d1514b55e4ea726750d4ff3256322e44ef6f84ba10b7502040560dd4b5b7a73"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho2/stdout.jsonl",
+      "sha256": "9d1514b55e4ea726750d4ff3256322e44ef6f84ba10b7502040560dd4b5b7a73"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p8_rho2/usage.json",
+      "sha256": "29f252760f70bd75b7574c35930d76020bccf5c3feaa0455cbc0b438aaabb91c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_a/stdout.jsonl",
+      "sha256": "dc6605c2318eb7a9b733b88552e633a956b2a4bccda4bbc7742b43d00062af3e"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_a/targets_result.jsonl",
+      "sha256": "c9f6a753db79f1a46a899ce071e39c8868e2462a9dc3b5974f1fb535fd180658"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_a/usage.json",
+      "sha256": "0a773902df6a57ad656cf1f8b1c74977659d2ad0ee2bc4bed4ad70c7b3da514a"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_b/stdout.jsonl",
+      "sha256": "04a82ed920d8aa9b7ffab7529cb849c7309917b675aa31f93dfa3f885f437658"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_b/targets_result.jsonl",
+      "sha256": "3b90ec953de43fdbe0ae18313b9a590a5364cbec3ee6e74decabff47bb6ce4fb"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_cur_b/usage.json",
+      "sha256": "84229ac7ed49c9f715c7d2b490a31132dc825a1aa973c1f25f1a0e53801c9fb7"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_padd/stdout.jsonl",
+      "sha256": "8c50d82f74e38fb6c1e27e2d06d3d03f519e031dedf45fd27bdad9960b44e03f"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_padd/targets_result.jsonl",
+      "sha256": "fee9500c584b465dfee9fe331a4f79a39e0c76621f0880fc83c33c22318b2fd2"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_padd/usage.json",
+      "sha256": "4e1c9f449886f9a25a19174f6cfe23ddf8992e57cd06059e10d4b4886c89cd14"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho0/receipt.json",
+      "sha256": "f2c1a1e582bbb98cf05a7ce61dae9aecdd447344c0e5a39de92a3cfc0da34a7c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho0/stdout.jsonl",
+      "sha256": "f2c1a1e582bbb98cf05a7ce61dae9aecdd447344c0e5a39de92a3cfc0da34a7c"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho0/usage.json",
+      "sha256": "727e2f0246b118c2db17ee0c3ac51a12e4000d64360b78b20f7cecdfe7d7ecd5"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho1/receipt.json",
+      "sha256": "653ccbc3a06780dfe5a9efd87df54c7ffa3f8009d2290d70ca4523e94a2a19df"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho1/stdout.jsonl",
+      "sha256": "653ccbc3a06780dfe5a9efd87df54c7ffa3f8009d2290d70ca4523e94a2a19df"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho1/usage.json",
+      "sha256": "8f88cfc4da265882bee2fbcb00272b2e2a9a95fbcff408e77080d6e511b45da9"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho2/receipt.json",
+      "sha256": "c87fd2766c3db74bf656ca7fb5b7aab0cddcb70b34ed0d341f69610c3201ee4d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho2/stdout.jsonl",
+      "sha256": "c87fd2766c3db74bf656ca7fb5b7aab0cddcb70b34ed0d341f69610c3201ee4d"
+    },
+    {
+      "path": "../../research/n83_padd_rank_20261019/raw-actions-39296352594/runs/p9_rho2/usage.json",
+      "sha256": "bb8b4327faab2d797c29b6beef1a69a6a8d375c225e5e093ec3f24203909bd62"
+    }
+  ],
+  "scalar_checks": 120,
+  "schema": "n83.padd-rank-validator-report/v1",
+  "status": "pass"
+}

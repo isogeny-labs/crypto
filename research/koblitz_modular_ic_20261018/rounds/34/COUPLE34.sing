@@ -1,0 +1,34 @@
+proc couple34(string label,ideal pointBits34){
+ if(ncols(matrix(pointBits34))!=196 || ncols(matrix(paddingJetBits33))!=196){ERROR("COUPLE34_COLUMN_FRAMING");}
+ list pivots34;list pivotCoordinates34;list kernels34;ideal originalColumns34;int row34;int col34;int term34;int position34;int rank34;int controlColumn34;
+ poly value34;poly coordinates34;poly recombined34;poly pointRecombined34;poly padRecombined34;poly altered34;
+ for(row34=1;row34<=128;row34++){pivots34[row34]=poly(0);pivotCoordinates34[row34]=poly(0);}
+ for(col34=1;col34<=196;col34++){
+  if(deg(pointBits34[col34])>82 || deg(paddingJetBits33[col34])>44){ERROR("COUPLE34_COMPONENT_WIDTH");}
+  value34=pointBits34[col34]+w^83*paddingJetBits33[col34];originalColumns34[col34]=value34;coordinates34=w^(col34-1);
+  if(value34!=0 && controlColumn34==0){controlColumn34=col34;}
+  while(value34!=0){
+   position34=deg(value34)+1;
+   if(pivots34[position34]==0){pivots34[position34]=value34;pivotCoordinates34[position34]=coordinates34;rank34++;break;}
+   value34=value34+pivots34[position34];coordinates34=coordinates34+pivotCoordinates34[position34];
+  }
+  if(value34==0){if(deg(coordinates34)!=col34-1){ERROR("COUPLE34_KERNEL_INDEPENDENCE");}kernels34[size(kernels34)+1]=coordinates34;}
+ }
+ if(rank34!=128 || size(kernels34)!=68 || controlColumn34==0){ERROR("COUPLE34_RANK_OR_KERNEL");}
+ for(row34=1;row34<=68;row34++){
+  coordinates34=kernels34[row34];recombined34=0;pointRecombined34=0;padRecombined34=0;
+  for(term34=1;term34<=size(coordinates34);term34++){
+   if(leadcoef(coordinates34[term34])!=1){ERROR("COUPLE34_NONBINARY_COORDINATE");}position34=deg(coordinates34[term34])+1;
+   recombined34=recombined34+originalColumns34[position34];pointRecombined34=pointRecombined34+pointBits34[position34];padRecombined34=padRecombined34+paddingJetBits33[position34];
+  }
+  if(recombined34!=0 || pointRecombined34!=0 || padRecombined34!=0){ERROR("COUPLE34_KERNEL_RECOMBINATION");}
+ }
+ for(row34=1;row34<=128;row34++){
+  if(pivots34[row34]!=0){coordinates34=pivotCoordinates34[row34];recombined34=0;for(term34=1;term34<=size(coordinates34);term34++){recombined34=recombined34+originalColumns34[deg(coordinates34[term34])+1];}if(recombined34!=pivots34[row34]){ERROR("COUPLE34_PIVOT_RECOMBINATION");}}
+ }
+ altered34=kernels34[1]+w^(controlColumn34-1);recombined34=0;for(term34=1;term34<=size(altered34);term34++){recombined34=recombined34+originalColumns34[deg(altered34[term34])+1];}if(recombined34==0){ERROR("COUPLE34_CORRUPTED_KERNEL_ACCEPTED");}
+ link out34="ASCII:w coupled-"+label+".sing";open(out34);write(out34,"ideal coupledColumns34;ideal coupledKernel34;");
+ for(col34=1;col34<=196;col34++){write(out34,"coupledColumns34["+string(col34)+"]="+string(originalColumns34[col34])+";");}
+ for(row34=1;row34<=68;row34++){write(out34,"coupledKernel34["+string(row34)+"]="+string(kernels34[row34])+";");}
+ close(out34);print("COUPLE34_RESULT "+label+" point_constraints=83 padding_constraints=45 rank=128 kernel=68 original_recombination=all corrupt_control=rejected");
+}

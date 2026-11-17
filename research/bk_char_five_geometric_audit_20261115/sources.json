@@ -1,0 +1,185 @@
+{
+  "schema": "bk-char-five-source-plan/v1",
+  "created": "2026-11-15T03:02:05.140866+00:00",
+  "formal": {
+    "project": "research/bk_char_five_geometric_audit_20261115/lean",
+    "theorem": "BKCharFiveGeometricAudit.bk_char_five_geometric_certificate",
+    "statement": "theorem bk_char_five_geometric_certificate : Nat.Prime 5 ∧ 5 ∣ Nat.card (curve F).Point ∧ ¬ 5 ∣ (5 : ℕ) - 1 ∧ (curve F).Δ ≠ 0 ∧ Nat.card (curve F).Point = 5 ∧ (∀ i s : Bool, addOrderOf (basePoint i s) = 5) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K], (∀ P : (geometricCurve K).Point, (5 : ℕ) • P = 0 → ∃ Q : (curve F).Point, baseMap K Q = P) ∧ Nat.card (GeometricFiveTorsion K) = 5) ∧ allGeometricFiveRational ∧ ¬ (allGeometricFiveRational ↔ 5 ∣ (5 : ℕ) - 1) ∧ (∀ k : ℕ, 0 < k → ¬ 5 ∣ 5 ^ k - 1) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K] [Fintype K], Nat.card (GeometricFiveTorsion K) = 5 ^ 2 ↔ 5 ∣ Fintype.card K - 1)",
+    "decl_sha256": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+    "scope": "Concrete actual E/F5:y²=x³+3x+2 has actual discriminant nonzero/count5/four nonzero pointorders5. Every characteristic5 field actual nonzero5-torsion point has x1/2,y±1, derived via two actual repeated-S3 doubling identities, kernelchecked finite-field eliminant factor and coprime3/5 group-order control. Every algebraic extension K/F5: actual whole geometric5-torsion point kernel equals actual Point.map image of E(F5); actual bijection/cardinality5 derived, including algebraic closure. Full geometric point-kernel inclusion is true while5 doesnotdivide5^k-1 forallk>0, directly refuting unrestricted inclusion paraphrase despiteprime5/dividingactualbasecount/notdividingq-1. OriginalBK source r²-count criterion bothfalse survives in every actualfiniteextension; source theorem notrefuted. Two prior S3 argumentcores adaptedonlymodule/public wrappers with original mathematical arguments unchanged; originals/rawcopies/amendment retained and credited, existing characteristic3 analog credited. Not nonreducedp-torsion group scheme/generalprime>=5 canonicalWeil/rank/determinant sourceproof/fullpopulationallkcensus/all14 closure. No canonical promotion/novelty.",
+    "sources": [
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/BaseCurve.lean",
+        "bytes": 2073,
+        "sha256": "f59cdac0ae5ae5884505a204dd269d96e2605ad5b3ea0f14281cc9bd74460444"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/CharFiveCertificate.lean",
+        "bytes": 1452,
+        "sha256": "12a5598687f39ad45cc1f51b4825fefcf80400086448e977766cb2884547ba6a"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/Eliminant.lean",
+        "bytes": 2733,
+        "sha256": "0a9eb06cc0a449126384f93f83cfa8b5aa1d41a38ed5e0d9c6bdf00c25b2bd5a"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/FiveCoordinates.lean",
+        "bytes": 4418,
+        "sha256": "a849d07627e85f9c890a2f1a5d5550d923c6c5a1801be8d824f789d9ba390c82"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/GeometricDescent.lean",
+        "bytes": 5635,
+        "sha256": "22247394ed4bc43ea739817c1dd3483536e742f0b940320f8c90d24d8cbed2b4"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/S3Completion.lean",
+        "bytes": 9913,
+        "sha256": "294ce59c3881821955acb289133892fabeb25ad49defd277d3485b3cda99b8cb"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/S3Roots.lean",
+        "bytes": 9630,
+        "sha256": "57afcee0087c598de46ea68e2a3b095949c0cd135b34838f1c5e9e4efb7fbe0f"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/lakefile.toml",
+        "bytes": 414,
+        "sha256": "dda2ad13cc269c8801ea6bbfe66fca57723d18d201ad16f6ea6b4c0ca8db64d8"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "32d279a9cc4dee5ed038bb4aef43090b3136b28920379c965ae1a6e4d755c0e0"
+      },
+      {
+        "path": "research/bk_char_five_geometric_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BaseCurve",
+    "CharFiveCertificate",
+    "Eliminant",
+    "FiveCoordinates",
+    "GeometricDescent",
+    "S3Completion",
+    "S3Roots"
+  ],
+  "artifacts": [
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 27544,
+      "sha256": "70cc09c0f8fbdc30c8cb02a6b2c3e3080a2d99dfec8786a48fdd02d5d2ecc242"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "4886f2089d8cf35e2c56a952f88c5552752ea377f5711f04774a73e9d1a5b437"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "811121a8b685c2716d6dc074ccdb965088ee461285f31744cbe49876a66ab623"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1943,
+      "sha256": "758383fbd979c60f4ab6f4496797a0c2bb698ae0a48810ff69894e2fefa0fa60"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/gate.json",
+      "bytes": 1259,
+      "sha256": "d9d4e7c8b4793f297cf6031700e3f61e1fa7c7cef325239d3190482365341b4f"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/source-review.json",
+      "bytes": 4323,
+      "sha256": "e87b11df8cfbaacbc5bb7aadd32d83f1147827eb84dcc00ddf114d64c422ea23"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/binding-check.json",
+      "bytes": 3636,
+      "sha256": "2165a0969da013e5b85146fa18cfdacae0589ac6a1b0b9f401cf724540ccff79"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/evidence/report-draft01.tar.xz",
+      "bytes": 48016,
+      "sha256": "910259148c9e52c528b48c0ddebf2aa2defbfda02af58daf7ca8d087550c7059"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/proof-map.json",
+      "bytes": 5075,
+      "sha256": "2f653aec76a341c83b23a8d3807038694deb82000d9024d09a9adba4e110f787"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/render_report.py",
+      "bytes": 7685,
+      "sha256": "3f11c8534e3b8841e7f8595160de89e43aea2ed45a8ca784df3c507b3d488d11"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/export_binding_input.py",
+      "bytes": 1748,
+      "sha256": "c09fd8dee0d883b4d8b19334d77511d0e43ae86753018ce96f49e4667f23e881"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/reports/char-five.svg",
+      "bytes": 1426,
+      "sha256": "a5a3bb7cad72074655af0ec162a76a1c0913f8832d15f6407319fecb7b4c29af"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/reports/layout.json",
+      "bytes": 338,
+      "sha256": "034a9b14df73c91c26de02224a1a7538b0f7dd884ca4c33615d4370084df8f74"
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115/reports/report.pdf",
+      "bytes": 47593,
+      "sha256": "b7a7f19c865c19c140ebcf6a6670c468a5e85e9d704d9b6bba79af3e56a1b7ff"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 61,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 7,
+    "final_new_module_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "two_credited_argument_cores_module_wrappers_adapted": true,
+    "original_argument_bodies_equal": true,
+    "actual_base_curve_count_and_pointorders_derived": true,
+    "actual_characteristic5_coordinate_restriction_proved": true,
+    "actual_point_map_descent_for_every_extension_proved": true,
+    "actual_whole_geometric_point_kernel_cardinality5_proved": true,
+    "actual_inclusion_paraphrase_disproved": true,
+    "original_BK_count_criterion_survives": true,
+    "nonreduced_p_torsion_group_scheme_proved": false,
+    "generalprime_BK_Weil_rank_determinant_proved": false,
+    "full_population_allk_census_complete": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

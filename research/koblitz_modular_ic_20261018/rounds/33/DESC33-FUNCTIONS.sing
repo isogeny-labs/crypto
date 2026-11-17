@@ -1,0 +1,23 @@
+// Original RR basis ring rrBasis27 is already loaded. Native rational functions.
+ring functionDescent33=(2,u),(n,l,v,T),dp;
+poly rn33=(u+1)*v+1;poly cn33=rn33+u^3;
+poly b33=rn33*cn33/u^7;poly c33=cn33/u^4;poly A33=1+c33;
+ideal base33=std(ideal(v^2+v+u^3+u,T^2+T+1));
+map phys033=rrBasis27,n+b33*T,l+A33*T,v,u;
+map phys133=rrBasis27,n+b33*(T+1),l+A33*(T+1),v,u;
+ideal old033=phys033(basisNumerators);ideal old133=phys133(basisNumerators);
+link functionsOut33="ASCII:w twist-basis-functions.sing";open(functionsOut33);
+write(functionsOut33,"// Explicit F2 functions on the diamond twist; n,l are DESCENT coordinates.");
+write(functionsOut33,"ring twistBasis33=2,(n,l,v,u),dp;poly twistDenominator33=u^49*(u+1)^16;ideal twistNumerators33;");
+int funI33;int funJ33;poly traceNumerator33;
+for(funI33=1;funI33<=68;funI33++){
+ traceNumerator33=reduce((T+1)*old033[funI33]+T*old133[funI33],base33);
+ if(traceNumerator33!=subst(traceNumerator33,T,0)){ERROR("DESC33_FUNCTION_NOT_DESCENDED");}
+ traceNumerator33=traceNumerator33*u^33;
+ for(funJ33=1;funJ33<=size(traceNumerator33);funJ33++){
+  if(denominator(leadcoef(traceNumerator33[funJ33]))!=1){ERROR("DESC33_DENOMINATOR_BOUND");}
+ }
+ write(functionsOut33,"twistNumerators33["+string(funI33)+"]="+string(traceNumerator33)+";");
+}
+close(functionsOut33);
+print("DESC33_EXPLICIT_F2_FUNCTIONS 68");

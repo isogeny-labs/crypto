@@ -1,0 +1,157 @@
+module
+public import OrientationProduct
+public import LocalCharts
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+public section
+noncomputable section
+namespace OrientationBaseBridge
+open Polynomial Finset OrientationAnchor
+
+abbrev Nodes (a : ℕ) := Fin (2^(a+1))
+
+def node (a : ℕ) (j : Nodes a) : ℚ := (j.val:ℚ)-(2^a:ℕ)
+
+def center (a : ℕ) : Nodes a := ⟨2^a, CauchyNormalizer.center_lt a⟩
+
+theorem node_injective (a : ℕ) : Function.Injective (node a) := by
+  intro j k h
+  apply Fin.ext
+  dsimp [node] at h
+  have hv : (j.val:ℚ) = (k.val:ℚ) := by linarith
+  exact_mod_cast hv
+
+theorem node_center (a : ℕ) : node a (center a) = 0 := by simp [node, center]
+
+/-- Literal equality of the old shifted-natural grid and the actual signed grid. -/
+theorem grid_eq_image (a : ℕ) : grid a = univ.image (node a) := by
+  ext q
+  constructor
+  · intro hq
+    obtain ⟨z,hz,hzq⟩ := mem_image.mp hq
+    have hzlo := (mem_Ico.mp hz).1
+    have hzhi := (mem_Ico.mp hz).2
+    have hk0 : 0 ≤ z+(2:ℤ)^a := by omega
+    have hkN : (z+(2:ℤ)^a).toNat < 2^(a+1) := by
+      have h : ((z+(2:ℤ)^a).toNat:ℤ) < ((2^(a+1):ℕ):ℤ) := by
+        rw [Int.toNat_of_nonneg hk0]
+        push_cast
+        rw [pow_succ]
+        omega
+      exact_mod_cast h
+    refine mem_image.mpr ⟨⟨(z+(2:ℤ)^a).toNat,hkN⟩, mem_univ _, ?_⟩
+    have hkQ : ((z+(2:ℤ)^a).toNat:ℚ) = ((z+(2:ℤ)^a:ℤ):ℚ) := by
+      exact_mod_cast Int.toNat_of_nonneg hk0
+    dsimp [node]
+    push_cast at hkQ ⊢
+    rw [← hzq]
+    linarith
+  · intro hq
+    obtain ⟨j,_,rfl⟩ := mem_image.mp hq
+    apply mem_image.mpr
+    refine ⟨(j.val:ℤ)-(2:ℤ)^a, ?_, ?_⟩
+    · apply mem_Ico.mpr
+      have hj : (j.val:ℤ) < (2:ℤ)^(a+1) := by exact_mod_cast j.isLt
+      simp only [pow_succ] at hj
+      constructor <;> omega
+    · simp [node]
+
+/-- Actual punctured polynomial transported through the proved grid bijection. -/
+theorem puncture_grid (a : ℕ) (s : Nodes a) :
+    puncture (grid a) (node a s) = ∏ j ∈ univ.erase s, (X-C (node a j)) := by
+  unfold puncture
+  rw [grid_eq_image, ← Finset.image_erase (node_injective a)]
+  exact Finset.prod_image (fun j _ k _ h => node_injective a h)
+
+theorem normalizer_center_product (a : ℕ) :
+    normalizer (grid a) = ∏ j ∈ univ.erase (center a), (0-node a j) := by
+  rw [normalizer_eq _ (zero_in_grid a), ← node_center a, puncture_grid]
+  simp only [eval_prod, eval_sub, eval_X, eval_C, node_center]
+
+
+/-- The derivative normalization equals the actual previously constructed center product. -/
+theorem normalizer_eq_centerDen (a : ℕ) : normalizer (grid a) = LocalCharts.centerDen a := by
+  have h := LocalCharts.base_as_fin_product a (center a) 0
+  have h0 : CauchyNormalizer.baseKernel a (center a).val 0 = 1 := by
+    simpa [center] using CauchyNormalizer.baseKernel_origin a (2^a)
+  rw [h0] at h
+  have hp := (div_eq_one_iff_eq (LocalCharts.centerDen_ne_zero a)).mp h.symm
+  rw [normalizer_center_product]
+  exact hp
+
+/-- Exact scalar evaluation equality to the actual prior base kernel. -/
+theorem base_eval_old (a : ℕ) (s : Nodes a) (T : ℚ) :
+    (base (grid a) (node a s)).eval T = CauchyNormalizer.baseKernel a s.val T := by
+  rw [base, normalizer_eq_centerDen, puncture_grid, LocalCharts.base_as_fin_product]
+  simp only [eval_mul, eval_C, eval_prod, eval_sub, eval_X]
+  ring
+
+/-- Literal polynomial identity, not agreement only at a finite set of samples. -/
+theorem chart_polynomial (a : ℕ) (m s : Nodes a) :
+    (LocalCharts.localBase a m s).map LocalIntegral.integralRing.subtype =
+      (base (grid a) (node a s)).comp
+        (C (node a m)+C ((2:ℚ)^(a+1))*X) := by
+  apply Polynomial.funext
+  intro z
+  calc
+    _ = CauchyNormalizer.baseKernel a s.val (node a m+(2:ℚ)^(a+1)*z) := by
+      rw [eval_map, LocalCharts.localBase_eval]
+      simp [node]
+    _ = (base (grid a) (node a s)).eval (node a m+(2:ℚ)^(a+1)*z) := (base_eval_old a s _).symm
+    _ = _ := by simp
+
+/-- The concrete rational integral subring's norm convention implies the exact content predicate. -/
+theorem vbound_of_norm_le_one (q : ℚ) (h : padicNorm 2 q ≤ 1) : VBound 0 q := by
+  by_cases hq : q=0
+  · exact Or.inl hq
+  · right
+    rw [padicNorm.eq_zpow_of_nonzero hq] at h
+    have hv := (zpow_le_one_iff_right₀ (by norm_num : (1:ℚ)<2)).mp h
+    omega
+
+/-- Coefficientwise integrality is transported from the actual constructed integral polynomial. -/
+theorem indexed_base_content (a : ℕ) (m s : Nodes a) :
+    Content 0 ((base (grid a) (node a s)).comp
+      (C (node a m)+C ((2:ℚ)^(a+1))*X)) := by
+  rw [← chart_polynomial]
+  intro n
+  rw [coeff_map]
+  exact vbound_of_norm_le_one _ ((LocalCharts.localBase a m s).coeff n).property
+
+/-- Every literal signed source chart of the actual normalized Cauchy base is integral. -/
+theorem actual_base_content (a : ℕ) (d : ℚ) (t : ℤ)
+    (hd : d ∈ grid a) (ht : t ∈ Ico (-(2:ℤ)^a) ((2:ℤ)^a)) :
+    Content 0 (chart a t (base (grid a) d)) := by
+  have htq : (t:ℚ) ∈ grid a := mem_image.mpr ⟨t,ht,rfl⟩
+  rw [grid_eq_image] at hd htq
+  obtain ⟨m,_,hm⟩ := mem_image.mp htq
+  obtain ⟨s,_,hs⟩ := mem_image.mp hd
+  have h := indexed_base_content a m s
+  rw [hm,hs] at h
+  exact h
+
+/-- The actual completed orientation kernel is integral in every old source chart.
+The earlier exposed base-content premise is now derived from the actual grid. -/
+theorem actual_completed_content (a u x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a)
+    (ht : t ∈ Ico (-(2:ℤ)^a) ((2:ℤ)^a)) (hu : u ≤ a)
+    (hm : ∀ j < u, 0 ≤ schedule u j m) :
+    Content 0 (chart a t (completed (grid a) u x y m)) := by
+  exact completed_content_from_base a u x y t m 0 ht hu hm
+    (actual_base_content a _ t (delta_in_grid a x y hx hy) ht)
+
+/-- The actual whole matrix crossing chart gains g without a supplied base-content witness. -/
+theorem actual_completed_crossing_content (a u x y i : ℕ) (t : ℤ) (m : ℕ → ℕ) (g : ℤ)
+    (hx : x < 2^a) (hy : y < 2^a)
+    (ht : t ∈ Ico (-(2:ℤ)^a) ((2:ℤ)^a)) (ht0 : t ≠ 0)
+    (hi : padicValInt 2 t = i) (hiu : i < u)
+    (hc : x.testBit i = y.testBit i) (hg : g ≤ schedule u i m) :
+    Content g (chart a t (completed (grid a) u x y m)) := by
+  have hb := actual_base_content a _ t (delta_in_grid a x y hx hy) ht
+  have h := completed_crossing_content_from_base a u x y i t m 0 g ht0 hi
+    (grid_order_le a t ht ht0) hiu hc hg hb
+  simpa only [zero_add] using h
+
+end OrientationBaseBridge

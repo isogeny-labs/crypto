@@ -1,0 +1,8 @@
+public_classes.cpp: In function ‘int main(int, char**)’:
+public_classes.cpp:44:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   44 |     for(size_t i=0;i<adapter.auxiliary.size();++i)std::cout<<(i?",":"")<<adapter.auxiliary[i];std::cout<<"],\"auxiliary_excluded_indices\":[";for(size_t i=0;i<adapter.excluded.size();++i)std::cout<<(i?",":"")<<adapter.excluded[i];std::cout<<"],\"evaluation_point_indices\":[";for(size_t i=0;i<km.pool.size();++i)std::cout<<(i?",":"")<<km.pool[i];std::cout<<"],\"public_class_spaces\":[";
+      |     ^~~
+public_classes.cpp:44:95: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   44 |     for(size_t i=0;i<adapter.auxiliary.size();++i)std::cout<<(i?",":"")<<adapter.auxiliary[i];std::cout<<"],\"auxiliary_excluded_indices\":[";for(size_t i=0;i<adapter.excluded.size();++i)std::cout<<(i?",":"")<<adapter.excluded[i];std::cout<<"],\"evaluation_point_indices\":[";for(size_t i=0;i<km.pool.size();++i)std::cout<<(i?",":"")<<km.pool[i];std::cout<<"],\"public_class_spaces\":[";
+      |                                                                                               ^~~
+cc1plus: all warnings being treated as errors

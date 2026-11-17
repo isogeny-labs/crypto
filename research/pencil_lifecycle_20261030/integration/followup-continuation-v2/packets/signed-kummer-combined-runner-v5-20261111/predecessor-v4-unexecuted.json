@@ -1,0 +1,18 @@
+{
+  "schema": "pencil.combined-v4-unexecuted-predecessor/v1",
+  "packet": "signed-kummer-combined-runner-v4-20261111",
+  "semantic_manifest_sha256": "f809fbcf94be0f164c11d482ab3b5e5bd8cc3f5925faa83fb00c71ac136d8231",
+  "published_revision": "9f2525d7bd5245c745c6a7a905f32cda707602d2",
+  "execution_performed": false,
+  "release_created": false,
+  "review_finding": {
+    "file": "durable-worker.py",
+    "lines": "94-105",
+    "summary": "Path.is_symlink() and Path.exists() suppress lookup errors beyond FileNotFoundError, so v4 did not prove that only genuine absence was allowed during materialization.",
+    "required_successor": "Use one lstat(), catch only FileNotFoundError during materialization, and require S_ISDIR for every present target."
+  },
+  "packaging_metadata_custody": {
+    "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-v4-final-binding-20261111/packaging-supersession-custody.json",
+    "sha256": "1a66938939d1d1e146915c7f0df58c580097fb54bd1ee96e7a0018ca102be94e"
+  }
+}

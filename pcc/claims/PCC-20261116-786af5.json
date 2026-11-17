@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:37:04Z",
+ "id": "PCC-20261116-786af5",
+ "kind": "execution",
+ "producer": {
+  "commit": "f68145a347f46f032d1f866ba6bda56e5271e190",
+  "model": "GPT-6",
+  "session": "selected-root-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/selected-api-e060f3ee6-01-post-call.json",
+    "sha256": "6a60d67d1f1db9f399a70403d215a080c219ed75c1155729f79942fa62df2fb8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/native-api-tests-01.log",
+    "sha256": "5f0b7b703b89f30576341264b43b13c1cda7904fab3235fcd23f59bbc12794f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/source-relationship-01.json",
+    "sha256": "21a84d56b839277d30125b05092bc72c52f9fb63bf1c59194cb594f11e29b2a7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Immutable actual-root API release qualifier built at e060f3ee6 completed six fixed correctness checks including both-field six-variable lazy/eager full-certificate equality, native boundary checking and rejection of altered public data. Its pre/post executable hash matches; this is not runtime evidence."
+}

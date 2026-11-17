@@ -1,0 +1,73 @@
+{
+  "schema": "injective-box-verification/v1",
+  "source_commit": "c9da9b542852c934afe6d2f011af9723725d5b71",
+  "claim_id": "PCC-20261114-8f6cf7",
+  "declaration_sha256": "74bd1e4a6ad421bdc085caeacc841339cffa62495e283ed494f6c18499ec6f35",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 25,
+  "gate_declarations": 49,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 131,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-8f6cf7",
+    "claim_sha256": "b9b5da7205287eac1cb5732dff951e45fac60fc8850463259916c22b7d571022",
+    "commit": "c9da9b542852c934afe6d2f011af9723725d5b71",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/injective_box_audit_20261114/lean (SamplingCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T11:23:45Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-8f6cf7",
+    "claim_sha256": "b9b5da7205287eac1cb5732dff951e45fac60fc8850463259916c22b7d571022",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46968,
+    "sha256": "965f79d2478e7f0005f1beb9fac5d2497174a5854db7d7e0740d27925979d59d",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 49,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "exact_finite_counting_core": true,
+    "actual_full_uniform_conditional_support_space": true,
+    "actual_pointmass_and_cardinality_derived": true,
+    "canonical_centered_coordinate_count": true,
+    "deleted_zero_index_probability_bound_refuted": true,
+    "corrected_asymptotic_one_point_one_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_later_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

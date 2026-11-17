@@ -1,0 +1,9 @@
+run_ts: 20261116T1637Z
+protocol_sha256: 215befa26da331ebc76cdf7e55e29e62ff1c94c5e7bcd994d594822010cc061e
+binary: target/release/nist_cover_quartic_map
+cmd: nist_cover_quartic_map --primes 1009,2003,4001,10007 --gamma-max 800 --out runs.jsonl
+p=1009 a=-3 b=4 #E=967(prime) gamma=16 | ord(phi*P)=967 hom=true #C=#H=true dlp_on_C=true k=323 rec=Some(323) => OK
+p=2003 a=-3 b=1 #E=2039(prime) gamma=3 | ord(phi*P)=2039 hom=true #C=#H=true dlp_on_C=true k=680 rec=Some(680) => OK
+p=4001 a=-3 b=9 #E=4079(prime) gamma=5 | ord(phi*P)=4079 hom=true #C=#H=true dlp_on_C=true k=1360 rec=Some(1360) => OK
+p=10007 a=-3 b=7 #E=10193(prime) gamma=9 | ord(phi*P)=10193 hom=true #C=#H=true dlp_on_C=true k=3398 rec=Some(3398) => OK
+exit: 0

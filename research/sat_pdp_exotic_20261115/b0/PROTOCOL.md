@@ -134,6 +134,44 @@ consecutive rungs ℓ ≥ 8 is read as the survey's falsifier firing (its
   first ℓ ≥ 7 row; raw JSONL goes to S3 by sha256.
 - Validator: independent build, replay of ℓ = 8 and 9, field-by-field compare.
 
+## Amendments
+
+- **AM1 (2026-11-15T04:50Z, before any ℓ ≥ 8 data; stopping rule only).** `cms`
+  and `cadical` run at ℓ = 7 only: the ℓ = 7 row run measured about 25 min of
+  wall for one CryptoMiniSat refutation on this host, so ℓ ≥ 8 would exceed
+  24 h per rung. Rungs ℓ = 8, 9, 10 run oracle, native, native-aa, lin,
+  lin-nolex, and rungs may run concurrently on the same frozen binaries
+  (counted metrics unaffected). Budget unchanged; the incumbent is therefore
+  expected to be censored at ℓ = 9, 10 and that is reported as censoring.
+  Hashes after the amendment: `FREEZE-am1.sha256`.
+
+- **AM2 (2026-11-15T04:50Z, after the first ℓ = 7 target; chain-p12 only).** In
+  the ℓ = 7 row run `chain-p12` censored at 4·10⁶ conflicts on target 0 after
+  1282 s (R > 484, outside its predicted 100–300), which made the rung ≈ 11 h and
+  kept the bench record open (an open record fails the repository's `records`
+  check for every PR). The run was stopped after its first complete target; that
+  row is kept unchanged as `rows/l7-run1-chain-p12-partial.jsonl`; the rung is
+  rerun without `chain-p12`, and `analyze.py` merges rows of one rung by target
+  (asserting the same `x_R`). `chain-p12` at ℓ = 7 is therefore 1 target,
+  censored, and B5 reads "not supported, censored". Other arms' counted metrics
+  are deterministic per target and unaffected. Hashes: `FREEZE-am2.sha256`.
+
+- **AM3 (2026-11-15T06:00Z, before any ℓ = 10 data; ℓ = 10 only).** The frozen
+  budget 1.6·10⁷ is below the incumbent's deterministic cost at ℓ = 10 (one
+  conflict per triple, C(1024, 3) = 1.78·10⁸), so `native` and `native-aa` would be
+  censored by construction at ≈ 40 machine-hours of cost and no information.
+  ℓ = 10 runs oracle, lin, lin-nolex; the native arms are reported as censored by
+  construction. ℓ = 9 (4·10⁶ < C(512, 3) = 2.2·10⁷) is run as frozen and its
+  native censoring is observed. Hashes: `FREEZE-am3.sha256`.
+
+- **AM4 (2026-11-15T06:05Z, execution only).** The session harness stops a
+  background command after 2 h, which will cut the ℓ = 7 rerun and the ℓ = 8 run
+  short. A detached watcher reruns a rung whose process ended with fewer than
+  20 rows, with the identical frozen binary, arguments and budget, into
+  `rows/l<ℓ>-run<k>.jsonl`; `analyze.py` merges by target (AM2). Counts are
+  deterministic per (target, arm), as the ℓ = 7 target-0 check showed. No data
+  is affected; some targets are computed twice. Hashes: `FREEZE-am4.sha256`.
+
 ## Inadmissible after the freeze
 
 Changing budget, seeds, target counts, symmetry-breaking setting, encoding, or

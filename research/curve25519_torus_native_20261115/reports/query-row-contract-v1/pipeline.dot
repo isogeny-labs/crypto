@@ -1,0 +1,11 @@
+digraph Contract {
+ graph [rankdir=TB,bgcolor="white",fontname="Helvetica",ranksep=.3];
+ node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+ edge [fontname="Helvetica",fontsize=10,color="#4D607D"];
+ query [label="Fresh private (a,b) for each query; oracle sees T only"];
+ one [label="Retain at most ONE checked row per query\nDuplicate targets/rows from different queries allowed"];
+ many [fillcolor="#FFF3D9",label="Multiple rows from ONE query share b\nNonzero row-kernel v need not give nonzero denominator"];
+ tags [label="Conditional independent tags at query level\nEarlier scalar counting law needs its selection bridge"];
+ group [fillcolor="#FFF3D9",label="For multi-output batches: aggregate w by query\nNeed w != 0 and full output/work/dependence accounting"];
+ query -> one; query -> many; one -> tags; many -> group;
+}

@@ -1,0 +1,14 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",fontname="DejaVu Sans"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef5fd",color="#315d89",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#315d89"];
+ row [label="Actual row x = r + 2^u h\nSame retained mask at r and x"];
+ den [label="Actual selected / pole denominators\ne_j = 2^u / d_j has valuation >= 1"];
+ poly [label="Construct D(H), constant 1\ncoefficient b has valuation >= b"];
+ inv [label="Construct invOfUnit(D,1)\ncoefficient b retains valuation >= b"];
+ trunc [label="Finite truncation Q_k\nactual integer-evaluation error has k bits"];
+ factors [label="Actual integral residue / moment factors\n2^u * k labels; row weight b; residual k"];
+ weight [label="Actual c, w=v2(c)\nrow weight w+b; residual w+k",fillcolor="#eaf7ee"];
+ open [label="OPEN: higher chart factors + all costs\ncoefficient / entry / recovery / recursion / public finder",style="rounded,dashed,filled",fillcolor="#fff2d9"];
+ row -> den -> poly -> inv -> trunc -> factors -> weight -> open;
+}

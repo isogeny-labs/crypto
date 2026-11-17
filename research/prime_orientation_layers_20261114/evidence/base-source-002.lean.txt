@@ -1,0 +1,73 @@
+module
+public import OrientationProduct
+public import LocalCharts
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+public section
+noncomputable section
+namespace OrientationBaseBridge
+open Polynomial Finset OrientationAnchor
+
+abbrev Nodes (a : ℕ) := Fin (2^(a+1))
+
+def node (a : ℕ) (j : Nodes a) : ℚ := (j.val:ℚ)-(2^a:ℕ)
+
+def center (a : ℕ) : Nodes a := ⟨2^a, CauchyNormalizer.center_lt a⟩
+
+theorem node_injective (a : ℕ) : Function.Injective (node a) := by
+  intro j k h
+  apply Fin.ext
+  dsimp [node] at h
+  have hv : (j.val:ℚ) = (k.val:ℚ) := by linarith
+  exact_mod_cast hv
+
+theorem node_center (a : ℕ) : node a (center a) = 0 := by simp [node, center]
+
+/-- Literal equality of the old shifted-natural grid and the actual signed grid. -/
+theorem grid_eq_image (a : ℕ) : grid a = univ.image (node a) := by
+  ext q
+  constructor
+  · intro hq
+    obtain ⟨z,hz,hzq⟩ := mem_image.mp hq
+    have hzlo := (mem_Ico.mp hz).1
+    have hzhi := (mem_Ico.mp hz).2
+    have hk0 : 0 ≤ z+(2:ℤ)^a := by omega
+    have hkN : (z+(2:ℤ)^a).toNat < 2^(a+1) := by
+      have h : ((z+(2:ℤ)^a).toNat:ℤ) < ((2^(a+1):ℕ):ℤ) := by
+        rw [Int.toNat_of_nonneg hk0]
+        push_cast
+        rw [pow_succ]
+        omega
+      exact_mod_cast h
+    refine mem_image.mpr ⟨⟨(z+(2:ℤ)^a).toNat,hkN⟩, mem_univ _, ?_⟩
+    have hkQ : ((z+(2:ℤ)^a).toNat:ℚ) = ((z+(2:ℤ)^a:ℤ):ℚ) := by
+      exact_mod_cast Int.toNat_of_nonneg hk0
+    dsimp [node]
+    push_cast at hkQ ⊢
+    rw [← hzq]
+    linarith
+  · intro hq
+    obtain ⟨j,_,rfl⟩ := mem_image.mp hq
+    apply mem_image.mpr
+    refine ⟨(j.val:ℤ)-(2:ℤ)^a, ?_, ?_⟩
+    · apply mem_Ico.mpr
+      have hj : (j.val:ℤ) < (2:ℤ)^(a+1) := by exact_mod_cast j.isLt
+      rw [pow_succ] at hj
+      constructor <;> omega
+    · simp [node]
+
+/-- Actual punctured polynomial transported through the proved grid bijection. -/
+theorem puncture_grid (a : ℕ) (s : Nodes a) :
+    puncture (grid a) (node a s) = ∏ j ∈ univ.erase s, (X-C (node a j)) := by
+  unfold puncture
+  rw [grid_eq_image, ← Finset.image_erase (node_injective a)]
+  exact Finset.prod_image (fun j _ k _ h => node_injective a h)
+
+theorem normalizer_center_product (a : ℕ) :
+    normalizer (grid a) = ∏ j ∈ univ.erase (center a), (0-node a j) := by
+  rw [normalizer_eq _ (zero_in_grid a), ← node_center a, puncture_grid]
+  simp only [eval_prod, eval_sub, eval_X, eval_C, node_center]
+
+end OrientationBaseBridge

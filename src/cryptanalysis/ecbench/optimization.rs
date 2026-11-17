@@ -207,6 +207,18 @@ const POLICIES: &[PolicyDecl] = &[
         FrozenHistorical,
         StandardBand
     ),
+    policy!(
+        "rho.curve25519_bounded",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.curve25519_pair_v1",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!("rho.plain", ReplayControl, FrozenHistorical, StandardBand),
     policy!(
         "rho.negation",
@@ -727,6 +739,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "max_ops"
         | "max_restarts"
         | "max_states"
+        | "max_steps"
+        | "max_scan"
         | "max_sums"
         | "max_trials"
         | "max_u"
@@ -748,6 +762,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "batch_trials"
         | "base"
         | "base_multiplier"
+        | "base_size"
         | "base_scale"
         | "beta"
         | "branches"
@@ -1344,6 +1359,7 @@ mod tests {
     #[test]
     fn censoring_and_seeds_cannot_be_tuning_knobs() {
         for name in [
+            "max_steps",
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",

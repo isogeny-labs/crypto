@@ -1,0 +1,1 @@
+The full original session archive is pinned at outcome5f3e and contains53 claims. This later raw intake claim and complete appended source-fork ledger are retained separately. Neither is appended to or substituted for canonical main. Source-fork standing remains unsigned. [pcc:unverified]

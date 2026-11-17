@@ -1,0 +1,113 @@
+name: conductor-gap-replication
+
+# Recheck archived synthetic data; never launches a new measured campaign.
+on:
+  pull_request:
+    paths:
+      - 'research/conductor_gap_replication_20261025/**'
+      - 'src/cryptanalysis/ic_framework/cm_orbit.rs'
+      - 'examples/conductor_gap_replication.rs'
+      - 'examples/conductor_gap_registry.rs'
+      - 'docs/curves/registry.json'
+      - '.github/workflows/conductor-gap-replication.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/conductor_gap_replication_20261025/**'
+      - 'src/cryptanalysis/ic_framework/cm_orbit.rs'
+      - 'examples/conductor_gap_replication.rs'
+      - 'examples/conductor_gap_registry.rs'
+      - 'docs/curves/registry.json'
+      - '.github/workflows/conductor-gap-replication.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  archive-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            .cargo
+            src
+            scripts
+            tools
+            isogeny_algos
+            docs
+            examples
+            tests
+            benches
+            research/conductor_gap_replication_20261025
+      - name: Materialize native build inputs
+        run: scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path research/conductor_gap_replication_20261025
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.99.1'
+      - uses: Swatinem/rust-cache@v2
+      - name: Build the native auditor
+        run: cargo build --release --locked --bin ecbench --example conductor_gap_replication
+      - name: Extract the exact sealed sessions
+        working-directory: research/conductor_gap_replication_20261025
+        run: |
+          sha256sum -c runs.tar.xz.sha256
+          tar -xJf runs.tar.xz
+      - name: Replay all recorded synthetic solves on this host
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/conductor_gap_replication_20261025
+          mkdir -p "$RUNNER_TEMP/conductor-gap-audits"
+          records=("$study"/sessions/*/session.json)
+          test "${#records[@]}" -eq 68
+          for record in "${records[@]}"; do
+            session="${record%/session.json}"
+            name="${session##*/}"
+            ./target/release/ecbench verify --dir "$session" --replay-all --exit-code \
+              --out "$RUNNER_TEMP/conductor-gap-audits/$name.json" \
+              > "$RUNNER_TEMP/conductor-gap-audits/$name.stdout"
+            jq -e '. as $a | .ok and (.problems | length == 0) and (($a.replays | length) == $a.records) and all(.replays[]; .reproduced)' \
+              "$RUNNER_TEMP/conductor-gap-audits/$name.json" > /dev/null
+          done
+      - name: Recompute summaries and exact CSV exports from the archived records
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/conductor_gap_replication_20261025
+          mkdir -p "$RUNNER_TEMP/conductor-gap-recomputed"
+          ./target/release/examples/conductor_gap_replication analyze "$study/prepared-a" "$RUNNER_TEMP/conductor-gap-recomputed"
+          ./target/release/examples/conductor_gap_replication analyze "$study/prepared-b-v2" "$RUNNER_TEMP/conductor-gap-recomputed"
+          ./target/release/examples/conductor_gap_replication b-checks "$study/prepared-b-v2" "$RUNNER_TEMP/conductor-gap-recomputed"
+          for name in records-A.csv records-B.csv panel-A.json panel-B.json b-mode-invariants.json recurrence-factorization.json recurrence-identity-check.json; do
+            cmp "$study/analysis/$name" "$RUNNER_TEMP/conductor-gap-recomputed/$name"
+          done
+      - name: Independently check arithmetic, graphs and headline means
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/conductor_gap_replication_20261025
+          node "$study/validation-inputs.mjs" "$RUNNER_TEMP/conductor-gap-validation-inputs"
+          for name in fixtures.csv vertices.csv export-sources.json; do
+            cmp "$study/validation/$name" "$RUNNER_TEMP/conductor-gap-validation-inputs/$name"
+          done
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/independent.cpp" -o "$RUNNER_TEMP/independent"
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/independent_geometry.cpp" -o "$RUNNER_TEMP/geometry"
+          "$RUNNER_TEMP/independent" "$study/analysis/records-A.csv" "$study/analysis/records-B.csv" \
+            > "$RUNNER_TEMP/conductor-gap-audits/independent.json"
+          "$RUNNER_TEMP/geometry" "$study/validation/fixtures.csv" "$study/validation/vertices.csv" \
+            > "$RUNNER_TEMP/conductor-gap-audits/geometry.json"
+          node "$study/validator-report.mjs" "$RUNNER_TEMP/conductor-gap-audits/validator-report.json" \
+            "$RUNNER_TEMP/conductor-gap-audits/independent.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conductor-gap-independent-audits
+          path: ${{ runner.temp }}/conductor-gap-audits/

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:39:23Z",
+ "id": "PCC-20261116-5c37d1",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v1/result.json",
+    "sha256": "ff08123ffbce8001d9f61a51019dfac66b9d6e82b6ec62134cf5f667d7070f1e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v1/stderr.txt",
+    "sha256": "3434393b0158772e7f882077212a963192b11f21aeb3f216d97bba746b98f00d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/historical-source/toy_ic_v1.cpp.txt",
+    "sha256": "e0a2dbb392c4ecbf467439aaddaac10e2a79607b0cf143f2116a6eded8baeefa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v1/pre-call-manifest.sha256",
+    "sha256": "6d231966dba9bf9cbf111c4e4c8a068009d7c9cc31fc54db90af724f3c89a633"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The native public F109 Hesse-derived norm-projected index-calculus correctness fixture completed. Source curve has99 points and prime subgroup order11. Actual mixed3-kernel construction used F109^6. After101 cover-point divisors were merged into10 projected base points,46047 principal-function candidates yielded10 verified relations and matrix rank10; the solver received only public quotient targets and recovered/source-verified all11 subgroup scalars, including zero. Three false-kernel/relation/answer controls reject. This is an unsigned tiny correctness fixture with full projected base, not Diem on a reconstructed plane quartic, a P-192 DLP solve or evidence of speed advantage."
+}

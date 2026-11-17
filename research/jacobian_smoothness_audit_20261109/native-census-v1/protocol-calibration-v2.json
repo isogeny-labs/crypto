@@ -1,0 +1,494 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "AUDIT-MUMFORD-CALIBRATION-20261109-v2",
+  "version": 2,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/jacobian_smoothness_audit_20261109/native-census-v1",
+  "authors": [
+    "Codex audit producer"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "formal_controls": [
+      "../lean/MumfordSmoothness.lean",
+      "../lean/MumfordFiveControl.lean"
+    ],
+    "instance_mapping": [
+      "f3-positive,instance0:F3y²=x⁵-x",
+      "f5-all-smooth,instance0:F5y²=x⁵-x"
+    ],
+    "note": "Separate calibration protocol before any curve data; full census will receive its own frozen protocol after these runtime diagnostics.",
+    "supersedes_protocol_sha256": "f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6",
+    "launcher_failure_receipt": "../evidence/calibration-v1-launcher-failure.json"
+  },
+  "question": "Does the source-frozen Rust Mumford/Cantor instrument reproduce the Lean-backed exact F3/F5counts and unequal/equal finite-subgroup controls, with every actual addition and group/subgroup table matched by separate C++arithmetic?",
+  "claims": [
+    {
+      "id": "C-count-controls",
+      "text": "Both complete known-answer polynomial-pair models match their pre-data Lean counts; every table/subgroup entry agrees with the C++implementation.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-control"
+      ]
+    },
+    {
+      "id": "C-runtime-calibration",
+      "text": "Diagnostic elapsed intervals for these known fixtures inform the separate full-census scheduling estimate; no speed, variance, typicalness, asymptotic or independent-machine conclusion.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "f3-positive",
+      "role": "control_positive",
+      "description": "Complete Lean-backed F3known unequal-proportion fixture.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--release"
+          ],
+          [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "cpp_counts.cpp",
+            "-o",
+            "target/mumford_cpp_counts"
+          ]
+        ],
+        "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+        "flags": {
+          "rust_source_sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65",
+          "cpp_source_sha256": "44e6523bd7657b9db8175779dffefbb6e9f7d4849040f57a925bd46ec1c92cd5",
+          "cpp_binary_sha256": "8030184af28b2621f76bc31263c6626ab219e8a92cf5049e84ef1e0e7dc578d0",
+          "backend_source_revision": "fe751b09b08bc274d60cb22cfba25b13983b2b6e",
+          "launcher": "Bash builtin time -p around timeout120s; no external GNUtime dependency."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "p": 3,
+        "mode": "fixture",
+        "polynomial": "X^5-X",
+        "all_addition_pairs": true,
+        "all_group_axioms": true,
+        "all_cyclic_subgroups": true
+      }
+    },
+    {
+      "id": "f5-all-smooth",
+      "role": "control_negative",
+      "description": "Complete Lean-backed F5all-smooth exact negative detector fixture, not a sampled statistical null.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--release"
+          ],
+          [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "cpp_counts.cpp",
+            "-o",
+            "target/mumford_cpp_counts"
+          ]
+        ],
+        "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+        "flags": {
+          "rust_source_sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65",
+          "cpp_source_sha256": "44e6523bd7657b9db8175779dffefbb6e9f7d4849040f57a925bd46ec1c92cd5",
+          "cpp_binary_sha256": "8030184af28b2621f76bc31263c6626ab219e8a92cf5049e84ef1e0e7dc578d0",
+          "backend_source_revision": "fe751b09b08bc274d60cb22cfba25b13983b2b6e",
+          "launcher": "Bash builtin time -p around timeout120s; no external GNUtime dependency."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "p": 5,
+        "mode": "fixture",
+        "polynomial": "X^5-X",
+        "all_addition_pairs": true,
+        "all_group_axioms": true,
+        "all_cyclic_subgroups": true
+      },
+      "same_instrument_as": "f3-positive"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact deterministic known-answer calibration has no sampling noise or statistical A/Ainterval. The later full census has two fresh-process repeats to check determinism, not variance."
+    },
+    "positive": {
+      "present": true,
+      "arm": "f3-positive",
+      "expected_detection": "F3:8pairs/7smooth and at least one proper nontrivial unequal subgroup; F5:16pairs/16smooth and0proper nontrivial unequal subgroups. Every addition/table/group/subgroup entry must match independent C++arithmetic.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "f5-all-smooth",
+      "null_population": {
+        "description": "Complete fixed F5reduced-pair model, all16smooth by Lean. A deterministic negative detector control; no statistical null or typicalness assertion.",
+        "generator": "Enumerate every actual admissible polynomial pair and every cyclic subgroup of this fixed control, under the identical source-frozen instrument.",
+        "n": 16,
+        "why_n": "This is the complete representation population, not a sample. Every member is smooth, so every nonempty subgroup has fraction1.",
+        "matched_on": [
+          "same native arithmetic/checker versions and flags",
+          "same one-infinity monic squarefree genus2model family",
+          "same complete enumeration and all-table/subgroup checks"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "field",
+        "levels": [
+          3,
+          5
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One source-committed Rust binary; one pinned C++checker; same flags/threads across the two fixtures."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Two source-derived known-answer fixtures selected before data, with actual complete-pair Lean proofs."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing managed host/CPU and binary identities retained; one thread; wall intervals are diagnostic and invalid as scientific timing."
+      },
+      {
+        "name": "layout",
+        "treatment": "measured",
+        "how": "Fresh processes; no layout-dependent or timing claim."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "F3known unequal control first, then F5known equality control. No inter-arm speed comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Counts compared to frozen literal answers and C++results; no discretionary exclusion or inferential ranking."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-control",
+        "arms": [
+          "f3-positive",
+          "f5-all-smooth"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All literal count/detector controls and every independent arithmetic/group/subgroup check pass; any failure invalidates the affected execution."
+      }
+    ],
+    "aa_not_applicable": "Known exact deterministic counts; no inferential noise floor.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Run exact F3positive detector first, then F5all-smooth negative control; no timing or statistical arm comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        202611090301,
+        202611090501
+      ],
+      "nonce": null,
+      "note": "Metadata-only seeds chosen before data; enumeration and arithmetic use no randomness."
+    },
+    "instance_sampling": {
+      "rule": "Exhaust the full admissible polynomial-pair space on each fixed fixture.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact literal known-answer validation; named public fields are visible. No typicalness, effect-selection or comparative statistical verdict.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Complete deterministic controls, no sampling/rank-test hypothesis. Alpha is a required schema field, not a p-value criterion."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 120,
+      "measured_on": "No timing data yet. Separate exact known-answer calibration bootstraps the later full-census runtime estimate. Planning allowance60s per small fixture/120stotal; hard cap120s per execution(240smaximum over both). These are scheduling estimates, not observations. Calibrationv1failed in launcher before native code; no timing observations from native curves yet."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "control_pairs",
+        "name": "Complete pair count",
+        "unit": "representations",
+        "kind": "exact",
+        "definition": "Every actual monic-u bounded reduced pair, identity included.",
+        "source": "analysis.json control_pairs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "control_smooth",
+        "name": "Split-u pair count",
+        "unit": "representations",
+        "kind": "exact",
+        "definition": "Every complete-model representation whose u splits; identity included.",
+        "source": "analysis.json control_smooth",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "proper_nontrivial_unequal",
+        "name": "Unequal proper cyclic subgroups",
+        "unit": "distinct subgroups",
+        "kind": "exact",
+        "definition": "Deduplicate exact membership sets; compare smooth_H*size_model against smooth_model*size_H for every proper nontrivial cyclic subgroup.",
+        "source": "analysis.json proper_nontrivial_unequal",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "checked_additions",
+        "name": "Actual Cantor additions checked",
+        "unit": "additions",
+        "kind": "counted",
+        "definition": "All ordered pairs of the complete representation space.",
+        "source": "finish.json checked_additions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "associativity_checks",
+        "name": "Finite associativity checks",
+        "unit": "triples",
+        "kind": "counted",
+        "definition": "All ordered triples on the produced complete addition table.",
+        "source": "finish.json associativity_checks",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "models_attempted",
+      "valid_models",
+      "nonsquarefree_models",
+      "checked_additions",
+      "associativity_checks",
+      "distinct_cyclic_subgroups"
+    ],
+    "record": [
+      "cpu",
+      "host",
+      "threads",
+      "binary_sha256",
+      "source_commit_checked",
+      "observed_worktree_commit",
+      "protocol_sha256",
+      "isolation",
+      "wall_valid"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "instance_type": "existing managed environment; user-approved zero-paid-compute backend",
+      "cpus": 1,
+      "spot": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly two executions: armf3-positive/instance0thenarmf5-all-smooth/instance0,one replicate each; Rust census,C++check,native analysis within120seconds per execution.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any failed positive/equality control, arithmetic discrepancy, incomplete footer or native error invalidates that execution and stops remaining calibration cells. Preserve all partial raw files and failure rows; fix and file a new version before affected reruns.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Failure, timeout or incomplete raw/TSVfooter is a censored/invalid execution, never a mathematical negative.",
+    "No timing is a scientific result at this nonisolated host; retain only diagnostic elapsed intervals for later scheduling."
+  ],
+  "decision_rule": {
+    "text": "Both executions are supported within exact fixture scope only if all literal counts/detector answers and independent C++checks pass. Otherwise invalid or inconclusive; no p-value or asymptotic conclusion.",
+    "comparison_ids": [
+      "C-control"
+    ],
+    "threshold": "Exact equality to8/7and16/16; F3unequal>0/F5unequal=0; all independent table/group/subgroup checks match.",
+    "statistic": "Exact integers and cross-products on complete finite sets.",
+    "interval": "None: exact complete controls, no sampling.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact count discrepancies and subgroup cross-product differences, not an inferential effect size.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65"
+    },
+    "inputs": [
+      "artifacts/calibration-v2-p3/raw.jsonl",
+      "artifacts/calibration-v2-p3/audit.tsv",
+      "artifacts/calibration-v2-p3/cpp-check.json",
+      "artifacts/calibration-v2-p5/raw.jsonl",
+      "artifacts/calibration-v2-p5/audit.tsv",
+      "artifacts/calibration-v2-p5/cpp-check.json"
+    ],
+    "outputs": [
+      "artifacts/calibration-v2-p3/analysis.json",
+      "artifacts/calibration-v2-p5/analysis.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact Lean versus native control counts, with identity convention explicit."
+    ],
+    "report_dir": "reports/calibration"
+  },
+  "inadmissible": [
+    "Any curve invocation before committed source and canonical frozen protocol.",
+    "Changing code, fields, controls, counts, seeds or exclusion rules after data without a dated new protocol version.",
+    "Treating same-host two-language agreement as independent-machine or signed verification.",
+    "Treating finite exact fixtures as large-prime/typical/asymptotic evidence or as completion of the fourteen-item request.",
+    "Promoting diagnostic wall intervals as performance measurements."
+  ],
+  "literature": [
+    {
+      "ref": "../five-control-sources.json",
+      "provenance": "internal",
+      "claim": "Complete Lean F5control16pairs/all16split and actual polynomial domain, without geometric Picard bridge.",
+      "verified_by": "Producer kernel gate240, unsigned standing pending."
+    },
+    {
+      "ref": "../cantor-sources.json",
+      "provenance": "internal",
+      "claim": "Complete Lean F3control8pairs/7split and actual Cantor subgroup comparison; primary read scopes and qualified-regime gaps.",
+      "verified_by": "Source-pinned existing full local packets, unsigned."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "AMEND-launcher-20261109",
+      "filed": "2026-11-09",
+      "filed_before_affected_data": true,
+      "reason": "v1launcher exits127before native code because /usr/bin/time is unavailable. Preserve that failed version and use the installed Bash timing keyword.",
+      "changes": [
+        "Use Bash builtin time -p for diagnostic elapsed/user/system output around the same120stimeout.",
+        "Use fresh calibration-v2-p3/p5artifact paths; retain every v1failure byte.",
+        "Arithmetic source, both binary pins, fields, fixtures, control answers, analysis code, metadata seeds,120scaps and failure criteria unchanged."
+      ],
+      "supersedes_fields": [
+        "protocol_id",
+        "version",
+        "arms[].instrument.flags.launcher",
+        "analysis_plan.inputs",
+        "analysis_plan.outputs",
+        "links"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "400a9c96380841436a15a857ead2893f8c66c79c8d99422a6792bf9b8419369c",
+    "commit": "eb164a7eb892c0ab9e7553dcbaf4df90f3c2daa0",
+    "frozen_at": "2026-11-09T22:17:41Z",
+    "filed_before_affected_data": true
+  }
+}

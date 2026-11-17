@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | L16 | 36/36 | 24.917 | 26.624 | 41.995 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | L32 | 36/36 | 25.516 | 27.327 | 43.623 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | fast | 36/36 | 24.799 | 26.495 | 41.760 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 36/36 | 1.029 | 1.130 | 2.035 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | walk | 36/36 | 24.799 | 26.495 | 41.760 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | L16 vs L32 | L16 < L32 |
+| icv1-fp28-tm3161-380f655a | L16 vs fast | fast < L16 |
+| icv1-fp28-tm3161-380f655a | L16 vs rho-neg | rho-neg < L16 |
+| icv1-fp28-tm3161-380f655a | L16 vs walk | walk < L16 |
+| icv1-fp28-tm3161-380f655a | L32 vs fast | fast < L32 |
+| icv1-fp28-tm3161-380f655a | L32 vs rho-neg | rho-neg < L32 |
+| icv1-fp28-tm3161-380f655a | L32 vs walk | walk < L32 |
+| icv1-fp28-tm3161-380f655a | fast vs rho-neg | rho-neg < fast |
+| icv1-fp28-tm3161-380f655a | fast vs walk | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | rho-neg vs walk | rho-neg < walk |

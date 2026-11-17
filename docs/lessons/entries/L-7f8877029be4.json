@@ -1,0 +1,14 @@
+{
+  "action": "compare .text/.rodata/.data first; in this crate the build-id and one .llvm.<hash> symbol suffix change with the build path, so a hash miss alone is not evidence of different sources",
+  "created": "2026-11-16T21:00:41Z",
+  "evidence": [
+    "research/genus4_positive_control_20261116/validation/validator-report.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "validating a rebuilt binary whose hash misses binary.sha256",
+  "why": ""
+}

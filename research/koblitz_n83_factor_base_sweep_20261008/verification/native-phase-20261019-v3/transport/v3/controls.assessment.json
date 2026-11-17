@@ -1,0 +1,35 @@
+{
+  "card_id": "CARD-n83-native-phase-20261019-v3-controls",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "interpretation": "not_assessed",
+  "reasons": [
+    "Native card-check independently verified exact actual relay and all recorded stream/output digests; status completed.",
+    "All three frozen commands exited0 with succeeded=true and timed_out=false; card_changed=false; dirty_before and dirty_after empty.",
+    "Known fully specified selector-witness control returned SAT_verified_witness_x, model_verified=true, conflicts0 within cap5000; native audit status PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM.",
+    "Witness exited0,wall_censored=false,cleanup_verified=true.",
+    "Passing v3 controls satisfy the frozen prerequisite for separately requested K2048 then K4096 natural cards using corrected retained public_x_hash policy and unpinned selectors.",
+    "V1 free-selector wall-censored control and v2 pre-search policy-selection failures remain distinct preserved observations; these gaps are not relabeled successful."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/cards/controls.json",
+    "card_sha256": "37fa0309a66e7a06eca8689d0e366a9f58d63a03ccd86b5e5ea38791649d8e03",
+    "relay": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/controls-relay.txt",
+    "relay_sha256": "8a06d27e5b73bde45f0d4ce658f2ca60eac6f3fb45319fdabbae6dbf6d150016",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/controls.receipt.json",
+    "witness_audit": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/witness/audit.json",
+    "source_commit": "27d17bd17b9fe9c6b4ce04e0c9206706b2b5c804"
+  },
+  "retained_arm_gate": {
+    "v3_controls_completed": true,
+    "authorized_sequence": [
+      "K2048",
+      "K4096"
+    ],
+    "dispatch_owner": "parent",
+    "performance_or_scalar_promotion": false
+  }
+}

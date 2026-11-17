@@ -539,19 +539,27 @@ where
     F: FnMut(&crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event) -> Result<(), ()>,
 {
     use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{
-        columns, criterion_reservation, pack, product, CriterionStatus, Stage, MULTIPLIERS,
+        columns, criterion_active_reservation, criterion_setup_reservation, pack, product,
+        CriterionStatus, Stage, MULTIPLIERS,
     };
-    gate.reserve(criterion_reservation(polys.len())?)?;
-    gate.report.backend_invoked = true;
-    let mut pruned = [0u8; 61];
-    gate.report.criterion_status = if polys.is_empty() {
+    // Predicate reads only degrees validated/recomputed from the original
+    // canonical equations by Gate::prepare, never producer report counters.
+    // Setup is charged before this inspection and any fixed-array mutation.
+    gate.reserve(criterion_setup_reservation(polys.len())?)?;
+    let status = if polys.is_empty() {
         CriterionStatus::EmptyInput
     } else if degrees[..polys.len()].contains(&0) {
         CriterionStatus::SkippedConstantInput
     } else {
         CriterionStatus::Active
     };
-    if gate.report.criterion_status != CriterionStatus::Active {
+    if status == CriterionStatus::Active {
+        gate.reserve(criterion_active_reservation(polys.len())?)?;
+    }
+    gate.report.backend_invoked = true;
+    gate.report.criterion_status = status;
+    let mut pruned = [0u8; 61];
+    if status != CriterionStatus::Active {
         return Ok(pruned);
     }
     // F5Criterion sorts/deduplicates these levels. Degrees are in 1..=3,
@@ -838,7 +846,7 @@ mod bounded_k2_tests {
             assert_eq!(seen, [Stage::Begin]);
             assert!(!report.backend_invoked);
             assert_eq!(report.criterion_status, CriterionStatus::NotRequested);
-            assert_eq!(report.reserved.work, 4224);
+            assert_eq!(report.reserved.work, if work >= 8448 { 8448 } else { 4224 });
             assert_eq!(report.counters.criterion_attempts, 0);
             assert_eq!(report.counters.main_attempts, 0);
             assert_eq!(report.counters.allocation_requests, 0);
@@ -865,15 +873,15 @@ mod bounded_k2_tests {
         // An admitted bypass phase is visible but is not active criterion
         // work, even when a later main reservation is refused.
         for (input, work, status) in [
-            (vec![], 9216, CriterionStatus::EmptyInput),
+            (vec![], 8192, CriterionStatus::EmptyInput),
             (
                 vec![polynomial(0)],
-                42240,
+                8448,
                 CriterionStatus::SkippedConstantInput,
             ),
             (
                 vec![polynomial(1)],
-                42240,
+                8448,
                 CriterionStatus::SkippedConstantInput,
             ),
         ] {
@@ -955,6 +963,68 @@ mod bounded_k2_tests {
         censored(&report, Stop::RowLimit);
         assert_eq!(report.counters.main_attempts, MAX_ROWS as u64 - 1);
         assert_eq!(report.counters.dynamic_layout_bytes, 0);
+    }
+    #[test]
+    fn skipped_and_active_criterion_charge_original_predicate_before_refusal() {
+        use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{
+            criterion_active_reservation, criterion_setup_reservation, main_reservation,
+        };
+        for anfs in [vec![], vec![0], vec![1], vec![0, 14, 11], vec![2, 4, 6]] {
+            let polys: Vec<_> = anfs.into_iter().map(polynomial).collect();
+            let e = polys.len();
+            let entry = 4096 + 128 * e as u64;
+            let setup = criterion_setup_reservation(e).unwrap().work;
+            let active =
+                !polys.is_empty() && polys.iter().all(|p| p.terms.iter().any(|m| m.mask != 0));
+            let phase = entry
+                + setup
+                + if active {
+                    criterion_active_reservation(e).unwrap().work
+                } else {
+                    0
+                };
+            let total = phase + main_reservation(e).unwrap().work;
+            for work in [entry + setup - 1, phase, total - 1, total] {
+                let mut caps = limits();
+                caps.work = work;
+                let mut stages = Vec::new();
+                let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |event| {
+                    stages.push(event.stage);
+                    Ok(())
+                });
+                if work == entry + setup - 1 {
+                    assert_eq!(report.reserved.work, entry);
+                    assert_eq!(report.criterion_status, CriterionStatus::NotRequested);
+                    assert!(!report.backend_invoked);
+                    assert_eq!(stages, vec![Stage::Begin]);
+                } else if work < total {
+                    assert_eq!(report.stop, Stop::WorkLimit);
+                    assert_eq!(report.reserved.work, phase);
+                    assert_eq!(report.counters.main_attempts, 0);
+                } else {
+                    assert_eq!(report.stop, Stop::Complete);
+                    assert_eq!(report.reserved.work, total);
+                    assert_eq!(row_space(&report.rows), oracle(&polys, 5));
+                    let mut replay_stages = Vec::new();
+                    let replay = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |event| {
+                        replay_stages.push(event.stage);
+                        Ok(())
+                    });
+                    assert_eq!(replay_stages, stages);
+                    assert_eq!(replay.reserved, report.reserved);
+                    assert_eq!(replay.rows, report.rows);
+                }
+                if !active {
+                    assert_eq!(report.counters.criterion_attempts, 0);
+                    assert_eq!(report.counters.criterion_rows, 0);
+                    assert_eq!(report.counters.criterion_word_xors, 0);
+                    assert!(!stages.iter().any(|s| matches!(
+                        s,
+                        Stage::CriterionLevel { .. } | Stage::CriterionCandidate { .. }
+                    )));
+                }
+            }
+        }
     }
 }
 

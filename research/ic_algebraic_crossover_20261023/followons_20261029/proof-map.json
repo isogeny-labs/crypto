@@ -1,0 +1,45 @@
+{
+  "schema": "ic-three-lead-proof-map/v1",
+  "source": "ThreeLeads.lean",
+  "source_sha256": "9b736c71806fbddeaded513f2a9bf5726a0815faf93776c97914393032a771f8",
+  "checked_with": "Lean4.34.1 -j1",
+  "axioms_inspected": true,
+  "theorems": [
+    {
+      "name": "quadratic_resultant_bezout",
+      "scope": "Exact polynomial Bezout identity in an arbitrary commutative ring; reduction to characteristic2 is valid."
+    },
+    {
+      "name": "complementary_quotient_identity",
+      "scope": "Algebraic identity for commuting coefficient variables; not a formalization of curve endomorphisms."
+    },
+    {
+      "name": "complementary_cofactor_4232",
+      "scope": "23,F,V specialization conditional on F*V=2."
+    },
+    {
+      "name": "certified_combination_vanishes",
+      "scope": "Finite linear/polynomial combination of vanishing generators vanishes."
+    },
+    {
+      "name": "replayed_consequence_vanishes",
+      "scope": "Consequence conditional on exact certificate replay and original constraints."
+    },
+    {
+      "name": "complementary_map_kernel_certificate",
+      "scope": "Exact phi-kernel conditional on complementary map, separately certified h-kernel coverage and checked annihilation."
+    },
+    {
+      "name": "subgroup_injective_from_complementarity",
+      "scope": "Phi injective on a specified domain conditional on complementary map and injectivity of h-multiplication there."
+    }
+  ],
+  "not_formalized": [
+    "actual elliptic-curve group and cardinality",
+    "Frobenius/Verschiebung geometry",
+    "Boolean polynomial and matrix implementation",
+    "finite kernel coverage from order/point certificates",
+    "solver completeness at large parameters",
+    "full pipeline cost or a speedup"
+  ]
+}

@@ -1,0 +1,4113 @@
+{
+  "standing": "[pcc:unverified]",
+  "evidence_scope": "source-specific producer GitHub Actions release Rust, not independent EKS PCC, no external IC frontier",
+  "execution_date_utc": "2026-11-16",
+  "source_commit": "ca03804400d998efe17bb904aa8f757e92a6ff8f",
+  "workflow_run_id": 43840938217,
+  "job_id": 133209109179,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43840938217",
+  "immutable_original_stdout_json": {
+    "arms": [
+      "legacy_s3_sqrt",
+      "xfibre",
+      "xfibre_repeat"
+    ],
+    "candidate_over_legacy_ratio": 0.7832071303076147,
+    "candidate_paired_wins": 23,
+    "candidate_repeat_drift": 0.005863233866692297,
+    "cases_detail": [
+      {
+        "case": 0,
+        "known_answer_caller_verifier_only": 503233561,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15447204,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 5678831,
+                "s3_sqrts": 28800,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1393860829,
+                  "beta": 1248108152,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 503233561,
+                  "partition_indices": [
+                    74,
+                    141,
+                    3472
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9367367,
+                "verification_group_additions": 54,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 15449870,
+            "field_square_roots": 28800,
+            "position": 0,
+            "recovered_scalar": 503233561,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13672167,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 3686323,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1393860829,
+                  "beta": 1248108152,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 503233561,
+                  "partition_indices": [
+                    74,
+                    141,
+                    3472
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9595580,
+                "verification_group_additions": 54,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 13675168,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 503233561,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12598882,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 3046633,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1393860829,
+                  "beta": 1248108152,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 503233561,
+                  "partition_indices": [
+                    74,
+                    141,
+                    3472
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9152577,
+                "verification_group_additions": 54,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12601255,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 503233561,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1933516518,
+          1103665338
+        ]
+      },
+      {
+        "case": 1,
+        "known_answer_caller_verifier_only": 1798307283,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11256371,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 27,
+                "s3_pair_quadratics": 10368,
+                "s3_query_ns": 1791468,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1631324316,
+                  "beta": 174926450,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1798307283,
+                  "partition_indices": [
+                    26,
+                    139,
+                    13433
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9058898,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11258419,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 1798307283,
+            "rounds": 1,
+            "s3_pair_quadratics": 10368,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11257018,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 27,
+                "s3_pair_quadratics": 10368,
+                "s3_query_ns": 1813473,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1631324316,
+                  "beta": 174926450,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1798307283,
+                  "partition_indices": [
+                    26,
+                    139,
+                    13433
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9055772,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11259045,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1798307283,
+            "rounds": 1,
+            "s3_pair_quadratics": 10368,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12076298,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 27,
+                "s3_pair_quadratics": 10368,
+                "s3_query_ns": 2578645,
+                "s3_sqrts": 10368,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1631324316,
+                  "beta": 174926450,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1798307283,
+                  "partition_indices": [
+                    26,
+                    139,
+                    13433
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9099750,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 12078077,
+            "field_square_roots": 10368,
+            "position": 2,
+            "recovered_scalar": 1798307283,
+            "rounds": 1,
+            "s3_pair_quadratics": 10368,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          107921872,
+          534705625
+        ]
+      },
+      {
+        "case": 2,
+        "known_answer_caller_verifier_only": 2010227834,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 32885049,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 23402500,
+                "s3_sqrts": 147456,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9077431,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": false
+              },
+              {
+                "elapsed_cold_ns": 48620033,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 98,
+                "s3_pair_quadratics": 37632,
+                "s3_query_ns": 6727055,
+                "s3_sqrts": 37632,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1527440978,
+                  "beta": 1406147003,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2010227834,
+                  "partition_indices": [
+                    97,
+                    280,
+                    10885
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 8999495,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 48622053,
+            "field_square_roots": 185088,
+            "position": 0,
+            "recovered_scalar": 2010227834,
+            "rounds": 2,
+            "s3_pair_quadratics": 185088,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 20226548,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 10827483,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9002990,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": true
+              },
+              {
+                "elapsed_cold_ns": 32716488,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 98,
+                "s3_pair_quadratics": 37632,
+                "s3_query_ns": 3699685,
+                "s3_sqrts": 768,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1527440978,
+                  "beta": 1406147003,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2010227834,
+                  "partition_indices": [
+                    97,
+                    280,
+                    10885
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 8782143,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 32718511,
+            "field_square_roots": 1536,
+            "position": 1,
+            "recovered_scalar": 2010227834,
+            "rounds": 2,
+            "s3_pair_quadratics": 185088,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 20231910,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 11033304,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8802890,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": true
+              },
+              {
+                "elapsed_cold_ns": 32496051,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 98,
+                "s3_pair_quadratics": 37632,
+                "s3_query_ns": 3588793,
+                "s3_sqrts": 768,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1527440978,
+                  "beta": 1406147003,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2010227834,
+                  "partition_indices": [
+                    97,
+                    280,
+                    10885
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 8667622,
+                "verification_group_additions": 57,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 32497936,
+            "field_square_roots": 1536,
+            "position": 2,
+            "recovered_scalar": 2010227834,
+            "rounds": 2,
+            "s3_pair_quadratics": 185088,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1818263512,
+          800805394
+        ]
+      },
+      {
+        "case": 3,
+        "known_answer_caller_verifier_only": 647891661,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 18150032,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 309,
+                "s3_pair_quadratics": 118656,
+                "s3_query_ns": 8918567,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 407047390,
+                  "beta": 670902323,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 647891661,
+                  "partition_indices": [
+                    308,
+                    272,
+                    4520
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 8838255,
+                "verification_group_additions": 53,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 18151843,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 647891661,
+            "rounds": 1,
+            "s3_pair_quadratics": 118656,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 17978201,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 309,
+                "s3_pair_quadratics": 118656,
+                "s3_query_ns": 8945347,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 407047390,
+                  "beta": 670902323,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 647891661,
+                  "partition_indices": [
+                    308,
+                    272,
+                    4520
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 8651781,
+                "verification_group_additions": 53,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 17980066,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 647891661,
+            "rounds": 1,
+            "s3_pair_quadratics": 118656,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 28162368,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 309,
+                "s3_pair_quadratics": 118656,
+                "s3_query_ns": 18829307,
+                "s3_sqrts": 118656,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 407047390,
+                  "beta": 670902323,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 647891661,
+                  "partition_indices": [
+                    308,
+                    272,
+                    4520
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 8948795,
+                "verification_group_additions": 53,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 28164383,
+            "field_square_roots": 118656,
+            "position": 2,
+            "recovered_scalar": 647891661,
+            "rounds": 1,
+            "s3_pair_quadratics": 118656,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          1868112924,
+          1788014901
+        ]
+      },
+      {
+        "case": 4,
+        "known_answer_caller_verifier_only": 653468872,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13698051,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 54,
+                "s3_pair_quadratics": 20736,
+                "s3_query_ns": 4219625,
+                "s3_sqrts": 20736,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 35303595,
+                  "beta": 796788944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 653468872,
+                  "partition_indices": [
+                    53,
+                    347,
+                    1426
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 9080096,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 13700115,
+            "field_square_roots": 20736,
+            "position": 0,
+            "recovered_scalar": 653468872,
+            "rounds": 1,
+            "s3_pair_quadratics": 20736,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12121866,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 54,
+                "s3_pair_quadratics": 20736,
+                "s3_query_ns": 2576953,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 35303595,
+                  "beta": 796788944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 653468872,
+                  "partition_indices": [
+                    53,
+                    347,
+                    1426
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 9138955,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12123956,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 653468872,
+            "rounds": 1,
+            "s3_pair_quadratics": 20736,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11958065,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 54,
+                "s3_pair_quadratics": 20736,
+                "s3_query_ns": 2532880,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 35303595,
+                  "beta": 796788944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 653468872,
+                  "partition_indices": [
+                    53,
+                    347,
+                    1426
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 9005566,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11959892,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 653468872,
+            "rounds": 1,
+            "s3_pair_quadratics": 20736,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          2144621708,
+          317431782
+        ]
+      },
+      {
+        "case": 5,
+        "known_answer_caller_verifier_only": 1308137553,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10640778,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 7,
+                "s3_pair_quadratics": 2688,
+                "s3_query_ns": 1295751,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 264318038,
+                  "beta": 710052157,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1308137553,
+                  "partition_indices": [
+                    6,
+                    42,
+                    7446
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8937385,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 10642619,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 1308137553,
+            "rounds": 1,
+            "s3_pair_quadratics": 2688,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10556101,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 7,
+                "s3_pair_quadratics": 2688,
+                "s3_query_ns": 1255975,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 264318038,
+                  "beta": 710052157,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1308137553,
+                  "partition_indices": [
+                    6,
+                    42,
+                    7446
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8894770,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 10557797,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1308137553,
+            "rounds": 1,
+            "s3_pair_quadratics": 2688,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10422876,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 7,
+                "s3_pair_quadratics": 2688,
+                "s3_query_ns": 1350761,
+                "s3_sqrts": 2688,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 264318038,
+                  "beta": 710052157,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1308137553,
+                  "partition_indices": [
+                    6,
+                    42,
+                    7446
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8687277,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 10424554,
+            "field_square_roots": 2688,
+            "position": 2,
+            "recovered_scalar": 1308137553,
+            "rounds": 1,
+            "s3_pair_quadratics": 2688,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          184882598,
+          1743101710
+        ]
+      },
+      {
+        "case": 6,
+        "known_answer_caller_verifier_only": 1674130740,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13849894,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 68,
+                "s3_pair_quadratics": 26112,
+                "s3_query_ns": 4750197,
+                "s3_sqrts": 26112,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1075427304,
+                  "beta": 1647933014,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1674130740,
+                  "partition_indices": [
+                    67,
+                    144,
+                    8020
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8718533,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 13851549,
+            "field_square_roots": 26112,
+            "position": 0,
+            "recovered_scalar": 1674130740,
+            "rounds": 1,
+            "s3_pair_quadratics": 26112,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12340502,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 68,
+                "s3_pair_quadratics": 26112,
+                "s3_query_ns": 2892517,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1075427304,
+                  "beta": 1647933014,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1674130740,
+                  "partition_indices": [
+                    67,
+                    144,
+                    8020
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9074444,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12342293,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1674130740,
+            "rounds": 1,
+            "s3_pair_quadratics": 26112,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12389201,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 68,
+                "s3_pair_quadratics": 26112,
+                "s3_query_ns": 2894943,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1075427304,
+                  "beta": 1647933014,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1674130740,
+                  "partition_indices": [
+                    67,
+                    144,
+                    8020
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9088808,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12390832,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 1674130740,
+            "rounds": 1,
+            "s3_pair_quadratics": 26112,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1705402845,
+          1254250795
+        ]
+      },
+      {
+        "case": 7,
+        "known_answer_caller_verifier_only": 169604875,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12457592,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 70,
+                "s3_pair_quadratics": 26880,
+                "s3_query_ns": 2974840,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1332802736,
+                  "beta": 1092517060,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 169604875,
+                  "partition_indices": [
+                    69,
+                    126,
+                    8627
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9085111,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12459336,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 169604875,
+            "rounds": 1,
+            "s3_pair_quadratics": 26880,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12454084,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 70,
+                "s3_pair_quadratics": 26880,
+                "s3_query_ns": 2973078,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1332802736,
+                  "beta": 1092517060,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 169604875,
+                  "partition_indices": [
+                    69,
+                    126,
+                    8627
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9075633,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12455935,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 169604875,
+            "rounds": 1,
+            "s3_pair_quadratics": 26880,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14470760,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 70,
+                "s3_pair_quadratics": 26880,
+                "s3_query_ns": 5045008,
+                "s3_sqrts": 26880,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1332802736,
+                  "beta": 1092517060,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 169604875,
+                  "partition_indices": [
+                    69,
+                    126,
+                    8627
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9027798,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 14472546,
+            "field_square_roots": 26880,
+            "position": 2,
+            "recovered_scalar": 169604875,
+            "rounds": 1,
+            "s3_pair_quadratics": 26880,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          1070311093,
+          1684216134
+        ]
+      },
+      {
+        "case": 8,
+        "known_answer_caller_verifier_only": 743488326,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 31912051,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 22465790,
+                "s3_sqrts": 147456,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9027275,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": false
+              },
+              {
+                "elapsed_cold_ns": 49080727,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 134,
+                "s3_pair_quadratics": 51456,
+                "s3_query_ns": 8560945,
+                "s3_sqrts": 51456,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 772735127,
+                  "beta": 848596677,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 743488326,
+                  "partition_indices": [
+                    133,
+                    312,
+                    5105
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 8599758,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 49082470,
+            "field_square_roots": 198912,
+            "position": 0,
+            "recovered_scalar": 743488326,
+            "rounds": 2,
+            "s3_pair_quadratics": 198912,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 20691049,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 11204375,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9082574,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": true
+              },
+              {
+                "elapsed_cold_ns": 34364599,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 134,
+                "s3_pair_quadratics": 51456,
+                "s3_query_ns": 4616970,
+                "s3_sqrts": 768,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 772735127,
+                  "beta": 848596677,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 743488326,
+                  "partition_indices": [
+                    133,
+                    312,
+                    5105
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 9048680,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 34366863,
+            "field_square_roots": 1536,
+            "position": 1,
+            "recovered_scalar": 743488326,
+            "rounds": 2,
+            "s3_pair_quadratics": 198912,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 20405939,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 384,
+                "s3_pair_quadratics": 147456,
+                "s3_query_ns": 10954909,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 0,
+                "solution": {
+                  "status": "no_relation_in_bounded_sample"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9054839,
+                "verification_group_additions": 0,
+                "x_fibre_precompute": true
+              },
+              {
+                "elapsed_cold_ns": 33784432,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 1,
+                "s3_batch_inversions": 134,
+                "s3_pair_quadratics": 51456,
+                "s3_query_ns": 4561176,
+                "s3_sqrts": 768,
+                "seed": "13059d9221e52034",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 772735127,
+                  "beta": 848596677,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 743488326,
+                  "partition_indices": [
+                    133,
+                    312,
+                    5105
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23300,
+                "source_setup_ns": 8808334,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 33786374,
+            "field_square_roots": 1536,
+            "position": 2,
+            "recovered_scalar": 743488326,
+            "rounds": 2,
+            "s3_pair_quadratics": 198912,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          481623379,
+          207656740
+        ]
+      },
+      {
+        "case": 9,
+        "known_answer_caller_verifier_only": 2072461222,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12337669,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 3149730,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2097027943,
+                  "beta": 2146891394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2072461222,
+                  "partition_indices": [
+                    74,
+                    218,
+                    1275
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8795949,
+                "verification_group_additions": 59,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12339732,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 2072461222,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12608396,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 3192473,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2097027943,
+                  "beta": 2146891394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2072461222,
+                  "partition_indices": [
+                    74,
+                    218,
+                    1275
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9007275,
+                "verification_group_additions": 59,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12610247,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 2072461222,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14903986,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 75,
+                "s3_pair_quadratics": 28800,
+                "s3_query_ns": 5406949,
+                "s3_sqrts": 28800,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2097027943,
+                  "beta": 2146891394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2072461222,
+                  "partition_indices": [
+                    74,
+                    218,
+                    1275
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9098818,
+                "verification_group_additions": 59,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 14905801,
+            "field_square_roots": 28800,
+            "position": 2,
+            "recovered_scalar": 2072461222,
+            "rounds": 1,
+            "s3_pair_quadratics": 28800,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          1183149880,
+          666058373
+        ]
+      },
+      {
+        "case": 10,
+        "known_answer_caller_verifier_only": 1259155852,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12628049,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 37,
+                "s3_pair_quadratics": 14208,
+                "s3_query_ns": 3149662,
+                "s3_sqrts": 14208,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1731945518,
+                  "beta": 251080812,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1259155852,
+                  "partition_indices": [
+                    36,
+                    6,
+                    15285
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9080535,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 12629708,
+            "field_square_roots": 14208,
+            "position": 0,
+            "recovered_scalar": 1259155852,
+            "rounds": 1,
+            "s3_pair_quadratics": 14208,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11473530,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 37,
+                "s3_pair_quadratics": 14208,
+                "s3_query_ns": 2008763,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1731945518,
+                  "beta": 251080812,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1259155852,
+                  "partition_indices": [
+                    36,
+                    6,
+                    15285
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9057996,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11475094,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1259155852,
+            "rounds": 1,
+            "s3_pair_quadratics": 14208,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11347511,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 37,
+                "s3_pair_quadratics": 14208,
+                "s3_query_ns": 2135882,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1731945518,
+                  "beta": 251080812,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1259155852,
+                  "partition_indices": [
+                    36,
+                    6,
+                    15285
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8838193,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11349292,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 1259155852,
+            "rounds": 1,
+            "s3_pair_quadratics": 14208,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          179172960,
+          932121371
+        ]
+      },
+      {
+        "case": 11,
+        "known_answer_caller_verifier_only": 1855834329,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13948858,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 131,
+                "s3_pair_quadratics": 50304,
+                "s3_query_ns": 4600037,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 972943980,
+                  "beta": 937863766,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1855834329,
+                  "partition_indices": [
+                    130,
+                    19,
+                    13893
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8944314,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 13952282,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 1855834329,
+            "rounds": 1,
+            "s3_pair_quadratics": 50304,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14049899,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 131,
+                "s3_pair_quadratics": 50304,
+                "s3_query_ns": 4572916,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 972943980,
+                  "beta": 937863766,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1855834329,
+                  "partition_indices": [
+                    130,
+                    19,
+                    13893
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9070500,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14051744,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1855834329,
+            "rounds": 1,
+            "s3_pair_quadratics": 50304,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 17815912,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 131,
+                "s3_pair_quadratics": 50304,
+                "s3_query_ns": 8421552,
+                "s3_sqrts": 50304,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 972943980,
+                  "beta": 937863766,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1855834329,
+                  "partition_indices": [
+                    130,
+                    19,
+                    13893
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8987872,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 17817664,
+            "field_square_roots": 50304,
+            "position": 2,
+            "recovered_scalar": 1855834329,
+            "rounds": 1,
+            "s3_pair_quadratics": 50304,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          447327310,
+          961914339
+        ]
+      },
+      {
+        "case": 12,
+        "known_answer_caller_verifier_only": 693387075,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 16527246,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 103,
+                "s3_pair_quadratics": 39552,
+                "s3_query_ns": 7045873,
+                "s3_sqrts": 39552,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 331909335,
+                  "beta": 793822079,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 693387075,
+                  "partition_indices": [
+                    102,
+                    261,
+                    10895
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9075081,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 16529069,
+            "field_square_roots": 39552,
+            "position": 0,
+            "recovered_scalar": 693387075,
+            "rounds": 1,
+            "s3_pair_quadratics": 39552,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13325867,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 103,
+                "s3_pair_quadratics": 39552,
+                "s3_query_ns": 3853270,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 331909335,
+                  "beta": 793822079,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 693387075,
+                  "partition_indices": [
+                    102,
+                    261,
+                    10895
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9074295,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 13327680,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 693387075,
+            "rounds": 1,
+            "s3_pair_quadratics": 39552,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13296790,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 103,
+                "s3_pair_quadratics": 39552,
+                "s3_query_ns": 3818384,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 331909335,
+                  "beta": 793822079,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 693387075,
+                  "partition_indices": [
+                    102,
+                    261,
+                    10895
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9072747,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 13298476,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 693387075,
+            "rounds": 1,
+            "s3_pair_quadratics": 39552,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          482953369,
+          924466204
+        ]
+      },
+      {
+        "case": 13,
+        "known_answer_caller_verifier_only": 1442439472,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12402343,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 69,
+                "s3_pair_quadratics": 26496,
+                "s3_query_ns": 2914666,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 522645426,
+                  "beta": 52369706,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1442439472,
+                  "partition_indices": [
+                    68,
+                    84,
+                    11390
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9081881,
+                "verification_group_additions": 49,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12404150,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 1442439472,
+            "rounds": 1,
+            "s3_pair_quadratics": 26496,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12394609,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 69,
+                "s3_pair_quadratics": 26496,
+                "s3_query_ns": 2909947,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 522645426,
+                  "beta": 52369706,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1442439472,
+                  "partition_indices": [
+                    68,
+                    84,
+                    11390
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9086119,
+                "verification_group_additions": 49,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12396396,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1442439472,
+            "rounds": 1,
+            "s3_pair_quadratics": 26496,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14463310,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 69,
+                "s3_pair_quadratics": 26496,
+                "s3_query_ns": 4983440,
+                "s3_sqrts": 26496,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 522645426,
+                  "beta": 52369706,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1442439472,
+                  "partition_indices": [
+                    68,
+                    84,
+                    11390
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9070536,
+                "verification_group_additions": 49,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 14465002,
+            "field_square_roots": 26496,
+            "position": 2,
+            "recovered_scalar": 1442439472,
+            "rounds": 1,
+            "s3_pair_quadratics": 26496,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          1966092337,
+          1347403224
+        ]
+      },
+      {
+        "case": 14,
+        "known_answer_caller_verifier_only": 68668149,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 18429993,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 9197239,
+                "s3_sqrts": 56064,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 118249953,
+                  "beta": 1861766125,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 68668149,
+                  "partition_indices": [
+                    145,
+                    338,
+                    12014
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8846877,
+                "verification_group_additions": 44,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 18433491,
+            "field_square_roots": 56064,
+            "position": 0,
+            "recovered_scalar": 68668149,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14429099,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 5089262,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 118249953,
+                  "beta": 1861766125,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 68668149,
+                  "partition_indices": [
+                    145,
+                    338,
+                    12014
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8939624,
+                "verification_group_additions": 44,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14430956,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 68668149,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14264504,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 4834676,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 118249953,
+                  "beta": 1861766125,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 68668149,
+                  "partition_indices": [
+                    145,
+                    338,
+                    12014
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9031182,
+                "verification_group_additions": 44,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14266325,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 68668149,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          885557783,
+          1315813365
+        ]
+      },
+      {
+        "case": 15,
+        "known_answer_caller_verifier_only": 2045805107,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 17463777,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 266,
+                "s3_pair_quadratics": 102144,
+                "s3_query_ns": 8155509,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 543990701,
+                  "beta": 1740732228,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2045805107,
+                  "partition_indices": [
+                    265,
+                    247,
+                    8184
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 8923270,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 17467611,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 2045805107,
+            "rounds": 1,
+            "s3_pair_quadratics": 102144,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 17420478,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 266,
+                "s3_pair_quadratics": 102144,
+                "s3_query_ns": 7978410,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 543990701,
+                  "beta": 1740732228,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2045805107,
+                  "partition_indices": [
+                    265,
+                    247,
+                    8184
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 9043834,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 17422224,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 2045805107,
+            "rounds": 1,
+            "s3_pair_quadratics": 102144,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 24659367,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 266,
+                "s3_pair_quadratics": 102144,
+                "s3_query_ns": 15481921,
+                "s3_sqrts": 102144,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 543990701,
+                  "beta": 1740732228,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2045805107,
+                  "partition_indices": [
+                    265,
+                    247,
+                    8184
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 8791233,
+                "verification_group_additions": 48,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 24661145,
+            "field_square_roots": 102144,
+            "position": 2,
+            "recovered_scalar": 2045805107,
+            "rounds": 1,
+            "s3_pair_quadratics": 102144,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          199598638,
+          1810086315
+        ]
+      },
+      {
+        "case": 16,
+        "known_answer_caller_verifier_only": 898056352,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 21368717,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 203,
+                "s3_pair_quadratics": 77952,
+                "s3_query_ns": 12377314,
+                "s3_sqrts": 77952,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1353394358,
+                  "beta": 1272893721,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 898056352,
+                  "partition_indices": [
+                    202,
+                    360,
+                    2915
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8619265,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 21372547,
+            "field_square_roots": 77952,
+            "position": 0,
+            "recovered_scalar": 898056352,
+            "rounds": 1,
+            "s3_pair_quadratics": 77952,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15983602,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 203,
+                "s3_pair_quadratics": 77952,
+                "s3_query_ns": 6492319,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1353394358,
+                  "beta": 1272893721,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 898056352,
+                  "partition_indices": [
+                    202,
+                    360,
+                    2915
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9071488,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 15985389,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 898056352,
+            "rounds": 1,
+            "s3_pair_quadratics": 77952,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15857613,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 203,
+                "s3_pair_quadratics": 77952,
+                "s3_query_ns": 6358058,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1353394358,
+                  "beta": 1272893721,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 898056352,
+                  "partition_indices": [
+                    202,
+                    360,
+                    2915
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9092626,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 15859248,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 898056352,
+            "rounds": 1,
+            "s3_pair_quadratics": 77952,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1030358520,
+          169343673
+        ]
+      },
+      {
+        "case": 17,
+        "known_answer_caller_verifier_only": 863113529,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14375504,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 4934465,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 536826152,
+                  "beta": 29100115,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 863113529,
+                  "partition_indices": [
+                    145,
+                    10,
+                    5181
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9057338,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14379176,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 863113529,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14423327,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 4927660,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 536826152,
+                  "beta": 29100115,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 863113529,
+                  "partition_indices": [
+                    145,
+                    10,
+                    5181
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9088855,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14425034,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 863113529,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 18521273,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 146,
+                "s3_pair_quadratics": 56064,
+                "s3_query_ns": 9187863,
+                "s3_sqrts": 56064,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 536826152,
+                  "beta": 29100115,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 863113529,
+                  "partition_indices": [
+                    145,
+                    10,
+                    5181
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8934087,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 18522918,
+            "field_square_roots": 56064,
+            "position": 2,
+            "recovered_scalar": 863113529,
+            "rounds": 1,
+            "s3_pair_quadratics": 56064,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          191947599,
+          213258432
+        ]
+      },
+      {
+        "case": 18,
+        "known_answer_caller_verifier_only": 816314375,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13392733,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 57,
+                "s3_pair_quadratics": 21888,
+                "s3_query_ns": 4415558,
+                "s3_sqrts": 21888,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 860129284,
+                  "beta": 678576944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 816314375,
+                  "partition_indices": [
+                    56,
+                    35,
+                    14944
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8597500,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 13396957,
+            "field_square_roots": 21888,
+            "position": 0,
+            "recovered_scalar": 816314375,
+            "rounds": 1,
+            "s3_pair_quadratics": 21888,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12007326,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 57,
+                "s3_pair_quadratics": 21888,
+                "s3_query_ns": 2563711,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 860129284,
+                  "beta": 678576944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 816314375,
+                  "partition_indices": [
+                    56,
+                    35,
+                    14944
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9043688,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12009141,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 816314375,
+            "rounds": 1,
+            "s3_pair_quadratics": 21888,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11939715,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 57,
+                "s3_pair_quadratics": 21888,
+                "s3_query_ns": 2588029,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 860129284,
+                  "beta": 678576944,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 816314375,
+                  "partition_indices": [
+                    56,
+                    35,
+                    14944
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8966596,
+                "verification_group_additions": 47,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11941534,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 816314375,
+            "rounds": 1,
+            "s3_pair_quadratics": 21888,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1129934240,
+          876149010
+        ]
+      },
+      {
+        "case": 19,
+        "known_answer_caller_verifier_only": 1216754935,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11722000,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 64,
+                "s3_pair_quadratics": 24576,
+                "s3_query_ns": 2649923,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 409735275,
+                  "beta": 1850817607,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1216754935,
+                  "partition_indices": [
+                    63,
+                    283,
+                    3516
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8672188,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11725637,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 1216754935,
+            "rounds": 1,
+            "s3_pair_quadratics": 24576,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12116446,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 64,
+                "s3_pair_quadratics": 24576,
+                "s3_query_ns": 2891642,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 409735275,
+                  "beta": 1850817607,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1216754935,
+                  "partition_indices": [
+                    63,
+                    283,
+                    3516
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8850427,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12118239,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1216754935,
+            "rounds": 1,
+            "s3_pair_quadratics": 24576,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14205933,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 64,
+                "s3_pair_quadratics": 24576,
+                "s3_query_ns": 4813023,
+                "s3_sqrts": 24576,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 409735275,
+                  "beta": 1850817607,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1216754935,
+                  "partition_indices": [
+                    63,
+                    283,
+                    3516
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8993852,
+                "verification_group_additions": 52,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 14207961,
+            "field_square_roots": 24576,
+            "position": 2,
+            "recovered_scalar": 1216754935,
+            "rounds": 1,
+            "s3_pair_quadratics": 24576,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          557447827,
+          1431848741
+        ]
+      },
+      {
+        "case": 20,
+        "known_answer_caller_verifier_only": 1278759526,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14255163,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 58,
+                "s3_pair_quadratics": 22272,
+                "s3_query_ns": 4738273,
+                "s3_sqrts": 22272,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1504027050,
+                  "beta": 754886626,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1278759526,
+                  "partition_indices": [
+                    57,
+                    50,
+                    6739
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9117424,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 14257689,
+            "field_square_roots": 22272,
+            "position": 0,
+            "recovered_scalar": 1278759526,
+            "rounds": 1,
+            "s3_pair_quadratics": 22272,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12071606,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 58,
+                "s3_pair_quadratics": 22272,
+                "s3_query_ns": 2610640,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1504027050,
+                  "beta": 754886626,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1278759526,
+                  "partition_indices": [
+                    57,
+                    50,
+                    6739
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9044033,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12073639,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 1278759526,
+            "rounds": 1,
+            "s3_pair_quadratics": 22272,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12121886,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 58,
+                "s3_pair_quadratics": 22272,
+                "s3_query_ns": 2638441,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1504027050,
+                  "beta": 754886626,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1278759526,
+                  "partition_indices": [
+                    57,
+                    50,
+                    6739
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9088383,
+                "verification_group_additions": 50,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 12123878,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 1278759526,
+            "rounds": 1,
+            "s3_pair_quadratics": 22272,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          2109443473,
+          128154552
+        ]
+      },
+      {
+        "case": 21,
+        "known_answer_caller_verifier_only": 827809868,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 16878607,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 241,
+                "s3_pair_quadratics": 92544,
+                "s3_query_ns": 7413441,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 365060040,
+                  "beta": 554839522,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 827809868,
+                  "partition_indices": [
+                    240,
+                    4,
+                    2030
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9068076,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 16882776,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 827809868,
+            "rounds": 1,
+            "s3_pair_quadratics": 92544,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 16724879,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 241,
+                "s3_pair_quadratics": 92544,
+                "s3_query_ns": 7238748,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 365060040,
+                  "beta": 554839522,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 827809868,
+                  "partition_indices": [
+                    240,
+                    4,
+                    2030
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9087147,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 16726712,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 827809868,
+            "rounds": 1,
+            "s3_pair_quadratics": 92544,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 23978634,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 241,
+                "s3_pair_quadratics": 92544,
+                "s3_query_ns": 14912120,
+                "s3_sqrts": 92544,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 365060040,
+                  "beta": 554839522,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 827809868,
+                  "partition_indices": [
+                    240,
+                    4,
+                    2030
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8671977,
+                "verification_group_additions": 51,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 23980620,
+            "field_square_roots": 92544,
+            "position": 2,
+            "recovered_scalar": 827809868,
+            "rounds": 1,
+            "s3_pair_quadratics": 92544,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          357398074,
+          1414238628
+        ]
+      },
+      {
+        "case": 22,
+        "known_answer_caller_verifier_only": 435658062,
+        "outcomes": [
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12312760,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 32,
+                "s3_pair_quadratics": 12288,
+                "s3_query_ns": 2825541,
+                "s3_sqrts": 12288,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 411246996,
+                  "beta": 1517547861,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 435658062,
+                  "partition_indices": [
+                    31,
+                    122,
+                    10981
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 9082803,
+                "verification_group_additions": 56,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 12316915,
+            "field_square_roots": 12288,
+            "position": 0,
+            "recovered_scalar": 435658062,
+            "rounds": 1,
+            "s3_pair_quadratics": 12288,
+            "verified": true,
+            "x_fibre_precompute": false
+          },
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11314082,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 32,
+                "s3_pair_quadratics": 12288,
+                "s3_query_ns": 1958769,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 411246996,
+                  "beta": 1517547861,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 435658062,
+                  "partition_indices": [
+                    31,
+                    122,
+                    10981
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8971080,
+                "verification_group_additions": 56,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 11315861,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 435658062,
+            "rounds": 1,
+            "s3_pair_quadratics": 12288,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10893843,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 32,
+                "s3_pair_quadratics": 12288,
+                "s3_query_ns": 1839162,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 411246996,
+                  "beta": 1517547861,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 435658062,
+                  "partition_indices": [
+                    31,
+                    122,
+                    10981
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8656363,
+                "verification_group_additions": 56,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 10895611,
+            "field_square_roots": 768,
+            "position": 2,
+            "recovered_scalar": 435658062,
+            "rounds": 1,
+            "s3_pair_quadratics": 12288,
+            "verified": true,
+            "x_fibre_precompute": true
+          }
+        ],
+        "public_target": [
+          1792917232,
+          1620150026
+        ]
+      },
+      {
+        "case": 23,
+        "known_answer_caller_verifier_only": 478757230,
+        "outcomes": [
+          {
+            "arm": "xfibre",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13710980,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 141,
+                "s3_pair_quadratics": 54144,
+                "s3_query_ns": 4739488,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1507262338,
+                  "beta": 1460354276,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 478757230,
+                  "partition_indices": [
+                    140,
+                    319,
+                    6930
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8599248,
+                "verification_group_additions": 46,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 13715051,
+            "field_square_roots": 768,
+            "position": 0,
+            "recovered_scalar": 478757230,
+            "rounds": 1,
+            "s3_pair_quadratics": 54144,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "xfibre_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14129187,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 141,
+                "s3_pair_quadratics": 54144,
+                "s3_query_ns": 4831237,
+                "s3_sqrts": 768,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1507262338,
+                  "beta": 1460354276,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 478757230,
+                  "partition_indices": [
+                    140,
+                    319,
+                    6930
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8908039,
+                "verification_group_additions": 46,
+                "x_fibre_precompute": true
+              }
+            ],
+            "cold_wall_ns": 14131155,
+            "field_square_roots": 768,
+            "position": 1,
+            "recovered_scalar": 478757230,
+            "rounds": 1,
+            "s3_pair_quadratics": 54144,
+            "verified": true,
+            "x_fibre_precompute": true
+          },
+          {
+            "arm": "legacy_s3_sqrt",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 17865314,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 141,
+                "s3_pair_quadratics": 54144,
+                "s3_query_ns": 8771441,
+                "s3_sqrts": 54144,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1507262338,
+                  "beta": 1460354276,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 478757230,
+                  "partition_indices": [
+                    140,
+                    319,
+                    6930
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 8695126,
+                "verification_group_additions": 46,
+                "x_fibre_precompute": false
+              }
+            ],
+            "cold_wall_ns": 17867180,
+            "field_square_roots": 54144,
+            "position": 2,
+            "recovered_scalar": 478757230,
+            "rounds": 1,
+            "s3_pair_quadratics": 54144,
+            "verified": true,
+            "x_fibre_precompute": false
+          }
+        ],
+        "public_target": [
+          540236416,
+          1831086850
+        ]
+      }
+    ],
+    "classification": "generic pair-MITM equivalent, no new non-generic ECDLP",
+    "cofactor": 1,
+    "cold_total_ns": [
+      "461210284",
+      "361223183",
+      "359105247"
+    ],
+    "complete_verified_solves_per_arm": [
+      24,
+      24,
+      24
+    ],
+    "curve_n": 2147446831,
+    "curve_p": 2147483647,
+    "field_square_roots": [
+      1297536,
+      19968,
+      19968
+    ],
+    "fresh_target_count": 24,
+    "limitations": "development CI, nonisolated, no mature external IC/PCC, not asymptotic",
+    "method": "APS S3 x-only discriminant fibre precompute versus per-pair square root",
+    "no_source_y_or_group_additions_used_for_root_discovery": true,
+    "pair_s3_quadratics": [
+      1297536,
+      1297536,
+      1297536
+    ],
+    "passes_preregistered_development_gate": true,
+    "profile": [
+      384,
+      384,
+      16384
+    ],
+    "round_cap": 6,
+    "standing": "[pcc:unverified]"
+  }
+}

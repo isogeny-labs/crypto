@@ -1,0 +1,189 @@
+{
+  "schema": "jv-source-field-source-plan/v1",
+  "created": "2026-11-13T03:01:19.209139+00:00",
+  "formal": {
+    "project": "research/jv_source_field_audit_20261113/lean",
+    "theorem": "JVSourceFieldAudit.literal_jv_source_field_certificate",
+    "statement": "theorem literal_jv_source_field_certificate : Nat.card K=1030301 ∧ curve.Δ≠0 ∧ target≠0 ∧ (∀ u : F, algebraMap F K u≠targetX) ∧ descend 0 symmetric=f0 ∧ descend 1 symmetric=f1 ∧ descend 2 symmetric=f2 ∧ (∀ u v : F, SemaevS3.S3 a b (algebraMap F K u) (algebraMap F K v) targetX≠0) ∧ ∀ P Q : curve.Point, InFactorBase P → InFactorBase Q → P+Q≠target ∧ P+-Q≠target",
+    "decl_sha256": "673e67fcef6a969711fd6dfa83bf82af9ed5530f531c9cf409c397fef09b1752",
+    "scope": "Actual original first Joux-Vitse F101^3 empty toy: quotient field and cardinality1030301; actual nonsingular short curve and nonzero target outside base-field x; literal S3 symmetrization and actual basis-coordinate descent into printed source quadratics; no base-field S3 zero and no sum or signed sum of two actual factor-base points equals the target. Uses separately proved actual affine unit ideal and checked S3 point-group equivalence. No whole-curve order/scalar relations/second split example/minimal cutoff/exact Hilbert length8/generic regularity/internal F4 or native compiler refinement claim.",
+    "sources": [
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/ActualCurve.lean",
+        "bytes": 2298,
+        "sha256": "93db2ecf02344e91d308a2a66a2f912abadff2f894c3fc54323a13d9164e0935"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/ActualDecomposition.lean",
+        "bytes": 2502,
+        "sha256": "012901c7914f0a27ad621b71e7f89cb48d176c9477690f767fd4ddacec32eb81"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/SourceDescent.lean",
+        "bytes": 3603,
+        "sha256": "3a0ecea02e9fae36c64a260d41329d63ee1ac86ce8977342aea69b3b6524d43d"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/SourceField.lean",
+        "bytes": 5280,
+        "sha256": "3936429c1308af45a6322e02baa42d013b1736e9d8b35f524f23a64df7a3fb0d"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/lake-manifest.json",
+        "bytes": 4098,
+        "sha256": "c1f9f19ee36ac36e48b035209e63068592bc0c941ebaa812eef1731738bbabf7"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/lakefile.toml",
+        "bytes": 388,
+        "sha256": "79bd84f920b5248797a79d3d921219c1ea106b95139221b83d59de391fb46281"
+      },
+      {
+        "path": "research/jv_source_field_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+        "bytes": 2125,
+        "sha256": "51196e6a76de350be0ece641393f58240beff5eff9903e6d31bca85f75893ecb"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+        "bytes": 2914,
+        "sha256": "6f71f8014dee9a161b4a85efdacc7200611463f675c2d25893247f04c37c74c5"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "f18793a72f079915913fa45693b8eabe5a0e33c7c04ad51353ddcc1726517fc0"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lake-manifest.json",
+        "bytes": 3557,
+        "sha256": "21b41c4e076c955374b730d6cc0a6c09033563089eab25dd0989b5084ff43c91"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/jv_source_field_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 11177,
+      "sha256": "91efd59ac854bd853245b249a6741092880911ab76fc757a142b84b4692ec98f"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/evidence/attempts.json",
+      "bytes": 5044,
+      "sha256": "7dd4b788dafb630236594534712613a78539643a478ddc2ac82a1e1df5d94f54"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 1848,
+      "sha256": "92ad4114a0996b943c2b75783ef642002dc473a1ff7f464e17741adf86ffb908"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/evidence/gate.json",
+      "bytes": 1165,
+      "sha256": "78316780d0e3e49203f817da58044f7ee35af3345bcf8b08b38b27297f554043"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/evidence/source-review.json",
+      "bytes": 1436,
+      "sha256": "1d5e1bb6af78fc942a32e0d39688536f87b532c321c5aba1cf9c0b3f5283202a"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/proof-map.json",
+      "bytes": 1758,
+      "sha256": "9ac5b2718c0907b0e9c5580d63b548f18ecbe063a6838aa5085f301f31386949"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/render_report.py",
+      "bytes": 7987,
+      "sha256": "0cf73a883aa7ce377a136f8675bc2750ee7a1b488d5e875b80cb4e23afd8e70d"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/reports/layout.json",
+      "bytes": 180,
+      "sha256": "f1e7173d561846a362639d48bf03d03c7b14c35736abb8fe08cb39719615b987"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/reports/proof-flow.svg",
+      "bytes": 1523,
+      "sha256": "c3de832d8ebcb0914ddaaeaa302890131c472ccb78d203d734d3c24b552adc60"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/reports/report.pdf",
+      "bytes": 47479,
+      "sha256": "946bfef6dce2b2ab341dde7bf45923e3b83215af4a13ab261bbce2a6002087f5"
+    },
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/source-review.json",
+      "bytes": 1540,
+      "sha256": "26a7c2a10b9d958ca3e5d4ff374cedc21817aaec1d986cbbcc5e8bf09051e183"
+    }
+  ],
+  "gate": {
+    "archive": "research/jv_source_field_audit_20261113/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_declarations": 59,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/jv_source_field_audit_20261113/evidence/attempts.tar.gz",
+    "files": 29,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "source_extension_field_descent_proved": true,
+    "actual_point_group_obstruction_proved": true,
+    "whole_curve_order_proved": false,
+    "source_scalar_relations_proved": false,
+    "generic_JV_proved_or_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_storage_upload": 0
+  }
+}
