@@ -451,3 +451,17 @@ Neednewusefulrelationarrivalmechanism/strongcomplete-costcase,broadgoalopen. PR4
 
 ### Errors
 No scientificfailures/retries. Initialunexecutedcheckpointamendedprospectivelywithstrongercontrol;onlyfinalrunexecuted.
+
+## Largerfieldholdout frozen
+
+### What was done
+Fixed6unseenfields:g2 251/1021,g3 211/421,g4 181/271;firstalgebraicallyeligiblec1..32. Fresh2targetspersourceD/17Dfromfixedseed,4unchangedmethods2repeats=192expectedcalls. CopiedqualificationonlypointorderBSGSbudget20000→200000beforeexecution; exactoperator/map/subgroupchecksretained. Nativewrapperdisablecountersduringcommonqualification,enablewholefreshsolve.
+
+### Decisions made
+Noeligibility/runtime-basedfieldreplacement. Allmissing/incompletearmsretained,nomoreanchors/walkbudget. Requireexactreturn/repeat/prefix/flagchecks,nottenfoldcriterion. 600swatchdog,no retry,GitcustodywhileS3down. Thisexpandsscope,notgenericnewmathproof.
+
+### Open threads
+Executeonceafterpushedfreeze,pollsamehandle,retainallcoverage/censoring. Broadgoalopen.
+
+### Errors
+FoundoldfixtureactualBSGSbudget20000duringinspection;prospectivelyraisedcopiedqualificationbudgetratherthansilentlychangingoldsourceorexcludinglargerfields. No scientificrunyet.
