@@ -51,3 +51,24 @@
 
 ### Errors
 - 40 library tests PASS, 2/3 example tests PASS, 1 test failed because `n` vs `0` noncanonical encoding; 1024 measurement did not run. Fixed in PR #4513.
+
+
+## 2026-11-17 05:34 UTC — complete 1024Q source-specific index-calculus result
+
+### What was done (commands, files, features)
+- Exact-source [Actions #44024919023](https://github.com/isogeny-labs/crypto/actions/runs/44024919023) **SUCCESS** on SHA `52b977cd3bb62ca78038a9d88479051b64ee8be2`: 40/40 original Rust library tests, 3/3 new Rust example tests and **1024/1024 complete unknown-scalar `PRIME31` recoveries**. Setup full rank 61/61 and all basis point replays; solver `[k]G=Q` checked, separately caller scalar checks matched every one. Raw artifact [14302631901](https://github.com/isogeny-labs/crypto/actions/runs/44024919023/artifacts/14302631901), GitHub sha256 `707d78965e3df25ede8a4ac6e4b107ba4558fca42a0a372341707fd790d73a58`.
+- Full cold once-per-curve setup **1733.483919 ms**, 1024 target descents total **1029.610760 ms**, charged complete batch **2763.094679 ms**, **1.00547926 ms per-target descent excluding setup**, **2.69833 ms per target including setup**. Full setup+descents at Q=1/64/256/512/1024 was 1734.081472 / 1813.225204 / 2008.244089 / 2246.585790 / 2763.094679 ms, all targets correct at every prefix.
+- Committed full method/result report `research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_IC_1024Q_RESULT_20261117.md`. Raw evidence preserved by exact-source CI. No separate signed PCC or matched strongest-rho yet.
+
+### Decisions made (and why)
+- Promote to **complete Rust multi-target index-calculus-derived scalar recovery** at this precise producer-development scope. Do **not** claim stronger optimized rho or external index-calculus victory: old rho32 24-Q was different host/target roster; our 4+4 group table remains generic MITM-equivalent, and amortization is classical.
+- 1 cold target is ~1.734 seconds, so a lower post-setup target time must not be substituted for a single cold ECDLP result.
+- The original WZ source-specific CI remains a build failure before any rho runs, not performance evidence.
+
+### Open threads
+- Same CPU and **identical 1024 Q** optimized native rho32, tuned WZ and **precomputed BSGS** comparison; include setup/memory and paired A/A statistics, preserve all failed/capped arms. This run did not run these comparators.
+- Nonenumerative RR9/S9 factor extraction from public residual, not generic half-table support enumeration.
+- PR review/independent signed PCC and tracked validation required for ranking.
+
+### Errors
+- After fixing `n` vs canonical `0` row, first sparse build omitted two source modules: [run 44024807315](https://github.com/isogeny-labs/crypto/actions/runs/44024807315) failed on missing `src/cryptanalysis/f4_fp_tower.rs`, not cryptanalysis. Corrected immutable checkout to include original `src/cryptanalysis` source only (SHA `52b977c`) without changing solver. Successful source-specific results above; failed runs retained.
