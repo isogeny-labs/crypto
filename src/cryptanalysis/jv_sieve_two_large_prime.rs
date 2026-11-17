@@ -31,11 +31,13 @@ pub use counted_linear::CountedRelationSystem;
 #[path = "jv_sparse_kernel.rs"]
 pub mod sparse_kernel;
 
-#[path = "jv_sparse_collection_rank.rs"]
-mod sparse_collection_rank;
 #[path = "jv_extension_sparse_dlp.rs"]
 mod extension_sparse_dlp;
-pub use extension_sparse_dlp::{run_extension_sparse_dlp_on, ExtensionSparseDlpOptions};
+#[path = "jv_sparse_collection_rank.rs"]
+mod sparse_collection_rank;
+pub use extension_sparse_dlp::{
+    run_extension_sparse_dlp_on, run_extension_sparse_table_dlp_on, ExtensionSparseDlpOptions,
+};
 pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
 
 #[path = "jv_homogeneous_quotient.rs"]
