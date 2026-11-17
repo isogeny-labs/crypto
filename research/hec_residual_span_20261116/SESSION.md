@@ -3115,3 +3115,10 @@ What was done: compiled2coldreplaysperoriginalfixture ofqualifiednormalizedHIC w
 Decisions made: currentquarticsetup/onlineonly favorablelowerbounds;notwallCPU/asymptotic/isogenyimpossibilityclaim. Checkanticipatedsetup33/16bound,retainalloutcomes. Gitfreeze precedes sole600CPUprocess.
 Open threads: executematchedscreen; ifnegativeprioritizenewstructuralcostmechanismforgenus2+overgenericPicoptimizations;fullgoalactiveunachieved.
 Errors: unusedimport/helpercompilewarningsonly.Noscientificexecutionyet.
+
+## Matched original IC screen rejects current generic Smith cost case
+
+What was done: freeze060550ae54c hashespass/exit0;4freshoriginalnormalizedcoldsolves reproduceoldfullvectors/reports,independentfinalverificationcharged. BaselineC=(26310,500,559,32)/(34857,669,489,32). Candidate setupvectors(558405,1440,12915,66)/(526763,1552,13983,66) dominateeachbaselineby33/16underdeclaredproxy. Currentonlinealonebounds1.767-2.405alsofail10x.
+Decisions made: negativeprice-familyresultnotCPU/wall/asymptotic/isogenyimpossibilitytheorem. Preservecorrecttransport/solves,butstopgenericPic/scheduler tuningasprimarybreakthroughroute. Neednewstructuralconstraint/costmechanism;nofurtheromitted-costchargescanrescuethiscandidateproxy.
+Open threads: literature/atlas-screenearlierindependentconstraintorwork-eliminationmechanismwithmathcostcaseonoriginalg2/3/4;matchedrho/hostmodelledgerseparate;full10xgoalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure;unusedimport/helpercompilewarnings.Gitcustody/noS3/no merge.
