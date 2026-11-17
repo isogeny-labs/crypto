@@ -24,9 +24,11 @@ ARMS = {
 
 
 def rows(paths):
+    import gzip
     out = []
     for p in paths:
-        out += [json.loads(l) for l in open(p) if l.strip()]
+        fh = gzip.open(p, "rt") if p.endswith(".gz") else open(p)
+        out += [json.loads(l) for l in fh if l.strip()]
     return out
 
 
@@ -51,7 +53,9 @@ def by_arm(rs, name, prefix=False):
     return d
 
 
-new = rows(sorted(glob.glob(os.path.join(HERE, "p*.jsonl"))))
+# Data are committed gzipped (the plain .jsonl exceed the artifact store's 64 KB
+# threshold); a plain copy beside its .gz is the same rows (duplicates must match).
+new = rows(sorted(glob.glob(os.path.join(HERE, "p*.jsonl")) + glob.glob(os.path.join(HERE, "p*.jsonl.gz"))))
 lean = rows(sorted(glob.glob(os.path.join(RES, "genus4_lean_rho_20261116", "p*.jsonl"))))
 older = rows([os.path.join(RES, "genus4_rho_refs_20261116", "run.jsonl")]
              + sorted(glob.glob(os.path.join(RES, "genus4_scale_20261116", "p*.jsonl"))))
