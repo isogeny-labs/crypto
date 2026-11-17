@@ -1025,3 +1025,17 @@ Find an admissible incidence filter or a different useful-rank mechanism with a 
 
 ### Errors
 Initial source-path guess orbit-core/binomial.rs did not exist; inspected actual incremental/pencil sources. No failed or hidden runtime attempt. Git custody, no S3 polling.
+
+## Streaming completed-bucket gate measured
+
+### What was done
+Frozen3aef9b6acc0 once-only run completes all32workloads/64calls, with1017independent prefix checks and128repeated modulus records. Same source/target scalar results verify. Implemented fixed16point batches and emitted exhausted residual buckets before anchor scan completion.
+
+### Decisions made
+Close this fixed scheduling candidate as tenfold route: base-field REDC ratio at best1.1423 and subgroup ratios mixed, including0.6333regression. No adaptive batch tuning/fullwall/novelty claim. Preserve classical method and full setup/finalchecks. Goal remains active.
+
+### Open threads
+A stronger independent-relation mechanism or complete-cost construction is needed; neither higher-dimensional all-pairs nor stream scheduling supplies it.
+
+### Errors
+No runtime/gate failure or retry. No S3 polling, cloud spending or old-baseline rerun.
