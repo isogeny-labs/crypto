@@ -269,3 +269,17 @@ Runonce; onlythenprospectiveall18solverprefix/countcomparisonwithsharedsetup.
 
 ### Errors
 No runtimeexecutedyet; originalphase/priorfreezesunchanged.
+
+## Sharedsetup320pass; equalintegrationfrozen
+
+### What was done
+At d9fc09110a9 all320FB/z/characterexactchecks passEXIT0. SelectedsetupREDCold/new8936/682,10658/610,12914/766; additions/storageincreaseexplicit. AppliedsamepreparetoPencil/Folded/Expandedcopies, unchangedwalks/rows/solver; prospectiveall54prefix/referencepairsand108repeatcountedsolves.
+
+### Decisions made
+No setupcomponentpromotion. Sharedoptimizationallcontrols equally; requireexactk/relations/trials/anchor/parameter andfullfreshcountvectors beforecomparison. No timing/noisegate rerun.
+
+### Open threads
+Executeintegrationgateafterpushedfreeze; broadobjectiveopen.
+
+### Errors
+No320gatefailure/retry. Localcompileunusedimports/fieldswarningsretained; noarithmeticsourcechangesoutsidepreparation.
