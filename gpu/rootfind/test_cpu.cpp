@@ -162,6 +162,18 @@ static U256x64 rand256_below(std::mt19937_64 &rng, const U256x64 &p) {
     }
 }
 
+/* Independent frozen pre-optimization exponentiation reference. */
+static U256x64 fp256_inv_bitwise_reference(const Fp256Ctx &f, const U256x64 &a) {
+    U256x64 e = f.p;
+    e.v[0] -= 2;
+    U256x64 acc = f.one;
+    for (int i = 255; i >= 0; --i) {
+        acc = fp256_sqr(f, acc);
+        if ((e.v[i >> 6] >> (i & 63)) & 1) acc = fp256_mul(f, acc, a);
+    }
+    return acc;
+}
+
 static void test_fp256(std::mt19937_64 &rng) {
     Fp256Ctx f = fp256_ctx_p256();
     /* constants: R mod p and R^2 mod p from the canonical definition */
@@ -188,17 +200,34 @@ static void test_fp256(std::mt19937_64 &rng) {
         if (!u256_is_zero(a)) {
             U256x64 inv = fp256_inv(f, am);
             CHECK(u256_eq(fp256_mul(f, inv, am), f.one), "p256 inv it=%d", it);
+            CHECK(u256_eq(inv, fp256_inv_bitwise_reference(f, am)),
+                  "p256 sparse exponent vs reference it=%d", it);
         }
     }
     /* p-1 squared is 1 */
     U256x64 pm1 = f.p; pm1.v[0] -= 1;
     U256x64 pm1m = fp256_to_mont(f, pm1);
     CHECK(u256_eq(fp256_from_mont(f, fp256_mul(f, pm1m, pm1m)), one), "(p-1)^2 == 1 (p256)");
-    for (int n : {1, 5, 16}) {
+    U256x64 zero = {{0, 0, 0, 0}};
+    CHECK(u256_eq(fp256_inv(f, zero), zero), "p256 zero inverse convention");
+    U256x64 sentinel[1] = {f.one}, scratch0[1] = {f.one};
+    fp256_batch_inv(f, sentinel, 0, scratch0);
+    CHECK(u256_eq(sentinel[0], f.one) && u256_eq(scratch0[0], f.one),
+          "p256 empty batch no-op");
+    for (int n : {1, 2, 5, 16, 32}) {
         std::vector<U256x64> x(n), s(n), orig(n);
-        for (int i = 0; i < n; i++) { x[i] = fp256_to_mont(f, rand256_below(rng, f.p)); orig[i] = x[i]; }
+        for (int i = 0; i < n; i++) {
+            U256x64 a = rand256_below(rng, f.p);
+            if (u256_is_zero(a)) a = one;
+            x[i] = fp256_to_mont(f, a);
+            orig[i] = x[i];
+        }
         fp256_batch_inv(f, x.data(), n, s.data());
-        for (int i = 0; i < n; i++) CHECK(u256_eq(fp256_mul(f, x[i], orig[i]), f.one), "p256 batch_inv n=%d", n);
+        for (int i = 0; i < n; i++) {
+            CHECK(u256_eq(fp256_mul(f, x[i], orig[i]), f.one), "p256 batch_inv n=%d", n);
+            CHECK(u256_eq(x[i], fp256_inv_bitwise_reference(f, orig[i])),
+                  "p256 batch vs bitwise reference n=%d i=%d", n, i);
+        }
     }
 }
 
