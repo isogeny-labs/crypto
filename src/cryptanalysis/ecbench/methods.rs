@@ -1967,6 +1967,38 @@ pub struct SolverStats {
     pub degree_of_regularity_forecast: Option<crate::cryptanalysis::dreg_forecast::Forecast>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forecast_unavailable: Option<String>,
+    /// Measured degree-fall observables of the solve (diagnostic, never priced
+    /// into `S`, outside the replay comparison, never a stopping rule). A
+    /// **degree fall** at working degree `d` is a step producing a fresh
+    /// generator of degree `< d`, the constant `1`, or a realized Hilbert value
+    /// below the semi-regular prediction. `first_fall_degree` is the smallest
+    /// such `d` over the run, `last_fall_degree` the largest, and
+    /// `degree_of_regularity_observed` the first degree the realized Hilbert
+    /// series goes non-positive (distinct from the advisory forecast above).
+    /// Present only for polynomial-system solves; absent on sparse-LA, generic
+    /// or table families and on records written before the fields existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    /// The total (sum over solver calls) solving degree.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solving_degree_sum: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Per-working-degree history of the richest solver call, for the trace
+    /// drawing (relations/steps against degree, coloured by fall intensity).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
+    /// Which cost story this block carries, so a reader never mistakes an
+    /// absent degree for a measured one: `polynomial-system` (Gröbner /
+    /// Macaulay / Semaev — the degree fields are measured), `sat`, `sparse-la`
+    /// (block-Wiedemann / Markowitz mod r), `generic-transfer`, or
+    /// `table-enumeration`. The degree fields are populated only for
+    /// `polynomial-system`; elsewhere they are absent by construction, not
+    /// missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_story: Option<String>,
 }
 
 impl SolverStats {
@@ -2031,6 +2063,13 @@ impl SolverStats {
             sat_restarts: if sat { get(&["restarts"]) } else { None },
             sat_learnt_clauses: if sat { get(&["learnt_clauses"]) } else { None },
             extra: x.clone(),
+            first_fall_degree: solver.first_fall_degree,
+            last_fall_degree: solver.last_fall_degree,
+            solving_degree_sum: (solver.solving_degree_sum > 0)
+                .then_some(solver.solving_degree_sum),
+            degree_of_regularity_observed: solver.degree_of_regularity_observed,
+            degree_trace: solver.degree_trace.clone(),
+            degree_story: Some(if sat { "sat" } else { "polynomial-system" }.to_string()),
             degree_of_regularity_forecast: None,
             forecast_unavailable: None,
         }
