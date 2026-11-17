@@ -28,3 +28,25 @@
 
 - KB MCP and Conductor tools not present in connector runtime; explicit fallback to GitHub prior-research paths and primary papers. No local `cargo`, repository checkout or auth to EKS runner; source-specific GitHub Actions used for tests instead.
 - No source-correctness or mathematical failure observed in first partial CI. The later chart code required separate CI, so no passing claim made for it prematurely.
+
+## 2026-11-17T07:39Z — direct monic factor extension and complete producer CI
+
+### What was done (commands, files, features)
+
+- Precommitted Extension C to public RR9 protocol (`56204322654ff6398cd9df4ed9b36c5050e999a0`), then implemented `rr9_signed_chart_monic_factor` on the seven-normalized signed-chart coordinates (`4680ec0578eb85138c84c5afdad4f9d4619f851f`). The direct identity is `M=(X²+rX+r²+a)V²-(X-r)A²-2sAV`. Code checks the separately computed normalized full x-norm quotient for each of 64 distinct and six repeated signed-leaf cases, plus all 70 altered-target-preserving negative controls, with no caller secret or support enumeration inside the predicate.
+- **Exact-source GitHub Actions #44039910636 SUCCESS** on `4680ec0578eb85138c84c5afdad4f9d4619f851f`. Rust 1.100.0; 40 original library and 5 RR9 example tests passed. The standalone run checked both real B31 bases, each 32 positive + 32 negative original RR9 determinant decisions. Asserted 70 positive public norm and direct monic factor confirmations + 70 target-preserving altered-F negative controls and 70 signed chart round-trips without failure. Producer-level [pcc:unverified]. Raw artifact id 14308623652, SHA256 `40664cacbb8f80ab6d45f20d2c21a9b8688c5312082aa2d0a1d14c781967d7fe`.
+- Prior signed-chart-only source CI #44039385332 also succeeded. Published updated report `research/prime31_ic_20261115/rr9/RR9_PUBLIC_COEFFICIENT_GATE_RESULT_20261117.md` with proof, exact source, raw receipt, prior lead audit and next seven-variable elimination gate. No new unknown-target full logarithms, benchmark or paid compute this run.
+
+### Decisions made (and why)
+
+- The signed-chart polynomial eliminates a full norm and synthetic division from a *given-F membership test*. This is a mathematical and Rust algebraic component success at the scope tested; cost-vs-BSGS extrapolation or algorithmic non-generic novelty is unsupported.
+- Keep signed PCC outstanding, and separate the **complete observed validation of supplied certificates** from the **not-yet-implemented extraction of F from R**.
+
+### Open threads (unfinished, pick up next time)
+
+- Construct seven-variable quotient/F4 solver on blinded B4/B8 public-only R, recover all exact signed fibres without enumerating candidate factor-base supports, and compare to independent exhaustive test-only controls; later B31 cold full unknown-Q logs against equal-precompute BSGS and tuned rho.
+- Complete independent signed PCC and compile from current main once sparse-dependency restoration lands; present CI checks only for pinned native source.
+
+### Errors (what went wrong, how it was handled)
+
+- No compilation failure in successful exact-source Rust controls. Older source run #44038934515 did not cover the chart; newest source run #44039910636 explicitly covers the full direct formula and supersedes earlier evidence. KB/Conductor/local Rust missing as documented above.
