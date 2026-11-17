@@ -1,6 +1,6 @@
 # RR9 B8 certificate follow-up
 
-Both frozen negative residuals have independently verified 8,713-byte branch certificates and 86,124-byte sign-independent polynomial identities. The frozen positive recovered its chart and replayed on the original curve. This work uses only the three frozen B8 residuals from the previous pilot. It measures certificate correctness, size, and single-host timings. It does not establish an index-calculus speedup.
+Both frozen negative residuals have independently verified 8,713-byte branch certificates and 86,124-byte sign-independent polynomial identities. The frozen positive recovered its chart and replayed on the original curve. This work uses only the three frozen B8 residuals from the previous pilot. It measures certificate correctness, size, and single-host timings. It does not establish an index-calculus speedup. [pcc:unverified]
 
 ## Sign-independent certificate generation
 
@@ -18,7 +18,7 @@ A support bitmap over the 3,432 monomials of total degree at most seven plus can
 
 ## Signed branch certificate
 
-For each prescribed abscissa x and canonical curve square root y, let d=x-r and use L±=dA(x)+(s±y)V(x). On these fixtures d is nonzero. The evaluation equation q obeys L+L−=-dq. The verifier checks the polynomial product identity against the independently reconstructed RR9 equations. A contradiction for each sign assignment therefore rules out a common zero, including over the algebraic closure. Each certificate stores the coefficients of an exact affine combination equal to one and proves collective branch coverage using a 256-entry bitmap.
+For each prescribed abscissa x and canonical curve square root y, let d=x-r and use L±=dA(x)+(s±y)V(x). On these fixtures d is nonzero. The evaluation equation q obeys L+L−=-dq. The verifier checks the polynomial product identity against the independently reconstructed RR9 equations. A contradiction for each sign assignment therefore rules out a common zero, including over the algebraic closure. Each certificate stores the coefficients of an exact affine combination equal to one and proves collective branch coverage using a 256-entry bitmap. [pcc:unverified]
 
 Both negatives needed all 256 leaves and 510 incremental row insertions. The proof is 8,713 bytes, about 56× smaller than the earlier text identity. The proof forms differ. Replay rejected a modified affine multiplier and a missing leaf. The positive used the first sign branch, generated a 34-byte chart witness, and independently replayed the seven chart coefficients and the original-curve point sum.
 

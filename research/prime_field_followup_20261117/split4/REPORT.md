@@ -18,7 +18,7 @@ All numbers cover both base laws and six targets each. Wall time is the median o
 | Full matrix-free x-only join | 32,768 | 514,954 | 65,536 | 6.328 ms |
 | Matrix-free x-only join, four-row blocks | 1,024 | 12,681,100 | 2,097,152 | 124.227 ms |
 
-The full x-only form saves some y-coordinate arithmetic and halves the number of keys. Its median paired time ratio was about 1.73×. This is a useful generic constant/memory improvement for signed-pair support matching. It misses the subquadratic advancement criterion. Blocking guarantees linear entry storage but scans the right side once for every block, paying cubic work. The x-only method uses rational lifts that were common inputs to all arms. Timing excludes generating those bases and the explicit post-build correctness oracle. The calculation collects relations for fixed public residuals and recovers no logarithms.
+The full x-only form saves some y-coordinate arithmetic and halves the number of keys. Its median paired time ratio was about 1.73×. This is a useful generic constant/memory improvement for signed-pair support matching. It misses the subquadratic advancement criterion. Blocking guarantees linear entry storage but scans the right side once for every block, paying cubic work. The x-only method uses rational lifts that were common inputs to all arms. Timing excludes generating those bases and the explicit post-build correctness oracle. The calculation collects relations for fixed public residuals and recovers no logarithms. [pcc:unverified]
 
 ## Replay
 
