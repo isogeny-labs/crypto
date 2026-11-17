@@ -884,7 +884,8 @@ mod complete_b31_1024_tests {
             table.entry(baby).or_insert(j);
             baby = ar.add(PRIME31, baby, Some(PRIME31.g));
         }
-        let minus_mg = ar.neg(PRIME31, ar.scalar(PRIME31, M, Some(PRIME31.g)));
+        let mg = ar.scalar(PRIME31, M, Some(PRIME31.g));
+        let minus_mg = ar.neg(PRIME31, mg);
         let mut giant = q;
         for i in 0..=(PRIME31.n / M + 1) {
             if let Some(&j) = table.get(&giant) {
