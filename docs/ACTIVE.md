@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Measure whether a Schroeppel-Shamir-style O(B)-memory 3-sum oracle beats the O(B^2) pair table for m=3 decompositions in prime-field IC (claude, started 2026-11-17, branch claude/ic-3sum-lowmem-20261117)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
