@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "toy-order-2-kernel",
+  "description": "Synthetic order-2 component checked only after multiplication by 2.",
+  "torsion_components": [
+    {"label": "H2", "prime": "2", "exponent": 1}
+  ],
+  "obligations": {
+    "group_structure": {"status": "verified", "evidence": "synthetic Z/2 fixture"},
+    "point_on_curve": {"status": "not_applicable", "evidence": "abstract module fixture"},
+    "input_domain": {"status": "not_applicable", "evidence": "abstract module fixture"},
+    "scalar_binding": {"status": "verified", "evidence": "fixed synthetic relation"},
+    "coefficient_bounds": {"status": "not_applicable", "evidence": "fixed coefficient"},
+    "map_actions": {"status": "not_applicable", "evidence": "integer scalar action only"}
+  },
+  "relations": [
+    {
+      "name": "weak_times_two",
+      "evidence": "synthetic [2] relation",
+      "matrix": [["2"]]
+    }
+  ],
+  "repair_candidates": [
+    {
+      "name": "redundant_times_four",
+      "evidence": "negative-control [4] relation",
+      "cost": 1,
+      "matrix": [["4"]]
+    },
+    {
+      "name": "bind_with_odd_scalar",
+      "evidence": "synthetic [7] relation",
+      "cost": 7,
+      "matrix": [["7"]]
+    }
+  ]
+}
