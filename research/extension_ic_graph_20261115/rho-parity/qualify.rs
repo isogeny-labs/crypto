@@ -200,3 +200,121 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn nested_rayon_hooks_are_owned_and_counted() {
+        use rayon::prelude::*;
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap();
+        pool.install(|| {
+            work::claim();
+            work::set_moduli(101, 103);
+            work::enable(true);
+            let before = work::snapshot();
+            (0..17).into_par_iter().for_each(|_| {
+                work::hook_mul(101);
+                work::hook_add(103);
+            });
+            let counts = work::prims_json(&work::snapshot().since(&before).total());
+            work::enable(false);
+            assert_eq!(counts["field_mul"], 17);
+            assert_eq!(counts["modr_add"], 17);
+            assert_eq!(work::foreign(), 0);
+        });
+    }
+    #[test]
+    fn backend_refusals_and_malformed_roots_remain_errors() {
+        let spec = cover::generate_spec(101, 409);
+        let ctx = cover::Ctx::new(&spec);
+        let opts = cover::jv_options(24, 30.0);
+        let mut rng = StdRng::seed_from_u64(13);
+        let base = cover::factor_base(&ctx, &mut rng);
+        let by_x = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+        assert!(nagao::decompose_using(
+            &ctx,
+            &base,
+            &by_x,
+            &spec.gj,
+            &opts,
+            &mut rng,
+            true,
+            |_, _, _, _| Err("explicit refusal")
+        )
+        .is_err());
+        assert!(nagao::decompose_using(
+            &ctx,
+            &base,
+            &by_x,
+            &spec.gj,
+            &opts,
+            &mut rng,
+            true,
+            |_, _, _, _| Ok((vec![vec![0; 5]], cover::ZeroDimStats::default()))
+        )
+        .is_err());
+    }
+    #[test]
+    fn reduced_backend_preserves_a_positive_quadratic_partial() {
+        let spec = cover::generate_spec(101, 409);
+        let ctx = cover::Ctx::new(&spec);
+        let opts = cover::jv_options(24, 30.0);
+        let base = cover::factor_base(&ctx, &mut StdRng::seed_from_u64(13));
+        let by_x = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+        // Bounded correctness search only: not part of the frozen cost cohort.
+        // Stop at the first baseline partial, without conditioning on speed.
+        for k in 1..=128 {
+            let r = ctx.jac().mul(&spec.gj, k);
+            let old = nagao::decompose(
+                &ctx,
+                &base,
+                &by_x,
+                &r,
+                &opts,
+                &mut StdRng::seed_from_u64(947),
+                true,
+            );
+            assert!(!old.stats.timed_out && !old.stats.incomplete);
+            if old.partial.is_empty() {
+                continue;
+            }
+            let new = nagao::decompose_using(
+                &ctx,
+                &base,
+                &by_x,
+                &r,
+                &opts,
+                &mut StdRng::seed_from_u64(947),
+                true,
+                unit_elimination::solve,
+            )
+            .unwrap();
+            assert!(!new.stats.timed_out && !new.stats.incomplete);
+            let mut a: Vec<_> = old
+                .cofactors
+                .iter()
+                .map(|x| serde_json::to_string(x).unwrap())
+                .collect();
+            let mut b: Vec<_> = new
+                .cofactors
+                .iter()
+                .map(|x| serde_json::to_string(x).unwrap())
+                .collect();
+            a.sort();
+            b.sort();
+            assert_eq!(a, b);
+            assert_eq!(old.full, new.full);
+            assert_eq!(old.partial.len(), new.partial.len());
+            for row in new.partial {
+                assert!(anchored::replay(&ctx.jac(), &base, &r, row.certificate()));
+            }
+            println!("first positive quadratic partial at [k]G with k={k}");
+            return;
+        }
+        panic!("no positive partial in registered correctness-search cap");
+    }
+}

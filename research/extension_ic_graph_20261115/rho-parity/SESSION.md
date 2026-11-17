@@ -45,3 +45,30 @@ paired materialization checks, then retain whichever outcome occurs.
 
 ### Errors
 None observed in the new code yet; compilation and qualification are pending.
+
+## 2026-11-17T03:58Z — First native qualification
+
+### What was done
+Baseline release library build exited0. Native sources published at
+e4af92fbc62ac21b6ae53d45d961de50ed60275f, with the exact local source tree.
+Ten tests passed. The first fixed diagnostic completed all24 records, with
+identical complete coordinate sets and materialized rows, exact repeated
+counts and zero foreign-thread hooks. Retained raw JSONL, exits and Rust
+analyzer report. Observed subtotals:4800849304 six-variable versus3471593796
+unit elimination, ratio0.7231207597; not complete cost or an admitted clock.
+Claim PCC-20261117-817df2 has unverified standing. [pcc:unverified]
+
+### Decisions made
+Keep the opt-in component. Add explicit refusal and positive partial-row
+coverage before publication of the result; do not broaden the six-case result
+into a descent-stream, full-DLP or rho-parity assertion.
+
+### Open threads
+Strict native lint, partial-row compatibility, report and PR publication.
+Complete accounting and admitted cold whole-pipeline comparison stay open.
+
+### Errors
+The first analyzer compile supplied only serde_json's own library directory,
+so rustc could not resolve its transitive crates. Repeated with all exact
+baseline dependency directories; build and analysis then exited0. No trial
+was repeated, repriced or discarded.
