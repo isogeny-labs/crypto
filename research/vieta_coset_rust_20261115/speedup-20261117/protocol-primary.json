@@ -35,7 +35,7 @@
       "description": "newton: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -44,10 +44,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -60,7 +60,7 @@
       "description": "fast: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -69,10 +69,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -85,7 +85,7 @@
       "description": "fiber-half: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -94,10 +94,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -110,7 +110,7 @@
       "description": "fiber-half-aa: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -119,10 +119,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -135,7 +135,7 @@
       "description": "fiber-half-double: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -144,10 +144,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -155,12 +155,12 @@
       }
     },
     {
-      "id": "lookup-fast",
+      "id": "lookup-fiber",
       "role": "reference",
-      "description": "lookup-fast: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "description": "Native lookup with same NTT/root-optimized full certified factor-base construction as fiber-half, plus required HashSet. Complete cold and query costs both recorded.",
       "instrument": {
         "repo": "isogeny-labs/crypto",
-        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "commit": "149fd91f33844390511f6310a21ffa50ad607542",
         "build": [
           [
             "cargo",
@@ -169,10 +169,10 @@
             "--locked",
             "--offline",
             "--manifest-path",
-            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber-scale/Cargo.toml"
           ]
         ],
-        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "binary_sha256": "f45c05dc311058ad65f3085d29fd1a7909fb744c0564357da3b29a0e6cba04f0",
         "threads": 1
       },
       "parameters": {
@@ -377,7 +377,7 @@
       {
         "id": "C-lookup",
         "arms": [
-          "lookup-fast",
+          "lookup-fiber",
           "fiber-half"
         ],
         "design": "absolute",
@@ -393,10 +393,10 @@
     "arm_order": "interleaved",
     "seed_derivation": {
       "method": "harness_drawn",
-      "note": "Exact config JSON seed, SplitMix draws as source. Indexed sums use offset4096; root seed0x53555000+i, cert42/representative3. Prior-target manifest SHA256b5f6521381dafe0eb4c5f851df79f133d5495ae0ca92801ff488e8c2eef8dfb0. No collision resampling. All retained targets differ from current calibration and prior9c662 input manifest; warmups also checked."
+      "note": "Exact config JSON seed, SplitMix draws as source. Indexed sums use offset4096; root seed0x53555000+i, cert42/representative3. Prior-target manifest SHA25625b8ac47e0291078bc83118828672df349048b08d3efb5cd22bdf516b1fbf26d. No collision resampling. All retained targets differ from current calibration and prior9c662 input manifest; warmups also checked."
     },
     "instance_sampling": {
-      "rule": "[('word62', 'coset', 16384), ('word62', 'coset', 32768), ('p224', 'coset', 2048), ('p224', 'rational', 512)];6retained+2warmups/config; alternating populations; conditioned pair index uses i+4096, config seeds below. prior-targets.json rejects any saved prior target without resampling; failed input retained and run stops.",
+      "rule": "[('word62', 'coset', 16384), ('word62', 'coset', 32768), ('p224', 'coset', 2048), ('p224', 'rational', 512)];6retained+2warmups/config; alternating populations; conditioned pair index uses i+4096, config seeds below. prior-targets-primary.json rejects any saved prior target without resampling; failed input retained and run stops.",
       "independent_of_arm": true
     },
     "blinding": {
@@ -538,7 +538,7 @@
     {
       "kind": "fixed_n",
       "preregistered": true,
-      "rule": "3 configs*9arms*2inputs=54 calls, no retries. Per-stage60s/4e9muls, worker135s, configuration300s, outer900s. Shared field setup inside outer/worker cold interval."
+      "rule": "4configs*6arms*(2warmups+6retained)=192calls, no retries or resampling. Stage60s/4e9muls, worker135s, configuration600s, outer1800s. All native field setup, full base and one query inside cold interval. Query includes fresh NTT roots/tables. Ordinary failed config continues next; panic/instrument mismatch stops and preserves missing rows."
     },
     {
       "kind": "invalidation",
@@ -567,8 +567,8 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "fiber/analysis.rs",
-      "sha256": "4e91ff145fce60f9da889de9f36a8e317f235270dc7b1f068794460361639940"
+      "path": "fiber-scale/analysis.rs",
+      "sha256": "50d87d7395399fe09faa9a5ea8e68edf4cdc3d254966b6bd533414e10d4b06f6"
     },
     "inputs": [
       "runs/primary/*/cell-*.json"
@@ -608,15 +608,20 @@
       "ref": "FIBER_PLAN.md",
       "provenance": "internal",
       "claim": "Exact quadratic formula, exhaustive finite-field root tests, unchanged full-splitting/pole/coprimality checks; general degree argument unverified."
+    },
+    {
+      "ref": "evidence/scale-source-equivalence.json",
+      "provenance": "internal",
+      "claim": "Independent native cap-boundary unit test, literal owner evaluator except declared local coset cap; all frozen algorithms preserved."
     }
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "cede27d77255bdd5ed12ff2da2921a815a8ae92066e2c5acd36442ff3fd38236",
+    "commit": "149fd91f33844390511f6310a21ffa50ad607542",
+    "frozen_at": "2026-11-17T08:40:47Z",
+    "filed_before_affected_data": true
   },
   "invalidation_rules": [
     "Exact set mismatch invalidates instrument; all failures retained.",
@@ -657,14 +662,23 @@
     ],
     "target_offset": 4096,
     "forbidden_targets": {
-      "path": "prior-targets.json",
-      "sha256": "b5f6521381dafe0eb4c5f851df79f133d5495ae0ca92801ff488e8c2eef8dfb0"
+      "path": "prior-targets-primary.json",
+      "sha256": "25b8ac47e0291078bc83118828672df349048b08d3efb5cd22bdf516b1fbf26d"
     },
     "all_arms_full_base_inside_cold": true,
     "native_field_setup_primitives_unpriced": true,
     "query_root_and_table_ops_counted": true,
     "no_paid_cloud": true,
     "no_local_s3": true,
-    "primary_timing_standing": "belowL2 diagnostic; goal not independently established"
+    "primary_timing_standing": "belowL2 diagnostic; goal not independently established",
+    "driver": {
+      "path": "primary-native.sh",
+      "sha256": "20ac4d65b2cb0bc0d917e31c3c42507d2e1f1e7b60a2e5963f21468f4566cba9",
+      "configuration_cap_seconds": 600
+    },
+    "local_coset_maximum": 32768,
+    "root_qualifying_fixture": "export-fiber-qualification.json",
+    "source_equivalence": "evidence/scale-source-equivalence.json",
+    "matched_optimized_lookup": true
   }
 }
