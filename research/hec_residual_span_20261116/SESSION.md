@@ -2674,3 +2674,10 @@ What was done: freezeebeb00ff265 hashespass, soleequivalencerun exit0.9structura
 Decisions made: production avoidsfullnorm/knownrootdivisions; no speedclaimfromequivalence. Nexttwo-pencil completecountgateusesauditfalseandfrozenwalk/fullbasecountcontrols, samecatalogue/qualificationboundary, no retuning.
 Open threads: pricecompletepipeline andretainnegativecases beforefurtherarithmeticchanges.
 Errors: no scientificfailure; inheritedunusedhelperswarnings. No S3/cloud/merge.
+
+## Complete fullnorm versus cheap-tail pencil count gate frozen
+
+What was done: compiledtwoexistingpencilmodules withauditfalse, same22publicfixtures/512anchorpolicy andexactoldcompleteReportreplay exceptdiagnosticcounter0.88freshcalls, twoalternatingrepeats, all16fieldvectors. Old2LPwalk/Fast/Dense/Hybridcontrols/dependencieshashedforreuse, nochangedfactory/qualification.
+Decisions made: entireAPIandinternalverificationcounted; externaldriverchecksafterdisable. Allnewregressionskept; fieldsseparate, no component-to-runtime10xclaim. One600CPUprocessafterGitfreeze.
+Open threads: priceactualextractionandcompletepencilpipeline againststrongestexistingcounts.
+Errors: pre-freeze extra closingbrace innewdriver failedcompile, correctedbeforeanyrun; inheritedunusedmodulewarnings remain. No S3/cloud/merge.
