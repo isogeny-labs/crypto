@@ -1,6 +1,6 @@
 # Canonical trust and artifact gates missing from the fetched main tree
 
-- **Status:** open
+- **Status:** investigating
 - **Kind:** missing repository dependencies; existing access/tool failures; ledger divergence
 - **Affected work:** chart10/audit11 source publication and canonical PCC intake
 - **Next action owner:** research lane for scoped evidence; repository maintenance for canonical trust/gate repair
@@ -43,3 +43,10 @@ Paid STOP, locked vault and original full LP workload requirements persist.
 Unresolved. The source successor preserves all original records in a whole
 archive and appends no record to the canonical ledger. A source PR or merge
 does not establish canonical PCC or store admission. [pcc:unverified]
+
+
+### 2026-11-17 restoration update
+
+GitHub reports PR4472 merged01:28:32Z as a4b7c27d after its head changed to a60bc018. Current observed main c321f825 restores the keyring, PCC tool, artifact config/tool and CI scope helper. Keyring01b7/config0107/artifacttoolcb9/PCCc761 match the original pinned bytes. The missing-file condition above describes the historical d06 snapshot. Complete current ledger and whole restoration path delta are retained under native12/main-restored-and-PR4472-closure-05/, claimb0c848. [pcc:unverified]
+
+Canonical current-base prefix intake, final-head CI/store/PCC acceptance and any explicit historical fork reconciliation remain unresolved. No closed-PR branch push was attempted. Source/native12 outcomes remain in the4841e784 immutable tag; a fresh current-main follow-up will carry them. Restoration does not itself establish green CI or a signed result. [pcc:unverified]

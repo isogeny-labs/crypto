@@ -88222,3 +88222,39 @@ Own4472 actual source/CI/full whole artifacts01:07; source PR update only after 
 
 ## Errors
 Custody metadata first parser missed Rust harness-prefixed first record, corrected without native repeat; original failed caller retained. No unique raw bytes removed during relocation; old physical copy was redundant and retained whole in RAM plus archive. No benchmark/cold or signed/green inference. [pcc:unverified]
+
+
+---
+
+2026-11-17T01:28:59.423804+00:00
+# Close first PR4472 CI and prepare balanced12 CI source update
+
+## What was done
+PCC-20261117-cac6b3: submittedbd8a first ownCI, three workflows/ten observed jobs. Native11 full28-phase success, original3675419B ZIP/282 regular members all CRC/SHA checked, six semantic controls and positive/elapsed outputs fully byte-equal localfirst11. Five full logs/APIs/member inventories retained. Validation missing artifacts.py and ecbench missingci-scope.mjs/dependent refusals; both paths absent base and source, five skipped jobs are not passes. PRopen/headbd8a/blocked/auto-merge methodmerge, no reviews. New CI-wrapper static record in native12 CI-wrapper-before-calls-04: Bash-n0/actionlint0, native source unchanged, no local wrapper execution. [pcc:unverified]
+
+## Decisions made
+Update the existing lane PR with completed4841 native12 outcome and a prospective independent-host wrapper using guarded locked vendor inputs before build; original local post-call dependency custody remains labeled. Preserve canonical ledger/root trust unchanged, source-fork collector nowa92a9a1b tag/readback0. No unrelated base-tool restoration or gate waiver. [pcc:unverified]
+
+## Open threads
+Normal source commit/guarded fast-forward and PRbody lint/title rewrite; re-arm ownCI about50min after that substantive head change. Then freeze native13 joint-chart/factor normalization, using exact existing CubicField.with_cubic and polynomial methods. Actual nontrivial Richelot map/dual[2], fullLP/admission/cost/store/PCC/merge/paid/vault gaps remain. [pcc:unverified]
+
+## Errors
+No new Rust source/native rerun. CI packet was recorded before wrapper editing; this dated-log append follows those wrapper edits, so strict previous-piece log ordering was delayed, not backdated. Complete raw CI and actual failures are retained. No green/signed/full12-CI inference from submitted11-CI success. [pcc:unverified]
+
+
+---
+
+2026-11-17T01:51:09.689037+00:00
+# Preserve completed update after PR4472 merges and main trust files return
+
+## What was done
+PCC-20261117-b0c848: prerequisite publication guard observed4472 merged01:28:32Z asa4b7c27d, finalheada60bc018/base06344691. No closed branch push attempted. Mainc321 restores425608 paths/28modified, original keyring01b7/config0107/artifacttoolcb9/PCCc761 now present. Whole current ledger/dependencies and39.15MB full path metadata retained losslessly. Actual final-head CI remains to collect. [pcc:unverified]
+
+## Decisions made
+Checkpoint all completed native12 outcomes/first4472CI/newCIwrapper as normal child/tag only, then create an isolated sparse-index checkout of actual current main using shared existing Git objects. Hydrate and check complete canonical PCC metadata before new canonical claims; preserve every old fork. Component handoff will live beside its evidence to avoid repeated large shared resume copies. Never push closed4472. [pcc:unverified]
+
+## Open threads
+Finala60CI/closure episode, fresh canonical source intake/regular follow-up and pending original store/merge/PCC. Native13 joint source/target chart/factor normalization using unchanged existing cubic-field methods, then actual nontrivial correspondence/dual[2]. Original LP/admission/cost/paidSTOP/vault persist. [pcc:unverified]
+
+## Errors
+Newly captured whole restoration path metadata temporarily exhausted workspace; full39146764B output was losslessly compressed1591324B only after complete SHA equality, no science/indices/policy removed. Missing-main-file problem is historical after restoration, updated without editing frozen prior evidence. Planned old-PR update stopped at actual state guard; no stale closed push or green/signed inference. [pcc:unverified]
