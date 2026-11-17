@@ -9,7 +9,7 @@ retain per-modulus vectors, not weighted into invented runtime.
 |p|source multiple|reference REDC|shared REDC|ratio|
 |---|---|---|---|---|
 |101|1|9244|7114|1.299410|
-|101|17|9488|7368|1.287663|
+|101|17|9488|7368|1.287731|
 |251|1|9412|7272|1.294279|
 |251|17|9412|7272|1.294279|
 |601|17|17930|15790|1.135529|
