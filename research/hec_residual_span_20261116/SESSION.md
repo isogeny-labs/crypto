@@ -1336,3 +1336,10 @@ What was done: derived cubic-through-four-points residual degree<=2 and six-cros
 Decisions made: structural gate before pricing the new sign family; 400 attempts and sixth no-trigger input retained. No square normalization omission, skipped cost claim or fixture substitution.
 Open threads: execute frozen gate once, compare useful rank to retained three-point gate, then qualify shared circuit only if useful.
 Errors: none; compiled without scientific execution.
+
+## Four-point harvesting gate completed
+
+What was done: at654f7ac52e1 all400trials/181splitgrouprelations pass with three-solver prefix agreement; all5eligible target scalars reconstruct. First-k attempts5/7/28/8/48 versus retained three-point9/18/25/5/38. Split181/400 versus93/200; sixth no-trigger preserved. Raw/exit/hashes retained.
+Decisions made: family qualifies exact rows but more signs are not a speed result. Two attempt improvements and three regressions prevent promoting a yield claim. Shared cross-term arithmetic remains unqualified and full costs remain required.
+Open threads: strong prepared six-cross-term comparison before cold full-cost work; original genus2+tenfold objective remains open.
+Errors: none; no retry/S3/cloud or target substitution.
