@@ -15,4 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+<!-- One line per task, added as the task's first step with its draft PR:
+- [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
+- [ ] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active)
+
 ## Blocked / questions for the owner
