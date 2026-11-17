@@ -87,3 +87,18 @@ Publish the integrated head, inspect its required checks and report any exact me
 
 ### Errors
 Auto-merge connector requests squash merging, which this repository disallows; no merge-setting change. Sparse checkout dematerialized out-of-pattern committed files during merge; adding exact sparse paths restored identical bytes. Initial add used an unsupported --no-cone flag; corrected to configured non-cone mode. Raw terminal blank lines remain preserved with scoped log whitespace attributes.
+
+
+## 2026-11-17T04:20:14Z — Current CI infrastructure integration
+
+### What was done
+Main advanced to e7425e39f1 through the separate CI/source-download repair while PR4493 was publishing. Merged it without changing the algorithm, fixed raw records, PDF or original claims. Journal resolution retains all three complete appended blocks in chronological order; canonical ledger1290 remains unchanged. [pcc:unverified]
+
+### Decisions made
+Use the repaired main infrastructure for the PR's fresh checks. Do not infer current CI state from an earlier cached PR base snapshot. Existing source13-test and scoped lint evidence remains unchanged. [pcc:unverified]
+
+### Open threads
+Publish this final integration and inspect its fresh merge gates. Full production descent comparison remains open as documented.
+
+### Errors
+The broad merged diff check began lazy-fetching unrelated upstream data with expired CLI credentials; interrupted that check, then passed the scoped changed-file check with public read configuration. No benchmark or source check was bypassed.

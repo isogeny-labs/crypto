@@ -26,6 +26,12 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+**Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
+prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
+then the newest session-log open threads. With no other instruction, take the
+first unchecked item (else the newest unowned open thread) and start. `/goal`
+re-reads the brief; `/goal <text>` pins a new goal.
+
 Run authorized x86 CPU experiments and crypto benchmarks through
 [`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
 (owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
