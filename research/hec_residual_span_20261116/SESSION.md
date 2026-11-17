@@ -227,3 +227,101 @@ Needdistinctrelation-generation/anchor-reuse mechanism or evidence-supportedcost
 
 ### Errors
 No runtime errors/retries. Generator reversechecknewlineissuefixedbeforefreeze; no arithmeticchanges. Localbuildunusedfieldwarnings retained.
+
+## Phase attribution frozen
+
+### What was done
+Preparednew108solveattribution experiment. Reusesexactcountednative modules, newcounterkeepsstageandtotalvectors. Runtimecopiesonlytaggedstagecalls; generatorreversecheckrecoversoriginalcores. Requireeverytotalmatchearlierrawvectors andsumstagesexactly, besidesallpriorgates.
+
+### Decisions made
+Measurefactorbase/action/walk-or-anchor/oracle-or-sieve/rows/LA/verify attribution, nochangedalgorithm/timing/retryoffailedwallrun. Anyderivedfloorlimitedtotheunchangedstageandcounter; nothardware/unconditionallowerbound.
+
+### Open threads
+Runonceafterpushedfreeze, thenselectmechanismusingactualdominantwork.
+
+### Errors
+Generatorheredocsyntaxcaughtbeforebuild/run, fixedbeforefreeze. Buildunusedfieldwarningsretained, no arithmeticchanges.
+
+## Phase attribution passes and preparation floor derived
+
+### What was done
+At pushed5f8af424242,108solvesverify; allpriorvector/repeat/stagesum/REDCchecks pass. Genus2Pencilprep61–75percentbasefieldREDC; fixed9006=5390FB+3616action. DerivedconditionalFolded/Pceiling1.63–2.01g2,4.72–10.65g3,6.51–9.19g4, onlyforunchangedpreparation/basefieldREDC, notwall/globalalgorithm bound. Rawhashesverify.
+
+### Decisions made
+Bucket/LA-only improvements cannot give10basefieldreductioncountergainoncurrentgenus2panelwithunchangedprep. Sharedsetup mustimproveequallyinallcontrols; classicaltable/finite-difference/characterenumeration candidates requireequivalence, notnoveltypromotion.
+
+### Open threads
+PR4480wasexternallymerged2026-11-17T04:01:52Z at67eb72188e249d62baa292f5a732cce49ddb756d,observedviaGitHub. Oldremotebranchhadbeendeleted,pushrecreatedit. Preparea successorPRcontainingonlyphaseworkbasedonthemerge; do noteditmergedPR. Broadgoalopen.
+
+### Errors
+Noscientificruntimefailure; no noisererun. Generatorheredocsyntaxfixedbeforefreeze. Unrelated.resumechangespreserved.
+
+## Shared setup equivalence frozen
+
+### What was done
+Implementedcanonicalresiduetable/additive-squareenumeration, polynomialforwarddifferences, primitivegeneratorcharacterclassenumeration insetup/fast.rs. Fixedall320nonzeroconstantsacrossF101g2/F113g3/F109g4. ExactFBordering/sign/z/coefficientvectorcomparison againstexistingcode, fullfreshsetupcountvectors.
+
+### Decisions made
+Classicalsharedoptimization, notnewattack. Mustintegrateequallyallthreecontrols afterall320pass; extraadditions/storage/primitivegeneratorsearchcharged. Nofavorableconstantselection/crossmodelcache/wallclaim. Freeze/pushbeforeexecution.
+
+### Open threads
+Runonce; onlythenprospectiveall18solverprefix/countcomparisonwithsharedsetup.
+
+### Errors
+No runtimeexecutedyet; originalphase/priorfreezesunchanged.
+
+## Sharedsetup320pass; equalintegrationfrozen
+
+### What was done
+At d9fc09110a9 all320FB/z/characterexactchecks passEXIT0. SelectedsetupREDCold/new8936/682,10658/610,12914/766; additions/storageincreaseexplicit. AppliedsamepreparetoPencil/Folded/Expandedcopies, unchangedwalks/rows/solver; prospectiveall54prefix/referencepairsand108repeatcountedsolves.
+
+### Decisions made
+No setupcomponentpromotion. Sharedoptimizationallcontrols equally; requireexactk/relations/trials/anchor/parameter andfullfreshcountvectors beforecomparison. No timing/noisegate rerun.
+
+### Open threads
+Executeintegrationgateafterpushedfreeze; broadobjectiveopen.
+
+### Errors
+No320gatefailure/retry. Localcompileunusedimports/fieldswarningsretained; noarithmeticsourcechangesoutsidepreparation.
+
+## Equal sharedsetup integration passes
+
+### What was done
+At pushedacec58a785a,54reference/optimizedprefix tuplesmatch and108optimizedcallsverify/EXIT0; repeats/fullREDCidentitiespass. Allrawhashesverify. EqualoptimizedFolded/PencilbaseREDCrangesg2 1.128701–1.843650,g3 2.390212–8.812722,g4 2.573906–6.592814. Inverse/subgroupcountsunchanged. PostrunRustanalysesretained.
+
+### Decisions made
+Classicalsharedsetupimprovementvalidbutnottenfoldsolve/breakthroughclaim. Allcontrolsoptimizedequally. Additions/storage/omittedinteger/memoryworkexplicit. Previouswallfailureunchanged. Nextmustchange remainingtarget-bearingrelation/anchorcostwithrankproof.
+
+### Open threads
+Broad10xgenus2+objectiveopen; currentevidence stillshortespeciallyg2. PR4490shoulddescribefinalsharedsetupscopeclearly.
+
+### Errors
+No320model/integrationgatefailuresorretries. Compileunusedimports/fieldswarningsretained; originalimplementationsunchanged.
+
+## Singleanchor scaling lemma and rankgate frozen
+
+### What was done
+DerivedaffinescalingY'=sY,k'=sk+(s−1)a/b preservingallrowsfromoneanchor. Nonzeroanchorimplieskvaries, soextra rowscannotfixscale. Prepared892isolatedprefixdense/drop-target/augmentedrank/nativeNonechecks plusvalidPUBLICsmoothsource normalizationpositivecontrols andoriginal18cumulativerecoveries.
+
+### Decisions made
+No claimofnewpriority/unconditionalbound. Distinctsourceequations oranchorcoefficientratiosbreakthisspecificsymmetrybutdonotguaranteefullrank. Fullbucket/polynomial/originalgroupverificationretained. Freeze/pushbeforeonce-onlyrankexperiment.
+
+### Open threads
+Qualifytheobstructionandnormalizationpositivecontrols; thenevaluatecheapnormalizationmechanismwithcostcase. Broadgoalopen.
+
+### Errors
+T7003retrybudgetexhausted; originaltaskworkwasmergedPR4480, markedthatoldtaskdoneandclaimednewT7008forspecificrankwork. No codeeditedduringunclaimedinterval. CLI done-jsonflagunsupported, retriedvalidcommand; no scientificretry.
+
+## Singleanchor rank gate passes, normalization controls verified
+
+### What was done
+At pushed26ab287b9a6 all892isolatedprefixrankequalities/nativeNonechecks pass; original18cumulativerecoveriesand31008bucketchecks pass/EXIT0. Publicsourcefullysmooth6/6g2,0/6g3,0/6g4. Validpublicsourceequationgives137source-verifieddetermining-prefixevents, notdistinctsolvecount. Rawhashesverify.
+
+### Decisions made
+Scalingobstructionqualifiedonallnonzeroanchorrows. Publicnormalizationisvalidavailableinformationg2; anynextcomparisonmustprovideitANDchargecostequallyPencil/Folded/Expanded. No g3/g4normalizationroute/performanceinferencefromthesecontrols.
+
+### Open threads
+Implementequalpublicsource-normalizedsolvers, qualifyfirstprefix/scalar/completecountcost; strongercrossgenusmechanismstillneeded. Broadgoalopen.
+
+### Errors
+No scientificfailures/retries; priortimingunqualifiedunchanged. Elementarylemma isnotnewpriorityclaim.

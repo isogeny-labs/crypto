@@ -93,6 +93,37 @@ tracked files that belong in the store.
 Never delete remote objects from an agent session. The remote is write-once;
 removing an object is a decision for the bucket's owner.
 
+### Diagnosing failed downloads
+
+S3 downloads use `s3api get-object` for the exact content-addressed key, without
+the high-level `s3 cp` HEAD preflight. The cache still verifies the manifest's
+SHA-256 and byte count before installing any bytes; failed downloads remove
+their partial output.
+
+- `AllAccessDisabled` means S3 has disabled access to the resource. The bucket
+  owner must restore access or supply an approved replacement containing the
+  exact manifest objects. Retries or additional IAM grants do not resolve
+  disabled resource access.
+- `AccessDenied` or HTTP 403 can mean denied access **or** an absent key when
+  the caller lacks `s3:ListBucket`. Do not infer that the object is missing.
+- `NoSuchKey` or HTTP 404 identifies a missing object. Recover its original
+  bytes and verify their SHA-256 before restoring it; do not rewrite the
+  manifest to accept substitute data.
+
+An approved alternate store can be selected with `ARTIFACTS_REMOTE`, and an
+S3-compatible endpoint with `ARTIFACTS_ENDPOINT`. These are existing tool
+environment overrides; setting them locally does not change GitHub Actions
+or repository secrets. Verify downloads from a replacement before changing
+the shared `.artifacts/config.json` (and the separate `store/config.json`).
+
+On 2026-11-16, the configured `s3://setec-astronomy-artifacts/store` returned
+`AllAccessDisabled` to both `GetObject` and bucket metadata/list requests.
+The earlier CI `HeadObject` 403 was therefore insufficient to diagnose an
+IAM or missing-object problem. This remains an external store-recovery
+dependency until the owner restores access or identifies a replacement.
+
+Reference: [Amazon S3 API error responses](https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html).
+
 ## Migrating existing data
 
 One PR, in this order:

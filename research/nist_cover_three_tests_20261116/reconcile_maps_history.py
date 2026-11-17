@@ -16,7 +16,9 @@ import subprocess
 
 
 def staged(stage, path):
-    return subprocess.check_output(["git", "show", f":{stage}:{path}"])
+    unmerged = subprocess.check_output(["git", "ls-files", "-u", "--", path])
+    ref = f":{stage}:{path}" if unmerged else f"{'HEAD' if stage == 2 else 'MERGE_HEAD'}:{path}"
+    return subprocess.check_output(["git", "show", ref])
 
 
 def key(entry):
