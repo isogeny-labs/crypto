@@ -34,7 +34,7 @@ The independent verifier is implemented in paired cryptanalysis PR #1733.
 representative range, conditional base-six reconstruction, inverse-six group
 update, the concrete cyclic-subgroup inverse certificate, and final uniqueness
 endpoint. `PROOF_MAP.md` records the instance gate and claim boundary;
-`proof-gate-v1/` passes 23 declarations with zero trusted-native. A full native
+`proof-gate-v1/` passes 24 declarations with zero trusted-native. A full native
 agreement score now supplies pointwise exactness on its finite measured row;
 it does not extrapolate to another curve. The raw artifact, measured report,
 and rendered visual report remain pending. A

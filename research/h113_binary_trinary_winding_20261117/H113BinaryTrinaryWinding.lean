@@ -309,6 +309,33 @@ theorem baseSix_cyclic_group_step
       inverse_six_on_cyclic generator order inverseSix quotient
         (scalar / 6) horder hcertificate
 
+/-- A full native score, bound to the current finite-cohort point, supplies the
+digit premise for the concrete cyclic decoder update. -/
+theorem full_score_cyclic_group_step
+    {Cohort Value : Type*} [Fintype Cohort] [DecidableEq Cohort]
+    (observable : Cohort → Value) (predicate : Value → ℕ)
+    (scalarOf : Cohort → ℕ) (point : Cohort)
+    (generator current : A)
+    (scalar digit order inverseSix quotient : ℕ)
+    (hfull : agreementScore (fun q => predicate (observable q))
+        (fun q => scalarOf q % 6) = Fintype.card Cohort)
+    (hcurrent : current = scalar • generator)
+    (hpointScalar : scalarOf point = scalar)
+    (hdigit : digit = predicate (observable point))
+    (horder : order • generator = 0)
+    (hcertificate : inverseSix * 6 = 1 + quotient * order) :
+    inverseSix • (current - digit • generator) =
+      (scalar / 6) • generator := by
+  have hexact : predicate (observable point) = scalarOf point % 6 :=
+    full_score_supplies_baseSix observable predicate scalarOf hfull point
+  have hdigitScalar : digit = scalar % 6 := by
+    calc
+      digit = predicate (observable point) := hdigit
+      _ = scalarOf point % 6 := hexact
+      _ = scalar % 6 := by rw [hpointScalar]
+  exact baseSix_cyclic_group_step generator current scalar digit order
+    inverseSix quotient hcurrent hdigitScalar horder hcertificate
+
 /-- Independent EC verification makes a reconstructed scalar unique whenever
 the admitted scalar-action map is injective. -/
 theorem verified_scalar_unique
@@ -338,6 +365,7 @@ end GroupDecoder
 #print axioms baseSix_group_step
 #print axioms inverse_six_on_cyclic
 #print axioms baseSix_cyclic_group_step
+#print axioms full_score_cyclic_group_step
 #print axioms verified_scalar_unique
 
 end H113BinaryTrinaryWinding
