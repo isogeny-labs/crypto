@@ -1,0 +1,60 @@
+{
+  "branch": "lane/vieta-speedup-20261117",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speedup-20261117/runs/transform-selection/isolation.jsonl",
+        "--label",
+        "vieta-transform-selection",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "900",
+        "bash",
+        "research/vieta_coset_rust_20261115/speedup-20261117/transform-panel.sh",
+        "/workspace/scratch/vieta-speedup-binaries/698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "transform-selection"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T08:16:04+00:00",
+      "wall_s": 293.004
+    }
+  ],
+  "commit": "b50c04fbf1d668b33bfbacd1aaf547521e1fe26b",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T08:15:56+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0815Z-vieta-transform-selection",
+  "metrics": [],
+  "problem": "vieta-component-speedup",
+  "raw": [],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-transform-selection",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}
