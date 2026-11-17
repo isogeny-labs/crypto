@@ -41,6 +41,7 @@ Post-freeze proof artifacts:
 | `lean-toolchain` | Pinned Lean toolchain | `d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b` |
 | `lake-manifest.json` | Resolved dependency graph | `05bb6c0943a46ac7b9afe4831996b3fcd2091949c7c8b9c085b5ea269f818dfb` |
 | `LEAN_PROOF_GATE.md` | Strict compile receipt and remaining obligations | self-hash intentionally omitted |
+| `IMPLEMENTATION_CLARIFICATIONS.md` | Pre-measurement extension, identity-control, torsion and serialization conventions | self-hash intentionally omitted |
 
 The first post-freeze native check is structural only:
 
