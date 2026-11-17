@@ -1609,3 +1609,10 @@ What was done: recovered edit claim T7093 after outage; retained conditional gen
 Decisions made: test exact integer norms, modular rank3, distinct kernels against unchanged frozen screen; expected50 model/kernel combinations. Producer checks are not independent verification. Git custody, no S3.
 Open threads: push freeze then once-only bounded invocation; ramified genus2 l5 and quotient costs remain open.
 Errors: MCP attach reports own-scope conflict; existing task card confirms own active lease. Shared docs/session-logs absent in sparse checkout; retained scoped SESSION as prior stages. KB revision9b2119e8fbac482b98b50521c0d604bb older than this work; primary Milne/Smith background checked, no novelty claim.
+
+## Norm-witness finite gate completed
+
+What was done: pushed freezee630f68ba91 then single invocation exits0;14admissions,50 norm/rank/distinctness checks pass as producer self-checks [pcc:unverified]. Counts per model2,1,2,2,8,2,8. Raw stdout/stderr/exit retained.
+Decisions made: bounded conditional self-isogeny argument supported by finite algebra checks; not independent Frobenius/polarization verification or a measured gain.
+Open threads: genus2p601l5 nilpotent polarization and p251l19 quotient classification; independent review of bounded genus3 obstruction.
+Errors: none in execution; no rerun/S3/cloud.
