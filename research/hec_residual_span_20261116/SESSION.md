@@ -2485,3 +2485,10 @@ What was done: freezedb3d1166dbb hashes passed, complete67931class census exit0;
 Decisions made: deprioritize further expensive genus-two CM curve reconstruction absent an additional arithmetic/rank/sampling mechanism; four distinguished quotients alone cannot establish10x via acceptance probability here. Restrict bound to uniform full-base model; no actual-walk mixing or general impossibility claim.
 Open threads: construct/prove a cheaper useful-rank mechanism or nonuniform sampler for genus-two; certified genus-three reduction bridge and genus-four construction remain open. Goal active, no10x result asserted.
 Errors: none in scientific run; native shared implementation means independent review remains pending.
+
+## Genus-two geometric factor-base transport bound derived
+
+What was done: inspected strongest retained production/prefix/verification evidence; read primary Milne Abel-Jacobi/theta statements. Derived fixed-degree-one-locus intersection bound2n for prime-to-characteristic(n,n)isogenies between genus-two Jacobians. At n19, at most38 source points enter a fixed destination degree-one translate; at least232/270 affine source points do not. Injective subgroup transport also preserves existing row coefficients and rank.
+Decisions made: four complex-distinct quotient modules alone do not justify additional cheap relation channels; require an explicit paid cross-base/rank mechanism before expensive CM reconstruction. Preserve scope and distinguish bound from universal impossibility/performance claim. Proof note [pcc:unverified], independent review pending; no scientific run needed for this deduction.
+Open threads: useful-rank/nonuniform relation construction that changes producer and final-verification costs; genus-three finite-field reduction bridge and genus-four mechanism. Full10x objective remains active and incomplete.
+Errors: browser improved-sieving PDF timed out; current PENCIL-NEXT.md already documents primary prior-art collision, preventing duplicate proposal. Existing own T-7093 scope check allows; attach reports own reservation as before. No S3/cloud/merge.
