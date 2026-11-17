@@ -2926,3 +2926,10 @@ What was done: compiled3arms forest/normalized(public+branch)/lazyfinish, freshq
 Decisions made: chargeALLnormalization/bootstrap/setup/failedtrials/fallback/verification, nosavedhitcountassumption/nointernalcounterreset. Fixed128boundnotobserved22. Bothstrongcontrols/branchrowsretained; classicalintegrationnotnewmath/10xassumption.
 Open threads: executecoldfieldgate, allregressions/failuresvisible;runtime/independentreview/fullgoalunachieved.
 Errors: prefreezeinspectioncaughtfinisherhookinitiallyonlyinpublicrowbranch; addedsamehooktopencilrowsbeforefreeze. No scientificexecutionbeforefreeze. Inheritedunusedhelper/importwarnings;No S3/cloud/merge.
+
+## Integrated lazy finisher qualifies but complete normalized subgroup counts regress all22
+
+What was done: freeze3a1c3c185bf hashespass/exit0;66positiveaudit+132count+32negativecalls pass,6unavailable. AlloldforestFULL16/newauditReport/repeatedvectors/lookups/nativeanswersand32finalrejectionspass; newpair/full-expressionandnorm/nativeFastchecks pass. All22finisherdetermining/noexhaustion,3-9projectednodes/8-118terms. Strongnormalized/lazysubratiosg2.821-.938,g3.816-.893,g4.770-.885(allregress);baseg2.956-1.035,g3.913-1.00045,g4.772-1.032.
+Decisions made: rejectfirst-rho1latefinisherasgeneralcompletegain/10xroute, preservequalifiedconstructive/negativeevidence. Newnormalizedg4p31source1needs96trials vsoldstructural<=22, fixed128boundessential. Earlierhighdimensionalbootstrapconstraintmechanism/costcaseneeded; noafteroutcomeretuning.
+Open threads: mathematicallynewearlyconstraintgenerationagainststrongnormalization/forestcontrols;full10xgenus2+objectiveactiveunachieved/independentreviewopen.
+Errors: no scientificfailure; inheritedunusedhelper/importwarnings. No S3/cloud/merge/unchangedrerun.
