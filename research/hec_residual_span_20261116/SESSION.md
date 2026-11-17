@@ -2030,3 +2030,10 @@ What was done: freeze33e4355a9cd once-onlyexit0;24calls/12targets byteexactfullp
 Decisions made: retainexactpacketcontrol, still6.194-8.180x subgrouptriangular baseline so10xgatefails. Nextstructural2variablebranchproof mustreturncontradiction provenance notpanic.
 Open threads: frozen triangularfourcomponent proof/cost gate; originalgenus2+10xgoal, independentreview/publicationartifacts/genus3/4coverage.
 Errors: none in execution,no retry/S3/cloud.
+
+## Triangular all-component cover frozen
+
+What was done: built perroot pointdefinition provenance, reduced2variableconstraints, exactscalar/contradiction proofcomposition. Keepold/newboundverifiers216mutations, samepacketexceptweights/rootstatuses/scalars exact.
+Decisions made: all4roots/proofs/selfchecks charged,24completecalls/12targets,repeats,newpacketraw retained, no nontriangular/unresolvedpanic usedasexclusion. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, compareallcompletecosts to sparse/densecover/triangular/botharms.
+Errors: onlyunusedwarnings,noscienceyet.
