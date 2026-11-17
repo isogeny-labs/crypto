@@ -381,3 +381,17 @@ Needstrongercompletecost/relationmechanismespeciallyg2;broadgoalopen. Keepinform
 
 ### Errors
 No scientificgatefailures/retries. Pre-freezegeneration/modulepatherrorsfixed; finalbuildwarningsretained.
+
+## Weighted LP quotient priorart and rankgate frozen
+
+### What was done
+ReadGTTDprimarysection3.1cycle/full-versus-single-LPdistinction andTsakouIonicapriororbitfactorbases. KBfoundexistingorbitLPproposal e3470db8 anddraftGLVvoltagegraph7ed0688d; no noveltyclaim. ExistingnativeLPbaselinealreadyexactcoefficientelimination. Implementedweightedgraphpotentialrankformula V−balancedungroundedcomponents, withindependentdenseprefixchecksontwofixedsmallorbitbases andparallel-edgefalsecyclenegativecontrols.
+
+### Decisions made
+Graphleftnullitynotindependentlabelrank; bothreported. Retainallfilteredtargetmisses/rejections, no10xfromvertexcounts. Newdiagnosticpreservesoriginal892relations/31008bucketchecks/18recoveries, notperformanceexperiment or olddraftdispatch. Freeze/pushbeforeexecution.
+
+### Open threads
+Qualifygraphsemantics/actualindependentlabelarrival; broadobjectiveopen. Needcompletecostcasebeforeproductiongraphcollector.
+
+### Errors
+Initialreadrootnativepathabsentinsparsecheckout; usedretainedcountednativecopy. No scientificrunyet.
