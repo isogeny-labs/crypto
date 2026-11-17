@@ -2254,3 +2254,10 @@ What was done: screened prior online/affine LP andsameorbitbootstrap; built orig
 Decisions made: test arrival/useful-rank only, no algorithm novelty or costclaim; freezeGit beforeone120CPU, no extraanchors/retry/S3/cloud/merge. SameopenPR4587.
 Open threads: inspect firstconsensus/incomplete cases then decide whether justified completecostproducer exists. Full10x/genus3/4goal staysopen.
 Errors: no buildfailure, diagnosticfield/unusedhelper warning only; ownConductor reservation confirmed despiteattach ownconflict.
+
+## Singleton source-orbit LP arrival qualifies all12target coverage
+
+What was done: pushedfreezefb6b39303a0, hashespass, onceexit0;1894queries/896acceptedrelations, all exactquotient/nativeidentities; all12targets fourbranchconsistentconsensus andscalarchecks. Firstanchors3..4p101,5..6p251,8..11p601. Everyfixedcap/unsuccessfulquery preserved andfirstboundarysummary derived without rerun.
+Decisions made: coverage justifiespaidprefix costcase, not10x/newLPnovelty/fullsolver orindependenttarget inference. No freeseed/actualaction/residuallog input. DenseRREF diagnosticunpriced, noanchorcount ratio claim. Assertions [pcc:unverified].
+Open threads: exact stopping/LPproducer costgate withidenticalpublicinfo andstrongcompletingcontrol, independentvalidation andgenus3/4extension; original10xgoalactive.
+Errors: none,no retry/S3/cloud/merge.
