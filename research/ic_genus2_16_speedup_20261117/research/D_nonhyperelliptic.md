@@ -1,6 +1,6 @@
 # D. Index calculus in Jacobians of non-hyperelliptic curves (genus 3..16)
 
-Status: IN PROGRESS (outline written first; sections appended as research proceeds).
+Status: COMPLETE draft (see end of file for gaps).
 Date: 2026-11-17. All claims are `[pcc:unverified]` literature assertions unless noted;
 items marked UNVERIFIED were not checked against a primary source in this session.
 
@@ -489,3 +489,74 @@ rho ~2^60..2^75 vs IC ~2^40..2^50 x constants) would itself be new data.
 - Not found: any improvement of the exponent for genus-3 quartics below 1 (O~(q) appears
   optimal for double-large-prime IC because the factor base must contain ~q^(1/2) points and
   the relation graph needs ~q edges); any published IC exponent for general g below 2-2/(g-2).
+
+## 10. Biggest speed-up levers by regime
+Exponents are in q (cost O~(q^x) group/field operations, fixed g, q -> infinity). "e" is the
+residual degree; the splitting constant ~1/e! is hidden in O~. Rho is q^(g/2). All rows
+`[pcc:unverified]`. "Published" = appears in a cited abstract; "derived" = substitution or
+Brill-Noether/semigroup arithmetic by this note, not a published algorithm.
+
+| g | Best known method (status) | Exponent in q (rho) | Curve model needed | Dominant cost | Single most promising lever | Confidence |
+|---|---|---|---|---|---|---|
+| 3 | Diem 2006 / Diem-Thome 2008 double-large-prime line IC; rigorous O~(q) Diem JTNB 2012; Laine-Lauter 2015 trade-offs | 1 (rho 1.5); hyperelliptic g=3 -> 1 via Smith/Tian isogeny when rational | Plane quartic (= canonical); hyperelliptic only via (2,2,2)/(l,l,l)-isogeny | Relation collection over ~q lines + large-prime graph; memory ~q^(3/4) (Diem talk, unverified) and graph ~370 B/vertex | Constants and memory: Laine-Lauter trade-off + automorphism orbits (Picard Z/3) + sieving lines through points; for hyperelliptic inputs, Tian (l,l,l) transfer to widen the 18.57% Smith coverage | High (exponent), medium (constants) |
+| 4 | Canonical/hyperplane IC (Oyono-Theriault 2023) = Diem g+1 plane model | 4/3 (rho 2) | Canonical (quadric cap cubic in P^3) or plane quintic with 2 nodes (project from a rational point); C_{3,5} special | Linear algebra on factor base ~q^(2/3) and relations ~q^(4/3); splitting 1/3! | Plane-quintic model + trigonal free relations (split g^1_3 fibres) + exploiting the two g^1_3 rulings; no exponent drop known | Medium-high |
+| 5 | Diem-Kochinke pencils (heuristic, "nearly all" curves) | 4/3 (rho 2.5); canonical 3/2 | Special linear systems (pencils) on a plane model; else canonical (3 quadrics in P^4) | Constructing the pencil family; relations ~q^(4/3) | Implement Diem-Kochinke pencils (no public implementation found): 3/2 -> 4/3 is the largest exponent drop available at any g | Medium |
+| 6-8 | Diem-Kochinke 2-2/(g-2) (published); ties with Brill-Noether-min plane model (derived) | g=6: 3/2; g=7: 8/5; g=8: 5/3 (rho 3, 3.5, 4). Special: smooth plane quintic g=6 -> 4/3; C_{4,5} g=6 -> 4/3 | General: nodal plane model of degree ceil(2g/3)+2 (6,7,8) or pencils; special: smooth quintic (g=6) | e = 4..6, splitting 1/24..1/720; factor base ~q^(1-1/e) | Choose/construct curves or models with smallest e: for g=6 target the plane-quintic locus (e=3); otherwise compute an F_q-rational g^2_d (rho(g,2,d) > 0 for g=7,8 so a positive-dim family exists) | Medium (published), low (derived) |
+| 9-12 | Diem-Kochinke 2-2/(g-2) (published); min plane model 2-2/ceil(2g/3) (derived, beats pencils from g=9) | Pencils 12/7..9/5; plane 5/3 (g=9), 12/7 (g=10), 7/4 (g=11, 12); special smooth plane sextic / C_{5,6} at g=10 -> 3/2 (rho 4.5..6) | Nodal plane model degree ceil(2g/3)+2; special: smooth sextic (g=10) | e = 6..10: splitting 1/720..1/3.6e6 dominates; linear algebra ~q^(2-2/e) on ~q^(1-1/e) unknowns | Low-degree plane models (Brill-Noether g^2_d computation over F_q, e.g. via Derickx-Terao-style Riemann-Roch tools) and special families with e <= 4 | Low-medium |
+| 13-16 | Same two routes; L(1/3) irrelevant at fixed g | Pencils 20/11 (g=13) .. 13/7 (g=16); plane 16/9 (g=13) .. 20/11 (g=16); special smooth septic / C_{6,7} at g=15 -> 8/5; nodal plane octic (g <= 21) -> 5/3 (rho 6.5..8) | Nodal plane models; C_ab with balanced a,b; superelliptic y^n=f(x) with n ~ deg f | Splitting probability 1/e! with e = 9..14 (~2.8e-6 .. 1.1e-11) and per-candidate cost poly(g); the q-exponent is near 2 so constants decide | Shrink e via special models (balanced C_ab, superelliptic, smooth/nodal plane curves of degree 7-8) combined with automorphism-orbit reduction (y^n = f(x) gives Z/n); sieving instead of per-line root finding | Low |
+
+Note on the g = 10, 11 plane column: ceil(20/3) = 7 and ceil(22/3) = 8, so the plane exponent is
+2-2/7 = 12/7 (g=10) and 2-2/8 = 7/4 (g=11); g=9 gives ceil(6) = 6 -> 5/3; g=12 gives 8 -> 7/4.
+Pencils: g=9 12/7, g=10 7/4, g=11 16/9, g=12 9/5. g=13: plane ceil(26/3)=9 -> 16/9, pencils 2-2/11 = 20/11;
+g=16: plane 11 -> 20/11, pencils 2-2/14 = 13/7.
+
+### Cross-cutting conclusions
+1. The exponent is governed by the residual degree e, not by g. Every concrete exponent
+   improvement in the literature (hyperelliptic g -> canonical g-1 -> pencils g-2 -> plane d-2)
+   is a reduction of e. The lab's biggest asymptotic lever beyond published work is lowering e
+   to ceil(2g/3) via an F_q-rational g^2_d of minimal degree (derived here, not published as
+   an algorithm), and choosing benchmark families (smooth plane quintic/sextic/septic,
+   balanced C_ab, superelliptic) where e ~ sqrt(2g).
+2. For g >= 4 the gap to rho is enormous in the exponent (rho g/2 vs IC < 2), so practical
+   distance is set by constants: 1/e! splitting, poly(g) per-candidate cost, and memory of
+   the large-prime graph. Sieving (Oyono-Theriault "curve sieving"), orbit reduction by
+   automorphisms, and the Laine-Lauter time-memory trade-off attack these.
+3. For g = 3, nothing beats O~(q); progress is in constants and in moving hyperelliptic inputs
+   (Smith 18.57%, Tian (l,l,l)) to quartics. For g >= 4 no generic hyperelliptic ->
+   non-hyperelliptic isogeny exists (Naranjo-Pirola), so the lab's hyperelliptic targets
+   cannot be moved this way.
+4. Rigour: only O~(q^(2-2/g)) (all curves) and O~(q^(2-2/(d-2))) for plane models with a
+   completely split line (JTNB 2012) are proven per the abstracts; 2-2/(g-1) for all curves
+   (Oyono-Theriault) has an +eps upper bound; 2-2/(g-2) (Diem-Kochinke) is heuristic.
+
+## 11. References (as cited above; verification level in brackets)
+- Diem, C. (2005/2006). Index calculus in class groups of plane curves of small degree. ePrint 2005/119, https://eprint.iacr.org/2005/119 ; ANTS-VII LNCS 4076, https://doi.org/10.1007/11792086_38 [abstract-checked]
+- Diem, C., Thome, E. (2008). Index calculus in class groups of non-hyperelliptic curves of genus three. J. Cryptology 21(4):593-611, https://link.springer.com/article/10.1007/s00145-007-9014-6 ; HAL inria-00107290 [abstract-checked]
+- Diem, C. (2006). Index calculus with double large prime variation for curves of small genus with cyclic class group. arXiv math/0606607, https://arxiv.org/abs/math/0606607 [abstract-checked]
+- Diem, C. (2011). On the discrete logarithm problem in class groups of curves. Math. Comp. 80:443-475, https://www.ams.org/mcom/2011-80-273/S0025-5718-2010-02281-1/ [abstract-checked]
+- Diem, C. (2012). On the discrete logarithm problem for plane curves. JTNB 24(3):639-667, https://jtnb.centre-mersenne.org/articles/10.5802/jtnb.815/ [abstract-checked]
+- Diem, C., Kochinke, S. Computing discrete logarithms with pencils; Computing discrete logarithms with special linear systems (preprints), https://www.math.uni-leipzig.de/~diem/preprints/dlp-linear-systems.pdf , https://www.semanticscholar.org/paper/6e74dbf3ffed71cb0adabf3a9aae5d37a6480e64 [abstract-checked via Semantic Scholar]
+- Kochinke, S. (2017). Special Linear Systems on Curves and Algorithmic Applications. PhD thesis, Univ. Leipzig [catalogue only]
+- Oyono, R., Theriault, N. (2023). Index calculus algorithm for non-planar curves. Finite Fields Appl., 102227, https://www.sciencedirect.com/science/article/abs/pii/S1071579723000692 [abstract-checked]
+- Laine, K., Lauter, K. (2015). Time-memory trade-offs for index calculus in genus 3. J. Math. Cryptol. 9(2):95-114, https://eprint.iacr.org/2014/346 [abstract-checked]
+- Hess, F. Computing relations in divisor class groups of algebraic curves over finite fields. Preprint (~2004) [not located; cited by EGT 2011]
+- Hess, F. (2002). Computing Riemann-Roch spaces in algebraic function fields and related topics. J. Symbolic Comput. 33:425-445 [UNVERIFIED-memory]
+- Enge, A., Gaudry, P. (2007). An L(1/3+eps) algorithm for the DLP for low degree curves. EUROCRYPT 2007, https://arxiv.org/abs/cs/0703032 [abstract-checked]
+- Enge, A., Gaudry, P., Thome, E. (2011). An L(1/3) discrete logarithm algorithm for low degree curves. J. Cryptology 24:24-41, https://arxiv.org/abs/0905.2177 [abstract-checked]
+- Couveignes, J.-M. (2001). Algebraic groups and discrete logarithm. In Public-key cryptography and computational number theory, de Gruyter, 17-27 [citation only]
+- Smith, B. (2008/2009). Isogenies and the discrete logarithm problem in Jacobians of genus 3 hyperelliptic curves. EUROCRYPT 2008; J. Cryptology 22(4):505-529, https://arxiv.org/abs/0806.2995 [abstract-checked]
+- Frey, G., Kani, E. (2011). Correspondences on hyperelliptic curves and applications to the discrete logarithm. SIIS 2011, LNCS 7053, https://www.mast.queensu.ca/~kani/papers/fkwarsawarticlerevised.pdf [abstract-checked]
+- Tian, S. (2021). Translating the DLP on Jacobians of genus 3 hyperelliptic curves with (l,l,l)-isogenies. J. Cryptology 34(3):32, https://arxiv.org/abs/2007.03172 [abstract-checked]
+- Dina, B., Ionica, S. (2023). Isogenous hyperelliptic and non-hyperelliptic Jacobians with maximal complex multiplication. Math. Comp. 92:349-383, https://arxiv.org/abs/2104.04919 [abstract-checked]
+- Naranjo, J.C., Pirola, G.P. (2018). Hyperelliptic Jacobians and isogenies. Adv. Math., https://arxiv.org/abs/1705.10154 [abstract-checked]
+- Bruin, N., Kulkarni, A. (2025). On (2,2)-decomposable genus 4 Jacobians. Canad. J. Math., doi:10.4153/S0008414X25101557 [abstract-checked]
+- Bruin, N. (2019). Prym varieties of genus four curves (slides, ICERM) [snippet-checked]
+- Frey, G., Shaska, T. (2018). Curves, Jacobians, and Cryptography. arXiv 1807.05270, https://arxiv.org/abs/1807.05270 [abstract-checked]
+- Joux, A., Vitse, V. (2012). Cover and decomposition index calculus on elliptic curves made practical. EUROCRYPT 2012, https://eprint.iacr.org/2011/020 [snippet-checked]
+- Tsakou, S., Ionica, S. (2021). Index calculus attacks on hyperelliptic Jacobians with effective endomorphisms. ePrint 2021/721, https://eprint.iacr.org/2021/721 [abstract-checked]
+- Derickx, M., Terao, K. (2026). Computing class groups and gonalities of algebraic curves over finite fields. arXiv 2602.17417, ANTS XVII, https://arxiv.org/abs/2602.17417 [abstract-checked]
+- Macri, V., Jacobson, M.J., Scheidler, R. (2026). Improvements to Jacobian arithmetic in global function fields. WAIFI 2026, LNCS 16611:111-128, https://arxiv.org/abs/2605.15323 [abstract-checked]
+- Gaudry, P. (2000). An algorithm for solving the discrete log problem on hyperelliptic curves. EUROCRYPT 2000, https://www.iacr.org/archive/eurocrypt2000/1807/18070019-new.pdf [abstract-checked]
+
+Status: COMPLETE (2026-11-17). Main gaps: full texts of Diem-Thome, Diem-Kochinke, Oyono-Theriault
+and Hess not read (hosts blocked / paywalled); record sizes for Diem-Thome and Laine-Lauter unverified.
