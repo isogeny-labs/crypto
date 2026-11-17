@@ -885,3 +885,17 @@ A mechanism that changes base-field work is still required. Kummer model/field-o
 
 ### Errors
 No runtime failures, censoring or retries. The strengthened solver does not uniformly reduce REDC; regressions are retained.
+
+## Kummer route screened without changing the target model
+
+### What was done
+Read primary Müller, Gaudry, Chung–Costello–Smith and Corte-Real Santos–Flynn papers and relevant KB metadata/context. Derived the homogeneous splitting predicate Delta=K2²-4K1K3, including sign/lift/exception obligations. Recorded the rational-node and irreducible-quintic Frobenius-module obstruction to a direct split fast-theta port on the odd-prime-order genus-2 controls. No new experiment ran. [pcc:unverified]
+
+### Decisions made
+Do not borrow split-model operation counts or silently extend to Fp5. Generic Fp Kummer arithmetic remains eligible, but needs a counted differential-addition and signed-recovery circuit before a full solve prototype. Keep general curve scope and final-check/setup costs.
+
+### Open threads
+Concrete generic Kummer circuit cost case; if competitive, freeze original-group/exception/sign controls and then a complete solve comparison. Genus-3/4 and broad tenfold mathematical objective remain open. Gaussian determinant proof is separate.
+
+### Errors
+ePrint and author mirror fetches failed; recovered the Gaudry publisher PDF. Sparse checkout has no src/crates tree, so the limited filename search is not evidence of repository-wide absence. No scientific retry or model substitution.
