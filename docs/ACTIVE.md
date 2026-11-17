@@ -30,7 +30,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
 
-- [ ] Genus 4: cheaper IC arms (sieve, SGE+coordinate Wiedemann, Ferrari) against window-free plain rho at w = 1 (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4613)
+- [x] Genus 4: cheaper IC arms (sieve, SGE+coordinate Wiedemann, Ferrari) against window-free plain rho at w = 1 (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4613)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
