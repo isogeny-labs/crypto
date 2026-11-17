@@ -2142,3 +2142,10 @@ What was done: checkedprior singleanchorambiguity applieswithoutsourceequation, 
 Decisions made: original12targets/24calls, same16anchors/3seeds, allattempts/batches/inversions/proofs charged, diagnosticnativefulltrace+mutation/repeat gates. Assertions [pcc:unverified]. Sources anchor-rank results/protocol andKB source:91b6bbe9fb73267bbeb5d7c97f493b26 backgroundonly,no noveltyclaim.
 Open threads: pushfreeze thenone120CPU invocation, inspectstalls/anchorcount/proofcost beforegainclaims.
 Errors: onlyunusedwarning,noscienceyet.
+
+## Persistent anchor closure qualified, costregressions retained
+
+What was done: freeze1a62fd27829 once-onlyexit0;24calls/12originaltargets native/diagnostictrace/control/repeat/mutation gatespass. Onep251targetcompletesoneanchor. P601source1costgrows (base13218->14490,7936->11668;subgroup4044->8496,3626->7656); source17basewins butsubgroupgrowth. Assertions [pcc:unverified].
+Decisions made: eagerclosure notuniformgain,10xgatefails. Definitionsaddunknown+equation; p60140orbits42rows leaves4constraints. Nextpublicclosure-constraintpriorityrule mustchargeclassification, notfuturewitnessoracle.
+Open threads: prospectiveconstraint-first scheduling/costcase versus bothstreams; originalgenus2+10x andindependentreview/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
