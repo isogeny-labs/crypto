@@ -1854,3 +1854,10 @@ What was done: recorded original lazy primitives; explicit action-folded rows an
 Decisions made: Git custody while S3 unavailable; same 12 targets and counters, 84 mutation gate, once-only 120 CPU seconds after push. Assertions [pcc:unverified].
 Open threads: qualify certificates, then register full-cost measurement separately.
 Errors: duplicate helper name corrected before freeze; no scientific execution yet.
+
+## Lazy producer certificates qualified
+
+What was done: freeze4a6bab348ec executed once, exit0;12 certificates/84 mutations each verifier, original producer vectors/native diagnostic traces exact. Three repeated-root relations used exact fallback;12 total attempts.
+Decisions made: qualification only, no certificate cost or complete speedup claim. Assertions [pcc:unverified]. Git custody replaces unavailable S3.
+Open threads: freeze complete-cost gate against both retained source arms; independent review/publication artifacts; original genus2+10x objective.
+Errors: none in execution; no retry/S3/cloud.
