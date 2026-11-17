@@ -2065,3 +2065,10 @@ What was done: derived norm/congruence addition certificate, compatible sharedsu
 Decisions made: knownvalidinputs explicit; no verification-only gain credited asfullcold. Gitfreeze beforeone120CPU invocation. Assertions [pcc:unverified]. SourcesKB receipt inprotocol; AMSoriginal403, universityStollnotes fallback; no noveltyclaim.
 Open threads: executeafterpush, assess certificateverification and actualconstructioncost, then decide fullpipeline admission.
 Errors: orchestration syntax rejected beforeexecution, retriedtoolcode only; no scientificrunyet.
+
+### Pre-execution source receipt correction
+
+What was done: Stoll fallbackPDF also returned502; protocol corrected to say neitherexternalPDF read, useexactlocalCantorimplementation.
+Decisions made: preserve failedretrieval scope explicitly, sourcefreeze amendment before scientificexecution.
+Open threads: once-onlygate aftercorrectedfreeze push.
+Errors: previousprospective text assumed fallbackretrievalsuccess; corrected,hasesupdated,noscienceexecuted.
