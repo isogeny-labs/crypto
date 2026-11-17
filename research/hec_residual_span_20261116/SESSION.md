@@ -1995,3 +1995,10 @@ What was done: built externallybound Context+coverpacket, separate weightedrow v
 Decisions made: original12targets/216rejections, qualificationonly no performancecostclaim, unchangedwholeprimeJpremise. Assertions [pcc:unverified]. Sources eigen-cover THEORY/results andexactgeometry proof, no newmechanism assumed.
 Open threads: pushfreeze thenonce-only120CPU invocation; nextfullcoldcost allfourbranches vs triangular/bothcontrols.
 Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Bound eigen-cover verifier qualified
+
+What was done: freeze01f132ab44e once-onlyexit0;12boundpackets accepted,216mutations rejected, noactioncharacterorproducerGaussian calls in verifier. Assertions [pcc:unverified].
+Decisions made: proceed to fullcostscreen, no performanceclaim fromqualification.
+Open threads: price all4proofs/rootgeneration/geometry/binding andproducer onoriginaltargets.
+Errors: none,no retry/S3/cloud.
