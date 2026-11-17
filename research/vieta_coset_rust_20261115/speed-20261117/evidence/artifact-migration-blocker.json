@@ -1,0 +1,22 @@
+{
+  "schema": "vieta-artifact-migration-blocker/v1",
+  "observed_utc": "2026-11-17T06:28:15.037420+00:00",
+  "observed_head": "5ac77b08ee047747fbb25abd48cecec4e792502c",
+  "job": {
+    "__typename": "CheckRun",
+    "completedAt": "2026-11-17T06:23:46Z",
+    "conclusion": "FAILURE",
+    "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/44030831912/job/133862107820",
+    "name": "migrate",
+    "startedAt": "2026-11-17T06:23:21Z",
+    "status": "COMPLETED",
+    "workflowName": "artifact-autofix"
+  },
+  "exact_result": "S3 HeadObject403 Forbidden; tool notes absent keys without s3:ListBucket can also return403",
+  "object_presence_or_absence_established": false,
+  "local_s3_operation": false,
+  "migration_success_claim": false,
+  "policy_files_pending": 9,
+  "source_protocol_claim_raw_hash_changes": false,
+  "alternatives_considered": "Git-only repacking of the committed control log is prohibited by AGENTS section13/13a; no policy bypass, historical edits, recompression or fake availability. Wait for legitimate store access repair/official bot."
+}

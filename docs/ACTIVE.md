@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] P-192 relation pipeline: functional replay and portable handoff complete; blocked on external verification/cloud connections (Codex, started 2026-11-17, branch lane/nist-relation-pipeline, PR #4529; automatic goal paused, resume when connections are supplied)
+- [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- P-192 #4529: the functional pipeline and portable replay handoff pass, but keyring keys/verifiers are empty and the producer cannot issue its own independent verdict. The existing read-only main OIDC route (run44035933968) fails sts:AssumeRoleWithWebIdentity before budget reads; live reservations/capacity are also unobserved. Restore an existing authorized verifier and cloud readback route; no increased allowance is requested. See PORTABLE_REPLAY.md and the original report's timing exclusions.
+- Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
