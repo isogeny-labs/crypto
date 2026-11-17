@@ -1,0 +1,60 @@
+{
+  "sources": [
+    "research/twist_routes_1_3_20261021/execution-v2/runs/block-worker-cost-20261025-v1/COST.json",
+    "research/twist_routes_1_3_20261021/execution-v2/runs/block-batch-cost-20261025-v1/COST.json"
+  ],
+  "unit": "Callgrind simulated guest instructions Ir",
+  "fixed_workload": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+  "rows": [
+    [
+      "Boolean membership",
+      21850152,
+      21911730,
+      25983653
+    ],
+    [
+      "Direct addition chain",
+      2423541,
+      2431742,
+      11030733
+    ],
+    [
+      "Factored membership",
+      63425225,
+      63477695,
+      34379495
+    ],
+    [
+      "First-pair invariants",
+      2324142,
+      1847549,
+      20283359
+    ],
+    [
+      "Frobenius variable blocks",
+      2416229,
+      2436407,
+      10980407
+    ],
+    [
+      "Eight-bucket helper",
+      5784840,
+      2458250,
+      78063100
+    ],
+    [
+      "Ordinary prefix order",
+      2422113,
+      2431752,
+      10976860
+    ]
+  ],
+  "columns": [
+    "encoding",
+    "native separate branch workers",
+    "native one batch worker",
+    "msolve separate branch workers"
+  ],
+  "scope": "solver worker startup, parse, symbolic/F4 work and serialization; excludes construction and complete IC",
+  "uncertainty": "one fixed public toy case; same-input A/A controls only"
+}

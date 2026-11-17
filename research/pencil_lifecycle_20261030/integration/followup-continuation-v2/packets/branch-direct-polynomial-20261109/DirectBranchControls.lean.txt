@@ -1,0 +1,101 @@
+import DirectBranchCoefficientMultiplicity
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.NormNum
+set_option autoImplicit false
+noncomputable section
+namespace DirectBranchCoefficientControls
+open Polynomial Common22BranchStalk WeightedProjSmoothPoints ActualNonbranchNorm
+abbrev F : ℚ[X] := quintic 0 0 (-1) 0
+abbrev u : ℚ[X] := Common22Coprime.firstSupport 0 1
+abbrev v : ℚ[X] := Common22Coprime.secondSupport 0 (-1)
+abbrev U : ℚ[X] := residual 0 1 0 0 0 (-1) 0 0
+abbrev b : ℚ := (Common22SupportHead.coefficientData 0 1 0 0 0 (-1) 0 0).1
+ theorem coefficients : Common22SupportHead.coefficientData (0:ℚ) 1 0 0 0 (-1) 0 0 = (-4,0,0,-16,0) := by
+  norm_num [Common22SupportHead.coefficientData]
+ theorem residual_value : U = C (-16)*X := by
+  norm_num [U,ActualNonbranchNorm.residual,coefficients]
+ theorem determinant_nonzero : b ≠ 0 := by norm_num [b,coefficients]
+ theorem valid_first : u ∣ F-(C (0:ℚ)*X+C 0)^2 := by
+  refine ⟨X*v, ?_⟩
+  simp only [u,v,F,Common22Coprime.firstSupport,Common22Coprime.secondSupport,quintic]
+  norm_num
+  simp only [Polynomial.C_ofNat]
+  ring
+ theorem valid_second : v ∣ F-(C (0:ℚ)*X+C 0)^2 := by
+  refine ⟨X*u, ?_⟩
+  simp only [u,v,F,Common22Coprime.firstSupport,Common22Coprime.secondSupport,quintic]
+  norm_num
+  simp only [Polynomial.C_ofNat]
+  ring
+ abbrev aa : ℚ[X] := -25*X^3
+ abbrev bb : ℚ[X] := 5*X^4-4
+ theorem bezout : aa*F+bb*derivative F = C (4:ℚ) := by
+  norm_num [aa,bb,F,quintic,derivative_add,derivative_sub,derivative_mul,derivative_pow]
+  simp only [Polynomial.C_ofNat]
+  ring
+ theorem separable : F.Separable := by
+  rw [Polynomial.separable_def']
+  refine ⟨C (1/4:ℚ)*aa,C (1/4:ℚ)*bb, ?_⟩
+  calc
+   _ = C (1/4:ℚ)*(aa*F+bb*derivative F) := by ring
+   _ = 1 := by rw [bezout,←map_mul]; norm_num
+ theorem branch_root : fAt (0:ℚ) 0 (-1) 0 0 = 0 := by norm_num [fAt]
+ theorem support_zero : u.eval 0*v.eval 0*U.eval 0=0 := by rw [residual_value]; simp
+ theorem actual_source_instance : u ≠ 0 ∧ v ≠ 0 ∧ U ≠ 0 ∧
+   u.rootMultiplicity 0+v.rootMultiplicity 0+U.rootMultiplicity 0=1 := by
+  exact DirectBranchCoefficientMultiplicity.source_support_base_multiplicity_sum
+    (0:ℚ) 0 (-1) 0 0 0 1 0 0 0 (-1) 0 0
+    branch_root separable determinant_nonzero valid_first valid_second support_zero
+ theorem equal_support_determinant_zero :
+   (Common22SupportHead.coefficientData (0:ℚ) 1 0 0 0 1 0 0).1=0 := by
+  norm_num [Common22SupportHead.coefficientData]
+ theorem wrong_branch_rejected : fAt (0:ℚ) 0 (-1) 0 2 ≠ 0 := by norm_num [fAt]
+-- Generic identity-level controls; no coefficientData realization is assumed.
+theorem x_multiplicity : (X : ℚ[X]).rootMultiplicity 0 = 1 := by
+  simpa using (rootMultiplicity_X_sub_C_self (R := ℚ) (x := 0))
+
+theorem zero_determinant_counterexample :
+    (X : ℚ[X])^2 - (X*X)*C 1 = C ((0:ℚ)^2)*X ∧
+    (X : ℚ[X]).eval 0 = 0 ∧
+    (X : ℚ[X]).derivative.eval 0 ≠ 0 ∧
+    (X : ℚ[X]).eval 0 * (X : ℚ[X]).eval 0 * (C (1:ℚ)).eval 0 = 0 ∧
+    (X : ℚ[X]).rootMultiplicity 0 + (X : ℚ[X]).rootMultiplicity 0 +
+      (C (1:ℚ)).rootMultiplicity 0 = 2 := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · norm_num <;> ring
+  · simp
+  · simp
+  · simp
+  · norm_num [x_multiplicity, rootMultiplicity_C]
+
+theorem nonsimple_root_counterexample :
+    (0 : ℚ[X])^2 - (X*X)*C (-1) = C ((1:ℚ)^2)*(X^2) ∧
+    (X^2 : ℚ[X]).eval 0 = 0 ∧
+    (X^2 : ℚ[X]).derivative.eval 0 = 0 ∧
+    (X : ℚ[X]).eval 0 * (X : ℚ[X]).eval 0 * (C (-1:ℚ)).eval 0 = 0 ∧
+    (X : ℚ[X]).rootMultiplicity 0 + (X : ℚ[X]).rootMultiplicity 0 +
+      (C (-1:ℚ)).rootMultiplicity 0 = 2 := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · norm_num <;> ring
+  · simp
+  · simp [derivative_sq]
+  · simp
+  · norm_num [x_multiplicity, rootMultiplicity_C]
+
+theorem missing_support_counterexample :
+    (1 : ℚ[X])^2 - ((1-X)*C 1)*C 1 = C ((1:ℚ)^2)*X ∧
+    (X : ℚ[X]).eval 0 = 0 ∧
+    (X : ℚ[X]).derivative.eval 0 ≠ 0 ∧
+    (1-X : ℚ[X]).eval 0 * (C (1:ℚ)).eval 0 * (C (1:ℚ)).eval 0 ≠ 0 ∧
+    (1-X : ℚ[X]).rootMultiplicity 0 + (C (1:ℚ)).rootMultiplicity 0 +
+      (C (1:ℚ)).rootMultiplicity 0 = 0 := by
+  have hm : (1-X : ℚ[X]).rootMultiplicity 0 = 0 := by
+    apply rootMultiplicity_eq_zero
+    norm_num [IsRoot]
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · norm_num <;> ring
+  · simp
+  · simp
+  · simp
+  · norm_num [hm, rootMultiplicity_C]
+end DirectBranchCoefficientControls

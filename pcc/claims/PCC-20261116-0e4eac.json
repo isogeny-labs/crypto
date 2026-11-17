@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T12:46:29Z",
+ "id": "PCC-20261116-0e4eac",
+ "kind": "measurement",
+ "producer": {
+  "commit": "e0e0a9d0a9ce076e28514007dbcc2bc83df9055f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/fused-profile-01/summary-baseline.json",
+    "sha256": "47cbb7909c60184c052ffbeb14c83994251e4b3274897900b08932332fc45af6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/fused-profile-01/summary-direct.json",
+    "sha256": "3be1b352d9b772962f5927e2e086b8a5596f5a6d73087c6dcddf676a3923b130"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/fused-profile-01/isolation.jsonl",
+    "sha256": "969b04f5ce8746746739841d84bb92757da441b88acf9eb165b8f2119dfbe83c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Registered fixedLAST matched Callgrind profiles complete with exact checked basis/modes and unchanged pins,0monitorcontention. Baseline111865803guestIr/direct108491681guestIr; directlead self14074655,axpy_in_place Vec self12410313,checkeradd_term self3480336. These are instruction counts, not native time ratios; inclusive costs overlap."
+}

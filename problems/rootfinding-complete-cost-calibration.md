@@ -4,7 +4,7 @@
 - **Kind:** measurement gap; implementation gap for native-work accounting; independent-host validation gap
 - **Affected work:** [ecbench root-finding assessment](../research/ecbench_rootfinding_assessment_20261012/REPORT.md), [arity trial](../research/ecbench_rootfinding_arity_20261013/REPORT.md), [batched pair-table trial](../research/ecbench_rootfinding_batchtable_20261013/REPORT.md), its [target-pinned follow-up](../research/ecbench_rootfinding_batchtable_20261013/followup/), and the [synchronized-lane and coverage study](../research/ecbench_rootfinding_lanes_20261013/REPORT.md)
 - **Next action owner:** unassigned measurement and ecbench instrumentation task
-- **Last updated:** 2026-11-15
+- **Last updated:** 2026-10-14
 
 ## Problem
 
@@ -61,12 +61,78 @@ Later 2026-10-13: The one-lane native walk matched every paired relation and ans
 
 Later 2026-10-14: The equal-prefix addendum first measured a reused-target exploratory panel, then a separately frozen eight-fresh-target confirmation. Both showed an early stride-23 independent-rank surplus; the fresh primary effect was smaller and diminished by 8,192 probes. The exact equal-probe control now exists, while complete native pricing, isolated wall and independent-host replay remain open.
 
-2026-11-15, K13 binary batch study: [the source-level cost-model review](../research/rootfind_negfold_binary_batch_20261115/COST_MODEL_REVIEW_20261115.md) identified a distinct metric obstruction before data. The fixed `bitop/v1` binary `group_add` weight prices the scalar and batched table's equal abstract additions alike; the ecbench rootfinding adapter does not serialize the shared-inversion and lazy-ordinate field work as separately priced primitives. Under matching relation trajectories, a strict batch `bitop/v1` win is structurally unavailable at m=2 and extra completed-block additions can make m=3 count worse. This is a model-sensitivity conclusion, not a wall measurement. [Amendment 3](../research/rootfind_negfold_binary_batch_20261115/AMENDMENT-3.md) makes the already specified L2/A/A whole-solve wall comparison the m=3 primary decision, tightens its target-cluster threshold, and keeps m=2 descriptive. A new source/protocol publication receipt and admitted run remain required. The existing problem-index row still identifies missing native field counts and L2 validation; its file is reserved by Conductor T-6315 for an unrelated N83 change, so no concurrent index edit was made. Unresolved.
+2026-10-19: The [F4/F5 and recursive-root continuation](../research/f4_f5_ecbench_20261019/README.md)
+now executes complete cold one-target ecbench recovery on dedicated native
+hosts, including F6, generalized roots, both Semaev table backends and the
+strong matched rho reference. The initial sessions each verify528 records
+(including88 warmups) and reproduce440 measured records. Timing admission is
+reported per arm; a verified record below L2 does not acquire an admitted
+clock. These small registered Koblitz fixtures address a bounded native-wall
+access/measurement gap, not full pricing of every native unit or independent
+host qualification of the earlier rational-lane study. The initial prepared
+schedule regresses full DLP recovery; its measurements remain unchanged,
+with the corrected adaptive policy frozen as a separate experiment. Complete
+pricing, coverage and independent-host exit criteria stay open.
 
+The corrected adaptive source completes the full native and cold-DLP panels.
+At n23 the F4/F5 paired candidate/baseline solve ratios are0.6309/0.6532,
+with40 L2 pairs each; complete child clocks are retained separately. Every
+record verifies and measured replay reproduces. Some short reference/table
+clocks remain below L2, and native work is partly priced. This establishes
+a bounded F4/F5 branch wall improvement, not a complete-cost resolution or
+a transfer of qualification to the earlier rational-lane study.
 
 ## 2026-10-19 generalized all-roots conditional-cell follow-up
 
 The [new cycle](../research/autolab_cycle_20261019_v3/REPORT.md) proves exact fixed-sum pair recovery and adaptive empty affine cells of dimension65 on GF(2^83), d18. These are conditional first-S3 components. They do not resolve the full339-coordinate hard root set, its2^101 outer (p,s) grid, all requested field families, or the matched full all-roots F4/F5/F6 performance gate. No speed ratio is inferred from cells or timeouts. Existing unrelated pipeline evidence and exit criteria above remain unchanged.
 
 Next discriminating experiment: [draft union/residual card](../backlog/XP-20261019-adaptive-pair-cell-union/README.md). Construct an exact disjoint union/residual partition, independently compare every small literal-S3 root, and freeze state/output/work caps before another changed hard solve. Unblock original completeness only with full ordered original tuples and a coverage certificate; unblock speed claims only with the unchanged20-input genuine-matched-baseline gate. Native component tests pass; legacy sparse Python-suite validation remains incomplete as documented in [validation](../research/autolab_cycle_20261019_v3/VALIDATION.md). This record remains open.
+
+
+- **Kind:** measurement gap; implementation gap for native-work accounting; independent-host validation gap; current local checkpoint ownership limit
+- **Affected work:** [ecbench root-finding assessment](../research/ecbench_rootfinding_assessment_20261012/REPORT.md), [arity trial](../research/ecbench_rootfinding_arity_20261013/REPORT.md), [batched pair-table trial](../research/ecbench_rootfinding_batchtable_20261013/REPORT.md), its [target-pinned follow-up](../research/ecbench_rootfinding_batchtable_20261013/followup/), the [synchronized-lane and coverage study](../research/ecbench_rootfinding_lanes_20261013/REPORT.md), the [K13 torsion timing preflight](../research/rootfind_torsion_timing_20261116/PREFLIGHT.md), and the [K13 duration admission probe](../research/rootfind_k13_l2_admission_probe_20261116/PROTOCOL.md)
+- **Last updated:** 2026-11-16
+
+
+
+
+
+- **Observed:** The two [sealed sessions](../research/ecbench_rootfinding_assessment_20261012/sessions/) have 128 verified executions each, 24 measured per arm, and [full](../research/ecbench_rootfinding_assessment_20261012/audit-prime20-all.json) [replay](../research/ecbench_rootfinding_assessment_20261012/audit-koblitz17-all.json) receipts with zero problems. The [summaries](../research/ecbench_rootfinding_assessment_20261012/summary-prime20.json) and [Koblitz summaries](../research/ecbench_rootfinding_assessment_20261012/summary-koblitz17.json) record `lower_bound`, `unpriced`, phase GAE, and process RSS. The host reports macOS arm64 with no CPU reservation; all measured wall grades are L0. [pcc:unverified]
+- **Observed, 2026-11-16 K13 duration risk:** The [hash-checked readback](../research/rootfind_k13_l2_admission_probe_20261116/REPORT.md) of two archived source-bound L0 Apple M4 Pro sessions found all 36 measured batch-m3 solve clocks below ecbench's 1 ms L2 floor (measurement record `PCC-20261116-912e14`, unverified). The sessions use target seeds `202611160401` and `202611160511`; neither is the frozen panel seed. The separate [independent K13 audit](../research/rootfind_k13_l0_independent_audit_20261116/REPORT.md) checked every recovered scalar in the second session. Current [`grade_v3`](../src/cryptanalysis/ecbench/measurement.rs) marks any solve below 1 ms as an L2 blocker. These local measurements cannot predict x86 duration; they expose a possible admission failure for the frozen [ten-arm K13 panel](../research/rootfind_f456_batch_combined_20261115/PROTOCOL.md). The [before-data x86 probe](../research/rootfind_k13_l2_admission_probe_20261116/PROTOCOL.md) fixes an all-eight-target, 32-measured-row test of this gate. It is not a performance comparison. [pcc:unverified]
+
+
+
+- [ ] A new ecbench record for the same registered curve identities and eight public target IDs per curve, with 24 measured executions per arm, scalar verification, a completed full-rank IC solve, and `unpriced: []` for every arm; retain all attempts, including failures. [pcc:unverified]
+
+
+
+
+
+
+
+
+
+Later 2026-10-13: The one-lane native walk matched every paired relation and answer in a fresh-target ecbench session, with a full same-host replay. Its L0 wall diagnostic did not show an improvement; native conversion and probe costs remain unpriced, and the lane-batched inversion kernel is not yet integrated. The complete-cost exit criteria remain open. [pcc:unverified]
+
+2026-10-14: The synchronized 4/8/16-lane collector and fixed-stride B48 coverage controls completed five frozen L0 sessions, all verified and replayed. The train-selected B48 did not establish a holdout B optimum, and the stride panels did not resolve a coverage bias against exact uniform occupancy. Missing sealed field-operation counters, unequal target-pinned probe budgets, inaccessible L2 workers and absent independent-host replay keep the stated exit criteria open. The prior kernel-only and one-lane observations remain immutable historical records. [pcc:unverified]
+
+
+2026-11-15, K13 binary batch study: [the source-level cost-model review](../research/rootfind_negfold_binary_batch_20261115/COST_MODEL_REVIEW_20261115.md) identified a distinct metric obstruction before data. The fixed `bitop/v1` binary `group_add` weight prices the scalar and batched table's equal abstract additions alike; the ecbench rootfinding adapter does not serialize the shared-inversion and lazy-ordinate field work as separately priced primitives. Under matching relation trajectories, a strict batch `bitop/v1` win is structurally unavailable at m=2 and extra completed-block additions can make m=3 count worse. This is a model-sensitivity conclusion, not a wall measurement. [Amendment 3](../research/rootfind_negfold_binary_batch_20261115/AMENDMENT-3.md) makes the already specified L2/A/A whole-solve wall comparison the m=3 primary decision, tightens its target-cluster threshold, and keeps m=2 descriptive. A new source/protocol publication receipt and admitted run remain required. The existing problem-index row still identifies missing native field counts and L2 validation; its file is reserved by Conductor T-6315 for an unrelated N83 change, so no concurrent index edit was made. Unresolved.
+
+2026-11-16, K13 duration admission: two distinct local K13 source-bound raw sessions used target seeds `202611160401` and `202611160511`, rather than the frozen panel's `202611151301`. Their 36 measured batch-m3 solve clocks are all below ecbench `grade_v3`'s 1 ms L2 floor on an L0 Apple M4 Pro. This is a host-specific admission risk, not a proof about x86 speed or a change to the frozen panel. The [before-data x86 admission probe](../research/rootfind_k13_l2_admission_probe_20261116/PROTOCOL.md) will repeat the exact frozen targets and batch method on the intended source, image and host class with A/A, 32 measured records and all-row verification. All L2 rows at or above 1 ms permit the full ten-arm panel to proceed under its separate budget, checkpoint and publication gates; any shorter or sub-L2 row prevents that panel's all-pairs decision rule from being met on that observed source/host/target round and requires an explicit pre-data amendment or a new host/source-bound design before further submission. The monthly and daily EKS cost gates are exhausted, and Conductor T-6814 holds the checkpoint file, so this probe remains unrun. The problem-index row still states the broader native-pricing and L2 impediment; Conductor T-6315 reserves that index. [pcc:unverified]
+
+2026-11-16, K13 admission correction before data: [Amendment 1](../research/rootfind_k13_l2_admission_probe_20261116/AMENDMENT-1.md) records that the original two-round, two-arm admission probe was not runnable through the native EKS benchmark path, which requires five measured rounds, a reference arm, and matching A/A. The corrected v2 spec keeps all eight frozen targets and the batch method, adds the unchanged F6-IC method as reference, and requests five measured rounds: 144 processes, 120 measured, 40 measured batch rows. The original protocol/spec and local readback remain immutable. No probe Job was found in the live namespace, and no probe execution has occurred. Cost and checkpoint gates still bind; the next admissible action is validator and source-bound plan checking, then one fixed v2 job when those gates permit. The existing problem-index row is unchanged while Conductor T-6315 reserves it. [pcc:unverified]
+
+2026-11-16, K13 admission coverage correction before data: [Amendment 2](../research/rootfind_k13_l2_admission_probe_20261116/AMENDMENT-2.md) supersedes v2 as the intended execution design. The native EKS benchmark rejects any sub-L2 record, while v2 omitted the frozen panel's actual rho reference and three other non-Gröbner arms. V3 copies all six non-Gröbner arm objects exactly from the frozen ten-arm spec, retains the eight targets and five measured rounds, and has 288 planned executions (240 measured). The historical v1/v2 inputs and readback remain unchanged. A v3 pass would screen the shortest-method admission risk but would still leave the four Gröbner arms and the full same-target comparison untested. Budget and checkpoint gates remain closed; no v3 execution has been submitted. The index row is held by Conductor T-6315. [pcc:unverified]
+
+
+
+The [new cycle](../research/autolab_cycle_20261019_v3/REPORT.md) proves exact fixed-sum pair recovery and adaptive empty affine cells of dimension65 on GF(2^83), d18. These are conditional first-S3 components. They do not resolve the full339-coordinate hard root set, its2^101 outer (p,s) grid, all requested field families, or the matched full all-roots F4/F5/F6 performance gate. No speed ratio is inferred from cells or timeouts. Existing unrelated pipeline evidence and exit criteria above remain unchanged. [pcc:unverified]
+
+
+## 2026-11-16 K13 torsion timing admission
+
+The [preflight receipt](../research/rootfind_torsion_timing_20261116/PREFLIGHT.md) identifies a separate local admission obstruction. The registered K13 curve index was repaired before data; the corrected release plan has the exact required curve UID, four public targets and 144 scheduled executions. The required `scripts/checkpoint.sh gate` returned exit 0 and uploaded a checkpoint, but `.resume/RESUME.md` describes unrelated work and contains conflict markers at lines 66, 198 and 202. Thus that checkpoint does not meet AGENTS.md's complete, independently resumable record requirement for this study. Conductor T-6342 holds `dir:.resume` exclusively for another task. No timed execution of this protocol has begun. [pcc:unverified]
+
+The local test unblocks when T-6342 releases the reservation through its ordinary completion or handoff, this branch's resume record names the K13 protocol/spec, source and binary, current state, next commands, in-flight runs, and stop/success conditions without conflict markers, and a fresh S3 upload plus gate pass are verified. Then execute the frozen 600-second bounded L0 session and retain all rows, including failures. Passing this local gate permits only the stated diagnostic; native pricing, isolated L2 comparison and independent replay still govern any broader claim. The existing problem-index row still captures those latter obligations. Its update is deferred because Conductor T-6315 holds `problems/README.md` exclusively; do not edit around that reservation. Unresolved. [pcc:unverified]
 

@@ -33,6 +33,9 @@ mod compact_cold;
 #[path = "../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs"]
 #[allow(dead_code, unused_imports, clippy::all)]
 mod primary_adapter;
+#[path = "n83_factor_base_sweep_v5.rs"]
+#[allow(dead_code)]
+mod v5_design;
 
 const STUDY: &str = "koblitz_n83_factor_base_sweep_20261008";
 const PREFIX: &str = "s3://crypto-autoresearcher/factor-bases/icv1/etc";
@@ -60,8 +63,72 @@ const SYMMETRIES: [&str; 5] = [
 ];
 const LA: [&str; 3] = ["dense_u64", "sparse_u64", "modular_biguint"];
 const RADICES: [usize; 8] = [5, 4, 5, 8, 2, 3, 3, 3];
+const V5_RETAINED_K600_ORDINAL: u64 = 26_960_859_236;
+const V5_RETAINED_K600_SHA256: &str =
+    "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf";
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+/// Bind one declared v5 cell to the already retained, exact K600 store object.
+/// This only checks a runnable adapter; it is not a runtime measurement.
+fn retained_v5_k600_binding(ordinal: u64, base_dir: &Path) -> Result<Value> {
+    if ordinal != V5_RETAINED_K600_ORDINAL {
+        return Err("no retained v5 adapter for this ordinal".into());
+    }
+    let source_root = std::env::var_os("ICV1_FROZEN_SOURCE_DIR")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")));
+    let v5_source = source_root.join("examples/n83_factor_base_sweep_v5.rs");
+    if fs::read(v5_source)?.as_slice() != include_bytes!("n83_factor_base_sweep_v5.rs").as_slice() {
+        return Err("v5 adapter source differs from the compiled source".into());
+    }
+    let case = v5_design::verified_case(&source_root, ordinal)?;
+    if case["region"] != "v5_single_base"
+        || case["source"]["base_index"] != 92
+        || case["source"]["base"]
+            != json!({"a":0,"closure":"signed_frobenius","family":"public_x_hash",
+                "parameter":600,"parameter_unit":"orbit_columns","seed":2026100801u64})
+        || case["symmetry_mask"] != 18
+        || case["solver"]
+            != json!({"summands":6,"split_bits":0,
+                "symmetry":["signed_frobenius","ordered_first_pair"],
+                "backend":"sat_cdcl","enumeration":"binary",
+                "max_large_primes":0,"threads":1,"linear_algebra":"modular_biguint"})
+    {
+        return Err("v5 retained K600 case no longer matches the executable strategy".into());
+    }
+    let manifest: Value = serde_json::from_slice(&fs::read(base_dir.join("manifest.json"))?)?;
+    if manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || manifest["remote"] != "s3://setec-astronomy-artifacts/store"
+        || manifest["base"]["a"] != 0
+        || manifest["base"]["closure"] != "signed_frobenius"
+        || manifest["base"]["columns"] != 600
+        || manifest["base"]["policy"] != "public_x_hash"
+        || manifest["base"]["seed"] != 2026100801u64
+        || manifest["base"]["compressed_sha256"] != V5_RETAINED_K600_SHA256
+        || manifest["base"]["bytes"] != 3_025_798u64
+    {
+        return Err("retained K600 store manifest differs from the v5 binding".into());
+    }
+    Ok(json!({
+        "schema":"n83.v5-retained-adapter-binding/v1",
+        "status":"PASS_EXACT_ADAPTER_BINDING",
+        "ordinal":ordinal,
+        "base_sha256":V5_RETAINED_K600_SHA256,
+        "strategy":"ordered-orbit-chain-s3",
+        "case":case,
+        "executed_complete_pipeline":false,
+        "selected_best_total_runtime":Value::Null
+    }))
+}
+
+fn require_v5_one_thread(value: Option<&str>) -> Result<()> {
+    if value != Some("1") {
+        return Err("V5 one-thread cell requires RAYON_NUM_THREADS=1".into());
+    }
+    Ok(())
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 struct BaseSpec {
@@ -1902,6 +1969,33 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
+        Some("primary-v5-retained-binding-check")=>{
+            if args.len()!=4 { return Err("primary-v5-retained-binding-check ORDINAL BASE_DIR".into()); }
+            println!("{}",retained_v5_k600_binding(args[2].parse()?,Path::new(&args[3]))?);
+        },
+        Some("primary-v5-retained-chain-cold")=>{
+            if args.len()!=13 { return Err("primary-v5-retained-chain-cold ORDINAL BASE_DIR FIXTURE_DIR MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (exact retained K600; hard cgroup and external wall caps required)".into()); }
+            require_v5_one_thread(std::env::var("RAYON_NUM_THREADS").ok().as_deref())?;
+            let ordinal=args[2].parse()?;
+            let base_dir=Path::new(&args[3]);
+            let binding=retained_v5_k600_binding(ordinal,base_dir)?;
+            let max_trials=args[5].parse()?;
+            let limits=ChainS3Limits {
+                max_variables:args[6].parse()?,max_domain_clauses:args[7].parse()?,
+                max_models:args[8].parse()?,conflict_budget:args[9].parse()?,
+            };
+            let budget_seconds=args[10].parse()?;
+            let memory_mib=args[11].parse()?;
+            let run_dir=Path::new(&args[12]);
+            let sidecar=run_dir.with_extension("v5-binding.json");
+            if run_dir.exists() || sidecar.exists() { return Err("v5 output path already exists".into()); }
+            write_new_json(&sidecar,&binding)?;
+            let summary=primary_adapter::run_store_chain_cli(
+                base_dir,Path::new(&args[4]),600,6,max_trials,limits,
+                budget_seconds,memory_mib,run_dir,true,true,
+            )?;
+            println!("{summary}");
+        },
         Some("primary-store-v3-chain-cold") | Some("primary-store-v3-orbit-chain-cold") | Some("primary-store-v3-ordered-orbit-chain-cold")=>{
             if args.len()!=14 { return Err("primary-store-v3-[ordered-orbit-|orbit-]chain-cold BASE_DIR FIXTURE_DIR K M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (verified v3 artifact-store input; requires hard cgroup memory and external wall caps)".into()); }
             let summary=primary_adapter::run_store_chain_cli(
@@ -1937,6 +2031,19 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retained_v5_cell_binds_only_the_exact_k600_object() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let base = root.join("research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/attempt-1");
+        let receipt = retained_v5_k600_binding(V5_RETAINED_K600_ORDINAL, &base).unwrap();
+        assert_eq!(receipt["status"], "PASS_EXACT_ADAPTER_BINDING");
+        assert_eq!(receipt["case"]["symmetry_mask"], 18);
+        assert_eq!(receipt["case"]["solver"]["backend"], "sat_cdcl");
+        assert!(retained_v5_k600_binding(V5_RETAINED_K600_ORDINAL + 1, &base).is_err());
+        assert!(require_v5_one_thread(Some("1")).is_ok());
+        assert!(require_v5_one_thread(None).is_err());
+        assert!(require_v5_one_thread(Some("4")).is_err());
+    }
     #[test]
     fn v2_object_gate_matches_the_frozen_size_receipt() {
         let design: Value = serde_json::from_slice(include_bytes!(

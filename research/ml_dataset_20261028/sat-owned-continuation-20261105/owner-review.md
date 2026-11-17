@@ -1,0 +1,23 @@
+# Original-owned SAT continuation independent source review
+
+Reviewed immutable proposal manifest `742560e13d7a012551c324cdd2d97cf4c50d2c4c91086eba97272960868943c5`, patch `7c67d3627623c3786104eccda9d31e474bbf2d2704a2e4c482ac51a55ec4847d`. All manifest artifact hashes verified. No main edits, native builds, cloud operations or runtime validation performed.
+
+Decision: isolated compilation and deliberately closed-gate diagnostics may proceed. Activation and positive model-verification acceptance require the corrections and controls below.
+
+## Findings requiring correction
+
+1. **Public verifier admits poisoned progress.** `checked_binary_sat_model.rs::verify` checks only formula_rows, blocks and signed_relation for freshness. Public Progress.lift_choices can already contain arbitrary points. The verifier appends freshly validated choices, but its sign loop reads the original first m entries. Current OwnedSearch uses default progress and avoids this route; the public checked-model API does not enforce its invariant. Reject all nondefault progress before semantic work, including lift_choices, path, sum, chain_steps and sign_mask. Add a negative test with poisoned preexisting lifts and otherwise initially empty progress; demonstrate rejection without a positive result.
+
+2. **Signed path is not joined to the model intermediate chain.** The verifier independently checks the Boolean model, x-chain and infinity pattern, then enumerates signed sums and checks only the final signed target. It does not compare each actual signed prefix sum to that model's named intermediate block and infinity bit. The endpoint relation can be valid while retained path is not a witness for the exact advertised model/pattern. Root requires a correction before activation: during each candidate path, compare prefix identity/x against the corresponding model block and pattern, retaining partial state and charging comparisons. A mismatch must reject the candidate sign choice, not certify it; include an endpoint-valid but intermediate-mismatched negative control and a valid matched path control.
+
+## Checked ownership and accounting
+
+The private continuation consumes the acknowledged WithLedger, retains the actual Solver and existing observer shared state, and does not construct another solver, budget or deadline. Checkpoint position, map original binding/pattern, published-map state, sealed/closed initial state, Setup phase and original solver deadline are checked before transition. Construction completion changes phase only after the construction deadline check; cumulative counters persist. Admission callback debits the same ledger and releases the mutex before native execution. Model extraction uses admitted_model; field arithmetic charges bounded operations and every group addition reserves from the original addition cap.
+
+No scalar logs or constructor witness enter the verifier. Signed target is retained from the original public target. Formula checking reads actual DIMACS-positive global wires as model[wire-1], all clauses/XORs, authenticated factor-base codes and field-chain equations. Field formulas for ordinary binary curves, infinity, inverses and doubling are consistent at source scope. Independent arithmetic runtime evidence is still required.
+
+Original capture router uses a separate search tag without reopening the initial transcript. Search pending events, accumulated events, actual custody position, model and partial verification survive failures in their owning frame. Actual result acknowledgment is stored before post-publication checks. Outer failure preserves the first ledger stop. Native Unsat is explicitly uncertified; no global negative or scalar flag is asserted. Existing native observer/XOR/nonroot gates remain closed, and dispatch is not activated. No public mutable solver/budget accessor is introduced.
+
+## Remaining runtime and integration gates
+
+Compile the precise composed source, then run genuine both-twist closed-gate ownership diagnostics and arithmetic controls. Those diagnostics are not nonroot positives. Separate reviewed native-gate changes must precede genuine both-twist nonroot search positives under the unchanged original caps. Add actual model/target/lift mutation, late work/allocation/deadline and post-ack capture refusal controls with retained failure state. Verify fixed serialization/copy tariffs against actual event shapes in those controls. Complete independent central replay and terminal joins, durable partial-outcome publication, and CLI acceptance before claiming end-to-end search delivery. Current proposal explicitly leaves those stages unimplemented.

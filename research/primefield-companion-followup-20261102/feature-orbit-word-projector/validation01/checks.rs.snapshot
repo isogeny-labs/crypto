@@ -1,0 +1,27 @@
+fn caps()->Caps{Caps{terms:128,stored:500000,pairs:2000000,output:64}}
+fn zeta(r:u64,m:usize)->u64{(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap()}
+fn word(r:u64,m:usize,z:u64,k:u64,b:u64)->Word{Word{b,signs:(0..m).map(|j|pow((k+r-mul(b,pow(z,j as u64,r),r))%r,(r-1)/2,r)).collect()}}
+fn checks(){
+ let(mut systems,mut memberships,mut phases,mut symmetric,mut strict,mut max_nodes,mut pairs)=(0,0,0,0,0,0,0);
+ for(r,m)in[(19u64,3usize),(41,5),(97,6),(109,9),(281,7)]{let z=zeta(r,m);let ks:Vec<_>=if r<50{(1..r).collect()}else{vec![1,2,3,7,17,r-1]};for k in ks{for radii in [&[2u64][..],&[2u64,1,3,2][..]]{let words:Vec<_>=radii.iter().map(|&b|word(r,m,z,k,b)).collect();if words.iter().any(|w|w.signs.contains(&0)){continue}for epsilon in [1,r-1]{
+  let p=WordProblem::build(r,m,z,epsilon,&words,100000).unwrap();max_nodes=max_nodes.max(p.circuit.nodes.len());let mut roots=std::collections::BTreeSet::new();for x in 1..r{if pow(x,(r-1)/2,r)==epsilon&&words.iter().all(|w|word(r,m,z,x,w.b).signs==w.signs){roots.insert(pow(x,m as u64,r));}}
+  let obs:Vec<_>=words.iter().map(|w|{let f=modes(r,m,z,w);Observation{b:w.b,f:[f[0],f[1],f[m-1]]}}).collect();let old=ImplicitTranscript::build(r,m,epsilon,&obs,100000).unwrap();let mut old_count=0;
+  for y in 1..r{if pow(y,p.l as u64,r)!=epsilon{continue}let got=p.circuit.evaluate(y).unwrap()[p.output];assert_eq!(got,u64::from(roots.contains(&y)));let v=old.circuit.evaluate(y).unwrap();let old_match=old.equations.iter().all(|&id|v[id]==0);if old_match{old_count+=1}if got==1{assert!(old_match);let phase=p.phase_at(y).unwrap();if p.stabilizer==1{let x=phase.unwrap();assert_eq!(pow(x,m as u64,r),y);assert!(words.iter().all(|w|word(r,m,z,x,w.b).signs==w.signs));phases+=1;}else{assert_eq!(phase,None);symmetric+=1;}}memberships+=1;}
+  if roots.len()<old_count{strict+=1}let(moment,stats)=p.extract(caps()).unwrap();assert_eq!(moment,[roots.len()as u64,roots.iter().fold(0,|a,&b|(a+b)%r)]);pairs+=stats.pairs;systems+=1;
+ }}}}
+ println!("systems={systems} image_memberships={memberships} phase_checks={phases} symmetric_images={symmetric} strict_vs_three_modes={strict} max_nodes={max_nodes} monomial_pairs={pairs}");
+ // Synthetic multiword spectrum: period 2 and period 3 together have trivial stabilizer,
+ // although both oriented modes vanish. Does not assert a nonempty curve transcript.
+ let r=97;let m=6;let z=zeta(r,m);let words=[Word{b:1,signs:vec![1,96,1,96,1,96]},Word{b:2,signs:vec![1,1,96,1,1,96]}];let p=WordProblem::build(r,m,z,1,&words,100000).unwrap();assert_eq!(p.stabilizer,1);for f in &p.modes{assert_eq!(f[1],0);assert_eq!(f[5],0)}
+ for k in 1..r{let(g,u,v)=egcd(3,2);assert_eq!(g,1);assert_eq!(mul(signed_power(pow(k,3,r),u,r),signed_power(pow(k,2,r),v,r),r),k)}
+ // All-constant words have nontrivial stabilizer and cannot yield unique phase.
+ let w=[Word{b:2,signs:vec![1;3]}];let p=WordProblem::build(19,3,zeta(19,3),1,&w,100000).unwrap();assert_eq!(p.stabilizer,3);
+ for t in [0,1,r-1]{for s in [1,r-1]{assert_eq!(mul((mul(t,t,r)+mul(s,t,r))%r,pow(2,r-2,r),r),u64::from(t==s));}}
+ assert!(matches!(WordProblem::build(19,3,zeta(19,3),1,&w,3),Err(Error::Limit)));
+ let w=[word(19,3,zeta(19,3),17,2)];let p=WordProblem::build(19,3,zeta(19,3),1,&w,100000).unwrap();for cap in [Caps{terms:0,..caps()},Caps{stored:0,..caps()},Caps{pairs:0,..caps()}]{assert!(matches!(p.extract(cap),Err((Error::Limit,_))));}
+ let malformed=[Word{b:2,signs:vec![0,1,1]}];assert!(matches!(WordProblem::build(19,3,zeta(19,3),1,&malformed,100000),Err(Error::Domain)));
+ let r=998244353;let z=pow(3,(r-1)/7,r);let words:Vec<_>=[2,1,3,2].iter().map(|&b|word(r,7,z,17,b)).collect();let p=WordProblem::build(r,7,z,pow(17,(r-1)/2,r),&words,100000).unwrap();assert_eq!(p.circuit.evaluate(pow(17,7,r)).unwrap()[p.output],1);let(e,stats)=p.extract(Caps{terms:64,stored:100000,pairs:2000000,output:8}).err().unwrap();assert_eq!(e,Error::Limit);println!("large_L={} large_nodes={} large_refusal={:?} large_pairs={} large_stored={} synthetic_joint_anchor_controls=1 bezout_checks=96 selector_checks=6 cap_controls=4",p.l,p.circuit.nodes.len(),stats.limit,stats.pairs,stats.stored);
+ let(mut cases,mut recovered,mut endpoints,mut unresolved,mut limited,mut calls,mut public_pairs,mut guards)=(0,0,0,0,0,0,0,0);
+ for(p,a,b,r,base,m)in[(17u64,2u64,2u64,19u64,[5u64,1u64],3usize),(257,1,7,281,[1,3],5)]{let curve=group::Curve::new(p,a,b);let bp=group::Point{x:base[0],y:base[1]};assert_eq!(multiple(curve,bp,r),None);let source=source::Source::new(p,a,b,r,base,64).unwrap();let z=zeta(r,m);let ks:Vec<_>=if r==19{(0..r).collect()}else{vec![0,1,2,3,7,17,31,63,127,280]};for k in ks{let target=multiple(curve,bp,k);let got=recover_word(&source,curve,bp,target,r,m,z,&[2,1,3,2],1+4*m,100000,caps()).unwrap();if let Some(j)=got.scalar{assert_eq!(j,k)}match got.route{"word-singleton"=>recovered+=1,"endpoint"=>endpoints+=1,"unresolved"=>unresolved+=1,"algebra-cap"|"node-cap"=>limited+=1,_=>panic!("route")};calls+=got.calls;public_pairs+=got.pairs;cases+=1;if k!=0{let got=recover_word(&source,curve,bp,target,r,m,z,&[2],1,100000,caps()).unwrap();assert_eq!(got.route,"call-cap");assert_eq!(got.calls,1);guards+=1;}}}
+ assert!(recovered>0);println!("public_cases={cases} recovered={recovered} identity_endpoints={endpoints} unresolved={unresolved} capped={limited} source_calls={calls} monomial_pairs={public_pairs} guard_calls={guards}");
+}

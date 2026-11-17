@@ -42,9 +42,13 @@ use std::time::Duration;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+    CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+
+/// The matrix contract consumed by the collector and [`RelationSolverFactory`].
+/// The older [`RelationSolver`] interface below additionally carries metadata.
+pub use crate::cryptanalysis::ic_boundary::RelationSolver as RelationMatrix;
 
 /// Free-form parameters a plug-in reads its configuration from.
 ///
@@ -101,6 +105,9 @@ impl Params {
     /// silently build a different factor base.
     pub fn parse_spec(spec: &str) -> Result<(String, Params), String> {
         let (name, rest) = spec.split_once(':').unwrap_or((spec, ""));
+        if name.is_empty() || name.chars().any(char::is_whitespace) {
+            return Err(format!("invalid plug-in name `{name}`"));
+        }
         let mut params = Params::default();
         let mut previous: Option<&str> = None;
         for kv in rest.split(',').filter(|s| !s.is_empty()) {
@@ -114,7 +121,16 @@ impl Params {
                     None => format!("parameter `{kv}` is not key=value"),
                 });
             };
-            params.set(k.trim(), v.trim());
+            let key = k.trim();
+            if key.is_empty() {
+                return Err(format!("empty parameter name in plug-in spec `{spec}`"));
+            }
+            if params.get(key).is_some() {
+                return Err(format!(
+                    "duplicate parameter `{key}` in plug-in spec `{spec}`"
+                ));
+            }
+            params.set(key, v.trim());
             previous = Some(kv);
         }
         Ok((name.to_string(), params))
@@ -188,6 +204,36 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
     }
 }
 
+/// Constructs a fresh relation matrix after the factor base fixes its width.
+///
+/// A factory may borrow application state. It receives no planted logarithm.
+/// Completion and verification policy belong to this contract rather than to
+/// a hard-coded string comparison in the runner. Returned matrices must start
+/// empty and obey [`RelationMatrix`]'s accounting and incremental-query rules.
+pub trait RelationSolverFactory {
+    fn name(&self) -> &str;
+
+    fn create(&self, columns: usize, modulus: u64) -> Result<Box<dyn RelationMatrix + '_>, String>;
+
+    fn completion_rule(&self) -> CompletionRule {
+        CompletionRule::TargetPinned
+    }
+
+    /// Check a representative of every factor-base column after recovery.
+    /// Requires [`CompletionRule::FullRank`].
+    fn verify_base_columns(&self) -> bool {
+        false
+    }
+}
+
+/// All replaceable stages needed by the runner. The caller owns the plug-ins;
+/// there is no global registry, required allocator scheme, or thread model.
+pub struct PipelineStages<'a, G: CountedGroup> {
+    pub factor_base: &'a dyn FactorBaseBuilder<G>,
+    pub oracle: &'a mut dyn DecompositionOracle<G>,
+    pub matrix: &'a dyn RelationSolverFactory,
+}
+
 /// The shape of an algebraic system, for the report's degree columns.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SystemShape {
@@ -242,6 +288,11 @@ pub trait DecompositionOracle<G: CountedGroup> {
         BTreeMap::new()
     }
 
+    /// Read, without counting or deciding anything, the memory
+    /// [`Self::decompose`] will read for `point`, so that a caller that
+    /// knows several targets ahead can overlap their cache misses.  The
+    /// default does nothing; it never changes a result or a counter.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
     /// Work performed by `prepare` that only `bitop/v1` prices (table
     /// insert attempts, canonicalisation tables), by `ecbench::work`
     /// counter name; kept out of `setup_native` so committed records
@@ -249,6 +300,14 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// the marker `counted:table_insert_attempts`.
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
         BTreeMap::new()
+    }
+
+    /// Verified homogeneous relations found during `prepare`. Each row has
+    /// one coefficient per factor-base column; the framework appends a zero
+    /// target coefficient and enters it with right-hand side zero before
+    /// drawing targets. Existing oracles seed no rows.
+    fn setup_rows(&self) -> &[Vec<u64>] {
+        &[]
     }
 
     /// Decompose `point`, or decide it does not decompose.
@@ -999,6 +1058,19 @@ mod tests {
         assert_eq!(fc.degree_bound, 14);
         assert_eq!(fc.cost.unit, "F_p multiplications");
         assert_eq!(fc.all_targets.predicted_degree, Some(14));
+    }
+
+    #[test]
+    fn ambiguous_plugin_parameters_are_rejected() {
+        for spec in [
+            "",
+            ":x=1",
+            "two words:x=1",
+            "engine:=1",
+            "engine:size=1, size=2",
+        ] {
+            assert!(Params::parse_spec(spec).is_err(), "accepted {spec:?}");
+        }
     }
 
     #[test]

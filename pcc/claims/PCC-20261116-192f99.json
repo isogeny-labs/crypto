@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:42:01Z",
+ "id": "PCC-20261116-192f99",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-v1/rows.jsonl",
+    "sha256": "475920d173592a270564e62c5516f7365874a5ffdf290b587ef3fb555c981704"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-v1/stdout.txt",
+    "sha256": "94ef1352b425d778d431b6e454bd4063828fe46e109eb12aaa021fbaed4d2d33"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/quotient_replay.cpp",
+    "sha256": "caa6a50179c04be44384246eda9a889953c4f831750a4635707783bd6a061aa1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-v1/pre-call-manifest.sha256",
+    "sha256": "8e660197dd7530f806a95c1fd518010f5f69fde416fb448533baa6e8b01c433e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native P-192 d7 correctness replay executes exact kernel-coset quotient image arithmetic for all eight kernels. Each partitions729 actual3-torsion classes into27 cosets of27. The dual candidate [D] maps to[3]D is representative-independent; five source fixtures per kernel satisfy Frobenius-fixedness, source subgroup/order screens, TF=[6] and inverse6 source-point roundtrips. Sixteen transported-base checks per kernel satisfy T(phi(D))=3*pi_*(D), and three malicious controls reject. This is a quotient-group image model, not a plane-quartic Jacobian construction, full quotient rational-point API, DLP solve or performance claim."
+}

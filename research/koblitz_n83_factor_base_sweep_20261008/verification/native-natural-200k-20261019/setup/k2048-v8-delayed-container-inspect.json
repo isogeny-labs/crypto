@@ -1,0 +1,326 @@
+[
+    {
+        "Id": "590f17e66289c2baf56c5561475e0a0fd556e468217d3b5c05690ce27061878a",
+        "Created": "2026-10-19T19:30:52.990203844Z",
+        "Path": "/usr/bin/timeout",
+        "Args": [
+            "--signal=KILL",
+            "1200s",
+            "/worker",
+            "primary-orbit-chain-cold",
+            "/panel",
+            "/fixtures",
+            "2048",
+            "public_x_hash",
+            "2026100801",
+            "5",
+            "1",
+            "150000",
+            "2000000",
+            "32",
+            "200000",
+            "1200",
+            "4096",
+            "/out/run"
+        ],
+        "State": {
+            "Status": "created",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "0001-01-01T00:00:00Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:541096ae9b05d3b850341b78790e2ed31e94d5aa0ea086933c6ff0c09ffa2e63",
+        "ResolvConfPath": "",
+        "HostnamePath": "",
+        "HostsPath": "",
+        "LogPath": "",
+        "Name": "/n83-native-775127-1792438252811216801",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "14",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 64,
+            "Ulimits": [
+                {
+                    "Name": "nofile",
+                    "Hard": 65536,
+                    "Soft": 32768
+                }
+            ],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048",
+                    "Target": "/panel",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures",
+                    "Target": "/fixtures",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/scratch/n83-xor-opt-20261019/candidate-target/release/examples/koblitz_n83_factor_base_export",
+                    "Target": "/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8/source",
+                    "Target": "/source",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/58e24480417683ad5047005d68a1b9288fecc4e1edb330779827a11d39ef9d3c-init/diff:/var/lib/docker/overlay2/4153786268a4f10631b7580f301f6abe21926b9bcc146e1ed1d2e4f38190248e/diff:/var/lib/docker/overlay2/d14dbe46eedfa9252d780d03523e3fc2be78d5fc7ac1d07d6eec4192733f85df/diff:/var/lib/docker/overlay2/fff1bb851e92bb5681c68ecf6d01b0d84e2a3ca7ac30ce258beb1afebfee2607/diff:/var/lib/docker/overlay2/ebe799f26fcb04fe0254183c9e749292fec8b4fff9d01afae4eb80a0acdfb23b/diff",
+                "MergedDir": "/var/lib/docker/overlay2/58e24480417683ad5047005d68a1b9288fecc4e1edb330779827a11d39ef9d3c/merged",
+                "UpperDir": "/var/lib/docker/overlay2/58e24480417683ad5047005d68a1b9288fecc4e1edb330779827a11d39ef9d3c/diff",
+                "WorkDir": "/var/lib/docker/overlay2/58e24480417683ad5047005d68a1b9288fecc4e1edb330779827a11d39ef9d3c/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/scratch/n83-xor-opt-20261019/candidate-target/release/examples/koblitz_n83_factor_base_export",
+                "Destination": "/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8/source",
+                "Destination": "/source",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048",
+                "Destination": "/panel",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures",
+                "Destination": "/fixtures",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "590f17e66289",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "RAYON_NUM_THREADS=1",
+                "ICV1_FROZEN_SOURCE_DIR=/source",
+                "N83_CHAIN_PHASE_TRACE=1",
+                "N83_SAT_PHASE_TRACE=1",
+                "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D",
+                "PYTHON_VERSION=3.11.17",
+                "PYTHON_SHA256=bfb74ad39efae27cda510f134ab408e00f9992c56851cfc0b1cdb5646da11599"
+            ],
+            "Cmd": [
+                "/usr/bin/timeout",
+                "--signal=KILL",
+                "1200s",
+                "/worker",
+                "primary-orbit-chain-cold",
+                "/panel",
+                "/fixtures",
+                "2048",
+                "public_x_hash",
+                "2026100801",
+                "5",
+                "1",
+                "150000",
+                "2000000",
+                "32",
+                "200000",
+                "1200",
+                "4096",
+                "/out/run"
+            ],
+            "Image": "sha256:541096ae9b05d3b850341b78790e2ed31e94d5aa0ea086933c6ff0c09ffa2e63",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "",
+                    "NetworkID": "",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DriverOpts": null,
+                    "DNSNames": null
+                }
+            }
+        }
+    }
+]

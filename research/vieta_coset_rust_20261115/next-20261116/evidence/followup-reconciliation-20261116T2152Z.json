@@ -1,0 +1,69 @@
+{
+  "schema": "vieta-followup-reconciliation/v1",
+  "remote_head_audited": "db2b11314ccbd601dabef02f3ff49ee9aca5af1e",
+  "journal_remote_repair": {
+    "base": "db2b11314c",
+    "source_blocks": {
+      "db2b11314c": 765,
+      "HEAD": 507,
+      "97fea7bf45": 505,
+      "a8b29cbbe0": 752
+    },
+    "added_missing_blocks": 54,
+    "final_blocks": 819,
+    "preserves_full_multisets": true,
+    "journal_sha256": "a77706805819af453b40f8c61b0b78ed8ea363e498f71429f31284021b6cb154"
+  },
+  "journal_current_main_repair": {
+    "base": "origin/main",
+    "source_blocks": {
+      "origin/main": 971,
+      "HEAD": 819,
+      "db2b11314c": 765,
+      "97fea7bf45": 505,
+      "a8b29cbbe0": 752
+    },
+    "added_missing_blocks": 67,
+    "final_blocks": 1038,
+    "preserves_full_multisets": true,
+    "journal_sha256": "f51522c151f5f5e941965621cbfd5daadc0646ac45da8e046686a712277925d8"
+  },
+  "ledger": {
+    "base": "90ea6cb42434698be3fac9d2d012a579f298b961",
+    "main_entries": 1216,
+    "head_entries": 1222,
+    "unchanged_missing_bodies_appended": 6,
+    "exact_main_prefix_sha256": "3275e3d4f97dfd74e12d81f181d344d4e051bff874562ab53e059fa2d90e4a5c",
+    "chain_and_prefix_errors": [],
+    "method": "official append_entry; unchanged type/body/signature; exact current-main byte prefix"
+  },
+  "base_reproduction": {
+    "base": "90ea6cb42434698be3fac9d2d012a579f298b961",
+    "main_claims_exact_git_blob_matches": 3194,
+    "base_checker_exit": 1,
+    "base_head_missing_claim_type_errors_identical": true,
+    "missing_claim_type_errors": 147,
+    "specific_study_claim_bytes_and_proof_pins_unchanged": [
+      "PCC-20261116-c8911d",
+      "PCC-20261116-9dc34f",
+      "PCC-20261116-640dba",
+      "PCC-20261116-480062",
+      "PCC-20261116-80ec09"
+    ],
+    "historical_bad_record_byte_equal_to_main": true,
+    "historical_bad_record": "benchmarks/records/20261105T0828Z-icb-large-prime-n53-s1-archive.json",
+    "standing": "producer infrastructure reproduction [pcc:unverified]"
+  },
+  "scoped_record_errors": [],
+  "raw_hashes": 95,
+  "metrics": 6,
+  "original_qualified_manifest": "all9 match",
+  "canonical_exports": "both PASS with file verification,0 findings",
+  "lessons_entries": 335,
+  "lessons_errors": 0,
+  "artifact_policy": "PASS on staged tree",
+  "global_progress_and_records": "FAIL on inherited main record command1; no rewrite/waiver; no global pass",
+  "source_data_protocol_claim_report_changes": false,
+  "no_measurement_rerun": true,
+  "standing": "producer metadata repair and custody checks [pcc:unverified]"
+}

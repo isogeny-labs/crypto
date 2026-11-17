@@ -1,0 +1,528 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "AUDIT-MUMFORD-CENSUS-v1",
+  "created": "2026-11-09T22:58:44Z",
+  "protocol": {
+    "path": "../../native-census-v1/protocol-census-v1.json",
+    "sha256": "a7bc5ba9f6af90f196155a4ff30093f4bd47701568c4c58cfc01b3bfc42828dc",
+    "protocol_id": "AUDIT-MUMFORD-CENSUS-20261109-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+    "dirty": false
+  },
+  "backend": "manual",
+  "host": {
+    "path": "../calibration/host.json",
+    "sha256": "9549bab63911038aa48e3f83fec6653831cff2317e45472c62b56c11b6fce4c9",
+    "class_id": "762f5fc120c9",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "field3",
+      "role": "baseline",
+      "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+      "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464"
+    },
+    {
+      "id": "field5",
+      "role": "candidate",
+      "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+      "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "census-v1-p3-r0",
+      "arm": "field3",
+      "instance_id": "0",
+      "seed": 202611093001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 8,
+          "control_smooth": 7,
+          "proper_nontrivial_unequal": 321,
+          "checked_additions": 31560,
+          "associativity_checks": 595488
+        },
+        "wall_seconds": 3.64,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "associativity_checks": 595488,
+          "checked_additions": 31560,
+          "models_attempted": 243,
+          "nonsquarefree_models": 81,
+          "valid_models": 162,
+          "distinct_cyclic_subgroups": 708,
+          "proper_nontrivial_unequal": 321,
+          "proper_odd_prime_noncharacteristic_unequal": 42
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Separate C++full arithmetic/table/subgroup and point-count recomputation matches; producer host, unsigned standing; no independent-machine/trusted-execution proof."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "p3-r0/analysis.json",
+          "sha256": "c6dfa96ce9e982897bc013abd42feb91888505fc679bea5a76ba9dffecee8d92",
+          "bytes": 1268,
+          "kind": "analysis"
+        },
+        {
+          "path": "p3-r0/cpp-check.json",
+          "sha256": "f761f1252d9a64efce50c6768f019e1af74b639bd75fd2ba7abb802447f91ce1",
+          "bytes": 402,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r0/cpp-check.json.counts.tsv",
+          "sha256": "df14351c7b843e9a7ad6f1b66489f9140a8e5374e981ec07885edf0427c7432e",
+          "bytes": 4640,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r0/finish.json",
+          "sha256": "169ef65b0950b4e174a6360fe21929e6e1bb1096a4cad7f254fed1b831d56af7",
+          "bytes": 234,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r0/start.json",
+          "sha256": "4880ce91448f14926bcd97710230626eb3b2f6e2189cf463a5bc97ff0c22adc2",
+          "bytes": 575,
+          "kind": "summary"
+        },
+        {
+          "path": "census-v1-p3-r0.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p3-r0.stderr-and-time.log",
+          "sha256": "3d9fe66bc4370cfff7593e4c1d419e309aed78250c75195da42e529d3cf615a7",
+          "bytes": 29,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p3-r0.exit-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "log"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "762f5fc120c9",
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p5-r0",
+      "arm": "field5",
+      "instance_id": "0",
+      "seed": 202611095001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 16,
+          "control_smooth": 16,
+          "proper_nontrivial_unequal": 11005,
+          "checked_additions": 2707800,
+          "associativity_checks": 111960960
+        },
+        "wall_seconds": 447.76,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "associativity_checks": 111960960,
+          "checked_additions": 2707800,
+          "models_attempted": 3125,
+          "nonsquarefree_models": 625,
+          "valid_models": 2500,
+          "distinct_cyclic_subgroups": 16624,
+          "proper_nontrivial_unequal": 11005,
+          "proper_odd_prime_noncharacteristic_unequal": 1510
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Separate C++full arithmetic/table/subgroup and point-count recomputation matches; producer host, unsigned standing; no independent-machine/trusted-execution proof."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "p5-r0/analysis.json",
+          "sha256": "83deec81532d7a139ac59f545e886c806dbc1489c6521bcff953e918c3555fb4",
+          "bytes": 1264,
+          "kind": "analysis"
+        },
+        {
+          "path": "p5-r0/cpp-check.json",
+          "sha256": "33993cb8115c5c6159a9d9ea4694743f5535f9ee9b37a95ec919232fe75dda1b",
+          "bytes": 411,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r0/cpp-check.json.counts.tsv",
+          "sha256": "1289230d1fadfe13ee171b01e9a9f8c7f63e7e8eb7a2f0255a81cb1b00f5d595",
+          "bytes": 65356,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r0/finish.json",
+          "sha256": "c7be08db9c581f24ecdcf665c87d59f0b90776d9ba24c9de18927671cb011a65",
+          "bytes": 242,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r0/start.json",
+          "sha256": "84e7738dbb3ef3d9242f5031ee643cfaed93ab348c81cdecbfd7e7f40e510ef9",
+          "bytes": 575,
+          "kind": "summary"
+        },
+        {
+          "path": "census-v1-p5-r0.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p5-r0.stderr-and-time.log",
+          "sha256": "b008ba4c67bc55e3164ffab62cd2e46f9aa07fe639606ceb29d08dec5a9069f6",
+          "bytes": 33,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p5-r0.exit-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "log"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "762f5fc120c9",
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p3-r1",
+      "arm": "field3",
+      "instance_id": "0",
+      "seed": 202611093002,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 8,
+          "control_smooth": 7,
+          "proper_nontrivial_unequal": 321,
+          "checked_additions": 31560,
+          "associativity_checks": 595488
+        },
+        "wall_seconds": 5.2,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "associativity_checks": 595488,
+          "checked_additions": 31560,
+          "models_attempted": 243,
+          "nonsquarefree_models": 81,
+          "valid_models": 162,
+          "distinct_cyclic_subgroups": 708,
+          "proper_nontrivial_unequal": 321,
+          "proper_odd_prime_noncharacteristic_unequal": 42
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Separate C++full arithmetic/table/subgroup and point-count recomputation matches; producer host, unsigned standing; no independent-machine/trusted-execution proof."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "p3-r1/analysis.json",
+          "sha256": "c6dfa96ce9e982897bc013abd42feb91888505fc679bea5a76ba9dffecee8d92",
+          "bytes": 1268,
+          "kind": "analysis"
+        },
+        {
+          "path": "p3-r1/cpp-check.json",
+          "sha256": "f761f1252d9a64efce50c6768f019e1af74b639bd75fd2ba7abb802447f91ce1",
+          "bytes": 402,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r1/cpp-check.json.counts.tsv",
+          "sha256": "df14351c7b843e9a7ad6f1b66489f9140a8e5374e981ec07885edf0427c7432e",
+          "bytes": 4640,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r1/finish.json",
+          "sha256": "169ef65b0950b4e174a6360fe21929e6e1bb1096a4cad7f254fed1b831d56af7",
+          "bytes": 234,
+          "kind": "summary"
+        },
+        {
+          "path": "p3-r1/start.json",
+          "sha256": "06abfb6f2a3c023f26faa0ecc08fd8727124458944c39daf8551954da1b302bb",
+          "bytes": 575,
+          "kind": "summary"
+        },
+        {
+          "path": "census-v1-p3-r1.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p3-r1.stderr-and-time.log",
+          "sha256": "e7c32225f7a0b2b135b8d5d4cb92ee7f436951858966117a998fbf429b580277",
+          "bytes": 29,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p3-r1.exit-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "log"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "762f5fc120c9",
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p5-r1",
+      "arm": "field5",
+      "instance_id": "0",
+      "seed": 202611095002,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 16,
+          "control_smooth": 16,
+          "proper_nontrivial_unequal": 11005,
+          "checked_additions": 2707800,
+          "associativity_checks": 111960960
+        },
+        "wall_seconds": 561.64,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "associativity_checks": 111960960,
+          "checked_additions": 2707800,
+          "models_attempted": 3125,
+          "nonsquarefree_models": 625,
+          "valid_models": 2500,
+          "distinct_cyclic_subgroups": 16624,
+          "proper_nontrivial_unequal": 11005,
+          "proper_odd_prime_noncharacteristic_unequal": 1510
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Separate C++full arithmetic/table/subgroup and point-count recomputation matches; producer host, unsigned standing; no independent-machine/trusted-execution proof."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "p5-r1/analysis.json",
+          "sha256": "83deec81532d7a139ac59f545e886c806dbc1489c6521bcff953e918c3555fb4",
+          "bytes": 1264,
+          "kind": "analysis"
+        },
+        {
+          "path": "p5-r1/cpp-check.json",
+          "sha256": "33993cb8115c5c6159a9d9ea4694743f5535f9ee9b37a95ec919232fe75dda1b",
+          "bytes": 411,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r1/cpp-check.json.counts.tsv",
+          "sha256": "1289230d1fadfe13ee171b01e9a9f8c7f63e7e8eb7a2f0255a81cb1b00f5d595",
+          "bytes": 65356,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r1/finish.json",
+          "sha256": "c7be08db9c581f24ecdcf665c87d59f0b90776d9ba24c9de18927671cb011a65",
+          "bytes": 242,
+          "kind": "summary"
+        },
+        {
+          "path": "p5-r1/start.json",
+          "sha256": "846ce21d6c7a423448a402197ddc1699543a732de970169215a1fe04683c1de8",
+          "bytes": 575,
+          "kind": "summary"
+        },
+        {
+          "path": "census-v1-p5-r1.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p5-r1.stderr-and-time.log",
+          "sha256": "824a82432d7c6214a709e0be5551cd789989e44fe8fd735b89462189a05ae609",
+          "bytes": 33,
+          "kind": "log"
+        },
+        {
+          "path": "census-v1-p5-r1.exit-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "log"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "762f5fc120c9",
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 4,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "rows.jsonl",
+      "sha256": "c4ca9e56a10aa86e2e77c78f2aa80fc83f6a8ff98dfede91fead877e25d2355f",
+      "bytes": 2577,
+      "kind": "raw"
+    },
+    {
+      "path": "raw-data.tar.gz",
+      "sha256": "c06f085bf3286b3474c9c5729073921d9831c51096641ab4d78b08ae593d0d99",
+      "bytes": 12171014,
+      "kind": "raw"
+    },
+    {
+      "path": "raw-manifest.json",
+      "sha256": "b711d601bb55242a3127cd2fe73a37c26005b3e4c14c67e1a6dda4d9e0a9fd9e",
+      "bytes": 6757,
+      "kind": "summary"
+    },
+    {
+      "path": "repeat-check.json",
+      "sha256": "d52ed81522b66e914a6cdcb2ad3df9569ca240bccabb6e6f2b139e911fb29480",
+      "bytes": 2490,
+      "kind": "summary"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../native-census-v1/src/main.rs",
+      "sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65",
+      "bytes": 16978,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex audit producer",
+      "text": "All four fresh-process cells completed within600scaps. Each repeats complete243/3125model populations,162/2500squarefree; C++matches every pair/addition/group/subgroup entry. Repeat raw.jsonl,audit.tsv,cpp results/point counts,finish and analysis all byte-equal. Determinism only; L0timings diagnostic and invalid scientifically. Source/protocol committed/published before affected calls."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex audit producer",
+      "text": "Raw archive contains every exact native file and launcher log. raw-manifest.json records each inner path/hash/size; canonical file verification checks archive bytes. Same-host different-language checking is not an independent host or signed standing. Complete model weights, identity-included exact cross-products; no qualified typicalness/asymptotic/geometric conclusion."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

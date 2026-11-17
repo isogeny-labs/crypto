@@ -1,0 +1,162 @@
+module
+public import OrientationResidue
+public import OrientationBaseBridge
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationHierarchy
+import all OrientationResidue
+public section
+noncomputable section
+namespace OrientationDiagonal
+open Polynomial Finset OrientationAnchor OrientationResidue
+
+def pole (i : ℕ) : ℤ := -(2:ℤ)^i
+
+def poleQ (i : ℕ) : ℚ := -(2:ℚ)^i
+
+theorem pole_cast (i : ℕ) : ((pole i:ℤ):ℚ) = poleQ i := by simp [pole,poleQ]
+
+theorem pole_ne_zero (i : ℕ) : pole i ≠ 0 := by
+  exact neg_ne_zero.mpr (by positivity)
+
+theorem pole_valuation (i : ℕ) : padicValInt 2 (pole i) = i := by
+  have h : padicValRat 2 ((pole i:ℤ):ℚ) = (i:ℤ) := by
+    rw [pole_cast, poleQ, padicValRat.neg, two_power_valuation]
+  rw [padicValRat.of_int] at h
+  exact_mod_cast h
+
+theorem pole_in_grid (a i : ℕ) (hi : i ≤ a) : pole i ∈ Ico (-(2:ℤ)^a) ((2:ℤ)^a) := by
+  have hp : (2:ℤ)^i ≤ (2:ℤ)^a := pow_le_pow_right₀ (by norm_num) hi
+  have hpa : 0 < (2:ℤ)^a := by positivity
+  have hpi : 0 < (2:ℤ)^i := by positivity
+  apply mem_Ico.mpr
+  dsimp [pole]
+  constructor <;> omega
+
+theorem factor_eval (d T : ℚ) (j : ℕ) :
+    (factor d j).eval T = ((2:ℚ)^j-T)/((2:ℚ)^j-d) := by
+  simp [factor,div_eq_mul_inv]
+
+/-- The actual diagonal correction value, not a supplied normalizing witness. -/
+def diagonalValue (u i : ℕ) (m : ℕ → ℕ) : ℚ :=
+  (correction u 0 0 m).eval (poleQ i)
+
+theorem diagonal_correction (u x : ℕ) (m : ℕ → ℕ) :
+    correction u x x m = correction u 0 0 m := by
+  simp [correction,mask,delta]
+
+theorem diagonal_value_product (u i : ℕ) (m : ℕ → ℕ) :
+    diagonalValue u i m = ∏ j ∈ range u, (((2:ℚ)^j+(2:ℚ)^i)/((2:ℚ)^j))^m j := by
+  unfold diagonalValue correction
+  rw [matching_mask u 0 0 rfl]
+  simp only [eval_prod,eval_pow,factor_eval,delta,Nat.cast_zero,sub_zero,poleQ,sub_neg_eq_add]
+
+theorem diagonal_positive (u i : ℕ) (m : ℕ → ℕ) : 0 < diagonalValue u i m := by
+  rw [diagonal_value_product]
+  apply prod_pos
+  intro j _
+  exact pow_pos (div_pos (by positivity) (by positivity)) _
+
+/-- Explicit finite product valuation, with every zero exclusion derived. -/
+theorem valuation_prod {ι : Type*} (S : Finset ι) (q : ι → ℚ)
+    (h : ∀ j ∈ S, q j ≠ 0) :
+    padicValRat 2 (∏ j ∈ S, q j) = ∑ j ∈ S, padicValRat 2 (q j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp
+  | @insert j S hj ih =>
+    have hS : ∀ k ∈ S, q k ≠ 0 := by intro k hk; exact h k (mem_insert_of_mem hk)
+    rw [prod_insert hj,sum_insert hj,
+      padicValRat.mul (h j (mem_insert_self _ _)) (prod_ne_zero_iff.mpr hS),ih hS]
+
+theorem sum_two_power_valuation (i j : ℕ) :
+    padicValRat 2 ((2:ℚ)^j+(2:ℚ)^i) =
+      if j=i then (i:ℤ)+1 else min (i:ℤ) j := by
+  by_cases he : j=i
+  · subst j
+    have hp : (2:ℚ)^i+(2:ℚ)^i = (2:ℚ)^(i+1) := by rw [pow_succ]; ring
+    rw [hp,two_power_valuation]
+    simp
+  · have h := padicValRat.add_eq_min (p:=2) (q:=(2:ℚ)^j) (r:=(2:ℚ)^i)
+      (by positivity) (by positivity) (by positivity)
+      (by rw [two_power_valuation,two_power_valuation]; exact_mod_cast he)
+    simpa [two_power_valuation,he,min_comm] using h
+
+theorem diagonal_factor_valuation (i j : ℕ) :
+    padicValRat 2 (((2:ℚ)^j+(2:ℚ)^i)/((2:ℚ)^j)) =
+      (if j=i then (i:ℤ)+1 else min (i:ℤ) j)-j := by
+  rw [padicValRat.div (by positivity) (by positivity),sum_two_power_valuation,two_power_valuation]
+
+/-- Exact diagonal valuation; this justifies normalization of strict margins. -/
+theorem diagonal_valuation (u i : ℕ) (m : ℕ → ℕ) (hi : i < u) :
+    padicValRat 2 (diagonalValue u i m) = schedule u i m := by
+  rw [diagonal_value_product,valuation_prod _ _ (by intro j _; exact pow_ne_zero _ (div_ne_zero (by positivity) (by positivity)))]
+  simp_rw [padicValRat.pow,diagonal_factor_valuation]
+  have ht (j : ℕ) :
+      (m j:ℤ)*((if j=i then (i:ℤ)+1 else min (i:ℤ) j)-j) =
+        (if j=i then (m i:ℤ) else 0)-((j-i:ℕ):ℤ)*m j := by
+    have hb : (if j=i then (i:ℤ)+1 else min (i:ℤ) j)-j =
+        if j=i then 1 else -((j-i:ℕ):ℤ) := by split_ifs <;> omega
+    rw [hb]
+    by_cases he : j=i
+    · subst j; simp
+    · simp [he,mul_comm]
+  simp_rw [ht,sum_sub_distrib]
+  simp only [schedule]
+  rw [sum_ite_eq']
+  simp [mem_range.mpr hi]
+
+/-- On matching retained classes the actual correction differs by explicit unit ratios. -/
+theorem matching_value_mul (u x y i : ℕ) (m : ℕ → ℕ)
+    (h : x % 2^u = y % 2^u) :
+    (correction u x y m).eval (poleQ i) = diagonalValue u i m *
+      ∏ j ∈ range u, (((2:ℚ)^j)/((2:ℚ)^j-delta x y))^m j := by
+  have hm := matching_mask u x y h
+  have hf (j : ℕ) (hj : j ∈ range u) :
+      (factor (delta x y) j).eval (poleQ i) =
+        (((2:ℚ)^j+(2:ℚ)^i)/((2:ℚ)^j))*(((2:ℚ)^j)/((2:ℚ)^j-delta x y)) := by
+    rw [factor_eval,poleQ,sub_neg_eq_add]
+    have hd := denominator_ne_zero u x y j (by rwa [hm])
+    field_simp [hd,show (2:ℚ)^j≠0 by positivity]
+  rw [correction,hm,eval_prod]
+  simp only [eval_pow]
+  calc
+    _ = ∏ j ∈ range u,
+        ((((2:ℚ)^j+(2:ℚ)^i)/((2:ℚ)^j))*(((2:ℚ)^j)/((2:ℚ)^j-delta x y)))^m j := by
+      apply prod_congr rfl
+      intro j hj
+      rw [hf j hj]
+    _ = _ := by simp only [mul_pow,prod_mul_distrib,diagonal_value_product]
+
+/-- The actual normalized correction is one modulo two inside a retained residue class. -/
+theorem matching_ratio_one (u x y i : ℕ) (m : ℕ → ℕ)
+    (h : x % 2^u = y % 2^u) :
+    OneModTwo ((correction u x y m).eval (poleQ i)/diagonalValue u i m) := by
+  have hp := OneModTwo.prod (range u)
+    (fun j => (((2:ℚ)^j)/((2:ℚ)^j-delta x y))^m j)
+    (by intro j hj; exact (anchor_ratio_one u x y j (mem_range.mp hj) h).pow (m j))
+  have he : (correction u x y m).eval (poleQ i)/diagonalValue u i m =
+      ∏ j ∈ range u, (((2:ℚ)^j)/((2:ℚ)^j-delta x y))^m j := by
+    rw [matching_value_mul u x y i m h]
+    field_simp [ne_of_gt (diagonal_positive u i m)]
+  rwa [he]
+
+/-- Different retained residues produce a strict extra bit after actual diagonal normalization. -/
+theorem nonmatching_ratio_even (u x y i : ℕ) (m : ℕ → ℕ)
+    (hi : i < u) (hc : x.testBit i = y.testBit i)
+    (hn : x % 2^u ≠ y % 2^u) (hm : ∀ j < u, 0 < m j) :
+    VBound 1 ((correction u x y m).eval (poleQ i)/diagonalValue u i m) := by
+  have hxy : x ≠ y := by intro h; subst y; exact hn rfl
+  have hs := order_lt_of_residue_ne u x y hn
+  have h := OrientationHierarchy.actual_strict_crossing_content i u x y i (pole i) m
+    (pole_ne_zero i) (pole_valuation i) le_rfl hi hc hxy hs hm
+  have h0 : VBound (schedule u i m+1) ((correction u x y m).eval (poleQ i)) := by
+    simpa only [coeff_zero_eq_eval_zero,chart,eval_comp,eval_add,eval_C,eval_mul,eval_X,
+      mul_zero,add_zero,pole_cast] using h 0
+  have hr := vbound_div h0 (r:=diagonalValue u i m)
+  rw [diagonal_valuation u i m hi] at hr
+  convert hr using 1 <;> ring
+
+end OrientationDiagonal

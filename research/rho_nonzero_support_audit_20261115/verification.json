@@ -1,0 +1,77 @@
+{
+  "schema": "rho-nonzero-verification/v1",
+  "source_commit": "96b72a0d89b59f9eaa1b3f521eb4b5b15ad6e204",
+  "claim_id": "PCC-20261115-f8a8f9",
+  "declaration_sha256": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 39,
+  "gate_declarations": 20,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 78,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-f8a8f9",
+    "claim_sha256": "11b42d2ce1a35f2b6e7624bbb8ea3bf4bd8ccdc67cddae619a9fbac2b0067a97",
+    "commit": "96b72a0d89b59f9eaa1b3f521eb4b5b15ad6e204",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/rho_nonzero_support_audit_20261115/lean (NonzeroCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T16:23:38Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-f8a8f9",
+    "claim_sha256": "11b42d2ce1a35f2b6e7624bbb8ea3bf4bd8ccdc67cddae619a9fbac2b0067a97",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47827,
+    "sha256": "c55f4d44aa2ed99d0f540e20f6dc8440cff4d3f5117b994e6a7ceab6f5a491a0",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 20,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_both_nonzero_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "exact_discarded_mass_and_conditioned_mean_comparison": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "p2_not_normalized_as_PMF": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

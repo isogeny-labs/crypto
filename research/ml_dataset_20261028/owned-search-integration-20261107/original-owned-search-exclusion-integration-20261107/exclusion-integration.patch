@@ -1,0 +1,109 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -1,7 +1,7 @@
+ //! Consuming transport proposal: actual admitted original parts, no borrowed token.
+ use super::*;
+ use provenance::boolean_equations as equations;
+-use provenance::{checked_model, signed_lift};
++use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
+ mod sparse {
+     pub use super::equations::{Charge, Monomial, Polynomial};
+@@ -12,6 +12,7 @@
+ #[path="dynamic_boolean_search_bqi.rs"] mod bridge;
+ #[path="dynamic_boolean_search_check.rs"] mod check;
+ #[path="dynamic_boolean_continuation.rs"] pub(in crate::ml_dataset::solvers) mod continuation;
++#[path="retained_exclusion_verifier.rs"] pub(in crate::ml_dataset::solvers) mod exclusions;
+ pub(in crate::ml_dataset::solvers) use continuation::Limits as ContinuationLimits;
+ pub(in crate::ml_dataset::solvers) use scheduler::search::SearchLimits;
+ pub(in crate::ml_dataset::solvers) use check::Limits as AuditLimits;
+@@ -33,6 +34,9 @@
+     fn reserve(&mut self,q:sparse::Charge)->Result<(),()>{reserve_phase(self.0,q.work,q.bytes).map_err(|_|())}
+     fn check(&mut self)->Result<(),()>{self.0.check(Instant::now()).map_err(|_|())}
+ }
++impl checked_model::VerificationAdmission for MatrixAdmission<'_>{
++    fn addition(&mut self)->Result<(),provenance::Error>{self.0.reserve_matrix_candidate_addition(Instant::now()).map_err(|_|provenance::Error::Admission)}
++}
+ struct LiftAdmission<'a>(&'a mut Budget);
+ impl provenance::Admission for LiftAdmission<'_>{
+     fn reserve(&mut self,q:provenance::Quote)->Result<(),provenance::Error>{self.0.reserve_checking(q.work,q.bytes,Instant::now()).map_err(|_|provenance::Error::Admission)}
+@@ -44,7 +48,7 @@
+ #[derive(Clone,Copy)]
+ pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub continuation:ContinuationLimits}
+ #[derive(Clone,Copy,Debug)]
+-pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure)}
++pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure)}
+ /// Each record belongs to one exact retained partition and model. Returned
+ /// callback values are diagnostics until callback_result is successful.
+ pub(in crate::ml_dataset::solvers) struct LiftRecord {
+@@ -53,6 +57,15 @@
+     pub callback_result:Option<Result<(),continuation::Failure>>,
+     pub returned:Option<Result<signed_lift::Outcome,Stop>>,
+ }
++struct RetainedRecords<'a>(&'a [LiftRecord]);
++impl exclusions::Records for RetainedRecords<'_>{
++    fn len(&self)->usize{self.0.len()}
++    fn get(&self,index:usize)->Option<exclusions::RecordView<'_>>{
++        let r=self.0.get(index)?;
++        Some(exclusions::RecordView{partition:r.partition,record:r.record,model:&r.model,
++            callback_result:r.callback_result,returned_outcome:r.returned.and_then(Result::ok)})
++    }
++}
+ struct OriginalParts{
+     public_sha256:[u8;32],factor_sha256:[u8;32],budget:Budget,binding:[u8;32],launch_sha256:[u8;32],math:Math,
+     checked:Option<provenance::CheckedMap>,unchecked:Option<provenance::Map>,pattern:Option<u32>,
+@@ -66,6 +79,7 @@
+     expansion:Option<equations::OwnedExpansion>,normalized:Vec<equations::Polynomial>,
+     normalization_generator:usize,normalization_term:usize,normalization_sort:usize,
+     continuation:Option<continuation::Attempt>,coverage:Option<continuation::CoverageAudit>,
++    exclusion_audit:Option<exclusions::Audit>,
+     original_deadline:Instant,failure:Option<Failure>,
+     lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+@@ -83,6 +97,13 @@
+     /// authentic classified replay before any pattern-negative conclusion.
+     pub(in crate::ml_dataset::solvers) fn conditional_coverage(&self)->Option<&continuation::CoverageAudit>{
+         if self.failure.is_some(){return None}self.coverage.as_ref().filter(|v|v.result.is_ok())
++    }
++    /// Raw replay diagnostics survive failed admission or arithmetic replay.
++    pub(in crate::ml_dataset::solvers) fn exclusion_audit(&self)->Option<&exclusions::Audit>{self.exclusion_audit.as_ref()}
++    /// Complete Boolean coverage with fresh per-model exhaustion for this exact
++    /// authenticated expansion and original signed domain, not all patterns.
++    pub(in crate::ml_dataset::solvers) fn verified_model_exclusions(&self)->Option<&exclusions::Audit>{
++        if self.failure.is_some(){return None}self.exclusion_audit.as_ref().filter(|v|v.result.is_ok())
+     }
+     fn fail(&mut self,f:Failure,s:Stop){self.failure=Some(f);let _:Result<(),Stop>=self.original.budget.fail(s);}
+     fn pay(&mut self,w:u64,b:usize)->Result<(),Stop>{reserve_phase(&mut self.original.budget,w,u64::try_from(b).map_err(|_|Stop::Overflow)?)}
+@@ -194,8 +215,21 @@
+         let audit=continuation::audit(variables,&self.normalized,self.continuation.as_ref().expect("retained continuation"),limits,self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
+         let result=audit.result;self.coverage=Some(audit);
+         if let Err(e)=result{let stop=if e==continuation::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};self.fail(Failure::Coverage(e),stop);return}
+-        // Stay Matrix for independently charged exclusion replay. Coverage alone
+-        // is conditional and cannot yield a pattern-negative/public solve report.
++        // Both equation order and checked map originate in this retained owned
++        // expansion; no caller-supplied formula/map/domain enters this boundary.
++        let expansion=self.expansion.as_ref().expect("retained authentic expansion");
++        let replay=exclusions::verify(expansion.variables(),&self.normalized,expansion.source(),
++            &self.original.math.signed,self.original.math.signed_target,
++            self.continuation.as_ref().expect("retained continuation"),&RetainedRecords(&self.lift_records),
++            exclusions::Limits{records:limits.partitions,work:limits.work,bytes:limits.bytes,coverage:limits},
++            self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
++        let result=replay.result;self.exclusion_audit=Some(replay);
++        if let Err(e)=result{
++            let stop=if e==exclusions::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};
++            self.fail(Failure::Exclusions(e),stop);return
++        }
++        // Stay Matrix. This proves only this source model partition's exhaustion;
++        // exceptional-pattern completeness and public negative transport are separate.
+     }
+     fn run(&mut self,mut caps:Caps){
+         let phase=match self.original.budget.begin_native(false,Instant::now()){Ok(v)=>v,Err(s)=>{self.fail(Failure::Admission(s),s);return}};
+@@ -231,7 +265,7 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            continuation:None,coverage:None,original_deadline,failure:None,
++            continuation:None,coverage:None,exclusion_audit:None,original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+         if let Err(s)=admission{out.fail(Failure::Admission(s),s);return out}

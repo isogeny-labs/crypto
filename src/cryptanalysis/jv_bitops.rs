@@ -62,6 +62,10 @@ use super::bitops::{Field, NoPrice, Prim, Widths};
 use crate::prime_hyperelliptic::ops::KINDS;
 pub use crate::prime_hyperelliptic::ops::{Kind, OpTally};
 
+#[path = "jv_bitops_uniform.rs"]
+mod uniform;
+pub use uniform::{uniform_json, uniform_mod_u64, uniform_snapshot, UniformCounts, UniformTally};
+
 static ENABLED: AtomicBool = AtomicBool::new(false);
 /// Set once any hook fires on a thread that did not [`claim`] the tally.
 /// A flag written only on its first change, so threads that are not
@@ -417,6 +421,15 @@ fn slow(m: u64, field: Kind, modr: Kind, n: u64) {
 pub fn hook_mul(m: u64) {
     if enabled() {
         slow(m, Kind::FieldMul, Kind::ModrMul, 1);
+    }
+}
+
+/// `n` reduced products, classified exactly like [`hook_mul`].
+/// Used when a kernel already maintains an exact arithmetic-operation count.
+#[inline(always)]
+pub fn hook_muls(m: u64, n: u64) {
+    if n != 0 && enabled() {
+        slow(m, Kind::FieldMul, Kind::ModrMul, n);
     }
 }
 

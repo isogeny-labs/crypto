@@ -1,0 +1,8 @@
+digraph Cost {
+ graph[rankdir=LR,bgcolor="transparent",ranksep=.3];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4ff",fontname="Helvetica",fontsize=11];
+ a[label="Actual rational slopes\nreduced num/den Bits bound"];
+ b[label="Construct positive integer d\nactual denomRows numerator\nd <= 2^B"];
+ c[label="Division-free geometric numerator\ncommon denominator d^k\nd^k <= 2^(B*k)"];
+ a -> b; b -> c;
+}

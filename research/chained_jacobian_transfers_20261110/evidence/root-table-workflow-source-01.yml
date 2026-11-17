@@ -1,0 +1,107 @@
+name: Chained Jacobian transfer fixture
+on:
+  push:
+    # The dedicated workflow is not on main yet;filtered research pushes
+    # exercise these same jobs without a new repository-wide PR trigger.
+    branches: [main, research/chained-jacobian-transfer-20261110]
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/native/**'
+      - 'research/chained_jacobian_transfers_20261110/lean/**'
+      - 'research/chained_jacobian_transfers_20261110/successor-preflight/**'
+      - 'src/prime_hyperelliptic/fp2.rs'
+      - 'src/cryptanalysis/jv_cover.rs'
+      - '.github/workflows/chained-jacobian-transfers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/native
+            src/prime_hyperelliptic
+      - name: Pin Rust and check the native fixtures
+        env:
+          RUSTUP_TOOLCHAIN: 1.99.1
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+          manifest=research/chained_jacobian_transfers_20261110/native/Cargo.toml
+          cargo fmt --manifest-path "$manifest" -- --check
+          cargo clippy --manifest-path "$manifest" --all-targets --features small-prime --offline --locked -- -D warnings
+          cargo test --release --manifest-path "$manifest" --features small-prime --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/native-tests.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: chained-jacobian-native-${{ github.sha }}
+          path: ${{ runner.temp }}/native-tests.txt
+          if-no-files-found: ignore
+
+  successor-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            research/chained_jacobian_transfers_20261110/successor-preflight
+            isogeny_algos
+            src/cryptanalysis/jv_cover.rs
+      - name: Check the frozen constructor and successor/kernel replay
+        env:
+          RUSTUP_TOOLCHAIN: 1.99.1
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+          cd research/chained_jacobian_transfers_20261110/successor-preflight
+          sha256sum -c reference.sha256
+          sha256sum -c legacy.sha256
+          cargo fmt -- --check
+          cargo clippy --all-targets --offline --locked -- -D warnings
+          cargo test --release --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/successor-tests.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: chained-successor-preflight-${{ github.sha }}
+          path: ${{ runner.temp }}/successor-tests.txt
+          if-no-files-found: ignore
+
+  structural-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/lean
+            tools/lean
+      - name: Install the pinned Lean toolchain
+        run: |
+          set -euo pipefail
+          curl -fsSL --connect-timeout 15 --max-time 120 https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain "$(cat research/chained_jacobian_transfers_20261110/lean/lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build and audit the proof files
+        run: |
+          set -euo pipefail
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart OddFieldDescent RootTable; do
+            tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: chained-jacobian-proofs-${{ github.sha }}
+          path: ${{ runner.temp }}/proofs-*
+          if-no-files-found: ignore

@@ -1,0 +1,11 @@
+name = "residue_weighted_length_audit"
+version = "0.1.0"
+defaultTargets = ["ResidueWeightedLengthAudit"]
+
+[[require]]
+name = "jv_scheme_stalk_audit"
+path = "../../jv_scheme_stalk_audit_20261115/lean"
+
+[[lean_lib]]
+name = "ResidueWeightedLengthAudit"
+roots = ["ResidueLengthImports", "LocalWeights", "GlobalWeights", "ProductWeights", "JVWeights", "SchemeWeights", "WeightedCertificate"]

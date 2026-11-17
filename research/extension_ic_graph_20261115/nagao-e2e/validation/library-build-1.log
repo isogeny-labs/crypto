@@ -1,0 +1,45 @@
+   Compiling isogeny_algos v0.1.0 (/workspace/nagao-e2e-library/isogeny_algos)
+   Compiling factor-base v0.1.0 (/workspace/nagao-e2e-library/tools/factor-base)
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/nagao-e2e-library/crates/hashed-ecdl-tensor)
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/nagao-e2e-library/crates/ecdl-tensor-ic)
+   Compiling pencil-symbolic-graph v0.1.0 (/workspace/nagao-e2e-library/research/pencil_large_prime_20261029)
+   Compiling volcano-cli v0.1.0 (/workspace/nagao-e2e-library/tools/volcano-cli)
+   Compiling crypto v0.1.0 (/workspace/nagao-e2e-library)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ic/boundary_targets.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/claim.rs:39:32
+   |
+39 | pub const CLAIM_LEDGER: &str = include_str!("../../../docs/ic/boundary_targets.json");
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ecbench/schema.sql`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/db.rs:42:30
+   |
+42 | pub const SCHEMA_SQL: &str = include_str!("../../../docs/ecbench/schema.sql");
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/three_leads.rs:74:38
+   |
+74 |                 serde_json::from_str(include_str!("../../../docs/curves/registry.json"))
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/workload.rs:988:24
+    |
+988 | const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/ic/calibration.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ic_boundary.rs:306:34
+    |
+306 | const PINNED_CALIBRATION: &str = include_str!("../../docs/ic/calibration.json");
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/curves/standards/parameters.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/secg_standards.rs:20:31
+   |
+20 | const PARAMETERS_JSON: &str = include_str!("../../docs/curves/standards/parameters.json");
+   |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (lib) due to 6 previous errors
+warning: build failed, waiting for other jobs to finish...

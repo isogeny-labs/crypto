@@ -1,0 +1,14 @@
+{
+  "action": "Treat --auto as merge-capable,not queued-only proof;require actual applicable head gate,size,artifacts and reviews before merge-capable action",
+  "created": "2026-11-17T05:21:55Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/pr-closure-4502-20261117/FACTS.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "Using gh pr merge --auto before explicit current-head gate registration",
+  "why": "4502 timeline hasMergedEvent/noAutoMergeEnabledEvent;required gates start after merge;exact fulfillment attribution unknown"
+}

@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.3,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#34556b"];
+ a [label="F3: f=X^5-X\nMonic, degree 5, separable / squarefree"];
+ b [label="All actual reduced polynomial pairs\nu monic; deg u<=2; deg v<deg u\nu divides v^2-f"];
+ c [label="Proved complete coefficient classification\n91 canonical candidates; exactly 8 valid"];
+ d [label="Actual u-polynomial splitting\n7 split, including identity; 1 nonsplit\nNonsplit u=X^2+1, v=0"];
+ e [label="Exact finite-model fraction =7/8\nDifference from 1/2 =3/8",fillcolor="#d4eedb"];
+ f [label="Refutes exact finite-half reading\nQualified q-to-infinity limit preserved",fillcolor="#fff2cf"];
+ g [label="Separate open obligations\nGeometric Picard identification\nCantor group law / cyclic subgroup proportions",fillcolor="#fff2cf"];
+ a -> b; b -> c; c -> d; d -> e; e -> f; b -> g [style=dashed];
+}

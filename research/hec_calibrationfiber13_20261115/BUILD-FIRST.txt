@@ -1,0 +1,44 @@
+     Locking 5 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling autocfg v1.5.1
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.47
+   Compiling num-bigint v0.4.8
+   Compiling hec-calibration-fiber13 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_calibrationfiber13_20261115)
+error[E0061]: this function takes 3 arguments but 4 arguments were supplied
+   --> ../hec_sourcejet13_20261115/source.rs:384:22
+    |
+384 |         let target = super::target::difference(&tj, pair[0], pair[1], &pts);
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^                        ---- unexpected argument #4 of type `&Vec<[u64; 3]>`
+    |
+note: function defined here
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:22:8
+    |
+ 22 | pub fn difference(j: &QuarticJacobian, p: [u64; 3], q: [u64; 3]) -> QClass {
+    |        ^^^^^^^^^^
+help: remove the extra argument
+    |
+384 -         let target = super::target::difference(&tj, pair[0], pair[1], &pts);
+384 +         let target = super::target::difference(&tj, pair[0], pair[1]);
+    |
+
+error[E0061]: this function takes 3 arguments but 4 arguments were supplied
+   --> ../hec_sourcejet13_20261115/source.rs:385:18
+    |
+385 |         let mt = super::target::difference(&tj, mpair[0], mpair[1], &pts);
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^                          ---- unexpected argument #4 of type `&Vec<[u64; 3]>`
+    |
+note: function defined here
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:22:8
+    |
+ 22 | pub fn difference(j: &QuarticJacobian, p: [u64; 3], q: [u64; 3]) -> QClass {
+    |        ^^^^^^^^^^
+help: remove the extra argument
+    |
+385 -         let mt = super::target::difference(&tj, mpair[0], mpair[1], &pts);
+385 +         let mt = super::target::difference(&tj, mpair[0], mpair[1]);
+    |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `hec-calibration-fiber13` (bin "fiber13") due to 2 previous errors

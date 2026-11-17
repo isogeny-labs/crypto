@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:54:32Z",
+ "id": "PCC-20261117-f0f239",
+ "kind": "statement",
+ "producer": {
+  "commit": "b0919b72b1688dbd9983381470d23d1d81b5fb05",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/report.json",
+    "sha256": "fdee33619ac7010fff3beaf15eda135ae1e22759f29a1f979907eb31c9dfea80"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/transport-control.json",
+    "sha256": "da13414a9d229b229c1cdd8e90bcef99dc146ef843c7bb0cafae427f8f9847ca"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/source-manifest.json",
+    "sha256": "e7125dc2ca8894130b2eaf905706d917cd32b3c635d1e05cc4317ab4d8079071"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/pre-call-manifest.json",
+    "sha256": "67aa8d9bb94d348fce9d10ff6be9ddd12cb05ffddf4349353bf95a6dec40791a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/post-call-manifest.json",
+    "sha256": "4ca1de28fa237418409873ea8e69cff8bd7fc693237b14688d67c8cc5e12192a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_quartic_encodings_20261117/validation.json",
+    "sha256": "9c8947d4a8210b469be49a2d91afdeebd680f851fdf46698f07d2f8ce0b14b3a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Matched Expanded4/Split4 finite correctness at sourceb0919b72; one known-answer target,two sampler streams,uncertain cells retained,no performance",
+ "statement": "The fixed8-arm Expanded4/Split4 cold/shared comparison exits0 with no excluded arms; complete projected root sets equal the independent affine oracle and recover the fixture scalar. Full auxiliary witnesses and native certification diagnostics are retained. Transport control deliberately fails all8 arms and keeps every planned arm. All are unsigned producer observations; canonical unified-export validation remains blocked by encrypted schema access."
+}

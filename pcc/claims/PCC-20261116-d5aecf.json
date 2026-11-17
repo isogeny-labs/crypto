@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T15:06:48Z",
+ "id": "PCC-20261116-d5aecf",
+ "kind": "theorem",
+ "producer": {
+  "commit": "88bc2ae5439de484d827698858d7444a815a6f10",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "3d7e778b228838bba92018a610456daa7bfc0e0c78166d888b1efa3336815577",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+   "theorem": "CubicFullFrobenius22302.fixed_expression_iff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact generic commutative-ring characteristic223 coefficient embedding and full cubic Frobenius transport under z^3=3. Fixed-expression converse explicitly assumes encode injectivity; no field construction, Rust/compiler/counter refinement, native/Jacobian population or timing claim. Both original local gates24 audited0 trusted; signed standing absent.",
+ "statement": "theorem fixed_expression_iff {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (hinj : Function.Injective (encode z)) (a b c : Fin 223) : (encode z (a,b,c))^223=encode z (a,b,c) \u2194 b=0 \u2227 c=0"
+}

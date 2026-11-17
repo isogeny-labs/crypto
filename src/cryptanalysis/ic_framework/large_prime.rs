@@ -41,7 +41,7 @@
 //! pipeline.  It is a constant-factor device inside the pair-table
 //! family and makes no claim beyond that.
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 use std::time::Instant;
 
 use num_bigint::BigUint;
@@ -49,8 +49,8 @@ use num_traits::ToPrimitive;
 
 use super::stages::{InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
-    BinaryGroup, BinaryInstance, CountedGroup, FactorBase, FrobeniusPairTable, GroupOps,
-    OracleCounters, Relation,
+    fast_map, BinaryGroup, BinaryInstance, CountedGroup, FactorBase, FastMap, FrobeniusPairTable,
+    GroupOps, OracleCounters, Relation,
 };
 use crate::cryptanalysis::koblitz_fast::FastPoint;
 use crate::cryptanalysis::koblitz_index_calculus::build_explicit_frobenius_point_factor_base;
@@ -149,7 +149,7 @@ pub struct LargePrimeCollector<'i> {
     /// The envelope table without `F × F` (and, with one large prime,
     /// without `D × D`).
     table_large: FrobeniusPairTable,
-    membership: HashMap<u64, Membership>,
+    membership: FastMap<Membership>,
     domain_orbits: usize,
     eliminator: WideLargePrimeEliminator<'i>,
     /// Signed orbit of the eliminator's base → (framework column, the
@@ -223,7 +223,7 @@ impl<'i> LargePrimeCollector<'i> {
 
         // Orbit keys of the base (one per signed orbit): the scan below
         // skips them and the probe recognises `T ∈ F`.
-        let mut membership: HashMap<u64, Membership> = HashMap::new();
+        let mut membership: FastMap<Membership> = fast_map(0);
         let mut base_keys = 0u64;
         for p in &fb.points {
             if membership

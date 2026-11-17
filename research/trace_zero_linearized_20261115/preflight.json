@@ -1,0 +1,1700 @@
+{
+  "rows": [
+    {
+      "arm": "sliced-original",
+      "dimension": 0,
+      "engineering_elapsed_seconds": 0.000403207,
+      "n": 5,
+      "result": {
+        "all_group_ops": {
+          "adds": 4,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 4,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 35,
+        "points": [
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 0,
+      "engineering_elapsed_seconds": 0.000037076,
+      "n": 5,
+      "result": {
+        "all_group_ops": {
+          "adds": 4,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 4,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 35,
+        "points": [
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 0,
+      "engineering_elapsed_seconds": 0.000025689,
+      "n": 5,
+      "result": {
+        "all_group_ops": {
+          "adds": 3,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 3,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 2,
+        "linear_systems": {
+          "linear_columns": 2,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 2,
+          "product_dimension": 1,
+          "source_dimension": 1,
+          "systems": 1
+        },
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 0,
+        "points": [
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 0,
+      "engineering_elapsed_seconds": 0.000017646,
+      "n": 5,
+      "result": {
+        "all_group_ops": {
+          "adds": 3,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 3,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 2,
+        "linear_systems": {
+          "linear_columns": 2,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 2,
+          "product_dimension": 1,
+          "source_dimension": 1,
+          "systems": 1
+        },
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 0,
+        "points": [
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 0,
+      "engineering_elapsed_seconds": 0.000016235,
+      "n": 5,
+      "result": {
+        "all_group_ops": {
+          "adds": 3,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 3,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Found",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": [
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ],
+          [
+            "2",
+            "1f"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000042504,
+      "n": 7,
+      "result": {
+        "all_group_ops": {
+          "adds": 7,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 2,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 9,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 21,
+        "points": [
+          [
+            "1e",
+            "42"
+          ],
+          [
+            "1e",
+            "5c"
+          ],
+          [
+            "c",
+            "1d"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000028443,
+      "n": 7,
+      "result": {
+        "all_group_ops": {
+          "adds": 7,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 2,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 9,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 1,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 21,
+        "points": [
+          [
+            "1e",
+            "42"
+          ],
+          [
+            "1e",
+            "5c"
+          ],
+          [
+            "c",
+            "1d"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000019829,
+      "n": 7,
+      "result": {
+        "all_group_ops": {
+          "adds": 3,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 3,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 5,
+        "linear_systems": {
+          "linear_columns": 5,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 3,
+          "source_dimension": 2,
+          "systems": 0
+        },
+        "models": 0,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 0,
+        "points": [
+          [
+            "c",
+            "1d"
+          ],
+          [
+            "c",
+            "11"
+          ],
+          [
+            "c",
+            "1d"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000018047,
+      "n": 7,
+      "result": {
+        "all_group_ops": {
+          "adds": 3,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 3,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 5,
+        "linear_systems": {
+          "linear_columns": 5,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 3,
+          "source_dimension": 2,
+          "systems": 0
+        },
+        "models": 0,
+        "outcome": "Found",
+        "patterns_attempted": 1,
+        "peak_variables": 0,
+        "points": [
+          [
+            "c",
+            "1d"
+          ],
+          [
+            "c",
+            "11"
+          ],
+          [
+            "c",
+            "1d"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000063506,
+      "n": 7,
+      "result": {
+        "all_group_ops": {
+          "adds": 8,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 4,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 12,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Found",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": [
+          [
+            "c",
+            "1d"
+          ],
+          [
+            "c",
+            "11"
+          ],
+          [
+            "c",
+            "1d"
+          ]
+        ],
+        "reason": null,
+        "replay": true,
+        "truth": true,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000242695,
+      "n": 9,
+      "result": {
+        "all_group_ops": {
+          "adds": 6,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 5,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 6,
+        "peak_variables": 72,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000176044,
+      "n": 9,
+      "result": {
+        "all_group_ops": {
+          "adds": 6,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 5,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 6,
+        "peak_variables": 72,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000055013,
+      "n": 9,
+      "result": {
+        "all_group_ops": {
+          "adds": 6,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 9,
+        "linear_systems": {
+          "linear_columns": 9,
+          "maximum_nullity_consistent": 2,
+          "maximum_rank_consistent": 8,
+          "product_dimension": 6,
+          "source_dimension": 3,
+          "systems": 6
+        },
+        "models": 8,
+        "outcome": "Refuted",
+        "patterns_attempted": 6,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000048974,
+      "n": 9,
+      "result": {
+        "all_group_ops": {
+          "adds": 6,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 9,
+        "linear_systems": {
+          "linear_columns": 9,
+          "maximum_nullity_consistent": 2,
+          "maximum_rank_consistent": 8,
+          "product_dimension": 6,
+          "source_dimension": 3,
+          "systems": 6
+        },
+        "models": 8,
+        "outcome": "Refuted",
+        "patterns_attempted": 6,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 4,
+      "engineering_elapsed_seconds": 0.000041712,
+      "n": 9,
+      "result": {
+        "all_group_ops": {
+          "adds": 21,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 6,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 27,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.005773083,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 10,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 10,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 10,
+        "peak_variables": 606,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.00499371,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 10,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 10,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 10,
+        "peak_variables": 606,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.0012228,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 10,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 10,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 11,
+        "linear_systems": {
+          "linear_columns": 11,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 7,
+          "source_dimension": 4,
+          "systems": 10
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 10,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.001172774,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 10,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 10,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 11,
+        "linear_systems": {
+          "linear_columns": 11,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 7,
+          "source_dimension": 4,
+          "systems": 10
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 10,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.001606736,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 55,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 10,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 65,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.090593299,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 134,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 134,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 134,
+        "peak_variables": 645,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.07865939,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 134,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 134,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 134,
+        "peak_variables": 645,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.003090238,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 134,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 134,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 23,
+        "linear_systems": {
+          "linear_columns": 23,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 15,
+          "source_dimension": 8,
+          "systems": 134
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 134,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.002990127,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 134,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 134,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 23,
+        "linear_systems": {
+          "linear_columns": 23,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 15,
+          "source_dimension": 8,
+          "systems": 134
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 134,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.053672547,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 9045,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 134,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 9179,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.751876646,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 2008,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 2008,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 180,
+        "peak_variables": 725,
+        "points": null,
+        "reason": "terminal-slice total budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.753374339,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 2008,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 2008,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 327,
+        "peak_variables": 725,
+        "points": null,
+        "reason": "terminal-slice total budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.042974517,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 2008,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 2008,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 35,
+        "linear_systems": {
+          "linear_columns": 35,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.041050683,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 2008,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 2008,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 35,
+        "linear_systems": {
+          "linear_columns": 35,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.769627874,
+      "n": 83,
+      "result": {
+        "all_group_ops": {
+          "adds": 120576,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 61,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 120637,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": "pair-table setup budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.011147708,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 8,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 8,
+        "peak_variables": 942,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.010315776,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 8,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 8,
+        "peak_variables": 942,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.002904489,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 8,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 12,
+        "linear_systems": {
+          "linear_columns": 12,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 8,
+          "source_dimension": 4,
+          "systems": 8
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 8,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.003146984,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 8,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 8,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 12,
+        "linear_systems": {
+          "linear_columns": 12,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 8,
+          "source_dimension": 4,
+          "systems": 8
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 8,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 5,
+      "engineering_elapsed_seconds": 0.003254255,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 36,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 8,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 44,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.140096395,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 112,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 112,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 112,
+        "peak_variables": 981,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.12908232,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 112,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 112,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 112,
+        "peak_variables": 981,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.004717646,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 112,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 112,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 23,
+        "linear_systems": {
+          "linear_columns": 23,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 15,
+          "source_dimension": 8,
+          "systems": 112
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 112,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.004630345,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 112,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 112,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 23,
+        "linear_systems": {
+          "linear_columns": 23,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 15,
+          "source_dimension": 8,
+          "systems": 112
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 112,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 8,
+      "engineering_elapsed_seconds": 0.040888709,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 6328,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 112,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 6440,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "sliced-original",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.751969601,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 1994,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 1994,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 157,
+        "peak_variables": 1061,
+        "points": null,
+        "reason": "terminal-slice total budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "prepared-sliced",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.754179712,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 1994,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 1994,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 0,
+        "linear_systems": {
+          "linear_columns": 0
+        },
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 220,
+        "peak_variables": 1061,
+        "points": null,
+        "reason": "terminal-slice total budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.042957552,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 1994,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 1994,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 35,
+        "linear_systems": {
+          "linear_columns": 35,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "linearized-aa",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.040660597,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 1994,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 1994,
+        "conflicts": 0,
+        "cost_scope": "Actual group work includes setup/admission/lifting/replay; linearization, field, SAT and quadratic root work not fully priced by that unit. No runtime claim.",
+        "linear_columns": 35,
+        "linear_systems": {
+          "linear_columns": 35,
+          "maximum_nullity_consistent": 0,
+          "maximum_rank_consistent": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "models": 0,
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "peak_variables": 0,
+        "points": null,
+        "reason": null,
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    },
+    {
+      "arm": "pair-table",
+      "dimension": 12,
+      "engineering_elapsed_seconds": 0.767605895,
+      "n": 131,
+      "result": {
+        "all_group_ops": {
+          "adds": 123538,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 63,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "charged_group_add_double_count": 123601,
+        "conflicts": 0,
+        "cost_scope": "Includes actual group work in setup/terminal translations/solver lifting/final replay; field/ANF and SAT work unpriced. Pair table rebuilt per query, no free setup or cached truth.",
+        "linear_columns": 0,
+        "models": 0,
+        "outcome": "Inconclusive",
+        "patterns_attempted": 0,
+        "peak_variables": 0,
+        "points": null,
+        "reason": "pair-table setup budget",
+        "replay": false,
+        "truth": false,
+        "valid": true
+      }
+    }
+  ]
+}

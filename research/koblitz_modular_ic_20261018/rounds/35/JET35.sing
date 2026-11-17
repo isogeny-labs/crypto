@@ -1,0 +1,78 @@
+ideal jetResidue35=std(ideal(z^154,T^2+T+1));
+proc inv35(poly f){ideal gens=jetResidue35,f;if(std(gens)[1]!=1){ERROR("JET35_NONUNIT");}matrix wit=lift(gens,ideal(1));poly ans=reduce(wit[nrows(wit),1],jetResidue35);if(reduce(f*ans+1,jetResidue35)!=0){ERROR("JET35_INVERSE");}return(ans);}
+proc pow35(poly f,int e){poly ans=1;while(e>0){if(e%2==1){ans=reduce(ans*f,jetResidue35);}e=e div 2;if(e>0){f=reduce(f*f,jetResidue35);}}return(ans);}
+proc evaluate35(list encoded,ideal images){
+ intvec bounds=0,0,0,0;int i;int j;int k;int v;intvec ex;list terms;
+ for(i=1;i<=size(encoded);i++){terms=encoded[i];for(j=1;j<=size(terms);j++){ex=terms[j];for(v=1;v<=4;v++){if(ex[v]>bounds[v]){bounds[v]=ex[v];}}}}
+ list powers;list row;for(v=1;v<=4;v++){row=list(poly(1));for(k=1;k<=bounds[v];k++){row[k+1]=reduce(poly(row[k])*images[v],jetResidue35);}powers[v]=row;}
+ ideal ans;poly termValue;poly val;
+ for(i=1;i<=size(encoded);i++){val=0;terms=encoded[i];for(j=1;j<=size(terms);j++){ex=terms[j];termValue=1;for(v=1;v<=4;v++){row=powers[v];termValue=reduce(termValue*poly(row[ex[v]+1]),jetResidue35);}val=val+termValue;}ans[i]=reduce(val,jetResidue35);}return(ans);
+}
+proc component35(ideal values,int index){poly f=values[(index+1) div 2];if(index%2==1){return(subst(f,T,0));}return(diff(f,T));}
+proc conj35(poly f){poly ans=0;int i;for(i=1;i<=size(f);i++){ans=ans+leadcoef(f[i])^2*leadmonom(f[i]);}return(ans);}
+list point35=paddingRepresentatives33[1];number b035=point35[1];number c035=point35[2];number l035=point35[3];number n035=point35[4];number u035=(b035+c035)/c035^2;number v035=((b035/c035)*u035^3+1)/(u035+1);
+if(u035^5+u035^3+1!=0 || v035^2+v035+u035^3+u035!=0){ERROR("JET35_BASE");}
+poly uj35=u035+z;poly rhs35=reduce(uj35^3+uj35+u035^3+u035,jetResidue35);poly vj35=v035;poly term35=rhs35;int i35;int j35;int k35;
+for(i35=0;i35<8;i35++){vj35=vj35+term35;term35=reduce(term35*term35,jetResidue35);}
+if(reduce(vj35*vj35+vj35+uj35^3+uj35,jetResidue35)!=0){ERROR("JET35_BASE_HENSEL");}
+poly rn35=reduce((uj35+1)*vj35+1,jetResidue35);poly cn35=reduce(rn35+uj35^3,jetResidue35);
+poly bj35=reduce(rn35*cn35*inv35(pow35(uj35,7)),jetResidue35);poly cj35=reduce(cn35*inv35(pow35(uj35,4)),jetResidue35);poly aj35=1+cj35;
+poly delta35=reduce(pow35(bj35,3)*reduce(bj35+reduce(cj35*pow35(aj35,3),jetResidue35),jetResidue35),jetResidue35);poly deltaInv35=inv35(delta35);
+poly lj35=l035;poly nj35=n035;
+ideal values35=evaluate35(sourceEncoded35,ideal(nj35+bj35*T,lj35+aj35*T,bj35,cj35));ideal dlValues35;ideal dnValues35;ideal errors35;
+for(i35=1;i35<=5;i35++){dlValues35[i35]=values35[5+i35];dnValues35[i35]=values35[10+i35];}
+int pivotA35;int pivotB35;number det035;
+for(i35=1;i35<=9;i35++){for(j35=i35+1;j35<=10;j35++){det035=number(subst(component35(dlValues35,i35)*component35(dnValues35,j35)+component35(dlValues35,j35)*component35(dnValues35,i35),z,0));if(pivotA35==0 && det035!=0){pivotA35=i35;pivotB35=j35;}}}
+if(pivotA35==0){ERROR("JET35_NO_ETALE_PAIR");}
+int precision35=1;int next35;poly det35;poly dl35;poly dn35;poly ea35;poly eb35;
+while(precision35<154){next35=2*precision35;if(next35>154){next35=154;}
+ values35=evaluate35(sourceEncoded35,ideal(nj35+bj35*T,lj35+aj35*T,bj35,cj35));
+ for(i35=1;i35<=5;i35++){errors35[i35]=values35[i35];dlValues35[i35]=values35[5+i35];dnValues35[i35]=values35[10+i35];}
+ ea35=component35(errors35,pivotA35);eb35=component35(errors35,pivotB35);
+ det35=reduce(component35(dlValues35,pivotA35)*component35(dnValues35,pivotB35)+component35(dlValues35,pivotB35)*component35(dnValues35,pivotA35),jetResidue35);
+ dl35=reduce((ea35*component35(dnValues35,pivotB35)+eb35*component35(dnValues35,pivotA35))*inv35(det35),jetResidue35);
+ dn35=reduce((component35(dlValues35,pivotA35)*eb35+component35(dlValues35,pivotB35)*ea35)*inv35(det35),jetResidue35);
+ lj35=jet(lj35+dl35,next35-1);nj35=jet(nj35+dn35,next35-1);
+ values35=evaluate35(sourceEncoded35,ideal(nj35+bj35*T,lj35+aj35*T,bj35,cj35));ideal stage35=std(ideal(z^next35,T^2+T+1));
+ for(i35=1;i35<=5;i35++){if(reduce(values35[i35],stage35)!=0){ERROR("JET35_NEWTON_RESIDUAL");}}
+ print("JET35_STAGE precision="+string(next35)+" all_source=pass");precision35=next35;
+}
+ideal units35;ideal inverses35;for(i35=1;i35<=8;i35++){units35[i35]=values35[15+i35];inverses35[i35]=inv35(units35[i35]);}
+values35=evaluate35(sourceEncoded35,ideal(nj35+z^153+bj35*T,lj35+aj35*T,bj35,cj35));int corruptDetected35;
+for(i35=1;i35<=5;i35++){if(values35[i35]!=0){corruptDetected35=1;}}if(corruptDetected35==0){ERROR("JET35_CORRUPT_ACCEPTED");}
+poly bc35=bj35;poly cc35=cj35;poly lc35=lj35;poly nc35=nj35;ideal ic35=inverses35;
+for(k35=1;k35<=5;k35++){bc35=conj35(bc35);cc35=conj35(cc35);lc35=conj35(lc35);nc35=conj35(nc35);values35=evaluate35(sourceEncoded35,ideal(nc35+bc35*T,lc35+(1+cc35)*T,bc35,cc35));for(i35=1;i35<=5;i35++){if(values35[i35]!=0){ERROR("JET35_CONJUGATE_SOURCE");}}for(i35=1;i35<=8;i35++){ic35[i35]=conj35(ic35[i35]);if(reduce(values35[15+i35]*ic35[i35]+1,jetResidue35)!=0){ERROR("JET35_CONJUGATE_UNIT");}}}
+if(bc35!=bj35 || cc35!=cj35 || lc35!=lj35 || nc35!=nj35){ERROR("JET35_CONJUGATE_CLOSURE");}
+print("JET35_SOURCE precision=154 units=8 discriminant=unit conjugates=5 corrupt_control=pass");
+ideal oldZero35=evaluate35(oldEncoded35,ideal(nj35+bj35*T,lj35+aj35*T,vj35,uj35));
+ideal oldOne35=evaluate35(oldEncoded35,ideal(nj35+bj35*(T+1),lj35+aj35*(T+1),vj35,uj35));
+ideal newValues35=evaluate35(newEncoded35,ideal(nj35,lj35,vj35,uj35));
+poly oldInv35=inv35(reduce(pow35(uj35,16)*pow35(uj35+1,16),jetResidue35));poly newInv35=inv35(reduce(pow35(uj35,49)*pow35(uj35+1,16),jetResidue35));
+ideal sections35;ideal quadratic35;ideal cubic35;poly comparison35;
+for(i35=1;i35<=68;i35++){sections35[i35]=reduce(newValues35[i35]*newInv35,jetResidue35);comparison35=reduce(((T+1)*oldZero35[i35]+T*oldOne35[i35])*oldInv35,jetResidue35);if(sections35[i35]!=comparison35 || sections35[i35]!=subst(sections35[i35],T,0)){ERROR("JET35_DESCENT");}}
+for(i35=1;i35<=196;i35++){quadratic35[i35]=reduce(sections35[sectionPairs2[i35,1]]*sections35[sectionPairs2[i35,2]],jetResidue35);}
+for(i35=1;i35<=324;i35++){cubic35[i35]=reduce(sections35[sectionPairs3[i35,1]]*quadratic35[sectionPairs3[i35,2]],jetResidue35);}
+ideal nine35=std(ideal(z^9,T^2+T+1));
+if(reduce(uj35+paddingUJet33,nine35)!=0 || reduce(vj35+paddingVJet33,nine35)!=0 || reduce(bj35+paddingBJet33,nine35)!=0 || reduce(cj35+paddingCJet33,nine35)!=0 || reduce(lj35+paddingLambdaJet33,nine35)!=0 || reduce(nj35+paddingNuJet33,nine35)!=0){ERROR("JET35_OLD_COORDINATES");}
+for(i35=1;i35<=8;i35++){if(reduce(units35[i35]+sourceUnitJetValues33[i35],nine35)!=0 || reduce(inverses35[i35]+sourceUnitJetInverses33[i35],nine35)!=0){ERROR("JET35_OLD_UNITS");}}
+for(i35=1;i35<=68;i35++){if(reduce(sections35[i35]+completeSectionJets33[i35],nine35)!=0){ERROR("JET35_OLD_SECTIONS");}}
+for(i35=1;i35<=196;i35++){if(reduce(quadratic35[i35]+completeQuadraticJets33[i35],nine35)!=0){ERROR("JET35_OLD_QUADRATICS");}}
+print("JET35_REGRESSION coordinates=6 units=8 inverses=8 sections=68 quadratics=196 precision=9 pass");
+list field35;int word35;int bit35;int remain35;number fieldValue35;
+for(word35=0;word35<32;word35++){remain35=word35;fieldValue35=0;for(bit35=0;bit35<5;bit35++){if(remain35%2==1){fieldValue35=fieldValue35+a^bit35;}remain35=remain35 div 2;}field35[word35+1]=fieldValue35;}
+for(i35=1;i35<=32;i35++){for(j35=i35+1;j35<=32;j35++){if(number(field35[i35])==number(field35[j35])){ERROR("JET35_FIELD_ENCODING");}}}
+proc code35(number x){int i;for(i=1;i<=32;i++){if(x==number(field35[i])){return(i-1);}}ERROR("JET35_FIELD_WORD");return(-1);}
+proc pack35(poly f){poly ans=0;int i;int j;int word;intvec ex;for(i=1;i<=size(f);i++){ex=leadexp(f[i]);if(ex[2]!=0 || ex[3]!=0 || ex[1]>=154){ERROR("JET35_PACK_DOMAIN");}word=code35(leadcoef(f[i]));for(j=0;j<5;j++){if(word%2==1){ans=ans+w^(5*ex[1]+j);}word=word div 2;}}return(ans);}
+proc rank35(ideal columns,int count){list piv;list co;int i;int j;int p;int rk;poly bits;poly label;poly rebuilt;for(i=1;i<=770;i++){piv[i]=poly(0);co[i]=poly(0);}for(i=1;i<=count;i++){bits=pack35(columns[i]);label=w^(i-1);while(bits!=0){p=deg(bits)+1;if(piv[p]==0){piv[p]=bits;co[p]=label;rk++;break;}bits=bits+poly(piv[p]);label=label+poly(co[p]);}if(bits==0){ERROR("JET35_DEPENDENT_SELECTED_SECTION");}}
+ for(p=1;p<=770;p++){if(piv[p]!=0){rebuilt=0;label=co[p];for(j=1;j<=size(label);j++){rebuilt=rebuilt+columns[deg(label[j])+1];}if(pack35(rebuilt)!=poly(piv[p])){ERROR("JET35_PIVOT_RECOMBINATION");}}}return(rk);}
+int rankSections35=rank35(sections35,68);int rankQuadratic35=rank35(quadratic35,196);int rankCubic35=rank35(cubic35,324);
+if(rankSections35!=68 || rankQuadratic35!=196 || rankCubic35!=324){ERROR("JET35_SELECTED_RANKS");}
+short=0;link out35="ASCII:w padding-jets154.sing";open(out35);
+write(out35,"poly paddingUJet35="+string(uj35)+";poly paddingVJet35="+string(vj35)+";poly paddingBJet35="+string(bj35)+";poly paddingCJet35="+string(cj35)+";poly paddingLambdaJet35="+string(lj35)+";poly paddingNuJet35="+string(nj35)+";ideal sourceUnits35;ideal sourceInverses35;ideal sectionValues35;ideal quadraticValues35;ideal cubicValues35;");
+for(i35=1;i35<=8;i35++){write(out35,"sourceUnits35["+string(i35)+"]="+string(units35[i35])+";sourceInverses35["+string(i35)+"]="+string(inverses35[i35])+";");}
+for(i35=1;i35<=68;i35++){write(out35,"sectionValues35["+string(i35)+"]="+string(sections35[i35])+";");}
+for(i35=1;i35<=196;i35++){write(out35,"quadraticValues35["+string(i35)+"]="+string(quadratic35[i35])+";");}
+for(i35=1;i35<=324;i35++){write(out35,"cubicValues35["+string(i35)+"]="+string(cubic35[i35])+";");}close(out35);
+link bitsOut35="ASCII:w evaluation-words.txt";open(bitsOut35);list spaces35=sections35,quadratic35,cubic35;intvec counts35=68,196,324;ideal space35;intvec words35;poly coefficient35;
+for(k35=1;k35<=3;k35++){space35=spaces35[k35];for(i35=1;i35<=counts35[k35];i35++){words35=intvec(0);for(j35=0;j35<154;j35++){coefficient35=jet(space35[i35],j35);if(j35>0){coefficient35=coefficient35+jet(space35[i35],j35-1);}words35[j35+1]=code35(number(coefficient35/z^j35));}write(bitsOut35,string(k35)+" "+string(i35)+" "+string(words35));}}close(bitsOut35);
+print("JET35_RESULT precision=154 residue_degree=5 source_equations=5 units=8 conjugates=5 descent_functions=68 ranks=68,196,324 old_precision9=pass pivot_recombination=all");print("JET35_ALL_CHECKS_PASS");quit;

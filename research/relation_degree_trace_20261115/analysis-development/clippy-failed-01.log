@@ -1,0 +1,30 @@
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking itoa v1.0.19
+    Checking memchr v2.8.3
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking compact-speed-analysis v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-protocol)
+error: the loop variable `j` is only used to index `sample[k]`
+   --> src/lib.rs:218:18
+    |
+218 |         for j in 0..n {
+    |                  ^^^^
+    |
+note: for this index operation
+   --> src/lib.rs:221:17
+    |
+221 |                 sample[k][j] = row[k];
+    |                 ^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+    |
+218 -         for j in 0..n {
+218 +         for <item> in sample[k].iter_mut().take(n) {
+    |
+
+error: could not compile `compact-speed-analysis` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `compact-speed-analysis` (lib test) due to 1 previous error

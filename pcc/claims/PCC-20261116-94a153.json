@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T17:07:29Z",
+ "id": "PCC-20261116-94a153",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/quartic_km_v3.cpp",
+    "sha256": "d52d593c4bb091f213a80e43f3b039565eaec9408c228b9f90e726ae2d87c070"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/TARGET_KM_PROTOCOL.md",
+    "sha256": "17c3ffdebe3a7515cab771444b1a7f11e9a976b3419f932b1c0824f6b6ce3888"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/TARGET_KM_V3_AMENDMENT.md",
+    "sha256": "e3f5b4dd9e7677b4d1673975f36bfdb74f956be44b65385bb087b8d437437036"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-km-v3/result.json",
+    "sha256": "e0a6fe97ccf00826755b8322d79e19abe2603e03428a865310ddf0b891788022"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-km-v3/pre-call-manifest.sha256",
+    "sha256": "3ac9a8f6e69ea4db13639f9130d67ce88a4d076f814124667bb763ecd560d0a7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Corrected native target KM v3 on the actual descended P192 kernel1 candidate uses85 disjoint evaluations with RR dimensions10/22/34/46 and the general equality preimage test. Two rational point classes pass addition versus an independently constructed effective divisor, cancellation, and an actual vertical principal relation/function membership, with five addflip calls and two rejecting corruptions. This is unsigned target-arithmetic evidence only; no source isogeny, Serre twist verdict or DLP recovery."
+}

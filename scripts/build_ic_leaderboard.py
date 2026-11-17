@@ -53,6 +53,9 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 24
 
 SOURCES = {
+    "relation_identity_component": "research/relation_degree_trace_20261115/native-identity-20261117/report-01/audit.json",
+    "n83_basis_cold": "research/n83_basis_setup_20261015/reports/run-20261015T1842Z/native_statistics.json",
+    "n83_basis_final": "research/n83_basis_setup_20261015/reports/final-20261016/native_final.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
@@ -111,6 +114,8 @@ SOURCES = {
     "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
     "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
+    "tableb_binary_ksum": "research/ic_tableb_binary_ksum_20261115/summary.json",
+    "ksum_prune": "research/ic_ksum_prune_20261115/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -182,6 +187,9 @@ SOURCES = {
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "n83_matched": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/statistics.json",
+    "n83_matched_replay": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/independent_replay_v3_receipt.json",
+    "n83_matched_supplement": "research/n83_matched_20261014/records/postprocess-20261015T0018Z/presentation_supplement.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "n83_tier1_finalist_rows": "research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json",
     "n83_tier1_finalist_validated": "research/n83_e2e_final_holdout_20261016/validated_rows.json",
@@ -523,6 +531,8 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "research/ic_gw_fasthash_20261114/validation",
                            "research/ic_gw_bl_reuse_20261115/validation",
                            "research/ic_gw_nrm_lz_20261115/validation",
+                           "benchmarks/20261115-tableb-binary-ksum",
+                           "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
                            "benchmarks/20261115-tableb-ksum")
 
@@ -2621,6 +2631,195 @@ def ghs_nrmlz_html(g: dict) -> str:
             gh(SOURCES["ghs_weak_nrmlz"], "Analysis") + '</section>')
 
 
+TABLEB_BKSUM_EVIDENCE = "benchmarks/20261115-tableb-binary-ksum"
+TABLEB_BKSUM_STUDY = "research/ic_tableb_binary_ksum_20261115"
+
+
+def tableb_binary_ksum_component() -> dict:
+    """Table B random-binary rows re-measured with the k-sum tables (frozen study
+    research/ic_tableb_binary_ksum_20261115; ecbench runs the generic ksum oracle on binary curves
+    since d87eb39548), counted GAE with native work at w = 0, 0.1, 1.  Copied from summary.json;
+    requires the validation gate's VALIDATION.json."""
+    summ = load(SOURCES["tableb_binary_ksum"])
+    errs = checked_evidence_dir(REPO / TABLEB_BKSUM_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{TABLEB_BKSUM_EVIDENCE}: not validated: " + "; ".join(errs))
+    if (summ.get("schema") != "crypto.ic_tableb_binary_ksum_summary/v1"
+            or summ.get("ksum5_l1_holds_on_a_primary_row") is not True or summ.get("ksum5_l1_falsified") is not False):
+        raise SystemExit(f"{SOURCES['tableb_binary_ksum']}: review the summary (schema, L1 verdict)")
+    rows = []
+    for r in summ["rows"]:
+        for w in ("0", "0.1", "1"):
+            b = r["weights"][w]
+            k5, k4 = b["ksum5"], b["ksum4"]
+            rows.append({"slug": r["slug"], "role": r["role"], "w": w, "tb": r["table_b"],
+                         "s_rho": b["s"]["rho-neg"], "s_tb": b["s"]["inc-tb"], "inc": b["strictest_incumbent"],
+                         "s_inc": b["s"][b["strictest_incumbent"]], "s_k5": b["s"]["ksum5"], "s_k4": b["s"]["ksum4"],
+                         "r5": k5["ratio"], "ci5": k5["ci95"], "r4": k4["ratio"], "gap": k5["gap_to_rho"],
+                         "holds5": r["ksum5"]["holds"], "holds4": r["ksum4"]["holds"]})
+    return {"rows": rows, "study": TABLEB_BKSUM_STUDY + "/", "report": TABLEB_BKSUM_STUDY + "/report.pdf",
+            "source": SOURCES["tableb_binary_ksum"], "binary_sha256": summ["binary_sha256"],
+            "sessions": summ["sessions"], "targets_per_curve": summ["targets_per_curve"],
+            "rounds": summ["rounds"], "replicates": summ["replicates"], "track": summ["track"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference with "
+                           f"the section 5a band ({TABLEB_BKSUM_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def tableb_binary_ksum_md(k: dict) -> list[str]:
+    L = ["", "## Table B random-binary rows re-measured with the k-sum tables (2026-11-15, counted component improvement, outside tables A-C)", "",
+         "ecbench now runs the generic `ksum` oracle (one probe a target into a negation-folded table of every signed m-sum "
+         "of the base) on binary curves. On Table B's five random-binary curves, each of three replicate sessions per curve "
+         f"({k['targets_per_curve']} targets × {k['rounds']} rounds) runs matched negation-map rho (rho-neg), BSGS, Table B's "
+         "own recipe base (inc-tb, binary-subspace at the row's dimension), three tuned pair-table incumbents on the "
+         "smallest-abscissa base (binary-multiplier) and ksum:m=4 and m=5 at sizes fixed by a disclosed sizing pilot. "
+         "Registered rule L1: the upper end of the 95% interval of cost(ksum5) / cost(strictest incumbent) below 1 at every "
+         "weight, pooled and in every replicate, beyond the replicate noise. Primary rows n21, n24, n27; n15, n18 secondary. "
+         f"Track: {k['track']}. {k['validation']}. Table B's recorded figures are another harness's before marks, shown, "
+         "never divided into the new S. Part of the gain over Table B's own row comes from tuning the incumbent's base "
+         "(inc-tb is 1.4–3.4× the tuned incumbent at w = 0, 1.5–3.9× at w = 1); the claim is only against the tuned incumbent.", "",
+         "| curve | role | w | Table B before (S_IC, S_rho) | S rho-neg | S inc-tb | strictest incumbent: S | S ksum4 | S ksum5 | ksum5 / incumbent [95%] | ksum4 / incumbent | L1 ksum5 | distance remaining: ksum5 / rho-neg |",
+         "|:--|:--|--:|:--|--:|--:|:--|--:|--:|:--|--:|:--|--:|"]
+    for r in k["rows"]:
+        L.append(f"| `{r['slug']}` | {r['role']} | {r['w']} | {r['tb']['s_ic']:.2f}, {r['tb']['s_rho']:.2f} | {r['s_rho']:.3f} | "
+                 f"{r['s_tb']:.2f} | {r['inc']}: {r['s_inc']:.2f} | {r['s_k4']:.2f} | {r['s_k5']:.2f} | "
+                 f"{r['r5']:.3f} [{r['ci5'][0]:.3f}, {r['ci5'][1]:.3f}] | {r['r4']:.3f} | {'holds' if r['holds5'] else 'does not hold'} | {r['gap']:.2f} |")
+    L += ["", f"Study: [{k['study']}](../../{k['study']}); [report](../../{k['report']}); source `{k['source']}`. "
+          f"Counted cost (L0), {k['sessions']} sessions, one ecbench binary (sha256 {k['binary_sha256'][:12]}…). [pcc:unverified]", ""]
+    return L
+
+
+def tableb_binary_ksum_html(k: dict) -> str:
+    md = tableb_binary_ksum_md(k)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    hdr = [c.strip() for c in md[4].strip("|").split("|")]
+    tr = [x for x in md if x.startswith("| `")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip().strip('`'))}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="tableb-binary-ksum-20261115"><h2>Table B random-binary rows re-measured with the k-sum tables</h2>' + body +
+            '<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) + '</tr></thead><tbody>' + rows +
+            '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
+
+
+KSUM_PRUNE_EVIDENCE = "benchmarks/20261115-ksum-prune-tableb"
+KSUM_PRUNE_STUDY = "research/ic_ksum_prune_20261115"
+
+
+def ksum_prune_component() -> dict:
+    """ksum:m=k,prune=1 against the same table unpruned on Table B's eight k-sum rows (frozen study
+    research/ic_ksum_prune_20261115; prune added in 6d6aa93b8f): the build skips the adds of partial sums
+    that cannot reach k summands, so the table, inserts and probes are identical and only build adds drop.
+    Copied from summary.json; requires the validation gate's VALIDATION.json."""
+    summ = load(SOURCES["ksum_prune"])
+    errs = checked_evidence_dir(REPO / KSUM_PRUNE_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{KSUM_PRUNE_EVIDENCE}: not validated: " + "; ".join(errs))
+    v = summ.get("verdict", {})
+    if (summ.get("schema") != "crypto.ic_ksum_prune_summary/v1" or v.get("ksum5_p_holds_all_rows") is not True
+            or v.get("correctness_ok") is not True or v.get("correctness_mismatches") != 0):
+        raise SystemExit(f"{SOURCES['ksum_prune']}: review the summary (schema, verdict, correctness)")
+    rows = []
+    for r in summ["rows"]:
+        for w in ("0", "0.1", "1"):
+            b = r["weights"][w]
+            k5, k4 = b["ksum5"], b["ksum4"]
+            rows.append({"id": r["id"], "slug": r["slug"], "field": r["field"], "w": w, "s_rho": b["s_rho_neg"],
+                         "s5": k5["s_unpruned"], "s5p": k5["s_pruned"], "r5": k5["ratio"], "ci5": k5["ci95"],
+                         "s4": k4["s_unpruned"], "s4p": k4["s_pruned"], "r4": k4["ratio"],
+                         "gap": k5["gap_to_rho_unpruned"], "gap_p": k5["gap_to_rho_pruned"],
+                         "saved": r["build_adds"]["ksum5"]["saved_fraction"],
+                         # Cheapest k-sum arm before against cheapest after (the validator's framing).
+                         "best": min(k5["s_unpruned"], k4["s_unpruned"]),
+                         "best_p": min(k5["s_pruned"], k4["s_pruned"])})
+    return {"rows": rows, "study": KSUM_PRUNE_STUDY + "/", "report": KSUM_PRUNE_STUDY + "/report.pdf",
+            "source": SOURCES["ksum_prune"], "binary_sha256": summ["binary_sha256"], "sessions": summ["sessions"],
+            "targets_per_curve": summ["targets_per_curve"], "rounds": summ["rounds"], "track": summ["track"],
+            "pairs": v["correctness_pairs_checked"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference with "
+                           f"the section 5a band ({KSUM_PRUNE_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def ksum_prune_md(k: dict) -> list[str]:
+    L = ["", "## k-sum table build without dead-end partial sums (2026-11-15, component speed-up, outside tables A-C)", "",
+         "`ksum:m=k,prune=1` (commit 6d6aa93b8f) stops each lower level of the k-sum table build where too few abscissae "
+         "remain to complete k summands, so no add is spent on a partial sum that can never be inserted. The table, its keys, "
+         "inserts, collisions and probes are unchanged; only build adds drop. Default off, so recorded sessions replay. "
+         "Measured on Table B's eight k-sum rows (the prime and random-binary studies' curves, seeds and sizes), "
+         f"{k['sessions']} sessions, {k['targets_per_curve']} targets × {k['rounds']} rounds, pruned and unpruned arms paired "
+         f"by target; {k['pairs']} target pairs recover the same log with identical counters outside the table build. "
+         f"Track: {k['track']}. {k['validation']}. Headline: the cheapest k-sum arm before (ksum4 or ksum5, unpruned) "
+         "against the cheapest after, since unpruned ksum4 is the cheaper arm at w = 0 on 7 of 8 rows; the saving is a "
+         "constant factor that shrinks as the base grows (about 1/a² of the build), no exponent changes.", "",
+         "| curve | w | S rho-neg | best k-sum before → after | best after / before | distance remaining: best k-sum / rho-neg, before → after | S ksum5 → pruned | ksum5 pruned / unpruned [95%] | S ksum4 → pruned | ksum4 ratio | build adds saved (ksum5) |",
+         "|:--|--:|--:|:--|--:|:--|:--|:--|:--|--:|--:|"]
+    for r in k["rows"]:
+        L.append(f"| `{r['slug']}` ({r['id']}) | {r['w']} | {r['s_rho']:.3f} | {r['best']:.2f} → {r['best_p']:.2f} | "
+                 f"{r['best_p'] / r['best']:.3f} | {r['best'] / r['s_rho']:.2f} → {r['best_p'] / r['s_rho']:.2f} | "
+                 f"{r['s5']:.2f} → {r['s5p']:.2f} | {r['r5']:.3f} [{r['ci5'][0]:.3f}, {r['ci5'][1]:.3f}] | "
+                 f"{r['s4']:.2f} → {r['s4p']:.2f} | {r['r4']:.3f} | {100 * r['saved']:.0f}% |")
+    L += ["", f"Study: [{k['study']}](../../{k['study']}); [report](../../{k['report']}); source `{k['source']}`. "
+          f"Counted cost (L0), one ecbench binary (sha256 {k['binary_sha256'][:12]}…). [pcc:unverified]", ""]
+    return L
+
+
+def ksum_prune_html(k: dict) -> str:
+    md = ksum_prune_md(k)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    hdr = [c.strip() for c in md[4].strip("|").split("|")]
+    tr = [x for x in md if x.startswith("| `")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip().strip('`'))}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ksum-prune-20261115"><h2>k-sum table build without dead-end partial sums</h2>' + body +
+            '<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) + '</tr></thead><tbody>' + rows +
+            '</tbody></table></div>' + gh(SOURCES["ksum_prune"], "Analysis") + '</section>')
+
+
+def ghs_weak_headline_dl1() -> dict:
+    """Owner decision 2026-11-15: the GHS-weak headline arm is DL1 (SGE + scalar Lanczos), not DL (block Lanczos,
+    width 4). An arm choice, not an improvement: both arms are measured in every study unit. DL1's k = 22 mean cold
+    M-eq comes from research/ic_gw_nrm_lz_20261115/analysis.json (recomputed by its validator, VAL-20261115-5c7af8);
+    the rho band and the study's standing come from that study's VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_nrmlz"])
+    errs = checked_evidence_dir(REPO / GHS_NRMLZ_EVIDENCE, REPO)
+    man = json.loads((REPO / GHS_NRMLZ_EVIDENCE / gate.MANIFEST).read_text()) if not errs else {}
+    band = man.get("rho_reference", {}).get("gae_band", {})
+    g = a["gap_k22"]["ic_mean_meq"]
+    rows = []
+    if band:
+        for w in ("0", "0.1", "1"):
+            rows.append({"w": w, "dl": g[f"BOTH/DL/{w}"], "dl1": g[f"BOTH/DL1/{w}"], "rho": band[w]["rho"]})
+    return {"rows": rows, "validated": not errs,
+            "validation": (f"evidence: {GHS_NRMLZ_EVIDENCE}/VALIDATION.json (validated)") if not errs else
+                          ("not validated: " + "; ".join(errs))}
+
+
+def ghs_headline_dl1_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: headline arm DL1 (owner decision 2026-11-15), outside tables A–C", "",
+         "The double-large-prime IC on this family is measured with three linear-algebra arms in every unit: D (plain "
+         "Lanczos), DL1 (structured Gaussian elimination + scalar Lanczos) and DL (structured Gaussian elimination + block "
+         "Lanczos of width 4). Block Lanczos's vector work grows with its width while its matrix work is the same, so under "
+         "the counted model DL1 is cheaper than DL at every size and addition price; block width buys parallel wall time, "
+         "which the counted model does not value. By owner decision (2026-11-15) the headline arm of the GHS-weak sections "
+         "is DL1 from now on. This is an arm choice, not an improvement: no cost changed, and the earlier sections keep "
+         f"their DL figures. {g['validation']}.", "",
+         "| w | DL, mean cold M-eq (k = 22) | DL1 | rho-neg (frozen band) | DL / rho | DL1 / rho |", "|--:|--:|--:|--:|--:|--:|"]
+    for r in g["rows"]:
+        L.append(f"| {r['w']} | {r['dl']:.4g} | {r['dl1']:.4g} | {r['rho']:.4g} | {r['dl'] / r['rho']:.5f} | {r['dl1'] / r['rho']:.5f} |")
+    L += ["", "Configuration: the latest GHS-weak configuration (c_D = 1.7, square-root chain, fast relation stage, block "
+          "Lanczos reuse, normalised-coordinate relation stage, scalar Lanczos reuse); seeds 1–3; [pcc:unverified].", ""]
+    return L
+
+
+def ghs_headline_dl1_html(g: dict) -> str:
+    md = ghs_headline_dl1_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| w ")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-headline-dl1"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: headline arm DL1 (owner decision '
+            '2026-11-15)</h2>' + body + '<div class="scroll"><table><thead><tr><th>w</th><th>DL</th><th>DL1</th>'
+            '<th>rho-neg</th><th>DL / rho</th><th>DL1 / rho</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_nrmlz"], "Analysis") + '</section>')
+
+
 def _ci(v, lo, hi, i):
     return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
 
@@ -2769,6 +2968,91 @@ def latest_frontier_audit() -> dict:
     }
 
 
+def matched_n83_diagnostic() -> dict:
+    """Quote native local-process observations outside every ranked table."""
+    result = load(SOURCES["n83_matched"])
+    replay = load(SOURCES["n83_matched_replay"])
+    supplement = load(SOURCES["n83_matched_supplement"])
+    if (result.get("schema") != "n83_matched_statistics_v1"
+            or result.get("all_required_rows_valid") is not True
+            or result.get("overall_primary_winner_eligible") is not True
+            or replay.get("status") != "PASS"
+            or replay.get("complete_panel_gate") is not True
+            or replay.get("completed_verified_processes") != 32
+            or replay.get("checked_target_rows") != 218
+            or replay.get("IC_four_point_witness_replays") != 104
+            or replay.get("checked_aa_semantic_pairs") != 5
+            or replay.get("invalid_rows") != 0
+            or supplement.get("schema") != "n83_matched_supplement_v1"
+            or supplement.get("counts") != {"ic_targets": 104, "rho_targets": 114,
+                                             "all_targets": 218, "processes": 32}
+            or supplement["provenance"]["frozen_statistics"]["sha256"]
+            != sha256(SOURCES["n83_matched"])
+            or result["input_metadata"]["independent_verification_receipt_sha256"]
+            != sha256(SOURCES["n83_matched_replay"])):
+        raise SystemExit("matched N83 diagnostic requires the complete bound native replay and analysis")
+    return {
+        "source": SOURCES["n83_matched"],
+        "replay_source": SOURCES["n83_matched_replay"],
+        "presentation_source": SOURCES["n83_matched_supplement"],
+        "curve": "icv1-f2m83-t6151469093347-9eba6cd5",
+        "measurement_date": "2026-10-14",
+        "class": "accounting",
+        "admission": "local diagnostic only; no ranked recipe or ledger promotion",
+        "S": None,
+        "ratio_to_floor": None,
+        "controlled_speedup": None,
+        "cold": result["primary_actual_cold_singleton_process_wall"],
+        "batch": result["primary_prepared_batch_process_wall"],
+        "online": result["secondary_prepared_online_target_means"],
+        "costs": result["costs"],
+        "observed_counts": result["observed_counts"],
+        "verification": {k: replay[k] for k in (
+            "completed_verified_processes", "checked_target_rows",
+            "IC_scalar_replays", "rho_scalar_replays", "IC_four_point_witness_replays",
+            "checked_aa_semantic_pairs", "aa_semantic_gate", "invalid_rows", "missing_target_rows")},
+        "limits": (
+            "Eight actual one-target cold pairs and three actual 32-target shared-setup pairs, "
+            "given retained K600; original base construction and OS-cold caching are unmeasured. "
+            "Rho reuses curve/basis preparation with fresh seed-specific jumps and fresh DP state. "
+            "Online is secondary because IC omits validation/output intervals charged by rho. "
+            "One VM, three preparation clusters, fixed IC rank seed 29; no common S, "
+            "sealed legacy-wide ecbench admission, physical-host or independent-host claim. "
+            "Modeled workloads beyond 32 are not measured crossovers."
+        ),
+    }
+
+
+def basis_n83_diagnostic() -> dict:
+    """Copy native recorded diagnostics; no scientific arithmetic or admission."""
+    cold, final = load(SOURCES["n83_basis_cold"]), load(SOURCES["n83_basis_final"])
+    if (cold.get("stage") != "cold" or cold.get("stage_failures") != 0
+            or final.get("status") != "COMPLETE_ACCOUNTING_WITH_UNRESOLVED_COHORT_REFERENCE"
+            or (final.get("attempted"), final.get("completed"), final.get("canonical_answers"),
+                final.get("rank_log_audits"), final.get("AA_pairs")) != (55, 50, 92, 30, 5)
+            or final.get("cohort_IC_over_rho") is not None):
+        raise SystemExit("N83 basis diagnostic requires bound actual evidence and unavailable cohort reference")
+    return {"source": SOURCES["n83_basis_final"], "cold_source": SOURCES["n83_basis_cold"],
+            "curve": "icv1-f2m83-t6151469093347-9eba6cd5", "measurement_date": "2026-10-15",
+            "class": "engineering", "admission": "local diagnostic only; no ranked or ledger promotion",
+            "S": None, "ratio_to_floor": None, "cohort_IC_over_rho": None,
+            "counts": {k: final[k] for k in ("attempted", "completed", "failed", "canonical_answers", "ic_answers", "rho_answers", "rank_log_audits", "AA_pairs")},
+            "cold": cold["comparisons"], "cold_processes": cold["process_summary"],
+            "cohort_selected_over_control": final["cohort_selected_over_control"],
+            "limits": "C3 selected before fresh holdouts. Eight actual cold blocks; three cohort rho workers rejected8-point input. Fifty complete and five failed processes,92answers. Cohort IC/rho unavailable; no replacement or projected timing. One guest/three prep clusters, no calibrated S/L2/independent-host or security claim. Original retained K600 construction and OS-cache flushing unpriced."}
+
+def basis_n83_markdown(doc):
+    b = doc["n83_basis_setup_diagnostic"]
+    lines = ["## Bounded legacy degree-83 basis/setup diagnostic (measured2026-10-15)", "",
+             "Training-selected C3 prefix1271dense, exact legacy a=1/tail149. Native complete-process ratios; below1 favors IC. Outside admitted tables.", "",
+             "| Cold comparison (8 target blocks) | Mean-cost ratio | Conditional95% interval |", "|:--|--:|:--|"]
+    for key, label in (("selected_over_rho", "C3/rho"), ("control_over_rho", "K600/rho"), ("selected_over_control", "C3/K600")):
+        row = b["cold"][key]
+        lines.append(f"| {label} | {row['mean_cost_ratio']:.9f} | [{row['conditional_95_percent_interval'][0]:.9f}, {row['conditional_95_percent_interval'][1]:.9f}] |")
+    lines += ["", b["limits"], "", f"[Native full accounting](../../{b['source']}); [cold statistics](../../{b['cold_source']}).", ""]
+    return lines
+
+
 def jv_sieve_table() -> dict:
     """Read qualified native analysis; retain descriptive fields without treating
     missing control acceptance or incomplete original accounting as eligibility.
@@ -2814,6 +3098,81 @@ def jv_sieve_table() -> dict:
 def f4_fp_ic_component() -> dict:
     """Display the frozen engineering result; native-audit checks its arithmetic."""
     return load(SOURCES["f4_fp_ic_effect"])
+
+
+def relation_identity_component() -> dict:
+    """Copy native frozen evidence; no Python measurement or statistic."""
+    value = load(SOURCES["relation_identity_component"])
+    if (value.get("schema") != "native-identity-audit/v1"
+            or value.get("checked_answers") != 816
+            or value.get("monitor_ok") is not True
+            or value.get("costs_orders_and_statistics_recomputed") is not True
+            or [row.get("n") for row in value.get("cases", [])] != [3, 4, 6]):
+        raise ValueError("complete native identity audit required")
+    return {"source": SOURCES["relation_identity_component"],
+            "class": "engineering diagnostic; unsigned producer evidence",
+            "report": "research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md",
+            "measurement_date": "2026-11-17", "audit": value,
+            "limits": "Fixed p2147483647, seed7, n3/4/6 polynomial kernels. Ordinary95 neutral controls reject n4/n6; prospective simultaneous screens pass. No15x, new-target, intrinsic-regularity or ranked ECDLP claim."}
+
+
+def relation_identity_md(component: dict) -> list[str]:
+    lines = ["## Exact Rust identity checking (development polynomial kernel)", "",
+             component["class"] + ". " + component["limits"] + " [pcc:unverified]", "",
+             "Ratios above1 favor the denominator.25 paired main blocks/case; work and full-paid accounting. [pcc:unverified]", "",
+             "|n|Comparison|Work median|Work lower1/720|Paid median|Paid lower1/720|Ordinary95 pass|Simultaneous pass|",
+             "|---|---|---:|---:|---:|---:|---|---|"]
+    for case in component["audit"]["cases"]:
+        stats = case["result"]["statistics"]
+        for j, label in enumerate(("prefix-Singular/prefix-Rust", "frontier-Rust/prefix-Rust", "frontier-Singular/frontier-Rust")):
+            work, paid = stats[2*j], stats[2*j+1]
+            lines.append(f"|{case['n']}|{label}|{work['median_paired_ratio']:.6f}|{work['adjusted_lower_1_over_720']:.6f}|{paid['median_paired_ratio']:.6f}|{paid['adjusted_lower_1_over_720']:.6f}|{case['aa_statistics']['ordinary_95_admitted']}|{case['aa_admitted']}|")
+    lines += ["", f"[Result](../../{component['report']}); native source `{component['source']}`. All checks remain included; old rejected studies retained. [pcc:unverified]", ""]
+    return lines
+
+
+def relation_identity_html(component: dict) -> str:
+    lines = relation_identity_md(component)
+    header = next(x for x in lines if x.startswith("|n|"))
+    rows = [x for x in lines if x.startswith("|") and not x.startswith("|---") and x != header]
+    cells = lambda line, tag: "".join(f"<{tag}>{html.escape(x)}</{tag}>" for x in line.strip("|").split("|"))
+    return ('<section id="relation-identity-20261117"><h2>Exact Rust identity checking · engineering diagnostic</h2><p>'
+            + html.escape(component["class"] + ". " + component["limits"]) + ' [pcc:unverified]</p>'
+            + '<p>25 paired main blocks/case; work and full-paid accounting. Ratios above1 favor the denominator. [pcc:unverified]</p><div class="scroll"><table><thead><tr>'
+            + cells(header, "th") + '</tr></thead><tbody>' + "".join('<tr>' + cells(row, "td") + '</tr>' for row in rows)
+            + '</tbody></table></div><p><a href="https://github.com/isogeny-labs/crypto/blob/main/' + component["report"]
+            + '">Result and raw replay</a>. Complete checks retained; unsigned evidence. [pcc:unverified]</p></section>')
+
+
+def refresh_relation_identity() -> int:
+    """Narrow presentation refresh when unrelated full-build inputs are broken.
+
+    Preserve existing ranked/native fields and their source pins byte-for-value;
+    the ordinary full --check still validates the complete source set.
+    """
+    original = load(str(OUT_JSON.relative_to(REPO)))
+    component = relation_identity_component()
+    rendered_md = "\n".join(relation_identity_md(component))
+    rendered_html = relation_identity_html(component)
+    original["relation_identity_component"] = component
+    original["sources"]["relation_identity_component"] = {"path": component["source"], "sha256": sha256(component["source"])}
+    updates = {OUT_JSON: json.dumps(original, indent=1, ensure_ascii=False) + "\n"}
+    start, end = "<!-- BEGIN RELATION IDENTITY 20261117 -->", "<!-- END RELATION IDENTITY 20261117 -->"
+    for target, content in ((OUT_MD, rendered_md), (OUT_HTML, rendered_html), (REPO / "docs/index-calculus-scoreboard.html", rendered_html)):
+        text = target.read_text()
+        block = start + "\n" + content + "\n" + end
+        if start in text:
+            a, b = text.index(start), text.index(end) + len(end)
+            text = text[:a] + block + text[b:]
+        elif target.suffix == ".html":
+            text = text.replace("</body>", block + "\n</body>")
+        else:
+            text += "\n" + block + "\n"
+        updates[target] = text
+    for target, text in updates.items():
+        target.write_text(text)
+        print(f"component-only refresh {target.relative_to(REPO)}; full baseline not certified")
+    return 0
 
 
 def build(allow_unvalidated: bool = False) -> dict:
@@ -3328,6 +3687,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                            "largest": {"slug": top["slug"], "log2_r": top["log2_r"],
                                        "ratio_rho": top["best"]["ratio_rho"]}}
     return {
+        "relation_identity_component": relation_identity_component(),
         "schema_version": 1,
         "generated_by": "scripts/build_ic_leaderboard.py",
         "unit": "none: the board has three families, each with its own unit, reference and floor "
@@ -3369,6 +3729,8 @@ def build(allow_unvalidated: bool = False) -> dict:
             "paired_intervals": n83_holdout["paired_intervals"],
             "aa_controls": n83_holdout["aa_controls"],
         },
+        "n83_matched_process_diagnostic": matched_n83_diagnostic(),
+        "n83_basis_setup_diagnostic": basis_n83_diagnostic(),
         "n83_tier1_finalist": {
             "source": SOURCES["n83_tier1_finalist_rows"],
             "report": "research/n83_e2e_finalist_results_20261017/RESULT.md",
@@ -3428,6 +3790,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "k1_pt_lgrow_component": k1_pt_lgrow_component(names),
         # Table B prime rows re-measured with the k = 5 sum table, copied from the study's frozen summary.
         "tableb_ksum_component": tableb_ksum_component(),
+        "tableb_binary_ksum_component": tableb_binary_ksum_component(),
+        "ksum_prune_component": ksum_prune_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3449,6 +3813,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "ghs_weak_relstage_component": ghs_weak_relstage(),
         "ghs_weak_blreuse_component": ghs_weak_blreuse(),
         "ghs_weak_nrmlz_component": ghs_weak_nrmlz(),
+        "ghs_weak_headline_dl1": ghs_weak_headline_dl1(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -3677,6 +4042,25 @@ def markdown(doc: dict) -> str:
         L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
                  f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
     L.append("")
+    L += basis_n83_markdown(doc)
+    matched = doc["n83_matched_process_diagnostic"]
+    L += ["## Matched legacy degree-83 local process diagnostic (measured 2026-10-14)", "",
+          f"`{matched['curve']}`; accounting only, outside tables A–C. "
+          "Ratios are native IC/rho costs; below 1 favors IC. No S, floor or admitted-best promotion.", "",
+          "| Workload | Mean IC seconds | Mean rho seconds | Native IC/rho [95%] |",
+          "|:--|--:|--:|:--|"]
+    for label, key in (("8 actual cold singleton pairs", "cold"),
+                       ("3 actual shared-setup pairs, 32 targets each", "batch"),
+                       ("32 target online means, 3 repeats; secondary", "online")):
+        row = matched[key]
+        L.append(f"| {label} | {row['arithmetic_mean_ic_s']:.6f} | "
+                 f"{row['arithmetic_mean_rho_s']:.6f} | {row['ic_over_rho']:.6f} "
+                 f"[{row['interval_95'][0]:.6f}, {row['interval_95'][1]:.6f}] |")
+    L += ["", "32 processes, 218 replayed scalar answers, 104 IC witnesses and five exact-work A/A pairs; "
+          "no failed or omitted cases. " + matched["limits"], "",
+          f"[Native statistics](../../{matched['source']}); "
+          f"[independent replay](../../{matched['replay_source']}); "
+          f"[native phases and resource records](../../{matched['presentation_source']}).", ""]
     pilot = doc["native_tournament_pilot"]
     pilot_rows = pilot["rows"]
     confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
@@ -3883,6 +4267,8 @@ def markdown(doc: dict) -> str:
     for code in ("A", "B", "C"):
         if code == "C":
             L += tableb_ksum_markdown(doc)
+            L += tableb_binary_ksum_md(doc["tableb_binary_ksum_component"])
+            L += ksum_prune_md(doc["ksum_prune_component"])
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -4690,6 +5076,7 @@ def markdown(doc: dict) -> str:
     L += ghs_relstage_md(doc["ghs_weak_relstage_component"])
     L += ghs_blreuse_md(doc["ghs_weak_blreuse_component"])
     L += ghs_nrmlz_md(doc["ghs_weak_nrmlz_component"])
+    L += ghs_headline_dl1_md(doc["ghs_weak_headline_dl1"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -4883,6 +5270,7 @@ def markdown(doc: dict) -> str:
     L += ["| " + " | ".join(r) + " |" for r in t["e39_rows"]]
     L += ["", t["e41"] + f" Read the [report](../../{k['e41']['report']}), [summary](../../{k['e41']['source']}) "
           f"and [validator report](../../{k['e41']['validator_report']}).", ""]
+    L += ["<!-- BEGIN RELATION IDENTITY 20261117 -->"] + relation_identity_md(doc["relation_identity_component"]) + ["<!-- END RELATION IDENTITY 20261117 -->"]
     return "\n".join(L) + "\n"
 
 
@@ -5181,6 +5569,32 @@ def page(doc: dict, standalone: bool) -> str:
                  f'{unit_ref("B")}</p></div>')
     P.append(f'<div class="fact"><dt>Curves</dt><dd>{len({r["slug"] for r in board})} priced</dd>'
              f'<p>of {len(doc["roster"])} named in the repository; every one by its ICV1 slug</p></div></dl></header>')
+    basis = doc["n83_basis_setup_diagnostic"]
+    P.append('<section class="panel" id="n83-basis-setup-diagnostic"><h2>Bounded degree-83 basis/setup · measured2026-10-15 <span class="chip">engineering diagnostic</span></h2><p>Training-selected C3 prefix1271dense. Native complete-process cold comparison,8 matched target blocks. No ranked/ledger promotion.</p><div class="scroll"><table><thead><tr><th>Cold comparison</th><th>Mean cost ratio</th><th>Conditional95% interval</th></tr></thead><tbody>')
+    for key, label in (("selected_over_rho", "C3/rho"), ("control_over_rho", "K600/rho"), ("selected_over_control", "C3/K600")):
+        row = basis["cold"][key]
+        P.append(f'<tr><td>{label}</td><td>{row["mean_cost_ratio"]:.9f}</td><td>[{row["conditional_95_percent_interval"][0]:.9f}, {row["conditional_95_percent_interval"][1]:.9f}]</td></tr>')
+    P.append('</tbody></table></div><p>' + esc(basis["limits"]) + '</p><p>' + gh(basis["source"], "Native final evidence") + ' · ' + gh(basis["cold_source"], "Native cold statistics") + '</p></section>')
+    matched = doc["n83_matched_process_diagnostic"]
+    P.append('<section class="panel" id="n83-matched-process-diagnostic">'
+             '<h2>Matched legacy degree-83 local process diagnostic · measured 2026-10-14 '
+             '<span class="chip">accounting</span></h2>'
+             f'<p><code>{esc(matched["curve"])}</code>. Native IC/rho costs; below 1 favors IC. '
+             'Outside the ranked tables: S, floor and admitted-best fields remain unset.</p>'
+             '<div class="scroll"><table><thead><tr><th>Workload</th><th>Mean IC seconds</th>'
+             '<th>Mean rho seconds</th><th>Native IC/rho [95%]</th></tr></thead><tbody>')
+    for label, key in (("8 actual cold singleton pairs", "cold"),
+                       ("3 actual shared-setup pairs, 32 targets each", "batch"),
+                       ("32 target online means, 3 repeats; secondary", "online")):
+        row = matched[key]
+        P.append(f'<tr><td>{esc(label)}</td><td>{row["arithmetic_mean_ic_s"]:.6f}</td>'
+                 f'<td>{row["arithmetic_mean_rho_s"]:.6f}</td><td>{row["ic_over_rho"]:.6f} '
+                 f'[{row["interval_95"][0]:.6f}, {row["interval_95"][1]:.6f}]</td></tr>')
+    P.append('</tbody></table></div><p>32 processes, 218 independently replayed scalar answers, '
+             '104 IC witnesses and five exact-work A/A pairs; no failed or omitted cases.</p>'
+             f'<p>{esc(matched["limits"])} {gh(matched["source"], "Native statistics")} · '
+             f'{gh(matched["replay_source"], "Independent replay")} · '
+             f'{gh(matched["presentation_source"], "Native phases and resource records")}.</p></section>')
     P.append(f'<section class="panel" id="lookup"><h2>Find a curve, base, and rho gap</h2>'
              '<p><a href="#board">Browse the ranked curve tables</a> or '
              f'<a href="{site}browser/#curves">search every registered curve</a>. Each ranked row names '
@@ -6216,6 +6630,8 @@ def page(doc: dict, standalone: bool) -> str:
         family_table(code)
         P.append('</section>')
 
+    P.append(tableb_binary_ksum_html(doc["tableb_binary_ksum_component"]))
+    P.append(ksum_prune_html(doc["ksum_prune_component"]))
     # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
     tk = doc["tableb_ksum_component"]
     tt = tableb_ksum_text(tk)
@@ -6537,6 +6953,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append(ghs_relstage_html(doc["ghs_weak_relstage_component"]))
     P.append(ghs_blreuse_html(doc["ghs_weak_blreuse_component"]))
     P.append(ghs_nrmlz_html(doc["ghs_weak_nrmlz_component"]))
+    P.append(ghs_headline_dl1_html(doc["ghs_weak_headline_dl1"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
@@ -6774,7 +7191,12 @@ def page(doc: dict, standalone: bool) -> str:
              + '. Curves are named by ICV1 slug (<a href="https://github.com/aburan28/crypto/blob/main/docs/curves/ICV1.md">docs/curves/ICV1.md</a>); '
              f'curve records: {gh(SOURCES["curves_schema"])} and {gh(SOURCES["curves_yaml"])} '
              '(<a href="#curve-records">coverage</a>).</p></footer></div>')
+    # Presentation only: new diagnostic counts/ratios are derived in Rust and
+    # supplied as a native-generated fragment, never recomputed here.
+    if doc.get("native_augmentation"):
+        P.append((REPO / "docs/ic/ecbench-diagnostics.fragment.html").read_text())
     body = "\n".join(P)
+    body += "<!-- BEGIN RELATION IDENTITY 20261117 -->\n" + relation_identity_html(doc["relation_identity_component"]) + "\n<!-- END RELATION IDENTITY 20261117 -->\n"
     if standalone:
         return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                 '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
@@ -6804,17 +7226,28 @@ def stable(o):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--refresh-relation-identity", action="store_true", help="refresh only frozen identity component; no full-build/gate assertion")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
     ap.add_argument("--allow-unvalidated", action="store_true",
                     help="local build only: mark rows without a VALIDATION.json 'unvalidated' "
                          "instead of refusing them (CI never passes this)")
     args = ap.parse_args()
+    if args.refresh_relation_identity:
+        if args.check or args.allow_unvalidated or args.artifact:
+            ap.error("component-only refresh cannot stand in for full --check")
+        return refresh_relation_identity()
     if args.check and args.allow_unvalidated:
         ap.error("--check never allows unvalidated rows")
     doc = build(allow_unvalidated=args.allow_unvalidated)
     # Round only the JSON: rendering compares recipe rows by identity.
-    outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
+    serialized = stable(doc)
+    # This diagnostic copies native results without Python-derived arithmetic;
+    # preserve their full binary64 values instead of rounding their evidence.
+    serialized["n83_matched_process_diagnostic"] = doc["n83_matched_process_diagnostic"]
+    serialized["n83_basis_setup_diagnostic"] = doc["n83_basis_setup_diagnostic"]
+    serialized["relation_identity_component"] = doc["relation_identity_component"]
+    outs = {OUT_JSON: json.dumps(serialized, indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}
     if args.check:
         sections = [int(m) for m in re.findall(r"^## (\d+)\.", (REPO / LEDGER).read_text(), re.M)]

@@ -1,0 +1,10 @@
+[package]
+name="hec-counted-comparison"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../native"}
+[[bin]]
+name="counted-comparison"
+path="../main.rs"

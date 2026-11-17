@@ -1,0 +1,89 @@
+{
+  "repository_base": "ca496f7898f4467a28b9733bd8a43f52f9e8e723",
+  "kb": "unavailable: no MCP tools; wrapper no executable",
+  "sources": [
+    {
+      "id": "Diem2011",
+      "url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/S0010437X10005075",
+      "sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a",
+      "scope": "Condition2.7; Section2.2; Propositions2.5,2.6,4.9–4.11",
+      "local_read": true
+    },
+    {
+      "id": "NIST800186",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf",
+      "sha256": "53c7cf3340528aaa0a7bbeaef947f2099568192367d4341a7d4abceb55f78432",
+      "scope": "Section3.1.2 and AppendixC.1 criteria1–6",
+      "local_read": true
+    },
+    {
+      "id": "GalbraithCh14",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch14.pdf",
+      "sha256": "ab59d8013db88ca145a101ddf9a9e28876fc4d10c76aac115d11da7bbbe1fada",
+      "scope": "Section14.2.5, random partitions and adding walks",
+      "local_read": true
+    },
+    {
+      "id": "GalbraithCh15",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch15.pdf",
+      "sha256": "0afaf638543e571b87ff90fcc30f7306ce6bca3d3e48575ca473bb623ff3b89a",
+      "scope": "Section15.6.3, Exercises15.6.4–15.6.5",
+      "local_read": true
+    },
+    {
+      "id": "GalbraithCh26",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+      "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+      "scope": "Section26.2 and26.4, exact BK exclusion; primary BK1998 proof not read",
+      "local_read": true
+    },
+    {
+      "id": "msolve-symbol.c",
+      "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/symbol.c",
+      "sha256": "33c5466bfada78d2bb8707312ee4864b944986637e136c9151b97de6baf24062",
+      "scope": "See SOURCE_AUDIT.md; static reading only",
+      "local_read": true
+    },
+    {
+      "id": "msolve-f4.c",
+      "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/f4.c",
+      "sha256": "1b78cc3be2bc82f39e52a21ad4fe4859c18a063d1732213a20087a356548ae14",
+      "scope": "See SOURCE_AUDIT.md; static reading only",
+      "local_read": true
+    },
+    {
+      "id": "msolve-f4sat.c",
+      "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/f4sat.c",
+      "sha256": "218a6e1432969cb3b944ed79e8a934ef7c1aba9469b83c3d3f2746e651b3ae7d",
+      "scope": "See SOURCE_AUDIT.md; static reading only",
+      "local_read": true
+    }
+  ],
+  "reused_modules": [
+    {
+      "path": "lean/S3Roots.lean",
+      "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106",
+      "provenance": "papers/rootfinding-decomposition/lean/S3Roots.lean"
+    },
+    {
+      "path": "lean/SolvingDegreeBound.lean",
+      "sha256": "14956b5ef063b890d4397545e3cf2b8976a21b24db7687a8d7ad171dcc5ac48a",
+      "provenance": "research/ecdlp_weakness_lean_20261104/lean/SolvingDegreeBound.lean"
+    }
+  ],
+  "production_source": {
+    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/src/main.rs",
+    "sha256": "386a759588a36215487b5b900646d0943195e091aaaad9a48e422dad45e8dc0d"
+  },
+  "access_failures": [
+    "Semaev2004 ePrint PDF: HTTP403",
+    "Galbraith-Gaudry HAL PDF: HTTP403",
+    "SafeCurves rho.html: HTTP502"
+  ],
+  "no_claim_of_primary_review": [
+    "Gaudry2000 original",
+    "BK1998 original",
+    "FGHR2014 original",
+    "Hildebrand1994 original"
+  ]
+}

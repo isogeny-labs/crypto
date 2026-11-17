@@ -642,7 +642,7 @@ fn publish_object(
                 .is_some_and(|sha| sha != &artifact.sha256)
         {
             return Err(format!(
-                "{key}: existing remote object has mismatched size or digest; refusing overwrite"
+                "{key}: remote round-trip integrity precheck: existing object has mismatched size or digest; refusing overwrite"
             ));
         }
         roundtrip(store, artifact, root)?;
@@ -852,6 +852,9 @@ pub fn publish_budgeted(
         }
         Some(_) => {}
         None => return Err("dataset publication requires an explicit S3 or file remote".into()),
+    }
+    if matches!(cfg.remote, Some(RemoteSpec::S3 { .. })) && budget.is_none() {
+        return Err("S3 dataset publication requires cumulative command admission".into());
     }
     // The existing store's multipart path does not enforce If-None-Match.
     // Dataset producers must chunk large objects before publication.

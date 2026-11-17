@@ -1,0 +1,66 @@
+--- renamed-parent/materialize.py
++++ successor/materialize.py
+@@ -29,10 +29,17 @@
+  if allow_resolved and 'resolved' in row:assert str(path.resolve())==row['resolved']
+  else:assert stat.S_ISREG(st.st_mode),str(path)
+  assert path.stat().st_size==row['bytes'] and digest(path)==row['sha256'],str(path)
++ if 'mode' in row:assert stat.S_IMODE(st.st_mode)==row['mode'],str(path)+' mode differs from frozen inventory'
+ def copy(src,dst,row):
+  checked(src,row);dst.parent.mkdir(parents=True,exist_ok=True)
+  with Path(src).open('rb') as f,dst.open('xb') as g:
++  if 'mode' in row:assert stat.S_IMODE(os.fstat(f.fileno()).st_mode)==row['mode'],'source fd mode changed'
+   for b in iter(lambda:f.read(1024**2),b''):guard();g.write(b)
++  if 'mode' in row:
++   assert type(row['mode']) is int and 0<=row['mode']<=0o777,'special mode bits disallowed'
++   os.fchmod(g.fileno(),row['mode'])
++   assert stat.S_IMODE(os.fstat(g.fileno()).st_mode)==row['mode'],'destination fd mode differs'
++   assert stat.S_IMODE(os.fstat(f.fileno()).st_mode)==row['mode'],'source fd mode changed during copy'
+   g.flush();os.fsync(g.fileno())
+  checked(dst,row);checked(src,row)
+ def bound(key):
+@@ -42,6 +49,22 @@
+ for name,h in A['packet_files'].items():assert digest(P/name)==h,name
+ M=bound('immutable_manifest');C=bound('fresh_cache_manifest')
+ assert C['schema']=='root-current-cache/v1'
++mode_file=P/'cache-mode-inventory.json'
++assert digest(mode_file)=='c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241'
++mode_inventory=json.loads(mode_file.read_text())
++assert mode_inventory['schema']=='pencil.cache-mode-inventory/v1'
++assert mode_inventory['cache_manifest']['sha256']==A['fresh_cache_manifest']['sha256']
++assert mode_inventory['donor_roots']==C['roots']
++assert mode_inventory['path_order']=='lexicographic_unicode_codepoint_absolute_paths'
++assert mode_inventory['file_types_allowed']==['regular'] and mode_inventory['special_permission_bits_allowed'] is False
++paths=sorted(C['files']);indices=mode_inventory['mode_index_nibbles'];table=mode_inventory['mode_table']
++assert len(paths)==len(indices)==mode_inventory['file_count']==2165
++assert table==['0600','0644','0700','0755'] and all(c in '0123' for c in indices)
++cache_modes={path:int(table[int(code,16)],8) for path,code in zip(paths,indices)}
++assert {mode:sum(cache_modes[path]==int(mode,8) for path in paths) for mode in table}==mode_inventory['mode_counts']
++assert [i for i,path in enumerate(paths) if cache_modes[path]&0o111]==mode_inventory['executable_file_indices']
++assert sum(bool(mode&0o111) for mode in cache_modes.values())==mode_inventory['executable_file_count']==82
++
+ assert C['roots']==[str(DONOR/'cache-stage-v2'/n) for n in ['target','cargo-home','tmp']]
+ assert A['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+ # A complete post-v4 snapshot must still match exact cache membership.
+@@ -65,7 +88,7 @@
+ for directory in C['directories']:
+  d=Path(directory);assert d.is_relative_to(DONOR/'cache-stage-v2');(CACHE/d.relative_to(DONOR/'cache-stage-v2')).mkdir(parents=True,exist_ok=True)
+ for path,row in C['files'].items():
+- f=Path(path);assert f.is_relative_to(DONOR/'cache-stage-v2');copy(f,CACHE/f.relative_to(DONOR/'cache-stage-v2'),row)
++ f=Path(path);assert f.is_relative_to(DONOR/'cache-stage-v2');copy(f,CACHE/f.relative_to(DONOR/'cache-stage-v2'),dict(row,mode=cache_modes[path]))
+ archive=json.loads((P/'overlay-archive.json').read_text());checked(P/archive['path'],archive)
+ rows=json.loads((P/'overlays.json').read_text());mapped={row['overlay_path']:row for row in rows};seen=set()
+ with tarfile.open(P/archive['path'],'r:gz') as tar:
+@@ -90,7 +113,12 @@
+ assert actual==set(expected)
+ # Cargo config retains exact immutable donor vendor path and offline mode.
+ config=CACHE/'cargo-home/config.toml';assert digest(config)==M['immutable'][str(DONOR/'cache-stage-v2/cargo-home/config.toml')]['sha256']
+-receipt={'status':'passed','source_files':len(actual),'source_manifest_sha256':digest(P/'expected-source-manifest.json'),'fresh_cache_manifest_sha256':A['fresh_cache_manifest']['sha256'],'workspace':str(W),'build_end_monotonic':END,'absolute_deadline':A['absolute_deadline'],'compiler_started':False,'donor_modified':False}
++# Reconcile every copied cache mode again at the completed staging boundary.
++for path,mode in cache_modes.items():
++ guard();source=Path(path);target=CACHE/source.relative_to(DONOR/'cache-stage-v2')
++ for file in [source,target]:
++  info=file.lstat();assert stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode)==mode,str(file)+' final mode mismatch'
++receipt={'cache_mode_inventory_sha256':digest(mode_file),'cache_modes_verified':len(cache_modes),'cache_executable_modes_verified':82,'status':'passed','source_files':len(actual),'source_manifest_sha256':digest(P/'expected-source-manifest.json'),'fresh_cache_manifest_sha256':A['fresh_cache_manifest']['sha256'],'workspace':str(W),'build_end_monotonic':END,'absolute_deadline':A['absolute_deadline'],'compiler_started':False,'donor_modified':False}
+ target=W/'materialization.json'
+ with target.open('x') as f:json.dump(receipt,f,indent=2);f.flush();os.fsync(f.fileno())
+ fd=os.open(W,os.O_DIRECTORY);os.fsync(fd);os.close(fd)

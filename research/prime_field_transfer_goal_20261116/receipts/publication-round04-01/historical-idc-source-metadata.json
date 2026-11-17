@@ -1,0 +1,28 @@
+{
+  "scope": "Versioned metadata clarification only; original frozen records remain unchanged",
+  "records": [
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-03/identities/parameter-norm.json",
+      "id": "IDC1hf7222ad459514e6d",
+      "recorded_source": "CoverDecodeExample.CMTargetBoundary.parameter_norm_identity",
+      "actual_declaration": "CMTargetBoundary.parameter_norm_identity",
+      "proof": {
+        "kind": "lean4",
+        "path": "research/prime_field_transfer_goal_20261116/lean/CMTargetBoundary.lean",
+        "sha256": "3239faea9230995d2ce41f28619b59640ead7a9fc831e3c1a7ac8738c0ec00c7"
+      }
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-03/identities/parameter-factor.json",
+      "id": "IDC1h303d11de248b5bc5",
+      "recorded_source": "CoverDecodeExample.CMTargetBoundary.parameter_factor_identity",
+      "actual_declaration": "CMTargetBoundary.parameter_factor_identity",
+      "proof": {
+        "kind": "lean4",
+        "path": "research/prime_field_transfer_goal_20261116/lean/CMTargetBoundary.lean",
+        "sha256": "3239faea9230995d2ce41f28619b59640ead7a9fc831e3c1a7ac8738c0ec00c7"
+      }
+    }
+  ],
+  "clarification": "The inherited round03 issuer prepended CoverDecodeExample. to statement.source. These prefixed declaration names do not exist. The proof.path/hash still identifies CMTargetBoundary.lean; the separate PCC theorem bindings name the actual CMTargetBoundary declarations. Final round04 issuer uses its actual WeberRootBoundaryV3 declaration names. Original IDC metadata is not a full Lean statement binding."
+}

@@ -1,0 +1,46 @@
+--- v3/durable-launcher.py
++++ v4/durable-launcher.py
+@@ -51,7 +51,7 @@
+   assert (expiry-now).total_seconds()>30,'lease renewal too short'
+   HB_EXPIRY=expiry
+   R.setdefault('heartbeats',[]).append({'status':200,'task_id':value['task_id'],'attempt_id':value['attempt_id'],'lease_id':value['id'],'fencing_epoch':value['fencing_epoch'],'expires_at':value['expires_at']})
+-  checkpoint('lease-renewed')
++  R['lease_renewed_pending_checkpoint']=True
+  except urllib.error.HTTPError as error:
+   R.setdefault('heartbeats',[]).append({'status':error.code})
+   if error.code in (401,403,404,409):raise RuntimeError('definitive lease loss HTTP'+str(error.code))
+@@ -78,13 +78,23 @@
+   if d.get('ControlGroup'):
+    if R.get('cgroup'):assert d['ControlGroup']==R['cgroup'],'unit cgroup changed'
+    R['cgroup']=d['ControlGroup']
+- R['observations'].append(d);checkpoint('query-recorded');return d
++ R['observations'].append(d)
++ # Identity is captured and checked above; the durable permit records it before
++ # cumulative receipt/log flushing. Never renew for cleanup or terminal states.
++ if R['unit_launch_attempted'] and not CLEANING and not INTERRUPTED and d.get('InvocationID') and d.get('ControlGroup') and d.get('ActiveState') in ('active','activating') and d.get('SubState') not in ('exited','dead'):
++  permit()
++ checkpoint('query-recorded');return d
+ def permit():
+- assert R.get('invocation_id') and HB_EXPIRY is not None
++ assert R.get('invocation_id') and HB_EXPIRY is not None and not CLEANING and not INTERRUPTED
+  now=datetime.datetime.now(datetime.timezone.utc)
+  expires=min(HB_EXPIRY.timestamp()-15,now.timestamp()+F['limits']['supervisor_permit_seconds'],DEADLINE.timestamp()-40)
+  assert expires>now.timestamp() and not INTERRUPTED
+- atomic_json(D/'supervisor-permit.json',{'invocation_id':R['invocation_id'],'lease':F['lease'],'expires_unix':expires})
++ issued=time.monotonic();sequence=R.get('permit_sequence',0)+1
++ value={'invocation_id':R['invocation_id'],'lease':F['lease'],'expires_unix':expires,'issued_unix':now.timestamp(),'sequence':sequence}
++ atomic_json(D/'supervisor-permit.json',value)
++ R['permit_sequence']=sequence
++ R.setdefault('permit_publications',[]).append({'sequence':sequence,'issued_unix':now.timestamp(),'expires_unix':expires,'elapsed_write_seconds':time.monotonic()-issued})
++ R['permit_publications']=R['permit_publications'][-32:]
+ def empty(cgroup):
+  if not cgroup:return True
+  path=Path('/sys/fs/cgroup')/cgroup.lstrip('/')
+@@ -126,7 +136,6 @@
+   if d.get('ControlGroup'):
+    if cgroup:assert cgroup==d['ControlGroup'],'unit cgroup changed'
+    cgroup=d['ControlGroup'];R['cgroup']=cgroup
+-  if R.get('invocation_id'):permit()
+   if d.get('ActiveState')=='failed' or (d.get('ActiveState')=='active' and d.get('SubState')=='exited') or d.get('LoadState')=='not-found':
+    R['terminal']=d;break
+   time.sleep(.5)

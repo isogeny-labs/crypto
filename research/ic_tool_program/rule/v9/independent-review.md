@@ -24,28 +24,28 @@ That unit is `unit_ns` (`src/bin/ic/price.rs`, `UnitBench::measure`): nanosecond
 
 | size | `unit_ns` median, v9 / v9c | per-target unit ratio v9/v9c (min–max) |
 |---|---|---|
-| k0n53 | 9.497 / 10.207 | 0.903–0.939 (64 of 64 below 0.94) |
-| k0n61 | 9.530 / 10.268 | 0.899–0.934 |
-| k1n47 | 9.516 / 10.222 | 0.927–0.950 |
+| icv1-f2m53-tm56619371-dac20a85 | 9.497 / 10.207 | 0.903–0.939 (64 of 64 below 0.94) |
+| icv1-f2m61-t158598901-ab42b6c5 | 9.530 / 10.268 | 0.899–0.934 |
+| icv1-f2m47-t22705043-f4e44623 | 9.516 / 10.222 | 0.927–0.950 |
 
-The effect appears at all six sizes and on both nodes; on a2's node alone, for k1n47 T30–T64, the medians are 9.504 and 10.224. That makes it a property of the binary, not host drift. The within-binary A/A rows (R2 against R1) move `unit_ns` by at most 0.9%. A cross-binary ratio in "units" therefore carries a 7% artifact.
+The effect appears at all six sizes and on both nodes; on a2's node alone, for icv1-f2m47-t22705043-f4e44623 T30–T64, the medians are 9.504 and 10.224. That makes it a property of the binary, not host drift. The within-binary A/A rows (R2 against R1) move `unit_ns` by at most 0.9%. A cross-binary ratio in "units" therefore carries a 7% artifact.
 
 In wall-clock nanoseconds, the only clock the two binaries share on one node:
 
 | size | IC cold time v9/v9c, units | **IC cold time v9/v9c, ns** | IC set-up v9/v9c, ns | IC online v9/v9c, ns | **rho online v9/v9c, ns** (identical step counts) |
 |---|---|---|---|---|---|
-| k1n47 | 1.0840 | 1.0124 | 1.0125 | 0.9982 | 0.9950 |
-| k0n57 | 1.0511 | 0.9797 | 0.9796 | 0.9903 | 0.9879 |
-| k0n41 | 1.0213 | 0.9489 | 0.9483 | 0.9911 | 0.9833 |
-| **k0n53** | **1.0252** | **0.9529** | 0.9528 | 0.9833 | 0.9812 |
-| k1n59 | 1.0334 | 0.9617 | 0.9615 | 1.0014 | 0.9902 |
-| k0n61 | 0.9925 | 0.9222 | 0.9218 | 0.9922 | 0.9815 |
+| icv1-f2m47-t22705043-f4e44623 | 1.0840 | 1.0124 | 1.0125 | 0.9982 | 0.9950 |
+| icv1-f2m57-tm747311035-c1f545af | 1.0511 | 0.9797 | 0.9796 | 0.9903 | 0.9879 |
+| icv1-f2m41-tm2308219-7f48b14a | 1.0213 | 0.9489 | 0.9483 | 0.9911 | 0.9833 |
+| **icv1-f2m53-tm56619371-dac20a85** | **1.0252** | **0.9529** | 0.9528 | 0.9833 | 0.9812 |
+| icv1-f2m59-tm943548413-98844ecc | 1.0334 | 0.9617 | 0.9615 | 1.0014 | 0.9902 |
+| icv1-f2m61-t158598901-ab42b6c5 | 0.9925 | 0.9222 | 0.9218 | 0.9922 | 0.9815 |
 
 At n = 53 the per-target IC cold-time ratio in ns lies in [0.899, 0.974]. All 64 of 64 targets fall inside the declared band [0.85, 1.00]. In units, all 64 of 64 targets lie above 1 (1.006–1.046). The within-binary A/A drift in ns is at most ±1.7%, far below the 4.7% set-up difference.
 
 So the prediction **holds in wall-clock time (0.953) and fails in each binary's own unit (1.025)**. The protocol did not fix the unit for this prediction. Rho's walk is **not** slower in v9: it takes the same steps on every target and its wall time per step is about 1.5–2% *shorter*. The narrowing of the cold ratio comes from v9's index-calculus set-up being 4.7% faster at n = 53 and 7.8% faster at n = 61, in wall time.
 
-**What this does not affect.** The within-run cold ratios are unaffected, because both arms of a row share one unit. Recomputed in ns, the cold ratio is 7.454 against 7.458 in units for v9 at k0n53, and 11.122 against 11.132 at k0n61. The paired cold ratio is 0.970 in ns against 0.968 in units.
+**What this does not affect.** The within-run cold ratios are unaffected, because both arms of a row share one unit. Recomputed in ns, the cold ratio is 7.454 against 7.458 in units for v9 at icv1-f2m53-tm56619371-dac20a85, and 11.122 against 11.132 at icv1-f2m61-t158598901-ab42b6c5. The paired cold ratio is 0.970 in ns against 0.968 in units.
 
 **Required fixes:**
 
@@ -77,7 +77,7 @@ git ls-files R/v9/runs R/v9c/runs | wc -l                                     # 
 
 a1 against a2: all 153 a1 files are present in a2. 151 are byte-identical; `v9/runs/psi-waits.log` (891 → 13430 B) and `v9/runs/refusals.log` (4138 → 45999 B) differ, and a1's copy of each is a byte prefix of a2's (`head -c $n a2 | cmp - a1`).
 
-a1 holds v9 k1n47 T01–T29 R1 (plus `T05-R1-retry1`, `T07-R1-retry1`), and `T30.params.json` without a row, which a2 re-ran from scratch. a1's v9c holds only `T01.params.json` per size.
+a1 holds v9 icv1-f2m47-t22705043-f4e44623 T01–T29 R1 (plus `T05-R1-retry1`, `T07-R1-retry1`), and `T30.params.json` without a row, which a2 re-ran from scratch. a1's v9c holds only `T01.params.json` per size.
 
 The bench record (`benchmarks/records/20261111T0437Z-ic-rule-v9.json`, committed in `4c004cc6ac`) pins two tarballs whose SHA-256 values I reproduced: `7cafea14…` (a1) and `9ee81c17…` (a2). Their contents are byte-identical to `DL/a1` and `DL/a2` (`diff -r`).
 
@@ -114,12 +114,12 @@ jq -s 'def med: sort|length as $n|if $n%2==1 then .[($n-1)/2] else (.[$n/2-1]+.[
 
 | size (log2 r) | v9 recomputed | v9 analysis.json | v9c recomputed | v9c analysis.json | paired v9/v9c recomputed | matched.json |
 |---|---|---|---|---|---|---|
-| k1n47 (36.64) | 4.07593714999039 | 4.07593714999039 | 4.02514911784903 | 4.02514911784903 | 1.012617677172789 | 1.012617677172789 |
-| k0n57 (38.0) | 4.731180628132081 | …082 | 4.829978789888934 | same | 0.9795448042207395 | same |
-| k0n41 (39.0) | 6.142826875178376 | …378 | 6.38136114077367 | …668 | 0.9626201588762654 | same |
-| **k0n53 (44.26)** | **7.458472722152139** | …137 | **7.708757441662707** | …708 | **0.9675324173312446** | **same** |
-| k1n59 (44.52) | 6.827982501917709 | …706 | 7.020517964842789 | …786 | 0.9725753193867952 | same |
-| **k0n61 (47.21)** | **11.13249852259846** | …462 | **11.88782809407168** | …677 | 0.9364619369075592 | same |
+| icv1-f2m47-t22705043-f4e44623 (36.64) | 4.07593714999039 | 4.07593714999039 | 4.02514911784903 | 4.02514911784903 | 1.012617677172789 | 1.012617677172789 |
+| icv1-f2m57-tm747311035-c1f545af (38.0) | 4.731180628132081 | …082 | 4.829978789888934 | same | 0.9795448042207395 | same |
+| icv1-f2m41-tm2308219-7f48b14a (39.0) | 6.142826875178376 | …378 | 6.38136114077367 | …668 | 0.9626201588762654 | same |
+| **icv1-f2m53-tm56619371-dac20a85 (44.26)** | **7.458472722152139** | …137 | **7.708757441662707** | …708 | **0.9675324173312446** | **same** |
+| icv1-f2m59-tm943548413-98844ecc (44.52) | 6.827982501917709 | …706 | 7.020517964842789 | …786 | 0.9725753193867952 | same |
+| **icv1-f2m61-t158598901-ab42b6c5 (47.21)** | **11.13249852259846** | …462 | **11.88782809407168** | …677 | 0.9364619369075592 | same |
 
 The largest relative difference is 4.4e-16. The online speedups (mean rho / mean IC online units) also agree to that precision, and the six-size v9 headline list in `validator-report.json` agrees with these values.
 
@@ -163,7 +163,7 @@ The largest relative difference is 4.4e-16. The online speedups (mean rho / mean
 
 **Blockers under `docs/VALIDATION_GATE.md`: none.**
 
-- **k1n47 of v9 split across two nodes.** The node effect I measured is negligible. The v9 `unit_ns` median is 9.528 on a1 and 9.504 on a2 (0.25%). The row-wise cold medians are 3.818 (T01–T29) and 3.846 (T30–T64). The paired v9/v9c ratio is about 1.02 in both halves. The split is disclosed. The cold ratio is in-process, so it is unaffected. Not a blocker.
+- **icv1-f2m47-t22705043-f4e44623 of v9 split across two nodes.** The node effect I measured is negligible. The v9 `unit_ns` median is 9.528 on a1 and 9.504 on a2 (0.25%). The row-wise cold medians are 3.818 (T01–T29) and 3.846 (T30–T64). The paired v9/v9c ratio is about 1.02 in both halves. The split is disclosed. The cold ratio is in-process, so it is unaffected. Not a blocker.
 - **`host.json` names only a1's node.** It is accurate for CPU model, flags and kernel on both nodes. Node identity is in `receipts/a2/result.json` and the pinned pod tarballs. Not a blocker, but noted as a provenance gap (D2).
 - **Rebuilt, non-identical `ic` hashes.** They were re-pinned in amendment 1 before any row. The hashes that ran are pinned, cross-checked by the pod (`job.sh` refuses others), named in `host.json` and in all claims, and replayed. Source binding is asserted (fingerprint-supported), not reproducible. Not a gate blocker.
 - **Command Jobs without L2 admission.** The gate does not require L2 admission. AGENTS.md §9a ("Require native L2, replay and A/A admission for an L2 benchmark") is not met: this is a command Job on `cpu-l2-spot`. The resumption was a new Job from the S3 prefix rather than CRIU. Both were pre-declared in amendment 1, and the row and report say "no L2 admission". This is a caveat that must stay on the row, not a gate blocker.
@@ -231,5 +231,5 @@ review_attestation:
 
 1. **D1: correct the prediction outcome and the rho-slowdown narrative** in `report/report.typ`, the PDF and the `benchmarks/README.md` row. Report both units, and disclose that `unit_ns` depends on the binary, so cross-binary unit ratios are not time ratios.
 2. **D2:** fix the replay certificate's host field. Add an a2 completion receipt from the launcher (the committed one shows `Running`), or cite the pinned pod tarball for `job-exit.json`.
-3. Keep "no L2 admission" and "k1n47 split across two nodes" on the row.
+3. Keep "no L2 admission" and "icv1-f2m47-t22705043-f4e44623 split across two nodes" on the row.
 4. Treat the Table A rows as `[pcc:unverified]` until CI signs the pcc verdict. Neutralise the stale v7 sweep caveats now shown on the v9 board rows.

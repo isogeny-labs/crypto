@@ -1,0 +1,254 @@
+[
+    {
+        "Id": "d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77",
+        "Created": "2026-11-16T14:57:56.453915926Z",
+        "Path": "sh",
+        "Args": [
+            "-ec",
+            "\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test -f attestation.json\n    cargo build --release --locked --offline -j 1 --example koblitz_n83_factor_base_export\n  "
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-16T14:57:56.481413444Z",
+            "FinishedAt": "2026-11-16T15:15:23.318501459Z"
+        },
+        "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+        "ResolvConfPath": "/var/lib/docker/containers/d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77/hostname",
+        "HostsPath": "/var/lib/docker/containers/d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77/hosts",
+        "LogPath": "/var/lib/docker/containers/d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77/d20cc8bba56804cf3dde5d34085f1467715cd4dfef30c87361f4eb072aa28c77-json.log",
+        "Name": "/n83-v5-exporter-build-20261116-attempt-5",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,size=512m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 12884901888,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 12884901888,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 512,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-cargo-registry-deref-20261116",
+                    "Target": "/usr/local/cargo/registry",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/private/tmp/n83-v5-colima-output-20261116",
+                    "Target": "/private/tmp/n83-v5-colima-output-20261116"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-cargo-registry-deref-20261116",
+                "Destination": "/usr/local/cargo/registry",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/private/tmp/n83-v5-colima-output-20261116",
+                "Destination": "/private/tmp/n83-v5-colima-output-20261116",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "d20cc8bba568",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "CARGO_TARGET_DIR=/private/tmp/n83-v5-colima-output-20261116/attempt-5/target",
+                "CARGO_INCREMENTAL=0",
+                "TMPDIR=/private/tmp/n83-v5-colima-output-20261116/attempt-5/tmp",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.99.1"
+            ],
+            "Cmd": [
+                "sh",
+                "-ec",
+                "\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test -f attestation.json\n    cargo build --release --locked --offline -j 1 --example koblitz_n83_factor_base_export\n  "
+            ],
+            "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+            "Volumes": null,
+            "WorkingDir": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "d9e04ab857b7fb4a36efbe7e93e3a45eb4739d4ab7f7d9b14c89eb7cd444f4c2",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:08323aa37a9a6bdf87c250655aae3a1cfa3cbd09f3b30caf3561f0bfc6ad942d",
+            "size": 1449,
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux"
+            }
+        }
+    }
+]

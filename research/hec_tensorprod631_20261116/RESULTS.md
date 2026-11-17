@@ -1,0 +1,11 @@
+# Production compiled arithmetic passes original-class recovery
+
+The once-only untimed correctness gate passes with exit0/stderrempty. Sourcea95f4065d4f9/checkpoint20261116T034544Z precedes execution. Optional phase logging explicitly unset; no TRACE_PHASEline occurs. The compiled multiplication/colon production functions do not call reference methods. Their55122product calls and2665colon calls are production workload counters, not saved field-operation counts.
+
+Both original direct quadratic outputs recover the same unique nonzero prime-subgroup classes as the independent replay, byte-identically. All primary/adjacent/sign/corruption and both-chart checks pass. The no-base section path executes48times; the explicit degree2base control exercises the fallback once. The preceding reference-comparison gate separately established exact coefficient/nullspace equivalence; this production gate does not rerun those comparisons.
+
+Afterward, matching optional phase instrumentation and a four-label comparison harness are built but not executed. Baseline uses original target multiplication/colon with the same production section shortcut; candidate uses compiled maps. Both include model/input/candidate spans and aggregate group-add/group-neg/section scopes. All timings are inclusive/nested and cannot be blindly summed. Diagnostic extension changes no arithmetic; BUILD-DIAGNOSTICS.txt/HASHES-DIAGNOSTICS.txt pin the current build. No clock is read with phase logging disabled. Enabled probes have not yet executed.
+
+Prospective20cellcohort: five blocks of baseline_a,tensor_a,tensor_b,baseline_bwith reverse order on oddblocks. A/Bwithin an algorithm are identical-executable controls. Predeclared qualification: each algorithm's larger/smaller A/Bmedian<=1.10AND each label's max/min<=1.25. All20class matches required. Primary ratio uses baseline_a/tensor_amedianfivecells; Bcontrols retained, no pooling/drop. Unstable outcome forbids stable speedup/regression inference. A new benchmark record/hashrecheck/checkpoint/gate required before launch; no measurement has started.
+
+Map compilation and dual construction are inside charged reconstruction; common quotient/publiccoordinatepreparation outside the inverse component. No cold end-to-end/genus2/4/10xclaim. Earlier1.621xand noisy0.930cohorts remain unchanged. Full mathematical objective stays open.

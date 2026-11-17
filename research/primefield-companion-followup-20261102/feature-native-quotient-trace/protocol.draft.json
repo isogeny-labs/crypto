@@ -1,0 +1,432 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-source-quotient-trace-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-quotient-trace",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "DRAFT: collector build and synthetic controls only; no workload data. Publication binding, admitted preflight, remaining budget and freeze/export integration required."
+  },
+  "question": "Which quotient routes and weighted supports occur inside the source Fp kernel during the fixed617 cold-source public recovery cases?",
+  "claims": [
+    {
+      "id": "source-quotient-trace",
+      "text": "Exact source-only quotient histograms and separate quotient multiplication/inversion counts for617 fixed public targets.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "trace",
+      "role": "candidate",
+      "description": "Fresh Source for each target, one recover_traced call; source Fp quotient events only",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "--cfg",
+            "quotient_trace",
+            "research/primefield-companion-followup-20261102/feature-native-quotient-trace/modes.rs",
+            "-o",
+            "collector"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "record_cap_per_target": 100000,
+        "source_lifetime": "fresh per target",
+        "mode_preparation": "once per curve, outside trace"
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Second identical collector process, independently captured; requires exact transcript equality",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "--cfg",
+            "quotient_trace",
+            "research/primefield-companion-followup-20261102/feature-native-quotient-trace/modes.rs",
+            "-o",
+            "collector"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "record_cap_per_target": 100000,
+        "source_lifetime": "fresh per target",
+        "mode_preparation": "once per curve, outside trace"
+      },
+      "same_instrument_as": "trace"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Synthetic software controls exercise all actual branches and known exact sparse products before collection; workload is descriptive, not detection of an unknown effect."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population or statistical detection claim; synthetic dropped/error/malformed controls reject invalid records."
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Five existing fixtures, every scalar index only in target generation and validation",
+        "how": "Source receives public target only; tuple order and ascending index frozen in collector"
+      },
+      {
+        "name": "source_lifetime",
+        "treatment": "fixed",
+        "value": "Fresh per target",
+        "how": "Constructor outside capture; lazy preparation during recovery included only insofar as it invokes quotient"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Pinned Rust source closure/compiler/binary",
+        "how": "Production binding pending freeze"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Admitted one-thread CPU Spot",
+        "how": "Retain host/job metadata; no valid wall clock"
+      },
+      {
+        "name": "order_analyst",
+        "treatment": "fixed",
+        "value": "Deterministic order and unblinded strict parser",
+        "how": "All617 targets required; no adaptive selection"
+      },
+      {
+        "name": "layout_preemption",
+        "treatment": "measured",
+        "value": "No timing; no resume",
+        "how": "Retain complete or partial rows and failure receipt"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "repeat",
+        "arms": [
+          "trace",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "absolute-source-trace",
+        "arms": [
+          "trace"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "617 verified targets; all declared records valid; zero drops/overflow"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Two identical deterministic processes, sequential order; no timing inference",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "nonce": null,
+      "note": "No pseudorandom generation; enumerate fixed fixture scalar indices outside measured source"
+    },
+    "instance_sampling": {
+      "rule": "r=19,47,79,191,281, all k=0..r-1,617 targets",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 617,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact fixed-fixture integer comparison; no population-power or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "quotients",
+        "name": "quotients",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Calls entering canonical quotient helper inside source Fp kernel",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "products",
+        "name": "products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Poly::fm calls during quotient construction; excludes residual and other source work",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "inversions",
+        "name": "inversions",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Poly::inverse entries during quotient construction",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "quotients",
+      "products",
+      "inversions"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "source_commit",
+      "protocol_sha256",
+      "image_digest",
+      "job_uid",
+      "pod_uid",
+      "environment",
+      "memory_layout",
+      "admission_receipt",
+      "raw_sha256",
+      "external_exit_status"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 1024,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "PROPOSED ceiling including build, idle, failures, storage and transfer; no reserved funds, no submission authority",
+      "concurrency": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Two identical617-target processes,1234 target rows total, one admitted attempt120s shared deadline, cap100000 events per target; no retry",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any missing/extra/reordered/malformed record, failed recovery, dropped events or counter overflow invalidates complete-panel analysis.",
+    "Every modulus must match source p; scalar-field mode/recovery polynomial events are out of scope.",
+    "Require canonical pre-data freeze, exact published source/binary, authentic admission, known remaining funds and successful external receipt."
+  ],
+  "decision_rule": {
+    "text": "Require identical validated transcripts in both independent processes before reporting source-only histograms.",
+    "comparison_ids": [
+      "absolute-source-trace"
+    ],
+    "threshold": "All617 target headers and all declared events valid",
+    "statistic": "Exact integer histogram and per-target named sums",
+    "interval": "None, fixed census",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "No comparative effect estimate",
+    "verdict_vocabulary": [
+      "complete_fixed_panel",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.py",
+      "sha256": "ee05059f97830455f1005ee95726aa65814c076fcf09d626f21cf6e02d787600"
+    },
+    "inputs": [
+      "collector CSV and external successful attempt receipt, pinned binary/protocol/source",
+      "Two independently captured CSVs must be byte-identical; prospective execution/export wrapper still required"
+    ],
+    "outputs": [
+      "source quotient histogram and per-target counts; canonical export adapter still required"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Quotient length vs route/support, source-only"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Execution before freeze/publication/budget/admission",
+    "Treating environment opt-in as authorization",
+    "Using synthetic rows as workload observations",
+    "Combining source and scalar fields or claiming whole-source/timing cost",
+    "Replacing original4563 cohort or retrying under a renamed attempt"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-weighted-quotient/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Weighted-support quotient bound and accounting scope",
+      "verified_by": "Source and proof review"
+    },
+    {
+      "ref": "../feature-native-resultant-protocol/authority/docs/experiment-protocol.md",
+      "provenance": "internal",
+      "claim": "Protocol freeze and export requirements",
+      "verified_by": "Read pinned authority"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "production_binding_status": "pending publication and admitted preflight",
+    "reserved_usd": 0,
+    "collector_build_only": true,
+    "canonical_export_adapter_status": "not implemented",
+    "canonical_authority": {
+      "repo": "isogeny-labs/crypto-autoresearcher",
+      "commit": "41bfaed260093c69da299cbad936205530909b6f",
+      "files": [
+        {
+          "path": "tools/experiment_protocol.py",
+          "git_blob": "9917acf83f0eeb37a249d3c822cbd422117d461a",
+          "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+          "bytes": 64811
+        },
+        {
+          "path": "schemas/experiment-protocol.v1.json",
+          "git_blob": "9d8543e6b448264c333649e1a4dfd83a2a297bd5",
+          "sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+          "bytes": 37583
+        },
+        {
+          "path": "schemas/experiment-export.v1.json",
+          "git_blob": "707ebf6f814d96bb44b36a9ccb3e25128e1aaf5e",
+          "sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+          "bytes": 11875
+        },
+        {
+          "path": "docs/experiment-protocol.md",
+          "git_blob": "0830f344b30e6d4386eec7be071d3cb7a94f4b3a",
+          "sha256": "111beee86ce91364cc23098ab232a151b1ece271eabdc544df49ba56067fecf2",
+          "bytes": 15572
+        }
+      ]
+    }
+  }
+}

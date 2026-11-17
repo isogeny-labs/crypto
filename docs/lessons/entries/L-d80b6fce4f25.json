@@ -1,0 +1,16 @@
+{
+  "action": "compare the new code at its best thread count against the baseline at its best thread count, and include existing knobs (e.g. F4_FP_SYMBOLIC_PAR=0, F4_FP_FL=0, RAYON_NUM_THREADS=1) as reference arms; a same-thread-count ratio can just remove an overhead a baseline user would avoid",
+  "created": "2026-11-17T00:19:45Z",
+  "evidence": [
+    "research/f4_groebner_speed_leads_20261116/data/runs.jsonl",
+    "research/f4_groebner_speed_leads_20261116/redteam/verdicts.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team",
+    "controlled-experiment"
+  ],
+  "trigger": "reviewing a parallelism or threading change reported as a speed-up at a fixed thread count",
+  "why": "f4-parallel quad_n7 integrated at 4 threads 1.22x but 0.997 against each arm at its best thread count; cubic_n5 1.13x vs 1.025 (serial ABBA run 2026-11-16)"
+}

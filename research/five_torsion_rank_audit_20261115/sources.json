@@ -1,0 +1,300 @@
+{
+  "schema": "five-rank-source-plan/v1",
+  "created": "2026-11-15T18:15:11.748188+00:00",
+  "formal": {
+    "project": "research/five_torsion_rank_audit_20261115/lean",
+    "theorem": "FiveTorsionRankAudit.actual_geometric_five_certificate",
+    "statement": "theorem actual_geometric_five_certificate : (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R), psiFive W=W.Ψ₂Sq^2*W.preΨ₄-W.Ψ₃^3 ∧ (psiFive W).derivative=5*W.Ψ₂Sq*(central W*W.preΨ₄-W.Ψ₃^2)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (5:ℕ) • Point.some x y hN=0 ↔ (psiFive W).IsRoot x) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (5:K)] (W : WeierstrassCurve.Affine K), W.Δ≠0 → (psiFive W).Separable ∧ (psiFive W).natDegree=12 ∧ Nat.card (FiveRoot W)=12 ∧ Finite (FiveTorsion W) ∧ Nat.card (FiveTorsion W)=25 ∧ Nat.card {P : W.Point // addOrderOf P=5}=24 ∧ finrank (ZMod 5) (FiveTorsion W)=2 ∧ Nonempty (Basis (Fin 2) (ZMod 5) (FiveTorsion W))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 5], (charFiveCurve K).Δ≠0 ∧ (∀ x : K, (psiFive (charFiveCurve K)).eval x= -1) ∧ Nat.card (FiveTorsion (charFiveCurve K))=1 ∧ Nat.card (FiveTorsion (charFiveCurve K))≠25) ∧ (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (FiveTorsion binaryCurve)=25 ∧ finrank (ZMod 5) (FiveTorsion binaryCurve)=2) ∧ (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧ Nat.card (FiveTorsion (short (-1:CharThreeClosure) 0))=25 ∧ finrank (ZMod 5) (FiveTorsion (short (-1:CharThreeClosure) 0))=2)",
+    "decl_sha256": "7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df",
+    "scope": "LiteralofficialW.preΨ5 overeveryCommRing, universalH=TC−D²/U=D²H−T³/Uprime=5D(CH−T²)/smallrootderivativeidentity kernelproved. Actualnonsingularpoint5P0iffliteralU(x)0 foreverygeneralWeierstrassmodel/everycharacteristic. ActualnonsingularrootD/Tnonzero andsmallquarticTaylor/twice-double/groupcoprime2-5/3-5/equalx±branch derivebothdirections, no suppliedpolynomial-groupbridge. Actualchar!=5ACallmodels Udegree12/12distinctroots/separability/twodistinctordinatefiberpoints, actualpoint-rootfiberbijection plusidentitygivewholeactual5kernel25. ActualderivedZMod5module/finrank2/Fin2basis/exactorder5count24; scalar-extensionactualcurve kernel25. No suppliedrank/kernelcount/separability/degree-of-multiplication premise. Actualbinary/ternarycurves havekernel25/rank2; actualeverychar5fieldcurve y²=x³+1 Δ3/Ueval−1/allactual5kernelpointszero/card1 refutesdeletedcoprimalityfromrankcount. NotBKcountdivisibilitycounter/nonreducedgroupschemeorSSdefinitionclaim. Prioractual3point/root/ordinate/fiber/countmethods andofficialdegrees/duplication credited; knownordinarychar5kernel5controlcreditedseparately/no novelty. Tennewconcretemodules/12frozenlocalmodules0copies/15oldformalconfigs31oldpins checkedeverystate/gate. Genericrank5gapclosed; determinantat5/canonicalWeil/generalprime≥7rankdet/fullallkp500population/remaining14open, qualifiedsourcesretained. Standardfoundations/defaultlimits/noholes/customaxioms/nativeproofeval/newglobalflags/waivers/frozenedits/cryptoPython/nativecryptoexperiment/spend/upload. Sameprover/host/frozenproceduralwrittenheadercheck, no kernelparser-hash-compiler/independentphysicalhost refinement; signedunverified.",
+    "sources": [
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+        "bytes": 2653,
+        "sha256": "187b01e8b72494449ceb9f2fd42cd33fd10b09f85b57d14a0d695688ec8b9550"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+        "bytes": 5157,
+        "sha256": "44c162daf6bc9ea3bacb0a3e5b965d8572f4f097d60aaa215df81a452bfbbab3"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+        "bytes": 2400,
+        "sha256": "5caa1d00afe151a6259dc659c40295afcb128a3b3fc6234f7c27e68a8e926cd2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCertificate.lean",
+        "bytes": 2518,
+        "sha256": "5d246802810d22f442789bffc32684555b54b6b2080934d47efcb170e3e5a8ab"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+        "bytes": 6143,
+        "sha256": "ae23e54b95ea98aa9f98d1a7f3a22d2c4fb0c4321330dd2dc36a4579e88c7f72"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+        "bytes": 4722,
+        "sha256": "f61099252ac9f05b6482e4f19559f02e9ef199fc7d44395dbb599c650bb0beb6"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+        "bytes": 2294,
+        "sha256": "139ff737ff154ca1f3952d82b4dab42512ddf382a977f76fc8e4ec301d4b2339"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+        "bytes": 3190,
+        "sha256": "c93226b190f59c494c6b01beaeaa71c9a01036edfea09d35ebabf64915bfc1dc"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+        "bytes": 2533,
+        "sha256": "32894b1a1e4f10e6a04d06ebf02324ff999442826f4cb3a8e548a4abddbb01b9"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/ThreeCertificate.lean",
+        "bytes": 1961,
+        "sha256": "bf23cd46809149b42a097f087933a9cdfa83402d33b0e05bc4490d424b3f225e"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveBasis.lean",
+        "bytes": 3024,
+        "sha256": "19337278804905007d0a0d54445c5298bb4887b651fce31bd9cfbcebc963c35d"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveCardinality.lean",
+        "bytes": 2840,
+        "sha256": "1d268c5cbdf9bfdef2676e9bc4b1054728b59db53da1245cc0ce0e7236f2fd6e"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveCertificate.lean",
+        "bytes": 2369,
+        "sha256": "749cdee742d67bb53d0a0092262d80727f4d021f9a0443607302cabb52b77edb"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveControls.lean",
+        "bytes": 3654,
+        "sha256": "cde2a7677d7b2f33f36485051785e2ee69bda0a889c0a8d36b1a53546421bfb7"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveConverse.lean",
+        "bytes": 2799,
+        "sha256": "2132e04794841ba083e0c6abcefca6e6c302dd4b00a6d807af1641beb9a124e7"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveDuplication.lean",
+        "bytes": 2559,
+        "sha256": "701267d67220405d0370c67e5b5304a9dfffd5973813be9ced7fa25721b4ea05"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveForward.lean",
+        "bytes": 2697,
+        "sha256": "91d5c426bf6866b830a1a7edfccd11d37ea7688db6439bebd8982c717978c8c1"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FivePolynomial.lean",
+        "bytes": 3587,
+        "sha256": "d26232e361579a4b10afd864de18e6bc991dd987984b6967ff58a539ac7ed3ed"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveRootData.lean",
+        "bytes": 1408,
+        "sha256": "adb84b0636807d5ae69e61a2e876787a4ceab3670a7fa6c17655b907b798f9f3"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/FiveSeparable.lean",
+        "bytes": 3541,
+        "sha256": "72fdd789c5c3609c3b16230680fb2dcd035888896beea39bf3cf251ee5c217f2"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3840,
+        "sha256": "0eaa0ae505534444f29b1d3e26170c436deb9c1b21aaaed456277388115b91f2"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/lakefile.toml",
+        "bytes": 415,
+        "sha256": "95cb8e1911f4b192b5d289a5ebd146ff5806cdfc751a44f3b08c0a46e75a4671"
+      },
+      {
+        "path": "research/five_torsion_rank_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CharacteristicThree",
+    "DivisionQuartic",
+    "FiveBasis",
+    "FiveCardinality",
+    "FiveCertificate",
+    "FiveControls",
+    "FiveConverse",
+    "FiveDuplication",
+    "FiveForward",
+    "FivePolynomial",
+    "FiveRootData",
+    "FiveSeparable",
+    "GeneralBasis",
+    "GeneralCardinality",
+    "GeneralCertificate",
+    "GeneralRoots",
+    "GeneralTriplePoint",
+    "GeometricCardinality",
+    "QuarticRoots",
+    "TernaryBasis",
+    "ThreeCertificate",
+    "TriplePoint"
+  ],
+  "artifacts": [
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 23824,
+      "sha256": "5f76c2bba70986f7f955287c78c63f55d49b44ad0ccb757285900b9ce390f9f5"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "24f543e902a0d74b4a68c862426e181844d3a105061c1484ab05ebd30e571a69"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/attempts.json",
+      "bytes": 227,
+      "sha256": "d8801308c13b638c7468f89e1a387961a3e453477ea7820bdb6c3044b056f0db"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1833,
+      "sha256": "c65ce898706a6ff27f884962a16adc221c5261cd17ab6230b972737849846374"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/gate.json",
+      "bytes": 6078,
+      "sha256": "012d87a34d7a244e5436be49b71e955c8b6566aa280ee0462dd3684cb465901c"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/source-review.json",
+      "bytes": 5218,
+      "sha256": "75a5150cede1f8aaa5096f53734583c9ca9e5bdd4928a5f47e8ebdf7ed6db740"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/evidence/binding-check.json",
+      "bytes": 5728,
+      "sha256": "78a1b207cdf167fbdf0c869671b4c13146f79e8eb3fd28890bde5f3054749b1f"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/proof-map.json",
+      "bytes": 7242,
+      "sha256": "34c872c0e07beadd0236194cffa39a785fa29761077227691b79166692609411"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/render_report.py",
+      "bytes": 7882,
+      "sha256": "9043f8b6785808e05190f0ecdbc0c26b837df07ab3a0b2380b97a804fc09682d"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/export_binding_input.py",
+      "bytes": 1741,
+      "sha256": "d4083a3ce8198e40e4b2a53c77a17f54696092646f20908ba212c7b8c13447c7"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/PROTOCOL.md",
+      "bytes": 4203,
+      "sha256": "2a80097f90b9e08b6f3802937eb20164ef1daee44c167c767336354aa7e23b99"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/preflight.json",
+      "bytes": 7490,
+      "sha256": "523670e1c4aaf7e4d37eecafa4abbe1713523b943c47d67c34d82449bfc24f7b"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/reports/five-torsion-rank.svg",
+      "bytes": 1457,
+      "sha256": "ee3e45f1a48762034b8ee69dd090bed90a3cfe3433c69654e33f7aa7ab7f0975"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/reports/layout.json",
+      "bytes": 225,
+      "sha256": "99c6bfec2fd654e47b6d26031d5fd292acc555ebff5682bc0e235718fabb7c30"
+    },
+    {
+      "path": "research/five_torsion_rank_audit_20261115/reports/report.pdf",
+      "bytes": 48116,
+      "sha256": "acf0889a306e8df19c326b8253ec0863e52583e581f79dbd107a30c231954231"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261114/sources.json",
+      "bytes": 10548,
+      "sha256": "49a0cfbc5d3906d0bc719e37dfc7d6d6f2ab6760cc7393a46e745a47c2c11ea6"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 50,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "literal_official_fifth_polynomial": true,
+    "universal_structured_derivative_identities": true,
+    "actual_five_point_iff_every_characteristic": true,
+    "separability_and_twelve_roots_derived": true,
+    "actual_point_root_fiber_bijection": true,
+    "actual_general_five_kernel25_rank2": true,
+    "actual_exactorder5_count24": true,
+    "actual_char2_char3_positive": true,
+    "actual_char5_kernel1_control": true,
+    "determinant_five": false,
+    "general_prime_ge7_rankdet": false,
+    "canonical_Weil_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

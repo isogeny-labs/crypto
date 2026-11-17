@@ -28,7 +28,7 @@ cost? (`protocol.json`, `question`.) [pcc:unverified]
 
 ## 2. Design
 
-- **Part A** (family `koblitzA`): curves k0n23, k1n29, k0n31, k0n37, k0n41
+- **Part A** (family `koblitzA`): curves icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a
   (a = 0 except n = 29, a = 1); m in {5, 6}; factor base union:S with S in
   {2, 3}; both engines, `chain-s3-orbit` and `chain-s3`; 4 public queries per
   cell and 4 planted queries in the matching positive-control cell; 600 s
@@ -117,8 +117,8 @@ Cell classes, public cells (from `table.tsv`) [pcc:unverified]:
 | B (4 cells) | chain-s3-orbit | 0 | 0 | 4 | 0 |
 | B (4 cells) | chain-s3 | 0 | 0 | 4 | 0 |
 
-Decided public cells all belong to `chain-s3`: k1n29 m = 5 and m = 6 at S = 2
-(0.016 s and 0.040 s per query) and the four k0n37 cells (0.1 s to 0.3 s per
+Decided public cells all belong to `chain-s3`: icv1-f2m29-tm40309-30c52b96 m = 5 and m = 6 at S = 2
+(0.016 s and 0.040 s per query) and the four icv1-f2m37-tm534059-32aad96b cells (0.1 s to 0.3 s per
 query). All are `decided_unsat`; there is no `decided_sat` public cell
 [pcc:unverified].
 
@@ -155,8 +155,8 @@ K2[chain-s3-orbit]: supported_partial  (analyze.py)  | under rule 4: not_evaluab
 K4[chain-s3-orbit]: supported          (analyze.py)  | under rule 4: not_evaluable for chain-s3-orbit
 ```
 
-The chain-s3-orbit m = 2 negative control is undecided at every n (k0n23,
-k1n29, k0n31, k0n37, k0n41 and n83k1), so invalidation rule 4 makes that
+The chain-s3-orbit m = 2 negative control is undecided at every n (icv1-f2m23-t5197-69e76b73,
+icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a and n83k1), so invalidation rule 4 makes that
 engine's capped cells not_evaluable for K2 and K4. K2 and K4 need both
 engines, so K4 is supported for chain-s3 only and is not established as a
 two-engine claim [pcc:unverified].
@@ -172,12 +172,12 @@ budget; undecided public cells there are therefore weak evidence of absence
 
 Claim by claim, as `analysis.txt` states them [pcc:unverified]:
 
-- **K1** (both engines decide the k0n23 m = 5 and m = 6 union:2 cells inside
+- **K1** (both engines decide the icv1-f2m23-t5197-69e76b73 m = 5 and m = 6 union:2 cells inside
   600 s): chain-s3-orbit falsified (capped); chain-s3 falsified (undecided).
 - **K2** (seconds grow at least geometrically with n; every m = 6 public cell
   at n = 37 and 41 caps): chain-s3-orbit supported_partial (2 of 4 tail cells
   measured, the n = 41 cells skipped by the stopping rule, no two decided
-  points for a slope); chain-s3 falsified (the k0n37 m = 6 cells are
+  points for a slope); chain-s3 falsified (the icv1-f2m37-tm534059-32aad96b m = 6 cells are
   decided_unsat; S = 2 log2-slope 0.379 per n between n = 29 and 37).
 - **K3** (planted relation recovered in every decided planted cell):
   falsified for both engines, 0 of 2 completed planted cells for
@@ -189,13 +189,13 @@ Claim by claim, as `analysis.txt` states them [pcc:unverified]:
   note above applies (supported but weak).
 - **K5** (no decided public cell at n >= 31 under 188 s per query):
   chain-s3-orbit supported, vacuously, with 0 decided cells; chain-s3
-  falsified by the four k0n37 public cells above.
+  falsified by the four icv1-f2m37-tm534059-32aad96b public cells above.
 - **K6** (kill criterion): not_evaluable (combined), both engines
   not_evaluable_instrument_invalid.
 - **K7** (out of scope): no complete-DLP, IC-versus-rho, leaderboard or
   benchmarks claim is made.
 
-**What the K5[chain-s3] falsification is.** The four k0n37 public cells are
+**What the K5[chain-s3] falsification is.** The four icv1-f2m37-tm534059-32aad96b public cells are
 `decided_unsat`: the engine proved UNSAT with 0 relations found, at 0.1 s to
 0.3 s per query. These decisions find no relation, so they are not an
 index-calculus improvement over the m = 4 parity point. The protocol's K5
@@ -215,18 +215,18 @@ there [pcc:unverified].
 ## 5. Controls
 
 - **Negative control (m = 2, union:2)**: chain-s3 decided_unsat at all six
-  curves (0.028, 0.000, 0.016, 0.001, 0.286 and 9.455 s per query at k0n23,
-  k1n29, k0n31, k0n37, k0n41 and n83k1); chain-s3-orbit undecided at all six.
+  curves (0.028, 0.000, 0.016, 0.001, 0.286 and 9.455 s per query at icv1-f2m23-t5197-69e76b73,
+  icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a and n83k1); chain-s3-orbit undecided at all six.
   `analysis.txt`: the n = 83 chain-s3 figure of 9.45 s per query against the
   n83_msweep record 17.33 s (ratio 0.55; diagnostic, different host)
   [pcc:unverified].
 - **A/A**: 0 pairs with disagreement or noise flag. Decided pairs (all
-  chain-s3, decided_unsat) have seconds ratios 1.152 and 1.026 (k1n29 m = 5 and
-  6, S = 2) and 0.939, 1.036, 0.975 and 1.151 (k0n37) [pcc:unverified].
+  chain-s3, decided_unsat) have seconds ratios 1.152 and 1.026 (icv1-f2m29-tm40309-30c52b96 m = 5 and
+  6, S = 2) and 0.939, 1.036, 0.975 and 1.151 (icv1-f2m37-tm534059-32aad96b) [pcc:unverified].
 - **Positive control**: planted cells completed, chain-s3-orbit: 2, all
   queries recovered and verified: 0; chain-s3: 12, all recovered and
   verified: 6. The 6 chain-s3 successes are `decided_sat` with every witness
-  re-added (k1n29 m = 5 and 6 S = 2; k0n37 all four). See limitations
+  re-added (icv1-f2m29-tm40309-30c52b96 m = 5 and 6 S = 2; icv1-f2m37-tm534059-32aad96b all four). See limitations
   [pcc:unverified].
 
 ## 6. Limitations
@@ -256,7 +256,7 @@ there [pcc:unverified].
   those cells it does not recover a known relation within its conflict
   budget; public verdicts there are not informative, and K3 is falsified for
   both engines [pcc:unverified].
-- **chain-s3-orbit at k1n29** (m = 5 and m = 6, S = 2) returns `incomplete`
+- **chain-s3-orbit at icv1-f2m29-tm40309-30c52b96** (m = 5 and m = 6, S = 2) returns `incomplete`
   with 0 conflicts in 0.0 s in the public, planted and A/A cells (and in the
   m = 2 negative control, table.tsv: undecided, conflicts 0, wall 0.0 s). The
   engine returns without searching; this report does not determine why, and

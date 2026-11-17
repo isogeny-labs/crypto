@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T10:44:40Z",
+ "id": "PCC-20261114-d90050",
+ "kind": "theorem",
+ "producer": {
+  "commit": "8455c485411b19c3b6a99cfc6c95f32276867b9b",
+  "model": "",
+  "session": "orientation-jet-successor-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "612e8fa5ba15e0de8eb7ed04be0749ec6f44e8acf978a3ab5f29381e3a240185",
+   "kind": "lean",
+   "project": "research/prime_orientation_layers_20261114/successor/lean",
+   "theorem": "OrientationRank.scaled_product"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual same orientation-completed first jet and derived scalar only. Precision upper construction uses2^v labels; necessary lowest-layer factor count2^u applies to this exact rational approximation problem, not all higher jets, all completions or ECDLP. Exact hypotheses retained. Standard determinant/rank/valuation arithmetic reused without priority claim. All unsigned, pinned gate/fresh pending at record creation. Protected concurrent canonical ledger history remains unreconciled; old sources/evidence/claims unchanged.",
+ "statement": "Exact source-bound declaration OrientationRank.scaled_product: theorem scaled_product (a u i k : \u2115) (m : \u2115 \u2192 \u2115) (A : Matrix (Ports a) (Fin k) \u211a) (B : Matrix (Fin k) (Ports a) \u211a) (x y : Ports a) : (scaledLeft a u i k m A*B) x y = (A*B) x y/diagonalJet a u i m"
+}

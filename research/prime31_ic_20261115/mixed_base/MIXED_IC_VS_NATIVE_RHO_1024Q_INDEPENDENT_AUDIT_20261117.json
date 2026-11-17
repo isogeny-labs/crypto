@@ -1,0 +1,48 @@
+{
+  "schema": "prime31.mixed_ic_vs_native_rho_1024.independent_replay.v1",
+  "audit": "independent Python affine arithmetic readback, not a discrete-log solver or signed PCC",
+  "p": 2147483647,
+  "n": 2147446831,
+  "Dickson_seed": 3,
+  "factor_base_points": 61,
+  "source_job": "https://github.com/isogeny-labs/crypto/actions/runs/44025539872",
+  "raw_artifact_zip_sha256": "a720f5f0533d384ee7526455453fae5e5dfb39e129914c924a2e3649ca098f93",
+  "original_curve_factor_base_scalar_checks": 61,
+  "original_curve_setup_witnesses_replayed": 61,
+  "original_curve_target_witnesses_replayed": 1024,
+  "original_curve_target_residual_attempts_replayed": 1024,
+  "original_curve_target_residual_misses": 0,
+  "original_curve_IC_candidate_logs_replayed": 1024,
+  "original_curve_unfolded_rho_candidate_logs_replayed": 1024,
+  "original_curve_folded_rho_candidate_logs_replayed": 1024,
+  "original_curve_unfolded_AA_candidate_logs_replayed": 64,
+  "IC_setup_ns": 1655699049,
+  "IC_target_descent_total_ns": 1029098499,
+  "IC_batch_fully_charged_ns": 2684797548,
+  "native_unfolded_rho32_fully_cold_ns": 3017608361,
+  "native_folded_rho32_fully_cold_ns": 5625174017,
+  "IC_over_unfolded_rho32_ratio": 0.8897104020186004,
+  "IC_over_folded_rho32_ratio": 0.4772825764831801,
+  "paired_target_bootstrap_25000_replicates_including_fixed_setup_ratio_IC_over_unfolded_percentile_2p5_50_97p5": [
+    0.8581835015869009,
+    0.8897274251904618,
+    0.9227607858767471
+  ],
+  "paired_target_bootstrap_25000_replicates_including_fixed_setup_ratio_IC_over_folded_percentile_2p5_50_97p5": [
+    0.4597071488492824,
+    0.4771781150751242,
+    0.49583619600509105
+  ],
+  "IC_descent_only_paired_wins_unfolded": 913,
+  "IC_descent_only_paired_wins_folded": 979,
+  "IC_setup_plus_descent_wins_single_cold_target_unfolded": 0,
+  "unfolded_AA_first64_drift": 0.004452045236795987,
+  "setup_probes": 214134,
+  "setup_attempts": 61,
+  "source_only_pcc": "unverified",
+  "not_benchmarked": [
+    "strongest external tuned WZ rho",
+    "shared-precomp BSGS",
+    "external mature index calculus"
+  ]
+}

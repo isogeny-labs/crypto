@@ -1,0 +1,65 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "kind": "native-software-validation-only",
+  "source_commit_short": "52ded7eb1e4",
+  "source_base": "d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83",
+  "design_commit": "77160fa8657",
+  "build_preceded_runtime_commit": true,
+  "compiled_source_hashes_rechecked_unchanged_after_build": 4,
+  "rust_toolchain": "1.98.0",
+  "checks": {
+    "initial_targeted": {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0
+    },
+    "final_targeted": {
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0
+    },
+    "new_tests": 8,
+    "existing_tests": 5,
+    "exhaustive_small_matrices_f3": 729,
+    "bounded_small_matrices_f5_f7": 200,
+    "strict_release_clippy_lib_tests": "passed",
+    "scoped_format_and_whitespace": "passed",
+    "full_library": {
+      "passed": 5191,
+      "failed": 0,
+      "ignored": 123,
+      "exit_code": 0,
+      "elapsed_seconds_diagnostic_only": 1329.34
+    }
+  },
+  "immutable_test_binary_sha256": "3cd0b3daf64282c1e0ae8a6179b723df7fb298082a4bdfd78fcd7830c0b81f7e",
+  "legacy_filter_body_unchanged": true,
+  "independent_checker": "Separate coefficient normalization and row-combination arithmetic; verifies legal recorded schedule, source-coefficient induction, aggregate counters and cap/acknowledgment semantics without native filter/replay calls",
+  "scope": {
+    "native_batch_filter_only": true,
+    "dataset_v2_adapter_implemented": false,
+    "signed_frobenius_reducer_instrumented": false,
+    "rank_reducer_instrumented": false,
+    "execution_trace_complete_verified": false,
+    "total_operation_count_verified": false,
+    "dependency_basis_complete_verified": false,
+    "unsat_or_scalar_recovery_claim": false,
+    "scientific_dataset_generated": false,
+    "cloud_job_launched": false,
+    "public_pr_or_push": false
+  },
+  "budget": {
+    "original_total_usd_min": 100,
+    "original_total_usd_max": 200,
+    "new_budget_or_deadline": false
+  },
+  "errors": [
+    "Malformed initial Conductor project slug returned 404; exact migrated UUID check and T-748 claim succeeded",
+    "CLI has no heartbeat subcommand; isolated copy of existing credential-safe renewal helper maintained lease",
+    "No native build, focused test or strict lint failure occurred"
+  ],
+  "source_commit": "52ded7eb1e42ab97c2d23cb6a4354e985ddd8540",
+  "source_equivalent_delivery_merge": "b49839f8a3591dd460fa3e0a05677fc286ca0ce4",
+  "full_suite_executable": "crypto-lib-tests-source-equivalent",
+  "historical_source_checkpoint": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/large-prime-trace/63ee9e07ccdb181a7cd5caa30ac24c2178cb59fb68762ec0ee9adf41e7f0a994/source.tar.gz"
+}

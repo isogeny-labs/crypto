@@ -1,0 +1,63 @@
+{
+  "schema": "trace-accelerated-protocol/v1",
+  "id": "trace-incidence-accelerated-20261116-a1",
+  "status": "preregistered candidate workload; not executed",
+  "source_revision": "Exact enclosing published commit, bound by a NEW successful standard S3 checkpoint before allocation",
+  "provider": "Runpod, explicitly selected by user",
+  "budget": {
+    "combined_lane_cap_usd": 1,
+    "previous_compute_estimate_usd": 0.0763778,
+    "new_allocation_compute_cap_usd": 0.25,
+    "maximum_total_new_allocations": 1,
+    "automatic_retries": 0,
+    "price_ceiling_usd_per_hour": 0.5,
+    "maximum_seconds_from_creation": 1800,
+    "worker_timeout_seconds": 1500,
+    "row_timeout_seconds": 45,
+    "admission": "Fresh actual balance/rate/capacity checks; include setup, failed attempts and storage. Do not reserve unrelated pods' full future budgets against this job. No budget increase is authorized."
+  },
+  "resources": {"vcpu": 8,"memory_gib": 16,"container_disk_gib": 20,"persistent_volume_gib": 0,"measurement_threads": 1,"parallel_measured_rows": 1},
+  "image": "debian:trixie-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392",
+  "inputs": {
+    "public_glob": "historical/prime_fixtures/b???_c?_natural_s?.json",
+    "B": [8,16,32,64,128],
+    "curves_per_size": 3,
+    "targets_per_curve": 4,
+    "target_count": 60,
+    "density": "Same r approximately 8 B^3 natural panel, no selected successful seeds",
+    "pool_labels": "Fresh MT19937_64/uniform_int_distribution alpha,beta; preserve draw/rejection order exactly; no input validation secret or frozen pool point is consumed by the timed generator",
+    "attempts_per_target_maximum": 4,
+    "seed": "public_seed + attempt*2654435761, attempt 0..3",
+    "stopping": "First informative relation; every prior miss charged, four misses censored. Errors/timeouts retained as failures and stop that arm-target."
+  },
+  "arms": [
+    {"label":"known","generator":"affine","norm":"horner","role":"frozen native quotient/GCD baseline"},
+    {"label":"pairs","generator":"affine","norm":"frozen-pairs","role":"frozen first-witness C++ pair baseline"},
+    {"label":"straus-pairs","generator":"straus","norm":"frozen-pairs","role":"arithmetic/backend control"},
+    {"label":"window-pairs","generator":"window","norm":"frozen-pairs","role":"generator-only ablation"},
+    {"label":"window-horner","generator":"window","norm":"horner","role":"unchanged algebraic norm with batch generation"},
+    {"label":"compose","generator":"window","norm":"compose","role":"tail-split preinverted Brent-Kung implicit incidence"},
+    {"label":"support","generator":"window","norm":"support","role":"complete streamed generic pair support, no Bloom"},
+    {"label":"support-bloom","generator":"window","norm":"support-bloom","role":"complete generic support, exact lookup after Bloom"},
+    {"label":"first","generator":"window","norm":"first","role":"generic first informative witness, no full GCD claim"},
+    {"label":"first-bloom","generator":"window","norm":"first-bloom","role":"generic first informative witness with Bloom"},
+    {"label":"first-bloom-aa","generator":"window","norm":"first-bloom","role":"identical-source A/A control"}
+  ],
+  "rho": {"source":"examples/trace_incidence_rho.rs","threads":1,"table_bits":4,"walkers":8,"dp_bits":0,"max_steps":10000000,"negation":true,"scope":"Matched unchanged reference; no claim of optimal tuning or exclusive phase admission"},
+  "controls": {
+    "qualification": "Immutable copied native qualifier; complete monic GCD equality against frozen quotient/GCD and independent cubic summation-polynomial enumeration; exact point/label/rejection agreement; small-subgroup identity/collision, unequal-size, invalid input and late-informative cases",
+    "positive": "Unfiltered natural relations and fixed nonlinear-control public target",
+    "negative": "Retain natural relation misses and all-uninformative labelled-pool control",
+    "no_new_root_claim": "Given-coordinate recovery needs no auxiliary datum; existing paper curve/twist/isogeny root arms remain frozen controls, and their speedups are not transferred to this incidence experiment"
+  },
+  "rounds": {"warmup":1,"measured":5,"order":"Rotate the full arm order by round. Fresh process per attempt, CPU affinity to first permitted CPU; no measured parallelism."},
+  "timing": "Native steady_clock and getrusage. Complete interval includes public input parsing/validation, per-target table/context setup, exact labelled pool construction/rejections, norm/support/index/Bloom setup, witness/scalar recovery and original-curve scalar check. Startup/output and peak RSS also recorded with /usr/bin/time. All target-level summaries sum preceding attempts.",
+  "memory": "Fresh-process peak RSS, not vector capacity as a substitute. Full pair support uses O(B) working storage; FLINT modular-composition internal workspace is charged by process RSS.",
+  "analysis": "Native frozen charge/censoring analyzer plus full-support and generation-accounting crosschecks. Descriptive medians and per-target paired ratios, retaining raw warmups/failures/censored units. No fitted exponent, isolation tier, novelty/fastest-tool claim or leaderboard promotion.",
+  "custody": "New exact-source standard S3 checkpoint and narrow upload authorization before launch. External supervisor enforces original creation deadline, mirrors raw rows, hashes/uploads/readbacks complete or partial archive and deletes only this allocation. Raw archive goes to approved artifact bucket; immutable CAS manifest only after successful matching readback.",
+  "hypotheses": [
+    "Equal-degree tail splitting enables Brent-Kung rather than generic FLINT Horner fallback and may reduce complete norm cost at larger B; native overhead may erase the gain at small B.",
+    "Fixed-window batched label multiplication may reduce full relation cost; Straus and unchanged frozen-pair controls distinguish arithmetic/backend changes from batching.",
+    "Bloom filtering may reduce exact hashmap probes but its hashing/setup may cost more; retain both arms and A/A noise control."
+  ]
+}

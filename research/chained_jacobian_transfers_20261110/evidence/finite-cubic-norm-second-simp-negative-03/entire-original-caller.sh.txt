@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+root=/workspace/crypto
+consumer=/workspace/cryptanalysis
+out=/workspace/scratch/ct531-finite-cubic-norm-final-original-dual-gates
+source=research/chained_jacobian_transfers_20261110/lean/CubicFiniteNorm22308.lean
+consumer_source=.resume/finite-cubic-norm-final-source-20261116-08/CubicFiniteNorm22308.lean
+mkdir "$out"
+mkdir -p "$consumer/.resume/finite-cubic-norm-final-source-20261116-08"
+cp "$root/$source" "$out/entire-actual-source.lean.txt"
+cp "$root/$source" "$consumer/$consumer_source"
+cmp "$root/$source" "$consumer/$consumer_source"
+sha256sum "$root/$source" "$consumer/$consumer_source" > "$out/entire-source-byte-pins.sha256"
+cp "$0" "$out/entire-original-caller.sh.txt"
+export PATH=/dev/shm/ct267-cubic-norm-final-dual-gates/proof-bin:/home/agent/.elan/bin:$PATH
+export GIT_OPTIONAL_LOCKS=0
+for label in Root435 Consumer434; do
+  repo=$root
+  target=$source
+  export ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+  if [[ "$label" == Consumer434 ]]; then
+    repo=$consumer
+    target=$consumer_source
+    export ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1
+  fi
+  date -u +%FT%TZ > "$out/$label.start"
+  sha256sum "$repo/tools/lean/proof-gate.sh" "$repo/tools/lean/AuditAxioms.lean" > "$out/$label.original-tool-byte-pins.sha256"
+  printf '%s\n' "cwd=$repo" "toolchain=$ELAN_TOOLCHAIN" 'workers=1' 'memory=original defaults unchanged' "timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out $out/$label $target" > "$out/$label.actual-command.txt"
+  set +e
+  (cd "$repo" && timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out "$out/$label" "$target") > "$out/$label.entire-caller.stdout" 2> "$out/$label.entire-caller.stderr"
+  result=$?
+  set -e
+  printf '%s\n' "$result" > "$out/$label.actual.exit"
+  date -u +%FT%TZ > "$out/$label.finish"
+  cat "$out/$label.entire-caller.stdout"
+  test "$result" -eq 0 || exit "$result"
+done
+cmp "$root/$source" "$consumer/$consumer_source"

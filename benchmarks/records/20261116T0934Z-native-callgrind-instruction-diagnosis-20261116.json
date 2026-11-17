@@ -1,0 +1,103 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T09:44:33+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/native-callgrind-isolation-6bd05b0e5-01.jsonl",
+        "--label",
+        "native-callgrind-instruction-diagnosis",
+        "--",
+        "/workspace/relation-native-qualifiers/callgrind-driver-6bd05b0e5-17",
+        "callgrind-profile",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/native-callgrind-results-6bd05b0e5-01",
+        "research/relation_degree_trace_20261115/callgrind-development/capture-config-17.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T09:34:24+00:00",
+      "wall_s": 4.487
+    }
+  ],
+  "commit": "1223113f8f1dffde34d002553a5c4229d23e5188",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T09:34:06+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0934Z-native-callgrind-instruction-diagnosis-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "total_guest_ir",
+      "note": "Single known-input instrumented whole process, generation/parent excluded; guest instructions, not cycles/native time or speedup",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 160575923.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 55192,
+      "path": "research/relation_degree_trace_20261115/callgrind-profile-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/04/0459a072b350cb8fa8a2dbd1009f962b7def2b04f9eb0abb8cf642ebee40e2fc",
+      "sha256": "0459a072b350cb8fa8a2dbd1009f962b7def2b04f9eb0abb8cf642ebee40e2fc",
+      "uploaded": false
+    },
+    {
+      "bytes": 300,
+      "path": "research/relation_degree_trace_20261115/callgrind-profile-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/44/44b8c0aaccc8df26a62fae4ada23e0087fccd96347ce896810885a22ca4beab8",
+      "sha256": "44b8c0aaccc8df26a62fae4ada23e0087fccd96347ce896810885a22ca4beab8",
+      "uploaded": false
+    },
+    {
+      "bytes": 1758,
+      "path": "research/relation_degree_trace_20261115/callgrind-profile-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/64fbef64be8eb072ef39d1df9b6d979d51cbf8e95d926c5c8fbe8b808672a842",
+      "sha256": "64fbef64be8eb072ef39d1df9b6d979d51cbf8e95d926c5c8fbe8b808672a842",
+      "uploaded": false
+    },
+    {
+      "bytes": 227603,
+      "path": "research/relation_degree_trace_20261115/callgrind-profile-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/5321ac2a9b802b37fac453eb860fcbb5bb1f3ae06ea37c13a0d93abbbb423165",
+      "sha256": "5321ac2a9b802b37fac453eb860fcbb5bb1f3ae06ea37c13a0d93abbbb423165",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/callgrind-profile-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/callgrind-profile-01/report-01/self.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/callgrind-profile-01/report-01/self.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "native-callgrind-instruction-diagnosis-20261116",
+  "status": "measured",
+  "summary": "One complete equal frozen n16 candidate underCallgrind;160575923 guestIr, self totals/raw/log allmatch, pinsunchanged0monitorcontention. No time/cycle/ratio/regularity claim. PCC40f7a9/a29e0f.",
+  "validation": null
+}

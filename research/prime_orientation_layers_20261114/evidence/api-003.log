@@ -1,0 +1,21 @@
+zpow_le_one_iff_right₀.{u_3} {G₀ : Type u_3} [GroupWithZero G₀] [PartialOrder G₀] [PosMulReflectLT G₀] {a : G₀}
+  [ZeroLEOneClass G₀] {n : ℤ} (ha : 1 < a) : a ^ n ≤ 1 ↔ n ≤ 0
+Finset.prod_image.{u_1, u_2, u_4} {ι : Type u_1} {κ : Type u_2} {M : Type u_4} [CommMonoid M] {f : ι → M}
+  [DecidableEq ι] {s : Finset κ} {g : κ → ι} : Set.InjOn g ↑s → ∏ x ∈ image g s, f x = ∏ x ∈ s, f (g x)
+Polynomial.coeff_one.{u} {R : Type u} [Semiring R] {n : ℕ} : (coeff 1) n = if n = 0 then 1 else 0
+Polynomial.coeff_derivative.{u} {R : Type u} [Semiring R] (p : R[X]) (n : ℕ) :
+  (derivative p).coeff n = p.coeff (n + 1) * (↑n + 1)
+Polynomial.eval₂_at_apply.{u, u_1} {R : Type u} [Semiring R] {p : R[X]} {S : Type u_1} [Semiring S] (f : R →+* S)
+  (r : R) : eval₂ f (f r) p = f (eval r p)
+Polynomial.eval_map.{u, v} {R : Type u} {S : Type v} [Semiring R] {p : R[X]} [Semiring S] (f : R →+* S) (x : S) :
+  eval x (Polynomial.map f p) = eval₂ f x p
+Polynomial.funext.{u} {R : Type u} [CommRing R] [IsDomain R] [Infinite R] {p q : R[X]}
+  (ext : ∀ (r : R), eval r p = eval r q) : p = q
+Finset.sum_eq_single.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [AddCommMonoid M] {s : Finset ι} {f : ι → M} (a : ι)
+  (h₀ : ∀ b ∈ s, b ≠ a → f b = 0) (h₁ : a ∉ s → f a = 0) : ∑ x ∈ s, f x = f a
+Matrix.mul_apply.{v, u_1, u_2, u_3} {l : Type u_1} {m : Type u_2} {n : Type u_3} {α : Type v} [Fintype m] [Mul α]
+  [AddCommMonoid α] {M : Matrix l m α} {N : Matrix m n α} {i : l} {k : n} : (M * N) i k = ∑ j, M i j * N j k
+Polynomial.coeff_zero_eq_eval_zero.{u} {R : Type u} [Semiring R] (p : R[X]) : p.coeff 0 = eval 0 p
+LocalCharts.localBase_eval (a : ℕ) (m s : Fin (2 ^ (a + 1))) (z : ℚ) :
+  eval₂ LocalIntegral.integralRing.subtype z (LocalCharts.localBase a m s) =
+    CauchyNormalizer.baseKernel a (↑s) (↑↑m - ↑(2 ^ a) + ↑(2 ^ (a + 1)) * z)

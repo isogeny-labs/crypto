@@ -24,7 +24,7 @@ admitted stage is under 1.0 ns a summand at 2^44.3 and 2^44.5.
   admitted (R12's run prefetch, lookups and finishing).
 - **Build:** `ic` built with `--features scan-probes`. Default builds compile
   none of it. The hash is in [`binaries.sha256`](binaries.sha256).
-- **Rows and order:** `M1`'s two rows at `k0n53`, `k1n59` and `k0n61` (the
+- **Rows and order:** `M1`'s two rows at `icv1-f2m53-tm56619371-dac20a85`, `icv1-f2m59-tm943548413-98844ecc` and `icv1-f2m61-t158598901-ab42b6c5` (the
   suite's, `suite/v1`), four rounds, as v8's
   [`probe.sh`](../scan-stages-v8-20261017/probe.sh) ran them
   ([`job.sh`](job.sh)).

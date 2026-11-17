@@ -1,0 +1,36 @@
+{
+  "schema": "native-prime-trace-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "prime-trace-weak-bound",
+      "expected_decl_sha256": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+      "full_characters": 1233,
+      "full_decl_sha256": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+      "full_normalized_signature": "theorem prime_trace_weak_bound_certificate : (∀ (K : Type) [Field K] [Fintype K], 3 < Fintype.card K → ringChar K ≠ 2 → ∀ (W : WeierstrassCurve.Affine K), W.Δ ≠ 0 → 1 < Nat.card W.Point ∧ Nat.card W.Point < 2 * Fintype.card K + 1) ∧ (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → ∀ (W : WeierstrassCurve.Affine (ZMod p)), W.Δ ≠ 0 → (sourceSupersingular p W ↔ actualTrace W = 0) ∧ (sourceSupersingular p W → Nat.card W.Point = p + 1) ∧ (∀ (r : ℕ), 2 < r → r ∣ Nat.card W.Point → sourceSupersingular p W → orderOf (p : ZMod r) = 2 ∧ Module.finrank (ZMod p) (rootsField p r) = 2)) ∧ lowerThree.Δ ≠ 0 ∧ upperThree.Δ ≠ 0 ∧ Nat.card lowerThree.Point = 1 ∧ Nat.card upperThree.Point = 7 ∧ sourceSupersingular 3 lowerThree ∧ sourceSupersingular 3 upperThree ∧ actualTrace lowerThree = 3 ∧ actualTrace upperThree = -3 ∧ twoControl.Δ ≠ 0 ∧ sourceSupersingular 5 twoControl ∧ Nat.card twoControl.Point = 6 ∧ addOrderOf twoPoint = 2 ∧ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 1 ∧ ¬ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 2 ∧ eightControl.Δ ≠ 0 ∧ sourceSupersingular 7 eightControl ∧ Nat.card eightControl.Point = 8 ∧ addOrderOf eightPoint = 8 ∧ Module.finrank (ZMod 7) (rootsField 7 (addOrderOf eightPoint)) = 2",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "prime_trace_weak_bound_certificate",
+        "end_byte": 1892,
+        "file": "/workspace/scratch/prime-trace-weak-binding-input01/PrimeTraceCertificate.lean",
+        "qualified_decl_id": "PrimeTraceWeakBoundAudit.prime_trace_weak_bound_certificate",
+        "signature": "theorem prime_trace_weak_bound_certificate :\n    (∀ (K : Type) [Field K] [Fintype K],\n      3 < Fintype.card K → ringChar K ≠ 2 →\n      ∀ (W : WeierstrassCurve.Affine K), W.Δ ≠ 0 →\n        1 < Nat.card W.Point ∧ Nat.card W.Point < 2 * Fintype.card K + 1) ∧\n    (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p →\n      ∀ (W : WeierstrassCurve.Affine (ZMod p)), W.Δ ≠ 0 →\n        (sourceSupersingular p W ↔ actualTrace W = 0) ∧\n        (sourceSupersingular p W → Nat.card W.Point = p + 1) ∧\n        (∀ (r : ℕ), 2 < r → r ∣ Nat.card W.Point → sourceSupersingular p W →\n          orderOf (p : ZMod r) = 2 ∧ Module.finrank (ZMod p) (rootsField p r) = 2)) ∧\n    lowerThree.Δ ≠ 0 ∧ upperThree.Δ ≠ 0 ∧\n    Nat.card lowerThree.Point = 1 ∧ Nat.card upperThree.Point = 7 ∧\n    sourceSupersingular 3 lowerThree ∧ sourceSupersingular 3 upperThree ∧\n    actualTrace lowerThree = 3 ∧ actualTrace upperThree = -3 ∧\n    twoControl.Δ ≠ 0 ∧ sourceSupersingular 5 twoControl ∧\n    Nat.card twoControl.Point = 6 ∧ addOrderOf twoPoint = 2 ∧\n    Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 1 ∧\n    ¬ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 2 ∧\n    eightControl.Δ ≠ 0 ∧ sourceSupersingular 7 eightControl ∧\n    Nat.card eightControl.Point = 8 ∧ addOrderOf eightPoint = 8 ∧\n    Module.finrank (ZMod 7) (rootsField 7 (addOrderOf eightPoint)) = 2",
+        "start_byte": 440
+      },
+      "recorded_statement": "theorem prime_trace_weak_bound_certificate : (∀ (K : Type) [Field K] [Fintype K], 3 < Fintype.card K → ringChar K ≠ 2 → ∀ (W : WeierstrassCurve.Affine K), W.Δ ≠ 0 → 1 < Nat.card W.Point ∧ Nat.card W.Point < 2 * Fintype.card K + 1) ∧ (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → ∀ (W : WeierstrassCurve.Affine (ZMod p)), W.Δ ≠ 0 → (sourceSupersingular p W ↔ actualTrace W = 0) ∧ (sourceSupersingular p W → Nat.card W.Point = p + 1) ∧ (∀ (r : ℕ), 2 < r → r ∣ Nat.card W.Point → sourceSupersingular p W → orderOf (p : ZMod r) = 2 ∧ Module.finrank (ZMod p) (rootsField p r) = 2)) ∧ lowerThree.Δ ≠ 0 ∧ upperThree.Δ ≠ 0 ∧ Nat.card lowerThree.Point = 1 ∧ Nat.card upperThree.Point = 7 ∧ sourceSupersingular 3 lowerThree ∧ sourceSupersingular 3 upperThree ∧ actualTrace lowerThree = 3 ∧ actualTrace upperThree = -3 ∧ twoControl.Δ ≠ 0 ∧ sourceSupersingular 5 twoControl ∧ Nat.card twoControl.Point = 6 ∧ addOrderOf twoPoint = 2 ∧ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 1 ∧ ¬ Module.finrank (ZMod 5) (rootsField 5 (addOrderOf twoPoint)) = 2 ∧ eightControl.Δ ≠ 0 ∧ sourceSupersingular 7 eightControl ∧ Nat.card eightControl.Point = 8 ∧ addOrderOf eightPoint = 8 ∧ Module.finrank (ZMod 7) (rootsField 7 (addOrderOf eightPoint)) = 2",
+      "recorded_text_sha256": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+      "source_plan": "research/prime_trace_weak_bound_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "PrimeTraceWeakBoundAudit.prime_trace_weak_bound_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

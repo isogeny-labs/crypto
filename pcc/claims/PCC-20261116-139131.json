@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T22:18:18Z",
+ "id": "PCC-20261116-139131",
+ "kind": "theorem",
+ "producer": {
+  "commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "57cc2b00808b8cc772bc24c97bc79383662318942acb039f7d36a57461afdf8c",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+   "theorem": "CubicFiniteNorm22308.coefficient_cofactor_product"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.",
+ "statement": "theorem coefficient_cofactor_product (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientProduct x (cofactor x)=(coefficientNorm x,0,0)"
+}

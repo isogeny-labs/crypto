@@ -1,0 +1,39 @@
+from pathlib import Path
+import hashlib,json
+p=Path(__file__).resolve().parent;old=p.parent/'feature-balanced-reciprocal-lift';rows=[]
+for f in sorted(old.glob('*.rs')):
+ if f.name=='driver.rs':continue
+ (p/f.name).write_bytes(f.read_bytes());rows.append({'source':f.name,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+s=(old/'balanced-initial.rs').read_text().replace('BalancedCharacterImage','OrientedImage').replace('BALANCED_CHARACTER_COUNTS','ORIENTED_COUNTS').replace('CharacterBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?}','RadiusAnchorBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?,anchor:None}').replace('rounds:0,slot_cap','rounds:0,slot_cap,anchor:None')
+(p/'oriented-initial.rs').write_text(s)
+s=(old/'balanced-adapter.rs').read_text().replace('BalancedCharacterImage','OrientedImage').replace('BALANCED_CHARACTER_COUNTS','ORIENTED_COUNTS').replace('recover_balanced_character_image','recover_oriented_image');(p/'oriented-adapter.rs').write_text(s)
+s=(old/'balanced-checks.rs').read_text().replace('fn balanced_checks()','fn oriented_checks()').replace('BalancedCharacterImage','OrientedImage').replace('BALANCED_CHARACTER_COUNTS','ORIENTED_COUNTS').replace('recover_balanced_character_image','recover_oriented_image')
+s=s.replace('let(mut states,mut old_equal,mut retained,mut wrong,mut zero)=(0,0,0,0,0);','let(mut states,mut old_equal,mut retained,mut wrong,mut zero,mut strict,mut late)=(0,0,0,0,0,0,0);')
+s=s.replace('let mut old:Option<SeededImage>=None;','let mut old:Option<BalancedCharacterImage>=None;')
+a=s.index('    for j in 1..r as usize{');b=s.index('\n    let mut p=',a)
+s=s[:a]+'''    let anchor=(0..=t).find(|&v|obs[k as usize][v][1]!=0&&obs[k as usize][v][2]!=0);
+    for j in 1..r as usize{if chars[j]==sign&&(0..=t).all(|v|obs[j][v][0]==obs[k as usize][v][0]&&mul(obs[j][v][1],obs[j][v][2],r)==mul(obs[k as usize][v][1],obs[k as usize][v][2],r)&&(obs[k as usize][v][1]!=0||obs[j][v][1]==0)&&(obs[k as usize][v][2]!=0||obs[j][v][2]==0))&&anchor.map_or(true,|a|(a..=t).all(|v|mul(obs[k as usize][a][1],obs[j][v][1],r)==mul(obs[k as usize][v][1],obs[j][a][1],r))){roots.insert(images[j]);}}
+'''+s[b:]
+a=s.index('    if l%2==0{');b=s.index('\n    if k==0',a)
+s=s[:a]+'''    if let Some(prior)=&mut old{prior.update(&modes,b,&f).unwrap();}else{old=Some(BalancedCharacterImage::new(&modes,b,&f,slots,sign,64).unwrap());}
+    let prior=old.as_mut().unwrap().materialize(r as usize,r as usize).unwrap();assert_eq!(p.divrem(&prior,&got).unwrap().1,vec![0]);old_equal+=1;if got.len()<prior.len(){strict+=1;if t>0{late+=1;}}
+'''+s[b:]
+s=s.replace('let(mut public,mut odd_public,mut compatible,mut updates,mut guards)=(0,0,0,0,0);','let(mut public,mut odd_public,mut compatible,mut updates,mut guards,mut routes,mut calls)=(0,0,0,0,0,0,0);')
+s=s.replace('recover_certified_character_image','recover_balanced_character_image')
+a=s.index('assert_eq!((got.0,got.2),(old.0,old.2));');b=s.index('compatible+=1;',a)
+s=s[:a]+'''assert_eq!(old.0,Some(k));routes+=usize::from(got.2!=old.2);calls+=usize::from(got.1.calls!=old.1.calls);'''+s[b:]
+s=s.replace(' balanced_lift_checks();',' assert!(strict>0&&late>0);\n println!("strict_support_reductions={strict} subsequent_radius_reductions={late} public_route_changes={routes} public_call_changes={calls}");')
+s=s.replace('predecessor_support_equalities={old_equal}','predecessor_support_inclusions={old_equal}').replace('predecessor_public_equalities={compatible}','predecessor_public_comparisons={compatible}')
+(p/'oriented-checks.rs').write_text(s)
+s=(old/'driver.rs').read_text();s=s[:s.index('fn main(){')]+''.join('include!("'+n+'");\n' for n in ['oriented-pair.rs','oriented-image.rs','oriented-initial.rs','oriented-adapter.rs','oriented-checks.rs'])+'fn main(){if std::env::args().any(|x|x=="--inherited"){inherited_checks()}else{oriented_checks()}}\n'
+(p/'driver.rs').write_text(s)
+(p/'generation.json').write_text(json.dumps({'source_commit':'13f693c7c969ff894c7c63b5c110295d0d5f97e5','copied':rows},indent=2)+'\n')
+
+f=p/'oriented-checks.rs';s=f.read_text().replace('mut strict,mut late)=(0,0,0,0,0,0,0);','mut strict,mut late,mut anchor_strict,mut delayed)=(0,0,0,0,0,0,0,0,0);')
+a=s.index('    for j in 1..r as usize{');b=s.index('    let mut p=',a)
+s=s[:a]+"""    let mut zero_roots=std::collections::BTreeSet::new();
+    for j in 1..r as usize{if chars[j]==sign&&(0..=t).all(|v|obs[j][v][0]==obs[k as usize][v][0]&&mul(obs[j][v][1],obs[j][v][2],r)==mul(obs[k as usize][v][1],obs[k as usize][v][2],r)&&(obs[k as usize][v][1]!=0||obs[j][v][1]==0)&&(obs[k as usize][v][2]!=0||obs[j][v][2]==0)){zero_roots.insert(images[j]);if anchor.map_or(true,|a|(a..=t).all(|v|mul(obs[k as usize][a][1],obs[j][v][1],r)==mul(obs[k as usize][v][1],obs[j][a][1],r))){roots.insert(images[j]);}}}
+    anchor_strict+=usize::from(roots.len()<zero_roots.len());delayed+=usize::from(anchor.map_or(false,|a|a>0));
+"""+s[b:]
+s=s.replace('assert!(strict>0&&late>0);','assert!(strict>0&&late>0&&anchor_strict>0);').replace('strict_support_reductions={strict}', 'anchor_only_reductions={anchor_strict} delayed_anchor_states={delayed} strict_support_reductions={strict}')
+f.write_text(s)

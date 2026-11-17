@@ -1,0 +1,250 @@
+{
+  "main": "EllipticTranslationAudit.actual_elliptic_translation_certificate",
+  "binding": "2569e8f18530d274a7a60789d4a0a33f511b376793a856212a165811f5f72bb8",
+  "custom_imports": {
+    "AllMiller": "research/finite_point_evaluation_audit_20261115/lean/AllMiller.lean",
+    "BasechangeCertificate": "research/finite_point_evaluation_audit_20261115/lean/BasechangeCertificate.lean",
+    "BasechangeControls": "research/finite_point_evaluation_audit_20261115/lean/BasechangeControls.lean",
+    "BasechangeField": "research/finite_point_evaluation_audit_20261115/lean/BasechangeField.lean",
+    "BasechangeFunctions": "research/finite_point_evaluation_audit_20261115/lean/BasechangeFunctions.lean",
+    "BasechangeInfinity": "research/finite_point_evaluation_audit_20261115/lean/BasechangeInfinity.lean",
+    "BasechangeMiller": "research/finite_point_evaluation_audit_20261115/lean/BasechangeMiller.lean",
+    "BasechangeNorm": "research/finite_point_evaluation_audit_20261115/lean/BasechangeNorm.lean",
+    "BasechangePoints": "research/finite_point_evaluation_audit_20261115/lean/BasechangePoints.lean",
+    "ChartAdicValuation": "research/finite_point_evaluation_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartAlgebra": "research/finite_point_evaluation_audit_20261115/lean/ChartAlgebra.lean",
+    "ChartCertificate": "research/finite_point_evaluation_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/finite_point_evaluation_audit_20261115/lean/ChartFractionField.lean",
+    "ChartLocalization": "research/finite_point_evaluation_audit_20261115/lean/ChartLocalization.lean",
+    "ConstantDivisors": "research/finite_point_evaluation_audit_20261115/lean/ConstantDivisors.lean",
+    "ConstantKernel": "research/finite_point_evaluation_audit_20261115/lean/ConstantKernel.lean",
+    "DVRIdentification": "research/finite_point_evaluation_audit_20261115/lean/DVRIdentification.lean",
+    "DiscreteValuation": "research/finite_point_evaluation_audit_20261115/lean/DiscreteValuation.lean",
+    "DivisorDegree": "research/finite_point_evaluation_audit_20261115/lean/DivisorDegree.lean",
+    "DivisorEvaluation": "research/finite_point_evaluation_audit_20261115/lean/DivisorEvaluation.lean",
+    "EvaluationCertificate": "research/finite_point_evaluation_audit_20261115/lean/EvaluationCertificate.lean",
+    "EvaluationConstants": "research/finite_point_evaluation_audit_20261115/lean/EvaluationConstants.lean",
+    "EvaluationControls": "research/finite_point_evaluation_audit_20261115/lean/EvaluationControls.lean",
+    "EvaluationFormulas": "research/finite_point_evaluation_audit_20261115/lean/EvaluationFormulas.lean",
+    "FieldValuation": "research/finite_point_evaluation_audit_20261115/lean/FieldValuation.lean",
+    "FiniteControls": "research/finite_point_evaluation_audit_20261115/lean/FiniteControls.lean",
+    "FiniteDVR": "research/finite_point_evaluation_audit_20261115/lean/FiniteDVR.lean",
+    "FiniteFractionField": "research/finite_point_evaluation_audit_20261115/lean/FiniteFractionField.lean",
+    "FinitePointCertificate": "research/finite_point_evaluation_audit_20261115/lean/FinitePointCertificate.lean",
+    "FiniteRegular": "research/finite_point_evaluation_audit_20261115/lean/FiniteRegular.lean",
+    "FiniteValuation": "research/finite_point_evaluation_audit_20261115/lean/FiniteValuation.lean",
+    "FiniteZeros": "research/finite_point_evaluation_audit_20261115/lean/FiniteZeros.lean",
+    "FunctionDivisor": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisor.lean",
+    "FunctionDivisorCertificate": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisorCertificate.lean",
+    "FunctionEvaluation": "research/finite_point_evaluation_audit_20261115/lean/FunctionEvaluation.lean",
+    "GeometricCertificate": "research/finite_point_evaluation_audit_20261115/lean/GeometricCertificate.lean",
+    "GeometricControls": "research/finite_point_evaluation_audit_20261115/lean/GeometricControls.lean",
+    "GeometricDegree": "research/finite_point_evaluation_audit_20261115/lean/GeometricDegree.lean",
+    "GeometricFibers": "research/finite_point_evaluation_audit_20261115/lean/GeometricFibers.lean",
+    "GeometricMiller": "research/finite_point_evaluation_audit_20261115/lean/GeometricMiller.lean",
+    "GuardControls": "research/finite_point_evaluation_audit_20261115/lean/GuardControls.lean",
+    "InfinityEvaluation": "research/finite_point_evaluation_audit_20261115/lean/InfinityEvaluation.lean",
+    "InfinityMonic": "research/finite_point_evaluation_audit_20261115/lean/InfinityMonic.lean",
+    "LineEvaluation": "research/finite_point_evaluation_audit_20261115/lean/LineEvaluation.lean",
+    "LineIdeals": "research/finite_point_evaluation_audit_20261115/lean/LineIdeals.lean",
+    "LineMultiplicity": "research/finite_point_evaluation_audit_20261115/lean/LineMultiplicity.lean",
+    "LocalComparison": "research/finite_point_evaluation_audit_20261115/lean/LocalComparison.lean",
+    "LocalNegation": "research/finite_point_evaluation_audit_20261115/lean/LocalNegation.lean",
+    "LocalOrderAlgebra": "research/finite_point_evaluation_audit_20261115/lean/LocalOrderAlgebra.lean",
+    "LocalOriginEvaluation": "research/finite_point_evaluation_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "MillerFunctions": "research/finite_point_evaluation_audit_20261115/lean/MillerFunctions.lean",
+    "MillerStep": "research/finite_point_evaluation_audit_20261115/lean/MillerStep.lean",
+    "NegationCertificate": "research/finite_point_evaluation_audit_20261115/lean/NegationCertificate.lean",
+    "NegationControls": "research/finite_point_evaluation_audit_20261115/lean/NegationControls.lean",
+    "NegationCoordinate": "research/finite_point_evaluation_audit_20261115/lean/NegationCoordinate.lean",
+    "NegationDivisor": "research/finite_point_evaluation_audit_20261115/lean/NegationDivisor.lean",
+    "NegationField": "research/finite_point_evaluation_audit_20261115/lean/NegationField.lean",
+    "NegationNorm": "research/finite_point_evaluation_audit_20261115/lean/NegationNorm.lean",
+    "NegationValuation": "research/finite_point_evaluation_audit_20261115/lean/NegationValuation.lean",
+    "NormDegree": "research/finite_point_evaluation_audit_20261115/lean/NormDegree.lean",
+    "NormEvaluation": "research/finite_point_evaluation_audit_20261115/lean/NormEvaluation.lean",
+    "Normalization": "research/finite_point_evaluation_audit_20261115/lean/Normalization.lean",
+    "NormalizedUniqueness": "research/finite_point_evaluation_audit_20261115/lean/NormalizedUniqueness.lean",
+    "OrderBounds": "research/finite_point_evaluation_audit_20261115/lean/OrderBounds.lean",
+    "OriginEvaluation": "research/finite_point_evaluation_audit_20261115/lean/OriginEvaluation.lean",
+    "PointDivisor": "research/finite_point_evaluation_audit_20261115/lean/PointDivisor.lean",
+    "PointLocalization": "research/finite_point_evaluation_audit_20261115/lean/PointLocalization.lean",
+    "PointResidue": "research/finite_point_evaluation_audit_20261115/lean/PointResidue.lean",
+    "PolynomialValues": "research/finite_point_evaluation_audit_20261115/lean/PolynomialValues.lean",
+    "RationalControls": "research/finite_point_evaluation_audit_20261115/lean/RationalControls.lean",
+    "RecursionCertificate": "research/finite_point_evaluation_audit_20261115/lean/RecursionCertificate.lean",
+    "RecursionControls": "research/finite_point_evaluation_audit_20261115/lean/RecursionControls.lean",
+    "ResidueNormalization": "research/finite_point_evaluation_audit_20261115/lean/ResidueNormalization.lean",
+    "SplitPolynomialDivisors": "research/finite_point_evaluation_audit_20261115/lean/SplitPolynomialDivisors.lean",
+    "UnitEvaluation": "research/finite_point_evaluation_audit_20261115/lean/UnitEvaluation.lean",
+    "ValuationCertificate": "research/finite_point_evaluation_audit_20261115/lean/ValuationCertificate.lean",
+    "PicardCertificate": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCertificate.lean",
+    "PicardControls": "research/elliptic_picard_bridge_audit_20261115/lean/PicardControls.lean",
+    "PicardCriterion": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCriterion.lean",
+    "PicardMaximal": "research/elliptic_picard_bridge_audit_20261115/lean/PicardMaximal.lean",
+    "PicardQuotient": "research/elliptic_picard_bridge_audit_20261115/lean/PicardQuotient.lean",
+    "PicardReduction": "research/elliptic_picard_bridge_audit_20261115/lean/PicardReduction.lean",
+    "PicardRegular": "research/elliptic_picard_bridge_audit_20261115/lean/PicardRegular.lean",
+    "PicardSimplePole": "research/elliptic_picard_bridge_audit_20261115/lean/PicardSimplePole.lean",
+    "TranslationAction": "research/elliptic_translation_audit_20261115/lean/TranslationAction.lean",
+    "TranslationCertificate": "research/elliptic_translation_audit_20261115/lean/TranslationCertificate.lean",
+    "TranslationCoordinate": "research/elliptic_translation_audit_20261115/lean/TranslationCoordinate.lean",
+    "TranslationDivisors": "research/elliptic_translation_audit_20261115/lean/TranslationDivisors.lean",
+    "TranslationExample": "research/elliptic_translation_audit_20261115/lean/TranslationExample.lean",
+    "TranslationExampleField": "research/elliptic_translation_audit_20261115/lean/TranslationExampleField.lean",
+    "TranslationGeneration": "research/elliptic_translation_audit_20261115/lean/TranslationGeneration.lean",
+    "TranslationGeneric": "research/elliptic_translation_audit_20261115/lean/TranslationGeneric.lean",
+    "TranslationNaturality": "research/elliptic_translation_audit_20261115/lean/TranslationNaturality.lean",
+    "TranslationPicard": "research/elliptic_translation_audit_20261115/lean/TranslationPicard.lean",
+    "TranslationReciprocal": "research/elliptic_translation_audit_20261115/lean/TranslationReciprocal.lean",
+    "TranslationTranscendence": "research/elliptic_translation_audit_20261115/lean/TranslationTranscendence.lean"
+  },
+  "claims": [
+    {
+      "declaration": "EllipticTranslationAudit.generic_point_not_constant",
+      "conclusion": "Actualgenericpointoutsideactualconstantpointimage."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translated_x_transcendental",
+      "conclusion": "Derivedactualtranslatedgenericabscissatranscendence."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translation_coordinate_injective",
+      "conclusion": "Actualnorm-productderivescoordinatehomtoFFinjection."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.fieldTranslation",
+      "conclusion": "Actualfraction-fieldlift."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.coefficientPointMap",
+      "conclusion": "ExplicitactualofficialPoint.mapinterface."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_point_generic",
+      "conclusion": "Actualconstructedfieldmapsendsactualgenericpointtoactualtranslate."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_point_translated",
+      "conclusion": "Actualpointmapcompositionontranslatedgenericpoint."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.function_hom_ext",
+      "conclusion": "Actualcoefficient/x/y/basis/fractiongeneration."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_translation_comp",
+      "conclusion": "ActualFFcompositionQ+R."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_translation_zero",
+      "conclusion": "ActualFFzeroidentity."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.fieldTranslationEquiv",
+      "conclusion": "ActualFFRingEquiv/actual−Qinverse."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_translation_equiv_symm_apply",
+      "conclusion": "Actualexplicitinverseformula."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.field_translation_faithful",
+      "conclusion": "ActualFFtranslationfaithfulness."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.divisor_translation_point_sum",
+      "conclusion": "ActualintegerdivisorpointsumschangebydegreeQ."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.divisor_translation_principal_iff",
+      "conclusion": "ActualprincipaldivisortransportderivedfromactualPicardcriterion."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translated_principal_has_function",
+      "conclusion": "Actualfunctionexistenceonly; no assertedidentitywithspecificFFpullback."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.picard_translation_identity",
+      "conclusion": "ActualinducedgeometricPicardquotientactionidentity."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translation_example_field_formula",
+      "conclusion": "CreditedactualsourceFFformula1/x,-y/x²."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.reciprocal_x_not_coordinate_image",
+      "conclusion": "Actualinversexexcludedfromactualaffineringimage."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translation_example_not_affine_coordinate",
+      "conclusion": "ConcreteactualACF5/CharP5/nonsingularcurve/actualFFtranslationdoesnotpreserveaffinering."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.raw_example_at_q_wrong",
+      "conclusion": "ActualF5deletedaffineguardcounteratQ."
+    },
+    {
+      "declaration": "EllipticTranslationAudit.translation_example_guarded_positive",
+      "conclusion": "ActualF5ordinarypositiveP2→S3."
+    }
+  ],
+  "prior_reused_claims": [
+    "Actualgenericx/yfunctioncurveequation/normvaluation/nonzeropoles and coordinate norm-product",
+    "Official Point.map and actual pointBaseChange injection/addition",
+    "Actual elliptic Picard/AddEquiv/principaliffdegree0pointsum0 and actual infinity norm-degree exclusion"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 82,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "canonical_localization_algebra_and_smul": true,
+    "actual_official_Point_map_and_add_some_adapters": true,
+    "actual_generic_point_nonconstant_and_transcendence_derived": true,
+    "actual_norm_coordinate_injectivity_derived": true,
+    "actual_fraction_field_translation": true,
+    "actual_FF_RingEquiv_explicit_inverse_composition_faithful": true,
+    "actual_coefficient_fixing_and_generic_point_compatibility": true,
+    "actual_integer_divisor_translation_degree_pointsum_formula": true,
+    "actual_principal_preservation_via_proved_Picard_criterion": true,
+    "actual_induced_Picard_action_identity": true,
+    "actual_source_FF_formula": true,
+    "actual_ACF5_CharP5_nonsingular_translation_not_affine_coordinate_ring": true,
+    "actual_F5_raw_affine_Q_counter": true,
+    "actual_F5_guarded_positive": true,
+    "supplied_transcendence_injectivity_inverse_or_action_premise": false,
+    "all_local_order_residue_pullback": false,
+    "divisor_pushforward_Q_would_match_FF_pullback_negative_Q_not_assumed": true,
+    "general_basefield_descent": false,
+    "linebundle_Scheme_comparison": false,
+    "canonical_pairing_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

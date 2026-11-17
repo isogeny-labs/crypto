@@ -1,0 +1,19 @@
+................................F................
+======================================================================
+FAIL: test_gate_passes_on_the_committed_tree (__main__.Committed.test_gate_passes_on_the_committed_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/test_validation_gate.py", line 413, in test_gate_passes_on_the_committed_tree
+    self.assertEqual(g.check(REPO), [])
+AssertionError: Lists differ: ['benchmarks 20261023-volcano-gap-speedups[4235 chars]eze'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'benchmarks 20261023-volcano-gap-speedups: unvalidated: validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/session/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/external_ca.jsonl: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rho-lanes/external_ca.jsonl is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard0/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard0/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard1/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard1/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard2/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-shard2/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-aa/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-aa/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-bsgs/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/speedups-20261023/rerun-sharded/sessions/spec-bsgs/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-aa/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-aa/records.jsonl.gz is not a file; validator report raw_data ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-bsgs/records.jsonl.gz: ../../research/deep_volcano_prime_gap_20261022/run/sessions/spec-bsgs/records.jsonl.gz is not a file; row is not in the pre-gate freeze'
+
+Diff is 4629 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 49 tests in 1.412s
+
+FAILED (failures=1)

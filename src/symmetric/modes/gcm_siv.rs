@@ -51,7 +51,7 @@ use super::cipher::BlockCipher128;
 use crate::symmetric::aes::AesKey;
 
 #[inline]
-fn enc<C: BlockCipher128>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
+fn enc<C: BlockCipher128 + ?Sized>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
     let mut b = *block;
     cipher.encrypt_block(&mut b);
     b
@@ -154,7 +154,7 @@ pub fn polyval(h: &[u8; 16], data: &[u8]) -> [u8; 16] {
 
 /// Generic key derivation.  Returns `(auth_key, enc_key_bytes)`.
 /// `enc_key_len` is 16 or 32 per RFC 8452.
-fn derive_key_bytes<C: BlockCipher128>(
+fn derive_key_bytes<C: BlockCipher128 + ?Sized>(
     master: &C,
     nonce: &[u8; 12],
     enc_key_len: usize,
@@ -201,7 +201,11 @@ fn length_block(aad_len: usize, pt_len: usize) -> [u8; 16] {
     lb
 }
 
-fn ctr_encrypt<C: BlockCipher128>(cipher: &C, init_ctr: &[u8; 16], data: &[u8]) -> Vec<u8> {
+fn ctr_encrypt<C: BlockCipher128 + ?Sized>(
+    cipher: &C,
+    init_ctr: &[u8; 16],
+    data: &[u8],
+) -> Vec<u8> {
     let mut ctr = *init_ctr;
     let mut out = Vec::with_capacity(data.len());
     let mut idx = 0;
@@ -238,7 +242,7 @@ pub fn gcm_siv_encrypt_with<M, C, F>(
     new_cipher: F,
 ) -> Vec<u8>
 where
-    M: BlockCipher128,
+    M: BlockCipher128 + ?Sized,
     C: BlockCipher128,
     F: Fn(&[u8]) -> C,
 {
@@ -273,7 +277,7 @@ pub fn gcm_siv_decrypt_with<M, C, F>(
     new_cipher: F,
 ) -> Option<Vec<u8>>
 where
-    M: BlockCipher128,
+    M: BlockCipher128 + ?Sized,
     C: BlockCipher128,
     F: Fn(&[u8]) -> C,
 {

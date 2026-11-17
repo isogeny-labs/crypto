@@ -1,0 +1,12 @@
+digraph failures {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.35",ranksep="0.25"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,fillcolor="#fff0e7",color="#885e48"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#49616c"];
+  s [label="Static01 / 336266\nClippy: indexed loop\nRemedy: enumerate iterator"];
+  l [label="Lean01 / 21c177\nreserved identifier partial\nRemedy: partialAction"];
+  b [label="Binding02 / a31d7b\nlean/lake missing from PATH\nRemedy: export elan PATH"];
+  ok [label="Full35 / f04008 · all623 hashes unchanged\nGate02:6 · bound03:6 local passes\nNo trusted native · scientific standing unsigned",fillcolor="#e5f2e8",color="#49616c"];
+  s -> ok;
+  l -> ok;
+  b -> ok;
+}

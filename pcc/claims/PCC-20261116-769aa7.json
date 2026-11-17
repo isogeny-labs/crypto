@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:22:41Z",
+ "id": "PCC-20261116-769aa7",
+ "kind": "statement",
+ "producer": {
+  "commit": "e398666199bdf5f1987ee7f5b7f796cb85a29092",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-04"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-setup-02-u3.json",
+    "sha256": "a334c238593e7240d3a289b30b74f28dc7c247e1380d85c5254e682beab7d50a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-qualify-02-u3-all.json",
+    "sha256": "2e2e4bb436cd221669a1a5e11c9605451c1e260243f02055717aa4d35d330a02"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_field_transfer_goal_20261116/round-04",
+ "statement": "Round04 version02 primitive-remainder arithmetic reproduces the version01 u3 exact model and full all18-input JSONL qualification byte for byte; both version02 calls exit0. This checks the small fixture against the preserved prior implementation, not independent execution or a scaling claim."
+}
