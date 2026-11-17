@@ -1925,3 +1925,10 @@ What was done: built g2/3/4 truncated coefficient recurrence vs exact division p
 Decisions made: fixed g4fixture is algebra-only, no subgroup order/target solve inference; two measured repeats, all nonsplits retained, Gitfreeze before once-only120CPU invocation. Assertions [pcc:unverified]. Sources: vieta GENERALIZATION and KB source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md, revision9b2119e8fbac482b98b50521c0d604bb.
 Open threads: run after push, inspect multiplicity and component costs; full originalgenus2+10xgoal unchanged.
 Errors: signed degree comparison compile error fixed before freeze; nonzero-x base rule declared before execution to avoid fixed-orbit base.
+
+## Three-genus truncated quotient qualified
+
+What was done: freeze3fe6d38b1b9 once-onlyexit0;1680exactquotient/principalidentity/bruteoracle cases, allsplit nativegroup checks and repeatedcostvectors pass. g3 split75/nonsplit700,repeated2;g4 split28/nonsplit644,repeated3; knownroot overlaps allgenera. Component extract+oracle REDC reductions86.16/55.45/22.58percent(g2/3/4). Assertions [pcc:unverified].
+Decisions made: retain exact recurrence for qualified binomial fixtures; nofullpipeline/neworiginalg4target coverage. G4cubicoracle and g2certificate construction remain bottlenecks.
+Open threads: screen prior residual/LP reuse before new nonsplit mechanism; complete originaltarget collector/setup/certificate changes for10x, independentreview/publicationartifacts.
+Errors: none in execution,no retry/S3/cloud.
