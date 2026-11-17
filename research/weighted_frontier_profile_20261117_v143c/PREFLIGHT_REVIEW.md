@@ -1,0 +1,5 @@
+# Profile preflight correction before execution
+
+The frozen bprofile would generate unrelated random coefficient families but reuse a direction certified for the historical family. A nonzero historical slope does not guarantee a nonzero slope on a new family. This was caught by review before registration/execution. Preserve the bsource and original manifest freeze;withdraw only its still-unregistered plan from the mutable schedule.
+
+Fresh cprofile replays the C139family RNG exactly:family construction,one nonzero scale draw,then six controls with nine field draws each. It verifies both regenerated R0and both variation rows against the immutable recorded certificate before normalizing it. Numerical positive-control translation and full tiny root comparison therefore use the same concrete certified coefficient family,not a new unrelated slope assumption. The historical initial family can be translated along its nonzero certified direction to make c=0at the origin;all costs/counts are recorded. No old raw/source is overwritten. The exhaustive weighted bkernel/oracles remain unchanged.

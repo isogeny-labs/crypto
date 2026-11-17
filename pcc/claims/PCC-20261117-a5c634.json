@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T04:45:19Z",
+ "id": "PCC-20261117-a5c634",
+ "kind": "statement",
+ "producer": {
+  "commit": "5c118f3c9481c74e62168277bd317f32f86903a9",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/opaque_km.cpp",
+    "sha256": "08127ef172794e963776b9b226d28dbad2631a8a7e3c5faa2bbff50d5f5a04b1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/OPAQUE_KM_PROTOCOL.md",
+    "sha256": "9c99d4bc342de0df0d95ac4ede92e33ef0694704c8127e7bf7588d2e5ad4d0cc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/opaque-km-panel-v1/result.json",
+    "sha256": "bf9d2d297ff2f86109a9766bdff18ddf552ecd761f4017e09ad84f431f0cc7de"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-opaque-km",
+ "statement": "Producer full opaque-KM extraction/reverse panel passes identity, the pullG image, its KM double, the generic source-point image and the actual target point1 class. Every extracted effective degree3 divisor reencodes its opaque input, and reverse outputs equal the exact expected source classes; off-ambient, changed-y and changed-result controls reject. Fixed data/source/protocol retained, no scalar recovery or independent verification."
+}

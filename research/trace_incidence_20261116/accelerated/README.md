@@ -1,9 +1,16 @@
 # Native acceleration candidates
 
+The [local runtime measurement](../measure_20261117/README.md) is complete.
+At B128 the new Bloom pair path gives a5.27× median paired improvement over the
+prior pair control; composition gives4.99× over same-generator Horner. The new
+pair path remains3.06× the registered rho cost. These are provisional local
+measurements, separate from the old Runpod data. [pcc:unverified]
+
 This sibling extends the incidence and pool-generation stage; the historical,
 native and closed Runpod sources remain frozen. The candidates are implemented
-for public synthetic prime-field inputs with prime p,r below 2^62. New runtime
-gains have not been measured. `PROTOCOL.json` defines the matched Runpod test.
+for public synthetic prime-field inputs with prime p,r below 2^62.
+`PROTOCOL.json` defines the parent Runpod test; the linked local amendment and
+explicit user exception define the completed local run.
 
 The baseline is the existing native quotient/Horner/GCD solver with actual
 random mixed-labelled pools. The strongest existing generic control is the
