@@ -316,3 +316,176 @@ completely decomposable Jacobians", arXiv 2604.18074 (2026) (title only checked)
 is a route from SMALLER genus to a (often non-hyperelliptic) higher genus; for DLP it goes the
 wrong way (makes the instance bigger), except that a split Jacobian lets the DLP be solved in
 the factors (Frey-Kani), which is a reduction, not IC.
+
+## 6. Curves with special structure that make IC faster
+The one parameter that controls the exponent in every fixed-g, q -> infinity method above is
+the RESIDUAL DEGREE e (number of points that must land in the factor base once the relation
+is pinned through two chosen points): exponent 2 - 2/e. Rho is q^(g/2). Special structure
+helps if it lowers e, shrinks the factor base by symmetry, or adds free relations.
+
+### 6a. Small plane models (smooth or nodal)
+- Smooth plane curves of degree d have genus (d-1)(d-2)/2 and e = d-2 (Diem 2006/2012):
+  d=4: g=3, exponent 1 (rho 1.5); d=5: g=6, exponent 4/3 (rho 3); d=6: g=10, exponent 3/2
+  (rho 5); d=7: g=15, exponent 8/5 (rho 7.5). [exponents: direct substitution in the
+  abstract-checked Diem formula]. Smooth plane quintics are codimension 3 in M_6, sextics
+  codim 8 in M_10, septics codim 15 in M_15 (dimension count: plane curves of degree d,
+  (d+1)(d+2)/2 - 1 - 8 moduli, vs 3g-3) [inference].
+- Nodal plane models: degree d with delta nodes has geometric genus (d-1)(d-2)/2 - delta and
+  the same e = d-2 (JTNB 2012 condition: a line cutting d distinct rational points; singular
+  points handled by working on the normalisation). Genus 4: plane quintic with 2 nodes
+  (projection of the canonical curve from a point on it), e=3, exponent 4/3. Genus 5: plane
+  sextic with 4 nodes (g+1 model) or, for the general curve, Brill-Noether min degree 6 again;
+  e=4, exponent 3/2. Genus 6: general curve is a plane sextic with 4 nodes, e=4, 3/2.
+  Lines through a node meet the curve at the node with multiplicity 2: such lines must be
+  avoided or handled (two branches = two places).
+- Brill-Noether minimum plane degree for a general curve d = ceil(2g/3)+2 (see sec. 2a), the
+  practical issue being an F_q-rational g^2_d.
+
+### 6b. Gonality: trigonal, tetragonal
+- Gonality alone does NOT lower e for the line method. What gonality gives:
+  (i) free relations: each completely split fibre of the degree-k map is linearly equivalent
+  to the fibre at infinity (~q/k! such relations; the hyperelliptic case k=2 is the usual
+  P + iota(P) trick halving the factor base). For k=3 this eliminates ~q/6 of ~q unknowns;
+  minor (constant-factor) lever. [inference]
+  (ii) trigonal curves have a Maroni-invariant scroll model; the plane model of a
+  trigonal genus-g curve of the form y^3 + a(x)y^2 + b(x)y + c(x) has degree about (g+3)/2..g+1
+  depending on Maroni invariant [UNVERIFIED-memory], not better than Brill-Noether general.
+  (iii) Diem-Kochinke show special-linear-system (pencil) methods FAIL for hyperelliptic curves
+  (the g^1_2 composes everything); for trigonal curves the g^1_3 is a special linear system
+  that could be used, but its exact payoff is UNVERIFIED.
+- C_ab curves (affine y^a + ... + x^b, single place at infinity, genus (a-1)(b-1)/2):
+  the semigroup <a,b> controls Riemann-Roch spaces L(n*inf). Using functions in L(n*inf)
+  with l(n*inf) = r+1 >= 3, residual e = #gaps of <a,b> up to n. Example C_{3,4} (g=3):
+  n=4, functions 1,x,y, gaps {1,2}, e = 2 -- the same as quartic lines. C_{3,5} (g=4):
+  n=5 gives 1,x,y (pole orders 0,3,5), gaps {1,2,4}, e = 3, exponent 4/3. C_{4,5} (g=6): n=5
+  gives 1,x,y (0,4,5), gaps {1,2,3}, e = 3, exponent 4/3 (C_{4,5} is a plane quintic with a
+  singularity at infinity -- consistent with 6a). C_{3,7} (g=6): n=6: 1,x,x^2 is composed with
+  the trigonal map (useless); n=7: 1,x,y,x^2 (0,3,6,7) r=3, gaps <=7: {1,2,4,5} e=4; so
+  trigonal C_{3,b} are worse than C_{4,5} at the same genus. [semigroup arithmetic by this note;
+  the general "gaps up to n" rule is the Riemann-Roch count, not quoted from a paper]
+  Lesson: balanced a < b with a ~ b ~ sqrt(2g) minimises e (using L(b*inf) = <1,x,y>,
+  e = b-2 = plane degree minus 2). That is the C_ab shape EGT exploit for L(1/3) (deg_X * deg_Y ~ g).
+- Superelliptic y^n = f(x), deg f = m: genus ~ (n-1)(m-1)/2 (for coprime n,m); plane degree
+  max(n,m); balanced n ~ m ~ sqrt(2g) gives e ~ sqrt(2g) - 2. These are special (very
+  low-dimensional moduli) but give the best exponents per genus among explicit families:
+  g=10 via y^5=f(x), deg 6? (genus (4)(5)/2=10, plane degree 6, e=4, exponent 3/2) [inference].
+- Picard curves y^3 = x^4 + ... (genus 3, C_{3,4}): already quartics, e=2, O~(q); extra
+  automorphism of order 3 when q = 1 mod 3 (6c).
+
+### 6c. Automorphisms and Frobenius (orbit reduction)
+- If an automorphism group G (defined over F_q) acts on the prime-order subgroup by scalars,
+  the factor base can be taken modulo G-orbits: factor-base size /|G|, relation search
+  ~/|G|, linear algebra ~/|G|^2, while rho gains only sqrt(|G|) [standard; Duursma-Gaudry-Morain
+  1999 for rho; for IC e.g. S. Tsakou, S. Ionica, "Index calculus attacks on hyperelliptic
+  Jacobians with effective endomorphisms", J. Math. Cryptol. / ePrint 2021/721,
+  https://eprint.iacr.org/2021/721 **[abstract-checked]**: endomorphism used to shrink the
+  factor base for ordinary elliptic and genus-2 Jacobians, gain on total complexity at the
+  cost of extra factor-base work]. "Extending the GLS endomorphism" (arXiv 2106.09967)
+  reports a factor-n speed-up of IC in a GHS setting and a factor-555 speed-up in its
+  experiments (snippet-checked, setting not confirmed).
+- Plane quartics with large automorphism groups (Picard: Z/3; Fermat/Klein-type: up to 168
+  over F_qbar, but these are isolated in moduli, so only twists exist) -- for a lab benchmark
+  family, Picard curves (Z/3 or Z/6 with the hyperelliptic-like involution absent) and
+  superelliptic y^n = f(x) (Z/n) give constant-factor orbit gains |G| in relation search,
+  |G|^2 in linear algebra.
+- Subfield (Koblitz-type) curves defined over F_p, attacked over F_{p^n}: Frobenius orbits
+  give a factor ~n. Not relevant to prime-field instances.
+
+## 7. Canonical-curve methods for g = 4..16
+- Canonical embedding: non-hyperelliptic C -> P^(g-1), degree 2g-2. Hyperplanes = canonical
+  divisors (zeros of holomorphic differentials). A hyperplane through g-1 chosen points is
+  unique for points in general position; residual e = (2g-2)-(g-1) = g-1 (Bezout/Riemann-Roch).
+  Each relation: H.C - H0.C = div(h/h0), so sum of 2g-2 points ~ fixed canonical divisor.
+- Oyono-Theriault 2023 (above) analyse exactly this: O(q^(2-2/(g-1)+eps)) for all
+  non-hyperelliptic curves; relation search stops after ~B^2 hyperplanes even though
+  hyperplanes are pinned through g-1 points (they choose hyperplanes through only 2 FB points
+  plus a free (g-3)-dimensional parameter? -- three selection strategies; detail UNVERIFIED).
+  NOTE the "B^2 hyperplanes" phrase means the candidate count is still quadratic in B; a
+  hyperplane through 2 FB points has (g-3) free parameters and residual 2g-4, which would
+  be worse; so the residual-(g-1) count requires pinning g-1 points with B^(g-1) candidates,
+  of which only ~B^2 are needed. [interpretation; check against full text]
+- Comparison with plane models: projecting the canonical curve from g-3 of its points gives
+  the degree-(g+1) plane model and the same e = g-1, so canonical = Diem's g+1 plane model
+  asymptotically (Oyono-Theriault's stated conclusion). Advantages of canonical: no
+  singular points (the plane model has nodes from the projection), works for ALL
+  non-hyperelliptic curves (removes "sufficiently general"), symmetric treatment.
+  Cost per candidate: computing the residual requires intersecting a hyperplane with g-2
+  quadrics/cubics (ideal of the canonical curve; Petri: generated by quadrics for g >= 5 unless
+  trigonal or plane quintic), i.e. solving a 0-dimensional system of degree g-1 -- reducible
+  to one univariate polynomial of degree g-1 via elimination: cost poly(g) per candidate,
+  comparable to the plane-line case where one substitutes the line into F(x,y) and divides out
+  the known roots (polynomial of degree d-2).
+- Beating g-1 requires leaving the canonical system: Diem-Kochinke pencils (e = g-2 for
+  nearly all curves with g >= 5) or a plane model of degree ceil(2g/3)+2 (e = ceil(2g/3),
+  unproven as an algorithm, needs a rational g^2_d).
+- Numbers vs rho (exponent in q; rho = g/2):
+  g=4: canonical 4/3 (rho 2); g=5: 3/2, pencils 4/3 (rho 2.5); g=6: 8/5, pencils 3/2 (rho 3);
+  g=8: 12/7, 5/3 (rho 4); g=12: 20/11, 9/5 (rho 6); g=16: 28/15, 13/7 (rho 8).
+  As g grows, the IC exponent tends to 2 while rho grows linearly, so the absolute gap
+  q^(g/2 - 2) explodes; the hidden constants (factorials in splitting probability 1/e!,
+  poly(g) factors, and the linear algebra over a factor base of size ~q^(1-1/e)) dominate
+  at practical q.
+- Splitting probability of a degree-e residual: ~1/e!. For e = 15 (g=16 canonical) that is
+  ~7.6e-13: each relation costs ~10^12 candidates beyond the q-power count. This e! factor is
+  what makes high-genus IC slow in practice and is the main "hidden constant" to attack
+  (sec. 10) [arithmetic].
+
+Addendum to 2a: Diem's publications page lists, with Kochinke, "Ordinary plane models and
+completely split divisors" (abstract not located), and Kochinke's thesis "Special Linear Systems
+on Curves and Algorithmic Applications", Univ. Leipzig (2017) (catalogue record only). A search
+snippet describes the pencils paper as using plane models intersected with lines through
+factor-base points, i.e. still a line-based method on a cleverly chosen (singular) plane model
+[snippet-checked; exact construction UNVERIFIED]. Diem's page:
+https://www.math.uni-leipzig.de/~diem/preprints/english.html .
+
+## 8. Record and reported computations (non-hyperelliptic IC)
+Few public "records" exist; the field moved on once O~(q) for quartics was established.
+- Diem-Thome (J. Cryptology 2008): experiments supporting the single heuristic assumption, and
+  "experimental data showing a variant is faster than rho even for small group sizes"
+  **[abstract-checked]**; exact sizes UNVERIFIED (full text not fetched).
+- Laine-Lauter (J. Math. Cryptol. 9(2):95-114, 2015; ePrint 2014/346,
+  https://eprint.iacr.org/2014/346): C++ implementation of a Diem variant; experiments for
+  small q match predicted constants; ~370 bytes per graph vertex memory; time-memory trade-off
+  and parallelisation **[abstract/snippet-checked]**. They make the hidden log-factors and
+  constants in O~(q) explicit -- the best available source for calibrating a lab baseline for
+  genus-3 quartics.
+- Joux-Vitse, "Cover and decomposition index calculus on elliptic curves made practical:
+  application to a previously unreachable curve over F_{p^6}", EUROCRYPT 2012, LNCS 7237;
+  ePrint 2011/020, https://eprint.iacr.org/2011/020 . **[snippet-checked]** 149-bit elliptic
+  group over a degree-6 extension, ~110,000 CPU-hours; combines a GHS/Diem cover to a
+  higher-genus curve over a subfield with decomposition index calculus. Whether the cover
+  curve is non-hyperelliptic: UNVERIFIED (memory: a genus-3 cover over F_{p^2}, likely
+  hyperelliptic). It is the largest published IC computation touching genus-3 Jacobians.
+- Gaudry 2000 (hyperelliptic, for contrast): a genus-6 hyperelliptic cryptosystem broken by IC
+  (EUROCRYPT 2000, https://www.iacr.org/archive/eurocrypt2000/1807/18070019-new.pdf).
+- No public DLP record found for non-hyperelliptic genus >= 4 via line/hyperplane IC
+  (search negative; treat as "none known to this note").
+Lab implication: a genus-3 quartic record at, e.g., q ~ 2^40..2^50 (group ~2^120..2^150,
+rho ~2^60..2^75 vs IC ~2^40..2^50 x constants) would itself be new data.
+
+## 9. 2015-2026 work, including negative results
+- Laine-Lauter 2015 (above): constants and trade-offs for genus-3 quartics.
+- Oyono-Theriault 2023 (FFA 102227): canonical/non-planar IC, same exponent 2-2/(g-1)+eps for
+  ALL non-hyperelliptic curves; Nagao graph with fixed factor base; curve sieving adapted.
+- Diem-Kochinke (preprints ~2013, thesis 2017): 2-2/(g-2) heuristic, g >= 5, nearly all curves.
+- Tian 2021 (J. Cryptology): (l,l,l)-isogenies genus-3 hyperelliptic -> non-hyperelliptic, O~(l^3).
+- Dina-Ionica 2023 (Math. Comp.): CM fields with both hyperelliptic and non-hyperelliptic
+  Jacobians with CM by Z_K: 14 of 547,156 sextic CM fields.
+- NEGATIVE: Naranjo-Pirola 2018 (Adv. Math.): very general hyperelliptic Jacobian of genus
+  >= 4 is not isogenous to any non-hyperelliptic Jacobian -> no generic Smith-style transfer
+  for g >= 4.
+- NEGATIVE (implicit): Diem-Kochinke show special linear systems fail for hyperelliptic curves.
+- NEGATIVE (regime): L(1/3) methods (EG 2007, EGT 2011) need g large relative to log q; no
+  benefit at fixed g in 3..16 for cryptographic q.
+- Tsakou-Ionica 2021 (ePrint 2021/721): endomorphism orbit reduction of the factor base
+  (elliptic and genus 2; method transfers to any curve with an F_q-rational automorphism).
+- Derickx-Terao 2026 (arXiv 2602.17417, ANTS XVII): practical Hess-style class group and
+  gonality computation, orders-of-magnitude speed-ups for large genus / residue field.
+- Macri-Jacobson-Scheidler 2026 (WAIFI, arXiv 2605.15323): faster Hess-style Jacobian
+  arithmetic for arbitrary global function fields (affects rho baselines and descent).
+- Bruin-Kulkarni 2025 (Canad. J. Math.): (2,2)-decomposable genus-4 Jacobians; generalized
+  Howe curves of genus 4-6 with completely decomposable Jacobians (arXiv 2604.18074, 2026):
+  decomposable Jacobians reduce DLP to factors (structure lever, not IC).
+- Not found: any improvement of the exponent for genus-3 quartics below 1 (O~(q) appears
+  optimal for double-large-prime IC because the factor base must contain ~q^(1/2) points and
+  the relation graph needs ~q edges); any published IC exponent for general g below 2-2/(g-2).

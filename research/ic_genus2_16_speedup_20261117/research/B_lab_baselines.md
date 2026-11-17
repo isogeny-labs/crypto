@@ -1,6 +1,6 @@
 # B. Lab baselines for index calculus on genus 2..16 (survey, 2026-11-17)
 
-Status: IN PROGRESS (outline written first; sections appended as read).
+Status: complete; sections were appended in reading order (1, 1.1b and 1.2 are instruments; 2.x measurements).
 Sources: pre-deletion tree `c0b657b6d5` (read via git show), current tree.
 Citations: all numbers below are lab measurements quoted from files; none were
 re-run here, so each is `[pcc:unverified]` unless a pcc claim id is quoted.
@@ -410,3 +410,153 @@ All Python or standalone instruments, `[pcc:unverified]`, counted FPM:
   e.g. 0.981 (g=4 one model), 1.11-1.17 (g=6) -- **void**: duplicate lines
   counted as relations (INCONCLUSIVE-instrument). This is the only genus-6
   relation collection found anywhere, and it is invalid.
+
+## 3. Tried and closed (genus >= 2)
+
+From the closed-routes map `c0b657b6d5:research/ic_mega_pass_20261031/brief/MAP_closed.json`
+(116 items; schema MAP_closed.v1):
+- `TREAT-frontier-measurement`: 4,848 priced executions, no IC arm below rho
+  on any prime-field or prime-degree binary *elliptic* curve; "weak
+  extension-field families DO cross rho: genus-3 GHS (exponent ~1.356 vs 1.5),
+  plane quartics ...".
+- `LEAD-TRF-same-field-genus-g-embedding` (closed_obstructed, theorem):
+  `#Jac(C)(F_p) = N * #A(F_p)`, `#A = Theta(N^{g-1})`; same-field genus-g
+  embeddings never help ("never revisit for same-field covers").
+- `LEAD-EXO-split-jacobian-projection` (closed_obstructed).
+- `LEAD-TRF-small-genus-cover-general` (closed_obstructed, proof): only the JV
+  configuration gives g <= 3 among 2-torsion Kummer covers of E/F_{q^3}
+  (others g in {1,7,9,13}); for E/GF(p^k) every GHS cover has genus >= 9, 49,
+  41 at k = 6, 10, 14.
+- `LEAD-TRF-jv-nagao-genus2-cover-decomp` (closed_dominated): Nagao on genus-2
+  cover of E(F_{p^6}) at S/rho 151-293.
+- `KR-IC-a4dd54` (known bound): 2LP IC `O~(q^{2-2/g})` beats rho `q^{g/2}` for
+  g >= 3; Diem plane quartic `O~(q)`.
+`research/leads_20261111/EXISTING_LEADS.txt` (173 lines) is a name list only;
+genus-related names: LEAD-EXO-split-jacobian-projection,
+LEAD-ICB-ecc2k130-jacobian-carrier, LEAD-TRF-cover-catalog-jacobian-transfer,
+LEAD-TRF-jv-nagao-genus2-cover-decomp, LEAD-TRF-odd-char-descent-smith-quartic,
+LEAD-TRF-same-field-genus-g-embedding, LEAD-TRF-small-genus-cover-general,
+LEAD-TRF-weil-restriction-jacobian-class.
+
+Closed within the genus_ladder programme (measured):
+- Cantor-intermediate harvesting (genus_ladder_harvest_20261115): FPM x1.12-1.15, closed.
+- Parity prefilter: kept, but only 1-9% of total (exact, no further gain).
+- Genus 2 2LP crossing rho: none up to 2^24 ("nothing suggests a crossing").
+- `leads.log` (c0b657b6d5): HEC-NATIVE genus-2 dense step-column solve
+  4.04-5.75x vs Fast (more mulmods); GENUS5 cover 2LP "keep cover family
+  restrictions explicit".
+
+Yesterday's twelve (`research/g2plus_leads_20261116/README.md`, each
+`L*/ASSESSMENT.md`):
+
+| lead | verdict | headline |
+|---|---|---|
+| L01 anchored pencil sieve | supported | g=2 relation phase 3-5x vs strongest baseline (30-70x vs generic Cantor walk); not a solve |
+| L02 automorphism orbits | g=2 supported, g=3 killed | x^5+a: 2.46x [2.23, 2.75]; x^7+a: 1.10x |
+| L03 base re-balance | supported | g=3 cc 2 -> 1: -36..40% counted cost (simulator) |
+| L04 batch smooth-part | **killed** | batch arms 9-44x dearer per candidate at g=3 |
+| L05 even-degree models | supported (parity) | cost 0.995-1.022 of odd model; reach only |
+| L06 odd-l isogeny census | void (instrument), rerun; F2 re-freeze | kernel criterion fires on 27.8/26.8/24.0% at l = 3,5,7 |
+| L07 Prym IC (g 4-5) | **killed** | 2LP exponent 16/9, 20/11 > 3/2, 8/5 |
+| L08 non-hyperelliptic g4-g6 | inconclusive (instrument) | duplicate lines counted |
+| L09 gonal pencil seeds | inconclusive | proxy saving 31% -> 7% as p grows |
+| L10 C34/Picard matched rho | orbit inconclusive; rho accounting supported | orbit fold R_T ~9.0; lab quartic rho overpriced 1.73x |
+| L11 Laine-Lauter memory | inconclusive | halving memory costs 2.1-2.4x trials |
+| L12 bielliptic orbits | void (instrument) | lab fold already beats orbit arm 1.4-1.6x; "no reason to rerun" |
+
+## 4. Cost units and how rho is matched
+
+Units in use (they are not interchangeable; ratios differ by >10x between them):
+1. **FPM** (genus_ladder, L-leads): `cantor_mul + 10 inv + rel_mul + g^2
+   la_mul` -- one F_p mult = 1, inversion I = 10, a mult mod r (r ~ p^g)
+   kappa = g^2. "FPM_mid" / band brackets I and kappa (L03 used (10, 9) at
+   g=3; L02 (10, g^2), (1,1), (30, g^2)).
+2. **GAE band** (AGENTS.md sec. 5a, `c0b657b6d5:AGENTS.md` line 1214): group
+   ops + w x every native op, w in {0, 0.1, 1}; rank only if the order holds
+   at all three; plus `w_cal` (measured mulmod/group-add, ~0.005-0.013 GAE on
+   lab hosts). Owner decision 2026-11-16 (genus4_rho_refs): primary reading
+   Q3 = every emitted native op on both sides. The genus-3 positive control
+   and genus-4 studies use this.
+3. **bitop/v1** (`docs/units/BITOPS.md`; hec_bitop_20261020).
+4. **M-eq** (`mul + r_inv inv + r_lmul lmul`) in the plane-quartic programme
+   (additions unpriced; quartic_dl1 shows the gain vanishes at w_add = 1).
+5. **Wall time** (humbert genus-5, unisolated L0).
+6. Formula model `log2` bit-ops (`jacobian_transfer/cost.rs`), never measured.
+
+Matched rho per genus:
+- **Hyperelliptic g = 2..5 (genus_ladder):** `run_rho` =
+  `rho_reference_walk(..., RhoWalk::negation())` on the order-r subgroup, max
+  steps `60 sqrt(r) + 10^4`, certified once; negation in Mumford form is free
+  (v -> -v). Expected steps `sqrt(pi r / 4)`. No other automorphisms (random
+  curves). The walk carries a 16-key fruitless-cycle window and Brent check:
+  ~18 compares per step (genus4_rho_refs), DP bits `floor(bits(r)/4)`.
+  Known defects: at g=4, p=16411 it needs **1.42x its expected steps**
+  (genus4_scale), and plain rho is then cheaper (P/R 0.67); against a
+  window-free plain rho (P0f) arm w goes from 0.149 to 1.05 at w=1. A lean
+  negation rho (`B`: window-free, Brent, Wiener-Zuccherato look-ahead) is in
+  genus4_lean_rho_20261116, results not written up.
+- **Genus 2 rho reference** has heavy fixed set-up (16 full-width jump
+  points; 68% of rho bitops at g=2, p=251 in hec_bitop), so small-p genus-2
+  ratios understate rho.
+- **Plane quartics (quartic_ladder, genus_ladder `--quartic`, bound_r):**
+  `ql::run_rho` negation walk. **L10 finding** (`research/g2plus_leads_20261116/L10_c34_picard_matched_rho/{PROTOCOL,RESULTS,ASSESSMENT}.md`):
+  each negation-walk step costs one Pic addition A ~ 3,521 mults + 44 inv
+  plus one negation N ~ 5,400 mults + 35 inv (sum ~8,921 + 79, matching the
+  observed ~8,900/op in bound_r.jsonl). Since a quartic negation is dearer
+  than the sqrt 2 it saves, `F_Q = (A + N)/(sqrt 2 A)` = **1.7338, 1.7269,
+  1.7322** at p = 2053, 4099, 8209 (model value: ideal step counts x measured
+  step costs; not an executed walk). Corrected ratios: bound_r 2LP/rho 0.0089,
+  0.0086, 0.013 -> ~0.0154, 0.0149, 0.0225; genus_ladder p=1031 quartic 0.027
+  -> ~0.047. For Picard curves (C_{3,4}, extra order-3 automorphism) the
+  cheapest matched rho is the `<rho>` class walk S3 = 0.447 x S2.
+  The GHS-weak quartic rows (plane_quartic_program, quartic_dl1) use an
+  *elliptic* reference (rho on E0/F_{q^3}; negation 0.715 of plain) and are
+  unaffected.
+- **Genus-5 cover (humbert):** rho on the elliptic source subgroup, the
+  crate's scalar rho, reported against expected steps and negation variant.
+- **L02 (y^2 = x^5 + a):** rho also folded by the automorphism (rho_gain 1.61).
+
+## 5. Gaps in genus 2..16
+
+- **Genus 2, 3, 4:** instrumented and measured (several instruments, several units).
+- **Genus 5:** hyperelliptic only in genus_ladder at p <= 1031 (5 primes,
+  4 curves; SGE at 1031 only); no scale study, no IcExt arms (v/w/s), no
+  explicit group law (`genus_ladder_fastgroup.rs` covers g = 3, 4 only), no
+  `h <= 2` bound-r run; `Rel` holds 5 base entries (REL_FB = 5), so the
+  harvest and sieve variants overflow at g >= 4/5. Cover-route genus 5
+  (humbert) measured in wall time only. Non-hyperelliptic genus 5: none.
+- **Genus 6:** no working instrument. `genus_ladder` stops at `MAX_GENUS = 5`
+  (and `(sqrt p + 1)^{2g} < 2^63` caps p; u64 group orders). The generic
+  `hyperelliptic_index_calculus.rs` has no genus bound in its header but no
+  genus-6 measurement was found. Only L08's Python plane-sextic arm, voided.
+- **Genus 7..16:** no instrument and no IC measurement at all. Only (a) the
+  textbook-Cantor op counts at g = 8, 10, 12, 14, 16 (jacobian_op_count),
+  (b) the formula cost model (`hyperelliptic_index_calculus` `g! q + g^2
+  q^{2-2/g}`; `enge_gaudry_smoothness` with degree <= b factor base, to genus
+  1024), (c) GHS genus-9/15/16 cover rows priced by formula.
+  No degree-b (Enge-Gaudry/Gaudry-style higher-degree) factor base, no
+  distinct-degree-factorisation smoothness test, no subexponential arm
+  exists in any executed IC instrument.
+- **Missing results inside measured genera:** genus_ladder_sge_scale_20261115
+  (2LP+SGE vs rho at g=3, p = 2^13..2^15) has protocol only;
+  genus4_lean_rho_20261116 has data but no RESULTS; follow-ups F1/F2/F3 frozen,
+  no results; no isolated-host validation for any genus >= 2 row; genus 4
+  w = 1 against the strongest rho is open (1.05-1.15 vs P0f).
+
+## 6. Summary table
+
+Ratios are IC/rho, `[pcc:unverified]` throughout. "Unit" matters: FPM ratios
+are far more favourable to IC than GAE-band ratios.
+
+| genus | instrument(s) | best measured IC/rho (unit, p) | exponent (IC; rho) | main cost component | status | path |
+|---|---|---|---|---|---|---|
+| 2 | genus_ladder (A/a/C/c), hyperelliptic_index_calculus + ic_bench, ecbench hyper_ic, hec-native-ic, L01/L02 (Python) | 2LP+pre: 1.7 (FPM, 11th of 12 primes ~2^23); typically 3-5x, 3.3 at 8209, 5.1 at 2^24; L02 orbit x^5+a 2.46x better | 1.004 [0.991, 1.020]; rho 0.975 | relation walk (LA 0.08-0.20) | open (L01 F3 pending); no crossing seen | `c0b657b6d5:research/genus_ladder_scale_20261115/RESULTS.md` |
+| 3 hyperelliptic | genus_ladder (+SGE), ic_control positive control (L, M, N, S, W arms), IcExt v/w at fffa1b1243 | FPM: **0.537 [0.407, 0.686] at p=32771** (2LP+pre); SGE(8,3) halves FPM at 1031 (composition at scale unmeasured). GAE: W/R 1.72 [0.95, 3.32] (w=0.1), 8.75 (w=1) at 32771 | 1.344 [1.334, 1.358]; rho 1.413 | LA 0.75-0.77 of FPM (2LP); in GAE the relation phase (smoothness test ~362 mults/trial originally) | open | `c0b657b6d5:research/genus_ladder_scale_20261115/RESULTS.md`; `research/ic_positive_control_capped_20261116/RESULTS.md` |
+| 3 plane quartic | quartic_ladder, plane_quartic_pic, diem_quartic, ecbench plane_quartic | generic: 2LP 0.0086 at 4099 (FPM) -> ~0.0149 after L10 1.73x; GHS-weak DL 0.0023 of negation rho at q~2^22 (M-eq, w=0) | generic 2LP 0.69 (ladder) / 1.56 [0.97, 1.96] (bound_r); GHS DL 0.988; rho 1.36 / 1.485 | relation phase (conic evaluations 70-80% of FPM) | N4 open, "no further work planned"; L10 correction pending to row owners | `c0b657b6d5:research/genus_ladder_bound_r_20261114/RESULTS.md`; `c0b657b6d5:research/plane_quartic_program_20261018/CLOSING.md`; `research/g2plus_leads_20261116/L10_c34_picard_matched_rho/ASSESSMENT.md` |
+| 4 hyperelliptic | genus_ladder c, IcExt v/w/f/s, fastgroup, sieve (smoke), round-seven bitops harness | FPM: c 0.031 at 8209; w 0.011 at 8209. GAE Q3 w=1: 0.142 (frozen negation refs), but 1.05 [0.785, 1.513] (8209 pooled) and 1.15 (16411) vs window-free plain rho. bitop/v1: 0.114 at p=61 | c 1.458 [1.449, 1.467]; rho 1.79 [1.20, 2.22] | relation phase 84-88% of arm w native mults | open (w=1 vs strongest rho unresolved; lean-rho results unwritten) | `research/genus4_scale_20261116/RESULTS.md`; `c0b657b6d5:research/genus_ladder_bound_r_20261114/RESULTS.md` |
+| 5 hyperelliptic | genus_ladder (A/a/C/c, SGE) | FPM 0.0084 [0.0047, 0.020] at 1031 (C+pre); SGE(8,3) x0.624; GAE w=1 0.48 [0.27, 1.14] | 1.02 [0.93, 1.12] (set-up dominated; theory 1.6); rho 2.69 | LA 0.52 of FPM (0.23 after SGE), then relations + Cantor | open, thinly measured | `c0b657b6d5:research/genus_ladder_20261114/RESULTS.md`; `.../genus_ladder_sge_20261115/RESULTS.md` |
+| 5 cover | humbert_genus5_cover crate | 0.36 vs expected-steps rho, 0.51 vs negation rho at q=32003 (wall time) | t_ic slope 1.36; rho ~2 | relation collection 62% (before levers) | open (toy crossover) | `c0b657b6d5:research/humbert_genus5_cover_20261021/README.md` |
+| 6 | none working (L08 Python sextic, void) | not found | L08 A_2LP 1.11-1.17 (void) | -- | no instrument | `research/g2plus_leads_20261116/L08_nonhyperelliptic_ladder_g4_g6/ASSESSMENT.md` |
+| 7-16 | none (formula model only; Cantor op counts) | not found | not found | -- | no instrument, no measurement | `c0b657b6d5:src/cryptanalysis/jacobian_transfer/cost.rs`; `c0b657b6d5:research/jacobian_op_count_20261014/summary.csv` |
+
+Status: COMPLETE (2026-11-17). All figures quoted from the named files; none re-run.
