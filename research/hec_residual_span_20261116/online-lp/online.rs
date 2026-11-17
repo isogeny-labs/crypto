@@ -110,3 +110,56 @@ impl Online {
         assert_eq!(label[self.small + 1], 0, "inconsistent partial relation");
     }
 }
+
+// Stronger control: incremental full coefficient matrix, no LP-first structure.
+pub struct Full {
+    f: Fp,
+    n: usize,
+    basis: Vec<Option<Vec<u64>>>,
+    pub rank: usize,
+}
+impl Full {
+    pub fn new(n: usize, ell: u64) -> Self {
+        Self {
+            f: Fp::new(ell),
+            n,
+            basis: vec![None; n],
+            rank: 0,
+        }
+    }
+    pub fn k(&self) -> Option<u64> {
+        self.basis[self.n - 1].as_ref().map(|v| v[self.n])
+    }
+    pub fn cells(&self) -> usize {
+        self.basis
+            .iter()
+            .filter_map(|v| v.as_ref())
+            .map(Vec::len)
+            .sum()
+    }
+    pub fn insert(&mut self, full: &[u64], rhs: u64) {
+        assert_eq!(full.len(), self.n);
+        let mut row = full.to_vec();
+        row.push(rhs);
+        for j in 0..self.n {
+            let a = row[j];
+            if a == 0 {
+                continue;
+            }
+            if let Some(p) = &self.basis[j] {
+                for k in j..row.len() {
+                    row[k] = self.f.sub(row[k], self.f.mul(a, p[k]))
+                }
+            } else {
+                let inv = self.f.inv(a);
+                for k in j..row.len() {
+                    row[k] = self.f.mul(row[k], inv)
+                }
+                self.basis[j] = Some(row);
+                self.rank += 1;
+                return;
+            }
+        }
+        assert_eq!(row[self.n], 0, "inconsistent full relation")
+    }
+}

@@ -423,3 +423,17 @@ Qualifyonlineeveryprefix/rank/target andinspectstagecost, thencompletecostcase. 
 
 ### Errors
 No scientificrunyet; originalfrozenimplementationsunchanged.
+
+## Strongeronlinecontrol added before first execution
+
+### What was done
+Initialonlinecheckpointneverexecuted. Addedincrementalfull-matrixecheloncontrolwithoutLPsplit, exacteveryprefixk/fullrankchecks,andFULL.tsvcostreceipt. Recompiledwithoutwarnings;finalfreezeprospectiveamendmentexplicit.
+
+### Decisions made
+CompareagainstbothscratchFastandfullincrementalcontrol; firstdeterminingprefixcostonlyforcompletefilteredstreams, finalbudgetforincomplete. Laterprefixesonlycorrectness. SeparatestreamingreusefromLP-specificgain.
+
+### Open threads
+Executeonlyfinalpushedcheckpointonce. Broadgoalopen.
+
+### Errors
+No scientificexecution/retry; changeispre-executioncomparatorstrengthening.

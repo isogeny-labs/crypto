@@ -2,7 +2,7 @@
 set -eu
 cd "$(git rev-parse --show-toplevel)"
 study=research/hec_residual_span_20261116/online-lp
-for f in CONTROL.tsv CONTROL.stderr FIXTURES.tsv PREFIX.tsv GRAPH.tsv ARITH.tsv RUN.txt EXIT.txt OUTPUT.sha256; do test ! -e "$study/$f" || { echo "Refusing overwrite $f" >&2; exit 1; }; done
+for f in CONTROL.tsv CONTROL.stderr FIXTURES.tsv PREFIX.tsv GRAPH.tsv ARITH.tsv FULL.tsv RUN.txt EXIT.txt OUTPUT.sha256; do test ! -e "$study/$f" || { echo "Refusing overwrite $f" >&2; exit 1; }; done
 test -z "$(git status --porcelain -- research/hec_residual_span_20261116 crates/hec-native-ic)"
 branch=$(git symbolic-ref --short HEAD)
 head=$(git rev-parse HEAD)
@@ -15,5 +15,5 @@ status=$?
 set -e
 printf '%s\n' "$status" > "$study/EXIT.txt"
 printf 'ended_utc=%s\nexit=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$status" >> "$study/RUN.txt"
-shasum -a 256 "$study/CONTROL.tsv" "$study/CONTROL.stderr" "$study/FIXTURES.tsv" "$study/PREFIX.tsv" "$study/GRAPH.tsv" "$study/ARITH.tsv" "$study/RUN.txt" "$study/EXIT.txt" > "$study/OUTPUT.sha256"
+shasum -a 256 "$study/CONTROL.tsv" "$study/CONTROL.stderr" "$study/FIXTURES.tsv" "$study/PREFIX.tsv" "$study/GRAPH.tsv" "$study/ARITH.tsv" "$study/FULL.tsv" "$study/RUN.txt" "$study/EXIT.txt" > "$study/OUTPUT.sha256"
 exit "$status"
