@@ -1875,3 +1875,11 @@ What was done: freezedbce54bbdd0 once-onlyexit0;24 calls/12 targets full packet 
 Decisions made: reject current complete implementation for10x; free-certificate producer floor exceeds0.1arm0 everywhere, so certificate-only successor insufficient.
 Open threads: mathematical relation-generation/incidence mechanism reducing producer scan/setup, reuse checked primitives; prospective proof/cost case before next experiment; originalgenus2+objective unchanged.
 Errors: none; all negative results retained,no retry/S3/cloud.
+
+## Orbit incidence norm frozen
+
+What was done: derived explicit quadratic norm over X5-r and generic non-descent of pencil tau for g2/3/4 binomial models. Compiled coefficient/product checks including denominator basepoints.
+Decisions made: no scalar orbit parameter substitution; test identity and basepoint hazards before cost prototype. Assertions [pcc:unverified].
+Sources checked (KB): revision9b2119e8fbac482b98b50521c0d604bb, refreshed2026-11-17T06:15:25Z; source:91b6bbe9fb73267bbeb5d7c97f493b26 crypto:docs/ecbench/README.md and source:fdff62973a741275cdbf8ec3b5ff069d crypto:docs/ic/LEAD_LADDER_METHODOLOGY_20261010.md; stale for current local measurements, no novelty claim. Sage resultant primary definition read, links in derivation.
+Open threads: once-only120CPU algebra screen after Git freeze push; shared-incidence cost case still needed.
+Errors: no compile errors, no scientific execution yet.
