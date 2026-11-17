@@ -2842,3 +2842,10 @@ What was done: freezed2335114daf hashespass/exit0;22audit+44freshcalls allnative
 Decisions made: rejectfixedall-groundedscan asgenericgain, keeppositivehighergenusbasecountsandallregressions. Selectivepromotionrequiresnewcost/rankcase/prospectiveholdout; noafteroutcomecutfitting. Knownonecorecomponentgainnotgenericcomplete10x.
 Open threads: integratedrelationmechanismwithpricedaffinesubstitution/usefulrankcaseagainststaticforest;fullgoalactiveunachieved/independentreviewopen.
 Errors: no scientificfailure; inheritedunusedsource/helperwarnings.No S3/cloud/merge/unchangedrerun.
+
+## Exact dual rank screen for future grounded selection
+
+What was done: derived rankincrement=rank(RN), targetdetermination iff e_kN liesinrowspace(RN), withN fullkernelbasis ofcurrentconsistent system. Specializedforestparameterization toqfreeLPcomponents+rho smallsystemdirections; groundedpointtags occupyonlyrho coordinates. GaveexplicitF101counterexample tosingle-target-vector zero-signature discard: x=5 annihilatesw=(0,1), butisneededwithx+k=12 torecoverk7.
+Decisions made: do notimplement invalidscalarfilter orcallrankoraclefree; onlyfullnullity1 permits exactonescalar dependence test. Futureselectorneedscertifiedquotientbasis/update/scanning/substitutioncostcase andheldoutprefixfalsifier. No newmeasurement/experiment orpostoutcomecutfit.
+Open threads: constructefficientexactlow-nullitysignature scheme orothernewrelationmechanism againststaticforest;10xgoalactiveunachieved/independentreviewopen.
+Errors: none. No S3/cloud/merge/unchangedrerun.
