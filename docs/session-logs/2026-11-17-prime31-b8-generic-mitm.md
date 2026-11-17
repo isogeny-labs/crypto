@@ -42,3 +42,17 @@
 
 ### Errors (what went wrong, how it was handled)
 - Initial compiler E0499 documented and fixed without algorithm/parameter changes. Signed independent PCC not available; all new measurements are producer CI. No other failures on final source.
+
+## 16:30 UTC — review publication
+
+### What was done (commands, files, features)
+- Updated PR #4575 with explicit numeric source-CI results and the audit receipts, then marked it **ready for review**. GitHub reported the branch as mergeable.
+
+### Decisions made (and why)
+- Leave the validated PR open rather than bypass the normal approval/CI review route via a forced manual merge.
+
+### Open threads (unfinished, pick up next time)
+- Repository maintainer can merge with an allowed method after remaining reviews/checks; preserve producer-only validation status.
+
+### Errors (what went wrong, how it was handled)
+- GitHub `enable_auto_merge` rejected the integration's selected method: **"Merge method squash merging is not allowed on this repository"**. This is a merge-method configuration blocker, not a Rust test failure; no merge or status claim made.
