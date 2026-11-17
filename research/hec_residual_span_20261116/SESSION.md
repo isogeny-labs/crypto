@@ -1385,3 +1385,10 @@ What was done: frozen3338194d4da exits0,200trials/99splitgrouprelations,allpromo
 Decisions made: no speed ratio for incomplete arm or promotion from larger point pool/split count/rank. Different orbit multiplicities give valid new rows but standalone replacement not justified.
 Open threads: a combined adaptive-label pool needs new useful-rank/cost case before cold campaign; broader original genus2+tenfold objective remains open.
 Errors: no runtime/assertion errors; incomplete identification is scientific outcome, not retried. No S3/cloud.
+
+## Self-orbit harvesting frozen
+
+What was done: derived exhaustive two-shape quotient for triples of a5cycle; eight signed trials per promoted orbit. Prepared40trial gate on same5fixtures, original no-trigger kept, exact affine label/group/polynomial/three-solver checks. Compiled, hashes frozen.
+Decisions made: test compact target-bearing family before building combined pool; no8vs40speed inference, scalar-copy triples excluded.
+Open threads: execute once and assess useful rank/target completion; full genus2+tenfold objective open.
+Errors: none; no execution before pushed freeze.
