@@ -1749,3 +1749,10 @@ What was done: newbranch research/hec-source-phases-20261117 after usermerge4552
 Decisions made: require alloldcountervectors identical andphase sums exact; deriveconditional verificationfloor before newsolvermechanism. KBstructuredmatrix tradeoff isleadonly, not cost evidence. Assertions [pcc:unverified].
 Open threads: pushfreeze then single120CPU invocation, selectsuccessor fromphase costs.
 Errors: none in compile; ownT7093lease confirmed.
+
+## Source phase audit completed and successor selected
+
+What was done: freeze83dfd55822d once-onlyexit0;24calls,alloldvectors/exclusivephases/repeats exact. Verification32.8-71.0percentbasefield; freeeverythingelse ceiling1.409-3.053x. Basefieldlinearphasezero. Assertions [pcc:unverified].
+Decisions made: solver-onlycannotreach10xbasefieldonpanel; investigate checkedprincipalrelations+linearwitness scalarcertificate, notverificationomission. Nativefinalcheck remains externalcontrol until new soundness/costgate.
+Open threads: originalcurve-bound certificate and mutationrejection, then fullcertificatecost andproducer improvements. Goalunchanged.
+Errors: none,no rerun/S3/cloud.
