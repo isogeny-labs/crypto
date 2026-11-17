@@ -25,3 +25,21 @@
 - Shared research-KB tools/catalog wrapper unavailable. Bounded primary GitHub and literature review documented.
 - Native Rust compiler unavailable in this connector runtime; source-specific CI provides compile/tests rather than a fabricated local test claim.
 - #4596 failed due unrelated CI source/checkout issues; preserved logs and posted blocker to the owner rather than retuning the frozen solver cohort.
+
+## 19:45 UTC — exact-source CI resolution
+
+### What was done (commands, files, features)
+- Read source-specific GitHub Actions #44161786208 job `134317243143`: pinned native library **40/40 PASS**; new release example **1/1 PASS**; release JSON generated; complete `jq` boundary assertions passed and archived.
+- Evidence artifact #14363726583; GitHub reported SHA-256 digest `e7a9adcaf068f12fc17948ea4fb44b95a98366f614ccc8bf3803d35430d67276`. Not independently rehashed.
+- Updated `RR9_B8_COST_GATE_RESULT_20261117.md` with exact run and digest.
+
+### Decisions made (and why)
+- Treat this result as a source-verified mathematical/cost gate; not an independently PCC-signed solver improvement or full ECDLP timing.
+- Keep separately owned #4596 and #4604 experiments intact.
+
+### Open threads (unfinished, pick up next time)
+- Genuine B31 sign-free quotient/root extraction with fresh blinded targets, all multiplicities/exceptional branches, full relation-rank and complete solver comparison. Await owned #4596 benchmark fixes.
+- Independent signed PCC validation of this producer record.
+
+### Errors (what went wrong, how it was handled)
+- None in source-specific gate CI; no local Rust compiler was available, so source compilation was verified on pinned GitHub Actions.
