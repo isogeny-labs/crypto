@@ -56,7 +56,7 @@ fn bsgs_setup(m: u64) -> Result<SharedBabyTable, String> {
         .ok_or("unexpected inverse step identity")?;
     let setup_ns = start.elapsed().as_nanos();
     let rss_after_setup_kib = bsgs_rss_kib();
-    Ok(SharedBabyTable {m, baby, minus_mg, setup_ns, baby_batches, rss_after_setup_kib})
+    Ok(SharedBabyTable {m, baby, minus_mg, setup_ns, baby_batches: batches, rss_after_setup_kib})
 }
 
 fn bsgs_solve(prep: &SharedBabyTable, q: (u64,u64))
