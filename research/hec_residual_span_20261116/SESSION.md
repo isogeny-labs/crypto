@@ -2800,3 +2800,10 @@ What was done: screenedpriorincremental-pencil/online-lp mixedresults, reusedorb
 Decisions made: classicalbaselineadaptationnotnovelty; changedstoppprefixexplicit, naturalpivotmayregressvsMarkowitz andmustretainallcases. One600CPUprocessafterGitfreeze, strongestdeferredmembershipcontrol.
 Open threads: executequalification/counts, inspectfullfieldcost andnonuniformregressions;10xgoalactiveunachieved.
 Errors: inheritedunusedimport/helperwarnings only;no scientificexecutionbeforefreeze. No S3/cloud/merge.
+
+## Generic incremental target gate qualifies with mixed arithmetic
+
+What was done: freezea1fcba10646 hashespass/exit0;22audit+44freshcalls/nativeanswers, everycompletedprefixnativeFastagreement, allnorm/principal/densechecks pass;16offsubgroupfinalrejections/6unavailable. Fullvector/lookups/newReportrepeatexact. Basecontrol/streamg21-1.098,g31.011-1.070,g41-1.358; subgroupg2.804-1.477(8/12improve),g3.814-.991(0/6),g4.967-1.545(3/4).
+Decisions made: keepbuffered/streambothcontrols; naturalpivotsregressdespiteearliertermination, no10x/uniformreplacement/newmathclaim. Frozenstderr old_outcomesreplay phraseclarifiedinRESULTS aspublicscalar/newauditReportagreement, notoldprefixidentity.
+Open threads: deferredpayload/pivotstructure with credible integratedcost, fullgenus2+10xgoalactive/independentreviewopen.
+Errors: no scientificfailure, inheritedunusedimport/helperwarnings only.No S3/cloud/mergeorunchangedrerun.
