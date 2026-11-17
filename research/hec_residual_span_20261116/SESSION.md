@@ -1441,3 +1441,10 @@ What was done: compiled no-support-file sparse bucketing/linear-residual produce
 Decisions made: structural gate before nativecost; scans only orbit-member pool, duplicates/discovery and exclusions explicit. Pointvisits nottotalcost.
 Open threads: execute once and retain stalls; prospective fresh coldcost ifqualified.
 Errors: coordination500onchecks/renewal while ownT7071lease stillvaliduntil02:38PST; no competingholder. No science before pushedfreeze.
+
+## Actual sparse inactivation producer completed
+
+What was done:60e22f8e941single invocation exits0;all6originalworkloads complete withfixedseed1 and noROOTSaccess. Pointvisits55/25/90/120/385/165,rows6/5/11/10/24/12. Exact originalgroup rows/labels,constraint-vs-Sparse prefixes,terminalnativeFast,scalars pass. Includes formerlystalledp601source1withoutpromotiontrigger.
+Decisions made: genuineproduction qualification,not10xmeasurement;all16anchors generated plusFB/actionsetup andsymbolicwork remaincharged in futurecoldcomparison.
+Open threads: fresh-target coldnativecounter comparison against strongfullscanSparse with equalpublicsourceinformation andfailure-retention; originalgenus2+10xgoalopen.
+Errors: no scientificerrors/retries/S3/cloud; coordination500whileownleasevalidnoted inprotocol.
