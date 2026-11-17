@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Price prime31 1024-target reusable mixed IC against shared-precomputed generic BSGS with existing Rust arithmetic (automation, started 2026-11-17, branch research/prime31-shared-bsgs-frontier-20261117)
+
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
 <!-- One line per task, added as the task's first step with its draft PR:
