@@ -437,7 +437,7 @@ pub fn degree_six_controls() -> Value {
     // sign masks, group lookup, or secret labels to public_macaulay.
     let (oracle_positive, oracle_negatives, supports) = fixtures(&mut ar, &base);
     assert_eq!(oracle_positive, positive, "frozen positive was changed");
-    assert_eq!(oracle_negatives, negatives, "frozen negative panel was changed");
+    assert_eq!(oracle_negatives.as_slice(), &negatives, "frozen negative panel was changed");
     assert_eq!(supports, 256);
     let pos = public_macaulay(positive, &xs, &h, 6).expect("B8 positive degree-six chart");
     assert_eq!(pos["degree"], 6);
