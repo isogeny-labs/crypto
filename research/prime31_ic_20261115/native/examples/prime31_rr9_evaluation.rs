@@ -828,9 +828,211 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     })
 }
 
+
+/// Exact affine linear solve for a GIVEN B8 sign vector and public residual.
+/// This deliberately enumerates signed supports: it is a correctness oracle,
+/// not a nonenumerative relation extraction algorithm or an ECDLP solver.
+fn rr9_b8_signed_linear_solve(
+    base: &[(u64, u64); 8], signs: u8, residual: Point,
+) -> Result<Option<([u64; 4], [u64; 4])>, String> {
+    let (r, s) = residual.ok_or("B8 solver excludes infinity residual")?;
+    let mut rows = [[0u64; 8]; 8];
+    for (i, &(x, y)) in base.iter().enumerate() {
+        if x == r { return Err("B8 exceptional coordinate x_i=r".into()); }
+        let signed_y = if ((signs >> i) & 1) == 1 { fp_sub(0, y) } else { y };
+        let t = fp_sub(x, r);
+        let w = fp_add(s, signed_y);
+        let powers = [1, x, fp_mul(x, x), fp_mul(fp_mul(x, x), x)];
+        for j in 0..4 { rows[i][j] = fp_mul(t, powers[j]); }
+        for j in 0..3 { rows[i][4+j] = fp_mul(w, powers[j]); }
+        // Fixed V_3=1 contributes w*x^3 to the left-hand side.
+        rows[i][7] = fp_sub(0, fp_mul(w, powers[3]));
+    }
+    let mut pivots = [usize::MAX; 7];
+    let mut rank = 0usize;
+    for col in 0..7 {
+        let Some(piv) = (rank..8).find(|&i| rows[i][col] != 0) else {
+            continue;
+        };
+        rows.swap(rank, piv);
+        let inv = fp_pow(rows[rank][col], P-2);
+        for j in col..8 { rows[rank][j] = fp_mul(rows[rank][j], inv); }
+        for i in 0..8 {
+            if i == rank { continue; }
+            let factor = rows[i][col];
+            for j in col..8 {
+                rows[i][j] = fp_sub(rows[i][j], fp_mul(factor, rows[rank][j]));
+            }
+        }
+        pivots[rank] = col;
+        rank += 1;
+    }
+    if (rank..8).any(|i| rows[i][7] != 0) { return Ok(None); }
+    if rank != 7 {
+        return Err(format!("B8 signed chart has a consistent rank-{rank} positive-dimensional fibre"));
+    }
+    let mut result = [0u64; 7];
+    for i in 0..7 { result[pivots[i]] = rows[i][7]; }
+    Ok(Some((
+        [result[0], result[1], result[2], result[3]],
+        [result[4], result[5], result[6], 1],
+    )))
+}
+
+/// Factor identity: -(x-r)M(x)=L_+(x)*L_-(x) at a factor-base x.
+/// This does NOT extend to a root test when x=r: both linear factors may
+/// vanish tautologically while M(r) is nonzero.
+fn rr9_b8_factor_identity_at(
+    a: &[u64; 4], v: &[u64; 4], residual: Point, q: (u64, u64),
+) -> Result<(u64, u64), String> {
+    let (r, s) = residual.ok_or("B8 factor identity needs affine residual")?;
+    let (x, y) = q;
+    if x == r { return Err("B8 identity cannot detect M(r)=0".into()); }
+    let x2 = fp_mul(x, x);
+    let x3 = fp_mul(x2, x);
+    let eval = |coeff: &[u64; 4]| {
+        fp_add(fp_add(coeff[0], fp_mul(coeff[1], x)),
+            fp_add(fp_mul(coeff[2], x2), fp_mul(coeff[3], x3)))
+    };
+    let av = eval(a);
+    let vv = eval(v);
+    let t = fp_sub(x, r);
+    let l_plus = fp_add(fp_mul(t, av), fp_mul(fp_add(s, y), vv));
+    let l_minus = fp_add(fp_mul(t, av), fp_mul(fp_sub(s, y), vv));
+    let m = rr9_signed_chart_monic_factor(a, v, residual)?;
+    let mval = m.iter().rev().fold(0u64, |z, &c| fp_add(fp_mul(z, x), c));
+    Ok((fp_sub(0, fp_mul(t, mval)), fp_mul(l_plus, l_minus)))
+}
+
+/// Exhaustive B8 signed-fibre equivalence test. All 256 masks enter only as
+/// a TEST oracle; no target scalar or basis discrete logs enter the solver.
+fn rr9_b8_linear_fibre_audit(ar: &mut Arithmetic) -> Value {
+    let first = first_rational_points(ar);
+    let base: [(u64, u64); 8] = first[..8].try_into().unwrap();
+    let mut h = vec![1u64];
+    for &(x, _) in &base {
+        h = rr9_poly_mul(&h, &[fp_sub(0, x), 1]);
+    }
+    assert_eq!(h.len(), 9);
+    let mut supports: HashMap<Point, Vec<u8>> = HashMap::new();
+    let mut sums = [None; 256];
+    for mask in 0u16..256 {
+        let leaves: [Point; 8] = std::array::from_fn(|i| {
+            if ((mask >> i) & 1) == 1 { neg(Some(base[i])) } else { Some(base[i]) }
+        });
+        let sum = group_sum(ar, &leaves);
+        sums[mask as usize] = sum;
+        supports.entry(sum).or_default().push(mask as u8);
+    }
+    let collisions = 256usize - supports.len();
+    let mut checked_residuals = HashSet::new();
+    let mut excluded_infinity = 0usize;
+    let mut excluded_same_x = 0usize;
+    let mut positive_systems = 0usize;
+    let mut recovered_masks = 0usize;
+    let mut exact_fibres = 0usize;
+    let mut factor_checks = 0usize;
+    for mask in 0usize..256 {
+        let target = sums[mask];
+        if target.is_none() {
+            excluded_infinity += 1;
+            continue;
+        }
+        let r = target.unwrap().0;
+        if base.iter().any(|&(x, _)| x == r) {
+            excluded_same_x += 1;
+            continue;
+        }
+        if !checked_residuals.insert(target) { continue; }
+        let expected = &supports[&target];
+        let mut found = Vec::new();
+        for candidate in 0u16..256 {
+            positive_systems += 1;
+            if let Some((a,v)) = rr9_b8_signed_linear_solve(&base, candidate as u8, target)
+                .expect("all 8x7 linear fibres must be determinate") {
+                let f = rr9_from_signed_chart(&a, &v, target).unwrap();
+                let signed: [Point; 8] = std::array::from_fn(|i| {
+                    if ((candidate >> i) & 1) == 1 { neg(Some(base[i])) } else { Some(base[i]) }
+                });
+                assert_eq!(rr9_function_at(&f, neg(target)).unwrap(), 0);
+                for &q in &signed { assert_eq!(rr9_function_at(&f, q).unwrap(), 0); }
+                let m = rr9_signed_chart_monic_factor(&a, &v, target).unwrap();
+                assert_eq!(m.as_slice(), h.as_slice(), "linear solution does not have M=H_B");
+                assert!(rr9_radical_support(&m, &h).unwrap().0);
+                assert_eq!(group_sum(ar, &signed), target, "false-positive chart solution");
+                found.push(candidate as u8);
+                recovered_masks += 1;
+            }
+        }
+        assert_eq!(found, *expected, "signed linear fibre differs from original-curve group sums");
+        exact_fibres += 1;
+        if factor_checks == 0 {
+            // Independent algebraic polynomial-factor identity, *not* a solver.
+            // Test all 256 arbitrary canonical A,V coefficients and eight base x.
+            for j in 0u64..256 {
+                let a = [j, j+1, j*j+17, j*3+7];
+                let v = [j*11+3, j*j+2, j+9, 1];
+                for &q in &base {
+                    let (left,right) = rr9_b8_factor_identity_at(&a,&v,target,q).unwrap();
+                    assert_eq!(left,right,"B8 split-quadric identity fails");
+                    factor_checks += 1;
+                }
+            }
+        }
+    }
+    let mut negative_systems = 0usize;
+    let mut excluded_negative_offsets = 0usize;
+    let mut verified_negative_targets = 0usize;
+    for &initial_mask in &[0x00usize, 0x35, 0x96, 0xff] {
+        let mut target = sums[initial_mask];
+        let mut found_negative = false;
+        for _attempt in 1..=64 {
+            target = ar.add(PRIME31, target, Some(PRIME31.g));
+            let suitable = target.map(|(x,_)| !base.iter().any(|&(bx,_)| bx==x))
+                .unwrap_or(false);
+            if suitable && !supports.contains_key(&target) {
+                found_negative = true;
+                break;
+            }
+            excluded_negative_offsets += 1;
+        }
+        assert!(found_negative, "64 deterministic G offsets failed to find B8 negative");
+        for mask in 0u16..256 {
+            negative_systems += 1;
+            assert!(rr9_b8_signed_linear_solve(&base, mask as u8, target)
+                .expect("negative linear chart must be determinate").is_none(),
+                "negative public residual admits a false signed fibre");
+        }
+        verified_negative_targets += 1;
+    }
+    assert!(exact_fibres >= 1);
+    assert!(positive_systems >= 256);
+    assert_eq!(negative_systems, 4 * 256);
+    assert_eq!(factor_checks, 256 * 8);
+    json!({
+        "factor_base":"first_eight_rational_x_prime31",
+        "formal_sign_masks":256, "distinct_original_curve_sums":supports.len(),
+        "sum_collisions":collisions, "admissible_unique_public_residuals":exact_fibres,
+        "skipped_masks_with_infinity_R":excluded_infinity,
+        "skipped_masks_with_base_x_equal_residual_x":excluded_same_x,
+        "positive_affine_linear_systems":positive_systems,
+        "recovered_signed_masks":recovered_masks,
+        "exact_signed_fibres":exact_fibres,
+        "independent_split_quadric_identity_checks":factor_checks,
+        "negative_affine_linear_systems":negative_systems,
+        "negative_public_residuals":verified_negative_targets,
+        "negative_offsets_skipped":excluded_negative_offsets,
+        "algorithm_enumerates_all_256_sign_masks":true,
+        "complete_unknown_Q_discrete_log_solves":0,
+        "nonenumerative_extraction_demonstrated":false,
+        "pcc":"unverified"
+    })
+}
+
 fn run() -> Value {
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("prime31 curve certificate");
+    let b8_fibre_audit = rr9_b8_linear_fibre_audit(&mut ar);
     let b1 = first_rational_points(&mut ar);
     let b2 = Base::build(PRIME31, 6, &mut ar).expect("real Dickson31 depth-six base");
     assert_eq!(b2.points.len(), 31);
@@ -840,7 +1042,7 @@ fn run() -> Value {
         "schema":"prime31.rr9.evaluation.v1", "p":PRIME31.p, "n":PRIME31.n,
         "curve":PRIME31, "method":"L(9O) evaluation determinant on nine distinct affine points",
         "positive_count":64, "negative_count":64,
-        "panels":[first,dickson], "source_only_pcc":"unverified",
+        "panels":[first,dickson], "b8_signed_fibres":b8_fibre_audit, "source_only_pcc":"unverified",
         "nonenumerative_factor_extraction":false,
         "complete_unknown_target_ecdlp_recoveries":0,
         "matched_optimized_rho":false
@@ -953,6 +1155,17 @@ mod tests {
         let mut bad = zero;
         bad[0] = P;
         assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
+    }
+    #[test]
+    fn rr9_b8_full_signed_fibre_equivalence() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).unwrap();
+        let report = rr9_b8_linear_fibre_audit(&mut ar);
+        assert_eq!(report["formal_sign_masks"], 256);
+        assert_eq!(report["negative_affine_linear_systems"], 1024);
+        assert_eq!(report["independent_split_quadric_identity_checks"], 2048);
+        assert_eq!(report["algorithm_enumerates_all_256_sign_masks"], true);
+        assert_eq!(report["nonenumerative_extraction_demonstrated"], false);
     }
     #[test]
     fn rr9_original_prime31_bases_and_duplicate_control() {
