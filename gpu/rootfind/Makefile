@@ -3,6 +3,7 @@
 #   make test            CPU verification of the shared headers (no GPU, no nvcc)
 #   make bench-host-inv  public-input host Fp64 inversion + batch benchmark
 #   make bench-mul256   compare old versus native-128 host P-256 MAC
+#   make bench-sparse256  compare generic versus sparse-modulus P-256 REDC
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
@@ -50,7 +51,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 ptxas-info clean
 
 all: test
 
@@ -86,6 +87,13 @@ bench_mul256: bench_mul256.cpp fp256x64.cuh fp64.cuh
 
 bench-mul256: bench_mul256
 	./bench_mul256
+
+# Specialize the host P-256 modulus reduction without changing CUDA.
+bench_sparse256: bench_sparse256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_sparse256.cpp
+
+bench-sparse256: bench_sparse256
+	./bench_sparse256
 
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
