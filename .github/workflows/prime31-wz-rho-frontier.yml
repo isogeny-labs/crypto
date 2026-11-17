@@ -73,10 +73,10 @@ jobs:
           # Repair only that exact syntax defect; refuse any source drift.
           bench = Path("aps-pinned/src/cryptanalysis/koblitz_bench.rs")
           b = bench.read_text()
-          needle = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\\n'
+          needle = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\n'
                     '    /// The Artin')
-          replacement = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\\n'
-                         '    }\\n\\n'
+          replacement = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\n'
+                         '    }\n\n'
                          '    /// The Artin')
           assert b.count(needle) == 1, "immutable Koblitz test source changed: refuse repair"
           b = b.replace(needle, replacement, 1)
