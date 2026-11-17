@@ -2086,3 +2086,10 @@ What was done: integrated polynomialcertificatebuild intoeachlazyanchorcompositi
 Decisions made: allproducerproof-emission overheadcharged, no freecertconstruction;24completecalls/12targets/exactrepeats, subgroup/controlreplay andgeometry/root/scalarpacketfields exact. Assertions [pcc:unverified].
 Open threads: pushfreeze thenone120CPU invocation, comparecompletecost witholdcover/single-action/botharms.
 Errors: onlyunusedwarnings,no scientificexecutionyet.
+
+## Emitted-anchor gate formatting failure retained
+
+What was done: freezefa7db31e05a once-onlyexit101 beforefirstresultrow; debugnormalizerremovedspacebeforeclosingbrace, valuesprintedmatchfirsttarget.
+Decisions made: preservefailure/raw, prospectivev2onlycomparisonformatfix, no scientificresultclaim.
+Open threads: freezev2correctedjoin andexecutenewgate.
+Errors: k4709} vs k4709 } comparison, no measuredrows;no S3/cloud.
