@@ -256,7 +256,7 @@ impl<R: Ring> Cube<R> {
             };
             l += d * 3u128.pow(j);
         }
-        if l % 3 != 0 {
+        if !l.is_multiple_of(3) {
             return None;
         }
         let y_inv = rpow(r, self.c, (self.p3s - l / 3) % self.p3s); // c^{-l/3}
@@ -337,7 +337,7 @@ impl RadicalRootCtx {
         let mut m = self.s2;
         let mut c = self.zc;
         let mut t = f.powm(a, self.t2);
-        let mut r = f.powm(a, (self.t2 + 1) / 2);
+        let mut r = f.powm(a, self.t2.div_ceil(2));
         loop {
             if t == 1 {
                 return Some(r);
