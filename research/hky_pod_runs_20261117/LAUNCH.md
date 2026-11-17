@@ -94,3 +94,7 @@ Checks and predictions written before the sweep's new cells:
 
 - PR #4585 merged at 17:57. Both remaining runs still going: depth 14 c = 6 (56 min in, peak RSS 12.4 GB);
   (6,3) D = 8 (74 min in, RSS 73.7 GB, host load average 78 to 218).
+
+## 19:29 UTC
+
+- Depth 14 c = 6: 1 h 43 min in, peak RSS 14.8 GB. (6,3) D = 8: 2 h 01 min in, peak RSS 90.4 GB. No new closure line.
