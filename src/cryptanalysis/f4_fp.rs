@@ -717,6 +717,16 @@ impl F4Options {
         self.weights = Some(weights);
         self
     }
+    /// Opt in to fall-degree diagnostics in [`VisitReport`]
+    /// (`first_fall_degree`, `last_fall_degree`,
+    /// `degree_of_regularity_observed`).  The streaming/domain solver does not
+    /// yet record these, so this is currently a no-op builder: the fields stay
+    /// `None`.  It exists so callers can request the diagnostics without a
+    /// behaviour change, and so the recording can be wired in later behind this
+    /// same opt-in.
+    pub fn recording_degree_falls(self) -> Self {
+        self
+    }
     pub fn with_budget(mut self, budget: Duration) -> Self {
         self.deadline = Some(Instant::now() + budget);
         self
@@ -4387,15 +4397,16 @@ pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Vec<usize> {
 /// Post-hoc degree-fall diagnostic (gated by [`F4Options::record_degree_falls`]).
 ///
 /// Compares the realized standard-monomial count of the final leading ideal
-/// (`uncovered_in_degree` of the computed basis) against the semi-regular
-/// Hilbert function of the input generator degrees. A **degree fall** at degree
-/// `d` is a degree where the realized count is strictly below the expectation:
-/// the ideal is larger than a generic system of the same degrees would be,
-/// which is exactly the first-fall phenomenon that makes a structured system
-/// cheaper than its generic bound. Returns
-/// `(first_fall, last_fall, degree_of_regularity_observed, per_degree)`. Purely
-/// diagnostic: it reads the finished basis, is never on the hot path, is never
-/// priced into `S`, and is never a stopping rule.
+/// (`uncovered_in_degree` of the computed basis) against the
+/// complete-intersection — i.e. semi-regular — Hilbert function of the input
+/// generator degrees (`complete_intersection_hilbert`, the same expectation the
+/// Hilbert stop uses). A **degree fall** at degree `d` is a degree where the
+/// realized count is strictly below the expectation: the ideal is larger than a
+/// generic system of the same degrees would be, which is exactly the first-fall
+/// phenomenon that makes a structured system cheaper than its generic bound.
+/// Returns `(first_fall, last_fall, degree_of_regularity_observed, per_degree)`.
+/// Purely diagnostic: it reads the finished basis, is never on the hot path, is
+/// never priced into `S`, and is never a stopping rule.
 fn degree_fall_diagnostic(
     input: &[Poly],
     basis: &[Poly],
@@ -6448,6 +6459,14 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
+    /// Fall-degree diagnostics, recorded only when the run opts in with
+    /// [`F4Options::recording_degree_falls`].  `None` means "not recorded on
+    /// this run" (the default); the streaming/domain solver does not yet emit
+    /// them, so they stay `None` until that recording is wired in.  Consumers
+    /// (e.g. `aps_single_relation`) treat `None` as "unobserved".
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -6636,6 +6655,20 @@ where
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        // An alive-only native basis can retire an input before its deferred
+        // pair is processed. Preserve the exact incoming generators in the
+        // opt-in traced traversal instead of claiming equality for that subset.
+        // This adds no pair processing and does not change any solver limit.
+        let preserved = trace.as_ref().map(|_| {
+            let mut generators = r.basis.clone();
+            for f in input {
+                if !f.is_empty() && !generators.contains(f) {
+                    generators.push(f.clone());
+                }
+            }
+            generators
+        });
+        let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(d) = r.first_fall_degree {
             self.report.first_fall_degree =
                 Some(self.report.first_fall_degree.map_or(d, |c| c.min(d)));
@@ -6651,20 +6684,6 @@ where
                     .map_or(d, |c| c.max(d)),
             );
         }
-        // An alive-only native basis can retire an input before its deferred
-        // pair is processed. Preserve the exact incoming generators in the
-        // opt-in traced traversal instead of claiming equality for that subset.
-        // This adds no pair processing and does not change any solver limit.
-        let preserved = trace.as_ref().map(|_| {
-            let mut generators = r.basis.clone();
-            for f in input {
-                if !f.is_empty() && !generators.contains(f) {
-                    generators.push(f.clone());
-                }
-            }
-            generators
-        });
-        let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
@@ -7256,6 +7275,54 @@ mod tests {
     use std::collections::BTreeMap;
 
     #[test]
+    fn analytic_linear_roots_match_exhaustive_field_roots() {
+        for p in [2, 3, 5, 7, 59] {
+            for a in 1..p {
+                for b in 0..p {
+                    let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
+                    let (var, root) = linear_assignment(&g, p).unwrap();
+                    assert_eq!(var, 1);
+                    assert_eq!(roots_univariate(&[(1, a), (0, b)], p), vec![root]);
+                }
+            }
+        }
+        assert_eq!(
+            linear_assignment(&vec![(vec![1], 1), (vec![1], 4)], 5),
+            None
+        );
+        assert_eq!(
+            linear_assignment(&vec![(vec![1, 0], 1), (vec![0, 1], 1)], 5),
+            None
+        );
+        assert_eq!(linear_assignment(&vec![(vec![2], 1)], 5), None);
+        assert_eq!(linear_assignment(&vec![(vec![0], 1)], 5), None);
+    }
+
+    #[test]
+    fn linear_root_policy_preserves_recursive_and_inconsistent_answers() {
+        for p in [3, 5, 7] {
+            for c in 0..p {
+                let input = vec![
+                    vec![(vec![2, 0], 1), (vec![0, 0], c)],
+                    vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+                ];
+                let opts = F4Options::new(Ordering::Grevlex, 8);
+                let baseline = solve_with_linear_roots(&input, 2, p, &opts, false);
+                let candidate = solve_with_linear_roots(&input, 2, p, &opts, true);
+                match (baseline.verdict, candidate.verdict) {
+                    (Verdict::Inconsistent, Verdict::Inconsistent) => {}
+                    (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {
+                        a.sort();
+                        b.sort();
+                        assert_eq!(a, b);
+                    }
+                    (a, b) => panic!("linear policy changed verdict: {a:?} vs {b:?}"),
+                }
+            }
+        }
+    }
+
+    #[test]
     fn semi_regular_hilbert_matches_hand_computed_series() {
         // Square complete intersection of two quadrics in two variables:
         // (1 - t^2)^2 / (1 - t)^2 = (1 + t)^2 = 1 + 2t + t^2.
@@ -7339,154 +7406,7 @@ mod tests {
         assert_eq!(r.degree_of_regularity_observed, None);
     }
 
-    /// Records a degree-fall dataset for the research-visuals trace figure:
-    /// a family of systems over F_101 in three variables that grows from a
-    /// regular sequence (three quadrics) to an over-determined one (up to six),
-    /// so the recorded per-degree Hilbert deviation shows how added relations
-    /// drive the degree of regularity down. No-op unless `ECBENCH_DEGREE_TRACE_OUT`
-    /// names an output path, so ordinary test runs are unaffected. Pure
-    /// instrument output: the Rust engine computes and records; the figure only
-    /// lays these values out.
     #[test]
-    fn emit_degree_fall_dataset() {
-        let Ok(out) = std::env::var("ECBENCH_DEGREE_TRACE_OUT") else {
-            return;
-        };
-        let p = 101u64;
-        let n = 3usize;
-        // Deterministic "generic" quadric coefficients from an LCG, so the
-        // dataset is reproducible without an external RNG dependency.
-        let mut state = 0x2026_1117u64;
-        let mut next = || {
-            state = state
-                .wrapping_mul(6_364_136_223_846_793_005)
-                .wrapping_add(1_442_695_040_888_963_407);
-            (state >> 33) % p
-        };
-        let monos: Vec<Vec<u32>> = {
-            let mut v = Vec::new();
-            for a in 0..=2u32 {
-                for b in 0..=2u32 {
-                    for c in 0..=2u32 {
-                        if a + b + c <= 2 {
-                            v.push(vec![a, b, c]);
-                        }
-                    }
-                }
-            }
-            v
-        };
-        // Each quadric is forced to vanish at (1,1,1): every monomial is 1
-        // there, so after drawing the non-constant coefficients the constant
-        // term is set to cancel their sum. That keeps (1,1,1) a common root for
-        // every k, so the over-determined systems stay consistent (an
-        // inconsistent system has no degree-of-regularity story to record).
-        let quadrics: Vec<Poly> = (0..6)
-            .map(|_| {
-                let mut terms: Vec<(Vec<u32>, u64)> = monos
-                    .iter()
-                    .filter(|m| !m.iter().all(|&e| e == 0))
-                    .filter_map(|m| {
-                        let c = next();
-                        (c != 0).then(|| (m.clone(), c))
-                    })
-                    .collect();
-                let s: u64 = terms.iter().map(|(_, c)| c % p).sum::<u64>() % p;
-                let k0 = (p - s) % p;
-                if k0 != 0 {
-                    terms.push((vec![0, 0, 0], k0));
-                }
-                terms
-            })
-            .collect();
-        let mut systems = Vec::new();
-        for k in 3..=6usize {
-            let input: Vec<Poly> = quadrics[..k].to_vec();
-            let mut opts = F4Options::new(Ordering::Grevlex, 12);
-            opts.record_degree_falls = true;
-            let r = f4(&input, n, p, &opts);
-            let steps: Vec<serde_json::Value> = r
-                .degree_falls
-                .iter()
-                .map(|s| {
-                    serde_json::json!({
-                        "degree": s.degree,
-                        "expected": s.hilbert_expected,
-                        "realized": s.hilbert_realized,
-                        "is_fall": s.is_fall,
-                    })
-                })
-                .collect();
-            systems.push(serde_json::json!({
-                "relations": k,
-                "n_vars": n,
-                "p": p,
-                "first_fall_degree": r.first_fall_degree,
-                "last_fall_degree": r.last_fall_degree,
-                "degree_of_regularity_observed": r.degree_of_regularity_observed,
-                "solving_degree": r.solving_degree,
-                "timed_out": r.timed_out,
-                "steps": steps,
-            }));
-        }
-        let dataset = serde_json::json!({
-            "schema": "ecbench.degree-fall-dataset/v1",
-            "field": p,
-            "n_vars": n,
-            "family": "quadric sequence, 3..6 relations, LCG-seeded over F_101",
-            "systems": systems,
-        });
-        std::fs::write(&out, serde_json::to_string_pretty(&dataset).unwrap()).unwrap();
-    }
-
-    #[test]
-    fn analytic_linear_roots_match_exhaustive_field_roots() {
-        for p in [2, 3, 5, 7, 59] {
-            for a in 1..p {
-                for b in 0..p {
-                    let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
-                    let (var, root) = linear_assignment(&g, p).unwrap();
-                    assert_eq!(var, 1);
-                    assert_eq!(roots_univariate(&[(1, a), (0, b)], p), vec![root]);
-                }
-            }
-        }
-        assert_eq!(
-            linear_assignment(&vec![(vec![1], 1), (vec![1], 4)], 5),
-            None
-        );
-        assert_eq!(
-            linear_assignment(&vec![(vec![1, 0], 1), (vec![0, 1], 1)], 5),
-            None
-        );
-        assert_eq!(linear_assignment(&vec![(vec![2], 1)], 5), None);
-        assert_eq!(linear_assignment(&vec![(vec![0], 1)], 5), None);
-    }
-
-    #[test]
-    fn linear_root_policy_preserves_recursive_and_inconsistent_answers() {
-        for p in [3, 5, 7] {
-            for c in 0..p {
-                let input = vec![
-                    vec![(vec![2, 0], 1), (vec![0, 0], c)],
-                    vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
-                ];
-                let opts = F4Options::new(Ordering::Grevlex, 8);
-                let baseline = solve_with_linear_roots(&input, 2, p, &opts, false);
-                let candidate = solve_with_linear_roots(&input, 2, p, &opts, true);
-                match (baseline.verdict, candidate.verdict) {
-                    (Verdict::Inconsistent, Verdict::Inconsistent) => {}
-                    (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {
-                        a.sort();
-                        b.sort();
-                        assert_eq!(a, b);
-                    }
-                    (a, b) => panic!("linear policy changed verdict: {a:?} vs {b:?}"),
-                }
-            }
-        }
-    }
-
     fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
         let root = std::env::temp_dir().join(format!(
             "f4-visitor-checkpoint-rejection-{}-{}",

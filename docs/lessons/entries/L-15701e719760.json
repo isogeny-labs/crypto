@@ -1,0 +1,14 @@
+{
+  "action": "run scripts/check-large-files.sh origin/main HEAD before the commit and pack any file over 10 MiB as <file>.xz with a sha256 sidecar (AGENTS.md 13a); the size check failed PR #4564 until I repacked",
+  "created": "2026-11-17T15:52:33Z",
+  "evidence": [
+    "PR #4564 check size, log 'check-large-files: 1 file(s) over 10485760 bytes'"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ic-autolab"
+  ],
+  "trigger": "committing a round whose holdout session writes a records.jsonl (1024 pairs x 5 arms is about 48 MB)",
+  "why": ""
+}
