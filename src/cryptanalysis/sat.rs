@@ -94,6 +94,8 @@ fn capacity_bytes<T>(buffer: &Vec<T>) -> u64 {
 fn storage_snapshot_due(phase: &str, conflicts: u64) -> bool {
     matches!(phase, "solve_enter" | "solve_return")
         || (phase == "conflict_snapshot" && conflicts.is_multiple_of(10_000))
+}
+
 /// Typed semantic search events, not an independently checked UNSAT proof. Clause IDs
 /// are immutable arena offsets; XOR row IDs are indices in the current matrix,
 /// reset by `XorMatrixReset`. Literal/variable names use DIMACS indexing.
@@ -1870,6 +1872,7 @@ impl Solver {
                         } else {
                             xor_into(target, &src);
                             self.stats.xor_word_updates += words as u64;
+                        }
                         xor_into(&mut matrix[j * words..(j + 1) * words], &src);
                         if self.event_observer.is_some() && self.event_failure.is_none() {
                             emit_to(
@@ -1911,9 +1914,9 @@ impl Solver {
             };
             self.stats.xor_row_scans += 1;
             let parity = if self.indexed_xors {
-                let Some(parity) = self.unit_parity(
-                    i, words, p, self.matrix_support[i].iter().copied(),
-                ) else {
+                let Some(parity) =
+                    self.unit_parity(i, words, p, self.matrix_support[i].iter().copied())
+                else {
                     continue 'rows;
                 };
                 parity
@@ -1921,9 +1924,14 @@ impl Solver {
                 let row = &self.matrix[i * words..(i + 1) * words];
                 let mut parity = self.matrix_rhs[i];
                 for (w, ((&m, &assigned), &value)) in row
-                    .iter().zip(&self.assigned_w).zip(&self.value_w).enumerate()
+                    .iter()
+                    .zip(&self.assigned_w)
+                    .zip(&self.value_w)
+                    .enumerate()
                 {
-                    if m == 0 { continue; }
+                    if m == 0 {
+                        continue;
+                    }
                     let free = m & !assigned;
                     if free.count_ones() > 1
                         || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
@@ -2920,31 +2928,6 @@ impl Solver {
             let mut stderr = std::io::stderr().lock();
             let _ = writeln!(stderr, "{record}");
             let _ = stderr.flush();
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
-        }
-        if self.observing() {
-            self.emit(SolverEvent::SolveBegin {
-                conflicts: self.conflicts,
-                conflict_budget: self.conflict_budget,
-            });
-        }
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
-        }
-        let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory);
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
-        }
-        if self.observing() {
-            self.emit(SolverEvent::SolveEnd {
-                result: format!("{result:?}"),
-            });
-        }
-        if self.event_failure.is_some() {
-            SolveResult::Unknown
-        } else {
-            result
         }
     }
 
@@ -2971,16 +2954,17 @@ impl Solver {
         let initial_conflict = self.propagate().is_some();
         self.trace_solve_phase(trace, "initial_propagation_complete", None);
         if initial_conflict {
-        if let Some(conflict) = self.propagate() {
-            if self.observing() {
-                let (reason, literals) = self.conflict_event(conflict, 0);
-                self.emit(SolverEvent::Conflict {
-                    level: self.trail_lim.len(),
-                    reason,
-                    literals,
-                });
+            if let Some(conflict) = self.propagate() {
+                if self.observing() {
+                    let (reason, literals) = self.conflict_event(conflict, 0);
+                    self.emit(SolverEvent::Conflict {
+                        level: self.trail_lim.len(),
+                        reason,
+                        literals,
+                    });
+                }
+                return SolveResult::Unsat;
             }
-            return SolveResult::Unsat;
         }
         if self.event_failure.is_some() {
             return SolveResult::Unknown;
@@ -4114,6 +4098,8 @@ mod tests {
         assert!(storage_snapshot_due("conflict_snapshot", 10_000));
         assert!(!storage_snapshot_due("conflict_snapshot", 1_000));
         assert!(!storage_snapshot_due("initial_propagation_complete", 0));
+    }
+
     /// Re-entering `solve` after a conflict-budget stop must give the
     /// same answer as one unbounded call.  Before the level-zero restart
     /// on entry, a resumed solve could return SAT with a model that

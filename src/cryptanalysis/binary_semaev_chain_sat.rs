@@ -868,6 +868,27 @@ impl ChainedS3Encoding {
         Ok(())
     }
 
+    /// Keep one representative within each run of equal adjacent summand
+    /// domains — the `EqualDomainRuns` ordering arm.
+    ///
+    /// Pre-existing-break repair: this method was referenced by
+    /// `koblitz_large_prime`'s `MixedOrbitOrdering::EqualDomainRuns` arm but
+    /// was never defined on this branch, so the crate did not compile. A
+    /// faithful implementation needs the per-adjacent-pair domain-equality
+    /// that [`Self::install_summand_domains`] does not retain (only the
+    /// first-pair and all-summands exchangeability flags are kept), and an
+    /// incorrect lex ordering between unequal-domain summands would drop
+    /// decompositions, making the search unsound. Until that equality data is
+    /// plumbed through and the ordering is verified, this arm is reported as
+    /// unsupported rather than guessed. It is not reachable from any current
+    /// caller or test; only an explicit `EqualDomainRuns` request hits it.
+    pub fn order_equal_adjacent_summands(
+        &mut self,
+        _max_variables: u32,
+    ) -> Result<(), ChainBuildError> {
+        Err(ChainBuildError::Unsupported)
+    }
+
     fn decode_block(&self, block: &[u32], model: &[bool]) -> F2mElement {
         let set: Vec<u32> = block
             .iter()

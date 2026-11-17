@@ -7,6 +7,7 @@ use serde_json::json;
 
 use super::canonical::{sha256_hex, short_id};
 use super::claw::{ClawGroup, NarrowClaw, WideClaw};
+use super::exact_scalar::ExactScalar;
 use super::methods::{FactorBaseFacts, PhaseRecord, ResolvedMethod, SolveReport};
 use super::workload::{CurveFacts, WideInstance};
 use crate::cryptanalysis::ic_boundary::{BinaryInstance, GroupOps};
@@ -459,7 +460,7 @@ fn run<G: ClawGroup>(
                 measurement::mark(Phase::TargetDescent);
                 rank.insert(row, &mut c)?;
                 if let Some(d) = rank.pinned(columns.len()) {
-                    recovered = Some(d.to_u128());
+                    recovered = Some(ExactScalar::from(d.to_u128()));
                     break 'queries;
                 }
                 break;
@@ -535,7 +536,10 @@ mod tests {
             let target = g.mul(&mut GroupOps::default(), i.generator, scalar);
             let direct = solve_narrow(&method("direct", 2, 512), i, &facts, target, 7351).unwrap();
             let orbit = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
-            assert_eq!(direct.recovered, Some(u128::from(scalar)));
+            assert_eq!(
+                direct.recovered,
+                Some(super::ExactScalar::from(u128::from(scalar)))
+            );
             assert_eq!(orbit.recovered, direct.recovered);
             assert_eq!(direct.factor_base, orbit.factor_base);
             let replay = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
@@ -587,7 +591,7 @@ mod tests {
             7351,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(123));
+        assert_eq!(rep.recovered, Some(super::ExactScalar::from(123u128)));
     }
 
     #[test]

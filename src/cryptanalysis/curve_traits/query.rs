@@ -180,7 +180,7 @@ mod tests {
                 .digest()
             })
             .collect();
-        assert_eq!(file.registry_sha256, digests[0].sha256);
+        assert_eq!(file.catalog_rows_sha256, digests[0].sha256);
         assert_eq!(file.inputs, digests);
     }
 
