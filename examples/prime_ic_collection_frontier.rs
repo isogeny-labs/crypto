@@ -38,7 +38,7 @@
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::prime_fast::{
-    collect_relations, collect_relations_table, find_a3_curve, ic_multi_solve_ex, ic_solve,
+    collect_relations, collect_relations_table, find_a3_curve, ic_multi_solve_ex, ic_solve, ic_solve_fast,
     ic_solve_table, rho_parallel, solve_relations, FastFactorBase, PairTable, RhoConfig,
 };
 use rand::rngs::StdRng;
@@ -259,6 +259,21 @@ fn main() {
                 sw_s / ba_s,
                 rho_wall / ba_s
             );
+            // ic_solve_fast: auto-tuned B = round(p^(1/3)), batched table path
+            let ((x_fa, rep_fa), fa_s) = {
+                let (r, s) = secs(|| ic_solve_fast(&fc, g, q, None, args.extra, mw, args.seed));
+                (r.expect("ic_solve_fast"), s)
+            };
+            assert_eq!(x_fa, k, "ic_solve_fast wrong log");
+            println!(
+                "| `ic_solve_fast` (auto B={}) | {:.4} | {}/{} | {:.2}× | {:.3}× |",
+                rep_fa.factor_base_size, fa_s, rep_fa.determined_logs, rep_fa.target_points_walked,
+                sw_s / fa_s, rho_wall / fa_s
+            );
+            out.push(json!({
+                "section": "e2e_fast", "bits": bits, "sweep_B": b, "fast_B": rep_fa.factor_base_size,
+                "sweep_total_s": sw_s, "fast_total_s": fa_s, "fast_vs_sweep": sw_s / fa_s,
+            }));
             println!();
             out.push(json!({
                 "section": "e2e", "bits": bits, "B": b,
