@@ -1392,3 +1392,10 @@ What was done: derived exhaustive two-shape quotient for triples of a5cycle; eig
 Decisions made: test compact target-bearing family before building combined pool; no8vs40speed inference, scalar-copy triples excluded.
 Open threads: execute once and assess useful rank/target completion; full genus2+tenfold objective open.
 Errors: none; no execution before pushed freeze.
+
+## Self-orbit eight-trial gate completed
+
+What was done: cdbea1ba123 single invocation exits0,40trials/24splitgrouprelations,alllabel/polynomial/three-solver checks. Addedrank2/2/3/3/4;onlyp251source17completesat8,versusold5. Other4undetermined, sixth no-trigger retained. Raw/exit/hashes/results preserved.
+Decisions made:60%split fraction not useful-target improvement. Exhausted same-orbit triple representatives without scalar-copy inflation; standalone circuit optimization not justified. Avoid further minor fixture variations without new useful-rank/cost mechanism.
+Open threads: mathematically different mechanism for original genus2+10xobjective; combined adaptive pool not justified by hit counts alone.
+Errors: none; incomplete cases scientific outcomes, no retries/S3/cloud.
