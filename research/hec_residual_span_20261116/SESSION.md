@@ -2527,3 +2527,10 @@ What was done: extracted all80retained complete base-field comparator counts acr
 Decisions made: compare10P>B against every frozen comparator, no omitted-map/solver work charged and no runtime interpretation. Existing scalar kernel only; alternate projector circuits remain outside bound. KB related adaptation source6651d950 recorded, no novelty claim. One120CPU process after Git freeze/push.
 Open threads: execute floor and retain every inequality; build full aliasmap only if a viable complete-cost case remains.
 Errors: pre-freeze source inspection corrected counter identity to2reduce128+pre+mul_pre; no scientific run yet. No S3/cloud/merge.
+
+## Paid scalar projection floor rejects all80tenfold count budgets
+
+What was done: freeze3d22845ebc7 hashes passed, sole run exit0. Projection reps24/102/14/10/9 cost38676/328458/31054/112428/156816baseREDC. Repeat vectors/output/validity/order/count identities pass. All80frozen complete-control comparisons have10P>B; exact per-arm/source/target table retained.
+Decisions made: do not build full alias-map solver around existing scalar projector; even optimistic setup fails tenfold basecount boundary. Preserve genuine compression result separately from cost failure. Alternative projector circuits not ruled out, but need new cost case and cannot improve original h1genus-two instance via projection compression.
+Open threads: materially different useful-rank/coordinate circuit or genus-three finite-field geometric route with complete-cost evidence; original fullgenus2+10xgoal open. Do not repeat scalar-map floor or promote component count into runtime.
+Errors: none in scientific run; no S3/cloud/merge. Internal shared implementation/counter evidence remains [pcc:unverified].
