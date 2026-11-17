@@ -11,11 +11,17 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-_(none pinned — set one with `/goal <text>`)_
+Achieve at least a 2x reduction in degree of regularity for the P-256
+factor-base relation systems, under a frozen definition and matched workload.
+Require exact algebraic certificates and relation replay; input degree,
+variable count and final Gröbner-basis degree alone do not meet this goal.
 
 ## Active items (top = next)
 
-- [ ] Achieve a matched 2x reduction in degree of regularity for P-256 factor-base relation systems (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117)
+- [ ] Freeze the regularity definition, nontrivial baseline and matched controls (codex, started 2026-11-17, branch lane/p256-dreg-half-20261117, PR #4555; in progress)
+- [ ] Implement exact regularity certificates and falsification controls for baseline/candidate (codex, PR #4555)
+- [ ] Establish a candidate with D_candidate <= D_baseline/2, preserving exact relations and charging auxiliary variables/covers (codex, PR #4555)
+- [ ] Validate m=2–7 and record scope, replay, costs and remaining obligations (codex, PR #4555)
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
