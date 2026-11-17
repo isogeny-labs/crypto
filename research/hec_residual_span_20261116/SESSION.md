@@ -1039,3 +1039,17 @@ A stronger independent-relation mechanism or complete-cost construction is neede
 
 ### Errors
 No runtime/gate failure or retry. No S3 polling, cloud spending or old-baseline rerun.
+
+## Balanced determinant proof supplied
+
+### What was done
+Read Weinstein Theorem3.3.2 and conventions. Supplied a paper-level proof of Hdet using Gaussian p-divisible idempotents,2+2Lie signature, determinant/cokernel length and Gaussian ideal norm. The proof does not require ordinarity. It invokes standard compatible etale/crystalline weight-one realizations explicitly; no experiment substitutes for these foundations. [pcc:unverified]
+
+### Decisions made
+Keep the new proof note separate from frozen historical reports/sources. No new timing, unique-candidate guarantee, formal certification or tenfold claim. This strengthens a specialgenus4setup construction; it does not silently narrow the general objective.
+
+### Open threads
+Independent review of realization conventions and full reconstruction theorem; a broad useful-relation/cost mechanism remains necessary for10xgenus2+.
+
+### Errors
+Browser502onprimarynotes; curl retrieval succeeded and full theorem/convention text read. No scientific run or S3 polling.
