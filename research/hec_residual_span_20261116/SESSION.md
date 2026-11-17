@@ -1861,3 +1861,10 @@ What was done: freeze4a6bab348ec executed once, exit0;12 certificates/84 mutatio
 Decisions made: qualification only, no certificate cost or complete speedup claim. Assertions [pcc:unverified]. Git custody replaces unavailable S3.
 Open threads: freeze complete-cost gate against both retained source arms; independent review/publication artifacts; original genus2+10x objective.
 Errors: none in execution; no retry/S3/cloud.
+
+## Complete lazy certificate cost frozen
+
+What was done: compiled complete producer/construction/verification cost harness, explicit native-control delta, prior packet/counter replay, two repeats and both retained arms.
+Decisions made: prospective descriptive gate, all 12 original targets; no mixed-modulus aggregation, Git freeze before once-only120CPU invocation. Sources are prior lazy/sparse/Frobenius protocols/results/derivation. Assertions [pcc:unverified].
+Open threads: execute after push, interpret complete costs and choose successor.
+Errors: none in compile; no science yet.
