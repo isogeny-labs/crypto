@@ -255,8 +255,20 @@ fabricating counter values. The local Debian 13 container also denies
 software task-clock and hardware cycles/instructions via
 `perf_event_open` (`EACCES`) and cannot resolve the package mirrors.
 
-The newly added `bench-batch-core` target and extended workflow were
-committed **after** that passing run and must pass their own CI build
-before the PR can be treated as fully verified. Even with a passing
-unit suite, GPU tests and full `rf64_decompose` benchmarking remain
-required; the PR must stay draft until those gates are satisfied.
+The subsequent [batch-core CI run 44181419222](https://github.com/isogeny-labs/crypto/actions/runs/44181419222)
+successfully compiled the new on-repository benchmark, passed `test_cpu`
+(`ALL PASS`) and checked all 8192 before/after field arrays bitwise.
+Its single-run seven-pass wall-clock medians were:
+
+| CPU microbenchmark | Before ns/op | After ns/op | Speedup |
+|---|---:|---:|---:|
+| Oracle CHUNK=16 | 274.73 | 268.03 | 1.025x |
+| Oracle CHUNK=32 | 428.81 | 419.32 | 1.023x |
+| Pair run m=16 | 276.04 | 267.98 | 1.030x |
+| Pair run m=1 | 137.22 | 130.54 | 1.051x |
+
+These are repeatable procedures, not confidence intervals or full-oracle
+throughput results. The CI runner also reported `perf version 7.0.14`
+but `perf_event_paranoid=4`, so the PMU measurement gate still failed
+closed. GPU correctness/occupancy and full `rf64_decompose` throughput
+remain unverified. Keep this PR draft until those gates are satisfied.
