@@ -50,3 +50,7 @@ Integratedlazyquotientfinisher: [completecostqualification/negative result](rese
 Originalmixedterm2-kernelcensus: [all11sources/completeisotropicenumeration](research/hec_residual_span_20261116/native-two-kernel/RESULTS.md) finds1rationaltractablekerneloneachg3p61/211/401, g2p101/1009oneeach, g4p31eleven;other5sourceszero. Kerneladmissiononly—noquotient/trigonalrationality/nonhyperellipticity/transport/speedclaim. Smithrouteispriorart; fullgenus2+objectiveopen.
 
 Originalg3trigonalmapconstruction: [all3fieldsadmittwoverifiedrationalmaps](research/hec_residual_span_20261116/native-trigonal-map/RESULTS.md), exactpairconditions/coprimedegree3/mapsandmutationschecked. ThisclearsSmithmaprationalityonly; noquotientcurve/isogenytargettransport/nonhyperellipticity/speedclaim.
+
+### Smith affine construction gate
+
+Six normalized maps now have exact norm and affine-equation checks under Git custody (freeze `57bf3b5d8be`). All 1,346 parameter checks and 208 quotient fibre points pass. Both maps over F61 pass the rational correspondence square test with 16 rho witnesses; both maps over F211 and both over F401 have nonsquare norm scalars, retained as obstructions. Smooth normalization and Jacobian/target transport remain open; this stage makes no speed claim. See `research/hec_residual_span_20261116/native-smith-affine/RESULTS.md`.

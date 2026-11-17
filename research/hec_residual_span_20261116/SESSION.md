@@ -2968,3 +2968,10 @@ What was done: compiled six-map exact norm, resultant, discriminant, Veronese an
 Decisions made: owner-authorized Git custody replaces unavailable S3 for this bounded stage; retain nonsquare obstruction and all original sources.
 Open threads: execute once, retain raw outcomes; smooth normalization and Jacobian transport remain open.
 Errors: compilation succeeds with one unused helper warning; no scientific execution yet.
+
+## Smith affine gate passed with four rational correspondence obstructions
+
+What was done: freeze57bf3b5d8be hashes pass, sole invocation exit0; six exact norm squares up to scalar, 1346 resultant/discriminant evaluations, 208 quotient fibre points and 16 rational rho witnesses pass.
+Decisions made: only both p61 maps pass square test; both p211 and both p401 maps have nonsquare norm scalar. Preserve obstructions, no twist substitution or speed claim. Git custody used, no S3 polling.
+Open threads: smooth normalization/nonhyperellipticity/Jacobian action and target transport for p61; other genera and full speed objective remain open.
+Errors: no runtime failure; unused compile helper warning only.
