@@ -23,3 +23,22 @@
 ### Errors (what went wrong, how it was handled)
 - Tool environment has GitHub connector but no `cargo` binary and no local checkout; delegated native test/build to source-specific GitHub Actions instead of claiming local compilation.
 - Research-KB MCP unavailable; fallback scope recorded above. No experimental numeric outcome asserted before runner completion.
+
+## 16:28–16:30 UTC — exact-source validation and outcome
+
+### What was done (commands, files, features)
+- Read failed [Actions #44125685729](https://github.com/isogeny-labs/crypto/actions/runs/44125685729): original **40/40 Rust library** tests passed; new example E0499 single nested borrow at `ar.sqrt(ar.rhs(..))`. Committed narrow source-only borrow fix `6b485f3`, same frozen protocol and fixtures; no post-data tuning.
+- Final [Actions #44125986122](https://github.com/isogeny-labs/crypto/actions/runs/44125986122) **SUCCESS**: native library 40/40, comparator 1/1, release JSON assertions, pinned Rust 1.100, original arithmetic ref `1df7146`, bounded virtual memory. Downloaded [artifact #14346464226](https://github.com/isogeny-labs/crypto/actions/runs/44125986122/artifacts/14346464226); independently SHA256-hashed ZIP in the container: `e5fe9fcb11dab0e15acde7a12644f3d13cb5935a859b2fe46702658b53d61212`, exactly GitHub's artifact digest.
+- Replayed **256/256** planted signed masks (256 distinct group points), B8 three frozen fixtures match existing chart outcome. Precompute 16+16 points, 128 original group additions, 27,161 ns. One favorable fixed positive generic query 311ns (1 probe); two off-support queries 4,066ns and 4,076ns (16 probes). Existing RR9 chart on same three R: 139,740ns positive and 136,144/136,204ns negatives (256 sign masks each). 1,024 distinct blinded public Q: zero hits, 16,384 query group additions, 4,197,002ns online.
+- Wrote `RR9_B8_GENERIC_MITM_RESULT_20261117.md` with exact provenance, historical 1024 full-solver frontier separated, bounded literature and previous-lead review, prioritized next experiments. Retained earlier failure and avoided any complete-solver speedup claim.
+
+### Decisions made (and why)
+- Simple B8 256-sign interpolation is a correct but generic-equivalent phase and is not an attractive performance lead relative to 16+16 precomputed point-law MITM. The group-law exact support predicate is more permissive than the RR9 *normalized chart* on exceptional cases, so the comparison claims fixed-fixture equality only.
+- Next decisional test: sign-independent public-R seven-equation sparse F4/quotient with negative unit certificate and independently replayed positive, then B31 all-multiplicity natural-Q extraction. No full ECDLP measured in this run.
+
+### Open threads (unfinished, pick up next time)
+- Build and preregister seven RR9 quadrics quotient/dimension/negative-unit F4 experiment on original native Rust, no sign-mask inputs; perform B31 scaling only if extraction works. Recheck base/current source before editing.
+- Complete B31 unknown-target solver comparisons including shared BSGS and external IC frontier. Independent signed PCC unavailable.
+
+### Errors (what went wrong, how it was handled)
+- Initial compiler E0499 documented and fixed without algorithm/parameter changes. Signed independent PCC not available; all new measurements are producer CI. No other failures on final source.
