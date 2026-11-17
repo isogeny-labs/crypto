@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Prime31 RR9 seven-anchor algebraic residual test (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-seven-anchor-20261117; in progress)
 - [x] Prime31 RR9 exceptional x=r residual and exact signed fibre checks (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-exceptional-residual-20261117, PR #4546)
 
 - [x] Prime31 RR9 B8 signed-fibre linear-factorization falsifier and Rust exact controls (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-b8-signed-fibres-20261117, PR #4545)
