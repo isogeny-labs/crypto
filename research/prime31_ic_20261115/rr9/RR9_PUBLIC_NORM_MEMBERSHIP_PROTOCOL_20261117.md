@@ -46,3 +46,17 @@ For a nonidentity public `R=(r,s)`, the condition `F(-R)=0` is exactly `U(r)-sV(
 with eight coefficients `A_0..A_3,V_0..V_3`. All relevant eight-leaf nonidentity solutions have `V_3!=0`; set `V_3=1` projectively, leaving precisely **seven** affine unknowns. This chart makes the signed orientation condition automatic, and the nonenumerative extraction target is the eight remainder equations in these seven variables.
 
 **New source-exact falsifier, no timed performance claim:** reconstruct `F` from this chart for all 64 already planted nonzero-R coefficients and all six repeated-point certificates; assert equality up to the unique `V_3` scaling, and that reconstructed `F(-R)=0`. The changed-support `F'=F+(X-r)` must also remain on this signed chart, so a negative test cannot pass by merely violating `F(-R)=0`. Reject `R=O` and `V_3=0`; require test assertions for both. No generic ECDLP enumeration, new solver or speedup claim.
+
+## Extension C — direct monic eight-factor polynomial, no norm division (frozen before source)
+
+Write `R=(r,s)`, `C(X)=X^3+aX+b`, `D_R(X)=X^2+rX+r^2+a`. Since `s^2=C(r)`, `C(X)-s^2=(X-r)D_R(X)`. On the signed chart `F=(X-r)A+(Y+s)V`, its x-norm is identically
+```
+N_F(X)=(X-r)[(X-r) A(X)^2 + 2s A(X)V(X) - D_R(X)V(X)^2].
+```
+Therefore, after `V_3=1`, the *monic degree-eight* residual factor polynomial is directly
+```
+M_(A,V,R)(X) = D_R(X)V(X)^2 - (X-r)A(X)^2 - 2s A(X)V(X).
+```
+This uses polynomial multiplication and subtraction only; no synthetic norm division, no supplied leaves and no elliptic group arithmetic. Its leading coefficient is one because `deg V=3`, `deg A<=3`. It makes extraction's eight congruences explicitly `H_B^8 mod M_(A,V,R)=0` in the seven normalized chart coefficients. This is an exact classical algebraic simplification, **not** a faster discrete-log solver.
+
+**Precommitted tests:** on the same 64 distinct and six repeated positive producer fixtures, compute `M_direct` and assert coefficient equality to the quotient of the full norm `N_F/[-V_3²(X-r)]`, after scaling `F` to `V_3=1`. Assert monic degree eight, `H_B^8 mod M_direct=0`, and target-preserving mutation changes the monic polynomial and fails divisibility. Reject invalid point / V3=0. Preserve the old independently computed norm and Hermite controls. Do not run a new timing experiment or make a speedup claim from polynomial formula simplification.
