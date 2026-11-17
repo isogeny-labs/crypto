@@ -713,6 +713,12 @@ impl F4Options {
         self.deadline = Some(Instant::now() + budget);
         self
     }
+    /// Record the post-hoc degree-fall diagnostic. See
+    /// [`F4Options::record_degree_falls`].
+    pub fn recording_degree_falls(mut self) -> Self {
+        self.record_degree_falls = true;
+        self
+    }
     /// See [`F4Options::stop_staircase`].
     pub fn stopping_below(mut self, standard_monomials: usize) -> Self {
         self.stop_staircase = Some(standard_monomials);
@@ -5021,6 +5027,13 @@ pub struct VisitReport {
     pub solutions_visited: usize,
     pub candidates_rejected: usize,
     pub solving_degree: u32,
+    /// Measured degree-fall observables, folded over the F4 runs of the
+    /// traversal (first fall = min, last fall = max, observed degree of
+    /// regularity = max). Diagnostic; `None` unless a run recorded them
+    /// (`F4Options::record_degree_falls`).
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_runs: usize,
@@ -5214,6 +5227,21 @@ where
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        if let Some(d) = r.first_fall_degree {
+            self.report.first_fall_degree =
+                Some(self.report.first_fall_degree.map_or(d, |c| c.min(d)));
+        }
+        if let Some(d) = r.last_fall_degree {
+            self.report.last_fall_degree =
+                Some(self.report.last_fall_degree.map_or(d, |c| c.max(d)));
+        }
+        if let Some(d) = r.degree_of_regularity_observed {
+            self.report.degree_of_regularity_observed = Some(
+                self.report
+                    .degree_of_regularity_observed
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
