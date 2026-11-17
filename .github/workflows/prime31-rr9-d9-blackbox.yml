@@ -127,6 +127,8 @@ jobs:
         if: always()
         with:
           name: prime31-rr9-d9-blackbox-negative-rank
-          path: prime31-rr9-d9-neg*.json
+          path: |
+            prime31-rr9-d9-neg*.json
+            prime31-rr9-d9-replay*.json
           retention-days: 30
           if-no-files-found: warn
