@@ -1890,3 +1890,10 @@ What was done: freeze f71d88998c3 executed onceexit0;181408 scalar identities,65
 Decisions made: reject single rational pencil parameter perorbit; generic degree2g+1 obstruction for binomial models g2/3/4. Retain exact norm with basepoint factor removal as possible shared-incidence interface.
 Open threads: complete product/gcd/update/rootlift cost case versus incremental explicit batch-inversion buckets before new performance prototype; independently review derivation; full10x scope unchanged.
 Errors: none; no retry/S3/cloud.
+
+## Orbit incidence constructor screen frozen
+
+What was done: built three-kernel exact component comparison, original12targets/all successful lazy reps/16anchors, norm/direct products/explicit batched parameters and exactrepeats.
+Decisions made: before a gcd collector measure implemented construction alone; no universal norm lower bound, no total-speed claim. Assertions [pcc:unverified]. Sources: previous orbit-incidence derivation/KB receipt and batched/inverse.rs.
+Open threads: push freeze, one120CPU invocation, assess construction hurdle and subsequent incidence mechanism.
+Errors: none in compile, no scientific execution yet.
