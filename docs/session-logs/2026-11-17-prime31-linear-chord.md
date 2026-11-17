@@ -22,3 +22,21 @@
 ### Errors (what went wrong, how it was handled)
 - No local Rust toolchain or accessible independent compute runner is provisioned here; therefore no local source compilation or new measured runtime is claimed. CI work is pending.
 - Research KB and Conductor interfaces are not exposed in this connector runtime; GitHub search/source review and literature citations are recorded as bounded fallback. No paid compute launched.
+
+
+## 2026-11-17 ~03:28Z — exact-source Rust audit catches identity bug, repaired before any benchmark [pcc:unverified]
+
+### What was done (commands, files, features)
+- GitHub Actions [run #44010310623](https://github.com/isogeny-labs/crypto/actions/runs/44010310623) successfully compiled the original 40 native library tests and all 23 APS example tests, including the new 256-pair linear chord equality/S3-root test. The separately implemented affine audit's first unit test failed (0/1): `scalar(1,G)` returned the identity instead of G because the independent `add` function used Option `?` on the inputs rather than handling O+P and P+O.
+- Patched only `native/examples/prime31_linear_chord_audit.rs` (commit `42352dc4421563d122d9d681987f47801c309389`): both identity branches now return the other point and nonidentity pairs use the unchanged affine field formulas. CI rerun is required before benchmarking.
+- Sparse source checkouts were introduced for efficiency (commit `b12c27fe35fd1f965a504a74a60f7d950477fc9e`) while preserving immutable 1df714 native code, compiler, curve and all target seeds. One preregistered 24Q panel remained **unexecuted** at this point.
+
+### Decisions made (and why)
+- Retain the failed CI receipt and repair the independent checker before any performance data; neither modify the preregistered speed threshold nor the candidate solver after observing zero measured outcomes.
+- Global workflow-syntax check for the previous source head failed because unrelated base `.github/workflows/curve-covers.yml` duplicates a `run` key at lines 225–226. Treat it separately; do not alter unrelated workflow to mask this result.
+
+### Open threads (unfinished, pick up next time)
+- Await exact-source rerun of the fixed Rust auditor, then execute/inspect full cold 24Q panel; preserve the failed-identity-auditor log and all resulting new performance measurements.
+
+### Errors (what went wrong, how it was handled)
+- Independent affine identity treatment was incorrect. Failure was caught by its Rust unit test before any benchmark; patched the group identity case and retained the original evidence. No new ECDLP timing or speedup was available from this failed CI.
