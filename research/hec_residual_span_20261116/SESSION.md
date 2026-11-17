@@ -2653,3 +2653,10 @@ What was done: implemented generic(noautomorphism)RRanchorsT+aD, smallpointbucke
 Decisions made: do not claim exhaustive repeated-smallhit sampling, speed or novelty. Allu0/degree-skips/nonsplits/overlap/repeats/failures counted. Previousbinomial128anchorfailure distinctandpreserved; noactualrerun orafter-outcomebudgetchange. One600CPUprocess after Gitfreeze.
 Open threads: executeall22, retainanygenus4coveragefailure beforecostgate.
 Errors: eprintprimaryfetch403, earlierread/PENCIL-NEXTandexplicitderivation used, gaprecorded. Inheritedunusedhelper warnings, compilepasses. No S3/cloud/merge.
+
+## General initial-family pencil passes all22fixtures, genus4coverage retained
+
+What was done: freeze6e193495ac9 hashes pass, one correctnessrun exit0,22/22nativeverifiedrecoveries/noidentityshortcut. All14089queriednorm/knownrootproducts andbrutesplitdecisions pass;6742acceptedprincipalgroupidentities,63repeatedroot and32overlapoccurrences checked.2053denseLPprefixchecks agree. Anchorsg211-33,g339-88,g4145-268withinprospective512.
+Decisions made: no anchor/matrixsize/speedratio inference; genus4doesNOTfit128here. Keepallnonsplit/skips andoldbinomialfailures. Derived two-leading-coefficient quadratic-tail kernel fornextprospectiveequivalencegate, notimplemented/measuredyet; classicalVieta/shortenedsieve, no novelty/10xclaim.
+Open threads: prospective cheap-tail equivalence andcompletecost comparison withoriginal2LPwalk/fullbasecontrols, commoncatalogueoptimizationonlyifshared; fullgenus2+objectiveactive/unachieved.
+Errors: none in scientificrun; inheritedunusedhelperswarnings only. No retry/S3/cloud/merge; sharednativeindependentreviewgap explicit.
