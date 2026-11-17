@@ -703,3 +703,17 @@ Attributepfieldcostbyexclusivephase; novelty-screen a generator that canreducecu
 
 ### Errors
 No runtimefailure/censoring/retry. Allboundsunchanged; output hashes retained. PR4518needs updatedscope andpush.
+
+## Solve outputs moved to successor PR4523
+
+### What was done
+Remote state showsPR4518mergedexternallyat3e3440abfb7withhead4ed203d724b, before resultscommit9ca2c636668. Createdsuccessorbranchresearch/hec-c4-solve-results-20261116andreadyPR4523withretainedoutputs. No program rerun.
+
+### Decisions made
+Preserveoriginalexecutionhashandallrawrecords. NewPRcontainsresultsonlyaftermergedproducerfreeze. No mergeperformedbythissession.
+
+### Open threads
+Exclusivepfieldphaseattributionandnewrelation-generationmechanismsremainthenextscientificwork. Broadgoalactive; complete-cost10xunestablished.
+
+### Errors
+ExternalmergeracedPRupdate: gh edit targeted4518justbeforeitsmergedstatewasobserved. CorrectedbysuccessorPR; no code/result loss.
