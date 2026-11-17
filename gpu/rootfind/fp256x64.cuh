@@ -169,6 +169,8 @@ RF_HD U256x64 fp256_mul(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
     /* phase 2: reduction */
 #pragma unroll
     for (int i = 0; i < 4; i++) {
+#ifdef __CUDA_ARCH__
+        /* Device path is unchanged until GPU occupancy/throughput validation. */
         uint64_t m = t[i] * f.pinv;
         uint64_t carry = 0;
 #pragma unroll
@@ -178,6 +180,26 @@ RF_HD U256x64 fp256_mul(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
             t[i + j] = lo;
             carry = hi;
         }
+#else
+        /* P-256 specialization: pinv=1, p[0]=B-1, p[2]=0, B=2^64.
+         * Therefore m=t[i], and t[i]+m*(B-1)=m*B exactly:
+         * eliminate the first wide MAC, set the cleared limb to zero,
+         * and use m as the next carry.  The zero p[2] limb also needs
+         * just a single add-with-carry, not a wide multiplication.
+         * fp256_ctx_p256() is the only constructor of this field. */
+        const uint64_t m = t[i];
+        uint64_t carry = m, lo, hi;
+        t[i] = 0;
+        u64_mac(t[i + 1], m, 0x00000000ffffffffull, carry, lo, hi);
+        t[i + 1] = lo;
+        carry = hi;
+        const uint64_t sum = t[i + 2] + carry;
+        carry = sum < t[i + 2];
+        t[i + 2] = sum;
+        u64_mac(t[i + 3], m, 0xffffffff00000001ull, carry, lo, hi);
+        t[i + 3] = lo;
+        carry = hi;
+#endif
         /* propagate through t[i+4 .. 8] */
 #pragma unroll
         for (int k = i + 4; k < 9; k++) {
