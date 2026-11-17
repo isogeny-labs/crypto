@@ -2954,3 +2954,10 @@ What was done: readSmithsection5Grassmannianprimarydetail, compiledFpsexticquoti
 Decisions made: rationalkernelnotmap; retainzerorationalmaps/degenerates/unsupportednullity, no claimsquotient/descent/nonhyperellipticity/transport/speed. One600CPUrunafterGitfreeze.
 Open threads: executemapgate; eligiblemapsnextneedexplicitRecillasquotient/rationaldescent/targethomomorphismproof;fullgoalactiveunachieved.
 Errors: noneincompile. No S3/cloud/merge/no scientificexecutionbeforefreeze.
+
+## Rational trigonal maps constructed on all original genus3 sources
+
+What was done: freezeb6294030ec2 hashpass/exit0. All3FpsexticFrobenius/pairconditionsrank4/nullity2; quadricdiscriminants56/134/169squaresover61/211/401.2projectiveplanes/mapsperkernel,0degenerates, allcoprimedegree3/directpairidentities/mutationrejections pass. Positive2-map/negativeanisotropiccontrols pass;6explicitN/Dmaps retained.
+Decisions made: clearsmaprationalitystep,notsixquotients/isogenies, noJacobianmodel/nonhyp/transport/speedclaim. NextnormalizeN/DtoSmithform, constructRecillasquotient/smoothness/rationaldescent andexplicitJacobianhomomorphismforactualsource/target.
+Open threads: quotientconstructionandfieldofdefinition/transportcost oneligibleoriginalg3;g2/g4/full10xgoalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure. No S3/cloud/merge/unchangedrerun.
