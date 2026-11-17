@@ -2268,3 +2268,10 @@ What was done: compilebatchedinversion/add_place producer, freezepriorfirstancho
 Decisions made: implementationprefix rejectionbound only, no onlinealgorithm/cold/wallclaim; test10P>B separatelyeachcomparator. No percellalgorithmselection. Gitfreeze beforeone120CPU.
 Open threads: executeafterpush, inspectwhetherany budgetremainsfor10x; preservecoverage evenifcostfails.
 Errors: no buildfailure, unusedhelperwarning; ownT7093reservation confirmed, checkallow/attachownconflict. NoS3/cloud/merge.
+
+## Singleton producerprefix uniform10x costcase rejected
+
+What was done: pushedfreeze55f1b51497f, hashchecks pass, oneexit0;24prefixcalls exactpriorrow/nativeprincipal/repeat16vectors. All36 comparisons10P>B; atp601prefix17798..23456 exceedsallthreecompletecontrols onall4targets. Rawcaps/oraclefree stopping boundary explicit.
+Decisions made: nofullcertificate/LPoptimizationforuniform10x withthisexactprefix; all12rankcoverage retained. CachedTSconstants possibleengineeringremedybutunmeasured; quadraticoraclealreadycalls sqrt onlyonce. No universal/wall/fullsolver bound. [pcc:unverified].
+Open threads: paidquery/splitreduction ormateriallydifferent usefularrival, independentvalidation/genus3/4 targetqualification andoriginal10xgoalactive.
+Errors: commentaryunderstatedp601countas3of4; exactrecordcorrects4of4. Nativefilesliveincounted/native viaholdoutpathattrs, initialdirectpathlookupmissed; no scientificrerun/S3/cloud/merge.
