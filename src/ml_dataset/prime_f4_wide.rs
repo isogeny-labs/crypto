@@ -1532,7 +1532,7 @@ mod tests {
     }
     fn fixture_at(twist: bool, n: u32) -> (CaseConfig, CaseData, SolverExecutionContext) {
         let cfg = CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "prime".into(),
             solver: "f4".into(),
@@ -1546,7 +1546,6 @@ mod tests {
             factor_base_size: 2,
             degree_bound: 8,
             work_limit: 50_000,
-            factor_base_policy: None,
         };
         let mut case = curves::generate(&cfg).unwrap();
         case.private_witness = Value::Null;

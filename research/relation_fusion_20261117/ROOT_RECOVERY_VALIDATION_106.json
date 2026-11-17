@@ -1,0 +1,32 @@
+{
+  "status": "focused checks pass; full-root check fails",
+  "focused_sat_tests_passed": 46,
+  "existing_packed_codec_tests_passed": 1,
+  "metrics_module_tests_passed": 1,
+  "full_crypto_lib_errors_after_include_hydration": 109,
+  "performance_claim": false,
+  "goal15x": "active,unachieved",
+  "source_files": [
+    {
+      "path": "src/cryptanalysis/sat.rs",
+      "sha256": "87dac62ea1874ce2e47a67a41ff8dd3f1a8b92a73918bad0e2bd6e24fae3892b"
+    },
+    {
+      "path": "src/ml_dataset/sat_initial_packed.rs",
+      "sha256": "0c35d3ea94beda78abacf639b4de4dc427094d265eae866504c160bf98e62598"
+    },
+    {
+      "path": "src/ml_dataset/custody.rs",
+      "sha256": "ba1088e10cade2a5719ce6834e471c694fb2a788776ea43445fa8780876d5d30"
+    },
+    {
+      "path": "crates/hashed-ecdl-tensor/src/lib.rs",
+      "sha256": "1393b2acb9ae0fb0795da8f7581d8125a89c75475bace488c44ed9d3b77289a2"
+    }
+  ],
+  "logs": [
+    "development-01/sat-codec-tests-105.stdout",
+    "development-01/metrics-module-test-106.stdout",
+    "development-01/root-recovered-check-104.stderr"
+  ]
+}

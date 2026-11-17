@@ -804,6 +804,18 @@
       "source": "round-037/holdout",
       "target_seed": 2026147932,
       "targets": 64
+    },
+    {
+      "size": 20,
+      "source": "round-038/train",
+      "target_seed": 2026148420,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "round-038/train",
+      "target_seed": 2026148424,
+      "targets": 16
     }
   ],
   "family": "curve25519",
@@ -2062,6 +2074,25 @@
         32
       ],
       "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-038",
+      "round": 38,
+      "sizes": [
+        20,
+        24
+      ],
+      "status": "ratcheted",
+      "track": "generic"
+    },
+    {
+      "dir": "round-039",
+      "round": 39,
+      "sizes": [
+        28
+      ],
+      "status": "frozen",
       "track": "generic"
     }
   ],
@@ -14500,7 +14531,51 @@
       "stage": "holdout",
       "status": "improvement",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 38,
+      "s": [
+        3.0815219946526,
+        3.2867152280946113,
+        5.13345432907271
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 38,
+      "s": [
+        2.055493600568792,
+        2.2286411760971894,
+        3.7869693558527677
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-10T04:10:43Z"
+  "updated": "2026-11-17T06:27:16Z"
 }

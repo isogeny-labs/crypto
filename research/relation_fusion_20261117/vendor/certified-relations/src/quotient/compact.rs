@@ -15,6 +15,10 @@ pub struct Certificate {
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct Info {
+    pub batch_groups_attempted: usize,
+    pub batch_groups_completed: usize,
+    pub coordinates_batched: usize,
+    pub batch_groups_fallback: usize,
     pub root_variable: usize,
     pub quotient_dimension: usize,
     pub definition_nodes: usize,
@@ -308,9 +312,55 @@ fn solve_impl(
     let mut parents = vec![None; n];
     let mut depths = vec![0; n];
     known[t] = true;
+    let mut batch_groups_attempted = 0usize;
+    let mut batch_groups_completed = 0usize;
+    let mut coordinates_batched = 0usize;
     loop {
         let mut progressed = false;
         let wave = known.clone();
+        if native_kernel_bits() & 256 != 0 {
+            let mut selected = Vec::new();
+            let mut seen = BTreeSet::new();
+            for pair in &pairs {
+                let [a, b] = pair.variables;
+                let candidate = if wave[a] && !known[b] {
+                    Some((a, b))
+                } else if wave[b] && !known[a] {
+                    Some((b, a))
+                } else {
+                    None
+                };
+                if let Some((parent, y)) = candidate {
+                    if seen.insert(y) {
+                        selected.push((pair.inputs, parent, y));
+                    }
+                }
+            }
+            if selected.len() >= 2 {
+                batch_groups_attempted += 1;
+                let candidates = selected
+                    .iter()
+                    .map(|(indices, _, y)| {
+                        (
+                            originals[indices[0]].clone(),
+                            originals[indices[1]].clone(),
+                            *y,
+                        )
+                    })
+                    .collect();
+                if let Some(rows) = coordinate_batch(candidates, &h, &rules, t, p)? {
+                    batch_groups_completed += 1;
+                    coordinates_batched += rows.len();
+                    for (row, (_, parent, y)) in rows.into_iter().zip(selected) {
+                        rules[y] = Some(chain.push(row)?);
+                        parents[y] = Some(parent);
+                        depths[y] = depths[parent] + 1;
+                        known[y] = true;
+                        progressed = true;
+                    }
+                }
+            }
+        }
         for pair in &pairs {
             let [a, b] = pair.variables;
             let (parent, y) = if wave[a] && !known[b] {
@@ -385,6 +435,10 @@ fn solve_impl(
     let definition_terms = certificate.definitions.iter().map(|r| r.proof.len()).sum();
     let basis_terms = certificate.basis.iter().map(|r| r.proof.len()).sum();
     let info = Info {
+        batch_groups_attempted,
+        batch_groups_completed,
+        coordinates_batched,
+        batch_groups_fallback: batch_groups_attempted - batch_groups_completed,
         root_variable: t,
         quotient_dimension: root.degree,
         definition_nodes: certificate.definitions.len(),
