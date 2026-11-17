@@ -2128,3 +2128,10 @@ What was done: derived publicD=sC anchorT+aC withconstantsa/s, implementedcollec
 Decisions made: unchanged16anchors/1..3seedbudget,24calls/12targets/allproof/sourcebindingcost charged, source17streamallowedchangebutfailuresretained. Assertions [pcc:unverified]. SourcesKB source:91b6bbe9fb73267bbeb5d7c97f493b26 andsource:18b3900e10b174cccc5479567bfc0b84 backgroundonly; localpublicnormalization priorrecordsscreened,no noveltyclaim.
 Open threads: pushfreeze thenone120CPU invocation, examinecompletecost andstopping ratherthanassumeanchorcostbenefit.
 Errors: onlyunusedwarning,no scienceyet.
+
+## Public-core anchor step qualified, mixed cost
+
+What was done: freeze03c6c0bd4d9 once-onlyexit0;24calls/12originaltargets originalkD=T/diagnosticnativeprimitive/fulltraces/mutation/repeat gates pass,source1exactcompleteREDCcontrol. Source17p601base16.9/7.9percent fewer;subgroupmixed, p101case0base regresses. Assertions [pcc:unverified].
+Decisions made: retainnormalizationasalternative, no posthocD/C oraclechoice oruniformgainclaim; cheapstep doesnotpredictproductiveclosure,10xgatefails.
+Open threads: mathematical productive-relation/scheduling mechanism withpubliccostdecision andindependenttargets, originalgenus2+goal/review/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
