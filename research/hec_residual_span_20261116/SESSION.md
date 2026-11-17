@@ -2247,3 +2247,10 @@ What was done: freeze5c41bff6150 pushed, inputhashespass, onceexit0;334g-known r
 Decisions made: optionalfastkernel only, reference notfastesttruncatedkernel; allpairenumeration cannotaddrank withinfixedpencil. g4previous28splitvs26eligible leaves2multiplicitycases requiringfallback. No smallFB/cold/fullsolver/10xgain inference. Assertions [pcc:unverified].
 Open threads: independentpencilgeneration/productivity mechanism withallscan/failurecosts, original10x/genus3/4qualification andindependentvalidation.
 Errors: none,no retry/S3/cloud/merge.
+
+## Source-orbit singleton relation-rank gate frozen
+
+What was done: screened prior online/affine LP andsameorbitbootstrap; built original12target/16T+aCanchor singletonquadratic sourceorbit queries, exactnativechecks andall4branch RREF consensus atanchorboundaries. No freeseed, actualeigenvalue, or knownresidual log. All failures/duplicates/zero-orbit exclusions retained.
+Decisions made: test arrival/useful-rank only, no algorithm novelty or costclaim; freezeGit beforeone120CPU, no extraanchors/retry/S3/cloud/merge. SameopenPR4587.
+Open threads: inspect firstconsensus/incomplete cases then decide whether justified completecostproducer exists. Full10x/genus3/4goal staysopen.
+Errors: no buildfailure, diagnosticfield/unusedhelper warning only; ownConductor reservation confirmed despiteattach ownconflict.
