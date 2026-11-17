@@ -1546,3 +1546,10 @@ What was done:5ff034f1672single invocation exits0;all18retainedpanels verifiedfi
 Decisions made: efficientstorage/correctnessbackendonly,callbackcountsnotfield/CPUgain; unknownnotinfeasibility. Comparewithincrementalsparseatmatchedprefixbeforeperformanceclaim,scaledproducer/CRTstillrequired.
 Open threads: matchedsolvercostandproductionintegration; originalgenus2+10xgoalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Matched solver-prefix cost frozen
+
+What was done:compiled18panelsfirst-completingoriginalSparseprefixes,72alternatingcalls. KrylovpaysDAGrebuild/RHS/allattempts/witness,targetverifyboth. Exactrepeat/countidentity,oldoperatorchecksrequired; hashesfrozen.
+Decisions made: optimisticprefixselectionfreeboth,notonlineproduction; knownfieldsolverstageonly,no10x/CPUclaim. Unknownsretainedcensored.
+Open threads: executeonceandcomparesubgroupworkbeforebackendintegration.
+Errors: none,nosciencebeforepushedfreeze.
