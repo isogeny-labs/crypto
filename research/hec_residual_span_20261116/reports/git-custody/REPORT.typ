@@ -151,3 +151,30 @@ Root discovery, nine eigenvalue scalar checks and nine projected point reconstru
 Shared AppleM4Pro ARM/macOS27.2/Rust1.99.1, L0: no core isolation or fixed-frequency guarantee. Warm process, cold algorithm setup. No fastest-external/automorphism-aware external comparison, counted-operation primary result, independent VALIDATION.json or leaderboard admission. These are diagnostic local wall observations on a known special-curve optimization, not a new exponent or tenfold mathematical breakthrough.
 
 Record20261117T0230Z-hec-orbit-coldretains rawhashes, source checkpoint, commands, full metrics, qualification and authorized Gitcustody during S3outage. No S3upload is claimed. Cost/PROTOCOL.md, RESULTS.md, CONTROL.tsv, SUMMARY.tsv and Rustsummarizer retain the exact boundaries. Prior failures, amended fixtures, zero gains and all correctness stages remain intact.
+
+#pagebreak()
+= Frobenius certificate: fixed-instance tenfold diagnostic
+Pushed execution checkpoints22a085d0738(correctness) and165ed3d0586(cold costs)
+
+== A classical operator identity replaces candidate group checks
+For the binomial model, enumerate nonzero t in F19 and identify chi(t)=t² with powers of the exact field ninth rootzeta. The signed quadratic-character sums give
+
+$P(X)=-X-2X^2+2X^3+2X^5-2X^7.$
+
+TwistedFrobenius fixed-point traces and Fourierinversion give pi=P(phi), with the action convention fixed in advance. On rational ell-torsion, phi⁹−1andP(phi)−1vanish. ExtendedEuclid overF8623gives gcd(X⁹−1,P−1)=X−5387and verifies its exactBezoutidentity. Substitution certifies phi(D)=5387Dwithout candidate scalar multiplications. This is classical diagonalcurve/Jacobi-sum theory, not mathematicalpriority or a machinechecked proof.
+
+The separate correctnessgate verifies P(phi)on everyrawcataloguepoint, subgroupaction, all9projectedpointreconstructions and three samepublictargetrecoveries. Reversing thecharacter convention gives inverse eigenvalue4538andfails the originalaction, as the frozen negativecontrol requires. No formula sign or curve was changed after execution.
+
+== Complete cold local measurements
+#table(columns:5,inset:4pt,align:center,
+[target],[character fast ms],[full qualification ms],[native ms],[native / fast],
+[37],[0.033763],[0.345424],[0.708982],[20.9987],
+[2026],[0.041698],[0.350456],[0.570685],[13.6862],
+[7001],[0.032180],[0.340349],[0.792266],[24.6201])
+
+All1200callsverify. Fivebatchesof16freshsetups pertarget/arm, fivearmswithrotatingorder. Worstspread1.047017passes1.25; native_AAratios1.000430,1.009713and1.002303pass0.90–1.10. The numericalnative/fasttenfoldcondition passes allthreefixedtargets. No target pooling or shared setup.
+
+== The validation contract is explicit
+The fastpath recomputes characters, roots, extendedgcd/Bezout/model/orbitchecks, targetdescentandfinaloriginalsourceverification. Written theory replaces percallcandidategroupactionchecks and projectedpointreconstructions. The qualifiedarm repeats those groupchecks and negativecontrols percall and is only about1.63–2.33times faster than native. This is not a tenfold same-check-path result; qualification cost is visible rather than omitted silently.
+
+SharedM4Pro/macOS27.2/Rust1.99.1L0wall only; no fastestexternal/automorphism-awarereference, countedoperationprimaryproof, independentreplay/admission or genericgenus2/3/4claim. Onebinomialcurve, oneorbitcatalogue and a lineargcd are essential; characterenumeration costsO(p). The broader mathematicalbreakthroughobjective remains incomplete. Next: independentproof/replay, g2/g3eligibility/solvercoverage and completeoperationaccounting. Records/rawhashes/limits remain under authorizedGitcustody, with noS3uploadclaim.
