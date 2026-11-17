@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -87,6 +87,12 @@ jobs:
           for arm in before after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/mul256-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_mul256 "--perf-$arm"
+          done
+          # Sparse P-256 modulus arm, compared against the immediately
+          # preceding native-u128 MAC algorithm (not the older MAC baseline).
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sparse256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_sparse256 "--perf-$arm"
           done
           # Inversion-core arms are in addition to the field-inversion arms.
           for arm in oracle16-before oracle16-after oracle32-before oracle32-after \
