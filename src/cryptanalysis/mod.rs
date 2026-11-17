@@ -220,11 +220,11 @@ pub mod groebner_f4;
 pub mod group_op_count;
 pub mod hash_attacks;
 pub mod hashed_ecdl;
+pub mod trace_zero_linearized;
 pub mod trace_zero_point_chain;
 pub mod trace_zero_relations;
-pub mod trace_zero_linearized;
-mod trace_zero_word_field;
 pub mod trace_zero_subspace_relations;
+mod trace_zero_word_field;
 /// Toy index calculus with tensor-contraction relation finding
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
 pub use ecdl_tensor_ic as tensor_ic;
@@ -388,9 +388,9 @@ pub mod sect113r1_audit;
 pub mod seed_grind_trapdoor;
 pub mod semaev_corpus;
 pub mod semaev_decomp;
-pub mod semaev_linear;
 pub mod semaev_higher;
 pub mod semaev_leading_form;
+pub mod semaev_linear;
 pub mod semaev_prime_poly;
 pub mod semaev_projection;
 pub mod semaev_s3_cost;
