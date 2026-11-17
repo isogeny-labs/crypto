@@ -2583,3 +2583,10 @@ What was done: compiled all four retained collector modes with only final verifi
 Decisions made: keep all cases/regressions, no post-hoc fallback; conditional operator qualification and genus-four subgroup scope explicit. No added free Fp preparation. One120CPU process after Git freeze, counts not walltime, no10xclaim.
 Open threads: execute full cross-genus test, report all96per-arm ratios and strongest-arm comparisons.
 Errors: inherited unused imports/report fields/modes warnings; compile clean otherwise. Own conflict check allows, attach same reservation. No S3/cloud/merge.
+
+## Complete cross-genus short-verification test passes, regressions retained
+
+What was done: freezec021e49f65c hashes pass, sole run exit0.192complete calls/24exact oldpublicworkloads/4modes pass native scalar, all16vector substitutions, unchanged subgroup work and repeats; wrong scalar/source/target controls pass. All96ratio rows and24strongest-arm comparisons retained.
+Decisions made: g3all32arm/workloads improve1.090-1.814x; g2range0.973-1.085with8armregressions; g4range0.836-1.281with16armregressions(allp271). Keep BOTH verifiers as controls; no unconditional default or post-hoc fallback, no uniform generalization of earlier original-g2gains. Conditional operator/genus4subgroup/unpricedinteger/independent-review scopes unchanged.
+Open threads: full producer/preparation mechanism against stronger available verification controls; potential prospective public-cost selector is separate, not a10xgoal substitute. Fullgenus2+goal active/unachieved.
+Errors: no scientific failure; inherited unused-import/report warnings only. No S3/cloud/merge.
