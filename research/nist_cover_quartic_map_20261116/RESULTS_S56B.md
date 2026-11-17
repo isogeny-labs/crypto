@@ -76,6 +76,13 @@ and checks were not altered. `proots` in the shared module was left as is
 (its root order feeds the operation counts of the frozen
 `smith_transfer_cost` study).
 
+After the result, clippy 1.98 (`-D warnings`) required removing same-type
+casts left by the `u32 -> u64` rename in `plane_quartic_pic64` (55 sites, no
+semantic change). The regression tests (21 passed) and the frozen command were
+run again on that final source: the record is identical apart from the timing
+fields, and `binary_s56b.sha256` / `data_s56b.sha256` refer to this final
+build and record.
+
 ## Distance to rho (derived, unchanged from S56)
 
 Matched negation rho on `E` needs about `2.4e8` group operations; index
