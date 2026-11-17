@@ -1193,3 +1193,17 @@ Fullcostcaseandnewusefulgeometryrequired; nofaircomparisonagainstdense-onlybasel
 
 ### Errors
 No failedgate/retry/S3/cloud. Previousonlinekernelhadpivotchainsbutnotgraphpathcompression; no falseassertionthatthiswasalreadymeasured.
+
+## Fresh complete one-core affine cost comparison closes route
+
+### What was done
+Frozenfdd4b4799e7 fullcoldcountercomparison on12freshgenus2workloads completes48calls/96records;307candidateprefixesmatchreference,allscalarsverifyandrepeatsmatch. Core0restrictedproducer+affineDSUagainstfullscanSparsewithallsetup/anchor/factor/verificationcharges. [pcc:unverified]
+
+### Decisions made
+Rejectunchangedcombinationas10xroute: baseREDCratios0.528–1.094,10regressions/2smallwins;ell1.042–6.108doesnotmaketotalgain. No arbitraryfieldweights/wall/CPU ornewmathclaim. Allcasescompletebutobjectiveunachieved/active;g3/g4notcoveredbythiscosttest.
+
+### Open threads
+Neednewproducer/setupgeometryorstrongcompletecostmechanism,notfurtherposthoccoretuning. AffineLPcomponentremainsqualifiedindependently.
+
+### Errors
+Postsummaryinitiallycomparedrepetitionidentifieritself; correctedcomparisonofoutcome/countfieldswithoutproducer retry. Initialunusedrankmethodwarning suppressedlocallybeforerun. NoS3/cloud.

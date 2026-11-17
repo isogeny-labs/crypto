@@ -1,0 +1,18 @@
+# Fresh cold one-core plus affine solver: completes, no tenfold case
+
+Frozen fdd4b4799e7 once-only execution exits0. All12freshgenus2workloads complete in botharms:48countedcalls,96modulusrecords. All307candidateacceptedprefixes agree with nativeFastreference. Allfirstdeterminingtuples/countvectorsrepeat exactly, allreturnedscalarsverifyagainstoriginalsource/target/qualificationanswer andallREDCidentitiespass. [pcc:unverified]
+
+Thefixedpubliccore0/shortenedproducer/affineDSUcombination is compared to the strongfullscanincrementalSparsecontrol on identicalfreshpublicinputs. AllcallschargeFB/action/characterpreparation,constructiblepublicsource-normalization,failedquadraticfactorizations,anchoradditions,exactresidualreconstruction,LA andoriginalgroupfinalscalarverification. No cross-targetcache,freeLPlogs orfreepilotselection. Knownorder/sourcefixturequalification staysoutsidebotharms.
+
+|counter domain|baseline/candidate REDC range|interpretation|
+|---|---:|---|
+|base field|0.528035–1.094118|10regressions;2modestwins|
+|subgroup field|1.042424–6.107649|12reductions, isolatedfrombasefieldcost|
+
+Thetwo basefieldwins arep251/source17cases,1.059457and1.094118. AllothercaseslosebasefieldREDC. Candidateoftenusesmoreanchors(2–13versus1–2baseline),withchargedquadraticrootwork. Those observations identify potentialcostsources but thisrun hasnoexclusivephaseattribution,so donotquantify their individualshares. Theellstagegain doesnotimplya6xfullsolvegain. No arbitraryfieldweights,wall/CPU/externalfastest/matchedrho claim.
+
+For a commonnonnegative weighting of ONLYthetwoREDCtotals withpositivedenominator, the old/newweightedratio liesbetweenthepermodulusratios andthereforecannotreach10onthesecases. That elementarybound isnotacompleteCPU/memorymodel orall-counterweightedtheorem. Raw16componentvectorsremainavailable.
+
+Decision: close thisunchangedone-core/affinecombinationasatenfoldcandidateonthefreshpanel. It qualifiescompletionandpreservestheusefulLAcomponent, butfullchargedcounterevidencefailstherequiredcostcase. No anchor/core/target/budgetretuneorretry. A newmechanismmustaddressremainingproducer/setupcostratherthanrelabeltherank/LAimprovementasbreakthrough. Genus3/4andthebroadmathematical10xgenus2+objective remainopen.
+
+RawCONTROL,stderr,run/exit,source/native/import/protocol/input/binaryhashes andRustsummaryretainedinGitduringS3outage. Initialsummarycomparisonincorrectlyincludedtherepetition-IDfieldwhencheckingrep0againstrep1; fixedinpostanalysiswithoutproducer rerun. Produceritselfalreadycheckedexactrepeatsandisunchanged. No scientificgatefailure,S3polling orcloudspend.
