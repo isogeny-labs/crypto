@@ -26,6 +26,7 @@ use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
+use crate::cryptanalysis::ecbench::hec::{thread_scalar, HecInstance};
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
 use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
@@ -292,6 +293,13 @@ pub enum CurveSpec {
         gu: Vec<u64>,
         gv: Vec<u64>,
     },
+    /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
+    /// hyperelliptic thread's instance rule (`ecbench::hec`), the Jacobian
+    /// of `y² = f(x)` over `F_p` for the first `c` with a prime subgroup
+    /// above 1000, genus 2 to 4, `p < 2^15`.  A reduced divisor is written
+    /// as two packed words.  `#Jac` is not computed, so only planted
+    /// targets exist.  Unregistered: ICV1 has no Jacobian form.
+    HecThread { p: u64, genus: u32 },
 }
 
 impl CurveSpec {
@@ -671,6 +679,9 @@ impl CurveSpec {
                 ref gv,
             } => HyperInstance::build_explicit(p, genus, f, group_order, r, gu, gv)
                 .map(|i| Instance::Hyper(Box::new(i))),
+            CurveSpec::HecThread { p, genus } => {
+                HecInstance::build(p, genus).map(|i| Instance::Hec(Box::new(i)))
+            }
         }
     }
 
@@ -739,7 +750,8 @@ impl CurveSpec {
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
             | Instance::ThreeLeads(_)
-            | Instance::Ext(_) => None,
+            | Instance::Ext(_)
+            | Instance::Hec(_) => None,
             // The thread rule and the order's point counts are the slow
             // part; a child rebuilds from the explicit model.
             Instance::Hyper(i) => {
@@ -760,7 +772,6 @@ impl CurveSpec {
     /// The constructor call, in the registry's `generator_call` form.
     pub fn call(&self) -> String {
         match *self {
-            CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
@@ -865,6 +876,9 @@ impl CurveSpec {
             CurveSpec::HyperellipticExplicit {
                 p, genus, ref f, ..
             } => format!("HCurve {{ p: {p}, genus: {genus}, f: {f:?} }} (explicit)"),
+            CurveSpec::HecThread { p, genus } => {
+                format!("hyperelliptic_ic_bench::thread_instance({p}, {genus})")
+            }
         }
     }
 }
@@ -899,6 +913,9 @@ pub enum Instance {
     /// A hyperelliptic Jacobian of genus 2 to 4 over `F_p`, `p < 256`
     /// (`ecbench::hyper`); a divisor is two packed words.
     Hyper(Box<HyperInstance>),
+    /// A hyperelliptic Jacobian over `F_p` (`ecbench::hec`); a reduced
+    /// divisor is two packed words.
+    Hec(Box<HecInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -942,7 +959,8 @@ pub struct CurveFacts {
     /// The ICV1 slug: the curve's name in prose and tables (AGENTS.md §11).
     pub slug: String,
     pub icv1: String,
-    /// `prime`, `koblitz` or `binary`.
+    /// `prime`, `koblitz`, `binary`, `fp4`, `extension` or
+    /// `hyperelliptic`.
     pub family: String,
     pub construction: String,
     /// Field degree for binary curves; `None` for prime fields.
@@ -953,6 +971,7 @@ pub struct CurveFacts {
     /// written as the number it always was, and a wider one as a decimal
     /// string ([`ExactScalar`], byte for byte the `canonical::compat_u128`
     /// encoding these fields had while they were `u128`).
+    /// HEC thread Jacobian order/cofactor zero means unknown.
     pub group_order: ExactScalar,
     pub r: ExactScalar,
     pub cofactor: ExactScalar,
@@ -1230,6 +1249,7 @@ impl Instance {
             Instance::Quartic(i) => u128::from(i.r),
             Instance::Ghs(i) => u128::from(i.l),
             Instance::Hyper(i) => u128::from(i.r()),
+            Instance::Hec(i) => u128::from(i.r),
         }
     }
 
@@ -1355,6 +1375,25 @@ impl Instance {
                 curve_uid: None,
             };
         }
+        if let Instance::Hec(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "hyperelliptic".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: 0u64.into(),
+                r: i.r.into(),
+                cofactor: 0u64.into(),
+                generator: i.generator_hex(),
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
         if let Instance::Big(i) = self {
             let id = i.kc.curve_id();
             let entry = registry_entry(&id.slug);
@@ -1418,6 +1457,7 @@ impl Instance {
             | Instance::Quartic(_)
             | Instance::Ghs(_)
             | Instance::Hyper(_)
+            | Instance::Hec(_)
             | Instance::Big(_) => {
                 unreachable!("returned above")
             }
@@ -1579,6 +1619,9 @@ impl Instance {
         if let Instance::Ghs(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Hec(i) = self {
+            return i.mul_generator_hex(k);
+        }
         if let Instance::Hyper(i) = self {
             return i.mul_generator_hex(k);
         }
@@ -1621,7 +1664,8 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::Hec(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1662,7 +1706,8 @@ impl Instance {
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::ThreeLeads(_)
-        | Instance::Hyper(_) = self
+        | Instance::Hyper(_)
+        | Instance::Hec(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
@@ -1750,7 +1795,8 @@ impl Instance {
                 | Instance::Big(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
-                | Instance::Hyper(_) => {
+                | Instance::Hyper(_)
+                | Instance::Hec(_) => {
                     unreachable!("handled above")
                 }
                 Instance::Ext(i) => {
@@ -1907,17 +1953,33 @@ pub enum TargetKind {
     PlantedShared,
     /// `Q` hashed to the subgroup; the answer is checked by `[d]G = Q`.
     Public,
+    /// `Q = [k]D₁` with `k = ⌊r/3⌋ + 7 + index` (`HEC_THREAD_TARGET_LAW`):
+    /// the fixed target of the hyperelliptic thread's studies, so their
+    /// rows can be reproduced as records.  `hec_thread` curves only.
+    PlantedHecThread,
 }
 
 impl TargetKind {
     pub fn is_planted(&self) -> bool {
-        matches!(self, TargetKind::Planted | TargetKind::PlantedShared)
+        matches!(
+            self,
+            TargetKind::Planted | TargetKind::PlantedShared | TargetKind::PlantedHecThread
+        )
     }
     /// Only the default kind stays unserialised.
     pub fn is_plain_planted(&self) -> bool {
         *self == TargetKind::Planted
     }
 }
+
+/// The hyperelliptic thread's fixed target, `k = ⌊r/3⌋ + 7 + index`
+/// (`examples/hyperelliptic_ic_vs_rho_bitops.rs` uses `k = N/3 + 7`).  Not
+/// drawn from the seed: it exists to reproduce that thread's rows.
+pub const HEC_THREAD_TARGET_LAW: &str = "hec_thread_scalar_v1";
+
+const NOT_HEC: &str = "planted_hec_thread targets need a hec_thread curve";
+const HEC_NO_PUBLIC: &str =
+    "a hec_thread Jacobian has no public-target law (its order is not computed)";
 
 /// The planted-scalar law for a subgroup order past `2^64`: the same
 /// inputs, hashed as decimal strings, with a 128-bit draw.  A one-word
@@ -2085,6 +2147,17 @@ impl Workload {
                     )?;
                     (SHARED_TARGET_LAW, q, Some(ExactScalar::from(k)), None)
                 }
+                TargetKind::PlantedHecThread => {
+                    let Instance::Hec(i) = inst else {
+                        return Err(NOT_HEC.into());
+                    };
+                    let k = thread_scalar(i.r, index);
+                    let q = inst.mul_generator_hex(k).ok_or("k gave the identity")?;
+                    (HEC_THREAD_TARGET_LAW, q, Some(ExactScalar::from(k)), None)
+                }
+                TargetKind::Public if matches!(inst, Instance::Hec(_)) => {
+                    return Err(HEC_NO_PUBLIC.into());
+                }
                 TargetKind::Public => {
                     // With r | h the r-torsion can be Z/r × Z/r, and a cleared
                     // point need not lie in <G>.
@@ -2143,6 +2216,8 @@ impl Workload {
             TargetKind::Public
         } else if self.target_law == SHARED_TARGET_LAW {
             TargetKind::PlantedShared
+        } else if self.target_law == HEC_THREAD_TARGET_LAW {
+            TargetKind::PlantedHecThread
         } else {
             TargetKind::Planted
         }

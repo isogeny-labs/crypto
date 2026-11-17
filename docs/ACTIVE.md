@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: partial source recovery passes47 SAT/codec tests, but full crypto_lib still has109 other API/type diagnostics; saved adapter tests await a coherent baseline. Benchmark closure and global PCC verification also reject pre-existing incomplete historical metadata; no frozen evidence or gate was changed. Constructor-only comparisons failed15x; goal remains in progress.
+- Relation15x / PR #4530: actual non-test root check141 and36-case actual-root matrix142/144 pass, with full saved-proof audit147/148;98 focused source tests pass. Full release library unit165 still compiling after preserving all selected parent test names and resolving cfg(test) interfaces. Prospective cost-profile169 is prepared, not yet run. Historical benchmark/PCC metadata gates remain unchanged. No15x admitted; goal remains in progress. [pcc:unverified]

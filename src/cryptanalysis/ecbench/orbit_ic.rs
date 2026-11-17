@@ -538,7 +538,7 @@ mod tests {
             let target = g.mul(&mut GroupOps::default(), i.generator, scalar);
             let direct = solve_narrow(&method("direct", 2, 512), i, &facts, target, 7351).unwrap();
             let orbit = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
-            assert_eq!(direct.recovered, Some(u128::from(scalar)));
+            assert_eq!(direct.recovered, Some(u128::from(scalar).into()));
             assert_eq!(orbit.recovered, direct.recovered);
             assert_eq!(direct.factor_base, orbit.factor_base);
             let replay = solve_narrow(&method("orbit", 2, 512), i, &facts, target, 7351).unwrap();
@@ -590,7 +590,7 @@ mod tests {
             7351,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(123));
+        assert_eq!(rep.recovered, Some(123u64.into()));
     }
 
     #[test]

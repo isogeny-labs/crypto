@@ -503,6 +503,7 @@ mod tests {
             r: 7,
             cofactor: 1,
             generator: (0, 1),
+            representation: None,
         }
     }
     fn stable(report: &SolveReport) -> serde_json::Value {
@@ -517,7 +518,7 @@ mod tests {
             let method = method(backend, 20_000_000);
             let a = solve(&method, &inst, PrimePoint::affine(3, 3), 701).unwrap();
             let b = solve(&method, &inst, PrimePoint::affine(3, 3), 701).unwrap();
-            assert_eq!(a.recovered, Some(3));
+            assert_eq!(a.recovered, Some(3u64.into()));
             assert!(!a.exhausted);
             assert_eq!(a.detail["online_start_phase"], "target_validation");
             assert_eq!(stable(&a), stable(&b));
