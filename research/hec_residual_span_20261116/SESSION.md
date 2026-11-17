@@ -605,3 +605,17 @@ Replay certificates independently, then implement and compare actual C4 solvers 
 
 ### Errors
 No runtime failures/retries; no fourth-extension enumeration for new fields. Calibration uniqueness premise was corrected before freeze, not after execution.
+
+## Strong C4 modular replay retained under Git custody
+
+### What was done
+Checked clean Git state and open PR4507 at4acb3b29fcc. Froze standalone determinant/interpolation verifier ataf4e654edd2 and pushed before once-only execution. Exit0;381positivewitnesses,zero unresolved,three models each covering127exponents; matrix controls passed. Retained input/binary/output hashes and execution checkpoint. Local implementation replay observations only. [pcc:unverified]
+
+### Decisions made
+Git checkpoints replace unavailable S3 custody as explicitly directed by the user. No S3 retry, producer rerun, model replacement or measurement. Reuse existing Howe-Zhu finite-certificate rationale and independent modular arithmetic, with no new priority claim.
+
+### Open threads
+Independent exact point-order/interval/source replay remains pending before strong-model admission. Then actual C4 solver comparison under public exact-order metadata. PR remains for review; no merge authorized.
+
+### Errors
+None in this replay. Toolchain uses Homebrew rustc1.93.1; no cross-toolchain timing claims.

@@ -17,3 +17,9 @@ All three selected models passed ordinary irreducibility and every finite absolu
 These inputs repair the earlier subgroup-strength limitation: the actual cofactor is two, rather than thousands. They remain a particular automorphism family and are qualification controls, not an unrestricted tenfold attack result. The order-four signed factor-base reduction is about two. No target solve, wall-time, complete-cost, independent-admission or new priority claim follows from model discovery.
 
 Raw hashes verified under Git custody while S3 is unavailable. No field/grid replacement, budget extension, retry or threshold change occurred. The broader tenfold genus-2+ objective remains open.
+
+## Independent modular implementation replay
+
+At pushed checkpoint `af4e654edd2`, the standalone determinant/interpolation replayer exited 0. It accepted all 381 positive witnesses, covering all 127 candidate exponents for each of the three models; there were zero unresolved records. Both matrix controls passed. Source, binary, input and output hashes are retained in `REPLAY.INPUT.sha256` and `REPLAY.OUTPUT.sha256`. These are local arithmetic replay observations, not a signed PCC verdict. [pcc:unverified]
+
+The verifier does not import the producer's trace/Newton or polynomial-gcd implementation. It has not independently re-enumerated extension point counts or replayed exact point orders, interval uniqueness, or source projections. Those remain the next qualification gate. No new model selection, target solve, or performance measurement occurred in this replay.
