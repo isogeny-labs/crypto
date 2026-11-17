@@ -2114,3 +2114,10 @@ What was done: integrate previouslyqualified distinct-degree/root principalident
 Decisions made: no relation/setup change, verifyacceptedpointcurve membership via finalphasecheck, allgeometryfallback costsincluded; original12targets/24calls/repeats,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
 Open threads: executeafterpush, reportcoldgain andremaininggap.
 Errors: onlyunusedwarning,noscienceyet.
+
+## Degree/root emitted-anchor pipeline qualified
+
+What was done: freezea21453fe317 once-onlyexit0;24calls/12targets allproducer/construction/controlvectors replay,packetfields/native/repeat gates,216common eachverifier+96anchor mutations pass.3exactfallbackrows retained. Completebase0.6-6.0percent fewer, p6013.9-6.0percent fewer; subgroupunchanged. Assertions [pcc:unverified].
+Decisions made: retaincompletecoldreduction; mixedsourcecomparison/10xgatefails, verificationoptimizationsalone notmathematicalbreakthrough.
+Open threads: newcollection/setup/relation mechanism withactualcostcase andpriornegative/rankscreens, originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: none,no retry/S3/cloud.
