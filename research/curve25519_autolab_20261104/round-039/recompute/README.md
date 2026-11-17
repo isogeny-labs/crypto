@@ -4,7 +4,7 @@ Written 2026-11-17 by the producing session, so this is a producer-side check, n
 
 ## Replay at eight times the loop's depth
 
-`ecbench verify --dir sessions/holdout-k28 --replay 64` (the loop's audit uses 8): 5760 records, 5760 verified, 64 replays reproduced, 0 problems. Receipt: `verify-holdout-k28-replay64.json`. The replay seed was drawn by the tool (17408933821038403668); 5120 runs were eligible.
+`ecbench verify --dir sessions/holdout-k28 --replay 64` (the loop's audit uses 8): 5760 records, 5760 verified, 64 replays reproduced, 0 problems. Receipt: `verify-holdout-k28-replay64.json`. The replay seed was drawn by the tool (17408933821038403668); 5120 runs were eligible. [pcc:unverified]
 
 ## Recompute of the statistic from raw records
 
