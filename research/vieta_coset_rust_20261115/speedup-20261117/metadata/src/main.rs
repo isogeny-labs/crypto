@@ -18,6 +18,9 @@ fn main() {
     let p = load(protocol);
     let raw = Path::new(&a[3]);
     let host = raw.join("isolation.jsonl");
+    let host_text = fs::read_to_string(&host).unwrap();
+    let host_record: Value = serde_json::from_str(host_text.lines().last().unwrap()).unwrap();
+    let contended = host_record["run"]["contended"].as_bool().unwrap();
     let mut files = vec![];
     let mut runs = vec![];
     let (mut success, mut failed) = (0, 0);
@@ -62,7 +65,7 @@ fn main() {
                     "failed"
                 }
             };
-            runs.push(json!({"run_id":key,"arm":arm,"instance_id":id,"seed":c["seed"].to_string(),"replicate":rep,"warmup":warm,"status":status,"outcome_class":if status=="succeeded"{"completed"}else{"not_completed"},"attempts":1,"resumed":0,"checkpoint":null,"measurements":{"counted":{"muls":r["query_work"]["muls"]},"wall_seconds":r["cold_ns"].as_str().map(|s|s.parse::<f64>().unwrap()/1e9),"wall_valid":false,"cpu_user_seconds":null,"cpu_sys_seconds":null,"max_rss_bytes":null,"counters":r["query_work"]},"isolation":{"tier":"L0","contended":false,"blockers":["No L2 admission; actual host wrapper stored","Local producer observation; no independent signed standing"]},"verification":{"status":"no_claim","verifier":"Native complete-set oracle in parent; producer-owned, no independent signature"},"exclusion":{"excluded":false,"rule":null},"artifacts":[pin(&path,"raw")],"started_at":null,"finished_at":null,"worker":"local CPU4","backend_ref":name}));
+            runs.push(json!({"run_id":key,"arm":arm,"instance_id":id,"seed":c["seed"].to_string(),"replicate":rep,"warmup":warm,"status":status,"outcome_class":if status=="succeeded"{"completed"}else{"not_completed"},"attempts":1,"resumed":0,"checkpoint":null,"measurements":{"counted":{"muls":r["query_work"]["muls"]},"wall_seconds":r["cold_ns"].as_str().map(|s|s.parse::<f64>().unwrap()/1e9),"wall_valid":false,"cpu_user_seconds":null,"cpu_sys_seconds":null,"max_rss_bytes":null,"counters":r["query_work"]},"isolation":{"tier":"L0","contended":contended,"blockers":["No L2 admission; actual host wrapper stored","Local producer observation; no independent signed standing"]},"verification":{"status":"no_claim","verifier":"Native complete-set oracle in parent; producer-owned, no independent signature"},"exclusion":{"excluded":false,"rule":null},"artifacts":[pin(&path,"raw")],"started_at":null,"finished_at":null,"worker":"local CPU4","backend_ref":name}));
         }
     }
     let planned = p["sample_size"]["instances"].as_u64().unwrap()
