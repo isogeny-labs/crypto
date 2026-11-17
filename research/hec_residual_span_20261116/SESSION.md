@@ -213,3 +213,17 @@ Executeonceafterpushedcheckpoint, inspectwhichwork changes; broadobjectiveopen.
 
 ### Errors
 Generator initial reversecheck caught one extra newline in libdeclaration removal; fixedbeforefreeze, every originalfile nowrecovered exactly. No scientificrunyet.
+
+## Deterministic field-vector gate passes
+
+### What was done
+At pushed40e9184bd4e,all108solvespass/EXIT0;54pairedvectorsidentical; REDCidentityallmoduli. Rawhashesverify. Rustpostrunsummary recordsbasefield/subgroupvectors independently. BasefieldFolded/PencilREDC rangesg2 1.057281–1.267375,g3 1.873001–5.223228,g4 2.100644–4.157634.
+
+### Decisions made
+No completecost/tenfoldclaim: someg2Pencilinversion/subgroupreductioncountsworse. ExpandedbasefieldidenticalFolded; expandedsubgroupcomponentgainscannotbeheadlined. Nestedvectornotweightedhardwaremodel; omittedinteger/memoryworkexplicit. Phasebreakdown/batchinverseclassicaloptimization possible butnotnovelty/10proof.
+
+### Open threads
+Needdistinctrelation-generation/anchor-reuse mechanism or evidence-supportedcostreduction withrankproof. Priorwallfailureunchanged; broadgoalopen.
+
+### Errors
+No runtime errors/retries. Generator reversechecknewlineissuefixedbeforefreeze; no arithmeticchanges. Localbuildunusedfieldwarnings retained.
