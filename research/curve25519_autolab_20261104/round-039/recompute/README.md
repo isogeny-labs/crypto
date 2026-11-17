@@ -8,7 +8,7 @@ Written 2026-11-17 by the producing session, so this is a producer-side check, n
 
 ## Recompute of the statistic from raw records
 
-`paired_ratio.py` reads `records.jsonl` without ecbench code, pairs `inc` and `sel` by (workload, round) over 128 workloads x 8 rounds = 1024 pairs, and gives (`paired_ratio.out`):
+`paired_ratio.py` reads the extracted `records.jsonl` (committed as `sessions/holdout-k28/records.jsonl.xz`, see `README-records.md` there; extract with `xz -dk`) without ecbench code, pairs `inc` and `sel` by (workload, round) over 128 workloads x 8 rounds = 1024 pairs, and gives (`paired_ratio.out`):
 
 | quantity | recompute | `ecbench compare` (round README) |
 |:--|--:|--:|
