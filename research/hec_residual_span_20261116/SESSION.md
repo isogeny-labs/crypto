@@ -1651,3 +1651,10 @@ What was done: read general Kummer oddisogeny construction Corte-RealSantos/Flyn
 Decisions made: auxiliarytwist onlyconstructiondevice, originaltargetunchanged; generalKummer route avoids assuming rational2torsion. Assertions [pcc:unverified].
 Open threads: pushfreeze then single invocation, explicit quotient/map and completecostcase remain.
 Errors: none in compile; no science yet.
+
+## Explicit rational twist kernel constructed
+
+What was done: freeze65977dbff83 single invocation exits0; d7twist523points, S=(u329,1;v108),deltaS=(149,39,1;234,12),R=(0,1;594); allorder5,125span, six25kernels orbit1+5. Producer assertions [pcc:unverified].
+Decisions made: H=<R,S> concrete nonfixedkernel; detwist uunchanged,v/sqrt7, originalKummerkernelrational. No targetsubstitution/map/speedclaim.
+Open threads: generalKummer invariantquintics/quotient recovery, independentisotropy and fullcostcase.
+Errors: none, no retry/S3/cloud.
