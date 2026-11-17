@@ -1,0 +1,25 @@
+error[E0425]: cannot find function `ic_check` in module `check::full`
+  --> examples/jv_sieve_extension_sparse_check.rs:87:38
+   |
+87 |             proofs.push(check::full::ic_check(&w, 1009, l, answer, Some(1018081))?);
+   |                                      ^^^^^^^^ not found in `check::full`
+
+error[E0425]: cannot find function `qualify` in module `check::rho`
+   --> examples/jv_sieve_extension_sparse_check.rs:106:37
+    |
+106 |             proofs.push(check::rho::qualify(&w, 1009, l, answer)?);
+    |                                     ^^^^^^^ not found in `check::rho`
+    |
+help: consider importing this function
+    |
+ 17 + use crate::collection_check::qualify;
+    |
+help: if you import `qualify`, refer to it directly
+    |
+106 -             proofs.push(check::rho::qualify(&w, 1009, l, answer)?);
+106 +             proofs.push(qualify(&w, 1009, l, answer)?);
+    |
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0425`.

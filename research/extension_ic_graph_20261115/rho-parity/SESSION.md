@@ -102,3 +102,33 @@ Publish this final integration and inspect its fresh merge gates. Full productio
 
 ### Errors
 The broad merged diff check began lazy-fetching unrelated upstream data with expired CLI credentials; interrupted that check, then passed the scoped changed-file check with public read configuration. No benchmark or source check was bypassed.
+
+
+## 2026-11-17T04:23:52Z — Published component; external CI blocker
+
+### What was done
+PR4493 at4e4450d7 contains the exact frozen source/data/report and merges cleanly with current main. Inspected fresh CI: recompute/current/names stop during existing artifact pulls with S3 InvalidAccessKeyId. Retained job links and literal shared error in CI_BLOCKERS.md. No all-green or merged assertion.
+
+### Decisions made
+Leave validation gates intact and do not change credential identities or merge settings. Keep the measured component separate from the unresolved full cold rho-parity goal.
+
+### Open threads
+CI artifact credentials require repair before gated merging. Production descent-stream integration, complete accounting and admitted matched cold recovery remain open; paid execution requires a known remaining balance.
+
+### Errors
+The final native checks still pass as recorded. Remote failures occur before artifact-dependent validation. The auto-merge connector's unsupported squash selection is separately documented; no bypass was attempted.
+
+
+## 2026-11-17T04:26:21Z — PR4493 merged; terminal metadata follow-up
+
+### What was done
+Fresh GitHub metadata reports4493 merged at04:24:23Z, mergea17eebb027ab, head98ee1d89e068, accountaburan28. This session invoked no merge. The extra head commit only unions the shared journal; native science bytes are unchanged. Preserved the earlier failed CI observations and this chronology in CI_BLOCKERS.md.
+
+### Decisions made
+Do not reopen the merged lane or claim green CI. Publish the pending three-file metadata receipt on a separate follow-up branch, because branch deletion rejected its original ref update. No new scientific run or gate change.
+
+### Open threads
+Independent standing, production descent-stream integration, complete accounting and an admitted full cold rho comparison remain open. Further paid work requires a known remaining balance.
+
+### Errors
+The closeout ref update returned a generic GraphQL error; readback found the PR merged and its branch deleted. It was not retried against another ref. The earlier CI artifact failures remain failures, regardless of the merged state.

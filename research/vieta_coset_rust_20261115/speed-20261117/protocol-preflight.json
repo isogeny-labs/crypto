@@ -1,0 +1,663 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-SPEED-PREFLIGHT-20261117",
+  "version": 1,
+  "created": "2026-11-17",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "What matched cold and query-only operation counts and local diagnostic elapsed ratios does recursive half-GCD produce against schoolbook, classical-Euclid/Newton and lookup, charging full factor-base construction?",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Complete ordered relation sets agree with scalar verification; double-query counted work is exactly twice single-query work.",
+      "decided_by": [
+        "C-half",
+        "C-school",
+        "C-lookup",
+        "C-positive"
+      ]
+    },
+    {
+      "id": "C-comparison",
+      "class": "comparative",
+      "text": "Matched descriptive full-construction-plus-query counts and local elapsed ratios, stratified by configuration/population; clocks stay diagnostic belowL2 and do not establish an admitted timing improvement.",
+      "decided_by": [
+        "C-half",
+        "C-school",
+        "C-lookup"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "school",
+      "role": "reference",
+      "description": "Schoolbook multiplication/division and classical Euclid reference.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "newton",
+      "role": "baseline",
+      "description": "Karatsuba/Newton with classical Euclid ablation.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "newton"
+      },
+      "same_instrument_as": "school"
+    },
+    {
+      "id": "half",
+      "role": "candidate",
+      "description": "Recursive half-GCD with Karatsuba/Newton.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half"
+      },
+      "same_instrument_as": "school"
+    },
+    {
+      "id": "half-aa",
+      "role": "control_negative",
+      "description": "Same half-GCD in a distinct fresh process/layout; provides both A/A noise and the zero-algorithm-change negative null (not two independent panels).",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half-aa"
+      },
+      "same_instrument_as": "school"
+    },
+    {
+      "id": "lookup",
+      "role": "reference",
+      "description": "Batched lookup after full factor-base/index construction.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "lookup"
+      },
+      "same_instrument_as": "school"
+    },
+    {
+      "id": "half-double",
+      "role": "control_positive",
+      "description": "Same half-GCD query executed twice under one context; timing/count positive control.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ecf84d40b2638f80c590142d6388c4f3ca95670de60bb5f1625a8c91da142be5",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half-double"
+      },
+      "same_instrument_as": "school"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "half-double",
+      "expected_detection": "Complete sets identical, query multiplication count exactly2x half on successful cells; timing positive detected only if paired median double/single query ratio>1.25 and exceeds A/A noise. Miss invalidates timing interpretation, not retained counts.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "half-aa",
+      "null_population": {
+        "description": "Zero algorithm change, independently exec-created process/layout; same A/A arm supplies the nuisance null, not a separate independent panel.",
+        "generator": "Same fixed native fixture/target/budgets and new process per arm.",
+        "n": 12,
+        "why_n": "Descriptive matched observations/A-A ranges, not powered for population-significance rejection.",
+        "matched_on": [
+          "field",
+          "curve",
+          "m",
+          "representation",
+          "target",
+          "seed",
+          "binary",
+          "budgets",
+          "algorithm"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "polynomial_backend",
+        "levels": [
+          "school",
+          "newton",
+          "half"
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "lookup"
+        ]
+      },
+      {
+        "name": "query_repetitions",
+        "levels": [
+          1,
+          2
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "representation_field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "coset",
+            "word62",
+            8192
+          ],
+          [
+            "coset",
+            "word62",
+            16384
+          ],
+          [
+            "coset",
+            "p224",
+            2048
+          ],
+          [
+            "rational",
+            "word62",
+            2048
+          ],
+          [
+            "rational",
+            "p224",
+            128
+          ],
+          [
+            "rational",
+            "p224",
+            512
+          ]
+        ],
+        "how": "Keep configurations separate. Rational fixtures are Mobius conjugates of squaring, not auxiliary-isogeny search benchmarks. Word62 has no prime-order subgroup assertion; P224 standard curve."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "seeded-random-abscissa",
+          "conditioned-sum"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "Williams6 [0,1,5,2,4,3] shifted by retained index, second block reversed",
+        "how": "12 retained rows balance all six positions separately within each population. First warmup runs double-query positive first. Calibration has no comparative order claim."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      },
+      {
+        "name": "construction_backend",
+        "treatment": "fixed",
+        "value": "KaratsubaNewton for all descriptor/certification work; query backend only is changed for C-half",
+        "how": "Each arm freshly builds its descriptor. Lookup additionally builds its required point table/hash set; candidates build no unused table for finite targets. Counter phases remain separate."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-half",
+        "arms": [
+          "newton",
+          "half"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-school",
+        "arms": [
+          "school",
+          "half"
+        ],
+        "design": "absolute",
+        "differs_in": [
+          "polynomial_backend"
+        ],
+        "threshold": "Complete uncensored matched pairs only; describe ratios against1 with bootstrap/A-A ranges, without rejection testing or an admitted timing claim. This absolute full-method contrast does not identify a single internal causal mechanism."
+      },
+      {
+        "id": "C-lookup",
+        "arms": [
+          "lookup",
+          "half"
+        ],
+        "design": "absolute",
+        "differs_in": [
+          "method",
+          "polynomial_backend"
+        ],
+        "threshold": "Complete uncensored matched pairs only; describe ratios against1 with bootstrap/A-A ranges, without rejection testing or an admitted timing claim. This absolute full-method contrast does not identify a single internal causal mechanism."
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "half",
+          "half-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "half",
+          "half-double"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "query_repetitions"
+        ]
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        "91604224951593",
+        "91604224943401",
+        "91604224962317",
+        "91604224961118",
+        "91604224958714",
+        "91604224959098"
+      ],
+      "note": "Configuration JSON seeds written before affected calls; root seed0x53500000+input index. Full rational certification representative3/seed42. No data-dependent seeds."
+    },
+    "instance_sampling": {
+      "rule": "[('coset', 'word62', 8192), ('coset', 'word62', 16384), ('coset', 'p224', 2048), ('rational', 'word62', 2048), ('rational', 'p224', 128), ('rational', 'p224', 512)];0 excluded warmups+2 retained; alternate seeded random abscissa/canonical sqrt and constructed sums. No uniform curve-point claim; identities separate.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit unblinded deterministic descriptive analysis frozen before data; no inferential selection or posthoc dispatch.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Descriptive paired medians/ranges/conditional percentile-bootstrap intervals at n6 per population in primary; no p-value/significance/exponent claim or power assertion."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Enforced bootstrap envelope, not measured forecast; main draft will receive exact native calibration forecast before its freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Fresh construction plus query field multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "Every arm freshly executes descriptor/full sibling-fiber certification AND full point factor-base lifting; lookup also hashes. Primitive muls include inverse/sqrt internals. Memory/hash/sort unpriced in counts; included in clocks. Setup teardown, process startup, fixture draw and scalar verification excluded. All successful raw total_work fields equal construction_work+query_work.",
+        "source": "row.total_work.muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Complete ordered pair array and SHA compared across all arms, then native BigUint scalar replay.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Local diagnostic cold/query elapsed intervals",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "Monotonic Instant: cold starts before fresh construction context and ends after query; separate query clock starts after construction. Full point-base construction charged for all arms; setup remains alive through clocks, teardown/process startup/external fixtures/scalar verification excluded. Clocks belowL2 remain wall_valid=false; ratio is a local descriptive diagnostic, not admitted speedup.",
+        "source": "row.cold_ns and row.query_ns",
+        "aggregation": "median",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions",
+      "half_gcd_nodes",
+      "half_gcd_batches",
+      "rational_map_steps",
+      "certified_fibers"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "6 configurations*6 arms*(0+2)=72 calls;60s/4e9 multiplications per construction/query stage,65536 splitting attempts,135s per worker; configuration cap400s calibration/1400s primary, outer1200s. No retries. Failures/timeouts/missing retained."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Complete-set mismatch or first double-query positive failure invalidates instrument and stops; preserve failed row and missing remainder. Ordinary budget failures retained and later arms/configurations continue. Timing control miss prevents timing interpretation."
+    }
+  ],
+  "decision_rule": {
+    "text": "Report native matched cold/query counts and elapsed ratios with min/median/bootstrap95 intervals and A/A ranges per configuration/population/identity. Any censored/missing counterpart prevents complete-cell speed assertion. Positive count2x mandatory; timing control threshold>1.25 and outside A/A. All clocks diagnostic belowL2, no admitted timing/exponent/fastest/whole-DLP inference.",
+    "comparison_ids": [
+      "C-half",
+      "C-school",
+      "C-lookup",
+      "C-positive"
+    ],
+    "statistic": "Frozen Rust median/min/max/all values and4096 percentile bootstrap resampling of each paired ratio.",
+    "interval": "Observed range, not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "newton/half, half/lookup at total-arithmetic and query-only scope; half/half-aa and lookup/lookup-fast are deterministic count controls.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "speed-20261117/native/src/main.rs",
+      "sha256": "222598cbc12a9a98eb576a4f6aa1d953186e6e5b535d88167ae8f1b1c77dfa4b"
+    },
+    "inputs": [
+      "speed-20261117/run/preflight/*/cell-*.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "replay.json",
+      "forecast.json",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before source/binary/analysis/protocol Git publication",
+    "Change seeds/matrix/limits/analysis/repeats after affected calls",
+    "Pool populations/configurations/identities or calibration with main",
+    "Omit full construction or treat lookup setup as free",
+    "Promote diagnostic clocks to L2 or counters to wall speedup",
+    "Drop failures/timeouts/missing/warmups",
+    "Call Mobius-Kummer fixtures auxiliary-isogeny search costs",
+    "Self-sign general degree argument or claim complete formal tower instantiation",
+    "Paid/cloud experiments or local S3 operations"
+  ],
+  "literature": [
+    {
+      "ref": "FLINTv3.3.1 src/nmod_poly/hgcd.c and src/gr_poly/hgcd.c; src/cryptanalysis/isogeny_eval/poly.rs; ic_framework/prime_tower.rs",
+      "provenance": "retrieved",
+      "claim": "Standard recursive polynomial half reduction, counted multiplication and normalized Velu-map source assumptions. No novelty claim.",
+      "verified_by": "Producer primary/internal source read; KB MCP/wrapper unavailable."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "af0985e46cd0f5b8c95c851e20da0d35a2423400655dd288332d96d6b4689a46",
+    "commit": "27bc4bf511cda40f904324901895a246f40a9c75",
+    "frozen_at": "2026-11-17T04:17:58Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Complete-set mismatch invalidates instrument; no arm omission after failure.",
+    "Local clocks remain diagnostic/wall_valid=false below L2.",
+    "A/A controls and positive detection must be reported, never silently discarded."
+  ],
+  "extensions": {
+    "panel": "speed-preflight",
+    "matrix": [
+      [
+        "coset",
+        "word62",
+        8192
+      ],
+      [
+        "coset",
+        "word62",
+        16384
+      ],
+      [
+        "coset",
+        "p224",
+        2048
+      ],
+      [
+        "rational",
+        "word62",
+        2048
+      ],
+      [
+        "rational",
+        "p224",
+        128
+      ],
+      [
+        "rational",
+        "p224",
+        512
+      ]
+    ],
+    "planned_calls": 72,
+    "primary_retained": 12,
+    "primary_warmups": 2,
+    "binary_custody": "Separate immutable local qualifier, Git source/build/lock/compiler/digests published; no remote binary-archive availability claim.",
+    "user_authorization": "Renewed request to do all items and then measure speedup. Persistent isolated-local/Git-only/no-cloud/no-S3 scope.",
+    "matched_contract": "Every arm constructs complete factor base; query-only uses freshly built object held alive through clocks; teardown excluded.",
+    "standard_panel_exception": "Existing word62/P224 component curves, no word62 prime-group-order assertion, no cross-representation speed comparison."
+  }
+}
