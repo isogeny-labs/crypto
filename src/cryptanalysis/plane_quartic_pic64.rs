@@ -1528,7 +1528,6 @@ fn pmod_powx(q: u64, base: &[u64], mut e: u64, g: &[u64]) -> Vec<u64> {
 /// All roots in `F_q` of the polynomial with ascending coefficients `c`
 /// (Cantor-Zassenhaus; setup only).
 pub fn poly_roots(q: u64, c: &[u64], rng: &mut u64) -> Vec<u64> {
-    let q = q;
     let mut g: Vec<u64> = c.to_vec();
     pmod_trim(&mut g);
     if g.len() <= 1 {
