@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] hky2 on a rented host: second depth-13 draw and depth-14 degree-6 closure; optlevel PMU and GPU validation (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit; RunPod, owner-authorized)
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
 - [ ] Build TorsionGuard finite-primary-module soundness analyzer (Codex, started 2026-11-17, branch codex/torsionguard-core-20261117, PR #4554)
