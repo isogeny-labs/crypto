@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] hky2 engine, second speed pass: adaptive schedule and parallel sequential pass, equality-gated (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] hky2 pod runs, part 3: depth-14 degree-6 closure and (6,3) degree-8 closure, final write-up, pods and proxy hosts cleaned up (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
