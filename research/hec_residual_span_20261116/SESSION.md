@@ -1413,3 +1413,10 @@ What was done: derived two-known-root collision leaves linear residual and affin
 Decisions made: free-support reachability falsifier before building adaptive bucketproducer; repeat to fixedpoint, all unresolved outcomes retained. No rank/cost inference from positive closure.
 Open threads: execute once; if closure stalls, new supports or multiunknown elimination needed; if succeeds, actual adaptiveproducer costs stillrequired. Original genus2+10xgoalopen.
 Errors: none, no scientificexecution before pushedfreeze.
+
+## Adaptive peeling oracle completed with stopping set
+
+What was done: frozen d6b9b8ad004 single invocation exits0,3781Sparse/nativeFast prefixes and allaffine/groupchecks pass. Fivepanels identifyk/reachallcolumns; p601source1stallsinitially with1/68known,0admitted outof2004rows. Retained raw/exit/hashes/results and induction stopping-set explanation.
+Decisions made: no unchanged peeling-only producer; free complete support oracle already stalls. Order/revisiting cannot rescue same rows/rule. New supports or multiunknown initialization needed; existingLPwork notnew/free and unchangedbootstrapfloor remainsbinding.
+Open threads: mathematical mechanism coupling components/geometry without previous bootstrap cost, original genus2+10xgoal unresolved.
+Errors: no assertion/runtime errors; oneundetermined arm scientific outcome retained. No retry/S3/cloud.
