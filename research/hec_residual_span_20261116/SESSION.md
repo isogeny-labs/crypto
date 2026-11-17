@@ -2688,3 +2688,10 @@ What was done: freeze96bd0f8bbdc hashespass, onecountgate exit0;88completecalls 
 Decisions made:22/22baseREDCimprove and21/22bothfieldsREDCimprove;g4p31source17subgroupregression1806->2490retained.220comparisons/44priorenvelopes/44substitutionrowsretained. No10xfield/wall/newmathclaim; keepallsixcontrols. Nextsharedgenericcatalogue/rootlookuporweightedLPgraphmechanismneedsowncost/qualification, notsingle-sidedprepareddataadvantage.
 Open threads: genericcatalogue/root-table equivalence andfairshared-costgate ifpursued; full10xgoalstillopenandindependentreviewpending.
 Errors: no scientificfailure; pre-freeze compiledelimitererroralreadyrecorded. No S3/cloud/merge.
+
+## Generic prepared root/catalogue/oracle qualification frozen
+
+What was done: separatedgenericrootenumeration/finite-differencecataloguefrombinomialcharacterbuilder. CompiledexplicitboundedRootTable(p<=65537), sqrt/Legendrelookupcounters andoracleforkpassingtablethroughquadraticEDF. All11initialcatalogues/everyfieldroot/everyf(x)mustmatch; exhaustivep5/7/11monicdegree0..4plus5632seededinitialfieldpolynomialsprospective.
+Decisions made: no freeglobal/cross-targetcache or binomialpremise; lookupbuild/memory/countersvisibleandfuturepreparedfacilitysharedallarms. NoDLP/speed/10xclaimfromqualificationorvanishingREDC. One600CPUinvocationafterGitfreeze.
+Open threads: executeequivalence, thenintegratefreshpreparationforallsolverarmswithcompletecostsandunchangedoutcomes.
+Errors: compilepasses, unusedsplit_referencewarningonly. Ownscopecheckallows, attachsameexistingreservation. No S3/cloud/merge.
