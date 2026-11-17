@@ -154,11 +154,20 @@ shared factor-base-log solve + per-target phase). All recover the planted `k`.
 incomplete merge left `f4_fp::VisitReport` without `first_fall_degree`,
 `last_fall_degree`, `degree_of_regularity_observed`, and `F4Options` without
 `recording_degree_falls`, while consumers (`aps_single_relation`,
-`aps_single_relation/leads`) referenced them. A minimal, behaviour-preserving
-repair adds the three diagnostic fields (defaulting to `None` — the
-streaming/domain solver does not yet record them) and a no-op
-`recording_degree_falls` builder. No F4 behaviour changes; the crate (and CI)
-now compiles. This unblocked all local measurement.
+`aps_single_relation/leads`) referenced them. A minimal, serialization-safe
+repair adds the three diagnostic fields (defaulting to `None`) and a no-op
+`recording_degree_falls` builder. `f4_fp::VisitReport` is serialized nowhere,
+so the shim cannot perturb any transcript; the crate now compiles and all local
+measurement ran.
+
+**Scope note.** This fixes only the *compile* break. The same merge
+(`b1514f86e`, PR #4559) also added `AlgebraReport` fall-degree fields and
+touched `aps_single_relation/replay.rs` without updating its `valid()`
+fixtures, so 12 `aps_single_relation::replay` tests remain red (exact-byte
+binding). That is #4559's unfinished feature, independent of this work and of
+the f4 shim, and is left for #4559 to complete rather than reverse-engineered
+here. The prime-IC regression test (`ic_solve_table_agrees_with_sweep`) and the
+IC tests pass.
 
 ## Reproduce
 

@@ -90,9 +90,24 @@ fastest; local baseline + measured optimization.
 
 ## Errors (what went wrong, how it was handled)
 
-- `main` lib did not compile (f4_fp merge mismatch). Repaired minimally (above);
-  rebuild clean. My first `cargo build --release --lib | tail` reported exit 0
-  from the pipe (tail), masking cargo's 101 — re-ran filtered to get the truth.
+- `main` lib did not compile (f4_fp merge mismatch). Repaired the **compile
+  break** minimally (above); rebuild clean. My first `cargo build --release
+  --lib | tail` reported exit 0 from the pipe (tail), masking cargo's 101 —
+  re-ran filtered to get the truth.
+- **Pre-existing deeper breakage (NOT this work, out of scope): merge
+  `b1514f86e` / PR #4559 ("happy-johnson") landed a half-finished fall-degree
+  feature.** It added `AlgebraReport::{first_fall_degree,last_fall_degree,
+  degree_of_regularity_observed}` and the `f4_fp` references (the compile errors
+  I shimmed) AND touched `aps_single_relation/replay.rs`, but did not update the
+  `valid()` replay fixtures, so 12 `aps_single_relation::replay::tests` fail
+  (exact-byte binding: the serialized `AlgebraReport` now carries fall-degree
+  fields the fixtures lack). Confirmed independent of my shim: `f4_fp::VisitReport`
+  is serialized nowhere (no fixture/byte-binding), so my added fields cannot
+  perturb any transcript. Finishing #4559 (implement f4 fall-degree recording
+  and regenerate its fixtures) is #4559's task, not reverse-engineered here —
+  touching those fixtures blind would risk masking the real breakage
+  ("sabotage is assumed"). My prime-IC tests pass; these 12 remain red on main
+  until #4559 is completed.
 - No matplotlib locally → generated the frontier SVG with a dependency-free
   Python emitter.
 - No Conductor/PCC/S3/KB access in this runtime (as prior sessions noted); kept

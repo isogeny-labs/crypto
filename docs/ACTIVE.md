@@ -32,4 +32,12 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
+- **main build broken by PR #4559 (`b1514f86e`, happy-johnson):** a half-merged
+  fall-degree feature left `f4_fp` without the fields/method
+  `aps_single_relation` references (9 compile errors) and left 12
+  `aps_single_relation::replay` tests failing (its `AlgebraReport` gained
+  fall-degree fields but `replay.rs::valid()` fixtures were not updated;
+  exact-byte binding). PR #4572 shims only the compile errors
+  (serialization-safe). Finishing #4559's feature + fixtures is owed by #4559;
+  not reverse-engineered here. (claude, 2026-11-17)
 - Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
