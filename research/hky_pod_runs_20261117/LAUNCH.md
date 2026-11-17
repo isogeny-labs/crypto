@@ -89,3 +89,8 @@ Checks and predictions written before the sweep's new cells:
 - `msweep-m9` (`kb81a8op5pd0ah`) terminated (GET 404) after target 1 closed D = 8 without 1; its D = 9 closure was not waited for.
 - Depth 13 finished (both targets, exit 0); depth 14 started 17:46 UTC on the same pod.
 - Still running: `hky2-cpu-t14` (depth 14) and `msweep-a` (`sweep6`, (6,3) D = 8, 18,000 s budget).
+
+## 18:42 UTC
+
+- PR #4585 merged at 17:57. Both remaining runs still going: depth 14 c = 6 (56 min in, peak RSS 12.4 GB);
+  (6,3) D = 8 (74 min in, RSS 73.7 GB, host load average 78 to 218).
