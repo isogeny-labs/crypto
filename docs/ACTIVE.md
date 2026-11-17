@@ -23,6 +23,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
+- [ ] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock, IC reference currency, workflow store pulls (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR pending)
+
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
 - [x] Gröbner solver shootout on GF(2^n) Semaev systems: local diagnostic, inherited-f4 vs msolve vs CMS (claude, started 2026-11-16, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4543; CI blocked by AWS/S3 and main breakages)
