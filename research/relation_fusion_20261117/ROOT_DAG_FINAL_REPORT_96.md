@@ -29,7 +29,7 @@ Source and protocol0bab6ab79e and launch pinsd9d89e071c were published before da
 
 Extract root-dag-96.tar.xz for every original, proof, stdout, stderr, process status and outcome. Check the SHA256 sidecar. ROOT_DAG_SUMMARY_96.json and ROOT_DAG_ANALYSIS_96.json contain raw integers, all paired ratios and statistics; the frozen Rust collector and analyzer are checked in. All evidence is unsigned and no S3 upload is attested.
 
-The full crypto_lib adapter remains a pending patch because the baseline cannot compile: missing metrics export, duplicated ecbench match arm, missing test brace and malformed SAT scopes. Provisional fixes were investigated and withdrawn from live unrelated source; exact patch and build logs are retained. Maintained producer/checker crate integration is qualified separately. Global benchrecord closure also refuses an older command receipt without a successful integer exit; no historical evidence or gate was edited.
+Full crypto_lib adapter validation remains pending. At stage96 the baseline had missing module exports and malformed merged source; attempted fixes were saved. Later recovery106 repairs the reviewed scopes and passes47 focused SAT/codec tests plus the metrics-module test. The full library still reports109 other API/type errors; see ROOT_RECOVERY_REPORT.md for current status. Maintained producer/checker qualification remains separate. Global benchrecord closure refuses an older documentary receipt without a captured exit; no historical evidence or gate was edited.
 
 ![Checked local proof sharing; this is a certificate diagram, not a speed claim.](visual-96/proof-sharing.png){width=100%}
 
