@@ -1581,3 +1581,10 @@ What was done:compiled48callmatchon12fixedinputs; fullscancontrolusesgeneratorre
 Decisions made: botharmsoptimize,noisolatedrootgainpromotion; nofreshinput/validationcontractchange,notKrylovdefault.
 Open threads: executeonceandpricecompletepipeline; original10xgoalopen.
 Errors: none,nosciencebeforepushedfreeze.
+
+## Common root optimization fullpipeline qualified
+
+What was done:1a1fea83255single invocation exits0;48callsexactrepeats,all12FIXEDtargetscomplete.96metadatarecord/48subgroupvectorsreplaypriorcontrolandconsensus. Bothcanonicalrootsoptimized; basecontrol/candidaterange0.779-1.268(2wins),ellunchanged0.471-8.274. Knownstall diagnosticseed2successretained.
+Decisions made: keepcommonengineeringfix,nofull10xclaim orrootstagegainpromotion. Preserveoldsourcesandallnegativegates; broadgenus2+goalopen.
+Open threads: mathematicallydifferentcomplete-costmechanism beyondunchangedlazy/consensusproducer; genus3/4fullqualificationstillmissing.
+Errors: copiedrawsummaryprintslegacyfresh_targets=12; thesearefixedoldinputs,correctedexplicitlyinRESULTSwithoutoverwritingraw. No scientificretry/S3/cloud.
