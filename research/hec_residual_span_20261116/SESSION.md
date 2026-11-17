@@ -1868,3 +1868,10 @@ What was done: compiled complete producer/construction/verification cost harness
 Decisions made: prospective descriptive gate, all 12 original targets; no mixed-modulus aggregation, Git freeze before once-only120CPU invocation. Sources are prior lazy/sparse/Frobenius protocols/results/derivation. Assertions [pcc:unverified].
 Open threads: execute after push, interpret complete costs and choose successor.
 Errors: none in compile; no science yet.
+
+## Complete lazy certificate cost screened
+
+What was done: freezedbce54bbdd0 once-onlyexit0;24 calls/12 targets full packet and producer vector replay,84 mutations each verifier, exact phases/repeats. Atp601 fullcandidate/arm0base1.932-3.797, subgroup4.876-6.872. Assertions [pcc:unverified].
+Decisions made: reject current complete implementation for10x; free-certificate producer floor exceeds0.1arm0 everywhere, so certificate-only successor insufficient.
+Open threads: mathematical relation-generation/incidence mechanism reducing producer scan/setup, reuse checked primitives; prospective proof/cost case before next experiment; originalgenus2+objective unchanged.
+Errors: none; all negative results retained,no retry/S3/cloud.
