@@ -1821,6 +1821,18 @@ fn algebraic_mode_factorized_index_variant_y(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
     compact:bool,packed:bool,use_public_y:bool
 )->Result<(Option<Solution>,Stats),String>{
+    algebraic_mode_factorized_chord::<false>(
+        parts,q,ar,compact,packed,use_public_y)
+}
+// All differences in this generic pair search are nonzero because the
+// existing public source enforces global x-uniqueness. The candidate batches
+// (x-z)^-1 directly and squares the two chord slopes, instead of batching
+// ((x-z)^2)^-1. Compile-time specialization keeps the incumbent byte-for-byte
+// arithmetic path for LINEAR=false. Both are classical S3 coordinate roots.
+fn algebraic_mode_factorized_chord<const LINEAR:bool>(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
+    compact:bool,packed:bool,use_public_y:bool
+)->Result<(Option<Solution>,Stats),String>{
     if compact && packed {return Err("APS index: choose only one mode".into());}
     let lookup=(!compact && !packed).then(||reverse_index(&parts[2]));
     let packed_lookup=if packed{Some(PackedXIndex::from_source(&parts[2])?)}else{None};
@@ -1873,7 +1885,7 @@ fn algebraic_mode_factorized_index_variant_y(
                 return Err("factorized S3: repeated x across partitions".into());
             }
             let diff=subp(x,z);
-            let d=mulp_mersenne(diff,diff);
+            let d=if LINEAR {diff} else {mulp_mersenne(diff,diff)};
             if d==0 {return Err("factorized S3: zero denominator".into());}
             prefix.push(mulp_mersenne(*prefix.last()
                 .ok_or("factorized S3: missing prefix")?,d));
@@ -1897,10 +1909,19 @@ fn algebraic_mode_factorized_index_variant_y(
             let sum_x=addp(x,z);
             let plus=addp(u,v);
             let minus=subp(u,v);
-            let mut roots=[
-                subp(mulp_mersenne(mulp_mersenne(plus,plus),inverses[j]),sum_x),
-                subp(mulp_mersenne(mulp_mersenne(minus,minus),inverses[j]),sum_x)
-            ];
+            let mut roots=if LINEAR {
+                let slope_plus=mulp_mersenne(plus,inverses[j]);
+                let slope_minus=mulp_mersenne(minus,inverses[j]);
+                [
+                    subp(mulp_mersenne(slope_plus,slope_plus),sum_x),
+                    subp(mulp_mersenne(slope_minus,slope_minus),sum_x)
+                ]
+            } else {
+                [
+                    subp(mulp_mersenne(mulp_mersenne(plus,plus),inverses[j]),sum_x),
+                    subp(mulp_mersenne(mulp_mersenne(minus,minus),inverses[j]),sum_x)
+                ]
+            };
             roots.sort_unstable();
             for (ridx,&root) in roots.iter().enumerate(){
                 if ridx==1 && root==roots[0] {continue;}
@@ -1951,6 +1972,13 @@ fn execute_factorized_unequal_index_variant_jumpmode(q:(u64,u64),sizes:[usize;3]
 }
 fn execute_factorized_unequal_index_variant_jumpmode_y(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool,jump_mode:u8,use_public_y:bool)
     ->Result<serde_json::Value,String>{
+    execute_factorized_unequal_index_variant_jumpmode_chord(
+        q,sizes,round_limit,compact,packed,jump_mode,use_public_y,false)
+}
+fn execute_factorized_unequal_index_variant_jumpmode_chord(
+    q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool,
+    jump_mode:u8,use_public_y:bool,linear:bool
+)->Result<serde_json::Value,String>{
     if jump_mode>2{return Err("unsupported jump source".into());}
     if sizes.iter().any(|&n|n<16 || n>32_768)
        || sizes.iter().sum::<usize>()>40_000
@@ -1980,8 +2008,13 @@ fn execute_factorized_unequal_index_variant_jumpmode_y(q:(u64,u64),sizes:[usize;
         let source_additions=ar.counts.group_additions-before;
         let root_begin=Instant::now();
         let before_verify=ar.counts.group_additions;
-        let (solution,stats)=algebraic_mode_factorized_index_variant_y(
-            &parts,q,&mut ar,compact,packed,use_public_y)?;
+        let (solution,stats)=if linear {
+            algebraic_mode_factorized_chord::<true>(
+                &parts,q,&mut ar,compact,packed,use_public_y)?
+        }else{
+            algebraic_mode_factorized_index_variant_y(
+                &parts,q,&mut ar,compact,packed,use_public_y)?
+        };
         let root_ns=root_begin.elapsed().as_nanos();
         let verify_additions=ar.counts.group_additions-before_verify;
         let found=solution.is_some();
@@ -1995,6 +2028,7 @@ fn execute_factorized_unequal_index_variant_jumpmode_y(q:(u64,u64),sizes:[usize;
             "s3_pair_quadratics":stats.pair_s3,
             "x_fibre_precompute":true,"jacobian_source":true,"joint_batched_public_jumps":jump_mode!=0,
             "public_ordinate_s3":use_public_y,
+            "linear_batch_chord":linear,
             "public_jump_window_bits":if jump_mode==2{4}else if jump_mode==1{1}else{0},
             "compact_x_index":compact,"packed_x_index":packed,
             "s3_sqrts":stats.s3_sqrt,
@@ -3777,8 +3811,169 @@ fn aps_composed_win4_publicy_24q_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-APS-LINCHORD. The public Q and scalar known-answer fixture are
+// caller-side only. No target scalar reaches either APS or rho solver.
+// This is a *fully cold* engineering comparison, not non-generic extraction.
+fn aps_linear_chord_24q_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const SIZES:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x4348_4f52_444c_3234;
+    const RHO_SEED:u64=0x4348_4f52_4452_3234;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut totals=[0u128;5];
+    let mut setup=[0u128;3];
+    let mut root=[0u128;3];
+    let mut successful=[0usize;5];
+    let mut paired_wins=0usize;
+    for i in 0..CASES {
+        let (known,q)=loop {
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k) {continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)) {
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED ^ (i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let mut order=[0usize,1,2,3,4];
+        order.rotate_left(i%5);
+        let mut arms:[serde_json::Value;5]=std::array::from_fn(|_|json!(null));
+        for idx in order {
+            let run=match idx {
+                0|1|2=>execute_factorized_unequal_index_variant_jumpmode_chord(
+                    q,SIZES,6,false,true,2,true,idx!=0)?,
+                3=>neg_rho_cold_policy_jumps(
+                    q,rho_seed,32,4,STEP_CAP,512,false,32)?,
+                4=>neg_rho_cold_policy_jumps(
+                    q,rho_seed,32,4,STEP_CAP,512,false,64)?,
+                _=>unreachable!()
+            };
+            let done=run["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let log=if idx<3 {
+                run["attempts"].as_array().and_then(|a|a.last())
+                    .and_then(|a|a["solution"]["log"].as_u64())
+            }else{run["log"].as_u64()};
+            // Independently recomputed outside solver from the caller-only
+            // known answer. Partial or inconsistent calls are a hard failure.
+            if !done || log!=Some(known) ||
+                verifier.scalar(PRIME31,log.unwrap_or(0),Some(PRIME31.g))!=Some(q){
+                return Err(format!("linear chord failed complete public scalar replay case={i} arm={idx}"));
+            }
+            successful[idx]+=1;
+            totals[idx]+=run["cold_wall_ns"].as_u64()
+                .ok_or("linear chord missing cold wall")? as u128;
+            if idx<3 {
+                for step in run["attempts"].as_array().ok_or("missing APS attempts")? {
+                    setup[idx]+=step["source_setup_ns"].as_u64()
+                        .ok_or("missing APS setup")? as u128;
+                    root[idx]+=step["s3_query_ns"].as_u64()
+                        .ok_or("missing APS oracle")? as u128;
+                }
+            }
+            arms[idx]=run;
+        }
+        let old=arms[0]["attempts"].as_array().ok_or("missing reference attempts")?;
+        for idx in [1usize,2] {
+            let new=arms[idx]["attempts"].as_array().ok_or("missing candidate attempts")?;
+            if old.len()!=new.len(){
+                return Err(format!("linear chord changed successful round count Q={i} arm={idx}"));
+            }
+            for (round,(baseline,candidate)) in old.iter().zip(new.iter()).enumerate() {
+                for key in ["round","seed","profile","rejected_identity",
+                    "rejected_duplicate_x","s3_pair_quadratics",
+                    "s3_batch_inversions","signed_candidates","solution"] {
+                    if baseline[key]!=candidate[key]{
+                        return Err(format!(
+                            "linear chord transcript mismatch Q={i} arm={idx} round={round} key={key}"));
+                    }
+                }
+            }
+        }
+        if arms[1]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){
+            paired_wins+=1;
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,"caller_known_answer_only":known,
+            "chronological_order":order,"old_publicy":arms[0],
+            "new_linear_chord":arms[1],"linear_chord_AA":arms[2],
+            "unfolded_rho32":arms[3],"unfolded_rho64":arms[4]
+        }));
+    }
+    let ratio=totals[1] as f64 / totals[0] as f64;
+    let drift=(totals[1] as f64/totals[2] as f64-1.0).abs();
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experiment":"EXP-R31-APS-LINCHORD",
+        "method":"published prime-field APS index calculus; batch linear chord inversions",
+        "classification":"generic pair-MITM equivalent; no non-generic advantage claim",
+        "p":P,"n":N,"a":PRIME31.a,"b":PRIME31.b,"h":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed":format!("{RHO_SEED:016x}"),
+        "profile":SIZES,"round_cap":6,"cases":CASES,
+        "arm_names":["old_publicy","new_linear_chord","linear_chord_AA","unfolded_rho32","unfolded_rho64"],
+        "completed":successful,
+        "all_120_complete":successful.iter().all(|&x|x==CASES),
+        "cold_total_ns":totals.map(|v|v.to_string()),
+        "source_setup_ns":setup.map(|v|v.to_string()),
+        "s3_oracle_ns":root.map(|v|v.to_string()),
+        "candidate_old_ratio":ratio,
+        "candidate_AA_drift":drift,
+        "candidate_paired_wins":paired_wins,
+        "passes_frozen_5pct_gate":ratio<=0.95 && drift<=0.05 &&
+            paired_wins>=18 && successful.iter().all(|&x|x==CASES),
+        "strongest_WZ_and_external_IC_missing":true,
+        "cases_detail":cases
+    }))
+}
+
+#[cfg(test)]
+#[test]
+fn linear_chord_roots_equal_square_denominator_and_s3(){
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar).unwrap();
+    let (parts,_,_)=source_walk_profile_jac_window4(
+        PUBLIC_Q,SEED,&mut ar,[16,16,32]).unwrap();
+    for left in &parts[0] {
+        for right in &parts[1] {
+            let (x,u)=left.pt;
+            let (z,v)=right.pt;
+            let d=subp(x,z);
+            assert_ne!(d,0,"source promised globally distinct x");
+            let inverse=pownp_mode::<true>(d,P-2);
+            let inverse_square=mulp_mersenne(inverse,inverse);
+            let sum_x=addp(x,z);
+            let coeff=s3_coeff_mode::<true>(x,z);
+            let mut old=[
+                subp(mulp_mersenne(mulp_mersenne(addp(u,v),addp(u,v)),inverse_square),sum_x),
+                subp(mulp_mersenne(mulp_mersenne(subp(u,v),subp(u,v)),inverse_square),sum_x)
+            ];
+            let plus=mulp_mersenne(addp(u,v),inverse);
+            let minus=mulp_mersenne(subp(u,v),inverse);
+            let mut new=[
+                subp(mulp_mersenne(plus,plus),sum_x),
+                subp(mulp_mersenne(minus,minus),sum_x)
+            ];
+            old.sort_unstable();new.sort_unstable();
+            assert_eq!(old,new);
+            for &r in &new {
+                assert_eq!(s3_eval_mode::<true>(coeff,r),0);
+            }
+        }
+    }
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--aps-linear-chord-24q" {
+        let result=aps_linear_chord_24q_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--aps-composed-win4-publicy-24q" {
         let result=aps_composed_win4_publicy_24q_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
