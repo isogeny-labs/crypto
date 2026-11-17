@@ -2450,3 +2450,10 @@ What was done: compiled separate v2 exact left solve BQ=19I with direct identity
 Decisions made: one120CPU invocation after Git freeze; arithmetic correction does not relax prediction. No S3 polling or merge.
 Open threads: run v2 and qualify completed certificates.
 Errors: only two inherited unused-helper warnings.
+
+## Four exceptional19 quotient-module representatives pass
+
+What was done: freeze2bef62517c8 input hashes passed; corrected sole invocation exit0. Exhaustive362/20/four-orbit checks and all four exact principal/F/V/Q/symplectic gates passed; five descriptor files retained. Auxiliary pi^10 rank4 passed.
+Decisions made: publish exact module result and preserve original failure. Predicted discriminant not independently certified; four symmetry orbits not unconditionally four geometric classes. No speed measurement.
+Open threads: certified genus-two algebraic invariants/reduction, explicit finite-field quotient curves and maps, same-target collection cost; genus-three valuation and genus-four work remain open.
+Errors: corrected scalar-conjugation bug resolved by direct BQ=19I identity; no rerun of original, S3 polling, cloud or merge.
