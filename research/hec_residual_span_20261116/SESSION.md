@@ -3101,3 +3101,10 @@ What was done: compiled12telemetryhooks atall3Picrawmodularproductsites/2inverse
 Decisions made: repairPicM/Icoverage,notallhostinstructions/wholeattackcost;kernel/modelconstructsuppliedfrozenartifacts. No tuning/labelsinsidealgorithms.Gitfreeze precedes sole600CPUrun.
 Open threads: executeexactcalibration,inspectcorrectedphasecosts,thencompletepipelineledger/matchedoriginalIC/rho.Full10xgoalactiveunachieved.
 Errors: noneincompile;unusedcopiedmodulewarnings.Noscientificexecutionyet.
+
+## Pic helper counter repair calibrated with exact paired replay
+
+What was done: freeze064ba08fc68 hashespass/exit0;exactprimitivevector/valuespass. Legacy/metered2models agreeallkeys/aux/certs/reports/legacycounts/nativephasevectors;8ICexecutionsverifyonH. CorrectedsecantPic502104/468132products+190/215inv;freshreference3712584/3438153products+40512/39464inv. Pointsearch/constructhelperscaptured;40phase records inPHASES.json.
+Decisions made: accountingrepairnotnovelty/10x;PicM/Iendpointcoveragefixed, notwholeCPU/attackledger. Native/ell vectorsdistinct;fullmodel/kernelconstructstillfrozenprovideddata.
+Open threads: completeconstruction/nativefield/ellledger and matchedoriginalHIC/rhocomparisonbeforemorequartictuning;othergenera/full10xgoalactiveunachieved/independentreviewopen.
+Errors: no scientificfailure;unusedcopiedmodulewarnings.Gitcustody/noS3/no merge.

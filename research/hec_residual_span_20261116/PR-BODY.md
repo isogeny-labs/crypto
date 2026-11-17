@@ -90,3 +90,7 @@ Freeze `f749102e1c5` executes four genuine quartic IC solves through the constru
 ### Rank-stopped secant collection
 
 Freeze `cc9f3a0f902` qualifies a secant/quadratic collector:190/215distinct lines yield the exact same rank66relation space as3783exhaustive lines. All4original answers and walks are unchanged; target rows fall212→68. Fresh paired reference setup and full native phase deltas are retained. Rank work moves into setup, and omitted Pic helper counters make the optimized Pic-counter zero an incomplete-work figure, not zero arithmetic. See `native-smith-secants/RESULTS.md`, `COMPARISON.json`, and `COUNTER-GAP.md`. This is an engineering component result, not total10x evidence. Counter repair and complete matched accounting remain next.
+
+### Pic helper product/inverse meter repaired
+
+Freeze `064ba08fc68` adds12telemetry hooks covering all3raw Pic modular-product sites and bothinverse backends. Stripped numerical source is byte-identical. Primitive exact-count controls and full paired legacy/metered numerical replay pass, including8original-H-verified IC executions. Corrected secant setups cost502104/468132Pic products and190/215inverses; fresh exhaustive setups3712584/3438153products and40512/39464inverses. Earlier zero Pic setup counters omitted real helper work. `native-smith-meter/PHASES.json` retains40phase records. This repairs Pic product/inverse coverage, not complete construction/host accounting or a10xproof; matched originalIC/rho comparison remains required.
