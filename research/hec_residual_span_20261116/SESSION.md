@@ -1707,3 +1707,10 @@ What was done: compiled conicmatrix inversion, polar cubiclinear correction, exp
 Decisions made: no identification fromcounts alone; no pointfilter/fittedGL. All assertions [pcc:unverified]. Primary paper section2Eq2.2-2.4read.
 Open threads: pushfreeze then once-only invocation; targetMumfordlift remains.
 Errors: none in compile, no science yet; ownT7093lease confirmed.
+
+## Exact standard Kummer coordinate identity completed
+
+What was done: freeze0ef439d7d09 single invocation exit0; invertibleGL4, alpha25/lambda502, exactKstandard(GL*y)=368Fimage(y). Fourtransformedquintics retained. Assertions [pcc:unverified].
+Decisions made: recoveredcurve identified by fullquarticidentity beyondcounts; no globalJacobianlift/degreeproof claim.
+Open threads: explicitMumfordlift and originalrationalgroup compatibility then cost.
+Errors: none,no rerun/S3/cloud.
