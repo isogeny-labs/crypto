@@ -2373,3 +2373,10 @@ What was done: compiledRustsymplecticdescriptor andCFLINT3.6ballconsumer256/512b
 Decisions made: quotientevennullcountsdescriptive, source35+1knowncontrol; ballcontainszeronotproofzero, complexnonhypernotsameasF421. Maximum4processes120CPUeach, no rerun/overwrite. PrimaryMarseglia/CMtheta/officialFLINTread; installed3.6vsweb3.7dev distinctionexplicit.
 Open threads: pushfreeze thenoneproducer/3consumerinvocations, inspectactualconditioning/control/thetaoutcomes; reconstruction/reduction/targettransport/costandfull10xscopeunchanged.
 Errors: Cmisleadingindentationwarningonly, Rustbuildconfirmedpass; no scienceexecutedyet/S3/cloud/merge.
+
+## Symplectic descriptors pass, FLINTconsumers failbeforemain
+
+What was done: pushedfreezef0e031eaa4f, inputhashpass, Rustexit0all3Spdescriptorscreated. ThreeCexit134dyldlibflint24pathmissing:opt->3.5.0 vscompiled3.6.0. No numericalevaluationoccurred; rawerrors/exits retained.
+Decisions made: do notchangeglobalHomebrewlinks oroverwriteattempt; prospectivelypinnedprivate3.6runtimev2 usingimmutableexactdescriptors/identicalCsource. Gitfreezeagainbeforeexecution.
+Open threads: v2loaderremedy thennumericalperiod/theta gate; finitefieldand10xscopeunchanged.
+Errors: dynamicloaderpathmismatch, notscientificfailure; no rerun/S3/cloud/merge.
