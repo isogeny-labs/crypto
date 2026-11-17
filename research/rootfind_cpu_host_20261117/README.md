@@ -338,3 +338,94 @@ perf_event_paranoid=4. Thus the actual-header table is **wall-clock**
 and the local perf numbers are **software task-clock**, not hardware
 cycles or instructions. End-to-end root-finding throughput and GPU
 validation are pending. Keep PR #4609 draft until those gates pass.
+
+
+## Follow-up: P-256 sparse reduction and host borrow-chain (2026-11-17)
+
+P-256 has the 64-bit little-endian limbs
+`[0xffffffffffffffff, 0x00000000ffffffff, 0, 0xffffffff00000001]`
+and `pinv=1`. In each of the four Montgomery reduction rounds, with
+`m=t[i]` and `B=2^64`, the low-limb multiply/add is exactly
+`t[i]+m*(B-1)=m*B`. The host implementation therefore sets
+`t[i]=0` and `carry=m` without a wide MAC. The zero modulus limb
+at index 2 also needs only one add-with-carry. Two wide MACs per
+reduction round are removed: 8 of 32 original wide MACs per
+4-limb Montgomery multiplication (16 schoolbook + 16 reduction);
+the final conditional subtraction and carry propagation are unchanged.
+The specialization uses constants from `fp256_ctx_p256()`, the only
+field-context constructor in this header. The device / CUDA branch
+retains the previous generic arithmetic until GPU profiling.
+
+Separately, x86-64 host-only `u256_sbb` now uses the native
+`_subborrow_u64` carry-flag chain instead of two comparisons per limb.
+The portable fallback remains for other architectures and CUDA.
+I also explored `_addcarry_u64` for `u256_adc`, but **reverted it**:
+the local pinned -O2 task-clock run had a median 0.98x speedup
+(i.e. a slight regression) across six rounds and large variance.
+Not adopting a benchmark-regressing candidate is intentional.
+
+### Correctness and actual-header CI
+
+The new `bench_sparse256.cpp` freezes the immediately preceding
+native-128-MAC Montgomery routine and compares its **bitwise outputs**
+against the changed header on **32,768 operand pairs**, including
+zero, one and maximal representatives. The independent
+`bench_carry256.cpp` compares ADC/SBB result limbs **and** carry/borrow
+bits over 32,768 input pairs and boundary values.
+
+[GitHub Actions run 44201059676](https://github.com/isogeny-labs/crypto/actions/runs/44201059676)
+compiled the actual headers with GCC -O2, passed the C++ rootfinder
+test suite (`ALL PASS`), and passed both new correctness checks.
+Its nine-sample median wall-clock results (prior to reverting the
+inconsistent ADC candidate) were:
+
+| Actual-header host operation | Before ns | After ns | Speedup |
+|---|---:|---:|---:|
+| P-256 Montgomery multiplication, sparse REDC | 62.931 | 47.925 | **1.313x** |
+| Four-limb ADC (subsequently reverted) | 4.472 | 4.192 | 1.067x on this VM only |
+| Four-limb SBB | 5.255 | 5.036 | 1.043x |
+
+These microbenchmarks are not whole-rootfinder throughput estimates;
+the 256-bit inversion has a large fixed addition chain and changes in
+one field operation do not imply an equal gain for that full path.
+
+### Local paired measurements with Linux perf software task-clock
+
+A standalone C++17 reproduction, not a checked-out repository header,
+was compiled on AMD EPYC 9V74 with GCC -O2. Deterministic 32,768-pair
+corpora were verified bitwise; one pinned CPU; ten independent paired
+runs for the sparse reduction. The local container lacks the
+`perf` command but `perf_event_open(PERF_TYPE_SOFTWARE,
+PERF_COUNT_SW_TASK_CLOCK)` worked for per-thread CPU time.
+
+- Sparse REDC: median **1.147x wall-clock**, range 1.067–1.160x;
+  median **1.147x perf software task-clock**, range 1.019–1.162x.
+  A separate `-fsanitize=undefined` run passed.
+- Four-limb SBB: median **1.415x** wall-clock speedup across six pinned
+  trials, range 1.370–1.566x. The actual-header hosted result above
+  was smaller, demonstrating meaningful compiler/CPU sensitivity.
+- Four-limb ADC intrinsic was **not retained** due mixed pinned -O2
+  results (0.88–1.08x wall-clock) despite positive one-shot hosted CI.
+
+The Ubuntu 24.04 runner installed `perf version 7.0.14` but denied
+hardware events with `kernel.perf_event_paranoid=4`; the local VM
+also lacks accessible hardware PMU cycles and instructions. Therefore
+**no hardware cycles, retired instructions, cache misses, CUDA, or
+end-to-end throughput data** are claimed. The PR remains draft.
+
+To reproduce the new same-input arms on a PMU-enabled host:
+
+```sh
+make -C gpu/rootfind test bench-sparse256 bench-carry256
+for arm in before after; do
+  perf stat -r 5 -e cycles,instructions,branches,branch-misses \
+    -- gpu/rootfind/bench_sparse256 --perf-$arm
+done
+for arm in sbb-before sbb-after; do
+  perf stat -r 5 -e cycles,instructions,branches,branch-misses \
+    -- gpu/rootfind/bench_carry256 --perf-$arm
+done
+```
+
+Retain the draft gate: actual PMU counters, GPU correctness and
+end-to-end `rf256_decompose` throughput on equal input streams.
