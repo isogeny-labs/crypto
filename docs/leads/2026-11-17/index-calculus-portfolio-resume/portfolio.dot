@@ -1,0 +1,62 @@
+digraph portfolio {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.65",
+         fontname="DejaVu Sans", labelloc="t",
+         label="Index-calculus portfolio after the 2026-11-17 resumed audit\nStatus and next gates; all scientific claims are PCC-unverified"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+        color="#475569", fontcolor="#0f172a", margin="0.14,0.09"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#64748b", fontcolor="#334155"];
+
+  goal [shape=oval, fillcolor="#e2e8f0", label="Useful index-calculus progress"];
+
+  structural [fillcolor="#dcfce7", color="#15803d",
+              label="Exponent / structure\nCan the relation mechanism scale differently?"];
+  engine [fillcolor="#dbeafe", color="#1d4ed8",
+          label="Engine / constants\nCan a fixed mechanism become usable?"];
+  special [fillcolor="#f3e8ff", color="#7e22ce",
+           label="Special family\nPositive control, narrow domain"];
+  hold [fillcolor="#fee2e2", color="#b91c1c",
+        label="Stop / hold\nGate failed, dominated, or no admitted run"];
+
+  goal -> structural [label="highest upside"];
+  goal -> engine [label="best demonstrated"];
+  goal -> special [label="strongest positive control"];
+  goal -> hold [label="do not spend now"];
+
+  p256 [fillcolor="#bbf7d0", color="#15803d",
+        label="1. P-256 complete system\nactive PR #4590\nnext: natural-target m>=4 yield + full F4/cold cost"];
+  c255 [fillcolor="#dcfce7", color="#15803d",
+        label="4. Curve25519 six-sum / section\nnext: coefficient + root recurrence\nand subcubic bound"];
+  p31 [fillcolor="#dcfce7", color="#15803d",
+       label="6. Prime31 full D9 gate\nnext: public-only nonenumerative extraction"];
+  structural -> p256;
+  structural -> c255;
+  structural -> p31;
+
+  lrf [fillcolor="#bfdbfe", color="#1d4ed8",
+       label="2. Binary linearized root finder\nstrongest engine gain\nnext: current-main integration + cold comparison"];
+  norm [fillcolor="#dbeafe", color="#1d4ed8",
+        label="5. Norm-branch rank census\ncheap discriminator\nblocked: 17 exact artifacts missing"];
+  baseline [fillcolor="#dbeafe", color="#1d4ed8",
+            label="Pair tables / projection / Boolean FL\nbaseline engineering only"];
+  engine -> lrf;
+  engine -> norm;
+  engine -> baseline;
+
+  jv [fillcolor="#e9d5ff", color="#7e22ce",
+      label="3. Joux-Vitse weak class\nrepository validation-gate control\nblocked for general curves by sparse reach"];
+  special -> jv;
+
+  retired [fillcolor="#fecaca", color="#b91c1c",
+           label="Retire current protocol\naimed m=3 + exact 2LP"];
+  paused [fillcolor="#fee2e2", color="#b91c1c",
+          label="Pause parameter tuning\nAutolab; projected base; PKM"];
+  admin [fillcolor="#fee2e2", color="#b91c1c",
+         label="No admitted science run\nICEX; PFDR; LEAD-15 current protocol"];
+  hold -> retired;
+  hold -> paused;
+  hold -> admin;
+
+  legend [shape=note, fillcolor="#f8fafc", color="#94a3b8", fontsize=9,
+          label="Decision rule\nContinue only the exact next gate.\nDo not duplicate active owner lanes.\nDo not weaken failed prospective gates."];
+  p256 -> legend [style=dashed, arrowhead=none, color="#94a3b8"];
+}
