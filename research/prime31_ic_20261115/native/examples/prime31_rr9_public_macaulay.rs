@@ -481,3 +481,155 @@ pub fn degree_six_controls() -> Value {
         "pcc": "unverified"
     })
 }
+
+
+/// Prospective #4550 test-only *positive* certificate for the degree-9
+/// homogeneous Macaulay row-space obstruction. No negative-rank computation,
+/// support-free extractor or unknown-log recovery is implemented here.
+/// The signed support is restricted to the INDEPENDENT TEST ORACLE. The
+/// eight public coefficient quadrics are unchanged from D5 and D6.
+pub fn projective_degree_nine_witness_controls() -> Value {
+    let start=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar).unwrap();
+    let base=first_eight(&mut ar);
+    let xs=base.map(|pt|pt.0);
+    assert_eq!(xs,[0,1,2,3,5,6,8,9]);
+    let h=factor_polynomial(&xs);
+    let positive:Point=Some((1_911_579_686,548_820_096));
+    let negatives:[Point;2]=[
+        Some((625_037_715,2_100_627_251)),
+        Some((1_923_055_775,307_731_458))
+    ];
+    let (oracle_positive,oracle_negatives,formal_supports)=fixtures(&mut ar,&base);
+    assert_eq!(oracle_positive,positive);
+    assert_eq!(oracle_negatives.as_slice(),&negatives);
+    assert_eq!(formal_supports,256);
+    let (r,s)=positive.unwrap();
+    assert!(!xs.contains(&r));
+
+    // Test-oracle ONLY: find the actual eight signed elliptic-curve leaves
+    // behind this *frozen positive* public residual. Never feed the sign mask
+    // or the resulting coefficients to a public-only unknown-R extractor.
+    let mut support=None;
+    for mask in 0..256u16 {
+        let chosen:[Point;8]=std::array::from_fn(|i|{
+            let (x,y)=base[i];
+            Some((x,if mask&(1u16<<i)==0 {y} else {sub(0,y)}))
+        });
+        if group_sum(&mut ar,&chosen)==positive {
+            support=Some((mask,chosen));
+            break;
+        }
+    }
+    let (_test_only_sign_mask,signed)=support.expect("positive sign support missing");
+    let mut rows=[[0u64;NV+1];8];
+    for (i,&point) in signed.iter().enumerate() {
+        let (x,y)=point.expect("finite signed leaf");
+        let xr=sub(x,r);
+        let ys=add(y,s);
+        let mut xpow=1u64;
+        for j in 0..4 {
+            rows[i][j]=mul(xr,xpow);
+            if j<3 {rows[i][4+j]=mul(ys,xpow);}
+            if j==3 {rows[i][NV]=sub(0,mul(ys,xpow));}
+            xpow=mul(xpow,x);
+        }
+    }
+    // Eight equations, seven unknown normalized coefficients. Elementary
+    // finite-field RREF with exact consistency / uniqueness checks.
+    let mut next_row=0usize;
+    for column in 0..NV {
+        let pivot=(next_row..8).find(|&i|rows[i][column]!=0)
+            .expect("frozen signed chart has deficient rank");
+        rows.swap(next_row,pivot);
+        let inv=pow(rows[next_row][column],P-2);
+        for k in column..=NV {rows[next_row][k]=mul(rows[next_row][k],inv);}
+        for i in 0..8 {
+            if i==next_row {continue;}
+            let factor=rows[i][column];
+            if factor==0 {continue;}
+            for k in column..=NV {
+                rows[i][k]=sub(rows[i][k],mul(factor,rows[next_row][k]));
+            }
+        }
+        next_row+=1;
+    }
+    assert_eq!(next_row,NV);
+    for row in rows.iter().skip(NV) {
+        assert!(row[..NV].iter().all(|&z|z==0),"unreduced overdetermined row");
+        assert_eq!(row[NV],0,"signed chart has no normalized solution");
+    }
+    let coeff:[u64;NV]=std::array::from_fn(|i|rows[i][NV]);
+    let quadrics=equations(r,s,&h);
+    assert!(quadrics.iter().all(|q|eval_poly(q,&coeff)==0),
+        "positive public coefficient equations not solved");
+    assert_eq!(independent_direct_m(&coeff,r,s),h);
+    assert!(check_public_coefficients(&mut ar,positive,&base,&coeff),
+        "positive chart fails independent original-curve replay");
+
+    // Homogenize eight affine quadrics in seven variables by a formal h.
+    // Columns of degree nine in (7 coefficients,h) correspond bijectively
+    // to affine monomials in coefficients of total degree <=9. Evaluation
+    // at (coefficients,h=1) is a NONZERO right-null vector of the 27456
+    // public Macaulay rows. Reassemble and test every sparse row, rather
+    // than merely observing q(coeff)=0.
+    let basis=monomials(9);
+    assert_eq!(basis.len(),11_440);
+    let multipliers=monomials(7);
+    assert_eq!(multipliers.len(),3_432);
+    let idx:HashMap<Exp,usize>=basis.iter().copied().enumerate()
+        .map(|(i,e)|(e,i)).collect();
+    let mut powers=[[1u64;10];NV];
+    for i in 0..NV {
+        for d in 1..=9 {powers[i][d]=mul(powers[i][d-1],coeff[i]);}
+    }
+    let evals:Vec<u64>=basis.iter().map(|ex|{
+        let mut z=1u64;
+        for j in 0..NV {z=mul(z,powers[j][ex[j] as usize]);}
+        z
+    }).collect();
+    assert_eq!(evals[*idx.get(&[0u8;NV]).unwrap()],1,
+        "homogeneous h^9 evaluation must be nonzero");
+    let mut nonzero_rows=0usize;
+    let mut sparse_terms=0u64;
+    for q in &quadrics {
+        for e in &multipliers {
+            let mut dot=0u64;
+            for (qe,&coefficient) in q {
+                let combined=add_exp(e,qe);
+                let column=*idx.get(&combined)
+                    .expect("degree-nine Macaulay monomial not indexed");
+                dot=add(dot,mul(coefficient,evals[column]));
+                sparse_terms+=1;
+            }
+            assert_eq!(dot,0,"the positive root must annihilate every D9 row");
+            nonzero_rows+=1;
+        }
+    }
+    assert_eq!(nonzero_rows,27_456);
+
+    // Only bounded positive-witness timing; no D9 rank or negative
+    // certificate has been computed and no cost claim is appropriate.
+    json!({
+        "schema":"prime31.rr9.projective-d9-positive-witness.v1",
+        "protocol":"RR9_PROJECTIVE_D9_PROTOCOL_20261117.md",
+        "p":P,"n":PRIME31.n,"curve_a":PRIME31.a,"curve_b":PRIME31.b,
+        "base_x":xs,"positive_residual":positive,"negative_controls":negatives,
+        "positive_chart_coefficients_test_oracle_only":coeff,
+        "oracle_supports_test_only":formal_supports,
+        "positive_chart_equations_replay":true,
+        "positive_original_curve_replay":true,
+        "degree":9,"macaulay_columns":basis.len(),
+        "macaulay_rows_checked":nonzero_rows,
+        "sparse_row_terms_checked":sparse_terms,
+        "evaluation_at_h_equals_one_nonzero":true,
+        "degree_nine_rank_upper_bound_for_positive":basis.len()-1,
+        "negative_degree_nine_rank":Value::Null,
+        "all_D9_rows_annihilated":true,
+        "witness_only_wall_ns":start.elapsed().as_nanos().to_string(),
+        "complete_unknown_ecdlp_solves":0,
+        "public_only_non_enumerative_extractor_implemented":false,
+        "pcc":"unverified"
+    })
+}
