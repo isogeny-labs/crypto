@@ -21,7 +21,7 @@ F'(-R) = A(r) - ((3r^2+a)/(2s))*V(r) = 0.
 ```
 Equivalently `(3r^2+a)V(r)-2sA(r)=0`. The exceptional x root is thus a union of **two linear factors in the seven normalized coefficients**, not an arbitrary tautology. The sign of the chosen leaf determines which factor must vanish. An unsaturated use of the old product at x=r admits spurious solutions.
 
-The even-order rational `s=0` case is excluded by this already-certified prime-order curve; the point at infinity and singular/noncanonical inputs remain explicitly excluded. This lemma is a local-function identity, not a faster relation-extraction algorithm or a complexity theorem.
+The even-order rational `s=0` case is excluded by this already-certified prime-order curve; the point at infinity and singular/noncanonical inputs remain explicitly excluded. **Normalization is lossless on any valid nine-zero affine relation:** a nonzero function in `L(9O)` that vanishes with total multiplicity nine must have a pole of exact order nine at `O` (otherwise its principal divisor has more zeros than poles). The only basis monomial of pole order nine is `x^3y`, so `V_3 != 0` and rescaling to one is legitimate. This is standard elliptic divisor degree algebra, not a novel cryptanalytic result.
 
 ## Registered Rust test and producer preflight
 Prospective protocol: [RR9_EXCEPTIONAL_RESIDUAL_PROTOCOL_20261117.md](RR9_EXCEPTIONAL_RESIDUAL_PROTOCOL_20261117.md), source-committed **before** modifications. The implementation adds:
@@ -35,7 +35,7 @@ An *independent producer preflight* using the same fixed curve but separate loca
 
 ## CI and scientific status
 - Source change commits `5fdd8ad4d987b6b6d48be8b71df82468950d8d59` and `2bcfb1227b91411a15f0969ddf1c09547e299631` on the stacked branch. 
-- GitHub Actions [source-specific original-curve Rust run #44064526434](https://github.com/isogeny-labs/crypto/actions/runs/44064526434) was **in progress** at report creation. Do not upgrade preflight to passed Rust or report an unobserved test count. The status of the final source revision is to be checked separately.
+- **Final source revision 2bcfb122: [exact-source Rust 1.100 CI #44064951148 SUCCESS](https://github.com/isogeny-labs/crypto/actions/runs/44064951148)**: 40/40 native library tests, **8/8 RR9 example tests** including `rr9_b8_exceptional_x_jet_fibre_equivalence`, and 64+64 previously registered original-curve determinant controls. [Raw 128-case JSON artifact #14319783227](https://github.com/isogeny-labs/crypto/actions/runs/44064951148/artifacts/14319783227) (ZIP SHA-256 `e0f6b48cbda7866d846961d08db9ef2bf85d9b9b07418d9cd5fa724a3671c8ec`). Precursor [source CI #44064526434](https://github.com/isogeny-labs/crypto/actions/runs/44064526434) also passed (40+8) on the earlier code revision without the additional raw JSON report field. These tests are exact-source **producer verification only** [pcc:unverified]; they do not certify independent PCC, ECDLP recovery or runtime improvement.
 - No new complete public unknown-scalar logs, solver runtime or asymptotic advantage. Signed independent PCC is not available for this producer experiment.
 
 ## Prior leads and next discriminating experiment
