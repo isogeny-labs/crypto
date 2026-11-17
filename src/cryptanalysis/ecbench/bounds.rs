@@ -1659,10 +1659,10 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
                 .iter()
                 .filter(|r| r.workload.curve.slug == row.slug)
                 .collect();
-            let ln_r = (row.r as f64).ln();
+            let ln_r = row.r.to_f64().ln();
             q_strata.push(
                 mine.iter()
-                    .map(|r| q_of(r) / (r.workload.curve.r as f64).sqrt())
+                    .map(|r| q_of(r) / r.workload.curve.r.to_f64().sqrt())
                     .collect(),
             );
             q_pts.push(

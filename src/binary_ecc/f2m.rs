@@ -506,7 +506,6 @@ impl F2mElement {
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
-                super::operation_tally::tick(self.m, "square");
                 sq.iter_mut().for_each(|w| *w = 0);
                 for (i, &w) in acc.bits.iter().enumerate() {
                     sq[2 * i] = spread32(w);

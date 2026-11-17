@@ -1,0 +1,87 @@
+{
+  "schema": "packed-prospective-pins/v1",
+  "status": "prospective; no affected200measurements collected",
+  "source_base": "d5f25f53dc0890a9b1a9045aa73126bd90136bfd",
+  "primary": "packed-dag-487",
+  "planned_calls": 1260,
+  "worker_paths": [
+    "/workspace/relation-native-qualifiers/fusion-85/fused-native",
+    "/workspace/relation-native-qualifiers/fusion-96/fused-native",
+    "/workspace/relation-native-qualifiers/fusion-200/fused-native"
+  ],
+  "worker_sha256": [
+    "6b689556a5c764a76f7366775f2b6e9fda5f5f534a5cd1f9647a4a06cf64817d",
+    "559d6d7591e3797038e7b9291a25368fa4835a3ba78f178d8bf32a92f419dfcd",
+    "87097a0be55304ebbfc3cc372e45adfad2e40b593e2dbe062472f391c0881a55"
+  ],
+  "tool_sha256": {
+    "/workspace/relation-native-qualifiers/fusion-200/packed-compare": "9adca8741c4ecf5080019288d67ec7d406a10cc63895ec8da1172824b75bc06b",
+    "/workspace/relation-native-qualifiers/fusion-200/packed-analyze": "949837f0c8a328c0bb0da95af0d0f89788ee74d293f876d00ebac7935eca7c95",
+    "/workspace/relation-native-qualifiers/fusion-200/fused-native": "87097a0be55304ebbfc3cc372e45adfad2e40b593e2dbe062472f391c0881a55",
+    "/workspace/relation-native-qualifiers/fusion-200/root-matrix-audit": "53b251284987f4f0f6b71fafa286e0699c515355c010f9c3c8a3e7f0b3d523aa"
+  },
+  "input_sha256": {
+    "p2147483647-n3": "266701ed30601d20d48e83dcfcb0866ceccc8617ab0452e58daca1e2d9b173f8",
+    "p2147483647-n4": "658d994fb5da43c3e31db20ebb7da5e9dcdf071614ea750ee07b486985788a3c",
+    "p2147483647-n6": "5697400235e3988cf7b310ee396a6c126e047d62adfa7fe32a65144b258da2ea",
+    "p9007199254740881-n3": "c71d9caae17300a1746e8fb2d75edb16d76e25fc3f1c6349e01f804ddfc782e6",
+    "p9007199254740881-n4": "ff7837ca4a29678c6a8ae4f5d4e0d1eb6f9acf76a7f545f217a810ff17966f5f",
+    "p9007199254740881-n6": "fdc8532bb6bc6394619946f4b281e672beb2194a05f2fbb091848244ad97daa8"
+  },
+  "source_sha256": {
+    "crates/certified-relations/src/cheap.rs": "d5bf10ad2025de513efecb842932af58cd5be142721bdf7321ee4c568374ce24",
+    "crates/certified-relations/src/dag.rs": "fac42760e1a3063b74d9c44fb54858052b027760a9d8daf45af7bf64ac6ad3ab",
+    "crates/certified-relations/src/kernels/arithmetic.rs": "4a05cc7600886d4387c9e5d4d2fa988b1b1551efb58be37a200d33ff78fa6ed4",
+    "crates/certified-relations/src/kernels/cheap.rs": "e88b4bcf37bb1e3100390ed33cb68a9a21a9fc52f6df5f1fbf600607720692a5",
+    "crates/certified-relations/src/kernels/check.rs": "e7246f2be7bfbecbed73d7bd989aeae582ede6d53ac81b323d92e31dfcaf1af1",
+    "crates/certified-relations/src/kernels/compact.rs": "064f132822ea5cdd9a1da9cd7095ca77cd06cf9ac393f6938bb8f6d838d6117f",
+    "crates/certified-relations/src/kernels/projection.rs": "529ba3320d0605ac810d8b8df58c46b0ab3d96bacd7c9bc31e70fd94477147ee",
+    "crates/certified-relations/src/kernels/quotient.rs": "50643d14d3dc072eded174b4bb443cdbd5da37b1f2ed419147f284ad025c84af",
+    "crates/certified-relations/src/lib.rs": "c64b0ffb3388a8e5c5a5271f3bffee8ffe1911adf2925863c5ed5e5207e6ec48",
+    "crates/certified-relations/src/monomial.rs": "8870db4d1d233532248e57281e794598418ccedb0cf4bdc7de732a0b93af6dbf",
+    "crates/certified-relations/src/packed_constructor.rs": "f5ff6b7670d3a3207a9b39f53a0403d96397bb486abd16098d7b6dd63bb07fe6",
+    "crates/certified-relations/src/projection.rs": "8169bc97dde2a61a9d422809369a2f2a718a817630f04c8f7c7f492ce5519aa3",
+    "crates/certified-relations/src/quotient.rs": "d27ebfd58069597e297e3c84c9f2bc5139d94a90ae4d0150958b9599042935a8",
+    "crates/certified-relations/src/quotient/compact.rs": "62b144ba4aff72b09781d6377b406719db67f3546a84612353f3f949eedea095",
+    "crates/certified-relations/src/replay.rs": "47e43919232c08c9f55ccbf225db4bdddbb9b9ea1335ab3e2fb7992e774ae623",
+    "crates/certified-relations/src/workload.rs": "caad0aad06b00b8287d16a5de9157b2f7d4dbf45024a3e69614e3679e3016df6",
+    "crates/relation-replay-checker/src/identities.rs": "d8b1c4fba21a87b310f1657ba9c94b7efe9d8e48de6139f5eeea614a25b09dd9",
+    "crates/relation-replay-checker/src/lib.rs": "9dea7862502ec34b49d82ff577df9164a176058f6258fa5e6b0697a9925ef130",
+    "crates/relation-replay-checker/src/main.rs": "1d1e63285d623bb27daa94f598c460feec32d95381422adb0a270e926487df11",
+    "crates/relation-replay-checker/src/packed.rs": "844eaac082af3deec1b61dadb000eb0acc8d5f43ee450b3625f648e4f9585f25",
+    "research/relation_fusion_20261117/Cargo.lock": "9889251c39ba5b7009fd0cb0168294799680dfc2d11fdc64413f28bcb906d063",
+    "research/relation_fusion_20261117/Cargo.toml": "212e0368bb93ebf6c460832a85013c6e106f37a622ca5fbb92cf8debdb8fd012",
+    "research/relation_fusion_20261117/PACKED_COMPARE_PROTOCOL_200.md": "fba87c14dd39e05799bc1d9663e9f14ecc8c5d748f8426df503ac81141c544d8",
+    "research/relation_fusion_20261117/launch-packed-200.sh": "8e7eb27eb67f00eedf3774570f3bb4b809c32cedc8048e5291788198b2f6a6c7",
+    "research/relation_fusion_20261117/src/bin/fused-native.rs": "4be8d4ed9bf207af3d318ad071608db4ca4b6a20dd75d5a26aa319d9b10ec3e7",
+    "research/relation_fusion_20261117/src/bin/packed-analyze.rs": "09e29a285bbe8afd361e0206dfd8bb3933871de1950fcea34039e43d083af6de",
+    "research/relation_fusion_20261117/src/bin/packed-compare.rs": "d941ad88cdd6142b09ed7986113c0966705f2a01646c7ea9691aeec35ac9daea",
+    "research/relation_fusion_20261117/src/packed_roster.rs": "208aa5d81b780e6d1fc499bee0110e6d5e57283f058182447f7a8f6abcb00e72",
+    "tools/isolated_bench.py": "ccfedf9ef7553fb1231e8d3538b94df01a3348a3da9c3c11fb351c4df5d60322"
+  },
+  "resources": {
+    "cpu": 0,
+    "threads": 1,
+    "cloud_spend_usd": 0,
+    "child_seconds": 30,
+    "child_memory_bytes": 2147483648,
+    "child_file_bytes": 16777216,
+    "case_seconds": 180,
+    "global_seconds": 600
+  },
+  "actual_root_qualification": "ROOT_PACKED_OUTCOME_198.json",
+  "separate_root_audit": "ROOT_PACKED_AUDIT_203.json",
+  "observed_solving_degree": null,
+  "compiled_source_context": "packed-qualification-206.tar.xz source; nine EOF-only normalizations are token-equal per PACKED_EOF_NORMALIZATION_208.json",
+  "qualified_pre_normalization_source_sha256": {
+    "crates/certified-relations/src/cheap.rs": "b89b9c2e9812a3662c73b527f0afcce9fa690f9a7aa6c8c49a963dcdc7f7b7a6",
+    "crates/certified-relations/src/projection.rs": "f06297476021906778e8bcbc5be25dfe65353efcf46c7303751e062e1575cfc9",
+    "crates/certified-relations/src/quotient.rs": "e8e47bd643dd6ddc3c703b5e2bee4177c6671dec99c718147f211f1d852b24c8",
+    "crates/certified-relations/src/quotient/compact.rs": "5c9e5aae21f4e5dd58a30b02dbafd61a9e56787e4eff1c92ef159427795fd3a3",
+    "crates/certified-relations/src/kernels/compact.rs": "c204eeb1a48ee39bb2ff489dea7c4eada5736f48269eb495efd90d6c5691af53",
+    "crates/certified-relations/src/kernels/cheap.rs": "ffafff530d18a1a7a40bc18edd1fd3e4e4e37c2a586fcbe9bfd9aa43e99dff0a",
+    "crates/certified-relations/src/kernels/check.rs": "d02b31327a65312a65bf0e3d38fa2deaaaeca94ea1b9e763f20fe560956e7170",
+    "crates/certified-relations/src/kernels/arithmetic.rs": "2a51007e3e756e52c2eea96b10f424b46620a084d1869a719fe26d6373178875",
+    "crates/certified-relations/src/kernels/quotient.rs": "76976d88e84e8d35f47402f040100a188d4b3c77afccac2c1fb55324749d7f0f"
+  }
+}

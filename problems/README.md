@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Curve25519 target-conditioned section coefficients](curve25519-section-coefficient-selection.md) | investigating | converting structured membership into exponent-moving discovery | biased coefficient constructor with complete attempt/yield/cold-cost and original-row bounds; native quotient query and actual-object proofs |
 | [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | quotient and maps implemented at producer standing; independent/search certification, restricted solver, complete costs and budget admission remain |
 | [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |
 | [Secret-key Rust API timing coverage](rust-secret-api-timing-coverage.md) | open | an end-to-end side-channel resistance claim for the whole crate | complete secret-data-flow coverage, fixed-width API boundaries and independent target-specific timing/code review |
