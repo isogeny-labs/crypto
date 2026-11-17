@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Benchmark Montgomery batch-inverted 4A complement checks for Dickson31 eight-sum IC relation controls, same 98 public targets (automation, started 2026-11-17, branch automation/prime31-dickson31-batched-complement-20261117)
+- [ ] Benchmark Montgomery batch-inverted 4A complement checks for Dickson31 eight-sum IC relation controls, same 98 public targets (automation, started 2026-11-17, branch automation/prime31-dickson31-batched-complement-20261117, PR #4618)
 
 - [x] Prime31 Dickson31 blinded adaptive eight-sum coverage gate (automation, started 2026-11-17, branch automation/prime31-dickson31-adaptive-holdout-20261117, PR #4615)
 
