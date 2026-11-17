@@ -2170,3 +2170,10 @@ What was done: priorweightedLP/self-orbitharvest screened; derivequadraticrecogn
 Decisions made: no minimumyieldassertion, allzero-triggercells retained; notfullsolver/costclaim ornovelrankprinciple. SourcesKB source:b3c90d39a347ef661ccf10680a742186 crypto:research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md,revision9b2119e8fbac482b98b50521c0d604bb andlocalgain-graph/self-orbit results. Assertions [pcc:unverified].
 Open threads: pushfreeze thenone120CPU invocation, no-trigger wouldrejectstandalone bootstrapcoverage.
 Errors: usize/u64 phasecast compilefix beforefreeze,no scientificexecutionyet.
+
+## Same-orbit residual recognition qualified, bootstrapcoverage rejected
+
+What was done: freezeed408645ff9 once-onlyexit0;1894trials/12originalcells exactrecognizer/fullquadraticoracle sets agree,40candidate groundingrows nativeprincipal/group/unitchecks pass.2zero-triggercells p251sm17case1,p601sm17case0 retained. Assertions [pcc:unverified].
+Decisions made: rejectstandaloneuniformbootstrapwithin16anchors, no40rows=rank/solve inference. Retainquadraticrecognizer/standardunitgrounding identity, no novelty/performanceclaim.
+Open threads: materiallydifferent useful-rank/collectionconstruction orcostjustifiedhybridwithnegativefallbacks/independenttargets; originalgenus2+10x/review/publication/genus3/4coverage.
+Errors: noneinrun,no retry/S3/cloud.
