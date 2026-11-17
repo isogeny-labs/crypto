@@ -913,3 +913,17 @@ Run symbolic preparation once, then implement all-chart generic differential ari
 
 ### Errors
 No formula or runtime failure. Previous task lease expired; claimed T7044 for this distinct kernel gate. KB revision9b2119e8fbac482b98b50521c0d604bb is ready but predates new files. Relevant metadata/context receipts are in SOURCES.md.
+
+## Generic Kummer primitive compiled and frozen
+
+### What was done
+Stage-1 specialization at 6cb42b18896 passed: 16 forms, 238 terms, exact degree and symmetry checks. Compiled an Fp fixed-source quadratic circuit, all-chart differential addition, projective split/root decoder, and charged signed recovery. Stage-2 scientific execution has not started.
+
+### Decisions made
+Use 3168 checked steps including explicit identity/theta/doubled-point controls and exact repeats. Native reference and sign recovery use add_place for degree-one sources. Report setup, kernel prefix and full collector primitive separately; nested kernel is not an additive phase. No full DLP or tenfold claim.
+
+### Open threads
+Execute once, retain every failure or cost regression, then decide whether this implementation has a credible complete collector cost case. Broader genus-3/4 and mathematical objective stay open.
+
+### Errors
+Pre-freeze review caught a zero-cost native identity case that could have no modulus entry; output now represents missing counts as zero. Removed one unused import. No scientific retry. Original Oxford expressions are transformed into attributed mathematical coefficient tensors, not vendored as a program.
