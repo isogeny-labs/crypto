@@ -441,6 +441,10 @@ fn setup_reusable_basis() -> ReusableBasis {
             // Reuse the same native row builder; remove the Q column, which
             // is identically 0 in this target-independent setup system.
             let mut row = signed_row(&left, &right, &ai, &di, basis.len()+1, a, 0);
+            // The original single-target helper assumes b>0 and encodes
+            // -b as n-b. For target-independent b=0 this returns n, which is
+            // zero in F_n but not in canonical [0,n) field representation.
+            row[basis.len()] %= PRIME31.n;
             assert_eq!(row[basis.len()], 0);
             row.remove(basis.len());
             assert_eq!(row.len(), basis.len()+1);
