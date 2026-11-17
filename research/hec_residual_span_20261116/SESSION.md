@@ -1532,3 +1532,10 @@ What was done:f030dee3d7aone invocation exits0;18panels252basiscolumns54adjoints
 Decisions made: operatorcorrectnessandwitnessverificationonly,densewitnessfinderreference,nofree-supportproduceror10xclaim. Growthheuristicrecoversclassicalexponent,notbreakthrough; futurebackendmustavoidreintroducingdenseSchur.
 Open threads: efficientrectangular/rank-deficienttargetwitnessfinder andscaledproducer,costedoriginalgenus2+targets; goalopen.
 Errors: none,no scientificretry/S3/cloud.
+
+## Callback-only Krylov target witness frozen
+
+What was done:readoriginalWiedemannsectionsII/III; implemented3attemptdiagonallypreconditionedrecurrencefinder,S/STcallbacksonly,exacttargetwitnessverification,linearvectorstorage. Same18retainedpanels plus5negative/rankdeficient/isotropicsynthetics; oldoperatorchecksretained. Compiled/hashfreeze.
+Decisions made: boundedfailureisunknown,neverinconsistency; no matrix/referenceanswerfinderinput,no seedretuning; allcallback/rejectioncountsretained,no10xclaim.
+Open threads: executeonceandretainallsolverfailures; cost/integrationremain.
+Errors: none, nosciencebeforepushedfreeze.
