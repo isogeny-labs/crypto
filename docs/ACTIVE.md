@@ -20,5 +20,8 @@ _(none pinned — set one with `/goal <text>`)_
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
+- [x] s56: carry the planted log onto the plane quartic at p = 2^56 - 5 (64-bit Pic^0, wide Psi) (claude, started 2026-11-17, branch claude/explicit-quartic-jacobian-map-6i2dng, PR #4540)
 
 ## Blocked / questions for the owner
+
+- main does not compile since after #4438 (`hashed-ecdl-tensor` uses `crate::metrics` with no `mod metrics`; `src/cryptanalysis/ecbench/workload.rs` unclosed delimiter); every Rust check on PR #4540 is red for that reason (claude, 2026-11-17).
