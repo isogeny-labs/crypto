@@ -21,3 +21,17 @@
 
 ### Errors
 - No local Cargo toolchain or research-KB MCP in this connector-only execution; Rust tests delegated to exact-source GitHub Actions. No results inferred from queued CI.
+
+## 18:33 UTC — checkout scope correction
+
+### What was done (commands, files, features)
+- Checked repository metadata: `isogeny-labs/crypto` is approximately **10,025,984 KB** according to GitHub. The original new Actions workflow checked out all current source without sparse selection and two initial runs stalled in the checkout step. Changed only the workflow's current-repo checkout to include `src`, path dependencies, exact new example, frozen native source/corpus suffix, and root Cargo files; the existing pinned native checkout was already sparse. Commit `c272c78` is the sparse checkout correction.
+
+### Decisions made (and why)
+- Do not spend CI time on 10-GB unrelated artifacts; using a sparse exact-source checkout does not alter the curve, algorithm, parameters, or target corpus.
+
+### Open threads
+- Confirm sparse source includes all root-Cargo build requirements, and resolve missing path dependencies if compilation identifies them. Read the final-source Actions run and audit its raw evidence before reporting a result.
+
+### Errors
+- Excessive root repository checkout scope before the correction; no Rust or benchmark failure yet.
