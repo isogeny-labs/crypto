@@ -619,3 +619,73 @@ Independent exact point-order/interval/source replay remains pending before stro
 
 ### Errors
 None in this replay. Toolchain uses Homebrew rustc1.93.1; no cross-toolchain timing claims.
+
+## Exact-order replay prepared
+
+### What was done
+Created a separate verifier for all39exactpointorders,LCMs,intervals,basecounts,andthreeWeilreconstructions. Uses shared native Cantor arithmetic, separate sqrt/interval/Newton/factorization code; extension counts explicitly not re-enumerated. Build passes onHomebrew1.93.1. No scientific execution yet.
+
+### Decisions made
+Freeze and push before once-only replay. Additional large-prime Hasse argument documented separately, without mutating producer protocol. Prior turn classified progress because authoritative Git/PR evidence changed.
+
+### Open threads
+Run replay and retain results, then establish actual solver cost on C4 inputs.
+
+### Errors
+Previous coordination task lease retry budget exhausted; released it and claimed separate replay taskT7017. No arithmetic run failure.
+
+## Exact-order replay passed; parent PR merged externally
+
+### What was done
+At010ae1959c6once-onlyreplayerexits0:39exactpointorders,threewholeorders,threeWeilreconstructions; allbasecounts/interval/LCMchecks pass. SharednativeCantorarithmeticandretainedextensioncountinputs explicitly disclosed. Local observations only. [pcc:unverified]
+
+### Decisions made
+PR4507wasmergedexternallyat29195579cf9withhead dace194b68b while next verifier was prepared. Preserve execution commit and move subsequent commits to a successor review PR; do not edit merged PR.
+
+### Open threads
+Source/orbit replay, then actual C4 solver cold-cost comparison. Independent extension re-enumeration remains absent.
+
+### Errors
+No arithmetic replay failures. Remote branch was deleted by parent merge and recreated by checkpoint push; no cleanup or rerun.
+
+## Source/orbit replay prepared
+
+### What was done
+Separate source/orbit verifier compiled; deserializes exact source Mumford records and checks action directly on points rather than producer's coefficient transformation. All211orbitrecords required. No scientific execution yet.
+
+### Decisions made
+Retain sharedgroup arithmetic limitation; freeze/push before once-only run. Parent4507mergedexternally; successor4518open for exact-order/source follow-up.
+
+### Open threads
+Execute source gate; then solver experiment with all cold costs, exact target identities and public metadata contract.
+
+### Errors
+None.
+
+## Source/orbit replay passed and next solver contract selected
+
+### What was done
+Atf4647780d67sourcecheckerexits0:all3exactMumfordsources/order/projections,all211orbitrecordsandcatalogueactions pass. Sharednativearithmeticlimits retained. [pcc:unverified]
+
+### Decisions made
+Nextcompare C4 folded walk and batched pencil on all3strongmodels, under public N/ell/source/target metadata. Derive scalar eigenvalue by actual source action and sqrt roots, never binomial pi=P(sigma). Charge setup inside each independent solve and retain censoring. Classical composition, no novelty claim.
+
+### Open threads
+Build/freeze/execute a bounded comparison. General10xbreakthrough unfulfilled.
+
+### Errors
+None. KB ready but refresh2026-11-14predatesnewwork; use current Git records as authoritative. KB revision9141e386254340a9bdba3036f2bb706a; lexical only. Sources checked(KB):source:a99a3a2fcb07f95da98f94e175a602f6 crypto-autoresearcher:ledger/proposals/IDEA-20260807-b42544.yaml identifies classical quotient arithmetic; source:34884c18abb08beff2ee71990c9dd502 ledger/proposals/IDEA-20260918-5a9a51.yaml identifies function-first/Sarkar-Singh priorart. Metadata/context/related inspected. Primary Improved sieving on algebraic curves https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf and GTTD https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf accessed; use established sieve/quotient as controls rather than claim a new mechanism.
+
+## C4 solve comparison prepared
+
+### What was done
+Adapted existing folded/expandedwalk and batchpencil to a shared publicN=2ellC4setup. No binomial setup import. Counts per-fresh-targetsetup/relation/LA/internalcheck; fixed72calls/12workloads,128anchors/200000trials, exactrepeat and firstprefix gates. Protocol retains all censoring. Compiles; scientific execution not started.
+
+### Decisions made
+Classicalroute falsifier, not newmath. C4orbitreduction2alone does not imply10x. Scalar action oncyclic rationalellsubgroup follows from checkednonzerosource andexactN; no per-orbit expensivequalification replay inside solver, priorseparatereceiptsremain.
+
+### Open threads
+Freeze/push/run boundedcomparison, classify vectorcost and failures, then choose genuinely new mechanism using observed bottleneck.
+
+### Errors
+Unused copied imports removed; retained diagnostic reports alloweddeadcode. No scientific retries.
