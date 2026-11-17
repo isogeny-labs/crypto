@@ -65,7 +65,8 @@ coordinatewise. The output must be fixed by Frobenius and lie in `F_p`.
 
 Let `N_d=#E(F_(p^d))` from the trace recurrence. Enumerate extension `x`
 values by canonical integer and choose the canonical square root with smaller
-serialized integer. Project each resulting point by `[N_d/r]`; retain the
+serialized integer. Require `r^2 | N_d` and `gcd(N_d/r^2,r)=1`, then project
+each resulting point by the cofactor `[N_d/r^2]`; retain the
 first point `T` for which `T` is nonzero and `Frobenius(T)-T` is nonzero.
 
 Require all `r^2` pairs `[i]G+[j]T` to be distinct and killed by `r`. The
