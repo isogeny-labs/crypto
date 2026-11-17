@@ -21,7 +21,7 @@ Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `rese
 - [x] Resume checkpoint and benchmark record before any `run`: S3 gate waived by the owner for round 38 (no upload token in this session); no benchrec record filed.
 - [x] Train, select, assess, ratchet, report and PDF for round 38: no challenger at k = 20 or 24 (no holdout); PR with the result and `ratchet.svg`.
 - [ ] Next lever (code, not a re-sweep): the generic configuration space is exhausted at k = 20, 24, 28, 32; add a family (fewer unknowns, cheaper price per point, or a construction change per `ideas/OBSTRUCTION.md`) to `families.json` and its oracle in ecbench, then round 39.
-- [ ] Fix or report the `hashed-ecdl-tensor` standalone build failure on `main` (`crate::metrics` undeclared in `lib.rs`).
+- [ ] Fix or report the `hashed-ecdl-tensor` standalone build failure on `main` (`crate::metrics` undeclared in `lib.rs`). Root cause found: `metrics.rs`, `batch.rs`, `optimized.rs`, `relation_graph.rs`, `subgroup.rs`, `target_walk.rs`, `witness_policy.rs`, `collector_metrics.rs` exist in `src/` but no revision of `lib.rs` in history ever declared them (restored by 1e85fdf181 / added by 43f559e053 without their `mod` lines); `curve.rs` and `partial.rs` call `crate::metrics`. Needs the owning branch's `lib.rs`, not a guess.
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
