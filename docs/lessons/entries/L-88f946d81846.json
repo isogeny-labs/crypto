@@ -1,0 +1,15 @@
+{
+  "action": "Retain both observations, audit setup and counter granularity, and check identical traces/counters before measuring a batched arithmetic implementation",
+  "created": "2026-11-17T02:37:02Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/summary.json",
+    "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/README.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ic-autolab"
+  ],
+  "trigger": "Instrumented finite-field backends disagree in abstract primitive ordering and elapsed-time ordering",
+  "why": "Runpod44 Lanczos uses a lower observed incomplete subtotal while batched-count RREF has a lower single elapsed time; per-operation counter overhead is a candidate explanation, not an established cause"
+}
