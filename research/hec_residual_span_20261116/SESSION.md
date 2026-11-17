@@ -1249,3 +1249,17 @@ Needcompletecompetitiveadaptiveconstructionornewgeometry; modestcircuitgaincanno
 
 ### Errors
 Pre-freezeliteralnewlineescapecompilefailurefixed; postanalysisRubyeditserializationfailed,recoveredwithoutproducerrun. Bothscientificgatespassonce.NoS3/cloud.
+
+## Optimistic unchanged-bootstrap floor measured
+
+### What was done
+Frozen2fb868459c1 truncatesone-corecoldproducerimmediatelyafterfirsttarget-bearingrow,beforeLA/finalcheck.24prefixcalls/48recordsrepeat,allfirstrowsverifyoriginalgroup,allprefixcomponents<=retainedfullcandidate. Matchedsame-targetfullscanB/Pceilings2.800–8.311,all12below10. [pcc:unverified]
+
+### Decisions made
+No fulladaptivecampaignadmittedfrompost-promotiongainswhilekeepingthisprefix: nonnegativesubsequentbaseREDCcannotreach10evenfree. Boundisconditionalonexactprefix/counter,notCPU/wall/newalgorithms. Needalteredbootstrap/preparationorstrongcompletecostcase. Broadgoalactive,g3/g4remainopen.
+
+### Open threads
+Newinitialrelation/preparationgeometry;source-reusemustbecharged/labeledandnotfreecoldwork. Do notpromotecomponentgainstobreakthrough.
+
+### Errors
+No failedgate/retry/S3/cloud. Reusedimmutablecompletingbaselineandmatchedseed,notoldtargetcounts.
