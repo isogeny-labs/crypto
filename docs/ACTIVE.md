@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Prime31 RR9 exact squarefree/radical support reduction and Rust prime31 controls (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-radical-support-20261117)
 - [x] Prime31 nonenumerative RR9/S9 extraction feasibility and Rust-checkable cost gates (ChatGPT automation, started 2026-11-17, branch research/prime31-rr9-algebraic-feasibility-20261117, PR #4539)
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
