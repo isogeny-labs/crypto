@@ -129,3 +129,7 @@ pushed, which are this directory at commit `833a35d21e`.
   were checked with `bash -n` and their `jq` filters against the committed
   result files (`results/b_m7-T2.jsonl` reproduces the summary lines in
   `results/b_msweep.log`); they have not run on a pod.
+
+## 21:18 UTC
+
+- Depth 14 c = 6: 3 h 31 min in, peak RSS 21.2 GB. (6,3) D = 8: 3 h 50 min of its 5 h budget. No new closure line.
