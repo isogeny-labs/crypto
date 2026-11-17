@@ -388,6 +388,7 @@ pub mod sect113r1_audit;
 pub mod seed_grind_trapdoor;
 pub mod semaev_corpus;
 pub mod semaev_decomp;
+pub mod semaev_linear;
 pub mod semaev_higher;
 pub mod semaev_leading_form;
 pub mod semaev_prime_poly;
