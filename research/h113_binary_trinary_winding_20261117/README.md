@@ -34,10 +34,13 @@ The independent verifier is implemented in paired cryptanalysis PR #1733.
 representative range, conditional base-six reconstruction, inverse-six group
 update, the concrete cyclic-subgroup inverse certificate, and final uniqueness
 endpoint. `PROOF_MAP.md` records the instance gate and claim boundary;
-`proof-gate-v1/` passes 24 declarations with zero trusted-native. A full native
-agreement score now supplies pointwise exactness on its finite measured row;
-it does not extrapolate to another curve. The raw artifact, measured report,
-and rendered visual report remain pending. A
+`proof-gate-v1/` passes 34 declarations with zero trusted-native. The final
+conditional theorem packages full-score exactness, every group-trace update,
+complete logarithmic radix recovery, identity termination, and independent
+final-candidate uniqueness. A full native agreement score supplies pointwise
+exactness only on its finite measured row; it does not extrapolate to another
+curve. The raw artifact, measured report, and rendered visual report remain
+pending. A
 protocol, compiling implementation, and conditional Lean proof do not
 establish the candidate identity or an ECDLP algorithm.
 [pcc:unverified]

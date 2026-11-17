@@ -183,6 +183,70 @@ theorem baseSix_round_bound (scalar : ℕ) :
     radixRoundState 6 scalar (Nat.log 6 scalar + 1) = 0 := by
   exact radixRoundState_log_succ_zero 6 scalar (by omega)
 
+/-- A complete bounded radix run. The first component is the recovered low
+digits and the second is the scalar quotient remaining after `rounds`. -/
+def radixRun (base : ℕ) : ℕ → ℕ → ℕ × ℕ
+  | scalar, 0 => (0, scalar)
+  | scalar, rounds + 1 =>
+      let tail := radixRun base (scalar / base) rounds
+      (scalar % base + base * tail.1, tail.2)
+
+/-- Every bounded radix run partitions the original scalar into its recovered
+prefix and its radix-weighted remaining quotient. -/
+theorem radixRun_invariant (base scalar rounds : ℕ) :
+    (radixRun base scalar rounds).1 +
+      base ^ rounds * (radixRun base scalar rounds).2 = scalar := by
+  induction rounds generalizing scalar with
+  | zero => simp [radixRun]
+  | succ rounds ih =>
+      let tail := radixRun base (scalar / base) rounds
+      have htail : tail.1 + base ^ rounds * tail.2 = scalar / base := by
+        simpa [tail] using ih (scalar / base)
+      calc
+        (radixRun base scalar (rounds + 1)).1 +
+            base ^ (rounds + 1) *
+              (radixRun base scalar (rounds + 1)).2 =
+            scalar % base + base * tail.1 +
+              (base ^ rounds * base) * tail.2 := by
+          simp [radixRun, tail, Nat.pow_succ]
+        _ = scalar % base +
+              base * (tail.1 + base ^ rounds * tail.2) := by
+          ring
+        _ = scalar % base + base * (scalar / base) := by rw [htail]
+        _ = scalar := Nat.mod_add_div scalar base
+
+/-- The second run component is exactly division by the corresponding radix
+power. -/
+theorem radixRun_remaining_eq (base scalar rounds : ℕ) :
+    (radixRun base scalar rounds).2 = scalar / base ^ rounds := by
+  induction rounds generalizing scalar with
+  | zero => simp [radixRun]
+  | succ rounds ih =>
+      simp only [radixRun]
+      rw [ih]
+      rw [Nat.pow_succ, Nat.div_div_eq_div_mul]
+      rw [Nat.mul_comm base (base ^ rounds)]
+
+/-- A complete exact radix run returns the scalar and zero remaining quotient
+within the logarithmic round bound. -/
+theorem radixRun_log_succ_eq
+    (base scalar : ℕ) (hbase : 2 ≤ base) :
+    radixRun base scalar (Nat.log base scalar + 1) = (scalar, 0) := by
+  have hremaining :
+      (radixRun base scalar (Nat.log base scalar + 1)).2 = 0 := by
+    rw [radixRun_remaining_eq]
+    exact radixRoundState_log_succ_zero base scalar hbase
+  apply Prod.ext
+  · have hinvariant :=
+      radixRun_invariant base scalar (Nat.log base scalar + 1)
+    simpa [hremaining] using hinvariant
+  · exact hremaining
+
+/-- End-to-end arithmetic reconstruction for H113's frozen radix six. -/
+theorem baseSix_run_recovers (scalar : ℕ) :
+    radixRun 6 scalar (Nat.log 6 scalar + 1) = (scalar, 0) := by
+  exact radixRun_log_succ_eq 6 scalar (by omega)
+
 end Oracle
 
 section GroupDecoder
@@ -336,6 +400,84 @@ theorem full_score_cyclic_group_step
   exact baseSix_cyclic_group_step generator current scalar digit order
     inverseSix quotient hcurrent hdigitScalar horder hcertificate
 
+/-- A full-score row drives every bound query in the canonical group trace,
+provided each frozen cohort record is bound to the corresponding quotient
+scalar and public group point. -/
+theorem full_score_group_trace_step
+    {Cohort Value : Type*} [Fintype Cohort] [DecidableEq Cohort]
+    (observable : Cohort → Value) (predicate : Value → ℕ)
+    (scalarOf : Cohort → ℕ) (pointAt : ℕ → Cohort)
+    (groupAt : Cohort → A) (generator : A)
+    (initialScalar order inverseSix quotient round : ℕ)
+    (hfull : agreementScore (fun q => predicate (observable q))
+        (fun q => scalarOf q % 6) = Fintype.card Cohort)
+    (hscalarAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      scalarOf (pointAt i) = radixRoundState 6 initialScalar i)
+    (hgroupAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      groupAt (pointAt i) =
+        radixRoundState 6 initialScalar i • generator)
+    (hround : round < Nat.log 6 initialScalar + 1)
+    (horder : order • generator = 0)
+    (hcertificate : inverseSix * 6 = 1 + quotient * order) :
+    inverseSix •
+        (groupAt (pointAt round) -
+          predicate (observable (pointAt round)) • generator) =
+      radixRoundState 6 initialScalar (round + 1) • generator := by
+  have hstep := full_score_cyclic_group_step
+    observable predicate scalarOf (pointAt round)
+    generator (groupAt (pointAt round))
+    (radixRoundState 6 initialScalar round)
+    (predicate (observable (pointAt round))) order inverseSix quotient
+    hfull (hgroupAt round hround) (hscalarAt round hround) rfl
+    horder hcertificate
+  calc
+    inverseSix •
+        (groupAt (pointAt round) -
+          predicate (observable (pointAt round)) • generator) =
+        (radixRoundState 6 initialScalar round / 6) • generator := hstep
+    _ = radixRoundState 6 initialScalar (round + 1) • generator := by
+      rw [radixRoundState_succ]
+
+/-- The last positive-scalar query is nonidentity in scalar space and its
+verified update lands at the group identity. -/
+theorem full_score_group_trace_last_step_zero
+    {Cohort Value : Type*} [Fintype Cohort] [DecidableEq Cohort]
+    (observable : Cohort → Value) (predicate : Value → ℕ)
+    (scalarOf : Cohort → ℕ) (pointAt : ℕ → Cohort)
+    (groupAt : Cohort → A) (generator : A)
+    (initialScalar order inverseSix quotient : ℕ)
+    (hinitial : initialScalar ≠ 0)
+    (hfull : agreementScore (fun q => predicate (observable q))
+        (fun q => scalarOf q % 6) = Fintype.card Cohort)
+    (hscalarAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      scalarOf (pointAt i) = radixRoundState 6 initialScalar i)
+    (hgroupAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      groupAt (pointAt i) =
+        radixRoundState 6 initialScalar i • generator)
+    (horder : order • generator = 0)
+    (hcertificate : inverseSix * 6 = 1 + quotient * order) :
+    radixRoundState 6 initialScalar (Nat.log 6 initialScalar) ≠ 0 ∧
+      inverseSix •
+          (groupAt (pointAt (Nat.log 6 initialScalar)) -
+            predicate (observable (pointAt (Nat.log 6 initialScalar))) •
+              generator) = 0 := by
+  have hqueryPositive :
+      0 < radixRoundState 6 initialScalar (Nat.log 6 initialScalar) := by
+    exact Nat.div_pos (Nat.pow_log_le_self 6 hinitial) (by positivity)
+  have hstep := full_score_group_trace_step
+    observable predicate scalarOf pointAt groupAt generator
+    initialScalar order inverseSix quotient (Nat.log 6 initialScalar)
+    hfull hscalarAt hgroupAt (Nat.lt_succ_self _) horder hcertificate
+  refine ⟨hqueryPositive.ne', ?_⟩
+  calc
+    inverseSix •
+        (groupAt (pointAt (Nat.log 6 initialScalar)) -
+          predicate (observable (pointAt (Nat.log 6 initialScalar))) •
+            generator) =
+        radixRoundState 6 initialScalar
+          (Nat.log 6 initialScalar + 1) • generator := hstep
+    _ = 0 := by rw [baseSix_round_bound, zero_nsmul]
+
 /-- Independent EC verification makes a reconstructed scalar unique whenever
 the admitted scalar-action map is injective. -/
 theorem verified_scalar_unique
@@ -345,6 +487,50 @@ theorem verified_scalar_unique
     candidate = trueScalar := by
   apply hinjective
   rw [hcandidate, htrue]
+
+/-- Final H113 certificate. A source-independently verified full-score row and
+its explicit trace bindings imply complete arithmetic recovery, a nonidentity
+last query, an identity terminal group update, and uniqueness under the
+independent final scalar verification map. The full-score premise remains an
+input; this theorem does not assert that the winding predicate has it. -/
+theorem h113_conditional_end_to_end_certificate
+    {Cohort Value Scalar VerifyPoint : Type*}
+    [Fintype Cohort] [DecidableEq Cohort]
+    (observable : Cohort → Value) (predicate : Value → ℕ)
+    (scalarOf : Cohort → ℕ) (pointAt : ℕ → Cohort)
+    (groupAt : Cohort → A) (generator : A)
+    (initialScalar order inverseSix quotient : ℕ)
+    (hinitial : initialScalar ≠ 0)
+    (hfull : agreementScore (fun q => predicate (observable q))
+        (fun q => scalarOf q % 6) = Fintype.card Cohort)
+    (hscalarAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      scalarOf (pointAt i) = radixRoundState 6 initialScalar i)
+    (hgroupAt : ∀ i, i < Nat.log 6 initialScalar + 1 →
+      groupAt (pointAt i) =
+        radixRoundState 6 initialScalar i • generator)
+    (horder : order • generator = 0)
+    (hcertificate : inverseSix * 6 = 1 + quotient * order)
+    (verifyMul : Scalar → VerifyPoint) (target : VerifyPoint)
+    (candidate trueScalar : Scalar)
+    (hcandidate : verifyMul candidate = target)
+    (htrue : verifyMul trueScalar = target)
+    (hinjective : Function.Injective verifyMul) :
+    radixRun 6 initialScalar (Nat.log 6 initialScalar + 1) =
+        (initialScalar, 0) ∧
+      radixRoundState 6 initialScalar (Nat.log 6 initialScalar) ≠ 0 ∧
+      inverseSix •
+          (groupAt (pointAt (Nat.log 6 initialScalar)) -
+            predicate (observable (pointAt (Nat.log 6 initialScalar))) •
+              generator) = 0 ∧
+      candidate = trueScalar := by
+  have hrun := baseSix_run_recovers initialScalar
+  have hlast := full_score_group_trace_last_step_zero
+    observable predicate scalarOf pointAt groupAt generator
+    initialScalar order inverseSix quotient hinitial hfull
+    hscalarAt hgroupAt horder hcertificate
+  have hunique := verified_scalar_unique verifyMul target candidate trueScalar
+    hcandidate htrue hinjective
+  exact ⟨hrun, hlast.1, hlast.2, hunique⟩
 
 end GroupDecoder
 
@@ -362,10 +548,18 @@ end GroupDecoder
 #print axioms radixRoundState_succ
 #print axioms radixRoundState_log_succ_zero
 #print axioms baseSix_round_bound
+#print axioms radixRun
+#print axioms radixRun_invariant
+#print axioms radixRun_remaining_eq
+#print axioms radixRun_log_succ_eq
+#print axioms baseSix_run_recovers
 #print axioms baseSix_group_step
 #print axioms inverse_six_on_cyclic
 #print axioms baseSix_cyclic_group_step
 #print axioms full_score_cyclic_group_step
+#print axioms full_score_group_trace_step
+#print axioms full_score_group_trace_last_step_zero
 #print axioms verified_scalar_unique
+#print axioms h113_conditional_end_to_end_certificate
 
 end H113BinaryTrinaryWinding

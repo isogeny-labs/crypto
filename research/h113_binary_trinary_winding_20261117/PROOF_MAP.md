@@ -2,7 +2,7 @@
 
 Status: design gate completed before the first Lean edit. Lean 4.34.1 and
 Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` build all declarations.
-The repository proof gate passes 24 audited declarations with zero failing
+The repository proof gate passes 34 audited declarations with zero failing
 and zero trusted-native; retained receipt:
 `proof-gate-v1/research_h113_binary_trinary_winding_20261117/`.
 
@@ -52,6 +52,10 @@ It does not assert that any measured winding predicate is exact.
    state(k)=m/base^k
      => state(k+1)=state(k)/base
      => state(log_base(m)+1)=0,
+
+   run(base,m,k)=(recovered,remaining)
+     => recovered + base^k*remaining = m
+     => run(base,m,log_base(m)+1)=(m,0),
    ```
 
    followed by generic radix-six reconstruction and an independent injective
@@ -88,11 +92,19 @@ It does not assert that any measured winding predicate is exact.
 | `radixRoundState_succ` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | none |
 | `radixRoundState_log_succ_zero` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | radix at least two |
 | `baseSix_round_bound` | endpoint | `H113BinaryTrinaryWinding` | `ℕ` | none |
+| `radixRun` | executable arithmetic decoder state | `H113BinaryTrinaryWinding` | `ℕ × ℕ` | none |
+| `radixRun_invariant` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | none |
+| `radixRun_remaining_eq` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | none |
+| `radixRun_log_succ_eq` | generic endpoint | `H113BinaryTrinaryWinding` | `ℕ × ℕ` | radix at least two |
+| `baseSix_run_recovers` | H113 endpoint | `H113BinaryTrinaryWinding` | `ℕ × ℕ` | none |
 | `baseSix_group_step` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | exact digit and inverse-six action |
 | `inverse_six_on_cyclic` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `AddCommGroup A` | generator order relation and integer Bezout certificate `inv6*6=1+q*r` |
 | `baseSix_cyclic_group_step` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | exact digit, generator order relation, and integer inverse-six certificate |
 | `full_score_cyclic_group_step` | evidence-to-algorithm endpoint | `H113BinaryTrinaryWinding` | finite cohort plus `AddCommGroup A` | full agreement score, current-point scalar binding, generator order relation, and inverse-six certificate |
+| `full_score_group_trace_step` | bounded trace endpoint | `H113BinaryTrinaryWinding` | finite cohort plus `AddCommGroup A` | full score and per-round cohort/group bindings |
+| `full_score_group_trace_last_step_zero` | terminal trace endpoint | `H113BinaryTrinaryWinding` | finite cohort plus `AddCommGroup A` | full score, positive initial scalar, per-round bindings, order and inverse certificate |
 | `verified_scalar_unique` | endpoint using injectivity | `H113BinaryTrinaryWinding` | arbitrary scalar/point types | candidate and true evaluations; injective action |
+| `h113_conditional_end_to_end_certificate` | final conditional theorem | `H113BinaryTrinaryWinding` | finite cohort, `AddCommGroup A`, and admitted scalar domain | all row bindings, full score, inverse certificate, positive scalar, and independent verification injectivity |
 
 ## Inheritance table
 
@@ -185,6 +197,28 @@ claim: end-to-end polynomial bit cost additionally requires the public digit
 predicate to exist and each winding query to use polynomial-time field/group
 arithmetic.
 
+### Complete arithmetic run
+
+`radixRun` returns `(recovered,remaining)`. At each round it records the exact
+remainder and recurses on the quotient. Its invariant is
+
+```text
+recovered + base^rounds * remaining = m.
+```
+
+The proof multiplies the recursive invariant by `base` and closes one step
+with `m % base + base*(m/base) = m`. Combining the invariant with the exact
+round bound gives
+
+```text
+radixRun(base,m,log_base(m)+1) = (m,0),
+```
+
+and `baseSix_run_recovers` is the frozen base-six instance. This is the
+end-to-end arithmetic reconstruction result; the separately stated
+evidence-to-update theorem connects an independently verified full score to
+each group-state digit premise.
+
 ### Prime-order inverse-six certificate
 
 ```text
@@ -215,6 +249,36 @@ This endpoint is the formal handoff expected from one independently verified
 row. It keeps the raw-record binding (`scalarOf(q)=m`) explicit and cannot be
 used with a score from a different cohort.
 
+### Bounded group trace
+
+For an initial scalar `m`, bind query index `i` to a frozen cohort record whose
+declared scalar is `m / 6^i` and whose public point is that scalar times `G`.
+For every `i < log_6(m)+1`, the full-score certificate and cyclic update give
+
+```text
+inv6 • (point_i - [predicate(point_i)]G)
+  = [m / 6^(i+1)]G.
+```
+
+At `i=log_6(m)`, the exact round bound makes the right side the identity. The
+positive-scalar hypothesis prevents treating the identity itself as a scored
+query; the frozen cohort scores exactly the nonidentity subgroup points.
+
+### Final conditional certificate
+
+The final theorem packages four independently visible conclusions:
+
+```text
+radixRun(6,m,log_6(m)+1) = (m,0);       [arithmetic recovery]
+last queried scalar != 0;                [cohort boundary]
+last verified group update = O;          [group trace]
+verified candidate = true scalar.        [injective final check]
+```
+
+It retains every premise rather than hiding them behind an `AlgorithmCorrect`
+predicate. In particular, the full-score equality remains an argument to the
+theorem and cannot be manufactured by the Lean proof.
+
 ## Open bridge and claim boundary
 
 The Lean result is conditional on: the four extracted carries really are the
@@ -240,7 +304,7 @@ ELAN_HOME=/workspace/.elan-h113 XDG_CACHE_HOME=/workspace/.cache-h113 \
   tools/lean/proof-gate.sh \
   --out research/h113_binary_trinary_winding_20261117/proof-gate-v1 \
   research/h113_binary_trinary_winding_20261117
-# PASS  24 thm  0 trusted
+# PASS  34 thm  0 trusted
 ```
 
 The transitive axiom audit reports only `propext`, `Classical.choice`, and
