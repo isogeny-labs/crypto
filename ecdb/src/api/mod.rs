@@ -20,6 +20,7 @@ mod curves;
 pub mod export;
 mod factor_bases;
 mod mcp;
+mod research;
 mod results;
 mod sql;
 mod viewer;
@@ -205,6 +206,12 @@ pub fn router(state: Shared) -> Router {
         .route("/v1/curves/{reference}/endomorphisms", get(curves::endomorphisms))
         .route("/v1/curves/{reference}/division-polynomials", get(curves::division_polynomials))
         .route("/v1/curves/{reference}/measurements", get(results::curve_measurements))
+        .route("/v1/curves/{reference}/features", get(research::curve_features))
+        .route("/v1/sweeps", get(research::sweeps))
+        .route("/v1/sweeps/{name}", get(research::sweep))
+        .route("/v1/features", get(research::features))
+        .route("/v1/datasets", get(research::datasets))
+        .route("/v1/datasets/{name}", get(research::dataset))
         .route("/v1/ic/leaderboard", get(results::leaderboard))
         .route("/v1/ic/progress", get(results::progress))
         .route("/v1/ic/boundary", get(results::boundary))
@@ -233,6 +240,8 @@ pub fn router(state: Shared) -> Router {
     let writes = Router::new()
         .route("/v1/evidence", post(write::evidence))
         .route("/v1/isogenies", post(write::isogeny))
+        .route("/v1/features/observations", post(write::feature_observation))
+        .route("/v1/factor-base-artifacts", post(write::factor_base_artifact))
         .route_layer(middleware::from_fn_with_state(state.clone(), write_auth));
     let api: Router = Router::new()
         .route("/", get(index))

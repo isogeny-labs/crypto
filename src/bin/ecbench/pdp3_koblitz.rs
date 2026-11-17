@@ -1463,6 +1463,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             solving_degree: None,
             timed_out: stats.exhausted,
             extra,
+            ..Default::default()
         };
         self.totals.absorb(shape, Some(&cost), stats.exhausted);
         let indices = indices?;
