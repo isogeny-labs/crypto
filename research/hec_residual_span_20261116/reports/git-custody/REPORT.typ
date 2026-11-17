@@ -178,3 +178,31 @@ All1200callsverify. Fivebatchesof16freshsetups pertarget/arm, fivearmswithrotati
 The fastpath recomputes characters, roots, extendedgcd/Bezout/model/orbitchecks, targetdescentandfinaloriginalsourceverification. Written theory replaces percallcandidategroupactionchecks and projectedpointreconstructions. The qualifiedarm repeats those groupchecks and negativecontrols percall and is only about1.63–2.33times faster than native. This is not a tenfold same-check-path result; qualification cost is visible rather than omitted silently.
 
 SharedM4Pro/macOS27.2/Rust1.99.1L0wall only; no fastestexternal/automorphism-awarereference, countedoperationprimaryproof, independentreplay/admission or genericgenus2/3/4claim. Onebinomialcurve, oneorbitcatalogue and a lineargcd are essential; characterenumeration costsO(p). The broader mathematicalbreakthroughobjective remains incomplete. Next: independentproof/replay, g2/g3eligibility/solvercoverage and completeoperationaccounting. Records/rawhashes/limits remain under authorizedGitcustody, with noS3uploadclaim.
+
+#pagebreak()
+= Genus 2–4 validation and the one-orbit boundary
+Pushed execution checkpoint96078a1308f · exit0 · fixed algebraic eligibility screen
+
+All164constants across six fixed(g,p)pairs were retained. Fourteenmodels qualify algebraically; every one passes the full originalFrobeniusoperator, subgroupaction, orbitreconstruction and reversed-characternegativecontrols. The firsteligibleconstant perpair is chosen before target outcomes; fivefixtures yield15verifiedcandidate/native targetpairs. Genus2/F31has noeligiblemodel and remains recorded.
+
+#table(columns:6,inset:4pt,align:center,
+[g,p,c],[ell],[h],[returned scalars],[descent trials],[native trials],
+[2,11,6],[131],[1],[37,61,58],[5,1,1],[36,31,25],
+[3,29,2],[15443],[1],[37,2026,7001],[172,28,3],[282,529,412],
+[3,43,26],[39929],[1],[37,2026,7001],[5,6,28],[931,1244,1331],
+[4,19,2],[8623],[13],[37,2026,7001],[11,9,2],[469,366,519],
+[4,37,18],[433],[2701],[37,294,73],[397,140,361],[3605,4472,4273])
+
+The lastrow reaches the identity in allthreecandidate descents, with trialsell−k+1. Those are retained linear-walk controls, not successful nonzero smoothdecompositions or speedwins. The other12recoveries use nonzero rationaldecompositions. Knownfixturemultipliers are reduced moduloell without replacing inputs. Allnativecontrols complete; no timings or cross-genustenfoldclaim are inferred.
+
+== Full one-orbit catalogues cannot scale in field size
+With exactlyn=2g+1canonical nonbranch points and bothsigns, the fullrationalcurve has4g+3points. Hasse–Weil therefore implies
+
+$p <= (g+sqrt(g^2+4g+2))^2.$
+
+The bounds are about32.967,60.775and96.648forg2,3,4. Withp≡1mod(2g+1), possibleoddprimefields are{11,31},{29,43}and{19,37,73}, respectively. This screen coversallg2/g3fieldsunderthesehypotheses andonly19/37forg4; p73remains unexamined. It is not a lowerbound on general indexcalculus or otherendomorphismmethods.
+
+== The scalable continuation needs multiple orbit unknowns
+For representativePj, projectedlogs satisfy log(h*phiᵃPj)=lambdaᵃLj. Every orbit has its own unknownLj. Contract a principalrow by summing its signedcoefficients weighted bylambdaᵃ, retaining all representatives. For the walkrow sum cᵢPᵢ−aD−bT=0, D=hP0andT=kD, the projectedscalar equation is sumweightedcoeff*Lj−b*h*k=a*h. UsingYj=h⁻¹Ljreturns the usualtarget coefficients. Silently assigning allorbitlogs to one source would fabricate information.
+
+The generalizedcharactercertificate now hascorrectnesscoverage acrossgenera2/3/4; a generictenfoldbreakthrough is not established. Next: exact multi-orbit row/operator qualification and supplied-target integration with allcosts, plus independentproof/replay/count/externalreference work. The priorg4localwallresult keeps its originalsinglefixture/proof-contractlimits. Full164roweligibility and everyzero/rejectedoutcome remain inGit.
