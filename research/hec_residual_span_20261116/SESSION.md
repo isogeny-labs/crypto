@@ -1081,3 +1081,17 @@ Independent determinant/convention review and scalar-action/cost qualification o
 
 ### Errors
 Standalonev1incorrectlysearchedyonlyinFp2; y^(p²)=-y shows nonzerofixedpointslieoutsideFp2. Corrected onlyinnewfrozenv2withfailurepreserved. Initialcompilewarning resolved beforefreeze usingRust2021. No S3/cloud.
+
+## Direct cyclotomic action screened on original targets
+
+### What was done
+Frozen7d6eba7cb3e compares direct5th/7throot action to charactercertificate on5originalg2/g3models,2sources,2repetitions,2arms. All40calls/80modulusrecords qualify exactFB,z,lambda and sourceaction/repeats. Fullsetup/sourcevalidation counted. [pcc:unverified]
+
+### Decisions made
+Rejectthisreplacementonpanel: baseREDCcandidatecost3.3–4.2xg2or6.4–7.4xg3, despite lowerellfieldarithmetic. No arbitrarymodulusweights/largefieldcrossover/fullsolve/noveltyclaim. Broadgoalactive; usefulrelationmechanismstillneeded.
+
+### Open threads
+No unjustifiednewlargefieldcampaign. A construction with credible completecostcase or usefulrankadvantage isneeded.
+
+### Errors
+No runtime/gatefailureorretry. Existingownleaseclaimrenewalattemptreturnedbudgetexhaustedwhiletheliveleasecontinued; no competingclaim taken. NoS3/cloud.
