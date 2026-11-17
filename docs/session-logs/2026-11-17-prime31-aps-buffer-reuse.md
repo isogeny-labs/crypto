@@ -23,3 +23,23 @@
 ## Errors (what went wrong, how it was handled)
 - Native Rust toolchain unavailable in this runtime; controlled CI rather than fabricated local test is prescribed.
 - GitHub's older WZ root build failed again on severely malformed pinned SAT source; reported it as infrastructure source corruption, not a mathematical failure.
+
+
+## Additional cross-repository lead-atlas review (after code/protocol freeze, before timing results)
+
+### What was done
+- Inspected merged [crypto-autoresearcher #3301](https://github.com/isogeny-labs/crypto-autoresearcher/pull/3301): the 2026-11-14 prime-field IC heat map covered 41 leads; 39 lead dispositions changed. It retains 14 proved/cost-obstructed, 17 exhausted *only at tested scale*, five blocked, two unexamined and one generic pair-table constant lead. Do not convert toy nulls into mathematical impossibility.
+- Inspected merged [crypto-autoresearcher #3305](https://github.com/isogeny-labs/crypto-autoresearcher/pull/3305): 28 preregistered Semaev-alternatives experiments and ERRATA, SA-23/24/25 limitations, lead-atlas fold, and preregistration rules. Target-conditioned RR9 extraction must explicitly check these before a novelty claim.
+- Inspected merged [crypto #4363](https://github.com/isogeny-labs/crypto/pull/4363): memory-optimized multitarget IC was 0.69–0.76× incumbent IC within the study; after jointly tuning rho, median IC/rho was 0.914–0.996 for tested 2^32/T=1024–16384 but every cell had a counterexample above parity, and 1.088–1.230 at 2^36. These are producer-level and multi-target, not evidence of a cheaper single cold prime31 solver; repeat on matched fronts.
+- Inspected merged [crypto #4108](https://github.com/isogeny-labs/crypto/pull/4108): shift-fixed symmetric IC improved incumbent IC ≈2.8–3× at 28–34 bits but still lost to fastest matched rho, by 6× to 88× across sizes. This is an IC-baseline success, not a rho success.
+- Inspected merged [cryptanalysis #1529](https://github.com/isogeny-labs/cryptanalysis/pull/1529): relation storage CSR-like encoding reduced ≈784 B to ≈68 B at 48 bits, with exact replay controls; a *different C* implementation and a memory-only result, not a directly reusable Rust oracle. Avoid claiming novelty for packed relation storage.
+
+### Decisions made
+- The new S3 buffer reuse belongs to the **generic-decomposition index-calculus** engineering track and must beat the *exact named APS incumbent*, not retroactively present a speedup over the repository's multi-target IC or exterior WZ rho.
+- Prior atlas records establish extensive earlier exploration, but no proof that target-conditioned RR9 norm extraction is impossible. The next non-generic gate is a solver *given only public residual R*, against B4/B8 exhaustive fibres including repeated leaves and negative targets, with original-ideal certification. No extra GH workflow/target seeds changed by this review.
+
+### Open threads
+- Retrieve full atlas evidence and semaev campaign's archival reports before implementing any allegedly novel RR9 elimination; this quick GitHub PR audit is not an exhaustive KB review.
+
+### Errors
+- No additional execution; this was read-only cross-repository triage and does not revise a frozen experiment or result.
