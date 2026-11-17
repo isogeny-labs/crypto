@@ -493,3 +493,17 @@ Runstrengthscreen,completegenus4odd-automorphismobstruction/alternativeclassproo
 
 ### Errors
 OldT7008claimretrybudgetexhausted;itsinitialrankworkmerged,markedoldtaskdoneandclaimedT7010forthiscoverageworkbeforeedits. No scientificrunyet.
+
+## Strength screen passes; prime-Jacobian target gate frozen
+
+### What was done
+At8e706cdb2f6all8fieldsclassified,5accepted,3ineligible,bothpositivecontrolspassEXIT0. Selectedg2F251c18ell67931/F601c7ell411491,g3F113c3ell1247429 plusF101/F421controls. Wholecofactorupper1or2andirreducibleoddbranchpolynomialexcludesrational2torsion,forcing#J=ell. AddedcheckedintegerFrobeniusdeterminantcertificatefornewfive-model160solvegatenotyetexecuted.
+
+### Decisions made
+IncludeALLscreenacceptedmodelsandfreshfixedseedtargets,no weakcaseposthocsubstitution. Ineligible3fieldsretained. SeparateGENUS4-ROUTEproof:tameoddordersonly3/5/9;3/9ellipticquotient,5extra genus2involutionoverclosure. Order4oddpolynomialcandidatehasnopositive-genusintermediatequotientfromthatcyclicactionalone,butrequiresnewsimplicity/action/orderproof,nooldcertificateimport.
+
+### Open threads
+Runonlynew160solvegatesafterpushedfreeze; broadgenus4/10xobjectiveopen.
+
+### Errors
+No strengthscreenfailures/retries. No targetsolvesclaimedfromscreen.
