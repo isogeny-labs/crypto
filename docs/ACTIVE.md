@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Integrate and measure grounded two-quadratic graph index calculus on Runpod (Codex, started 2026-11-17, branch feat/extension-ic-quadratic-pair-collector, PR #4537; in progress, continuation of merged PR #4508)
+- [ ] Continue extension-field graph index calculus toward rho parity (Codex, started 2026-11-17, branch feat/extension-ic-quadratic-pair-collector, PR #4537; in progress, Run50 eight-arm qualification passes; descent/accounting/fresh-target work next). [pcc:unverified]
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
