@@ -1,8 +1,12 @@
 //! Fixed identity records for the section-search derivation. No section solver.
-#[path = "../../../src/hash/sha256.rs"]
-pub mod sha256_source;
 pub mod hash {
-    pub use crate::sha256_source as sha256;
+    pub mod sha256 {
+        use sha2::{Digest, Sha256};
+        // Thin crate-interface adapter; SHA256 is the pinned sha2 dependency.
+        pub fn sha256(bytes: &[u8]) -> [u8; 32] {
+            Sha256::digest(bytes).into()
+        }
+    }
 }
 #[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/identity_certificate.rs"]
@@ -84,15 +88,20 @@ pub fn run_controls() -> Result<Value, String> {
         .map_err(|e| e.to_string())?;
         let verdict = identity::check_with_extra(&cert, Some((202611170846 + i as u64, 32)))
             .map_err(|e| e.to_string())?;
-        if !matches!(verdict, identity::Verdict::Accept { .. }) {
-            return Err("extra stream rejected".into());
-        }
+        let extra = match verdict {
+            identity::Verdict::Accept {
+                points,
+                extra_points,
+                ..
+            } => json!({"status":"accept","issuer_points":points,"extra_points":extra_points}),
+            _ => return Err("extra stream rejected".into()),
+        };
         let mut bad = s;
         bad.rhs = E::plus(bad.rhs, E::Const(1));
         let refusal = identity::issue(bad, 202611170845 + i as u64, 32, "plus-one control", None)
             .err()
             .ok_or("false identity was accepted")?;
-        records.push(json!({"certificate":cert,"extra_stream_verdict":verdict,
+        records.push(json!({"certificate":cert,"extra_stream_verdict":extra,
             "plus_one_refusal":refusal.to_string()}));
     }
     Ok(json!({"schema":"section-search.identity-controls/v1",
@@ -113,6 +122,6 @@ pub fn source_hashes() -> Value {
         "src/lib.rs":digest(include_bytes!("lib.rs")),
         "src/main.rs":digest(include_bytes!("main.rs")),
         "shared/identity_certificate.rs":digest(include_bytes!("../../../src/cryptanalysis/identity_certificate.rs")),
-        "shared/sha256.rs":digest(include_bytes!("../../../src/hash/sha256.rs"))
+        "hash_backend":"sha2 0.10 with exact version/checksum in Cargo.lock; adapter in src/lib.rs"
     })
 }
