@@ -30,6 +30,20 @@ Files:
 | `PROOF_MAP.md` | Generic identities, score handoff, decoder and cost obligations | `99319afcea8e17b60c668a446535b4c1bb2864f0b4aa877ee193407e08f1a7e0` |
 | `mechanism.svg` | Editable algebra/evidence diagram | `7cdc6fb0c6a4f2719e72641119649825b51f81e46f78d5210ee56eb367da3d7e` |
 | `mechanism.png` | Inspected 1,200-by-640 rendering | `6dfa6ac9033d15f9424125b290a7546fbb54f2dc394862336ba002567f23ef79` |
+| `h115_curve_fixture_check.rs` | Native base-field cohort/isomorphism checker | `bd47365d63c0091371e36a3cd3f6f243b21b319e6fec0cd460e0d66f56275757` |
+
+The first post-freeze native check is structural only:
+
+```text
+rustc --edition=2021 -D warnings h115_curve_fixture_check.rs -o h115_curve_fixture_check
+./h115_curve_fixture_check
+```
+
+It independently recounts all five base-field groups, checks primality,
+nonsingularity, traces, Hasse bounds, `d=ord_r(p)`, extension sizes, every
+nonidentity point's order and the `lambda=2` coordinate-isomorphism fixtures.
+It reports 5 curves, 15 rows and 366 row-targets. It does not construct the
+extension torsion or read any scalar label, moment or predicate.
 
 No candidate moment scores, selected IDs, decoder outcomes or runtime
 measurements exist. External novelty and a generic/subexponential ECDLP
