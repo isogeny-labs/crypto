@@ -1,0 +1,16 @@
+{
+  "action": "Before freezing, declare a fresh indexed-target offset and hashed prior-target manifest; reject any collision without resampling and retain it as failure.",
+  "created": "2026-11-17T08:48:34Z",
+  "evidence": [
+    "research/vieta_coset_rust_20261115/speedup-20261117/fiber/build.rs",
+    "research/vieta_coset_rust_20261115/speedup-20261117/prior-targets-primary.json",
+    "research/vieta_coset_rust_20261115/speedup-20261117/protocol-primary-v2.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "experiment-protocol"
+  ],
+  "trigger": "Conditioned synthetic targets use deterministic point-pair indices while a new experiment changes only config seed.",
+  "why": "Seed changes do not change index-only conditioned targets."
+}

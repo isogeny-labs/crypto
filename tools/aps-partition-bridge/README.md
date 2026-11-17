@@ -10,6 +10,8 @@ with a complete disjoint label-profile cover. The tuple-only valuation
 sections below still describe the original binary and its frozen reports.
 The [encoding comparison](ENCODINGS.md) matches Expanded4 and Split4 on that
 same cell plan, retaining all auxiliary witnesses and failed arms.
+The [four parallel leads](FOUR-LEADS.md) add auxiliary constraints, fresh label
+laws, finite-domain remainders and per-cell pairing controls.
 
 The purpose is structural correctness, not timing, throughput or a speed
 ranking. No profiler is launched, and trace diagnostics are not complete

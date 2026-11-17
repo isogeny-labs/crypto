@@ -41,6 +41,7 @@ use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
     verify_candidate, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::koblitz_batched::{self, BatchedParams as KoblitzBatchedParams};
@@ -292,6 +293,46 @@ const NEG_STRONG_PARAMS: &[ParamDecl] = &[
         default: Some("64"),
         help: "give up after this multiple of √(πr/4) walk steps (at least 10⁶)",
     },
+];
+
+/// The arm's solver seed: the harness's algorithm seed unless pinned.
+const HEC_FIXED_SEED: ParamDecl = ParamDecl {
+    name: "fixed_seed",
+    default: Some("none"),
+    help: "a decimal seed the solver uses instead of the harness's algorithm seed, to reproduce a study's seed list one arm per seed; `none` uses the algorithm seed",
+};
+
+const HEC_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "branches",
+        default: None,
+        help: "factor-base walk steps (the thread's fb-walk: 64)",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: None,
+        help: "one step in d_step_in is by D₁ or D₂ rather than a place (the thread's fb-walk: 4)",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: None,
+        help: "rows collected beyond the m + 1 unknowns (the thread: 8)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("5000000"),
+        help: "candidate divisors before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
+];
+
+const HEC_RHO_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "max_steps",
+        default: Some("200000000"),
+        help: "walk steps before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
 ];
 
 const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
@@ -1116,6 +1157,22 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::hyper_ic::solve",
             applies: Applies::Any,
             params: HYPER_IC_PARAMS,
+        },
+        MethodDecl {
+            id: "hec.ic_fb_walk",
+            family: "ic",
+            summary: "index calculus on a hyperelliptic Jacobian (hec_thread curves): the full degree-1 factor base, the factor-base walk, the gcd smoothness test, sparse elimination mod r and the solver's own [k]D₁ = D₂ checks, every F_p, mod-r, word and hash-probe operation counted in bitop/v1 primitives by phase (ecbench::hec); group operations in gae are a lower bound",
+            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+            applies: Applies::Any,
+            params: HEC_IC_PARAMS,
+        },
+        MethodDecl {
+            id: "hec.rho_full_width",
+            family: "rho",
+            summary: "Pollard rho on a hyperelliptic Jacobian (hec_thread curves): 16 full-width branches a_jD₁ + b_jD₂, distinguished points, about 1.25·√r steps, counted in bitop/v1 primitives by phase like hec.ic_fb_walk",
+            entry: "hyperelliptic_ic_bench::pollard_rho_jacobian_with(DistinguishedPointsFullWidth)",
+            applies: Applies::Any,
+            params: HEC_RHO_PARAMS,
         },
         MethodDecl {
             id: "ic.pipeline",
@@ -1985,6 +2042,38 @@ pub struct SolverStats {
     pub degree_of_regularity_forecast: Option<crate::cryptanalysis::dreg_forecast::Forecast>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forecast_unavailable: Option<String>,
+    /// Measured degree-fall observables of the solve (diagnostic, never priced
+    /// into `S`, outside the replay comparison, never a stopping rule). A
+    /// **degree fall** at working degree `d` is a step producing a fresh
+    /// generator of degree `< d`, the constant `1`, or a realized Hilbert value
+    /// below the semi-regular prediction. `first_fall_degree` is the smallest
+    /// such `d` over the run, `last_fall_degree` the largest, and
+    /// `degree_of_regularity_observed` the first degree the realized Hilbert
+    /// series goes non-positive (distinct from the advisory forecast above).
+    /// Present only for polynomial-system solves; absent on sparse-LA, generic
+    /// or table families and on records written before the fields existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    /// The total (sum over solver calls) solving degree.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solving_degree_sum: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Per-working-degree history of the richest solver call, for the trace
+    /// drawing (relations/steps against degree, coloured by fall intensity).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
+    /// Which cost story this block carries, so a reader never mistakes an
+    /// absent degree for a measured one: `polynomial-system` (Gröbner /
+    /// Macaulay / Semaev — the degree fields are measured), `sat`, `sparse-la`
+    /// (block-Wiedemann / Markowitz mod r), `generic-transfer`, or
+    /// `table-enumeration`. The degree fields are populated only for
+    /// `polynomial-system`; elsewhere they are absent by construction, not
+    /// missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_story: Option<String>,
 }
 
 impl SolverStats {
@@ -2049,6 +2138,13 @@ impl SolverStats {
             sat_restarts: if sat { get(&["restarts"]) } else { None },
             sat_learnt_clauses: if sat { get(&["learnt_clauses"]) } else { None },
             extra: x.clone(),
+            first_fall_degree: solver.first_fall_degree,
+            last_fall_degree: solver.last_fall_degree,
+            solving_degree_sum: (solver.solving_degree_sum > 0)
+                .then_some(solver.solving_degree_sum),
+            degree_of_regularity_observed: solver.degree_of_regularity_observed,
+            degree_trace: solver.degree_trace.clone(),
+            degree_story: Some(if sat { "sat" } else { "polynomial-system" }.to_string()),
             degree_of_regularity_forecast: None,
             forecast_unavailable: None,
         }
@@ -3841,6 +3937,15 @@ fn solve_inner(
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
+    if let Instance::Hec(i) = inst {
+        return hec::solve(m, i, tx, ty, seed);
+    }
+    if m.id.starts_with("hec.") {
+        return Err(format!(
+            "`{}` runs on hec_thread curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
+    }
     if let Instance::Ext(i) = inst {
         return solve_ext(m, i, tx, ty, seed);
     }
@@ -4248,7 +4353,8 @@ fn solve_inner(
         | (Instance::Genus2(_), _)
         | (Instance::Quartic(_), _)
         | (Instance::Ghs(_), _)
-        | (Instance::Hyper(_), _) => {
+        | (Instance::Hyper(_), _)
+        | (Instance::Hec(_), _) => {
             unreachable!("returned above")
         }
     }
@@ -5275,9 +5381,6 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
-            unreachable!("returned above")
-        }
     }
 }
 
@@ -6257,7 +6360,7 @@ pub const PRICED_NATIVE: &[(&str, &str)] = &[
     ("target_guard_probes", "ns_per_lookup"),
 ];
 
-fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
+pub(crate) fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
     PhaseRecord {
         name: name.into(),
         adds: p.group_ops.adds,
@@ -8686,7 +8789,7 @@ pub fn dump_factor_base(
     if let Instance::Hyper(_) = &inst {
         return Err("no factor-base plug-in runs on a hyperelliptic Jacobian".into());
     }
-    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) | Instance::Hec(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
@@ -8814,7 +8917,8 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
+        | Instance::Hyper(_)
+        | Instance::Hec(_) => unreachable!("returned above"),
     }
 }
 

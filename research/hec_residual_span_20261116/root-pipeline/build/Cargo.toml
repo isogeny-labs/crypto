@@ -1,0 +1,10 @@
+[package]
+name="hec-root-pipeline"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="root-pipeline"
+path="../main.rs"

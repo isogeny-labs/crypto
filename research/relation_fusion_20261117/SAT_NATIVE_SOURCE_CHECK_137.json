@@ -1,0 +1,18 @@
+{
+  "scope": "actual source SAT/native-admission + existing packed codec/scalar/canonical/SHA256 source tests; not full root",
+  "status": "producer_tests_passed",
+  "standing": "unsigned/not independently verified",
+  "source_primary": "ff02728b58",
+  "merge_base": "f0863aefd6",
+  "current_source_before": "acb0ad313f",
+  "test_command": "RUST_TEST_THREADS=1 cargo test --release --manifest-path research/relation_fusion_20261117/root-source-tests/Cargo.toml --lib",
+  "exit": 0,
+  "summary": "98 passed; 0 failed; 0 ignored",
+  "source_and_log_sha256": {
+    "src/cryptanalysis/sat.rs": "590ca34e6d5ba24b580b452f7744e469392ab6992be6bb28351acc20e616ff8c",
+    "research/relation_fusion_20261117/root-source-tests/lib.rs": "ffdba6efc87d76e9864d96a0e7631b65fd9cd7a2ada08bc21eea44c103f149fd",
+    "research/relation_fusion_20261117/development-01/source-tests-137.stdout": "73ad2573d219462df7dfe9bcddcfe2ad55f79484f168b2ea590f0664ff5b5aca",
+    "research/relation_fusion_20261117/development-01/source-tests-137.stderr": "a35647f34bd8287bbed49e434c0ea0735d65aa90106b201d4a03545bcca5b727"
+  },
+  "structure": "existing indexed/dense XOR and arena/telemetry legacy paths retained; admitted dense XOR and reduction implementations retained separately; shared public solve wrapper has original admission/payload guards and phase tracing"
+}

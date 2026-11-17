@@ -1,0 +1,31 @@
+{
+  "tools_discovered": [],
+  "calls": [
+    {
+      "argv": [
+        "bash",
+        "scripts/research-kb",
+        "status"
+      ],
+      "exit": 127,
+      "entire_stdout": "",
+      "entire_stderr": "bash: scripts/research-kb: No such file or directory\n"
+    },
+    {
+      "argv": [
+        "bash",
+        "-lc",
+        "conductor check --summary \"Chained inverse16 complete prime-field operation accounting\" --scope path:research/chained_primefield_cost_20261117"
+      ],
+      "exit": 127,
+      "entire_stdout": "",
+      "entire_stderr": "bash: line 1: conductor: command not found\n"
+    }
+  ],
+  "fallback_queries_intended": [
+    "guarded cubic subfield inverse full prime-field cost",
+    "Euclidean inverse a versus a squared negative operation count",
+    "Richelot closed-fibre field arithmetic atomic inversion accounting"
+  ],
+  "fallback": "exact15B/fp_poly.rs/CubicField/Field and original cost/admission rules; no novelty or absence inference"
+}

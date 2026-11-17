@@ -1017,6 +1017,110 @@ def vieta_component(ref, since):
                      source=f"{path}@{commit}")
 
 
+def vieta_native_speedup(ref, since):
+    """Copy frozen Rust medians only: no Python estimates or timing admission."""
+    # Git date-only --since retains the current time; use the UTC day boundary.
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    root = "research/vieta_coset_rust_20261115/speedup-20261117/evidence"
+    for panel, filename in (("primary", "primary-summary.json"),
+                            ("budget8b", "budget-summary.json")):
+        path = f"{root}/{filename}"
+        for date, commit, text in file_history(ref, path, since_day):
+            data = json.loads(text)
+            source = f"{path}@{commit}"
+            emit(f"vieta.native.{panel}.failed_calls", data.get("failed"),
+                 date=date, problem="vieta-relation-component", unit="calls",
+                 better="neutral", label="Stored failed-call count; PCC unverified",
+                 source=source)
+            for group in data.get("groups", []):
+                identity = group["group"].replace(":", "_").replace("-", "_")
+                ratio = group["paired_ratios"].get("newton/fiber-half:cold_ns", {})
+                if "median" in ratio:
+                    emit(f"vieta.native.{panel}.{identity}.cold_newton_ratio",
+                         ratio["median"], date=date,
+                         problem="vieta-relation-component", unit="ratio",
+                         better="higher",
+                         label="Stored native paired median, full cold; below L2, PCC unverified",
+                         source=source)
+                query = group["arms"].get("fiber-half", {}).get("query_work_muls", {})
+                if "median" in query:
+                    emit(f"vieta.native.{panel}.{identity}.query_muls",
+                         query["median"], date=date,
+                         problem="vieta-relation-component", unit="field multiplications",
+                         better="lower",
+                         label="Stored native evaluator query median; native field constructor ops unpriced, PCC unverified",
+                         source=source)
+
+
+def trace_local_runtime(ref, since):
+    """Export already-computed native observations, without re-estimating them."""
+    path = "research/trace_incidence_20261116/measure_20261117/results/report-data.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        source = f"{path}@{commit}"
+        for row in data.get("table", []):
+            if row.get("B") != 128:
+                continue
+            arm = row["arm"]
+            if arm not in ("known", "compose", "pairs", "first-bloom", "rho"):
+                continue
+            emit(f"trace.local.b128.{arm.replace('-', '_')}.wall_s",
+                 row["wall_seconds"]["median"], date=date,
+                 problem="prime-labelled-pool-recovery", unit="wall_s", better="neutral",
+                 label="B128 complete target median; shared local host, PCC unverified",
+                 source=source)
+        for comparison in ("pairs/first-bloom", "window-horner/compose", "first-bloom/rho"):
+            metric = comparison.replace("-", "_").replace("/", "_over_")
+            emit(f"trace.local.b128.{metric}.paired_ratio",
+                 data["paired_completed_only"][comparison]["128"]["wall_ratio"]["median"],
+                 date=date, problem="prime-labelled-pool-recovery", unit="ratio", better="neutral",
+                 label="Median of paired completed-target ratios; local provisional, PCC unverified",
+                 source=source)
+
+
+def relation_fusion_observations(ref, since):
+    """Export raw declared-call observations, without computing ratios."""
+    path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("outcomes", []):
+            if row.get("status") != "complete":
+                continue
+            key = f"p{row['prime']}.n{row['n']}.{row['kind']}.{row['kernel']}"
+            emit(f"relation.fusion.scan.{key}.parent_ns", row["parent_ns"], date=date,
+                 problem="complete-certificate-replay", unit="ns", better="neutral",
+                 label="Single declared call including controller replay; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
+def relation_fusion_repeated(ref, since):
+    """Export recorded component medians with their actual admission status."""
+    path = "research/relation_fusion_20261117/MATCHED_ANALYSIS_85.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.repeated.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call median; contended85, no timing admission; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
+def relation_fusion_root_dag(ref, since):
+    """Export the recorded96 medians; no admitted improvement is implied."""
+    path = "research/relation_fusion_20261117/ROOT_DAG_ANALYSIS_96.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for case in data.get("cases", []):
+            for arm in case.get("arms", []):
+                key = f"p{case['prime']}.n{case['n']}.{arm['arm']}"
+                emit(f"relation.fusion.root_dag.{key}.parent_ns", arm["median_parent_ns"],
+                     date=date, problem="complete-certificate-replay", unit="ns", better="neutral",
+                     label="Five-call96 median; no gain admitted beyond A/A; PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -1060,6 +1164,11 @@ def main():
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
+    vieta_native_speedup(a.ref, a.since)
+    trace_local_runtime(a.ref, a.since)
+    relation_fusion_observations(a.ref, a.since)
+    relation_fusion_repeated(a.ref, a.since)
+    relation_fusion_root_dag(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
