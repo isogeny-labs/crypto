@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Profile and optimize Fp64 root-finding field arithmetic on CPU emulation, with baseline and regression tests (automation, started 2026-11-17, branch automation/rootfind-fp64-host-20261117)
+- [ ] Profile and optimize Fp64 root-finding field arithmetic on CPU emulation, with baseline and regression tests (automation, started 2026-11-17, branch automation/rootfind-fp64-host-20261117, PR #4609; code and preliminary local timing committed, blocked on repo checkout tests and hardware perf counters)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
