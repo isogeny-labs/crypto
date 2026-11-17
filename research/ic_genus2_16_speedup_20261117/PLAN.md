@@ -57,6 +57,10 @@ optional structured-elimination pass. Gates: (a) count identity against `genus_l
 g = 2-5 on shared cells; (b) every solve recovers and verifies a planted logarithm.
 Deliverable: the first measured IC/rho table for g = 6-16, at the largest p that fits the
 run window per genus.
+*Update 2026-11-17:* built as a patch to the lab's `genus_ladder` rather than a fresh crate.
+The group order comes from F_{p^k} point counts. Arms D and E (degree-2 places) were added
+early, because the pilot showed degree-1 bases collapse at the small p where #J is
+computable. See `P1/DESIGN.md`.
 
 **P2. Levers, each as a paired arm in the P1 instrument.**
 - L-SGE: structured elimination before the solve (expected to matter most at g >= 6).
