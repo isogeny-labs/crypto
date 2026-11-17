@@ -2296,3 +2296,10 @@ What was done: derived complete-row R-module span invariance under Z^i transport
 Decisions made: reject free rank multiplier from whole-pencil rotations before another run; fixed-target source rotations remain a different unmeasured algorithm with correction/newgeometry costs. No new performance/novelty claim, [pcc:unverified]. Sources anchor-rank/PENCIL-NEXT/orbit-incidence and current phase evidence; KB source:e331f4a51e3488bf4c9154e923353096 background only.
 Open threads: construction with demonstrably new component span and paid support generation, separately frozen targets, complete genus3/4 premises and original10x objective.
 Errors: none. OwnT7093reservation confirmed despite attach ownconflict; checkallow. No measurement/S3/cloud/merge.
+
+## Regular-prime cyclotomic polarized self-quotient criterion frozen
+
+What was done: derived classnumber1 viaMinkowski<5 andresiduedegrees, totpositiveunitsquares via3independentsignatures+Dirichlet, O-stablekernel conjugateideal generator withunitcorrection eta†eta=l. Proposedcriterion forgenus3l outside7pFrobeniusindex, beyondold<=47screen. CompiledRustexactindices/factorall/exceptionalrank+degree andfieldarithmeticgate.
+Decisions made: theorem conditionalonexistingcyclotomic/Tate/Frobeniuspremises, [pcc:unverified], no softwarepolarizationproof/quotient/speedclaim. MilneANT Minkowski/units andAV Tate/polarization primarybackground; own specialization, KBunrelatedhitsnotproof. Gitfreeze beforeone120CPU.
+Open threads: factorallindexexceptions thenadmitexplicitstableisotropykernel/quotientconstruction onlywhere justified; original10x/genus2/4goalsstayopen.
+Errors: none, releaseoverflowcheckedbuildpass. No scientificexecutionyet/S3/cloud/merge.
