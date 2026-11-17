@@ -409,3 +409,17 @@ PR4498externallymerged2026-11-17T04:26:30Z at164dc1799e20decf5d0e26632bc8941a61b
 
 ### Errors
 No scientificrankfailures/retries;filteredmissisretainedincompleteasregistered. Rootnativepathsparseabsent;usedfrozenretainedcopy.
+
+## OnlineweightedLP eliminator frozen
+
+### What was done
+ImplementedstreamingLP-firstechelonpivotswithsparse≤2LPsupportanddenselabeltails, plusincrementallabelbasis. Exactrowspaceinvariantandtargetpivotcriteriondeclared. Preparedsame1528prefixfullreference/dense/graphcomparisons, recordstoredcoefficientcellsandLP-stage-onlycumulativearithmeticvsscratchFast.
+
+### Decisions made
+Notunion-find/externalfastest/end-to-endcostclaim; sourceproducer/setup/diagnosticsoutsidebothstageintervals. Memorycellsarenotpeakbytes; temporary/metadata/integercostsomitted. Preserveallfilteredmisses/budgets. Freeze/pushbeforeonce-onlyrun.
+
+### Open threads
+Qualifyonlineeveryprefix/rank/target andinspectstagecost, thencompletecostcase. PR4504externallymerged;newsuccesorneededafterresults. Broad10xgoalopen.
+
+### Errors
+No scientificrunyet; originalfrozenimplementationsunchanged.
